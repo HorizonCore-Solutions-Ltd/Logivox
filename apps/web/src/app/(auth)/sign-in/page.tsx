@@ -2,30 +2,58 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Mail, Lock, ArrowRight, Github, Chrome } from "lucide-react"
+import { Building2, Mail, Lock, ArrowRight, Github, Chrome, AlertCircle } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function SignInPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const { isAuthenticated, isLoading } = useAuth()
+  
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
     rememberMe: false
   })
   const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/dashboard"
+      router.push(callbackUrl)
+    }
+  }, [isAuthenticated, isLoading, router, searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
     
-    // Simulate authentication
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    console.log("Sign in attempted:", formData)
-    alert("Sign in functionality will be implemented with authentication system")
-    
-    setIsSubmitting(false)
+    try {
+      const result = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError("Invalid email or password. Please try again.")
+        setIsSubmitting(false)
+      } else if (result?.ok) {
+        const callbackUrl = searchParams.get("callbackUrl") || "/dashboard/dashboard"
+        router.push(callbackUrl)
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.")
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,10 +62,22 @@ export default function SignInPage() {
       ...prev,
       [e.target.name]: value
     }))
+    // Clear error when user starts typing
+    if (error) setError(null)
   }
 
-  const handleOAuthSignIn = (provider: string) => {
-    alert(`${provider} OAuth will be implemented with authentication system`)
+  const handleOAuthSignIn = async (provider: "google" | "github") => {
+    setIsSubmitting(true)
+    setError(null)
+    
+    try {
+      await signIn(provider, {
+        callbackUrl: searchParams.get("callbackUrl") || "/dashboard/dashboard",
+      })
+    } catch (err) {
+      setError(`Failed to sign in with ${provider}. Please try again.`)
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -62,12 +102,21 @@ export default function SignInPage() {
           </CardHeader>
           
           <CardContent className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md flex items-start space-x-2">
+                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
+
             {/* OAuth Buttons */}
             <div className="space-y-3">
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => handleOAuthSignIn('Google')}
+                onClick={() => handleOAuthSignIn("google")}
+                disabled={isSubmitting}
               >
                 <Chrome className="mr-2 h-4 w-4" />
                 Continue with Google
@@ -76,7 +125,8 @@ export default function SignInPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => handleOAuthSignIn('GitHub')}
+                onClick={() => handleOAuthSignIn("github")}
+                disabled={isSubmitting}
               >
                 <Github className="mr-2 h-4 w-4" />
                 Continue with GitHub

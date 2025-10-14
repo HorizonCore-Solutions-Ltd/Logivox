@@ -2,12 +2,18 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Building2, Mail, Lock, User, Building, ArrowRight, Github, Chrome, Check } from "lucide-react"
+import { Building2, Mail, Lock, User, Building, ArrowRight, Github, Chrome, Check, AlertCircle } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function SignUpPage() {
+  const router = useRouter()
+  const { isAuthenticated, isLoading } = useAuth()
+  
   const [formData, setFormData] = React.useState({
     fullName: "",
     email: "",
@@ -18,29 +24,76 @@ export default function SignUpPage() {
   })
   const [isSubmitting, setIsSubmitting] = React.useState(false)
   const [passwordStrength, setPasswordStrength] = React.useState(0)
+  const [error, setError] = React.useState<string | null>(null)
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated && !isLoading) {
+      router.push("/dashboard/dashboard")
+    }
+  }, [isAuthenticated, isLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
     
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match")
+      setError("Passwords do not match")
+      return
+    }
+
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long")
       return
     }
 
     if (!formData.agreeToTerms) {
-      alert("Please agree to the Terms of Service and Privacy Policy")
+      setError("Please agree to the Terms of Service and Privacy Policy")
       return
     }
 
     setIsSubmitting(true)
     
-    // Simulate account creation
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    console.log("Sign up attempted:", formData)
-    alert("Sign up functionality will be implemented with authentication system")
-    
-    setIsSubmitting(false)
+    try {
+      // Register user
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          organizationName: formData.company || undefined,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setError(data.error || "Failed to create account")
+        setIsSubmitting(false)
+        return
+      }
+
+      // Auto sign-in after successful registration
+      const signInResult = await signIn("credentials", {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (signInResult?.ok) {
+        router.push("/dashboard/dashboard")
+      } else {
+        // Registration successful but auto sign-in failed
+        router.push("/sign-in?registered=true")
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.")
+      setIsSubmitting(false)
+    }
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +102,9 @@ export default function SignUpPage() {
       ...prev,
       [e.target.name]: value
     }))
+
+    // Clear error when user starts typing
+    if (error) setError(null)
 
     // Calculate password strength
     if (e.target.name === 'password') {
@@ -63,8 +119,18 @@ export default function SignUpPage() {
     }
   }
 
-  const handleOAuthSignUp = (provider: string) => {
-    alert(`${provider} OAuth will be implemented with authentication system`)
+  const handleOAuthSignUp = async (provider: "google" | "github") => {
+    setIsSubmitting(true)
+    setError(null)
+    
+    try {
+      await signIn(provider, {
+        callbackUrl: "/dashboard/dashboard",
+      })
+    } catch (err) {
+      setError(`Failed to sign up with ${provider}. Please try again.`)
+      setIsSubmitting(false)
+    }
   }
 
   const getPasswordStrengthColor = () => {
@@ -101,12 +167,21 @@ export default function SignUpPage() {
           </CardHeader>
           
           <CardContent className="space-y-6">
+            {/* Error Message */}
+            {error && (
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-md flex items-start space-x-2">
+                <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <p className="text-sm">{error}</p>
+              </div>
+            )}
+
             {/* OAuth Buttons */}
             <div className="space-y-3">
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => handleOAuthSignUp('Google')}
+                onClick={() => handleOAuthSignUp("google")}
+                disabled={isSubmitting}
               >
                 <Chrome className="mr-2 h-4 w-4" />
                 Continue with Google
@@ -115,7 +190,8 @@ export default function SignUpPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => handleOAuthSignUp('GitHub')}
+                onClick={() => handleOAuthSignUp("github")}
+                disabled={isSubmitting}
               >
                 <Github className="mr-2 h-4 w-4" />
                 Continue with GitHub

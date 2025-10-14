@@ -2,8 +2,11 @@
 
 import * as React from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { useTheme } from "next-themes"
+import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/hooks/use-auth"
 import { 
   Building2, 
   Moon, 
@@ -14,13 +17,23 @@ import {
   Zap,
   Shield,
   BarChart3,
-  Users
+  Users,
+  LogOut,
+  User,
+  Settings
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export function Header() {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [showUserMenu, setShowUserMenu] = React.useState(false)
   const { theme, setTheme } = useTheme()
+  const { user, isAuthenticated, isLoading } = useAuth()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/" })
+  }
 
   const navigation = [
     {
@@ -154,12 +167,75 @@ export function Header() {
 
           {/* Auth buttons */}
           <div className="hidden md:flex md:items-center md:space-x-2">
-            <Button variant="ghost" asChild>
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/sign-up">Start Free Trial</Link>
-            </Button>
+            {isLoading ? (
+              <div className="h-9 w-20 animate-pulse bg-muted rounded" />
+            ) : isAuthenticated && user ? (
+              <div className="relative">
+                <Button
+                  variant="ghost"
+                  className="flex items-center space-x-2"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
+                    {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium">{user.name || user.email}</span>
+                  <ChevronDown className={cn(
+                    "h-4 w-4 transition-transform",
+                    showUserMenu && "rotate-180"
+                  )} />
+                </Button>
+
+                {/* User dropdown menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-card border border-border">
+                    <div className="py-1">
+                      <div className="px-4 py-2 border-b border-border">
+                        <p className="text-sm font-medium">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                        {user.role && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Role: {user.role}
+                          </p>
+                        )}
+                      </div>
+                      <Link
+                        href="/dashboard/dashboard"
+                        className="flex items-center px-4 py-2 text-sm hover:bg-muted"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <BarChart3 className="h-4 w-4 mr-2" />
+                        Dashboard
+                      </Link>
+                      <Link
+                        href="/dashboard/settings"
+                        className="flex items-center px-4 py-2 text-sm hover:bg-muted"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        <Settings className="h-4 w-4 mr-2" />
+                        Settings
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-muted"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link href="/sign-in">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/sign-up">Start Free Trial</Link>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
