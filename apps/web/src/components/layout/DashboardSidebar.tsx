@@ -1,0 +1,244 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import {
+  Building2,
+  LayoutDashboard,
+  Package,
+  Users,
+  Settings,
+  BarChart3,
+  FileText,
+  Bell,
+  Search,
+  Menu,
+  X,
+  ChevronDown,
+  LogOut,
+  User,
+  Moon,
+  Sun
+} from "lucide-react"
+import { useTheme } from "next-themes"
+
+interface DashboardSidebarProps {
+  children: React.ReactNode
+}
+
+export function DashboardSidebar({ children }: DashboardSidebarProps) {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false)
+  const pathname = usePathname()
+  const { theme, setTheme } = useTheme()
+
+  const navigation = [
+    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Inventory", href: "/dashboard/inventory", icon: Package },
+    { name: "Stock Bookings", href: "/dashboard/bookings", icon: FileText },
+    { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+    { name: "Team", href: "/dashboard/team", icon: Users },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  ]
+
+  const isActive = (href: string) => pathname === href
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Sidebar - Desktop */}
+      <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-card border-r">
+        {/* Logo */}
+        <div className="flex items-center h-16 px-6 border-b">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
+              <Building2 className="h-5 w-5" />
+            </div>
+            <span className="text-xl font-bold">FlowStock</span>
+          </Link>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+          {navigation.map((item) => {
+            const Icon = item.icon
+            return (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                  isActive(item.href)
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <Icon className="mr-3 h-5 w-5" />
+                {item.name}
+              </Link>
+            )
+          })}
+        </nav>
+
+        {/* User Section */}
+        <div className="p-4 border-t">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center text-white font-medium">
+                JD
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">John Doe</p>
+                <p className="text-xs text-muted-foreground truncate">john@acme.com</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </Button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <div className="lg:pl-64 flex-1 flex flex-col">
+        {/* Top Navigation Bar */}
+        <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-card px-4 lg:px-6">
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="lg:hidden"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+
+          {/* Search Bar */}
+          <div className="flex-1 max-w-md">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <input
+                type="search"
+                placeholder="Search inventory, bookings..."
+                className="w-full pl-10 pr-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          {/* Right Section */}
+          <div className="flex items-center gap-2">
+            {/* Notifications */}
+            <Button variant="ghost" size="sm" className="relative">
+              <Bell className="h-5 w-5" />
+              <Badge
+                variant="destructive"
+                className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+              >
+                3
+              </Badge>
+            </Button>
+
+            {/* User Menu - Mobile/Tablet */}
+            <div className="lg:hidden relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              >
+                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                  JD
+                </div>
+              </Button>
+
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-card border rounded-lg shadow-lg py-2">
+                  <div className="px-4 py-2 border-b">
+                    <p className="text-sm font-medium">John Doe</p>
+                    <p className="text-xs text-muted-foreground">john@acme.com</p>
+                  </div>
+                  <Link
+                    href="/dashboard/profile"
+                    className="flex items-center px-4 py-2 text-sm hover:bg-muted"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Profile
+                  </Link>
+                  <Link
+                    href="/dashboard/settings"
+                    className="flex items-center px-4 py-2 text-sm hover:bg-muted"
+                  >
+                    <Settings className="mr-2 h-4 w-4" />
+                    Settings
+                  </Link>
+                  <div className="border-t mt-2 pt-2">
+                    <button className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-muted">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile Sidebar */}
+        {isMobileMenuOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 bg-background/80 backdrop-blur-sm">
+            <aside className="fixed inset-y-0 left-0 w-64 bg-card border-r shadow-xl">
+              {/* Logo */}
+              <div className="flex items-center justify-between h-16 px-6 border-b">
+                <Link href="/" className="flex items-center space-x-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
+                    <Building2 className="h-5 w-5" />
+                  </div>
+                  <span className="text-xl font-bold">FlowStock</span>
+                </Link>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Navigation */}
+              <nav className="px-4 py-6 space-y-1">
+                {navigation.map((item) => {
+                  const Icon = item.icon
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                        isActive(item.href)
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      <Icon className="mr-3 h-5 w-5" />
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              </nav>
+            </aside>
+          </div>
+        )}
+
+        {/* Page Content */}
+        <main className="flex-1">
+          {children}
+        </main>
+      </div>
+    </div>
+  )
+}

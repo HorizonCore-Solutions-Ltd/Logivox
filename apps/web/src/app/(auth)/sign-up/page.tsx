@@ -1,0 +1,339 @@
+"use client"
+
+import * as React from "react"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Building2, Mail, Lock, User, Building, ArrowRight, Github, Chrome, Check } from "lucide-react"
+
+export default function SignUpPage() {
+  const [formData, setFormData] = React.useState({
+    fullName: "",
+    email: "",
+    company: "",
+    password: "",
+    confirmPassword: "",
+    agreeToTerms: false
+  })
+  const [isSubmitting, setIsSubmitting] = React.useState(false)
+  const [passwordStrength, setPasswordStrength] = React.useState(0)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match")
+      return
+    }
+
+    if (!formData.agreeToTerms) {
+      alert("Please agree to the Terms of Service and Privacy Policy")
+      return
+    }
+
+    setIsSubmitting(true)
+    
+    // Simulate account creation
+    await new Promise(resolve => setTimeout(resolve, 1500))
+    
+    console.log("Sign up attempted:", formData)
+    alert("Sign up functionality will be implemented with authentication system")
+    
+    setIsSubmitting(false)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: value
+    }))
+
+    // Calculate password strength
+    if (e.target.name === 'password') {
+      const password = e.target.value
+      let strength = 0
+      if (password.length >= 8) strength++
+      if (password.length >= 12) strength++
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++
+      if (/\d/.test(password)) strength++
+      if (/[^a-zA-Z0-9]/.test(password)) strength++
+      setPasswordStrength(strength)
+    }
+  }
+
+  const handleOAuthSignUp = (provider: string) => {
+    alert(`${provider} OAuth will be implemented with authentication system`)
+  }
+
+  const getPasswordStrengthColor = () => {
+    if (passwordStrength <= 1) return 'bg-red-500'
+    if (passwordStrength <= 3) return 'bg-yellow-500'
+    return 'bg-green-500'
+  }
+
+  const getPasswordStrengthText = () => {
+    if (passwordStrength <= 1) return 'Weak'
+    if (passwordStrength <= 3) return 'Medium'
+    return 'Strong'
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/20 py-12 px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <Link href="/" className="flex items-center space-x-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
+              <Building2 className="h-6 w-6" />
+            </div>
+            <span className="text-2xl font-bold">FlowStock</span>
+          </Link>
+        </div>
+
+        <Card>
+          <CardHeader className="space-y-1 text-center">
+            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardDescription>
+              Get started with your free 14-day trial
+            </CardDescription>
+          </CardHeader>
+          
+          <CardContent className="space-y-6">
+            {/* OAuth Buttons */}
+            <div className="space-y-3">
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => handleOAuthSignUp('Google')}
+              >
+                <Chrome className="mr-2 h-4 w-4" />
+                Continue with Google
+              </Button>
+              
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => handleOAuthSignUp('GitHub')}
+              >
+                <Github className="mr-2 h-4 w-4" />
+                Continue with GitHub
+              </Button>
+            </div>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-card px-2 text-muted-foreground">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+
+            {/* Sign Up Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="form-field">
+                <label htmlFor="fullName" className="form-label">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    required
+                    value={formData.fullName}
+                    onChange={handleChange}
+                    className="form-input pl-10"
+                    placeholder="John Doe"
+                  />
+                </div>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="email" className="form-label">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="form-input pl-10"
+                    placeholder="you@company.com"
+                  />
+                </div>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="company" className="form-label">
+                  Company Name
+                </label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="company"
+                    name="company"
+                    type="text"
+                    required
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="form-input pl-10"
+                    placeholder="Acme Corporation"
+                  />
+                </div>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="password" className="form-label">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    required
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="form-input pl-10"
+                    placeholder="••••••••"
+                  />
+                </div>
+                {formData.password && (
+                  <div className="mt-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs text-muted-foreground">Password strength:</span>
+                      <span className={`text-xs font-medium ${
+                        passwordStrength <= 1 ? 'text-red-600' :
+                        passwordStrength <= 3 ? 'text-yellow-600' :
+                        'text-green-600'
+                      }`}>
+                        {getPasswordStrengthText()}
+                      </span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${getPasswordStrengthColor()}`}
+                        style={{ width: `${(passwordStrength / 5) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="confirmPassword" className="form-label">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="form-input pl-10"
+                    placeholder="••••••••"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-2">
+                <input
+                  id="agreeToTerms"
+                  name="agreeToTerms"
+                  type="checkbox"
+                  checked={formData.agreeToTerms}
+                  onChange={handleChange}
+                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary mt-1"
+                />
+                <label
+                  htmlFor="agreeToTerms"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I agree to the{' '}
+                  <Link href="/terms" className="text-primary hover:underline">
+                    Terms of Service
+                  </Link>
+                  {' '}and{' '}
+                  <Link href="/privacy" className="text-primary hover:underline">
+                    Privacy Policy
+                  </Link>
+                </label>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full"
+                size="lg"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="animate-spin mr-2">⏳</span>
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+
+            {/* Features List */}
+            <div className="pt-4 border-t space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">What's included:</p>
+              <div className="space-y-1">
+                {[
+                  "14-day free trial",
+                  "No credit card required",
+                  "Full access to all features",
+                  "24/7 support"
+                ].map((feature) => (
+                  <div key={feature} className="flex items-center space-x-2 text-xs text-muted-foreground">
+                    <Check className="h-3 w-3 text-green-600" />
+                    <span>{feature}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sign In Link */}
+        <div className="mt-6 text-center text-sm">
+          <span className="text-muted-foreground">Already have an account? </span>
+          <Link href="/sign-in" className="text-primary font-medium hover:underline">
+            Sign in
+          </Link>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="mt-4 flex justify-center gap-2">
+          <Badge variant="secondary" className="text-xs">
+            <Lock className="h-3 w-3 mr-1" />
+            SOC 2 Certified
+          </Badge>
+          <Badge variant="secondary" className="text-xs">
+            GDPR Compliant
+          </Badge>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,0 +1,182 @@
+# FlowStock - AI Development Rules & Guidelines
+
+## Project Overview
+FlowStock is a next-generation cloud-based warehouse management platform that revolutionizes stock booking, procurement integration, and supplier relationships. Built with modern SaaS architecture supporting multi-tenant operations.
+
+## Core Technologies
+- **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
+- **Backend**: Node.js + Express + TypeScript + Prisma ORM
+- **Database**: PostgreSQL with multi-tenant architecture
+- **Authentication**: JWT with role-based access control (RBAC)
+- **Real-time**: WebSocket integration for live updates
+- **Architecture**: Monorepo with apps (web, api) and packages (database)
+
+## Development Rules
+
+### Code Style & Standards
+1. **TypeScript First**: All new code must be written in TypeScript with strict type checking
+2. **Functional Components**: Use React functional components with hooks, avoid class components
+3. **Naming Conventions**:
+   - Use camelCase for variables, functions, and methods
+   - Use PascalCase for components, interfaces, and types
+   - Use kebab-case for file names and URLs
+   - Use SCREAMING_SNAKE_CASE for constants and environment variables
+
+### Architecture Principles
+1. **Multi-tenant SaaS**: Every feature must support organization-level isolation
+2. **RBAC Integration**: All endpoints and UI components must respect user roles and permissions
+3. **API-First Design**: Backend endpoints should be RESTful and well-documented
+4. **Database Integrity**: Use Prisma schema for all database operations, include proper relations
+5. **Error Handling**: Implement comprehensive error boundaries and user-friendly error messages
+
+### File Organization
+```
+flowstock/
+├── apps/
+│   ├── web/          # React frontend application
+│   └── api/          # Express backend API
+├── packages/
+│   └── database/     # Prisma schema and migrations
+└── docs/            # Project documentation
+```
+
+### Component Guidelines
+1. **Reusable Components**: Create atomic, reusable components in `components/ui/`
+2. **Page Components**: Keep page-level components in `pages/` directory
+3. **Custom Hooks**: Extract complex logic into custom hooks in `hooks/`
+4. **Type Definitions**: Define interfaces and types in dedicated `.types.ts` files
+
+### API Development
+1. **Route Structure**: Organize routes by feature (warehouses, inventory, suppliers, etc.)
+2. **Middleware**: Use authentication, validation, and error handling middleware consistently
+3. **Response Format**: Standardize API responses with consistent error and success formats
+4. **Documentation**: Document all endpoints with clear parameters and response examples
+
+### Database Rules
+1. **Migrations**: Always create migrations for schema changes, never edit existing migrations
+2. **Relationships**: Define proper foreign key relationships and cascading rules
+3. **Indexing**: Add database indexes for frequently queried fields
+4. **Seeding**: Maintain seed data for development and testing
+
+### Security Guidelines
+1. **Authentication**: Validate JWT tokens on all protected routes
+2. **Authorization**: Check user permissions for each operation
+3. **Input Validation**: Sanitize and validate all user inputs
+4. **Environment Variables**: Never commit sensitive data, use .env files
+
+### Testing Strategy
+1. **Unit Tests**: Write tests for utility functions and business logic
+2. **Integration Tests**: Test API endpoints with proper authentication
+3. **Component Tests**: Test React components with user interactions
+4. **E2E Tests**: Create end-to-end tests for critical user flows
+
+## Feature Development Guidelines
+
+### Stock Booking Features
+- Support barcode scanning, manual entry, and photo capture
+- Implement offline-first approach with sync capabilities
+- Ensure real-time inventory updates across all connected clients
+- Include audit trails for all stock movements
+
+### ERP Integration
+- Design pluggable integration framework
+- Support common ERP systems (SAP, Oracle, Microsoft Dynamics)
+- Implement data mapping and transformation layers
+- Include error handling and retry mechanisms
+
+### Supplier Portal
+- Create dedicated supplier interface
+- Support purchase order management and communication
+- Implement supplier onboarding workflows
+- Include performance analytics and reporting
+
+### Mobile Responsiveness
+- Design mobile-first approach for warehouse operations
+- Optimize for touch interactions and barcode scanning
+- Implement progressive web app (PWA) capabilities
+- Ensure offline functionality for critical operations
+
+## AI Assistant Instructions
+
+### When Adding Features
+1. Always check existing patterns and follow established conventions
+2. Update both frontend and backend components consistently
+3. Include proper TypeScript types and interfaces
+4. Add appropriate error handling and validation
+5. Update documentation and tests
+
+### When Refactoring
+1. Maintain backward compatibility for API endpoints
+2. Update all related components and dependencies
+3. Preserve existing functionality while improving structure
+4. Test thoroughly before marking as complete
+
+### When Debugging
+1. Check console errors and network requests
+2. Verify database queries and relationships
+3. Ensure proper authentication and authorization
+4. Test across different user roles and scenarios
+
+## Common Patterns
+
+### Authentication Flow
+```typescript
+// Protect routes with authentication middleware
+app.use('/api/protected', authenticateToken);
+
+// Check user permissions
+const hasPermission = checkUserPermission(user, 'inventory:read');
+```
+
+### Database Queries
+```typescript
+// Use Prisma for type-safe database operations
+const inventory = await prisma.inventoryItem.findMany({
+  where: { organizationId: user.organizationId },
+  include: { warehouse: true, supplier: true }
+});
+```
+
+### Component Structure
+```typescript
+// Follow this pattern for React components
+interface ComponentProps {
+  // Define props with proper types
+}
+
+export default function Component({ prop }: ComponentProps) {
+  // Component logic
+  return <div>{/* JSX */}</div>;
+}
+```
+
+### Error Handling
+```typescript
+// Standardized error responses
+res.status(400).json({
+  success: false,
+  error: 'Validation failed',
+  details: validationErrors
+});
+```
+
+## Performance Guidelines
+1. **Lazy Loading**: Implement code splitting for large components
+2. **Caching**: Use React Query for API data caching
+3. **Optimization**: Optimize database queries and avoid N+1 problems
+4. **Bundle Size**: Monitor and optimize bundle sizes regularly
+
+## Deployment Considerations
+1. **Environment Separation**: Maintain separate dev, staging, and production environments
+2. **Database Migrations**: Run migrations safely in production
+3. **Environment Variables**: Configure all necessary environment variables
+4. **Monitoring**: Implement logging and error tracking
+
+## Brand Guidelines
+- **Brand Name**: FlowStock (always capitalize F and S)
+- **Domain**: flowstock.io
+- **Color Scheme**: Use Tailwind CSS primary colors consistently
+- **Logo**: "FS" initials in branded containers
+- **Messaging**: Focus on "Smart Warehouse Management" and "Next-generation platform"
+
+Remember: FlowStock is designed to scale from small warehouses to enterprise operations. Every decision should consider multi-tenancy, security, and user experience.
