@@ -41,6 +41,7 @@
     "@changesets/cli": "^2.27.1",
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.10.4",
     "@typescript-eslint/eslint-plugin": "^6.13.1",
     "@typescript-eslint/parser": "^6.13.1",
@@ -56,6 +57,8 @@
     "lint-staged": "^15.2.0",
     "prettier": "^3.1.0",
     "prettier-plugin-tailwindcss": "^0.5.7",
+    "prisma": "^6.17.1",
+    "ts-node": "^10.9.2",
     "turbo": "^1.11.2",
     "typescript": "^5.3.3"
   },
@@ -73,5 +76,14 @@
       "@commitlint/config-conventional"
     ]
   },
-  "packageManager": "npm@10.2.4"
+  "packageManager": "npm@10.2.4",
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.0",
+    "@prisma/client": "^6.17.1",
+    "bcryptjs": "^3.0.2",
+    "next-auth": "^4.24.11"
+  }
 }
