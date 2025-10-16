@@ -1,0 +1,351 @@
+/**
+ * Database Indexes for Prisma Schema
+ * Comprehensive indexing strategy for optimal query performance
+ */
+
+// Add these indexes to your schema.prisma file for better performance
+
+// ============================================================================
+// INVENTORY MODEL INDEXES
+// ============================================================================
+
+model Inventory {
+  // ... existing fields
+  
+  // Single column indexes
+  @@index([sku], name: "idx_inventory_sku")
+  @@index([warehouseId], name: "idx_inventory_warehouse")
+  @@index([status], name: "idx_inventory_status")
+  @@index([createdAt], name: "idx_inventory_created")
+  @@index([updatedAt], name: "idx_inventory_updated")
+  
+  // Composite indexes for common queries
+  @@index([warehouseId, status], name: "idx_inventory_warehouse_status")
+  @@index([status, quantity], name: "idx_inventory_status_qty")
+  @@index([reorderPoint, quantity], name: "idx_inventory_reorder")
+  
+  // Full-text search
+  @@fulltext([name, description], name: "idx_inventory_search")
+}
+
+// ============================================================================
+// ORDER MODEL INDEXES
+// ============================================================================
+
+model Order {
+  // ... existing fields
+  
+  // Single column indexes
+  @@index([orderNumber], name: "idx_order_number")
+  @@index([customerId], name: "idx_order_customer")
+  @@index([warehouseId], name: "idx_order_warehouse")
+  @@index([status], name: "idx_order_status")
+  @@index([type], name: "idx_order_type")
+  @@index([createdAt], name: "idx_order_created")
+  @@index([expectedDate], name: "idx_order_expected")
+  
+  // Composite indexes for common queries
+  @@index([customerId, status], name: "idx_order_customer_status")
+  @@index([warehouseId, status], name: "idx_order_warehouse_status")
+  @@index([status, createdAt], name: "idx_order_status_created")
+  @@index([type, status], name: "idx_order_type_status")
+}
+
+// ============================================================================
+// ORDER ITEM MODEL INDEXES
+// ============================================================================
+
+model OrderItem {
+  // ... existing fields
+  
+  @@index([orderId], name: "idx_order_item_order")
+  @@index([inventoryId], name: "idx_order_item_inventory")
+  
+  // Composite for order details
+  @@index([orderId, inventoryId], name: "idx_order_item_composite")
+}
+
+// ============================================================================
+// INVENTORY MOVEMENT MODEL INDEXES
+// ============================================================================
+
+model InventoryMovement {
+  // ... existing fields
+  
+  // Single column indexes
+  @@index([inventoryId], name: "idx_movement_inventory")
+  @@index([fromWarehouseId], name: "idx_movement_from_warehouse")
+  @@index([toWarehouseId], name: "idx_movement_to_warehouse")
+  @@index([type], name: "idx_movement_type")
+  @@index([createdAt], name: "idx_movement_created")
+  @@index([createdById], name: "idx_movement_creator")
+  
+  // Composite indexes for common queries
+  @@index([inventoryId, createdAt], name: "idx_movement_inventory_time")
+  @@index([fromWarehouseId, createdAt], name: "idx_movement_from_time")
+  @@index([toWarehouseId, createdAt], name: "idx_movement_to_time")
+  @@index([type, createdAt], name: "idx_movement_type_time")
+}
+
+// ============================================================================
+// USER MODEL INDEXES
+// ============================================================================
+
+model User {
+  // ... existing fields
+  
+  @@index([email], name: "idx_user_email")
+  @@index([role], name: "idx_user_role")
+  @@index([status], name: "idx_user_status")
+  @@index([createdAt], name: "idx_user_created")
+  
+  // Composite for active users by role
+  @@index([status, role], name: "idx_user_status_role")
+}
+
+// ============================================================================
+// WAREHOUSE MODEL INDEXES
+// ============================================================================
+
+model Warehouse {
+  // ... existing fields
+  
+  @@index([code], name: "idx_warehouse_code")
+  @@index([type], name: "idx_warehouse_type")
+  @@index([status], name: "idx_warehouse_status")
+  @@index([managerId], name: "idx_warehouse_manager")
+  
+  // Composite for active warehouses by type
+  @@index([type, status], name: "idx_warehouse_type_status")
+}
+
+// ============================================================================
+// WAREHOUSE LOCATION MODEL INDEXES
+// ============================================================================
+
+model WarehouseLocation {
+  // ... existing fields
+  
+  @@index([warehouseId], name: "idx_location_warehouse")
+  @@index([aisle], name: "idx_location_aisle")
+  @@index([status], name: "idx_location_status")
+  
+  // Composite for location queries
+  @@index([warehouseId, aisle, rack, shelf], name: "idx_location_composite")
+  @@index([warehouseId, status], name: "idx_location_warehouse_status")
+}
+
+// ============================================================================
+// CUSTOMER MODEL INDEXES
+// ============================================================================
+
+model Customer {
+  // ... existing fields
+  
+  @@index([email], name: "idx_customer_email")
+  @@index([phone], name: "idx_customer_phone")
+  @@index([status], name: "idx_customer_status")
+  @@index([type], name: "idx_customer_type")
+  @@index([createdAt], name: "idx_customer_created")
+  
+  // Full-text search
+  @@fulltext([name, company], name: "idx_customer_search")
+}
+
+// ============================================================================
+// SUPPLIER MODEL INDEXES
+// ============================================================================
+
+model Supplier {
+  // ... existing fields
+  
+  @@index([email], name: "idx_supplier_email")
+  @@index([phone], name: "idx_supplier_phone")
+  @@index([status], name: "idx_supplier_status")
+  @@index([type], name: "idx_supplier_type")
+  @@index([createdAt], name: "idx_supplier_created")
+  
+  // Full-text search
+  @@fulltext([name, company], name: "idx_supplier_search")
+}
+
+// ============================================================================
+// PURCHASE ORDER MODEL INDEXES
+// ============================================================================
+
+model PurchaseOrder {
+  // ... existing fields
+  
+  @@index([orderNumber], name: "idx_po_number")
+  @@index([supplierId], name: "idx_po_supplier")
+  @@index([warehouseId], name: "idx_po_warehouse")
+  @@index([status], name: "idx_po_status")
+  @@index([expectedDate], name: "idx_po_expected")
+  @@index([createdAt], name: "idx_po_created")
+  
+  // Composite indexes
+  @@index([supplierId, status], name: "idx_po_supplier_status")
+  @@index([warehouseId, status], name: "idx_po_warehouse_status")
+  @@index([status, expectedDate], name: "idx_po_status_expected")
+}
+
+// ============================================================================
+// WAVE MODEL INDEXES
+// ============================================================================
+
+model Wave {
+  // ... existing fields
+  
+  @@index([waveNumber], name: "idx_wave_number")
+  @@index([warehouseId], name: "idx_wave_warehouse")
+  @@index([status], name: "idx_wave_status")
+  @@index([priority], name: "idx_wave_priority")
+  @@index([createdAt], name: "idx_wave_created")
+  @@index([assignedToId], name: "idx_wave_assigned")
+  
+  // Composite indexes
+  @@index([warehouseId, status], name: "idx_wave_warehouse_status")
+  @@index([status, priority], name: "idx_wave_status_priority")
+}
+
+// ============================================================================
+// TASK MODEL INDEXES
+// ============================================================================
+
+model Task {
+  // ... existing fields
+  
+  @@index([type], name: "idx_task_type")
+  @@index([status], name: "idx_task_status")
+  @@index([priority], name: "idx_task_priority")
+  @@index([assignedToId], name: "idx_task_assigned")
+  @@index([warehouseId], name: "idx_task_warehouse")
+  @@index([waveId], name: "idx_task_wave")
+  @@index([createdAt], name: "idx_task_created")
+  
+  // Composite indexes for task management
+  @@index([assignedToId, status], name: "idx_task_assigned_status")
+  @@index([warehouseId, status], name: "idx_task_warehouse_status")
+  @@index([status, priority], name: "idx_task_status_priority")
+}
+
+// ============================================================================
+// AUDIT LOG MODEL INDEXES
+// ============================================================================
+
+model AuditLog {
+  // ... existing fields
+  
+  @@index([userId], name: "idx_audit_user")
+  @@index([eventType], name: "idx_audit_event")
+  @@index([severity], name: "idx_audit_severity")
+  @@index([timestamp], name: "idx_audit_timestamp")
+  @@index([resource], name: "idx_audit_resource")
+  
+  // Composite indexes for audit queries
+  @@index([userId, timestamp], name: "idx_audit_user_time")
+  @@index([eventType, timestamp], name: "idx_audit_event_time")
+  @@index([severity, timestamp], name: "idx_audit_severity_time")
+  @@index([resource, resourceId], name: "idx_audit_resource_id")
+}
+
+// ============================================================================
+// NOTIFICATION MODEL INDEXES
+// ============================================================================
+
+model Notification {
+  // ... existing fields
+  
+  @@index([userId], name: "idx_notification_user")
+  @@index([type], name: "idx_notification_type")
+  @@index([read], name: "idx_notification_read")
+  @@index([createdAt], name: "idx_notification_created")
+  
+  // Composite for user inbox queries
+  @@index([userId, read, createdAt], name: "idx_notification_inbox")
+}
+
+// ============================================================================
+// INTEGRATION LOG MODEL INDEXES
+// ============================================================================
+
+model IntegrationLog {
+  // ... existing fields
+  
+  @@index([integration], name: "idx_integration_type")
+  @@index([status], name: "idx_integration_status")
+  @@index([createdAt], name: "idx_integration_created")
+  
+  // Composite for monitoring
+  @@index([integration, status], name: "idx_integration_type_status")
+  @@index([integration, createdAt], name: "idx_integration_type_time")
+}
+
+// ============================================================================
+// REPORT MODEL INDEXES
+// ============================================================================
+
+model Report {
+  // ... existing fields
+  
+  @@index([type], name: "idx_report_type")
+  @@index([status], name: "idx_report_status")
+  @@index([createdById], name: "idx_report_creator")
+  @@index([createdAt], name: "idx_report_created")
+  
+  // Composite for report management
+  @@index([type, status], name: "idx_report_type_status")
+  @@index([createdById, createdAt], name: "idx_report_creator_time")
+}
+
+// ============================================================================
+// SETTINGS MODEL INDEXES
+// ============================================================================
+
+model Settings {
+  // ... existing fields
+  
+  @@index([key], name: "idx_settings_key")
+  @@index([category], name: "idx_settings_category")
+  @@index([updatedAt], name: "idx_settings_updated")
+  
+  // Unique constraint on key
+  @@unique([key], name: "unique_settings_key")
+}
+
+// ============================================================================
+// INDEX USAGE GUIDELINES
+// ============================================================================
+
+/*
+INDEX SELECTION RULES:
+
+1. WHERE clauses: Create indexes for frequently filtered columns
+2. JOIN operations: Index foreign key columns
+3. ORDER BY: Index columns used for sorting
+4. GROUP BY: Consider composite indexes
+5. Full-text search: Use @@fulltext for text search
+
+COMPOSITE INDEX ORDER:
+- Most selective column first
+- Equality before range
+- ORDER BY columns last
+
+AVOID:
+- Too many indexes (slows INSERT/UPDATE)
+- Indexes on low-cardinality columns (status with 2-3 values)
+- Duplicate indexes
+- Unused indexes
+
+MONITORING:
+- Check query performance regularly
+- Use EXPLAIN ANALYZE in PostgreSQL
+- Monitor slow query logs
+- Review index usage statistics
+
+MAINTENANCE:
+- Rebuild indexes periodically
+- Update statistics
+- Remove unused indexes
+- Test index changes in staging first
+*/
