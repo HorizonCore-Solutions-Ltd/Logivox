@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: flowstock-config
+  namespace: production
+data:
+  nextauth-url: "https://flowstock.com"
+  app-name: "FlowStock WMS"
+  app-version: "1.0.0"
+  log-level: "info"
+  max-upload-size: "10485760"  # 10MB
+  session-max-age: "86400"      # 24 hours
