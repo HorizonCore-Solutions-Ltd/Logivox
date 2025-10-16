@@ -1,0 +1,38 @@
+/**
+ * Database Schema - Audit Log
+ * Add to schema.prisma
+ */
+
+/*
+model AuditLog {
+  id            String   @id @default(cuid())
+  eventType     String   // AuditEventType enum
+  severity      String   @default("INFO") // AuditSeverity enum
+  userId        String?
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  userName      String?
+  userEmail     String?
+  ipAddress     String?
+  userAgent     String?
+  resource      String?  // e.g., 'inventory', 'order', 'user'
+  resourceId    String?  // ID of the affected resource
+  action        String?  // Description of action
+  changes       Json?    // Before/after values
+  metadata      Json?    // Additional context
+  success       Boolean  @default(true)
+  errorMessage  String?
+  timestamp     DateTime @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([timestamp])
+  @@index([resource, resourceId])
+  @@map("audit_logs")
+}
+
+// Add to User model:
+model User {
+  // ... existing fields
+  auditLogs     AuditLog[]
+}
+*/
