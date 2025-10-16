@@ -1,0 +1,15 @@
+/**
+ * Prisma Schema Extensions for Admin Dashboard
+ * SystemSetting model for configuration management
+ */
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([key])
+  @@map("system_settings")
+}
