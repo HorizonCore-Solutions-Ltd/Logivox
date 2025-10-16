@@ -69,7 +69,7 @@ registerRoute(
 )
 
 // Background sync for failed POST requests
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', (event: FetchEvent) => {
   if (event.request.method === 'POST') {
     event.respondWith(
       fetch(event.request.clone()).catch(() => {
@@ -83,7 +83,7 @@ self.addEventListener('fetch', (event) => {
 })
 
 // Push notification handler
-self.addEventListener('push', (event) => {
+self.addEventListener('push', (event: PushEvent) => {
   const data = event.data?.json() ?? {}
   const title = data.title || 'FlowStock Notification'
   const options = {
@@ -97,14 +97,14 @@ self.addEventListener('push', (event) => {
 })
 
 // Notification click handler
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close()
   event.waitUntil(
     self.clients.openWindow(event.notification.data || '/dashboard')
   )
 })
 
-self.addEventListener('message', (event) => {
+self.addEventListener('message', (event: ExtendableMessageEvent) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting()
   }

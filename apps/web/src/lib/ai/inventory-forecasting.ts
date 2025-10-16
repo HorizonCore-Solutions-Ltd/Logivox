@@ -91,8 +91,11 @@ export function calculateEMA(data: number[], period: number): number[] {
 
   // Calculate EMA for remaining values
   for (let i = period; i < data.length; i++) {
-    const currentEMA = (data[i] - ema[i - period]) * multiplier + ema[i - period];
-    ema.push(currentEMA);
+    const prevEMA = ema[i - period];
+    if (prevEMA !== undefined) {
+      const currentEMA = (data[i] - prevEMA) * multiplier + prevEMA;
+      ema.push(currentEMA);
+    }
   }
 
   return ema;
@@ -122,8 +125,12 @@ export function calculateLinearRegression(data: number[]): TrendLine {
   let denominator = 0;
 
   for (let i = 0; i < n; i++) {
-    numerator += (x[i] - xMean) * (y[i] - yMean);
-    denominator += (x[i] - xMean) ** 2;
+    const xi = x[i];
+    const yi = y[i];
+    if (xi !== undefined && yi !== undefined) {
+      numerator += (xi - xMean) * (yi - yMean);
+      denominator += (xi - xMean) ** 2;
+    }
   }
 
   const slope = numerator / denominator;
@@ -134,9 +141,13 @@ export function calculateLinearRegression(data: number[]): TrendLine {
   let ssTot = 0; // Total sum of squares
 
   for (let i = 0; i < n; i++) {
-    const predicted = slope * x[i] + intercept;
-    ssRes += (y[i] - predicted) ** 2;
-    ssTot += (y[i] - yMean) ** 2;
+    const xi = x[i];
+    const yi = y[i];
+    if (xi !== undefined && yi !== undefined) {
+      const predicted = slope * xi + intercept;
+      ssRes += (yi - predicted) ** 2;
+      ssTot += (yi - yMean) ** 2;
+    }
   }
 
   const r2 = 1 - ssRes / ssTot;
@@ -239,17 +250,19 @@ export function forecastDemand(
     const ema = calculateEMA(historicalData, period);
     const lastEMA = ema[ema.length - 1];
 
-    for (let i = 0; i < daysToForecast; i++) {
-      const date = new Date();
-      date.setDate(date.getDate() + i + 1);
+    if (lastEMA !== undefined) {
+      for (let i = 0; i < daysToForecast; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i + 1);
 
-      predictions.push({
-        date,
-        predictedQuantity: Math.round(lastEMA),
-        lowerBound: Math.round(lastEMA * 0.75),
-        upperBound: Math.round(lastEMA * 1.25),
-        confidence: 0.75,
-      });
+        predictions.push({
+          date,
+          predictedQuantity: Math.round(lastEMA),
+          lowerBound: Math.round(lastEMA * 0.75),
+          upperBound: Math.round(lastEMA * 1.25),
+          confidence: 0.75,
+        });
+      }
     }
   } else if (method === 'linear') {
     // Linear regression forecast

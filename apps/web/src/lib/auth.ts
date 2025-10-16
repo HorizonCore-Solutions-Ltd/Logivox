@@ -85,7 +85,7 @@ export const authOptions: NextAuthOptions = {
 
         if (dbUser) {
           token.role = dbUser.role
-          token.organizations = dbUser.organizationMemberships.map((m) => ({
+          token.organizations = dbUser.organizationMemberships.map((m: any) => ({
             id: m.organization.id,
             name: m.organization.name,
             role: m.role,

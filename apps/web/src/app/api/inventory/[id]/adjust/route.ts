@@ -80,7 +80,7 @@ export async function POST(
     }
 
     // Update item and create movement in a transaction
-    const result = await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx: any) => {
       // Update inventory item
       const updatedItem = await tx.inventoryItem.update({
         where: { id: params.id },
