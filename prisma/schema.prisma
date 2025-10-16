@@ -69,6 +69,13 @@ model User {
   approvedPurchaseOrders  PurchaseOrder[]      @relation("POApprover")
   receivedGRNs            GoodsReceiptNote[]   @relation("GRNReceivedBy")
   qcGRNs                  GoodsReceiptNote[]   @relation("GRNQCBy")
+  createdSalesOrders      SalesOrder[]         @relation("SOCreator")
+  approvedSalesOrders     SalesOrder[]         @relation("SOApprover")
+  pickedSalesOrders       SalesOrder[]         @relation("SOPicker")
+  packedSalesOrders       SalesOrder[]         @relation("SOPacker")
+  assignedPickLists       PickList[]           @relation("PickListAssignee")
+  createdPickLists        PickList[]           @relation("PickListCreator")
+  createdShipments        Shipment[]           @relation("ShipmentCreator")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -129,6 +136,9 @@ model Organization {
   customers          Customer[]
   purchaseOrders     PurchaseOrder[]
   goodsReceiptNotes  GoodsReceiptNote[]
+  salesOrders        SalesOrder[]
+  pickLists          PickList[]
+  shipments          Shipment[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -191,6 +201,8 @@ model Warehouse {
   organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   inventoryItems InventoryItem[]
   grns           GoodsReceiptNote[]
+  salesOrders    SalesOrder[]
+  pickLists      PickList[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -270,6 +282,8 @@ model InventoryItem {
   reorderAlerts      ReorderAlert[]
   purchaseOrderItems PurchaseOrderItem[]  @relation("POInventoryItem")
   grnItems           GRNItem[]
+  salesOrderItems    SalesOrderItem[]
+  pickListItems      PickListItem[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -518,6 +532,7 @@ model Customer {
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   bookings     Booking[]
+  salesOrders  SalesOrder[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -737,6 +752,284 @@ model GRNItem {
   @@index([inventoryItemId])
   @@index([purchaseOrderItemId])
   @@map("grn_items")
+}
+
+// ==========================================
+// SALES ORDERS & OUTBOUND OPERATIONS
+// ==========================================
+
+enum SalesOrderStatus {
+  DRAFT              // Initial creation
+  PENDING_APPROVAL   // Awaiting approval
+  APPROVED           // Approved, ready to pick
+  PICKING            // Items being picked
+  PICKED             // All items picked
+  PACKING            // Items being packed
+  PACKED             // Ready to ship
+  SHIPPED            // Shipped to customer
+  DELIVERED          // Delivered successfully
+  CANCELLED          // Order cancelled
+  ON_HOLD            // Temporarily paused
+}
+
+enum PaymentStatus {
+  UNPAID
+  PARTIAL
+  PAID
+  REFUNDED
+  OVERDUE
+}
+
+enum ShippingMethod {
+  STANDARD
+  EXPRESS
+  OVERNIGHT
+  PICKUP
+  FREIGHT
+}
+
+model SalesOrder {
+  id              String            @id @default(cuid())
+  organizationId  String
+  soNumber        String            // Auto-generated (SO-YYYYMMDD-XXX)
+  
+  // Customer Information
+  customerId      String
+  
+  // Order Details
+  status          SalesOrderStatus  @default(DRAFT)
+  orderDate       DateTime          @default(now())
+  requestedDate   DateTime?         // Customer requested delivery date
+  promisedDate    DateTime?         // Promised delivery date
+  
+  // Warehouse & Fulfillment
+  warehouseId     String?
+  
+  // Shipping Information
+  shippingMethod  ShippingMethod?
+  shippingAddress String?           @db.Text
+  shippingCity    String?
+  shippingState   String?
+  shippingZip     String?
+  shippingCountry String?
+  trackingNumber  String?
+  carrierName     String?
+  shippedDate     DateTime?
+  deliveredDate   DateTime?
+  
+  // Financial
+  subtotal        Decimal           @db.Decimal(10, 2)
+  taxAmount       Decimal           @db.Decimal(10, 2) @default(0)
+  shippingCost    Decimal           @db.Decimal(10, 2) @default(0)
+  discount        Decimal           @db.Decimal(10, 2) @default(0)
+  total           Decimal           @db.Decimal(10, 2)
+  currency        String            @default("USD")
+  
+  // Payment
+  paymentStatus   PaymentStatus     @default(UNPAID)
+  paymentMethod   String?
+  paidAmount      Decimal           @db.Decimal(10, 2) @default(0)
+  
+  // Workflow
+  priority        Int               @default(0) // Higher = more urgent
+  approvedById    String?
+  approvedDate    DateTime?
+  pickedById      String?
+  pickedDate      DateTime?
+  packedById      String?
+  packedDate      DateTime?
+  
+  // Metadata
+  notes           String?           @db.Text
+  internalNotes   String?           @db.Text
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  createdById     String
+  
+  // Relations
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer        Customer          @relation(fields: [customerId], references: [id])
+  warehouse       Warehouse?        @relation(fields: [warehouseId], references: [id])
+  createdBy       User              @relation("SOCreator", fields: [createdById], references: [id])
+  approvedBy      User?             @relation("SOApprover", fields: [approvedById], references: [id])
+  pickedBy        User?             @relation("SOPicker", fields: [pickedById], references: [id])
+  packedBy        User?             @relation("SOPacker", fields: [packedById], references: [id])
+  items           SalesOrderItem[]
+  pickLists       PickList[]
+  shipments       Shipment[]
+
+  @@unique([organizationId, soNumber])
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([orderDate])
+  @@map("sales_orders")
+}
+
+model SalesOrderItem {
+  id                String        @id @default(cuid())
+  salesOrderId      String
+  inventoryItemId   String
+  
+  // Quantities
+  quantity          Int
+  quantityPicked    Int           @default(0)
+  quantityPacked    Int           @default(0)
+  quantityShipped   Int           @default(0)
+  
+  // Pricing
+  unitPrice         Decimal       @db.Decimal(10, 2)
+  discount          Decimal       @db.Decimal(10, 2) @default(0)
+  taxRate           Decimal       @db.Decimal(5, 2) @default(0)
+  lineTotal         Decimal       @db.Decimal(10, 2)
+  
+  // Fulfillment
+  binLocation       String?
+  batchNumber       String?
+  serialNumbers     Json?         // Array of serial numbers
+  
+  // Metadata
+  notes             String?       @db.Text
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  salesOrder        SalesOrder    @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
+  inventoryItem     InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  pickListItems     PickListItem[]
+
+  @@index([salesOrderId])
+  @@index([inventoryItemId])
+  @@map("sales_order_items")
+}
+
+enum PickListStatus {
+  PENDING
+  IN_PROGRESS
+  PICKED
+  CANCELLED
+}
+
+model PickList {
+  id              String          @id @default(cuid())
+  organizationId  String
+  pickListNumber  String          // Auto-generated (PICK-YYYYMMDD-XXX)
+  salesOrderId    String
+  warehouseId     String
+  
+  status          PickListStatus  @default(PENDING)
+  priority        Int             @default(0)
+  
+  // Assignment
+  assignedToId    String?
+  assignedDate    DateTime?
+  startedDate     DateTime?
+  completedDate   DateTime?
+  
+  // Metadata
+  notes           String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  createdById     String
+  
+  // Relations
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrder      SalesOrder      @relation(fields: [salesOrderId], references: [id])
+  warehouse       Warehouse       @relation(fields: [warehouseId], references: [id])
+  assignedTo      User?           @relation("PickListAssignee", fields: [assignedToId], references: [id])
+  createdBy       User            @relation("PickListCreator", fields: [createdById], references: [id])
+  items           PickListItem[]
+
+  @@unique([organizationId, pickListNumber])
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([warehouseId])
+  @@index([status])
+  @@map("pick_lists")
+}
+
+model PickListItem {
+  id                String         @id @default(cuid())
+  pickListId        String
+  salesOrderItemId  String
+  inventoryItemId   String
+  
+  quantityToPick    Int
+  quantityPicked    Int            @default(0)
+  binLocation       String?
+  batchNumber       String?
+  serialNumbers     Json?
+  
+  pickedAt          DateTime?
+  
+  // Relations
+  pickList          PickList       @relation(fields: [pickListId], references: [id], onDelete: Cascade)
+  salesOrderItem    SalesOrderItem @relation(fields: [salesOrderItemId], references: [id])
+  inventoryItem     InventoryItem  @relation(fields: [inventoryItemId], references: [id])
+
+  @@index([pickListId])
+  @@index([salesOrderItemId])
+  @@index([inventoryItemId])
+  @@map("pick_list_items")
+}
+
+enum ShipmentStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+  CANCELLED
+}
+
+model Shipment {
+  id              String          @id @default(cuid())
+  organizationId  String
+  shipmentNumber  String          // Auto-generated (SHIP-YYYYMMDD-XXX)
+  salesOrderId    String
+  
+  status          ShipmentStatus  @default(PENDING)
+  
+  // Carrier Information
+  carrierName     String?
+  carrierService  String?
+  trackingNumber  String?
+  trackingUrl     String?
+  labelUrl        String?
+  
+  // Shipping Details
+  weight          Decimal?        @db.Decimal(10, 2)
+  weightUnit      String?         @default("kg")
+  dimensions      Json?           // {length, width, height, unit}
+  
+  // Dates
+  shippedDate     DateTime?
+  estimatedDelivery DateTime?
+  actualDelivery  DateTime?
+  
+  // Cost
+  shippingCost    Decimal?        @db.Decimal(10, 2)
+  currency        String          @default("USD")
+  
+  // Metadata
+  notes           String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  createdById     String
+  
+  // Relations
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrder      SalesOrder      @relation(fields: [salesOrderId], references: [id])
+  createdBy       User            @relation("ShipmentCreator", fields: [createdById], references: [id])
+
+  @@unique([organizationId, shipmentNumber])
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([status])
+  @@index([trackingNumber])
+  @@map("shipments")
 }
 
 // ==========================================
