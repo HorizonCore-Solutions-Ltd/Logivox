@@ -1,0 +1,10 @@
+# User-agent: *
+# Disallow: /api/
+# Disallow: /dashboard/
+# Allow: /
+
+# Sitemap: https://flowstock.com/sitemap.xml
+
+# For development - Allow all
+User-agent: *
+Allow: /

@@ -1,12 +1,16 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Header, Footer } from '@/components/layout'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { QueryProvider } from '@/components/providers/query-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
 import { Toaster } from '@/components/ui/toaster'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { CookieBanner } from '@/components/cookie-banner'
+import { SkipLinks } from '@/components/accessibility/skip-links'
+import { KeyboardShortcutsHelp } from '@/components/accessibility/keyboard-shortcuts-help'
+import { ScreenReaderAnnouncer } from '@/components/accessibility/screen-reader-announcer'
+import { VisualAccessibilityProvider } from '@/components/providers/visual-accessibility-provider'
 import './globals.css'
 
 const inter = Inter({
@@ -49,6 +53,12 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://flowstock.com'),
   alternates: {
     canonical: '/',
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'FlowStock',
   },
   openGraph: {
     type: 'website',
@@ -97,24 +107,35 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <head>
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-192x192.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-192x192.png" />
+        <meta name="theme-color" content="#0ea5e9" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="FlowStock" />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
+        <SkipLinks />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
-          <QueryProvider>
-            <AuthProvider>
-              <div className="relative flex min-h-screen flex-col">
-                <Header />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </div>
-              <Toaster />
-            </AuthProvider>
-          </QueryProvider>
+          <VisualAccessibilityProvider>
+            <QueryProvider>
+              <AuthProvider>
+                {children}
+                <Toaster />
+                <CookieBanner />
+                <KeyboardShortcutsHelp />
+                <ScreenReaderAnnouncer />
+              </AuthProvider>
+            </QueryProvider>
+          </VisualAccessibilityProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

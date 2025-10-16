@@ -3,6 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -21,9 +22,19 @@ import {
   LogOut,
   User,
   Moon,
-  Sun
+  Sun,
+  Warehouse,
+  FolderTree,
+  ChevronRight,
+  Activity,
+  Webhook,
+  Key,
+  Book,
+  FileBarChart,
+  Smartphone
 } from "lucide-react"
 import { useTheme } from "next-themes"
+import { OrganizationSwitcher } from "@/components/organizations/organization-switcher"
 
 interface DashboardSidebarProps {
   children: React.ReactNode
@@ -32,19 +43,54 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ children }: DashboardSidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false)
+  const [isInventoryExpanded, setIsInventoryExpanded] = React.useState(true)
+  const [currentOrgId, setCurrentOrgId] = React.useState<string>("")
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
+  const { data: session } = useSession()
+
+  // Initialize current org ID from session
+  React.useEffect(() => {
+    if (session?.user?.organizations?.[0]?.id) {
+      setCurrentOrgId(session.user.organizations[0].id)
+    }
+  }, [session])
+
+  const handleOrgSwitch = (orgId: string) => {
+    setCurrentOrgId(orgId)
+    // TODO: Update session context with new org ID
+    // For now, we'll just update local state
+    console.log("Switched to organization:", orgId)
+  }
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Inventory", href: "/dashboard/inventory", icon: Package },
-    { name: "Stock Bookings", href: "/dashboard/bookings", icon: FileText },
+    { 
+      name: "Inventory", 
+      href: "/dashboard/inventory", 
+      icon: Package,
+      subItems: [
+        { name: "All Items", href: "/dashboard/inventory", icon: Package },
+        { name: "Warehouses", href: "/dashboard/warehouses", icon: Warehouse },
+        { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
+      ]
+    },
+    { name: "Customers", href: "/dashboard/customers", icon: Users },
+    { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
-    { name: "Team", href: "/dashboard/team", icon: Users },
+    { name: "Reports", href: "/dashboard/reports", icon: FileBarChart },
+    { name: "Webhooks", href: "/dashboard/webhooks", icon: Webhook },
+    { name: "API Keys", href: "/dashboard/api-keys", icon: Key },
+    { name: "API Docs", href: "/dashboard/api-docs", icon: Book },
+    { name: "Activity Logs", href: "/dashboard/activity", icon: Activity },
+    { name: "PWA Settings", href: "/dashboard/pwa-settings", icon: Smartphone },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ]
 
   const isActive = (href: string) => pathname === href
+  const isInventoryActive = pathname.startsWith("/dashboard/inventory") || 
+                           pathname.startsWith("/dashboard/warehouses") || 
+                           pathname.startsWith("/dashboard/categories")
 
   return (
     <div className="min-h-screen flex">
@@ -64,6 +110,50 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
             const Icon = item.icon
+            const hasSubItems = 'subItems' in item && item.subItems
+            
+            if (hasSubItems) {
+              return (
+                <div key={item.name}>
+                  <button
+                    onClick={() => setIsInventoryExpanded(!isInventoryExpanded)}
+                    className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                      isInventoryActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <Icon className="mr-3 h-5 w-5" />
+                      {item.name}
+                    </div>
+                    <ChevronRight className={`h-4 w-4 transition-transform ${isInventoryExpanded ? 'rotate-90' : ''}`} />
+                  </button>
+                  {isInventoryExpanded && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {item.subItems.map((subItem) => {
+                        const SubIcon = subItem.icon
+                        return (
+                          <Link
+                            key={subItem.name}
+                            href={subItem.href}
+                            className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                              isActive(subItem.href)
+                                ? "bg-primary text-primary-foreground"
+                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                            }`}
+                          >
+                            <SubIcon className="mr-3 h-4 w-4" />
+                            {subItem.name}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+            
             return (
               <Link
                 key={item.name}
@@ -133,6 +223,14 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
 
           {/* Right Section */}
           <div className="flex items-center gap-2">
+            {/* Organization Switcher */}
+            {currentOrgId && (
+              <OrganizationSwitcher
+                currentOrgId={currentOrgId}
+                onSwitch={handleOrgSwitch}
+              />
+            )}
+
             {/* Notifications */}
             <Button variant="ghost" size="sm" className="relative">
               <Bell className="h-5 w-5" />
@@ -213,6 +311,51 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
               <nav className="px-4 py-6 space-y-1">
                 {navigation.map((item) => {
                   const Icon = item.icon
+                  const hasSubItems = 'subItems' in item && item.subItems
+                  
+                  if (hasSubItems) {
+                    return (
+                      <div key={item.name}>
+                        <button
+                          onClick={() => setIsInventoryExpanded(!isInventoryExpanded)}
+                          className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                            isInventoryActive
+                              ? "bg-primary/10 text-primary"
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          }`}
+                        >
+                          <div className="flex items-center">
+                            <Icon className="mr-3 h-5 w-5" />
+                            {item.name}
+                          </div>
+                          <ChevronRight className={`h-4 w-4 transition-transform ${isInventoryExpanded ? 'rotate-90' : ''}`} />
+                        </button>
+                        {isInventoryExpanded && (
+                          <div className="ml-4 mt-1 space-y-1">
+                            {item.subItems.map((subItem) => {
+                              const SubIcon = subItem.icon
+                              return (
+                                <Link
+                                  key={subItem.name}
+                                  href={subItem.href}
+                                  onClick={() => setIsMobileMenuOpen(false)}
+                                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                                    isActive(subItem.href)
+                                      ? "bg-primary text-primary-foreground"
+                                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                  }`}
+                                >
+                                  <SubIcon className="mr-3 h-4 w-4" />
+                                  {subItem.name}
+                                </Link>
+                              )
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  }
+                  
                   return (
                     <Link
                       key={item.name}

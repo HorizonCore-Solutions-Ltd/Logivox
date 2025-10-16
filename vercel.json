@@ -1,0 +1,114 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm build",
+  "installCommand": "pnpm install",
+  "framework": null,
+  "outputDirectory": ".next",
+  "env": {
+    "DATABASE_URL": "@flowstock-database-url",
+    "DIRECT_URL": "@flowstock-direct-url",
+    "NEXTAUTH_SECRET": "@flowstock-nextauth-secret",
+    "GOOGLE_CLIENT_ID": "@flowstock-google-client-id",
+    "GOOGLE_CLIENT_SECRET": "@flowstock-google-client-secret",
+    "GITHUB_ID": "@flowstock-github-id",
+    "GITHUB_SECRET": "@flowstock-github-secret"
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-DNS-Prefetch-Control",
+          "value": "on"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains; preload"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+        }
+      ]
+    },
+    {
+      "source": "/api/:path*",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://flowstock.com"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/health",
+      "destination": "/api/health"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-expired-sessions",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/cron/generate-reports",
+      "schedule": "0 8 * * 1"
+    },
+    {
+      "path": "/api/cron/backup-database",
+      "schedule": "0 3 * * *"
+    }
+  ],
+  "regions": ["iad1"],
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 1024
+    },
+    "app/api/reports/generate/route.ts": {
+      "maxDuration": 60,
+      "memory": 3008
+    },
+    "app/api/cron/**/*.ts": {
+      "maxDuration": 300,
+      "memory": 1024
+    }
+  }
+}

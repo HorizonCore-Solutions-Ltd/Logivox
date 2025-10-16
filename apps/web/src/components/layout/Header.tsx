@@ -7,6 +7,13 @@ import { useTheme } from "next-themes"
 import { signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/hooks/use-auth"
+import { useQuery } from "@tanstack/react-query"
+import { Badge } from "@/components/ui/badge"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { 
   Building2, 
   Moon, 
@@ -20,7 +27,10 @@ import {
   Users,
   LogOut,
   User,
-  Settings
+  Settings,
+  Bell,
+  Package,
+  AlertTriangle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -30,6 +40,26 @@ export function Header() {
   const { theme, setTheme } = useTheme()
   const { user, isAuthenticated, isLoading } = useAuth()
   const router = useRouter()
+
+  // Fetch low stock alerts (only when authenticated)
+  const { data: lowStockItems = [] } = useQuery({
+    queryKey: ["inventory", "low-stock"],
+    queryFn: async () => {
+      const res = await fetch("/api/inventory?status=LOW_STOCK")
+      if (!res.ok) return []
+      const lowStock = await res.json()
+      
+      const outRes = await fetch("/api/inventory?status=OUT_OF_STOCK")
+      if (outRes.ok) {
+        const outOfStock = await outRes.json()
+        return [...lowStock, ...outOfStock]
+      }
+      
+      return lowStock
+    },
+    enabled: isAuthenticated,
+    refetchInterval: 60000, // Refetch every minute
+  })
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" })
@@ -164,6 +194,65 @@ export function Header() {
             <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
             <span className="sr-only">Toggle theme</span>
           </Button>
+
+          {/* Notifications Bell (only when authenticated) */}
+          {isAuthenticated && lowStockItems.length > 0 && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="ghost" size="icon" className="relative h-9 w-9">
+                  <Bell className="h-4 w-4" />
+                  {lowStockItems.length > 0 && (
+                    <Badge 
+                      className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                      variant="destructive"
+                    >
+                      {lowStockItems.length}
+                    </Badge>
+                  )}
+                  <span className="sr-only">Notifications</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-semibold text-sm">Stock Alerts</h4>
+                    <Badge variant="destructive" className="text-xs">
+                      {lowStockItems.length}
+                    </Badge>
+                  </div>
+                  <div className="space-y-2 max-h-[300px] overflow-y-auto">
+                    {lowStockItems.slice(0, 5).map((item: any) => (
+                      <div
+                        key={item.id}
+                        className="flex items-start space-x-2 p-2 hover:bg-muted rounded-lg cursor-pointer"
+                        onClick={() => {
+                          router.push(`/dashboard/inventory/${item.id}`)
+                        }}
+                      >
+                        <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.quantity} {item.unit} remaining
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {lowStockItems.length > 5 && (
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => router.push("/dashboard/inventory?filter=alerts")}
+                    >
+                      View all {lowStockItems.length} alerts →
+                    </Button>
+                  )}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
 
           {/* Auth buttons */}
           <div className="hidden md:flex md:items-center md:space-x-2">

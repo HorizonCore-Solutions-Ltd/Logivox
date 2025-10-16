@@ -126,6 +126,7 @@ model Organization {
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
+  reorderAlerts      ReorderAlert[]
 
   @@index([slug])
   @@index([createdById])
@@ -231,6 +232,10 @@ model InventoryItem {
   minStockLevel  Int      @default(0)
   maxStockLevel  Int?
   reorderPoint   Int?
+  reorderQuantity Int?     @default(0) // How many to reorder when threshold hit
+  leadTimeDays   Int?     @default(7)  // Supplier lead time in days
+  lastReorderDate DateTime?             // Track when last reorder was triggered
+  autoReorder    Boolean  @default(false) // Enable auto-reorder alerts
   
   // Pricing
   costPrice      Decimal? @db.Decimal(10, 2)
@@ -255,6 +260,7 @@ model InventoryItem {
   createdBy      User              @relation("InventoryCreator", fields: [createdById], references: [id])
   bookingItems   BookingItem[]
   movements      InventoryMovement[]
+  reorderAlerts  ReorderAlert[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -300,6 +306,75 @@ enum MovementType {
   DAMAGE
   BOOKING
   RELEASE
+}
+
+// ==========================================
+// REORDER ALERTS
+// ==========================================
+
+model ReorderAlert {
+  id              String        @id @default(cuid())
+  organizationId  String
+  inventoryItemId String
+  
+  // Alert details
+  alertType       AlertType     @default(LOW_STOCK)
+  severity        AlertSeverity @default(MEDIUM)
+  status          AlertStatus   @default(PENDING)
+  
+  // Stock information at time of alert
+  currentStock    Int
+  reorderPoint    Int
+  reorderQuantity Int
+  estimatedStockoutDate DateTime?
+  
+  // Notification tracking
+  emailSent       Boolean       @default(false)
+  smsSent         Boolean       @default(false)
+  slackSent       Boolean       @default(false)
+  pushSent        Boolean       @default(false)
+  
+  sentAt          DateTime?
+  acknowledgedAt  DateTime?
+  resolvedAt      DateTime?
+  dismissedAt     DateTime?
+  
+  notes           String?       @db.Text
+  metadata        Json?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([inventoryItemId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("reorder_alerts")
+}
+
+enum AlertType {
+  LOW_STOCK        // Below reorder point
+  OUT_OF_STOCK     // Zero stock
+  CRITICAL_STOCK   // Stockout imminent (within lead time)
+  OVERSTOCK        // Above max stock level
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum AlertStatus {
+  PENDING
+  ACKNOWLEDGED
+  RESOLVED
+  DISMISSED
+  AUTO_RESOLVED
 }
 
 // ==========================================
