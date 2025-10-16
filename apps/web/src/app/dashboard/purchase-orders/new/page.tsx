@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 
 interface Supplier {
   id: string;
@@ -118,7 +118,7 @@ export default function CreatePurchaseOrderPage() {
 
   const handleItemChange = (index: number, field: keyof POItem, value: any) => {
     const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
+    newItems[index] = { ...newItems[index], [field]: value } as POItem;
     setItems(newItems);
   };
 
