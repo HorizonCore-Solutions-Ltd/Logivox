@@ -92,8 +92,9 @@ export function calculateEMA(data: number[], period: number): number[] {
   // Calculate EMA for remaining values
   for (let i = period; i < data.length; i++) {
     const prevEMA = ema[i - period];
-    if (prevEMA !== undefined) {
-      const currentEMA = (data[i] - prevEMA) * multiplier + prevEMA;
+    const currentValue = data[i];
+    if (prevEMA !== undefined && currentValue !== undefined) {
+      const currentEMA = (currentValue - prevEMA) * multiplier + prevEMA;
       ema.push(currentEMA);
     }
   }
