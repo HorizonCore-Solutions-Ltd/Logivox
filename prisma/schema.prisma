@@ -100,6 +100,10 @@ model User {
   issuedComponents        AssemblyComponentIssue[] @relation("ComponentIssuer")
   returnedComponents      AssemblyComponentIssue[] @relation("ComponentReturner")
   productionLogs          AssemblyProductionLog[]  @relation("ProductionOperator")
+  createdReports          Report[]                 @relation("ReportCreator")
+  executedReports         ReportExecution[]        @relation("ReportExecutor")
+  createdDashboards       Dashboard[]              @relation("DashboardCreator")
+  analyticsEvents         AnalyticsEvent[]         @relation("AnalyticsUser")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -180,6 +184,11 @@ model Organization {
   qcInspections      QCInspection[]
   billsOfMaterials   BillOfMaterials[]
   assemblyOrders     AssemblyOrder[]
+  reports            Report[]
+  reportExecutions   ReportExecution[]
+  dashboards         Dashboard[]
+  analyticsEvents    AnalyticsEvent[]
+  kpiMetrics         KPIMetric[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -2794,4 +2803,365 @@ enum ProductionEventType {
   REWORK          // Rework performed
   EQUIPMENT_CHANGE // Equipment changed
   MATERIAL_CHANGE // Material substitution
+}
+
+// ==========================================
+// ANALYTICS & REPORTING
+// ==========================================
+
+model Report {
+  id              String       @id @default(cuid())
+  organizationId  String
+  
+  // Report Identification
+  name            String
+  description     String?      @db.Text
+  code            String       // Unique code per organization
+  
+  // Report Configuration
+  reportType      ReportType
+  category        ReportCategory
+  
+  // Data Configuration
+  dataSource      String       // Table/entity name
+  filters         Json?        // Filter configuration
+  groupBy         Json?        // Group by fields
+  sortBy          Json?        // Sort configuration
+  columns         Json         // Column definitions with aggregations
+  
+  // Visualization
+  chartType       ChartType?
+  chartConfig     Json?        // Chart-specific configuration
+  
+  // Schedule
+  isScheduled     Boolean      @default(false)
+  scheduleType    ScheduleType?
+  scheduleConfig  Json?        // Cron expression or interval config
+  
+  // Distribution
+  emailRecipients Json?        // Array of email addresses
+  webhookUrl      String?
+  
+  // Access Control
+  isPublic        Boolean      @default(false)
+  allowedRoles    Json?        // Array of roles
+  allowedUserIds  Json?        // Array of user IDs
+  
+  // Status
+  isActive        Boolean      @default(true)
+  lastRunAt       DateTime?
+  nextRunAt       DateTime?
+  
+  // Metadata
+  tags            Json?        // Array of tags
+  customFields    Json?
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  createdById     String
+  
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy       User         @relation("ReportCreator", fields: [createdById], references: [id])
+  executions      ReportExecution[]
+  
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([reportType])
+  @@index([category])
+  @@index([isActive])
+  @@map("reports")
+}
+
+model ReportExecution {
+  id              String           @id @default(cuid())
+  reportId        String
+  organizationId  String
+  
+  // Execution Details
+  executionNumber String           // AUTO: EXEC-YYYYMMDD-XXX
+  status          ExecutionStatus  @default(PENDING)
+  
+  // Timing
+  startedAt       DateTime         @default(now())
+  completedAt     DateTime?
+  durationMs      Int?             // Execution time in milliseconds
+  
+  // Results
+  resultCount     Int              @default(0)
+  resultData      Json?            // Actual report data (limited for large datasets)
+  resultUrl       String?          // URL to full results file
+  
+  // Parameters
+  parameters      Json?            // Runtime parameters
+  filters         Json?            // Applied filters
+  
+  // Distribution
+  emailSent       Boolean          @default(false)
+  emailSentAt     DateTime?
+  webhookSent     Boolean          @default(false)
+  webhookSentAt   DateTime?
+  
+  // Error Handling
+  error           String?          @db.Text
+  errorStack      String?          @db.Text
+  
+  // Metadata
+  fileSize        Int?             // Size in bytes
+  fileFormat      String?          // PDF, XLSX, CSV
+  
+  createdAt       DateTime         @default(now())
+  executedById    String?
+  
+  // Relations
+  report          Report           @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  executedBy      User?            @relation("ReportExecutor", fields: [executedById], references: [id])
+  
+  @@index([reportId])
+  @@index([organizationId])
+  @@index([status])
+  @@index([startedAt])
+  @@map("report_executions")
+}
+
+model Dashboard {
+  id              String       @id @default(cuid())
+  organizationId  String
+  
+  // Dashboard Identification
+  name            String
+  description     String?      @db.Text
+  slug            String       // URL-friendly identifier
+  
+  // Configuration
+  layout          Json         // Grid layout configuration
+  widgets         Json         // Array of widget configurations
+  
+  // Dashboard Type
+  dashboardType   DashboardType @default(CUSTOM)
+  category        String?      // OPERATIONS, SALES, FINANCE, INVENTORY
+  
+  // Access Control
+  isPublic        Boolean      @default(false)
+  isDefault       Boolean      @default(false) // Default dashboard for role
+  allowedRoles    Json?
+  allowedUserIds  Json?
+  
+  // Refresh
+  autoRefresh     Boolean      @default(false)
+  refreshInterval Int?         // Seconds
+  
+  // Status
+  isActive        Boolean      @default(true)
+  
+  // Metadata
+  icon            String?
+  color           String?
+  tags            Json?
+  
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  createdById     String
+  
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy       User         @relation("DashboardCreator", fields: [createdById], references: [id])
+  
+  @@unique([organizationId, slug])
+  @@index([organizationId])
+  @@index([dashboardType])
+  @@index([isActive])
+  @@map("dashboards")
+}
+
+model AnalyticsEvent {
+  id              String       @id @default(cuid())
+  organizationId  String
+  
+  // Event Details
+  eventType       String       // USER_ACTION, SYSTEM_EVENT, BUSINESS_EVENT
+  eventName       String       // login, order_created, inventory_updated
+  category        String?      // auth, orders, inventory, users
+  
+  // User Context
+  userId          String?
+  sessionId       String?
+  ipAddress       String?
+  userAgent       String?
+  
+  // Event Data
+  properties      Json?        // Event-specific properties
+  metadata        Json?        // Additional metadata
+  
+  // Performance
+  duration        Int?         // Duration in milliseconds
+  
+  // Status
+  success         Boolean      @default(true)
+  errorMessage    String?      @db.Text
+  
+  // Timestamps
+  timestamp       DateTime     @default(now())
+  
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User?        @relation("AnalyticsUser", fields: [userId], references: [id])
+  
+  @@index([organizationId])
+  @@index([eventType])
+  @@index([eventName])
+  @@index([category])
+  @@index([userId])
+  @@index([timestamp])
+  @@map("analytics_events")
+}
+
+model KPIMetric {
+  id              String       @id @default(cuid())
+  organizationId  String
+  
+  // KPI Identification
+  metricCode      String       // REVENUE_TODAY, ORDERS_PENDING, INVENTORY_VALUE
+  metricName      String
+  description     String?      @db.Text
+  category        MetricCategory
+  
+  // Value
+  currentValue    Decimal      @db.Decimal(18, 4)
+  previousValue   Decimal?     @db.Decimal(18, 4)
+  targetValue     Decimal?     @db.Decimal(18, 4)
+  
+  // Units
+  unit            String?      // USD, units, percentage, hours
+  
+  // Change Tracking
+  changeAmount    Decimal?     @db.Decimal(18, 4)
+  changePercent   Decimal?     @db.Decimal(8, 2)
+  trend           TrendDirection?
+  
+  // Time Period
+  periodType      PeriodType   @default(DAILY)
+  periodStart     DateTime
+  periodEnd       DateTime
+  
+  // Status
+  status          MetricStatus @default(NORMAL)
+  alertThreshold  Decimal?     @db.Decimal(18, 4)
+  
+  // Display
+  displayOrder    Int          @default(0)
+  isVisible       Boolean      @default(true)
+  icon            String?
+  color           String?
+  
+  // Metadata
+  metadata        Json?
+  
+  calculatedAt    DateTime     @default(now())
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, metricCode, periodStart])
+  @@index([organizationId])
+  @@index([category])
+  @@index([periodType])
+  @@index([periodStart])
+  @@map("kpi_metrics")
+}
+
+// Enums for Analytics & Reporting
+
+enum ReportType {
+  TABULAR         // Standard table report
+  SUMMARY         // Summary/aggregated report
+  CHART           // Chart/visualization
+  COMBINED        // Table + Chart
+  PIVOT           // Pivot table
+  MATRIX          // Matrix/cross-tab
+}
+
+enum ReportCategory {
+  INVENTORY       // Inventory reports
+  SALES           // Sales reports
+  PURCHASING      // Purchasing reports
+  WAREHOUSE       // Warehouse operations
+  FINANCIAL       // Financial reports
+  QUALITY         // Quality control reports
+  PRODUCTION      // Production/assembly reports
+  CUSTOM          // Custom reports
+}
+
+enum ChartType {
+  BAR             // Bar chart
+  LINE            // Line chart
+  PIE             // Pie chart
+  DONUT           // Donut chart
+  AREA            // Area chart
+  SCATTER         // Scatter plot
+  GAUGE           // Gauge/meter
+  FUNNEL          // Funnel chart
+  HEATMAP         // Heat map
+  TABLE           // Data table
+}
+
+enum ScheduleType {
+  HOURLY          // Every hour
+  DAILY           // Daily
+  WEEKLY          // Weekly
+  MONTHLY         // Monthly
+  CUSTOM          // Custom cron expression
+}
+
+enum ExecutionStatus {
+  PENDING         // Waiting to run
+  RUNNING         // Currently executing
+  COMPLETED       // Successfully completed
+  FAILED          // Failed with error
+  CANCELLED       // Cancelled by user
+}
+
+enum DashboardType {
+  OVERVIEW        // Main overview dashboard
+  INVENTORY       // Inventory-focused
+  SALES           // Sales-focused
+  WAREHOUSE       // Warehouse operations
+  ANALYTICS       // Analytics dashboard
+  CUSTOM          // Custom dashboard
+}
+
+enum MetricCategory {
+  SALES           // Sales metrics
+  INVENTORY       // Inventory metrics
+  WAREHOUSE       // Warehouse metrics
+  FINANCIAL       // Financial metrics
+  OPERATIONAL     // Operational metrics
+  QUALITY         // Quality metrics
+  PRODUCTIVITY    // Productivity metrics
+}
+
+enum TrendDirection {
+  UP              // Increasing
+  DOWN            // Decreasing
+  STABLE          // No significant change
+}
+
+enum MetricStatus {
+  NORMAL          // Within normal range
+  WARNING         // Approaching threshold
+  CRITICAL        // Exceeds threshold
+  UNKNOWN         // Cannot determine
+}
+
+enum PeriodType {
+  HOURLY          // Hourly period
+  DAILY           // Daily period
+  WEEKLY          // Weekly period
+  MONTHLY         // Monthly period
+  QUARTERLY       // Quarterly period
+  YEARLY          // Yearly period
+  CUSTOM          // Custom period
 }
