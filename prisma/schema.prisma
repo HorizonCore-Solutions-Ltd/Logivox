@@ -94,6 +94,12 @@ model User {
   inspectedQC             QCInspection[]       @relation("QCInspector")
   performedCheckpoints    QCCheckpoint[]       @relation("CheckpointPerformer")
   qcApprovals             QCApproval[]         @relation("QCApprover")
+  approvedBOMs            BillOfMaterials[]    @relation("BOMApprover")
+  createdAssemblyOrders   AssemblyOrder[]      @relation("AssemblyCreator")
+  assignedAssemblyOrders  AssemblyOrder[]      @relation("AssemblyAssignee")
+  issuedComponents        AssemblyComponentIssue[] @relation("ComponentIssuer")
+  returnedComponents      AssemblyComponentIssue[] @relation("ComponentReturner")
+  productionLogs          AssemblyProductionLog[]  @relation("ProductionOperator")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -172,6 +178,8 @@ model Organization {
   lotGenealogies     LotGenealogy[]
   inspectionTemplates InspectionTemplate[]
   qcInspections      QCInspection[]
+  billsOfMaterials   BillOfMaterials[]
+  assemblyOrders     AssemblyOrder[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -237,6 +245,7 @@ model Warehouse {
   salesOrders    SalesOrder[]
   pickLists      PickList[]
   packs          Pack[]
+  assemblyOrders AssemblyOrder[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -328,6 +337,10 @@ model InventoryItem {
   lots               Lot[]
   serialNumbers      SerialNumber[]
   qcInspections      QCInspection[]
+  bomsAsProduct      BillOfMaterials[]    @relation("BOMProduct")
+  bomComponents      BOMComponent[]       @relation("BOMComponent")
+  assemblyOrdersAsProduct AssemblyOrder[]  @relation("AssemblyProduct")
+  assemblyComponents AssemblyComponentIssue[] @relation("AssemblyComponent")
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -912,6 +925,7 @@ model SalesOrder {
   rmas            RMA[]
   serialNumbers   SerialNumber[]
   qcInspections   QCInspection[]
+  assemblyOrders  AssemblyOrder[]
 
   @@unique([organizationId, soNumber])
   @@index([organizationId])
@@ -1395,6 +1409,7 @@ model Location {
   rmaRestockItems RMAItem[]
   lots            Lot[]
   serialNumbers   SerialNumber[]
+  componentIssues AssemblyComponentIssue[]
 
   @@unique([organizationId, locationCode])
   @@index([organizationId])
@@ -1951,6 +1966,7 @@ model Lot {
   genealogyParents    LotGenealogy[]     @relation("LotParent")
   genealogyChildren   LotGenealogy[]     @relation("LotChild")
   qcInspections       QCInspection[]
+  assemblyComponentIssues AssemblyComponentIssue[]
 
   @@unique([organizationId, lotNumber])
   @@index([organizationId])
@@ -2429,4 +2445,353 @@ enum ApprovalDecision {
   REJECT          // Reject inspection
   REQUEST_REWORK  // Request rework
   ESCALATE        // Escalate to next level
+}
+
+// ==========================================
+// KITTING & ASSEMBLY MANAGEMENT
+// ==========================================
+
+model BillOfMaterials {
+  id              String    @id @default(cuid())
+  organizationId  String
+  
+  // BOM Identification
+  bomNumber       String    // Auto-generated (BOM-YYYYMMDD-XXX)
+  name            String
+  description     String?   @db.Text
+  version         String    @default("1.0")
+  
+  // Product Information
+  productId       String    // The finished product (InventoryItem)
+  productQuantity Int       @default(1) // How many units this BOM produces
+  
+  // BOM Type & Configuration
+  bomType         BOMType   @default(ASSEMBLY)
+  isActive        Boolean   @default(true)
+  isDefault       Boolean   @default(false) // Default BOM for this product
+  
+  // Production Details
+  estimatedTime   Int?      // Estimated production time in minutes
+  laborCost       Decimal?  @db.Decimal(10, 2)
+  overheadCost    Decimal?  @db.Decimal(10, 2)
+  totalCost       Decimal?  @db.Decimal(10, 2) // Auto-calculated
+  
+  // Yield Management
+  standardYield   Decimal   @db.Decimal(5, 2) @default(100.00) // Expected yield %
+  scrapRate       Decimal   @db.Decimal(5, 2) @default(0.00)   // Expected scrap %
+  
+  // Workflow
+  status          BOMStatus @default(DRAFT)
+  approvedById    String?
+  approvedDate    DateTime?
+  
+  // Effective dates
+  effectiveFrom   DateTime  @default(now())
+  effectiveTo     DateTime?
+  
+  // Metadata
+  notes           String?   @db.Text
+  attachments     Json?     // Array of file URLs
+  customFields    Json?     // Flexible fields for industry-specific data
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  organization    Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  product         InventoryItem    @relation("BOMProduct", fields: [productId], references: [id])
+  approvedBy      User?            @relation("BOMApprover", fields: [approvedById], references: [id])
+  components      BOMComponent[]
+  assemblyOrders  AssemblyOrder[]
+  
+  @@unique([organizationId, bomNumber])
+  @@index([organizationId])
+  @@index([productId])
+  @@index([status])
+  @@index([isActive])
+  @@map("bills_of_materials")
+}
+
+model BOMComponent {
+  id              String    @id @default(cuid())
+  bomId           String
+  
+  // Component Information
+  componentId     String    // The component/raw material (InventoryItem)
+  quantity        Decimal   @db.Decimal(10, 4) // Quantity needed per unit
+  unit            String?   // Unit of measure
+  
+  // Component Details
+  isOptional      Boolean   @default(false)
+  isSubstitutable Boolean   @default(false)
+  substituteIds   Json?     // Array of substitute component IDs
+  
+  // Costing
+  unitCost        Decimal?  @db.Decimal(10, 2)
+  totalCost       Decimal?  @db.Decimal(10, 2) // quantity * unitCost
+  
+  // Assembly Instructions
+  sequence        Int       @default(1) // Order of assembly
+  assemblyNotes   String?   @db.Text
+  position        String?   // Physical position in assembly
+  
+  // Waste & Scrap
+  scrapFactor     Decimal   @db.Decimal(5, 2) @default(0.00) // Expected waste %
+  
+  // Metadata
+  reference       String?   // Reference designator (e.g., "R1", "C5" for electronics)
+  notes           String?   @db.Text
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  bom             BillOfMaterials @relation(fields: [bomId], references: [id], onDelete: Cascade)
+  component       InventoryItem   @relation("BOMComponent", fields: [componentId], references: [id])
+  
+  @@index([bomId])
+  @@index([componentId])
+  @@index([sequence])
+  @@map("bom_components")
+}
+
+model AssemblyOrder {
+  id                  String          @id @default(cuid())
+  organizationId      String
+  
+  // Order Identification
+  orderNumber         String          // Auto-generated (ASM-YYYYMMDD-XXX)
+  
+  // BOM & Product
+  bomId               String
+  productId           String          // Finished product
+  
+  // Quantities
+  plannedQuantity     Int
+  producedQuantity    Int             @default(0)
+  scrapQuantity       Int             @default(0)
+  
+  // Yield Tracking
+  actualYield         Decimal?        @db.Decimal(5, 2) // Actual yield %
+  yieldVariance       Decimal?        @db.Decimal(5, 2) // Variance from standard
+  
+  // Status & Workflow
+  status              AssemblyStatus  @default(PENDING)
+  priority            Int             @default(0) // Higher = more urgent
+  
+  // Scheduling
+  scheduledStart      DateTime?
+  scheduledEnd        DateTime?
+  actualStart         DateTime?
+  actualEnd           DateTime?
+  
+  // Location
+  warehouseId         String?
+  workstationId       String?         // Specific assembly location
+  
+  // Assignment
+  assignedToId        String?
+  
+  // Component Tracking
+  componentsReserved  Boolean         @default(false)
+  componentsIssued    Boolean         @default(false)
+  autoDeduct          Boolean         @default(true) // Auto-deduct components on completion
+  
+  // Financial
+  totalComponentCost  Decimal?        @db.Decimal(10, 2)
+  laborCost           Decimal?        @db.Decimal(10, 2)
+  overheadCost        Decimal?        @db.Decimal(10, 2)
+  totalCost           Decimal?        @db.Decimal(10, 2)
+  
+  // Quality Control
+  qcRequired          Boolean         @default(false)
+  qcStatus            String?         // PENDING, PASSED, FAILED
+  qcNotes             String?         @db.Text
+  
+  // Reference
+  referenceType       String?         // SALES_ORDER, STOCK_REPLENISHMENT, CUSTOM
+  referenceId         String?
+  salesOrderId        String?
+  
+  // Metadata
+  notes               String?         @db.Text
+  internalNotes       String?         @db.Text
+  attachments         Json?           // Array of file URLs
+  
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  createdById         String
+  
+  // Relations
+  organization        Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  bom                 BillOfMaterials      @relation(fields: [bomId], references: [id])
+  product             InventoryItem        @relation("AssemblyProduct", fields: [productId], references: [id])
+  warehouse           Warehouse?           @relation(fields: [warehouseId], references: [id])
+  assignedTo          User?                @relation("AssemblyAssignee", fields: [assignedToId], references: [id])
+  createdBy           User                 @relation("AssemblyCreator", fields: [createdById], references: [id])
+  salesOrder          SalesOrder?          @relation(fields: [salesOrderId], references: [id])
+  componentIssues     AssemblyComponentIssue[]
+  productionLogs      AssemblyProductionLog[]
+  
+  @@unique([organizationId, orderNumber])
+  @@index([organizationId])
+  @@index([bomId])
+  @@index([productId])
+  @@index([status])
+  @@index([scheduledStart])
+  @@map("assembly_orders")
+}
+
+model AssemblyComponentIssue {
+  id                String        @id @default(cuid())
+  assemblyOrderId   String
+  bomComponentId    String?       // Link to BOM component
+  
+  // Component Details
+  componentId       String        // What was issued
+  requiredQuantity  Decimal       @db.Decimal(10, 4)
+  issuedQuantity    Decimal       @db.Decimal(10, 4)
+  consumedQuantity  Decimal       @db.Decimal(10, 4) @default(0)
+  returnedQuantity  Decimal       @db.Decimal(10, 4) @default(0)
+  scrapQuantity     Decimal       @db.Decimal(10, 4) @default(0)
+  
+  // Lot/Serial Tracking
+  lotId             String?
+  serialNumbers     Json?         // Array of serial numbers consumed
+  
+  // Status
+  status            IssueStatus   @default(ISSUED)
+  
+  // Issued Details
+  issuedById        String
+  issuedDate        DateTime      @default(now())
+  
+  // Return Details
+  returnedById      String?
+  returnedDate      DateTime?
+  
+  // Location
+  fromLocationId    String?       // Where component was taken from
+  
+  // Costing
+  unitCost          Decimal?      @db.Decimal(10, 2)
+  totalCost         Decimal?      @db.Decimal(10, 2)
+  
+  // Metadata
+  notes             String?       @db.Text
+  
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  assemblyOrder     AssemblyOrder @relation(fields: [assemblyOrderId], references: [id], onDelete: Cascade)
+  component         InventoryItem @relation("AssemblyComponent", fields: [componentId], references: [id])
+  lot               Lot?          @relation(fields: [lotId], references: [id])
+  issuedBy          User          @relation("ComponentIssuer", fields: [issuedById], references: [id])
+  returnedBy        User?         @relation("ComponentReturner", fields: [returnedById], references: [id])
+  fromLocation      Location?     @relation(fields: [fromLocationId], references: [id])
+  
+  @@index([assemblyOrderId])
+  @@index([componentId])
+  @@index([lotId])
+  @@index([status])
+  @@map("assembly_component_issues")
+}
+
+model AssemblyProductionLog {
+  id              String        @id @default(cuid())
+  assemblyOrderId String
+  
+  // Production Event
+  eventType       ProductionEventType
+  eventDate       DateTime      @default(now())
+  
+  // Quantity Tracking
+  quantityProduced Int?
+  quantityScrapped Int?
+  
+  // Yield Information
+  yieldPercentage Decimal?      @db.Decimal(5, 2)
+  
+  // Operator
+  operatorId      String
+  
+  // Scrap/Defect Details
+  scrapReason     String?
+  defectType      String?       // MATERIAL, WORKMANSHIP, EQUIPMENT, DESIGN
+  defectDescription String?     @db.Text
+  
+  // Time Tracking
+  startTime       DateTime?
+  endTime         DateTime?
+  durationMinutes Int?
+  
+  // Quality Data
+  qcCheckpoint    String?
+  qcResult        String?       // PASS, FAIL
+  
+  // Metadata
+  notes           String?       @db.Text
+  attachments     Json?         // Photos, documents
+  
+  createdAt       DateTime      @default(now())
+  
+  // Relations
+  assemblyOrder   AssemblyOrder @relation(fields: [assemblyOrderId], references: [id], onDelete: Cascade)
+  operator        User          @relation("ProductionOperator", fields: [operatorId], references: [id])
+  
+  @@index([assemblyOrderId])
+  @@index([eventType])
+  @@index([eventDate])
+  @@map("assembly_production_logs")
+}
+
+// Enums for Kitting & Assembly
+
+enum BOMType {
+  ASSEMBLY        // Standard assembly (combine components)
+  DISASSEMBLY     // Breakdown into components
+  KIT             // Bundle/kit of items
+  RECIPE          // Recipe-based (food, chemicals)
+  CONFIGURATION   // Configured product
+}
+
+enum BOMStatus {
+  DRAFT           // Being created
+  PENDING_APPROVAL // Awaiting approval
+  APPROVED        // Approved and active
+  OBSOLETE        // No longer used
+  ARCHIVED        // Archived for history
+}
+
+enum AssemblyStatus {
+  PENDING         // Awaiting start
+  READY           // Components reserved, ready to start
+  IN_PROGRESS     // Assembly in progress
+  ON_HOLD         // Temporarily paused
+  COMPLETED       // Assembly completed
+  CANCELLED       // Cancelled
+  FAILED          // Failed (quality issues)
+}
+
+enum IssueStatus {
+  ISSUED          // Components issued
+  PARTIALLY_CONSUMED // Some components used
+  FULLY_CONSUMED  // All components consumed
+  PARTIALLY_RETURNED // Some returned
+  RETURNED        // All returned
+  SCRAPPED        // Scrapped/wasted
+}
+
+enum ProductionEventType {
+  START           // Production started
+  PRODUCTION      // Production output recorded
+  SCRAP           // Scrap recorded
+  PAUSE           // Production paused
+  RESUME          // Production resumed
+  COMPLETE        // Production completed
+  QC_CHECK        // Quality check performed
+  REWORK          // Rework performed
+  EQUIPMENT_CHANGE // Equipment changed
+  MATERIAL_CHANGE // Material substitution
 }
