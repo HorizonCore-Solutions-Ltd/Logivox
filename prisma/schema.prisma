@@ -104,6 +104,13 @@ model User {
   executedReports         ReportExecution[]        @relation("ReportExecutor")
   createdDashboards       Dashboard[]              @relation("DashboardCreator")
   analyticsEvents         AnalyticsEvent[]         @relation("AnalyticsUser")
+  createdNotificationTemplates NotificationTemplate[] @relation("NotificationTemplateCreator")
+  receivedNotifications   Notification[]           @relation("NotificationRecipient")
+  createdNotifications    Notification[]           @relation("NotificationCreator")
+  createdAlertRules       AlertRule[]              @relation("AlertRuleCreator")
+  acknowledgedAlerts      Alert[]                  @relation("AlertAcknowledger")
+  resolvedAlerts          Alert[]                  @relation("AlertResolver")
+  notificationPreference  NotificationPreference?
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -189,6 +196,10 @@ model Organization {
   dashboards         Dashboard[]
   analyticsEvents    AnalyticsEvent[]
   kpiMetrics         KPIMetric[]
+  notificationTemplates NotificationTemplate[]
+  notifications      Notification[]
+  alertRules         AlertRule[]
+  alerts             Alert[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -3164,4 +3175,454 @@ enum PeriodType {
   QUARTERLY       // Quarterly period
   YEARLY          // Yearly period
   CUSTOM          // Custom period
+}
+
+// ============================================================================
+// NOTIFICATIONS & ALERTS SYSTEM - Phase 8 Days 23-24
+// ============================================================================
+
+// Notification template for reusable notification configurations
+model NotificationTemplate {
+  id                String   @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Template identification
+  name              String
+  description       String?
+  code              String   // Unique code per organization (e.g., "ORDER_SHIPPED", "LOW_STOCK_ALERT")
+  category          NotificationCategory
+  
+  // Template configuration
+  notificationType  NotificationType // EMAIL, SMS, WEBHOOK, PUSH, IN_APP
+  priority          NotificationPriority @default(MEDIUM)
+  
+  // Content templates (supports variables like {{orderNumber}}, {{customerName}})
+  subject           String?  // For email/push
+  body              String   @db.Text // Template body with variables
+  htmlBody          String?  @db.Text // HTML version for email
+  smsBody           String?  // SMS-specific body (character limit optimized)
+  
+  // Delivery configuration
+  channels          Json     // Array of channels: ["EMAIL", "SMS", "PUSH"]
+  deliveryRules     Json?    // Delivery rules (time windows, retry logic)
+  
+  // Recipient configuration
+  recipientType     RecipientType // USER, ROLE, CUSTOM, DYNAMIC
+  defaultRecipients Json?    // Default recipients (userIds, emails, phone numbers)
+  
+  // Conditions & triggers
+  triggerEvent      String   // Event that triggers this notification
+  conditions        Json?    // Conditions that must be met
+  
+  // Settings
+  isActive          Boolean  @default(true)
+  requireApproval   Boolean  @default(false)
+  
+  // Metadata
+  metadata          Json?
+  createdById       String
+  createdBy         User     @relation("NotificationTemplateCreator", fields: [createdById], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  notifications     Notification[]
+  alertRules        AlertRule[]
+  
+  @@unique([organizationId, code])
+  @@index([organizationId, category])
+  @@index([organizationId, isActive])
+}
+
+// Individual notification instance
+model Notification {
+  id                String   @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Notification identification
+  notificationNumber String  @unique // Auto-generated (NOTIF-YYYYMMDD-XXXX)
+  templateId        String?
+  template          NotificationTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  
+  // Notification details
+  category          NotificationCategory
+  notificationType  NotificationType
+  priority          NotificationPriority @default(MEDIUM)
+  
+  // Content
+  subject           String?
+  body              String   @db.Text
+  htmlBody          String?  @db.Text
+  data              Json?    // Additional data payload
+  
+  // Recipient
+  recipientType     RecipientType
+  recipientId       String?  // User ID if applicable
+  recipient         User?    @relation("NotificationRecipient", fields: [recipientId], references: [id], onDelete: SetNull)
+  recipientEmail    String?
+  recipientPhone    String?
+  recipientPushToken String?
+  
+  // Delivery status
+  status            NotificationStatus @default(PENDING)
+  channels          Json     // Array of channels attempted
+  
+  // Scheduling
+  scheduledFor      DateTime?
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  readAt            DateTime?
+  expiresAt         DateTime?
+  
+  // Error handling
+  attempts          Int      @default(0)
+  maxAttempts       Int      @default(3)
+  lastAttemptAt     DateTime?
+  error             String?
+  errorStack        String?  @db.Text
+  
+  // Related entities (polymorphic-style references)
+  relatedEntityType String?  // "SALES_ORDER", "PURCHASE_ORDER", "SHIPMENT", etc.
+  relatedEntityId   String?
+  
+  // Actions & links
+  actionUrl         String?
+  actionLabel       String?
+  
+  // Metadata
+  metadata          Json?
+  createdById       String?
+  createdBy         User?    @relation("NotificationCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  deliveries        NotificationDelivery[]
+  
+  @@index([organizationId, recipientId, status])
+  @@index([organizationId, category, status])
+  @@index([organizationId, createdAt])
+  @@index([recipientId, readAt])
+  @@index([scheduledFor])
+}
+
+// Notification delivery tracking (one per channel)
+model NotificationDelivery {
+  id                String   @id @default(cuid())
+  notificationId    String
+  notification      Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  
+  // Delivery details
+  channel           NotificationChannel
+  status            DeliveryStatus @default(PENDING)
+  
+  // Delivery tracking
+  sentAt            DateTime?
+  deliveredAt       DateTime?
+  bouncedAt         DateTime?
+  openedAt          DateTime?
+  clickedAt         DateTime?
+  
+  // Provider details
+  provider          String?  // "SendGrid", "Twilio", "Firebase", "Webhook"
+  providerId        String?  // External ID from provider
+  providerResponse  Json?
+  
+  // Error handling
+  attempts          Int      @default(0)
+  lastAttemptAt     DateTime?
+  error             String?
+  errorCode         String?
+  
+  // Metadata
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([notificationId, channel])
+  @@index([status, sentAt])
+}
+
+// Alert rules for automated notifications
+model AlertRule {
+  id                String   @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Rule identification
+  name              String
+  description       String?
+  code              String   // Unique code per organization
+  category          AlertCategory
+  
+  // Alert configuration
+  alertType         NotificationAlertType
+  severity          AlertSeverity @default(MEDIUM)
+  
+  // Trigger conditions
+  triggerEntity     String   // Entity to monitor (e.g., "INVENTORY_ITEM", "SALES_ORDER")
+  triggerConditions Json     // Conditions in query format
+  triggerFrequency  TriggerFrequency @default(REALTIME)
+  
+  // Threshold settings (for metric-based alerts)
+  metricCode        String?
+  threshold         Decimal? @db.Decimal(18, 4)
+  thresholdOperator ThresholdOperator? // GT, LT, GTE, LTE, EQ, NE
+  
+  // Notification configuration
+  templateId        String?
+  template          NotificationTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  notificationChannels Json  // Channels to use
+  
+  // Recipients
+  recipientType     RecipientType
+  recipients        Json     // User IDs, roles, or emails
+  
+  // Scheduling & throttling
+  activeHoursStart  String?  // "09:00"
+  activeHoursEnd    String?  // "17:00"
+  activeDays        Json?    // ["MON", "TUE", "WED", "THU", "FRI"]
+  throttlePeriod    Int?     // Minimum minutes between alerts
+  maxAlertsPerDay   Int?     // Maximum alerts per day
+  
+  // Settings
+  isActive          Boolean  @default(true)
+  requireAcknowledgment Boolean @default(false)
+  autoResolve       Boolean  @default(true)
+  
+  // Tracking
+  lastTriggeredAt   DateTime?
+  triggeredCount    Int      @default(0)
+  
+  // Metadata
+  metadata          Json?
+  createdById       String
+  createdBy         User     @relation("AlertRuleCreator", fields: [createdById], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Relations
+  alerts            Alert[]
+  
+  @@unique([organizationId, code])
+  @@index([organizationId, isActive])
+  @@index([organizationId, category])
+}
+
+// Alert instance (triggered alert)
+model Alert {
+  id                String   @id @default(cuid())
+  organizationId    String
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Alert identification
+  alertNumber       String   @unique // Auto-generated (ALERT-YYYYMMDD-XXXX)
+  ruleId            String?
+  rule              AlertRule? @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  
+  // Alert details
+  category          AlertCategory
+  alertType         NotificationAlertType
+  severity          AlertSeverity
+  
+  // Alert content
+  title             String
+  message           String   @db.Text
+  data              Json?    // Alert data/context
+  
+  // Related entity
+  relatedEntityType String?
+  relatedEntityId   String?
+  
+  // Status
+  status            NotificationAlertStatus @default(ACTIVE)
+  triggeredAt       DateTime @default(now())
+  acknowledgedAt    DateTime?
+  acknowledgedById  String?
+  acknowledgedBy    User?    @relation("AlertAcknowledger", fields: [acknowledgedById], references: [id], onDelete: SetNull)
+  resolvedAt        DateTime?
+  resolvedById      String?
+  resolvedBy        User?    @relation("AlertResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  
+  // Resolution
+  resolution        String?  @db.Text
+  resolutionAction  String?
+  
+  // Escalation
+  escalationLevel   Int      @default(0)
+  escalatedAt       DateTime?
+  
+  // Metadata
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@index([organizationId, status, severity])
+  @@index([organizationId, category, status])
+  @@index([ruleId, triggeredAt])
+  @@index([acknowledgedById])
+  @@index([resolvedById])
+}
+
+// User notification preferences
+model NotificationPreference {
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Channel preferences
+  emailEnabled      Boolean  @default(true)
+  smsEnabled        Boolean  @default(false)
+  pushEnabled       Boolean  @default(true)
+  inAppEnabled      Boolean  @default(true)
+  webhookEnabled    Boolean  @default(false)
+  
+  // Category preferences (JSON: { "ORDER_UPDATES": { "email": true, "push": false }, ... })
+  categoryPreferences Json?
+  
+  // Quiet hours
+  quietHoursEnabled Boolean  @default(false)
+  quietHoursStart   String?  // "22:00"
+  quietHoursEnd     String?  // "08:00"
+  
+  // Digest settings
+  digestEnabled     Boolean  @default(false)
+  digestFrequency   DigestFrequency? // DAILY, WEEKLY
+  digestTime        String?  // "09:00"
+  
+  // Alert preferences
+  alertEmailEnabled Boolean  @default(true)
+  alertSmsEnabled   Boolean  @default(true)
+  alertPushEnabled  Boolean  @default(true)
+  criticalOnlyMode  Boolean  @default(false)
+  
+  // Contact info
+  preferredEmail    String?
+  preferredPhone    String?
+  pushTokens        Json?    // Array of device push tokens
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// Notification enums
+enum NotificationCategory {
+  ORDER_UPDATES      // Order status changes
+  INVENTORY_ALERTS   // Inventory alerts
+  SHIPMENT_UPDATES   // Shipment tracking
+  PAYMENT_UPDATES    // Payment notifications
+  QUALITY_ALERTS     // Quality control alerts
+  SYSTEM_ALERTS      // System notifications
+  USER_ACTIONS       // User action confirmations
+  REPORTS            // Report generation
+  APPROVALS          // Approval requests
+  CUSTOM             // Custom notifications
+}
+
+enum NotificationType {
+  EMAIL              // Email notification
+  SMS                // SMS notification
+  WEBHOOK            // Webhook callback
+  PUSH               // Push notification
+  IN_APP             // In-app notification
+}
+
+enum NotificationChannel {
+  EMAIL              // Email channel
+  SMS                // SMS channel
+  WEBHOOK            // Webhook channel
+  PUSH               // Push notification channel
+  IN_APP             // In-app channel
+}
+
+enum NotificationPriority {
+  LOW                // Low priority
+  MEDIUM             // Medium priority
+  HIGH               // High priority
+  URGENT             // Urgent priority
+}
+
+enum RecipientType {
+  USER               // Specific user
+  ROLE               // Users with role
+  CUSTOM             // Custom recipient list
+  DYNAMIC            // Dynamically determined
+}
+
+enum NotificationStatus {
+  PENDING            // Pending delivery
+  SCHEDULED          // Scheduled for later
+  SENDING            // Currently sending
+  SENT               // Sent successfully
+  DELIVERED          // Delivered to recipient
+  READ               // Read by recipient
+  FAILED             // Failed to send
+  CANCELLED          // Cancelled
+  EXPIRED            // Expired
+}
+
+enum DeliveryStatus {
+  PENDING            // Pending delivery
+  SENDING            // Sending in progress
+  SENT               // Sent successfully
+  DELIVERED          // Delivered confirmation
+  OPENED             // Email opened
+  CLICKED            // Link clicked
+  BOUNCED            // Delivery bounced
+  FAILED             // Delivery failed
+}
+
+enum AlertCategory {
+  INVENTORY          // Inventory alerts
+  SALES              // Sales alerts
+  PURCHASING         // Purchasing alerts
+  WAREHOUSE          // Warehouse alerts
+  QUALITY            // Quality alerts
+  FINANCIAL          // Financial alerts
+  SYSTEM             // System alerts
+  SECURITY           // Security alerts
+  PERFORMANCE        // Performance alerts
+  CUSTOM             // Custom alerts
+}
+
+enum NotificationAlertType {
+  THRESHOLD          // Threshold-based alert
+  ANOMALY            // Anomaly detection
+  STATUS_CHANGE      // Status change alert
+  SCHEDULE           // Scheduled alert
+  EVENT              // Event-based alert
+}
+
+enum NotificationAlertStatus {
+  ACTIVE             // Active alert
+  ACKNOWLEDGED       // Acknowledged
+  RESOLVED           // Resolved
+  DISMISSED          // Dismissed
+  ESCALATED          // Escalated
+}
+
+enum TriggerFrequency {
+  REALTIME           // Real-time trigger
+  EVERY_MINUTE       // Every minute
+  EVERY_5_MINUTES    // Every 5 minutes
+  EVERY_15_MINUTES   // Every 15 minutes
+  HOURLY             // Hourly
+  DAILY              // Daily
+}
+
+enum ThresholdOperator {
+  GT                 // Greater than
+  LT                 // Less than
+  GTE                // Greater than or equal
+  LTE                // Less than or equal
+  EQ                 // Equal
+  NE                 // Not equal
+}
+
+enum DigestFrequency {
+  DAILY              // Daily digest
+  WEEKLY             // Weekly digest
 }
