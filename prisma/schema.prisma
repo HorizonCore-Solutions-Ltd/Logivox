@@ -4211,3 +4211,564 @@ enum WebhookStatus {
   ERROR                // Webhook has errors
   PAUSED               // Temporarily paused
 }
+
+// ============================================================================
+// ADVANCED WAREHOUSE OPERATIONS
+// ============================================================================
+
+// WavePick - Wave picking strategy for batch order fulfillment
+model WavePick {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouseId           String
+  warehouse             Warehouse                 @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  
+  // Wave identification
+  waveNumber            String                    // Auto-generated: WAVE-YYYYMMDD-XXXX
+  name                  String                    // Wave name
+  description           String?                   @db.Text
+  waveType              WaveType                  // Wave type
+  priority              WavePriority              @default(NORMAL)
+  
+  // Wave strategy
+  strategy              WaveStrategy              // Picking strategy
+  groupingCriteria      Json                      // Criteria for grouping orders (zone, carrier, ship date)
+  maxLines              Int?                      // Maximum pick lines per wave
+  maxOrders             Int?                      // Maximum orders per wave
+  maxWeight             Decimal?                  @db.Decimal(10, 2) // Maximum weight
+  maxVolume             Decimal?                  @db.Decimal(10, 2) // Maximum volume
+  
+  // Scheduling
+  scheduledFor          DateTime?                 // Scheduled start time
+  releaseTime           DateTime?                 // Time wave was released
+  pickDeadline          DateTime?                 // Pick completion deadline
+  shipDate              DateTime?                 // Target ship date
+  
+  // Status tracking
+  status                WaveStatus                @default(PLANNED)
+  
+  // Statistics
+  totalOrders           Int                       @default(0)
+  totalLines            Int                       @default(0)
+  totalQuantity         Int                       @default(0)
+  totalWeight           Decimal?                  @db.Decimal(10, 2)
+  totalVolume           Decimal?                  @db.Decimal(10, 2)
+  
+  // Progress tracking
+  pickedLines           Int                       @default(0)
+  packedOrders          Int                       @default(0)
+  shippedOrders         Int                       @default(0)
+  progress              Decimal                   @default(0) @db.Decimal(5, 2) // Percentage
+  
+  // Timing
+  startedAt             DateTime?
+  completedAt           DateTime?
+  duration              Int?                      // Duration in minutes
+  
+  // Assignment
+  assignedToId          String?
+  assignedTo            User?                     @relation("WaveAssignee", fields: [assignedToId], references: [id])
+  assignedAt            DateTime?
+  
+  // Performance metrics
+  pickRate              Decimal?                  @db.Decimal(8, 2) // Lines per hour
+  accuracy              Decimal?                  @db.Decimal(5, 2) // Percentage
+  
+  // Metadata
+  tags                  String[]
+  notes                 String?                   @db.Text
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("WaveCreator", fields: [createdById], references: [id])
+  
+  // Relations
+  lines                 WavePickLine[]
+  tasks                 PickingTask[]
+  routes                PickingRoute[]
+  
+  @@unique([organizationId, waveNumber])
+  @@index([organizationId, warehouseId])
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([assignedToId])
+}
+
+// WavePickLine - Individual pick line within a wave
+model WavePickLine {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  wavePickId            String
+  wavePick              WavePick                  @relation(fields: [wavePickId], references: [id], onDelete: Cascade)
+  
+  // Line details
+  lineNumber            Int                       // Sequential line number in wave
+  salesOrderId          String
+  salesOrder            SalesOrder                @relation(fields: [salesOrderId], references: [id])
+  pickListId            String?
+  pickList              PickList?                 @relation(fields: [pickListId], references: [id])
+  
+  // Item details
+  inventoryItemId       String
+  inventoryItem         InventoryItem             @relation(fields: [inventoryItemId], references: [id])
+  locationId            String?
+  location              Location?                 @relation(fields: [locationId], references: [id])
+  
+  // Quantities
+  orderedQuantity       Int
+  pickedQuantity        Int                       @default(0)
+  shortQuantity         Int                       @default(0)
+  
+  // Batch/Serial tracking
+  lotId                 String?
+  lot                   Lot?                      @relation(fields: [lotId], references: [id])
+  serialNumbers         String[]                  // Array of serial numbers
+  
+  // Priority & sequencing
+  priority              Int                       @default(0)
+  pickSequence          Int?                      // Optimized pick sequence
+  zoneSequence          Int?                      // Zone-based sequence
+  
+  // Status
+  status                PickLineStatus            @default(PENDING)
+  
+  // Assignment
+  assignedToId          String?
+  assignedTo            User?                     @relation("LinePickerAssignee", fields: [assignedToId], references: [id])
+  pickedAt              DateTime?
+  pickedById            String?
+  pickedBy              User?                     @relation("LinePicker", fields: [pickedById], references: [id])
+  
+  // Verification
+  verified              Boolean                   @default(false)
+  verifiedAt            DateTime?
+  verifiedById          String?
+  verifiedBy            User?                     @relation("LineVerifier", fields: [verifiedById], references: [id])
+  
+  // Notes & issues
+  notes                 String?
+  issues                Json?                     // Array of issues encountered
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  
+  @@index([organizationId, wavePickId])
+  @@index([salesOrderId])
+  @@index([inventoryItemId])
+  @@index([status])
+  @@index([assignedToId])
+}
+
+// PickingTask - Individual picking task assignment
+model PickingTask {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouseId           String
+  warehouse             Warehouse                 @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  
+  // Task identification
+  taskNumber            String                    // Auto-generated: TASK-YYYYMMDD-XXXX
+  taskType              TaskType
+  priority              TaskPriority              @default(NORMAL)
+  
+  // Task details
+  title                 String
+  description           String?                   @db.Text
+  instructions          String?                   @db.Text
+  
+  // Source reference
+  sourceType            String?                   // Source entity type (WavePick, PickList, etc.)
+  sourceId              String?                   // Source entity ID
+  wavePickId            String?
+  wavePick              WavePick?                 @relation(fields: [wavePickId], references: [id])
+  
+  // Location details
+  fromLocationId        String?
+  fromLocation          Location?                 @relation("TaskFromLocation", fields: [fromLocationId], references: [id])
+  toLocationId          String?
+  toLocation            Location?                 @relation("TaskToLocation", fields: [toLocationId], references: [id])
+  
+  // Item details (for pick/put tasks)
+  inventoryItemId       String?
+  inventoryItem         InventoryItem?            @relation(fields: [inventoryItemId], references: [id])
+  quantity              Int?
+  
+  // Status & progress
+  status                TaskStatus                @default(PENDING)
+  progress              Decimal                   @default(0) @db.Decimal(5, 2) // Percentage
+  
+  // Assignment
+  assignedToId          String?
+  assignedTo            User?                     @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  assignedAt            DateTime?
+  
+  // Timing
+  scheduledFor          DateTime?
+  dueBy                 DateTime?
+  startedAt             DateTime?
+  completedAt           DateTime?
+  duration              Int?                      // Duration in seconds
+  
+  // Completion details
+  completedById         String?
+  completedBy           User?                     @relation("TaskCompleter", fields: [completedById], references: [id])
+  completionNotes       String?                   @db.Text
+  
+  // Dependencies
+  dependsOn             String[]                  // Array of task IDs this depends on
+  blockedBy             String[]                  // Array of task IDs blocking this
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("TaskCreator", fields: [createdById], references: [id])
+  
+  @@unique([organizationId, taskNumber])
+  @@index([organizationId, warehouseId])
+  @@index([taskType])
+  @@index([status])
+  @@index([assignedToId])
+  @@index([scheduledFor])
+}
+
+// PickingRoute - Optimized route for picking tasks
+model PickingRoute {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouseId           String
+  warehouse             Warehouse                 @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  
+  // Route identification
+  routeNumber           String                    // Auto-generated: ROUTE-YYYYMMDD-XXXX
+  name                  String
+  description           String?                   @db.Text
+  
+  // Route details
+  wavePickId            String?
+  wavePick              WavePick?                 @relation(fields: [wavePickId], references: [id])
+  routeType             RouteType                 @default(STANDARD)
+  optimizationMethod    OptimizationMethod        @default(SHORTEST_PATH)
+  
+  // Route configuration
+  startLocationId       String?
+  startLocation         Location?                 @relation("RouteStart", fields: [startLocationId], references: [id])
+  endLocationId         String?
+  endLocation           Location?                 @relation("RouteEnd", fields: [endLocationId], references: [id])
+  
+  // Route waypoints
+  waypoints             Json                      // Array of location IDs in sequence
+  // Example: [{ locationId: "loc1", sequence: 1, distance: 10, estimatedTime: 30 }]
+  
+  // Statistics
+  totalStops            Int                       @default(0)
+  totalDistance         Decimal?                  @db.Decimal(10, 2) // Distance in meters
+  estimatedDuration     Int?                      // Estimated duration in seconds
+  actualDuration        Int?                      // Actual duration in seconds
+  
+  // Status
+  status                RouteStatus               @default(PLANNED)
+  
+  // Assignment
+  assignedToId          String?
+  assignedTo            User?                     @relation("RouteAssignee", fields: [assignedToId], references: [id])
+  assignedAt            DateTime?
+  
+  // Timing
+  startedAt             DateTime?
+  completedAt           DateTime?
+  
+  // Performance
+  efficiency            Decimal?                  @db.Decimal(5, 2) // Percentage
+  deviations            Json?                     // Deviations from planned route
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("RouteCreator", fields: [createdById], references: [id])
+  
+  @@unique([organizationId, routeNumber])
+  @@index([organizationId, warehouseId])
+  @@index([wavePickId])
+  @@index([status])
+  @@index([assignedToId])
+}
+
+// TaskAutomation - Automated task creation rules
+model TaskAutomation {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Automation identification
+  name                  String
+  code                  String                    // Unique code
+  description           String?                   @db.Text
+  
+  // Trigger configuration
+  triggerEvent          TriggerEvent              // Event that triggers automation
+  triggerConditions     Json                      // Conditions for triggering
+  // Example: { "field": "quantity", "operator": "lt", "value": 10 }
+  
+  // Task template
+  taskType              TaskType
+  taskPriority          TaskPriority              @default(NORMAL)
+  taskTemplate          Json                      // Template for creating tasks
+  // Example: { "title": "Restock {{item}}", "instructions": "..." }
+  
+  // Assignment rules
+  assignmentRule        AssignmentRule            @default(ROUND_ROBIN)
+  assignToRole          String?                   // Role to assign to
+  assignToUserId        String?                   // Specific user to assign to
+  assignToUser          User?                     @relation("AutomationAssignee", fields: [assignToUserId], references: [id])
+  
+  // Scheduling
+  scheduleType          ScheduleType              @default(IMMEDIATE)
+  scheduleTime          String?                   // Time of day (HH:MM)
+  scheduleDays          String[]                  // Days of week
+  delay                 Int?                      // Delay in minutes
+  
+  // Frequency limits
+  maxExecutionsPerDay   Int?
+  maxExecutionsPerHour  Int?
+  cooldownPeriod        Int?                      // Minutes between executions
+  
+  // Status & monitoring
+  isActive              Boolean                   @default(true)
+  lastTriggeredAt       DateTime?
+  lastExecutionAt       DateTime?
+  executionCount        Int                       @default(0)
+  successCount          Int                       @default(0)
+  failureCount          Int                       @default(0)
+  
+  // Error handling
+  lastError             String?                   @db.Text
+  retryOnFailure        Boolean                   @default(true)
+  maxRetries            Int                       @default(3)
+  
+  // Metadata
+  tags                  String[]
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("AutomationCreator", fields: [createdById], references: [id])
+  
+  // Relations
+  executions            TaskExecution[]
+  
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([triggerEvent])
+  @@index([isActive])
+}
+
+// TaskExecution - Execution log for automated tasks
+model TaskExecution {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  automationId          String
+  automation            TaskAutomation            @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  
+  // Execution details
+  executionNumber       String                    // Auto-generated: EXEC-YYYYMMDD-XXXX
+  status                ExecutionStatus           @default(PENDING)
+  
+  // Trigger details
+  triggerData           Json                      // Data that triggered execution
+  triggeredBy           String?                   // User ID if manually triggered
+  
+  // Created task reference
+  taskId                String?                   // Created PickingTask ID
+  taskNumber            String?                   // Created task number
+  
+  // Timing
+  startedAt             DateTime?
+  completedAt           DateTime?
+  duration              Int?                      // Duration in milliseconds
+  
+  // Result
+  result                Json?                     // Execution result
+  error                 String?                   @db.Text
+  errorStack            String?                   @db.Text
+  
+  // Retry tracking
+  attempt               Int                       @default(1)
+  maxAttempts           Int                       @default(3)
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamp
+  createdAt             DateTime                  @default(now())
+  
+  @@unique([organizationId, executionNumber])
+  @@index([organizationId, automationId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Enums for Advanced Operations
+
+enum WaveType {
+  SINGLE_ORDER         // Wave for single order
+  BATCH                // Batch multiple orders
+  ZONE                 // Zone-based wave
+  CARRIER              // Carrier-based wave
+  PRIORITY             // Priority-based wave
+  CUSTOM               // Custom wave type
+}
+
+enum WavePriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+  CRITICAL
+}
+
+enum WaveStrategy {
+  FIFO                 // First In First Out
+  LIFO                 // Last In First Out
+  ZONE_BASED           // Pick by zone
+  CARRIER_BASED        // Group by carrier
+  SHIP_DATE            // Group by ship date
+  PRIORITY             // Priority-based
+  SHORTEST_PATH        // Optimize for shortest path
+  CUSTOM               // Custom strategy
+}
+
+enum WaveStatus {
+  PLANNED              // Wave planned
+  RELEASED             // Released for picking
+  IN_PROGRESS          // Picking in progress
+  PICKED               // All items picked
+  VERIFIED             // Picks verified
+  PACKED               // Orders packed
+  SHIPPED              // Orders shipped
+  COMPLETED            // Wave completed
+  CANCELLED            // Wave cancelled
+  ON_HOLD              // Temporarily on hold
+}
+
+enum PickLineStatus {
+  PENDING              // Waiting to be picked
+  ASSIGNED             // Assigned to picker
+  IN_PROGRESS          // Being picked
+  PICKED               // Picked
+  SHORT                // Short pick
+  VERIFIED             // Verified
+  CANCELLED            // Cancelled
+}
+
+enum TaskType {
+  PICK                 // Pick task
+  PUT                  // Put away task
+  MOVE                 // Move inventory
+  COUNT                // Count task
+  REPLENISH            // Replenishment
+  RESTOCK              // Restock task
+  PACK                 // Packing task
+  INSPECT              // Inspection task
+  LABEL                // Labeling task
+  CUSTOM               // Custom task
+}
+
+enum TaskPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+  CRITICAL
+}
+
+enum TaskStatus {
+  PENDING              // Pending execution
+  ASSIGNED             // Assigned to user
+  IN_PROGRESS          // In progress
+  COMPLETED            // Completed
+  CANCELLED            // Cancelled
+  ON_HOLD              // On hold
+  FAILED               // Failed
+}
+
+enum RouteType {
+  STANDARD             // Standard picking route
+  EXPRESS              // Express route
+  ZONE                 // Zone-specific route
+  BATCH                // Batch picking route
+  CUSTOM               // Custom route
+}
+
+enum OptimizationMethod {
+  SHORTEST_PATH        // Shortest path algorithm
+  NEAREST_NEIGHBOR     // Nearest neighbor
+  GENETIC_ALGORITHM    // Genetic algorithm
+  SIMULATED_ANNEALING  // Simulated annealing
+  MANUAL               // Manually defined
+}
+
+enum RouteStatus {
+  PLANNED              // Route planned
+  ASSIGNED             // Assigned to picker
+  IN_PROGRESS          // In progress
+  COMPLETED            // Completed
+  CANCELLED            // Cancelled
+}
+
+enum TriggerEvent {
+  LOW_STOCK            // Low stock trigger
+  OUT_OF_STOCK         // Out of stock
+  ORDER_CREATED        // New order created
+  ORDER_RELEASED       // Order released
+  SHIPMENT_DUE         // Shipment due soon
+  WAVE_RELEASED        // Wave released
+  LOCATION_FULL        // Location full
+  LOCATION_EMPTY       // Location empty
+  SCHEDULE             // Scheduled trigger
+  MANUAL               // Manual trigger
+  CUSTOM               // Custom event
+}
+
+enum AssignmentRule {
+  ROUND_ROBIN          // Round robin assignment
+  LEAST_BUSY           // Assign to least busy user
+  SKILL_BASED          // Skill-based assignment
+  ZONE_BASED           // Zone-based assignment
+  RANDOM               // Random assignment
+  MANUAL               // Manual assignment
+}
+
+enum ScheduleType {
+  IMMEDIATE            // Execute immediately
+  SCHEDULED            // Execute at specific time
+  DELAYED              // Execute after delay
+  RECURRING            // Recurring schedule
+}
+
+enum ExecutionStatus {
+  PENDING              // Pending execution
+  RUNNING              // Currently executing
+  COMPLETED            // Completed successfully
+  FAILED               // Failed
+  RETRYING             // Retrying after failure
+  CANCELLED            // Cancelled
+}
