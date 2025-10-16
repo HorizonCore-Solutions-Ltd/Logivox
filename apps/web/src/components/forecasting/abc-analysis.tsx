@@ -129,7 +129,7 @@ export function ABCAnalysis({ categories }: ABCAnalysisProps) {
                 dataKey="value"
               >
                 {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[categories[index].category]} />
+                  <Cell key={`cell-${index}`} fill={COLORS[categories[index]?.category || 'C']} />
                 ))}
               </Pie>
               <Tooltip 

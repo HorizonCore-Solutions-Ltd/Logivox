@@ -9,12 +9,18 @@ export async function GET(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.tenantId) {
+    if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const productId = params.productId;
-    const forecast = await generateProductForecast(productId, session.user.tenantId);
+    // Use the first organization ID as tenant context
+    const organizationId = session.user.organizations[0]?.id;
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+    }
+
+    const forecast = await generateProductForecast(productId, organizationId);
 
     if (!forecast) {
       return NextResponse.json(

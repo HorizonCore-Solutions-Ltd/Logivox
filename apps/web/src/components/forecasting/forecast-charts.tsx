@@ -62,7 +62,7 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
     const x = index - forecast.historicalSales.length;
     const trendValue = forecast.trend.slope * x + 
       (forecast.historicalSales.length > 0 
-        ? forecast.historicalSales[forecast.historicalSales.length - 1].quantity 
+        ? (forecast.historicalSales[forecast.historicalSales.length - 1]?.quantity || 0)
         : 0);
     return {
       ...point,
