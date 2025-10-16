@@ -78,6 +78,12 @@ model User {
   createdShipments        Shipment[]           @relation("ShipmentCreator")
   createdPacks            Pack[]               @relation("PackCreator")
   initiatedPacks          Pack[]               @relation("PackInitiator")
+  requestedTransfers      WarehouseTransfer[]  @relation("TransferRequestedBy")
+  approvedTransfers       WarehouseTransfer[]  @relation("TransferApprovedBy")
+  completedTransfers      WarehouseTransfer[]  @relation("TransferCompletedBy")
+  createdAdjustments      StockAdjustment[]    @relation("AdjustmentCreatedBy")
+  approvedAdjustments     StockAdjustment[]    @relation("AdjustmentApprovedBy")
+  completedAdjustments    StockAdjustment[]    @relation("AdjustmentCompletedBy")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -143,6 +149,9 @@ model Organization {
   shipments          Shipment[]
   packs              Pack[]
   carrierConfigs     CarrierConfig[]
+  locations          Location[]
+  warehouseTransfers WarehouseTransfer[]
+  stockAdjustments   StockAdjustment[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -290,6 +299,8 @@ model InventoryItem {
   salesOrderItems    SalesOrderItem[]
   pickListItems      PickListItem[]
   packageItems       PackageItem[]
+  warehouseTransfers WarehouseTransfer[]
+  stockAdjustments   StockAdjustment[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -1249,6 +1260,219 @@ enum IntegrationType {
   SHIPPING
   ANALYTICS
   CUSTOM
+}
+
+// ==========================================
+// WAREHOUSE OPERATIONS
+// ==========================================
+
+enum LocationType {
+  WAREHOUSE
+  ZONE
+  AISLE
+  RACK
+  SHELF
+  BIN
+  STAGING
+  SHIPPING
+  RECEIVING
+  QUARANTINE
+}
+
+enum TransferStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum AdjustmentReason {
+  DAMAGE
+  LOSS
+  FOUND
+  CORRECTION
+  RECOUNT
+  RETURN_TO_VENDOR
+  SAMPLE
+  THEFT
+  EXPIRY
+  OTHER
+}
+
+enum AdjustmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model Location {
+  id             String       @id @default(cuid())
+  organizationId String
+  locationCode   String       // e.g., "WH1-A-01-R2-S3-B4"
+  name           String
+  type           LocationType
+  parentId       String?
+  
+  // Hierarchy fields
+  warehouseId    String?
+  zoneId         String?
+  aisleId        String?
+  rackId         String?
+  shelfId        String?
+  
+  // Physical attributes
+  barcode        String?      @unique
+  qrCode         String?
+  capacity       Float?       // Max units
+  maxWeight      Float?       // kg
+  
+  // Dimensions (cm)
+  length         Float?
+  width          Float?
+  height         Float?
+  
+  // Status
+  isActive       Boolean      @default(true)
+  isPickable     Boolean      @default(true)
+  isPutaway      Boolean      @default(true)
+  temperature    Float?       // For cold storage
+  
+  // Metadata
+  notes          String?
+  metadata       Json?
+  
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parent         Location?    @relation("LocationHierarchy", fields: [parentId], references: [id])
+  children       Location[]   @relation("LocationHierarchy")
+  
+  transfersFrom  WarehouseTransfer[] @relation("TransferFromLocation")
+  transfersTo    WarehouseTransfer[] @relation("TransferToLocation")
+  adjustments    StockAdjustment[]
+
+  @@unique([organizationId, locationCode])
+  @@index([organizationId])
+  @@index([locationCode])
+  @@index([barcode])
+  @@index([type])
+  @@index([parentId])
+  @@index([warehouseId])
+  @@map("locations")
+}
+
+model WarehouseTransfer {
+  id                String         @id @default(cuid())
+  organizationId    String
+  transferNumber    String         @unique
+  status            TransferStatus @default(PENDING)
+  
+  // Source and destination
+  fromLocationId    String
+  toLocationId      String
+  
+  // Item details
+  inventoryId       String
+  quantity          Int
+  
+  // Transfer details
+  reason            String?
+  notes             String?
+  priority          String?        // HIGH, MEDIUM, LOW
+  
+  // User tracking
+  requestedById     String
+  approvedById      String?
+  completedById     String?
+  
+  // Dates
+  requestedDate     DateTime       @default(now())
+  scheduledDate     DateTime?
+  approvedDate      DateTime?
+  startedDate       DateTime?
+  completedDate     DateTime?
+  
+  // Metadata
+  metadata          Json?
+  
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  organization      Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  fromLocation      Location       @relation("TransferFromLocation", fields: [fromLocationId], references: [id])
+  toLocation        Location       @relation("TransferToLocation", fields: [toLocationId], references: [id])
+  inventoryItem     InventoryItem  @relation(fields: [inventoryId], references: [id])
+  requestedBy       User           @relation("TransferRequestedBy", fields: [requestedById], references: [id])
+  approvedBy        User?          @relation("TransferApprovedBy", fields: [approvedById], references: [id])
+  completedBy       User?          @relation("TransferCompletedBy", fields: [completedById], references: [id])
+
+  @@index([organizationId])
+  @@index([transferNumber])
+  @@index([status])
+  @@index([fromLocationId])
+  @@index([toLocationId])
+  @@index([inventoryId])
+  @@map("warehouse_transfers")
+}
+
+model StockAdjustment {
+  id                String           @id @default(cuid())
+  organizationId    String
+  adjustmentNumber  String           @unique
+  status            AdjustmentStatus @default(PENDING)
+  
+  // Item details
+  inventoryId       String
+  locationId        String?
+  
+  // Adjustment details
+  quantityBefore    Int
+  quantityAfter     Int
+  quantityChange    Int              // Can be negative
+  reason            AdjustmentReason
+  reasonNotes       String?
+  
+  // Approval workflow
+  requiresApproval  Boolean          @default(true)
+  approvedById      String?
+  rejectionReason   String?
+  
+  // User tracking
+  createdById       String
+  completedById     String?
+  
+  // Dates
+  adjustmentDate    DateTime         @default(now())
+  approvedDate      DateTime?
+  completedDate     DateTime?
+  
+  // Financial impact
+  unitCost          Float?
+  totalCost         Float?
+  
+  // Metadata
+  attachments       Json?            // URLs to photos/documents
+  metadata          Json?
+  
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inventoryItem     InventoryItem    @relation(fields: [inventoryId], references: [id])
+  location          Location?        @relation(fields: [locationId], references: [id])
+  createdBy         User             @relation("AdjustmentCreatedBy", fields: [createdById], references: [id])
+  approvedBy        User?            @relation("AdjustmentApprovedBy", fields: [approvedById], references: [id])
+  completedBy       User?            @relation("AdjustmentCompletedBy", fields: [completedById], references: [id])
+
+  @@index([organizationId])
+  @@index([adjustmentNumber])
+  @@index([status])
+  @@index([inventoryId])
+  @@index([locationId])
+  @@index([reason])
+  @@map("stock_adjustments")
 }
 
 model ApiKey {
