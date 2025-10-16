@@ -88,6 +88,12 @@ model User {
   approvedCycleCounts     CycleCount[]         @relation("ApprovedCycleCounts")
   countedItems            CycleCountItem[]     @relation("CountedItems")
   reconciledItems         CycleCountItem[]     @relation("ReconciledItems")
+  approvedRMAs            RMA[]                @relation("RMAApprovedBy")
+  inspectedRMAs           RMA[]                @relation("RMAInspectedBy")
+  restockedRMAItems       RMAItem[]            @relation("RMARestockedBy")
+  inspectedQC             QCInspection[]       @relation("QCInspector")
+  performedCheckpoints    QCCheckpoint[]       @relation("CheckpointPerformer")
+  qcApprovals             QCApproval[]         @relation("QCApprover")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -157,6 +163,15 @@ model Organization {
   warehouseTransfers WarehouseTransfer[]
   stockAdjustments   StockAdjustment[]
   cycleCounts        CycleCount[]
+  returnReasons      ReturnReason[]
+  rmas               RMA[]
+  lots               Lot[]
+  serialNumbers      SerialNumber[]
+  lotMovements       LotMovement[]
+  serialMovements    SerialMovement[]
+  lotGenealogies     LotGenealogy[]
+  inspectionTemplates InspectionTemplate[]
+  qcInspections      QCInspection[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -308,6 +323,11 @@ model InventoryItem {
   warehouseTransfers WarehouseTransfer[]
   stockAdjustments   StockAdjustment[]
   cycleCountItems    CycleCountItem[]
+  rmaItems           RMAItem[]        @relation("RMAInventoryItem")
+  rmaExchangeItems   RMAItem[]        @relation("RMAExchangeItem")
+  lots               Lot[]
+  serialNumbers      SerialNumber[]
+  qcInspections      QCInspection[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -533,6 +553,7 @@ model Supplier {
   organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   inventoryItems  InventoryItem[]
   purchaseOrders  PurchaseOrder[]
+  lots            Lot[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -557,6 +578,8 @@ model Customer {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   bookings     Booking[]
   salesOrders  SalesOrder[]
+  rmas         RMA[]
+  serialNumbers SerialNumber[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -615,6 +638,7 @@ model PurchaseOrder {
   approvedBy      User?             @relation("POApprover", fields: [approvedById], references: [id])
   items           PurchaseOrderItem[]
   receipts        GoodsReceiptNote[]
+  lots            Lot[]
 
   @@index([organizationId])
   @@index([supplierId])
@@ -723,6 +747,9 @@ model GoodsReceiptNote {
   receivedBy        User @relation("GRNReceivedBy", fields: [receivedById], references: [id])
   qcBy              User? @relation("GRNQCBy", fields: [qcById], references: [id])
   items             GRNItem[]
+  lots              Lot[]
+  serialNumbers     SerialNumber[]
+  qcInspections     QCInspection[]
 
   @@index([organizationId])
   @@index([purchaseOrderId])
@@ -882,6 +909,9 @@ model SalesOrder {
   pickLists       PickList[]
   shipments       Shipment[]
   packs           Pack[]
+  rmas            RMA[]
+  serialNumbers   SerialNumber[]
+  qcInspections   QCInspection[]
 
   @@unique([organizationId, soNumber])
   @@index([organizationId])
@@ -924,6 +954,7 @@ model SalesOrderItem {
   inventoryItem     InventoryItem @relation(fields: [inventoryItemId], references: [id])
   pickListItems     PickListItem[]
   packageItems      PackageItem[]
+  rmaItems          RMAItem[]
 
   @@index([salesOrderId])
   @@index([inventoryItemId])
@@ -1361,6 +1392,9 @@ model Location {
   adjustments    StockAdjustment[]
   cycleCounts    CycleCount[]
   cycleCountItems CycleCountItem[]
+  rmaRestockItems RMAItem[]
+  lots            Lot[]
+  serialNumbers   SerialNumber[]
 
   @@unique([organizationId, locationCode])
   @@index([organizationId])
@@ -1653,4 +1687,746 @@ model CycleCountItem {
   @@index([isCounted])
   @@index([isReconciled])
   @@map("cycle_count_items")
+}
+
+// ==========================================
+// RETURNS MANAGEMENT (RMA)
+// ==========================================
+
+enum RMAStatus {
+  PENDING        // Return requested, awaiting approval
+  APPROVED       // Return authorized
+  REJECTED       // Return denied
+  IN_TRANSIT     // Customer shipped the return
+  RECEIVED       // Return received at warehouse
+  INSPECTING     // Under inspection/QC
+  COMPLETED      // Return processed (refunded/exchanged/restocked)
+  CANCELLED      // Return cancelled
+}
+
+enum ReturnAction {
+  REFUND         // Issue refund to customer
+  EXCHANGE       // Exchange for same/different item
+  STORE_CREDIT   // Issue store credit
+  REPAIR         // Repair and return to customer
+  DISPOSE        // Dispose of item (damaged beyond repair)
+}
+
+enum ReturnCondition {
+  NEW            // Unopened, like new
+  GOOD           // Used but good condition
+  FAIR           // Shows wear, functional
+  DAMAGED        // Damaged but repairable
+  DEFECTIVE      // Manufacturing defect
+  DESTROYED      // Not salvageable
+}
+
+model ReturnReason {
+  id             String   @id @default(cuid())
+  organizationId String
+  code           String   // e.g., "DEFECTIVE", "WRONG_ITEM", "NOT_AS_DESCRIBED"
+  name           String   // Display name
+  description    String?
+  
+  // Workflow automation
+  autoApprove    Boolean  @default(false)  // Auto-approve returns with this reason
+  requiresQC     Boolean  @default(true)   // Requires quality inspection
+  defaultAction  ReturnAction?             // Default action for this reason
+  
+  // Business rules
+  allowedDays    Int?     // Days after delivery to allow returns (null = unlimited)
+  restockable    Boolean  @default(true)   // Can item be restocked
+  
+  // Metrics
+  isActive       Boolean  @default(true)
+  sortOrder      Int      @default(0)
+  
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rmas           RMA[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("return_reasons")
+}
+
+model RMA {
+  id                String         @id @default(cuid())
+  organizationId    String
+  rmaNumber         String         @unique  // RMA-YYYYMMDD-XXX
+  status            RMAStatus      @default(PENDING)
+  
+  // Source information
+  salesOrderId      String?        // Original sales order
+  customerId        String
+  
+  // Return details
+  returnReasonId    String
+  customerNotes     String?        @db.Text
+  
+  // Dates
+  requestedDate     DateTime       @default(now())
+  approvedDate      DateTime?
+  receivedDate      DateTime?
+  completedDate     DateTime?
+  
+  // Approval workflow
+  approvedById      String?
+  rejectionReason   String?
+  
+  // Shipping details
+  returnTrackingNumber String?
+  returnCarrier        String?
+  returnShippingCost   Decimal?   @db.Decimal(10, 2)
+  
+  // Financial
+  totalRefundAmount    Decimal?   @db.Decimal(10, 2)
+  restockingFee        Decimal?   @db.Decimal(10, 2)
+  
+  // Processing
+  inspectedById        String?
+  inspectedDate        DateTime?
+  qcNotes              String?    @db.Text
+  
+  // Configuration
+  requiresApproval     Boolean    @default(true)
+  notifyCustomer       Boolean    @default(true)
+  
+  // Metadata
+  attachments          Json?      // Photos, documents
+  metadata             Json?
+  
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  organization         Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrder           SalesOrder?   @relation(fields: [salesOrderId], references: [id])
+  customer             Customer      @relation(fields: [customerId], references: [id])
+  returnReason         ReturnReason  @relation(fields: [returnReasonId], references: [id])
+  approvedBy           User?         @relation("RMAApprovedBy", fields: [approvedById], references: [id])
+  inspectedBy          User?         @relation("RMAInspectedBy", fields: [inspectedById], references: [id])
+  
+  items                RMAItem[]
+
+  @@index([organizationId])
+  @@index([rmaNumber])
+  @@index([status])
+  @@index([salesOrderId])
+  @@index([customerId])
+  @@index([returnReasonId])
+  @@map("rmas")
+}
+
+model RMAItem {
+  id                String          @id @default(cuid())
+  rmaId             String
+  inventoryId       String
+  salesOrderItemId  String?         // Link to original order item
+  
+  // Quantities
+  quantityRequested Int
+  quantityReceived  Int?
+  quantityAccepted  Int?            // Quantity approved for refund/exchange
+  quantityRejected  Int?            // Quantity not accepted
+  
+  // Item details
+  condition         ReturnCondition?
+  action            ReturnAction    @default(REFUND)
+  
+  // Financial
+  unitPrice         Decimal         @db.Decimal(10, 2)
+  refundAmount      Decimal?        @db.Decimal(10, 2)
+  restockingFee     Decimal?        @db.Decimal(10, 2)
+  
+  // Processing
+  isInspected       Boolean         @default(false)
+  inspectionNotes   String?         @db.Text
+  
+  // Restocking
+  isRestocked       Boolean         @default(false)
+  restockLocationId String?
+  restockedDate     DateTime?
+  restockedById     String?
+  
+  // Exchange (if action = EXCHANGE)
+  exchangeInventoryId String?
+  exchangeQuantity    Int?
+  
+  // Metadata
+  serialNumbers     Json?           // Array of serial numbers
+  batchNumbers      Json?           // Array of batch numbers
+  photos            Json?           // Inspection photos
+  metadata          Json?
+  
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  rma               RMA             @relation(fields: [rmaId], references: [id], onDelete: Cascade)
+  inventoryItem     InventoryItem   @relation("RMAInventoryItem", fields: [inventoryId], references: [id])
+  salesOrderItem    SalesOrderItem? @relation(fields: [salesOrderItemId], references: [id])
+  restockLocation   Location?       @relation(fields: [restockLocationId], references: [id])
+  restockedBy       User?           @relation("RMARestockedBy", fields: [restockedById], references: [id])
+  exchangeItem      InventoryItem?  @relation("RMAExchangeItem", fields: [exchangeInventoryId], references: [id])
+
+  @@index([rmaId])
+  @@index([inventoryId])
+  @@index([salesOrderItemId])
+  @@index([isInspected])
+  @@index([isRestocked])
+  @@map("rma_items")
+}
+
+// ==========================================
+// BATCH & SERIAL TRACKING
+// ==========================================
+
+model Lot {
+  id                  String      @id @default(cuid())
+  organizationId      String
+  inventoryId         String
+  
+  // Lot identification
+  lotNumber           String      // Unique lot/batch number
+  supplierLotNumber   String?     // Vendor's lot number
+  
+  // Dates
+  manufacturingDate   DateTime?
+  expiryDate          DateTime?
+  receivedDate        DateTime    @default(now())
+  
+  // Quantities
+  initialQuantity     Int
+  currentQuantity     Int
+  reservedQuantity    Int         @default(0)
+  availableQuantity   Int         @default(0) // currentQuantity - reservedQuantity
+  
+  // Quality & Compliance
+  qcStatus            QCStatus    @default(PENDING)
+  qcDate              DateTime?
+  qcNotes             String?     @db.Text
+  certificateNumber   String?     // Certificate of Analysis number
+  
+  // Traceability
+  grnId               String?     // Link to GRN if received
+  purchaseOrderId     String?
+  supplierId          String?
+  
+  // Status
+  status              LotStatus   @default(AVAILABLE)
+  isQuarantined       Boolean     @default(false)
+  quarantineReason    String?
+  quarantineDate      DateTime?
+  
+  // Recall management
+  isRecalled          Boolean     @default(false)
+  recallDate          DateTime?
+  recallReason        String?     @db.Text
+  recallNotes         String?     @db.Text
+  
+  // Storage
+  locationId          String?
+  storageConditions   String?     // e.g., "Keep refrigerated 2-8°C"
+  
+  // Metadata
+  customFields        Json?       // Flexible fields for industry-specific data
+  notes               String?     @db.Text
+  metadata            Json?
+  
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  organization        Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inventoryItem       InventoryItem      @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  grn                 GoodsReceiptNote?  @relation(fields: [grnId], references: [id])
+  purchaseOrder       PurchaseOrder?     @relation(fields: [purchaseOrderId], references: [id])
+  supplier            Supplier?          @relation(fields: [supplierId], references: [id])
+  location            Location?          @relation(fields: [locationId], references: [id])
+  
+  serialNumbers       SerialNumber[]
+  movements           LotMovement[]
+  genealogyParents    LotGenealogy[]     @relation("LotParent")
+  genealogyChildren   LotGenealogy[]     @relation("LotChild")
+  qcInspections       QCInspection[]
+
+  @@unique([organizationId, lotNumber])
+  @@index([organizationId])
+  @@index([inventoryId])
+  @@index([lotNumber])
+  @@index([expiryDate])
+  @@index([status])
+  @@index([qcStatus])
+  @@index([isRecalled])
+  @@index([grnId])
+  @@map("lots")
+}
+
+model SerialNumber {
+  id                String     @id @default(cuid())
+  organizationId    String
+  inventoryId       String
+  lotId             String?    // Optional link to lot
+  
+  // Serial identification
+  serialNumber      String     // Unique serial number
+  
+  // Status
+  status            SerialStatus @default(AVAILABLE)
+  
+  // Traceability
+  grnId             String?
+  grnItemId         String?
+  salesOrderId      String?
+  salesOrderItemId  String?
+  customerId        String?
+  
+  // Dates
+  receivedDate      DateTime?
+  soldDate          DateTime?
+  returnedDate      DateTime?
+  
+  // Location
+  locationId        String?
+  
+  // Warranty & Service
+  warrantyStartDate DateTime?
+  warrantyEndDate   DateTime?
+  warrantyPeriodDays Int?
+  serviceHistory    Json?      // Array of service records
+  
+  // Metadata
+  customFields      Json?
+  notes             String?    @db.Text
+  metadata          Json?
+  
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  organization      Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inventoryItem     InventoryItem      @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  lot               Lot?               @relation(fields: [lotId], references: [id])
+  grn               GoodsReceiptNote?  @relation(fields: [grnId], references: [id])
+  salesOrder        SalesOrder?        @relation(fields: [salesOrderId], references: [id])
+  customer          Customer?          @relation(fields: [customerId], references: [id])
+  location          Location?          @relation(fields: [locationId], references: [id])
+  
+  movements         SerialMovement[]
+
+  @@unique([organizationId, serialNumber])
+  @@index([organizationId])
+  @@index([inventoryId])
+  @@index([lotId])
+  @@index([serialNumber])
+  @@index([status])
+  @@index([salesOrderId])
+  @@index([customerId])
+  @@map("serial_numbers")
+}
+
+model LotMovement {
+  id              String         @id @default(cuid())
+  organizationId  String
+  lotId           String
+  
+  // Movement details
+  movementType    MovementType
+  quantity        Int
+  
+  // Reference
+  referenceType   String?        // e.g., "GRN", "SALES_ORDER", "ADJUSTMENT"
+  referenceId     String?
+  
+  // Location
+  fromLocationId  String?
+  toLocationId    String?
+  
+  // Metadata
+  notes           String?        @db.Text
+  performedById   String?
+  
+  createdAt       DateTime       @default(now())
+
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  lot             Lot            @relation(fields: [lotId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([lotId])
+  @@index([movementType])
+  @@index([createdAt])
+  @@map("lot_movements")
+}
+
+model SerialMovement {
+  id              String         @id @default(cuid())
+  organizationId  String
+  serialNumberId  String
+  
+  // Movement details
+  movementType    MovementType
+  
+  // Reference
+  referenceType   String?        // e.g., "GRN", "SALES_ORDER", "ADJUSTMENT"
+  referenceId     String?
+  
+  // Location
+  fromLocationId  String?
+  toLocationId    String?
+  
+  // Metadata
+  notes           String?        @db.Text
+  performedById   String?
+  
+  createdAt       DateTime       @default(now())
+
+  organization    Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  serialNumber    SerialNumber   @relation(fields: [serialNumberId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([serialNumberId])
+  @@index([movementType])
+  @@index([createdAt])
+  @@map("serial_movements")
+}
+
+model LotGenealogy {
+  id             String   @id @default(cuid())
+  organizationId String
+  parentLotId    String   // Parent lot (ingredient/component)
+  childLotId     String   // Child lot (produced/assembled)
+  
+  // Relationship details
+  quantity       Int      // Quantity of parent used in child
+  
+  // Metadata
+  notes          String?  @db.Text
+  
+  createdAt      DateTime @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  parentLot      Lot          @relation("LotParent", fields: [parentLotId], references: [id], onDelete: Cascade)
+  childLot       Lot          @relation("LotChild", fields: [childLotId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([parentLotId])
+  @@index([childLotId])
+  @@map("lot_genealogy")
+}
+
+enum QCStatus {
+  PENDING
+  PASSED
+  FAILED
+  CONDITIONAL
+}
+
+enum LotStatus {
+  AVAILABLE
+  RESERVED
+  QUARANTINED
+  EXPIRED
+  RECALLED
+  DEPLETED
+}
+
+enum SerialStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  IN_SERVICE
+  RETURNED
+  DEFECTIVE
+  SCRAPPED
+}
+
+// ==========================================
+// QUALITY CONTROL SYSTEM
+// ==========================================
+
+model InspectionTemplate {
+  id              String   @id @default(cuid())
+  organizationId  String
+  
+  // Template details
+  name            String
+  code            String   // Unique code per organization
+  description     String?  @db.Text
+  
+  // Applicability
+  category        InspectionCategory
+  inventoryIds    Json?    // Array of inventory item IDs (null = applies to all)
+  supplierIds     Json?    // Array of supplier IDs (null = applies to all)
+  
+  // Sampling
+  samplingType    SamplingType @default(FULL)
+  sampleSize      Int?         // For statistical sampling
+  samplePercentage Decimal?    @db.Decimal(5, 2) // For percentage sampling
+  
+  // Workflow
+  requiresApproval Boolean  @default(true)
+  approvalLevels   Int      @default(1) // Number of approval levels required
+  autoQuarantine   Boolean  @default(false) // Auto-quarantine on fail
+  
+  // Configuration
+  checkpoints      Json     // Array of checkpoint definitions
+  
+  // Status
+  isActive         Boolean  @default(true)
+  
+  // Metadata
+  notes            String?  @db.Text
+  metadata         Json?
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  organization     Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inspections      QCInspection[]
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([category])
+  @@index([isActive])
+  @@map("inspection_templates")
+}
+
+model QCInspection {
+  id                  String            @id @default(cuid())
+  organizationId      String
+  templateId          String
+  
+  // Inspection details
+  inspectionNumber    String            // Auto-generated: QC-YYYYMMDD-XXX
+  category            InspectionCategory
+  
+  // Reference
+  referenceType       String?           // GRN, PRODUCTION, SALES_ORDER
+  referenceId         String?
+  grnId               String?
+  salesOrderId        String?
+  lotId               String?
+  
+  // Items inspected
+  inventoryId         String
+  quantity            Int               // Total quantity inspected
+  sampleSize          Int?              // Sample size if sampling used
+  
+  // Results
+  status              InspectionStatus  @default(PENDING)
+  result              InspectionResult?
+  passedCount         Int               @default(0)
+  failedCount         Int               @default(0)
+  defectCount         Int               @default(0)
+  
+  // Defect tracking
+  majorDefects        Int               @default(0)
+  minorDefects        Int               @default(0)
+  criticalDefects     Int               @default(0)
+  
+  // Quality metrics
+  qualityScore        Decimal?          @db.Decimal(5, 2) // Percentage score
+  aqlLevel            String?           // Acceptable Quality Level
+  
+  // Inspector
+  inspectedById       String
+  inspectedDate       DateTime          @default(now())
+  
+  // Approval chain
+  currentApprovalLevel Int              @default(1)
+  approvalStatus      ApprovalStatus    @default(PENDING)
+  
+  // Actions
+  isQuarantined       Boolean           @default(false)
+  quarantineReason    String?           @db.Text
+  
+  // Documentation
+  certificateNumber   String?           // CoA number if generated
+  certificateUrl      String?           // Link to CoA document
+  photos              Json?             // Array of photo URLs
+  attachments         Json?             // Array of document URLs
+  
+  // Metadata
+  notes               String?           @db.Text
+  inspectorNotes      String?           @db.Text
+  metadata            Json?
+  
+  completedDate       DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  organization        Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  template            InspectionTemplate @relation(fields: [templateId], references: [id])
+  inventoryItem       InventoryItem     @relation(fields: [inventoryId], references: [id])
+  inspectedBy         User              @relation("QCInspector", fields: [inspectedById], references: [id])
+  grn                 GoodsReceiptNote? @relation(fields: [grnId], references: [id])
+  salesOrder          SalesOrder?       @relation(fields: [salesOrderId], references: [id])
+  lot                 Lot?              @relation(fields: [lotId], references: [id])
+  
+  checkpoints         QCCheckpoint[]
+  approvals           QCApproval[]
+
+  @@unique([organizationId, inspectionNumber])
+  @@index([organizationId])
+  @@index([templateId])
+  @@index([inventoryId])
+  @@index([status])
+  @@index([result])
+  @@index([grnId])
+  @@index([salesOrderId])
+  @@index([lotId])
+  @@index([inspectedDate])
+  @@map("qc_inspections")
+}
+
+model QCCheckpoint {
+  id              String          @id @default(cuid())
+  inspectionId    String
+  
+  // Checkpoint details
+  name            String
+  description     String?         @db.Text
+  type            CheckpointType
+  sequence        Int             // Order of execution
+  
+  // Requirements
+  isRequired      Boolean         @default(true)
+  expectedValue   String?         // For measurements
+  tolerance       String?         // Acceptable range
+  unit            String?         // Measurement unit
+  
+  // Results
+  status          CheckpointStatus @default(PENDING)
+  actualValue     String?
+  result          CheckpointResult?
+  
+  // Defects
+  defectType      DefectSeverity?
+  defectDescription String?       @db.Text
+  
+  // Evidence
+  photos          Json?           // Array of photo URLs
+  
+  // Metadata
+  notes           String?         @db.Text
+  performedById   String?
+  performedDate   DateTime?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  inspection      QCInspection    @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  performedBy     User?           @relation("CheckpointPerformer", fields: [performedById], references: [id])
+
+  @@index([inspectionId])
+  @@index([type])
+  @@index([status])
+  @@index([result])
+  @@map("qc_checkpoints")
+}
+
+model QCApproval {
+  id              String          @id @default(cuid())
+  inspectionId    String
+  
+  // Approval details
+  level           Int             // Approval level (1, 2, 3, etc.)
+  status          ApprovalStatus  @default(PENDING)
+  decision        ApprovalDecision?
+  
+  // Approver
+  approverId      String?
+  approvedDate    DateTime?
+  
+  // Feedback
+  comments        String?         @db.Text
+  rejectionReason String?         @db.Text
+  
+  // Metadata
+  notifiedDate    DateTime?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  inspection      QCInspection    @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
+  approver        User?           @relation("QCApprover", fields: [approverId], references: [id])
+
+  @@index([inspectionId])
+  @@index([level])
+  @@index([status])
+  @@index([approverId])
+  @@map("qc_approvals")
+}
+
+enum InspectionCategory {
+  INCOMING        // GRN/Receipt inspection
+  IN_PROCESS      // Production/Assembly inspection
+  FINAL           // Pre-shipment inspection
+  RANDOM          // Random sampling inspection
+  COMPLAINT       // Customer complaint inspection
+}
+
+enum SamplingType {
+  FULL            // 100% inspection
+  STATISTICAL     // Statistical sampling (e.g., AQL)
+  PERCENTAGE      // Percentage-based sampling
+  RANDOM          // Random selection
+}
+
+enum InspectionStatus {
+  PENDING         // Not started
+  IN_PROGRESS     // Inspection ongoing
+  AWAITING_APPROVAL // Awaiting QC approval
+  COMPLETED       // Finished
+  CANCELLED       // Cancelled
+}
+
+enum InspectionResult {
+  PASS            // All checks passed
+  PASS_WITH_NOTES // Passed with minor issues
+  FAIL            // Failed inspection
+  CONDITIONAL     // Conditional pass (requires action)
+}
+
+enum CheckpointType {
+  VISUAL          // Visual inspection
+  MEASUREMENT     // Dimensional/quantitative measurement
+  FUNCTIONAL      // Functional testing
+  DOCUMENTATION   // Documentation check
+  PACKAGING       // Packaging inspection
+  LABELING        // Label verification
+}
+
+enum CheckpointStatus {
+  PENDING         // Not performed
+  IN_PROGRESS     // Being performed
+  COMPLETED       // Finished
+  SKIPPED         // Skipped (optional checkpoints)
+}
+
+enum CheckpointResult {
+  PASS            // Meets requirements
+  FAIL            // Does not meet requirements
+  NA              // Not applicable
+}
+
+enum DefectSeverity {
+  CRITICAL        // Critical defect (safety/legal)
+  MAJOR           // Major defect (functionality)
+  MINOR           // Minor defect (cosmetic)
+}
+
+enum ApprovalStatus {
+  PENDING         // Awaiting approval
+  APPROVED        // Approved
+  REJECTED        // Rejected
+  ESCALATED       // Escalated to higher level
+}
+
+enum ApprovalDecision {
+  APPROVE         // Approve inspection
+  REJECT          // Reject inspection
+  REQUEST_REWORK  // Request rework
+  ESCALATE        // Escalate to next level
 }
