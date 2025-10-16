@@ -59,13 +59,15 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  accounts           Account[]
-  sessions           Session[]
+  accounts                Account[]
+  sessions                Session[]
   organizationMemberships OrganizationMember[]
-  createdOrganizations   Organization[]       @relation("OrganizationCreator")
-  createdInventoryItems  InventoryItem[]      @relation("InventoryCreator")
-  createdBookings        Booking[]            @relation("BookingCreator")
-  activityLogs           ActivityLog[]
+  createdOrganizations    Organization[]       @relation("OrganizationCreator")
+  createdInventoryItems   InventoryItem[]      @relation("InventoryCreator")
+  createdBookings         Booking[]            @relation("BookingCreator")
+  createdPurchaseOrders   PurchaseOrder[]      @relation("POCreator")
+  approvedPurchaseOrders  PurchaseOrder[]      @relation("POApprover")
+  activityLogs            ActivityLog[]
 
   @@index([email])
   @@map("users")
@@ -123,6 +125,7 @@ model Organization {
   categories         Category[]
   suppliers          Supplier[]
   customers          Customer[]
+  purchaseOrders     PurchaseOrder[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -254,13 +257,14 @@ model InventoryItem {
   
   // Relations
   organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse      Warehouse         @relation(fields: [warehouseId], references: [id])
-  category       Category?         @relation(fields: [categoryId], references: [id])
-  supplier       Supplier?         @relation(fields: [supplierId], references: [id])
-  createdBy      User              @relation("InventoryCreator", fields: [createdById], references: [id])
-  bookingItems   BookingItem[]
-  movements      InventoryMovement[]
-  reorderAlerts  ReorderAlert[]
+  warehouse          Warehouse            @relation(fields: [warehouseId], references: [id])
+  category           Category?            @relation(fields: [categoryId], references: [id])
+  supplier           Supplier?            @relation(fields: [supplierId], references: [id])
+  createdBy          User                 @relation("InventoryCreator", fields: [createdById], references: [id])
+  bookingItems       BookingItem[]
+  movements          InventoryMovement[]
+  reorderAlerts      ReorderAlert[]
+  purchaseOrderItems PurchaseOrderItem[]  @relation("POInventoryItem")
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -483,8 +487,9 @@ model Supplier {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  inventoryItems InventoryItem[]
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  inventoryItems  InventoryItem[]
+  purchaseOrders  PurchaseOrder[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -512,6 +517,132 @@ model Customer {
   @@unique([organizationId, code])
   @@index([organizationId])
   @@map("customers")
+}
+
+// ==========================================
+// PURCHASE ORDERS (Inbound Operations)
+// ==========================================
+
+model PurchaseOrder {
+  id              String            @id @default(cuid())
+  organizationId  String
+  supplierId      String
+  poNumber        String            @unique
+  
+  // Status & workflow
+  status          POStatus          @default(DRAFT)
+  priority        Priority          @default(MEDIUM)
+  
+  // Dates
+  orderDate       DateTime          @default(now())
+  expectedDate    DateTime?
+  approvedDate    DateTime?
+  receivedDate    DateTime?
+  cancelledDate   DateTime?
+  
+  // Financial
+  subtotal        Decimal?          @db.Decimal(10, 2)
+  tax             Decimal?          @db.Decimal(10, 2)
+  shipping        Decimal?          @db.Decimal(10, 2)
+  totalAmount     Decimal?          @db.Decimal(10, 2)
+  currency        String            @default("USD")
+  
+  // Delivery information
+  deliveryAddress String?
+  deliveryCity    String?
+  deliveryCountry String?
+  deliveryNotes   String?           @db.Text
+  
+  // Internal tracking
+  notes           String?           @db.Text
+  internalNotes   String?           @db.Text
+  approvedById    String?
+  
+  // Metadata
+  metadata        Json?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  createdById     String
+  
+  // Relations
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplier        Supplier          @relation(fields: [supplierId], references: [id])
+  createdBy       User              @relation("POCreator", fields: [createdById], references: [id])
+  approvedBy      User?             @relation("POApprover", fields: [approvedById], references: [id])
+  items           PurchaseOrderItem[]
+  receipts        GoodsReceiptNote[]
+
+  @@index([organizationId])
+  @@index([supplierId])
+  @@index([poNumber])
+  @@index([status])
+  @@index([createdAt])
+  @@map("purchase_orders")
+}
+
+model PurchaseOrderItem {
+  id              String        @id @default(cuid())
+  purchaseOrderId String
+  inventoryItemId String?
+  
+  // Product details
+  sku             String
+  description     String
+  
+  // Quantity & pricing
+  quantityOrdered Int
+  quantityReceived Int          @default(0)
+  unitPrice       Decimal       @db.Decimal(10, 2)
+  tax             Decimal?      @db.Decimal(10, 2)
+  totalPrice      Decimal       @db.Decimal(10, 2)
+  
+  // Metadata
+  notes           String?       @db.Text
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem? @relation("POInventoryItem", fields: [inventoryItemId], references: [id])
+
+  @@index([purchaseOrderId])
+  @@index([inventoryItemId])
+  @@map("purchase_order_items")
+}
+
+enum POStatus {
+  DRAFT               // Being created
+  PENDING             // Awaiting approval
+  APPROVED            // Approved, ready to send
+  SENT                // Sent to supplier
+  CONFIRMED           // Confirmed by supplier
+  PARTIALLY_RECEIVED  // Some items received
+  RECEIVED            // All items received
+  CANCELLED           // Cancelled
+  CLOSED              // Completed and closed
+}
+
+// ==========================================
+// GOODS RECEIPT NOTE (GRN) - Placeholder for Day 2
+// ==========================================
+
+model GoodsReceiptNote {
+  id              String   @id @default(cuid())
+  organizationId  String
+  purchaseOrderId String
+  grnNumber       String   @unique
+  receivedDate    DateTime @default(now())
+  receivedById    String
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations will be added in Day 2
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+
+  @@index([organizationId])
+  @@index([purchaseOrderId])
+  @@map("goods_receipt_notes")
 }
 
 // ==========================================
