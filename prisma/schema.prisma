@@ -111,6 +111,12 @@ model User {
   acknowledgedAlerts      Alert[]                  @relation("AlertAcknowledger")
   resolvedAlerts          Alert[]                  @relation("AlertResolver")
   notificationPreference  NotificationPreference?
+  createdExternalIntegrations ExternalIntegration[] @relation("ExternalIntegrationCreator")
+  createdConnections      IntegrationConnection[]  @relation("ConnectionCreator")
+  triggeredSyncs          IntegrationSync[]        @relation("SyncTriggeredBy")
+  createdMappings         IntegrationMapping[]     @relation("MappingCreator")
+  integrationLogs         IntegrationLog[]         @relation("LogUser")
+  createdWebhooks         IntegrationWebhook[]     @relation("WebhookCreator")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -201,6 +207,12 @@ model Organization {
   alertRules         AlertRule[]
   alerts             Alert[]
   integrations       Integration[]
+  externalIntegrations ExternalIntegration[]
+  integrationConnections IntegrationConnection[]
+  integrationSyncs   IntegrationSync[]
+  integrationMappings IntegrationMapping[]
+  integrationLogs    IntegrationLog[]
+  integrationWebhooks IntegrationWebhook[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
   reorderAlerts      ReorderAlert[]
@@ -3625,4 +3637,577 @@ enum ThresholdOperator {
 enum DigestFrequency {
   DAILY              // Daily digest
   WEEKLY             // Weekly digest
+}
+
+// ============================================================================
+// EXTERNAL INTEGRATIONS
+// ============================================================================
+
+// ExternalIntegration - Third-party system integration configuration
+model ExternalIntegration {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  // Integration identification
+  name                  String                    // Integration name (e.g., "QuickBooks Online", "Shopify Store")
+  code                  String                    // Unique code for this integration
+  description           String?                   @db.Text
+  provider              IntegrationProvider       // Provider type
+  category              IntegrationCategory       // Integration category
+  
+  // Configuration
+  config                Json                      // Provider-specific configuration
+  authType              AuthType                  // Authentication type
+  credentials           Json?                     // Encrypted credentials (API keys, tokens)
+  webhookSecret         String?                   // Secret for webhook validation
+  
+  // Features & capabilities
+  features              Json                      // Enabled features for this integration
+  syncDirection         SyncDirection             // Data sync direction
+  syncFrequency         SyncFrequency             // How often to sync
+  autoSync              Boolean                   @default(false)
+  
+  // Data mapping
+  fieldMappings         Json                      // Field mappings configuration
+  defaultMappings       Json?                     // Default field mappings
+  
+  // Rate limiting
+  rateLimitPerMinute    Int?                      // API rate limit per minute
+  rateLimitPerHour      Int?                      // API rate limit per hour
+  rateLimitPerDay       Int?                      // API rate limit per day
+  
+  // Status & monitoring
+  status                IntegrationStatus         @default(INACTIVE)
+  isActive              Boolean                   @default(true)
+  lastSyncAt            DateTime?
+  lastSuccessfulSyncAt  DateTime?
+  lastErrorAt           DateTime?
+  lastError             String?                   @db.Text
+  syncCount             Int                       @default(0)
+  errorCount            Int                       @default(0)
+  
+  // Health monitoring
+  healthStatus          HealthStatus              @default(UNKNOWN)
+  healthCheckedAt       DateTime?
+  healthMessage         String?
+  uptime                Decimal?                  @db.Decimal(5, 2) // Percentage
+  
+  // Metadata
+  version               String?                   // Integration version
+  apiVersion            String?                   // Provider API version
+  tags                  String[]                  // Tags for categorization
+  metadata              Json?                     // Additional metadata
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("ExternalIntegrationCreator", fields: [createdById], references: [id])
+  
+  // Relations
+  connections           IntegrationConnection[]
+  syncs                 IntegrationSync[]
+  mappings              IntegrationMapping[]
+  logs                  IntegrationLog[]
+  webhooks              IntegrationWebhook[]
+  
+  @@unique([organizationId, code])
+  @@index([organizationId, provider])
+  @@index([organizationId, category])
+  @@index([status])
+  @@index([healthStatus])
+}
+
+// IntegrationConnection - Active connection to external system
+model IntegrationConnection {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integrationId         String
+  integration           ExternalIntegration       @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  
+  // Connection details
+  name                  String                    // Connection name
+  description           String?                   @db.Text
+  connectionType        ConnectionType            // Connection type
+  
+  // OAuth 2.0 authentication
+  accessToken           String?                   @db.Text // Encrypted
+  refreshToken          String?                   @db.Text // Encrypted
+  tokenType             String?                   // Bearer, etc.
+  expiresAt             DateTime?                 // Token expiration
+  scope                 String?                   // OAuth scope
+  
+  // API Key authentication
+  apiKey                String?                   @db.Text // Encrypted
+  apiSecret             String?                   @db.Text // Encrypted
+  
+  // Basic authentication
+  username              String?
+  password              String?                   @db.Text // Encrypted
+  
+  // Connection settings
+  baseUrl               String?                   // API base URL
+  webhookUrl            String?                   // Webhook endpoint URL
+  environment           Environment               @default(PRODUCTION)
+  
+  // Status
+  status                ConnectionStatus          @default(DISCONNECTED)
+  isActive              Boolean                   @default(true)
+  connectedAt           DateTime?
+  lastConnectedAt       DateTime?
+  disconnectedAt        DateTime?
+  
+  // Validation
+  isValid               Boolean                   @default(false)
+  lastValidatedAt       DateTime?
+  validationError       String?                   @db.Text
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("ConnectionCreator", fields: [createdById], references: [id])
+  
+  @@index([organizationId, integrationId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// IntegrationSync - Sync job between WMS and external system
+model IntegrationSync {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integrationId         String
+  integration           ExternalIntegration       @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  
+  // Sync identification
+  syncNumber            String                    // Auto-generated: SYNC-YYYYMMDD-XXXX
+  syncType              SyncType                  // Type of sync
+  direction             SyncDirection             // Sync direction
+  
+  // Entity details
+  entityType            String                    // Entity being synced (e.g., "Product", "Order", "Customer")
+  entityId              String?                   // Specific entity ID (for single entity sync)
+  
+  // Sync configuration
+  mode                  SyncMode                  @default(INCREMENTAL)
+  filters               Json?                     // Filters for data selection
+  includeFields         String[]                  // Fields to include
+  excludeFields         String[]                  // Fields to exclude
+  
+  // Batch settings
+  batchSize             Int                       @default(100)
+  batchNumber           Int                       @default(1)
+  totalBatches          Int                       @default(1)
+  
+  // Status & progress
+  status                SyncStatus                @default(PENDING)
+  progress              Decimal                   @default(0) @db.Decimal(5, 2) // Percentage
+  
+  // Statistics
+  totalRecords          Int                       @default(0)
+  processedRecords      Int                       @default(0)
+  successfulRecords     Int                       @default(0)
+  failedRecords         Int                       @default(0)
+  skippedRecords        Int                       @default(0)
+  
+  // Timing
+  scheduledFor          DateTime?
+  startedAt             DateTime?
+  completedAt           DateTime?
+  duration              Int?                      // Duration in seconds
+  
+  // Error handling
+  errors                Json?                     // Array of errors
+  errorSummary          String?                   @db.Text
+  retryCount            Int                       @default(0)
+  maxRetries            Int                       @default(3)
+  lastRetryAt           DateTime?
+  
+  // Results
+  result                Json?                     // Sync results and details
+  changes               Json?                     // Changes made during sync
+  
+  // Trigger
+  triggeredBy           TriggerType               @default(MANUAL)
+  triggeredByUserId     String?
+  triggeredByUser       User?                     @relation("SyncTriggeredBy", fields: [triggeredByUserId], references: [id])
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  
+  // Relations
+  logs                  IntegrationLog[]
+  
+  @@unique([organizationId, syncNumber])
+  @@index([organizationId, integrationId])
+  @@index([syncType, entityType])
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([createdAt])
+}
+
+// IntegrationMapping - Field mapping between WMS and external system
+model IntegrationMapping {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integrationId         String
+  integration           ExternalIntegration       @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  
+  // Mapping details
+  name                  String                    // Mapping name
+  description           String?                   @db.Text
+  entityType            String                    // Entity type (e.g., "Product", "Order")
+  direction             SyncDirection             // Mapping direction
+  
+  // Field mappings
+  mappings              Json                      // Array of field mappings
+  // Example: [{ "wmsField": "sku", "externalField": "itemNumber", "transform": "uppercase" }]
+  
+  // Transformation rules
+  transformations       Json?                     // Transformation rules
+  defaultValues         Json?                     // Default values for missing fields
+  
+  // Validation rules
+  validationRules       Json?                     // Field validation rules
+  requiredFields        String[]                  // Required fields
+  
+  // Conditional mapping
+  conditions            Json?                     // Conditions for applying mapping
+  
+  // Status
+  isActive              Boolean                   @default(true)
+  version               Int                       @default(1)
+  
+  // Usage tracking
+  usageCount            Int                       @default(0)
+  lastUsedAt            DateTime?
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("MappingCreator", fields: [createdById], references: [id])
+  
+  @@unique([organizationId, integrationId, entityType, direction])
+  @@index([organizationId, integrationId])
+  @@index([entityType])
+  @@index([isActive])
+}
+
+// IntegrationLog - Audit log for integration activities
+model IntegrationLog {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integrationId         String
+  integration           ExternalIntegration       @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  syncId                String?
+  sync                  IntegrationSync?          @relation(fields: [syncId], references: [id], onDelete: SetNull)
+  
+  // Log details
+  level                 LogLevel                  // Log level
+  action                String                    // Action performed
+  message               String                    @db.Text
+  
+  // Context
+  entityType            String?                   // Related entity type
+  entityId              String?                   // Related entity ID
+  
+  // Request/Response
+  request               Json?                     // Request data
+  response              Json?                     // Response data
+  statusCode            Int?                      // HTTP status code
+  
+  // Error details
+  error                 String?                   @db.Text
+  errorCode             String?
+  errorStack            String?                   @db.Text
+  
+  // Performance
+  duration              Int?                      // Duration in milliseconds
+  
+  // User context
+  userId                String?
+  user                  User?                     @relation("LogUser", fields: [userId], references: [id], onDelete: SetNull)
+  ipAddress             String?
+  userAgent             String?
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamp
+  createdAt             DateTime                  @default(now())
+  
+  @@index([organizationId, integrationId])
+  @@index([syncId])
+  @@index([level])
+  @@index([action])
+  @@index([createdAt])
+  @@index([entityType, entityId])
+}
+
+// IntegrationWebhook - Webhook configurations for receiving events
+model IntegrationWebhook {
+  id                    String                    @id @default(cuid())
+  organizationId        String
+  organization          Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  integrationId         String
+  integration           ExternalIntegration       @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  
+  // Webhook details
+  name                  String                    // Webhook name
+  description           String?                   @db.Text
+  event                 String                    // Event type (e.g., "order.created")
+  url                   String                    // Webhook URL
+  method                HttpMethod                @default(POST)
+  
+  // Security
+  secret                String?                   // Webhook secret for validation
+  signatureHeader       String?                   // Header name for signature
+  signatureAlgorithm    String?                   // Signature algorithm (e.g., "sha256")
+  
+  // Headers
+  headers               Json?                     // Custom headers
+  
+  // Payload configuration
+  payloadTemplate       String?                   @db.Text // Custom payload template
+  includeMetadata       Boolean                   @default(true)
+  
+  // Filtering
+  filters               Json?                     // Event filters
+  
+  // Retry configuration
+  retryEnabled          Boolean                   @default(true)
+  maxRetries            Int                       @default(3)
+  retryDelay            Int                       @default(60) // Seconds
+  
+  // Status
+  status                WebhookStatus             @default(ACTIVE)
+  isActive              Boolean                   @default(true)
+  
+  // Monitoring
+  lastTriggeredAt       DateTime?
+  lastSuccessAt         DateTime?
+  lastFailureAt         DateTime?
+  lastError             String?                   @db.Text
+  successCount          Int                       @default(0)
+  failureCount          Int                       @default(0)
+  
+  // Metadata
+  metadata              Json?
+  
+  // Timestamps
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  createdById           String
+  createdBy             User                      @relation("WebhookCreator", fields: [createdById], references: [id])
+  
+  @@index([organizationId, integrationId])
+  @@index([event])
+  @@index([status])
+  @@index([isActive])
+}
+
+// Enums for External Integrations
+
+enum IntegrationProvider {
+  // Accounting & ERP
+  QUICKBOOKS_ONLINE
+  QUICKBOOKS_DESKTOP
+  XERO
+  SAGE
+  NETSUITE
+  SAP
+  MICROSOFT_DYNAMICS
+  
+  // E-commerce
+  SHOPIFY
+  WOOCOMMERCE
+  MAGENTO
+  BIGCOMMERCE
+  AMAZON
+  EBAY
+  ETSY
+  
+  // Shipping & Logistics
+  FEDEX
+  UPS
+  DHL
+  USPS
+  SHIPSTATION
+  EASYPOST
+  SHIPPO
+  
+  // Payment Gateways
+  STRIPE
+  PAYPAL
+  SQUARE
+  BRAINTREE
+  AUTHORIZE_NET
+  
+  // CRM
+  SALESFORCE
+  HUBSPOT
+  ZOHO_CRM
+  
+  // Communication
+  TWILIO
+  SENDGRID
+  MAILCHIMP
+  
+  // Other
+  CUSTOM
+  WEBHOOK
+}
+
+enum IntegrationCategory {
+  ACCOUNTING           // Accounting & financial systems
+  ECOMMERCE            // E-commerce platforms
+  SHIPPING             // Shipping & logistics
+  PAYMENT              // Payment processing
+  CRM                  // Customer relationship management
+  MARKETING            // Marketing automation
+  COMMUNICATION        // Email, SMS, etc.
+  ANALYTICS            // Analytics platforms
+  CUSTOM               // Custom integrations
+}
+
+enum AuthType {
+  OAUTH2               // OAuth 2.0
+  API_KEY              // API Key
+  BASIC                // Basic authentication
+  BEARER_TOKEN         // Bearer token
+  CUSTOM               // Custom authentication
+  NONE                 // No authentication
+}
+
+enum SyncDirection {
+  IMPORT               // Import from external system
+  EXPORT               // Export to external system
+  BIDIRECTIONAL        // Two-way sync
+}
+
+enum SyncFrequency {
+  REALTIME             // Real-time sync
+  EVERY_5_MINUTES
+  EVERY_15_MINUTES
+  EVERY_30_MINUTES
+  HOURLY
+  EVERY_6_HOURS
+  DAILY
+  WEEKLY
+  MANUAL               // Manual sync only
+}
+
+enum IntegrationStatus {
+  ACTIVE               // Integration is active
+  INACTIVE             // Integration is inactive
+  ERROR                // Integration has errors
+  CONFIGURING          // Being configured
+  TESTING              // In testing
+  PAUSED               // Temporarily paused
+  ARCHIVED             // Archived
+}
+
+enum HealthStatus {
+  HEALTHY              // System is healthy
+  DEGRADED             // Performance degraded
+  UNHEALTHY            // System unhealthy
+  UNKNOWN              // Unknown status
+}
+
+enum ConnectionType {
+  OAUTH                // OAuth connection
+  API_KEY              // API key connection
+  CREDENTIALS          // Username/password
+  CUSTOM               // Custom connection
+}
+
+enum Environment {
+  PRODUCTION           // Production environment
+  SANDBOX              // Sandbox/test environment
+  DEVELOPMENT          // Development environment
+}
+
+enum ConnectionStatus {
+  CONNECTED            // Connected
+  DISCONNECTED         // Disconnected
+  CONNECTING           // Connecting
+  ERROR                // Connection error
+  EXPIRED              // Token expired
+  INVALID              // Invalid credentials
+}
+
+enum SyncType {
+  PRODUCTS             // Product sync
+  ORDERS               // Order sync
+  CUSTOMERS            // Customer sync
+  INVENTORY            // Inventory sync
+  INVOICES             // Invoice sync
+  PAYMENTS             // Payment sync
+  SHIPMENTS            // Shipment sync
+  RETURNS              // Return sync
+  CUSTOM               // Custom entity sync
+}
+
+enum SyncMode {
+  FULL                 // Full sync (all records)
+  INCREMENTAL          // Incremental sync (changes only)
+  DELTA                // Delta sync (changes since last sync)
+}
+
+enum SyncStatus {
+  PENDING              // Pending execution
+  RUNNING              // Currently running
+  COMPLETED            // Completed successfully
+  FAILED               // Failed
+  PARTIAL              // Partially completed
+  CANCELLED            // Cancelled
+  RETRYING             // Retrying after failure
+}
+
+enum TriggerType {
+  MANUAL               // Manually triggered
+  SCHEDULED            // Scheduled trigger
+  WEBHOOK              // Webhook trigger
+  EVENT                // Event-based trigger
+  API                  // API trigger
+}
+
+enum LogLevel {
+  DEBUG                // Debug information
+  INFO                 // Informational
+  WARNING              // Warning
+  ERROR                // Error
+  CRITICAL             // Critical error
+}
+
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  PATCH
+  DELETE
+}
+
+enum WebhookStatus {
+  ACTIVE               // Active webhook
+  INACTIVE             // Inactive webhook
+  ERROR                // Webhook has errors
+  PAUSED               // Temporarily paused
 }
