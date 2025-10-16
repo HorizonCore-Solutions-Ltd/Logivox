@@ -84,6 +84,10 @@ model User {
   createdAdjustments      StockAdjustment[]    @relation("AdjustmentCreatedBy")
   approvedAdjustments     StockAdjustment[]    @relation("AdjustmentApprovedBy")
   completedAdjustments    StockAdjustment[]    @relation("AdjustmentCompletedBy")
+  assignedCycleCounts     CycleCount[]         @relation("AssignedCycleCounts")
+  approvedCycleCounts     CycleCount[]         @relation("ApprovedCycleCounts")
+  countedItems            CycleCountItem[]     @relation("CountedItems")
+  reconciledItems         CycleCountItem[]     @relation("ReconciledItems")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -152,6 +156,7 @@ model Organization {
   locations          Location[]
   warehouseTransfers WarehouseTransfer[]
   stockAdjustments   StockAdjustment[]
+  cycleCounts        CycleCount[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -238,6 +243,7 @@ model Category {
   parent         Category?       @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children       Category[]      @relation("CategoryHierarchy")
   inventoryItems InventoryItem[]
+  cycleCounts    CycleCount[]
 
   @@unique([organizationId, slug])
   @@index([organizationId])
@@ -301,6 +307,7 @@ model InventoryItem {
   packageItems       PackageItem[]
   warehouseTransfers WarehouseTransfer[]
   stockAdjustments   StockAdjustment[]
+  cycleCountItems    CycleCountItem[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -1352,6 +1359,8 @@ model Location {
   transfersFrom  WarehouseTransfer[] @relation("TransferFromLocation")
   transfersTo    WarehouseTransfer[] @relation("TransferToLocation")
   adjustments    StockAdjustment[]
+  cycleCounts    CycleCount[]
+  cycleCountItems CycleCountItem[]
 
   @@unique([organizationId, locationCode])
   @@index([organizationId])
@@ -1465,6 +1474,7 @@ model StockAdjustment {
   createdBy         User             @relation("AdjustmentCreatedBy", fields: [createdById], references: [id])
   approvedBy        User?            @relation("AdjustmentApprovedBy", fields: [approvedById], references: [id])
   completedBy       User?            @relation("AdjustmentCompletedBy", fields: [completedById], references: [id])
+  cycleCountItems   CycleCountItem[]
 
   @@index([organizationId])
   @@index([adjustmentNumber])
@@ -1518,4 +1528,129 @@ model ActivityLog {
   @@index([entityType, entityId])
   @@index([createdAt])
   @@map("activity_logs")
+}
+
+// ==========================================
+// CYCLE COUNTS & STOCK TAKE
+// ==========================================
+
+enum CycleCountType {
+  SCHEDULED   // Regular scheduled cycle count
+  ADHOC       // Unscheduled count triggered manually
+  FULL        // Complete physical inventory count
+  SPOT        // Random spot check
+}
+
+enum CycleCountStatus {
+  PLANNED     // Count scheduled but not started
+  IN_PROGRESS // Counting in progress
+  COMPLETED   // Counting finished
+  APPROVED    // Count verified and approved
+  REJECTED    // Count rejected, needs recount
+  CANCELLED   // Count cancelled
+}
+
+model CycleCount {
+  id              String            @id @default(cuid())
+  organizationId  String
+  countNumber     String            @unique // CC-YYYYMMDD-XXX
+  type            CycleCountType
+  status          CycleCountStatus  @default(PLANNED)
+  
+  // Scheduling
+  scheduledDate   DateTime
+  startedDate     DateTime?
+  completedDate   DateTime?
+  approvedDate    DateTime?
+  
+  // Scope - what to count
+  locationId      String?           // Specific location (null = all locations)
+  categoryId      String?           // Specific category (null = all categories)
+  includeZeroQty  Boolean           @default(false) // Include items with zero quantity
+  
+  // Assignments
+  assignedToId    String?           // User assigned to perform count
+  approvedById    String?           // User who approved count
+  
+  // Results
+  totalItems      Int               @default(0)    // Total items to count
+  countedItems    Int               @default(0)    // Items counted so far
+  varianceItems   Int               @default(0)    // Items with variance
+  totalVariance   Decimal           @default(0) @db.Decimal(15, 2) // Total financial variance
+  
+  // Configuration
+  requiresApproval Boolean          @default(true)
+  autoAdjust      Boolean           @default(false) // Auto-adjust inventory on completion
+  notes           String?           @db.Text
+  metadata        Json?
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  organization    Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  location        Location?         @relation(fields: [locationId], references: [id])
+  category        Category?         @relation(fields: [categoryId], references: [id])
+  assignedTo      User?             @relation("AssignedCycleCounts", fields: [assignedToId], references: [id])
+  approvedBy      User?             @relation("ApprovedCycleCounts", fields: [approvedById], references: [id])
+  
+  items           CycleCountItem[]
+
+  @@index([organizationId])
+  @@index([countNumber])
+  @@index([status])
+  @@index([locationId])
+  @@index([categoryId])
+  @@index([assignedToId])
+  @@index([scheduledDate])
+  @@map("cycle_counts")
+}
+
+model CycleCountItem {
+  id              String            @id @default(cuid())
+  cycleCountId    String
+  inventoryId     String
+  locationId      String?
+  
+  // Expected vs Actual
+  expectedQty     Int               // System quantity before count
+  countedQty      Int?              // Physical count quantity
+  variance        Int?              // Difference (countedQty - expectedQty)
+  variancePercent Decimal?          @db.Decimal(5, 2) // Variance as percentage
+  
+  // Financial Impact
+  unitCost        Decimal?          @db.Decimal(15, 2)
+  varianceValue   Decimal?          @db.Decimal(15, 2) // Financial impact of variance
+  
+  // Count Details
+  isCounted       Boolean           @default(false)
+  countedById     String?           // User who counted this item
+  countedAt       DateTime?
+  
+  // Reconciliation
+  isReconciled    Boolean           @default(false)
+  reconciledById  String?
+  reconciledAt    DateTime?
+  adjustmentId    String?           // Link to stock adjustment if created
+  
+  // Notes
+  notes           String?           @db.Text
+  reason          String?           // Reason for variance
+  metadata        Json?
+  
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  cycleCount      CycleCount        @relation(fields: [cycleCountId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem     @relation(fields: [inventoryId], references: [id])
+  location        Location?         @relation(fields: [locationId], references: [id])
+  countedBy       User?             @relation("CountedItems", fields: [countedById], references: [id])
+  reconciledBy    User?             @relation("ReconciledItems", fields: [reconciledById], references: [id])
+  adjustment      StockAdjustment?  @relation(fields: [adjustmentId], references: [id])
+
+  @@index([cycleCountId])
+  @@index([inventoryId])
+  @@index([locationId])
+  @@index([isCounted])
+  @@index([isReconciled])
+  @@map("cycle_count_items")
 }
