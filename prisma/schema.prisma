@@ -67,6 +67,8 @@ model User {
   createdBookings         Booking[]            @relation("BookingCreator")
   createdPurchaseOrders   PurchaseOrder[]      @relation("POCreator")
   approvedPurchaseOrders  PurchaseOrder[]      @relation("POApprover")
+  receivedGRNs            GoodsReceiptNote[]   @relation("GRNReceivedBy")
+  qcGRNs                  GoodsReceiptNote[]   @relation("GRNQCBy")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -126,6 +128,7 @@ model Organization {
   suppliers          Supplier[]
   customers          Customer[]
   purchaseOrders     PurchaseOrder[]
+  goodsReceiptNotes  GoodsReceiptNote[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -185,8 +188,9 @@ model Warehouse {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   inventoryItems InventoryItem[]
+  grns           GoodsReceiptNote[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -265,6 +269,7 @@ model InventoryItem {
   movements          InventoryMovement[]
   reorderAlerts      ReorderAlert[]
   purchaseOrderItems PurchaseOrderItem[]  @relation("POInventoryItem")
+  grnItems           GRNItem[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -604,6 +609,7 @@ model PurchaseOrderItem {
   // Relations
   purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
   inventoryItem   InventoryItem? @relation("POInventoryItem", fields: [inventoryItemId], references: [id])
+  grnItems        GRNItem[]
 
   @@index([purchaseOrderId])
   @@index([inventoryItemId])
@@ -623,26 +629,114 @@ enum POStatus {
 }
 
 // ==========================================
-// GOODS RECEIPT NOTE (GRN) - Placeholder for Day 2
+// GOODS RECEIPT NOTE (GRN) - Receiving System
 // ==========================================
 
+enum GRNStatus {
+  DRAFT           // Being created
+  PENDING         // Submitted for QC
+  QUALITY_CHECK   // Under quality inspection
+  APPROVED        // QC passed
+  REJECTED        // QC failed
+  COMPLETED       // Finalized & inventory updated
+}
+
 model GoodsReceiptNote {
-  id              String   @id @default(cuid())
-  organizationId  String
-  purchaseOrderId String
-  grnNumber       String   @unique
-  receivedDate    DateTime @default(now())
-  receivedById    String
-  notes           String?  @db.Text
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                String    @id @default(cuid())
+  organizationId    String
+  purchaseOrderId   String
+  warehouseId       String?
+  grnNumber         String    @unique
+  status            GRNStatus @default(DRAFT)
+  receivedDate      DateTime  @default(now())
+  receivedById      String
   
-  // Relations will be added in Day 2
-  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  // Quality Control
+  qcStatus          String?   // PASS, FAIL, PENDING
+  qcNotes           String?   @db.Text
+  qcById            String?
+  qcDate            DateTime?
+  
+  // Discrepancies
+  hasDiscrepancy    Boolean   @default(false)
+  discrepancyNotes  String?   @db.Text
+  
+  // Financial
+  totalReceived     Decimal   @default(0) @db.Decimal(10, 2)
+  currency          String    @default("GBP")
+  
+  // Location & Put-away
+  receivingDock     String?
+  putAwayCompleted  Boolean   @default(false)
+  putAwayDate       DateTime?
+  
+  // Metadata
+  notes             String?   @db.Text
+  internalNotes     String?   @db.Text
+  attachments       Json?     // Array of file URLs
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  // Relations
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  purchaseOrder     PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  warehouse         Warehouse? @relation(fields: [warehouseId], references: [id])
+  receivedBy        User @relation("GRNReceivedBy", fields: [receivedById], references: [id])
+  qcBy              User? @relation("GRNQCBy", fields: [qcById], references: [id])
+  items             GRNItem[]
 
   @@index([organizationId])
   @@index([purchaseOrderId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([receivedDate])
   @@map("goods_receipt_notes")
+}
+
+model GRNItem {
+  id                  String   @id @default(cuid())
+  grnId               String
+  purchaseOrderItemId String?
+  inventoryItemId     String
+  
+  // Quantities
+  orderedQuantity     Int      // From PO
+  receivedQuantity    Int      // Actually received
+  acceptedQuantity    Int      // After QC
+  rejectedQuantity    Int      @default(0)
+  
+  // Quality
+  qcStatus            String?  // PASS, FAIL, PENDING
+  qcNotes             String?  @db.Text
+  hasDefects          Boolean  @default(false)
+  defectDescription   String?  @db.Text
+  
+  // Location
+  binLocation         String?
+  putAwayCompleted    Boolean  @default(false)
+  
+  // Batch/Serial Tracking
+  batchNumber         String?
+  serialNumbers       Json?    // Array of serial numbers
+  expiryDate          DateTime?
+  
+  // Financial
+  unitCost            Decimal  @db.Decimal(10, 2)
+  
+  // Metadata
+  notes               String?  @db.Text
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  // Relations
+  grn                 GoodsReceiptNote @relation(fields: [grnId], references: [id], onDelete: Cascade)
+  purchaseOrderItem   PurchaseOrderItem? @relation(fields: [purchaseOrderItemId], references: [id])
+  inventoryItem       InventoryItem @relation(fields: [inventoryItemId], references: [id])
+
+  @@index([grnId])
+  @@index([inventoryItemId])
+  @@index([purchaseOrderItemId])
+  @@map("grn_items")
 }
 
 // ==========================================
