@@ -76,6 +76,8 @@ model User {
   assignedPickLists       PickList[]           @relation("PickListAssignee")
   createdPickLists        PickList[]           @relation("PickListCreator")
   createdShipments        Shipment[]           @relation("ShipmentCreator")
+  createdPacks            Pack[]               @relation("PackCreator")
+  initiatedPacks          Pack[]               @relation("PackInitiator")
   activityLogs            ActivityLog[]
 
   @@index([email])
@@ -139,6 +141,7 @@ model Organization {
   salesOrders        SalesOrder[]
   pickLists          PickList[]
   shipments          Shipment[]
+  packs              Pack[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -203,6 +206,7 @@ model Warehouse {
   grns           GoodsReceiptNote[]
   salesOrders    SalesOrder[]
   pickLists      PickList[]
+  packs          Pack[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -284,6 +288,7 @@ model InventoryItem {
   grnItems           GRNItem[]
   salesOrderItems    SalesOrderItem[]
   pickListItems      PickListItem[]
+  packageItems       PackageItem[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -857,6 +862,7 @@ model SalesOrder {
   items           SalesOrderItem[]
   pickLists       PickList[]
   shipments       Shipment[]
+  packs           Pack[]
 
   @@unique([organizationId, soNumber])
   @@index([organizationId])
@@ -898,6 +904,7 @@ model SalesOrderItem {
   salesOrder        SalesOrder    @relation(fields: [salesOrderId], references: [id], onDelete: Cascade)
   inventoryItem     InventoryItem @relation(fields: [inventoryItemId], references: [id])
   pickListItems     PickListItem[]
+  packageItems      PackageItem[]
 
   @@index([salesOrderId])
   @@index([inventoryItemId])
@@ -940,6 +947,7 @@ model PickList {
   assignedTo      User?           @relation("PickListAssignee", fields: [assignedToId], references: [id])
   createdBy       User            @relation("PickListCreator", fields: [createdById], references: [id])
   items           PickListItem[]
+  packs           Pack[]
 
   @@unique([organizationId, pickListNumber])
   @@index([organizationId])
@@ -972,6 +980,110 @@ model PickListItem {
   @@index([salesOrderItemId])
   @@index([inventoryItemId])
   @@map("pick_list_items")
+}
+
+enum PackingStatus {
+  PENDING
+  IN_PROGRESS
+  PACKED
+  CANCELLED
+}
+
+model Pack {
+  id              String          @id @default(cuid())
+  organizationId  String
+  packNumber      String          // Auto-generated (PACK-YYYYMMDD-XXX)
+  salesOrderId    String
+  pickListId      String?
+  warehouseId     String
+  
+  status          PackingStatus   @default(PENDING)
+  
+  // Assignment
+  packedById      String?
+  startedDate     DateTime?
+  completedDate   DateTime?
+  
+  // Package details
+  totalPackages   Int             @default(0)
+  totalWeight     Decimal?        @db.Decimal(10, 2)
+  weightUnit      String?         @default("kg")
+  
+  // Metadata
+  notes           String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  createdById     String
+  
+  // Relations
+  organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrder      SalesOrder      @relation(fields: [salesOrderId], references: [id])
+  pickList        PickList?       @relation(fields: [pickListId], references: [id])
+  warehouse       Warehouse       @relation(fields: [warehouseId], references: [id])
+  packedBy        User?           @relation("PackCreator", fields: [packedById], references: [id])
+  createdBy       User            @relation("PackInitiator", fields: [createdById], references: [id])
+  packages        Package[]
+
+  @@unique([organizationId, packNumber])
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([pickListId])
+  @@index([warehouseId])
+  @@index([status])
+  @@map("packs")
+}
+
+model Package {
+  id              String          @id @default(cuid())
+  packId          String
+  packageNumber   String          // Sequential within pack (1, 2, 3...)
+  
+  // Package details
+  packageType     String?         // Box, Pallet, Envelope, etc.
+  weight          Decimal?        @db.Decimal(10, 2)
+  weightUnit      String?         @default("kg")
+  dimensions      Json?           // {length, width, height, unit}
+  
+  // Tracking
+  trackingNumber  String?
+  labelUrl        String?
+  
+  // Contents
+  items           PackageItem[]
+  
+  // Metadata
+  notes           String?         @db.Text
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  // Relations
+  pack            Pack            @relation(fields: [packId], references: [id], onDelete: Cascade)
+
+  @@index([packId])
+  @@index([trackingNumber])
+  @@map("packages")
+}
+
+model PackageItem {
+  id                String         @id @default(cuid())
+  packageId         String
+  salesOrderItemId  String
+  inventoryItemId   String
+  
+  quantity          Int
+  binLocation       String?
+  batchNumber       String?
+  serialNumbers     Json?
+  
+  // Relations
+  package           Package        @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  salesOrderItem    SalesOrderItem @relation(fields: [salesOrderItemId], references: [id])
+  inventoryItem     InventoryItem  @relation(fields: [inventoryItemId], references: [id])
+
+  @@index([packageId])
+  @@index([salesOrderItemId])
+  @@index([inventoryItemId])
+  @@map("package_items")
 }
 
 enum ShipmentStatus {
