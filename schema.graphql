@@ -1,0 +1,798 @@
+# GraphQL API Schema
+# FlowStock WMS - GraphQL Alternative to REST API
+
+type Query {
+  # Inventory
+  inventoryItem(id: ID!): InventoryItem
+  inventoryItems(
+    where: InventoryItemWhereInput
+    orderBy: [InventoryItemOrderByInput!]
+    skip: Int
+    take: Int
+  ): [InventoryItem!]!
+  inventoryItemsCount(where: InventoryItemWhereInput): Int!
+  
+  # Stock Levels
+  stockLevel(id: ID!): StockLevel
+  stockLevels(
+    where: StockLevelWhereInput
+    orderBy: [StockLevelOrderByInput!]
+    skip: Int
+    take: Int
+  ): [StockLevel!]!
+  
+  # Orders
+  salesOrder(id: ID!): SalesOrder
+  salesOrders(
+    where: SalesOrderWhereInput
+    orderBy: [SalesOrderOrderByInput!]
+    skip: Int
+    take: Int
+  ): [SalesOrder!]!
+  salesOrdersCount(where: SalesOrderWhereInput): Int!
+  
+  purchaseOrder(id: ID!): PurchaseOrder
+  purchaseOrders(
+    where: PurchaseOrderWhereInput
+    orderBy: [PurchaseOrderOrderByInput!]
+    skip: Int
+    take: Int
+  ): [PurchaseOrder!]!
+  
+  # Warehouse
+  warehouse(id: ID!): Warehouse
+  warehouses: [Warehouse!]!
+  
+  location(id: ID!): Location
+  locations(
+    where: LocationWhereInput
+    orderBy: [LocationOrderByInput!]
+    skip: Int
+    take: Int
+  ): [Location!]!
+  
+  # Tasks
+  pickingTask(id: ID!): PickingTask
+  pickingTasks(
+    where: PickingTaskWhereInput
+    orderBy: [PickingTaskOrderByInput!]
+    skip: Int
+    take: Int
+  ): [PickingTask!]!
+  myTasks(
+    status: TaskStatus
+    taskType: TaskType
+  ): [PickingTask!]!
+  
+  # Wave Picking
+  wavePick(id: ID!): WavePick
+  wavePicks(
+    where: WavePickWhereInput
+    orderBy: [WavePickOrderByInput!]
+    skip: Int
+    take: Int
+  ): [WavePick!]!
+  
+  # Analytics
+  dashboardStats(warehouseId: ID, dateRange: DateRangeInput): DashboardStats!
+  inventoryTurnover(warehouseId: ID, period: String!): [TurnoverData!]!
+  orderFulfillmentRate(warehouseId: ID, period: String!): FulfillmentRate!
+  
+  # Mobile
+  barcodeScan(barcode: String!, context: String): ScanResult!
+  myTasksForMobile(status: TaskStatus, taskType: TaskType): [PickingTask!]!
+}
+
+type Mutation {
+  # Inventory
+  createInventoryItem(data: CreateInventoryItemInput!): InventoryItem!
+  updateInventoryItem(id: ID!, data: UpdateInventoryItemInput!): InventoryItem!
+  deleteInventoryItem(id: ID!): Boolean!
+  
+  adjustStock(data: StockAdjustmentInput!): StockLevel!
+  transferStock(data: StockTransferInput!): Transfer!
+  
+  # Orders
+  createSalesOrder(data: CreateSalesOrderInput!): SalesOrder!
+  updateSalesOrder(id: ID!, data: UpdateSalesOrderInput!): SalesOrder!
+  cancelSalesOrder(id: ID!, reason: String): SalesOrder!
+  
+  createPurchaseOrder(data: CreatePurchaseOrderInput!): PurchaseOrder!
+  updatePurchaseOrder(id: ID!, data: UpdatePurchaseOrderInput!): PurchaseOrder!
+  receivePurchaseOrder(id: ID!, data: ReceivePOInput!): PurchaseOrder!
+  
+  # Warehouse
+  createWarehouse(data: CreateWarehouseInput!): Warehouse!
+  updateWarehouse(id: ID!, data: UpdateWarehouseInput!): Warehouse!
+  
+  createLocation(data: CreateLocationInput!): Location!
+  updateLocation(id: ID!, data: UpdateLocationInput!): Location!
+  
+  # Tasks
+  createPickingTask(data: CreatePickingTaskInput!): PickingTask!
+  updatePickingTask(id: ID!, data: UpdatePickingTaskInput!): PickingTask!
+  startTask(id: ID!): PickingTask!
+  completeTask(id: ID!, data: CompleteTaskInput!): PickingTask!
+  cancelTask(id: ID!, reason: String): PickingTask!
+  
+  # Wave Picking
+  createWave(data: CreateWaveInput!): WavePick!
+  releaseWave(id: ID!): WavePick!
+  completeWave(id: ID!): WavePick!
+  
+  # Mobile
+  mobileLogin(email: String!, password: String!, deviceInfo: DeviceInfoInput!): AuthPayload!
+  syncOfflineData(data: SyncInput!): SyncResult!
+}
+
+type Subscription {
+  # Real-time updates
+  taskAssigned(userId: ID!): PickingTask!
+  taskUpdated(taskId: ID!): PickingTask!
+  stockLevelChanged(itemId: ID!): StockLevel!
+  orderStatusChanged(orderId: ID!): SalesOrder!
+  waveStatusChanged(waveId: ID!): WavePick!
+}
+
+# Types
+
+type InventoryItem {
+  id: ID!
+  sku: String!
+  name: String!
+  description: String
+  barcode: String
+  category: Category
+  supplier: Supplier
+  unitPrice: Float!
+  unitCost: Float
+  reorderPoint: Int!
+  reorderQuantity: Int!
+  stockLevels: [StockLevel!]!
+  totalStock: Int!
+  availableStock: Int!
+  allocatedStock: Int!
+  locations: [Location!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type StockLevel {
+  id: ID!
+  inventoryItem: InventoryItem!
+  warehouse: Warehouse!
+  quantity: Int!
+  allocatedQuantity: Int!
+  availableQuantity: Int!
+  reservedQuantity: Int!
+  location: Location
+  lotNumber: String
+  expiryDate: DateTime
+  updatedAt: DateTime!
+}
+
+type SalesOrder {
+  id: ID!
+  soNumber: String!
+  status: OrderStatus!
+  customer: Customer!
+  warehouse: Warehouse!
+  orderDate: DateTime!
+  requiredDate: DateTime
+  shippedDate: DateTime
+  lines: [SalesOrderLine!]!
+  totalAmount: Float!
+  fulfillmentProgress: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type SalesOrderLine {
+  id: ID!
+  salesOrder: SalesOrder!
+  inventoryItem: InventoryItem!
+  quantity: Int!
+  unitPrice: Float!
+  totalPrice: Float!
+  quantityPicked: Int!
+  quantityShipped: Int!
+}
+
+type PurchaseOrder {
+  id: ID!
+  poNumber: String!
+  status: OrderStatus!
+  supplier: Supplier!
+  warehouse: Warehouse!
+  orderDate: DateTime!
+  expectedDate: DateTime
+  receivedDate: DateTime
+  lines: [PurchaseOrderLine!]!
+  totalAmount: Float!
+  receiptProgress: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PurchaseOrderLine {
+  id: ID!
+  purchaseOrder: PurchaseOrder!
+  inventoryItem: InventoryItem!
+  quantity: Int!
+  unitCost: Float!
+  totalCost: Float!
+  quantityReceived: Int!
+}
+
+type Warehouse {
+  id: ID!
+  name: String!
+  code: String!
+  address: String
+  city: String
+  state: String
+  postalCode: String
+  country: String
+  isActive: Boolean!
+  locations: [Location!]!
+  stockLevels: [StockLevel!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Location {
+  id: ID!
+  name: String!
+  barcode: String
+  warehouse: Warehouse!
+  zone: String!
+  aisle: String!
+  rack: String!
+  bin: String!
+  locationType: LocationType!
+  isActive: Boolean!
+  capacity: Int
+  currentUtilization: Float
+  inventoryItems: [InventoryItem!]!
+  stockLevels: [StockLevel!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type PickingTask {
+  id: ID!
+  taskNumber: String!
+  taskType: TaskType!
+  status: TaskStatus!
+  priority: Int!
+  warehouse: Warehouse!
+  assignedTo: User
+  fromLocation: Location
+  toLocation: Location
+  inventoryItem: InventoryItem
+  quantity: Int
+  scheduledFor: DateTime
+  startedAt: DateTime
+  completedAt: DateTime
+  duration: Int
+  notes: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type WavePick {
+  id: ID!
+  waveNumber: String!
+  status: WaveStatus!
+  warehouse: Warehouse!
+  strategy: WaveStrategy!
+  scheduledFor: DateTime
+  releasedAt: DateTime
+  completedAt: DateTime
+  lines: [WavePickLine!]!
+  totalOrders: Int!
+  totalLines: Int!
+  totalQuantity: Int!
+  progress: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type WavePickLine {
+  id: ID!
+  wave: WavePick!
+  salesOrderLine: SalesOrderLine!
+  inventoryItem: InventoryItem!
+  location: Location
+  quantityToPick: Int!
+  quantityPicked: Int!
+  status: WaveLineStatus!
+  pickedBy: User
+  pickedAt: DateTime
+}
+
+type Category {
+  id: ID!
+  name: String!
+  description: String
+  items: [InventoryItem!]!
+}
+
+type Supplier {
+  id: ID!
+  name: String!
+  code: String!
+  email: String
+  phone: String
+  leadTimeDays: Int
+  items: [InventoryItem!]!
+}
+
+type Customer {
+  id: ID!
+  name: String!
+  code: String!
+  email: String
+  phone: String
+  address: String
+  salesOrders: [SalesOrder!]!
+}
+
+type User {
+  id: ID!
+  email: String!
+  name: String!
+  role: UserRole!
+  isActive: Boolean!
+  tasks: [PickingTask!]!
+}
+
+type Transfer {
+  id: ID!
+  transferNumber: String!
+  status: TransferStatus!
+  fromWarehouse: Warehouse!
+  toWarehouse: Warehouse!
+  transferDate: DateTime!
+  lines: [TransferLine!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TransferLine {
+  id: ID!
+  transfer: Transfer!
+  inventoryItem: InventoryItem!
+  quantity: Int!
+  quantityReceived: Int
+}
+
+# Analytics Types
+
+type DashboardStats {
+  totalInventoryValue: Float!
+  lowStockItems: Int!
+  pendingOrders: Int!
+  pendingTasks: Int!
+  warehouseUtilization: Float!
+  orderFulfillmentRate: Float!
+  averagePickTime: Float!
+  recentActivity: [ActivityLog!]!
+}
+
+type TurnoverData {
+  period: String!
+  turnoverRate: Float!
+  averageDaysInStock: Float!
+}
+
+type FulfillmentRate {
+  period: String!
+  totalOrders: Int!
+  fulfilledOrders: Int!
+  rate: Float!
+  averageFulfillmentTime: Float!
+}
+
+type ActivityLog {
+  id: ID!
+  action: String!
+  entity: String!
+  entityId: String!
+  user: User
+  timestamp: DateTime!
+  details: String
+}
+
+# Mobile Types
+
+type AuthPayload {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+  expiresIn: Int!
+}
+
+type ScanResult {
+  entityType: EntityType!
+  data: ScanResultData!
+}
+
+union ScanResultData = InventoryItem | Location | SalesOrder | WavePick | PickingTask
+
+type SyncResult {
+  syncTimestamp: DateTime!
+  appliedChanges: [AppliedChange!]!
+  failedChanges: [FailedChange!]!
+  serverChanges: ServerChanges!
+  conflicts: [SyncConflict!]!
+}
+
+type AppliedChange {
+  localId: String!
+  serverId: String!
+  entity: String!
+  action: String!
+}
+
+type FailedChange {
+  localId: String!
+  entity: String!
+  action: String!
+  error: String!
+}
+
+type ServerChanges {
+  tasks: [PickingTask!]!
+  items: [InventoryItem!]!
+}
+
+type SyncConflict {
+  entity: String!
+  entityId: String!
+  localVersion: DateTime!
+  serverVersion: DateTime!
+  conflictType: String!
+}
+
+# Enums
+
+enum OrderStatus {
+  DRAFT
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  PAUSED
+  CANCELLED
+}
+
+enum TaskType {
+  PUTAWAY
+  PICKING
+  REPLENISHMENT
+  CYCLE_COUNT
+  TRANSFER
+  RELOCATION
+}
+
+enum WaveStatus {
+  DRAFT
+  RELEASED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum WaveStrategy {
+  SINGLE_ORDER
+  BATCH_ORDER
+  ZONE_BASED
+  WAVE_LESS
+}
+
+enum WaveLineStatus {
+  PENDING
+  PICKED
+  SHORT_PICKED
+  CANCELLED
+}
+
+enum LocationType {
+  RECEIVING
+  STORAGE
+  PICKING
+  PACKING
+  SHIPPING
+  STAGING
+}
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  WAREHOUSE_WORKER
+  INVENTORY_CLERK
+}
+
+enum TransferStatus {
+  PENDING
+  IN_TRANSIT
+  COMPLETED
+  CANCELLED
+}
+
+enum EntityType {
+  INVENTORY_ITEM
+  LOCATION
+  SALES_ORDER
+  PURCHASE_ORDER
+  WAVE_PICK
+  PICKING_TASK
+}
+
+# Inputs
+
+input InventoryItemWhereInput {
+  AND: [InventoryItemWhereInput!]
+  OR: [InventoryItemWhereInput!]
+  NOT: [InventoryItemWhereInput!]
+  id: IDFilter
+  sku: StringFilter
+  name: StringFilter
+  barcode: StringFilter
+  categoryId: IDFilter
+  supplierId: IDFilter
+  unitPrice: FloatFilter
+  reorderPoint: IntFilter
+}
+
+input InventoryItemOrderByInput {
+  sku: SortOrder
+  name: SortOrder
+  unitPrice: SortOrder
+  createdAt: SortOrder
+  updatedAt: SortOrder
+}
+
+input CreateInventoryItemInput {
+  sku: String!
+  name: String!
+  description: String
+  barcode: String
+  categoryId: ID
+  supplierId: ID
+  unitPrice: Float!
+  unitCost: Float
+  reorderPoint: Int!
+  reorderQuantity: Int!
+}
+
+input UpdateInventoryItemInput {
+  sku: String
+  name: String
+  description: String
+  barcode: String
+  categoryId: ID
+  supplierId: ID
+  unitPrice: Float
+  unitCost: Float
+  reorderPoint: Int
+  reorderQuantity: Int
+}
+
+input StockAdjustmentInput {
+  inventoryItemId: ID!
+  warehouseId: ID!
+  locationId: ID
+  quantity: Int!
+  adjustmentType: String!
+  reason: String
+  notes: String
+}
+
+input StockTransferInput {
+  fromWarehouseId: ID!
+  toWarehouseId: ID!
+  lines: [TransferLineInput!]!
+  notes: String
+}
+
+input TransferLineInput {
+  inventoryItemId: ID!
+  quantity: Int!
+}
+
+input CreateSalesOrderInput {
+  customerId: ID!
+  warehouseId: ID!
+  orderDate: DateTime!
+  requiredDate: DateTime
+  lines: [SalesOrderLineInput!]!
+  notes: String
+}
+
+input SalesOrderLineInput {
+  inventoryItemId: ID!
+  quantity: Int!
+  unitPrice: Float!
+}
+
+input UpdateSalesOrderInput {
+  status: OrderStatus
+  requiredDate: DateTime
+  notes: String
+}
+
+input CreatePurchaseOrderInput {
+  supplierId: ID!
+  warehouseId: ID!
+  orderDate: DateTime!
+  expectedDate: DateTime
+  lines: [PurchaseOrderLineInput!]!
+  notes: String
+}
+
+input PurchaseOrderLineInput {
+  inventoryItemId: ID!
+  quantity: Int!
+  unitCost: Float!
+}
+
+input ReceivePOInput {
+  receivedDate: DateTime!
+  lines: [ReceivePOLineInput!]!
+}
+
+input ReceivePOLineInput {
+  lineId: ID!
+  quantityReceived: Int!
+  locationId: ID
+}
+
+input CreateWarehouseInput {
+  name: String!
+  code: String!
+  address: String
+  city: String
+  state: String
+  postalCode: String
+  country: String
+}
+
+input UpdateWarehouseInput {
+  name: String
+  address: String
+  city: String
+  state: String
+  postalCode: String
+  country: String
+  isActive: Boolean
+}
+
+input CreateLocationInput {
+  name: String!
+  barcode: String
+  warehouseId: ID!
+  zone: String!
+  aisle: String!
+  rack: String!
+  bin: String!
+  locationType: LocationType!
+  capacity: Int
+}
+
+input UpdateLocationInput {
+  name: String
+  barcode: String
+  locationType: LocationType
+  capacity: Int
+  isActive: Boolean
+}
+
+input CreatePickingTaskInput {
+  taskType: TaskType!
+  warehouseId: ID!
+  assignedToId: ID
+  fromLocationId: ID
+  toLocationId: ID
+  inventoryItemId: ID
+  quantity: Int
+  priority: Int
+  scheduledFor: DateTime
+  notes: String
+}
+
+input UpdatePickingTaskInput {
+  status: TaskStatus
+  assignedToId: ID
+  priority: Int
+  scheduledFor: DateTime
+  notes: String
+}
+
+input CompleteTaskInput {
+  actualQuantity: Int
+  notes: String
+}
+
+input CreateWaveInput {
+  warehouseId: ID!
+  strategy: WaveStrategy!
+  salesOrderIds: [ID!]!
+  scheduledFor: DateTime
+}
+
+input DeviceInfoInput {
+  deviceId: String!
+  deviceName: String!
+  fcmToken: String
+}
+
+input SyncInput {
+  lastSyncAt: DateTime
+  pendingChanges: [PendingChangeInput!]!
+}
+
+input PendingChangeInput {
+  entity: String!
+  action: String!
+  data: JSON!
+  localId: String!
+  timestamp: DateTime!
+}
+
+input DateRangeInput {
+  from: DateTime!
+  to: DateTime!
+}
+
+# Filter Inputs
+
+input IDFilter {
+  equals: ID
+  in: [ID!]
+  notIn: [ID!]
+}
+
+input StringFilter {
+  equals: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  in: [String!]
+  notIn: [String!]
+}
+
+input IntFilter {
+  equals: Int
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  in: [Int!]
+  notIn: [Int!]
+}
+
+input FloatFilter {
+  equals: Float
+  lt: Float
+  lte: Float
+  gt: Float
+  gte: Float
+}
+
+enum SortOrder {
+  asc
+  desc
+}
+
+# Scalars
+
+scalar DateTime
+scalar JSON
