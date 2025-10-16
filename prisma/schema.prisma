@@ -142,6 +142,7 @@ model Organization {
   pickLists          PickList[]
   shipments          Shipment[]
   packs              Pack[]
+  carrierConfigs     CarrierConfig[]
   integrations       Integration[]
   apiKeys            ApiKey[]
   activityLogs       ActivityLog[]
@@ -1023,6 +1024,7 @@ model Pack {
   packedBy        User?           @relation("PackCreator", fields: [packedById], references: [id])
   createdBy       User            @relation("PackInitiator", fields: [createdById], references: [id])
   packages        Package[]
+  shipments       Shipment[]
 
   @@unique([organizationId, packNumber])
   @@index([organizationId])
@@ -1091,9 +1093,12 @@ enum ShipmentStatus {
   PROCESSING
   SHIPPED
   IN_TRANSIT
+  OUT_FOR_DELIVERY
   DELIVERED
+  EXCEPTION
   FAILED
   CANCELLED
+  RETURNED
 }
 
 model Shipment {
@@ -1101,15 +1106,29 @@ model Shipment {
   organizationId  String
   shipmentNumber  String          // Auto-generated (SHIP-YYYYMMDD-XXX)
   salesOrderId    String
+  packId          String?
   
   status          ShipmentStatus  @default(PENDING)
   
   // Carrier Information
+  carrierCode     String?         // UPS, FEDEX, DHL, USPS
   carrierName     String?
-  carrierService  String?
+  carrierService  String?         // Ground, Express, Overnight, etc.
   trackingNumber  String?
   trackingUrl     String?
   labelUrl        String?
+  labelFormat     String?         // PDF, PNG, ZPL
+  
+  // Shipping Address
+  recipientName   String?
+  recipientPhone  String?
+  recipientEmail  String?
+  addressLine1    String?
+  addressLine2    String?
+  city            String?
+  state           String?
+  postalCode      String?
+  country         String?
   
   // Shipping Details
   weight          Decimal?        @db.Decimal(10, 2)
@@ -1121,12 +1140,26 @@ model Shipment {
   estimatedDelivery DateTime?
   actualDelivery  DateTime?
   
-  // Cost
+  // Cost & Rating
   shippingCost    Decimal?        @db.Decimal(10, 2)
+  insuranceAmount Decimal?        @db.Decimal(10, 2)
   currency        String          @default("USD")
+  
+  // Signature & Delivery Options
+  signatureRequired Boolean       @default(false)
+  saturdayDelivery  Boolean       @default(false)
+  
+  // Tracking Events
+  trackingEvents  Json?           // Array of tracking updates
+  lastTrackingUpdate DateTime?
+  
+  // Exception Handling
+  exceptionReason String?
+  exceptionDate   DateTime?
   
   // Metadata
   notes           String?         @db.Text
+  metadata        Json?           // Carrier-specific data
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   createdById     String
@@ -1134,14 +1167,55 @@ model Shipment {
   // Relations
   organization    Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   salesOrder      SalesOrder      @relation(fields: [salesOrderId], references: [id])
+  pack            Pack?           @relation(fields: [packId], references: [id])
   createdBy       User            @relation("ShipmentCreator", fields: [createdById], references: [id])
 
   @@unique([organizationId, shipmentNumber])
   @@index([organizationId])
   @@index([salesOrderId])
+  @@index([packId])
   @@index([status])
   @@index([trackingNumber])
+  @@index([carrierCode])
   @@map("shipments")
+}
+
+enum CarrierType {
+  UPS
+  FEDEX
+  DHL
+  USPS
+  CUSTOM
+}
+
+model CarrierConfig {
+  id              String        @id @default(cuid())
+  organizationId  String
+  
+  carrierType     CarrierType
+  carrierName     String
+  isActive        Boolean       @default(true)
+  
+  // API Credentials (encrypted)
+  apiKey          String?
+  apiSecret       String?
+  accountNumber   String?
+  
+  // Configuration
+  config          Json?         // Carrier-specific settings
+  
+  // Default settings
+  defaultService  String?
+  
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  organization    Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, carrierType])
+  @@index([organizationId])
+  @@map("carrier_configs")
 }
 
 // ==========================================
