@@ -23,18 +23,18 @@ export function PricingSection() {
   const plans = [
     {
       name: "Starter",
-      description: "Perfect for small teams getting started",
+      description: "Perfect for small warehouses getting started",
       price: "$49",
       period: "per user/month",
       badge: null,
       features: [
-        "Up to 10,000 stock items",
-        "Basic reporting & analytics",
-        "Standard integrations",
+        "1 warehouse location",
+        "Up to 10,000 SKUs",
+        "Basic inventory tracking",
+        "Order management",
+        "Mobile app (iOS & Android)",
         "Email support",
-        "Mobile app access",
-        "Basic user management",
-        "99.5% uptime SLA"
+        "Basic reporting"
       ],
       cta: "Start Free Trial",
       ctaVariant: "outline" as const,
@@ -42,20 +42,20 @@ export function PricingSection() {
     },
     {
       name: "Professional",
-      description: "Advanced features for growing businesses",
+      description: "Advanced WMS for growing operations",
       price: "$99",
       period: "per user/month",
       badge: "Most Popular",
       features: [
-        "Up to 100,000 stock items",
-        "Advanced analytics & forecasting",
-        "Premium integrations (Oracle, SAP)",
+        "Up to 5 warehouses",
+        "Unlimited SKUs",
+        "Wave & batch picking",
+        "Quality control workflows",
+        "Carrier integrations (FedEx, UPS)",
+        "E-commerce sync (Shopify, WooCommerce)",
+        "Advanced analytics",
         "Priority support (24/7)",
-        "Custom workflows",
-        "Advanced user management",
-        "99.9% uptime SLA",
-        "API access",
-        "Custom branding"
+        "API access"
       ],
       cta: "Start Free Trial",
       ctaVariant: "default" as const,
@@ -63,21 +63,21 @@ export function PricingSection() {
     },
     {
       name: "Enterprise",
-      description: "Complete solution for large organizations",
+      description: "Complete WMS for large operations",
       price: "Custom",
       period: "contact sales",
       badge: "Best Value",
       features: [
-        "Unlimited stock items",
-        "Enterprise analytics & AI insights",
-        "All integrations + custom",
+        "Unlimited warehouses",
+        "Unlimited SKUs",
+        "Assembly & kitting",
+        "Cross-docking",
+        "Yard management",
+        "Custom integrations",
         "Dedicated success manager",
-        "Custom development",
         "SSO & advanced security",
-        "99.99% uptime SLA",
-        "White-label solution",
-        "On-premise deployment",
-        "Compliance certifications"
+        "On-premise deployment option",
+        "White-label solution"
       ],
       cta: "Contact Sales",
       ctaVariant: "outline" as const,
@@ -87,36 +87,36 @@ export function PricingSection() {
 
   const addOns = [
     {
-      name: "Advanced Security",
-      description: "Enhanced security features and compliance",
-      price: "$25/user/month",
+      name: "Barcode Labels & Printing",
+      description: "Professional barcode generation and label printing",
+      price: "$20/user/month",
       features: [
-        "Advanced threat protection",
-        "Compliance reporting",
-        "Enhanced audit logs",
-        "Security consulting"
+        "Custom label templates",
+        "Barcode generation",
+        "Thermal printer support",
+        "QR code support"
       ]
     },
     {
-      name: "Premium Support",
-      description: "Dedicated support and faster response times",
-      price: "$15/user/month", 
+      name: "Advanced Analytics",
+      description: "Demand forecasting and inventory optimization",
+      price: "$30/user/month", 
       features: [
-        "Dedicated support team",
-        "1-hour response time",
-        "Training sessions",
-        "Implementation assistance"
+        "AI-powered forecasting",
+        "ABC/XYZ analysis",
+        "Inventory optimization",
+        "Custom dashboards"
       ]
     },
     {
-      name: "Custom Integrations",
-      description: "Build custom integrations for your workflows",
+      name: "Professional Services",
+      description: "Implementation and training services",
       price: "From $5,000",
       features: [
-        "Custom API development",
-        "Legacy system integration",
-        "Data migration services",
-        "Ongoing maintenance"
+        "Warehouse setup assistance",
+        "Data migration",
+        "Staff training",
+        "Process optimization"
       ]
     }
   ]

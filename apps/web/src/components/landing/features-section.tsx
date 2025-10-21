@@ -19,95 +19,101 @@ import {
   Clock,
   Layers,
   Activity,
-  Settings
+  Settings,
+  Package,
+  Truck,
+  ClipboardCheck,
+  Boxes,
+  LayoutGrid,
+  ScanBarcode
 } from "lucide-react"
 
 export function FeaturesSection() {
   const primaryFeatures = [
     {
-      icon: Shield,
-      title: "Zero-Trust Security",
-      description: "Enterprise-grade security with end-to-end encryption, role-based access control, and continuous monitoring.",
+      icon: Package,
+      title: "Inventory Management",
+      description: "Complete inventory control with multi-warehouse tracking, lot/serial numbers, cycle counting, and automated reorder alerts.",
       features: [
-        "End-to-end encryption",
-        "Role-based access control",
-        "Audit trails & compliance",
-        "SOC 2 Type II certified"
+        "Multi-warehouse tracking",
+        "Lot & serial number management",
+        "Cycle counting & audits",
+        "Automated reorder points"
       ],
-      badge: "Security",
+      badge: "Core WMS",
       color: "from-blue-500/20 to-blue-600/20"
     },
     {
-      icon: Zap,
-      title: "Real-time Synchronization",
-      description: "Lightning-fast real-time updates across all systems with conflict resolution and offline support.",
+      icon: Boxes,
+      title: "Order Fulfillment",
+      description: "Streamlined order processing with wave picking, batch operations, packing workflows, and shipping integrations.",
       features: [
-        "Instant data sync",
-        "Conflict resolution",
-        "Offline capability",
-        "Event-driven architecture"
+        "Wave & batch picking",
+        "Pick-pack-ship workflows",
+        "Carrier integrations",
+        "Returns (RMA) processing"
       ],
-      badge: "Performance",
-      color: "from-yellow-500/20 to-yellow-600/20"
-    },
-    {
-      icon: Building2,
-      title: "Multi-Tenant Architecture",
-      description: "Scalable multi-tenant platform with complete data isolation and custom branding per organization.",
-      features: [
-        "Complete data isolation",
-        "Custom branding",
-        "Scalable infrastructure",
-        "Organization management"
-      ],
-      badge: "Enterprise",
+      badge: "Operations",
       color: "from-green-500/20 to-green-600/20"
     },
     {
-      icon: BarChart3,
-      title: "Advanced Analytics",
-      description: "Comprehensive reporting and analytics with real-time dashboards and predictive insights.",
+      icon: LayoutGrid,
+      title: "Warehouse Operations",
+      description: "Complete WMS features including receiving, putaway, location management, cross-docking, and task automation.",
       features: [
-        "Real-time dashboards",
-        "Predictive analytics",
-        "Custom reports",
-        "Data visualization"
+        "Receiving & putaway",
+        "Location management",
+        "Cross-docking support",
+        "Task automation"
       ],
-      badge: "Analytics",
+      badge: "Warehouse",
       color: "from-purple-500/20 to-purple-600/20"
+    },
+    {
+      icon: ClipboardCheck,
+      title: "Quality Control",
+      description: "Built-in QC workflows with inspection templates, checkpoints, approvals, and compliance tracking.",
+      features: [
+        "Inspection templates",
+        "QC checkpoints",
+        "Approval workflows",
+        "Compliance reporting"
+      ],
+      badge: "Quality",
+      color: "from-orange-500/20 to-orange-600/20"
     }
   ]
 
   const additionalFeatures = [
     {
+      icon: ScanBarcode,
+      title: "Mobile Scanning",
+      description: "iOS & Android apps with barcode scanning for receiving, picking, counting, and transfers."
+    },
+    {
+      icon: Settings,
+      title: "Assembly & Kitting",
+      description: "BOM management, component tracking, assembly orders, and production workflows."
+    },
+    {
+      icon: BarChart3,
+      title: "Advanced Analytics",
+      description: "Real-time dashboards, inventory turnover, demand forecasting, and custom reports."
+    },
+    {
+      icon: Truck,
+      title: "Shipping Integration",
+      description: "Integrated carrier management for FedEx, UPS, USPS with rate shopping and tracking."
+    },
+    {
       icon: Database,
-      title: "ERP Integrations",
-      description: "Seamless integration with Oracle, SAP, NetSuite, and other enterprise systems."
+      title: "E-commerce Sync",
+      description: "Real-time integration with Shopify, WooCommerce, Magento, and custom platforms."
     },
     {
-      icon: Globe,
-      title: "Global Scale",
-      description: "Deploy across multiple regions with automatic failover and disaster recovery."
-    },
-    {
-      icon: Lock,
-      title: "Compliance Ready",
-      description: "Built-in compliance for GDPR, HIPAA, SOX, and other regulatory requirements."
-    },
-    {
-      icon: Users,
-      title: "Team Collaboration",
-      description: "Advanced workflow management with approval processes and team coordination."
-    },
-    {
-      icon: Clock,
-      title: "24/7 Monitoring",
-      description: "Continuous monitoring with intelligent alerting and automated issue resolution."
-    },
-    {
-      icon: Layers,
-      title: "API-First Design",
-      description: "Comprehensive REST and GraphQL APIs for seamless integrations and customizations."
+      icon: Shield,
+      title: "Enterprise Security",
+      description: "RBAC, MFA, audit logging, encryption, and SOC 2 compliance readiness."
     }
   ]
 
@@ -120,14 +126,14 @@ export function FeaturesSection() {
             Features
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-            Everything you need for
+            Complete WMS features for
             <span className="block bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-              enterprise operations
+              modern warehouses
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            FlowStock combines cutting-edge technology with enterprise-grade reliability 
-            to deliver a comprehensive stock booking and inventory management solution.
+            FlowStock delivers a comprehensive warehouse management system with inventory control, 
+            order fulfillment, quality management, and powerful integrations.
           </p>
         </div>
 
@@ -191,22 +197,22 @@ export function FeaturesSection() {
         <div className="text-center space-y-8">
           <div>
             <h3 className="text-2xl font-bold mb-4">
-              Seamless integrations with your existing tools
+              Connect with your e-commerce and business tools
             </h3>
             <p className="text-muted-foreground mb-8">
-              Connect FlowStock with your favorite enterprise applications and workflows
+              Seamless integrations with leading platforms to power your warehouse operations
             </p>
           </div>
 
           {/* Integration logos/icons */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
             {[
-              { name: "Oracle ERP", icon: Database },
-              { name: "SAP", icon: Building2 },
-              { name: "NetSuite", icon: Globe },
-              { name: "Salesforce", icon: Users },
-              { name: "Microsoft", icon: Settings },
-              { name: "APIs", icon: Activity },
+              { name: "Shopify", icon: Database },
+              { name: "WooCommerce", icon: Building2 },
+              { name: "QuickBooks", icon: Globe },
+              { name: "FedEx", icon: Truck },
+              { name: "Stripe", icon: Settings },
+              { name: "REST API", icon: Activity },
             ].map((integration) => (
               <div
                 key={integration.name}

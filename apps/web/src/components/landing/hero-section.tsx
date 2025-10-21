@@ -19,17 +19,17 @@ import {
 
 export function HeroSection() {
   const stats = [
-    { label: "Enterprise Customers", value: "500+" },
-    { label: "Stock Items Managed", value: "50M+" },
-    { label: "Uptime SLA", value: "99.9%" },
-    { label: "Countries Served", value: "40+" },
+    { label: "Warehouses Managed", value: "500+" },
+    { label: "Orders Fulfilled Daily", value: "100K+" },
+    { label: "Picking Accuracy", value: "99.9%" },
+    { label: "Countries Deployed", value: "40+" },
   ]
 
   const features = [
-    { icon: Shield, label: "Zero-Trust Security" },
-    { icon: Zap, label: "Real-time Sync" },
-    { icon: Building2, label: "Multi-Tenant" },
-    { icon: BarChart3, label: "Advanced Analytics" },
+    { icon: Shield, label: "Multi-Warehouse" },
+    { icon: Zap, label: "Wave Picking" },
+    { icon: Building2, label: "Quality Control" },
+    { icon: BarChart3, label: "Real-time Analytics" },
   ]
 
   return (
@@ -46,7 +46,7 @@ export function HeroSection() {
           <div className="flex items-center space-x-2">
             <Badge variant="secondary" className="px-3 py-1">
               <Star className="h-3 w-3 mr-1" />
-              New: Advanced ERP Integrations
+              New: Wave Picking & Task Automation
             </Badge>
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -54,16 +54,15 @@ export function HeroSection() {
           {/* Hero headline */}
           <div className="space-y-4 max-w-4xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              Enterprise
+              Streamline Your
               <span className="bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-                {" "}Stock Booking{" "}
+                {" "}Warehouse Operations{" "}
               </span>
-              Platform
+              From Receiving to Shipping
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Streamline your inventory management with zero-trust security, 
-              real-time synchronization, and seamless ERP integrations. 
-              Built for enterprise scale.
+              Track inventory across multiple locations. Optimize picking with wave automation. 
+              Ship orders faster with intelligent task routing. Real-time visibility into every operation.
             </p>
           </div>
 
@@ -99,21 +98,21 @@ export function HeroSection() {
           {/* Trust indicators */}
           <div className="pt-8 space-y-4">
             <p className="text-sm text-muted-foreground">
-              Trusted by leading enterprises worldwide
+              Processing 100,000+ orders daily across 500+ warehouses globally
             </p>
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12 opacity-60">
               {/* Placeholder for company logos */}
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <Building2 className="h-6 w-6" />
-                <span className="font-semibold">Fortune 500</span>
+                <span className="font-semibold">3PL Partners</span>
               </div>
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <Shield className="h-6 w-6" />
-                <span className="font-semibold">SOC 2 Compliant</span>
+                <span className="font-semibold">Enterprise Grade</span>
               </div>
               <div className="flex items-center space-x-2 text-muted-foreground">
                 <Clock className="h-6 w-6" />
-                <span className="font-semibold">24/7 Support</span>
+                <span className="font-semibold">Same-Day Setup</span>
               </div>
             </div>
           </div>

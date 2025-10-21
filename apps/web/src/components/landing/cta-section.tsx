@@ -43,15 +43,15 @@ export function CTASection() {
               {/* Headline */}
               <div className="space-y-4">
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  Ready to transform your
+                  Ready to optimize your
                   <span className="block bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-                    inventory management?
+                    warehouse operations?
                   </span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Join hundreds of enterprises who have streamlined their operations 
-                  with FlowStock. Experience the power of enterprise-grade inventory 
-                  management today.
+                  Join hundreds of warehouses who have streamlined their operations 
+                  with FlowStock WMS. Experience complete inventory control, 
+                  efficient order fulfillment, and powerful analytics today.
                 </p>
               </div>
 
@@ -104,22 +104,22 @@ export function CTASection() {
               {/* Trust indicators */}
               <div className="pt-8 border-t">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Join 500+ enterprises already using FlowStock
+                  Join 500+ warehouses already using FlowStock
                 </p>
                 <div className="flex justify-center items-center space-x-8 text-xs text-muted-foreground">
                   <div className="flex items-center space-x-1">
                     <CheckCircle className="h-3 w-3 text-primary" />
-                    <span>SOC 2 Certified</span>
+                    <span>Enterprise Ready</span>
                   </div>
                   <span>•</span>
                   <div className="flex items-center space-x-1">
                     <CheckCircle className="h-3 w-3 text-primary" />
-                    <span>GDPR Compliant</span>
+                    <span>Mobile Apps</span>
                   </div>
                   <span>•</span>
                   <div className="flex items-center space-x-1">
                     <CheckCircle className="h-3 w-3 text-primary" />
-                    <span>99.9% Uptime</span>
+                    <span>99.9% Accuracy</span>
                   </div>
                 </div>
               </div>
@@ -131,19 +131,19 @@ export function CTASection() {
             <div className="text-center p-6 rounded-lg border bg-card hover:bg-accent transition-colors">
               <div className="text-2xl font-bold mb-2">500+</div>
               <div className="text-sm text-muted-foreground">
-                Enterprise customers worldwide
+                Warehouses powered globally
               </div>
             </div>
             <div className="text-center p-6 rounded-lg border bg-card hover:bg-accent transition-colors">
-              <div className="text-2xl font-bold mb-2">50M+</div>
+              <div className="text-2xl font-bold mb-2">100K+</div>
               <div className="text-sm text-muted-foreground">
-                Stock items managed daily
+                Orders fulfilled daily
               </div>
             </div>
             <div className="text-center p-6 rounded-lg border bg-card hover:bg-accent transition-colors">
-              <div className="text-2xl font-bold mb-2">24/7</div>
+              <div className="text-2xl font-bold mb-2">99.9%</div>
               <div className="text-sm text-muted-foreground">
-                Expert support available
+                Picking accuracy rate
               </div>
             </div>
           </div>
