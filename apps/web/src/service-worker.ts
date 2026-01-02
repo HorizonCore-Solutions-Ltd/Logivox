@@ -85,7 +85,7 @@ self.addEventListener('fetch', (event: FetchEvent) => {
 // Push notification handler
 self.addEventListener('push', (event: PushEvent) => {
   const data = event.data?.json() ?? {}
-  const title = data.title || 'FlowStock Notification'
+  const title = data.title || 'LogiVox Notification'
   const options = {
     body: data.body || 'You have a new notification',
     icon: '/icons/icon-192x192.png',

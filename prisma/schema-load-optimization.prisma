@@ -1,0 +1,466 @@
+// Add these models to your prisma/schema.prisma file
+
+// ============================================================================
+// LOAD OPTIMIZATION MODELS
+// ============================================================================
+
+model Trailer {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Basic info
+  name          String
+  type          TrailerType
+  licensePlate  String?      @unique
+  
+  // Dimensions (inches)
+  length        Int
+  width         Int
+  height        Int
+  
+  // Weight capacity (lbs)
+  maxWeight     Int
+  frontAxleMax  Int?
+  rearAxleMax   Int?
+  
+  // Configuration
+  doorType      DoorType
+  doorWidth     Int?
+  doorHeight    Int?
+  
+  // Features (stored as JSON array)
+  features      Json?  // ['TEMPERATURE_CONTROLLED', 'LIFT_GATE', etc.]
+  
+  // Temperature control
+  hasTemperatureControl Boolean @default(false)
+  minTemperature        Int?    // Fahrenheit
+  maxTemperature        Int?
+  
+  // Lift gate
+  hasLiftGate          Boolean @default(false)
+  liftGateCapacity     Int?    // lbs
+  
+  // Status
+  status        TrailerStatus @default(AVAILABLE)
+  
+  // Location
+  warehouseId      String?
+  warehouse        Warehouse?     @relation(fields: [warehouseId], references: [id])
+  currentDockDoorId String?       @unique
+  currentDockDoor   DockDoor?     @relation(fields: [currentDockDoorId], references: [id])
+  
+  // Maintenance
+  registrationExpiry DateTime?
+  lastInspection     DateTime?
+  nextInspection     DateTime?
+  
+  // Relationships
+  loadPlans     LoadPlan[]
+  yardMoves     YardMove[]
+  
+  // Notes
+  notes         String?
+  
+  // Metadata
+  tenantId      String
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
+  
+  @@index([tenantId, status])
+  @@index([warehouseId, status])
+  @@index([currentDockDoorId])
+}
+
+enum TrailerType {
+  DRY_VAN
+  REEFER
+  BOX_TRUCK
+  CONTAINER
+  FLATBED
+  STEP_DECK
+  LOWBOY
+}
+
+enum DoorType {
+  REAR
+  SIDE
+  REAR_ROLLUP
+  SWING
+  OPEN
+}
+
+enum TrailerStatus {
+  AVAILABLE
+  AT_DOCK
+  LOADING
+  IN_TRANSIT
+  MAINTENANCE
+  OUT_OF_SERVICE
+}
+
+model LoadPlan {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Trailer assignment
+  trailerId    String
+  trailer      Trailer      @relation(fields: [trailerId], references: [id])
+  
+  // Warehouse
+  warehouseId  String
+  warehouse    Warehouse    @relation(fields: [warehouseId], references: [id])
+  
+  // Dock door assignment
+  dockDoorId   String?
+  dockDoor     DockDoor?    @relation(fields: [dockDoorId], references: [id])
+  
+  // Status
+  status       LoadPlanStatus @default(DRAFT)
+  
+  // Orders
+  orders       Order[]
+  orderIds     String[]     // Quick lookup
+  
+  // Load items (stored as JSON for 3D positions)
+  items        Json         // Array of LoadedItem with positions
+  
+  // Metrics
+  totalItems   Int
+  totalWeight  Int          // lbs
+  
+  // Utilization
+  volumeUtilization  Float  // percent
+  weightUtilization  Float
+  floorUtilization   Float
+  
+  // Weight distribution
+  frontAxleWeight    Int?   // lbs
+  rearAxleWeight     Int?
+  weightBalanced     Boolean @default(true)
+  
+  // Multi-stop data
+  stops              Json?  // Array of DeliveryStop
+  totalStops         Int    @default(1)
+  
+  // Timing
+  estimatedLoadTime  Int?   // minutes
+  actualLoadTime     Int?
+  loadingStartedAt   DateTime?
+  loadingCompletedAt DateTime?
+  
+  // Assignments
+  assignedLoaders    String[] // User IDs
+  loaders            User[]   @relation("LoadPlanLoaders")
+  
+  // Instructions
+  loadingInstructions String?
+  specialRequirements String[]
+  
+  // Issues & recommendations
+  issues             String[]
+  recommendations    String[]
+  
+  // Events
+  events        LoadPlanEvent[]
+  
+  // Approval
+  createdBy     String
+  creator       User         @relation("LoadPlanCreator", fields: [createdBy], references: [id])
+  approvedBy    String?
+  approver      User?        @relation("LoadPlanApprover", fields: [approvedBy], references: [id])
+  approvedAt    DateTime?
+  
+  // Voice commands used
+  voiceCommandsUsed Int @default(0)
+  
+  // Metadata
+  tenantId      String
+  tenant        Tenant       @relation(fields: [tenantId], references: [id])
+  
+  @@index([tenantId, status])
+  @@index([warehouseId, status])
+  @@index([trailerId])
+  @@index([dockDoorId])
+  @@index([createdAt])
+}
+
+enum LoadPlanStatus {
+  DRAFT
+  OPTIMIZED
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model LoadPlanEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Load plan
+  loadPlanId String
+  loadPlan   LoadPlan @relation(fields: [loadPlanId], references: [id], onDelete: Cascade)
+  
+  // Event details
+  type       LoadPlanEventType
+  
+  // User who triggered event
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  
+  // Event data (JSON for flexibility)
+  data       Json?
+  
+  // Notes
+  notes      String?
+  
+  // Location (if via mobile/voice)
+  location   String?  // e.g., "Dock Door 5"
+  
+  // Voice command (if triggered by voice)
+  voiceCommand String?
+  
+  @@index([loadPlanId])
+  @@index([type])
+  @@index([createdAt])
+}
+
+enum LoadPlanEventType {
+  CREATED
+  OPTIMIZED
+  ASSIGNED
+  LOADING_STARTED
+  ITEM_LOADED
+  STOP_COMPLETED
+  LOADING_PAUSED
+  LOADING_RESUMED
+  LOADING_COMPLETED
+  ISSUE_REPORTED
+  MODIFIED
+  CANCELLED
+  WEIGHT_VERIFIED
+  DOOR_SEALED
+}
+
+model DockDoor {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Door identification
+  doorNumber   String
+  name         String
+  
+  // Location in warehouse
+  warehouseId  String
+  warehouse    Warehouse    @relation(fields: [warehouseId], references: [id])
+  zoneId       String?
+  zone         Zone?        @relation(fields: [zoneId], references: [id])
+  
+  // Type
+  type         DockDoorType
+  
+  // Status
+  status       DockDoorStatus @default(AVAILABLE)
+  
+  // Current assignment
+  currentTrailerId String?  @unique
+  currentTrailer   Trailer?
+  
+  // Current activity
+  currentLoadPlanId String?
+  
+  // Capabilities
+  hasLevelingPlate Boolean @default(true)
+  hasDockSeal      Boolean @default(true)
+  hasDockLight     Boolean @default(true)
+  
+  // Dimensions
+  doorWidth    Int?     // inches
+  doorHeight   Int?
+  
+  // Equipment
+  equipment    String[] // ['FORKLIFT', 'PALLET_JACK', etc.]
+  
+  // Scheduling
+  loadPlans    LoadPlan[]
+  appointments AppointmentSchedule[]
+  
+  // Restrictions
+  restrictions String[] // ['REEFER_ONLY', 'HAZMAT', etc.]
+  
+  // Notes
+  notes        String?
+  
+  // Metadata
+  tenantId     String
+  tenant       Tenant       @relation(fields: [tenantId], references: [id])
+  
+  @@unique([warehouseId, doorNumber])
+  @@index([tenantId, warehouseId])
+  @@index([status])
+}
+
+enum DockDoorType {
+  SHIPPING
+  RECEIVING
+  BOTH
+  CROSS_DOCK
+}
+
+enum DockDoorStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+  CLOSED
+}
+
+model AppointmentSchedule {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Dock door
+  dockDoorId String
+  dockDoor   DockDoor @relation(fields: [dockDoorId], references: [id])
+  
+  // Time slot
+  startTime  DateTime
+  endTime    DateTime
+  
+  // Type
+  type       AppointmentType
+  
+  // Assignment
+  trailerId  String?
+  loadPlanId String?
+  orderId    String?
+  
+  // Carrier info
+  carrierName    String?
+  driverName     String?
+  driverPhone    String?
+  
+  // Status
+  status     AppointmentStatus @default(SCHEDULED)
+  
+  // Check-in/out
+  checkedInAt  DateTime?
+  checkedOutAt DateTime?
+  
+  // Notes
+  notes      String?
+  
+  // Metadata
+  tenantId   String
+  tenant     Tenant       @relation(fields: [tenantId], references: [id])
+  
+  @@index([dockDoorId, startTime])
+  @@index([tenantId, startTime])
+}
+
+enum AppointmentType {
+  INBOUND
+  OUTBOUND
+  CROSS_DOCK
+  PICKUP
+  DELIVERY
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CHECKED_IN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+// ============================================================================
+// UPDATES TO EXISTING MODELS
+// ============================================================================
+
+// Add to Order model
+model Order {
+  // ... existing fields ...
+  
+  // Load planning
+  loadPlanId       String?
+  loadPlan         LoadPlan?    @relation(fields: [loadPlanId], references: [id])
+  
+  // Multi-stop delivery
+  deliverySequence Int?         // Stop number (1, 2, 3...)
+  deliveryStop     Int?         // Same as sequence
+  
+  // Load position (set after loading)
+  loadPosition     Json?        // { x, y, z } position in trailer
+  
+  // Loading status
+  loadingStatus    OrderLoadingStatus @default(NOT_LOADED)
+  loadedAt         DateTime?
+  loadedBy         String?
+  
+  // Estimated unload time
+  estimatedUnloadTime Int?      // minutes
+}
+
+enum OrderLoadingStatus {
+  NOT_LOADED
+  PARTIALLY_LOADED
+  FULLY_LOADED
+  VERIFIED
+}
+
+// Add to Product model
+model Product {
+  // ... existing fields ...
+  
+  // Load planning attributes
+  stackable        Boolean @default(true)
+  maxStackHeight   Int?    // max units that can stack
+  fragile          Boolean @default(false)
+  hazmat           Boolean @default(false)
+  requiresTemperatureControl Boolean @default(false)
+  minTemperature   Int?    // Fahrenheit
+  maxTemperature   Int?
+  
+  // Orientation
+  mustBeUpright    Boolean @default(false)
+  
+  // Loading instructions
+  loadingInstructions String?
+}
+
+// Add to User model (for loader assignments)
+model User {
+  // ... existing fields ...
+  
+  // Load plan relationships
+  createdLoadPlans   LoadPlan[]      @relation("LoadPlanCreator")
+  approvedLoadPlans  LoadPlan[]      @relation("LoadPlanApprover")
+  assignedLoadPlans  LoadPlan[]      @relation("LoadPlanLoaders")
+  loadPlanEvents     LoadPlanEvent[]
+}
+
+// Add to Warehouse model
+model Warehouse {
+  // ... existing fields ...
+  
+  // Load planning
+  trailers      Trailer[]
+  loadPlans     LoadPlan[]
+  dockDoors     DockDoor[]
+}
+
+// Add to Tenant model
+model Tenant {
+  // ... existing fields ...
+  
+  trailers           Trailer[]
+  loadPlans          LoadPlan[]
+  dockDoors          DockDoor[]
+  appointments       AppointmentSchedule[]
+}

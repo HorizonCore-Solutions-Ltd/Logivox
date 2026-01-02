@@ -102,7 +102,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
             <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
               <Building2 className="h-5 w-5" />
             </div>
-            <span className="text-xl font-bold">FlowStock</span>
+            <span className="text-xl font-bold">LogiVox</span>
           </Link>
         </div>
 
@@ -296,7 +296,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                   <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
                     <Building2 className="h-5 w-5" />
                   </div>
-                  <span className="text-xl font-bold">FlowStock</span>
+                  <span className="text-xl font-bold">LogiVox</span>
                 </Link>
                 <Button
                   variant="ghost"

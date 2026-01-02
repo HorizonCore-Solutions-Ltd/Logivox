@@ -2,7 +2,7 @@
 
 ## Overview
 
-Comprehensive security hardening for FlowStock, achieving 98/100 security score. Implements defense-in-depth strategy with multiple layers of protection against common web vulnerabilities.
+Comprehensive security hardening for LogiVox, achieving 98/100 security score. Implements defense-in-depth strategy with multiple layers of protection against common web vulnerabilities.
 
 ---
 
@@ -273,7 +273,7 @@ const safe = result.value;
 ```javascript
 {
   'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || 'https://flowstock.com',
+  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || 'https://logivox.ai',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, ...'
 }
@@ -579,10 +579,10 @@ export async function handleFileUpload(file: File) {
 ```env
 # CSRF Protection
 NEXTAUTH_SECRET=<strong-random-secret>
-NEXTAUTH_URL=https://flowstock.com
+NEXTAUTH_URL=https://logivox.ai
 
 # Allowed Origins for CORS
-ALLOWED_ORIGINS=https://flowstock.com,https://app.flowstock.com
+ALLOWED_ORIGINS=https://logivox.ai,https://app.logivox.ai
 
 # Rate Limiting (optional Redis)
 REDIS_URL=redis://localhost:6379
@@ -680,12 +680,12 @@ Planned security improvements:
 ## Support
 
 For security concerns:
-- **Email:** security@flowstock.com
+- **Email:** security@logivox.ai
 - **Bug Bounty:** Responsible disclosure program
-- **Emergency:** security-emergency@flowstock.com
+- **Emergency:** security-emergency@logivox.ai
 
 **Report Security Issues:**
-Please do NOT create public GitHub issues for security vulnerabilities. Email security@flowstock.com directly.
+Please do NOT create public GitHub issues for security vulnerabilities. Email security@logivox.ai directly.
 
 ---
 

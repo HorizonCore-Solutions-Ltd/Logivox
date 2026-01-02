@@ -25,7 +25,7 @@ export default function ERPIntegrationPage() {
     {
       icon: ArrowLeftRight,
       title: "Bi-Directional Sync",
-      description: "Seamless two-way data flow between FlowStock and your ERP system in real-time."
+      description: "Seamless two-way data flow between LogiVox and your ERP system in real-time."
     },
     {
       icon: Zap,
@@ -111,7 +111,7 @@ export default function ERPIntegrationPage() {
               ERP Integration
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Connect FlowStock seamlessly with your existing ERP system. Eliminate data silos, automate workflows, and maintain a single source of truth across your enterprise.
+              Connect LogiVox seamlessly with your existing ERP system. Eliminate data silos, automate workflows, and maintain a single source of truth across your enterprise.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>

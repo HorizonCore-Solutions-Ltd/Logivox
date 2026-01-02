@@ -1,7 +1,7 @@
 # Performance Optimization Guide
 
 ## Overview
-This guide provides comprehensive strategies and implementation details for optimizing FlowStock WMS performance across all layers of the application.
+This guide provides comprehensive strategies and implementation details for optimizing LogiVox WMS performance across all layers of the application.
 
 ---
 

@@ -1,7 +1,7 @@
 # Landing Page Updates - Alignment with Codebase
 
 ## Overview
-Updated the FlowStock landing page to accurately reflect the **Warehouse Management System (WMS)** capabilities instead of generic "Stock Booking Platform" messaging.
+Updated the LogiVox landing page to accurately reflect the **Warehouse Management System (WMS)** capabilities instead of generic "Stock Booking Platform" messaging.
 
 ## Changes Made
 
@@ -185,4 +185,4 @@ Consider also updating:
 ---
 
 **Updated:** January 15, 2024
-**Status:** Landing page now accurately reflects FlowStock WMS capabilities
+**Status:** Landing page now accurately reflects LogiVox WMS capabilities

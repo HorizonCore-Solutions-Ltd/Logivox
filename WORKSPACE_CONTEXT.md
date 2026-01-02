@@ -1,7 +1,7 @@
-# FlowStock Development Workspace
+# LogiVox Development Workspace
 
 ## Project Context
-FlowStock is a comprehensive warehouse management platform designed to modernize inventory operations, supplier relationships, and ERP integrations. This workspace contains the complete monorepo structure for building a next-generation SaaS solution.
+LogiVox is a comprehensive warehouse management platform designed to modernize inventory operations, supplier relationships, and ERP integrations. This workspace contains the complete monorepo structure for building a next-generation SaaS solution.
 
 ## What We're Building
 
@@ -213,7 +213,7 @@ Every component is designed with multi-tenancy in mind:
 ## Business Context
 
 ### Market Position
-FlowStock addresses the gap between simple inventory apps and complex ERP systems, providing enterprise-grade warehouse management with modern user experience.
+LogiVox addresses the gap between simple inventory apps and complex ERP systems, providing enterprise-grade warehouse management with modern user experience.
 
 ### Target Users
 - **Warehouse Managers**: Oversight and operational control
@@ -229,7 +229,7 @@ FlowStock addresses the gap between simple inventory apps and complex ERP system
 
 ## Getting Started for AI Assistants
 
-When working on FlowStock:
+When working on LogiVox:
 1. **Understand the Context**: This is a SaaS warehouse management platform
 2. **Follow Patterns**: Use established conventions for new features
 3. **Think Multi-tenant**: Every feature must work across organizations

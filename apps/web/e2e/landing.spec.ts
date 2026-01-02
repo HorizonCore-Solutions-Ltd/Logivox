@@ -7,7 +7,7 @@ test.describe('Landing Page', () => {
 
   test('should display navigation with all links', async ({ page }) => {
     // Check logo
-    await expect(page.getByText('FlowStock')).toBeVisible()
+    await expect(page.getByText('LogiVox')).toBeVisible()
     
     // Check main navigation items
     await expect(page.getByRole('button', { name: 'Solutions' })).toBeVisible()

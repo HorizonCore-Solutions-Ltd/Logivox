@@ -3,12 +3,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@/components/*": ["./src/components/*"],
-      "@/lib/*": ["./src/lib/*"],
+      "@/*": ["./src/*", "../../*"],
+      "@/components/*": ["./src/components/*", "../../components/*"],
+      "@/lib/*": ["./src/lib/*", "../../lib/*"],
       "@/hooks/*": ["./src/hooks/*"],
       "@/store/*": ["./src/store/*"],
-      "@/types/*": ["./src/types/*"],
+      "@/types/*": ["./src/types/*", "../../types/*"],
       "@flowstock/ui": ["../../packages/ui/src"],
       "@flowstock/database": ["../../packages/database/src"],
       "@flowstock/auth": ["../../packages/auth/src"],

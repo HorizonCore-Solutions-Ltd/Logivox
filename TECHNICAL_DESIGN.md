@@ -1,8 +1,8 @@
-# FlowStock - Technical Design Document
+# LogiVox - Technical Design Document
 
 ## 1. Design Overview
 
-This document provides comprehensive technical design specifications for FlowStock's next-generation platform, covering enterprise-grade UI/UX design, intelligent database architecture, advanced API specifications, AI/ML integration patterns, and future-proof system design.
+This document provides comprehensive technical design specifications for LogiVox's next-generation platform, covering enterprise-grade UI/UX design, intelligent database architecture, advanced API specifications, AI/ML integration patterns, and future-proof system design.
 
 ## 2. Next-Generation UI/UX Design System
 
@@ -36,7 +36,7 @@ This document provides comprehensive technical design specifications for FlowSto
   /* Dynamic Brand Colors (AI-adjusted based on industry) */
   --brand-primary-50: #eff6ff;
   --brand-primary-100: #dbeafe;
-  --brand-primary-500: #3b82f6;   /* FlowStock Blue */
+  --brand-primary-500: #3b82f6;   /* LogiVox Blue */
   --brand-primary-600: #2563eb;
   --brand-primary-900: #1e3a8a;
 
@@ -129,7 +129,7 @@ This document provides comprehensive technical design specifications for FlowSto
 #### 2.2.3 Advanced Component Library
 ```typescript
 // Component Architecture with AI Integration
-interface FlowStockComponentProps {
+interface LogiVoxComponentProps {
   // AI-powered props
   aiSuggestions?: boolean;
   predictiveText?: boolean;
@@ -151,7 +151,7 @@ interface FlowStockComponentProps {
 }
 
 // Smart Input Component with AI Suggestions
-interface SmartInputProps extends FlowStockComponentProps {
+interface SmartInputProps extends LogiVoxComponentProps {
   type: 'text' | 'number' | 'barcode' | 'sku' | 'po-number';
   aiComplete?: boolean;           // Enable AI autocomplete
   historicalData?: boolean;       // Use historical data for suggestions
@@ -162,7 +162,7 @@ interface SmartInputProps extends FlowStockComponentProps {
 }
 
 // Advanced Table Component with Real-time Updates
-interface SmartTableProps extends FlowStockComponentProps {
+interface SmartTableProps extends LogiVoxComponentProps {
   data: TableData[];
   columns: SmartTableColumn[];
   realTimeUpdates?: boolean;      // WebSocket updates
@@ -173,7 +173,7 @@ interface SmartTableProps extends FlowStockComponentProps {
 }
 
 // Intelligent Dashboard Component
-interface SmartDashboardProps extends FlowStockComponentProps {
+interface SmartDashboardProps extends LogiVoxComponentProps {
   widgets: DashboardWidget[];
   aiRecommendations?: boolean;    // Show AI recommendations
   anomalyDetection?: boolean;     // Highlight unusual patterns
@@ -643,7 +643,7 @@ CREATE TRIGGER audit_stock_movements
 
 #### 4.1.1 API Versioning and Base Structure
 ```
-Base URL: https://api.flowstock.io/v1/
+Base URL: https://api.logivox.ai/v1/
 Authentication: Bearer {jwt_token}
 Content-Type: application/json
 ```
@@ -918,7 +918,7 @@ interface ReceiveItemRequest {
 #### 4.3.1 Connection and Authentication
 ```typescript
 // WebSocket connection URL
-const wsUrl = 'wss://api.flowstock.io/ws';
+const wsUrl = 'wss://api.logivox.ai/ws';
 
 // Authentication after connection
 interface WSAuthMessage {
@@ -1056,7 +1056,7 @@ interface PollingIntegration {
   
   async sync(): Promise<SyncResult> {
     // 1. Fetch changes from ERP
-    // 2. Transform data to FlowStock format
+    // 2. Transform data to LogiVox format
     // 3. Validate and update local data
     // 4. Handle conflicts and errors
     // 5. Update sync status and logs
@@ -1073,7 +1073,7 @@ interface WebhookIntegration {
   async handleWebhook(payload: any): Promise<void> {
     // 1. Verify webhook signature
     // 2. Parse and validate payload
-    // 3. Transform to FlowStock format
+    // 3. Transform to LogiVox format
     // 4. Update local data
     // 5. Send confirmation response
   }
@@ -1239,4 +1239,4 @@ class OfflineSyncManager {
 **Document Version**: 1.0  
 **Last Updated**: October 14, 2025  
 **Next Review**: November 14, 2025  
-**Owner**: FlowStock Design Team
+**Owner**: LogiVox Design Team

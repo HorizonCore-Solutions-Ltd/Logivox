@@ -1,5 +1,5 @@
 /**
- * Rate Limiting System for FlowStock
+ * Rate Limiting System for LogiVox
  * 
  * Implements token bucket algorithm for API rate limiting.
  * Protects against brute force, DDoS, and API abuse.

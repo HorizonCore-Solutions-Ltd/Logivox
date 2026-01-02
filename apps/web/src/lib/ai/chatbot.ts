@@ -114,7 +114,7 @@ function extractEntities(message: string): Record<string, any> {
 
   // Extract product names (simple heuristic - words after "for", "of", "about")
   const productMatch = message.match(/(?:for|of|about)\s+([a-z\s]+?)(?:\s|$|,|\.|\?)/i);
-  if (productMatch) {
+  if (productMatch?.[1]) {
     entities.product = productMatch[1].trim();
   }
 
@@ -175,7 +175,7 @@ export function generateResponse(intent: Intent, context: ChatContext): string {
         : "Hello! How can I assist you with your inventory management today?";
 
     case "goodbye":
-      return "Thank you for using FlowStock! Have a great day!";
+      return "Thank you for using LogiVox! Have a great day!";
 
     case "stock_check":
       if (entities.product) {
@@ -359,7 +359,7 @@ export function getSuggestedQuestions(context: ChatContext): string[] {
     ],
   };
 
-  return suggestions[lastIntent || "greeting"] || suggestions.greeting;
+  return suggestions[lastIntent ?? "greeting"] ?? suggestions.greeting;
 }
 
 /**

@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
-  description: 'FlowStock Privacy Policy - How we collect, use, and protect your data. GDPR and CCPA compliant.',
+  description: 'LogiVox Privacy Policy - How we collect, use, and protect your data. GDPR and CCPA compliant.',
 }
 
 export default function PrivacyPolicyPage() {
@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
             <h1 className="text-4xl font-bold">Privacy Policy</h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl">
-            Your privacy is important to us. This policy explains how FlowStock collects, uses, and protects your personal information.
+            Your privacy is important to us. This policy explains how LogiVox collects, uses, and protects your personal information.
           </p>
           <p className="text-sm text-muted-foreground mt-4">
             Last Updated: {lastUpdated}
@@ -55,7 +55,7 @@ export default function PrivacyPolicyPage() {
                 <h2 className="text-2xl font-bold m-0">1. Introduction</h2>
               </div>
               <p className="text-muted-foreground">
-                FlowStock ("we," "our," or "us") is committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our enterprise stock booking and inventory management platform.
+                LogiVox ("we," "our," or "us") is committed to protecting your privacy and ensuring the security of your personal information. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our enterprise stock booking and inventory management platform.
               </p>
               <p className="text-muted-foreground">
                 This policy complies with the General Data Protection Regulation (GDPR), California Consumer Privacy Act (CCPA), and other applicable data protection laws.
@@ -107,7 +107,7 @@ export default function PrivacyPolicyPage() {
               
               <h3 className="text-xl font-semibold mt-6 mb-3">3.1 Service Delivery</h3>
               <ul className="space-y-2 text-muted-foreground">
-                <li>Provide and maintain the FlowStock platform</li>
+                <li>Provide and maintain the LogiVox platform</li>
                 <li>Process inventory bookings and transactions</li>
                 <li>Generate reports and analytics</li>
                 <li>Send automated reorder alerts and notifications</li>
@@ -233,7 +233,7 @@ export default function PrivacyPolicyPage() {
 
               <h3 className="text-xl font-semibold mt-6 mb-3">6.3 Exercising Your Rights</h3>
               <p className="text-muted-foreground">
-                To exercise any of these rights, please contact us at <a href="mailto:privacy@flowstock.com" className="text-primary hover:underline">privacy@flowstock.com</a> or use the privacy controls in your account settings. We will respond within 30 days.
+                To exercise any of these rights, please contact us at <a href="mailto:privacy@logivox.ai" className="text-primary hover:underline">privacy@logivox.ai</a> or use the privacy controls in your account settings. We will respond within 30 days.
               </p>
             </div>
 
@@ -270,7 +270,7 @@ export default function PrivacyPolicyPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">9. Children's Privacy</h2>
               <p className="text-muted-foreground">
-                FlowStock is a business-to-business (B2B) platform not intended for individuals under 18 years of age. We do not knowingly collect personal information from children.
+                LogiVox is a business-to-business (B2B) platform not intended for individuals under 18 years of age. We do not knowingly collect personal information from children.
               </p>
             </div>
 
@@ -286,7 +286,7 @@ export default function PrivacyPolicyPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">11. Changes to This Privacy Policy</h2>
               <p className="text-muted-foreground">
-                We may update this Privacy Policy from time to time. We will notify you of material changes by email or through a prominent notice on our platform. Your continued use of FlowStock after changes constitutes acceptance of the updated policy.
+                We may update this Privacy Policy from time to time. We will notify you of material changes by email or through a prominent notice on our platform. Your continued use of LogiVox after changes constitutes acceptance of the updated policy.
               </p>
             </div>
 
@@ -297,12 +297,12 @@ export default function PrivacyPolicyPage() {
                 If you have questions about this Privacy Policy or our data practices, please contact us:
               </p>
               <div className="bg-muted p-6 rounded-lg">
-                <p className="font-semibold mb-2">FlowStock Privacy Team</p>
-                <p className="text-muted-foreground">Email: <a href="mailto:privacy@flowstock.com" className="text-primary hover:underline">privacy@flowstock.com</a></p>
-                <p className="text-muted-foreground">Data Protection Officer: <a href="mailto:dpo@flowstock.com" className="text-primary hover:underline">dpo@flowstock.com</a></p>
+                <p className="font-semibold mb-2">LogiVox Privacy Team</p>
+                <p className="text-muted-foreground">Email: <a href="mailto:privacy@logivox.ai" className="text-primary hover:underline">privacy@logivox.ai</a></p>
+                <p className="text-muted-foreground">Data Protection Officer: <a href="mailto:dpo@logivox.ai" className="text-primary hover:underline">dpo@logivox.ai</a></p>
                 <p className="text-muted-foreground mt-4">
                   Address:<br />
-                  FlowStock Inc.<br />
+                  LogiVox Inc.<br />
                   123 Enterprise Way<br />
                   San Francisco, CA 94105<br />
                   United States

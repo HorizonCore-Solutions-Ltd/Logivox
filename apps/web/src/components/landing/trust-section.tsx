@@ -21,7 +21,7 @@ export function TrustSection() {
       value: "500+",
       label: "Enterprise Customers",
       icon: Building2,
-      description: "Fortune 500 companies trust FlowStock"
+      description: "Fortune 500 companies trust LogiVox"
     },
     {
       value: "50M+",
@@ -87,7 +87,7 @@ export function TrustSection() {
             Join thousands of companies worldwide
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            From startups to Fortune 500 enterprises, FlowStock powers mission-critical 
+            From startups to Fortune 500 enterprises, LogiVox powers mission-critical 
             inventory operations across the globe.
           </p>
         </div>

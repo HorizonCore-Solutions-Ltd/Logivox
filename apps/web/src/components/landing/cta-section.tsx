@@ -50,7 +50,7 @@ export function CTASection() {
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                   Join hundreds of warehouses who have streamlined their operations 
-                  with FlowStock WMS. Experience complete inventory control, 
+                  with LogiVox WMS. Experience complete inventory control, 
                   efficient order fulfillment, and powerful analytics today.
                 </p>
               </div>
@@ -104,7 +104,7 @@ export function CTASection() {
               {/* Trust indicators */}
               <div className="pt-8 border-t">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Join 500+ warehouses already using FlowStock
+                  Join 500+ warehouses already using LogiVox
                 </p>
                 <div className="flex justify-center items-center space-x-8 text-xs text-muted-foreground">
                   <div className="flex items-center space-x-1">

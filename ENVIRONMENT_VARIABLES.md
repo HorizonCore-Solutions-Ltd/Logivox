@@ -1,7 +1,7 @@
-# FlowStock Environment Variables Guide
+# LogiVox Environment Variables Guide
 
 ## Overview
-This document outlines all environment variables used across the FlowStock platform for development, staging, and production environments.
+This document outlines all environment variables used across the LogiVox platform for development, staging, and production environments.
 
 ## Backend API Environment Variables
 
@@ -29,7 +29,7 @@ JWT_EXPIRES_IN="7d"
 BCRYPT_SALT_ROUNDS=12
 
 # CORS origins (comma-separated)
-CORS_ORIGINS="http://localhost:5173,https://app.flowstock.io"
+CORS_ORIGINS="http://localhost:5173,https://app.logivox.ai"
 ```
 
 #### Server Configuration
@@ -51,7 +51,7 @@ SMTP_HOST="smtp.sendgrid.net"
 SMTP_PORT=587
 SMTP_USER="apikey"
 SMTP_PASS="your-sendgrid-api-key"
-EMAIL_FROM="noreply@flowstock.io"
+EMAIL_FROM="noreply@logivox.ai"
 ```
 
 #### File Storage (AWS S3)
@@ -60,10 +60,10 @@ EMAIL_FROM="noreply@flowstock.io"
 AWS_ACCESS_KEY_ID="your-aws-access-key"
 AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 AWS_REGION="us-east-1"
-AWS_S3_BUCKET="flowstock-uploads"
+AWS_S3_BUCKET="logivox-uploads"
 
 # S3 configuration
-S3_PUBLIC_URL="https://flowstock-uploads.s3.amazonaws.com"
+S3_PUBLIC_URL="https://logivox-uploads.s3.amazonaws.com"
 S3_UPLOAD_LIMIT="10MB"
 ```
 
@@ -195,7 +195,7 @@ BCRYPT_SALT_ROUNDS=4  # Faster for development
 # Production-like settings with test data
 NODE_ENV="staging"
 JWT_SECRET="staging-secret-key-different-from-prod"
-CORS_ORIGINS="https://staging.flowstock.io"
+CORS_ORIGINS="https://staging.logivox.ai"
 LOG_LEVEL="info"
 BCRYPT_SALT_ROUNDS=12
 ```
@@ -205,7 +205,7 @@ BCRYPT_SALT_ROUNDS=12
 # Secure production settings
 NODE_ENV="production"
 JWT_SECRET="super-secure-production-secret-key"
-CORS_ORIGINS="https://app.flowstock.io"
+CORS_ORIGINS="https://app.logivox.ai"
 LOG_LEVEL="error"
 BCRYPT_SALT_ROUNDS=12
 RATE_LIMIT_MAX_REQUESTS=50  # Stricter rate limiting
@@ -307,13 +307,13 @@ SMTP_HOST="smtp.sendgrid.net"
 SMTP_PORT=587
 SMTP_USER="apikey"
 SMTP_PASS="your-sendgrid-api-key"
-EMAIL_FROM="noreply@flowstock.io"
+EMAIL_FROM="noreply@logivox.ai"
 
 # AWS S3
 AWS_ACCESS_KEY_ID="your-aws-access-key"
 AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 AWS_REGION="us-east-1"
-AWS_S3_BUCKET="flowstock-uploads"
+AWS_S3_BUCKET="logivox-uploads"
 
 # Stripe
 STRIPE_SECRET_KEY="sk_test_your-stripe-secret-key"

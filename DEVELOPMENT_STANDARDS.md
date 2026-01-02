@@ -1,4 +1,4 @@
-# FlowStock Enterprise Development Standards
+# LogiVox Enterprise Development Standards
 
 ## 1. Next-Generation Code Architecture Guidelines
 
@@ -125,7 +125,7 @@ export interface MultiTenantEntity {
 #### 1.2.2 Advanced Error Handling
 ```typescript
 // ✅ Comprehensive error handling for enterprise systems
-export class FlowStockError extends Error {
+export class LogiVoxError extends Error {
   constructor(
     message: string,
     public code: ErrorCode,
@@ -135,7 +135,7 @@ export class FlowStockError extends Error {
     public userId?: string
   ) {
     super(message);
-    this.name = 'FlowStockError';
+    this.name = 'LogiVoxError';
   }
 }
 
@@ -189,7 +189,7 @@ export class ErrorBoundary extends React.Component<
     // Log to monitoring service
     logError(error, {
       componentStack: errorInfo.componentStack,
-      errorBoundary: 'FlowStockErrorBoundary'
+      errorBoundary: 'LogiVoxErrorBoundary'
     });
   }
 
@@ -264,7 +264,7 @@ const useAppStore = create<AppStore>()(
         actions: createAppActions(set, get)
       })),
       {
-        name: 'flowstock-store',
+        name: 'logivox-store',
         partialize: (state) => ({
           user: state.user,
           tenant: state.tenant,
@@ -292,7 +292,7 @@ export const queryClient = new QueryClient({
       staleTime: 5 * 60 * 1000, // 5 minutes
       cacheTime: 30 * 60 * 1000, // 30 minutes
       retry: (failureCount, error) => {
-        if (error instanceof FlowStockError) {
+        if (error instanceof LogiVoxError) {
           return error.severity !== 'critical' && failureCount < 3;
         }
         return failureCount < 2;
@@ -303,7 +303,7 @@ export const queryClient = new QueryClient({
     mutations: {
       retry: 1,
       onError: (error) => {
-        if (error instanceof FlowStockError) {
+        if (error instanceof LogiVoxError) {
           notificationService.showError(error.message);
           logError(error);
         }
@@ -1752,6 +1752,6 @@ export interface InventorySearchWidgetProps {
 }
 ```
 
-This comprehensive enterprise development standards document ensures FlowStock maintains the highest quality, security, and performance standards throughout its development lifecycle. These standards support the platform's evolution into a next-generation enterprise solution while maintaining developer productivity and code maintainability.
+This comprehensive enterprise development standards document ensures LogiVox maintains the highest quality, security, and performance standards throughout its development lifecycle. These standards support the platform's evolution into a next-generation enterprise solution while maintaining developer productivity and code maintainability.
 
-These standards ensure consistent, maintainable, and scalable code across the FlowStock platform.
+These standards ensure consistent, maintainable, and scalable code across the LogiVox platform.

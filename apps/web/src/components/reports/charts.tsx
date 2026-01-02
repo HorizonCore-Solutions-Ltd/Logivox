@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Chart Components for FlowStock Reports
+ * Chart Components for LogiVox Reports
  * 
  * Data visualization using Recharts library.
  * Supports: Bar, Line, Pie, Area, and Combo charts.

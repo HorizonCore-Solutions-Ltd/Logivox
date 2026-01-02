@@ -1,4 +1,4 @@
-# 💰 FlowStock - Financial Model & Projections
+# 💰 LogiVox - Financial Model & Projections
 ## 5-Year Revenue, Expenses, and Cash Flow Analysis
 
 > **Last Updated:** October 15, 2025  
@@ -551,9 +551,9 @@ Total Operations: $350K
 
 ## 🏆 Benchmark Comparison
 
-### FlowStock vs. SaaS Industry Standards
+### LogiVox vs. SaaS Industry Standards
 
-| Metric | FlowStock (Year 3) | SaaS Industry Avg | Status |
+| Metric | LogiVox (Year 3) | SaaS Industry Avg | Status |
 |--------|--------------------|--------------------|--------|
 | **LTV:CAC** | 14.2:1 | 3:1 | ✅ 4.7x better |
 | **CAC Payback** | 4.2 months | 12 months | ✅ 2.9x faster |
@@ -563,7 +563,7 @@ Total Operations: $350K
 | **NRR** | 120%+ | 100-110% | ✅ 10-20% better |
 | **Growth Rate** | 162% | 40-60% | ✅ 102-122% better |
 
-**Result:** FlowStock outperforms industry benchmarks across ALL key metrics! 🚀
+**Result:** LogiVox outperforms industry benchmarks across ALL key metrics! 🚀
 
 ---
 
@@ -580,7 +580,7 @@ Total Operations: $350K
 | **Shopify** | $7.1B | $98B | 14x | E-commerce platform |
 | **Average** | - | - | **15.7x** | - |
 
-**FlowStock Year 5 Valuation:**
+**LogiVox Year 5 Valuation:**
 - ARR: $420M
 - Multiple: 12-15x (conservative vs. 15.7x avg)
 - Valuation: **$5.0-6.3B**
@@ -595,7 +595,7 @@ Total Operations: $350K
 | **Momentive** | ZenDesk (now Momentive Global) | $400M | $4.1B | 10.3x |
 | **Average** | - | - | - | **13.2x** |
 
-**FlowStock Acquisition Potential:**
+**LogiVox Acquisition Potential:**
 - Year 3: $84M ARR × 12x = **$1.0B**
 - Year 5: $420M ARR × 13x = **$5.5B**
 
@@ -624,4 +624,4 @@ A: 1) Modern tech stack (serverless, low infrastructure costs). 2) Low CAC (orga
 
 **For detailed Excel model with monthly projections, contact:** [Your Email]
 
-**FlowStock Inc. © 2025 - Confidential**
+**LogiVox Inc. © 2025 - Confidential**

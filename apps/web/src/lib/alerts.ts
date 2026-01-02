@@ -12,8 +12,12 @@
  * - Predictive stockout date calculation
  */
 
-import { PrismaClient, AlertType, AlertSeverity, AlertStatus } from '@prisma/client';
+import { PrismaClient, AlertType } from '@prisma/client';
 import { addDays, differenceInDays, format } from 'date-fns';
+
+// Define alert enums if not in Prisma schema
+export type AlertSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type AlertStatus = 'PENDING' | 'SENT' | 'ACKNOWLEDGED' | 'RESOLVED';
 
 const prisma = new PrismaClient();
 

@@ -1,4 +1,4 @@
-# 📊 FlowStock Progress Summary
+# 📊 LogiVox Progress Summary
 
 **Last Updated:** ${new Date().toISOString().split('T')[0]}
 
@@ -346,7 +346,7 @@ Stock/
    http://localhost:3000
 
 6. **Login with demo account:**
-   - Email: `admin@flowstock.com`
+   - Email: `admin@logivox.ai`
    - Password: `Admin@123`
 
 ---
@@ -371,7 +371,7 @@ GITHUB_SECRET=""
 
 # App Config
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
-NEXT_PUBLIC_APP_NAME="FlowStock"
+NEXT_PUBLIC_APP_NAME="LogiVox"
 
 # Feature Flags
 NEXT_PUBLIC_ENABLE_ANALYTICS="false"

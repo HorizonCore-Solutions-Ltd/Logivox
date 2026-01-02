@@ -1,6 +1,6 @@
-# 🎯 FlowStock WMS - IP Sale Preparation Plan
+# 🎯 LogiVox WMS - IP Sale Preparation Plan
 
-**Objective**: Prepare FlowStock for sale as complete intellectual property to a buyer  
+**Objective**: Prepare LogiVox for sale as complete intellectual property to a buyer  
 **Timeline**: 8-12 weeks to maximum sale value  
 **Target Sale Price**: $150K - $500K (based on code quality, documentation, and market potential)  
 **Date Created**: October 21, 2025
@@ -466,7 +466,7 @@
 
 Suggested Structure:
 ```
-FlowStock-IP-Package/
+LogiVox-IP-Package/
 ├── 01-Executive-Summary/
 │   ├── Business-Opportunity.pdf
 │   ├── Financial-Projections.xlsx
@@ -896,7 +896,7 @@ Create list of 50-100 companies who might buy:
 ### **Title Options**:
 - "Production-Ready Warehouse Management System (WMS) - 100K+ Lines - Modern Stack"
 - "Complete WMS SaaS Platform for Sale - Cloud-Native, React/Node.js, Ready to Launch"
-- "FlowStock WMS - Enterprise Warehouse Software IP - Full Transfer"
+- "LogiVox WMS - Enterprise Warehouse Software IP - Full Transfer"
 
 ### **Description** (for marketplaces):
 

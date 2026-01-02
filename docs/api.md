@@ -1,8 +1,8 @@
-# FlowStock API Documentation
+# LogiVox API Documentation
 
 ## Overview
 
-The FlowStock API is a RESTful API built with Node.js, Express, and TypeScript. It provides endpoints for managing warehouses, inventory, purchase orders, suppliers, and integrations.
+The LogiVox API is a RESTful API built with Node.js, Express, and TypeScript. It provides endpoints for managing warehouses, inventory, purchase orders, suppliers, and integrations.
 
 ## Base URL
 
@@ -406,13 +406,13 @@ socket.on('inventory_updated', (data) => {
 ### JavaScript/TypeScript
 
 ```bash
-npm install @flowstock/sdk
+npm install @logivox/sdk
 ```
 
 ```javascript
-import { FlowStockClient } from '@flowstock/sdk';
+import { LogiVoxClient } from '@logivox/sdk';
 
-const client = new FlowStockClient({
+const client = new LogiVoxClient({
   apiUrl: 'http://localhost:5000/api',
   apiKey: 'your-api-key'
 });
@@ -437,4 +437,4 @@ const inventory = await client.inventory.list({
 For API support, please:
 1. Check this documentation
 2. Review the [GitHub issues](https://github.com/flowstock/flowstock/issues)
-3. Contact support at api-support@flowstock.io
+3. Contact support at api-support@logivox.ai

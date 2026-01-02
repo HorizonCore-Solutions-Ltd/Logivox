@@ -1,4 +1,4 @@
-# FlowStock - Feature Verification Checklist
+# LogiVox - Feature Verification Checklist
 
 > **Purpose:** Ensure NO feature is missed from the comprehensive requirements  
 > **Status:** Use this as master checklist before launch  
@@ -111,7 +111,7 @@
   - [ ] Live preview panel
   - [ ] CSS variable injection
 - [ ] ❌ White-label mode
-  - [ ] Hide "Powered by FlowStock"
+  - [ ] Hide "Powered by LogiVox"
   - [ ] Custom branding throughout
   - [ ] Custom domain support
 - [ ] ❌ Database schema updates
@@ -488,12 +488,12 @@
   - [ ] RSS feed
 - [ ] ❌ 10+ professional blog posts
   - [ ] "Top 10 Inventory Management Best Practices"
-  - [ ] "How to Integrate ERP Systems with FlowStock"
+  - [ ] "How to Integrate ERP Systems with LogiVox"
   - [ ] "AI-Powered Stock Forecasting Explained"
   - [ ] "Warehouse Label Printing: A Complete Guide"
   - [ ] "Multi-Tenant vs Single-Tenant: Which is Right?"
   - [ ] "5 Ways to Reduce Stock Errors with Automation"
-  - [ ] "Building a Modern Warehouse with FlowStock"
+  - [ ] "Building a Modern Warehouse with LogiVox"
   - [ ] "Understanding RBAC in Inventory Management"
   - [ ] "Choosing the Right Label Printer"
   - [ ] "PWA for Warehouse Operations"
@@ -512,7 +512,7 @@
   - [ ] shadcn/ui documentation
   - [ ] PostgreSQL documentation
   - [ ] TypeScript documentation
-  - [ ] FlowStock internal docs
+  - [ ] LogiVox internal docs
 - [ ] ❌ Document processing
   - [ ] Markdown parser
   - [ ] Document chunker (500-1000 tokens)
@@ -635,7 +635,7 @@
 ## 16. WHITE-LABEL & RESELLER PLATFORM (Phase 23.4) - 🔵 OPTIONAL
 
 - [ ] 🔵 Complete white-label mode
-  - [ ] Hide FlowStock branding
+  - [ ] Hide LogiVox branding
   - [ ] Custom login pages
   - [ ] Custom email templates
 - [ ] 🔵 Custom domain support

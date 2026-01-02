@@ -1,4 +1,4 @@
-# FlowStock Project Roadmap & Status
+# LogiVox Project Roadmap & Status
 
 ## Current Status: Foundation Complete ✅
 
@@ -8,7 +8,7 @@
 - [x] **Backend API Foundation**: Express server with authentication, middleware, and basic routing
 - [x] **Frontend Application**: React app with routing, authentication pages, and component structure
 - [x] **Development Environment**: Working dev setup with hot reloading and TypeScript compilation
-- [x] **Brand Identity**: Complete rebrand to FlowStock with consistent naming across all assets
+- [x] **Brand Identity**: Complete rebrand to LogiVox with consistent naming across all assets
 
 ## Phase 2: Core Stock Booking Features (In Progress)
 

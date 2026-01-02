@@ -2,7 +2,7 @@
 
 ## Overview
 
-Comprehensive screen reader support implementation for FlowStock, ensuring WCAG 2.1 Level AA compliance and excellent experience with assistive technologies.
+Comprehensive screen reader support implementation for LogiVox, ensuring WCAG 2.1 Level AA compliance and excellent experience with assistive technologies.
 
 ---
 
@@ -518,6 +518,6 @@ enableLiveAccessibilityMonitoring();
 ## Support
 
 For questions or issues with accessibility implementation:
-- Email: accessibility@flowstock.com
+- Email: accessibility@logivox.ai
 - Review accessibility audit results in development console
 - Enable live monitoring during development

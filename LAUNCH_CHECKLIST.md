@@ -1,4 +1,4 @@
-# FlowStock WMS - Production Launch Checklist
+# LogiVox WMS - Production Launch Checklist
 
 **Version**: 1.0  
 **Last Updated**: October 16, 2025  
@@ -8,7 +8,7 @@
 
 ## 📋 Pre-Launch Checklist Overview
 
-This comprehensive checklist ensures FlowStock WMS is production-ready. Complete all sections before launching to production.
+This comprehensive checklist ensures LogiVox WMS is production-ready. Complete all sections before launching to production.
 
 ### Checklist Categories
 
@@ -383,13 +383,13 @@ This checklist must be signed off by key stakeholders before production launch.
 
 ## 📞 Support Resources
 
-- **Status Page**: https://status.flowstock.com
-- **Support Email**: support@flowstock.com
-- **Emergency Hotline**: 1-800-FLOWSTOCK
-- **Slack Channel**: #flowstock-launch
+- **Status Page**: https://status.logivox.ai
+- **Support Email**: support@logivox.ai
+- **Emergency Hotline**: 1-800-LOGIVOX
+- **Slack Channel**: #logivox-launch
 - **War Room**: [Video conference link]
 
 ---
 
-**FlowStock WMS Launch Checklist v1.0**  
+**LogiVox WMS Launch Checklist v1.0**  
 *Ensure all items are completed before production launch*

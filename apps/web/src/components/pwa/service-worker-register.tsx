@@ -23,7 +23,7 @@ export function ServiceWorkerRegister() {
           setShowReload(true)
           toast({
             title: "Update Available",
-            description: "A new version of FlowStock is available.",
+            description: "A new version of LogiVox is available.",
             duration: 0,
           })
         }

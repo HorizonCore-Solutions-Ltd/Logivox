@@ -1,4 +1,4 @@
-# FlowStock Marketing Master Plan
+# LogiVox Marketing Master Plan
 ## Complete Go-to-Market Strategy for $8M → $420M ARR Growth
 
 **Document Version:** 1.0  
@@ -32,7 +32,7 @@
 ## Executive Summary
 
 ### The Big Idea
-FlowStock is creating a **NEW CATEGORY**: "Secure Inventory Management" - the first and only inventory platform with built-in security awareness training.
+LogiVox is creating a **NEW CATEGORY**: "Secure Inventory Management" - the first and only inventory platform with built-in security awareness training.
 
 ### Unique Positioning
 **"We're Fishbowl + KnowBe4 in one platform"**
@@ -162,7 +162,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 
 #### Q1 (Launch Quarter)
 1. **Website & SEO Foundation**
-   - Build SEO-optimized website (flowstock.com)
+   - Build SEO-optimized website (logivox.ai)
    - Target 50+ high-intent keywords
    - Publish 20 foundational blog posts
    - Set up Google Analytics, HubSpot, Mixpanel
@@ -217,9 +217,9 @@ This isn't just inventory software. It's the **ONLY** solution that:
    - Launch comparison pages (vs. Fishbowl, vs. NetSuite, etc.)
 
 2. **Community Building**
-   - Launch FlowStock Community (Slack/Discord)
+   - Launch LogiVox Community (Slack/Discord)
    - Host monthly "Inventory Optimization Masterclass" webinars
-   - Create "FlowStock Champions" program (power users)
+   - Create "LogiVox Champions" program (power users)
    - User-generated content campaigns
 
 3. **Email Marketing**
@@ -349,7 +349,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 3. **Community Growth**
    - Grow community to 5,000 members
    - Host quarterly virtual summit (1,000+ attendees)
-   - Launch user conference: "FlowStock FLOW 2026" (500 attendees)
+   - Launch user conference: "LogiVox FLOW 2026" (500 attendees)
    - Create community content program (user-generated tutorials)
 
 4. **Brand Campaigns**
@@ -373,7 +373,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 
 3. **Referral & Advocacy**
    - Scale referral program (500+ referrals)
-   - Launch "FlowStock Certified" partner program
+   - Launch "LogiVox Certified" partner program
    - Build customer advisory board (20 strategic customers)
    - Host customer appreciation events
 
@@ -555,7 +555,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 2. **Security** - "Prevent phishing, protect your business"
 3. **Compliance** - "HIPAA, FDA, NHS, ISO 27001 guides"
 4. **Industry** - "Healthcare, manufacturing, retail best practices"
-5. **Product** - "How to use FlowStock features"
+5. **Product** - "How to use LogiVox features"
 
 ### Content Types & Frequency
 
@@ -833,7 +833,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 - ✅ $15-50/user/year savings vs. buying training separately
 
 **Messaging:**
-"Fishbowl manages inventory. FlowStock manages inventory AND trains your team to prevent security breaches. Stop paying for two platforms when one will do."
+"Fishbowl manages inventory. LogiVox manages inventory AND trains your team to prevent security breaches. Stop paying for two platforms when one will do."
 
 #### vs. NetSuite (Oracle)
 **Their Strengths:**
@@ -848,7 +848,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 - ✅ Better user experience (NPS: 50 vs. 20)
 
 **Messaging:**
-"NetSuite is an ERP. FlowStock is focused inventory management with security. Get up and running in 2 weeks, not 6 months. Save 80% on costs."
+"NetSuite is an ERP. LogiVox is focused inventory management with security. Get up and running in 2 weeks, not 6 months. Save 80% on costs."
 
 #### vs. KnowBe4 (Security Training)
 **Their Strengths:**
@@ -863,7 +863,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 - ✅ Save $15-50/user/year (bundled pricing)
 
 **Messaging:**
-"KnowBe4 trains on generic security. FlowStock trains on YOUR inventory workflows while managing your operations. Two platforms in one."
+"KnowBe4 trains on generic security. LogiVox trains on YOUR inventory workflows while managing your operations. Two platforms in one."
 
 ### Win/Loss Analysis Process
 
@@ -877,7 +877,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 **Key Questions:**
 - What was the decision criteria?
 - Who were the final 2-3 vendors?
-- What made you choose FlowStock (or competitor)?
+- What made you choose LogiVox (or competitor)?
 - What almost made you choose differently?
 - What could we improve?
 
@@ -955,7 +955,7 @@ This isn't just inventory software. It's the **ONLY** solution that:
 
 **Response Plan:**
 1. **Month 1**: Launch "ROI calculator" showing savings
-2. **Month 2**: Create "FlowStock Stimulus Package" (flexible payment terms)
+2. **Month 2**: Create "LogiVox Stimulus Package" (flexible payment terms)
 3. **Month 3**: Emphasize cost savings vs. separate platforms
 4. **Ongoing**: Customer success focus (prevent churn)
 

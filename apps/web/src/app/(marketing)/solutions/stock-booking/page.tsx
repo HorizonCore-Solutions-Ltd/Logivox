@@ -221,7 +221,7 @@ export default function StockBookingPage() {
             Ready to Optimize Your Stock Bookings?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join hundreds of companies using FlowStock to streamline inventory reservations
+            Join hundreds of companies using LogiVox to streamline inventory reservations
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

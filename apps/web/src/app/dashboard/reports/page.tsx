@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Reports Dashboard Page for FlowStock
+ * Reports Dashboard Page for LogiVox
  * 
  * Browse, search, and execute reports.
  * Access 50+ pre-built templates and custom reports.

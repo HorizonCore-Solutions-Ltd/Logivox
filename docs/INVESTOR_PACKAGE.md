@@ -1,4 +1,4 @@
-# 🚀 FlowStock - Investor Package
+# 🚀 LogiVox - Investor Package
 ## Enterprise Inventory Management Platform with Built-in Security Academy
 
 > **Investment Opportunity**: Series A / Seed Round  
@@ -22,7 +22,7 @@
 
 ### The Solution
 
-**FlowStock** is the **world's first enterprise inventory management platform** with:
+**LogiVox** is the **world's first enterprise inventory management platform** with:
 - ✅ **Real-time inventory tracking** (multi-location, multi-tenant)
 - ✅ **Advanced label printing system** (drag-and-drop designer)
 - ✅ **Built-in Security Academy** (like KnowBe4 but integrated)
@@ -395,7 +395,7 @@ Security:
 
 ### Competitive Advantages
 
-| Feature | FlowStock | Fishbowl | Sortly | inFlow | Zoho |
+| Feature | LogiVox | Fishbowl | Sortly | inFlow | Zoho |
 |---------|-----------|----------|--------|--------|------|
 | **Price (monthly)** | $99-299 | $329+ | $99+ | $179+ | $79+ |
 | **Security Training** | ✅ Built-in | ❌ None | ❌ None | ❌ None | ❌ None |
@@ -408,7 +408,7 @@ Security:
 | **White-Label** | ✅ Yes | ❌ No | ❌ No | ❌ No | ✅ Yes |
 | **API Quality** | ✅ Modern REST | ⚠️ Limited | ⚠️ Limited | ⚠️ Basic | ✅ Good |
 
-**Result:** FlowStock wins on **Security**, **Training**, **Modern Tech**, and **Compliance**
+**Result:** LogiVox wins on **Security**, **Training**, **Modern Tech**, and **Compliance**
 
 ---
 
@@ -848,7 +848,7 @@ Year 1 Targets:
 
 ### Risk 3: Security Breach
 
-**Risk:** FlowStock gets hacked (ironic given our training focus)
+**Risk:** LogiVox gets hacked (ironic given our training focus)
 
 **Mitigation:**
 - Military-grade 7-layer security (already built)
@@ -916,8 +916,8 @@ Year 1 Targets:
 - Integration framework (custom architecture)
 
 **2. Trademarks:**
-- "FlowStock" (pending registration)
-- "FlowStock Academy" (pending registration)
+- "LogiVox" (pending registration)
+- "LogiVox Academy" (pending registration)
 - Logo and branding (registered)
 
 **3. Trade Secrets:**
@@ -933,7 +933,7 @@ Year 1 Targets:
 
 ### Corporate Structure
 
-**Entity:** FlowStock Inc. (Delaware C-Corp)
+**Entity:** LogiVox Inc. (Delaware C-Corp)
 - **Founded:** [To be incorporated post-funding]
 - **Registered Agent:** [To be appointed]
 - **Board:** 3 seats (1 founder, 2 investor seats)
@@ -1065,7 +1065,7 @@ Total: 12,500,000 shares
 **Deck & Materials:**
 - Pitch Deck: [Link to deck.pdf]
 - Financial Model: [Link to model.xlsx]
-- Product Demo: [Link to demo.flowstock.com]
+- Product Demo: [Link to demo.logivox.ai]
 - Documentation: [Link to GitHub]
 
 **Meeting Links:**
@@ -1081,7 +1081,7 @@ Total: 12,500,000 shares
 *[To be added as beta customers onboard]*
 
 **Manufacturing Company:**
-> "FlowStock transformed our inventory management. The security training alone saved us from 3 phishing attacks in the first month!"
+> "LogiVox transformed our inventory management. The security training alone saved us from 3 phishing attacks in the first month!"
 
 **Healthcare Organization:**
 > "Finally, an inventory system that understands compliance. The built-in training meets our HIPAA requirements."
@@ -1139,7 +1139,7 @@ Total: 12,500,000 shares
 
 ## 🎯 Investment Highlights (Summary)
 
-**Why Invest in FlowStock:**
+**Why Invest in LogiVox:**
 
 ✅ **Huge Market:** $12.8B TAM, 14% CAGR, growing fast
 ✅ **Unique Product:** ONLY inventory platform with built-in security training
@@ -1162,7 +1162,7 @@ Total: 12,500,000 shares
 
 ## 📧 Let's Build the Future Together
 
-**FlowStock is not just an inventory management platform.**
+**LogiVox is not just an inventory management platform.**
 
 It's the **future of secure, compliant, and intelligent operations** for businesses worldwide.
 
@@ -1173,12 +1173,12 @@ We're combining **best-in-class technology** with **world-class security trainin
 ---
 
 **Contact:** [Your Email] | [Your Phone]  
-**Website:** https://flowstock.com  
-**Demo:** https://demo.flowstock.com  
+**Website:** https://logivox.ai  
+**Demo:** https://demo.logivox.ai  
 **Deck:** [Attach pitch deck PDF]
 
 ---
 
 *This document is confidential and intended only for potential investors. Do not distribute without permission.*
 
-**FlowStock Inc. © 2025. All rights reserved.**
+**LogiVox Inc. © 2025. All rights reserved.**

@@ -509,4 +509,4 @@ The AI Customer Experience Suite provides enterprise-grade AI capabilities that 
 
 **Version**: 1.0.0  
 **Last Updated**: October 15, 2025  
-**Author**: FlowStock Development Team
+**Author**: LogiVox Development Team

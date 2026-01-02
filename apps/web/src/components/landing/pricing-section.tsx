@@ -232,7 +232,7 @@ export function PricingSection() {
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold mb-4">Add-ons & Services</h3>
             <p className="text-muted-foreground">
-              Enhance your FlowStock experience with additional services
+              Enhance your LogiVox experience with additional services
             </p>
           </div>
 
@@ -302,7 +302,7 @@ export function PricingSection() {
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link href="mailto:enterprise@flowstock.com">
+                <Link href="mailto:enterprise@logivox.ai">
                   <Mail className="mr-2 h-4 w-4" />
                   Email Sales
                 </Link>

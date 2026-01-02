@@ -1,4 +1,4 @@
-# FlowStock WMS - Administrator Guide
+# LogiVox WMS - Administrator Guide
 
 **Version 1.0**  
 **Last Updated: October 16, 2025**
@@ -121,7 +121,7 @@ Import multiple users:
 
 ### Available Roles
 
-FlowStock WMS includes 7 predefined roles:
+LogiVox WMS includes 7 predefined roles:
 
 #### 1. SUPER_ADMIN
 **Full system access**
@@ -219,7 +219,7 @@ Create granular permissions:
 Navigate to **Admin → Settings → General**
 
 #### Application Settings
-- **Application Name**: Display name (default: "FlowStock WMS")
+- **Application Name**: Display name (default: "LogiVox WMS")
 - **Application URL**: Base URL for the application
 - **Company Name**: Your company name
 - **Timezone**: System timezone (affects all timestamps)
@@ -238,7 +238,7 @@ SMTP Port: 587 (TLS) or 465 (SSL)
 SMTP User: your-email@company.com
 SMTP Password: your-app-password
 From Email: noreply@company.com
-From Name: FlowStock WMS
+From Name: LogiVox WMS
 ```
 
 #### Testing Email
@@ -438,17 +438,17 @@ Similar process to QuickBooks.
 #### E-commerce Platforms
 
 **Shopify Integration**
-1. Install FlowStock WMS app from Shopify App Store
+1. Install LogiVox WMS app from Shopify App Store
 2. Authorize access
 3. Configure sync settings:
    - Product sync: ✅ Two-way
    - Inventory sync: ✅ Real-time
    - Order import: ✅ Automatic
-4. Map Shopify locations to FlowStock warehouses
+4. Map Shopify locations to LogiVox warehouses
 5. Click **"Save"**
 
 **WooCommerce Integration**
-1. Install FlowStock WMS plugin on WordPress
+1. Install LogiVox WMS plugin on WordPress
 2. Enter API credentials
 3. Configure sync settings
 4. Click **"Save"**
@@ -489,7 +489,7 @@ Grant API access to external systems:
 4. Copy API key (shown once only!)
 5. Store securely
 
-**API Documentation**: https://api.flowstock.com/docs
+**API Documentation**: https://api.logivox.ai/docs
 
 ---
 
@@ -644,7 +644,7 @@ Regular security checks:
 
 #### SOC 2 Compliance
 
-FlowStock WMS meets SOC 2 Type II requirements:
+LogiVox WMS meets SOC 2 Type II requirements:
 - ✅ Security controls
 - ✅ Availability monitoring
 - ✅ Processing integrity
@@ -891,20 +891,20 @@ Preserve data for legal proceedings:
 ## Support & Resources
 
 **Administrator Support:**
-- 📧 Email: admin-support@flowstock.com
-- 📞 Phone: 1-800-FLOWSTOCK (24/7 for critical issues)
-- 💬 Slack: FlowStock Administrators Community
-- 📚 Knowledge Base: https://admin.flowstock.com
+- 📧 Email: admin-support@logivox.ai
+- 📞 Phone: 1-800-LOGIVOX (24/7 for critical issues)
+- 💬 Slack: LogiVox Administrators Community
+- 📚 Knowledge Base: https://admin.logivox.ai
 
 **Training:**
 - 🎓 Administrator Certification Program
-- 📹 Video Tutorials: https://learn.flowstock.com/admin
-- 📖 API Documentation: https://api.flowstock.com/docs
+- 📹 Video Tutorials: https://learn.logivox.ai/admin
+- 📖 API Documentation: https://api.logivox.ai/docs
 
 **Release Notes:**
-- https://changelog.flowstock.com
+- https://changelog.logivox.ai
 
 ---
 
-**FlowStock WMS Administrator Guide - Version 1.0**  
-*For questions or feedback: documentation@flowstock.com*
+**LogiVox WMS Administrator Guide - Version 1.0**  
+*For questions or feedback: documentation@logivox.ai*

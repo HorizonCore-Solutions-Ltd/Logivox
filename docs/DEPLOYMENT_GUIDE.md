@@ -1,4 +1,4 @@
-# FlowStock WMS - Deployment Guide
+# LogiVox WMS - Deployment Guide
 
 **Version 1.0**  
 **Last Updated**: October 16, 2025
@@ -25,7 +25,7 @@
 
 ## Overview
 
-This guide provides comprehensive instructions for deploying FlowStock WMS in production environments. Whether you're deploying to Docker, Kubernetes, or cloud platforms, this guide covers all necessary steps.
+This guide provides comprehensive instructions for deploying LogiVox WMS in production environments. Whether you're deploying to Docker, Kubernetes, or cloud platforms, this guide covers all necessary steps.
 
 ### Deployment Architecture
 
@@ -173,8 +173,8 @@ docker compose version
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourcompany/flowstock-wms.git
-cd flowstock-wms
+git clone https://github.com/yourcompany/logivox-wms.git
+cd logivox-wms
 
 # Checkout production branch
 git checkout main
@@ -195,7 +195,7 @@ nano .env.production
 ```bash
 # Application
 NODE_ENV=production
-APP_NAME=FlowStock WMS
+APP_NAME=LogiVox WMS
 APP_URL=https://flowstock.yourcompany.com
 PORT=3000
 
@@ -227,13 +227,13 @@ SMTP_SECURE=false
 SMTP_USER=noreply@yourcompany.com
 SMTP_PASSWORD=your_app_password
 SMTP_FROM_EMAIL=noreply@yourcompany.com
-SMTP_FROM_NAME=FlowStock WMS
+SMTP_FROM_NAME=LogiVox WMS
 
 # AWS S3 (File Storage)
 AWS_REGION=us-east-1
 AWS_ACCESS_KEY_ID=your_access_key
 AWS_SECRET_ACCESS_KEY=your_secret_key
-AWS_S3_BUCKET=flowstock-files-prod
+AWS_S3_BUCKET=logivox-files-prod
 
 # Integrations (Optional)
 STRIPE_SECRET_KEY=sk_live_...
@@ -273,7 +273,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    container_name: flowstock-app
+    container_name: logivox-app
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -286,7 +286,7 @@ services:
       - ./uploads:/app/uploads
       - ./logs:/app/logs
     networks:
-      - flowstock-network
+      - logivox-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 30s
@@ -295,7 +295,7 @@ services:
 
   db:
     image: postgres:16-alpine
-    container_name: flowstock-db
+    container_name: logivox-db
     restart: unless-stopped
     environment:
       POSTGRES_DB: flowstock_prod
@@ -306,7 +306,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
       - ./backups:/backups
     networks:
-      - flowstock-network
+      - logivox-network
     ports:
       - "5432:5432"
     healthcheck:
@@ -317,13 +317,13 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: flowstock-redis
+    container_name: logivox-redis
     restart: unless-stopped
     command: redis-server --requirepass ${REDIS_PASSWORD} --maxmemory 2gb --maxmemory-policy allkeys-lru
     volumes:
       - redis-data:/data
     networks:
-      - flowstock-network
+      - logivox-network
     ports:
       - "6379:6379"
     healthcheck:
@@ -334,7 +334,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: flowstock-nginx
+    container_name: logivox-nginx
     restart: unless-stopped
     ports:
       - "80:80"
@@ -346,14 +346,14 @@ services:
     depends_on:
       - app
     networks:
-      - flowstock-network
+      - logivox-network
 
 volumes:
   postgres-data:
   redis-data:
 
 networks:
-  flowstock-network:
+  logivox-network:
     driver: bridge
 ```
 
@@ -533,10 +533,10 @@ kubectl get nodes
 
 ```bash
 # Create namespace
-kubectl create namespace flowstock-prod
+kubectl create namespace logivox-prod
 
 # Set as default namespace (optional)
-kubectl config set-context --current --namespace=flowstock-prod
+kubectl config set-context --current --namespace=logivox-prod
 ```
 
 ### Step 3: Create Secrets
@@ -547,26 +547,26 @@ kubectl create secret generic db-credentials \
   --from-literal=username=flowstock \
   --from-literal=password=secure_password_here \
   --from-literal=database=flowstock_prod \
-  -n flowstock-prod
+  -n logivox-prod
 
 # Application secrets
 kubectl create secret generic app-secrets \
   --from-literal=jwt-secret=your_jwt_secret_min_32_chars \
   --from-literal=session-secret=your_session_secret_min_32_chars \
   --from-literal=encryption-key=your_encryption_key_32_chars \
-  -n flowstock-prod
+  -n logivox-prod
 
 # AWS credentials
 kubectl create secret generic aws-credentials \
   --from-literal=access-key-id=your_access_key \
   --from-literal=secret-access-key=your_secret_key \
-  -n flowstock-prod
+  -n logivox-prod
 
 # SMTP credentials
 kubectl create secret generic smtp-credentials \
   --from-literal=username=noreply@yourcompany.com \
   --from-literal=password=your_app_password \
-  -n flowstock-prod
+  -n logivox-prod
 ```
 
 ### Step 4: Deploy PostgreSQL
@@ -578,7 +578,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: flowstock-prod
+  namespace: logivox-prod
 spec:
   accessModes:
     - ReadWriteOnce
@@ -591,7 +591,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgres
-  namespace: flowstock-prod
+  namespace: logivox-prod
 spec:
   replicas: 1
   selector:
@@ -644,7 +644,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: postgres-service
-  namespace: flowstock-prod
+  namespace: logivox-prod
 spec:
   selector:
     app: postgres
@@ -668,7 +668,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
-  namespace: flowstock-prod
+  namespace: logivox-prod
 spec:
   replicas: 1
   selector:
@@ -710,7 +710,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: redis-service
-  namespace: flowstock-prod
+  namespace: logivox-prod
 spec:
   selector:
     app: redis
@@ -733,21 +733,21 @@ kubectl apply -f k8s/redis-deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flowstock-app
-  namespace: flowstock-prod
+  name: logivox-app
+  namespace: logivox-prod
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: flowstock-app
+      app: logivox-app
   template:
     metadata:
       labels:
-        app: flowstock-app
+        app: logivox-app
     spec:
       containers:
       - name: app
-        image: your-registry.com/flowstock-wms:latest
+        image: your-registry.com/logivox-wms:latest
         ports:
         - containerPort: 3000
         env:
@@ -806,11 +806,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: flowstock-app-service
-  namespace: flowstock-prod
+  name: logivox-app-service
+  namespace: logivox-prod
 spec:
   selector:
-    app: flowstock-app
+    app: logivox-app
   ports:
   - port: 80
     targetPort: 3000
@@ -819,13 +819,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: flowstock-app-hpa
-  namespace: flowstock-prod
+  name: logivox-app-hpa
+  namespace: logivox-prod
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: flowstock-app
+    name: logivox-app
   minReplicas: 3
   maxReplicas: 10
   metrics:
@@ -848,9 +848,9 @@ spec:
 kubectl apply -f k8s/app-deployment.yaml
 
 # Check deployment status
-kubectl get deployments -n flowstock-prod
-kubectl get pods -n flowstock-prod
-kubectl get services -n flowstock-prod
+kubectl get deployments -n logivox-prod
+kubectl get pods -n logivox-prod
+kubectl get services -n logivox-prod
 ```
 
 ### Step 7: Configure Ingress
@@ -861,8 +861,8 @@ kubectl get services -n flowstock-prod
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: flowstock-ingress
-  namespace: flowstock-prod
+  name: logivox-ingress
+  namespace: logivox-prod
   annotations:
     cert-manager.io/cluster-issuer: "letsencrypt-prod"
     nginx.ingress.kubernetes.io/proxy-body-size: "100m"
@@ -872,7 +872,7 @@ spec:
   tls:
   - hosts:
     - flowstock.yourcompany.com
-    secretName: flowstock-tls
+    secretName: logivox-tls
   rules:
   - host: flowstock.yourcompany.com
     http:
@@ -881,7 +881,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: flowstock-app-service
+            name: logivox-app-service
             port:
               number: 80
 ```
@@ -906,16 +906,16 @@ kubectl apply -f k8s/ingress.yaml
 **1. Create ECS Cluster:**
 
 ```bash
-aws ecs create-cluster --cluster-name flowstock-prod
+aws ecs create-cluster --cluster-name logivox-prod
 
 # Create task definition
 aws ecs register-task-definition --cli-input-json file://ecs-task-definition.json
 
 # Create service
 aws ecs create-service \
-  --cluster flowstock-prod \
-  --service-name flowstock-app \
-  --task-definition flowstock-app:1 \
+  --cluster logivox-prod \
+  --service-name logivox-app \
+  --task-definition logivox-app:1 \
   --desired-count 3 \
   --launch-type FARGATE \
   --network-configuration "awsvpcConfiguration={subnets=[subnet-xxxxx],securityGroups=[sg-xxxxx],assignPublicIp=ENABLED}"
@@ -925,19 +925,19 @@ aws ecs create-service \
 
 ```bash
 # Create resource group
-az group create --name flowstock-prod --location eastus
+az group create --name logivox-prod --location eastus
 
 # Create AKS cluster
 az aks create \
-  --resource-group flowstock-prod \
-  --name flowstock-cluster \
+  --resource-group logivox-prod \
+  --name logivox-cluster \
   --node-count 3 \
   --node-vm-size Standard_D4s_v3 \
   --enable-managed-identity \
   --generate-ssh-keys
 
 # Get credentials
-az aks get-credentials --resource-group flowstock-prod --name flowstock-cluster
+az aks get-credentials --resource-group logivox-prod --name logivox-cluster
 
 # Deploy application
 kubectl apply -f k8s/
@@ -947,13 +947,13 @@ kubectl apply -f k8s/
 
 ```bash
 # Create GKE cluster
-gcloud container clusters create flowstock-cluster \
+gcloud container clusters create logivox-cluster \
   --num-nodes=3 \
   --machine-type=n1-standard-4 \
   --zone=us-central1-a
 
 # Get credentials
-gcloud container clusters get-credentials flowstock-cluster --zone=us-central1-a
+gcloud container clusters get-credentials logivox-cluster --zone=us-central1-a
 
 # Deploy application
 kubectl apply -f k8s/
@@ -1004,7 +1004,7 @@ psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE flowstock_prod TO flowstoc
 docker compose -f docker-compose.prod.yml exec app npm run migrate:prod
 
 # Using Kubernetes
-kubectl exec -it <pod-name> -n flowstock-prod -- npm run migrate:prod
+kubectl exec -it <pod-name> -n logivox-prod -- npm run migrate:prod
 
 # Direct server
 npm run migrate:prod
@@ -1096,27 +1096,27 @@ kubectl port-forward -n monitoring svc/prometheus-grafana 3000:80
 
 ```bash
 #!/bin/bash
-# FlowStock WMS - Automated Backup Script
+# LogiVox WMS - Automated Backup Script
 
 BACKUP_DIR="/backups"
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="flowstock_backup_${DATE}.sql.gz"
 
 # Database backup
-docker exec flowstock-db pg_dump -U flowstock flowstock_prod | gzip > "${BACKUP_DIR}/${BACKUP_FILE}"
+docker exec logivox-db pg_dump -U flowstock flowstock_prod | gzip > "${BACKUP_DIR}/${BACKUP_FILE}"
 
 # Upload to S3
-aws s3 cp "${BACKUP_DIR}/${BACKUP_FILE}" s3://flowstock-backups-prod/
+aws s3 cp "${BACKUP_DIR}/${BACKUP_FILE}" s3://logivox-backups-prod/
 
 # Delete local backups older than 7 days
 find ${BACKUP_DIR} -name "flowstock_backup_*.sql.gz" -mtime +7 -delete
 
 # Delete S3 backups older than 30 days
-aws s3 ls s3://flowstock-backups-prod/ | while read -r line; do
+aws s3 ls s3://logivox-backups-prod/ | while read -r line; do
   fileName=$(echo $line | awk '{print $4}')
   fileDate=$(echo $fileName | grep -oP '\d{8}')
   if [ $(($(date +%s) - $(date -d $fileDate +%s))) -gt $((30*86400)) ]; then
-    aws s3 rm "s3://flowstock-backups-prod/${fileName}"
+    aws s3 rm "s3://logivox-backups-prod/${fileName}"
   fi
 done
 
@@ -1130,7 +1130,7 @@ echo "Backup completed: ${BACKUP_FILE}"
 crontab -e
 
 # Add daily backup at 2 AM
-0 2 * * * /path/to/backup.sh >> /var/log/flowstock-backup.log 2>&1
+0 2 * * * /path/to/backup.sh >> /var/log/logivox-backup.log 2>&1
 ```
 
 ---
@@ -1270,14 +1270,14 @@ sudo certbot renew --dry-run
 docker compose logs -f app | grep -i error
 
 # Monitor database queries
-docker exec -it flowstock-db psql -U flowstock -d flowstock_prod
+docker exec -it logivox-db psql -U flowstock -d flowstock_prod
 SELECT pid, now() - pg_stat_activity.query_start AS duration, query 
 FROM pg_stat_activity 
 WHERE state = 'active' 
 ORDER BY duration DESC;
 
 # Clear Redis cache
-docker exec -it flowstock-redis redis-cli FLUSHALL
+docker exec -it logivox-redis redis-cli FLUSHALL
 
 # Restart services
 docker compose restart
@@ -1288,15 +1288,15 @@ docker compose restart
 ## Support
 
 **Deployment Support:**
-- 📧 Email: devops@flowstock.com
+- 📧 Email: devops@logivox.ai
 - 💬 Slack: #deployment-support
-- 📚 Docs: https://docs.flowstock.com/deployment
+- 📚 Docs: https://docs.logivox.ai/deployment
 
 **Emergency Support:**
-- 📞 Phone: 1-800-FLOWSTOCK (24/7)
+- 📞 Phone: 1-800-LOGIVOX (24/7)
 - 🚨 On-call: PagerDuty integration
 
 ---
 
-**FlowStock WMS Deployment Guide - Version 1.0**  
+**LogiVox WMS Deployment Guide - Version 1.0**  
 *Last updated: October 16, 2025*

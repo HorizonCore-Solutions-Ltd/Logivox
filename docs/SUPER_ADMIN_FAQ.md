@@ -1,4 +1,4 @@
-# 🎛️ FlowStock Super Admin Dashboard
+# 🎛️ LogiVox Super Admin Dashboard
 ## Enterprise Monitoring & Control System - Better Than Bank Apps
 
 > **MONITORING LEVEL**: Real-Time 360° Visibility  
@@ -37,7 +37,7 @@ Permissions: SUPER_ADMIN role only
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  🎛️  FlowStock Super Admin Control Center                       │
+│  🎛️  LogiVox Super Admin Control Center                       │
 │  User: John Doe (CEO) | Role: SUPER_ADMIN | Last Login: 2m ago │
 └─────────────────────────────────────────────────────────────────┘
 ┌─────────────────────────────────────────────────────────────────┐
@@ -490,8 +490,8 @@ export function RevenueWidget({ amount }: { amount: number }) {
 
 ### General Questions
 
-#### Q1: What is FlowStock?
-**A:** FlowStock is an enterprise-grade inventory management system with advanced features including:
+#### Q1: What is LogiVox?
+**A:** LogiVox is an enterprise-grade inventory management system with advanced features including:
 - Multi-tenant architecture for unlimited organizations
 - Real-time inventory tracking with barcode/QR scanning
 - Customer & booking management
@@ -502,8 +502,8 @@ export function RevenueWidget({ amount }: { amount: number }) {
 - Multi-factor authentication and role-based access control
 - SOC 2, ISO 27001, GDPR, HIPAA compliance ready
 
-#### Q2: How secure is FlowStock?
-**A:** FlowStock implements military-grade security:
+#### Q2: How secure is LogiVox?
+**A:** LogiVox implements military-grade security:
 - ✅ **Encryption**: AES-256 at rest, TLS 1.3 in transit
 - ✅ **Authentication**: MFA + Hardware Keys (FIDO2) + Biometric
 - ✅ **Authorization**: Zero-trust RBAC with organization isolation
@@ -516,7 +516,7 @@ export function RevenueWidget({ amount }: { amount: number }) {
 **Security Score**: 98/100 (Better than most banking applications)
 
 #### Q3: Can a single person delete all data?
-**A:** **NO**. FlowStock implements multi-executive approval system:
+**A:** **NO**. LogiVox implements multi-executive approval system:
 - Deleting organization: Requires 3 executive approvals (CEO + CTO + CISO)
 - Deleting database: Requires 3 executive approvals (all different roles)
 - Exporting all data: Requires 3 executive approvals (CEO + CISO + Legal)
@@ -532,7 +532,7 @@ export function RevenueWidget({ amount }: { amount: number }) {
 7. Automatic backup created before deletion
 
 #### Q4: What happens if the system gets hacked?
-**A:** FlowStock has 7 layers of defense:
+**A:** LogiVox has 7 layers of defense:
 
 **Layer 1: Prevention**
 - WAF blocks 99.9% of attacks (SQL injection, XSS, CSRF)
@@ -594,7 +594,7 @@ export function RevenueWidget({ amount }: { amount: number }) {
 - Health checks every 30 seconds
 - Real-time alerting (PagerDuty)
 - 24/7 on-call engineer
-- Status page: status.flowstock.com
+- Status page: status.logivox.ai
 
 #### Q6: How is data backed up?
 **A:** Enterprise-grade backup strategy:
@@ -647,7 +647,7 @@ export function RevenueWidget({ amount }: { amount: number }) {
 
 ### Business Questions
 
-#### Q8: How much does FlowStock cost?
+#### Q8: How much does LogiVox cost?
 **A:** Pricing tiers:
 
 **Starter** ($49/month):
@@ -673,7 +673,7 @@ export function RevenueWidget({ amount }: { amount: number }) {
 - Dedicated account manager
 - Custom SLA
 
-**Contact sales@flowstock.com for volume discounts**
+**Contact sales@logivox.ai for volume discounts**
 
 #### Q9: Do you offer a free trial?
 **A:** Yes! 30-day free trial with:
@@ -683,7 +683,7 @@ export function RevenueWidget({ amount }: { amount: number }) {
 - Video tutorials
 - Sample data included
 
-**Sign up**: https://flowstock.com/signup
+**Sign up**: https://logivox.ai/signup
 
 #### Q10: What integrations are supported?
 **A:** 20+ integrations:
@@ -720,13 +720,13 @@ export function RevenueWidget({ amount }: { amount: number }) {
 
 ## 📞 Support & Contact
 
-**Email**: support@flowstock.com  
-**Phone**: 1-800-FLOWSTOCK (Enterprise customers)  
-**Chat**: Live chat on flowstock.com (9am-5pm EST)  
-**Status**: status.flowstock.com  
-**Documentation**: docs.flowstock.com  
+**Email**: support@logivox.ai  
+**Phone**: 1-800-LOGIVOX (Enterprise customers)  
+**Chat**: Live chat on logivox.ai (9am-5pm EST)  
+**Status**: status.logivox.ai  
+**Documentation**: docs.logivox.ai  
 **GitHub**: github.com/flowstock (Open source modules)
 
 ---
 
-**FlowStock: Enterprise Inventory Management That You Can Trust With Your Business**
+**LogiVox: Enterprise Inventory Management That You Can Trust With Your Business**

@@ -1,5 +1,5 @@
 /**
- * Voice Control System for FlowStock
+ * Voice Control System for LogiVox
  * 
  * Browser-based speech recognition using Web Speech API (FREE!)
  * 
@@ -12,6 +12,14 @@
  * - Multi-language support
  * - Noise filtering and accuracy improvements
  */
+
+// Text-to-speech helper function
+const speak = (text: string): void => {
+  if ('speechSynthesis' in window) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(utterance);
+  }
+};
 
 export interface VoiceCommand {
   patterns: string[];
@@ -245,6 +253,157 @@ export const VOICE_COMMANDS: VoiceCommand[] = [
     },
     category: 'action',
   },
+  {
+    patterns: ['stop listening', 'stop voice', 'turn off voice'],
+    description: 'Stop voice recognition',
+    action: () => {
+      // Handled by voice recognition system
+    },
+    category: 'action',
+  },
+
+  // ==========================================
+  // VEHICLE & LOAD OPTIMIZATION COMMANDS
+  // ==========================================
+  
+  {
+    patterns: [
+      'recommend vehicle for order {orderNumber}',
+      'what vehicle for order {orderNumber}',
+      'suggest vehicle for order {orderNumber}',
+      'which vehicle for order {orderNumber}'
+    ],
+    description: 'Recommend vehicle for an order',
+    action: async (params) => {
+      try {
+        const response = await fetch('/api/vehicle-types/recommend-for-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderNumber: params.orderNumber }),
+        });
+        const data = await response.json();
+        
+        if (data.success && data.vehicle) {
+          speak(`Recommended ${data.vehicle.name}. ${Math.round(data.utilization.volumePercent)} percent utilization.`);
+        } else {
+          speak('No suitable vehicle found.');
+        }
+      } catch (error) {
+        console.error('Vehicle recommendation error:', error);
+        speak('Error getting vehicle recommendation.');
+      }
+    },
+    category: 'action',
+    parameters: [
+      { name: 'orderNumber', type: 'string', required: true }
+    ],
+    requiresAuth: true,
+  },
+  
+  {
+    patterns: [
+      'show vehicle types',
+      'list vehicles',
+      'what vehicles are available',
+      'show available vehicles'
+    ],
+    description: 'Show available vehicle types',
+    action: () => {
+      window.location.href = '/dashboard/vehicle-types';
+    },
+    category: 'navigation',
+    requiresAuth: true,
+  },
+  
+  {
+    patterns: [
+      'what vehicle fits {volume} cubic feet',
+      'which vehicle for {volume} cubic feet',
+      'recommend vehicle for {volume} cubic feet'
+    ],
+    description: 'Find vehicle by volume capacity',
+    action: async (params) => {
+      try {
+        const volume = parseFloat(params.volume ?? '0');
+        const response = await fetch('/api/vehicle-types/recommend', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            totalVolumeCubicFeet: volume,
+            totalWeightLbs: volume * 10, // Rough estimate
+            region: 'UK',
+          }),
+        });
+        const data = await response.json();
+        
+        if (data.success && data.recommended) {
+          speak(`${data.recommended.name} can fit ${volume} cubic feet. Total capacity ${data.recommended.volumeCubicFeet} cubic feet.`);
+        } else {
+          speak('No vehicle found for that volume.');
+        }
+      } catch (error) {
+        console.error('Vehicle search error:', error);
+        speak('Error finding vehicle.');
+      }
+    },
+    category: 'search',
+    parameters: [
+      { name: 'volume', type: 'number', required: true }
+    ],
+    requiresAuth: true,
+  },
+  
+  {
+    patterns: [
+      'optimize load for order {orderNumber}',
+      'plan load for order {orderNumber}',
+      'calculate load for order {orderNumber}'
+    ],
+    description: 'Optimize load plan for an order',
+    action: async (params) => {
+      try {
+        const response = await fetch('/api/load-optimization/optimize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderNumber: params.orderNumber }),
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          speak(`Load plan created. ${data.vehicle.name} with ${Math.round(data.loadPlan.utilization.volumePercent)} percent utilization.`);
+        } else {
+          speak('Error creating load plan.');
+        }
+      } catch (error) {
+        console.error('Load optimization error:', error);
+        speak('Error optimizing load.');
+      }
+    },
+    category: 'action',
+    parameters: [
+      { name: 'orderNumber', type: 'string', required: true }
+    ],
+    requiresAuth: true,
+  },
+  
+  {
+    patterns: [
+      'show {region} vehicles',
+      'list {region} vehicle types',
+      'what {region} vehicles do we have'
+    ],
+    description: 'Show vehicles for a specific region',
+    action: (params) => {
+      const region = (params.region ?? 'US').toUpperCase();
+      window.location.href = `/dashboard/vehicle-types?region=${region}`;
+    },
+    category: 'navigation',
+    parameters: [
+      { name: 'region', type: 'string', required: true }
+    ],
+    requiresAuth: true,
+  },
+
   {
     patterns: ['stop listening', 'stop voice', 'turn off voice'],
     description: 'Stop voice recognition',

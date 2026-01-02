@@ -56,7 +56,7 @@ export function calculateRFM(
   // Recency: days since last purchase
   const lastPurchase = purchases.reduce((latest, p) =>
     p.date > latest ? p.date : latest,
-    purchases[0].date
+    purchases[0]?.date ?? new Date()
   );
   const recencyDays = Math.floor(
     (referenceDate.getTime() - lastPurchase.getTime()) / (1000 * 60 * 60 * 24)
@@ -225,9 +225,11 @@ export function analyzePurchasePattern(
     const diff = purchase.date.getTime() - sorted[i].date.getTime();
     return diff / (1000 * 60 * 60 * 24);
   });
-  const avgDaysBetween = daysBetweenPurchases.reduce((sum, d) => sum + d, 0) / daysBetweenPurchases.length;
+  const avgDaysBetween = daysBetweenPurchases.length > 0 
+    ? daysBetweenPurchases.reduce((sum, d) => sum + d, 0) / daysBetweenPurchases.length
+    : 30; // Default to 30 days if no history
   
-  const lastDate = sorted[sorted.length - 1].date;
+  const lastDate = sorted[sorted.length - 1]?.date ?? new Date();
   const nextDate = new Date(lastDate.getTime() + avgDaysBetween * 24 * 60 * 60 * 1000);
 
   return {

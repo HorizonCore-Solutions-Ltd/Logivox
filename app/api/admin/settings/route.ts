@@ -14,8 +14,8 @@ import { logAuditEvent } from '@/lib/audit-logger';
 // Default settings structure
 const defaultSettings = {
   general: {
-    appName: 'FlowStock WMS',
-    appUrl: 'https://flowstock.com',
+    appName: 'LogiVox',
+    appUrl: 'https://logivox.ai',
     companyName: 'Your Company',
     timezone: 'UTC',
     dateFormat: 'MM/DD/YYYY',
@@ -28,8 +28,8 @@ const defaultSettings = {
     smtpPort: 587,
     smtpUser: '',
     smtpPassword: '',
-    fromEmail: 'noreply@flowstock.com',
-    fromName: 'FlowStock WMS',
+    fromEmail: 'noreply@logivox.ai',
+    fromName: 'LogiVox',
   },
   notifications: {
     emailNotifications: true,

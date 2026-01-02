@@ -1,4 +1,4 @@
-# FlowStock Enterprise Build Progress Summary
+# LogiVox Enterprise Build Progress Summary
 ## Comprehensive Turnkey Solution Implementation
 
 **Last Updated:** December 2024  
@@ -8,7 +8,7 @@
 
 ## 🎯 Project Overview
 
-FlowStock is an enterprise-grade stock booking and inventory management platform built with:
+LogiVox is an enterprise-grade stock booking and inventory management platform built with:
 - **Next.js 14** (App Router)
 - **TypeScript** (Strict Mode)
 - **PostgreSQL** + Prisma ORM

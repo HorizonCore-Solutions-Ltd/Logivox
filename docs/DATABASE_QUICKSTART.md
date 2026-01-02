@@ -45,7 +45,7 @@
 
 2. **Create New Project**
    - Click "New Project"
-   - Name: FlowStock
+   - Name: LogiVox
    - Set strong database password
    - Choose region closest to you
    - Wait for project to be ready (~2 minutes)
@@ -117,7 +117,7 @@
 Once you've run the seed, you can log in with:
 
 ### Super Admin
-- **Email:** admin@flowstock.com
+- **Email:** admin@logivox.ai
 - **Password:** Admin@123
 - **Role:** SUPER_ADMIN
 - **Organization:** Demo Company Ltd (OWNER)

@@ -1,4 +1,4 @@
-# 📊 FlowStock - Documentation Summary & Next Steps
+# 📊 LogiVox - Documentation Summary & Next Steps
 
 > **Last Updated:** October 15, 2025 at 19:30  
 > **Documentation Status:** COMPLETE - All features + Investor Package + Marketing Strategy  
@@ -42,7 +42,7 @@
 - .env.production.example (60+ variables)
 - Security headers enhanced
 
-**🎓 NEW: FlowStock Academy Designed (Ready to Build)**
+**🎓 NEW: LogiVox Academy Designed (Ready to Build)**
 - 125+ training lessons (23 hours content)
 - Security awareness training (phishing, scams)
 - Phishing simulation system (KnowBe4-style)
@@ -181,7 +181,7 @@
 
 ### �🎓 TRAINING & ACADEMY (1 file, ~37 KB) 🆕
 
-7. **FLOWSTOCK_ACADEMY_TRAINING_SYSTEM.md** (85 pages, ~37 KB) ⭐ NEW
+7. **LOGIVOX_ACADEMY_TRAINING_SYSTEM.md** (85 pages, ~37 KB) ⭐ NEW
    - Complete training platform design
    - 125+ interactive lessons (23 hours)
    - **App Training Modules:**
@@ -701,7 +701,7 @@ Overall Progress:         [████████████░░░░░�
 
 ---
 
-## 🔍 What Makes FlowStock a $1B+ Opportunity?
+## 🔍 What Makes LogiVox a $1B+ Opportunity?
 
 ### 1. **UNIQUE: Security Training + Inventory Management**
 ONLY platform combining KnowBe4-style training with Fishbowl-style inventory. 12-18 month competitive moat.
@@ -765,14 +765,14 @@ Oracle paid $10.3B for Cerner. SAP paid $8B for Qualtrics. Microsoft acquires ve
 1. ✅ Review marketing strategy
 2. ✅ Prioritize high-ROI features (AI forecasting, customer portal, warehouse bins)
 3. ✅ Start building (complete Phase 22: Label printing + academy)
-4. ✅ Deploy demo (demo.flowstock.com)
+4. ✅ Deploy demo (demo.logivox.ai)
 5. ✅ Get 3-5 beta customers
 6. ✅ Start fundraising ($2-5M seed round)
 7. ✅ Build a billion-dollar business 🚀
 - ✅ Nothing missed - full feature verification checklist
 
 **Next milestone:**
-🎯 **Sprint 2 (Week 2): Label Printing System** - The game-changing feature that sets FlowStock apart from competitors.
+🎯 **Sprint 2 (Week 2): Label Printing System** - The game-changing feature that sets LogiVox apart from competitors.
 
 **Success looks like:**
 - Professional label designer with drag-and-drop
@@ -787,6 +787,6 @@ Oracle paid $10.3B for Cerner. SAP paid $8B for Qualtrics. Microsoft acquires ve
 **Last Updated:** October 15, 2025 at 17:25  
 **Documentation Status:** ✅ COMPLETE  
 **Next Review:** After Sprint 1 completion  
-**Maintained By:** FlowStock Development Team
+**Maintained By:** LogiVox Development Team
 
 **Ready to build? Start with Sprint 1 this week! 🚀**

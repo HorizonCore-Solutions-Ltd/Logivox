@@ -383,7 +383,7 @@ const safe = result.value;
 ```javascript
 {
   'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || 'https://flowstock.com',
+  'Access-Control-Allow-Origin': process.env.ALLOWED_ORIGINS || 'https://logivox.ai',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
   'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, ...',
 }
@@ -540,7 +540,7 @@ const safe = result.value;
 
 ## Competitive Advantage
 
-**FlowStock Accessibility Suite:**
+**LogiVox Accessibility Suite:**
 - ✅ **7,050+ lines of accessibility code** (most in SaaS industry)
 - ✅ **Voice Control System** (industry-first for inventory management)
 - ✅ **Full WCAG 2.1 AA compliance** (21/21 criteria)
@@ -551,7 +551,7 @@ const safe = result.value;
 - ✅ **Built-in accessibility audit tool**
 - ✅ **Complete legal compliance** (GDPR/CCPA/ADA/Section 508)
 
-**FlowStock Security Suite:**
+**LogiVox Security Suite:**
 - ✅ **98/100 security score** (industry-leading)
 - ✅ **Token bucket rate limiting** (4 tiers)
 - ✅ **Comprehensive input sanitization** (30+ functions)
@@ -670,7 +670,7 @@ const safe = result.value;
 - ✅ **Reduced legal risk** (full compliance)
 - ✅ **Increased trust** (professional security and accessibility)
 
-**FlowStock is now:**
+**LogiVox is now:**
 - ✅ Most accessible inventory management system in the industry
 - ✅ Most secure inventory management system (98/100 score)
 - ✅ Fully compliant with accessibility and privacy regulations
@@ -683,4 +683,4 @@ const safe = result.value;
 
 **User Directive Fulfilled:** "proceed not missing anything" ✅
 
-**Result:** **World-class accessibility and security systems** that no competitor can match. FlowStock is now enterprise-ready with industry-leading accessibility (7,050+ lines) and security (98/100 score).
+**Result:** **World-class accessibility and security systems** that no competitor can match. LogiVox is now enterprise-ready with industry-leading accessibility (7,050+ lines) and security (98/100 score).

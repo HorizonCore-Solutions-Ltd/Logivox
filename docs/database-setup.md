@@ -2,7 +2,7 @@
 
 ## Overview
 
-FlowStock uses **PostgreSQL** with **Prisma ORM** for database management. This guide will help you set up your database locally or in production.
+LogiVox uses **PostgreSQL** with **Prisma ORM** for database management. This guide will help you set up your database locally or in production.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: flowstock-db
+    container_name: logivox-db
     environment:
       POSTGRES_USER: flowstock
       POSTGRES_PASSWORD: flowstock_dev_password
@@ -95,7 +95,7 @@ DATABASE_URL="postgresql://flowstock:your_password@localhost:5432/flowstock?sche
 2. Sign up/Sign in
 3. Click "New Project"
 4. Fill in details:
-   - Name: FlowStock
+   - Name: LogiVox
    - Database Password: (generate strong password)
    - Region: (choose closest to you)
 
@@ -218,10 +218,10 @@ async function main() {
   const hashedPassword = await bcrypt.hash('admin123', 12)
   
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@flowstock.com' },
+    where: { email: 'admin@logivox.ai' },
     update: {},
     create: {
-      email: 'admin@flowstock.com',
+      email: 'admin@logivox.ai',
       name: 'Admin User',
       password: hashedPassword,
       role: 'SUPER_ADMIN',

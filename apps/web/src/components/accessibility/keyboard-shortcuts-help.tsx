@@ -163,7 +163,7 @@ export function KeyboardShortcutsHelp() {
             <DialogTitle>Keyboard Shortcuts</DialogTitle>
           </div>
           <DialogDescription>
-            Navigate FlowStock faster with these keyboard shortcuts
+            Navigate LogiVox faster with these keyboard shortcuts
           </DialogDescription>
         </DialogHeader>
 

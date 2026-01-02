@@ -50,8 +50,8 @@ export default function ContactPage() {
       icon: Mail,
       title: "Email Us",
       description: "Our team typically responds within 24 hours",
-      value: "hello@flowstock.com",
-      action: "mailto:hello@flowstock.com"
+      value: "hello@logivox.ai",
+      action: "mailto:hello@logivox.ai"
     },
     {
       icon: Phone,
@@ -310,7 +310,7 @@ export default function ContactPage() {
                   </CardDescription>
                   <div className="pt-4">
                     <Button variant="outline" className="w-full" asChild>
-                      <a href="mailto:support@flowstock.com">
+                      <a href="mailto:support@logivox.ai">
                         <Mail className="mr-2 h-4 w-4" />
                         Email Support
                       </a>

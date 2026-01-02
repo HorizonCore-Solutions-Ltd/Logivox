@@ -162,7 +162,7 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
           type="text"
           placeholder={placeholder}
           value={query}
-          onChange={(e) => handleQueryChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleQueryChange(e.target.value)}
           onFocus={() => setIsOpen(true)}
           className="pl-10 pr-10"
         />

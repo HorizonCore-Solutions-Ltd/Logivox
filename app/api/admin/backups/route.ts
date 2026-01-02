@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const backupDir = process.env.BACKUP_DIR || '/var/backups/flowstock';
+    const backupDir = process.env.BACKUP_DIR || '/var/backups/logivox';
 
     // List local backups
     const files = await fs.readdir(backupDir);
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { type = 'manual' } = body;
 
-    const backupDir = process.env.BACKUP_DIR || '/var/backups/flowstock';
+    const backupDir = process.env.BACKUP_DIR || '/var/backups/logivox';
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const filename = `backup-${type}-${timestamp}.sql.gz`;
     const filePath = path.join(backupDir, filename);

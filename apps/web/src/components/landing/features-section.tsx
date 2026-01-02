@@ -132,7 +132,7 @@ export function FeaturesSection() {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            FlowStock delivers a comprehensive warehouse management system with inventory control, 
+            LogiVox delivers a comprehensive warehouse management system with inventory control, 
             order fulfillment, quality management, and powerful integrations.
           </p>
         </div>

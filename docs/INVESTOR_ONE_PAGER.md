@@ -1,4 +1,4 @@
-# 📊 FlowStock - One-Page Executive Summary
+# 📊 LogiVox - One-Page Executive Summary
 ## The ONLY Inventory Platform with Built-in Security Training
 
 > **Seeking:** $2-5M | **Valuation:** $20-25M Post-Money | **Equity:** 20-25%
@@ -15,7 +15,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 
 ## 💡 The Solution
 
-**FlowStock** = Inventory Management + Security Academy (like KnowBe4) **in ONE platform**
+**LogiVox** = Inventory Management + Security Academy (like KnowBe4) **in ONE platform**
 
 **Unique Features:**
 - ✅ Real-time inventory tracking (multi-location, barcode scanning)
@@ -94,7 +94,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 
 ## 🏆 Competitive Advantage
 
-| Feature | FlowStock | Competitors |
+| Feature | LogiVox | Competitors |
 |---------|-----------|-------------|
 | **Security Training** | ✅ Built-in | ❌ None |
 | **Phishing Simulation** | ✅ Automated | ❌ None |
@@ -170,10 +170,10 @@ Operations (5%): $250K - Infrastructure
 📧 [Your Email]  
 📱 [Your Phone]  
 🔗 [LinkedIn]  
-🌐 demo.flowstock.com
+🌐 demo.logivox.ai
 
 ---
 
 **Let's build a $1B+ company together. 🚀**
 
-*FlowStock Inc. © 2025 - Confidential*
+*LogiVox Inc. © 2025 - Confidential*

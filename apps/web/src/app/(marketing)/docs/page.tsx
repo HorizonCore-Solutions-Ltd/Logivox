@@ -29,14 +29,14 @@ export default function DocsPage() {
     {
       icon: Rocket,
       title: "Getting Started",
-      description: "Set up your FlowStock account and configure your first warehouse in minutes",
+      description: "Set up your LogiVox account and configure your first warehouse in minutes",
       href: "/docs/getting-started",
       time: "5 min"
     },
     {
       icon: Code,
       title: "API Quickstart",
-      description: "Make your first API call and integrate FlowStock into your applications",
+      description: "Make your first API call and integrate LogiVox into your applications",
       href: "/docs/api/quickstart",
       time: "10 min"
     },
@@ -137,13 +137,13 @@ export default function DocsPage() {
   const sdks = [
     {
       name: "Node.js",
-      description: "Official Node.js SDK for FlowStock API",
-      command: "npm install @flowstock/sdk",
+      description: "Official Node.js SDK for LogiVox API",
+      command: "npm install @logivox/sdk",
       docsHref: "/docs/sdks/nodejs"
     },
     {
       name: "Python",
-      description: "Official Python SDK for FlowStock API",
+      description: "Official Python SDK for LogiVox API",
       command: "pip install flowstock",
       docsHref: "/docs/sdks/python"
     },
@@ -155,8 +155,8 @@ export default function DocsPage() {
     },
     {
       name: "C# / .NET",
-      description: "Official .NET SDK for FlowStock integration",
-      command: "dotnet add package FlowStock.SDK",
+      description: "Official .NET SDK for LogiVox integration",
+      command: "dotnet add package LogiVox.SDK",
       docsHref: "/docs/sdks/dotnet"
     }
   ]
@@ -176,12 +176,12 @@ export default function DocsPage() {
               <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
                 Everything you need to
                 <span className="block bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-                  build with FlowStock
+                  build with LogiVox
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed">
                 Comprehensive guides, API references, and resources to help you 
-                integrate and extend FlowStock for your enterprise needs.
+                integrate and extend LogiVox for your enterprise needs.
               </p>
             </div>
 
@@ -204,7 +204,7 @@ export default function DocsPage() {
             <div className="mb-12">
               <h2 className="text-3xl font-bold mb-4">Quick Start Guides</h2>
               <p className="text-muted-foreground text-lg">
-                Get up and running with FlowStock in minutes
+                Get up and running with LogiVox in minutes
               </p>
             </div>
 
@@ -360,7 +360,7 @@ export default function DocsPage() {
                   Need help getting started?
                 </h2>
                 <p className="text-xl text-muted-foreground">
-                  Our support team is here to help you succeed with FlowStock
+                  Our support team is here to help you succeed with LogiVox
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">

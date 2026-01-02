@@ -1,7 +1,7 @@
 # Security Implementation Guide
 
 ## Overview
-This document describes the comprehensive security features implemented in FlowStock WMS to protect against common vulnerabilities and attacks.
+This document describes the comprehensive security features implemented in LogiVox WMS to protect against common vulnerabilities and attacks.
 
 ## Security Features
 

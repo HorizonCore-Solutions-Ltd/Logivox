@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
-  description: 'FlowStock Terms of Service - Legal terms and conditions for using our enterprise inventory management platform.',
+  description: 'LogiVox Terms of Service - Legal terms and conditions for using our enterprise inventory management platform.',
 }
 
 export default function TermsOfServicePage() {
@@ -36,7 +36,7 @@ export default function TermsOfServicePage() {
             <h1 className="text-4xl font-bold">Terms of Service</h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl">
-            Legal terms and conditions governing your use of the FlowStock platform.
+            Legal terms and conditions governing your use of the LogiVox platform.
           </p>
           <p className="text-sm text-muted-foreground mt-4">
             Last Updated: {lastUpdated} | Effective Date: {effectiveDate}
@@ -56,7 +56,7 @@ export default function TermsOfServicePage() {
                 <div>
                   <p className="font-semibold text-amber-900 dark:text-amber-100 mb-2">Important Legal Agreement</p>
                   <p className="text-sm text-amber-800 dark:text-amber-200">
-                    By accessing or using FlowStock, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.
+                    By accessing or using LogiVox, you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our platform.
                   </p>
                 </div>
               </div>
@@ -66,7 +66,7 @@ export default function TermsOfServicePage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">1. Agreement to Terms</h2>
               <p className="text-muted-foreground">
-                These Terms of Service ("Terms") constitute a legally binding agreement between you (either an individual or entity, "you" or "Customer") and FlowStock Inc. ("FlowStock," "we," "us," or "our") governing your access to and use of the FlowStock platform, including our website, applications, and services (collectively, the "Service").
+                These Terms of Service ("Terms") constitute a legally binding agreement between you (either an individual or entity, "you" or "Customer") and LogiVox Inc. ("LogiVox," "we," "us," or "our") governing your access to and use of the LogiVox platform, including our website, applications, and services (collectively, the "Service").
               </p>
               <p className="text-muted-foreground">
                 BY CREATING AN ACCOUNT, ACCESSING, OR USING OUR SERVICE, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS AND OUR PRIVACY POLICY.
@@ -77,7 +77,7 @@ export default function TermsOfServicePage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">2. Definitions</h2>
               <ul className="space-y-2 text-muted-foreground">
-                <li><strong>"Service"</strong> means the FlowStock enterprise inventory management and stock booking platform</li>
+                <li><strong>"Service"</strong> means the LogiVox enterprise inventory management and stock booking platform</li>
                 <li><strong>"Account"</strong> means your unique account created to access the Service</li>
                 <li><strong>"Organization"</strong> means the business entity or group you represent</li>
                 <li><strong>"User"</strong> means any individual authorized by an Organization to use the Service</li>
@@ -92,7 +92,7 @@ export default function TermsOfServicePage() {
               
               <h3 className="text-xl font-semibold mt-6 mb-3">3.1 Eligibility</h3>
               <p className="text-muted-foreground">
-                You must be at least 18 years old and have the legal capacity to enter into contracts to use the Service. By using FlowStock, you represent and warrant that you meet these requirements.
+                You must be at least 18 years old and have the legal capacity to enter into contracts to use the Service. By using LogiVox, you represent and warrant that you meet these requirements.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">3.2 Account Creation</h3>
@@ -109,7 +109,7 @@ export default function TermsOfServicePage() {
 
               <h3 className="text-xl font-semibold mt-6 mb-3">3.3 Business Use Only</h3>
               <p className="text-muted-foreground">
-                FlowStock is designed for business and commercial use. You may not use the Service for personal, family, or household purposes.
+                LogiVox is designed for business and commercial use. You may not use the Service for personal, family, or household purposes.
               </p>
             </div>
 
@@ -119,7 +119,7 @@ export default function TermsOfServicePage() {
               
               <h3 className="text-xl font-semibold mt-6 mb-3">4.1 License Grant</h3>
               <p className="text-muted-foreground">
-                Subject to these Terms and payment of applicable fees, FlowStock grants you a limited, non-exclusive, non-transferable, revocable license to access and use the Service for your internal business operations.
+                Subject to these Terms and payment of applicable fees, LogiVox grants you a limited, non-exclusive, non-transferable, revocable license to access and use the Service for your internal business operations.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">4.2 Restrictions</h3>
@@ -142,7 +142,7 @@ export default function TermsOfServicePage() {
               
               <h3 className="text-xl font-semibold mt-6 mb-3">5.1 Subscription Plans</h3>
               <p className="text-muted-foreground">
-                FlowStock offers various subscription plans with different features and pricing. Current plans and pricing are available at flowstock.com/pricing.
+                LogiVox offers various subscription plans with different features and pricing. Current plans and pricing are available at logivox.ai/pricing.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">5.2 Billing and Payment</h3>
@@ -176,7 +176,7 @@ export default function TermsOfServicePage() {
               
               <h3 className="text-xl font-semibold mt-6 mb-3">6.1 Your Content</h3>
               <p className="text-muted-foreground">
-                You retain all ownership rights to Content you submit, post, or display through the Service. By submitting Content, you grant FlowStock a worldwide, non-exclusive, royalty-free license to use, store, process, and display your Content solely to provide and improve the Service.
+                You retain all ownership rights to Content you submit, post, or display through the Service. By submitting Content, you grant LogiVox a worldwide, non-exclusive, royalty-free license to use, store, process, and display your Content solely to provide and improve the Service.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">6.2 Content Responsibility</h3>
@@ -190,7 +190,7 @@ export default function TermsOfServicePage() {
 
               <h3 className="text-xl font-semibold mt-6 mb-3">6.3 Data Backup</h3>
               <p className="text-muted-foreground">
-                While we perform regular backups, you are responsible for maintaining your own backup copies of your Content. FlowStock is not liable for any loss or corruption of Content.
+                While we perform regular backups, you are responsible for maintaining your own backup copies of your Content. LogiVox is not liable for any loss or corruption of Content.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">6.4 Data Security</h3>
@@ -219,19 +219,19 @@ export default function TermsOfServicePage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">8. Intellectual Property Rights</h2>
               
-              <h3 className="text-xl font-semibold mt-6 mb-3">8.1 FlowStock Property</h3>
+              <h3 className="text-xl font-semibold mt-6 mb-3">8.1 LogiVox Property</h3>
               <p className="text-muted-foreground">
-                The Service, including all software, designs, text, graphics, logos, and trademarks, is owned by FlowStock and protected by copyright, trademark, and other intellectual property laws. All rights not expressly granted are reserved.
+                The Service, including all software, designs, text, graphics, logos, and trademarks, is owned by LogiVox and protected by copyright, trademark, and other intellectual property laws. All rights not expressly granted are reserved.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">8.2 Trademarks</h3>
               <p className="text-muted-foreground">
-                "FlowStock" and associated logos are trademarks of FlowStock Inc. You may not use our trademarks without prior written permission.
+                "LogiVox" and associated logos are trademarks of LogiVox Inc. You may not use our trademarks without prior written permission.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">8.3 Feedback</h3>
               <p className="text-muted-foreground">
-                If you provide feedback, suggestions, or ideas about the Service, you grant FlowStock a perpetual, irrevocable, worldwide, royalty-free license to use, modify, and incorporate such feedback without compensation or attribution.
+                If you provide feedback, suggestions, or ideas about the Service, you grant LogiVox a perpetual, irrevocable, worldwide, royalty-free license to use, modify, and incorporate such feedback without compensation or attribution.
               </p>
             </div>
 
@@ -239,7 +239,7 @@ export default function TermsOfServicePage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">9. Third-Party Services and Integrations</h2>
               <p className="text-muted-foreground">
-                FlowStock may integrate with third-party services (ERP systems, payment processors, analytics tools). Your use of third-party services is subject to their own terms and privacy policies. FlowStock is not responsible for third-party services.
+                LogiVox may integrate with third-party services (ERP systems, payment processors, analytics tools). Your use of third-party services is subject to their own terms and privacy policies. LogiVox is not responsible for third-party services.
               </p>
             </div>
 
@@ -257,7 +257,7 @@ export default function TermsOfServicePage() {
               
               <h3 className="text-xl font-semibold mt-6 mb-3">11.1 Service Warranty</h3>
               <p className="text-muted-foreground">
-                FlowStock warrants that the Service will perform substantially as described in our documentation. If the Service does not conform to this warranty, your sole remedy is for FlowStock to use commercially reasonable efforts to correct the issue.
+                LogiVox warrants that the Service will perform substantially as described in our documentation. If the Service does not conform to this warranty, your sole remedy is for LogiVox to use commercially reasonable efforts to correct the issue.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">11.2 Disclaimer</h3>
@@ -265,7 +265,7 @@ export default function TermsOfServicePage() {
                 EXCEPT AS EXPRESSLY PROVIDED, THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.
               </p>
               <p className="text-muted-foreground mt-3">
-                FlowStock does not warrant that:
+                LogiVox does not warrant that:
               </p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>• The Service will be uninterrupted or error-free</li>
@@ -279,7 +279,7 @@ export default function TermsOfServicePage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">12. Limitation of Liability</h2>
               <p className="text-muted-foreground font-semibold uppercase mb-3">
-                TO THE MAXIMUM EXTENT PERMITTED BY LAW, FLOWSTOCK SHALL NOT BE LIABLE FOR:
+                TO THE MAXIMUM EXTENT PERMITTED BY LAW, LOGIVOX SHALL NOT BE LIABLE FOR:
               </p>
               <ul className="space-y-1 text-muted-foreground uppercase">
                 <li>• INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES</li>
@@ -287,7 +287,7 @@ export default function TermsOfServicePage() {
                 <li>• COSTS OF PROCUREMENT OF SUBSTITUTE SERVICES</li>
               </ul>
               <p className="text-muted-foreground mt-4">
-                IN NO EVENT SHALL FLOWSTOCK'S TOTAL LIABILITY EXCEED THE AMOUNT YOU PAID TO FLOWSTOCK IN THE 12 MONTHS PRECEDING THE CLAIM.
+                IN NO EVENT SHALL LOGIVOX'S TOTAL LIABILITY EXCEED THE AMOUNT YOU PAID TO LOGIVOX IN THE 12 MONTHS PRECEDING THE CLAIM.
               </p>
             </div>
 
@@ -295,7 +295,7 @@ export default function TermsOfServicePage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">13. Indemnification</h2>
               <p className="text-muted-foreground">
-                You agree to indemnify, defend, and hold harmless FlowStock, its affiliates, officers, directors, employees, and agents from any claims, liabilities, damages, losses, costs, or expenses (including reasonable attorneys' fees) arising from:
+                You agree to indemnify, defend, and hold harmless LogiVox, its affiliates, officers, directors, employees, and agents from any claims, liabilities, damages, losses, costs, or expenses (including reasonable attorneys' fees) arising from:
               </p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>• Your use or misuse of the Service</li>
@@ -370,7 +370,7 @@ export default function TermsOfServicePage() {
 
               <h3 className="text-xl font-semibold mt-6 mb-3">16.2 Entire Agreement</h3>
               <p className="text-muted-foreground">
-                These Terms, together with our Privacy Policy and any applicable order forms, constitute the entire agreement between you and FlowStock.
+                These Terms, together with our Privacy Policy and any applicable order forms, constitute the entire agreement between you and LogiVox.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">16.3 Severability</h3>
@@ -385,12 +385,12 @@ export default function TermsOfServicePage() {
 
               <h3 className="text-xl font-semibold mt-6 mb-3">16.5 Assignment</h3>
               <p className="text-muted-foreground">
-                You may not assign these Terms without our written consent. FlowStock may assign these Terms at any time.
+                You may not assign these Terms without our written consent. LogiVox may assign these Terms at any time.
               </p>
 
               <h3 className="text-xl font-semibold mt-6 mb-3">16.6 Force Majeure</h3>
               <p className="text-muted-foreground">
-                FlowStock is not liable for failures or delays due to circumstances beyond our reasonable control.
+                LogiVox is not liable for failures or delays due to circumstances beyond our reasonable control.
               </p>
             </div>
 
@@ -401,11 +401,11 @@ export default function TermsOfServicePage() {
                 For questions about these Terms, please contact:
               </p>
               <div className="bg-muted p-6 rounded-lg">
-                <p className="font-semibold mb-2">FlowStock Legal Team</p>
-                <p className="text-muted-foreground">Email: <a href="mailto:legal@flowstock.com" className="text-primary hover:underline">legal@flowstock.com</a></p>
+                <p className="font-semibold mb-2">LogiVox Legal Team</p>
+                <p className="text-muted-foreground">Email: <a href="mailto:legal@logivox.ai" className="text-primary hover:underline">legal@logivox.ai</a></p>
                 <p className="text-muted-foreground mt-4">
                   Address:<br />
-                  FlowStock Inc.<br />
+                  LogiVox Inc.<br />
                   123 Enterprise Way<br />
                   San Francisco, CA 94105<br />
                   United States

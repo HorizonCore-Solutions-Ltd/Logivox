@@ -1,5 +1,5 @@
 /**
- * Report Engine for FlowStock
+ * Report Engine for LogiVox
  * 
  * Executes report configurations and generates data results.
  * Handles filtering, sorting, grouping, and aggregations.

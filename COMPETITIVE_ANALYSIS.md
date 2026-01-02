@@ -1,4 +1,4 @@
-# 🎯 FlowStock WMS - Competitive Analysis & Gap Assessment
+# 🎯 LogiVox WMS - Competitive Analysis & Gap Assessment
 
 **Analysis Date**: October 17, 2025  
 **Competitor Focus**: Körber, Manhattan Associates, Blue Yonder, SAP EWM, Oracle WMS, Infor WMS  
@@ -8,7 +8,7 @@
 
 ## 📊 Executive Summary
 
-FlowStock has built a **solid foundation** (101,674 lines) covering 80%+ of core WMS functionality. However, to compete with enterprise leaders like **Körber**, **Manhattan Associates**, and **Blue Yonder**, we need to add advanced capabilities in:
+LogiVox has built a **solid foundation** (101,674 lines) covering 80%+ of core WMS functionality. However, to compete with enterprise leaders like **Körber**, **Manhattan Associates**, and **Blue Yonder**, we need to add advanced capabilities in:
 
 1. **AI/ML-Powered Intelligence** (Critical Gap)
 2. **Advanced Warehouse Automation** (Critical Gap)
@@ -689,7 +689,7 @@ FlowStock has built a **solid foundation** (101,674 lines) covering 80%+ of core
 | **TOTAL** | **Enterprise Competitive** | **86-110 weeks** | **~109,000** | | **1.5-2 years** |
 
 ### Combined Total After All Phases
-- **Current FlowStock**: ~101,674 lines
+- **Current LogiVox**: ~101,674 lines
 - **Additional Development**: ~109,000 lines
 - **Total Enterprise WMS**: **~210,000+ lines of code**
 - **Timeline**: **1.5-2 years additional development**
@@ -803,27 +803,27 @@ FlowStock has built a **solid foundation** (101,674 lines) covering 80%+ of core
 
 ## 🔑 Key Differentiators to Emphasize
 
-### What Makes FlowStock Different (Even Now):
+### What Makes LogiVox Different (Even Now):
 
 1. **Modern Tech Stack**
    - Competitors: Legacy systems (Java, .NET Framework, Oracle DB)
-   - FlowStock: React, Node.js, PostgreSQL, Cloud-native
+   - LogiVox: React, Node.js, PostgreSQL, Cloud-native
 
 2. **True Cloud SaaS**
    - Competitors: Many are "cloud-enabled" but not cloud-native
-   - FlowStock: Built for cloud from day one
+   - LogiVox: Built for cloud from day one
 
 3. **API-First Architecture**
    - Competitors: APIs are afterthought
-   - FlowStock: RESTful API, webhooks, modern integrations
+   - LogiVox: RESTful API, webhooks, modern integrations
 
 4. **Mobile-First**
    - Competitors: Mobile as add-on
-   - FlowStock: React Native, offline-first
+   - LogiVox: React Native, offline-first
 
 5. **Lower Total Cost of Ownership**
    - Competitors: $100K-$500K+ implementations
-   - FlowStock: SaaS pricing, faster deployments
+   - LogiVox: SaaS pricing, faster deployments
 
 ---
 

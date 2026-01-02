@@ -310,7 +310,7 @@ export default function SecurityPage() {
             Security You Can Trust
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join thousands of companies relying on FlowStock's enterprise security
+            Join thousands of companies relying on LogiVox's enterprise security
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

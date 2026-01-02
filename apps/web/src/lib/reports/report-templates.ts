@@ -1,5 +1,5 @@
 /**
- * Pre-built Report Templates for FlowStock
+ * Pre-built Report Templates for LogiVox
  * 
  * 50+ ready-to-use report templates covering common business scenarios.
  * Users can run these directly or use them as starting points for custom reports.

@@ -1,4 +1,4 @@
-# FlowStock - Current Project Structure
+# LogiVox - Current Project Structure
 
 > **Last Updated:** October 14, 2025  
 > **Status:** Enterprise Foundation Complete ✅  

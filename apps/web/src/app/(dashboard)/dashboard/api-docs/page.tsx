@@ -30,7 +30,7 @@ export default function ApiDocsPage() {
             API Documentation
           </h1>
           <p className="text-muted-foreground mt-2">
-            Learn how to integrate with FlowStock's REST API
+            Learn how to integrate with LogiVox's REST API
           </p>
         </div>
 

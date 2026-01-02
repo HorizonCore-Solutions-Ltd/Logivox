@@ -1,4 +1,4 @@
-# FlowStock Enterprise - Execution Roadmap
+# LogiVox Enterprise - Execution Roadmap
 
 ## 📊 Overall Progress: 60% Complete (Updated with Phase 22)
 
@@ -469,7 +469,7 @@ npm install next-mdx-remote rehype-highlight remark-gfm gray-matter
 
 3. **White-Label Mode** (2 hours)
    - Add `whiteLabel` boolean to Organization model
-   - Hide "Powered by FlowStock" branding
+   - Hide "Powered by LogiVox" branding
    - Custom email templates with org logo/colors
    - Custom login page per organization (optional)
    - Available only for Enterprise tier
@@ -511,7 +511,7 @@ npm install @vercel/blob sharp react-colorful
      - shadcn/ui docs
      - PostgreSQL docs
      - TypeScript docs
-     - FlowStock custom documentation
+     - LogiVox custom documentation
    - Parse and chunk documents (500-1000 tokens)
    - Generate embeddings
    - Store in vector database with metadata (source URL, title, section)
@@ -1196,4 +1196,4 @@ Each phase is considered complete when:
 
 **Document Version:** 1.0  
 **Last Updated:** October 15, 2025  
-**Maintained By:** FlowStock Development Team
+**Maintained By:** LogiVox Development Team

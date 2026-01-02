@@ -1,4 +1,4 @@
-# 📚 FlowStock Documentation Index
+# 📚 LogiVox Documentation Index
 
 ## 🎯 Current Status
 
@@ -267,7 +267,7 @@ If you need clarification on any phase or implementation detail:
 
 ## 🎉 What You're Building
 
-**FlowStock** is becoming a **world-class enterprise inventory management system** with:
+**LogiVox** is becoming a **world-class enterprise inventory management system** with:
 
 ✅ Multi-tenant architecture (done)  
 ✅ Advanced analytics (done)  
@@ -288,7 +288,7 @@ If you need clarification on any phase or implementation detail:
 
 **Last Updated:** October 15, 2025  
 **Next Update:** After Sprint 1 completion  
-**Maintained By:** FlowStock Development Team  
+**Maintained By:** LogiVox Development Team  
 
 **Version History:**
 - v2.0 (Oct 15, 2025): Added Phase 22 documentation

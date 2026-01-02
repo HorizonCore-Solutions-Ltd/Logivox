@@ -1,10 +1,10 @@
 # Mobile App Guide
 
-## FlowStock WMS - Mobile Application Documentation
+## LogiVox WMS - Mobile Application Documentation
 
 ### Overview
 
-The FlowStock mobile application provides warehouse workers with a powerful, offline-first tool for managing warehouse operations on the go. Built for iOS and Android, it features barcode scanning, task management, offline sync, and real-time updates.
+The LogiVox mobile application provides warehouse workers with a powerful, offline-first tool for managing warehouse operations on the go. Built for iOS and Android, it features barcode scanning, task management, offline sync, and real-time updates.
 
 ---
 
@@ -84,8 +84,8 @@ Real-time alerts for:
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/flowstock-mobile.git
-cd flowstock-mobile
+git clone https://github.com/your-org/logivox-mobile.git
+cd logivox-mobile
 
 # Install dependencies
 npm install
@@ -562,12 +562,12 @@ cd android
 ## Support
 
 For issues or questions:
-- Email: support@flowstock.com
+- Email: support@logivox.ai
 - Slack: #mobile-support
-- Documentation: https://docs.flowstock.com/mobile
+- Documentation: https://docs.logivox.ai/mobile
 
 ---
 
 ## License
 
-© 2025 FlowStock WMS. All rights reserved.
+© 2025 LogiVox WMS. All rights reserved.

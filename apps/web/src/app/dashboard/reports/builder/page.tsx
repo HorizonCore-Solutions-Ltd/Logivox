@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Report Builder Page for FlowStock
+ * Report Builder Page for LogiVox
  * 
  * Create custom reports with drag-and-drop interface.
  */

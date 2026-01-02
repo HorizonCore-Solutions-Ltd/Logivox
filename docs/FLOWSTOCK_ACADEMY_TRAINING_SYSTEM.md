@@ -1,4 +1,4 @@
-# 🎓 FlowStock Academy - Training & Security Awareness System
+# 🎓 LogiVox Academy - Training & Security Awareness System
 ## Enterprise Learning Platform (Like KnowBe4 but for Inventory Management)
 
 > **TRAINING LEVEL**: Enterprise-Grade User Education  
@@ -23,11 +23,11 @@
 
 ## 🎯 Academy Overview
 
-### FlowStock Academy Features
+### LogiVox Academy Features
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  🎓 FlowStock Academy - Complete Training Platform          │
+│  🎓 LogiVox Academy - Complete Training Platform          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  📚 APPLICATION TRAINING                                    │
@@ -86,7 +86,7 @@
 **Completion Required**: Before accessing main features
 
 #### Lessons:
-1. **Welcome to FlowStock** (5 min)
+1. **Welcome to LogiVox** (5 min)
    - Platform overview
    - Key features tour
    - Navigation basics
@@ -268,7 +268,7 @@
 
 **Lesson 9: Data Classification** (10 min)
 - Public vs. confidential vs. restricted
-- FlowStock data sensitivity levels
+- LogiVox data sensitivity levels
 - Handling customer data
 - GDPR and privacy laws
 
@@ -296,7 +296,7 @@
 - Password limitations
 - MFA effectiveness (99.9% attack prevention)
 - Types of MFA (SMS, TOTP, hardware keys)
-- FlowStock MFA setup
+- LogiVox MFA setup
 
 **Lesson 13: Setting Up MFA** (8 min)
 - Authenticator apps (Google, Microsoft, Authy)
@@ -304,7 +304,7 @@
 - Backup codes
 - Recovery procedures
 
-**Hands-On Lab**: Set up MFA on FlowStock account
+**Hands-On Lab**: Set up MFA on LogiVox account
 
 ---
 
@@ -328,9 +328,9 @@
 
 ---
 
-### Module 4: FlowStock Security Features (30 min)
+### Module 4: LogiVox Security Features (30 min)
 
-**Lesson 16: FlowStock Security Overview** (10 min)
+**Lesson 16: LogiVox Security Overview** (10 min)
 - Zero-trust architecture
 - Encryption (at rest and in transit)
 - Audit logging
@@ -375,7 +375,7 @@
 export const ONBOARDING_STEPS = [
   {
     id: 'welcome',
-    title: 'Welcome to FlowStock! 🎉',
+    title: 'Welcome to LogiVox! 🎉',
     component: 'WelcomeScreen',
     duration: 2,
     required: true,
@@ -520,7 +520,7 @@ export const ONBOARDING_STEPS = [
     duration: 2,
     required: false,
     content: {
-      heading: 'Take FlowStock Anywhere',
+      heading: 'Take LogiVox Anywhere',
       qrCode: true, // Generate QR code for mobile install
       platforms: ['iOS', 'Android', 'PWA'],
       features: [
@@ -568,7 +568,7 @@ export const ONBOARDING_STEPS = [
     duration: 1,
     required: true,
     content: {
-      heading: 'Welcome to FlowStock!',
+      heading: 'Welcome to LogiVox!',
       description: 'You\'re ready to start managing your inventory like a pro.',
       nextSteps: [
         'Explore the dashboard',
@@ -717,12 +717,12 @@ export const PHISHING_TEMPLATES: PhishingTemplate[] = [
     name: 'Fake Password Reset',
     difficulty: 'EASY',
     category: 'SECURITY_ALERT',
-    subject: 'FlowStock Security Alert: Password Reset Required',
-    from: 'security@flowstock-security.com',
-    fromName: 'FlowStock Security Team',
+    subject: 'LogiVox Security Alert: Password Reset Required',
+    from: 'security@logivox-security.com',
+    fromName: 'LogiVox Security Team',
     body: `
       <div style="font-family:Arial,sans-serif;">
-        <img src="{{fakeLogo}}" alt="FlowStock" width="200">
+        <img src="{{fakeLogo}}" alt="LogiVox" width="200">
         <h2>Security Alert</h2>
         <p>We detected suspicious login activity on your account from an unrecognized device:</p>
         <ul>
@@ -733,11 +733,11 @@ export const PHISHING_TEMPLATES: PhishingTemplate[] = [
         <p><strong>Action Required:</strong> Reset your password immediately to secure your account.</p>
         <a href="{{trackingLink}}" style="background:#007bff;color:white;padding:10px 20px;text-decoration:none;border-radius:5px;display:inline-block;">Reset Password Now</a>
         <p style="color:#999;font-size:12px;margin-top:20px;">If you did not attempt to login, please contact support immediately.</p>
-        <p style="color:#999;font-size:10px;">FlowStock Security Team<br>support@flowstock.com</p>
+        <p style="color:#999;font-size:10px;">LogiVox Security Team<br>support@logivox.ai</p>
       </div>
     `,
     redFlags: [
-      'Suspicious domain (flowstock-security.com, not flowstock.com)',
+      'Suspicious domain (logivox-security.com, not logivox.ai)',
       'Creates panic with "suspicious activity"',
       'Generic greeting (no personalization)',
       'External link to reset password',
@@ -930,7 +930,7 @@ export class PhishingSimulationService {
   }
 
   private static async forwardToSecurityTeam(params: any): Promise<void> {
-    // Forward suspected phishing to security@flowstock.com
+    // Forward suspected phishing to security@logivox.ai
     console.log('[PHISHING REPORT] User reported:', params);
   }
 }

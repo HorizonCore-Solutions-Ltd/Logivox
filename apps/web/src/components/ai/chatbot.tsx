@@ -275,7 +275,7 @@ export function AIChatbot() {
             <div className="flex gap-2">
               <Input
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
                 disabled={loading}
@@ -290,7 +290,7 @@ export function AIChatbot() {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              Powered by AI • FlowStock Assistant
+              Powered by AI • LogiVox Assistant
             </p>
           </div>
         </>

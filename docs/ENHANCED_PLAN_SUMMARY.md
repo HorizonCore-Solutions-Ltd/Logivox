@@ -1,4 +1,4 @@
-# 🚀 FlowStock - Enhanced Plan Summary
+# 🚀 LogiVox - Enhanced Plan Summary
 
 ## 📊 Project Status
 
@@ -103,7 +103,7 @@ This is the **most exciting addition** - a professional label printing system:
 **Phase 19: Organization Branding** (8-10 hours)
 - Logo upload per organization
 - Custom color schemes
-- White-label mode (hide FlowStock branding)
+- White-label mode (hide LogiVox branding)
 - Custom domain support (e.g., inventory.clientcompany.com)
 
 ---

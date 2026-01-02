@@ -1,5 +1,5 @@
 # GraphQL API Schema
-# FlowStock WMS - GraphQL Alternative to REST API
+# LogiVox WMS - GraphQL Alternative to REST API
 
 type Query {
   # Inventory

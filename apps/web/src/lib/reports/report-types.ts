@@ -1,5 +1,5 @@
 /**
- * Report Types & Categories for FlowStock
+ * Report Types & Categories for LogiVox
  * 
  * Defines all available report types, their metadata, and categorization.
  * Used by the report builder and report engine.

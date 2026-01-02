@@ -152,7 +152,7 @@ export const SecurityConfig = {
    */
   twoFactor: {
     enabled: process.env.ENABLE_2FA === 'true',
-    issuer: process.env.APP_NAME || 'FlowStock WMS',
+    issuer: process.env.APP_NAME || 'LogiVox WMS',
     window: 1, // Allow 1 time step before/after
     backupCodesCount: 10,
   },

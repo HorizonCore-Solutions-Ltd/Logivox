@@ -21,8 +21,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'FlowStock - Enterprise Stock Booking Platform',
-    template: '%s | FlowStock',
+    default: 'LogiVox - Enterprise Stock Booking Platform',
+    template: '%s | LogiVox',
   },
   description: 'Enterprise-grade stock booking and inventory management platform with zero-trust security, real-time synchronization, and seamless ERP integrations.',
   keywords: [
@@ -39,18 +39,18 @@ export const metadata: Metadata = {
   ],
   authors: [
     {
-      name: 'FlowStock Team',
-      url: 'https://flowstock.com',
+      name: 'LogiVox Team',
+      url: 'https://logivox.ai',
     },
   ],
-  creator: 'FlowStock',
-  publisher: 'FlowStock',
+  creator: 'LogiVox',
+  publisher: 'LogiVox',
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://flowstock.com'),
+  metadataBase: new URL('https://logivox.ai'),
   alternates: {
     canonical: '/',
   },
@@ -58,29 +58,29 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'FlowStock',
+    title: 'LogiVox',
   },
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://flowstock.com',
-    title: 'FlowStock - Enterprise Stock Booking Platform',
+    url: 'https://logivox.ai',
+    title: 'LogiVox - Enterprise Stock Booking Platform',
     description: 'Enterprise-grade stock booking and inventory management platform with zero-trust security and real-time synchronization.',
-    siteName: 'FlowStock',
+    siteName: 'LogiVox',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'FlowStock Platform',
+        alt: 'LogiVox Platform',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'FlowStock - Enterprise Stock Booking Platform',
+    title: 'LogiVox - Enterprise Stock Booking Platform',
     description: 'Enterprise-grade stock booking and inventory management platform with zero-trust security and real-time synchronization.',
-    creator: '@flowstock',
+    creator: '@logivox',
     images: ['/og-image.jpg'],
   },
   robots: {
@@ -115,7 +115,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="FlowStock" />
+        <meta name="apple-mobile-web-app-title" content="LogiVox" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <SkipLinks />

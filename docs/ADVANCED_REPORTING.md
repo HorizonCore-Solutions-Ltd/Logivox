@@ -1,6 +1,6 @@
 # Advanced Reporting Dashboard
 
-The FlowStock Advanced Reporting Dashboard provides enterprise-grade business intelligence with 50+ pre-built templates, a custom report builder, multi-format export, scheduled delivery, and interactive data visualization.
+The LogiVox Advanced Reporting Dashboard provides enterprise-grade business intelligence with 50+ pre-built templates, a custom report builder, multi-format export, scheduled delivery, and interactive data visualization.
 
 ## 📊 Features
 
@@ -98,7 +98,7 @@ Create custom reports with drag-and-drop interface:
 Export reports in four professional formats:
 
 #### **PDF Export**
-- Professional styling with FlowStock branding
+- Professional styling with LogiVox branding
 - Headers and footers
 - Summary statistics
 - Print-friendly layout
@@ -134,7 +134,7 @@ Automate report generation and email delivery:
 
 #### **Email Delivery**
 - Professional email templates
-- FlowStock branding
+- LogiVox branding
 - Report attached in chosen format
 - Summary statistics in email body
 - Multiple recipients supported
@@ -364,10 +364,10 @@ app/dashboard/reports/
 
 ### Contact
 
-- **Email**: support@flowstock.com
-- **Documentation**: https://docs.flowstock.com
-- **Community**: https://community.flowstock.com
+- **Email**: support@logivox.ai
+- **Documentation**: https://docs.logivox.ai
+- **Community**: https://community.logivox.ai
 
 ---
 
-**FlowStock Advanced Reporting Dashboard** - Enterprise-grade business intelligence for inventory management.
+**LogiVox Advanced Reporting Dashboard** - Enterprise-grade business intelligence for inventory management.

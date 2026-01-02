@@ -70,7 +70,7 @@ You have **3 options**. Choose the one that works best for you:
 
 2. **Create New Project**
    - Click "New Project"
-   - Name: `FlowStock`
+   - Name: `LogiVox`
    - Database Password: (choose a strong password - save it!)
    - Region: (choose closest to you)
    - Wait ~2 minutes for setup
@@ -131,7 +131,7 @@ You have **3 options**. Choose the one that works best for you:
 Once you've run the database setup, you can log in with these accounts:
 
 ### Super Admin Account
-- **Email:** `admin@flowstock.com`
+- **Email:** `admin@logivox.ai`
 - **Password:** `Admin@123`
 - **Role:** SUPER_ADMIN
 - **Organization:** Demo Company Ltd (OWNER)

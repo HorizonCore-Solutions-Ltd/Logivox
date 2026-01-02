@@ -1,14 +1,14 @@
-# FlowStock - System Architecture Document
+# LogiVox - System Architecture Document
 
 ## 1. Architecture Overview
 
-FlowStock is built on a next-generation, cloud-native architecture designed to be 5-10 years ahead of the competition. The system combines enterprise-grade scalability with intelligent automation, providing seamless multi-tenancy, AI-powered insights, and comprehensive ERP integration across all industries.
+LogiVox is built on a next-generation, cloud-native architecture designed to be 5-10 years ahead of the competition. The system combines enterprise-grade scalability with intelligent automation, providing seamless multi-tenancy, AI-powered insights, and comprehensive ERP integration across all industries.
 
 ### 1.1 High-Level Enterprise Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                            FlowStock Enterprise Platform                        │
+│                            LogiVox Enterprise Platform                        │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │  Client Applications Layer                                                      │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌──────────┐ │
@@ -201,7 +201,7 @@ FlowStock is built on a next-generation, cloud-native architecture designed to b
          │                       │                       │
          ▼                       ▼                       ▼
 ┌─────────────────────────────────────────────────────────────┐
-│              FlowStock Integration Service                   │
+│              LogiVox Integration Service                   │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
 │  │ Data Mapper │  │ Queue       │  │ Sync Engine │         │
 │  │             │  │ Manager     │  │             │         │
@@ -279,7 +279,7 @@ queue:integration_jobs         # Background job queue
 
 #### 2.3.3 File Storage (AWS S3)
 ```
-flowstock-storage/
+logivox-storage/
 ├── organizations/
 │   ├── {org_id}/
 │   │   ├── documents/        # Purchase orders, invoices
@@ -420,7 +420,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: flowstock-cluster
+  name: logivox-cluster
   region: us-west-2
   version: "1.28"
 
@@ -453,12 +453,12 @@ addons:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: flowstock-api
+  name: logivox-api
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: flowstock-api
+      app: logivox-api
   template:
     spec:
       containers:
@@ -586,7 +586,7 @@ const logger = winston.createLogger({
     winston.format.json()
   ),
   defaultMeta: { 
-    service: 'flowstock-api',
+    service: 'logivox-api',
     version: process.env.APP_VERSION 
   },
   transports: [
@@ -615,7 +615,7 @@ logger.info('User authenticated', {
       "type": "metric",
       "properties": {
         "metrics": [
-          ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "flowstock-alb"],
+          ["AWS/ApplicationELB", "RequestCount", "LoadBalancer", "logivox-alb"],
           [".", "TargetResponseTime", ".", "."],
           [".", "HTTPCode_Target_2XX_Count", ".", "."],
           [".", "HTTPCode_Target_4XX_Count", ".", "."],
@@ -640,12 +640,12 @@ logger.info('User authenticated', {
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: flowstock-api-hpa
+  name: logivox-api-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: flowstock-api
+    name: logivox-api
   minReplicas: 3
   maxReplicas: 20
   metrics:
@@ -697,12 +697,12 @@ pg_dump -h $DB_HOST -U $DB_USER -d $DB_NAME | \
 
 # Upload to S3 with 30-day retention
 aws s3 cp /backups/flowstock_$(date +%Y%m%d).sql.gz \
-  s3://flowstock-backups/database/ \
+  s3://logivox-backups/database/ \
   --storage-class STANDARD_IA
 
 # Point-in-time recovery setup
 # WAL archiving to S3
-archive_command = 'aws s3 cp %p s3://flowstock-backups/wal/%f'
+archive_command = 'aws s3 cp %p s3://logivox-backups/wal/%f'
 ```
 
 #### 7.1.2 Application State Backup
@@ -716,7 +716,7 @@ spec:
   schedule: "0 2 * * *"  # Daily at 2 AM
   template:
     includedNamespaces:
-    - flowstock-prod
+    - logivox-prod
     storageLocation: aws-s3
     ttl: 720h0m0s  # 30 days retention
 ```
@@ -739,4 +739,4 @@ spec:
 **Document Version**: 1.0  
 **Last Updated**: October 14, 2025  
 **Next Review**: November 14, 2025  
-**Owner**: FlowStock Architecture Team
+**Owner**: LogiVox Architecture Team

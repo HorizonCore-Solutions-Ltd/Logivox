@@ -1,5 +1,5 @@
 /**
- * Forecasting Engine for FlowStock
+ * Forecasting Engine for LogiVox
  * 
  * Integrates AI forecasting models with database to provide
  * real-time inventory predictions and recommendations.

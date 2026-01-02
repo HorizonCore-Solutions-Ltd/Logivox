@@ -1,8 +1,8 @@
-# FlowStock Security Guidelines & Best Practices
+# LogiVox Security Guidelines & Best Practices
 
 ## Security Overview
 
-FlowStock implements comprehensive security measures to protect sensitive warehouse and business data. As a multi-tenant SaaS platform, security is critical at every layer from authentication to data isolation.
+LogiVox implements comprehensive security measures to protect sensitive warehouse and business data. As a multi-tenant SaaS platform, security is critical at every layer from authentication to data isolation.
 
 ## Security Principles
 
@@ -162,8 +162,8 @@ import qrcode from 'qrcode';
 
 export async function generateMFASecret(user: User) {
   const secret = speakeasy.generateSecret({
-    name: `FlowStock (${user.email})`,
-    issuer: 'FlowStock'
+    name: `LogiVox (${user.email})`,
+    issuer: 'LogiVox'
   });
 
   // Store secret in database (encrypted)
@@ -901,4 +901,4 @@ export class IncidentResponse {
 }
 ```
 
-This comprehensive security framework ensures FlowStock maintains the highest standards of data protection, user privacy, and system integrity across all aspects of the platform.
+This comprehensive security framework ensures LogiVox maintains the highest standards of data protection, user privacy, and system integrity across all aspects of the platform.

@@ -1,4 +1,4 @@
-# FlowStock Content Marketing Strategy
+# LogiVox Content Marketing Strategy
 ## SEO, Blog, Video, Podcast, Social Media Master Plan
 
 **Last Updated:** October 15, 2025
@@ -134,17 +134,17 @@ Our content strategy has 3 goals:
 ---
 
 ### Pillar 4: Product Education & Features
-**Target Audience:** Existing customers, trial users, prospects evaluating FlowStock
+**Target Audience:** Existing customers, trial users, prospects evaluating LogiVox
 
 **Topics:**
-- FlowStock features overview
-- How to set up FlowStock (onboarding)
+- LogiVox features overview
+- How to set up LogiVox (onboarding)
 - Label printing tutorial
 - Barcode scanning guide
 - Mobile app usage
 - Integration setup (QuickBooks, Shopify, etc.)
 - Advanced tips & tricks
-- FlowStock vs. competitors
+- LogiVox vs. competitors
 
 **Content Types:**
 - Video tutorials (2-5 minutes each)
@@ -154,8 +154,8 @@ Our content strategy has 3 goals:
 - Comparison pages (vs. Fishbowl, vs. NetSuite)
 
 **SEO Keywords:**
-- "FlowStock tutorial" (brand search)
-- "FlowStock vs Fishbowl" (comparison)
+- "LogiVox tutorial" (brand search)
+- "LogiVox vs Fishbowl" (comparison)
 - "best inventory software" (22K)
 - "inventory software reviews" (15K)
 
@@ -190,7 +190,7 @@ Our content strategy has 3 goals:
 | Day | Content Type | Example Topic | Owner |
 |-----|--------------|---------------|-------|
 | **Monday** | Blog post (SEO) | "How to Calculate Reorder Points" | Content Writer 1 |
-| **Tuesday** | Video tutorial | "FlowStock Label Printing Guide" | Video Producer |
+| **Tuesday** | Video tutorial | "LogiVox Label Printing Guide" | Video Producer |
 | **Wednesday** | Blog post (industry) | "FDA Compliance for Medical Inventory" | Content Writer 2 |
 | **Thursday** | Social media (LinkedIn) | Customer success story snippet | Social Media Manager |
 | **Friday** | Blog post (features) | "New Feature: AI Forecasting" | Product Marketing |
@@ -221,19 +221,19 @@ Our content strategy has 3 goals:
 
 ### YouTube Channel Plan
 
-**Channel Name:** FlowStock  
+**Channel Name:** LogiVox  
 **Tagline:** "Secure Your Operations, Train Your Team, Grow Your Business"
 
 **Content Pillars:**
-1. **FlowStock Tutorials** (product how-tos)
+1. **LogiVox Tutorials** (product how-tos)
 2. **Inventory Management Tips** (educational)
 3. **Customer Success Stories** (testimonials)
 4. **Industry Insights** (thought leadership)
 
 ### Video Types
 
-**1. FlowStock Tutorials (50+ videos)**
-- Getting Started with FlowStock (5 minutes)
+**1. LogiVox Tutorials (50+ videos)**
+- Getting Started with LogiVox (5 minutes)
 - How to Create Your First Inventory Item (3 minutes)
 - Label Printing Made Easy (4 minutes)
 - Mobile Scanning Tutorial (3 minutes)
@@ -258,7 +258,7 @@ Our content strategy has 3 goals:
 
 **4. Customer Success Stories (20+ videos)**
 - How [Healthcare Company] Reduced Inventory Costs 30% (5 minutes)
-- [Manufacturer] Achieves FDA Compliance with FlowStock (4 minutes)
+- [Manufacturer] Achieves FDA Compliance with LogiVox (4 minutes)
 - [Retailer] Scales to 50 Locations (6 minutes)
 
 ### Video Production Workflow
@@ -315,12 +315,12 @@ Our content strategy has 3 goals:
 - Guest background and expertise
 - Deep dive into topic (inventory trends, security challenges, industry insights)
 - Actionable advice for listeners
-- FlowStock mention (if relevant to conversation)
+- LogiVox mention (if relevant to conversation)
 
 **Outro (3 minutes):**
 - Key takeaways recap
 - Where to find guest (LinkedIn, website)
-- Call to action (try FlowStock free, download resource)
+- Call to action (try LogiVox free, download resource)
 
 ### Guest Targets
 
@@ -336,7 +336,7 @@ Our content strategy has 3 goals:
 - Spotify
 - Google Podcasts
 - YouTube (video version)
-- FlowStock website (embedded player)
+- LogiVox website (embedded player)
 
 **Promotion:**
 - Email to newsletter (100K subscribers by Year 2)
@@ -388,7 +388,7 @@ Our content strategy has 3 goals:
 - **Goal:** Be helpful, not promotional
 - **Subreddits:** r/smallbusiness, r/entrepreneur, r/warehouse, r/logistics
 - **Posting Frequency:** 3-5 comments/week (answer questions, provide value)
-- **Strategy:** Don't spam. Genuinely help people. Mention FlowStock only when directly relevant.
+- **Strategy:** Don't spam. Genuinely help people. Mention LogiVox only when directly relevant.
 
 ### Social Media Calendar Template
 
@@ -444,10 +444,10 @@ Our content strategy has 3 goals:
 - etc.
 
 **Comparison Keywords (20+ keywords):**
-- "FlowStock vs Fishbowl"
-- "FlowStock vs Cin7"
-- "FlowStock vs NetSuite"
-- "FlowStock vs Zoho Inventory"
+- "LogiVox vs Fishbowl"
+- "LogiVox vs Cin7"
+- "LogiVox vs NetSuite"
+- "LogiVox vs Zoho Inventory"
 - "Fishbowl alternatives"
 - "best alternative to NetSuite for small business"
 - etc.
@@ -464,7 +464,7 @@ Our content strategy has 3 goals:
 - ✅ Internal links (3-5 links to other blog posts/pages)
 - ✅ External links (1-2 links to authoritative sources)
 - ✅ Content length (1,500+ words for blog posts, 3,000+ for pillar pages)
-- ✅ Clear call-to-action (CTA) at end (try FlowStock free, download resource)
+- ✅ Clear call-to-action (CTA) at end (try LogiVox free, download resource)
 
 ### Content Cluster Strategy
 
@@ -472,17 +472,17 @@ Our content strategy has 3 goals:
 
 **Pillar Page (10,000 words):**
 - "The Complete Guide to Inventory Management (2026)"
-- URL: flowstock.com/inventory-management-guide
+- URL: logivox.ai/inventory-management-guide
 - Covers everything about inventory management
 - Links to 50+ supporting articles
 
 **Supporting Articles (50+ posts, 1,500-2,500 words each):**
-- "What is Inventory Management?" (flowstock.com/blog/what-is-inventory-management)
-- "Inventory Management Methods: FIFO, LIFO, WAC" (flowstock.com/blog/inventory-methods)
-- "How to Calculate Reorder Points" (flowstock.com/blog/reorder-point-formula)
-- "ABC Inventory Analysis: Complete Guide" (flowstock.com/blog/abc-analysis)
-- "Cycle Counting vs. Physical Inventory" (flowstock.com/blog/cycle-counting)
-- "Inventory Turnover Ratio Explained" (flowstock.com/blog/inventory-turnover)
+- "What is Inventory Management?" (logivox.ai/blog/what-is-inventory-management)
+- "Inventory Management Methods: FIFO, LIFO, WAC" (logivox.ai/blog/inventory-methods)
+- "How to Calculate Reorder Points" (logivox.ai/blog/reorder-point-formula)
+- "ABC Inventory Analysis: Complete Guide" (logivox.ai/blog/abc-analysis)
+- "Cycle Counting vs. Physical Inventory" (logivox.ai/blog/cycle-counting)
+- "Inventory Turnover Ratio Explained" (logivox.ai/blog/inventory-turnover)
 - [45 more supporting articles]
 
 **Internal Linking:**
@@ -490,7 +490,7 @@ Our content strategy has 3 goals:
 - Pillar page links to all supporting articles
 - Supporting articles link to each other (where relevant)
 
-**Result:** Google recognizes FlowStock as authority on "inventory management" → ranks pillar page #1
+**Result:** Google recognizes LogiVox as authority on "inventory management" → ranks pillar page #1
 
 ### Link Building Strategy
 
@@ -500,7 +500,7 @@ Our content strategy has 3 goals:
 
 **1. Guest Posting (20 posts/month):**
 - Write articles for industry blogs
-- Include link back to FlowStock (author bio or contextual)
+- Include link back to LogiVox (author bio or contextual)
 - Target: Supply Chain Digital, Logistics Management, Modern Materials Handling
 
 **2. PR & Media (10 placements/quarter):**
@@ -510,7 +510,7 @@ Our content strategy has 3 goals:
 
 **3. Partnership Co-Marketing:**
 - Co-authored content with partners (Oracle, SAP, QuickBooks)
-- Each partner links to FlowStock from their website
+- Each partner links to LogiVox from their website
 - Joint webinars → link exchange
 
 **4. Industry Directories:**
@@ -523,7 +523,7 @@ Our content strategy has 3 goals:
 - Industry blogs reference report → backlinks
 
 **6. Customer Success Stories:**
-- Ask customers to link to FlowStock from their website
+- Ask customers to link to LogiVox from their website
 - Offer: "We'll feature you on our blog if you link to us"
 
 ---
@@ -556,16 +556,16 @@ Our content strategy has 3 goals:
 - **Sent:** Every Wednesday, 10am EST
 - **Subscribers:** All email list (100K by Year 2)
 - **Content:**
-  - Top story (industry news or FlowStock update)
+  - Top story (industry news or LogiVox update)
   - 3 blog posts from past week (links)
   - 1 customer story (case study teaser)
   - 1 tip/trick (quick win)
-  - CTA (try FlowStock free, download resource)
+  - CTA (try LogiVox free, download resource)
 
 **2. Free Trial Nurture (9 emails over 14 days):**
 - **Day 0:** Welcome! Here's how to get started (onboarding)
 - **Day 1:** Quick win: Add your first inventory item (tutorial)
-- **Day 2:** Watch: FlowStock overview video (3 minutes)
+- **Day 2:** Watch: LogiVox overview video (3 minutes)
 - **Day 3:** Feature spotlight: Label printing (tutorial)
 - **Day 4:** Customer story: How [Company] saved $50K/year
 - **Day 7:** Mid-trial check-in: Need help? (support offer)
@@ -574,7 +574,7 @@ Our content strategy has 3 goals:
 - **Day 14:** Last day! Don't lose your data (final push)
 
 **3. Customer Onboarding (5 emails over 30 days):**
-- **Day 0:** Welcome to FlowStock! (getting started guide)
+- **Day 0:** Welcome to LogiVox! (getting started guide)
 - **Day 3:** Pro tip: Set up integrations (QuickBooks, Shopify)
 - **Day 7:** Watch: Advanced features tutorial
 - **Day 14:** Join our community (Slack/Discord invite)

@@ -1,5 +1,5 @@
 /**
- * Report Export System for FlowStock
+ * Report Export System for LogiVox
  * 
  * Handles exporting reports to PDF, Excel (XLSX), and CSV formats.
  * Supports custom formatting, charts, and branding.
@@ -308,7 +308,7 @@ export function exportToPDF(
   </table>
 
   <div class="footer">
-    FlowStock Reporting System &copy; ${new Date().getFullYear()}
+    LogiVox Reporting System &copy; ${new Date().getFullYear()}
     <br>Page 1 of 1
   </div>
 </body>

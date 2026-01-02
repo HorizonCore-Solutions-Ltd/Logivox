@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Report Builder Component for FlowStock
+ * Report Builder Component for LogiVox
  * 
  * Drag-and-drop interface for building custom reports.
  * Supports field selection, filtering, sorting, grouping, and chart configuration.

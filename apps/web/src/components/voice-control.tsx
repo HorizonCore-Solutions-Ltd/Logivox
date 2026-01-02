@@ -1,5 +1,5 @@
 /**
- * Voice Control UI Component for FlowStock
+ * Voice Control UI Component for LogiVox
  * 
  * Provides a beautiful floating voice control interface with:
  * - Microphone permission handling
@@ -187,7 +187,7 @@ export function VoiceControl() {
           </div>
           
           <CardDescription>
-            Use voice commands to navigate FlowStock hands-free
+            Use voice commands to navigate LogiVox hands-free
           </CardDescription>
         </CardHeader>
 
@@ -400,7 +400,7 @@ function VoiceCommandHelp() {
           Voice Commands Help
         </DialogTitle>
         <DialogDescription>
-          Control FlowStock with natural voice commands. No typing required!
+          Control LogiVox with natural voice commands. No typing required!
         </DialogDescription>
       </DialogHeader>
 

@@ -2,7 +2,7 @@
 
 ## 🎯 Overview
 
-The FlowStock Label Template & Printing System is a **game-changing warehouse operations feature** that enables users to design, manage, and print professional labels with dynamic field mapping, batch processing, and multi-format export capabilities.
+The LogiVox Label Template & Printing System is a **game-changing warehouse operations feature** that enables users to design, manage, and print professional labels with dynamic field mapping, batch processing, and multi-format export capabilities.
 
 **Priority:** HIGH  
 **Estimated Time:** 20-25 hours  
@@ -870,7 +870,7 @@ export async function POST(request: NextRequest) {
         title: `Label - ${printJob.id}`,
         contentType,
         content: outputBuffer.toString("base64"),
-        source: "FlowStock",
+        source: "LogiVox",
       });
 
       await prisma.printJob.update({

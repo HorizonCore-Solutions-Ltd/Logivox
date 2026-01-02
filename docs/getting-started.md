@@ -1,4 +1,4 @@
-# Getting Started with FlowStock
+# Getting Started with LogiVox
 
 ## Prerequisites
 

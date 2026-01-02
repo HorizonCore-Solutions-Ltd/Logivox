@@ -1,4 +1,4 @@
-# FlowStock WMS - User Manual
+# LogiVox WMS - User Manual
 
 **Version 1.0**  
 **Last Updated: October 16, 2025**
@@ -22,11 +22,11 @@
 
 ## Introduction
 
-Welcome to **FlowStock WMS** - your comprehensive warehouse management solution. This manual will guide you through all features and functionality to help you efficiently manage your inventory, orders, and warehouse operations.
+Welcome to **LogiVox WMS** - your comprehensive warehouse management solution. This manual will guide you through all features and functionality to help you efficiently manage your inventory, orders, and warehouse operations.
 
-### What is FlowStock WMS?
+### What is LogiVox WMS?
 
-FlowStock WMS is a cloud-based warehouse management system designed to streamline inventory tracking, order fulfillment, and warehouse operations. It provides real-time visibility into your stock levels, automated reordering, and powerful analytics to optimize your supply chain.
+LogiVox WMS is a cloud-based warehouse management system designed to streamline inventory tracking, order fulfillment, and warehouse operations. It provides real-time visibility into your stock levels, automated reordering, and powerful analytics to optimize your supply chain.
 
 ### Key Features
 
@@ -57,7 +57,7 @@ FlowStock WMS is a cloud-based warehouse management system designed to streamlin
 
 ### Logging In
 
-1. Navigate to `https://your-company.flowstock.com`
+1. Navigate to `https://your-company.logivox.ai`
 2. Enter your **email address** and **password**
 3. Complete two-factor authentication if enabled
 4. Click **"Sign In"**
@@ -495,13 +495,13 @@ Create custom analytics dashboards:
 
 **iOS:**
 1. Open App Store
-2. Search "FlowStock WMS"
+2. Search "LogiVox WMS"
 3. Tap "Get" then "Install"
 4. Open app when installed
 
 **Android:**
 1. Open Google Play Store
-2. Search "FlowStock WMS"
+2. Search "LogiVox WMS"
 3. Tap "Install"
 4. Open app when installed
 
@@ -617,14 +617,14 @@ Create custom analytics dashboards:
 
 ### General Questions
 
-**Q: Can I use FlowStock WMS offline?**  
+**Q: Can I use LogiVox WMS offline?**  
 A: The mobile app has limited offline functionality. You can scan products and perform counts, which will sync when connection is restored. The web app requires internet connection.
 
 **Q: How often is data backed up?**  
 A: Automated backups run daily. Manual backups can be created anytime by administrators. Backups are retained for 30 days.
 
 **Q: Can I integrate with my accounting software?**  
-A: Yes! FlowStock integrates with QuickBooks, Xero, and other accounting platforms. Contact support to set up integrations.
+A: Yes! LogiVox integrates with QuickBooks, Xero, and other accounting platforms. Contact support to set up integrations.
 
 **Q: How many users can access the system?**  
 A: Unlimited users based on your subscription plan. Each user needs their own credentials.
@@ -644,7 +644,7 @@ A: Yes! Enable serial number tracking per product. Each item will have a unique 
 A: The system generates a low stock alert. If auto-reorder is enabled, a draft purchase order is created automatically.
 
 **Q: Can I manage multiple warehouses?**  
-A: Yes! FlowStock supports unlimited warehouses with stock visibility across all locations.
+A: Yes! LogiVox supports unlimited warehouses with stock visibility across all locations.
 
 ### Order Questions
 
@@ -666,11 +666,11 @@ A: Cash, check, credit card, and custom payment terms. Payment processing integr
 
 ### Support Resources
 
-**📚 Knowledge Base**: https://help.flowstock.com  
-**📧 Email Support**: support@flowstock.com  
-**📞 Phone Support**: 1-800-FLOWSTOCK  
+**📚 Knowledge Base**: https://help.logivox.ai  
+**📧 Email Support**: support@logivox.ai  
+**📞 Phone Support**: 1-800-LOGIVOX  
 **💬 Live Chat**: Available in-app (bottom right corner)  
-**🎓 Video Tutorials**: https://learn.flowstock.com
+**🎓 Video Tutorials**: https://learn.logivox.ai
 
 ### Support Hours
 
@@ -680,6 +680,6 @@ A: Cash, check, credit card, and custom payment terms. Payment processing integr
 
 ---
 
-**Thank you for choosing FlowStock WMS!** 🚀
+**Thank you for choosing LogiVox WMS!** 🚀
 
-*This manual is regularly updated. Check for the latest version at https://docs.flowstock.com*
+*This manual is regularly updated. Check for the latest version at https://docs.logivox.ai*

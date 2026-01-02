@@ -265,6 +265,6 @@ Navigate to **Dashboard → AI Forecasting** to view the forecasting interface.
 ## Support
 
 For questions or issues with the AI Forecasting system:
-- Contact: support@flowstock.com
-- Documentation: https://docs.flowstock.com/ai-forecasting
-- Training Videos: https://academy.flowstock.com/forecasting
+- Contact: support@logivox.ai
+- Documentation: https://docs.logivox.ai/ai-forecasting
+- Training Videos: https://academy.logivox.ai/forecasting

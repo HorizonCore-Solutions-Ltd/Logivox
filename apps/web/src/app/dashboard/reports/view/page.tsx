@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Report View Page for FlowStock
+ * Report View Page for LogiVox
  * 
  * Display and interact with report results.
  */

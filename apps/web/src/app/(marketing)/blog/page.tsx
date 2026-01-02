@@ -15,7 +15,7 @@ export default function BlogPage() {
     slug: "zero-trust-security-enterprise-inventory",
     title: "Implementing Zero-Trust Security in Enterprise Inventory Management",
     excerpt: "Learn how zero-trust architecture transforms security in modern inventory systems, protecting your data at every level.",
-    author: "FlowStock Security Team",
+    author: "LogiVox Security Team",
     date: "2025-10-10",
     readTime: "8 min read",
     category: "Security",
@@ -36,7 +36,7 @@ export default function BlogPage() {
       slug: "real-time-inventory-tracking",
       title: "Real-Time Inventory Tracking with WebSockets",
       excerpt: "How we built real-time synchronization across thousands of concurrent users without compromising performance.",
-      author: "FlowStock Engineering",
+      author: "LogiVox Engineering",
       date: "2025-10-05",
       readTime: "10 min read",
       category: "Technology"

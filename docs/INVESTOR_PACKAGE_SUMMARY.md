@@ -1,4 +1,4 @@
-# 🎉 FlowStock - Investor Package Complete!
+# 🎉 LogiVox - Investor Package Complete!
 ## Summary of What You Have
 
 > **Status:** ✅ READY TO PITCH INVESTORS  
@@ -51,7 +51,7 @@
 
 ### 🎓 Training Academy Design (1 file, 37 KB)
 
-5. **FLOWSTOCK_ACADEMY_TRAINING_SYSTEM.md** (85 KB - Part 1)
+5. **LOGIVOX_ACADEMY_TRAINING_SYSTEM.md** (85 KB - Part 1)
    - Complete training platform architecture
    - 125+ interactive lessons (23 hours of content)
    - App training: Getting started, inventory, customers, labels, integrations
@@ -142,7 +142,7 @@
 
 ---
 
-## 🚀 What Makes FlowStock Special
+## 🚀 What Makes LogiVox Special
 
 ### Unique Value Proposition
 
@@ -177,7 +177,7 @@
 
 ## 📊 Competitive Comparison
 
-| Feature | FlowStock | Fishbowl | Sortly | inFlow | Zoho |
+| Feature | LogiVox | Fishbowl | Sortly | inFlow | Zoho |
 |---------|-----------|----------|--------|--------|------|
 | **Price/month** | $99-299 | $329+ | $99+ | $179+ | $79+ |
 | **Security Training** | ✅ Built-in | ❌ None | ❌ None | ❌ None | ❌ None |
@@ -189,7 +189,7 @@
 | **Mobile Offline** | ✅ Yes | ⚠️ Limited | ✅ Yes | ⚠️ Limited | ⚠️ Limited |
 | **White-Label** | ✅ Yes | ❌ No | ❌ No | ❌ No | ✅ Yes |
 
-**Result:** FlowStock wins on **Security**, **Training**, **Modern Tech**, **Compliance**, and **Value**
+**Result:** LogiVox wins on **Security**, **Training**, **Modern Tech**, **Compliance**, and **Value**
 
 ---
 
@@ -292,7 +292,7 @@
 
 ### Next Actions (To Deploy)
 
-- [ ] ⏳ **Deploy demo** (demo.flowstock.com)
+- [ ] ⏳ **Deploy demo** (demo.logivox.ai)
 - [ ] ⏳ **Get beta customers** (3-5 testimonials)
 - [ ] ⏳ **Incorporate** (Delaware C-Corp)
 - [ ] ⏳ **Practice pitch** (20+ times)
@@ -307,7 +307,7 @@
 Send **INVESTOR_ONE_PAGER.md** as PDF attachment with personalized email:
 
 ```
-Subject: [Mutual Connection] - FlowStock ($12.8B market)
+Subject: [Mutual Connection] - LogiVox ($12.8B market)
 
 Hi [Investor],
 
@@ -369,7 +369,7 @@ Use **INVESTOR_PITCH_CHECKLIST.md** for:
 
 ### What You Need to Do
 
-1. **Deploy demo** (demo.flowstock.com) - 2 hours
+1. **Deploy demo** (demo.logivox.ai) - 2 hours
 2. **Get 3-5 beta customers** - 2 weeks
 3. **Incorporate company** (Delaware C-Corp) - 1 week
 4. **Practice pitch 20 times** - 1 week
@@ -412,8 +412,8 @@ You have everything you need:
 
 **Questions?** Contact: [Your Email] | [Your Phone] | [LinkedIn]
 
-**Demo:** demo.flowstock.com (deploy soon!)
+**Demo:** demo.logivox.ai (deploy soon!)
 
 ---
 
-*FlowStock Inc. © 2025 - YOU'VE GOT THIS! 🎉*
+*LogiVox Inc. © 2025 - YOU'VE GOT THIS! 🎉*

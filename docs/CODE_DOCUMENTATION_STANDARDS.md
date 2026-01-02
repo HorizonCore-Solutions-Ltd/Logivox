@@ -1,4 +1,4 @@
-# 📝 FlowStock Code Documentation Standards
+# 📝 LogiVox Code Documentation Standards
 ## Enterprise-Grade Code Quality, Comments, Headers & Licensing
 
 > **DOCUMENTATION LEVEL**: Enterprise Standard (Microsoft/Google Level)  
@@ -27,21 +27,21 @@
 /**
  * @fileoverview [Brief description of what this file does]
  * @module [Module name - e.g., lib/auth/session]
- * @author FlowStock Engineering Team
+ * @author LogiVox Engineering Team
  * @created [YYYY-MM-DD]
  * @lastModified [YYYY-MM-DD]
  * @version 1.0.0
  * 
  * @license Proprietary
- * Copyright (c) 2024-2025 FlowStock Technologies, Inc.
+ * Copyright (c) 2024-2025 LogiVox Technologies, Inc.
  * All rights reserved.
  * 
  * CONFIDENTIAL AND PROPRIETARY INFORMATION
- * This code is the proprietary property of FlowStock Technologies, Inc.
+ * This code is the proprietary property of LogiVox Technologies, Inc.
  * 
  * Unauthorized copying, distribution, modification, or use of this software,
  * via any medium, is strictly prohibited without express written permission
- * from FlowStock Technologies, Inc.
+ * from LogiVox Technologies, Inc.
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -51,7 +51,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  * 
- * For licensing inquiries, contact: legal@flowstock.com
+ * For licensing inquiries, contact: legal@logivox.ai
  * 
  * @dependencies
  * - next-auth: Authentication framework
@@ -78,13 +78,13 @@
 /**
  * @fileoverview Session Management Service with enterprise-grade security
  * @module lib/auth/session
- * @author FlowStock Engineering Team
+ * @author LogiVox Engineering Team
  * @created 2025-01-15
  * @lastModified 2025-01-15
  * @version 1.0.0
  * 
  * @license Proprietary
- * Copyright (c) 2024-2025 FlowStock Technologies, Inc.
+ * Copyright (c) 2024-2025 LogiVox Technologies, Inc.
  * All rights reserved.
  * 
  * @description
@@ -688,13 +688,13 @@ function calculateReorderPoint(
 ```typescript
 /**
  * @license Proprietary
- * Copyright (c) 2024-2025 FlowStock Technologies, Inc.
+ * Copyright (c) 2024-2025 LogiVox Technologies, Inc.
  * All rights reserved.
  * 
  * CONFIDENTIAL AND PROPRIETARY INFORMATION
  * 
  * This software and associated documentation files (the "Software") contain
- * proprietary information owned by FlowStock Technologies, Inc. ("FlowStock").
+ * proprietary information owned by LogiVox Technologies, Inc. ("LogiVox").
  * 
  * The Software is licensed, not sold. This license grants you the following rights:
  * 
@@ -720,15 +720,15 @@ function calculateReorderPoint(
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
  * 
  * LIMITATION OF LIABILITY:
- * IN NO EVENT SHALL FLOWSTOCK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * IN NO EVENT SHALL LOGIVOX BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  * 
- * For licensing inquiries: legal@flowstock.com
- * For support: support@flowstock.com
+ * For licensing inquiries: legal@logivox.ai
+ * For support: support@logivox.ai
  * 
- * FlowStock Technologies, Inc.
+ * LogiVox Technologies, Inc.
  * [Address]
  * [Phone]
  * [Email]
@@ -741,7 +741,7 @@ function calculateReorderPoint(
 /**
  * @license MIT
  * 
- * Copyright (c) 2024-2025 FlowStock Technologies, Inc.
+ * Copyright (c) 2024-2025 LogiVox Technologies, Inc.
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -770,13 +770,13 @@ function calculateReorderPoint(
  * @license Dual Licensed: Commercial and MIT
  * 
  * COMMERCIAL LICENSE:
- * For commercial use, contact sales@flowstock.com
+ * For commercial use, contact sales@logivox.ai
  * 
  * OPEN SOURCE LICENSE (MIT):
  * For open source projects, this module is available under the MIT License.
  * See LICENSE-MIT.txt for details.
  * 
- * Copyright (c) 2024-2025 FlowStock Technologies, Inc.
+ * Copyright (c) 2024-2025 LogiVox Technologies, Inc.
  */
 ```
 
@@ -789,7 +789,7 @@ function calculateReorderPoint(
 ```yaml
 # sonar-project.properties
 sonar.projectKey=flowstock
-sonar.projectName=FlowStock
+sonar.projectName=LogiVox
 sonar.projectVersion=1.0.0
 
 # Source code
@@ -886,4 +886,4 @@ sonar.security_hotspots.threshold=0
 
 ---
 
-**With these documentation standards, FlowStock maintains enterprise-grade code quality that rivals Microsoft, Google, and Amazon.**
+**With these documentation standards, LogiVox maintains enterprise-grade code quality that rivals Microsoft, Google, and Amazon.**

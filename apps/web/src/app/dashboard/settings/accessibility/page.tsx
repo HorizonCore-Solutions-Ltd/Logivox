@@ -3,7 +3,7 @@ import { AccessibilitySettings } from './accessibility-settings'
 
 export const metadata: Metadata = {
   title: 'Accessibility Settings',
-  description: 'Customize your visual accessibility preferences for FlowStock',
+  description: 'Customize your visual accessibility preferences for LogiVox',
 }
 
 export default function AccessibilitySettingsPage() {

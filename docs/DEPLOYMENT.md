@@ -1,7 +1,7 @@
 # Deployment Guide
 
 ## Overview
-This guide provides comprehensive instructions for deploying FlowStock WMS to production environments using Docker, Kubernetes, and CI/CD pipelines.
+This guide provides comprehensive instructions for deploying LogiVox WMS to production environments using Docker, Kubernetes, and CI/CD pipelines.
 
 ---
 
@@ -115,7 +115,7 @@ kubectl config set-context --current --namespace=production
 #### 2. Create Secrets
 ```bash
 # Generate secrets
-kubectl create secret generic flowstock-secrets \
+kubectl create secret generic logivox-secrets \
   --from-literal=database-url='postgresql://user:pass@postgres:5432/flowstock' \
   --from-literal=redis-url='redis://:pass@redis:6379' \
   --from-literal=nextauth-secret='your-secret-here' \
@@ -145,7 +145,7 @@ kubectl get pvc -n production
 kubectl apply -f k8s/deployment.yaml
 
 # Check rollout status
-kubectl rollout status deployment/flowstock-app -n production
+kubectl rollout status deployment/logivox-app -n production
 
 # View pods
 kubectl get pods -n production
@@ -168,21 +168,21 @@ kubectl get ingress -n production
 #### Update Application
 ```bash
 # Update image
-kubectl set image deployment/flowstock-app \
-  flowstock-app=ghcr.io/pndlovu/flowstock:v1.0.1 \
+kubectl set image deployment/logivox-app \
+  logivox-app=ghcr.io/pndlovu/flowstock:v1.0.1 \
   -n production
 
 # Rollout status
-kubectl rollout status deployment/flowstock-app -n production
+kubectl rollout status deployment/logivox-app -n production
 
 # Rollback if needed
-kubectl rollout undo deployment/flowstock-app -n production
+kubectl rollout undo deployment/logivox-app -n production
 ```
 
 #### Scale Application
 ```bash
 # Manual scaling
-kubectl scale deployment/flowstock-app --replicas=5 -n production
+kubectl scale deployment/logivox-app --replicas=5 -n production
 
 # Auto-scaling is configured via HPA (see deployment.yaml)
 kubectl get hpa -n production
@@ -265,13 +265,13 @@ gh workflow run ci-cd.yml --ref rollback
 
 ```bash
 # Run migrations in Kubernetes
-kubectl exec -it deployment/flowstock-app -n production -- npx prisma migrate deploy
+kubectl exec -it deployment/logivox-app -n production -- npx prisma migrate deploy
 
 # Generate Prisma client
-kubectl exec -it deployment/flowstock-app -n production -- npx prisma generate
+kubectl exec -it deployment/logivox-app -n production -- npx prisma generate
 
 # Reset database (DANGER!)
-kubectl exec -it deployment/flowstock-app -n production -- npx prisma migrate reset --force
+kubectl exec -it deployment/logivox-app -n production -- npx prisma migrate reset --force
 ```
 
 ### Database Access
@@ -305,10 +305,10 @@ kubectl logs --since=1h -l app=flowstock -n production
 
 ```bash
 # Check health endpoint
-curl https://flowstock.com/api/health
+curl https://logivox.ai/api/health
 
 # Check readiness
-curl https://flowstock.com/api/health/ready
+curl https://logivox.ai/api/health/ready
 
 # Via kubectl
 kubectl exec -it <pod-name> -n production -- curl http://localhost:3000/api/health
@@ -338,14 +338,14 @@ Backups run automatically via cron job (see docker-compose.prod.yml).
 ```env
 BACKUP_SCHEDULE=0 2 * * *  # Daily at 2 AM
 RETENTION_DAYS=30
-S3_BUCKET=flowstock-backups
+S3_BUCKET=logivox-backups
 ```
 
 ### Manual Backup
 
 ```bash
 # Run backup script
-docker exec flowstock-postgres /backup.sh
+docker exec logivox-postgres /backup.sh
 
 # Or in Kubernetes
 kubectl exec -it deployment/postgres -n production -- /backup.sh
@@ -383,7 +383,7 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@flowstock.com
+    email: admin@logivox.ai
     privateKeySecretRef:
       name: letsencrypt-prod
     solvers:
@@ -400,10 +400,10 @@ EOF
 kubectl get certificate -n production
 
 # Describe certificate
-kubectl describe certificate flowstock-tls -n production
+kubectl describe certificate logivox-tls -n production
 
 # Force renewal
-kubectl delete certificate flowstock-tls -n production
+kubectl delete certificate logivox-tls -n production
 kubectl apply -f k8s/ingress.yaml
 ```
 
@@ -465,7 +465,7 @@ kubectl create secret docker-registry ghcr-secret \
 kubectl get pods -n ingress-nginx
 
 # Check ingress status
-kubectl describe ingress flowstock-ingress -n production
+kubectl describe ingress logivox-ingress -n production
 
 # Check certificate
 kubectl get certificate -n production

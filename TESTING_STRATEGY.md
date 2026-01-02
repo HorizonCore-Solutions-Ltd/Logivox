@@ -1,8 +1,8 @@
-# FlowStock Testing Strategy & Guidelines
+# LogiVox Testing Strategy & Guidelines
 
 ## Testing Philosophy
 
-FlowStock follows a comprehensive testing approach to ensure reliability, security, and performance across all components. Our testing strategy emphasizes:
+LogiVox follows a comprehensive testing approach to ensure reliability, security, and performance across all components. Our testing strategy emphasizes:
 
 1. **Multi-tenant Isolation**: Every test must verify organization-level data separation
 2. **Mobile-first Testing**: UI tests prioritize mobile device compatibility
@@ -473,7 +473,7 @@ test.describe('Warehouse Stock Management Workflow', () => {
   test.beforeEach(async ({ page }) => {
     // Login as warehouse manager
     await page.goto('/login');
-    await page.fill('[data-testid="email"]', 'manager@flowstock.io');
+    await page.fill('[data-testid="email"]', 'manager@logivox.ai');
     await page.fill('[data-testid="password"]', 'password123');
     await page.click('[data-testid="login-button"]');
     
@@ -897,4 +897,4 @@ jobs:
 3. **Update Tests**: Keep tests current with feature changes
 4. **Performance Monitoring**: Track test execution times and optimize slow tests
 
-This comprehensive testing strategy ensures FlowStock maintains high quality, security, and performance standards across all components and user scenarios.
+This comprehensive testing strategy ensures LogiVox maintains high quality, security, and performance standards across all components and user scenarios.

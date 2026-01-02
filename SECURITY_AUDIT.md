@@ -1,4 +1,4 @@
-# 🔒 FlowStock WMS Security Audit Checklist
+# 🔒 LogiVox WMS Security Audit Checklist
 
 Complete security audit procedures for production deployment.
 

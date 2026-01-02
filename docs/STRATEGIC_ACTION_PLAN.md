@@ -1,4 +1,4 @@
-# 🚀 FlowStock - Strategic Action Plan
+# 🚀 LogiVox - Strategic Action Plan
 ## From Idea to $1B+ Business: Your Complete Roadmap
 
 **Created:** October 15, 2025  
@@ -57,8 +57,8 @@
 - ✅ Investor package ready
 - ✅ Marketing strategy complete
 - ⏳ Implement Priority 1 features (AI forecasting, reorder alerts, reporting)
-- ⏳ Build FlowStock Academy
-- ⏳ Deploy demo (demo.flowstock.com)
+- ⏳ Build LogiVox Academy
+- ⏳ Deploy demo (demo.logivox.ai)
 
 **Month 4-6: Launch & Validation**
 - Get 3-5 beta customers
@@ -189,7 +189,7 @@
 ### Month 1: Foundation
 
 **Week 1-2: Setup**
-- [ ] Deploy demo (demo.flowstock.com)
+- [ ] Deploy demo (demo.logivox.ai)
 - [ ] Set up analytics (Google Analytics, Mixpanel, HubSpot)
 - [ ] Create social media accounts (LinkedIn, Twitter, YouTube)
 - [ ] Design brand assets (logo, colors, templates)
@@ -273,7 +273,7 @@
 ### Week 1-2: Preparation
 
 **Demo Deployment:**
-- [ ] Deploy to demo.flowstock.com
+- [ ] Deploy to demo.logivox.ai
 - [ ] Seed with realistic demo data (3 orgs)
 - [ ] Test all features (10-minute walkthrough)
 - [ ] Create demo script (what to show investors)
@@ -486,7 +486,7 @@
 
 **Tuesday-Wednesday:**
 - [ ] Start building chosen Priority 1 feature
-- [ ] Deploy demo environment (demo.flowstock.com)
+- [ ] Deploy demo environment (demo.logivox.ai)
 - [ ] Write first 5 blog posts
 - [ ] Record first 3 tutorial videos
 
@@ -518,7 +518,7 @@
 ### Month 2-3
 
 - [ ] Build remaining Priority 1 features
-- [ ] Build FlowStock Academy (125+ lessons)
+- [ ] Build LogiVox Academy (125+ lessons)
 - [ ] Get first beta customer
 - [ ] Launch Product Hunt
 - [ ] Start paid ads (Google, LinkedIn)
@@ -623,7 +623,7 @@ You have everything you need:
    - [ ] Reorder Alerts (4-6h, prevents stockouts)
    - [ ] Advanced Reporting (8-10h, enterprise requirement)
 
-2. When do you want to build FlowStock Academy?
+2. When do you want to build LogiVox Academy?
    - [ ] NOW (before fundraising, 30-40 hours)
    - [ ] LATER (after fundraising, when we have team)
 

@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge'
 
 export const metadata: Metadata = {
   title: 'Accessibility Statement',
-  description: 'FlowStock Accessibility Statement - Our commitment to WCAG 2.1 AA compliance and inclusive design.',
+  description: 'LogiVox Accessibility Statement - Our commitment to WCAG 2.1 AA compliance and inclusive design.',
 }
 
 export default function AccessibilityStatementPage() {
@@ -36,7 +36,7 @@ export default function AccessibilityStatementPage() {
             <h1 className="text-4xl font-bold">Accessibility Statement</h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl">
-            FlowStock is committed to ensuring digital accessibility for all users, including those with disabilities.
+            LogiVox is committed to ensuring digital accessibility for all users, including those with disabilities.
           </p>
           <div className="flex flex-wrap gap-2 mt-6">
             <Badge variant="outline" className="text-sm">WCAG 2.1 AA Compliant</Badge>
@@ -58,7 +58,7 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Our Commitment</h2>
               <p className="text-muted-foreground">
-                FlowStock is dedicated to providing an inclusive and accessible experience for all users, regardless of ability or disability. We believe that everyone should be able to manage inventory, create bookings, and access reports with ease.
+                LogiVox is dedicated to providing an inclusive and accessible experience for all users, regardless of ability or disability. We believe that everyone should be able to manage inventory, create bookings, and access reports with ease.
               </p>
               <p className="text-muted-foreground">
                 We continuously work to enhance the accessibility of our platform and ensure compliance with the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA, Section 508 of the Rehabilitation Act, and the Americans with Disabilities Act (ADA).
@@ -73,7 +73,7 @@ export default function AccessibilityStatementPage() {
                   <Accessibility className="h-6 w-6 text-primary" />
                   <div>
                     <p className="font-semibold text-lg">WCAG 2.1 Level AA Conformance</p>
-                    <p className="text-sm text-muted-foreground">FlowStock conforms to WCAG 2.1 Level AA standards</p>
+                    <p className="text-sm text-muted-foreground">LogiVox conforms to WCAG 2.1 Level AA standards</p>
                   </div>
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -81,7 +81,7 @@ export default function AccessibilityStatementPage() {
                 </p>
               </div>
               <p className="text-muted-foreground">
-                This means FlowStock meets all Level A and Level AA success criteria of the Web Content Accessibility Guidelines 2.1, ensuring our platform is perceivable, operable, understandable, and robust for all users.
+                This means LogiVox meets all Level A and Level AA success criteria of the Web Content Accessibility Guidelines 2.1, ensuring our platform is perceivable, operable, understandable, and robust for all users.
               </p>
             </div>
 
@@ -216,7 +216,7 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Keyboard Shortcuts</h2>
               <p className="text-muted-foreground mb-4">
-                FlowStock supports numerous keyboard shortcuts for efficient navigation. Press <kbd className="px-2 py-1 text-xs font-semibold bg-muted border border-border rounded">Ctrl+Shift+K</kbd> or <kbd className="px-2 py-1 text-xs font-semibold bg-muted border border-border rounded">?</kbd> anywhere in the app to view all available shortcuts.
+                LogiVox supports numerous keyboard shortcuts for efficient navigation. Press <kbd className="px-2 py-1 text-xs font-semibold bg-muted border border-border rounded">Ctrl+Shift+K</kbd> or <kbd className="px-2 py-1 text-xs font-semibold bg-muted border border-border rounded">?</kbd> anywhere in the app to view all available shortcuts.
               </p>
               <div className="bg-muted p-6 rounded-lg">
                 <h3 className="font-semibold mb-3">Common Shortcuts:</h3>
@@ -245,7 +245,7 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Supported Assistive Technologies</h2>
               <p className="text-muted-foreground mb-4">
-                FlowStock has been tested with and supports the following assistive technologies:
+                LogiVox has been tested with and supports the following assistive technologies:
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -274,7 +274,7 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Browser Compatibility</h2>
               <p className="text-muted-foreground mb-4">
-                FlowStock is designed to work with the following browsers and their accessibility features:
+                LogiVox is designed to work with the following browsers and their accessibility features:
               </p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>• Google Chrome (latest 2 versions)</li>
@@ -288,7 +288,7 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Technical Specifications</h2>
               <p className="text-muted-foreground mb-4">
-                FlowStock's accessibility relies on the following technologies:
+                LogiVox's accessibility relies on the following technologies:
               </p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>• <strong>HTML:</strong> Semantic HTML5 elements</li>
@@ -319,7 +319,7 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Testing and Evaluation</h2>
               <p className="text-muted-foreground mb-4">
-                FlowStock's accessibility has been evaluated using:
+                LogiVox's accessibility has been evaluated using:
               </p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>• Automated testing tools (axe, WAVE, Lighthouse)</li>
@@ -339,7 +339,7 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Continuous Improvement</h2>
               <p className="text-muted-foreground">
-                We are committed to continually improving the accessibility of FlowStock. Our ongoing efforts include:
+                We are committed to continually improving the accessibility of LogiVox. Our ongoing efforts include:
               </p>
               <ul className="space-y-1 text-muted-foreground">
                 <li>• Regular accessibility audits and testing</li>
@@ -354,11 +354,11 @@ export default function AccessibilityStatementPage() {
             <div id="contact" className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Feedback and Contact Information</h2>
               <p className="text-muted-foreground mb-4">
-                We welcome your feedback on the accessibility of FlowStock. If you encounter accessibility barriers or have suggestions for improvement, please contact us:
+                We welcome your feedback on the accessibility of LogiVox. If you encounter accessibility barriers or have suggestions for improvement, please contact us:
               </p>
               <div className="bg-muted p-6 rounded-lg">
                 <p className="font-semibold mb-2">Accessibility Team</p>
-                <p className="text-muted-foreground">Email: <a href="mailto:accessibility@flowstock.com" className="text-primary hover:underline">accessibility@flowstock.com</a></p>
+                <p className="text-muted-foreground">Email: <a href="mailto:accessibility@logivox.ai" className="text-primary hover:underline">accessibility@logivox.ai</a></p>
                 <p className="text-muted-foreground">Phone: +1 (555) 123-4567</p>
                 <p className="text-muted-foreground mt-4">
                   We aim to respond to accessibility feedback within 2 business days and to implement necessary changes within 30 days.
@@ -370,11 +370,11 @@ export default function AccessibilityStatementPage() {
             <div className="mb-12">
               <h2 className="text-2xl font-bold mb-4">Formal Complaints</h2>
               <p className="text-muted-foreground">
-                If you wish to file a formal complaint about FlowStock's accessibility:
+                If you wish to file a formal complaint about LogiVox's accessibility:
               </p>
               <ol className="space-y-2 text-muted-foreground list-decimal list-inside">
                 <li>Contact our Accessibility Team (details above)</li>
-                <li>If not satisfied, contact our Accessibility Officer at <a href="mailto:accessibility-officer@flowstock.com" className="text-primary hover:underline">accessibility-officer@flowstock.com</a></li>
+                <li>If not satisfied, contact our Accessibility Officer at <a href="mailto:accessibility-officer@logivox.ai" className="text-primary hover:underline">accessibility-officer@logivox.ai</a></li>
                 <li>For further escalation, you may file a complaint with:
                   <ul className="ml-8 mt-2 space-y-1 list-disc list-inside">
                     <li>U.S. Department of Justice (for ADA compliance)</li>

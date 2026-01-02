@@ -1,7 +1,7 @@
 # Flowstock API Documentation
 
 **Version:** 1.0.0  
-**Base URL:** `https://api.flowstock.com/v1`  
+**Base URL:** `https://api.logivox.ai/v1`  
 **Authentication:** Bearer Token (JWT)
 
 ## Table of Contents
@@ -634,7 +634,7 @@ Check report status and download.
 {
   "id": "report_001",
   "status": "COMPLETED",
-  "downloadUrl": "https://api.flowstock.com/reports/download/report_001.pdf",
+  "downloadUrl": "https://api.logivox.ai/reports/download/report_001.pdf",
   "expiresAt": "2025-10-23T15:00:00Z"
 }
 ```
@@ -762,12 +762,12 @@ Register webhook endpoint.
 
 ## SDK & Client Libraries
 
-- **JavaScript/TypeScript:** `npm install @flowstock/sdk`
-- **Python:** `pip install flowstock-sdk`
+- **JavaScript/TypeScript:** `npm install @logivox/sdk`
+- **Python:** `pip install logivox-sdk`
 - **C#/.NET:** `dotnet add package Flowstock.SDK`
 - **PHP:** `composer require flowstock/sdk`
 
 ---
 
-**Support:** api-support@flowstock.com  
-**Status Page:** https://status.flowstock.com
+**Support:** api-support@logivox.ai  
+**Status Page:** https://status.logivox.ai

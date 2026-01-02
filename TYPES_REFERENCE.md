@@ -1,10 +1,10 @@
-# FlowStock TypeScript Types Reference
+# LogiVox TypeScript Types Reference
 
 > **✅ COMPLETED**: Comprehensive TypeScript types documentation and shared package implementation
 
 ## Overview
 
-This document provides comprehensive TypeScript type definitions for FlowStock. These types are centralized in the `packages/shared` package to ensure consistency across all applications. The package includes types, constants, validators, and utilities.
+This document provides comprehensive TypeScript type definitions for LogiVox. These types are centralized in the `packages/shared` package to ensure consistency across all applications. The package includes types, constants, validators, and utilities.
 
 ## Package Structure
 
@@ -25,16 +25,16 @@ packages/shared/
 ### Import Shared Types
 ```typescript
 // Import specific types
-import { User, Organization, InventoryItem } from '@flowstock/shared';
+import { User, Organization, InventoryItem } from '@logivox/shared';
 
 // Import constants  
-import { API_VERSION, VALIDATION_LIMITS } from '@flowstock/shared';
+import { API_VERSION, VALIDATION_LIMITS } from '@logivox/shared';
 
 // Import validators
-import { userValidators, validateInventoryItem } from '@flowstock/shared';
+import { userValidators, validateInventoryItem } from '@logivox/shared';
 
 // Import utilities
-import { stringUtils, dateUtils, numberUtils } from '@flowstock/shared';
+import { stringUtils, dateUtils, numberUtils } from '@logivox/shared';
 ```
 
 ## Core Entity Types
@@ -887,7 +887,7 @@ export enum NotificationType {
 
 ```typescript
 // Error handling types
-export interface FlowStockError {
+export interface LogiVoxError {
   code: string;
   message: string;
   details?: Record<string, any>;
@@ -1205,4 +1205,4 @@ export async function POST(request: Request): Promise<ApiResponse<InventoryItem>
 }
 ```
 
-This comprehensive type system ensures type safety across the entire FlowStock platform and serves as living documentation for all data structures and API contracts.
+This comprehensive type system ensures type safety across the entire LogiVox platform and serves as living documentation for all data structures and API contracts.

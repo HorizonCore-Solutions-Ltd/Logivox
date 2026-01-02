@@ -375,7 +375,7 @@ export function CookiePreferences() {
       <div>
         <h3 className="text-lg font-semibold mb-2">Cookie Preferences</h3>
         <p className="text-muted-foreground">
-          Manage how we use cookies to improve your experience on FlowStock.
+          Manage how we use cookies to improve your experience on LogiVox.
         </p>
       </div>
 

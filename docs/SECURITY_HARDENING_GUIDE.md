@@ -1,4 +1,4 @@
-# 🔐 FlowStock Security Hardening Guide
+# 🔐 LogiVox Security Hardening Guide
 ## Enterprise-Grade Security Framework - Military-Grade Protection
 
 > **SECURITY LEVEL**: BANK-GRADE + HEALTHCARE-GRADE + GOVERNMENT-GRADE  
@@ -137,7 +137,7 @@ export class MFAService {
     // Generate QR code for authenticator apps
     const otpauth = authenticator.keyuri(
       user!.email,
-      'FlowStock',
+      'LogiVox',
       secret
     );
     const qrCode = await toDataURL(otpauth);
@@ -285,7 +285,7 @@ import type {
  * - Phishing-Resistant Authentication
  */
 export class WebAuthnService {
-  private static RP_NAME = 'FlowStock';
+  private static RP_NAME = 'LogiVox';
   private static RP_ID = process.env.NEXTAUTH_URL!.replace(/https?:\/\//, '');
   private static ORIGIN = process.env.NEXTAUTH_URL!;
 

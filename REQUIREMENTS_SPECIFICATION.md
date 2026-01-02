@@ -1,8 +1,8 @@
-# FlowStock - Requirements Specification Document
+# LogiVox - Requirements Specification Document
 
 ## Executive Summary
 
-FlowStock is a next-generation cloud-based stock booking and procurement integration platform designed to be 5-10 years ahead of the competition. The platform replaces fragile Excel/Access workflows with intelligent, scalable, and modular SaaS solutions that enable seamless stock booking, real-time supplier communication, deep ERP integration, and AI-powered automation across all industries.
+LogiVox is a next-generation cloud-based stock booking and procurement integration platform designed to be 5-10 years ahead of the competition. The platform replaces fragile Excel/Access workflows with intelligent, scalable, and modular SaaS solutions that enable seamless stock booking, real-time supplier communication, deep ERP integration, and AI-powered automation across all industries.
 
 ## 1. Business Requirements
 
@@ -929,7 +929,7 @@ Acceptance Criteria:
 ```
 As a new customer,
 I want to easily import my existing Excel/Access data,
-So that I can quickly start using FlowStock without data loss.
+So that I can quickly start using LogiVox without data loss.
 
 Acceptance Criteria:
 - Upload Excel, Access, CSV, or XML files
@@ -1061,4 +1061,4 @@ Acceptance Criteria:
 **Document Version**: 1.0  
 **Last Updated**: October 14, 2025  
 **Next Review**: November 14, 2025  
-**Owner**: FlowStock Product Team
+**Owner**: LogiVox Product Team

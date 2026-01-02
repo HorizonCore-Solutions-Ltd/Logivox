@@ -90,7 +90,7 @@ export function PWAInstallPrompt() {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-2">
               <Smartphone className="h-5 w-5 text-primary" />
-              <CardTitle className="text-lg">Install FlowStock</CardTitle>
+              <CardTitle className="text-lg">Install LogiVox</CardTitle>
             </div>
             <Button
               variant="ghost"
@@ -102,7 +102,7 @@ export function PWAInstallPrompt() {
             </Button>
           </div>
           <CardDescription>
-            Add FlowStock to your home screen for quick access and offline use
+            Add LogiVox to your home screen for quick access and offline use
           </CardDescription>
         </CardHeader>
         <CardContent className="pb-3">

@@ -2,7 +2,7 @@
 
 ## Overview
 
-FlowStock uses PostgreSQL with Prisma ORM for database management. The schema is designed to support multi-tenant SaaS architecture with robust inventory management, purchase order tracking, and ERP integrations.
+LogiVox uses PostgreSQL with Prisma ORM for database management. The schema is designed to support multi-tenant SaaS architecture with robust inventory management, purchase order tracking, and ERP integrations.
 
 ## Entity Relationship Diagram
 

@@ -1,4 +1,4 @@
-# 🚀 FlowStock - Investor Pitch Checklist
+# 🚀 LogiVox - Investor Pitch Checklist
 ## Everything You Need to Raise $2-5M
 
 > **Status:** ✅ COMPLETE - Ready to pitch investors TODAY  
@@ -39,7 +39,7 @@
 
 ### 🎓 Competitive Differentiator
 
-- [x] **FLOWSTOCK_ACADEMY_TRAINING_SYSTEM.md** (85 KB)
+- [x] **LOGIVOX_ACADEMY_TRAINING_SYSTEM.md** (85 KB)
   - 125+ training lessons
   - Security awareness (phishing, scams)
   - Phishing simulation system
@@ -82,7 +82,7 @@
 
 ### The One-Liner
 
-> **"FlowStock is the world's first enterprise inventory management platform with built-in security training - think Fishbowl meets KnowBe4, saving businesses $1.1 trillion lost to poor inventory management and security breaches."**
+> **"LogiVox is the world's first enterprise inventory management platform with built-in security training - think Fishbowl meets KnowBe4, saving businesses $1.1 trillion lost to poor inventory management and security breaches."**
 
 ### The Problem (TAM: $12.8B)
 
@@ -94,7 +94,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 
 ### The Solution (Unique!)
 
-**FlowStock = Inventory Management + Security Academy in ONE platform**
+**LogiVox = Inventory Management + Security Academy in ONE platform**
 
 **No competitor offers:**
 1. Integrated security training (saves $15-50/user/year)
@@ -187,7 +187,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 **Meeting Agenda (30 min):**
 1. **Intro** (2 min): Who you are, background
 2. **Problem** (5 min): $1.1T lost, security crisis
-3. **Solution** (10 min): Live demo of FlowStock + Academy
+3. **Solution** (10 min): Live demo of LogiVox + Academy
 4. **Market** (3 min): $12.8B TAM, growing 14% CAGR
 5. **Traction** (3 min): Product 95% ready, launching Q4
 6. **Business Model** (3 min): $99-999/month, 8.5:1 LTV:CAC
@@ -242,7 +242,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 
 ## 🎬 Elevator Pitch (30 seconds)
 
-> "Hi, I'm [Your Name], founder of **FlowStock**. We're building the world's first inventory management platform with built-in security training. 
+> "Hi, I'm [Your Name], founder of **LogiVox**. We're building the world's first inventory management platform with built-in security training. 
 >
 > Think **Fishbowl meets KnowBe4**. Businesses lose $1.1 trillion annually from poor inventory management and security breaches. We solve both problems in one platform.
 >
@@ -261,11 +261,11 @@ Businesses lose **$1.1 TRILLION annually** from:
 ### Initial Outreach Email
 
 ```
-Subject: [Mutual Connection] recommended I reach out - FlowStock
+Subject: [Mutual Connection] recommended I reach out - LogiVox
 
 Hi [Investor Name],
 
-[Mutual Connection] suggested I reach out. I'm [Your Name], founder of FlowStock - we're building the world's first inventory management platform with built-in security training.
+[Mutual Connection] suggested I reach out. I'm [Your Name], founder of LogiVox - we're building the world's first inventory management platform with built-in security training.
 
 We're solving a $12.8B market problem: businesses lose $1.1 trillion annually from poor inventory management and security breaches (60% caused by untrained users clicking phishing emails).
 
@@ -291,7 +291,7 @@ Best,
 ### Follow-Up Email (After Demo)
 
 ```
-Subject: FlowStock demo follow-up + materials
+Subject: LogiVox demo follow-up + materials
 
 Hi [Investor Name],
 
@@ -299,7 +299,7 @@ Thanks for the great conversation today! As promised, here are the materials:
 
 • Full investor deck (70 pages): [Link to PDF]
 • Financial model (5-year projections): [Link to Excel]
-• Product demo: demo.flowstock.com
+• Product demo: demo.logivox.ai
 • Code review: [GitHub link - during DD]
 
 Key takeaways from our call:
@@ -332,7 +332,7 @@ Before pitching investors, make sure you have:
 - [x] **One-pager** (INVESTOR_ONE_PAGER.md) ✅
 - [x] **Financial model** (FINANCIAL_MODEL.md) ✅
 - [x] **Pitch practice** (rehearse 20+ times) ⏳
-- [ ] **Demo environment** (deploy to demo.flowstock.com) ⏳
+- [ ] **Demo environment** (deploy to demo.logivox.ai) ⏳
 - [ ] **Beta customers** (get 3-5 testimonials) ⏳
 - [ ] **Incorporate** (Delaware C-Corp) ⏳
 - [ ] **Legal docs** (stock purchase agreements) ⏳
@@ -388,7 +388,7 @@ Before pitching investors, make sure you have:
 - ✅ Product ready (95/100)
 
 **Next Actions:**
-1. Deploy demo to demo.flowstock.com
+1. Deploy demo to demo.logivox.ai
 2. Get 3-5 beta customers (testimonials)
 3. Incorporate (Delaware C-Corp)
 4. Reach out to 20+ VCs (use email template)
@@ -406,4 +406,4 @@ Before pitching investors, make sure you have:
 
 ---
 
-*FlowStock Inc. © 2025 - You've got this!*
+*LogiVox Inc. © 2025 - You've got this!*

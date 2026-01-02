@@ -1,8 +1,8 @@
-# FlowStock PWA Setup Guide
+# LogiVox PWA Setup Guide
 
 ## Overview
 
-FlowStock is now configured as a Progressive Web App (PWA) with full offline support, push notifications, and native app-like experience.
+LogiVox is now configured as a Progressive Web App (PWA) with full offline support, push notifications, and native app-like experience.
 
 ## Features Implemented
 
@@ -46,19 +46,19 @@ FlowStock is now configured as a Progressive Web App (PWA) with full offline sup
 ### For Users
 
 #### Desktop (Chrome, Edge, etc.)
-1. Visit FlowStock in your browser
+1. Visit LogiVox in your browser
 2. Look for the install icon in the address bar
-3. Click "Install FlowStock"
+3. Click "Install LogiVox"
 4. The app will be added to your applications
 
 #### Mobile (Android)
-1. Open FlowStock in Chrome
+1. Open LogiVox in Chrome
 2. Tap the menu (three dots)
 3. Select "Add to Home screen"
 4. Confirm the installation
 
 #### Mobile (iOS/Safari)
-1. Open FlowStock in Safari
+1. Open LogiVox in Safari
 2. Tap the Share button
 3. Select "Add to Home Screen"
 4. Confirm the installation

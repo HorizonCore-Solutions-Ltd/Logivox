@@ -1,5 +1,5 @@
 /**
- * Input Sanitization & Validation System for FlowStock
+ * Input Sanitization & Validation System for LogiVox
  * 
  * Protects against XSS, SQL injection, and other injection attacks.
  * All user inputs should be sanitized before processing or storage.

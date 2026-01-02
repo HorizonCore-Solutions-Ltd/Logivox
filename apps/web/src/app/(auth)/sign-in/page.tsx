@@ -89,7 +89,7 @@ export default function SignInPage() {
             <div className="flex h-10 w-10 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
               <Building2 className="h-6 w-6" />
             </div>
-            <span className="text-2xl font-bold">FlowStock</span>
+            <span className="text-2xl font-bold">LogiVox</span>
           </Link>
         </div>
 

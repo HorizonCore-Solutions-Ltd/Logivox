@@ -1,4 +1,4 @@
-# FlowStock WMS - Troubleshooting Guide
+# LogiVox WMS - Troubleshooting Guide
 
 **Version 1.0**  
 **Last Updated**: October 16, 2025
@@ -26,15 +26,15 @@
 
 ## Overview
 
-This comprehensive troubleshooting guide helps administrators and support staff diagnose and resolve common issues in FlowStock WMS. Each section includes symptoms, causes, diagnostics, and solutions.
+This comprehensive troubleshooting guide helps administrators and support staff diagnose and resolve common issues in LogiVox WMS. Each section includes symptoms, causes, diagnostics, and solutions.
 
 ### Getting Help
 
 - **Self-Service**: Check this guide first
-- **Knowledge Base**: https://support.flowstock.com
-- **Email Support**: support@flowstock.com
-- **Phone Support**: 1-800-FLOWSTOCK
-- **Emergency**: urgent@flowstock.com (24/7)
+- **Knowledge Base**: https://support.logivox.ai
+- **Email Support**: support@logivox.ai
+- **Phone Support**: 1-800-LOGIVOX
+- **Emergency**: urgent@logivox.ai (24/7)
 
 ---
 
@@ -49,7 +49,7 @@ Run the built-in health check command:
 docker compose exec app npm run health-check
 
 # Kubernetes deployment
-kubectl exec -it <pod-name> -n flowstock-prod -- npm run health-check
+kubectl exec -it <pod-name> -n logivox-prod -- npm run health-check
 
 # Direct server
 npm run health-check
@@ -382,7 +382,7 @@ LIMIT 20;
 **1. Create Missing Indexes:**
 
 ```sql
--- Common indexes for FlowStock WMS
+-- Common indexes for LogiVox WMS
 CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku);
 CREATE INDEX IF NOT EXISTS idx_products_barcode ON products(barcode);
 CREATE INDEX IF NOT EXISTS idx_sales_orders_status ON sales_orders(status);
@@ -1006,16 +1006,16 @@ docker compose build
 
 ```bash
 # Check pod status
-kubectl get pods -n flowstock-prod
+kubectl get pods -n logivox-prod
 
 # View pod logs
-kubectl logs <pod-name> -n flowstock-prod
+kubectl logs <pod-name> -n logivox-prod
 
 # Describe pod
-kubectl describe pod <pod-name> -n flowstock-prod
+kubectl describe pod <pod-name> -n logivox-prod
 
 # Check events
-kubectl get events -n flowstock-prod --sort-by='.lastTimestamp'
+kubectl get events -n logivox-prod --sort-by='.lastTimestamp'
 ```
 
 **Solutions:**
@@ -1024,10 +1024,10 @@ kubectl get events -n flowstock-prod --sort-by='.lastTimestamp'
 
 ```bash
 # Verify secrets exist
-kubectl get secrets -n flowstock-prod
+kubectl get secrets -n logivox-prod
 
 # Verify config maps
-kubectl get configmaps -n flowstock-prod
+kubectl get configmaps -n logivox-prod
 ```
 
 **2. Increase Resources:**
@@ -1152,14 +1152,14 @@ curl https://flowstock.yourcompany.com/api/health
 
 # Check mobile app logs
 # iOS: Xcode → Devices → Select device → View console
-# Android: adb logcat | grep FlowStock
+# Android: adb logcat | grep LogiVox
 ```
 
 **Solutions:**
 
 **1. Clear App Cache:**
-- iOS: Settings → FlowStock → Clear Cache
-- Android: Settings → Apps → FlowStock → Storage → Clear Cache
+- iOS: Settings → LogiVox → Clear Cache
+- Android: Settings → Apps → LogiVox → Storage → Clear Cache
 
 **2. Force Sync:**
 - Open app → Settings → Force Sync
@@ -1260,7 +1260,7 @@ docker compose logs app | grep -i "error"
 docker compose logs app | grep -i "warn"
 
 # Export logs
-docker compose logs > flowstock-logs-$(date +%Y%m%d).txt
+docker compose logs > logivox-logs-$(date +%Y%m%d).txt
 ```
 
 ### Log Locations
@@ -1309,10 +1309,10 @@ docker compose exec app npm run health-check
 docker compose stop app
 
 # 2. Create safety backup
-docker exec flowstock-db pg_dump -U flowstock flowstock_prod | gzip > safety_backup_$(date +%Y%m%d_%H%M%S).sql.gz
+docker exec logivox-db pg_dump -U flowstock flowstock_prod | gzip > safety_backup_$(date +%Y%m%d_%H%M%S).sql.gz
 
 # 3. Restore from backup
-gunzip -c flowstock_backup_20251015.sql.gz | docker exec -i flowstock-db psql -U flowstock -d flowstock_prod
+gunzip -c flowstock_backup_20251015.sql.gz | docker exec -i logivox-db psql -U flowstock -d flowstock_prod
 
 # 4. Start application
 docker compose start app
@@ -1321,8 +1321,8 @@ docker compose start app
 ### Emergency Contact
 
 **Critical Issues (24/7):**
-- 📞 Phone: 1-800-FLOWSTOCK
-- 📧 Email: urgent@flowstock.com
+- 📞 Phone: 1-800-LOGIVOX
+- 📧 Email: urgent@logivox.ai
 - 💬 Slack: #emergency-support
 
 **On-Call Engineer:**
@@ -1333,13 +1333,13 @@ docker compose start app
 
 ## Support Resources
 
-- **Knowledge Base**: https://support.flowstock.com
-- **Community Forum**: https://community.flowstock.com
-- **API Documentation**: https://docs.flowstock.com/api
-- **Video Tutorials**: https://flowstock.com/tutorials
-- **Status Page**: https://status.flowstock.com
+- **Knowledge Base**: https://support.logivox.ai
+- **Community Forum**: https://community.logivox.ai
+- **API Documentation**: https://docs.logivox.ai/api
+- **Video Tutorials**: https://logivox.ai/tutorials
+- **Status Page**: https://status.logivox.ai
 
 ---
 
-**FlowStock WMS Troubleshooting Guide - Version 1.0**  
+**LogiVox WMS Troubleshooting Guide - Version 1.0**  
 *Last updated: October 16, 2025*

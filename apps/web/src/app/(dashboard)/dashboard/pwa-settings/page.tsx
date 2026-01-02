@@ -158,8 +158,8 @@ export default function PWASettingsPage() {
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {isInstalled
-                    ? 'FlowStock is running as an installed app'
-                    : 'Install FlowStock for a better experience'}
+                    ? 'LogiVox is running as an installed app'
+                    : 'Install LogiVox for a better experience'}
                 </p>
               </div>
               <div
@@ -270,7 +270,7 @@ export default function PWASettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>Progressive Web App Features</CardTitle>
-          <CardDescription>What you get with FlowStock PWA</CardDescription>
+          <CardDescription>What you get with LogiVox PWA</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2">

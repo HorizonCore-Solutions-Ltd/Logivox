@@ -4,7 +4,7 @@ import { Building2, Users, Target, Shield, Zap, Globe } from "lucide-react"
 
 export const metadata = {
   title: "About Us",
-  description: "Learn about FlowStock - our mission, values, and the team building the future of enterprise stock booking.",
+  description: "Learn about LogiVox - our mission, values, and the team building the future of enterprise stock booking.",
 }
 
 export default function AboutPage() {
@@ -42,7 +42,7 @@ export default function AboutPage() {
     },
     {
       name: "Customer Success",
-      description: "Dedicated team ensuring your success with FlowStock at every step."
+      description: "Dedicated team ensuring your success with LogiVox at every step."
     }
   ]
 
@@ -52,7 +52,7 @@ export default function AboutPage() {
       <section className="py-24 bg-gradient-to-b from-background to-muted/20">
         <div className="container-enterprise">
           <div className="max-w-3xl mx-auto text-center space-y-6">
-            <Badge variant="secondary">About FlowStock</Badge>
+            <Badge variant="secondary">About LogiVox</Badge>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
               Building the Future of
               <span className="block bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
@@ -60,7 +60,7 @@ export default function AboutPage() {
               </span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              FlowStock is transforming how enterprises manage inventory and stock booking 
+              LogiVox is transforming how enterprises manage inventory and stock booking 
               with cutting-edge technology, zero-trust security, and seamless integrations.
             </p>
           </div>

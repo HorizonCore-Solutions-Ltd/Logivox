@@ -117,7 +117,7 @@ class OfflineDB {
 
 // Initialize offline database
 export const offlineDB = new OfflineDB({
-  name: 'flowstock-offline',
+  name: 'logivox-offline',
   version: 1,
   stores: [
     {

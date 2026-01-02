@@ -1,4 +1,4 @@
-# FlowStock WMS - Onboarding Materials
+# LogiVox WMS - Onboarding Materials
 
 **Version 1.0**  
 **Last Updated**: October 16, 2025
@@ -22,12 +22,12 @@
 
 ## Overview
 
-Welcome to FlowStock WMS! This onboarding program will help new team members become productive users quickly. The program is designed for different roles and experience levels.
+Welcome to LogiVox WMS! This onboarding program will help new team members become productive users quickly. The program is designed for different roles and experience levels.
 
 ### Onboarding Goals
 
 By the end of onboarding, new users will be able to:
-- ✅ Navigate FlowStock confidently
+- ✅ Navigate LogiVox confidently
 - ✅ Perform daily tasks efficiently
 - ✅ Understand best practices
 - ✅ Know where to find help
@@ -47,7 +47,7 @@ By the end of onboarding, new users will be able to:
 ### Pre-First Day
 
 **Manager/Admin Tasks:**
-- [ ] Create user account in FlowStock
+- [ ] Create user account in LogiVox
 - [ ] Assign appropriate role and permissions
 - [ ] Generate temporary password
 - [ ] Assign training buddy/mentor
@@ -58,13 +58,13 @@ By the end of onboarding, new users will be able to:
 **Welcome Email Template:**
 
 ```
-Subject: Welcome to FlowStock WMS!
+Subject: Welcome to LogiVox WMS!
 
 Hi [Name],
 
 Welcome to the team! We're excited to have you join us.
 
-Here are your FlowStock WMS login credentials:
+Here are your LogiVox WMS login credentials:
 
 URL: https://flowstock.yourcompany.com
 Email: [user@company.com]
@@ -74,7 +74,7 @@ Please log in and change your password on your first day. For security, enable t
 
 Your first day schedule:
 9:00 AM - Welcome & orientation
-10:00 AM - FlowStock system access setup
+10:00 AM - LogiVox system access setup
 11:00 AM - Core concepts training
 12:00 PM - Lunch
 1:00 PM - Hands-on practice
@@ -93,7 +93,7 @@ Looking forward to working with you,
 - [ ] Complete HR paperwork
 - [ ] Receive workstation and equipment
 - [ ] Set up email and communication tools
-- [ ] First login to FlowStock
+- [ ] First login to LogiVox
 - [ ] Change temporary password
 - [ ] Enable two-factor authentication (2FA)
 - [ ] Complete "Getting Started" video (5 min)
@@ -158,7 +158,7 @@ Looking forward to working with you,
 - Day 10: Assessment and certification
 
 **Core Competencies:**
-- Navigate FlowStock interface
+- Navigate LogiVox interface
 - Search and locate products
 - Perform inventory adjustments
 - Process picking and packing tasks
@@ -251,7 +251,7 @@ Looking forward to working with you,
 - Welcome new hire to team
 - Explain company culture and values
 - Overview of warehouse operations
-- Introduction to FlowStock WMS
+- Introduction to LogiVox WMS
 
 **Agenda:**
 1. **Welcome (10 min)**
@@ -263,10 +263,10 @@ Looking forward to working with you,
    - Organizational structure
    - Your role and responsibilities
    
-3. **FlowStock WMS Overview (20 min)**
-   - What is FlowStock WMS?
-   - Why we use FlowStock
-   - How FlowStock fits into daily operations
+3. **LogiVox WMS Overview (20 min)**
+   - What is LogiVox WMS?
+   - Why we use LogiVox
+   - How LogiVox fits into daily operations
    
 4. **Safety and Policies (15 min)**
    - Safety protocols
@@ -277,20 +277,20 @@ Looking forward to working with you,
 - Welcome packet
 - Employee handbook
 - Safety guidelines
-- FlowStock login credentials
+- LogiVox login credentials
 
 ---
 
 ### Session 2: First Login & Setup (60 min)
 
 **Objectives:**
-- Access FlowStock for the first time
+- Access LogiVox for the first time
 - Set up secure account
 - Navigate basic interface
 
 **Step-by-Step Guide:**
 
-**Step 1: Access FlowStock**
+**Step 1: Access LogiVox**
 1. Open web browser (Chrome recommended)
 2. Navigate to: https://flowstock.yourcompany.com
 3. Enter your email address
@@ -310,7 +310,7 @@ Looking forward to working with you,
 
 **Step 3: Set Up Two-Factor Authentication (2FA)**
 1. Download Google Authenticator or Authy on your smartphone
-2. Scan QR code displayed in FlowStock
+2. Scan QR code displayed in LogiVox
 3. Enter 6-digit code from authenticator app
 4. Save backup codes in a secure location
 5. Click "Enable 2FA"
@@ -608,7 +608,7 @@ Task: Find 10 locations in warehouse
 1. How do you access your user profile settings?
 2. Where is the global search bar located?
 3. What menu item leads to product inventory?
-4. How do you log out of FlowStock?
+4. How do you log out of LogiVox?
 5. Where can you change notification preferences?
 
 **Section 2: Inventory (10 questions)**
@@ -690,7 +690,7 @@ Task: Find 10 locations in warehouse
 - Integration with CRM tools
 
 **For Managers:**
-- Team management in FlowStock
+- Team management in LogiVox
 - Performance monitoring
 - Custom report building
 - Dashboard creation
@@ -827,7 +827,7 @@ Task: Find 10 locations in warehouse
 **Passing Score: 85/100 (85%)**
 
 **Upon passing, receive:**
-- FlowStock WMS Certified User certificate
+- LogiVox WMS Certified User certificate
 - Digital badge for email signature
 - Recognition on team board
 - Increased system permissions (if applicable)
@@ -922,7 +922,7 @@ Task: Find 10 locations in warehouse
 - [ ] 360-degree feedback from team
 - [ ] Review of goal achievement
 - [ ] Discussion of career development plan
-- [ ] Certification as FlowStock Manager
+- [ ] Certification as LogiVox Manager
 
 ---
 
@@ -930,7 +930,7 @@ Task: Find 10 locations in warehouse
 
 ### Self-Paced Learning
 
-**FlowStock University (Online Learning Portal):**
+**LogiVox University (Online Learning Portal):**
 - Video tutorials library (50+ videos)
 - Interactive simulations
 - Downloadable cheat sheets
@@ -945,7 +945,7 @@ Task: Find 10 locations in warehouse
 
 ### Weekly Training Sessions
 
-**"FlowStock Fridays" (1 hour/week):**
+**"LogiVox Fridays" (1 hour/week):**
 - New feature announcements
 - Pro tips and tricks
 - Q&A with experts
@@ -965,22 +965,22 @@ Task: Find 10 locations in warehouse
 
 **Available Certifications:**
 
-**1. FlowStock Certified User**
+**1. LogiVox Certified User**
 - Duration: 2 weeks of training + exam
 - Prerequisites: Complete onboarding
 - Renewal: Every 2 years
 
-**2. FlowStock Certified Advanced User**
+**2. LogiVox Certified Advanced User**
 - Duration: 1 month of advanced training + exam
 - Prerequisites: Certified User + 6 months experience
 - Renewal: Every 2 years
 
-**3. FlowStock Certified Trainer**
+**3. LogiVox Certified Trainer**
 - Duration: 2 months + teaching practicum
 - Prerequisites: Certified Advanced User + 1 year experience
 - Renewal: Every year
 
-**4. FlowStock Certified Administrator**
+**4. LogiVox Certified Administrator**
 - Duration: 1 month intensive + exam
 - Prerequisites: Certified Advanced User + admin experience
 - Renewal: Every year
@@ -1040,10 +1040,10 @@ Every new hire is assigned a training buddy who:
 - User manual (PDF)
 
 **Support Channels:**
-- Email: support@flowstock.com
-- Phone: 1-800-FLOWSTOCK
+- Email: support@logivox.ai
+- Phone: 1-800-LOGIVOX
 - Live chat: Available 9 AM - 5 PM
-- Slack: #flowstock-help channel
+- Slack: #logivox-help channel
 
 **Emergency Support:**
 - On-call support: For production issues
@@ -1130,7 +1130,7 @@ Upon successfully completing onboarding:
 - [ ] Security Badge
 
 **Software Access:**
-- [ ] FlowStock WMS account
+- [ ] LogiVox WMS account
 - [ ] Email account
 - [ ] Communication tools (Slack, Teams)
 - [ ] Video conferencing
@@ -1138,10 +1138,10 @@ Upon successfully completing onboarding:
 
 ---
 
-**FlowStock WMS Onboarding Materials - Version 1.0**  
+**LogiVox WMS Onboarding Materials - Version 1.0**  
 *Last updated: October 16, 2025*
 
 **Questions? Contact:**
-- Training Team: training@flowstock.com
-- HR Department: hr@flowstock.com
+- Training Team: training@logivox.ai
+- HR Department: hr@logivox.ai
 - Your Manager: [manager@company.com]

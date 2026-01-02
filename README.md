@@ -1,4 +1,4 @@
-# FlowStock - Next-Generation Stock Booking & ERP Integration Platform
+# LogiVox - Voice-First Warehouse Management System
 
 [![Next.js](https://img.shields.io/badge/Next.js-14.2.33-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -25,7 +25,7 @@
 
 ## 🌐 Overview
 
-FlowStock is a next-generation cloud-based stock booking and procurement integration platform designed to be 5-10 years ahead of the competition. We replace fragile Excel/Access workflows with intelligent, scalable, and modular SaaS solutions that enable seamless stock booking, real-time supplier communication, deep ERP integration, and AI-powered automation across all industries.
+LogiVox is the world's first voice-first warehouse management system, designed to revolutionize warehouse operations through hands-free voice control. Built 5-10 years ahead of the competition with AI-powered voice recognition, 3D load optimization, and intelligent automation, LogiVox enables warehouse workers to operate at peak efficiency with their hands free and eyes on the product, not a screen.
 
 ## 🎯 Mission Statement
 
@@ -49,7 +49,7 @@ To become the universal stock booking and ERP integration layer for warehouses a
 
 ### Monorepo Structure
 ```
-flowstock/
+logivox/
 ├── apps/
 │   ├── web/                    # React web application (Admin & Operations)
 │   ├── mobile/                 # React Native mobile app (Warehouse Staff)
@@ -190,8 +190,8 @@ flowstock/
 ### Quick Start
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/flowstock.git
-cd flowstock
+git clone https://github.com/your-org/logivox.git
+cd logivox
 
 # Install dependencies
 npm install
@@ -217,7 +217,7 @@ npm run dev
 ### Environment Configuration
 ```bash
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/flowstock"
+DATABASE_URL="postgresql://user:password@localhost:5432/logivox"
 SUPABASE_URL="your-supabase-url"
 SUPABASE_ANON_KEY="your-supabase-anon-key"
 
@@ -256,7 +256,7 @@ AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 
 ## � Competitive Advantages
 
-### What Makes FlowStock Different
+### What Makes LogiVox Different
 - **🧠 AI-First**: Smart matching, predictive analytics, and automation
 - **🔌 API-Native**: Extensible architecture with webhook system
 - **📱 Mobile-First**: Designed for warehouse operations on mobile devices
@@ -266,7 +266,7 @@ AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 - **🔒 Enterprise-Ready**: Security, compliance, and white-label capabilities
 
 ### Market Position
-FlowStock is positioned as the **"Shopify for Warehouse Operations"** - a modular, intelligent, and scalable platform that anticipates future business needs while solving today's problems.
+LogiVox is positioned as the **world's first voice-native WMS** - a hands-free, AI-powered warehouse management platform that enables workers to operate at peak efficiency without touching a screen.
 
 ## 🤝 Contributing
 
@@ -278,11 +278,11 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ## 🆘 Support
 
-- **Documentation**: [docs.flowstock.com](https://docs.flowstock.com)
-- **Community**: [GitHub Discussions](https://github.com/your-org/flowstock/discussions)
-- **Enterprise Support**: [enterprise@flowstock.com](mailto:enterprise@flowstock.com)
-- **Security Issues**: [security@flowstock.com](mailto:security@flowstock.com)
+- **Documentation**: [docs.logivox.ai](https://docs.logivox.ai)
+- **Community**: [GitHub Discussions](https://github.com/your-org/logivox/discussions)
+- **Enterprise Support**: [enterprise@logivox.ai](mailto:enterprise@logivox.ai)
+- **Security Issues**: [security@logivox.ai](mailto:security@logivox.ai)
 
 ---
 
-**FlowStock** - Revolutionizing warehouse operations with intelligent, cloud-native stock booking and ERP integration. Built for the future, available today.
+**LogiVox** - The world's first voice-native warehouse management system. Hands-free operations. AI-powered intelligence. Built for the future, available today.

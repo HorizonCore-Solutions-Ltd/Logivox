@@ -1,6 +1,6 @@
 {
-  "name": "FlowStock - Stock Management System",
-  "short_name": "FlowStock",
+  "name": "LogiVox - Stock Management System",
+  "short_name": "LogiVox",
   "description": "Enterprise stock management and inventory tracking system",
   "start_url": "/dashboard",
   "display": "standalone",

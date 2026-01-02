@@ -1,5 +1,5 @@
 # COMPLETE WMS BUILD ROADMAP
-## FlowStock - Full Warehouse Management System
+## LogiVox - Full Warehouse Management System
 
 **Status:** 70% Complete (Foundation + AI Features Built)  
 **Target:** 100% Production-Ready WMS  
@@ -452,7 +452,7 @@
 
 ## Market Positioning
 
-### **FlowStock WMS - Unique Selling Points**
+### **LogiVox WMS - Unique Selling Points**
 
 1. **🎯 Specialized Stock Booking WMS**
    - Not trying to be everything
@@ -484,7 +484,7 @@
 
 ## Competitive Analysis
 
-| Feature | FlowStock | Fishbowl | NetSuite | SAP |
+| Feature | LogiVox | Fishbowl | NetSuite | SAP |
 |---------|-----------|----------|----------|-----|
 | **Stock Booking Focus** | ✅ Core | ❌ No | ❌ Basic | ❌ Complex |
 | **AI Forecasting** | ✅ 4 methods | ❌ No | ⚠️ Basic | ⚠️ Expensive |
@@ -562,7 +562,7 @@
 8. This can complement your existing products
 
 **Strategy:**
-- Build FlowStock as **standalone specialized WMS**
+- Build LogiVox as **standalone specialized WMS**
 - Position against Fishbowl/Zoho (mid-market)
 - NOT competing with your main SaaS
 - Different target customers (stock booking focus)

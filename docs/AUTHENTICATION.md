@@ -2,7 +2,7 @@
 
 ## Overview
 
-FlowStock now has a **fully functional authentication system** powered by NextAuth.js v5 with PostgreSQL database integration via Prisma. Users can sign up, sign in, and access protected routes with role-based access control.
+LogiVox now has a **fully functional authentication system** powered by NextAuth.js v5 with PostgreSQL database integration via Prisma. Users can sign up, sign in, and access protected routes with role-based access control.
 
 ---
 

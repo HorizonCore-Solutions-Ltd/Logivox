@@ -2,7 +2,7 @@
  * Screen Reader Utilities
  * 
  * Comprehensive utilities for enhancing screen reader support
- * across the FlowStock application. WCAG 2.1 AA compliant.
+ * across the LogiVox application. WCAG 2.1 AA compliant.
  */
 
 import { useEffect, useRef } from 'react';

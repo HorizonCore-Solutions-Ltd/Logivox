@@ -497,7 +497,7 @@ export function AccessibilitySettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            FlowStock is designed to meet WCAG 2.1 Level AA standards, ensuring our platform is accessible 
+            LogiVox is designed to meet WCAG 2.1 Level AA standards, ensuring our platform is accessible 
             to users with diverse needs and abilities.
           </p>
           <div className="flex flex-wrap gap-2">
@@ -518,8 +518,8 @@ export function AccessibilitySettings() {
             <p className="font-semibold mb-1">Need help?</p>
             <p className="text-muted-foreground">
               Contact our accessibility team at{' '}
-              <a href="mailto:accessibility@flowstock.com" className="text-primary hover:underline">
-                accessibility@flowstock.com
+              <a href="mailto:accessibility@logivox.ai" className="text-primary hover:underline">
+                accessibility@logivox.ai
               </a>
             </p>
           </div>

@@ -1,8 +1,8 @@
-# FlowStock - Visual Progress Dashboard
+# LogiVox - Visual Progress Dashboard
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                   FLOWSTOCK ENTERPRISE PLATFORM                      │
+│                   LOGIVOX ENTERPRISE PLATFORM                      │
 │                     Overall Progress: 60%                            │
 │                   Last Updated: Oct 15, 2025                         │
 └─────────────────────────────────────────────────────────────────────┘

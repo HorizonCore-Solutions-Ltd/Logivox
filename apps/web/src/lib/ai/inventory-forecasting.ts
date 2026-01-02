@@ -1,5 +1,5 @@
 /**
- * AI-Powered Inventory Forecasting System for FlowStock
+ * AI-Powered Inventory Forecasting System for LogiVox
  * 
  * Machine learning models for demand prediction, seasonal pattern detection,
  * and intelligent reorder suggestions.

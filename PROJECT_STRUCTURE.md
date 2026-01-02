@@ -1,8 +1,8 @@
-# FlowStock - Project Structure & Development Roadmap
+# LogiVox - Project Structure & Development Roadmap
 
 ## 1. Enterprise Project Structure Overview
 
-FlowStock is architected as a next-generation monorepo with intelligent microservices, comprehensive AI integration, and modular SaaS capabilities. The structure enables independent development, automated testing, and seamless deployment while maintaining enterprise-grade consistency.
+LogiVox is architected as a next-generation monorepo with intelligent microservices, comprehensive AI integration, and modular SaaS capabilities. The structure enables independent development, automated testing, and seamless deployment while maintaining enterprise-grade consistency.
 
 ### 1.1 Advanced Monorepo Structure
 
@@ -681,7 +681,7 @@ Knowledge Management:
 └── 🤝 Cross-team collaboration sessions
 ```
 
-This comprehensive project structure and development roadmap provides a clear path for building FlowStock into a next-generation enterprise platform. The modular architecture, detailed task breakdown, and structured development phases ensure scalable growth while maintaining code quality and team productivity.
+This comprehensive project structure and development roadmap provides a clear path for building LogiVox into a next-generation enterprise platform. The modular architecture, detailed task breakdown, and structured development phases ensure scalable growth while maintaining code quality and team productivity.
 │   ├── 📁 types/                     # TypeScript type definitions
 │   ├── 📄 App.tsx                    # Main App component
 │   ├── 📄 main.tsx                   # Application entry point
@@ -1328,4 +1328,4 @@ Phase 10: Production Launch  (Weeks 37-40) [PLANNED]
 **Document Version**: 1.0  
 **Last Updated**: October 14, 2025  
 **Next Review**: November 14, 2025  
-**Owner**: FlowStock Project Management Team
+**Owner**: LogiVox Project Management Team

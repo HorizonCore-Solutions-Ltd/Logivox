@@ -8,7 +8,7 @@ import { Page } from '@playwright/test';
 /**
  * Login helper for E2E tests
  */
-export async function login(page: Page, email: string = 'admin@flowstock.com', password: string = 'password') {
+export async function login(page: Page, email: string = 'admin@logivox.ai', password: string = 'password') {
   await page.goto('/login');
   await page.fill('input[name="email"]', email);
   await page.fill('input[name="password"]', password);

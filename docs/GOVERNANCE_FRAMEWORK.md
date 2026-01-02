@@ -1,4 +1,4 @@
-# 🏛️ FlowStock Governance Framework
+# 🏛️ LogiVox Governance Framework
 ## Enterprise Governance, Compliance & Multi-Executive Control System
 
 > **GOVERNANCE LEVEL**: Fortune 500 Standard  
@@ -825,7 +825,7 @@ export class DatabaseBackupService {
    */
   static async createFullBackup(): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `flowstock-full-${timestamp}.sql`;
+    const filename = `logivox-full-${timestamp}.sql`;
     const encryptedFilename = `${filename}.enc`;
 
     try {
@@ -999,4 +999,4 @@ export class DatabaseBackupService {
 
 ---
 
-**This system ensures NO ONE can destroy FlowStock alone - not even the CEO. Every critical operation requires multi-executive approval with full audit trail.**
+**This system ensures NO ONE can destroy LogiVox alone - not even the CEO. Every critical operation requires multi-executive approval with full audit trail.**

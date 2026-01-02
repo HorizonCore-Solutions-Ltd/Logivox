@@ -2,7 +2,7 @@
  * Accessibility Audit Helper
  * 
  * Development tool to audit and report accessibility issues
- * in the FlowStock application. WCAG 2.1 AA compliance checks.
+ * in the LogiVox application. WCAG 2.1 AA compliance checks.
  * 
  * ⚠️ This is a development tool - do not include in production builds
  */

@@ -1,9 +1,9 @@
-# FlowStock AI Assistant Prompts & Guidelines
+# LogiVox AI Assistant Prompts & Guidelines
 
 ## Context Awareness Prompt
 
 ```
-You are working on FlowStock, a next-generation cloud-based warehouse management platform. This is a comprehensive SaaS solution that revolutionizes stock booking, procurement integration, and supplier relationships.
+You are working on LogiVox, a next-generation cloud-based warehouse management platform. This is a comprehensive SaaS solution that revolutionizes stock booking, procurement integration, and supplier relationships.
 
 CRITICAL CONTEXT:
 - Technology Stack: React 18 + TypeScript + Vite (frontend), Node.js + Express + TypeScript (backend), PostgreSQL + Prisma (database)
@@ -35,7 +35,7 @@ When working on features, always consider:
 
 ### For Stock Management Features
 ```
-You're implementing stock management features for FlowStock. Consider these requirements:
+You're implementing stock management features for LogiVox. Consider these requirements:
 
 MOBILE-FIRST APPROACH:
 - Warehouse staff use mobile devices primarily
@@ -58,7 +58,7 @@ AUDIT REQUIREMENTS:
 
 ### For ERP Integration Features
 ```
-You're building ERP integration capabilities for FlowStock. Key considerations:
+You're building ERP integration capabilities for LogiVox. Key considerations:
 
 INTEGRATION PATTERNS:
 - Design pluggable architecture for multiple ERP systems
@@ -73,7 +73,7 @@ TARGET ERP SYSTEMS:
 - QuickBooks Enterprise (XML/REST APIs)
 
 DATA FLOW:
-- Bidirectional sync between FlowStock and ERP
+- Bidirectional sync between LogiVox and ERP
 - Conflict resolution with business rule priorities
 - Comprehensive logging for troubleshooting
 - Health monitoring with alerting systems
@@ -81,7 +81,7 @@ DATA FLOW:
 
 ### For Supplier Portal Features
 ```
-You're developing supplier collaboration features for FlowStock:
+You're developing supplier collaboration features for LogiVox:
 
 SUPPLIER EXPERIENCE:
 - Dedicated login portal separate from main app
@@ -106,7 +106,7 @@ PERFORMANCE ANALYTICS:
 
 ### For React Components
 ```
-Generate React components for FlowStock following these patterns:
+Generate React components for LogiVox following these patterns:
 
 COMPONENT STRUCTURE:
 - Use TypeScript with strict typing
@@ -137,7 +137,7 @@ REQUIREMENTS:
 
 ### For API Endpoints
 ```
-Create API endpoints for FlowStock following these standards:
+Create API endpoints for LogiVox following these standards:
 
 ROUTE STRUCTURE:
 - Use RESTful conventions with proper HTTP methods
@@ -181,7 +181,7 @@ SECURITY REQUIREMENTS:
 
 ### For Database Operations
 ```
-Implement database operations for FlowStock using these Prisma patterns:
+Implement database operations for LogiVox using these Prisma patterns:
 
 QUERY PATTERNS:
 - Always scope queries by organizationId for multi-tenancy
@@ -229,7 +229,7 @@ PERFORMANCE REQUIREMENTS:
 
 ### For Component Testing
 ```
-Create comprehensive tests for FlowStock React components:
+Create comprehensive tests for LogiVox React components:
 
 TESTING REQUIREMENTS:
 - Test user interactions and accessibility
@@ -253,7 +253,7 @@ EXAMPLE AREAS:
 
 ### For API Testing
 ```
-Create integration tests for FlowStock API endpoints:
+Create integration tests for LogiVox API endpoints:
 
 TEST REQUIREMENTS:
 - Test authentication and authorization
@@ -278,7 +278,7 @@ COVERAGE AREAS:
 
 ### For Performance Issues
 ```
-When troubleshooting FlowStock performance issues:
+When troubleshooting LogiVox performance issues:
 
 INVESTIGATION AREAS:
 1. Database query optimization (check Prisma query logs)
@@ -301,7 +301,7 @@ MONITORING TOOLS:
 
 ### For Multi-Tenant Issues
 ```
-When debugging multi-tenant problems in FlowStock:
+When debugging multi-tenant problems in LogiVox:
 
 DATA ISOLATION CHECKS:
 1. Verify organizationId is included in all queries
@@ -325,7 +325,7 @@ DEBUGGING STEPS:
 ## Best Practices Reminders
 
 ```
-ALWAYS REMEMBER FOR FLOWSTOCK:
+ALWAYS REMEMBER FOR LOGIVOX:
 
 1. MULTI-TENANCY: Every feature must work across multiple organizations
 2. MOBILE-FIRST: Warehouse staff primarily use mobile devices
@@ -336,5 +336,5 @@ ALWAYS REMEMBER FOR FLOWSTOCK:
 7. OFFLINE: Support offline operations with background sync
 8. SCALABILITY: Design for warehouses with 10 to 10,000 products
 
-These principles guide every technical decision in FlowStock development.
+These principles guide every technical decision in LogiVox development.
 ```

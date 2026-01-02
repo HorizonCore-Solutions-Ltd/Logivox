@@ -1,4 +1,4 @@
-# FlowStock Competitive Advantages & Unique Features
+# LogiVox Competitive Advantages & Unique Features
 ## Features That Make Us Impossible to Copy
 
 **Last Updated:** October 15, 2025
@@ -178,7 +178,7 @@
 - We include it FREE in all plans (PWA, no app store needed)
 
 **Customer Impact:**
-- Warehouse with 10 workers: "We process 500 items/day, 3x faster than before. This paid for FlowStock in the first month."
+- Warehouse with 10 workers: "We process 500 items/day, 3x faster than before. This paid for LogiVox in the first month."
 
 ---
 
@@ -209,7 +209,7 @@
 - We include basic BOM in Professional ($249), advanced in Enterprise ($499)
 
 **Customer Value:**
-- "We were using Fishbowl Manufacturing ($4,000/year). FlowStock does everything we need for $2,988/year. Saved $1,000+ and got security training too!"
+- "We were using Fishbowl Manufacturing ($4,000/year). LogiVox does everything we need for $2,988/year. Saved $1,000+ and got security training too!"
 
 ---
 
@@ -383,7 +383,7 @@
 - HIPAA security compliance
 
 **Customer Use Cases:**
-- **Pharmaceutical Distributor:** "FDA audit = 3 days of stress. With FlowStock, we printed reports in 10 minutes. Passed with zero findings."
+- **Pharmaceutical Distributor:** "FDA audit = 3 days of stress. With LogiVox, we printed reports in 10 minutes. Passed with zero findings."
 - **Medical Device Manufacturer:** "Lot recall in 30 seconds vs. 3 days with spreadsheets. This feature alone is worth $10K/year."
 
 **Competitive Advantage:**
@@ -429,7 +429,7 @@
 
 **Drop Ship Workflow:**
 1. Customer orders product on your store
-2. FlowStock auto-sends PO to supplier
+2. LogiVox auto-sends PO to supplier
 3. Supplier ships directly to customer
 4. You get tracking number, customer gets notified
 5. You pay supplier, keep margin
@@ -474,7 +474,7 @@
 5. Monthly settlement report auto-generated
 
 **Customer Use Cases:**
-- **Art Gallery:** "We have 200 artists on consignment. FlowStock auto-calculates commissions. Saves 20 hours/month of Excel work."
+- **Art Gallery:** "We have 200 artists on consignment. LogiVox auto-calculates commissions. Saves 20 hours/month of Excel work."
 - **Vintage Shop:** "We track 5,000+ consignment items. When something sells, we know exactly who to pay."
 
 **Competitive Advantage:**
@@ -543,7 +543,7 @@
 - **Medical Equipment:** Rent wheelchair for 30 days
 
 **Customer Value:**
-- **Equipment Rental Company:** "We rent 500+ items/month. FlowStock auto-calculates fees and tracks returns. Revenue up 20% from better utilization."
+- **Equipment Rental Company:** "We rent 500+ items/month. LogiVox auto-calculates fees and tracks returns. Revenue up 20% from better utilization."
 
 **Competitive Advantage:**
 - Specialized rental software costs $200-500/month (Alert EasyPro, Rental Tracker Pro)
@@ -755,7 +755,7 @@
 
 ## 🏆 Summary: Our Competitive Moat
 
-**What makes FlowStock impossible to replicate:**
+**What makes LogiVox impossible to replicate:**
 
 1. ✅ **Security Training Academy** - 12-18 month head start, patent-pending
 2. ✅ **Label Printing Designer** - Drag-and-drop, templates, mobile workflows

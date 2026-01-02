@@ -1,4 +1,4 @@
-# 🎉 FlowStock WMS - Project Completion Summary
+# 🎉 LogiVox WMS - Project Completion Summary
 
 **Status**: Production-Ready ✅  
 **Completion Date**: January 15, 2024  
@@ -191,7 +191,7 @@
 ## 📁 Project Structure
 
 ```
-FlowStock/
+LogiVox/
 ├── backend/                      # Node.js/Express backend
 │   ├── src/
 │   │   ├── api/                  # API routes
@@ -301,7 +301,7 @@ FlowStock/
 ```bash
 # Clone repository
 git clone https://github.com/PNdlovu/Flowstock.git
-cd FlowStock
+cd LogiVox
 
 # Install dependencies
 cd backend && npm install
@@ -356,7 +356,7 @@ kubectl get pods
 kubectl get services
 
 # Access application
-kubectl port-forward service/flowstock-frontend 3000:80
+kubectl port-forward service/logivox-frontend 3000:80
 ```
 
 ### Cloud Deployment
@@ -629,9 +629,9 @@ kubectl port-forward service/flowstock-frontend 3000:80
 ## 📞 Support & Contact
 
 ### Support Channels
-- **Email**: support@flowstock.com
-- **Documentation**: https://docs.flowstock.com
-- **Community Forum**: https://community.flowstock.com
+- **Email**: support@logivox.ai
+- **Documentation**: https://docs.logivox.ai
+- **Community Forum**: https://community.logivox.ai
 - **GitHub Issues**: https://github.com/PNdlovu/Flowstock/issues
 
 ### Emergency Contacts
@@ -685,7 +685,7 @@ kubectl port-forward service/flowstock-frontend 3000:80
 
 ---
 
-**🎉 FlowStock WMS is now production-ready and available for deployment!**
+**🎉 LogiVox WMS is now production-ready and available for deployment!**
 
 **Total Development Time**: ~4 months  
 **Total Lines of Code**: ~101,674 lines  

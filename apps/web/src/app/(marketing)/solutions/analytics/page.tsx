@@ -324,7 +324,7 @@ export default function AnalyticsPage() {
             Ready to Unlock Your Data's Potential?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join leading companies using FlowStock Analytics to drive growth
+            Join leading companies using LogiVox Analytics to drive growth
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

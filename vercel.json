@@ -5,13 +5,13 @@
   "framework": null,
   "outputDirectory": ".next",
   "env": {
-    "DATABASE_URL": "@flowstock-database-url",
-    "DIRECT_URL": "@flowstock-direct-url",
-    "NEXTAUTH_SECRET": "@flowstock-nextauth-secret",
-    "GOOGLE_CLIENT_ID": "@flowstock-google-client-id",
-    "GOOGLE_CLIENT_SECRET": "@flowstock-google-client-secret",
-    "GITHUB_ID": "@flowstock-github-id",
-    "GITHUB_SECRET": "@flowstock-github-secret"
+    "DATABASE_URL": "@logivox-database-url",
+    "DIRECT_URL": "@logivox-direct-url",
+    "NEXTAUTH_SECRET": "@logivox-nextauth-secret",
+    "GOOGLE_CLIENT_ID": "@logivox-google-client-id",
+    "GOOGLE_CLIENT_SECRET": "@logivox-google-client-secret",
+    "GITHUB_ID": "@logivox-github-id",
+    "GITHUB_SECRET": "@logivox-github-secret"
   },
   "headers": [
     {
@@ -56,7 +56,7 @@
         },
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "https://flowstock.com"
+          "value": "https://logivox.ai"
         },
         {
           "key": "Access-Control-Allow-Methods",

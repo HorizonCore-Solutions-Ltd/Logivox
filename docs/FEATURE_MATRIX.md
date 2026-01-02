@@ -1,16 +1,16 @@
-# FlowStock - Complete Feature Matrix & Business Model
+# LogiVox - Complete Feature Matrix & Business Model
 
 ## 🎯 Vision Statement
 
-**"FlowStock empowers warehouses to move from manual chaos to intelligent automation — with AI, ERP, and real-time insights built into every booking."**
+**"LogiVox empowers warehouses to move from manual chaos to intelligent automation — with AI, ERP, and real-time insights built into every booking."**
 
-FlowStock is a next-generation SaaS platform designed to replace outdated Excel/Access workflows with intelligent, scalable, and AI-powered stock booking and procurement tools. Built for warehouses, suppliers, and receivers, it offers real-time automation, ERP integration, and modular enterprise features.
+LogiVox is a next-generation SaaS platform designed to replace outdated Excel/Access workflows with intelligent, scalable, and AI-powered stock booking and procurement tools. Built for warehouses, suppliers, and receivers, it offers real-time automation, ERP integration, and modular enterprise features.
 
 ---
 
 ## 🏗️ Modular Architecture
 
-FlowStock is built around a **core booking and stock management engine**, with optional modules that extend functionality for broader business models. The architecture is modular, allowing businesses to adopt only the features they need.
+LogiVox is built around a **core booking and stock management engine**, with optional modules that extend functionality for broader business models. The architecture is modular, allowing businesses to adopt only the features they need.
 
 ### Layer 1: Core Booking Engine (Foundation) ✅
 
@@ -129,11 +129,11 @@ FlowStock is built around a **core booking and stock management engine**, with o
 - Admin Training Portal - Dedicated admin resources
 
 #### White-label & Reseller Options 🏷️
-- ⏳ White-label Mode - Hide FlowStock branding (Phase 19)
+- ⏳ White-label Mode - Hide LogiVox branding (Phase 19)
 - Custom Domains - inventory.clientcompany.com
 - Reseller Portal - Manage multiple client accounts
 - Revenue Sharing - Partner commission structures
-- Co-branding Options - Partner logos alongside FlowStock
+- Co-branding Options - Partner logos alongside LogiVox
 - API White-labeling - Custom API endpoints
 
 **Status:** 30-70% Complete (Phases 15-20 in progress/planned)
@@ -231,7 +231,7 @@ FlowStock is built around a **core booking and stock management engine**, with o
 
 ## 🎯 Strategic Positioning
 
-FlowStock is **NOT** becoming a generic ERP or logistics suite. It remains **stock-centric** while providing:
+LogiVox is **NOT** becoming a generic ERP or logistics suite. It remains **stock-centric** while providing:
 
 ✅ **SMB Entry Point:** Basic booking needs (Starter tier)  
 ✅ **Mid-Market Growth:** Complex workflows (Pro tier)  
@@ -384,4 +384,4 @@ FlowStock is **NOT** becoming a generic ERP or logistics suite. It remains **sto
 
 **Last Updated:** October 15, 2025  
 **Version:** 3.0 (with complete feature matrix and business model)  
-**Maintained By:** FlowStock Development Team
+**Maintained By:** LogiVox Development Team

@@ -88,7 +88,7 @@ export async function GET(request: Request) {
     });
 
     // Remove sensitive data before sending
-    const sanitizedConnections = connections.map((conn) => ({
+    const sanitizedConnections = connections.map((conn: typeof connections[number]) => ({
       ...conn,
       accessToken: conn.accessToken ? "****" : null,
       refreshToken: conn.refreshToken ? "****" : null,

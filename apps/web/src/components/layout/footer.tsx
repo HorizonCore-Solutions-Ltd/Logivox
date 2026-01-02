@@ -90,7 +90,7 @@ export function Footer() {
               <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
                 <Building2 className="h-5 w-5" />
               </div>
-              <span className="text-xl font-bold text-white">FlowStock</span>
+              <span className="text-xl font-bold text-white">LogiVox</span>
             </div>
             <p className="text-slate-400 mb-6 max-w-sm">
               Complete warehouse management system with wave picking, real-time inventory tracking, 
@@ -101,7 +101,7 @@ export function Footer() {
             <div className="space-y-3 mb-6">
               <div className="flex items-center space-x-3 text-sm text-slate-400">
                 <Mail className="h-4 w-4 text-slate-500" />
-                <span>hello@flowstock.com</span>
+                <span>hello@logivox.ai</span>
               </div>
               <div className="flex items-center space-x-3 text-sm text-slate-400">
                 <Phone className="h-4 w-4 text-slate-500" />
@@ -177,7 +177,7 @@ export function Footer() {
         <div className="border-t border-slate-800 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="text-sm text-slate-500">
-              © {currentYear} FlowStock, Inc. All rights reserved.
+              © {currentYear} LogiVox, Inc. All rights reserved.
             </div>
             
             {/* Legal links */}

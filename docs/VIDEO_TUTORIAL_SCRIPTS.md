@@ -1,4 +1,4 @@
-# FlowStock WMS - Video Tutorial Scripts
+# LogiVox WMS - Video Tutorial Scripts
 
 **Version 1.0**  
 **Last Updated**: October 16, 2025
@@ -32,9 +32,9 @@
 
 **[INTRO - 0:00-0:20]**
 
-*[Screen: FlowStock logo animation]*
+*[Screen: LogiVox logo animation]*
 
-**Narrator**: "Welcome to FlowStock WMS! In this quick 5-minute tutorial, you'll learn everything you need to get started with our warehouse management system."
+**Narrator**: "Welcome to LogiVox WMS! In this quick 5-minute tutorial, you'll learn everything you need to get started with our warehouse management system."
 
 *[Screen: Login page]*
 
@@ -42,13 +42,13 @@
 
 **[SECTION 1: LOGGING IN - 0:20-1:00]**
 
-**Narrator**: "Let's start by logging in to FlowStock."
+**Narrator**: "Let's start by logging in to LogiVox."
 
 *[Action: Navigate to https://flowstock.yourcompany.com]*
 
-**Narrator**: "Open your web browser and navigate to your FlowStock URL. Enter your email address and password provided by your administrator."
+**Narrator**: "Open your web browser and navigate to your LogiVox URL. Enter your email address and password provided by your administrator."
 
-*[Action: Type demo@flowstock.com in Email field]*  
+*[Action: Type demo@logivox.ai in Email field]*  
 *[Action: Type password in Password field]*  
 *[Action: Click "Sign In" button]*
 
@@ -130,7 +130,7 @@
 
 *[Action: Search results appear]*
 
-**Narrator**: "...and FlowStock will show you matching products, orders, and customers."
+**Narrator**: "...and LogiVox will show you matching products, orders, and customers."
 
 *[Action: Press ESC to close search]*
 
@@ -158,11 +158,11 @@
 
 **[OUTRO - 4:50-5:00]**
 
-*[Screen: FlowStock dashboard]*
+*[Screen: LogiVox dashboard]*
 
-**Narrator**: "That's it! You're now ready to start using FlowStock WMS. In our next video, we'll dive into Inventory Management. Thanks for watching!"
+**Narrator**: "That's it! You're now ready to start using LogiVox WMS. In our next video, we'll dive into Inventory Management. Thanks for watching!"
 
-*[Screen: FlowStock logo with text "Watch next: Inventory Management"]*
+*[Screen: LogiVox logo with text "Watch next: Inventory Management"]*
 
 ---
 
@@ -181,9 +181,9 @@
 
 **[INTRO - 0:00-0:15]**
 
-*[Screen: FlowStock logo]*
+*[Screen: LogiVox logo]*
 
-**Narrator**: "Welcome to FlowStock WMS Inventory Management! In this 10-minute tutorial, you'll learn how to manage your product catalog and stock levels like a pro."
+**Narrator**: "Welcome to LogiVox WMS Inventory Management! In this 10-minute tutorial, you'll learn how to manage your product catalog and stock levels like a pro."
 
 *[Screen: Inventory dashboard]*
 
@@ -249,7 +249,7 @@
 
 *[Action: Enter Reorder Level: 50]*
 
-**Narrator**: "Set a reorder point. When stock drops below this level, FlowStock will alert you to reorder."
+**Narrator**: "Set a reorder point. When stock drops below this level, LogiVox will alert you to reorder."
 
 *[Action: Enter Reorder Quantity: 200]*
 
@@ -355,11 +355,11 @@
 
 *[Action: Navigate to product detail]*
 
-**Narrator**: "FlowStock's barcode features make inventory management effortless."
+**Narrator**: "LogiVox's barcode features make inventory management effortless."
 
 *[Action: Click "Barcode" tab]*
 
-**Narrator**: "Every product has a unique barcode. You can print these labels directly from FlowStock."
+**Narrator**: "Every product has a unique barcode. You can print these labels directly from LogiVox."
 
 *[Action: Click "Print Barcode"]*
 
@@ -381,7 +381,7 @@
 
 *[Screen: Barcode scanner active]*
 
-**Narrator**: "Use your device camera or a USB barcode scanner to scan any product barcode, and FlowStock instantly shows you the product details and current stock levels."
+**Narrator**: "Use your device camera or a USB barcode scanner to scan any product barcode, and LogiVox instantly shows you the product details and current stock levels."
 
 ---
 
@@ -405,13 +405,13 @@
 
 **Narrator**: "Open the template in Excel, fill in your product data, and save."
 
-*[Action: Click "Upload CSV" back in FlowStock]*
+*[Action: Click "Upload CSV" back in LogiVox]*
 
-**Narrator**: "Back in FlowStock, click 'Upload CSV' and select your file."
+**Narrator**: "Back in LogiVox, click 'Upload CSV' and select your file."
 
 *[Screen: Import preview]*
 
-**Narrator**: "FlowStock will preview your import and flag any errors. Once everything looks good, click 'Import Products' and all your products are added instantly!"
+**Narrator**: "LogiVox will preview your import and flag any errors. Once everything looks good, click 'Import Products' and all your products are added instantly!"
 
 ---
 
@@ -419,7 +419,7 @@
 
 *[Screen: Inventory dashboard]*
 
-**Narrator**: "And that's Inventory Management in FlowStock! You now know how to add products, adjust stock, transfer between warehouses, and use barcodes. In our next video, we'll cover Order Processing. Thanks for watching!"
+**Narrator**: "And that's Inventory Management in LogiVox! You now know how to add products, adjust stock, transfer between warehouses, and use barcodes. In our next video, we'll cover Order Processing. Thanks for watching!"
 
 *[Screen: "Watch next: Order Processing"]*
 
@@ -439,9 +439,9 @@
 
 **[INTRO - 0:00-0:15]**
 
-*[Screen: FlowStock logo]*
+*[Screen: LogiVox logo]*
 
-**Narrator**: "Welcome to Order Processing in FlowStock WMS! In this 12-minute tutorial, you'll master the complete order lifecycle from creation to shipment."
+**Narrator**: "Welcome to Order Processing in LogiVox WMS! In this 12-minute tutorial, you'll master the complete order lifecycle from creation to shipment."
 
 ---
 
@@ -475,7 +475,7 @@
 
 *[Action: Enter Quantity: 50]*
 
-**Narrator**: "Enter the quantity – FlowStock will automatically check if you have enough stock and show you the unit price."
+**Narrator**: "Enter the quantity – LogiVox will automatically check if you have enough stock and show you the unit price."
 
 *[Action: Click "Add Item"]*
 
@@ -483,7 +483,7 @@
 
 *[Action: Add 2 more products]*
 
-**Narrator**: "You can add as many products as needed. FlowStock calculates the totals automatically."
+**Narrator**: "You can add as many products as needed. LogiVox calculates the totals automatically."
 
 *[Action: Select Shipping Method: Standard Shipping]*
 
@@ -513,7 +513,7 @@
 
 *[Screen: Confirmation dialog]*
 
-**Narrator**: "FlowStock checks stock availability. If everything is in stock, the order moves to 'Confirmed' status and inventory is reserved."
+**Narrator**: "LogiVox checks stock availability. If everything is in stock, the order moves to 'Confirmed' status and inventory is reserved."
 
 *[Action: Click "Confirm"]*
 
@@ -587,7 +587,7 @@
 
 *[Action: Click "Generate Shipping Label"]*
 
-**Narrator**: "Generate a shipping label directly from FlowStock if you have carrier integration enabled."
+**Narrator**: "Generate a shipping label directly from LogiVox if you have carrier integration enabled."
 
 *[Action: Enter Tracking Number: 1Z999AA10123456784]*
 
@@ -621,13 +621,13 @@
 
 *[Action: Add products below reorder level]*
 
-**Narrator**: "Add products you need to reorder. FlowStock shows you items below reorder level to help you decide what to buy."
+**Narrator**: "Add products you need to reorder. LogiVox shows you items below reorder level to help you decide what to buy."
 
 *[Action: Enter Quantity: 500]*
 
 *[Action: Enter Unit Cost: $12.50]*
 
-**Narrator**: "Enter quantities and unit costs. FlowStock calculates the total automatically."
+**Narrator**: "Enter quantities and unit costs. LogiVox calculates the total automatically."
 
 *[Action: Set Expected Delivery Date]*
 
@@ -685,7 +685,7 @@
 
 *[Action: Click "Generate RMA Number"]*
 
-**Narrator**: "FlowStock generates a unique RMA (Return Merchandise Authorization) number."
+**Narrator**: "LogiVox generates a unique RMA (Return Merchandise Authorization) number."
 
 *[Screen: RMA number generated: RMA-2025-0001]*
 
@@ -745,7 +745,7 @@
 
 *[Screen: Orders dashboard]*
 
-**Narrator**: "Congratulations! You now know how to process orders from start to finish in FlowStock WMS. In our next video, we'll explore Warehouse Operations. Thanks for watching!"
+**Narrator**: "Congratulations! You now know how to process orders from start to finish in LogiVox WMS. In our next video, we'll explore Warehouse Operations. Thanks for watching!"
 
 *[Screen: "Watch next: Warehouse Operations"]*
 
@@ -765,9 +765,9 @@
 
 **[INTRO - 0:00-0:15]**
 
-*[Screen: FlowStock logo]*
+*[Screen: LogiVox logo]*
 
-**Narrator**: "Welcome to Warehouse Operations in FlowStock WMS! This 15-minute tutorial will teach you advanced warehouse management techniques to maximize efficiency."
+**Narrator**: "Welcome to Warehouse Operations in LogiVox WMS! This 15-minute tutorial will teach you advanced warehouse management techniques to maximize efficiency."
 
 ---
 
@@ -779,7 +779,7 @@
 
 *[Screen: Locations list with hierarchy view]*
 
-**Narrator**: "FlowStock uses a hierarchical location system: Zone, Aisle, Rack, Shelf, and Bin."
+**Narrator**: "LogiVox uses a hierarchical location system: Zone, Aisle, Rack, Shelf, and Bin."
 
 *[Action: Show location code: A-01-1-B-02]*
 
@@ -815,7 +815,7 @@
 
 *[Screen: Bulk create form]*
 
-**Narrator**: "Specify ranges for zones, aisles, racks, shelves, and bins, and FlowStock generates all combinations automatically!"
+**Narrator**: "Specify ranges for zones, aisles, racks, shelves, and bins, and LogiVox generates all combinations automatically!"
 
 *[Action: Enter Zone: A-C, Aisles: 01-10, etc.]*
 
@@ -905,7 +905,7 @@
 
 *[Action: Enter Physical Count: 148 (System shows 150)]*
 
-**Narrator**: "FlowStock shows the system quantity and highlights any discrepancies."
+**Narrator**: "LogiVox shows the system quantity and highlights any discrepancies."
 
 *[Action: Enter Discrepancy Note: "2 units damaged"]*
 
@@ -919,7 +919,7 @@
 
 *[Screen: Count summary with discrepancies]*
 
-**Narrator**: "FlowStock shows a summary of all discrepancies found."
+**Narrator**: "LogiVox shows a summary of all discrepancies found."
 
 *[Action: Click "Adjust Inventory"]*
 
@@ -931,7 +931,7 @@
 
 *[Action: Navigate to Warehouse → Settings → Picking Strategies]*
 
-**Narrator**: "FlowStock supports four picking strategies to optimize your operations."
+**Narrator**: "LogiVox supports four picking strategies to optimize your operations."
 
 **[Strategy 1: Single Order Picking - 7:45-8:30]**
 
@@ -1009,7 +1009,7 @@
 
 *[Action: Click "Calculate Route"]*
 
-**Narrator**: "Click 'Calculate Route' and FlowStock analyzes your warehouse layout."
+**Narrator**: "Click 'Calculate Route' and LogiVox analyzes your warehouse layout."
 
 *[Screen: Optimized route displayed on warehouse map]*
 
@@ -1059,7 +1059,7 @@
 
 *[Screen: Automation in action – task created automatically]*
 
-**Narrator**: "Now whenever stock drops low, FlowStock automatically creates a replenishment task and assigns it to an available worker. No manual intervention needed!"
+**Narrator**: "Now whenever stock drops low, LogiVox automatically creates a replenishment task and assigns it to an available worker. No manual intervention needed!"
 
 ---
 
@@ -1099,7 +1099,7 @@
 
 *[Screen: Warehouse dashboard]*
 
-**Narrator**: "Excellent work! You now know how to optimize warehouse operations in FlowStock WMS. In our next video, we'll explore Reports & Analytics. Thanks for watching!"
+**Narrator**: "Excellent work! You now know how to optimize warehouse operations in LogiVox WMS. In our next video, we'll explore Reports & Analytics. Thanks for watching!"
 
 *[Screen: "Watch next: Reports & Analytics"]*
 
@@ -1119,9 +1119,9 @@
 
 **[INTRO - 0:00-0:15]**
 
-*[Screen: FlowStock logo]*
+*[Screen: LogiVox logo]*
 
-**Narrator**: "Welcome to Reports & Analytics in FlowStock WMS! In 8 minutes, you'll learn how to generate powerful insights from your warehouse data."
+**Narrator**: "Welcome to Reports & Analytics in LogiVox WMS! In 8 minutes, you'll learn how to generate powerful insights from your warehouse data."
 
 ---
 
@@ -1129,7 +1129,7 @@
 
 *[Action: Navigate to Reports → Standard Reports]*
 
-**Narrator**: "FlowStock includes 7 pre-built standard reports. Let's explore them."
+**Narrator**: "LogiVox includes 7 pre-built standard reports. Let's explore them."
 
 *[Action: Click "Stock Level Report"]*
 
@@ -1149,7 +1149,7 @@
 
 *[Screen: Report generating...]*
 
-**Narrator**: "FlowStock generates the report in seconds!"
+**Narrator**: "LogiVox generates the report in seconds!"
 
 *[Screen: Report opens]*
 
@@ -1157,7 +1157,7 @@
 
 *[Action: Click "Download" and "Email"]*
 
-**Narrator**: "Download or email the report directly from FlowStock."
+**Narrator**: "Download or email the report directly from LogiVox."
 
 *[Action: Quick tour of other reports]*
 
@@ -1211,7 +1211,7 @@
 
 *[Screen: Chart preview appears]*
 
-**Narrator**: "FlowStock shows a preview of your chart in real-time!"
+**Narrator**: "LogiVox shows a preview of your chart in real-time!"
 
 *[Action: Click "Save Report"]*
 
@@ -1337,7 +1337,7 @@
 
 *[Screen: Reports dashboard]*
 
-**Narrator**: "Fantastic! You now know how to generate reports, build custom reports, create dashboards, and schedule automated reports in FlowStock WMS. In our next video, we'll cover Admin Configuration. Thanks for watching!"
+**Narrator**: "Fantastic! You now know how to generate reports, build custom reports, create dashboards, and schedule automated reports in LogiVox WMS. In our next video, we'll cover Admin Configuration. Thanks for watching!"
 
 *[Screen: "Watch next: Admin Configuration"]*
 
@@ -1357,9 +1357,9 @@
 
 **[INTRO - 0:00-0:15]**
 
-*[Screen: FlowStock logo]*
+*[Screen: LogiVox logo]*
 
-**Narrator**: "Welcome to Admin Configuration in FlowStock WMS! In this 12-minute tutorial, you'll learn how to configure and manage your FlowStock system like a pro."
+**Narrator**: "Welcome to Admin Configuration in LogiVox WMS! In this 12-minute tutorial, you'll learn how to configure and manage your LogiVox system like a pro."
 
 ---
 
@@ -1382,9 +1382,9 @@
 
 **[INTRO - 0:00-0:15]**
 
-*[Screen: FlowStock logo]*
+*[Screen: LogiVox logo]*
 
-**Narrator**: "Welcome to FlowStock Mobile! In 7 minutes, you'll learn how to use FlowStock on your smartphone or tablet for fast, efficient warehouse operations."
+**Narrator**: "Welcome to LogiVox Mobile! In 7 minutes, you'll learn how to use LogiVox on your smartphone or tablet for fast, efficient warehouse operations."
 
 ---
 
@@ -1406,9 +1406,9 @@
 
 **[INTRO - 0:00-0:15]**
 
-*[Screen: FlowStock logo]*
+*[Screen: LogiVox logo]*
 
-**Narrator**: "Welcome to Integrations Setup in FlowStock WMS! In 10 minutes, you'll learn how to connect FlowStock with your favorite business tools."
+**Narrator**: "Welcome to Integrations Setup in LogiVox WMS! In 10 minutes, you'll learn how to connect LogiVox with your favorite business tools."
 
 ---
 
@@ -1446,12 +1446,12 @@
 
 **Publishing:**
 - Upload to YouTube (unlisted or public)
-- Embed on FlowStock website
+- Embed on LogiVox website
 - Create video playlists by topic
 - Add video descriptions with timestamps
 - Enable comments for questions
 
 ---
 
-**FlowStock WMS Video Tutorial Scripts - Version 1.0**  
+**LogiVox WMS Video Tutorial Scripts - Version 1.0**  
 *Last updated: October 16, 2025*

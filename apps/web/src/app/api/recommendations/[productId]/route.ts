@@ -47,7 +47,7 @@ export async function GET(
     });
 
     // Transform to expected format
-    const productList = products.map(p => ({
+    const productList = products.map((p: typeof products[number]) => ({
       id: p.id,
       name: p.name,
       category: p.category || 'Uncategorized',
@@ -107,7 +107,7 @@ export async function GET(
         // For demo, just return trending products (most popular)
         recommendations = productList
           .slice(0, limit)
-          .map(p => ({
+          .map((p: typeof productList[number]) => ({
             productId: p.id,
             productName: p.name,
             score: Math.random(),

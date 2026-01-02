@@ -9,7 +9,7 @@ test.describe('Authentication', () => {
   test('should login successfully with valid credentials', async ({ page }) => {
     await page.goto('/login');
     
-    await page.fill('input[name="email"]', 'admin@flowstock.com');
+    await page.fill('input[name="email"]', 'admin@logivox.ai');
     await page.fill('input[name="password"]', 'password');
     await page.click('button[type="submit"]');
     
@@ -55,7 +55,7 @@ test.describe('Authentication', () => {
   test('should remember me work correctly', async ({ page, context }) => {
     await page.goto('/login');
     
-    await page.fill('input[name="email"]', 'admin@flowstock.com');
+    await page.fill('input[name="email"]', 'admin@logivox.ai');
     await page.fill('input[name="password"]', 'password');
     await page.check('input[name="rememberMe"]');
     await page.click('button[type="submit"]');

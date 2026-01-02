@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Report Viewer Component for FlowStock
+ * Report Viewer Component for LogiVox
  * 
  * Displays executed report results with tables, charts, and export options.
  */

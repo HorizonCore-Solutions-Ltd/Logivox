@@ -1,4 +1,4 @@
-# FlowStock - Systematic Execution Plan
+# LogiVox - Systematic Execution Plan
 
 > **Status:** Foundation Complete ✅ | Landing Page Live 🎉  
 > **Next Phase:** Complete All Pages & Build Enterprise Features  

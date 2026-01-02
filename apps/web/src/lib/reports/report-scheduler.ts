@@ -1,5 +1,5 @@
 /**
- * Report Scheduler for FlowStock
+ * Report Scheduler for LogiVox
  * 
  * Handles scheduled report generation and delivery via email.
  * Supports daily, weekly, and monthly schedules.
@@ -163,7 +163,7 @@ export function generateReportEmail(
 } {
   const { reportConfig } = scheduledReport;
 
-  const subject = `FlowStock Report: ${reportConfig.name}`;
+  const subject = `LogiVox Report: ${reportConfig.name}`;
 
   const html = `
 <!DOCTYPE html>
@@ -235,7 +235,7 @@ export function generateReportEmail(
 </head>
 <body>
   <div class="header">
-    <h1>📊 FlowStock Report</h1>
+    <h1>📊 LogiVox Report</h1>
   </div>
 
   <div class="content">
@@ -269,9 +269,9 @@ export function generateReportEmail(
 
   <div class="footer">
     <p>
-      This is an automated email from FlowStock Reporting System.
+      This is an automated email from LogiVox Reporting System.
       <br>
-      &copy; ${new Date().getFullYear()} FlowStock. All rights reserved.
+      &copy; ${new Date().getFullYear()} LogiVox. All rights reserved.
     </p>
   </div>
 </body>
@@ -279,7 +279,7 @@ export function generateReportEmail(
   `;
 
   const text = `
-FlowStock Report: ${reportConfig.name}
+LogiVox Report: ${reportConfig.name}
 
 ${reportConfig.description || ''}
 
@@ -294,8 +294,8 @@ Your scheduled report has been generated and is attached to this email.
 Schedule: ${getScheduleDescription(scheduledReport.schedule)}
 
 ---
-This is an automated email from FlowStock Reporting System.
-© ${new Date().getFullYear()} FlowStock. All rights reserved.
+This is an automated email from LogiVox Reporting System.
+© ${new Date().getFullYear()} LogiVox. All rights reserved.
   `.trim();
 
   return { subject, html, text };

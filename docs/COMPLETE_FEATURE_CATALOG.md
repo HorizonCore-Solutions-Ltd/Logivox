@@ -1,4 +1,4 @@
-# FlowStock - Complete Feature Catalog & Implementation Guide
+# LogiVox - Complete Feature Catalog & Implementation Guide
 
 > **Last Updated:** October 15, 2025  
 > **Purpose:** Comprehensive catalog of ALL features (implemented, planned, and optional)  
@@ -388,12 +388,12 @@
   - [ ] RSS feed
 - [ ] 10+ professional blog posts
   - [ ] "Top 10 Inventory Management Best Practices"
-  - [ ] "How to Integrate ERP Systems with FlowStock"
+  - [ ] "How to Integrate ERP Systems with LogiVox"
   - [ ] "AI-Powered Stock Forecasting Explained"
   - [ ] "Warehouse Label Printing: A Complete Guide"
   - [ ] "Multi-Tenant vs Single-Tenant: Which is Right for You?"
   - [ ] "5 Ways to Reduce Stock Errors with Automation"
-  - [ ] "Building a Modern Warehouse with FlowStock"
+  - [ ] "Building a Modern Warehouse with LogiVox"
   - [ ] "Understanding RBAC in Inventory Management"
   - [ ] "How to Choose the Right Label Printer for Your Warehouse"
   - [ ] "PWA for Warehouse Operations: Benefits and Implementation"
@@ -430,7 +430,7 @@
   - [ ] White-label mode toggle
   - [ ] Custom domain CNAME guide
 - [ ] Logo display
-  - [ ] Replace FlowStock logo with organization logo
+  - [ ] Replace LogiVox logo with organization logo
   - [ ] Sidebar logo
   - [ ] Navigation logo
   - [ ] Email logo
@@ -440,7 +440,7 @@
   - [ ] Theme system integration
   - [ ] Component theming
 - [ ] White-label mode
-  - [ ] Hide "Powered by FlowStock"
+  - [ ] Hide "Powered by LogiVox"
   - [ ] Custom branding throughout
   - [ ] Custom domain support
 
@@ -465,7 +465,7 @@
   - [ ] shadcn/ui documentation
   - [ ] PostgreSQL documentation
   - [ ] TypeScript documentation
-  - [ ] FlowStock internal documentation
+  - [ ] LogiVox internal documentation
 - [ ] Document processing
   - [ ] Markdown parser
   - [ ] Document chunker (500-1000 tokens)
@@ -1132,7 +1132,7 @@ model Brand {
 **Features:**
 - [ ] Shopify integration
   - [ ] OAuth connection at `/dashboard/integrations/shopify`
-  - [ ] Product sync (Shopify ↔ FlowStock)
+  - [ ] Product sync (Shopify ↔ LogiVox)
   - [ ] Order sync (create bookings from orders)
   - [ ] Inventory sync (real-time stock updates)
   - [ ] Webhook listeners
@@ -1276,7 +1276,7 @@ model UserTrainingProgress {
 
 **Features:**
 - [ ] Complete white-label mode
-  - [ ] Hide FlowStock branding
+  - [ ] Hide LogiVox branding
   - [ ] Replace with organization branding
   - [ ] Custom login pages
   - [ ] Custom email templates
@@ -1527,6 +1527,6 @@ model ComplianceDocument {
 
 **Last Updated:** October 15, 2025  
 **Version:** 1.0  
-**Maintained By:** FlowStock Development Team  
+**Maintained By:** LogiVox Development Team  
 **Total Features Tracked:** 50+  
 **Completion:** 23/50 (46%)

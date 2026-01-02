@@ -145,7 +145,7 @@ export default function IntegrationsPage() {
               Powerful Integrations
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Connect FlowStock with your entire tech stack. 100+ pre-built integrations, comprehensive APIs, and webhooks for seamless automation.
+              Connect LogiVox with your entire tech stack. 100+ pre-built integrations, comprehensive APIs, and webhooks for seamless automation.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -372,7 +372,7 @@ export default function IntegrationsPage() {
             Ready to Connect Your Systems?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Start integrating FlowStock with your tech stack today
+            Start integrating LogiVox with your tech stack today
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

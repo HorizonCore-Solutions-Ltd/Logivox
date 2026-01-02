@@ -176,4 +176,4 @@ This session delivered **THREE COMPLETE ENTERPRISE FEATURE SUITES** with world-c
 
 ---
 
-**FlowStock is now the most advanced, secure, and accessible inventory management platform in the market!** 🎊
+**LogiVox is now the most advanced, secure, and accessible inventory management platform in the market!** 🎊

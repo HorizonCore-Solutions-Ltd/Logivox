@@ -37,14 +37,14 @@ function jaccardSimilarity<T>(set1: Set<T>, set2: Set<T>): number {
 function cosineSimilarity(vec1: number[], vec2: number[]): number {
   if (vec1.length !== vec2.length) return 0;
 
-  let dotProduct = 0;
-  let mag1 = 0;
-  let mag2 = 0;
+  let dotProduct: number = 0;
+  let mag1: number = 0;
+  let mag2: number = 0;
 
   for (let i = 0; i < vec1.length; i++) {
-    dotProduct += vec1[i] * vec2[i];
-    mag1 += vec1[i] * vec1[i];
-    mag2 += vec2[i] * vec2[i];
+    dotProduct += (vec1[i] ?? 0) * (vec2[i] ?? 0);
+    mag1 += (vec1[i] ?? 0) * (vec1[i] ?? 0);
+    mag2 += (vec2[i] ?? 0) * (vec2[i] ?? 0);
   }
 
   mag1 = Math.sqrt(mag1);

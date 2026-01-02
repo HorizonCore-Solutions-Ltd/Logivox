@@ -3,6 +3,20 @@
  * Provides semantic search, autocomplete, filters, and intelligent ranking
  */
 
+// Product interface for type safety
+export interface Product {
+  id: string;
+  name: string;
+  description?: string;
+  sku?: string;
+  category?: string;
+  price?: number;
+  inStock?: boolean;
+  tags?: string[];
+  type?: string;
+  [key: string]: any;
+}
+
 export interface SearchResult {
   id: string;
   type: "product" | "category" | "supplier" | "customer";

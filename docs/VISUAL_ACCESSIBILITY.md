@@ -2,7 +2,7 @@
 
 ## Overview
 
-Comprehensive visual accessibility system for FlowStock, providing customizable visual preferences, high contrast modes, font scaling, and more. WCAG 2.1 Level AA compliant with AAA enhancements.
+Comprehensive visual accessibility system for LogiVox, providing customizable visual preferences, high contrast modes, font scaling, and more. WCAG 2.1 Level AA compliant with AAA enhancements.
 
 ---
 
@@ -434,7 +434,7 @@ Changes apply immediately via CSS class toggling.
 ## Support
 
 For questions about visual accessibility features:
-- **Email:** accessibility@flowstock.com
+- **Email:** accessibility@logivox.ai
 - **Settings Page:** `/dashboard/settings/accessibility`
 - **Documentation:** This guide
 
