@@ -12,10 +12,11 @@
  * - Predictive stockout date calculation
  */
 
-import { PrismaClient, AlertType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { addDays, differenceInDays, format } from 'date-fns';
 
 // Define alert enums if not in Prisma schema
+export type AlertType = 'LOW_STOCK' | 'REORDER_POINT' | 'STOCKOUT' | 'EXPIRING_SOON';
 export type AlertSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 export type AlertStatus = 'PENDING' | 'SENT' | 'ACKNOWLEDGED' | 'RESOLVED';
 
@@ -197,20 +198,20 @@ export class ReorderAlertEngine {
     let shouldAlert = false;
 
     if (currentStock <= 0) {
-      alertType = AlertType.OUT_OF_STOCK;
-      severity = AlertSeverity.CRITICAL;
+      alertType = 'STOCKOUT';
+      severity = 'CRITICAL';
       shouldAlert = true;
     } else if (this.config.checkLeadTime && daysUntilStockout <= leadTimeDays) {
-      alertType = AlertType.CRITICAL_STOCK;
-      severity = AlertSeverity.HIGH;
+      alertType = 'REORDER_POINT';
+      severity = 'HIGH';
       shouldAlert = true;
     } else if (currentStock <= reorderPoint) {
-      alertType = AlertType.LOW_STOCK;
-      severity = AlertSeverity.MEDIUM;
+      alertType = 'LOW_STOCK';
+      severity = 'MEDIUM';
       shouldAlert = true;
     } else {
-      alertType = AlertType.LOW_STOCK;
-      severity = AlertSeverity.LOW;
+      alertType = 'LOW_STOCK';
+      severity = 'LOW';
       shouldAlert = false;
     }
 
@@ -278,7 +279,7 @@ export class ReorderAlertEngine {
         inventoryItemId: item.id,
         alertType: analysis.alertType,
         severity: analysis.severity,
-        status: AlertStatus.PENDING,
+        status: 'PENDING',
         currentStock: analysis.currentStock,
         reorderPoint: analysis.reorderPoint,
         reorderQuantity: analysis.reorderQuantity,
@@ -356,12 +357,12 @@ export class ReorderAlertEngine {
 
     let message = `🚨 Reorder Alert: ${item.name} (${item.sku})\n\n`;
 
-    if (alertType === AlertType.OUT_OF_STOCK) {
+    if (alertType === 'STOCKOUT') {
       message += `❌ OUT OF STOCK!\n`;
       message += `Current Stock: ${currentStock}\n`;
       message += `Reorder Point: ${reorderPoint}\n`;
       message += `Suggested Reorder: ${reorderQuantity} units\n`;
-    } else if (alertType === AlertType.CRITICAL_STOCK) {
+    } else if (alertType === 'REORDER_POINT') {
       message += `⚠️ CRITICAL - Stockout Imminent!\n`;
       message += `Current Stock: ${currentStock} units\n`;
       message += `Reorder Point: ${reorderPoint} units\n`;
@@ -452,7 +453,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.findMany({
       where: {
         organizationId,
-        status: AlertStatus.PENDING,
+        status: 'PENDING',
       },
       include: {
         inventoryItem: {
@@ -477,7 +478,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.update({
       where: { id: alertId },
       data: {
-        status: AlertStatus.ACKNOWLEDGED,
+        status: 'ACKNOWLEDGED',
         acknowledgedAt: new Date(),
       },
     });
@@ -490,7 +491,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.update({
       where: { id: alertId },
       data: {
-        status: AlertStatus.RESOLVED,
+        status: 'RESOLVED',
         resolvedAt: new Date(),
         notes,
       },
@@ -504,7 +505,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.update({
       where: { id: alertId },
       data: {
-        status: AlertStatus.DISMISSED,
+        status: 'DISMISSED',
         dismissedAt: new Date(),
         notes,
       },
@@ -527,10 +528,10 @@ export class ReorderAlertEngine {
       await prisma.reorderAlert.updateMany({
         where: {
           inventoryItemId,
-          status: { in: [AlertStatus.PENDING, AlertStatus.ACKNOWLEDGED] },
+          status: { in: ['PENDING', 'ACKNOWLEDGED'] },
         },
         data: {
-          status: AlertStatus.AUTO_RESOLVED,
+          status: 'RESOLVED',
           resolvedAt: new Date(),
           notes: 'Auto-resolved: Stock replenished',
         },
@@ -577,16 +578,16 @@ export async function getAlertStatistics(organizationId: string, days: number = 
       where: { organizationId, createdAt: { gte: since } },
     }),
     prisma.reorderAlert.count({
-      where: { organizationId, status: AlertStatus.PENDING, createdAt: { gte: since } },
+      where: { organizationId, status: 'PENDING', createdAt: { gte: since } },
     }),
     prisma.reorderAlert.count({
-      where: { organizationId, status: AlertStatus.ACKNOWLEDGED, createdAt: { gte: since } },
+      where: { organizationId, status: 'ACKNOWLEDGED', createdAt: { gte: since } },
     }),
     prisma.reorderAlert.count({
-      where: { organizationId, status: AlertStatus.RESOLVED, createdAt: { gte: since } },
+      where: { organizationId, status: 'RESOLVED', createdAt: { gte: since } },
     }),
     prisma.reorderAlert.count({
-      where: { organizationId, status: AlertStatus.DISMISSED, createdAt: { gte: since } },
+      where: { organizationId, status: 'DISMISSED', createdAt: { gte: since } },
     }),
   ]);
 

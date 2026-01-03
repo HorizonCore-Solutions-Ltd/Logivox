@@ -16,7 +16,17 @@ import {
   FileText,
   BookOpen,
   Users,
-  Phone
+  Phone,
+  Package,
+  Truck,
+  MapPin,
+  ShieldCheck,
+  Mic,
+  LineChart,
+  Warehouse,
+  ClipboardCheck,
+  Radio,
+  AlertTriangle
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -44,35 +54,71 @@ export function Navigation() {
 
   const solutions = [
     {
-      title: "Stock Booking",
-      description: "Real-time inventory management and booking",
-      icon: Database,
-      href: "/solutions/stock-booking",
+      title: "Warehouse Management",
+      description: "Complete WMS with real-time inventory control",
+      icon: Warehouse,
+      href: "/solutions/warehouse-management",
     },
     {
-      title: "ERP Integration",
-      description: "Seamless integration with Oracle, SAP, NetSuite",
-      icon: Zap,
-      href: "/solutions/erp-integration",
+      title: "Voice-Enabled Operations",
+      description: "Hands-free voice commands for warehouse tasks",
+      icon: Mic,
+      href: "/solutions/voice-operations",
     },
     {
-      title: "Analytics & Insights",
-      description: "Advanced reporting and predictive analytics",
-      icon: BarChart3,
+      title: "Returns Management",
+      description: "Streamlined RMA processing and reverse logistics",
+      icon: Package,
+      href: "/solutions/returns",
+    },
+    {
+      title: "Yard Management",
+      description: "Smart parking and dock scheduling optimization",
+      icon: MapPin,
+      href: "/solutions/yard-management",
+    },
+    {
+      title: "Gate & Security",
+      description: "Complete gate entry and guard management system",
+      icon: ShieldCheck,
+      href: "/solutions/gate-security",
+    },
+    {
+      title: "Inventory Management",
+      description: "Real-time stock tracking and cycle counting",
+      icon: Package,
+      href: "/solutions/inventory",
+    },
+    {
+      title: "Order Fulfillment",
+      description: "Picking, packing, and shipping optimization",
+      icon: ClipboardCheck,
+      href: "/solutions/fulfillment",
+    },
+    {
+      title: "Transportation Management",
+      description: "Load planning and route optimization",
+      icon: Truck,
+      href: "/solutions/transportation",
+    },
+    {
+      title: "AI Analytics & Forecasting",
+      description: "Predictive insights and demand forecasting",
+      icon: LineChart,
       href: "/solutions/analytics",
-    },
-    {
-      title: "Multi-Tenant",
-      description: "Enterprise-grade multi-tenant architecture",
-      icon: Users,
-      href: "/solutions/multi-tenant",
     },
   ]
 
   const platform = [
     {
+      title: "AI Assistant",
+      description: "Public & tenant-aware intelligent assistant",
+      icon: Radio,
+      href: "/platform/ai-assistant",
+    },
+    {
       title: "Security",
-      description: "Zero-trust security and compliance",
+      description: "Military-grade security & compliance",
       icon: Shield,
       href: "/platform/security",
     },
@@ -89,10 +135,16 @@ export function Navigation() {
       href: "/docs/api",
     },
     {
-      title: "Enterprise",
-      description: "Solutions for large organizations",
+      title: "Business Continuity",
+      description: "99.99% uptime & disaster recovery",
+      icon: AlertTriangle,
+      href: "/platform/business-continuity",
+    },
+    {
+      title: "Multi-Tenant",
+      description: "Complete data isolation per tenant",
       icon: Building2,
-      href: "/platform/enterprise",
+      href: "/platform/multi-tenant",
     },
   ]
 
@@ -143,7 +195,7 @@ export function Navigation() {
               <NavigationMenuItem>
                 <NavigationMenuTrigger>Solutions</NavigationMenuTrigger>
                 <NavigationMenuContent>
-                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                  <ul className="grid w-[500px] gap-3 p-4 md:w-[600px] md:grid-cols-2 lg:w-[800px] lg:grid-cols-3">
                     {solutions.map((item) => (
                       <li key={item.title}>
                         <NavigationMenuLink asChild>

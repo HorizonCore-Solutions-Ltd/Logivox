@@ -23,6 +23,11 @@ import {
 export default function SecurityPage() {
   const securityFeatures = [
     {
+      icon: ShieldCheck,
+      title: "Military-Grade Security",
+      description: "AES-256 encryption (same as used by military/government), zero-trust architecture, and continuous threat monitoring."
+    },
+    {
       icon: Lock,
       title: "End-to-End Encryption",
       description: "AES-256 encryption for data at rest and TLS 1.3 for data in transit."
@@ -30,7 +35,7 @@ export default function SecurityPage() {
     {
       icon: Key,
       title: "Multi-Factor Authentication",
-      description: "Require MFA with TOTP, SMS, or hardware keys for enhanced security."
+      description: "Require MFA with TOTP, SMS, hardware keys, or biometric authentication."
     },
     {
       icon: Shield,
@@ -39,8 +44,8 @@ export default function SecurityPage() {
     },
     {
       icon: Eye,
-      title: "Audit Logging",
-      description: "Complete activity logs with immutable records for compliance and forensics."
+      title: "Complete Audit Logging",
+      description: "Immutable audit trails for all activities with forensic-level detail for compliance."
     },
     {
       icon: Fingerprint,
@@ -51,6 +56,11 @@ export default function SecurityPage() {
       icon: Server,
       title: "DDoS Protection",
       description: "Enterprise-grade protection against distributed denial of service attacks."
+    },
+    {
+      icon: Database,
+      title: "Business Continuity",
+      description: "99.99% uptime SLA with automated failover, disaster recovery, real-time backups, and multi-region redundancy."
     }
   ]
 
@@ -91,12 +101,17 @@ export default function SecurityPage() {
   ]
 
   const benefits = [
+    "AI Assistant: Public (no internet) & tenant-aware for logged-in users",
+    "Military-grade AES-256 encryption & zero-trust architecture",
+    "99.99% uptime with advanced business continuity",
     "Protect sensitive inventory and customer data",
-    "Meet regulatory compliance requirements",
+    "Meet regulatory compliance requirements (SOC 2, ISO 27001, GDPR)",
     "Prevent unauthorized access and data breaches",
     "Complete audit trail for security investigations",
     "Automated threat detection and response",
     "24/7 security monitoring and alerts",
+    "Real-time backups with disaster recovery",
+    "Multi-region redundancy and automated failover",
     "Regular security updates and patches",
     "Dedicated security team and incident response"
   ]

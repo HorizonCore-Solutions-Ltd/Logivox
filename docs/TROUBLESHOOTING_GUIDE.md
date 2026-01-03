@@ -329,7 +329,7 @@ docker compose restart db
 
 ```bash
 # Check if port 5432 is accessible
-telnet localhost 5432
+nc -zv localhost 5432
 
 # Allow PostgreSQL through firewall
 sudo ufw allow 5432/tcp
@@ -921,7 +921,7 @@ docker compose logs app | grep -i "email"
 
 ```bash
 # Test SMTP connection
-telnet smtp.gmail.com 587
+nc -zv smtp.gmail.com 587
 
 # Update .env with correct credentials
 SMTP_HOST=smtp.gmail.com

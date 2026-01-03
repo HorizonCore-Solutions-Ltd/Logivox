@@ -21,21 +21,25 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'LogiVox - Enterprise Stock Booking Platform',
+    default: 'LogiVox - Enterprise Warehouse Management System | WMS Software',
     template: '%s | LogiVox',
   },
-  description: 'Enterprise-grade stock booking and inventory management platform with zero-trust security, real-time synchronization, and seamless ERP integrations.',
+  description: 'Industry-leading Warehouse Management System (WMS) with intelligent automation, wave picking, quality control, and real-time analytics. Fully adaptable, mobile-enabled WMS software driving supply chain efficiency.',
   keywords: [
-    'stock booking',
+    'warehouse management system',
+    'WMS software',
+    'warehouse automation',
     'inventory management',
+    'wave picking',
+    'order fulfillment',
+    'supply chain software',
+    'warehouse operations',
+    'quality control',
     'ERP integration',
-    'enterprise platform',
-    'multi-tenant',
-    'zero-trust security',
-    'real-time sync',
-    'Oracle integration',
     'SAP integration',
-    'NetSuite integration'
+    'real-time inventory tracking',
+    'mobile WMS',
+    'barcode scanning'
   ],
   authors: [
     {

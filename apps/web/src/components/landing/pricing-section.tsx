@@ -16,11 +16,153 @@ import {
   Crown,
   Phone,
   Mail,
-  Clock
+  Clock,
+  X,
+  Calendar,
+  Video
 } from "lucide-react"
 
 export function PricingSection() {
+  const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">("monthly")
+  const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">("monthly")
+  
+  const getPrice = (monthlyPrice: string) => {
+    if (monthlyPrice === "Custom") return "Custom"
+    const price = parseInt(monthlyPrice.replace("$", ""))
+    if (billingCycle === "annual") {
+      const annualPrice = Math.floor(price * 0.8) // 20% discount
+      return `$${annualPrice}`
+    }
+    return monthlyPrice
+  }
+
   const plans = [
+    {
+      name: "Starter",
+      description: "Perfect for small warehouses getting started",
+      monthlyPrice: "$49",
+      period: "per user/month",
+      badge: null,
+      features: [
+        "1 warehouse location",
+        "Up to 10,000 SKUs",
+        "Basic inventory tracking",
+        "Order management",
+        "Mobile app (iOS & Android)",
+        "Email support",
+        "Basic reporting",
+        "Barcode scanning"
+      ],
+      cta: "Start Free Trial",
+      ctaVariant: "outline" as const,
+      popular: false
+    },
+    {
+      name: "Professional",
+      description: "Advanced WMS for growing operations",
+      monthlyPrice: "$99",
+      period: "per user/month",
+      badge: "Most Popular",
+      features: [
+        "Up to 5 warehouses",
+        "Unlimited SKUs",
+        "Wave & batch picking",
+        "Quality control workflows",
+        "Carrier integrations (FedEx, UPS)",
+        "E-commerce sync (Shopify, WooCommerce)",
+        "Advanced analytics & AI",
+        "Voice-enabled operations",
+        "Returns management",
+        "Priority support (24/7)",
+        "API access",
+        "Custom workflows"
+      ],
+      cta: "Start Free Trial",
+      ctaVariant: "default" as const,
+      popular: true
+    },
+    {
+      name: "Enterprise",
+      description: "Complete WMS for large operations",
+      monthlyPrice: "Custom",
+      period: "contact sales",
+      badge: "Best Value",
+      features: [
+        "Unlimited warehouses",
+        "Unlimited SKUs",
+        "Assembly & kitting",
+        "Cross-docking",
+        "Yard & gate management",
+        "Transportation management",
+        "AI-powered forecasting",
+        "Custom integrations (SAP, Oracle, NetSuite)",
+        "Dedicated success manager",
+        "SSO & advanced security",
+        "On-premise deployment option",
+        "White-label solution",
+        "99.99% uptime SLA",
+        "Custom SLA agreements"
+      ],
+      cta: "Contact Sales",
+      ctaVariant: "outline" as const,
+      popular: false
+    }
+  ]
+
+  const comparisonFeatures = [
+    {
+      category: "Core Features",
+      features: [
+        { name: "Warehouse Locations", starter: "1", professional: "Up to 5", enterprise: "Unlimited" },
+        { name: "SKU Limit", starter: "10,000", professional: "Unlimited", enterprise: "Unlimited" },
+        { name: "Users", starter: "Unlimited", professional: "Unlimited", enterprise: "Unlimited" },
+        { name: "Mobile App", starter: true, professional: true, enterprise: true },
+        { name: "Barcode Scanning", starter: true, professional: true, enterprise: true },
+      ]
+    },
+    {
+      category: "Warehouse Operations",
+      features: [
+        { name: "Basic Inventory Tracking", starter: true, professional: true, enterprise: true },
+        { name: "Wave & Batch Picking", starter: false, professional: true, enterprise: true },
+        { name: "Quality Control", starter: false, professional: true, enterprise: true },
+        { name: "Returns Management", starter: false, professional: true, enterprise: true },
+        { name: "Assembly & Kitting", starter: false, professional: false, enterprise: true },
+        { name: "Cross-Docking", starter: false, professional: false, enterprise: true },
+        { name: "Cycle Counting", starter: false, professional: true, enterprise: true },
+      ]
+    },
+    {
+      category: "Advanced Features",
+      features: [
+        { name: "Voice-Enabled Operations", starter: false, professional: true, enterprise: true },
+        { name: "AI-Powered Forecasting", starter: false, professional: false, enterprise: true },
+        { name: "Yard Management", starter: false, professional: false, enterprise: true },
+        { name: "Gate & Security", starter: false, professional: false, enterprise: true },
+        { name: "Transportation Management", starter: false, professional: false, enterprise: true },
+      ]
+    },
+    {
+      category: "Integrations",
+      features: [
+        { name: "E-commerce (Shopify, WooCommerce)", starter: false, professional: true, enterprise: true },
+        { name: "Carriers (FedEx, UPS, USPS)", starter: false, professional: true, enterprise: true },
+        { name: "ERP (SAP, Oracle, NetSuite)", starter: false, professional: false, enterprise: true },
+        { name: "API Access", starter: false, professional: true, enterprise: true },
+        { name: "Custom Integrations", starter: false, professional: false, enterprise: true },
+      ]
+    },
+    {
+      category: "Support & Security",
+      features: [
+        { name: "Email Support", starter: true, professional: true, enterprise: true },
+        { name: "24/7 Priority Support", starter: false, professional: true, enterprise: true },
+        { name: "Dedicated Success Manager", starter: false, professional: false, enterprise: true },
+        { name: "SSO & Advanced Security", starter: false, professional: false, enterprise: true },
+        { name: "99.99% Uptime SLA", starter: false, professional: false, enterprise: true },
+      ]
+    }
+  ]
     {
       name: "Starter",
       description: "Perfect for small warehouses getting started",
@@ -141,10 +283,10 @@ export function PricingSection() {
   ]
 
   return (
-    <section className="py-24 bg-muted/30">
+    <section className="py-24">
       <div className="container-enterprise">
         {/* Section header */}
-        <div className="text-center space-y-4 mb-16">
+        <div className="text-center space-y-4 mb-12">
           <Badge variant="secondary" className="mb-4">
             Pricing
           </Badge>
@@ -155,13 +297,33 @@ export function PricingSection() {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Choose the perfect plan for your organization. Start with our free trial 
+            Choose the perfect plan for your organization. Start with our 14-day free trial 
             and scale as you grow. No hidden fees, cancel anytime.
           </p>
+
+          {/* Billing cycle toggle */}
+          <div className="flex items-center justify-center gap-4 pt-6">
+            <Button
+              variant={billingCycle === "monthly" ? "default" : "outline"}
+              onClick={() => setBillingCycle("monthly")}
+              size="lg"
+            >
+              Monthly
+            </Button>
+            <Button
+              variant={billingCycle === "annual" ? "default" : "outline"}
+              onClick={() => setBillingCycle("annual")}
+              size="lg"
+              className="relative"
+            >
+              Annual
+              <Badge className="absolute -top-2 -right-2 bg-green-500">Save 20%</Badge>
+            </Button>
+          </div>
         </div>
 
         {/* Pricing cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
           {plans.map((plan) => (
             <Card 
               key={plan.name} 
@@ -188,14 +350,19 @@ export function PricingSection() {
                 <div className="pt-4">
                   <div className="flex items-baseline justify-center space-x-1">
                     <span className="text-4xl font-bold">
-                      {plan.price}
+                      {getPrice(plan.monthlyPrice)}
                     </span>
-                    {plan.period && (
+                    {plan.monthlyPrice !== "Custom" && (
                       <span className="text-muted-foreground">
                         /{plan.period}
                       </span>
                     )}
                   </div>
+                  {billingCycle === "annual" && plan.monthlyPrice !== "Custom" && (
+                    <p className="text-sm text-green-600 mt-2">
+                      Billed annually • Save 20%
+                    </p>
+                  )}
                 </div>
               </CardHeader>
 
@@ -225,6 +392,78 @@ export function PricingSection() {
               </CardContent>
             </Card>
           ))}
+        </div>
+
+        {/* Feature Comparison Table */}
+        <div className="mb-20">
+          <div className="text-center mb-12">
+            <h3 className="text-3xl font-bold mb-4">Detailed Feature Comparison</h3>
+            <p className="text-muted-foreground text-lg">
+              Compare all features across our plans
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-4 font-semibold">Feature</th>
+                  <th className="text-center p-4 font-semibold">Starter</th>
+                  <th className="text-center p-4 font-semibold bg-primary/5">Professional</th>
+                  <th className="text-center p-4 font-semibold">Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                {comparisonFeatures.map((category) => (
+                  <React.Fragment key={category.category}>
+                    <tr className="bg-muted/50">
+                      <td colSpan={4} className="p-4 font-semibold text-sm uppercase tracking-wide">
+                        {category.category}
+                      </td>
+                    </tr>
+                    {category.features.map((feature, idx) => (
+                      <tr key={idx} className="border-b hover:bg-muted/30 transition-colors">
+                        <td className="p-4">{feature.name}</td>
+                        <td className="text-center p-4">
+                          {typeof feature.starter === "boolean" ? (
+                            feature.starter ? (
+                              <Check className="h-5 w-5 text-primary mx-auto" />
+                            ) : (
+                              <X className="h-5 w-5 text-muted-foreground mx-auto" />
+                            )
+                          ) : (
+                            <span className="text-sm">{feature.starter}</span>
+                          )}
+                        </td>
+                        <td className="text-center p-4 bg-primary/5">
+                          {typeof feature.professional === "boolean" ? (
+                            feature.professional ? (
+                              <Check className="h-5 w-5 text-primary mx-auto" />
+                            ) : (
+                              <X className="h-5 w-5 text-muted-foreground mx-auto" />
+                            )
+                          ) : (
+                            <span className="text-sm font-medium">{feature.professional}</span>
+                          )}
+                        </td>
+                        <td className="text-center p-4">
+                          {typeof feature.enterprise === "boolean" ? (
+                            feature.enterprise ? (
+                              <Check className="h-5 w-5 text-primary mx-auto" />
+                            ) : (
+                              <X className="h-5 w-5 text-muted-foreground mx-auto" />
+                            )
+                          ) : (
+                            <span className="text-sm">{feature.enterprise}</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {/* Add-ons section */}
@@ -284,31 +523,107 @@ export function PricingSection() {
           </div>
         </div>
 
-        {/* Enterprise CTA */}
-        <div className="text-center mt-16 p-8 border rounded-xl bg-card">
-          <div className="max-w-2xl mx-auto space-y-4">
-            <Crown className="h-12 w-12 text-primary mx-auto" />
-            <h3 className="text-2xl font-bold">Need something custom?</h3>
-            <p className="text-muted-foreground">
-              Our enterprise team can create a custom solution tailored to your 
-              specific requirements, including on-premise deployment, custom integrations, 
-              and dedicated support.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" asChild>
-                <Link href="/contact">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Schedule a Call
+        {/* Enterprise CTA with Calendar */}
+        <div className="grid md:grid-cols-2 gap-8 mb-16">
+          {/* Schedule Demo */}
+          <Card className="border-primary/50 bg-gradient-to-br from-primary/5 to-primary/10">
+            <CardHeader>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl">Schedule a Demo</CardTitle>
+                  <CardDescription className="text-base">
+                    See LogiVox in action with a personalized walkthrough
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Book a 30-minute demo with our product experts to:
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">Explore features relevant to your business</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">Ask questions about implementation</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">Discuss pricing and custom solutions</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">See a live warehouse workflow demonstration</span>
+                </li>
+              </ul>
+              <Button size="lg" className="w-full" asChild>
+                <Link href="/contact?type=demo">
+                  <Video className="mr-2 h-4 w-4" />
+                  Book Your Demo
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="mailto:enterprise@logivox.ai">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Email Sales
-                </Link>
-              </Button>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+
+          {/* Contact Sales */}
+          <Card className="border-2">
+            <CardHeader>
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
+                  <Crown className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl">Enterprise Sales</CardTitle>
+                  <CardDescription className="text-base">
+                    Custom solutions for large-scale operations
+                  </CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-muted-foreground">
+                Our enterprise team can create a tailored solution including:
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">On-premise deployment options</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">Custom integrations with legacy systems</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">Dedicated support and training</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <Check className="h-4 w-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">Volume discounts and flexible contracts</span>
+                </li>
+              </ul>
+              <div className="flex gap-3">
+                <Button size="lg" variant="outline" className="flex-1" asChild>
+                  <Link href="/contact?type=sales">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Call Sales
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" className="flex-1" asChild>
+                  <Link href="mailto:enterprise@logivox.ai">
+                    <Mail className="mr-2 h-4 w-4" />
+                    Email Us
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>

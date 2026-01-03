@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, X, Minimize2, Maximize2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@repo/ui/components/ui/card";
-import { Button } from "@repo/ui/components/ui/button";
-import { Input } from "@repo/ui/components/ui/input";
-import { Badge } from "@repo/ui/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface ChatMessage {
   id: string;

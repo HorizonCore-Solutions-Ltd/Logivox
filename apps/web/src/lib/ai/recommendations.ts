@@ -421,16 +421,22 @@ export class MatrixFactorization {
     // Gradient descent
     for (let iter = 0; iter < iterations; iter++) {
       interactions.forEach(({ userId, productId, rating }) => {
-        const userVec = this.userFeatures.get(userId)!;
-        const productVec = this.productFeatures.get(productId)!;
+        const userVec = this.userFeatures.get(userId);
+        const productVec = this.productFeatures.get(productId);
+
+        if (!userVec || !productVec) return;
 
         const predicted = this.dotProduct(userVec, productVec);
         const error = rating - predicted;
 
-        // Update features
+        // Update features (vectors are guaranteed to exist after check above)
         for (let f = 0; f < this.numFeatures; f++) {
-          userVec[f] += learningRate * error * productVec[f];
-          productVec[f] += learningRate * error * userVec[f];
+          const userVal = userVec[f];
+          const prodVal = productVec[f];
+          if (userVal !== undefined && prodVal !== undefined) {
+            userVec[f] = userVal + learningRate * error * prodVal;
+            productVec[f] = prodVal + learningRate * error * userVal;
+          }
         }
       });
     }
@@ -468,6 +474,6 @@ export class MatrixFactorization {
   }
 
   private dotProduct(vec1: number[], vec2: number[]): number {
-    return vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);
+    return vec1.reduce((sum, val, i) => sum + val * (vec2[i] || 0), 0);
   }
 }

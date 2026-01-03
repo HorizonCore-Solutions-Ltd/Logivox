@@ -1,7 +1,9 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { sendEmail } from '@/lib/services/email-service';
 
 // ============================================================================
 // POST /api/purchase-orders/[id]/send - Send PO to supplier
@@ -68,14 +70,25 @@ export async function POST(
       },
     });
 
-    // TODO: Send email to supplier (integrate with email service)
-    // For now, we'll just log it
-    console.log('Sending PO email to supplier:', {
-      to: existingPO.supplier.email,
-      poNumber: existingPO.poNumber,
-      totalAmount: existingPO.totalAmount,
-      itemCount: existingPO.items.length,
-    });
+    // Send email to supplier
+    if (existingPO.supplier.email) {
+      await sendEmail({
+        to: existingPO.supplier.email,
+        subject: `Purchase Order ${existingPO.poNumber}`,
+        html: `
+          <h2>Purchase Order ${existingPO.poNumber}</h2>
+          <p>Dear ${existingPO.supplier.name},</p>
+          <p>Please find attached purchase order details below:</p>
+          <ul>
+            <li><strong>PO Number:</strong> ${existingPO.poNumber}</li>
+            <li><strong>Total Amount:</strong> $${existingPO.totalAmount.toFixed(2)}</li>
+            <li><strong>Items:</strong> ${existingPO.items.length}</li>
+            <li><strong>Expected Date:</strong> ${existingPO.expectedDate?.toLocaleDateString() || 'TBD'}</li>
+          </ul>
+          <p>Thank you for your business!</p>
+        `,
+      });
+    }
 
     // Log activity
     await prisma.activityLog.create({

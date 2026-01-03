@@ -359,7 +359,7 @@ export function getSuggestedQuestions(context: ChatContext): string[] {
     ],
   };
 
-  return suggestions[lastIntent ?? "greeting"] ?? suggestions.greeting;
+  return (suggestions[lastIntent ?? "greeting"] ?? suggestions.greeting) || [];
 }
 
 /**

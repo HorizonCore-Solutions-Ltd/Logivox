@@ -1,0 +1,14 @@
+# Database Backup Cron Jobs
+# Add these to your crontab with: crontab -e
+
+# Backup production database daily at 2 AM UTC
+0 2 * * * /workspaces/Flowstock/scripts/backup-db.sh production >> /var/log/logivox-backup.log 2>&1
+
+# Backup staging database daily at 3 AM UTC
+0 3 * * * /workspaces/Flowstock/scripts/backup-db.sh staging >> /var/log/logivox-backup.log 2>&1
+
+# Backup development database weekly on Sunday at 4 AM UTC
+0 4 * * 0 /workspaces/Flowstock/scripts/backup-db.sh development >> /var/log/logivox-backup.log 2>&1
+
+# Health check for backup process (runs at 6 AM, checks if backup ran in last 24 hours)
+0 6 * * * /workspaces/Flowstock/scripts/check-backup-health.sh >> /var/log/logivox-backup-health.log 2>&1

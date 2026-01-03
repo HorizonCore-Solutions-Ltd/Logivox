@@ -132,6 +132,9 @@ model User {
   createdRoutes       PickingRoute[]   @relation("RouteCreator")
   assignedAutomations TaskAutomation[] @relation("AutomationAssignee")
   createdAutomations  TaskAutomation[] @relation("AutomationCreator")
+  
+  // Labor Management
+  employee            Employee?
 
   @@index([email])
   @@map("users")
@@ -175,6 +178,9 @@ model Organization {
   // Settings
   timezone String @default("UTC")
   currency String @default("USD")
+  
+  // Security Settings (Configurable per organization)
+  securitySettings Json? // Visitor policies, gate rules, etc.
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -238,6 +244,59 @@ model Organization {
   pickingRoutes   PickingRoute[]
   taskAutomations TaskAutomation[]
   taskExecutions  TaskExecution[]
+  
+  // New Features Relations
+  employees              Employee[]
+  shifts                 Shift[]
+  shiftAssignments       ShiftAssignment[]
+  timeEntries            TimeEntry[]
+  productivityRecords    ProductivityRecord[]
+  slottingRules          SlottingRule[]
+  slottingRecommendations SlottingRecommendation[]
+  loadPlans              LoadPlan[]
+  deliveryRoutes         DeliveryRoute[]
+  clients                Client[]
+  rateCards              BillingRateCard[]
+  billingTransactions    BillingTransaction[]
+  clientInvoices         ClientInvoice[]
+  yardLocations          YardLocation[]
+  dockAppointments       DockAppointment[]
+  iotDevices             IoTDevice[]
+  iotAlerts              IoTAlert[]
+  securityPersonnel      SecurityPersonnel[]
+  securityShifts         SecurityShift[]
+  gateEntries            GateEntry[]
+  visitors               Visitor[]
+  securityIncidents      SecurityIncident[]
+  securityAccessLogs     SecurityAccessLog[]
+  cameraSystems          CameraSystem[]
+  accessControlZones     AccessControlZone[]
+  securityNotifications  SecurityNotification[]
+  visitorPreRegistrations VisitorPreRegistration[]
+  securityAlerts         SecurityAlert[]
+  complianceReports      SecurityComplianceReport[]
+  vehicleBlacklist       VehicleBlacklist[]
+  vehicleWhitelist       VehicleWhitelist[]
+  gates                  Gate[]
+  gateQueue              GateQueue[]
+  parkingSpots           ParkingSpot[]
+  gateWeighBridges       GateWeighBridge[]
+  gatePhotos             GatePhoto[]
+  gateDocuments          GateDocument[]
+  temperatureLogs        TemperatureLog[]
+  hazmatRecords          HazmatRecord[]
+  
+  // New Guard Management Relations
+  patrolRoutes           PatrolRoute[]
+  guardLocations         GuardLocation[]
+  geofences              Geofence[]
+  panicAlerts            PanicAlert[]
+  dailyActivityReports   DailyActivityReport[]
+  equipment              Equipment[]
+  shiftHandovers         ShiftHandover[]
+  guardCertifications    GuardCertification[]
+  trainingCourses        TrainingCourse[]
+  weatherLogs            WeatherLog[]
 
   @@index([slug])
   @@index([createdById])
@@ -402,6 +461,7 @@ model InventoryItem {
   assemblyComponents      AssemblyComponentIssue[] @relation("AssemblyComponent")
   WavePickLine            WavePickLine[]
   PickingTask             PickingTask[]
+  slottingRecommendations SlottingRecommendation[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -988,6 +1048,7 @@ model SalesOrder {
   qcInspections  QCInspection[]
   assemblyOrders AssemblyOrder[]
   WavePickLine   WavePickLine[]
+  loadPlanItems  LoadPlanItem[]
 
   @@unique([organizationId, soNumber])
   @@index([organizationId])
@@ -1295,6 +1356,7 @@ model Shipment {
   salesOrder   SalesOrder   @relation(fields: [salesOrderId], references: [id])
   pack         Pack?        @relation(fields: [packId], references: [id])
   createdBy    User         @relation("ShipmentCreator", fields: [createdById], references: [id])
+  loadPlanItems LoadPlanItem[]
 
   @@unique([organizationId, shipmentNumber])
   @@index([organizationId])
@@ -4445,8 +4507,12 @@ model PickingTask {
 
   // Assignment
   assignedToId String?
-  assignedTo   User?     @relation("TaskAssignee", fields: [assignedToId], references: [id])
+  assignedTo   User?      @relation("TaskAssignee", fields: [assignedToId], references: [id])
   assignedAt   DateTime?
+  
+  // Employee Assignment (for labor management)
+  employeeId   String?
+  employee     Employee?  @relation("TaskAssignee", fields: [employeeId], references: [id])
 
   // Timing
   scheduledFor DateTime?
@@ -4795,3 +4861,3417 @@ enum AssignmentRule {
   RANDOM // Random assignment
   MANUAL // Manual assignment
 }
+
+// ==========================================
+// LABOR MANAGEMENT
+// ==========================================
+
+model Employee {
+  id             String   @id @default(cuid())
+  organizationId String
+  userId         String?  @unique // Link to User if applicable
+  employeeNumber String
+  
+  // Personal Information
+  firstName      String
+  lastName       String
+  email          String?
+  phone          String?
+  dateOfBirth    DateTime?
+  hireDate       DateTime
+  terminationDate DateTime?
+  
+  // Employment Details
+  status         EmployeeStatus @default(ACTIVE)
+  employmentType EmploymentType @default(FULL_TIME)
+  department     String?
+  position       String?
+  hourlyRate     Decimal?       @db.Decimal(10, 2)
+  
+  // Warehouse Assignment
+  warehouseId    String?
+  defaultZoneId  String?
+  
+  // Skills & Certifications
+  skills         Json? // Array of skill codes
+  certifications Json? // Array of certification details
+  
+  // Preferences
+  preferredShiftType ShiftType?
+  maxHoursPerWeek    Float?     @default(40)
+  
+  // Metadata
+  notes      String?  @db.Text
+  metadata   Json?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  createdById String?
+  securityPersonnel SecurityPersonnel?
+  
+  // Relations
+  organization    Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User?                @relation(fields: [userId], references: [id])
+  shiftAssignments ShiftAssignment[]
+  timeEntries     TimeEntry[]
+  productivity    ProductivityRecord[]
+  tasks           PickingTask[]        @relation("TaskAssignee")
+  
+  @@unique([organizationId, employeeNumber])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([status])
+  @@index([warehouseId])
+  @@map("employees")
+}
+
+model Shift {
+  id             String    @id @default(cuid())
+  organizationId String
+  shiftCode      String
+  shiftName      String
+  
+  // Shift Details
+  shiftType      ShiftType
+  warehouseId    String?
+  
+  // Time
+  startTime      String // HH:MM format
+  endTime        String // HH:MM format
+  duration       Float  // Hours
+  breakDuration  Float? @default(0) // Hours
+  
+  // Days of Week (JSON array: [1,2,3,4,5] for Mon-Fri)
+  daysOfWeek     Json
+  
+  // Capacity
+  maxEmployees   Int?
+  minEmployees   Int?
+  
+  // Pay & Rules
+  overtimeAfter  Float? @default(8) // Hours
+  payMultiplier  Float  @default(1.0)
+  
+  // Status
+  isActive       Boolean  @default(true)
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignments      ShiftAssignment[]
+  
+  @@unique([organizationId, shiftCode])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([shiftType])
+  @@index([effectiveFrom, effectiveTo])
+  @@map("shifts")
+}
+
+model ShiftAssignment {
+  id          String            @id @default(cuid())
+  organizationId String
+  employeeId  String
+  shiftId     String
+  
+  // Schedule
+  assignedDate DateTime // Date of the shift
+  status       ShiftAssignmentStatus @default(SCHEDULED)
+  
+  // Time Tracking
+  checkInTime  DateTime?
+  checkOutTime DateTime?
+  actualHours  Float?
+  overtimeHours Float?
+  
+  // Performance
+  tasksCompleted Int?
+  linesProcessed Int?
+  accuracy       Float? // Percentage
+  
+  // Approval
+  approvedBy   String?
+  approvedAt   DateTime?
+  
+  // Metadata
+  notes        String? @db.Text
+  metadata     Json?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employee     Employee     @relation(fields: [employeeId], references: [id])
+  shift        Shift        @relation(fields: [shiftId], references: [id])
+  
+  @@unique([employeeId, shiftId, assignedDate])
+  @@index([organizationId])
+  @@index([employeeId])
+  @@index([shiftId])
+  @@index([assignedDate])
+  @@index([status])
+  @@map("shift_assignments")
+}
+
+model TimeEntry {
+  id             String        @id @default(cuid())
+  organizationId String
+  employeeId     String
+  
+  // Time
+  startTime      DateTime
+  endTime        DateTime?
+  duration       Float? // Calculated hours
+  breakDuration  Float? @default(0)
+  
+  // Type & Category
+  entryType      TimeEntryType
+  category       String? // "REGULAR", "OVERTIME", "HOLIDAY", "SICK", etc.
+  
+  // Work Details
+  warehouseId    String?
+  zoneId         String?
+  taskType       String? // "PICKING", "PACKING", "RECEIVING", etc.
+  
+  // Approval
+  status         TimeEntryStatus @default(PENDING)
+  approvedBy     String?
+  approvedAt     DateTime?
+  
+  // Payroll
+  hourlyRate     Decimal? @db.Decimal(10, 2)
+  payMultiplier  Float?   @default(1.0)
+  totalPay       Decimal? @db.Decimal(10, 2)
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employee     Employee     @relation(fields: [employeeId], references: [id])
+  
+  @@index([organizationId])
+  @@index([employeeId])
+  @@index([startTime])
+  @@index([status])
+  @@index([entryType])
+  @@map("time_entries")
+}
+
+model ProductivityRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  employeeId     String
+  
+  // Period
+  recordDate     DateTime
+  shiftId        String?
+  
+  // Productivity Metrics
+  tasksAssigned  Int      @default(0)
+  tasksCompleted Int      @default(0)
+  linesProcessed Int      @default(0)
+  unitsPicked    Int      @default(0)
+  unitsPacked    Int      @default(0)
+  
+  // Quality Metrics
+  accuracy       Float?   // Percentage
+  errorRate      Float?   // Percentage
+  shortPicks     Int      @default(0)
+  damagedUnits   Int      @default(0)
+  
+  // Efficiency
+  hoursWorked    Float?
+  unitsPerHour   Float?   // Calculated
+  linesPerHour   Float?   // Calculated
+  utilization    Float?   // Percentage
+  
+  // Performance Score
+  performanceScore Float? // 0-100
+  ranking         Int? // Rank among peers
+  
+  // Metadata
+  notes      String?  @db.Text
+  metadata   Json?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relations
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employee     Employee     @relation(fields: [employeeId], references: [id])
+  
+  @@unique([employeeId, recordDate])
+  @@index([organizationId])
+  @@index([employeeId])
+  @@index([recordDate])
+  @@index([performanceScore])
+  @@map("productivity_records")
+}
+
+// ==========================================
+// SLOTTING OPTIMIZATION
+// ==========================================
+
+model SlottingRule {
+  id             String   @id @default(cuid())
+  organizationId String
+  warehouseId    String?
+  
+  // Rule Details
+  ruleName       String
+  ruleCode       String
+  priority       Int      @default(100)
+  
+  // Criteria
+  criteria       Json // {velocity: "HIGH", category: "ABC", weight: <10}
+  
+  // Target Location Criteria
+  targetZoneType String?
+  targetLevel    String? // "FLOOR", "GROUND", "HIGH"
+  maxDistance    Float? // From shipping area (meters)
+  
+  // Strategy
+  strategy       SlottingStrategy
+  
+  // Thresholds
+  minPickFrequency Int? // Picks per month
+  maxPickFrequency Int?
+  minVelocity      Float? // Revenue/month
+  maxVelocity      Float?
+  
+  // Status
+  isActive       Boolean  @default(true)
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  
+  // Metadata
+  description    String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  
+  // Relations
+  organization      Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  recommendations   SlottingRecommendation[]
+  
+  @@unique([organizationId, ruleCode])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([priority])
+  @@index([isActive])
+  @@map("slotting_rules")
+}
+
+model SlottingRecommendation {
+  id             String   @id @default(cuid())
+  organizationId String
+  ruleId         String?
+  
+  // Item & Location
+  itemId         String
+  currentLocationId String?
+  recommendedLocationId String
+  
+  // Analysis
+  currentPickFrequency  Int?
+  currentTravelDistance Float? // meters
+  projectedPickFrequency Int?
+  projectedTravelDistance Float?
+  
+  // Benefits
+  estimatedTimeSaving Float? // hours/month
+  estimatedCostSaving Decimal? @db.Decimal(10, 2)
+  priorityScore       Float?
+  
+  // Status
+  status         RecommendationStatus @default(PENDING)
+  reason         String? @db.Text
+  
+  // Approval
+  approvedBy     String?
+  approvedAt     DateTime?
+  implementedAt  DateTime?
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rule           SlottingRule? @relation(fields: [ruleId], references: [id])
+  item           InventoryItem @relation(fields: [itemId], references: [id])
+  
+  @@index([organizationId])
+  @@index([ruleId])
+  @@index([itemId])
+  @@index([status])
+  @@index([priorityScore])
+  @@map("slotting_recommendations")
+}
+
+// ==========================================
+// LOAD & ROUTE OPTIMIZATION
+// ==========================================
+
+model LoadPlan {
+  id             String   @id @default(cuid())
+  organizationId String
+  planNumber     String
+  
+  // Plan Details
+  planName       String
+  shipmentDate   DateTime
+  warehouseId    String?
+  
+  // Vehicle/Container
+  vehicleType    String?
+  maxWeight      Float? // kg
+  maxVolume      Float? // cubic meters
+  maxPallets     Int?
+  
+  // Optimization
+  optimizationGoal LoadOptimizationGoal @default(MAXIMIZE_UTILIZATION)
+  algorithm        String? // Algorithm used
+  
+  // Results
+  totalWeight    Float?
+  totalVolume    Float?
+  totalPallets   Int?
+  utilization    Float? // Percentage
+  
+  // Cost
+  estimatedCost  Decimal? @db.Decimal(10, 2)
+  actualCost     Decimal? @db.Decimal(10, 2)
+  
+  // Status
+  status         LoadPlanStatus @default(DRAFT)
+  
+  // Approval
+  approvedBy     String?
+  approvedAt     DateTime?
+  
+  // Execution
+  loadedBy       String?
+  loadedAt       DateTime?
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  
+  // Relations
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  items          LoadPlanItem[]
+  routes         DeliveryRoute[]
+  
+  @@unique([organizationId, planNumber])
+  @@index([organizationId])
+  @@index([shipmentDate])
+  @@index([status])
+  @@index([warehouseId])
+  @@map("load_plans")
+}
+
+model LoadPlanItem {
+  id             String   @id @default(cuid())
+  loadPlanId     String
+  
+  // Item Reference
+  salesOrderId   String?
+  shipmentId     String?
+  packId         String?
+  
+  // Item Details
+  itemSKU        String
+  itemName       String
+  quantity       Int
+  
+  // Dimensions
+  weight         Float // kg
+  volume         Float? // cubic meters
+  length         Float? // cm
+  width          Float? // cm
+  height         Float? // cm
+  
+  // Loading Info
+  palletNumber   Int?
+  loadSequence   Int?
+  stackPosition  Int?
+  
+  // Special Requirements
+  isFragile      Boolean @default(false)
+  requiresCooling Boolean @default(false)
+  stackLimit     Int?
+  
+  // Status
+  isLoaded       Boolean @default(false)
+  loadedAt       DateTime?
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  loadPlan       LoadPlan      @relation(fields: [loadPlanId], references: [id], onDelete: Cascade)
+  salesOrder     SalesOrder?   @relation(fields: [salesOrderId], references: [id])
+  shipment       Shipment?     @relation(fields: [shipmentId], references: [id])
+  
+  @@index([loadPlanId])
+  @@index([salesOrderId])
+  @@index([shipmentId])
+  @@index([palletNumber])
+  @@map("load_plan_items")
+}
+
+model DeliveryRoute {
+  id             String   @id @default(cuid())
+  organizationId String
+  routeNumber    String
+  loadPlanId     String?
+  
+  // Route Details
+  routeName      String
+  deliveryDate   DateTime
+  warehouseId    String?
+  
+  // Vehicle & Driver
+  vehicleId      String?
+  driverName     String?
+  driverPhone    String?
+  
+  // Route Optimization
+  optimizationMethod OptimizationMethod @default(SHORTEST_PATH)
+  totalDistance  Float? // km
+  estimatedDuration Float? // hours
+  
+  // Status
+  status         DeliveryRouteStatus @default(PLANNED)
+  
+  // Execution
+  startTime      DateTime?
+  endTime        DateTime?
+  actualDistance Float?
+  actualDuration Float?
+  
+  // Cost
+  estimatedCost  Decimal? @db.Decimal(10, 2)
+  actualCost     Decimal? @db.Decimal(10, 2)
+  fuelCost       Decimal? @db.Decimal(10, 2)
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  
+  // Relations
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  loadPlan       LoadPlan?          @relation(fields: [loadPlanId], references: [id])
+  stops          DeliveryStop[]
+  
+  @@unique([organizationId, routeNumber])
+  @@index([organizationId])
+  @@index([loadPlanId])
+  @@index([deliveryDate])
+  @@index([status])
+  @@index([warehouseId])
+  @@map("delivery_routes")
+}
+
+model DeliveryStop {
+  id             String   @id @default(cuid())
+  routeId        String
+  
+  // Stop Details
+  stopSequence   Int
+  stopType       StopType @default(DELIVERY)
+  
+  // Customer/Location
+  customerName   String?
+  contactPerson  String?
+  contactPhone   String?
+  addressLine1   String
+  addressLine2   String?
+  city           String
+  state          String?
+  postalCode     String
+  country        String   @default("US")
+  
+  // Geographic
+  latitude       Float?
+  longitude      Float?
+  
+  // Timing
+  scheduledArrival DateTime?
+  scheduledDeparture DateTime?
+  actualArrival    DateTime?
+  actualDeparture  DateTime?
+  serviceTime      Float? // minutes
+  
+  // Orders
+  salesOrderIds  Json? // Array of sales order IDs
+  
+  // Delivery
+  deliveryStatus StopDeliveryStatus @default(PENDING)
+  signedBy       String?
+  signedAt       DateTime?
+  signatureImage String? // URL to signature
+  proofOfDelivery String? // URL to photo
+  
+  // Special Instructions
+  instructions   String?  @db.Text
+  specialRequirements Json?
+  
+  // Distance from previous stop
+  distanceFromPrevious Float? // km
+  travelTime           Float? // minutes
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  route          DeliveryRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  
+  @@index([routeId])
+  @@index([stopSequence])
+  @@index([deliveryStatus])
+  @@map("delivery_stops")
+}
+
+// ==========================================
+// 3PL & MULTI-TENANT BILLING
+// ==========================================
+
+model Client {
+  id             String   @id @default(cuid())
+  organizationId String // 3PL organization
+  clientCode     String
+  
+  // Client Information
+  clientName     String
+  legalName      String?
+  taxId          String?
+  
+  // Contact
+  primaryContact String?
+  email          String?
+  phone          String?
+  website        String?
+  
+  // Address
+  addressLine1   String?
+  addressLine2   String?
+  city           String?
+  state          String?
+  postalCode     String?
+  country        String?
+  
+  // Status
+  status         ClientStatus @default(ACTIVE)
+  onboardingDate DateTime
+  contractStart  DateTime?
+  contractEnd    DateTime?
+  
+  // Billing Configuration
+  billingCycle   BillingCycle @default(MONTHLY)
+  currency       String       @default("USD")
+  paymentTerms   Int          @default(30) // Days
+  
+  // Service Level Agreement
+  slaTarget      Float? // percentage
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  
+  // Relations
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rateCards      BillingRateCard[]
+  invoices       ClientInvoice[]
+  transactions   BillingTransaction[]
+  
+  @@unique([organizationId, clientCode])
+  @@index([organizationId])
+  @@index([status])
+  @@map("clients")
+}
+
+model BillingRateCard {
+  id             String   @id @default(cuid())
+  organizationId String
+  clientId       String
+  
+  // Rate Card Details
+  rateCardName   String
+  rateCardCode   String
+  
+  // Validity
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  isActive       Boolean  @default(true)
+  
+  // Rates (JSON structure)
+  storageRates   Json? // {unit: "PALLET", rate: 10.00, frequency: "MONTHLY"}
+  handlingRates  Json? // {inbound: {unit: "PALLET", rate: 5.00}, outbound: {...}}
+  orderRates     Json? // {base: 2.50, perLine: 0.50, perUnit: 0.10}
+  valueAddedServices Json? // Array of VAS with rates
+  
+  // Minimum Charges
+  minimumMonthly Decimal? @db.Decimal(10, 2)
+  minimumTransaction Decimal? @db.Decimal(10, 2)
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client         Client       @relation(fields: [clientId], references: [id])
+  
+  @@unique([organizationId, rateCardCode])
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([effectiveFrom, effectiveTo])
+  @@index([isActive])
+  @@map("billing_rate_cards")
+}
+
+model BillingTransaction {
+  id             String   @id @default(cuid())
+  organizationId String
+  clientId       String
+  
+  // Transaction Details
+  transactionNumber String
+  transactionDate DateTime
+  transactionType BillingTransactionType
+  
+  // Service Details
+  serviceCode    String
+  serviceName    String
+  description    String? @db.Text
+  
+  // Quantity & Units
+  quantity       Float
+  unit           String // "PALLET", "ORDER", "LINE", "UNIT", "HOUR"
+  
+  // Pricing
+  unitRate       Decimal  @db.Decimal(10, 4)
+  amount         Decimal  @db.Decimal(10, 2)
+  
+  // References
+  referenceType  String? // "SALES_ORDER", "GRN", "SHIPMENT", etc.
+  referenceId    String?
+  referenceNumber String?
+  
+  // Period
+  periodStart    DateTime?
+  periodEnd      DateTime?
+  
+  // Billing
+  invoiceId      String?
+  billingStatus  BillingStatus @default(PENDING)
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client         Client         @relation(fields: [clientId], references: [id])
+  invoice        ClientInvoice? @relation(fields: [invoiceId], references: [id])
+  
+  @@unique([organizationId, transactionNumber])
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([invoiceId])
+  @@index([transactionDate])
+  @@index([billingStatus])
+  @@map("billing_transactions")
+}
+
+model ClientInvoice {
+  id             String   @id @default(cuid())
+  organizationId String
+  clientId       String
+  
+  // Invoice Details
+  invoiceNumber  String
+  invoiceDate    DateTime
+  dueDate        DateTime
+  
+  // Period
+  periodStart    DateTime
+  periodEnd      DateTime
+  
+  // Amounts
+  subtotal       Decimal  @db.Decimal(10, 2)
+  taxAmount      Decimal  @db.Decimal(10, 2) @default(0)
+  discountAmount Decimal  @db.Decimal(10, 2) @default(0)
+  total          Decimal  @db.Decimal(10, 2)
+  paidAmount     Decimal  @db.Decimal(10, 2) @default(0)
+  balanceDue     Decimal  @db.Decimal(10, 2)
+  
+  // Status
+  status         InvoiceStatus @default(DRAFT)
+  
+  // Payment
+  paymentMethod  String?
+  paymentDate    DateTime?
+  paymentRef     String?
+  
+  // Documents
+  invoicePDF     String? // URL to PDF
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  
+  // Relations
+  organization   Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  client         Client               @relation(fields: [clientId], references: [id])
+  transactions   BillingTransaction[]
+  
+  @@unique([organizationId, invoiceNumber])
+  @@index([organizationId])
+  @@index([clientId])
+  @@index([invoiceDate])
+  @@index([dueDate])
+  @@index([status])
+  @@map("client_invoices")
+}
+
+// ==========================================
+// YARD MANAGEMENT
+// ==========================================
+
+model YardLocation {
+  id             String   @id @default(cuid())
+  organizationId String
+  warehouseId    String?
+  
+  // Location Details
+  locationCode   String
+  locationName   String
+  locationType   YardLocationType
+  
+  // Physical Details
+  capacity       Int? // Number of trailers/containers
+  length         Float? // meters
+  width          Float? // meters
+  
+  // Status
+  isActive       Boolean  @default(true)
+  isOccupied     Boolean  @default(false)
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  appointments   DockAppointment[]
+  
+  @@unique([organizationId, locationCode])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([locationType])
+  @@index([isActive, isOccupied])
+  @@map("yard_locations")
+}
+
+model DockAppointment {
+  id             String   @id @default(cuid())
+  organizationId String
+  appointmentNumber String
+  
+  // Appointment Details
+  appointmentType DockAppointmentType
+  warehouseId    String?
+  yardLocationId String?
+  
+  // Scheduling
+  scheduledDate  DateTime
+  scheduledStart DateTime
+  scheduledEnd   DateTime
+  duration       Float // hours
+  
+  // Actual Times
+  actualArrival  DateTime?
+  actualStart    DateTime?
+  actualEnd      DateTime?
+  actualDuration Float?
+  
+  // Carrier & Vehicle
+  carrierName    String?
+  driverName     String?
+  driverPhone    String?
+  vehicleNumber  String?
+  trailerNumber  String?
+  sealNumber     String?
+  
+  // References
+  referenceType  String? // "PURCHASE_ORDER", "SALES_ORDER", "TRANSFER"
+  referenceId    String?
+  referenceNumber String?
+  
+  // Capacity
+  expectedPallets Int?
+  actualPallets   Int?
+  expectedWeight  Float?
+  actualWeight    Float?
+  
+  // Status
+  status         AppointmentStatus @default(SCHEDULED)
+  
+  // Check-in/out
+  checkedInBy    String?
+  checkedInAt    DateTime?
+  checkedOutBy   String?
+  checkedOutAt   DateTime?
+  
+  // Approval
+  approvedBy     String?
+  approvedAt     DateTime?
+  
+  // Relations
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  yardLocation   YardLocation? @relation(fields: [yardLocationId], references: [id])
+  gateEntries    GateEntry[]
+
+  @@unique([organizationId, appointmentNumber])
+  @@index([organizationId])
+  @@index([yardLocationId])
+  @@index([scheduledDate])
+  @@index([status])
+  @@index([carrierName])
+  @@map("dock_appointments")
+}
+
+// ==========================================
+// IOT & DEVICE INTEGRATION
+// ==========================================
+
+model IoTDevice {
+  id             String   @id @default(cuid())
+  organizationId String
+  deviceId       String @unique
+  
+  // Device Details
+  deviceName     String
+  deviceType     IoTDeviceType
+  manufacturer   String?
+  modelNumber    String?
+  serialNumber   String?
+  
+  // Location
+  warehouseId    String?
+  locationId     String?
+  zoneId         String?
+  
+  // Status
+  status         DeviceStatus @default(OFFLINE)
+  isActive       Boolean      @default(true)
+  
+  // Connectivity
+  ipAddress      String?
+  macAddress     String?
+  firmwareVersion String?
+  lastHeartbeat  DateTime?
+  
+  // Configuration
+  configuration  Json? // Device-specific settings
+  thresholds     Json? // Alert thresholds
+  
+  // Battery (for mobile devices)
+  batteryLevel   Float?
+  isCharging     Boolean?
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  installedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdById    String?
+  
+  // Relations
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  readings       IoTSensorReading[]
+  alerts         IoTAlert[]
+  
+  @@index([organizationId])
+  @@index([deviceType])
+  @@index([status])
+  @@index([warehouseId])
+  @@map("iot_devices")
+}
+
+model IoTSensorReading {
+  id             String   @id @default(cuid())
+  deviceId       String
+  
+  // Reading Details
+  readingType    String // "TEMPERATURE", "HUMIDITY", "LOCATION", "WEIGHT", etc.
+  readingValue   Float
+  unit           String // "C", "%", "kg", etc.
+  
+  // Timestamp
+  timestamp      DateTime @default(now())
+  
+  // Context
+  warehouseId    String?
+  locationId     String?
+  inventoryId    String?
+  
+  // Metadata
+  metadata       Json?
+  
+  // Relations
+  device         IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  
+  @@index([deviceId])
+  @@index([timestamp])
+  @@index([readingType])
+  @@map("iot_sensor_readings")
+}
+
+model IoTAlert {
+  id             String   @id @default(cuid())
+  organizationId String
+  deviceId       String
+  
+  // Alert Details
+  alertType      IoTAlertType
+  severity       AlertSeverity
+  message        String       @db.Text
+  
+  // Context
+  readingType    String?
+  readingValue   Float?
+  thresholdValue Float?
+  
+  // Status
+  status         AlertStatus @default(PENDING)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  resolvedBy     String?
+  resolvedAt     DateTime?
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  device         IoTDevice    @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([deviceId])
+  @@index([status])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("iot_alerts")
+}
+
+// ==========================================
+// ENUMS FOR NEW FEATURES
+// ==========================================
+
+enum EmployeeStatus {
+  ACTIVE
+  INACTIVE
+  ON_LEAVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+  TEMPORARY
+  SEASONAL
+}
+
+enum ShiftType {
+  DAY
+  EVENING
+  NIGHT
+  ROTATING
+  SPLIT
+  ON_CALL
+}
+
+enum ShiftAssignmentStatus {
+  SCHEDULED
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+enum TimeEntryType {
+  CLOCK_IN_OUT
+  MANUAL_ENTRY
+  ADJUSTED
+  IMPORTED
+}
+
+enum TimeEntryStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PAID
+}
+
+enum SlottingStrategy {
+  ABC_ANALYSIS
+  VELOCITY_BASED
+  SIZE_BASED
+  FAMILY_GROUPING
+  CUSTOM
+}
+
+enum RecommendationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  IMPLEMENTED
+  EXPIRED
+}
+
+enum LoadOptimizationGoal {
+  MAXIMIZE_UTILIZATION
+  MINIMIZE_STOPS
+  MINIMIZE_COST
+  MINIMIZE_TIME
+  BALANCE_LOAD
+}
+
+enum LoadPlanStatus {
+  DRAFT
+  OPTIMIZING
+  OPTIMIZED
+  APPROVED
+  IN_PROGRESS
+  LOADED
+  COMPLETED
+  CANCELLED
+}
+
+enum DeliveryRouteStatus {
+  PLANNED
+  OPTIMIZED
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DELAYED
+}
+
+enum StopType {
+  PICKUP
+  DELIVERY
+  BOTH
+}
+
+enum StopDeliveryStatus {
+  PENDING
+  IN_TRANSIT
+  ARRIVED
+  DELIVERED
+  FAILED
+  RESCHEDULED
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  ONBOARDING
+  OFFBOARDING
+}
+
+enum BillingCycle {
+  DAILY
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUALLY
+  ON_DEMAND
+}
+
+enum BillingTransactionType {
+  STORAGE
+  INBOUND_HANDLING
+  OUTBOUND_HANDLING
+  ORDER_PROCESSING
+  VALUE_ADDED_SERVICE
+  LABOR
+  TRANSPORTATION
+  EQUIPMENT
+  OTHER
+}
+
+enum BillingStatus {
+  PENDING
+  INVOICED
+  PAID
+  DISPUTED
+  WRITTEN_OFF
+}
+
+enum InvoiceStatus {
+  DRAFT
+  PENDING
+  SENT
+  VIEWED
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+  DISPUTED
+}
+
+enum YardLocationType {
+  LOADING_DOCK
+  UNLOADING_DOCK
+  STAGING_AREA
+  PARKING_SPOT
+  MAINTENANCE_BAY
+  HOLDING_AREA
+}
+
+enum DockAppointmentType {
+  INBOUND
+  OUTBOUND
+  CROSS_DOCK
+  MAINTENANCE
+  OTHER
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  CONFIRMED
+  CHECKED_IN
+  IN_PROGRESS
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+  DELAYED
+}
+
+enum IoTDeviceType {
+  BARCODE_SCANNER
+  RFID_READER
+  TEMPERATURE_SENSOR
+  HUMIDITY_SENSOR
+  WEIGHT_SCALE
+  FORKLIFT_TRACKER
+  DOOR_SENSOR
+  MOTION_DETECTOR
+  CAMERA
+  GPS_TRACKER
+  OTHER
+}
+
+enum DeviceStatus {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
+  ERROR
+  LOW_BATTERY
+}
+
+enum IoTAlertType {
+  TEMPERATURE_THRESHOLD
+  HUMIDITY_THRESHOLD
+  DEVICE_OFFLINE
+  LOW_BATTERY
+  SENSOR_ERROR
+  UNAUTHORIZED_ACCESS
+  GEOFENCE_BREACH
+  CUSTOM
+}
+
+// ==========================================
+// SECURITY & ACCESS CONTROL
+// ==========================================
+
+model SecurityPersonnel {
+  id             String   @id @default(cuid())
+  organizationId String
+  employeeId     String?  @unique // Link to Employee if they're also an employee
+  
+  // Personal Information
+  firstName      String
+  lastName       String
+  email          String?
+  phone          String?
+  badgeNumber    String   @unique
+  
+  // Employment
+  status         SecurityPersonnelStatus @default(ACTIVE)
+  hireDate       DateTime
+  terminationDate DateTime?
+  
+  // Assignment
+  warehouseId    String?
+  primaryZone    String?
+  
+  // Credentials & Clearance
+  clearanceLevel SecurityClearanceLevel @default(STANDARD)
+  certifications Json? // Array of security certifications
+  trainingExpiry DateTime?
+  
+  // Access Card
+  accessCardNumber String?
+  accessCardExpiry DateTime?
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employee       Employee?         @relation(fields: [employeeId], references: [id])
+  shifts         SecurityShift[]
+  incidents      SecurityIncident[] @relation("IncidentReporter")
+  investigations SecurityIncident[] @relation("IncidentInvestigator")
+  gateEntries    GateEntry[]
+  accessLogs     SecurityAccessLog[]
+  visitors       Visitor[]
+  
+  @@unique([organizationId, badgeNumber])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([clearanceLevel])
+  @@map("security_personnel")
+}
+
+model SecurityShift {
+  id             String   @id @default(cuid())
+  organizationId String
+  personnelId    String
+  
+  // Shift Details
+  shiftDate      DateTime
+  shiftType      ShiftType @default(DAY)
+  startTime      DateTime
+  endTime        DateTime?
+  
+  // Location
+  warehouseId    String?
+  assignedZone   String?
+  assignedPost   String? // "Main Gate", "Loading Dock", "Patrol", etc.
+  
+  // Status
+  status         ShiftStatus @default(SCHEDULED)
+  checkInTime    DateTime?
+  checkOutTime   DateTime?
+  
+  // Activities
+  patrols        Int      @default(0)
+  incidentsReported Int   @default(0)
+  visitorsProcessed Int   @default(0)
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  personnel      SecurityPersonnel   @relation(fields: [personnelId], references: [id])
+  
+  @@index([organizationId])
+  @@index([personnelId])
+  @@index([shiftDate])
+  @@index([warehouseId])
+  @@map("security_shifts")
+}
+
+model GateEntry {
+  id             String   @id @default(cuid())
+  organizationId String
+  entryNumber    String
+  
+  // Entry Details
+  entryType      GateEntryType
+  direction      EntryDirection
+  warehouseId    String?
+  gateNumber     String?
+  
+  // Vehicle Information
+  vehicleType    VehicleType?
+  vehicleNumber  String?
+  licensePlate   String?
+  trailerNumber  String?
+  driverName     String?
+  driverLicense  String?
+  driverPhone    String?
+  carrierName    String?
+  
+  // Visitor Information (for VISITOR type)
+  visitorName    String?
+  visitorCompany String?
+  visitorId      String?
+  visitorPhone   String?
+  visitorEmail   String?
+  purposeOfVisit String?
+  hostName       String? // Employee being visited
+  
+  // Dock Appointment Link
+  appointmentId  String?
+  
+  // Reference Documents
+  referenceType  String? // "PURCHASE_ORDER", "SALES_ORDER", "DELIVERY", etc.
+  referenceId    String?
+  referenceNumber String?
+  
+  // Security Check
+  securityPersonnelId String?
+  securityCheckPassed Boolean @default(false)
+  securityNotes       String? @db.Text
+  
+  // Timing
+  scheduledTime  DateTime?
+  entryTime      DateTime
+  exitTime       DateTime?
+  duration       Int? // Minutes
+  
+  // Items/Cargo
+  cargoDescription String? @db.Text
+  numberOfPallets  Int?
+  estimatedWeight  Float?
+  hasDangerousGoods Boolean @default(false)
+  
+  // Photos/Documents
+  vehiclePhoto   String? // URL
+  driverIdPhoto  String? // URL
+  documents      Json? // Array of document URLs
+  
+  // Status
+  status         GateEntryStatus @default(CHECKED_IN)
+  
+  // Approval
+  approvedBy     String?
+  approvedAt     DateTime?
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  securityPersonnel SecurityPersonnel? @relation(fields: [securityPersonnelId], references: [id])
+  appointment    DockAppointment? @relation(fields: [appointmentId], references: [id])
+  weighBridges   GateWeighBridge[]
+  photos         GatePhoto[]
+  queueEntry     GateQueue?
+  temperatureLogs TemperatureLog[]
+  hazmatRecords  HazmatRecord[]
+  gateDocuments  GateDocument[]
+  manifest       TruckManifest?
+  
+  @@unique([organizationId, entryNumber])
+  @@index([organizationId])
+  @@index([appointmentId])
+  @@index([warehouseId])
+  @@index([entryTime])
+  @@index([licensePlate])
+  @@index([status])
+  @@map("gate_entries")
+}
+
+model Visitor {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Visitor Information
+  firstName      String
+  lastName       String
+  company        String?
+  email          String?
+  phone          String
+  idType         String? // "DRIVERS_LICENSE", "PASSPORT", etc.
+  idNumber       String?
+  
+  // Badge
+  badgeNumber    String?
+  badgeIssued    DateTime?
+  badgeReturned  DateTime?
+  
+  // Visit Details
+  visitDate      DateTime
+  checkInTime    DateTime
+  checkOutTime   DateTime?
+  purposeOfVisit String   @db.Text
+  
+  // Host Information
+  hostName       String
+  hostDepartment String?
+  hostPhone      String?
+  
+  // Location
+  warehouseId    String?
+  allowedAreas   Json? // Array of zone IDs visitor can access
+  
+  // Security
+  securityCheckPassed Boolean @default(false)
+  securityPersonnelId String?
+  securityPersonnel   SecurityPersonnel? @relation(fields: [securityPersonnelId], references: [id])
+  
+  // Photos
+  photo          String? // URL to visitor photo
+  idPhoto        String? // URL to ID photo
+  
+  // Status
+  status         VisitorStatus @default(CHECKED_IN)
+  
+  // Emergency Contact
+  emergencyContact String?
+  emergencyPhone   String?
+  
+  // Escort Required
+  escortRequired Boolean @default(false)
+  escortName     String?
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  preRegistration VisitorPreRegistration?
+  
+  @@unique([organizationId, badgeNumber])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([visitDate])
+  @@index([status])
+  @@index([phone])
+  @@map("visitors")
+}
+
+model SecurityIncident {
+  id             String   @id @default(cuid())
+  organizationId String
+  incidentNumber String
+  
+  // Incident Details
+  incidentType   SecurityIncidentType
+  severity       IncidentSeverity
+  title          String
+  description    String   @db.Text
+  
+  // Location
+  warehouseId    String?
+  locationDetails String? @db.Text
+  zoneId         String?
+  
+  // Timing
+  incidentDate   DateTime
+  reportedAt     DateTime @default(now())
+  
+  // People Involved
+  reportedById   String
+  reportedBy     SecurityPersonnel @relation("IncidentReporter", fields: [reportedById], references: [id])
+  
+  investigatorId String?
+  investigatedBy SecurityPersonnel? @relation("IncidentInvestigator", fields: [investigatorId], references: [id])
+  
+  personsInvolved Json? // Array of person details
+  witnesses       Json? // Array of witness details
+  
+  // Related Entities
+  relatedEntityType String? // "GATE_ENTRY", "VISITOR", "EMPLOYEE", etc.
+  relatedEntityId   String?
+  
+  // Investigation
+  status         IncidentStatus @default(REPORTED)
+  investigationNotes String? @db.Text
+  actionTaken    String? @db.Text
+  resolution     String? @db.Text
+  resolvedAt     DateTime?
+  
+  // Police/Authorities
+  policeNotified Boolean @default(false)
+  policeReportNumber String?
+  policeDepartment String?
+  
+  // Evidence
+  photos         Json? // Array of photo URLs
+  videos         Json? // Array of video URLs
+  documents      Json? // Array of document URLs
+  cameraFootage  Json? // Array of camera IDs and timestamps
+  
+  // Follow-up
+  followUpRequired Boolean @default(false)
+  followUpDate     DateTime?
+  followUpNotes    String? @db.Text
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, incidentNumber])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([incidentDate])
+  @@index([incidentType])
+  @@index([severity])
+  @@index([status])
+  @@map("security_incidents")
+}
+
+model SecurityAccessLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Access Details
+  accessTime     DateTime @default(now())
+  accessType     AccessType
+  accessPoint    String // "Main Gate", "Warehouse Door A", etc.
+  
+  // Who
+  personType     PersonType
+  personId       String // ID of employee, visitor, or security personnel
+  personName     String
+  badgeNumber    String?
+  
+  // Security Personnel
+  personnelId    String?
+  personnel      SecurityPersonnel? @relation(fields: [personnelId], references: [id])
+  
+  // Location
+  warehouseId    String?
+  zoneId         String?
+  locationId     String?
+  
+  // Access Result
+  accessGranted  Boolean
+  accessMethod   AccessMethod // "BADGE", "BIOMETRIC", "MANUAL", "PIN"
+  denialReason   String?
+  
+  // Device Information
+  deviceId       String? // ID of access control device
+  deviceType     String? // "CARD_READER", "FINGERPRINT", "FACE_RECOGNITION"
+  
+  // Metadata
+  metadata       Json?
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([accessTime])
+  @@index([personId])
+  @@index([warehouseId])
+  @@index([accessGranted])
+  @@map("security_access_logs")
+}
+
+model CameraSystem {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Camera Details
+  cameraId       String   @unique
+  cameraName     String
+  cameraType     CameraType
+  manufacturer   String?
+  modelNumber    String?
+  
+  // Location
+  warehouseId    String?
+  locationDetails String
+  zoneId         String?
+  mountingType   String? // "CEILING", "WALL", "POLE", etc.
+  
+  // Coverage
+  viewDirection  String? // "NORTH", "EAST", etc.
+  coverageArea   String? // Description of what it covers
+  fieldOfView    Int? // Degrees
+  
+  // Technical Specs
+  resolution     String? // "1080p", "4K", etc.
+  hasNightVision Boolean @default(false)
+  hasPTZ         Boolean @default(false) // Pan-Tilt-Zoom
+  hasAudio       Boolean @default(false)
+  
+  // Network
+  ipAddress      String?
+  macAddress     String?
+  streamUrl      String?
+  recordingUrl   String?
+  
+  // Status
+  status         DeviceStatus @default(OFFLINE)
+  isRecording    Boolean @default(false)
+  lastOnline     DateTime?
+  
+  // Storage
+  storageLocation String? // NVR/DVR location
+  retentionDays   Int @default(30)
+  
+  // Metadata
+  notes          String?  @db.Text
+  metadata       Json?
+  installedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([isRecording])
+  @@map("camera_systems")
+}
+
+model AccessControlZone {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Zone Details
+  zoneName       String
+  zoneCode       String
+  description    String?  @db.Text
+  
+  // Location
+  warehouseId    String?
+  parentZoneId   String?
+  
+  // Security Level
+  securityLevel  SecurityClearanceLevel @default(STANDARD)
+  requiresEscort Boolean @default(false)
+  
+  // Access Rules
+  allowedRoles   Json? // Array of roles/departments
+  restrictedTimes Json? // Time restrictions
+  maxOccupancy   Int?
+  
+  // Status
+  isActive       Boolean @default(true)
+  isRestricted   Boolean @default(false)
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, zoneCode])
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([securityLevel])
+  @@map("access_control_zones")
+}
+
+// ==========================================
+// SECURITY ENUMS
+// ==========================================
+
+enum SecurityPersonnelStatus {
+  ACTIVE
+  ON_DUTY
+  OFF_DUTY
+  ON_LEAVE
+  SUSPENDED
+  TERMINATED
+}
+
+enum SecurityClearanceLevel {
+  VISITOR
+  STANDARD
+  ELEVATED
+  HIGH
+  MAXIMUM
+}
+
+enum ShiftStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  NO_SHOW
+  CANCELLED
+}
+
+enum GateEntryType {
+  DELIVERY
+  PICKUP
+  VISITOR
+  EMPLOYEE
+  CONTRACTOR
+  SERVICE_VEHICLE
+  EMERGENCY
+}
+
+enum EntryDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum VehicleType {
+  TRUCK
+  VAN
+  CAR
+  MOTORCYCLE
+  FORKLIFT
+  TRAILER
+  CONTAINER
+  OTHER
+}
+
+enum GateEntryStatus {
+  SCHEDULED
+  CHECKED_IN
+  PROCESSING
+  APPROVED
+  DENIED
+  CHECKED_OUT
+  OVERSTAYED
+}
+
+enum VisitorStatus {
+  PRE_REGISTERED
+  CHECKED_IN
+  ON_PREMISES
+  CHECKED_OUT
+  BANNED
+  EXPIRED
+}
+
+enum SecurityIncidentType {
+  THEFT
+  VANDALISM
+  TRESPASSING
+  UNAUTHORIZED_ACCESS
+  SAFETY_VIOLATION
+  FIRE
+  MEDICAL_EMERGENCY
+  VEHICLE_ACCIDENT
+  SUSPICIOUS_ACTIVITY
+  POLICY_VIOLATION
+  EQUIPMENT_DAMAGE
+  MISSING_PERSON
+  ALTERCATION
+  OTHER
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+  EMERGENCY
+}
+
+enum IncidentStatus {
+  REPORTED
+  INVESTIGATING
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+  ESCALATED
+}
+
+enum AccessType {
+  ENTRY
+  EXIT
+  ATTEMPT
+}
+
+enum PersonType {
+  EMPLOYEE
+  VISITOR
+  CONTRACTOR
+  SECURITY_PERSONNEL
+  DELIVERY_DRIVER
+  UNKNOWN
+}
+
+enum AccessMethod {
+  BADGE
+  PIN
+  BIOMETRIC
+  FACIAL_RECOGNITION
+  LICENSE_PLATE
+  MANUAL_OVERRIDE
+  QR_CODE
+  MOBILE_APP
+}
+
+enum CameraType {
+  FIXED
+  PTZ
+  DOME
+  BULLET
+  THERMAL
+  LICENSE_PLATE_READER
+  BODY_CAMERA
+}
+
+// ==========================================
+// ADVANCED GATE SECURITY FEATURES
+// ==========================================
+
+model VehicleBlacklist {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Vehicle Details
+  licensePlate   String
+  vehicleNumber  String?
+  carrierName    String?
+  driverName     String?
+  
+  // Blacklist Details
+  reason         String @db.Text
+  severity       BlacklistSeverity @default(MEDIUM)
+  bannedDate     DateTime @default(now())
+  bannedUntil    DateTime?
+  bannedBy       String // User ID
+  
+  // Status
+  isActive       Boolean @default(true)
+  notes          String? @db.Text
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, licensePlate])
+  @@index([organizationId])
+  @@index([licensePlate])
+  @@index([isActive])
+  @@map("vehicle_blacklist")
+}
+
+model VehicleWhitelist {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Vehicle/Carrier Details
+  licensePlate   String?
+  carrierName    String?
+  
+  // Whitelist Type
+  whitelistType  WhitelistType @default(CARRIER)
+  
+  // Auto-Approval
+  autoApprove    Boolean @default(true)
+  skipInspection Boolean @default(false)
+  
+  // Validity
+  validFrom      DateTime @default(now())
+  validUntil     DateTime?
+  
+  // Status
+  isActive       Boolean @default(true)
+  notes          String? @db.Text
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([licensePlate])
+  @@index([carrierName])
+  @@index([isActive])
+  @@map("vehicle_whitelist")
+}
+
+model GateWeighBridge {
+  id             String   @id @default(cuid())
+  organizationId String
+  gateEntryId    String
+  
+  // Weight Details
+  direction      EntryDirection // IN or OUT
+  weight         Decimal @db.Decimal(10, 2) // kg
+  weightUnit     String @default("KG")
+  
+  // Weigh Bridge
+  bridgeId       String
+  bridgeName     String?
+  
+  // Timestamp
+  weighTime      DateTime @default(now())
+  
+  // Operator
+  operatorId     String?
+  operatorName   String?
+  
+  // Verification
+  verified       Boolean @default(true)
+  verificationNotes String? @db.Text
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  gateEntry      GateEntry @relation(fields: [gateEntryId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([gateEntryId])
+  @@index([direction])
+  @@map("gate_weigh_bridges")
+}
+
+model GatePhoto {
+  id             String   @id @default(cuid())
+  organizationId String
+  gateEntryId    String
+  
+  // Photo Details
+  photoType      GatePhotoType
+  imageUrl       String
+  thumbnailUrl   String?
+  
+  // Metadata
+  capturedAt     DateTime @default(now())
+  capturedBy     String? // User or Camera ID
+  cameraId       String?
+  
+  // AI Analysis (optional)
+  aiAnalysis     Json? // Plate number, cargo type, etc.
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  gateEntry      GateEntry @relation(fields: [gateEntryId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([gateEntryId])
+  @@index([photoType])
+  @@map("gate_photos")
+}
+
+model GateDocument {
+  id             String   @id @default(cuid())
+  organizationId String
+  gateEntryId    String
+  
+  // Document Details
+  documentType   GateDocumentType
+  documentNumber String?
+  fileUrl        String
+  fileName       String
+  fileSize       Int?
+  mimeType       String?
+  
+  // Verification
+  verified       Boolean @default(false)
+  verifiedBy     String?
+  verifiedAt     DateTime?
+  verificationNotes String? @db.Text
+  
+  // Metadata
+  uploadedAt     DateTime @default(now())
+  uploadedBy     String?
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  gateEntry      GateEntry @relation(fields: [gateEntryId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([gateEntryId])
+  @@index([documentType])
+  @@map("gate_documents")
+}
+
+model GateQueue {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Vehicle Details
+  licensePlate   String
+  driverName     String?
+  driverPhone    String?
+  carrierName    String?
+  vehicleType    VehicleType?
+  
+  // Queue Details
+  position       Int
+  arrivalTime    DateTime @default(now())
+  estimatedWaitMinutes Int?
+  
+  // Assignment
+  gateId         String?
+  assignedGate   Gate? @relation(fields: [gateId], references: [id])
+  calledForward  Boolean @default(false)
+  calledAt       DateTime?
+  
+  // Status
+  status         QueueStatus @default(WAITING)
+  
+  // Completion
+  processedAt    DateTime?
+  gateEntryId    String? @unique
+  gateEntry      GateEntry? @relation(fields: [gateEntryId], references: [id])
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([status])
+  @@index([position])
+  @@map("gate_queue")
+}
+
+model Gate {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Gate Details
+  gateName       String
+  gateNumber     String
+  gateType       GateType @default(BOTH)
+  
+  // Location
+  warehouseId    String?
+  location       String?
+  
+  // Capabilities
+  hasLPR         Boolean @default(false)
+  hasWeighBridge Boolean @default(false)
+  hasBarrier     Boolean @default(true)
+  
+  // Status
+  status         GateStatus @default(OPEN)
+  isActive       Boolean @default(true)
+  
+  // Current State
+  currentQueue   Int @default(0)
+  lastActivity   DateTime?
+  
+  // Assigned Personnel
+  assignedGuards Json? // Array of security personnel IDs
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  queueEntries   GateQueue[]
+  
+  @@unique([organizationId, gateNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@map("gates")
+}
+
+model ParkingSpot {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Spot Details
+  spotNumber     String
+  spotName       String?
+  zone           String?
+  
+  // Capacity
+  spotType       ParkingSpotType @default(STANDARD)
+  maxLength      Int? // feet
+  maxWeight      Int? // kg
+  
+  // Features
+  refrigerated   Boolean @default(false)
+  covered        Boolean @default(false)
+  hazmatApproved Boolean @default(false)
+  
+  // Status
+  status         ParkingStatus @default(AVAILABLE)
+  isActive       Boolean @default(true)
+  
+  // Current Occupancy
+  currentVehicle String? // License plate
+  occupiedSince  DateTime?
+  gateEntryId    String?
+  
+  // Location
+  mapCoordinates Json? // {x, y} or lat/lng
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, spotNumber])
+  @@index([organizationId])
+  @@index([status])
+  @@index([zone])
+  @@map("parking_spots")
+}
+
+model TemperatureLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  gateEntryId    String
+  
+  // Temperature
+  temperature    Decimal @db.Decimal(5, 2)
+  unit           TempUnit @default(CELSIUS)
+  
+  // Location
+  location       String // "TRAILER_INTERIOR", "CARGO_ZONE_1"
+  sensorId       String?
+  
+  // Timestamp
+  recordedAt     DateTime @default(now())
+  recordedBy     String?
+  
+  // Alert
+  outOfRange     Boolean @default(false)
+  minThreshold   Decimal? @db.Decimal(5, 2)
+  maxThreshold   Decimal? @db.Decimal(5, 2)
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  gateEntry      GateEntry @relation(fields: [gateEntryId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([gateEntryId])
+  @@index([recordedAt])
+  @@map("temperature_logs")
+}
+
+model HazmatRecord {
+  id             String   @id @default(cuid())
+  organizationId String
+  gateEntryId    String
+  
+  // Hazmat Classification
+  hazmatClass    String // "CLASS_3_FLAMMABLE"
+  unNumber       String // "UN1203"
+  properShippingName String
+  
+  // Permits
+  permitNumber   String?
+  permitExpiry   DateTime?
+  
+  // Emergency Info
+  emergencyContact String?
+  emergencyPhone   String
+  spillProcedure   String? @db.Text
+  
+  // Special Handling
+  specialParkingZone String?
+  specialInstructions String? @db.Text
+  segregationRequired Boolean @default(false)
+  
+  // Verification
+  verified       Boolean @default(false)
+  verifiedBy     String?
+  verifiedAt     DateTime?
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  gateEntry      GateEntry @relation(fields: [gateEntryId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([gateEntryId])
+  @@index([hazmatClass])
+  @@map("hazmat_records")
+}
+
+// ==========================================
+// GATE SECURITY ENUMS
+// ==========================================
+
+enum BlacklistSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  PERMANENT
+}
+
+enum WhitelistType {
+  CARRIER
+  VEHICLE
+  DRIVER
+}
+
+enum GatePhotoType {
+  DRIVER_ID
+  DRIVER_FACE
+  TRUCK_FRONT
+  TRUCK_REAR
+  TRUCK_SIDE
+  LICENSE_PLATE
+  CARGO
+  SEAL
+  DAMAGE
+  OTHER
+}
+
+enum GateDocumentType {
+  BILL_OF_LADING
+  MANIFEST
+  DELIVERY_ORDER
+  PERMIT
+  INSURANCE
+  DRIVER_LICENSE
+  VEHICLE_REGISTRATION
+  CUSTOMS_DOCS
+  HAZMAT_PERMIT
+  OTHER
+}
+
+enum QueueStatus {
+  WAITING
+  CALLED
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+enum GateType {
+  INBOUND
+  OUTBOUND
+  BOTH
+  EMPLOYEE
+}
+
+enum GateStatus {
+  OPEN
+  CLOSED
+  MAINTENANCE
+  EMERGENCY_CLOSED
+}
+
+enum ParkingSpotType {
+  STANDARD
+  OVERSIZED
+  REFRIGERATED
+  HAZMAT
+  STAGING
+  LOADING
+}
+
+enum ParkingStatus {
+  AVAILABLE
+  OCCUPIED
+  RESERVED
+  MAINTENANCE
+  BLOCKED
+}
+
+enum TempUnit {
+  CELSIUS
+  FAHRENHEIT
+}
+
+// ==========================================
+// SECURITY AUTOMATION & NOTIFICATIONS
+// ==========================================
+
+model SecurityNotification {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Notification Details
+  type           SecurityNotificationType
+  priority       NotificationPriority @default(HIGH)
+  title          String
+  message        String @db.Text
+  
+  // Recipient
+  recipientType  RecipientType
+  recipientId    String? // User ID, Security Personnel ID, etc.
+  recipientEmail String?
+  recipientPhone String?
+  recipientName  String?
+  
+  // Delivery
+  deliveryMethod DeliveryMethod
+  status         NotificationStatus @default(PENDING)
+  sentAt         DateTime?
+  deliveredAt    DateTime?
+  readAt         DateTime?
+  failureReason  String?
+  
+  // Context
+  relatedEntity  String? // "GATE_ENTRY", "VISITOR", "INCIDENT", etc.
+  relatedEntityId String?
+  actionUrl      String? // Deep link to relevant page
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([recipientId])
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@map("security_notifications")
+}
+
+model VisitorPreRegistration {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Pre-Registration Number
+  registrationNumber String @unique
+  qrCode         String   @unique // QR code data for quick check-in
+  
+  // Visitor Information
+  firstName      String
+  lastName       String
+  email          String
+  phone          String?
+  company        String?
+  visitorType    VisitorType @default(GUEST)
+  
+  // Visit Details
+  visitDate      DateTime
+  visitPurpose   String
+  expectedDuration Int? // minutes
+  
+  // Host Information
+  hostEmployeeId String?
+  hostName       String
+  hostEmail      String?
+  hostDepartment String?
+  
+  // Requirements
+  escortRequired Boolean @default(false)
+  allowedAreas   Json? // Array of zone IDs
+  specialInstructions String? @db.Text
+  
+  // Approval
+  status         PreRegistrationStatus @default(PENDING)
+  approvedBy     String? // User ID
+  approvedAt     DateTime?
+  rejectionReason String?
+  
+  // Check-in
+  checkedIn      Boolean @default(false)
+  checkedInAt    DateTime?
+  visitorId      String? @unique // Links to actual Visitor record after check-in
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  expiresAt      DateTime // Registration expires after visit date
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  visitor        Visitor? @relation(fields: [visitorId], references: [id])
+  
+  @@unique([organizationId, registrationNumber])
+  @@index([organizationId])
+  @@index([email])
+  @@index([visitDate])
+  @@index([status])
+  @@index([qrCode])
+  @@map("visitor_pre_registrations")
+}
+
+model SecurityAlert {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Alert Details
+  alertType      SecurityAlertType
+  severity       AlertSeverity @default(HIGH)
+  title          String
+  description    String @db.Text
+  
+  // Trigger
+  triggeredBy    String? // System, Rule ID, User ID
+  triggerSource  String? // "CAMERA", "ACCESS_CONTROL", "MANUAL", etc.
+  triggerTime    DateTime @default(now())
+  
+  // Location
+  warehouseId    String?
+  location       String?
+  zoneId         String? // AccessControlZone ID
+  
+  // Related Entities
+  relatedEntity  String? // "GATE_ENTRY", "VISITOR", "INCIDENT", etc.
+  relatedEntityId String?
+  
+  // Response
+  status         SecurityAlertStatus @default(ACTIVE)
+  acknowledgedBy String? // User ID or Security Personnel ID
+  acknowledgedAt DateTime?
+  resolvedBy     String?
+  resolvedAt     DateTime?
+  resolutionNotes String? @db.Text
+  
+  // Actions Taken
+  incidentCreated Boolean @default(false)
+  incidentId      String? // Link to SecurityIncident if created
+  notificationsSent Int @default(0)
+  
+  // Metadata
+  metadata       Json? // Camera footage, sensor data, etc.
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([alertType])
+  @@index([severity])
+  @@index([status])
+  @@index([triggerTime])
+  @@map("security_alerts")
+}
+
+model SecurityComplianceReport {
+  id             String   @id @default(cuid())
+  organizationId String
+  
+  // Report Details
+  reportNumber   String
+  reportType     ComplianceReportType
+  title          String
+  
+  // Period
+  periodStart    DateTime
+  periodEnd      DateTime
+  generatedAt    DateTime @default(now())
+  
+  // Content
+  summary        String @db.Text
+  findings       Json // Structured findings data
+  statistics     Json // Stats like total visitors, incidents, etc.
+  recommendations String? @db.Text
+  
+  // Files
+  pdfUrl         String? // Generated PDF report URL
+  csvUrl         String? // Raw data export
+  
+  // Status
+  status         ReportStatus @default(DRAFT)
+  publishedAt    DateTime?
+  publishedBy    String? // User ID
+  
+  // Distribution
+  recipientEmails Json? // Array of emails
+  sentAt         DateTime?
+  
+  // Metadata
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, reportNumber])
+  @@index([organizationId])
+  @@index([reportType])
+  @@index([periodStart])
+  @@index([status])
+  @@map("security_compliance_reports")
+}
+
+// ==========================================
+// SECURITY AUTOMATION ENUMS
+// ==========================================
+
+enum SecurityNotificationType {
+  VISITOR_ARRIVAL
+  VISITOR_OVERDUE
+  VISITOR_CHECKOUT
+  GATE_ENTRY
+  INCIDENT_REPORTED
+  INCIDENT_ESCALATED
+  INCIDENT_RESOLVED
+  SHIFT_REMINDER
+  SHIFT_NO_SHOW
+  ACCESS_DENIED
+  BLACKLIST_DETECTED
+  SECURITY_ALERT
+  COMPLIANCE_DUE
+  SYSTEM_ERROR
+}
+
+enum PreRegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+  CHECKED_IN
+  CANCELLED
+}
+
+enum DeliveryMethod {
+  EMAIL
+  SMS
+  PUSH
+  IN_APP
+  WEBHOOK
+}
+
+enum SecurityAlertType {
+  UNAUTHORIZED_ACCESS
+  TAILGATING
+  LOITERING
+  BLACKLIST_DETECTED
+  VISITOR_OVERDUE
+  ZONE_BREACH
+  AFTER_HOURS_ACCESS
+  FORCED_ENTRY
+  CAMERA_OFFLINE
+  MULTIPLE_FAILED_ACCESS
+  SUSPICIOUS_BEHAVIOR
+  EMERGENCY
+  SYSTEM_MALFUNCTION
+}
+
+enum SecurityAlertStatus {
+  ACTIVE
+  ACKNOWLEDGED
+  INVESTIGATING
+  RESOLVED
+  FALSE_ALARM
+  DISMISSED
+}
+
+enum ComplianceReportType {
+  DAILY_SUMMARY
+  WEEKLY_SUMMARY
+  MONTHLY_SUMMARY
+  VISITOR_LOG
+  INCIDENT_LOG
+  ACCESS_LOG
+  GATE_ACTIVITY
+  SECURITY_AUDIT
+  OSHA_REPORT
+  CUSTOM
+}
+
+enum ReportStatus {
+  DRAFT
+  PENDING
+  PUBLISHED
+  ARCHIVED
+}
+
+enum VisitorType {
+  CONTRACTOR
+  VENDOR
+  CUSTOMER
+  AUDITOR
+  CANDIDATE
+  GUEST
+  OTHER
+}
+
+// ==========================================
+// PATROL & CHECKPOINT SYSTEM
+// ==========================================
+
+model PatrolRoute {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?  @db.Text
+  warehouseId    String?
+  isActive       Boolean  @default(true)
+  frequency      String? // "HOURLY", "EVERY_4_HOURS", "DAILY"
+  estimatedMinutes Int? // Expected completion time
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  checkpoints    PatrolCheckpoint[]
+  executions     PatrolExecution[]
+  
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@map("patrol_routes")
+}
+
+model PatrolCheckpoint {
+  id             String   @id @default(cuid())
+  routeId        String
+  organizationId String
+  name           String
+  location       String
+  checkpointNumber Int
+  checkpointType PatrolCheckpointType @default(QR_CODE)
+  qrCode         String?  @unique // Generated QR code value
+  nfcId          String?  @unique // NFC tag ID
+  gpsLat         Float?
+  gpsLng         Float?
+  gpsRadius      Float?   @default(50) // meters
+  instructions   String?  @db.Text
+  photoRequired  Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  route          PatrolRoute @relation(fields: [routeId], references: [id], onDelete: Cascade)
+  scans          CheckpointScan[]
+  
+  @@index([organizationId])
+  @@index([routeId])
+  @@index([qrCode])
+  @@index([nfcId])
+  @@map("patrol_checkpoints")
+}
+
+model PatrolExecution {
+  id             String   @id @default(cuid())
+  routeId        String
+  organizationId String
+  guardId        String // SecurityPersonnel ID
+  startTime      DateTime
+  endTime        DateTime?
+  status         PatrolStatus @default(IN_PROGRESS)
+  totalCheckpoints Int
+  scannedCheckpoints Int    @default(0)
+  missedCheckpoints Int     @default(0)
+  notes          String?  @db.Text
+  completionRate Float?   @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  route          PatrolRoute @relation(fields: [routeId], references: [id])
+  scans          CheckpointScan[]
+  
+  @@index([organizationId])
+  @@index([routeId])
+  @@index([guardId])
+  @@index([startTime])
+  @@map("patrol_executions")
+}
+
+model CheckpointScan {
+  id             String   @id @default(cuid())
+  checkpointId   String
+  executionId    String
+  organizationId String
+  guardId        String
+  scanTime       DateTime @default(now())
+  scanMethod     PatrolCheckpointType
+  gpsLat         Float?
+  gpsLng         Float?
+  photoUrl       String?
+  notes          String?  @db.Text
+  issueReported  Boolean  @default(false)
+  issueDescription String? @db.Text
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  checkpoint     PatrolCheckpoint @relation(fields: [checkpointId], references: [id])
+  execution      PatrolExecution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([checkpointId])
+  @@index([executionId])
+  @@index([guardId])
+  @@index([scanTime])
+  @@map("checkpoint_scans")
+}
+
+// ==========================================
+// EMERGENCY PANIC SYSTEM
+// ==========================================
+
+model PanicAlert {
+  id             String   @id @default(cuid())
+  organizationId String
+  guardId        String // SecurityPersonnel ID
+  guardName      String
+  location       String?
+  gpsLat         Float?
+  gpsLng         Float?
+  audioUrl       String? // 30-min audio recording
+  videoUrl       String? // Video if available
+  triggeredAt    DateTime @default(now())
+  status         PanicAlertStatus @default(ACTIVE)
+  resolvedAt     DateTime?
+  resolvedBy     String?
+  resolution     String?  @db.Text
+  isFalseAlarm   Boolean  @default(false)
+  responseTime   Int? // seconds until first responder arrived
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  responses      PanicResponse[]
+  
+  @@index([organizationId])
+  @@index([guardId])
+  @@index([triggeredAt])
+  @@index([status])
+  @@map("panic_alerts")
+}
+
+model PanicResponse {
+  id             String   @id @default(cuid())
+  panicAlertId   String
+  responderId    String // SecurityPersonnel ID
+  responderName  String
+  responseType   PanicResponseType
+  responseTime   DateTime
+  arrivalTime    DateTime?
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  panicAlert     PanicAlert @relation(fields: [panicAlertId], references: [id], onDelete: Cascade)
+  
+  @@index([panicAlertId])
+  @@index([responderId])
+  @@map("panic_responses")
+}
+
+// ==========================================
+// GPS TRACKING & GEOFENCING
+// ==========================================
+
+model GuardLocation {
+  id             String   @id @default(cuid())
+  organizationId String
+  guardId        String // SecurityPersonnel ID
+  gpsLat         Float
+  gpsLng         Float
+  accuracy       Float? // meters
+  speed          Float? // km/h
+  heading        Float? // degrees 0-360
+  batteryLevel   Int? // 0-100%
+  timestamp      DateTime @default(now())
+  metadata       Json?
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([guardId])
+  @@index([timestamp])
+  @@map("guard_locations")
+}
+
+model Geofence {
+  id             String   @id @default(cuid())
+  organizationId String
+  name           String
+  description    String?  @db.Text
+  warehouseId    String?
+  zoneType       GeofenceType
+  coordinates    Json // GeoJSON polygon
+  radius         Float? // For circular zones (meters)
+  centerLat      Float?
+  centerLng      Float?
+  isActive       Boolean  @default(true)
+  alertOnEntry   Boolean  @default(false)
+  alertOnExit    Boolean  @default(false)
+  allowedGuards  String[] // Array of guard IDs (empty = all allowed)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  violations     GeofenceViolation[]
+  
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([zoneType])
+  @@map("geofences")
+}
+
+model GeofenceViolation {
+  id             String   @id @default(cuid())
+  geofenceId     String
+  organizationId String
+  guardId        String
+  guardName      String
+  violationType  GeofenceViolationType
+  gpsLat         Float
+  gpsLng         Float
+  timestamp      DateTime @default(now())
+  acknowledged   Boolean  @default(false)
+  acknowledgedBy String?
+  acknowledgedAt DateTime?
+  notes          String?  @db.Text
+  
+  // Relations
+  geofence       Geofence @relation(fields: [geofenceId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([geofenceId])
+  @@index([guardId])
+  @@index([timestamp])
+  @@map("geofence_violations")
+}
+
+// ==========================================
+// DAILY ACTIVITY REPORTS
+// ==========================================
+
+model DailyActivityReport {
+  id             String   @id @default(cuid())
+  organizationId String
+  reportNumber   String // DAR-2026-001
+  warehouseId    String?
+  reportDate     DateTime
+  shiftType      String // "DAY", "EVENING", "NIGHT"
+  guardId        String
+  guardName      String
+  supervisorId   String?
+  supervisorName String?
+  
+  // Shift Summary
+  shiftStart     DateTime
+  shiftEnd       DateTime
+  totalHours     Float?
+  
+  // Activity Counts (auto-populated)
+  gateEntries    Int      @default(0)
+  gateExits      Int      @default(0)
+  visitorCheckIns Int     @default(0)
+  visitorCheckOuts Int    @default(0)
+  incidentsReported Int   @default(0)
+  patrolsCompleted Int    @default(0)
+  checkpointsScanned Int  @default(0)
+  
+  // Weather
+  weatherConditions String?
+  temperature    Float?
+  
+  // Equipment Status
+  equipmentStatus Json? // { radio: "working", torch: "working" }
+  
+  // Observations
+  observations   String?  @db.Text
+  significantEvents String? @db.Text
+  handoverNotes  String?  @db.Text
+  
+  // Signatures
+  guardSignature String? // Base64 signature
+  guardSignedAt  DateTime?
+  supervisorSignature String?
+  supervisorSignedAt DateTime?
+  
+  status         DARStatus @default(DRAFT)
+  submittedAt    DateTime?
+  approvedAt     DateTime?
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, reportNumber])
+  @@index([organizationId])
+  @@index([reportDate])
+  @@index([guardId])
+  @@index([status])
+  @@map("daily_activity_reports")
+}
+
+// ==========================================
+// EQUIPMENT TRACKING
+// ==========================================
+
+model Equipment {
+  id             String   @id @default(cuid())
+  organizationId String
+  equipmentType  EquipmentType
+  equipmentNumber String // RADIO-01, KEY-05, etc.
+  name           String
+  description    String?  @db.Text
+  serialNumber   String?
+  purchaseDate   DateTime?
+  warrantyExpiry DateTime?
+  status         EquipmentStatus @default(AVAILABLE)
+  condition      EquipmentCondition @default(GOOD)
+  currentGuardId String?
+  location       String?
+  lastMaintenanceDate DateTime?
+  nextMaintenanceDate DateTime?
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  checkouts      EquipmentCheckout[]
+  maintenanceLogs EquipmentMaintenance[]
+  
+  @@unique([organizationId, equipmentNumber])
+  @@index([organizationId])
+  @@index([equipmentType])
+  @@index([status])
+  @@index([currentGuardId])
+  @@map("equipment")
+}
+
+model EquipmentCheckout {
+  id             String   @id @default(cuid())
+  equipmentId    String
+  organizationId String
+  guardId        String
+  guardName      String
+  checkoutTime   DateTime @default(now())
+  expectedReturn DateTime?
+  returnTime     DateTime?
+  returnedBy     String?
+  condition      EquipmentCondition?
+  notes          String?  @db.Text
+  isOverdue      Boolean  @default(false)
+  
+  // Relations
+  equipment      Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([equipmentId])
+  @@index([guardId])
+  @@index([checkoutTime])
+  @@map("equipment_checkouts")
+}
+
+model EquipmentMaintenance {
+  id             String   @id @default(cuid())
+  equipmentId    String
+  organizationId String
+  maintenanceType MaintenanceType
+  performedBy    String
+  maintenanceDate DateTime @default(now())
+  nextDueDate    DateTime?
+  cost           Decimal? @db.Decimal(10, 2)
+  description    String   @db.Text
+  partsReplaced  String?  @db.Text
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  equipment      Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([equipmentId])
+  @@index([maintenanceDate])
+  @@map("equipment_maintenance")
+}
+
+// ==========================================
+// SHIFT HANDOVER
+// ==========================================
+
+model ShiftHandover {
+  id             String   @id @default(cuid())
+  organizationId String
+  handoverNumber String // HO-2026-001
+  warehouseId    String?
+  handoverDate   DateTime @default(now())
+  
+  // Outgoing Shift
+  outgoingGuardId String
+  outgoingGuardName String
+  outgoingShift  String // "NIGHT"
+  outgoingSignature String?
+  outgoingSignedAt DateTime?
+  
+  // Incoming Shift
+  incomingGuardId String
+  incomingGuardName String
+  incomingShift  String // "DAY"
+  incomingSignature String?
+  incomingSignedAt DateTime?
+  
+  // Summary
+  gateEntriesCount Int    @default(0)
+  gateExitsCount Int      @default(0)
+  currentVehiclesOnSite Int @default(0)
+  visitorsCount  Int      @default(0)
+  incidentsCount Int      @default(0)
+  patrolsCompleted Int    @default(0)
+  
+  // Key Events
+  keyEvents      Json? // Array of events
+  
+  // Ongoing Issues
+  ongoingIssues  String?  @db.Text
+  
+  // Equipment Status
+  equipmentStatus Json?
+  
+  // Notes
+  notesForNextShift String? @db.Text
+  
+  status         HandoverStatus @default(PENDING)
+  completedAt    DateTime?
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([organizationId, handoverNumber])
+  @@index([organizationId])
+  @@index([handoverDate])
+  @@index([outgoingGuardId])
+  @@index([incomingGuardId])
+  @@map("shift_handovers")
+}
+
+// ==========================================
+// TRAINING & CERTIFICATIONS
+// ==========================================
+
+model GuardCertification {
+  id             String   @id @default(cuid())
+  organizationId String
+  guardId        String // SecurityPersonnel ID
+  guardName      String
+  certificationType CertificationType
+  certificationName String
+  certificationNumber String?
+  issuer         String?
+  issueDate      DateTime
+  expiryDate     DateTime?
+  status         CertificationStatus @default(VALID)
+  documentUrl    String? // PDF/image of certificate
+  verifiedBy     String?
+  verifiedAt     DateTime?
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([guardId])
+  @@index([expiryDate])
+  @@index([status])
+  @@map("guard_certifications")
+}
+
+model TrainingCourse {
+  id             String   @id @default(cuid())
+  organizationId String
+  courseName     String
+  description    String?  @db.Text
+  courseType     CourseType
+  duration       Int? // minutes
+  validityPeriod Int? // months until re-training needed
+  isRequired     Boolean  @default(false)
+  contentUrl     String? // Link to training materials
+  passingScore   Int? // Percentage
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  completions    TrainingCompletion[]
+  
+  @@index([organizationId])
+  @@index([courseType])
+  @@map("training_courses")
+}
+
+model TrainingCompletion {
+  id             String   @id @default(cuid())
+  courseId       String
+  organizationId String
+  guardId        String
+  guardName      String
+  completionDate DateTime @default(now())
+  expiryDate     DateTime?
+  score          Int? // Percentage
+  passed         Boolean  @default(true)
+  certificateUrl String? // Generated certificate
+  instructorId   String?
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now())
+  
+  // Relations
+  course         TrainingCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([courseId])
+  @@index([guardId])
+  @@index([expiryDate])
+  @@map("training_completions")
+}
+
+// ==========================================
+// MANIFEST TRACKING
+// ==========================================
+
+model TruckManifest {
+  id             String   @id @default(cuid())
+  gateEntryId    String   @unique
+  organizationId String
+  manifestNumber String?
+  manifestPhoto  String? // URL to photo
+  ocrText        String?  @db.Text // Extracted text
+  
+  // Manifest Details
+  supplier       String?
+  poNumbers      String[] // Array of PO numbers
+  expectedUnits  Int?
+  actualUnits    Int?
+  hasDiscrepancy Boolean  @default(false)
+  discrepancyNotes String? @db.Text
+  
+  // Verification
+  verifiedBy     String?
+  verifiedAt     DateTime?
+  verificationStatus ManifestStatus @default(PENDING)
+  
+  // Forwarding
+  forwardedToWarehouse Boolean @default(false)
+  forwardedAt    DateTime?
+  forwardedBy    String?
+  
+  metadata       Json?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  gateEntry      GateEntry @relation(fields: [gateEntryId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([gateEntryId])
+  @@index([verificationStatus])
+  @@map("truck_manifests")
+}
+
+// ==========================================
+// WEATHER INTEGRATION
+// ==========================================
+
+model WeatherLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  warehouseId    String?
+  timestamp      DateTime @default(now())
+  
+  // Weather Data
+  temperature    Float // Celsius
+  feelsLike      Float?
+  humidity       Int? // Percentage
+  windSpeed      Float? // km/h
+  windDirection  String?
+  conditions     String // "Clear", "Rain", "Snow", etc.
+  visibility     Float? // km
+  pressure       Float? // hPa
+  
+  // Alerts
+  hasAlert       Boolean  @default(false)
+  alertType      String? // "STORM", "HEAT_WAVE", "SNOW", etc.
+  alertSeverity  String? // "LOW", "MEDIUM", "HIGH"
+  alertMessage   String?  @db.Text
+  
+  // Data Source
+  source         String   @default("OpenWeather") // API provider
+  
+  // Relations
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([timestamp])
+  @@map("weather_logs")
+}
+
+// ==========================================
+// NEW ENUMS
+// ==========================================
+
+enum PatrolCheckpointType {
+  QR_CODE
+  NFC
+  GPS
+  MANUAL
+}
+
+enum PatrolStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  MISSED
+  CANCELLED
+}
+
+enum PanicAlertStatus {
+  ACTIVE
+  RESPONDING
+  RESOLVED
+  FALSE_ALARM
+}
+
+enum PanicResponseType {
+  ACKNOWLEDGED
+  EN_ROUTE
+  ARRIVED
+  RESOLVED
+}
+
+enum GeofenceType {
+  ALLOWED
+  RESTRICTED
+  ALERT_ONLY
+  SAFETY_ZONE
+}
+
+enum GeofenceViolationType {
+  ENTERED_RESTRICTED
+  EXITED_ALLOWED
+  ENTERED_ALERT_ZONE
+  SPEEDING
+  LOITERING
+}
+
+enum DARStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+}
+
+enum EquipmentType {
+  RADIO
+  TORCH
+  BATON
+  KEYS
+  ACCESS_CARD
+  VEHICLE
+  CAMERA
+  TABLET
+  FIRST_AID_KIT
+  FIRE_EXTINGUISHER
+  OTHER
+}
+
+enum EquipmentStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  DAMAGED
+  LOST
+  RETIRED
+}
+
+enum EquipmentCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  BROKEN
+}
+
+enum MaintenanceType {
+  ROUTINE
+  REPAIR
+  CALIBRATION
+  BATTERY_REPLACEMENT
+  SOFTWARE_UPDATE
+  INSPECTION
+}
+
+enum HandoverStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+enum CertificationType {
+  SIA_LICENSE
+  FIRST_AID
+  FIRE_SAFETY
+  CPR
+  DRIVERS_LICENSE
+  FORKLIFT
+  CCTV_OPERATOR
+  CONFLICT_MANAGEMENT
+  HEALTH_SAFETY
+  OTHER
+}
+
+enum CertificationStatus {
+  VALID
+  EXPIRING_SOON
+  EXPIRED
+  SUSPENDED
+  REVOKED
+}
+
+enum CourseType {
+  ONBOARDING
+  COMPLIANCE
+  SAFETY
+  TECHNICAL
+  SOFT_SKILLS
+  REFRESHER
+}
+
+enum ManifestStatus {
+  PENDING
+  VERIFIED
+  DISCREPANCY
+  FORWARDED
+}
+

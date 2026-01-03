@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
@@ -143,13 +144,20 @@ export async function POST(
       },
     })
 
-    // TODO: Send invitation email
-    // For now, we'll just log it
-    console.log("Invitation created:", {
-      email,
-      role,
-      token,
-      inviteUrl: `${process.env.NEXTAUTH_URL}/invite/${token}`,
+    // Send invitation email
+    const inviteUrl = `${process.env.NEXTAUTH_URL}/invite/${token}`;
+    await sendEmail({
+      to: email,
+      subject: `Invitation to join ${invitation.organization.name}`,
+      html: `
+        <h2>You've been invited!</h2>
+        <p>${invitation.inviter.name} (${invitation.inviter.email}) has invited you to join ${invitation.organization.name}.</p>
+        <p><strong>Role:</strong> ${role}</p>
+        <p>Click the link below to accept the invitation:</p>
+        <p><a href="${inviteUrl}" style="background-color: #0070f3; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Accept Invitation</a></p>
+        <p>Or copy this link: ${inviteUrl}</p>
+        <p>This invitation will expire in 7 days.</p>
+      `,
     })
 
     // Create activity log

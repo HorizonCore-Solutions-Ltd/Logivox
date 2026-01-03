@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Search, X, Clock, TrendingUp } from "lucide-react";
-import { Card, CardContent } from "@repo/ui/components/ui/card";
-import { Badge } from "@repo/ui/components/ui/badge";
-import { Input } from "@repo/ui/components/ui/input";
-import { Button } from "@repo/ui/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface SearchResult {
   id: string;

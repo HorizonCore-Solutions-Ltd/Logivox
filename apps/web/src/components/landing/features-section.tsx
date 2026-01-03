@@ -86,6 +86,21 @@ export function FeaturesSection() {
 
   const additionalFeatures = [
     {
+      icon: Activity,
+      title: "AI Assistant (Public & Logged-In)",
+      description: "Intelligent AI assistant available on all public pages (no internet required) and tenant-aware AI for logged-in users."
+    },
+    {
+      icon: Shield,
+      title: "Military-Grade Security",
+      description: "AES-256 encryption, zero-trust architecture, SOC 2 Type II, ISO 27001, and continuous security monitoring."
+    },
+    {
+      icon: Clock,
+      title: "Advanced Business Continuity",
+      description: "99.99% uptime SLA, automated failover, disaster recovery, real-time backups, and multi-region redundancy."
+    },
+    {
       icon: ScanBarcode,
       title: "Mobile Scanning",
       description: "iOS & Android apps with barcode scanning for receiving, picking, counting, and transfers."
@@ -111,9 +126,9 @@ export function FeaturesSection() {
       description: "Real-time integration with Shopify, WooCommerce, Magento, and custom platforms."
     },
     {
-      icon: Shield,
-      title: "Enterprise Security",
-      description: "RBAC, MFA, audit logging, encryption, and SOC 2 compliance readiness."
+      icon: Lock,
+      title: "Zero-Trust Security",
+      description: "Never trust, always verify. End-to-end encryption, MFA, biometric auth, and complete audit trails."
     }
   ]
 

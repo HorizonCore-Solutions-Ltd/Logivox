@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Accessibility utilities for keyboard navigation, focus management, and screen reader support
  * Ensures WCAG 2.1 AA compliance across the application

@@ -43,15 +43,15 @@ export function CTASection() {
               {/* Headline */}
               <div className="space-y-4">
                 <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  Ready to optimize your
+                  Ready to transform your
                   <span className="block bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-                    warehouse operations?
+                    supply chain operations?
                   </span>
                 </h2>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Join hundreds of warehouses who have streamlined their operations 
-                  with LogiVox WMS. Experience complete inventory control, 
-                  efficient order fulfillment, and powerful analytics today.
+                  Join 500+ warehouses across 40+ countries who trust LogiVox WMS. 
+                  Get industry-leading warehouse management with intelligent automation, 
+                  wave picking, quality control, and real-time visibility into every operation.
                 </p>
               </div>
 

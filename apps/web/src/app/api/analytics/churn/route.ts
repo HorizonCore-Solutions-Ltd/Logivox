@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -52,7 +53,6 @@ export async function GET(request: NextRequest) {
       customerBehaviors.map(async (customer) => {
         const prediction = await predictChurn(customer);
         return {
-          customerId: customer.customerId,
           customerName: customer.customerName,
           ...prediction,
         };

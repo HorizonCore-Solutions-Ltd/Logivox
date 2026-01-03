@@ -19,7 +19,14 @@ import {
   FileText,
   HelpCircle,
   BookOpen,
-  Calendar
+  Calendar,
+  Warehouse,
+  Mic,
+  ShieldCheck,
+  Package,
+  ClipboardCheck,
+  Truck,
+  Globe
 } from "lucide-react"
 
 export function Footer() {
@@ -27,21 +34,30 @@ export function Footer() {
 
   const footerSections = [
     {
-      title: "Solutions",
+      title: "Core Solutions",
       links: [
-        { name: "Stock Booking", href: "/solutions/stock-booking", icon: Building2 },
-        { name: "ERP Integration", href: "/solutions/erp-integration", icon: Zap },
-        { name: "Analytics", href: "/solutions/analytics", icon: BarChart3 },
-        { name: "Multi-Tenant", href: "/solutions/multi-tenant", icon: Users },
+        { name: "Warehouse Management", href: "/solutions/warehouse-management", icon: Warehouse },
+        { name: "Voice Operations", href: "/solutions/voice-operations", icon: Mic },
+        { name: "Yard Management", href: "/solutions/yard-management", icon: MapPin },
+        { name: "Gate & Security", href: "/solutions/gate-security", icon: ShieldCheck },
+      ],
+    },
+    {
+      title: "Operations",
+      links: [
+        { name: "Inventory Management", href: "/solutions/inventory", icon: Package },
+        { name: "Order Fulfillment", href: "/solutions/fulfillment", icon: ClipboardCheck },
+        { name: "Transportation", href: "/solutions/transportation", icon: Truck },
+        { name: "AI Analytics", href: "/solutions/analytics", icon: BarChart3 },
       ],
     },
     {
       title: "Platform",
       links: [
         { name: "Security", href: "/platform/security", icon: Shield },
+        { name: "Integrations", href: "/platform/integrations", icon: Globe },
         { name: "API Documentation", href: "/docs/api", icon: FileText },
-        { name: "Integrations", href: "/platform/integrations", icon: Zap },
-        { name: "Enterprise", href: "/platform/enterprise", icon: Building2 },
+        { name: "Multi-Tenant", href: "/platform/multi-tenant", icon: Building2 },
       ],
     },
     {
@@ -50,15 +66,15 @@ export function Footer() {
         { name: "Documentation", href: "/docs", icon: BookOpen },
         { name: "Help Center", href: "/help", icon: HelpCircle },
         { name: "Blog", href: "/blog", icon: FileText },
-        { name: "Webinars", href: "/webinars", icon: Calendar },
+        { name: "Pricing", href: "/pricing", icon: Zap },
       ],
     },
     {
       title: "Company",
       links: [
         { name: "About Us", href: "/about", icon: Building2 },
-        { name: "Careers", href: "/careers", icon: Users },
         { name: "Contact", href: "/contact", icon: Mail },
+        { name: "Careers", href: "/careers", icon: Users },
         { name: "Partners", href: "/partners", icon: Users },
       ],
     },
@@ -84,7 +100,7 @@ export function Footer() {
       <div className="container-enterprise">
         {/* Main footer content */}
         <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8">
-          {/* Company info */}
+          {/* Company Info & Contact */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">

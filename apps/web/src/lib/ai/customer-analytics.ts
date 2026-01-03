@@ -222,7 +222,9 @@ export function analyzePurchasePattern(
 
   // Predict next purchase date
   const daysBetweenPurchases = sorted.slice(1).map((purchase, i) => {
-    const diff = purchase.date.getTime() - sorted[i].date.getTime();
+    const prevPurchase = sorted[i];
+    if (!prevPurchase) return 30; // Default to 30 days
+    const diff = purchase.date.getTime() - prevPurchase.date.getTime();
     return diff / (1000 * 60 * 60 * 24);
   });
   const avgDaysBetween = daysBetweenPurchases.length > 0 

@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * Skip Links Component
  * Provides keyboard users with quick navigation to important page sections

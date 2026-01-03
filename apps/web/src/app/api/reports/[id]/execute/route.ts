@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -165,7 +166,25 @@ export async function POST(
 
       // Send email/webhook if configured
       if (report.emailRecipients && report.emailRecipients.length > 0) {
-        // TODO: Send email
+        // Send report via email
+        const emailRecipients = Array.isArray(report.emailRecipients) 
+          ? report.emailRecipients 
+          : [report.emailRecipients];
+        
+        for (const recipient of emailRecipients) {
+          await sendEmail({
+            to: recipient,
+            subject: `Report: ${report.name}`,
+            html: `
+              <h2>${report.name}</h2>
+              <p>${report.description || ''}</p>
+              <p><strong>Report executed at:</strong> ${new Date().toLocaleString()}</p>
+              <p><strong>Row count:</strong> ${result.rowCount}</p>
+              <p>View the full report in the dashboard.</p>
+            `,
+          });
+        }
+        
         await prisma.reportExecution.update({
           where: { id: execution.id },
           data: {
@@ -176,7 +195,20 @@ export async function POST(
       }
 
       if (report.webhookUrl) {
-        // TODO: Send webhook
+        // Send webhook with retry logic
+        const webhookResult = await sendWebhook(report.webhookUrl, {
+          event: 'report.executed',
+          data: {
+            reportId: report.id,
+            reportName: report.name,
+            executionId: execution.id,
+            rowCount: result.rowCount,
+            executedAt: new Date().toISOString(),
+          },
+          timestamp: new Date().toISOString(),
+          organizationId: report.organizationId,
+        });
+        
         await prisma.reportExecution.update({
           where: { id: execution.id },
           data: {

@@ -26,10 +26,12 @@ export function HeroSection() {
   ]
 
   const features = [
-    { icon: Shield, label: "Multi-Warehouse" },
-    { icon: Zap, label: "Wave Picking" },
-    { icon: Building2, label: "Quality Control" },
-    { icon: BarChart3, label: "Real-time Analytics" },
+    { icon: Shield, label: "Military-Grade Security" },
+    { icon: Users, label: "AI Assistant (Public & Tenant-Aware)" },
+    { icon: Clock, label: "99.99% Uptime & Business Continuity" },
+    { icon: Zap, label: "No Internet Required (Public Pages)" },
+    { icon: Building2, label: "Multi-Warehouse Support" },
+    { icon: BarChart3, label: "Advanced Analytics & AI" },
   ]
 
   return (
@@ -46,7 +48,7 @@ export function HeroSection() {
           <div className="flex items-center space-x-2">
             <Badge variant="secondary" className="px-3 py-1">
               <Star className="h-3 w-3 mr-1" />
-              New: Wave Picking & Task Automation
+              Enterprise-Grade WMS | Deployed in 40+ Countries
             </Badge>
             <ArrowRight className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -54,15 +56,15 @@ export function HeroSection() {
           {/* Hero headline */}
           <div className="space-y-4 max-w-4xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
-              Streamline Your
+              Industry-Leading
               <span className="bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-                {" "}Warehouse Operations{" "}
+                {" "}Warehouse Management System{" "}
               </span>
-              From Receiving to Shipping
+              Powering Modern Supply Chains
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Track inventory across multiple locations. Optimize picking with wave automation. 
-              Ship orders faster with intelligent task routing. Real-time visibility into every operation.
+              Complete WMS solution with intelligent automation, wave picking, quality control, and real-time analytics. 
+              From receiving and putaway to picking, packing, and shipping — all in one fully adaptable platform.
             </p>
           </div>
 
