@@ -9,7 +9,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const transactions = await prisma.blockchainTransaction.findMany({
+    const transactions = await (prisma as any).blockchainTransaction.findMany({
       orderBy: {
         timestamp: 'desc',
       },

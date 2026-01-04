@@ -252,7 +252,7 @@ export default function IoTMonitoringPage() {
                   <CardContent>
                     <div className="text-2xl font-bold text-blue-600">
                       {stats.avg.toFixed(1)}
-                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit}</span>
+                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit || ''}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -265,7 +265,7 @@ export default function IoTMonitoringPage() {
                     <div className="text-2xl font-bold text-green-600 flex items-center">
                       <TrendingDown className="h-5 w-5 mr-2" />
                       {stats.min.toFixed(1)}
-                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit}</span>
+                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit || ''}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -278,7 +278,7 @@ export default function IoTMonitoringPage() {
                     <div className="text-2xl font-bold text-red-600 flex items-center">
                       <TrendingUp className="h-5 w-5 mr-2" />
                       {stats.max.toFixed(1)}
-                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit}</span>
+                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit || ''}</span>
                     </div>
                   </CardContent>
                 </Card>

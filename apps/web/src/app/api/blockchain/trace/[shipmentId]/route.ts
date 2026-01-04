@@ -33,7 +33,7 @@ export async function GET(
     }
 
     // Get blockchain transactions for this shipment
-    const transactions = await prisma.blockchainTransaction.findMany({
+    const transactions = await (prisma as any).blockchainTransaction.findMany({
       where: {
         entityType: 'SHIPMENT',
         entityId: shipmentId,

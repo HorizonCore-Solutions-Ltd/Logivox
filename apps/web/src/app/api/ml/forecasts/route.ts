@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const horizon = parseInt(searchParams.get('horizon') || '30');
 
     // Generate mock forecast data based on historical demand
-    const forecasts = await prisma.demandForecast.findMany({
+    const forecasts = await (prisma as any).demandForecast.findMany({
       where: {
         forecastDate: {
           gte: new Date(),

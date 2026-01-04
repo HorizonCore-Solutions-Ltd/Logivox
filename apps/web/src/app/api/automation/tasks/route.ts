@@ -9,7 +9,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const tasks = await prisma.automationTask.findMany({
+    const tasks = await (prisma as any).automationTask.findMany({
       where: {
         status: {
           in: ['QUEUED', 'IN_PROGRESS', 'COMPLETED', 'FAILED'],
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       take: 100,
     });
 
-    const formattedTasks = tasks.map(t => ({
+    const formattedTasks = tasks.map((t: any) => ({
       id: t.id,
       taskType: t.taskType,
       deviceId: t.deviceId,

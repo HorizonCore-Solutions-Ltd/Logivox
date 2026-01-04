@@ -9,7 +9,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const models = await prisma.mLModel.findMany({
+    const models = await (prisma as any).mLModel.findMany({
       where: {
         isActive: true,
       },
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       },
     });
 
-    const metrics = models.map(m => ({
+    const metrics = models.map((m: any) => ({
       modelName: m.modelName,
       version: m.version,
       accuracy: m.accuracy,

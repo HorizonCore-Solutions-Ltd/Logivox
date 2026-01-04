@@ -395,10 +395,10 @@ export default function SustainabilityDashboard() {
 
           <div className="grid gap-4 md:grid-cols-4">
             {[
-              { icon: Truck, label: 'Transportation', value: breakdownData[0].value, color: 'text-red-600', bgColor: 'bg-red-50' },
-              { icon: Package, label: 'Packaging', value: breakdownData[1].value, color: 'text-orange-600', bgColor: 'bg-orange-50' },
-              { icon: Zap, label: 'Warehousing', value: breakdownData[2].value, color: 'text-blue-600', bgColor: 'bg-blue-50' },
-              { icon: Package, label: 'Manufacturing', value: breakdownData[3].value, color: 'text-purple-600', bgColor: 'bg-purple-50' },
+              { icon: Truck, label: 'Transportation', value: breakdownData[0]?.value || 0, color: 'text-red-600', bgColor: 'bg-red-50' },
+              { icon: Package, label: 'Packaging', value: breakdownData[1]?.value || 0, color: 'text-orange-600', bgColor: 'bg-orange-50' },
+              { icon: Zap, label: 'Warehousing', value: breakdownData[2]?.value || 0, color: 'text-blue-600', bgColor: 'bg-blue-50' },
+              { icon: Package, label: 'Manufacturing', value: breakdownData[3]?.value || 0, color: 'text-purple-600', bgColor: 'bg-purple-50' },
             ].map((item, index) => (
               <Card key={index}>
                 <CardContent className="pt-6">

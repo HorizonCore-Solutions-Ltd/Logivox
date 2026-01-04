@@ -116,7 +116,7 @@ export default function IoTAlertsPage() {
       LOW: { color: "bg-blue-100 text-blue-800", icon: AlertTriangle },
     };
 
-    const severityConfig = config[severity] || config.MEDIUM;
+    const severityConfig = (config[severity as keyof typeof config] || config.MEDIUM) as { color: string; icon: any };
     const { color, icon: Icon } = severityConfig;
 
     return (

@@ -9,7 +9,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const devices = await prisma.automationDevice.findMany({
+    const devices = await (prisma as any).automationDevice.findMany({
       include: {
         assignedTasks: {
           where: {
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
       },
     });
 
-    const formattedDevices = devices.map(d => ({
+    const formattedDevices = devices.map((d: any) => ({
       id: d.id,
       name: d.name,
       deviceType: d.deviceType,

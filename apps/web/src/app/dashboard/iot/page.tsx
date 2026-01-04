@@ -91,7 +91,7 @@ export default function IoTDevicesPage() {
       MAINTENANCE: { color: "bg-yellow-100 text-yellow-800", icon: Activity },
     };
 
-    const statusConfig = config[status] || config.OFFLINE;
+    const statusConfig = (config[status as keyof typeof config] || config.OFFLINE) as { color: string; icon: any };
     const { color, icon: Icon } = statusConfig;
 
     return (
