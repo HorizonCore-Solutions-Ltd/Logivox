@@ -1,7 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { DollarSign, FileText, Clock, Check } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { DollarSign, FileText, Clock, Check, Plus, RefreshCw, Download, Send, TrendingUp } from 'lucide-react';
+import Link from "next/link";
 
 interface Invoice {
   id: string;
@@ -14,6 +33,7 @@ interface Invoice {
   totalAmount: number;
   paidAmount?: number;
   lineItems: any[];
+  createdAt: string;
 }
 
 export default function BillingPage() {
@@ -61,59 +81,97 @@ export default function BillingPage() {
     .filter(inv => inv.status === 'SENT' || inv.status === 'OVERDUE')
     .reduce((sum, inv) => sum + inv.totalAmount, 0);
 
+  const overdueInvoices = invoices.filter(inv => inv.status === 'OVERDUE').length;
+  const draftInvoices = invoices.filter(inv => inv.status === 'DRAFT').length;
+
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-6">
+    <div className="container mx-auto py-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Billing & Invoicing</h1>
-          <p className="text-gray-600 mt-1">Manage invoices and payments</p>
+          <h1 className="text-3xl font-bold text-gray-900">3PL Billing & Invoicing</h1>
+          <p className="text-gray-600 mt-1">
+            Manage client billing, rate cards, and automated invoicing
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={fetchInvoices} variant="outline">
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
+          <Link href="/dashboard/billing/rate-cards">
+            <Button variant="outline">
+              <FileText className="h-4 w-4 mr-2" />
+              Rate Cards
+            </Button>
+          </Link>
+          <Link href="/dashboard/billing/new">
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              New Invoice
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Invoices</p>
-              <p className="text-2xl font-bold">{invoices.length}</p>
+      {/* Enhanced Stats */}
+      <div className="grid gap-4 md:grid-cols-5">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Total Invoices
+            </CardTitle>
+            <FileText className="h-4 w-4 text-gray-400" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-gray-900">{invoices.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Revenue (Paid)
+            </CardTitle>
+            <Check className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-600">
+              ${totalRevenue.toLocaleString()}
             </div>
-            <FileText className="w-8 h-8 text-blue-600" />
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Paid</p>
-              <p className="text-2xl font-bold text-green-600">
-                ${totalRevenue.toFixed(0)}
-              </p>
+            <p className="text-xs text-gray-500 mt-1">From {invoices.filter(i => i.status === 'PAID').length} invoices</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Pending Revenue
+            </CardTitle>
+            <Clock className="h-4 w-4 text-yellow-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-yellow-600">
+              ${pendingRevenue.toLocaleString()}
             </div>
-            <Check className="w-8 h-8 text-green-600" />
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-yellow-600">
-                ${pendingRevenue.toFixed(0)}
-              </p>
+            <p className="text-xs text-gray-500 mt-1">Awaiting payment</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Overdue
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-red-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-red-600">
+              {invoices.filter(inv => inv.status === 'OVERDUE').length}
             </div>
-            <Clock className="w-8 h-8 text-yellow-600" />
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Overdue</p>
-              <p className="text-2xl font-bold text-red-600">
-                {invoices.filter(inv => inv.status === 'OVERDUE').length}
-              </p>
-            </div>
-            <DollarSign className="w-8 h-8 text-red-600" />
-          </div>
-        </div>
+            <p className="text-xs text-gray-500 mt-1">Requires attention</p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}

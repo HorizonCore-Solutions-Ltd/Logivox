@@ -1,0 +1,66 @@
+/**
+ * Prisma Schema Extensions for Integrations
+ * Add these models to your existing schema.prisma
+ */
+
+// Webhook Model (add to schema.prisma)
+model Webhook {
+  id              String   @id @default(cuid())
+  url             String
+  events          String[] // List of event types to subscribe to
+  status          String   @default("ACTIVE") // ACTIVE, INACTIVE
+  lastTriggered   DateTime?
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([status])
+}
+
+// Integration Connection Model
+model IntegrationConnection {
+  id              String   @id @default(cuid())
+  type            String   // SAP, ORACLE, FEDEX, UPS, DHL
+  name            String
+  config          Json     // Connection settings (API keys, URLs, etc.)
+  status          String   @default("ACTIVE") // ACTIVE, INACTIVE, ERROR
+  lastSync        DateTime?
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([type])
+}
+
+// Integration Log Model
+model IntegrationLog {
+  id              String   @id @default(cuid())
+  integrationType String   // SAP, ORACLE, FEDEX, etc.
+  action          String   // SYNC, DISPATCH, WEBHOOK
+  status          String   // SUCCESS, FAILURE
+  request         Json?    // Request payload
+  response        Json?    // Response data
+  error           String?  // Error message if failed
+  duration        Int?     // Processing time in ms
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+
+  @@index([organizationId])
+  @@index([integrationType])
+  @@index([status])
+  @@index([createdAt])
+}
+
+// Update Organization model to include new relations
+// Add to existing Organization model:
+model Organization {
+  // ... existing fields ...
+  webhooks               Webhook[]
+  integrationConnections IntegrationConnection[]
+  integrationLogs        IntegrationLog[]
+}
