@@ -69,7 +69,7 @@ export interface StaffingRecommendation {
   // Recommendations by function
   staffing: {
     function: 'RETURNS_RECEIVING' | 'TRIAGE' | 'QC' | 'REFURB' | 'PACKOUT' | 'CUSTOMER_SERVICE';
-    recommended Headcount: number;
+    recommendedHeadcount: number;
     currentHeadcount: number;
     gap: number;
     

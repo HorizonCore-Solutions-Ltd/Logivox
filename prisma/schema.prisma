@@ -138,6 +138,9 @@ model User {
   
   // QC Module Relations
   qcReceivingInspections QCReceivingInspection[] @relation("QCReceivingInspector")
+  
+  // Blog Relations
+  blogComments        BlogComment[]
 
   @@index([email])
   @@map("users")
@@ -317,14 +320,30 @@ model Organization {
   returnsForecasts       ReturnsForecast[]
   
   // Cross-Docking Relations
-  crossDockAppointments  CrossDockingAppointment[]
-  crossDockReceipts      CrossDockReceipt[]
-  crossDockReceiptItems  CrossDockReceiptItem[]
-  crossDockShipments     CrossDockShipment[]
-  crossDockAllocations   CrossDockAllocation[]
-  crossDockSorting       CrossDockSorting[]
-  crossDockActivities    CrossDockActivity[]
-  crossDockSettings      CrossDockSettings?
+  // DISABLED:   crossDockAppointments  CrossDockingAppointment[]
+  // DISABLED:   crossDockReceipts      CrossDockReceipt[]
+  // DISABLED:   crossDockReceiptItems  CrossDockReceiptItem[]
+  // DISABLED:   crossDockShipments     CrossDockShipment[]
+  // DISABLED:   crossDockAllocations   CrossDockAllocation[]
+  // DISABLED:   crossDockSorting       CrossDockSorting[]
+  // DISABLED:   crossDockActivities    CrossDockActivity[]
+  // DISABLED:   crossDockSettings      CrossDockSettings?
+  
+  // Advanced Returns Management Relations
+  instantRefunds         InstantRefund[]
+  qrReturns              QRReturn[]
+  aggregatedReturns      AggregatedReturn[]
+  serialTracking         SerialTracking[]
+  vendorChargebacks      VendorChargeback[]
+  sustainabilityReports  SustainabilityReport[]
+  crossBorderReturns     CrossBorderReturn[]
+  returnRiskPredictions  ReturnRiskPrediction[]
+  productReturnAnalyses  ProductReturnAnalysis[]
+  customerReturnProfiles CustomerReturnProfile[]
+  
+  // Advanced Inventory Management Relations
+  autonomousDecisions    AutonomousDecision[]
+  autonomousConfig       AutonomousConfig?
 
   @@index([slug])
   @@index([createdById])
@@ -387,7 +406,7 @@ model Warehouse {
   rtvs                   RTV[]
   
   // Cross-Docking Relations
-  crossDockAppointments  CrossDockingAppointment[]
+  // DISABLED:   crossDockAppointments  CrossDockingAppointment[]
   
   inventoryItems InventoryItem[]
   grns           GoodsReceiptNote[]
@@ -500,10 +519,17 @@ model InventoryItem {
   slottingRecommendations SlottingRecommendation[]
   
   // QC Module Relations
-  qcInspectionItems       QCInspectionItem[]
+  qcInspectionItems       QCInspectionItem[]       @relation("QCInspectionItemProduct")
+  refurbWorkOrders        RefurbWorkOrder[]        @relation("RefurbWorkOrderProduct")
   
   // Cross-Docking Relations
-  crossDockReceiptItems   CrossDockReceiptItem[]
+  // DISABLED:   crossDockReceiptItems   CrossDockReceiptItem[]
+  
+  // Advanced Inventory Management Relations
+  autonomousDecisions     AutonomousDecision[]
+  demandForecasts         DemandForecast[]
+  velocityClassification  VelocityClassification?
+  digitalTwinStates       DigitalTwinState[]
 
   @@unique([organizationId, sku])
   @@index([organizationId])
@@ -719,7 +745,7 @@ model Supplier {
   // QC Module Relations
   qcReceivingInspections QCReceivingInspection[] @relation("SupplierInspections")
   rtvs                   RTV[]                   @relation("SupplierRTVs")
-  qualityScore           VendorQualityScore?
+  qualityScore           VendorQualityScore?     @relation("VendorQualityScore")
   email          String?
   phone          String?
   address        String?
@@ -737,7 +763,12 @@ model Supplier {
   lots           Lot[]
   
   // Cross-Docking Relations
-  crossDockReceipts CrossDockReceipt[]
+  // DISABLED:   crossDockReceipts CrossDockReceipt[]
+  
+  // Advanced Returns Management Relations
+  vendorChargebacks    VendorChargeback[]
+  rtvRequests          RTVRequest[]         @relation("RTVRequest")
+  vendorPolicies       VendorReturnPolicy[] @relation("VendorReturnPolicy")
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -766,8 +797,16 @@ model Customer {
   serialNumbers SerialNumber[]
   fraudAnalyses FraudAnalysis[]
   
+  // Advanced Returns Management Relations
+  instantRefunds         InstantRefund[]
+  qrReturns              QRReturn[]
+  aggregatedReturns      AggregatedReturn[]
+  crossBorderReturns     CrossBorderReturn[]
+  returnRiskPredictions  ReturnRiskPrediction[]
+  customerReturnProfile  CustomerReturnProfile?
+  
   // Cross-Docking Relations
-  crossDockShipments CrossDockShipment[]
+  // DISABLED:   crossDockShipments CrossDockShipment[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -831,6 +870,9 @@ model PurchaseOrder {
   // QC Module Relations
   qcInspections QCReceivingInspection[]
   rtvs          RTV[]
+  
+  // Advanced Inventory Management Relations
+  autonomousDecisions AutonomousDecision[]
 
   @@index([organizationId])
   @@index([supplierId])
@@ -1112,7 +1154,7 @@ model SalesOrder {
   loadPlanItems  LoadPlanItem[]
   
   // Cross-Docking Relations
-  crossDockShipments CrossDockShipment[]
+  // DISABLED:   crossDockShipments CrossDockShipment[]
 
   @@unique([organizationId, soNumber])
   @@index([organizationId])
@@ -1608,9 +1650,9 @@ model Location {
   routeEnds     PickingRoute[] @relation("RouteEnd")
   
   // Cross-Docking Relations
-  crossDockSorting      CrossDockingAppointment[] @relation("CrossDockSorting")
-  sortingTasks          CrossDockSorting[]        @relation("SortingTaskArea")
-  crossDockReceiptItems CrossDockReceiptItem[]    @relation("CrossDockItemLocation")
+  // DISABLED:   crossDockSorting      CrossDockingAppointment[] @relation("CrossDockSorting")
+  // DISABLED:   sortingTasks          CrossDockSorting[]        @relation("SortingTaskArea")
+  // DISABLED:   crossDockReceiptItems CrossDockReceiptItem[]    @relation("CrossDockItemLocation")
 
   @@unique([organizationId, locationCode])
   @@index([organizationId])
@@ -1666,6 +1708,9 @@ model WarehouseTransfer {
   requestedBy   User          @relation("TransferRequestedBy", fields: [requestedById], references: [id])
   approvedBy    User?         @relation("TransferApprovedBy", fields: [approvedById], references: [id])
   completedBy   User?         @relation("TransferCompletedBy", fields: [completedById], references: [id])
+  
+  // Advanced Inventory Management Relations
+  autonomousDecisions AutonomousDecision[]
 
   @@index([organizationId])
   @@index([transferNumber])
@@ -1725,6 +1770,9 @@ model StockAdjustment {
   approvedBy      User?            @relation("AdjustmentApprovedBy", fields: [approvedById], references: [id])
   completedBy     User?            @relation("AdjustmentCompletedBy", fields: [completedById], references: [id])
   cycleCountItems CycleCountItem[]
+  
+  // Advanced Inventory Management Relations
+  autonomousDecisions AutonomousDecision[]
 
   @@index([organizationId])
   @@index([adjustmentNumber])
@@ -2018,6 +2066,13 @@ model RMA {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Advanced Returns Management Relations
+  instantRefund          InstantRefund?
+  qrReturn               QRReturn?
+  sustainabilityReports  SustainabilityReport[]
+  crossBorderReturn      CrossBorderReturn?
+  serialTrackings        SerialTracking[]
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   salesOrder   SalesOrder?  @relation(fields: [salesOrderId], references: [id])
@@ -5889,8 +5944,11 @@ model IoTDevice {
   thresholds     Json? // Alert thresholds
   
   // Battery (for mobile devices)
-  batteryLevel   Float?
-  isCharging     Boolean?
+  batteryLevel    Float?
+  isCharging      Boolean?
+  signalStrength  Float?   @default(100)     // Signal strength 0-100
+  lastCalibration DateTime? @default(now())   // Last calibration date
+  lastSeen        DateTime? @default(now())   // Last seen timestamp
   
   // Metadata
   notes          String?  @db.Text
@@ -5901,9 +5959,11 @@ model IoTDevice {
   createdById    String?
   
   // Relations
-  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   readings       IoTSensorReading[]
   alerts         IoTAlert[]
+  iotReadings    IoTReading[] // Advanced inventory monitoring
+  environmentalReadings EnvironmentalReading[] // Environmental monitoring
   
   @@index([organizationId])
   @@index([deviceType])
@@ -8435,7 +8495,7 @@ model RefurbWorkOrder {
   updatedAt         DateTime  @updatedAt @map("updated_at")
 
   rmaItem RMAItem @relation(fields: [rmaItemId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
+  product InventoryItem @relation("RefurbWorkOrderProduct", fields: [productId], references: [id])
 
   @@index([rmaItemId])
   @@index([productId])
@@ -8549,7 +8609,7 @@ model RTVRequest {
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  vendor       Vendor       @relation(fields: [vendorId], references: [id])
+  vendor       Supplier     @relation("RTVRequest", fields: [vendorId], references: [id])
 
   @@index([organizationId])
   @@index([vendorId])
@@ -8575,7 +8635,7 @@ model VendorReturnPolicy {
   updatedAt              DateTime @updatedAt @map("updated_at")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  vendor       Vendor       @relation(fields: [vendorId], references: [id])
+  vendor       Supplier     @relation("VendorReturnPolicy", fields: [vendorId], references: [id])
 
   @@unique([organizationId, vendorId])
   @@index([organizationId])
@@ -8686,7 +8746,7 @@ model QCInspectionItem {
   updatedAt         DateTime @updatedAt @map("updated_at")
   
   inspection        QCReceivingInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
-  product           Product               @relation(fields: [productId], references: [id])
+  product           InventoryItem         @relation("QCInspectionItemProduct", fields: [productId], references: [id])
   defects           QCDefect[]
   
   @@index([inspectionId])
@@ -8815,7 +8875,7 @@ model RTVActivity {
 model VendorQualityScore {
   id                   String   @id @default(cuid())
   organizationId       String   @map("organization_id")
-  supplierId           String   @map("supplier_id")
+  supplierId           String   @unique @map("supplier_id")
   
   totalPurchaseOrders  Int      @default(0) @map("total_purchase_orders")
   totalUnitsReceived   Int      @default(0) @map("total_units_received")
@@ -8853,7 +8913,7 @@ model VendorQualityScore {
   updatedAt            DateTime @updatedAt @map("updated_at")
   
   organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  supplier             Supplier     @relation(fields: [supplierId], references: [id])
+  supplier             Supplier     @relation("VendorQualityScore", fields: [supplierId], references: [id])
   
   @@unique([organizationId, supplierId])
   @@index([organizationId])
@@ -8977,754 +9037,607 @@ model ReturnsForecast {
 }
 
 // ==========================================
-// RECEIVING QC MODULE
+// ADVANCED RETURNS MANAGEMENT SYSTEM
 // ==========================================
 
-model QCReceivingInspection {
-  id                 String   @id @default(cuid())
-  inspectionNumber   String   @unique @map("inspection_number")
-  organizationId     String   @map("organization_id")
-  warehouseId        String   @map("warehouse_id")
-  grnId              String?  @map("grn_id") // Link to GRN if exists
-  poId               String   @map("po_id")
-  vendorId           String   @map("vendor_id")
-  inspectorId        String   @map("inspector_id")
+model InstantRefund {
+  id                    String    @id @default(cuid())
+  rmaId                 String    @unique @map("rma_id")
+  customerId            String    @map("customer_id")
+  organizationId        String    @map("organization_id")
   
-  // Inspection details
-  inspectionType     String   @map("inspection_type") // FULL, SAMPLE, VISUAL, FUNCTIONAL
-  sampleSize         Int?     @map("sample_size") // For SAMPLE type
-  totalUnits         Int      @map("total_units")
-  inspectedUnits     Int      @map("inspected_units")
-  passedUnits        Int      @map("passed_units") @default(0)
-  failedUnits        Int      @map("failed_units") @default(0)
+  // Trust scoring
+  customerTrustScore    Int       @map("customer_trust_score") // 0-100
+  trustTier             String    @map("trust_tier") // GOLD, SILVER, BRONZE, NONE
+  trustFactors          Json      @map("trust_factors")
+  riskFactors           Json      @map("risk_factors")
   
-  // Status and results
-  status             String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, CANCELLED
-  result             String?  // PASS, FAIL, CONDITIONAL
-  overallNotes       String?  @map("overall_notes") @db.Text
+  // Refund details
+  refundAmount          Decimal   @map("refund_amount") @db.Decimal(10, 2)
+  refundMethod          String    @map("refund_method") // ORIGINAL_PAYMENT, STORE_CREDIT, CHECK
+  refundIssuedAt        DateTime  @map("refund_issued_at")
+  paymentProcessor      String    @map("payment_processor") // STRIPE, PAYPAL, etc.
+  transactionId         String    @map("transaction_id")
   
-  // Timing
-  scheduledAt        DateTime? @map("scheduled_at")
-  startedAt          DateTime? @map("started_at")
-  completedAt        DateTime? @map("completed_at")
+  // Verification
+  verificationDeadline  DateTime  @map("verification_deadline")
+  requiresPhotos        Boolean   @map("requires_photos")
+  requiresSerialNumber  Boolean   @map("requires_serial_number")
+  requiresTrackingUpdate Boolean  @map("requires_tracking_update")
+  requiresSignature     Boolean   @map("requires_signature")
+  verificationStatus    String    @map("verification_status") // PENDING, VERIFIED, MISMATCH, NOT_RECEIVED, FRAUD_DETECTED
+  verifiedAt            DateTime? @map("verified_at")
+  itemReceivedAt        DateTime? @map("item_received_at")
+  discrepancies         String[]  @map("discrepancies")
   
-  // Metadata
-  priority           String   @default("MEDIUM") // URGENT, HIGH, MEDIUM, LOW
-  metadata           Json?
-  createdAt          DateTime @default(now()) @map("created_at")
-  updatedAt          DateTime @updatedAt @map("updated_at")
+  // Chargeback
+  chargebackRequired    Boolean   @map("chargeback_required") @default(false)
+  chargebackAmount      Decimal?  @map("chargeback_amount") @db.Decimal(10, 2)
+  chargebackReason      String?   @map("chargeback_reason")
+  chargebackInitiatedAt DateTime? @map("chargeback_initiated_at")
+  chargebackCompletedAt DateTime? @map("chargeback_completed_at")
   
-  // Relations
-  organization       Organization               @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse          Warehouse                  @relation(fields: [warehouseId], references: [id])
-  purchaseOrder      PurchaseOrder              @relation(fields: [poId], references: [id])
-  vendor             Vendor                     @relation(fields: [vendorId], references: [id])
-  inspector          User                       @relation("QCReceivingInspector", fields: [inspectorId], references: [id])
-  grn                GoodsReceiptNote?          @relation(fields: [grnId], references: [id])
-  items              QCInspectionItem[]
-  defects            QCDefect[]
-  activities         QCInspectionActivity[]
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
   
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([poId])
-  @@index([vendorId])
-  @@index([inspectorId])
-  @@index([status])
-  @@index([result])
-  @@index([createdAt])
-  @@map("qc_receiving_inspections")
-}
-
-model QCInspectionItem {
-  id                String   @id @default(cuid())
-  inspectionId      String   @map("inspection_id")
-  productId         String   @map("product_id")
-  sku               String
-  productName       String   @map("product_name")
-  
-  // Quantities
-  expectedQty       Int      @map("expected_qty")
-  inspectedQty      Int      @map("inspected_qty")
-  passedQty         Int      @map("passed_qty") @default(0)
-  failedQty         Int      @map("failed_qty") @default(0)
-  
-  // Inspection results
-  result            String?  // PASS, FAIL, CONDITIONAL
-  checklistData     Json     @map("checklist_data") // Store all checkpoint results
-  
-  // Notes
-  notes             String?  @db.Text
-  inspectorNotes    String?  @map("inspector_notes") @db.Text
-  
-  // Photos
-  photoUrls         String[] @map("photo_urls")
-  
-  // Timing
-  inspectedAt       DateTime? @map("inspected_at")
-  
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-  
-  // Relations
-  inspection        QCReceivingInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
-  product           Product               @relation(fields: [productId], references: [id])
-  defects           QCDefect[]
-  
-  @@index([inspectionId])
-  @@index([productId])
-  @@index([sku])
-  @@index([result])
-  @@map("qc_inspection_items")
-}
-
-model QCDefect {
-  id                String   @id @default(cuid())
-  inspectionId      String   @map("inspection_id")
-  itemId            String   @map("item_id")
-  organizationId    String   @map("organization_id")
-  
-  // Defect classification
-  defectType        String   @map("defect_type") // CRITICAL, MAJOR, MINOR
-  defectCategory    String   @map("defect_category") // DAMAGE, WRONG_ITEM, MISSING_PARTS, FUNCTIONAL, PACKAGING, LABELING, EXPIRED, OTHER
-  description       String   @db.Text
-  
-  // Impact
-  quantityAffected  Int      @map("quantity_affected")
-  estimatedCost     Decimal? @map("estimated_cost") @db.Decimal(10, 2)
-  
-  // Evidence
-  photoUrls         String[] @map("photo_urls")
-  videoUrls         String[] @map("video_urls")
-  
-  // Resolution tracking
-  resolutionStatus  String   @default("PENDING") @map("resolution_status") // PENDING, RTV_REQUESTED, RTV_APPROVED, CREDITED, REPLACED, ACCEPTED_WITH_DISCOUNT, REJECTED
-  resolutionNotes   String?  @map("resolution_notes") @db.Text
-  resolutionDate    DateTime? @map("resolution_date")
-  
-  // Root cause (optional)
-  rootCause         String?  @map("root_cause") @db.Text
-  correctiveAction  String?  @map("corrective_action") @db.Text
-  
-  createdAt         DateTime @default(now()) @map("created_at")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-  
-  // Relations
-  inspection        QCReceivingInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
-  item              QCInspectionItem      @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  organization      Organization          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  rtv               RTV?
-  
-  @@index([inspectionId])
-  @@index([itemId])
-  @@index([organizationId])
-  @@index([defectType])
-  @@index([defectCategory])
-  @@index([resolutionStatus])
-  @@index([createdAt])
-  @@map("qc_defects")
-}
-
-model RTV {
-  id                  String   @id @default(cuid())
-  rtvNumber           String   @unique @map("rtv_number")
-  organizationId      String   @map("organization_id")
-  defectId            String   @unique @map("defect_id")
-  poId                String   @map("po_id")
-  vendorId            String   @map("vendor_id")
-  warehouseId         String   @map("warehouse_id")
-  
-  // Return details
-  reason              String   @db.Text
-  quantity            Int
-  value               Decimal  @db.Decimal(10, 2)
-  
-  // Vendor response
-  vendorRmaNumber     String?  @map("vendor_rma_number")
-  vendorResponseDate  DateTime? @map("vendor_response_date")
-  vendorNotes         String?  @map("vendor_notes") @db.Text
-  
-  // Status tracking
-  status              String   @default("PENDING") // PENDING, VENDOR_NOTIFIED, APPROVED, REJECTED, SHIPPED, RECEIVED_BY_VENDOR, CREDITED, REPLACED, CLOSED, CANCELLED
-  
-  // Shipping details
-  carrier             String?
-  trackingNumber      String?  @map("tracking_number")
-  labelUrl            String?  @map("label_url")
-  shippingCost        Decimal? @map("shipping_cost") @db.Decimal(8, 2)
-  shippedAt           DateTime? @map("shipped_at")
-  deliveredAt         DateTime? @map("delivered_at")
-  
-  // Resolution
-  resolutionType      String?  @map("resolution_type") // CREDIT, REPLACEMENT, REFUSED, PARTIAL_CREDIT
-  creditAmount        Decimal? @map("credit_amount") @db.Decimal(10, 2)
-  creditMemoNumber    String?  @map("credit_memo_number")
-  creditedAt          DateTime? @map("credited_at")
-  
-  // Replacement tracking
-  replacementPoId     String?  @map("replacement_po_id")
-  replacementReceived Boolean  @map("replacement_received") @default(false)
-  replacementDate     DateTime? @map("replacement_date")
-  
-  // Internal tracking
-  priority            String   @default("MEDIUM") // URGENT, HIGH, MEDIUM, LOW
-  assignedTo          String?  @map("assigned_to")
-  internalNotes       String?  @map("internal_notes") @db.Text
-  
-  createdAt           DateTime @default(now()) @map("created_at")
-  createdBy           String   @map("created_by")
-  updatedAt           DateTime @updatedAt @map("updated_at")
-  
-  // Relations
-  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  defect              QCDefect     @relation(fields: [defectId], references: [id])
-  purchaseOrder       PurchaseOrder @relation(fields: [poId], references: [id])
-  vendor              Vendor       @relation(fields: [vendorId], references: [id])
-  warehouse           Warehouse    @relation(fields: [warehouseId], references: [id])
-  activities          RTVActivity[]
+  rma          RMA          @relation(fields: [rmaId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   @@index([organizationId])
-  @@index([vendorId])
-  @@index([warehouseId])
-  @@index([poId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("rtvs")
-}
-
-model RTVActivity {
-  id          String   @id @default(cuid())
-  rtvId       String   @map("rtv_id")
-  activityType String  @map("activity_type") // CREATED, VENDOR_NOTIFIED, APPROVED, SHIPPED, RECEIVED, CREDITED, etc.
-  description String   @db.Text
-  performedBy String   @map("performed_by")
-  metadata    Json?
-  createdAt   DateTime @default(now()) @map("created_at")
-  
-  rtv         RTV      @relation(fields: [rtvId], references: [id], onDelete: Cascade)
-  
-  @@index([rtvId])
-  @@index([createdAt])
-  @@map("rtv_activities")
-}
-
-model VendorQualityScore {
-  id                   String   @id @default(cuid())
-  organizationId       String   @map("organization_id")
-  vendorId             String   @map("vendor_id")
-  
-  // Lifetime statistics
-  totalPurchaseOrders  Int      @default(0) @map("total_purchase_orders")
-  totalUnitsReceived   Int      @default(0) @map("total_units_received")
-  totalDefectiveUnits  Int      @default(0) @map("total_defective_units")
-  totalRtvCount        Int      @default(0) @map("total_rtv_count")
-  totalRtvValue        Decimal  @default(0) @map("total_rtv_value") @db.Decimal(12, 2)
-  
-  // Rolling 90-day metrics
-  recent90DaysOrders   Int      @default(0) @map("recent_90days_orders")
-  recent90DaysUnits    Int      @default(0) @map("recent_90days_units")
-  recent90DaysDefects  Int      @default(0) @map("recent_90days_defects")
-  recent90DaysRtv      Int      @default(0) @map("recent_90days_rtv")
-  
-  // Calculated metrics
-  lifetimeDefectRate   Decimal  @default(0) @map("lifetime_defect_rate") @db.Decimal(5, 4) // Percentage
-  recent90DefectRate   Decimal  @default(0) @map("recent_90_defect_rate") @db.Decimal(5, 4)
-  avgResolutionDays    Int?     @map("avg_resolution_days")
-  
-  // Quality scoring (0-100)
-  qualityScore         Int      @default(100) @map("quality_score")
-  reliabilityScore     Int      @default(100) @map("reliability_score")
-  responseScore        Int      @default(100) @map("response_score")
-  overallScore         Int      @default(100) @map("overall_score")
-  
-  // Status and classification
-  status               String   @default("APPROVED") // APPROVED, PROBATION, SUSPENDED, BLOCKED
-  tier                 String   @default("STANDARD") @map("tier") // PREMIUM, STANDARD, BASIC, POOR
-  
-  // Incident tracking
-  lastDefectDate       DateTime? @map("last_defect_date")
-  lastRtvDate          DateTime? @map("last_rtv_date")
-  lastInspectionDate   DateTime? @map("last_inspection_date")
-  consecutiveGoodOrders Int     @default(0) @map("consecutive_good_orders")
-  
-  // Review and notes
-  lastReviewDate       DateTime? @map("last_review_date")
-  lastReviewedBy       String?   @map("last_reviewed_by")
-  reviewNotes          String?   @map("review_notes") @db.Text
-  
-  createdAt            DateTime @default(now()) @map("created_at")
-  updatedAt            DateTime @updatedAt @map("updated_at")
-  
-  // Relations
-  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  vendor               Vendor       @relation(fields: [vendorId], references: [id])
-  
-  @@unique([organizationId, vendorId])
-  @@index([organizationId])
-  @@index([vendorId])
-  @@index([qualityScore])
-  @@index([status])
-  @@map("vendor_quality_scores")
-}
-
-model QCInspectionTemplate {
-  id                String   @id @default(cuid())
-  organizationId    String   @map("organization_id")
-  name              String
-  description       String?  @db.Text
-  
-  // Template scope
-  templateType      String   @map("template_type") // PRODUCT_SPECIFIC, CATEGORY, VENDOR_SPECIFIC, UNIVERSAL
-  targetId          String?  @map("target_id") // Product ID, Category ID, or Vendor ID
-  
-  // Inspection configuration
-  inspectionType    String   @map("inspection_type") // FULL, SAMPLE, VISUAL, FUNCTIONAL
-  sampleSizePercent Int?     @map("sample_size_percent") // For SAMPLE type (1-100)
-  minSampleSize     Int?     @map("min_sample_size")
-  maxSampleSize     Int?     @map("max_sample_size")
-  
-  // Checklist (JSON array of inspection points)
-  checklist         Json     // Array of { id, description, type, required, pass_criteria, fail_action }
-  
-  // Acceptance criteria
-  aqlLevel          String?  @map("aql_level") // Acceptable Quality Limit (e.g., "1.0", "2.5", "4.0")
-  criticalDefectAql Decimal? @map("critical_defect_aql") @db.Decimal(4, 2)
-  majorDefectAql    Decimal? @map("major_defect_aql") @db.Decimal(4, 2)
-  minorDefectAql    Decimal? @map("minor_defect_aql") @db.Decimal(4, 2)
-  
-  // Settings
-  requirePhotos     Boolean  @default(false) @map("require_photos")
-  photoMinCount     Int?     @map("photo_min_count")
-  autoAssign        Boolean  @default(true) @map("auto_assign")
-  priority          String   @default("MEDIUM")
-  
-  // Status
-  active            Boolean  @default(true)
-  version           Int      @default(1)
-  
-  createdAt         DateTime @default(now()) @map("created_at")
-  createdBy         String   @map("created_by")
-  updatedAt         DateTime @updatedAt @map("updated_at")
-  
-  // Relations
-  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
-  @@index([organizationId])
-  @@index([templateType])
-  @@index([active])
-  @@map("qc_inspection_templates")
-}
-
-model QCInspectionActivity {
-  id              String   @id @default(cuid())
-  inspectionId    String   @map("inspection_id")
-  activityType    String   @map("activity_type") // CREATED, ASSIGNED, STARTED, PAUSED, RESUMED, COMPLETED, CANCELLED, etc.
-  description     String   @db.Text
-  performedBy     String   @map("performed_by")
-  metadata        Json?
-  createdAt       DateTime @default(now()) @map("created_at")
-  
-  inspection      QCReceivingInspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
-  
-  @@index([inspectionId])
-  @@index([createdAt])
-  @@map("qc_inspection_activities")
-}
-
-model QCSettings {
-  organizationId         String   @id @map("organization_id")
-  
-  // General settings
-  enableAutoInspection   Boolean  @default(true) @map("enable_auto_inspection")
-  inspectionTrigger      String   @default("ON_RECEIPT") @map("inspection_trigger") // ON_RECEIPT, ON_PUTAWAY, MANUAL
-  defaultInspectionType  String   @default("SAMPLE") @map("default_inspection_type")
-  defaultSamplePercent   Int      @default(10) @map("default_sample_percent")
-  
-  // Vendor-based rules
-  newVendorInspection    String   @default("FULL") @map("new_vendor_inspection") // FULL, SAMPLE, VISUAL
-  trustedVendorSampling  Int      @default(5) @map("trusted_vendor_sampling") // %
-  
-  // Defect handling
-  autoQuarantine         Boolean  @default(true) @map("auto_quarantine")
-  autoCreateRtv          Boolean  @default(false) @map("auto_create_rtv")
-  criticalDefectAction   String   @default("REJECT") @map("critical_defect_action") // REJECT, QUARANTINE, ACCEPT_WITH_DISCOUNT
-  
-  // Photo requirements
-  requireDefectPhotos    Boolean  @default(true) @map("require_defect_photos")
-  minDefectPhotos        Int      @default(2) @map("min_defect_photos")
-  
-  // Notifications
-  notifyOnDefect         Boolean  @default(true) @map("notify_on_defect")
-  notifyVendorAutomatic  Boolean  @default(false) @map("notify_vendor_automatic")
-  escalationThreshold    Int      @default(3) @map("escalation_threshold") // Number of defects before escalation
-  
-  // Scoring and performance
-  updateVendorScores     Boolean  @default(true) @map("update_vendor_scores")
-  scoreUpdateFrequency   String   @default("DAILY") @map("score_update_frequency") // REALTIME, DAILY, WEEKLY
-  
-  // RTV settings
-  rtvApprovalRequired    Boolean  @default(true) @map("rtv_approval_required")
-  rtvApprovalThreshold   Decimal  @default(500) @map("rtv_approval_threshold") @db.Decimal(10, 2)
-  autoRequestVendorRma   Boolean  @default(true) @map("auto_request_vendor_rma")
-  
-  createdAt              DateTime @default(now()) @map("created_at")
-  updatedAt              DateTime @updatedAt @map("updated_at")
-  
-  organization           Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
-  @@map("qc_settings")
-}
-
-// ==========================================
-// CROSS-DOCKING MODULE
-// ==========================================
-
-enum CrossDockType {
-  DIRECT        // Direct transfer from inbound to outbound
-  MERGE         // Multiple inbound to single outbound
-  SPLIT         // Single inbound to multiple outbound
-  TRANSLOAD     // Container-to-container transfer
-  CONSOLIDATION // Consolidate multiple shipments
-}
-
-enum CrossDockStatus {
-  SCHEDULED     // Appointment scheduled
-  RECEIVING     // Inbound receiving in progress
-  SORTING       // Items being sorted/allocated
-  STAGED        // Staged for outbound loading
-  LOADING       // Loading onto outbound trucks
-  COMPLETED     // Cross-dock completed
-  CANCELLED     // Operation cancelled
-}
-
-enum SortingMethod {
-  MANUAL        // Manual sorting by workers
-  SCAN_SORT     // Scan-based sorting
-  CONVEYOR      // Automated conveyor sorting
-  VOICE         // Voice-directed sorting
-  PUT_WALL      // Put wall sorting system
-}
-
-model CrossDockingAppointment {
-  id                  String              @id @default(cuid())
-  appointmentNumber   String              @unique @map("appointment_number")
-  organizationId      String              @map("organization_id")
-  warehouseId         String              @map("warehouse_id")
-  
-  // Appointment details
-  type                CrossDockType
-  status              CrossDockStatus     @default(SCHEDULED)
-  priority            String              @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
-  
-  // Inbound details
-  inboundDoorId       String?             @map("inbound_door_id")
-  inboundCarrier      String?             @map("inbound_carrier")
-  inboundVehicleId    String?             @map("inbound_vehicle_id")
-  expectedArrival     DateTime            @map("expected_arrival")
-  actualArrival       DateTime?           @map("actual_arrival")
-  
-  // Outbound details
-  outboundDoorIds     String[]            @map("outbound_door_ids") // Can load to multiple doors
-  targetShipDate      DateTime            @map("target_ship_date")
-  actualShipDate      DateTime?           @map("actual_ship_date")
-  
-  // Operational
-  sortingMethod       SortingMethod       @default(MANUAL) @map("sorting_method")
-  sortingAreaId       String?             @map("sorting_area_id") // Location used for sorting
-  maxDwellTime        Int                 @default(4) @map("max_dwell_time") // Hours allowed in cross-dock
-  
-  // Metrics
-  totalUnits          Int                 @default(0) @map("total_units")
-  receivedUnits       Int                 @default(0) @map("received_units")
-  sortedUnits         Int                 @default(0) @map("sorted_units")
-  shippedUnits        Int                 @default(0) @map("shipped_units")
-  dwellTimeMinutes    Int?                @map("dwell_time_minutes") // Actual time from receipt to ship
-  
-  // Notes
-  notes               String?             @db.Text
-  specialInstructions String?             @map("special_instructions") @db.Text
-  
-  // Timestamps
-  createdAt           DateTime            @default(now()) @map("created_at")
-  updatedAt           DateTime            @updatedAt @map("updated_at")
-  completedAt         DateTime?           @map("completed_at")
-  
-  // Relations
-  organization        Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  warehouse           Warehouse           @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
-  inboundDoor         DockDoor?           @relation("InboundDoor", fields: [inboundDoorId], references: [id])
-  inboundVehicle      Vehicle?            @relation("CrossDockInbound", fields: [inboundVehicleId], references: [id])
-  sortingArea         Location?           @relation("CrossDockSorting", fields: [sortingAreaId], references: [id])
-  receipts            CrossDockReceipt[]
-  shipments           CrossDockShipment[]
-  sortingTasks        CrossDockSorting[]
-  activities          CrossDockActivity[]
-  
-  @@index([organizationId])
-  @@index([warehouseId])
-  @@index([status])
-  @@index([expectedArrival])
-  @@index([targetShipDate])
-  @@map("cross_docking_appointments")
-}
-
-model CrossDockReceipt {
-  id                  String                    @id @default(cuid())
-  receiptNumber       String                    @unique @map("receipt_number")
-  appointmentId       String                    @map("appointment_id")
-  organizationId      String                    @map("organization_id")
-  
-  // Receipt details
-  supplierId          String?                   @map("supplier_id")
-  carrier             String?
-  referenceNumber     String?                   @map("reference_number") // PO, ASN, BOL
-  
-  // Status
-  status              String                    @default("RECEIVING") // RECEIVING, COMPLETED
-  
-  // Timestamps
-  receivedAt          DateTime                  @default(now()) @map("received_at")
-  completedAt         DateTime?                 @map("completed_at")
-  
-  // Relations
-  organization        Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  appointment         CrossDockingAppointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  supplier            Supplier?                 @relation(fields: [supplierId], references: [id])
-  items               CrossDockReceiptItem[]
-  
-  @@index([organizationId])
-  @@index([appointmentId])
-  @@index([supplierId])
-  @@map("cross_dock_receipts")
-}
-
-model CrossDockReceiptItem {
-  id                  String              @id @default(cuid())
-  receiptId           String              @map("receipt_id")
-  organizationId      String              @map("organization_id")
-  
-  // Product details
-  inventoryId         String              @map("inventory_id")
-  sku                 String
-  productName         String              @map("product_name")
-  
-  // Quantities
-  quantityReceived    Int                 @map("quantity_received")
-  quantityAllocated   Int                 @default(0) @map("quantity_allocated")
-  quantityShipped     Int                 @default(0) @map("quantity_shipped")
-  quantityRemaining   Int                 @default(0) @map("quantity_remaining")
-  
-  // Traceability
-  lotNumber           String?             @map("lot_number")
-  serialNumbers       String[]            @map("serial_numbers")
-  
-  // Location
-  currentLocationId   String?             @map("current_location_id") // Where it's staged
-  
-  // Timestamps
-  receivedAt          DateTime            @default(now()) @map("received_at")
-  
-  // Relations
-  organization        Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  receipt             CrossDockReceipt    @relation(fields: [receiptId], references: [id], onDelete: Cascade)
-  inventory           InventoryItem       @relation(fields: [inventoryId], references: [id])
-  currentLocation     Location?           @relation("CrossDockItemLocation", fields: [currentLocationId], references: [id])
-  allocations         CrossDockAllocation[]
-  
-  @@index([organizationId])
-  @@index([receiptId])
-  @@index([inventoryId])
-  @@index([sku])
-  @@map("cross_dock_receipt_items")
-}
-
-model CrossDockShipment {
-  id                  String                    @id @default(cuid())
-  shipmentNumber      String                    @unique @map("shipment_number")
-  appointmentId       String                    @map("appointment_id")
-  organizationId      String                    @map("organization_id")
-  
-  // Shipment details
-  customerId          String?                   @map("customer_id")
-  salesOrderId        String?                   @map("sales_order_id")
-  carrier             String?
-  trackingNumber      String?                   @map("tracking_number")
-  
-  // Door assignment
-  outboundDoorId      String?                   @map("outbound_door_id")
-  loadSheetId         String?                   @map("load_sheet_id")
-  
-  // Status
-  status              String                    @default("PLANNED") // PLANNED, PICKING, STAGED, LOADING, SHIPPED
-  
-  // Metrics
-  totalUnits          Int                       @default(0) @map("total_units")
-  packedUnits         Int                       @default(0) @map("packed_units")
-  
-  // Timestamps
-  targetShipDate      DateTime                  @map("target_ship_date")
-  shippedAt           DateTime?                 @map("shipped_at")
-  createdAt           DateTime                  @default(now()) @map("created_at")
-  
-  // Relations
-  organization        Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  appointment         CrossDockingAppointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  customer            Customer?                 @relation(fields: [customerId], references: [id])
-  salesOrder          SalesOrder?               @relation(fields: [salesOrderId], references: [id])
-  outboundDoor        DockDoor?                 @relation("OutboundDoor", fields: [outboundDoorId], references: [id])
-  loadSheet           LoadSheet?                @relation(fields: [loadSheetId], references: [id])
-  allocations         CrossDockAllocation[]
-  
-  @@index([organizationId])
-  @@index([appointmentId])
   @@index([customerId])
-  @@index([salesOrderId])
-  @@index([status])
-  @@map("cross_dock_shipments")
+  @@index([verificationStatus])
+  @@map("instant_refunds")
 }
 
-model CrossDockAllocation {
-  id                  String                  @id @default(cuid())
-  organizationId      String                  @map("organization_id")
+model QRReturn {
+  id                    String    @id @default(cuid())
+  rmaId                 String    @unique @map("rma_id")
+  organizationId        String    @map("organization_id")
+  customerId            String    @map("customer_id")
   
-  // Source (inbound)
-  receiptItemId       String                  @map("receipt_item_id")
+  qrCode                String    @unique @map("qr_code")
+  qrPayload             Json      @map("qr_payload")
+  qrImageUrl            String    @map("qr_image_url")
+  qrImageData           String?   @map("qr_image_data") @db.Text
   
-  // Destination (outbound)
-  shipmentId          String                  @map("shipment_id")
+  dropOffLocationId     String    @map("drop_off_location_id")
+  dropOffCarrier        String    @map("drop_off_carrier")
+  dropOffAddress        String    @map("drop_off_address")
+  dropOffHours          String    @map("drop_off_hours")
   
-  // Allocation details
-  quantityAllocated   Int                     @map("quantity_allocated")
-  quantityPicked      Int                     @default(0) @map("quantity_picked")
-  quantityShipped     Int                     @default(0) @map("quantity_shipped")
+  expiresAt             DateTime  @map("expires_at")
+  scannedAt             DateTime? @map("scanned_at")
+  trackingNumber        String?   @map("tracking_number")
+  labelUrl              String?   @map("label_url")
+  labelGeneratedAt      DateTime? @map("label_generated_at")
   
-  // Status
-  status              String                  @default("ALLOCATED") // ALLOCATED, PICKING, PICKED, STAGED, LOADED, SHIPPED
+  scanEvents            Json      @map("scan_events") // Array of scan events
   
-  // Assignment
-  assignedTo          String?                 @map("assigned_to") // Worker assigned to pick
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
   
-  // Timestamps
-  allocatedAt         DateTime                @default(now()) @map("allocated_at")
-  pickedAt            DateTime?               @map("picked_at")
-  shippedAt           DateTime?               @map("shipped_at")
-  
-  // Relations
-  organization        Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  receiptItem         CrossDockReceiptItem    @relation(fields: [receiptItemId], references: [id], onDelete: Cascade)
-  shipment            CrossDockShipment       @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  rma          RMA          @relation(fields: [rmaId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   @@index([organizationId])
-  @@index([receiptItemId])
-  @@index([shipmentId])
-  @@index([status])
-  @@map("cross_dock_allocations")
+  @@index([qrCode])
+  @@index([expiresAt])
+  @@map("qr_returns")
 }
 
-model CrossDockSorting {
-  id                  String                    @id @default(cuid())
-  appointmentId       String                    @map("appointment_id")
-  organizationId      String                    @map("organization_id")
+model AggregatedReturn {
+  id                      String    @id @default(cuid())
+  organizationId          String    @map("organization_id")
+  customerId              String    @map("customer_id")
+  rmaIds                  String[]  @map("rma_ids")
   
-  // Sorting details
-  sortingMethod       SortingMethod
-  sortingAreaId       String                    @map("sorting_area_id")
+  totalItems              Int       @map("total_items")
+  totalWeight             Decimal   @map("total_weight") @db.Decimal(10, 2)
   
-  // Assignment
-  assignedWorkerId    String?                   @map("assigned_worker_id")
-  teamSize            Int                       @default(1) @map("team_size")
+  originalShippingCost    Decimal   @map("original_shipping_cost") @db.Decimal(10, 2)
+  aggregatedShippingCost  Decimal   @map("aggregated_shipping_cost") @db.Decimal(10, 2)
+  costSavings             Decimal   @map("cost_savings") @db.Decimal(10, 2)
+  savingsPercentage       Decimal   @map("savings_percentage") @db.Decimal(5, 2)
   
-  // Progress
-  status              String                    @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED
-  totalUnits          Int                       @default(0) @map("total_units")
-  sortedUnits         Int                       @default(0) @map("sorted_units")
+  consolidatedLabel       String?   @map("consolidated_label")
+  trackingNumber          String?   @map("tracking_number")
+  carrier                 String?   @map("carrier")
   
-  // Performance metrics
-  unitsPerHour        Decimal?                  @map("units_per_hour") @db.Decimal(10, 2)
-  accuracy            Decimal?                  @db.Decimal(5, 2) // Percentage
+  packingInstructions     Json      @map("packing_instructions")
   
-  // Timestamps
-  startedAt           DateTime?                 @map("started_at")
-  completedAt         DateTime?                 @map("completed_at")
-  createdAt           DateTime                  @default(now()) @map("created_at")
+  status                  String    @map("status") // PENDING, LABEL_GENERATED, SHIPPED, DELIVERED
   
-  // Relations
-  organization        Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  appointment         CrossDockingAppointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
-  sortingArea         Location                  @relation("SortingTaskArea", fields: [sortingAreaId], references: [id])
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id])
   
   @@index([organizationId])
-  @@index([appointmentId])
+  @@index([customerId])
   @@index([status])
-  @@map("cross_dock_sorting")
+  @@map("aggregated_returns")
 }
 
-model CrossDockActivity {
-  id                  String                    @id @default(cuid())
-  appointmentId       String                    @map("appointment_id")
-  organizationId      String                    @map("organization_id")
+model SerialTracking {
+  id                   String    @id @default(cuid())
+  rmaId                String    @map("rma_id")
+  organizationId       String    @map("organization_id")
+  serialNumber         String    @map("serial_number")
+  productSku           String    @map("product_sku")
+  originalOrderId      String    @map("original_order_id")
+  purchasedDate        DateTime  @map("purchased_date")
   
-  // Activity details
-  action              String                    // CREATED, RECEIVED, SORTED, ALLOCATED, SHIPPED, etc.
-  description         String                    @db.Text
-  performedBy         String?                   @map("performed_by")
+  validationStatus     String    @map("validation_status") // VALID, INVALID, SUSPICIOUS
+  validationChecks     Json      @map("validation_checks")
   
-  // Metadata
-  metadata            Json?                     // Additional contextual data
+  swapDetected         Boolean   @map("swap_detected") @default(false)
+  swapConfidence       Decimal   @map("swap_confidence") @db.Decimal(5, 2) // 0-100
+  swapEvidence         Json?     @map("swap_evidence")
+  counterfeightRisk    Decimal   @map("counterfeit_risk") @db.Decimal(5, 2) // 0-100
   
-  // Timestamp
-  performedAt         DateTime                  @default(now()) @map("performed_at")
+  lifecycleEvents      Json      @map("lifecycle_events")
   
-  // Relations
-  organization        Organization              @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  appointment         CrossDockingAppointment   @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  warrantyStatus       String    @map("warranty_status") // ACTIVE, EXPIRED, VOIDED
+  warrantyExpiresAt    DateTime? @map("warranty_expires_at")
+  
+  flagged              Boolean   @map("flagged") @default(false)
+  flagReason           String?   @map("flag_reason")
+  
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  
+  rma          RMA          @relation(fields: [rmaId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
   @@index([organizationId])
-  @@index([appointmentId])
-  @@index([performedAt])
-  @@map("cross_dock_activities")
+  @@index([serialNumber])
+  @@index([validationStatus])
+  @@map("serial_tracking")
 }
 
-model CrossDockSettings {
-  organizationId            String    @id @map("organization_id")
+model VendorChargeback {
+  id                      String    @id @default(cuid())
+  organizationId          String    @map("organization_id")
+  supplierId              String    @map("supplier_id")
+  rmaIds                  String[]  @map("rma_ids")
   
-  // Operational settings
-  enableAutomaticMatching   Boolean   @default(true) @map("enable_automatic_matching")
-  matchingStrategy          String    @default("FIFO") @map("matching_strategy") // FIFO, LIFO, CLOSEST_DUE_DATE
-  defaultDwellTimeHours     Int       @default(4) @map("default_dwell_time_hours")
-  maxDwellTimeHours         Int       @default(24) @map("max_dwell_time_hours")
+  defectRate              Decimal   @map("defect_rate") @db.Decimal(5, 2) // %
+  defectThreshold         Decimal   @map("defect_threshold") @db.Decimal(5, 2) // %
   
-  // Sorting settings
-  defaultSortingMethod      SortingMethod @default(MANUAL) @map("default_sorting_method")
-  requireScanValidation     Boolean   @default(true) @map("require_scan_validation")
-  enableVoiceDirected       Boolean   @default(false) @map("enable_voice_directed")
+  merchandiseCost         Decimal   @map("merchandise_cost") @db.Decimal(10, 2)
+  inspectionCost          Decimal   @map("inspection_cost") @db.Decimal(10, 2)
+  handlingFees            Decimal   @map("handling_fees") @db.Decimal(10, 2)
+  shippingCost            Decimal   @map("shipping_cost") @db.Decimal(10, 2)
+  penaltyAmount           Decimal   @map("penalty_amount") @db.Decimal(10, 2)
+  totalChargebackAmount   Decimal   @map("total_chargeback_amount") @db.Decimal(10, 2)
   
-  // Allocation rules
-  allowPartialAllocations   Boolean   @default(true) @map("allow_partial_allocations")
-  reserveBuffer             Decimal   @default(0) @map("reserve_buffer") @db.Decimal(5, 2) // % to reserve
-  priorityAllocation        Boolean   @default(true) @map("priority_allocation") // Allocate high priority first
+  invoiceNumber           String?   @map("invoice_number")
+  invoiceUrl              String?   @map("invoice_url")
   
-  // Performance thresholds
-  targetDwellTime           Int       @default(2) @map("target_dwell_time") // Hours
-  targetThroughput          Int       @default(100) @map("target_throughput") // Units per hour
-  alertThreshold            Int       @default(80) @map("alert_threshold") // % of max dwell time
+  disputeStatus           String    @map("dispute_status") @default("PENDING") // PENDING, DISPUTED, ACCEPTED, REJECTED
+  disputeReason           String?   @map("dispute_reason")
+  disputeDocuments        Json?     @map("dispute_documents")
+  disputeResolution       String?   @map("dispute_resolution")
+  disputeResolvedAt       DateTime? @map("dispute_resolved_at")
   
-  // Notifications
-  notifyOnArrival           Boolean   @default(true) @map("notify_on_arrival")
-  notifyOnDelay             Boolean   @default(true) @map("notify_on_delay")
-  notifyOnCompletion        Boolean   @default(false) @map("notify_on_completion")
-  escalateDelays            Boolean   @default(true) @map("escalate_delays")
+  paymentDeduction        Json?     @map("payment_deduction")
   
-  // Integration
-  autoCreateShipments       Boolean   @default(true) @map("auto_create_shipments")
-  syncWithLoadPlanning      Boolean   @default(true) @map("sync_with_load_planning")
-  updateInventoryRealtime   Boolean   @default(false) @map("update_inventory_realtime")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
   
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplier     Supplier     @relation(fields: [supplierId], references: [id])
+  
+  @@index([organizationId])
+  @@index([supplierId])
+  @@index([disputeStatus])
+  @@map("vendor_chargebacks")
+}
+
+model SustainabilityReport {
+  id                        String    @id @default(cuid())
+  organizationId            String    @map("organization_id")
+  rmaId                     String?   @map("rma_id")
+  reportType                String    @map("report_type") // SINGLE_RETURN, ORGANIZATION_WIDE
+  period                    Json?     @map("period")
+  
+  // Carbon footprint
+  shippingEmissions         Decimal   @map("shipping_emissions") @db.Decimal(10, 2)
+  packagingEmissions        Decimal   @map("packaging_emissions") @db.Decimal(10, 2)
+  processingEmissions       Decimal   @map("processing_emissions") @db.Decimal(10, 2)
+  totalCO2Emissions         Decimal   @map("total_co2_emissions") @db.Decimal(10, 2)
+  totalCO2Saved             Decimal   @map("total_co2_saved") @db.Decimal(10, 2)
+  
+  // Circularity
+  circularityScore          Decimal   @map("circularity_score") @db.Decimal(5, 2) // 0-100
+  circularityGrade          String    @map("circularity_grade") // A+, A, B, C, D, F
+  restockedCount            Int       @map("restocked_count")
+  refurbishedCount          Int       @map("refurbished_count")
+  donatedCount              Int       @map("donated_count")
+  recycledCount             Int       @map("recycled_count")
+  scrapCount                Int       @map("scrap_count")
+  
+  // Product lifecycle
+  productLifecycleExtension Decimal   @map("product_lifecycle_extension") @db.Decimal(10, 2)
+  secondLifeRevenue         Decimal   @map("second_life_revenue") @db.Decimal(10, 2)
+  
+  // Customer engagement
+  greenScore                Decimal?  @map("green_score") @db.Decimal(5, 2) // 0-100
+  customerMessage           String?   @map("customer_message")
+  
+  // Certifications
+  certifications            String[]  @map("certifications")
+  
+  createdAt                 DateTime  @default(now()) @map("created_at")
+  updatedAt                 DateTime  @updatedAt @map("updated_at")
+  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  rma          RMA?         @relation(fields: [rmaId], references: [id])
+  
+  @@index([organizationId])
+  @@index([reportType])
+  @@map("sustainability_reports")
+}
+
+model CrossBorderReturn {
+  id                      String    @id @default(cuid())
+  rmaId                   String    @unique @map("rma_id")
+  customerId              String    @map("customer_id")
+  organizationId          String    @map("organization_id")
+  
+  originCountry           String    @map("origin_country")
+  destinationCountry      String    @map("destination_country")
+  
+  routingDecision         String    @map("routing_decision") // LOCAL_WAREHOUSE, ORIGIN_WAREHOUSE, THIRD_PARTY_PARTNER
+  routingReasoning        String    @map("routing_reasoning")
+  localWarehouseId        String?   @map("local_warehouse_id")
+  localPartner            String?   @map("local_partner")
+  estimatedCostSavings    Decimal   @map("estimated_cost_savings") @db.Decimal(10, 2)
+  
+  dutyPaid                Decimal   @map("duty_paid") @db.Decimal(10, 2)
+  vatPaid                 Decimal   @map("vat_paid") @db.Decimal(10, 2)
+  dutyRefund              Decimal   @map("duty_refund") @db.Decimal(10, 2)
+  vatRefund               Decimal   @map("vat_refund") @db.Decimal(10, 2)
+  
+  customsDeclaration      Json      @map("customs_declaration")
+  customsStatus           String    @map("customs_status") // PENDING, CLEARED, HELD, REJECTED
+  customsClearanceDate    DateTime? @map("customs_clearance_date")
+  
+  originalCurrency        String    @map("original_currency")
+  refundCurrency          String    @map("refund_currency")
+  exchangeRate            Decimal   @map("exchange_rate") @db.Decimal(10, 6)
+  refundAmountOriginal    Decimal   @map("refund_amount_original") @db.Decimal(10, 2)
+  refundAmountConverted   Decimal   @map("refund_amount_converted") @db.Decimal(10, 2)
+  
+  complianceChecks        Json      @map("compliance_checks")
+  
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  rma          RMA          @relation(fields: [rmaId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([originCountry])
+  @@index([customsStatus])
+  @@map("cross_border_returns")
+}
+
+model ReturnRiskPrediction {
+  id                      String    @id @default(cuid())
+  orderId                 String    @map("order_id")
+  organizationId          String    @map("organization_id")
+  rmaId                   String?   @map("rma_id")
+  
+  overallRiskScore        Decimal   @map("overall_risk_score") @db.Decimal(5, 2) // 0-100
+  riskLevel               String    @map("risk_level") // LOW, MEDIUM, HIGH, CRITICAL
+  returnProbability       Decimal   @map("return_probability") @db.Decimal(5, 2) // %
+  willReturn              Boolean   @map("will_return")
+  
+  productRiskScore        Decimal   @map("product_risk_score") @db.Decimal(5, 2)
+  customerRiskScore       Decimal   @map("customer_risk_score") @db.Decimal(5, 2)
+  orderRiskScore          Decimal   @map("order_risk_score") @db.Decimal(5, 2)
+  seasonalRiskScore       Decimal   @map("seasonal_risk_score") @db.Decimal(5, 2)
+  
+  riskFactors             Json      @map("risk_factors")
+  preventionOpportunities Json      @map("prevention_opportunities")
+  preventionActions       Json?     @map("prevention_actions")
+  
+  predictedAt             DateTime  @map("predicted_at")
+  actuallyReturned        Boolean?  @map("actually_returned")
+  actualReturnDate        DateTime? @map("actual_return_date")
+  
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [orderId], references: [id])
+  
+  @@index([organizationId])
+  @@index([orderId])
+  @@index([riskLevel])
+  @@map("return_risk_predictions")
+}
+
+model ProductReturnAnalysis {
+  id                    String    @id @default(cuid())
+  organizationId        String    @map("organization_id")
+  productSku            String    @map("product_sku")
+  
+  totalSold             Int       @map("total_sold")
+  totalReturned         Int       @map("total_returned")
+  returnRate            Decimal   @map("return_rate") @db.Decimal(5, 2) // %
+  
+  financialImpact       Decimal   @map("financial_impact") @db.Decimal(10, 2)
+  projectedAnnualLoss   Decimal   @map("projected_annual_loss") @db.Decimal(10, 2)
+  
+  rootCauses            Json      @map("root_causes")
+  recommendations       Json      @map("recommendations")
+  
+  listingQualityScore   Decimal   @map("listing_quality_score") @db.Decimal(5, 2) // 0-100
+  
+  customerSentiment     Json      @map("customer_sentiment")
+  
+  analysisDate          DateTime  @map("analysis_date")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([productSku])
+  @@index([returnRate])
+  @@map("product_return_analyses")
+}
+
+model CustomerReturnProfile {
+  id                      String    @id @default(cuid())
+  customerId              String    @unique @map("customer_id")
+  organizationId          String    @map("organization_id")
+  
+  totalOrders             Int       @map("total_orders")
+  totalReturns            Int       @map("total_returns")
+  returnRate              Decimal   @map("return_rate") @db.Decimal(5, 2) // %
+  
+  serialReturner          Boolean   @default(false) @map("serial_returner") // >50% return rate
+  wardrobingDetected      Boolean   @default(false) @map("wardrobing_detected")
+  bracketingDetected      Boolean   @default(false) @map("bracketing_detected")
+  
+  riskScore               Decimal   @map("risk_score") @db.Decimal(5, 2) // 0-100
+  riskTier                String?   @map("risk_tier") // LOW, MEDIUM, HIGH, CRITICAL
+  
+  lifetimeValue           Decimal   @map("lifetime_value") @db.Decimal(10, 2)
+  lifetimeReturnValue     Decimal   @map("lifetime_return_value") @db.Decimal(10, 2)
+  
+  recommendations         Json?     @map("recommendations")
+  
+  instantRefundsReceived  Int       @default(0) @map("instant_refunds_received")
+  instantRefundsAbused    Int       @default(0) @map("instant_refunds_abused")
+  
+  lastReturnDate          DateTime? @map("last_return_date")
+  
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer     @relation(fields: [customerId], references: [id])
+  
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([riskScore])
+  @@map("customer_return_profiles")
+}
+
+// ==========================================
+// ADVANCED INVENTORY MANAGEMENT
+// ==========================================
+
+model AutonomousDecision {
+  id               String    @id @default(cuid())
+  organizationId   String    @map("organization_id")
+  productId        String    @map("product_id")
+  decisionType     String    @map("decision_type") // REORDER, TRANSFER, ADJUST
+  confidence       Float     @map("confidence") // 0-100
+  reasoning        Json      @map("reasoning")
+  actionTaken      Boolean   @default(false) @map("action_taken")
+  result           String?   @map("result") // SUCCESS, PENDING, FAILED, REJECTED
+  estimatedCost    Decimal   @map("estimated_cost") @db.Decimal(10, 2)
+  estimatedSavings Decimal?  @map("estimated_savings") @db.Decimal(10, 2)
+  metadata         Json?     @map("metadata")
+  purchaseOrderId  String?   @map("purchase_order_id")
+  transferId       String?   @map("transfer_id")
+  adjustmentId     String?   @map("adjustment_id")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  organization     Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  product          InventoryItem      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  purchaseOrder    PurchaseOrder?     @relation(fields: [purchaseOrderId], references: [id])
+  warehouseTransfer WarehouseTransfer? @relation(fields: [transferId], references: [id])
+  stockAdjustment  StockAdjustment?   @relation(fields: [adjustmentId], references: [id])
+
+  @@index([organizationId])
+  @@index([productId])
+  @@index([decisionType])
+  @@index([result])
+  @@index([createdAt])
+  @@map("autonomous_decisions")
+}
+
+model DemandForecast {
+  id              String    @id @default(cuid())
+  productId       String    @map("product_id")
+  horizonDays     Int       @map("horizon_days")
+  predictions     Json      @map("predictions") // Array of daily predictions
+  avgDailyDemand  Float     @map("avg_daily_demand")
+  confidence      Float     @map("confidence") // 0-100
+  modelType       String    @map("model_type") // SMA, EMA, LINEAR, SEASONAL, ENSEMBLE
+  metadata        Json?     @map("metadata")
+  generatedAt     DateTime  @default(now()) @map("generated_at")
+  
+  product         InventoryItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@index([productId])
+  @@index([generatedAt])
+  @@index([confidence])
+  @@map("demand_forecasts")
+}
+
+model IoTReading {
+  id          String    @id @default(cuid())
+  deviceId    String    @map("device_id")
+  readingType String    @map("reading_type") // RFID, WEIGHT, TEMP, HUMIDITY
+  value       Float     @map("value")
+  metadata    Json?     @map("metadata")
+  timestamp   DateTime  @default(now()) @map("timestamp")
+  
+  device      IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  
+  @@index([deviceId])
+  @@index([timestamp])
+  @@index([readingType])
+  @@map("iot_readings")
+}
+
+model VelocityClassification {
+  id              String    @id @default(cuid())
+  productId       String    @unique @map("product_id")
+  velocityClass   String    @map("velocity_class") // A, B, C, D
+  velocityScore   Float     @map("velocity_score") // 0-100
+  turnoverRate    Float     @map("turnover_rate")
+  annualRevenue   Decimal   @map("annual_revenue") @db.Decimal(10, 2)
+  lastCalculated  DateTime  @map("last_calculated")
+  metadata        Json?     @map("metadata")
+  
+  product         InventoryItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@index([velocityClass])
+  @@index([lastCalculated])
+  @@map("velocity_classifications")
+}
+
+model DigitalTwinState {
+  id                String    @id @default(cuid())
+  productId         String    @map("product_id")
+  physicalState     Json      @map("physical_state") // From IoT sensors
+  digitalState      Json      @map("digital_state") // From WMS
+  discrepancies     Json      @map("discrepancies")
+  syncConfidence    Float     @map("sync_confidence") // 0-100
+  lastSync          DateTime? @map("last_sync")
+  needsSync         Boolean   @default(false) @map("needs_sync")
+  timestamp         DateTime  @default(now()) @map("timestamp")
+  
+  product           InventoryItem @relation(fields: [productId], references: [id], onDelete: Cascade)
+  
+  @@index([productId])
+  @@index([timestamp])
+  @@index([needsSync])
+  @@map("digital_twin_states")
+}
+
+model EnvironmentalReading {
+  id          String    @id @default(cuid())
+  deviceId    String    @map("device_id")
+  zoneId      String?   @map("zone_id")
+  temperature Float     @map("temperature")
+  humidity    Float     @map("humidity")
+  productIds  String[]  @map("product_ids")
+  violations  Json?     @map("violations")
+  timestamp   DateTime  @default(now()) @map("timestamp")
+  
+  device      IoTDevice @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  
+  @@index([deviceId])
+  @@index([zoneId])
+  @@index([timestamp])
+  @@map("environmental_readings")
+}
+
+model AutonomousConfig {
+  id                        String    @id @default(cuid())
+  organizationId            String    @unique @map("organization_id")
+  minTrustScore             Float     @default(80) @map("min_trust_score") // 0-100
+  approvalThreshold         Decimal   @default(10000) @map("approval_threshold") @db.Decimal(10, 2)
+  maxOrderValue             Decimal   @default(50000) @map("max_order_value") @db.Decimal(10, 2)
+  iotDiscrepancyThreshold   Float     @default(10) @map("iot_discrepancy_threshold") // %
+  maxAdjustmentValue        Decimal   @default(5000) @map("max_adjustment_value") @db.Decimal(10, 2)
+  requireVerification       Boolean   @default(true) @map("require_verification")
+  enableAutoReorders        Boolean   @default(true) @map("enable_auto_reorders")
+  enableAutoTransfers       Boolean   @default(true) @map("enable_auto_transfers")
+  enableAutoAdjustments     Boolean   @default(true) @map("enable_auto_adjustments")
   createdAt                 DateTime  @default(now()) @map("created_at")
   updatedAt                 DateTime  @updatedAt @map("updated_at")
   
   organization              Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   
-  @@map("cross_dock_settings")
+  @@map("autonomous_configs")
 }
 
+// ==========================================
+// BLOG & CONTENT MANAGEMENT
+// ==========================================
+
+model BlogPost {
+  id              String       @id @default(cuid())
+  slug            String       @unique
+  title           String
+  excerpt         String       @db.Text
+  content         String       @db.Text
+  author          String
+  authorRole      String?      @map("author_role")
+  category        BlogCategory @default(GENERAL)
+  tags            String[]
+  readTime        String       @default("5 min read") @map("read_time")
+  featured        Boolean      @default(false)
+  published       Boolean      @default(false)
+  trending        Boolean      @default(false)
+  views           Int          @default(0)
+  likes           Int          @default(0)
+  publishedAt     DateTime?    @map("published_at")
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+  
+  comments        BlogComment[]
+  
+  @@index([slug])
+  @@index([category])
+  @@index([published])
+  @@index([publishedAt])
+  @@map("blog_posts")
+}
+
+model BlogComment {
+  id              String    @id @default(cuid())
+  postId          String    @map("post_id")
+  userId          String?   @map("user_id")
+  authorName      String    @map("author_name")
+  authorEmail     String    @map("author_email")
+  content         String    @db.Text
+  approved        Boolean   @default(false)
+  createdAt       DateTime  @default(now()) @map("created_at")
+  
+  post            BlogPost  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([postId])
+  @@index([userId])
+  @@index([approved])
+  @@map("blog_comments")
+}
+
+enum BlogCategory {
+  GENERAL
+  TECHNOLOGY
+  SECURITY
+  ARCHITECTURE
+  OPERATIONS
+  BUSINESS
+  CASE_STUDY
+  PRODUCT
+  BEST_PRACTICES
+  INDUSTRY_NEWS
+}

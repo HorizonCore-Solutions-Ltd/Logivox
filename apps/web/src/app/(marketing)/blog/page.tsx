@@ -25,6 +25,17 @@ export default function BlogPage() {
 
   const blogPosts = [
     {
+      slug: "business-owner-wishlist-premium-features",
+      title: "Business Owner's Wishlist: Premium Features That Transform Your WMS",
+      excerpt: "If I owned a warehouse business, here are the 15 premium features I'd demand from my WMS to maximize ROI and competitive advantage. Real talk from an owner's perspective.",
+      author: "LogiVox Product Team",
+      date: "2026-01-05",
+      readTime: "15 min read",
+      category: "Business",
+      trending: true,
+      featured: true
+    },
+    {
       slug: "multi-tenant-architecture-best-practices",
       title: "Multi-Tenant Architecture: Best Practices for SaaS Platforms",
       excerpt: "Explore proven patterns for building scalable multi-tenant applications with complete data isolation.",
