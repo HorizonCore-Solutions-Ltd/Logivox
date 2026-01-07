@@ -3,14 +3,39 @@
  * Flexible, user-configurable return policies and automation rules
  */
 
-export type ReturnChannel = 'CUSTOMER' | '3PL_CLIENT' | 'RETAIL' | 'MARKETPLACE' | 'INTERNAL' | 'B2B';
-export type ReturnLabelType = 'PREPAID' | 'CUSTOMER_PAID' | 'CARRIER_COLLECT' | 'NONE';
-export type DispositionAction = 'RESTOCK_A' | 'RESTOCK_B' | 'RESTOCK_C' | 'REFURBISH' | 'RESALE' | 'RTV' | 'SCRAP' | 'DONATE' | 'QUARANTINE';
-export type CreditMethod = 'ORIGINAL_PAYMENT' | 'STORE_CREDIT' | 'CHECK' | 'GIFT_CARD' | 'ACH' | 'MANUAL';
+export type ReturnChannel =
+  | "CUSTOMER"
+  | "3PL_CLIENT"
+  | "RETAIL"
+  | "MARKETPLACE"
+  | "INTERNAL"
+  | "B2B";
+export type ReturnLabelType =
+  | "PREPAID"
+  | "CUSTOMER_PAID"
+  | "CARRIER_COLLECT"
+  | "NONE";
+export type DispositionAction =
+  | "RESTOCK_A"
+  | "RESTOCK_B"
+  | "RESTOCK_C"
+  | "REFURBISH"
+  | "RESALE"
+  | "RTV"
+  | "SCRAP"
+  | "DONATE"
+  | "QUARANTINE";
+export type CreditMethod =
+  | "ORIGINAL_PAYMENT"
+  | "STORE_CREDIT"
+  | "CHECK"
+  | "GIFT_CARD"
+  | "ACH"
+  | "MANUAL";
 
 export interface ReturnSettings {
   organizationId: string;
-  
+
   // General Settings
   general: {
     enabled: boolean;
@@ -43,7 +68,7 @@ export interface ReturnSettings {
     requireOriginalPackaging: boolean;
     requirePhotosForDamage: boolean;
     requireSerialForWarranty: boolean;
-    
+
     // Automatic approvals
     autoApprove: {
       enabled: boolean;
@@ -73,11 +98,11 @@ export interface ReturnSettings {
       defaultMethod: CreditMethod;
       autoIssue: boolean;
       autoIssueThreshold: number;
-      
+
       // Fees
       restockingFee: {
         enabled: boolean;
-        type: 'PERCENTAGE' | 'FLAT';
+        type: "PERCENTAGE" | "FLAT";
         value: number;
         applyToDefective: boolean;
         applyToUnwanted: boolean;
@@ -108,7 +133,7 @@ export interface ReturnSettings {
     required: boolean;
     requirePhotos: boolean;
     minPhotosRequired: number;
-    
+
     // Computer Vision
     computerVision: {
       enabled: boolean;
@@ -143,7 +168,7 @@ export interface ReturnSettings {
   // Disposition Rules
   disposition: {
     autoDisposition: boolean;
-    
+
     rules: {
       condition: string; // 'GRADE_A', 'GRADE_B', 'DEFECTIVE', etc.
       reasonCategory: string; // 'UNWANTED', 'DAMAGED', 'DEFECTIVE'
@@ -208,7 +233,7 @@ export interface ReturnSettings {
   // Fraud Prevention
   fraud: {
     enabled: boolean;
-    
+
     // Detection Rules
     detection: {
       serialValidation: boolean;
@@ -217,13 +242,13 @@ export interface ReturnSettings {
         enabled: boolean;
         maxReturns: number;
         periodDays: number;
-        action: 'FLAG' | 'BLOCK' | 'REVIEW';
+        action: "FLAG" | "BLOCK" | "REVIEW";
       };
-      
+
       highRiskPatterns: {
         enabled: boolean;
         patterns: string[]; // e.g., 'SERIAL_RETURNER', 'WRONG_SERIAL', 'HIGH_VALUE_FREQUENT'
-        action: 'FLAG' | 'HOLD' | 'REVIEW' | 'REJECT';
+        action: "FLAG" | "HOLD" | "REVIEW" | "REJECT";
       };
 
       mlScoring: {
@@ -258,8 +283,8 @@ export interface ReturnSettings {
 
     notifications: {
       enabled: boolean;
-      channels: ('EMAIL' | 'SMS' | 'PUSH' | 'WEBHOOK')[];
-      
+      channels: ("EMAIL" | "SMS" | "PUSH" | "WEBHOOK")[];
+
       events: {
         rmaCreated: boolean;
         rmaApproved: boolean;
@@ -289,7 +314,7 @@ export interface ReturnSettings {
   // Analytics & Reporting
   analytics: {
     enabled: boolean;
-    
+
     // Forecasting
     forecasting: {
       enabled: boolean;
@@ -403,7 +428,7 @@ export interface ReturnSettings {
       dataRetention: number; // days
       rightToForget: boolean;
     };
-    
+
     environmental: {
       trackDisposal: boolean;
       ewasteCompliance: boolean;
@@ -431,7 +456,7 @@ export interface ReturnSettings {
       hours: number;
       businessHoursOnly: boolean;
     };
-    
+
     inspection: {
       hours: number;
       businessHoursOnly: boolean;
@@ -457,10 +482,10 @@ export interface ReturnSettings {
   // Custom Fields
   customFields: {
     name: string;
-    type: 'TEXT' | 'NUMBER' | 'DATE' | 'BOOLEAN' | 'SELECT';
+    type: "TEXT" | "NUMBER" | "DATE" | "BOOLEAN" | "SELECT";
     required: boolean;
     options?: string[];
-    appliesTo: 'RMA' | 'LINE' | 'BOTH';
+    appliesTo: "RMA" | "LINE" | "BOTH";
   }[];
 
   // Metadata
@@ -477,7 +502,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
   general: {
     enabled: true,
     requireRMA: true,
-    autoNumberFormat: 'RMA-{YYYY}{MM}{DD}-{###}',
+    autoNumberFormat: "RMA-{YYYY}{MM}{DD}-{###}",
     defaultReturnWindow: 30,
     allowLateReturns: true,
     lateReturnApprovalRequired: true,
@@ -485,12 +510,12 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
 
   labels: {
     enabled: true,
-    defaultType: 'PREPAID',
+    defaultType: "PREPAID",
     autoGenerate: true,
     carriers: [
-      { name: 'UPS', enabled: true, prepaidByDefault: true },
-      { name: 'FedEx', enabled: true, prepaidByDefault: true },
-      { name: 'USPS', enabled: true, prepaidByDefault: false },
+      { name: "UPS", enabled: true, prepaidByDefault: true },
+      { name: "FedEx", enabled: true, prepaidByDefault: true },
+      { name: "USPS", enabled: true, prepaidByDefault: false },
     ],
     includeQRCode: true,
     includeInstructions: true,
@@ -500,7 +525,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
     requireOriginalPackaging: false,
     requirePhotosForDamage: true,
     requireSerialForWarranty: true,
-    
+
     autoApprove: {
       enabled: true,
       maxValue: 100,
@@ -522,14 +547,14 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
   financial: {
     refunds: {
       enabled: true,
-      methods: ['ORIGINAL_PAYMENT', 'STORE_CREDIT', 'CHECK'],
-      defaultMethod: 'ORIGINAL_PAYMENT',
+      methods: ["ORIGINAL_PAYMENT", "STORE_CREDIT", "CHECK"],
+      defaultMethod: "ORIGINAL_PAYMENT",
       autoIssue: true,
       autoIssueThreshold: 100,
-      
+
       restockingFee: {
         enabled: false,
-        type: 'PERCENTAGE',
+        type: "PERCENTAGE",
         value: 15,
         applyToDefective: false,
         applyToUnwanted: true,
@@ -557,7 +582,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
     required: true,
     requirePhotos: true,
     minPhotosRequired: 2,
-    
+
     computerVision: {
       enabled: true,
       autoGrade: true,
@@ -569,11 +594,41 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
     grading: {
       enabled: true,
       grades: [
-        { code: 'A', label: 'Like New', restockable: true, refundPercentage: 100, resaleMultiplier: 0.9 },
-        { code: 'B', label: 'Good', restockable: true, refundPercentage: 85, resaleMultiplier: 0.7 },
-        { code: 'C', label: 'Fair', restockable: false, refundPercentage: 60, resaleMultiplier: 0.5 },
-        { code: 'D', label: 'Poor', restockable: false, refundPercentage: 40, resaleMultiplier: 0.3 },
-        { code: 'F', label: 'Scrap', restockable: false, refundPercentage: 0, resaleMultiplier: 0 },
+        {
+          code: "A",
+          label: "Like New",
+          restockable: true,
+          refundPercentage: 100,
+          resaleMultiplier: 0.9,
+        },
+        {
+          code: "B",
+          label: "Good",
+          restockable: true,
+          refundPercentage: 85,
+          resaleMultiplier: 0.7,
+        },
+        {
+          code: "C",
+          label: "Fair",
+          restockable: false,
+          refundPercentage: 60,
+          resaleMultiplier: 0.5,
+        },
+        {
+          code: "D",
+          label: "Poor",
+          restockable: false,
+          refundPercentage: 40,
+          resaleMultiplier: 0.3,
+        },
+        {
+          code: "F",
+          label: "Scrap",
+          restockable: false,
+          refundPercentage: 0,
+          resaleMultiplier: 0,
+        },
       ],
     },
 
@@ -588,14 +643,44 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
 
   disposition: {
     autoDisposition: true,
-    
+
     rules: [
-      { condition: 'GRADE_A', reasonCategory: 'UNWANTED', action: 'RESTOCK_A', autoExecute: true },
-      { condition: 'GRADE_B', reasonCategory: 'UNWANTED', action: 'RESTOCK_B', autoExecute: true },
-      { condition: 'GRADE_A', reasonCategory: 'DEFECTIVE', action: 'RTV', autoExecute: false },
-      { condition: 'GRADE_B', reasonCategory: 'DAMAGED', action: 'REFURBISH', autoExecute: true },
-      { condition: 'GRADE_C', reasonCategory: 'ANY', action: 'RESALE', autoExecute: true },
-      { condition: 'GRADE_D', reasonCategory: 'ANY', action: 'SCRAP', autoExecute: false },
+      {
+        condition: "GRADE_A",
+        reasonCategory: "UNWANTED",
+        action: "RESTOCK_A",
+        autoExecute: true,
+      },
+      {
+        condition: "GRADE_B",
+        reasonCategory: "UNWANTED",
+        action: "RESTOCK_B",
+        autoExecute: true,
+      },
+      {
+        condition: "GRADE_A",
+        reasonCategory: "DEFECTIVE",
+        action: "RTV",
+        autoExecute: false,
+      },
+      {
+        condition: "GRADE_B",
+        reasonCategory: "DAMAGED",
+        action: "REFURBISH",
+        autoExecute: true,
+      },
+      {
+        condition: "GRADE_C",
+        reasonCategory: "ANY",
+        action: "RESALE",
+        autoExecute: true,
+      },
+      {
+        condition: "GRADE_D",
+        reasonCategory: "ANY",
+        action: "SCRAP",
+        autoExecute: false,
+      },
     ],
 
     restocking: {
@@ -616,9 +701,27 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
       enabled: true,
       autoList: false,
       channels: [
-        { name: 'Amazon', enabled: true, minGrade: 'B', autoPrice: true, priceFloor: 0.5 },
-        { name: 'eBay', enabled: true, minGrade: 'C', autoPrice: true, priceFloor: 0.3 },
-        { name: 'Shopify', enabled: false, minGrade: 'B', autoPrice: false, priceFloor: 0.6 },
+        {
+          name: "Amazon",
+          enabled: true,
+          minGrade: "B",
+          autoPrice: true,
+          priceFloor: 0.5,
+        },
+        {
+          name: "eBay",
+          enabled: true,
+          minGrade: "C",
+          autoPrice: true,
+          priceFloor: 0.3,
+        },
+        {
+          name: "Shopify",
+          enabled: false,
+          minGrade: "B",
+          autoPrice: false,
+          priceFloor: 0.6,
+        },
       ],
     },
 
@@ -646,7 +749,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
 
   fraud: {
     enabled: true,
-    
+
     detection: {
       serialValidation: true,
       duplicateDetection: true,
@@ -654,13 +757,13 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
         enabled: true,
         maxReturns: 5,
         periodDays: 30,
-        action: 'REVIEW',
+        action: "REVIEW",
       },
-      
+
       highRiskPatterns: {
         enabled: true,
-        patterns: ['SERIAL_RETURNER', 'WRONG_SERIAL', 'HIGH_VALUE_FREQUENT'],
-        action: 'REVIEW',
+        patterns: ["SERIAL_RETURNER", "WRONG_SERIAL", "HIGH_VALUE_FREQUENT"],
+        action: "REVIEW",
       },
 
       mlScoring: {
@@ -692,8 +795,8 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
 
     notifications: {
       enabled: true,
-      channels: ['EMAIL', 'SMS'],
-      
+      channels: ["EMAIL", "SMS"],
+
       events: {
         rmaCreated: true,
         rmaApproved: true,
@@ -716,7 +819,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
 
   analytics: {
     enabled: true,
-    
+
     forecasting: {
       enabled: true,
       horizonDays: 90,
@@ -750,7 +853,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
     },
     tts: true,
     multiLanguage: true,
-    languages: ['en', 'es', 'fr', 'de', 'zh'],
+    languages: ["en", "es", "fr", "de", "zh"],
   },
 
   mobile: {
@@ -770,7 +873,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
       dataRetention: 2555, // 7 years
       rightToForget: true,
     },
-    
+
     environmental: {
       trackDisposal: true,
       ewasteCompliance: true,
@@ -797,7 +900,7 @@ export const DEFAULT_RETURN_SETTINGS: Partial<ReturnSettings> = {
       hours: 24,
       businessHoursOnly: false,
     },
-    
+
     inspection: {
       hours: 48,
       businessHoursOnly: true,
