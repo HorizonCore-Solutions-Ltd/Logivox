@@ -170,3 +170,7 @@ releases/
 # yarn.lock
 # pnpm-lock.yaml
 /generated/prisma
+
+# Turbo cache and logs
+.turbo/
+*.turbo.log*
