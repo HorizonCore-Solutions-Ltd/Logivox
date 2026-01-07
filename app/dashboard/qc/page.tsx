@@ -12,6 +12,7 @@ import {
   RefreshCw,
   Plus,
   Eye,
+  Smartphone,
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -210,7 +211,7 @@ export default function QCDashboardPage() {
         </Card>
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - Core Modules */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Link href="/dashboard/qc/inspections">
           <Card className="cursor-pointer hover:bg-accent transition-colors">
@@ -259,6 +260,243 @@ export default function QCDashboardPage() {
                     View quality scorecards
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
+
+      {/* Advanced Modules - Financial Recovery & Compliance */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-4">Financial Recovery & Compliance</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Link href="/dashboard/qc/vendor-chargebacks">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 rounded-lg">
+                    <Package className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Chargebacks</div>
+                    <div className="text-xs text-muted-foreground">Cost recovery</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/debit-memos">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Debit Memos</div>
+                    <div className="text-xs text-muted-foreground">Vendor penalties</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/concessions">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-yellow-100 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-yellow-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Concessions</div>
+                    <div className="text-xs text-muted-foreground">Vendor credits</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/compliance-checks">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-cyan-100 rounded-lg">
+                    <ClipboardCheck className="w-5 h-5 text-cyan-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Compliance</div>
+                    <div className="text-xs text-muted-foreground">Standards audit</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </div>
+
+      {/* Quality Improvement Modules */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-4">Quality Improvement</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Link href="/dashboard/qc/performance-reviews">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-indigo-100 rounded-lg">
+                    <Package className="w-6 h-6 text-indigo-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-lg">Performance Reviews</div>
+                    <div className="text-sm text-muted-foreground">
+                      Quarterly vendor assessments
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/root-cause-analysis">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-pink-100 rounded-lg">
+                    <AlertTriangle className="w-6 h-6 text-pink-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-lg">Root Cause Analysis</div>
+                    <div className="text-sm text-muted-foreground">
+                      5 Whys methodology
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </div>
+
+      {/* Advanced Quality Assurance */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-4">Advanced Quality Assurance</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Link href="/dashboard/qc/ncr">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-100 rounded-lg">
+                    <AlertTriangle className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">NCR Management</div>
+                    <div className="text-xs text-muted-foreground">Non-conformance reports</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/capa">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-orange-100 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">CAPA System</div>
+                    <div className="text-xs text-muted-foreground">Corrective & preventive actions</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/quality-holds">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-amber-100 rounded-lg">
+                    <Package className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Quality Holds</div>
+                    <div className="text-xs text-muted-foreground">Quarantine management</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/sampling-plans">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 rounded-lg">
+                    <ClipboardCheck className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Sampling Plans</div>
+                    <div className="text-xs text-muted-foreground">AQL inspection plans</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/measurements">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-teal-100 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-teal-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Measurements</div>
+                    <div className="text-xs text-muted-foreground">Parametric quality data</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/dashboard/qc/reports">
+            <Card className="cursor-pointer hover:bg-accent transition-colors">
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-violet-100 rounded-lg">
+                    <ClipboardCheck className="w-5 h-5 text-violet-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Quality Reports</div>
+                    <div className="text-xs text-muted-foreground">Analytics & insights</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </Link>
+        </div>
+      </div>
+
+      {/* Mobile Interface */}
+      <div className="mt-6">
+        <h2 className="text-xl font-semibold mb-4">Mobile Tools</h2>
+        <Link href="/dashboard/qc/mobile">
+          <Card className="cursor-pointer hover:bg-accent transition-colors">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg">
+                  <Smartphone className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <div className="font-bold text-lg">Mobile Inspection Interface</div>
+                  <div className="text-sm text-muted-foreground">
+                    Quick receiving inspections on mobile devices
+                  </div>
+                </div>
+                <Badge variant="secondary" className="ml-auto">New</Badge>
               </div>
             </CardContent>
           </Card>

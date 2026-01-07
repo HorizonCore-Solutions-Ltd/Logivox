@@ -24,7 +24,6 @@ import {
 
 export function PricingSection() {
   const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">("monthly")
-  const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">("monthly")
   
   const getPrice = (monthlyPrice: string) => {
     if (monthlyPrice === "Custom") return "Custom"
@@ -39,66 +38,62 @@ export function PricingSection() {
   const plans = [
     {
       name: "Starter",
-      description: "Perfect for small warehouses getting started",
+      description: "For small warehouses just getting started",
       monthlyPrice: "$49",
       period: "per user/month",
       badge: null,
       features: [
         "1 warehouse location",
         "Up to 10,000 SKUs",
-        "Basic inventory tracking",
+        "Inventory tracking",
         "Order management",
-        "Mobile app (iOS & Android)",
+        "Mobile app with barcode scanning",
         "Email support",
-        "Basic reporting",
-        "Barcode scanning"
+        "Basic reporting"
       ],
-      cta: "Start Free Trial",
+      cta: "Start Free 30-Day Trial",
       ctaVariant: "outline" as const,
       popular: false
     },
     {
       name: "Professional",
-      description: "Advanced WMS for growing operations",
+      description: "For growing businesses that need more power",
       monthlyPrice: "$99",
       period: "per user/month",
       badge: "Most Popular",
       features: [
         "Up to 5 warehouses",
         "Unlimited SKUs",
-        "Wave & batch picking",
+        "Wave & batch picking (4 modes)",
         "Quality control workflows",
-        "Carrier integrations (FedEx, UPS)",
-        "E-commerce sync (Shopify, WooCommerce)",
-        "Advanced analytics & AI",
-        "Voice-enabled operations",
+        "Built-in shipping (compare rates)",
+        "E-commerce sync",
+        "Advanced analytics",
         "Returns management",
-        "Priority support (24/7)",
-        "API access",
-        "Custom workflows"
+        "24/7 priority support",
+        "API access"
       ],
-      cta: "Start Free Trial",
+      cta: "Start Free 30-Day Trial",
       ctaVariant: "default" as const,
       popular: true
     },
     {
       name: "Enterprise",
-      description: "Complete WMS for large operations",
+      description: "For large operations with complex needs",
       monthlyPrice: "Custom",
       period: "contact sales",
       badge: "Best Value",
       features: [
-        "Unlimited warehouses",
-        "Unlimited SKUs",
+        "Unlimited warehouses & SKUs",
+        "Everything in Professional, plus:",
         "Assembly & kitting",
-        "Cross-docking",
+        "Cross-docking operations",
         "Yard & gate management",
         "Transportation management",
-        "AI-powered forecasting",
-        "Custom integrations (SAP, Oracle, NetSuite)",
+        "AI forecasting & demand planning",
+        "Custom integrations",
         "Dedicated success manager",
-        "SSO & advanced security",
-        "On-premise deployment option",
+        "Custom SLAs",
         "White-label solution",
         "99.99% uptime SLA",
         "Custom SLA agreements"
@@ -145,9 +140,9 @@ export function PricingSection() {
     {
       category: "Integrations",
       features: [
-        { name: "E-commerce (Shopify, WooCommerce)", starter: false, professional: true, enterprise: true },
-        { name: "Carriers (FedEx, UPS, USPS)", starter: false, professional: true, enterprise: true },
-        { name: "ERP (SAP, Oracle, NetSuite)", starter: false, professional: false, enterprise: true },
+        { name: "E-commerce Platform Sync", starter: false, professional: true, enterprise: true },
+        { name: "Built-in Carrier Integration", starter: false, professional: true, enterprise: true },
+        { name: "ERP System Integration", starter: false, professional: false, enterprise: true },
         { name: "API Access", starter: false, professional: true, enterprise: true },
         { name: "Custom Integrations", starter: false, professional: false, enterprise: true },
       ]
@@ -161,69 +156,6 @@ export function PricingSection() {
         { name: "SSO & Advanced Security", starter: false, professional: false, enterprise: true },
         { name: "99.99% Uptime SLA", starter: false, professional: false, enterprise: true },
       ]
-    }
-  ]
-    {
-      name: "Starter",
-      description: "Perfect for small warehouses getting started",
-      price: "$49",
-      period: "per user/month",
-      badge: null,
-      features: [
-        "1 warehouse location",
-        "Up to 10,000 SKUs",
-        "Basic inventory tracking",
-        "Order management",
-        "Mobile app (iOS & Android)",
-        "Email support",
-        "Basic reporting"
-      ],
-      cta: "Start Free Trial",
-      ctaVariant: "outline" as const,
-      popular: false
-    },
-    {
-      name: "Professional",
-      description: "Advanced WMS for growing operations",
-      price: "$99",
-      period: "per user/month",
-      badge: "Most Popular",
-      features: [
-        "Up to 5 warehouses",
-        "Unlimited SKUs",
-        "Wave & batch picking",
-        "Quality control workflows",
-        "Carrier integrations (FedEx, UPS)",
-        "E-commerce sync (Shopify, WooCommerce)",
-        "Advanced analytics",
-        "Priority support (24/7)",
-        "API access"
-      ],
-      cta: "Start Free Trial",
-      ctaVariant: "default" as const,
-      popular: true
-    },
-    {
-      name: "Enterprise",
-      description: "Complete WMS for large operations",
-      price: "Custom",
-      period: "contact sales",
-      badge: "Best Value",
-      features: [
-        "Unlimited warehouses",
-        "Unlimited SKUs",
-        "Assembly & kitting",
-        "Cross-docking",
-        "Yard management",
-        "Custom integrations",
-        "Dedicated success manager",
-        "SSO & advanced security",
-        "On-premise deployment option",
-        "White-label solution"
-      ],
-      cta: "Contact Sales",
-      ctaVariant: "outline" as const,
-      popular: false
     }
   ]
 

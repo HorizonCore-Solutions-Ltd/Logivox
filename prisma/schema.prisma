@@ -319,6 +319,26 @@ model Organization {
   returnSettings         ReturnSettings?
   returnsForecasts       ReturnsForecast[]
   
+  // Quality & Compliance Enhancement Relations
+  vendorChargebacks            VendorChargeback[]
+  vendorDebitMemos             VendorDebitMemo[]
+  vendorConcessions            VendorConcession[]
+  complianceChecks             VendorComplianceCheck[]
+  supplierPerformanceReviews   SupplierPerformanceReview[]
+  
+  // Advanced QA Module Relations
+  nonConformanceReports  NonConformanceReport[]
+  capas                  CorrectivePreventiveAction[]
+  rootCauseAnalyses      RootCauseAnalysis[]
+  qualityHolds           QualityHold[]
+  samplingPlans          SamplingPlan[]
+  qualityMeasurements    QualityMeasurement[]
+  qualityReports         QualityReport[]
+  riskRegister           RiskRegister[]
+  audits                 Audit[]
+  documents              Document[]
+  fmeas                  FMEA[]
+  
   // Cross-Docking Relations
   // DISABLED:   crossDockAppointments  CrossDockingAppointment[]
   // DISABLED:   crossDockReceipts      CrossDockReceipt[]
@@ -334,7 +354,6 @@ model Organization {
   qrReturns              QRReturn[]
   aggregatedReturns      AggregatedReturn[]
   serialTracking         SerialTracking[]
-  vendorChargebacks      VendorChargeback[]
   sustainabilityReports  SustainabilityReport[]
   crossBorderReturns     CrossBorderReturn[]
   returnRiskPredictions  ReturnRiskPrediction[]
@@ -766,9 +785,19 @@ model Supplier {
   // DISABLED:   crossDockReceipts CrossDockReceipt[]
   
   // Advanced Returns Management Relations
-  vendorChargebacks    VendorChargeback[]
   rtvRequests          RTVRequest[]         @relation("RTVRequest")
   vendorPolicies       VendorReturnPolicy[] @relation("VendorReturnPolicy")
+  
+  // Quality & Compliance Enhancement Relations
+  chargebacks               VendorChargeback[]           @relation("VendorChargebacks")
+  debitMemos                VendorDebitMemo[]            @relation("VendorDebitMemos")
+  concessions               VendorConcession[]           @relation("VendorConcessions")
+  complianceChecks          VendorComplianceCheck[]      @relation("ComplianceChecks")
+  ncrs                      NonConformanceReport[]       @relation("NCRs")
+  supplierUsers             SupplierUser[]
+  audits                    Audit[]
+  supplierPerformanceReviews SupplierPerformanceReview[]
+  rootCauseAnalyses         RootCauseAnalysis[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -9198,45 +9227,6 @@ model SerialTracking {
   @@map("serial_tracking")
 }
 
-model VendorChargeback {
-  id                      String    @id @default(cuid())
-  organizationId          String    @map("organization_id")
-  supplierId              String    @map("supplier_id")
-  rmaIds                  String[]  @map("rma_ids")
-  
-  defectRate              Decimal   @map("defect_rate") @db.Decimal(5, 2) // %
-  defectThreshold         Decimal   @map("defect_threshold") @db.Decimal(5, 2) // %
-  
-  merchandiseCost         Decimal   @map("merchandise_cost") @db.Decimal(10, 2)
-  inspectionCost          Decimal   @map("inspection_cost") @db.Decimal(10, 2)
-  handlingFees            Decimal   @map("handling_fees") @db.Decimal(10, 2)
-  shippingCost            Decimal   @map("shipping_cost") @db.Decimal(10, 2)
-  penaltyAmount           Decimal   @map("penalty_amount") @db.Decimal(10, 2)
-  totalChargebackAmount   Decimal   @map("total_chargeback_amount") @db.Decimal(10, 2)
-  
-  invoiceNumber           String?   @map("invoice_number")
-  invoiceUrl              String?   @map("invoice_url")
-  
-  disputeStatus           String    @map("dispute_status") @default("PENDING") // PENDING, DISPUTED, ACCEPTED, REJECTED
-  disputeReason           String?   @map("dispute_reason")
-  disputeDocuments        Json?     @map("dispute_documents")
-  disputeResolution       String?   @map("dispute_resolution")
-  disputeResolvedAt       DateTime? @map("dispute_resolved_at")
-  
-  paymentDeduction        Json?     @map("payment_deduction")
-  
-  createdAt               DateTime  @default(now()) @map("created_at")
-  updatedAt               DateTime  @updatedAt @map("updated_at")
-  
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  supplier     Supplier     @relation(fields: [supplierId], references: [id])
-  
-  @@index([organizationId])
-  @@index([supplierId])
-  @@index([disputeStatus])
-  @@map("vendor_chargebacks")
-}
-
 model SustainabilityReport {
   id                        String    @id @default(cuid())
   organizationId            String    @map("organization_id")
@@ -9641,3 +9631,1838 @@ enum BlogCategory {
   BEST_PRACTICES
   INDUSTRY_NEWS
 }
+
+// ==========================================
+// VENDOR QUALITY & COMPLIANCE ENHANCEMENT
+// ==========================================
+
+model VendorChargeback {
+  id                      String    @id @default(cuid())
+  chargebackNumber        String    @unique @map("chargeback_number")
+  organizationId          String    @map("organization_id")
+  vendorId                String    @map("vendor_id")
+  rtvIds                  String[]  @map("rtv_ids")
+  
+  // Cost Breakdown
+  defectiveMerchandiseCost Decimal  @map("defective_merchandise_cost") @db.Decimal(10, 2)
+  inspectionCost          Decimal   @map("inspection_cost") @db.Decimal(10, 2)
+  handlingCost            Decimal   @map("handling_cost") @db.Decimal(10, 2)
+  shippingCost            Decimal   @map("shipping_cost") @db.Decimal(10, 2)
+  customerRefunds         Decimal   @map("customer_refunds") @db.Decimal(10, 2)
+  qualityPenalty          Decimal   @map("quality_penalty") @db.Decimal(10, 2)
+  administrativeFee       Decimal   @map("administrative_fee") @db.Decimal(10, 2)
+  totalAmount             Decimal   @map("total_amount") @db.Decimal(10, 2)
+  
+  // Invoice Details
+  invoiceNumber           String    @map("invoice_number")
+  invoiceDate             DateTime  @map("invoice_date")
+  paymentTerms            String    @map("payment_terms") // NET_30, NET_60
+  paymentDue              DateTime  @map("payment_due")
+  
+  // Payment Deduction
+  autoDeductFromPayment   Boolean   @map("auto_deduct_from_payment") @default(false)
+  deductionScheduled      Boolean   @map("deduction_scheduled") @default(false)
+  deductionDate           DateTime? @map("deduction_date")
+  deductionAmount         Decimal?  @map("deduction_amount") @db.Decimal(10, 2)
+  
+  // Dispute
+  disputeWindow           Int       @map("dispute_window") // days
+  disputeDeadline         DateTime  @map("dispute_deadline")
+  disputed                Boolean   @default(false)
+  disputedAmount          Decimal?  @map("disputed_amount") @db.Decimal(10, 2)
+  disputeReason           String?   @map("dispute_reason") @db.Text
+  disputeStatus           String?   @map("dispute_status") // OPEN, VENDOR_RESPONDED, UNDER_REVIEW, RESOLVED
+  disputeResolvedAt       DateTime? @map("dispute_resolved_at")
+  disputeOutcome          String?   @map("dispute_outcome") // UPHELD, REDUCED, CANCELLED
+  adjustedAmount          Decimal?  @map("adjusted_amount") @db.Decimal(10, 2)
+  
+  // Status
+  status                  String    @default("PENDING") // PENDING, APPROVED, INVOICED, PAID, DISPUTED, RESOLVED, WRITTEN_OFF
+  approvedAt              DateTime? @map("approved_at")
+  approvedBy              String?   @map("approved_by")
+  paidAt                  DateTime? @map("paid_at")
+  paidAmount              Decimal?  @map("paid_amount") @db.Decimal(10, 2)
+  
+  // Documents
+  invoicePdfUrl           String?   @map("invoice_pdf_url")
+  supportingDocuments     Json?     @map("supporting_documents")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  vendor                  Supplier  @relation("VendorChargebacks", fields: [vendorId], references: [id])
+  
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([paymentDue])
+  @@map("vendor_chargebacks")
+}
+
+model VendorDebitMemo {
+  id                      String    @id @default(cuid())
+  debitMemoNumber         String    @unique @map("debit_memo_number")
+  organizationId          String    @map("organization_id")
+  vendorId                String    @map("vendor_id")
+  
+  // Reason
+  reason                  String    // SHORT_SHIPMENT, LATE_DELIVERY, NON_COMPLIANT_PACKAGING, MISSING_DOCS, QUALITY_FAILURE, OTHER
+  reasonDescription       String    @map("reason_description") @db.Text
+  
+  // Related Documents
+  purchaseOrderId         String?   @map("purchase_order_id")
+  grnId                   String?   @map("grn_id")
+  rtvId                   String?   @map("rtv_id")
+  
+  // Financial Details
+  debitAmount             Decimal   @map("debit_amount") @db.Decimal(10, 2)
+  calculationMethod       String    @map("calculation_method") // FIXED_FEE, PERCENTAGE, QUANTITY_BASED, TIME_BASED
+  calculationDetails      Json      @map("calculation_details")
+  
+  // Invoice Details
+  invoiceNumber           String    @map("invoice_number")
+  invoiceDate             DateTime  @map("invoice_date")
+  paymentTerms            String    @map("payment_terms")
+  paymentDue              DateTime  @map("payment_due")
+  
+  // Payment Offset
+  offsetFromPayment       Boolean   @map("offset_from_payment") @default(true)
+  offsetScheduled         Boolean   @map("offset_scheduled") @default(false)
+  offsetDate              DateTime? @map("offset_date")
+  
+  // Dispute
+  disputed                Boolean   @default(false)
+  disputeReason           String?   @map("dispute_reason") @db.Text
+  disputeStatus           String?   @map("dispute_status")
+  disputeResolvedAt       DateTime? @map("dispute_resolved_at")
+  disputeOutcome          String?   @map("dispute_outcome")
+  
+  // Status
+  status                  String    @default("PENDING") // PENDING, APPROVED, INVOICED, OFFSET, PAID, DISPUTED, CANCELLED
+  approvedAt              DateTime? @map("approved_at")
+  approvedBy              String?   @map("approved_by")
+  collectedAt             DateTime? @map("collected_at")
+  collectedAmount         Decimal?  @map("collected_amount") @db.Decimal(10, 2)
+  
+  // Documents
+  invoicePdfUrl           String?   @map("invoice_pdf_url")
+  supportingDocuments     Json?     @map("supporting_documents")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  vendor                  Supplier  @relation("VendorDebitMemos", fields: [vendorId], references: [id])
+  
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([paymentDue])
+  @@map("vendor_debit_memos")
+}
+
+model VendorConcession {
+  id                      String    @id @default(cuid())
+  concessionNumber        String    @unique @map("concession_number")
+  organizationId          String    @map("organization_id")
+  vendorId                String    @map("vendor_id")
+  
+  // Concession Type
+  concessionType          String    @map("concession_type") // PRICE_DISCOUNT, CREDIT_ALLOWANCE, FREE_GOODS, EXTENDED_TERMS, PROMOTIONAL_ALLOWANCE
+  
+  // Related Issue
+  relatedIssue            String    @map("related_issue") // RTV, QUALITY_ISSUE, DELIVERY_DELAY, OTHER
+  rtvId                   String?   @map("rtv_id")
+  chargebackId            String?   @map("chargeback_id")
+  debitMemoId             String?   @map("debit_memo_id")
+  
+  // Concession Details
+  originalClaimAmount     Decimal   @map("original_claim_amount") @db.Decimal(10, 2)
+  concessionValue         Decimal   @map("concession_value") @db.Decimal(10, 2)
+  concessionDescription   String    @map("concession_description") @db.Text
+  
+  // Terms
+  applicableOrders        Int?      @map("applicable_orders") // Number of orders concession applies to
+  expiresAt               DateTime? @map("expires_at")
+  minimumOrderValue       Decimal?  @map("minimum_order_value") @db.Decimal(10, 2)
+  termsAndConditions      String?   @map("terms_and_conditions") @db.Text
+  
+  // Tracking
+  utilizationAmount       Decimal   @map("utilization_amount") @default(0) @db.Decimal(10, 2)
+  utilizationCount        Int       @map("utilization_count") @default(0)
+  remainingValue          Decimal   @map("remaining_value") @db.Decimal(10, 2)
+  
+  // Status
+  status                  String    @default("PENDING") // PENDING, APPROVED, ACTIVE, UTILIZED, EXPIRED, CANCELLED
+  approvedAt              DateTime? @map("approved_at")
+  approvedBy              String?   @map("approved_by")
+  activatedAt             DateTime? @map("activated_at")
+  fullyUtilizedAt         DateTime? @map("fully_utilized_at")
+  
+  // Agreement
+  agreementDocumentUrl    String?   @map("agreement_document_url")
+  vendorAcceptedAt        DateTime? @map("vendor_accepted_at")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  vendor                  Supplier  @relation("VendorConcessions", fields: [vendorId], references: [id])
+  
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([expiresAt])
+  @@map("vendor_concessions")
+}
+
+// ==========================================
+// NON-CONFORMANCE REPORTS (NCR)
+// ==========================================
+
+model NonConformanceReport {
+  id                      String    @id @default(cuid())
+  ncrNumber               String    @unique @map("ncr_number")
+  organizationId          String    @map("organization_id")
+  
+  // Report Details
+  title                   String
+  description             String    @db.Text
+  reportDate              DateTime  @default(now()) @map("report_date")
+  discoveredBy            String    @map("discovered_by")
+  discoveryLocation       String    @map("discovery_location")
+  
+  // Source
+  sourceType              String    @map("source_type") // RECEIVING, PRODUCTION, PICKING, PACKING, CUSTOMER_COMPLAINT, AUDIT
+  sourceId                String?   @map("source_id") // Reference to inspection/order/etc
+  
+  // Supplier Information
+  supplierId              String?   @map("supplier_id")
+  supplierName            String?   @map("supplier_name")
+  poNumber                String?   @map("po_number")
+  
+  // Product Information
+  productSku              String?   @map("product_sku")
+  productDescription      String?   @map("product_description") @db.Text
+  lotNumber               String?   @map("lot_number")
+  serialNumber            String?   @map("serial_number")
+  quantityAffected        Int       @map("quantity_affected")
+  
+  // Defect Classification
+  nonConformanceType      String    @map("nonconformance_type") // MATERIAL_DEFECT, DIMENSIONAL, PACKAGING, CONTAMINATION, DOCUMENTATION, LABELING, FUNCTIONAL
+  severity                String    // CRITICAL, MAJOR, MINOR
+  category                String    // QUALITY, SAFETY, REGULATORY, DOCUMENTATION
+  
+  // Root Cause Analysis
+  suspectedRootCause      String?   @map("suspected_root_cause") @db.Text
+  confirmedRootCause      String?   @map("confirmed_root_cause") @db.Text
+  rootCauseMethod         String?   @map("root_cause_method") // 5_WHYS, FISHBONE, FAULT_TREE, PARETO
+  rcaCompletedDate        DateTime? @map("rca_completed_date")
+  rcaPerformedBy          String?   @map("rca_performed_by")
+  
+  // Disposition
+  disposition             String    // REWORK, SCRAP, RETURN_TO_VENDOR, USE_AS_IS, CREDIT_CLAIM, QUARANTINE
+  dispositionDetails      String?   @map("disposition_details") @db.Text
+  dispositionDate         DateTime? @map("disposition_date")
+  dispositionBy           String?   @map("disposition_by")
+  
+  // Financial Impact
+  estimatedCost           Decimal?  @map("estimated_cost") @db.Decimal(10, 2)
+  actualCost              Decimal?  @map("actual_cost") @db.Decimal(10, 2)
+  
+  // Supplier Claims
+  claimAmount             Decimal?  @map("claim_amount") @db.Decimal(10, 2)
+  claimStatus             String?   @map("claim_status") // PENDING, SUBMITTED, APPROVED, REJECTED, PAID, PARTIALLY_PAID
+  claimSubmittedDate      DateTime? @map("claim_submitted_date")
+  claimApprovedDate       DateTime? @map("claim_approved_date")
+  claimPaidAmount         Decimal?  @map("claim_paid_amount") @db.Decimal(10, 2)
+  claimNotes              String?   @map("claim_notes") @db.Text
+  
+  // Corrective Actions (linked to CAPA)
+  capaRequired            Boolean   @map("capa_required") @default(false)
+  capaIds                 String[]  @map("capa_ids") // Array of CAPA IDs
+  
+  // Status & Workflow
+  status                  String    @default("OPEN") // OPEN, INVESTIGATING, ACTION_PENDING, CLOSED, CANCELLED
+  priority                String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  assignedTo              String?   @map("assigned_to")
+  dueDate                 DateTime? @map("due_date")
+  closedDate              DateTime? @map("closed_date")
+  closedBy                String?   @map("closed_by")
+  closureNotes            String?   @map("closure_notes") @db.Text
+  
+  // Documents & Evidence
+  photos                  Json?     // Array of photo URLs
+  documents               Json?     // Array of document URLs
+  
+  // Customer Impact
+  customerImpact          Boolean   @map("customer_impact") @default(false)
+  customersAffected       Int?      @map("customers_affected")
+  customerComplaintId     String?   @map("customer_complaint_id")
+  
+  // Regulatory
+  regulatoryNotification  Boolean   @map("regulatory_notification") @default(false)
+  regulatoryBody          String?   @map("regulatory_body")
+  regulatoryReportDate    DateTime? @map("regulatory_report_date")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplier                Supplier? @relation("NCRs", fields: [supplierId], references: [id])
+  capas                   CorrectivePreventiveAction[] @relation("NCR_CAPAs")
+  supplierResponses       SupplierResponse[]
+  
+  @@index([organizationId])
+  @@index([supplierId])
+  @@index([status])
+  @@index([severity])
+  @@index([claimStatus])
+  @@index([reportDate])
+  @@map("non_conformance_reports")
+}
+
+// ==========================================
+// CORRECTIVE & PREVENTIVE ACTIONS (CAPA)
+// ==========================================
+
+model CorrectivePreventiveAction {
+  id                      String    @id @default(cuid())
+  capaNumber              String    @unique @map("capa_number")
+  organizationId          String    @map("organization_id")
+  
+  // CAPA Type
+  capaType                String    @map("capa_type") // CORRECTIVE, PREVENTIVE, BOTH
+  actionCategory          String    @map("action_category") // PROCESS, MATERIAL, EQUIPMENT, TRAINING, DOCUMENTATION, DESIGN
+  
+  // Source/Trigger
+  sourceType              String    @map("source_type") // NCR, INSPECTION, AUDIT, COMPLAINT, MANAGEMENT_REVIEW, RISK_ASSESSMENT
+  sourceId                String?   @map("source_id")
+  ncrId                   String?   @map("ncr_id")
+  
+  // Problem Description
+  problemStatement        String    @map("problem_statement") @db.Text
+  problemSeverity         String    @map("problem_severity") // CRITICAL, HIGH, MEDIUM, LOW
+  
+  // Root Cause Analysis
+  rootCauseMethod         String    @map("root_cause_method") // 5_WHYS, FISHBONE, FAULT_TREE, PARETO, FMEA
+  rootCauseAnalysis       Json      @map("root_cause_analysis") // Structured RCA data
+  rootCause               String    @map("root_cause") @db.Text
+  contributingFactors     Json?     @map("contributing_factors")
+  
+  // Risk Assessment
+  riskPriority            Int?      @map("risk_priority") // RPN = Severity × Occurrence × Detection
+  riskSeverity            Int?      @map("risk_severity") // 1-10
+  riskOccurrence          Int?      @map("risk_occurrence") // 1-10
+  riskDetection           Int?      @map("risk_detection") // 1-10
+  
+  // Immediate/Containment Actions
+  immediateActions        Json      @map("immediate_actions") // Array of immediate actions taken
+  containmentComplete     Boolean   @map("containment_complete") @default(false)
+  containmentDate         DateTime? @map("containment_date")
+  
+  // Corrective Actions (fix the problem)
+  correctiveActions       Json      @map("corrective_actions") // Array of corrective action steps
+  correctiveActionsOwner  String?   @map("corrective_actions_owner")
+  correctiveTargetDate    DateTime? @map("corrective_target_date")
+  correctiveCompletedDate DateTime? @map("corrective_completed_date")
+  
+  // Preventive Actions (prevent recurrence)
+  preventiveActions       Json      @map("preventive_actions") // Array of preventive action steps
+  preventiveActionsOwner  String?   @map("preventive_actions_owner")
+  preventiveTargetDate    DateTime? @map("preventive_target_date")
+  preventiveCompletedDate DateTime? @map("preventive_completed_date")
+  
+  // Action Details
+  responsiblePerson       String    @map("responsible_person")
+  departmentResponsible   String?   @map("department_responsible")
+  targetCompletionDate    DateTime  @map("target_completion_date")
+  actualCompletionDate    DateTime? @map("actual_completion_date")
+  
+  // Verification & Effectiveness
+  verificationMethod      String?   @map("verification_method") @db.Text
+  verificationCriteria    String?   @map("verification_criteria") @db.Text
+  verificationDate        DateTime? @map("verification_date")
+  verificationPerformedBy String?   @map("verification_performed_by")
+  verificationPassed      Boolean?  @map("verification_passed")
+  
+  effectivenessCheckDate  DateTime? @map("effectiveness_check_date")
+  effectivenessScore      Int?      @map("effectiveness_score") // 0-100
+  effectivenessNotes      String?   @map("effectiveness_notes") @db.Text
+  
+  // Management Review
+  managementReviewRequired Boolean  @map("management_review_required") @default(false)
+  managementReviewDate    DateTime? @map("management_review_date")
+  managementReviewedBy    String?   @map("management_reviewed_by")
+  managementApproval      String?   @map("management_approval") // APPROVED, REJECTED, PENDING
+  managementComments      String?   @map("management_comments") @db.Text
+  
+  // Status & Workflow
+  status                  String    @default("OPEN") // OPEN, IN_PROGRESS, ACTIONS_IMPLEMENTED, VERIFICATION_PENDING, VERIFIED, CLOSED, CANCELLED
+  priority                String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  
+  // Closure
+  closedDate              DateTime? @map("closed_date")
+  closedBy                String?   @map("closed_by")
+  closureApproved         Boolean?  @map("closure_approved")
+  closureApprovedBy       String?   @map("closure_approved_by")
+  closureApprovedDate     DateTime? @map("closure_approved_date")
+  
+  // Documents
+  documents               Json?     // Array of supporting documents
+  
+  // Recurrence Prevention
+  updatedProcedures       Json?     @map("updated_procedures") // List of updated SOPs/procedures
+  trainingRequired        Boolean   @map("training_required") @default(false)
+  trainingCompleted       Boolean   @map("training_completed") @default(false)
+  trainingCompletedDate   DateTime? @map("training_completed_date")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  ncr                     NonConformanceReport? @relation("NCR_CAPAs", fields: [ncrId], references: [id])
+  
+  @@index([organizationId])
+  @@index([ncrId])
+  @@index([status])
+  @@index([priority])
+  @@index([capaType])
+  @@index([targetCompletionDate])
+  @@map("corrective_preventive_actions")
+}
+
+// ==========================================
+// ROOT CAUSE ANALYSIS
+// ==========================================
+
+model RootCauseAnalysis {
+  id                      String    @id @default(cuid())
+  rcaNumber               String    @unique @map("rca_number")
+  organizationId          String    @map("organization_id")
+  vendorId                String?   @map("vendor_id")
+  
+  // Issue Details
+  issueTitle              String    @map("issue_title")
+  issueDescription        String    @map("issue_description") @db.Text
+  issueType               String    @map("issue_type") // QUALITY_DEFECT, DELIVERY_DELAY, COMPLIANCE_VIOLATION, PROCESS_FAILURE
+  severity                String    // CRITICAL, HIGH, MEDIUM, LOW
+  
+  // Affected Items
+  affectedProducts        Json      @map("affected_products") // Array of {sku, name, quantity}
+  affectedOrders          Json      @map("affected_orders") // Array of order IDs
+  relatedRTVs             String[]  @map("related_rtvs")
+  quantityAffected        Int       @map("quantity_affected")
+  financialImpact         Decimal   @map("financial_impact") @db.Decimal(12, 2)
+  customerImpact          String?   @map("customer_impact") @db.Text
+  
+  // 5 Whys Analysis
+  fiveWhys                Json      @map("five_whys") // FiveWhysAnalysis structure
+  rootCause               String    @map("root_cause") @db.Text
+  rootCauseCategory       String    @map("root_cause_category") // SUPPLIER_PROCESS, MATERIAL_DEFECT, etc.
+  
+  // Actions
+  immediateActions        Json      @map("immediate_actions") // Array of immediate actions
+  correctiveActions       Json      @map("corrective_actions") // Array of corrective actions
+  preventiveActions       Json      @map("preventive_actions") // Array of preventive actions
+  
+  // Responsibility
+  responsibleParty        String    @map("responsible_party")
+  targetCompletionDate    DateTime  @map("target_completion_date")
+  actualCompletionDate    DateTime? @map("actual_completion_date")
+  
+  // Verification
+  verificationRequired    Boolean   @default(false) @map("verification_required")
+  verificationMethod      String?   @map("verification_method") @db.Text
+  verificationDate        DateTime? @map("verification_date")
+  verificationPassed      Boolean?  @map("verification_passed")
+  effectivenessScore      Int?      @map("effectiveness_score") // 0-100
+  
+  // Status
+  status                  String    @default("IN_PROGRESS") // IN_PROGRESS, ACTIONS_IMPLEMENTED, VERIFIED, CLOSED
+  
+  notes                   String?   @db.Text
+  createdBy               String    @map("created_by")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  vendor                  Supplier?    @relation(fields: [vendorId], references: [id])
+  
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([status])
+  @@index([severity])
+  @@map("root_cause_analyses")
+}
+
+// ==========================================
+// QUALITY HOLDS (QUARANTINE)
+// ==========================================
+
+model QualityHold {
+  id                      String    @id @default(cuid())
+  holdNumber              String    @unique @map("hold_number")
+  organizationId          String    @map("organization_id")
+  
+  // Hold Type
+  holdType                String    @map("hold_type") // PRODUCT, LOT, LOCATION, VENDOR, ORDER
+  holdLevel               String    @map("hold_level") // ITEM_LEVEL, LOT_LEVEL, LOCATION_LEVEL, VENDOR_LEVEL
+  
+  // Target Entity
+  productSku              String?   @map("product_sku")
+  productName             String?   @map("product_name")
+  lotNumber               String?   @map("lot_number")
+  serialNumbers           String[]  @map("serial_numbers")
+  locationId              String?   @map("location_id")
+  locationName            String?   @map("location_name")
+  vendorId                String?   @map("vendor_id")
+  orderId                 String?   @map("order_id")
+  
+  // Quantity
+  quantityOnHold          Int       @map("quantity_on_hold")
+  quantityReleased        Int       @default(0) @map("quantity_released")
+  quantityRejected        Int       @default(0) @map("quantity_rejected")
+  quantityRemaining       Int       @map("quantity_remaining")
+  
+  // Hold Details
+  holdReason              String    @map("hold_reason") // QUALITY_DEFECT, PENDING_INSPECTION, CONTAMINATION, EXPIRED, DOCUMENTATION_MISSING, REGULATORY, CUSTOMER_COMPLAINT
+  holdDescription         String    @map("hold_description") @db.Text
+  severity                String    // CRITICAL, HIGH, MEDIUM, LOW
+  
+  // Source
+  initiatedBy             String    @map("initiated_by")
+  initiatedDate           DateTime  @default(now()) @map("initiated_date")
+  sourceType              String    @map("source_type") // NCR, INSPECTION, COMPLAINT, AUDIT, MANUAL
+  sourceId                String?   @map("source_id")
+  ncrId                   String?   @map("ncr_id")
+  
+  // Disposition
+  disposition             String?   // RELEASE, REWORK, RETURN_TO_VENDOR, SCRAP, DESTROY, USE_AS_IS
+  dispositionReason       String?   @map("disposition_reason") @db.Text
+  dispositionDate         DateTime? @map("disposition_date")
+  dispositionBy           String?   @map("disposition_by")
+  dispositionApprovedBy   String?   @map("disposition_approved_by")
+  
+  // Financial Impact
+  estimatedValue          Decimal?  @map("estimated_value") @db.Decimal(10, 2)
+  actualLoss              Decimal?  @map("actual_loss") @db.Decimal(10, 2)
+  
+  // Release Workflow
+  releaseRequested        Boolean   @map("release_requested") @default(false)
+  releaseRequestDate      DateTime? @map("release_request_date")
+  releaseRequestedBy      String?   @map("release_requested_by")
+  releaseApproved         Boolean?  @map("release_approved")
+  releaseApprovedDate     DateTime? @map("release_approved_date")
+  releaseApprovedBy       String?   @map("release_approved_by")
+  releaseConditions       String?   @map("release_conditions") @db.Text
+  
+  // Status
+  status                  String    @default("ACTIVE") // ACTIVE, PARTIAL_RELEASE, RELEASED, REJECTED, CANCELLED
+  priority                String    @default("MEDIUM") // LOW, MEDIUM, HIGH, CRITICAL
+  
+  // Investigation
+  investigationRequired   Boolean   @map("investigation_required") @default(true)
+  investigationStatus     String?   @map("investigation_status") // PENDING, IN_PROGRESS, COMPLETED
+  investigationNotes      String?   @map("investigation_notes") @db.Text
+  
+  // Documents
+  photos                  Json?
+  documents               Json?
+  
+  // Notifications
+  notificationsSent       Json?     @map("notifications_sent") // Array of notification records
+  escalated               Boolean   @default(false)
+  escalatedDate           DateTime? @map("escalated_date")
+  escalatedTo             String?   @map("escalated_to")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([status])
+  @@index([holdType])
+  @@index([severity])
+  @@index([vendorId])
+  @@index([productSku])
+  @@index([lotNumber])
+  @@map("quality_holds")
+}
+
+// ==========================================
+// SAMPLING PLANS (AQL-BASED)
+// ==========================================
+
+model SamplingPlan {
+  id                      String    @id @default(cuid())
+  planNumber              String    @unique @map("plan_number")
+  organizationId          String    @map("organization_id")
+  
+  // Plan Details
+  planName                String    @map("plan_name")
+  planDescription         String?   @map("plan_description") @db.Text
+  
+  // Target
+  targetType              String    @map("target_type") // PRODUCT, SUPPLIER, CATEGORY, UNIVERSAL
+  targetId                String?   @map("target_id") // SKU, Supplier ID, Category ID
+  targetName              String?   @map("target_name")
+  
+  // Inspection Type
+  inspectionType          String    @map("inspection_type") // RECEIVING, IN_PROCESS, FINAL, AUDIT, RANDOM
+  
+  // AQL Standards (ANSI/ASQ Z1.4)
+  standard                String    @default("ANSI_Z1_4") // ANSI_Z1_4, ISO_2859, MIL_STD_105E
+  inspectionLevel         String    @map("inspection_level") // S1, S2, S3, S4, I, II, III
+  
+  // AQL Values (Acceptable Quality Levels)
+  aqlCritical             Decimal?  @map("aql_critical") @db.Decimal(5, 3) // e.g., 0.010, 0.065
+  aqlMajor                Decimal?  @map("aql_major") @db.Decimal(5, 3)    // e.g., 0.65, 1.0, 2.5
+  aqlMinor                Decimal?  @map("aql_minor") @db.Decimal(5, 3)    // e.g., 2.5, 4.0, 6.5
+  
+  // Sampling Type
+  samplingType            String    @map("sampling_type") // SINGLE, DOUBLE, MULTIPLE, SEQUENTIAL
+  sampleSizeCode          String?   @map("sample_size_code") // A, B, C, D, E, F, G, H, J, K, L, M, N, P, Q, R
+  
+  // Sample Size Rules
+  usePercentage           Boolean   @map("use_percentage") @default(false)
+  samplePercentage        Decimal?  @map("sample_percentage") @db.Decimal(5, 2) // 10.00 = 10%
+  minimumSampleSize       Int?      @map("minimum_sample_size")
+  maximumSampleSize       Int?      @map("maximum_sample_size")
+  
+  // Lot Size Ranges (for AQL tables)
+  lotSizeRanges           Json?     @map("lot_size_ranges") // Array of {min, max, sampleSize, acceptNumber, rejectNumber}
+  
+  // Acceptance Criteria
+  acceptanceNumber        Int?      @map("acceptance_number") // Max defects allowed to pass
+  rejectionNumber         Int?      @map("rejection_number") // Min defects to fail
+  
+  // Attributes vs Variables
+  planType                String    @map("plan_type") // ATTRIBUTES (pass/fail), VARIABLES (measurements)
+  measurementRequired     Boolean   @map("measurement_required") @default(false)
+  measurementSpecs        Json?     @map("measurement_specs") // Array of measurement requirements
+  
+  // Inspection Frequency
+  inspectionFrequency     String?   @map("inspection_frequency") // EVERY_LOT, PERIODIC, RANDOM, SKIP_LOT
+  frequencyValue          Int?      @map("frequency_value") // e.g., every 10 lots
+  
+  // Status & Version
+  status                  String    @default("ACTIVE") // ACTIVE, INACTIVE, SUPERSEDED
+  version                 Int       @default(1)
+  effectiveDate           DateTime  @map("effective_date")
+  expirationDate          DateTime? @map("expiration_date")
+  supersededBy            String?   @map("superseded_by") // New plan ID
+  
+  // Usage Statistics
+  timesUsed               Int       @default(0) @map("times_used")
+  lastUsedDate            DateTime? @map("last_used_date")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([targetType])
+  @@index([targetId])
+  @@index([status])
+  @@index([inspectionType])
+  @@map("sampling_plans")
+}
+
+// ==========================================
+// QUALITY MEASUREMENTS (PARAMETRIC)
+// ==========================================
+
+model QualityMeasurement {
+  id                      String    @id @default(cuid())
+  measurementNumber       String    @unique @map("measurement_number")
+  organizationId          String    @map("organization_id")
+  
+  // Source
+  inspectionId            String?   @map("inspection_id")
+  ncrId                   String?   @map("ncr_id")
+  productSku              String    @map("product_sku")
+  productName             String    @map("product_name")
+  lotNumber               String?   @map("lot_number")
+  serialNumber            String?   @map("serial_number")
+  
+  // Measurement Details
+  measurementType         String    @map("measurement_type") // DIMENSIONAL, WEIGHT, TEMPERATURE, PRESSURE, pH, HARDNESS, THICKNESS, VISCOSITY
+  parameterName           String    @map("parameter_name") // e.g., "Length", "Weight", "Temperature"
+  unitOfMeasure           String    @map("unit_of_measure") // mm, kg, °C, psi, etc.
+  
+  // Specification Limits
+  nominalValue            Decimal?  @map("nominal_value") @db.Decimal(12, 4) // Target value
+  lowerSpecLimit          Decimal?  @map("lower_spec_limit") @db.Decimal(12, 4) // LSL
+  upperSpecLimit          Decimal?  @map("upper_spec_limit") @db.Decimal(12, 4) // USL
+  lowerControlLimit       Decimal?  @map("lower_control_limit") @db.Decimal(12, 4) // LCL
+  upperControlLimit       Decimal?  @map("upper_control_limit") @db.Decimal(12, 4) // UCL
+  
+  // Measured Value
+  measuredValue           Decimal   @map("measured_value") @db.Decimal(12, 4)
+  deviation               Decimal?  @map("deviation") @db.Decimal(12, 4) // Deviation from nominal
+  deviationPercentage     Decimal?  @map("deviation_percentage") @db.Decimal(5, 2)
+  
+  // Conformance
+  withinSpec              Boolean   @map("within_spec")
+  withinControl           Boolean   @map("within_control")
+  conformanceStatus       String    @map("conformance_status") // CONFORMING, NON_CONFORMING, MARGINAL
+  
+  // Measurement Conditions
+  measurementDate         DateTime  @default(now()) @map("measurement_date")
+  measuredBy              String    @map("measured_by")
+  measurementLocation     String?   @map("measurement_location")
+  environmentalConditions Json?     @map("environmental_conditions") // temp, humidity, etc.
+  
+  // Equipment Used
+  equipmentId             String?   @map("equipment_id")
+  equipmentName           String?   @map("equipment_name")
+  calibrationDueDate      DateTime? @map("calibration_due_date")
+  calibrationCurrent      Boolean   @map("calibration_current") @default(true)
+  
+  // Sample Information
+  sampleSize              Int?      @map("sample_size")
+  sampleNumber            Int?      @map("sample_number")
+  
+  // Statistical Data (for multiple measurements)
+  measurementCount        Int       @default(1) @map("measurement_count")
+  meanValue               Decimal?  @map("mean_value") @db.Decimal(12, 4)
+  standardDeviation       Decimal?  @map("standard_deviation") @db.Decimal(12, 4)
+  rangeValue              Decimal?  @map("range_value") @db.Decimal(12, 4)
+  cpk                     Decimal?  @map("cpk") @db.Decimal(5, 3) // Process capability index
+  ppk                     Decimal?  @map("ppk") @db.Decimal(5, 3) // Process performance index
+  
+  // Actions
+  actionRequired          Boolean   @map("action_required") @default(false)
+  actionTaken             String?   @map("action_taken") @db.Text
+  
+  // Documents
+  photos                  Json?
+  chartImage              String?   @map("chart_image") // URL to control chart
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([inspectionId])
+  @@index([productSku])
+  @@index([measurementType])
+  @@index([measurementDate])
+  @@index([conformanceStatus])
+  @@map("quality_measurements")
+}
+
+// ==========================================
+// QUALITY REPORTS (PERIODIC)
+// ==========================================
+
+model QualityReport {
+  id                      String    @id @default(cuid())
+  reportNumber            String    @unique @map("report_number")
+  organizationId          String    @map("organization_id")
+  
+  // Report Type & Period
+  reportType              String    @map("report_type") // DAILY, WEEKLY, MONTHLY, QUARTERLY, ANNUAL, CUSTOM
+  reportCategory          String    @map("report_category") // INSPECTION, DEFECTS, NCR, CAPA, SUPPLIER, COMPLIANCE, EXECUTIVE
+  
+  periodStart             DateTime  @map("period_start")
+  periodEnd               DateTime  @map("period_end")
+  reportDate              DateTime  @default(now()) @map("report_date")
+  
+  // Summary Metrics
+  metrics                 Json      // Complete metrics object
+  
+  // Inspection Metrics
+  totalInspections        Int       @default(0) @map("total_inspections")
+  passedInspections       Int       @default(0) @map("passed_inspections")
+  failedInspections       Int       @default(0) @map("failed_inspections")
+  inspectionPassRate      Decimal   @default(0) @map("inspection_pass_rate") @db.Decimal(5, 2)
+  
+  // Defect Metrics
+  totalDefects            Int       @default(0) @map("total_defects")
+  criticalDefects         Int       @default(0) @map("critical_defects")
+  majorDefects            Int       @default(0) @map("major_defects")
+  minorDefects            Int       @default(0) @map("minor_defects")
+  defectRate              Decimal   @default(0) @map("defect_rate") @db.Decimal(5, 4)
+  
+  // NCR Metrics
+  totalNcrs               Int       @default(0) @map("total_ncrs")
+  openNcrs                Int       @default(0) @map("open_ncrs")
+  closedNcrs              Int       @default(0) @map("closed_ncrs")
+  ncrClosureRate          Decimal   @default(0) @map("ncr_closure_rate") @db.Decimal(5, 2)
+  
+  // CAPA Metrics
+  totalCapas              Int       @default(0) @map("total_capas")
+  openCapas               Int       @default(0) @map("open_capas")
+  completedCapas          Int       @default(0) @map("completed_capas")
+  overdueCapas            Int       @default(0) @map("overdue_capas")
+  capaEffectiveness       Decimal?  @map("capa_effectiveness") @db.Decimal(5, 2)
+  
+  // Supplier Quality
+  suppliersEvaluated      Int       @default(0) @map("suppliers_evaluated")
+  avgSupplierScore        Decimal?  @map("avg_supplier_score") @db.Decimal(5, 2)
+  
+  // Financial Impact
+  totalQualityCost        Decimal?  @map("total_quality_cost") @db.Decimal(12, 2)
+  totalClaimAmount        Decimal?  @map("total_claim_amount") @db.Decimal(12, 2)
+  totalRecoveredAmount    Decimal?  @map("total_recovered_amount") @db.Decimal(12, 2)
+  
+  // Top Issues
+  topDefectTypes          Json?     @map("top_defect_types") // Array of {type, count, percentage}
+  topSupplierIssues       Json?     @map("top_supplier_issues") // Array of {supplier, issueCount}
+  topProducts             Json?     @map("top_products") // Array of {sku, defectCount}
+  
+  // Trends
+  trendAnalysis           Json?     @map("trend_analysis") // Comparison with previous periods
+  improvementAreas        Json?     @map("improvement_areas")
+  concernAreas            Json?     @map("concern_areas")
+  
+  // Charts & Visualizations
+  chartData               Json?     @map("chart_data") // Data for charts/graphs
+  
+  // Report Status
+  status                  String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  publishedDate           DateTime? @map("published_date")
+  publishedBy             String?   @map("published_by")
+  
+  // Distribution
+  recipients              Json?     // Array of user IDs who receive this report
+  distributedDate         DateTime? @map("distributed_date")
+  
+  // Documents
+  pdfUrl                  String?   @map("pdf_url")
+  excelUrl                String?   @map("excel_url")
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([reportType])
+  @@index([reportCategory])
+  @@index([periodStart])
+  @@index([periodEnd])
+  @@index([status])
+  @@map("quality_reports")
+}
+
+model VendorComplianceCheck {
+  id                      String    @id @default(cuid())
+  checkNumber             String    @unique @map("check_number")
+  organizationId          String    @map("organization_id")
+  vendorId                String    @map("vendor_id")
+  
+  // Check Details
+  checkType               String    @map("check_type") // PACKAGING, LABELING, DOCUMENTATION, CERTIFICATION, QUALITY_STANDARDS, SAFETY
+  checkDate               DateTime  @map("check_date")
+  inspectorId             String    @map("inspector_id")
+  
+  // Checklist
+  checklistItems          Json      @map("checklist_items") // Array of items with pass/fail
+  totalItems              Int       @map("total_items")
+  passedItems             Int       @map("passed_items")
+  failedItems             Int       @map("failed_items")
+  complianceRate          Decimal   @map("compliance_rate") @db.Decimal(5, 2) // percentage
+  
+  // Violations
+  violations              Json?     // Array of violation details
+  violationCount          Int       @map("violation_count") @default(0)
+  criticalViolations      Int       @map("critical_violations") @default(0)
+  majorViolations         Int       @map("major_violations") @default(0)
+  minorViolations         Int       @map("minor_violations") @default(0)
+  
+  // Actions
+  correctiveActionsRequired Boolean @map("corrective_actions_required") @default(false)
+  correctiveActions       Json?     @map("corrective_actions")
+  
+  // Penalties
+  penaltyAssessed         Boolean   @map("penalty_assessed") @default(false)
+  penaltyAmount           Decimal?  @map("penalty_amount") @db.Decimal(10, 2)
+  penaltyReason           String?   @map("penalty_reason") @db.Text
+  
+  // Results
+  overallResult           String    @map("overall_result") // PASSED, PASSED_WITH_WARNINGS, FAILED
+  
+  // Follow-up
+  followUpRequired        Boolean   @map("follow_up_required") @default(false)
+  followUpDate            DateTime? @map("follow_up_date")
+  followUpCompleted       Boolean   @map("follow_up_completed") @default(false)
+  
+  // Status
+  status                  String    @default("COMPLETED") // IN_PROGRESS, COMPLETED, FOLLOW_UP_REQUIRED, CLOSED
+  
+  // Documents
+  reportPdfUrl            String?   @map("report_pdf_url")
+  photos                  Json?
+  
+  notes                   String?   @db.Text
+  createdAt               DateTime  @default(now()) @map("created_at")
+  createdBy               String    @map("created_by")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+  
+  organization            Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  vendor                  Supplier  @relation("ComplianceChecks", fields: [vendorId], references: [id])
+  
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([checkType])
+  @@index([checkDate])
+  @@map("vendor_compliance_checks")
+}
+
+// ==========================================
+// SUPPLIER PERFORMANCE REVIEWS
+// ==========================================
+
+model SupplierPerformanceReview {
+  id                  String   @id @default(cuid())
+  reviewNumber        String   @unique @map("review_number")
+  organizationId      String   @map("organization_id")
+  vendorId            String   @map("vendor_id")
+  
+  // Review period
+  reviewPeriod        String   @map("review_period") // Q1 2024, FY2024, etc.
+  periodStart         DateTime @map("period_start")
+  periodEnd           DateTime @map("period_end")
+  reviewType          String   @map("review_type") // QUARTERLY, ANNUAL, AD_HOC
+  
+  // Performance scores (0-100)
+  qualityScore        Int      @map("quality_score")
+  deliveryScore       Int      @map("delivery_score")
+  responsivenessScore Int      @map("responsiveness_score")
+  pricingScore        Int      @map("pricing_score")
+  complianceScore     Int      @map("compliance_score")
+  overallScore        Int      @map("overall_score")
+  
+  // Metrics snapshot
+  metricsSnapshot     Json     @map("metrics_snapshot") // Detailed metrics data
+  
+  // Qualitative assessment
+  strengths           Json     @map("strengths") // Array of strings
+  weaknesses          Json     @map("weaknesses") // Array of strings
+  improvementAreas    Json     @map("improvement_areas") // Array of strings
+  
+  // Action items
+  actionItems         Json?    @map("action_items") // Array of action items
+  
+  // Status & Recommendation
+  status              String   @default("DRAFT") // DRAFT, UNDER_REVIEW, APPROVED, PUBLISHED
+  recommendation      String?  @map("recommendation") // CONTINUE, PROBATION, etc.
+  
+  // Approval workflow
+  reviewedBy          String?  @map("reviewed_by")
+  reviewedAt          DateTime? @map("reviewed_at")
+  approvedBy          String?  @map("approved_by")
+  approvedAt          DateTime? @map("approved_at")
+  
+  notes               String?  @db.Text
+  createdBy           String   @map("created_by")
+  createdAt           DateTime @default(now()) @map("created_at")
+  updatedAt           DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  vendor              Supplier @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([vendorId])
+  @@index([status])
+  @@map("supplier_performance_reviews")
+}
+
+// ==========================================
+// SUPPLIER PORTAL
+// ==========================================
+
+model SupplierUser {
+  id          String   @id @default(cuid())
+  supplierId  String   @map("supplier_id")
+  email       String   @unique
+  name        String
+  password    String   // Hashed
+  role        SupplierRole
+  phone       String?
+  lastLogin   DateTime? @map("last_login")
+  active      Boolean  @default(true)
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  supplier    Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  responses   SupplierResponse[]
+  
+  @@index([supplierId])
+  @@index([email])
+  @@map("supplier_users")
+}
+
+model SupplierResponse {
+  id            String   @id @default(cuid())
+  ncrId         String   @map("ncr_id")
+  respondedById String   @map("responded_by_id")
+  responseDate  DateTime @map("response_date")
+  
+  // 8D Report Structure
+  eightD        Json     // 8D methodology response
+  rootCause     String?  @db.Text @map("root_cause")
+  correctiveAction String? @db.Text @map("corrective_action")
+  preventiveAction String? @db.Text @map("preventive_action")
+  
+  // Evidence
+  attachments   Json?    // Array of file URLs
+  photos        Json?
+  
+  // Status
+  status        ResponseStatus
+  approvedBy    String?  @map("approved_by")
+  approvedDate  DateTime? @map("approved_date")
+  
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  ncr           NonConformanceReport @relation(fields: [ncrId], references: [id])
+  respondedBy   SupplierUser @relation(fields: [respondedById], references: [id])
+  
+  @@index([ncrId])
+  @@index([respondedById])
+  @@map("supplier_responses")
+}
+
+enum SupplierRole {
+  VIEWER
+  RESPONDER
+  ADMIN
+}
+
+enum ResponseStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  REVISED
+}
+
+// ==========================================
+// RISK MANAGEMENT (ISO 9001:2015 Requirement)
+// ==========================================
+
+model RiskRegister {
+  id              String   @id @default(cuid())
+  riskNumber      String   @unique @map("risk_number")
+  organizationId  String   @map("organization_id")
+  
+  // Risk Details
+  title           String
+  description     String   @db.Text
+  category        RiskCategory
+  processArea     String?  @map("process_area")
+  
+  // Risk Assessment (RPN = Severity × Occurrence × Detection)
+  severity        Int      // 1-10: Impact if risk occurs
+  occurrence      Int      // 1-10: Likelihood of occurrence
+  detection       Int      // 1-10: Likelihood of detecting before impact (10 = hard to detect)
+  rpn             Int      // Risk Priority Number (calculated)
+  
+  // Mitigation
+  mitigationPlan  String?  @map("mitigation_plan") @db.Text
+  mitigationOwner String?  @map("mitigation_owner")
+  mitigationDate  DateTime? @map("mitigation_date")
+  
+  // Residual Risk (after mitigation)
+  residualSeverity    Int?      @map("residual_severity")
+  residualOccurrence  Int?      @map("residual_occurrence")
+  residualDetection   Int?      @map("residual_detection")
+  residualRPN         Int?      @map("residual_rpn")
+  
+  // Status & Workflow
+  status          RiskStatus
+  owner           String
+  reviewDate      DateTime? @map("review_date")
+  nextReviewDate  DateTime? @map("next_review_date")
+  
+  // Linkages
+  linkedNCRIds    String[]  @map("linked_ncr_ids")
+  linkedCAPAIds   String[]  @map("linked_capa_ids")
+  
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+  createdBy       String    @map("created_by")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([status])
+  @@index([rpn])
+  @@map("risk_register")
+}
+
+enum RiskCategory {
+  PROCESS
+  PRODUCT
+  SUPPLIER
+  REGULATORY
+  SAFETY
+  ENVIRONMENTAL
+  FINANCIAL
+  OPERATIONAL
+}
+
+enum RiskStatus {
+  IDENTIFIED
+  ASSESSED
+  MITIGATION_PLANNED
+  MITIGATING
+  MITIGATED
+  ACCEPTED
+  CLOSED
+}
+
+// ==========================================
+// AUDIT MANAGEMENT
+// ==========================================
+
+model Audit {
+  id            String   @id @default(cuid())
+  auditNumber   String   @unique @map("audit_number")
+  organizationId String  @map("organization_id")
+  
+  // Audit Details
+  type          AuditType
+  scope         String   @db.Text
+  standard      String?  // ISO 9001, ISO 13485, AS9100, etc.
+  auditDate     DateTime @map("audit_date")
+  location      String?
+  
+  // Auditor
+  auditorName   String   @map("auditor_name")
+  auditorId     String?  @map("auditor_id")
+  auditorOrg    String?  @map("auditor_org") // For external audits
+  
+  // Auditee
+  auditeeName   String?  @map("auditee_name")
+  auditeeId     String?  @map("auditee_id")
+  supplierId    String?  @map("supplier_id")
+  
+  // Status
+  status        AuditStatus
+  findings      AuditFinding[]
+  
+  // Report
+  reportPath    String?  @map("report_path")
+  summary       String?  @db.Text
+  recommendations String? @db.Text
+  
+  notes         String?  @db.Text
+  createdAt     DateTime @default(now()) @map("created_at")
+  createdBy     String   @map("created_by")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  organization  Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  supplier      Supplier? @relation(fields: [supplierId], references: [id])
+  
+  @@index([organizationId])
+  @@index([supplierId])
+  @@index([type])
+  @@index([status])
+  @@map("audits")
+}
+
+model AuditFinding {
+  id            String   @id @default(cuid())
+  auditId       String   @map("audit_id")
+  findingNumber String   @map("finding_number")
+  
+  // Classification
+  severity      FindingSeverity
+  clause        String?  // ISO clause reference
+  category      String?  // PROCESS, DOCUMENT, PRODUCT, etc.
+  
+  // Description
+  description   String   @db.Text
+  evidence      Json?    // Photos, documents
+  requirement   String?  @db.Text // What standard requires
+  
+  // Corrective Action
+  ncrId         String?  @map("ncr_id")
+  capaId        String?  @map("capa_id")
+  
+  // Status
+  status        FindingStatus
+  responsiblePerson String? @map("responsible_person")
+  dueDate       DateTime? @map("due_date")
+  closedDate    DateTime? @map("closed_date")
+  closureNotes  String?   @db.Text @map("closure_notes")
+  
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  audit         Audit @relation(fields: [auditId], references: [id], onDelete: Cascade)
+  
+  @@index([auditId])
+  @@index([severity])
+  @@index([status])
+  @@map("audit_findings")
+}
+
+enum AuditType {
+  INTERNAL
+  SUPPLIER
+  CUSTOMER
+  REGULATORY
+  CERTIFICATION
+}
+
+enum AuditStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  REPORT_ISSUED
+  CLOSED
+}
+
+enum FindingSeverity {
+  MAJOR
+  MINOR
+  OBSERVATION
+}
+
+enum FindingStatus {
+  OPEN
+  CAPA_ASSIGNED
+  PENDING_VERIFICATION
+  VERIFIED
+  CLOSED
+}
+
+// ==========================================
+// DOCUMENT CONTROL
+// ==========================================
+
+model Document {
+  id              String   @id @default(cuid())
+  docNumber       String   @unique @map("doc_number")
+  organizationId  String   @map("organization_id")
+  
+  // Document Details
+  title           String
+  type            DocumentType
+  version         String   @default("1.0")
+  description     String?  @db.Text
+  
+  // File
+  filePath        String   @map("file_path")
+  fileSize        Int?     @map("file_size")
+  fileType        String?  @map("file_type") // PDF, DOCX, etc.
+  
+  // Ownership
+  owner           String
+  department      String?
+  
+  // Approval Workflow
+  status          DocumentStatus
+  approvedBy      String?  @map("approved_by")
+  approvedDate    DateTime? @map("approved_date")
+  
+  // Effective Dates
+  effectiveDate   DateTime? @map("effective_date")
+  reviewDate      DateTime? @map("review_date")
+  nextReviewDate  DateTime? @map("next_review_date")
+  obsoleteDate    DateTime? @map("obsolete_date")
+  
+  // Linkages
+  linkedNCRIds    String[]  @map("linked_ncr_ids")
+  linkedCAPAIds   String[]  @map("linked_capa_ids")
+  linkedRiskIds   String[]  @map("linked_risk_ids")
+  
+  // Training
+  trainingRequired Boolean  @default(false) @map("training_required")
+  trainingRecords  TrainingAcknowledgment[]
+  
+  // Revision History
+  revisions       DocumentRevision[]
+  
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  createdBy       String   @map("created_by")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([type])
+  @@index([status])
+  @@map("documents")
+}
+
+model DocumentRevision {
+  id          String   @id @default(cuid())
+  documentId  String   @map("document_id")
+  version     String
+  changes     String   @db.Text
+  changedBy   String   @map("changed_by")
+  changeDate  DateTime @map("change_date")
+  reason      String?  @db.Text
+  
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@index([documentId])
+  @@map("document_revisions")
+}
+
+model TrainingAcknowledgment {
+  id          String   @id @default(cuid())
+  documentId  String   @map("document_id")
+  userId      String   @map("user_id")
+  userName    String   @map("user_name")
+  trainedDate DateTime @map("trained_date")
+  signature   String?  // Base64 signature
+  passed      Boolean  @default(true)
+  notes       String?  @db.Text
+  
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  
+  @@index([documentId])
+  @@index([userId])
+  @@map("training_acknowledgments")
+}
+
+enum DocumentType {
+  SOP
+  WORK_INSTRUCTION
+  FORM
+  QUALITY_MANUAL
+  SPECIFICATION
+  PROCEDURE
+  POLICY
+  DRAWING
+}
+
+enum DocumentStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  EFFECTIVE
+  UNDER_REVIEW
+  OBSOLETE
+}
+
+// ==========================================
+// FMEA (Failure Mode and Effects Analysis)
+// ==========================================
+
+model FMEA {
+  id              String   @id @default(cuid())
+  fmeaNumber      String   @unique @map("fmea_number")
+  organizationId  String   @map("organization_id")
+  
+  // FMEA Details
+  title           String
+  type            FMEAType
+  processName     String?  @map("process_name")
+  productName     String?  @map("product_name")
+  scope           String   @db.Text
+  
+  // Team
+  teamLead        String   @map("team_lead")
+  teamMembers     Json     // Array of team member names
+  
+  // Dates
+  startDate       DateTime @map("start_date")
+  lastReviewDate  DateTime? @map("last_review_date")
+  
+  // Status
+  status          FMEAStatus
+  
+  // Failure Modes
+  failureModes    FMEAFailureMode[]
+  
+  notes           String?  @db.Text
+  createdAt       DateTime @default(now()) @map("created_at")
+  createdBy       String   @map("created_by")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@index([organizationId])
+  @@index([type])
+  @@map("fmeas")
+}
+
+model FMEAFailureMode {
+  id              String   @id @default(cuid())
+  fmeaId          String   @map("fmea_id")
+  
+  // Process/Function
+  processStep     String   @map("process_step")
+  processFunction String   @map("process_function") @db.Text
+  
+  // Failure Mode
+  failureMode     String   @map("failure_mode") @db.Text
+  effectsOfFailure String  @map("effects_of_failure") @db.Text
+  potentialCauses String   @map("potential_causes") @db.Text
+  
+  // Current Controls
+  currentControls String?  @map("current_controls") @db.Text
+  
+  // Risk Assessment (RPN = S × O × D)
+  severity        Int      // 1-10: How severe is the effect?
+  occurrence      Int      // 1-10: How likely to occur?
+  detection       Int      // 1-10: How difficult to detect?
+  rpn             Int      // Risk Priority Number
+  
+  // Recommended Actions
+  recommendedActions String? @map("recommended_actions") @db.Text
+  responsiblePerson  String? @map("responsible_person")
+  targetDate         DateTime? @map("target_date")
+  actionsTaken       String?   @db.Text @map("actions_taken")
+  
+  // Residual Risk (after actions)
+  residualSeverity    Int?   @map("residual_severity")
+  residualOccurrence  Int?   @map("residual_occurrence")
+  residualDetection   Int?   @map("residual_detection")
+  residualRPN         Int?   @map("residual_rpn")
+  
+  // Status
+  status          FMEAItemStatus
+  
+  // Linkages
+  linkedCAPAIds   String[] @map("linked_capa_ids")
+  
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  
+  fmea            FMEA @relation(fields: [fmeaId], references: [id], onDelete: Cascade)
+  
+  @@index([fmeaId])
+  @@index([rpn])
+  @@map("fmea_failure_modes")
+}
+
+enum FMEAType {
+  PROCESS_FMEA
+  DESIGN_FMEA
+  SYSTEM_FMEA
+}
+
+enum FMEAStatus {
+  IN_PROGRESS
+  COMPLETED
+  UNDER_REVIEW
+  APPROVED
+}
+
+enum FMEAItemStatus {
+  OPEN
+  ACTION_PLANNED
+  ACTION_IN_PROGRESS
+  ACTION_COMPLETED
+  CLOSED
+}
+
+// ============================================
+// Priority 4: Training Management
+// ============================================
+
+model TrainingRequirement {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  trainingTitle         String
+  trainingCategory      String
+  description           String?  @db.Text
+  frequency             String
+  validityPeriod        Int?
+  minimumScore          Int?
+  isISO9001Required     Boolean  @default(false)
+  isISO13485Required    Boolean  @default(false)
+  isMandatory           Boolean  @default(true)
+  applicableRoles       String[]
+  instructor            String?
+  estimatedDuration     Int?
+  trainingMethod        String?
+  assessmentRequired    Boolean  @default(false)
+  prerequisites         String[]
+  createdBy             String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  records               TrainingRecord[]
+
+  @@index([organizationId])
+  @@index([trainingCategory])
+}
+
+model TrainingRecord {
+  id                    String   @id @default(uuid())
+  requirementId         String
+  requirement           TrainingRequirement @relation(fields: [requirementId], references: [id])
+  employeeId            String
+  employeeName          String
+  completionDate        DateTime
+  expiryDate            DateTime?
+  assessmentScore       Int?
+  assessmentPassed      Boolean?
+  certificationIssued   Boolean  @default(false)
+  certificationNumber   String?
+  instructor            String?
+  trainingDuration      Int?
+  effectiveness         String?
+  effectivenessNotes    String?  @db.Text
+  attachments           Json?
+  completedBy           String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([requirementId])
+  @@index([employeeId])
+  @@index([expiryDate])
+}
+
+model TrainingSchedule {
+  id                    String   @id @default(uuid())
+  requirementId         String
+  scheduledDate         DateTime
+  location              String?
+  instructor            String?
+  maxAttendees          Int?
+  currentAttendees      Int      @default(0)
+  status                String
+  notes                 String?  @db.Text
+  createdBy             String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([requirementId])
+  @@index([scheduledDate])
+}
+
+// ============================================
+// Priority 4: Change Control
+// ============================================
+
+model ChangeControl {
+  id                            String   @id @default(uuid())
+  changeNumber                  String   @unique
+  organizationId                String
+  changeType                    String
+  title                         String
+  description                   String   @db.Text
+  reasonForChange               String   @db.Text
+  urgency                       String
+  requestedBy                   String
+  requestDate                   DateTime
+  submittedDate                 DateTime?
+  department                    String?
+  affectedProducts              String[]
+  affectedDocuments             String[]
+  estimatedCost                 Float?
+  estimatedImplementationTime   Int?
+  customerImpact                Boolean  @default(false)
+  regulatoryImpact              Boolean  @default(false)
+  validationRequired            Boolean  @default(false)
+  status                        String
+  approvalStatus                String
+  impactAssessment              Json?
+  proposedImplementationPlan    String?  @db.Text
+  requiredApprovers             String[]
+  approvedDate                  DateTime?
+  implementationDate            DateTime?
+  implementedBy                 String?
+  actualCost                    Float?
+  actualDuration                Int?
+  verificationResults           String?  @db.Text
+  deviationsFromPlan            String?  @db.Text
+  lessonsLearned                String?  @db.Text
+  closedDate                    DateTime?
+  effectivenessReview           String?  @db.Text
+  objectivesMet                 Boolean?
+  reviewedBy                    String?
+  closureNotes                  String?  @db.Text
+  attachments                   Json?
+  createdBy                     String
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+
+  approvals                     ChangeApproval[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([changeType])
+}
+
+model ChangeApproval {
+  id                    String   @id @default(uuid())
+  changeControlId       String
+  changeControl         ChangeControl @relation(fields: [changeControlId], references: [id])
+  approverRole          String
+  approvalLevel         Int
+  status                String
+  approvedBy            String?
+  approvalDate          DateTime?
+  requestedDate         DateTime
+  comments              String?  @db.Text
+  conditions            String[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([changeControlId])
+  @@index([status])
+}
+
+// ============================================
+// Priority 4: Equipment Calibration
+// ============================================
+
+model CalibrationEquipment {
+  id                    String   @id @default(uuid())
+  equipmentId           String   @unique
+  organizationId        String
+  equipmentName         String
+  equipmentType         String
+  manufacturer          String
+  model                 String
+  serialNumber          String
+  calibrationFrequency  Int
+  calibrationMethod     String
+  acceptanceCriteria    Json
+  criticalEquipment     Boolean  @default(false)
+  location              String
+  responsiblePerson     String
+  status                String
+  calibrationStatus     String?
+  lastCalibrationDate   DateTime?
+  nextCalibrationDue    DateTime
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  calibrationRecords    CalibrationRecord[]
+
+  @@index([organizationId])
+  @@index([nextCalibrationDue])
+  @@index([criticalEquipment])
+}
+
+model CalibrationRecord {
+  id                        String   @id @default(uuid())
+  equipmentId               String
+  equipment                 CalibrationEquipment @relation(fields: [equipmentId], references: [equipmentId])
+  calibrationDate           DateTime
+  calibratedBy              String
+  calibrationLab            String?
+  certificateNumber         String
+  standardsUsed             String[]
+  measurementResults        Json
+  asFoundCondition          String
+  asLeftCondition           String
+  uncertaintyValue          Float?
+  uncertaintyUnit           String?
+  environmentalConditions   Json?
+  calibrationCost           Float?
+  nextCalibrationDate       DateTime
+  passed                    Boolean
+  notes                     String?  @db.Text
+  attachments               Json?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  @@index([equipmentId])
+  @@index([calibrationDate])
+}
+
+// ============================================
+// Priority 4: Customer Complaints
+// ============================================
+
+model CustomerComplaint {
+  id                        String   @id @default(uuid())
+  complaintNumber           String   @unique
+  organizationId            String
+  customerId                String
+  customerName              String
+  contactPerson             String
+  contactEmail              String
+  contactPhone              String?
+  complaintDate             DateTime
+  receivedDate              DateTime
+  receivedVia               String
+  productId                 String?
+  productName               String?
+  lotNumber                 String?
+  serialNumber              String?
+  quantityAffected          Int?
+  complaintDescription      String   @db.Text
+  severity                  String
+  category                  String
+  status                    String
+  isReportable              Boolean  @default(false)
+  reportedBy                String
+  acknowledgementSent       Boolean  @default(false)
+  acknowledgementDate       DateTime?
+  acknowledgedBy            String?
+  initialResponse           String?  @db.Text
+  expectedResolutionDate    DateTime?
+  investigatorId            String?
+  investigationStartDate    DateTime?
+  investigationFindings     String?  @db.Text
+  rootCause                 String?  @db.Text
+  contributingFactors       String[]
+  evidenceCollected         Json?
+  immediateActions          String?  @db.Text
+  requiresCAPA              Boolean  @default(false)
+  capaId                    String?
+  productReturnRequired     Boolean  @default(false)
+  isValidComplaint          Boolean?
+  resolutionDescription     String?  @db.Text
+  resolutionType            String?
+  compensationAmount        Float?
+  resolutionDate            DateTime?
+  resolvedBy                String?
+  customerNotified          Boolean  @default(false)
+  preventiveActions         String?  @db.Text
+  closedDate                DateTime?
+  closedBy                  String?
+  customerSatisfied         Boolean?
+  customerFeedback          String?  @db.Text
+  closureNotes              String?  @db.Text
+  attachments               Json?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+
+  communications            ComplaintCommunication[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([severity])
+  @@index([customerId])
+}
+
+model ComplaintCommunication {
+  id                    String   @id @default(uuid())
+  complaintId           String
+  complaint             CustomerComplaint @relation(fields: [complaintId], references: [id])
+  communicationType     String
+  content               String   @db.Text
+  sentBy                String
+  sentDate              DateTime
+  createdAt             DateTime @default(now())
+
+  @@index([complaintId])
+  @@index([sentDate])
+}
+
+// ============================================
+// Priority 4: Material Review Board (MRB)
+// ============================================
+
+model MaterialReviewBoard {
+  id                            String   @id @default(uuid())
+  mrbNumber                     String   @unique
+  organizationId                String
+  ncrId                         String?
+  productId                     String
+  productName                   String
+  lotNumber                     String?
+  quantity                      Int
+  unitOfMeasure                 String
+  location                      String
+  nonconformanceDescription     String   @db.Text
+  severity                      String
+  affectedCharacteristics       String[]
+  measurementData               Json?
+  photos                        Json[]
+  submittedBy                   String
+  submittedDate                 DateTime
+  urgency                       String
+  customerImpact                Boolean  @default(false)
+  estimatedValue                Float?
+  status                        String
+  meetingDate                   DateTime?
+  chairperson                   String?
+  attendees                     String[]
+  meetingLocation               String?
+  disposition                   String?
+  dispositionJustification      String?  @db.Text
+  conditions                    String[]
+  reworkInstructions            String?  @db.Text
+  inspectionRequirements        String?  @db.Text
+  approvalLevel                 String?
+  approvers                     Json?
+  dispositionDate               DateTime?
+  effectiveDate                 DateTime?
+  expirationDate                DateTime?
+  limitedQuantity               Int?
+  costImpact                    Float?
+  scheduleImpact                Int?
+  customerNotificationRequired  Boolean  @default(false)
+  executedBy                    String?
+  executionDate                 DateTime?
+  actualQuantityProcessed       Int?
+  executionNotes                String?  @db.Text
+  verificationResults           String?  @db.Text
+  finalInspectionPassed         Boolean?
+  actualCost                    Float?
+  closedDate                    DateTime?
+  closedBy                      String?
+  closureNotes                  String?  @db.Text
+  lessonsLearned                String?  @db.Text
+  preventiveActionsRequired     Boolean  @default(false)
+  capaId                        String?
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([severity])
+  @@index([productId])
+}
+
+// ============================================
+// Priority 5: Scheduled Reporting
+// ============================================
+
+model ScheduledReport {
+  id                    String   @id @default(uuid())
+  organizationId        String
+  reportType            String
+  frequency             String
+  recipients            String[]
+  format                String
+  nextRunDate           DateTime
+  lastRunDate           DateTime?
+  active                Boolean  @default(true)
+  createdBy             String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([nextRunDate])
+  @@index([active])
+}
+

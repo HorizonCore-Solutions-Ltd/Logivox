@@ -635,29 +635,29 @@ Begin with order picking as it shows immediate ROI:
 ### Common Voice Workflows
 
 **Receiving:**
-```
+\`\`\`
 System: "Scan pallet license plate"
 Worker: "LP-12345"
 System: "PO 98765, 50 units expected"
 Worker: "50 units received"
 System: "Putaway to location A-05-12"
-```
+\`\`\`
 
 **Picking:**
-```
+\`\`\`
 System: "Go to aisle 3, section B, level 2"
 Worker: "Arrived"
 System: "Pick 5 units, SKU 67890, check digit 4"
 Worker: "4... 5 units"
 System: "Confirmed. Next location: aisle 3, section D"
-```
+\`\`\`
 
 **Cycle Counting:**
-```
+\`\`\`
 System: "Count location F-12-05"
 Worker: "20 units"
 System: "Expected 20. Correct. Next location F-12-06"
-```
+\`\`\`
 
 ## Integration with LogiVox WMS
 
@@ -823,19 +823,19 @@ export const tenantMiddleware = (req, res, next) => {
 ## Security Best Practices
 
 ### 1. Request-Level Tenant Validation
-```typescript
+\`\`\`typescript
 // Validate tenant on every request
 if (req.tenantId !== resource.tenantId) {
   throw new ForbiddenError()
 }
-```
+\`\`\`
 
 ### 2. Database-Level Enforcement
-```sql
+\`\`\`sql
 -- Row-level security policies
 CREATE POLICY tenant_isolation ON orders
   USING (tenant_id = current_setting('app.tenant_id')::uuid);
-```
+\`\`\`
 
 ### 3. API Design
 - Include tenant_id in JWT tokens
@@ -845,14 +845,14 @@ CREATE POLICY tenant_isolation ON orders
 ## Performance Optimization
 
 ### Connection Pooling
-```typescript
+\`\`\`typescript
 // Tenant-aware connection pooling
 const pool = createPool({
   max: 100,
   idleTimeoutMillis: 30000,
   connectionTimeoutMillis: 2000,
 })
-```
+\`\`\`
 
 ### Caching Strategy
 - Cache per tenant

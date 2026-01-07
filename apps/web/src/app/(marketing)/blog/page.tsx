@@ -4,12 +4,14 @@ import * as React from "react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { AutoSuggestSearch } from "@/components/ui/auto-suggest-search"
 import Link from "next/link"
-import { Calendar, Clock, ArrowRight, Search, TrendingUp, Bookmark } from "lucide-react"
+import { Calendar, Clock, ArrowRight, TrendingUp, Bookmark } from "lucide-react"
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = React.useState("All Posts")
   const [searchQuery, setSearchQuery] = React.useState("")
+  const [suggestions, setSuggestions] = React.useState<Array<{ id: string; text: string; type?: "popular" | "recent" | "category" | "page"; category?: string }>>([])
 
   // Sample blog posts - will be replaced with real data later
   const featuredPost = {
@@ -158,14 +160,39 @@ export default function BlogPage() {
 
             {/* Search Bar */}
             <div className="pt-4">
-              <div className="relative max-w-md mx-auto">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <input
-                  type="search"
-                  placeholder="Search articles..."
+              <div className="max-w-md mx-auto">
+                <AutoSuggestSearch
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-input bg-background rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+                  onValueChange={(value) => {
+                    setSearchQuery(value)
+                    // Generate suggestions based on blog content
+                    if (value.trim()) {
+                      const filtered = blogPosts
+                        .filter(post => 
+                          post.title.toLowerCase().includes(value.toLowerCase()) ||
+                          post.excerpt.toLowerCase().includes(value.toLowerCase()) ||
+                          post.category.toLowerCase().includes(value.toLowerCase())
+                        )
+                        .slice(0, 5)
+                        .map(post => ({
+                          id: post.slug,
+                          text: post.title,
+                          type: "page" as const,
+                          category: post.category
+                        }))
+                      setSuggestions(filtered)
+                    } else {
+                      setSuggestions([])
+                    }
+                  }}
+                  suggestions={suggestions}
+                  onSuggestionSelect={(suggestion) => {
+                    setSearchQuery(suggestion.text)
+                  }}
+                  placeholder="Search articles..."
+                  contextType="blog"
+                  className="h-12"
+                  showHistory={true}
                 />
               </div>
             </div>

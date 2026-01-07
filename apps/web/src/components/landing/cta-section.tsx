@@ -3,155 +3,67 @@
 import * as React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { 
-  ArrowRight,
-  Play,
-  CheckCircle,
-  Calendar,
-  Sparkles,
-  Rocket
-} from "lucide-react"
+import { ArrowRight, CheckCircle } from "lucide-react"
 
 export function CTASection() {
   const benefits = [
+    "30-day money-back guarantee",
     "No credit card required",
-    "14-day free trial",
-    "Cancel anytime",
-    "Setup in minutes"
+    "Cancel anytime"
   ]
 
   return (
-    <section className="py-24 relative overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary-600/10 via-primary-500/5 to-background" />
-      <div className="absolute inset-0 bg-grid-small-black/[0.2] dark:bg-grid-small-white/[0.2]" />
-
+    <section className="py-20 md:py-28 relative overflow-hidden">
+      {/* Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
+      
       <div className="container-enterprise relative">
-        <div className="max-w-4xl mx-auto">
-          {/* Main CTA Card */}
-          <div className="rounded-2xl border-2 border-primary/20 bg-gradient-to-br from-background via-background to-primary/5 p-12 shadow-xl backdrop-blur-sm">
-            <div className="text-center space-y-6">
-              {/* Badge */}
-              <div className="flex justify-center">
-                <Badge className="px-4 py-2 text-sm">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  Start Your Free Trial Today
-                </Badge>
-              </div>
-
-              {/* Headline */}
-              <div className="space-y-4">
-                <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-                  Ready to transform your
-                  <span className="block bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
-                    supply chain operations?
-                  </span>
-                </h2>
-                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                  Join 500+ warehouses across 40+ countries who trust LogiVox WMS. 
-                  Get industry-leading warehouse management with intelligent automation, 
-                  wave picking, quality control, and real-time visibility into every operation.
-                </p>
-              </div>
-
-              {/* Benefits list */}
-              <div className="flex flex-wrap justify-center gap-6 py-4">
-                {benefits.map((benefit) => (
-                  <div
-                    key={benefit}
-                    className="flex items-center space-x-2 text-sm"
-                  >
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span className="font-medium">{benefit}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                <Button size="lg" className="text-lg px-8 py-6 shadow-lg hover:shadow-xl transition-shadow" asChild>
-                  <Link href="/sign-up">
-                    <Rocket className="mr-2 h-5 w-5" />
-                    Start Free Trial
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="text-lg px-8 py-6 border-2" 
-                  asChild
-                >
-                  <Link href="/demo">
-                    <Play className="mr-2 h-5 w-5" />
-                    Watch Demo
-                  </Link>
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="text-lg px-8 py-6 border-2" 
-                  asChild
-                >
-                  <Link href="/contact">
-                    <Calendar className="mr-2 h-5 w-5" />
-                    Schedule Call
-                  </Link>
-                </Button>
-              </div>
-
-              {/* Trust indicators */}
-              <div className="pt-8 border-t">
-                <p className="text-sm text-muted-foreground mb-4">
-                  Join 500+ warehouses already using LogiVox
-                </p>
-                <div className="flex justify-center items-center space-x-8 text-xs text-muted-foreground">
-                  <div className="flex items-center space-x-1">
-                    <CheckCircle className="h-3 w-3 text-primary" />
-                    <span>Enterprise Ready</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center space-x-1">
-                    <CheckCircle className="h-3 w-3 text-primary" />
-                    <span>Mobile Apps</span>
-                  </div>
-                  <span>•</span>
-                  <div className="flex items-center space-x-1">
-                    <CheckCircle className="h-3 w-3 text-primary" />
-                    <span>99.9% Accuracy</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        <div className="max-w-3xl mx-auto text-center space-y-8">
+          {/* Headline */}
+          <div className="space-y-4">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
+              Ready to eliminate warehouse chaos?
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              Join growing businesses who've cut picking errors by 95% and sped up fulfillment 3x with LogiVox.
+            </p>
           </div>
 
-          {/* Secondary CTAs */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <div className="text-center p-6 rounded-lg border bg-card hover:bg-accent transition-colors">
-              <div className="text-2xl font-bold mb-2">500+</div>
-              <div className="text-sm text-muted-foreground">
-                Warehouses powered globally
+          {/* Benefits */}
+          <div className="flex flex-wrap justify-center gap-6 py-6">
+            {benefits.map((benefit) => (
+              <div key={benefit} className="flex items-center space-x-2">
+                <CheckCircle className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium">{benefit}</span>
               </div>
-            </div>
-            <div className="text-center p-6 rounded-lg border bg-card hover:bg-accent transition-colors">
-              <div className="text-2xl font-bold mb-2">100K+</div>
-              <div className="text-sm text-muted-foreground">
-                Orders fulfilled daily
-              </div>
-            </div>
-            <div className="text-center p-6 rounded-lg border bg-card hover:bg-accent transition-colors">
-              <div className="text-2xl font-bold mb-2">99.9%</div>
-              <div className="text-sm text-muted-foreground">
-                Picking accuracy rate
-              </div>
-            </div>
+            ))}
           </div>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+            <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25" asChild>
+              <Link href="/sign-up">
+                Start Free 30-Day Trial
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" className="text-lg px-8 py-6" asChild>
+              <Link href="/demo">
+                Schedule a Demo
+              </Link>
+            </Button>
+          </div>
+
+          {/* Trust line */}
+          <p className="text-sm text-muted-foreground pt-6">
+            Questions? Call us at <span className="font-semibold text-foreground">(555) 123-4567</span> or{" "}
+            <Link href="/contact" className="text-primary hover:underline">
+              chat with our team
+            </Link>
+          </p>
         </div>
       </div>
-
-      {/* Bottom gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
     </section>
   )
 }

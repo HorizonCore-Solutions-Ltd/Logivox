@@ -6,11 +6,10 @@ import { Footer } from '@/components/layout/footer'
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { AutoSuggestSearch } from "@/components/ui/auto-suggest-search"
 import Link from "next/link"
 import { 
   BookOpen,
-  Search,
   Code,
   Zap,
   Shield,
@@ -25,6 +24,9 @@ import {
 } from "lucide-react"
 
 export default function DocsPage() {
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [suggestions, setSuggestions] = React.useState<Array<{ id: string; text: string; type?: string; category?: string }>>([])
+
   const quickStart = [
     {
       icon: Rocket,
@@ -187,13 +189,36 @@ export default function DocsPage() {
 
             {/* Search */}
             <div className="max-w-2xl mx-auto mt-12">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                <Input 
-                  placeholder="Search documentation..." 
-                  className="pl-10 h-12 text-base"
-                />
-              </div>
+              <AutoSuggestSearch
+                value={searchQuery}
+                onValueChange={(value) => {
+                  setSearchQuery(value)
+                  // Generate contextual suggestions
+                  if (value.trim()) {
+                    const allItems = [...quickStart, ...apiDocs, ...categories]
+                    const filtered = allItems
+                      .filter(item => 
+                        item.title.toLowerCase().includes(value.toLowerCase()) ||
+                        item.description?.toLowerCase().includes(value.toLowerCase())
+                      )
+                      .slice(0, 6)
+                      .map(item => ({
+                        id: item.title,
+                        text: item.title,
+                        type: "page" as const,
+                        category: item.description || "Documentation"
+                      }))
+                    setSuggestions(filtered)
+                  } else {
+                    setSuggestions([])
+                  }
+                }}
+                suggestions={suggestions}
+                placeholder="Search documentation..."
+                contextType="docs"
+                className="h-12 text-base"
+                showHistory={true}
+              />
             </div>
           </div>
         </section>

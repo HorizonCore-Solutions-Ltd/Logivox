@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { 
+import {
   Building2,
   Menu,
   X,
@@ -26,7 +26,12 @@ import {
   Warehouse,
   ClipboardCheck,
   Radio,
-  AlertTriangle
+  AlertTriangle,
+  ArrowLeftRight,
+  Box,
+  BadgeCheck,
+  Briefcase,
+  Gift
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
@@ -102,6 +107,42 @@ export function Navigation() {
       href: "/solutions/transportation",
     },
     {
+      title: "Cross-Docking Operations",
+      description: "Fast-moving goods with minimal storage",
+      icon: ArrowLeftRight,
+      href: "/solutions/cross-docking",
+    },
+    {
+      title: "Kitting & Assembly",
+      description: "Product bundling and light assembly",
+      icon: Box,
+      href: "/solutions/kitting",
+    },
+    {
+      title: "Quality Control & Inspection",
+      description: "AQL sampling and defect management",
+      icon: BadgeCheck,
+      href: "/solutions/quality-control",
+    },
+    {
+      title: "Labor Management System",
+      description: "Workforce productivity and time tracking",
+      icon: Briefcase,
+      href: "/solutions/labor-management",
+    },
+    {
+      title: "3PL Multi-Client Operations",
+      description: "Complete client segregation and billing",
+      icon: Building2,
+      href: "/solutions/3pl",
+    },
+    {
+      title: "Value-Added Services",
+      description: "Labeling, bundling, and customization",
+      icon: Gift,
+      href: "/solutions/value-added-services",
+    },
+    {
       title: "AI Analytics & Forecasting",
       description: "Predictive insights and demand forecasting",
       icon: LineChart,
@@ -148,24 +189,75 @@ export function Navigation() {
     },
   ]
 
+  const servicesSupport = [
+    {
+      title: "24/7 Support Center",
+      description: "Enterprise-grade support with guaranteed SLA",
+      icon: Phone,
+      href: "/services/support",
+    },
+    {
+      title: "Implementation Services",
+      description: "Expert deployment and go-live support",
+      icon: Zap,
+      href: "/services/implementation",
+    },
+    {
+      title: "Training & Certification",
+      description: "Professional training programs for your team",
+      icon: Users,
+      href: "/services/training",
+    },
+    {
+      title: "Custom Development",
+      description: "Tailored solutions for unique requirements",
+      icon: FileText,
+      href: "/services/custom-development",
+    },
+    {
+      title: "Managed Services",
+      description: "We manage your WMS so you can focus on growth",
+      icon: Shield,
+      href: "/services/managed-services",
+    },
+    {
+      title: "Partner Program",
+      description: "Join our global partner network",
+      icon: Globe,
+      href: "/services/partners",
+    },
+  ]
+
   const resources = [
     {
       title: "Documentation",
-      description: "Complete guides and references",
+      description: "Complete guides and API reference",
       icon: BookOpen,
       href: "/docs",
     },
     {
-      title: "Blog",
-      description: "Latest news and insights",
+      title: "Blog & Insights",
+      description: "Latest news and industry insights",
       icon: FileText,
       href: "/blog",
     },
     {
-      title: "Help Center",
-      description: "Get answers to your questions",
-      icon: Users,
+      title: "Case Studies",
+      description: "Customer success stories and ROI",
+      icon: BarChart3,
+      href: "/resources/case-studies",
+    },
+    {
+      title: "Knowledge Base",
+      description: "Self-service support articles",
+      icon: Database,
       href: "/help",
+    },
+    {
+      title: "Supported Devices",
+      description: "Compatible hardware and system requirements",
+      icon: Radio,
+      href: "/supported-devices",
     },
   ]
 
@@ -249,6 +341,35 @@ export function Navigation() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
+              {/* Services & Support */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Services & Support</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    {servicesSupport.map((item) => (
+                      <li key={item.title}>
+                        <NavigationMenuLink asChild>
+                          <Link
+                            href={item.href}
+                            className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                          >
+                            <div className="flex items-center space-x-2 mb-1">
+                              <item.icon className="h-4 w-4 text-primary" />
+                              <div className="text-sm font-medium leading-none">
+                                {item.title}
+                              </div>
+                            </div>
+                            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                              {item.description}
+                            </p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                    ))}
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+
               {/* Pricing */}
               <NavigationMenuItem>
                 <Link href="/pricing" legacyBehavior passHref>
@@ -285,15 +406,6 @@ export function Navigation() {
                     ))}
                   </ul>
                 </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              {/* About */}
-              <NavigationMenuItem>
-                <Link href="/about" legacyBehavior passHref>
-                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                    About
-                  </NavigationMenuLink>
-                </Link>
               </NavigationMenuItem>
 
               {/* Contact */}
@@ -373,6 +485,52 @@ export function Navigation() {
                   </div>
                 </div>
 
+                {/* Services & Support */}
+                <div>
+                  <h3 className="font-semibold mb-3">Services & Support</h3>
+                  <div className="space-y-2">
+                    {servicesSupport.map((item) => (
+                      <Link
+                        key={item.title}
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-start space-x-3 p-2 rounded-md hover:bg-accent transition-colors"
+                      >
+                        <item.icon className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <div className="font-medium text-sm">{item.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {item.description}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Resources */}
+                <div>
+                  <h3 className="font-semibold mb-3">Resources</h3>
+                  <div className="space-y-2">
+                    {resources.map((item) => (
+                      <Link
+                        key={item.title}
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="flex items-start space-x-3 p-2 rounded-md hover:bg-accent transition-colors"
+                      >
+                        <item.icon className="h-5 w-5 text-primary mt-0.5" />
+                        <div>
+                          <div className="font-medium text-sm">{item.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {item.description}
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Quick Links */}
                 <div className="space-y-2 pt-4 border-t">
                   <Link
@@ -381,13 +539,6 @@ export function Navigation() {
                     className="block p-2 rounded-md hover:bg-accent transition-colors font-medium text-sm"
                   >
                     Pricing
-                  </Link>
-                  <Link
-                    href="/about"
-                    onClick={() => setMobileOpen(false)}
-                    className="block p-2 rounded-md hover:bg-accent transition-colors font-medium text-sm"
-                  >
-                    About
                   </Link>
                   <Link
                     href="/contact"

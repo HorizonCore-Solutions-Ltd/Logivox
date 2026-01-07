@@ -5,7 +5,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
+import { AutoSuggestSearch } from "@/components/ui/auto-suggest-search"
 import {
   HelpCircle,
   BookOpen,
@@ -13,7 +13,6 @@ import {
   Mail,
   Video,
   FileText,
-  Search,
   ArrowRight,
   CheckCircle2,
   Zap,
@@ -21,6 +20,9 @@ import {
 } from "lucide-react"
 
 export default function HelpCenterPage() {
+  const [searchQuery, setSearchQuery] = React.useState("")
+  const [suggestions, setSuggestions] = React.useState<Array<{ id: string; text: string; type?: "popular" | "recent" | "category" | "page"; category?: string }>>([])
+
   const helpCategories = [
     {
       icon: BookOpen,
@@ -116,16 +118,47 @@ export default function HelpCenterPage() {
             <p className="mt-6 text-lg text-muted-foreground">
               Search our knowledge base or browse categories to find answers to your questions
             </p>
-            <div className="mt-8 flex items-center space-x-2 max-w-2xl mx-auto">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search for help articles..."
-                  className="pl-10 h-12"
-                />
-              </div>
-              <Button size="lg">Search</Button>
+            <div className="mt-8 max-w-2xl mx-auto">
+              <AutoSuggestSearch
+                value={searchQuery}
+                onValueChange={(value) => {
+                  setSearchQuery(value)
+                  // Generate help-specific suggestions
+                  if (value.trim()) {
+                    const categoryResults = helpCategories
+                      .filter(cat => 
+                        cat.title.toLowerCase().includes(value.toLowerCase()) ||
+                        cat.description.toLowerCase().includes(value.toLowerCase())
+                      )
+                      .map(cat => ({
+                        id: cat.href,
+                        text: cat.title,
+                        type: "category" as const,
+                        category: cat.description
+                      }))
+                    
+                    const articleResults = popularArticles
+                      .filter(article => 
+                        article.toLowerCase().includes(value.toLowerCase())
+                      )
+                      .map((article, idx) => ({
+                        id: `article-${idx}`,
+                        text: article,
+                        type: "page" as const,
+                        category: "Help Article"
+                      }))
+                    
+                    setSuggestions([...categoryResults, ...articleResults].slice(0, 6))
+                  } else {
+                    setSuggestions([])
+                  }
+                }}
+                suggestions={suggestions}
+                placeholder="Search for help articles..."
+                contextType="help"
+                className="h-12"
+                showHistory={true}
+              />
             </div>
           </div>
         </div>
