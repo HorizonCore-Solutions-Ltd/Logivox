@@ -1,22 +1,22 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { z } from "zod"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const updateMemberSchema = z.object({
   role: z.enum(["ADMIN", "MEMBER", "VIEWER"]),
-})
+});
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string; memberId: string } }
+  { params }: { params: { id: string; memberId: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Verify user is admin of this organization
@@ -26,18 +26,18 @@ export async function PATCH(
         organizationId: params.id,
         role: "ADMIN",
       },
-    })
+    });
 
     if (!adminMembership) {
       return NextResponse.json(
         { message: "Only admins can update member roles" },
-        { status: 403 }
-      )
+        { status: 403 },
+      );
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const { role } = updateMemberSchema.parse(body)
+    const body = await request.json();
+    const { role } = updateMemberSchema.parse(body);
 
     // Get the target member
     const targetMember = await prisma.organizationMember.findUnique({
@@ -47,18 +47,21 @@ export async function PATCH(
       include: {
         user: true,
       },
-    })
+    });
 
     if (!targetMember || targetMember.organizationId !== params.id) {
-      return NextResponse.json({ message: "Member not found" }, { status: 404 })
+      return NextResponse.json(
+        { message: "Member not found" },
+        { status: 404 },
+      );
     }
 
     // Prevent changing own role
     if (targetMember.userId === session.user.id) {
       return NextResponse.json(
         { message: "You cannot change your own role" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Count admins in organization
@@ -67,14 +70,14 @@ export async function PATCH(
         organizationId: params.id,
         role: "ADMIN",
       },
-    })
+    });
 
     // Prevent removing last admin
     if (targetMember.role === "ADMIN" && adminCount === 1) {
       return NextResponse.json(
         { message: "Cannot change role of the last admin" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Update member role
@@ -91,7 +94,7 @@ export async function PATCH(
           },
         },
       },
-    })
+    });
 
     // Create activity log
     await prisma.activityLog.create({
@@ -108,33 +111,33 @@ export async function PATCH(
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
       },
-    })
+    });
 
-    return NextResponse.json(updatedMember)
+    return NextResponse.json(updatedMember);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: "Validation error", errors: error.errors },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
-    console.error("Member update error:", error)
+    console.error("Member update error:", error);
     return NextResponse.json(
       { message: "Failed to update member" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string; memberId: string } }
+  { params }: { params: { id: string; memberId: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Verify user is admin of this organization
@@ -144,13 +147,13 @@ export async function DELETE(
         organizationId: params.id,
         role: "ADMIN",
       },
-    })
+    });
 
     if (!adminMembership) {
       return NextResponse.json(
         { message: "Only admins can remove members" },
-        { status: 403 }
-      )
+        { status: 403 },
+      );
     }
 
     // Get the target member
@@ -161,18 +164,21 @@ export async function DELETE(
       include: {
         user: true,
       },
-    })
+    });
 
     if (!targetMember || targetMember.organizationId !== params.id) {
-      return NextResponse.json({ message: "Member not found" }, { status: 404 })
+      return NextResponse.json(
+        { message: "Member not found" },
+        { status: 404 },
+      );
     }
 
     // Prevent removing self
     if (targetMember.userId === session.user.id) {
       return NextResponse.json(
         { message: "You cannot remove yourself from the organization" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Count admins in organization
@@ -181,20 +187,20 @@ export async function DELETE(
         organizationId: params.id,
         role: "ADMIN",
       },
-    })
+    });
 
     // Prevent removing last admin
     if (targetMember.role === "ADMIN" && adminCount === 1) {
       return NextResponse.json(
         { message: "Cannot remove the last admin" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Delete member
     await prisma.organizationMember.delete({
       where: { id: params.memberId },
-    })
+    });
 
     // Create activity log
     await prisma.activityLog.create({
@@ -210,14 +216,14 @@ export async function DELETE(
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
       },
-    })
+    });
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Member delete error:", error)
+    console.error("Member delete error:", error);
     return NextResponse.json(
       { message: "Failed to delete member" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

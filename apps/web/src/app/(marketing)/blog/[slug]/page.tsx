@@ -1,20 +1,38 @@
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { Calendar, Clock, ArrowLeft, Share2, Bookmark, Twitter, Linkedin, Facebook, Link2 } from "lucide-react"
-import { notFound } from "next/navigation"
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import {
+  Calendar,
+  Clock,
+  ArrowLeft,
+  Share2,
+  Bookmark,
+  Twitter,
+  Linkedin,
+  Facebook,
+  Link2,
+} from "lucide-react";
+import { notFound } from "next/navigation";
 
 // Sample blog content - In production, this would come from a CMS or database
 const blogArticles: Record<string, any> = {
   "business-owner-wishlist-premium-features": {
-    title: "Business Owner's Wishlist: Premium Features That Transform Your WMS",
+    title:
+      "Business Owner's Wishlist: Premium Features That Transform Your WMS",
     author: "Logivox Product Team",
     authorRole: "Strategic Planning",
     date: "2026-01-05",
     readTime: "15 min read",
     category: "Business",
-    excerpt: "If I owned a warehouse business, here are the 15 premium features I'd demand from my WMS to maximize ROI and competitive advantage. Real talk from an owner's perspective.",
+    excerpt:
+      "If I owned a warehouse business, here are the 15 premium features I'd demand from my WMS to maximize ROI and competitive advantage. Real talk from an owner's perspective.",
     content: `
 ## 🎯 The Business Owner's Perspective
 
@@ -519,7 +537,7 @@ Choose wisely. Choose data-driven. Choose ROI-focused.
 [Start Free Trial](#) | [Schedule Demo](#) | [Calculate Your ROI](#)
 
 *This article reflects real business analysis based on decades of warehouse operations experience and actual customer data. Your results may vary based on industry, scale, and implementation quality.*
-    `
+    `,
   },
   "voice-enabled-warehouse-operations": {
     title: "Voice-Enabled Warehouse Operations: The Future is Here",
@@ -528,7 +546,8 @@ Choose wisely. Choose data-driven. Choose ROI-focused.
     date: "2026-01-01",
     readTime: "8 min read",
     category: "Technology",
-    excerpt: "How voice technology is revolutionizing warehouse operations with hands-free picking, packing, and inventory management.",
+    excerpt:
+      "How voice technology is revolutionizing warehouse operations with hands-free picking, packing, and inventory management.",
     content: `
 ## Introduction
 
@@ -723,10 +742,19 @@ LogiVox's comprehensive voice solution makes implementation simple, with 500+ pr
 **Ready to go voice-enabled?** [Schedule a demo](/contact?type=demo) or [start your free trial](/sign-up) to experience voice operations in action.
     `,
     relatedArticles: [
-      { slug: "wave-picking-optimization", title: "Wave Picking Optimization: Increase Efficiency by 50%" },
-      { slug: "ai-powered-inventory-forecasting", title: "AI-Powered Inventory Forecasting: Reduce Stockouts by 40%" },
-      { slug: "multi-tenant-architecture-best-practices", title: "Multi-Tenant Architecture: Best Practices" }
-    ]
+      {
+        slug: "wave-picking-optimization",
+        title: "Wave Picking Optimization: Increase Efficiency by 50%",
+      },
+      {
+        slug: "ai-powered-inventory-forecasting",
+        title: "AI-Powered Inventory Forecasting: Reduce Stockouts by 40%",
+      },
+      {
+        slug: "multi-tenant-architecture-best-practices",
+        title: "Multi-Tenant Architecture: Best Practices",
+      },
+    ],
   },
   "multi-tenant-architecture-best-practices": {
     title: "Multi-Tenant Architecture: Best Practices for SaaS Platforms",
@@ -735,7 +763,8 @@ LogiVox's comprehensive voice solution makes implementation simple, with 500+ pr
     date: "2026-01-02",
     readTime: "6 min read",
     category: "Architecture",
-    excerpt: "Explore proven patterns for building scalable multi-tenant applications with complete data isolation.",
+    excerpt:
+      "Explore proven patterns for building scalable multi-tenant applications with complete data isolation.",
     content: `
 ## Introduction
 
@@ -871,21 +900,31 @@ Multi-tenant architecture enables SaaS businesses to scale efficiently while mai
 **Want to learn more?** [Contact our architecture team](/contact) for a deep-dive consultation.
     `,
     relatedArticles: [
-      { slug: "database-optimization-strategies", title: "Database Optimization Strategies for Scale" },
-      { slug: "real-time-inventory-tracking", title: "Real-Time Inventory Tracking with WebSockets" }
-    ]
-  }
-}
+      {
+        slug: "database-optimization-strategies",
+        title: "Database Optimization Strategies for Scale",
+      },
+      {
+        slug: "real-time-inventory-tracking",
+        title: "Real-Time Inventory Tracking with WebSockets",
+      },
+    ],
+  },
+};
 
 export async function generateStaticParams() {
-  return Object.keys(blogArticles).map((slug) => ({ slug }))
+  return Object.keys(blogArticles).map((slug) => ({ slug }));
 }
 
-export default function BlogArticlePage({ params }: { params: { slug: string } }) {
-  const article = blogArticles[params.slug]
+export default function BlogArticlePage({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const article = blogArticles[params.slug];
 
   if (!article) {
-    notFound()
+    notFound();
   }
 
   return (
@@ -904,7 +943,7 @@ export default function BlogArticlePage({ params }: { params: { slug: string } }
       <header className="container-enterprise mb-12">
         <div className="max-w-4xl mx-auto">
           <Badge className="mb-4">{article.category}</Badge>
-          
+
           <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">
             {article.title}
           </h1>
@@ -917,20 +956,29 @@ export default function BlogArticlePage({ params }: { params: { slug: string } }
             <div className="flex items-center space-x-2">
               <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                 <span className="font-semibold text-primary">
-                  {article.author.split(' ').map((n: string) => n[0]).join('')}
+                  {article.author
+                    .split(" ")
+                    .map((n: string) => n[0])
+                    .join("")}
                 </span>
               </div>
               <div>
-                <div className="font-medium text-foreground">{article.author}</div>
+                <div className="font-medium text-foreground">
+                  {article.author}
+                </div>
                 <div className="text-xs">{article.authorRole}</div>
               </div>
             </div>
-            
+
             <span className="flex items-center">
               <Calendar className="h-4 w-4 mr-2" />
-              {new Date(article.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+              {new Date(article.date).toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
             </span>
-            
+
             <span className="flex items-center">
               <Clock className="h-4 w-4 mr-2" />
               {article.readTime}
@@ -963,34 +1011,49 @@ export default function BlogArticlePage({ params }: { params: { slug: string } }
       <div className="container-enterprise">
         <div className="max-w-4xl mx-auto">
           <div className="prose prose-lg dark:prose-invert max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: article.content.trim().split('\n').map((line: string) => {
-              if (line.startsWith('## ')) {
-                return `<h2 class="text-3xl font-bold mt-12 mb-6">${line.slice(3)}</h2>`
-              } else if (line.startsWith('### ')) {
-                return `<h3 class="text-2xl font-bold mt-8 mb-4">${line.slice(4)}</h3>`
-              } else if (line.startsWith('**') && line.endsWith('**')) {
-                return `<p class="font-bold text-lg mt-6 mb-3">${line.slice(2, -2)}</p>`
-              } else if (line.startsWith('- ')) {
-                return `<li class="ml-6">${line.slice(2)}</li>`
-              } else if (line.startsWith('✓ ')) {
-                return `<li class="ml-6 flex items-center"><svg class="h-5 w-5 text-primary mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>${line.slice(2)}</li>`
-              } else if (line.startsWith('```')) {
-                return line.includes('```') ? '<pre class="bg-muted p-4 rounded-lg overflow-x-auto my-6"><code>' + line.replace(/```\w*/g, '') + '</code></pre>' : line
-              } else if (line.trim() === '---') {
-                return '<hr class="my-12 border-t-2" />'
-              } else if (line.trim().length > 0) {
-                return `<p class="mb-4 leading-relaxed">${line}</p>`
-              }
-              return ''
-            }).join('') }} />
+            <div
+              dangerouslySetInnerHTML={{
+                __html: article.content
+                  .trim()
+                  .split("\n")
+                  .map((line: string) => {
+                    if (line.startsWith("## ")) {
+                      return `<h2 class="text-3xl font-bold mt-12 mb-6">${line.slice(3)}</h2>`;
+                    } else if (line.startsWith("### ")) {
+                      return `<h3 class="text-2xl font-bold mt-8 mb-4">${line.slice(4)}</h3>`;
+                    } else if (line.startsWith("**") && line.endsWith("**")) {
+                      return `<p class="font-bold text-lg mt-6 mb-3">${line.slice(2, -2)}</p>`;
+                    } else if (line.startsWith("- ")) {
+                      return `<li class="ml-6">${line.slice(2)}</li>`;
+                    } else if (line.startsWith("✓ ")) {
+                      return `<li class="ml-6 flex items-center"><svg class="h-5 w-5 text-primary mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>${line.slice(2)}</li>`;
+                    } else if (line.startsWith("```")) {
+                      return line.includes("```")
+                        ? '<pre class="bg-muted p-4 rounded-lg overflow-x-auto my-6"><code>' +
+                            line.replace(/```\w*/g, "") +
+                            "</code></pre>"
+                        : line;
+                    } else if (line.trim() === "---") {
+                      return '<hr class="my-12 border-t-2" />';
+                    } else if (line.trim().length > 0) {
+                      return `<p class="mb-4 leading-relaxed">${line}</p>`;
+                    }
+                    return "";
+                  })
+                  .join(""),
+              }}
+            />
           </div>
 
           {/* Article Footer CTA */}
           <Card className="mt-16 bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
             <CardContent className="p-8 text-center">
-              <h3 className="text-2xl font-bold mb-4">Ready to Transform Your Warehouse?</h3>
+              <h3 className="text-2xl font-bold mb-4">
+                Ready to Transform Your Warehouse?
+              </h3>
               <p className="text-muted-foreground mb-6">
-                Experience the power of LogiVox's enterprise warehouse management system with voice-enabled operations.
+                Experience the power of LogiVox's enterprise warehouse
+                management system with voice-enabled operations.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild>
@@ -1009,10 +1072,16 @@ export default function BlogArticlePage({ params }: { params: { slug: string } }
               <h3 className="text-2xl font-bold mb-6">Related Articles</h3>
               <div className="grid md:grid-cols-3 gap-6">
                 {article.relatedArticles.map((related: any) => (
-                  <Card key={related.slug} className="hover:shadow-lg transition-shadow">
+                  <Card
+                    key={related.slug}
+                    className="hover:shadow-lg transition-shadow"
+                  >
                     <CardHeader>
                       <CardTitle className="text-lg">
-                        <Link href={`/blog/${related.slug}`} className="hover:text-primary">
+                        <Link
+                          href={`/blog/${related.slug}`}
+                          className="hover:text-primary"
+                        >
                           {related.title}
                         </Link>
                       </CardTitle>
@@ -1025,5 +1094,5 @@ export default function BlogArticlePage({ params }: { params: { slug: string } }
         </div>
       </div>
     </article>
-  )
+  );
 }

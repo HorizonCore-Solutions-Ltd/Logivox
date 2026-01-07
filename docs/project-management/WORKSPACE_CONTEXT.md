@@ -1,11 +1,13 @@
 # LogiVox Development Workspace
 
 ## Project Context
+
 LogiVox is a comprehensive warehouse management platform designed to modernize inventory operations, supplier relationships, and ERP integrations. This workspace contains the complete monorepo structure for building a next-generation SaaS solution.
 
 ## What We're Building
 
 ### Core Platform Features
+
 1. **Smart Stock Booking System**
    - Barcode scanning with mobile camera integration
    - Manual inventory entry with validation
@@ -39,6 +41,7 @@ LogiVox is a comprehensive warehouse management platform designed to modernize i
 ## Architecture Overview
 
 ### Monorepo Structure
+
 ```
 flowstock/
 ├── apps/
@@ -67,6 +70,7 @@ flowstock/
 ### Technology Decisions & Rationale
 
 **Frontend Stack:**
+
 - **React 18**: Latest features including concurrent rendering and automatic batching
 - **TypeScript**: Type safety and better developer experience
 - **Vite**: Fast development server and optimized builds
@@ -75,6 +79,7 @@ flowstock/
 - **React Query**: Server state management and caching
 
 **Backend Stack:**
+
 - **Node.js + Express**: Mature, performant JavaScript runtime
 - **TypeScript**: Shared language across frontend and backend
 - **Prisma ORM**: Type-safe database operations with excellent DX
@@ -83,6 +88,7 @@ flowstock/
 - **Express Rate Limiting**: API protection and abuse prevention
 
 **Database & Infrastructure:**
+
 - **PostgreSQL**: ACID compliance, complex queries, and JSON support
 - **Multi-tenant Architecture**: Organization-level data isolation
 - **Role-Based Access Control**: Granular permissions system
@@ -92,25 +98,30 @@ flowstock/
 ## Development Principles
 
 ### SaaS-First Architecture
+
 Every component is designed with multi-tenancy in mind:
+
 - Organization-scoped data access
 - Tenant-specific configurations
 - Scalable subscription billing integration
 - Resource isolation and performance
 
 ### API-Driven Development
+
 - RESTful API design with consistent patterns
 - OpenAPI/Swagger documentation
 - Versioned endpoints for backward compatibility
 - Comprehensive error handling and status codes
 
 ### Security by Design
+
 - Authentication required for all protected resources
 - Role-based authorization at route and component levels
 - Input validation and sanitization
 - SQL injection and XSS protection
 
 ### Performance & Scalability
+
 - Database indexing for common query patterns
 - Efficient pagination for large datasets
 - Background job processing for heavy operations
@@ -119,6 +130,7 @@ Every component is designed with multi-tenancy in mind:
 ## Current Implementation Status
 
 ### ✅ Completed Foundation
+
 1. **Project Architecture**: Monorepo structure with proper tooling
 2. **Database Schema**: Complete multi-tenant design with RBAC
 3. **Backend API**: Express server with authentication middleware
@@ -126,11 +138,13 @@ Every component is designed with multi-tenancy in mind:
 5. **Development Environment**: Working dev setup with hot reloading
 
 ### 🚧 In Progress
+
 1. **Core Stock Booking Features**: Implementing barcode scanning and manual entry
 2. **Mobile Optimization**: PWA capabilities and mobile-first design
 3. **Real-time Updates**: WebSocket integration for live inventory changes
 
 ### 📋 Planned Features
+
 1. **ERP Integration Framework**: Pluggable system for external integrations
 2. **Supplier Portal**: Dedicated interface for supplier interactions
 3. **Advanced Analytics**: Reporting dashboard and insights
@@ -140,6 +154,7 @@ Every component is designed with multi-tenancy in mind:
 ## Database Schema Highlights
 
 ### Core Entities
+
 - **Organizations**: Multi-tenant isolation
 - **Users**: Authentication and role management
 - **Warehouses**: Location-based inventory management
@@ -149,6 +164,7 @@ Every component is designed with multi-tenancy in mind:
 - **Stock Movements**: Audit trail for all inventory changes
 
 ### Key Relationships
+
 - Users belong to Organizations with specific Roles
 - Warehouses are owned by Organizations
 - Inventory Items are tracked per Warehouse
@@ -158,12 +174,14 @@ Every component is designed with multi-tenancy in mind:
 ## UI/UX Design Philosophy
 
 ### Design System
+
 - **Tailwind CSS**: Utility-first approach with custom component classes
 - **Responsive Design**: Mobile-first with tablet and desktop optimizations
 - **Accessibility**: WCAG compliance and keyboard navigation
 - **Dark Mode Ready**: Theme system for user preference
 
 ### User Experience Priorities
+
 1. **Speed**: Fast loading times and responsive interactions
 2. **Simplicity**: Intuitive workflows for complex warehouse operations
 3. **Reliability**: Offline capabilities and data synchronization
@@ -172,12 +190,14 @@ Every component is designed with multi-tenancy in mind:
 ## Integration Strategy
 
 ### ERP Systems
+
 - **Target Platforms**: SAP, Oracle NetSuite, Microsoft Dynamics, QuickBooks
 - **Integration Methods**: REST APIs, webhooks, file-based imports
 - **Data Mapping**: Flexible field mapping and transformation rules
 - **Sync Frequency**: Real-time, scheduled, or manual synchronization
 
 ### Third-Party Services
+
 - **Payment Processing**: Stripe for subscription billing
 - **File Storage**: AWS S3 for documents and images
 - **Email Service**: SendGrid for transactional emails
@@ -186,12 +206,14 @@ Every component is designed with multi-tenancy in mind:
 ## Quality Assurance
 
 ### Testing Strategy
+
 - **Unit Tests**: Critical business logic and utilities
 - **Integration Tests**: API endpoints and database operations
 - **Component Tests**: React component behavior and interactions
 - **E2E Tests**: Complete user workflows and scenarios
 
 ### Code Quality
+
 - **ESLint + Prettier**: Consistent code formatting and style
 - **TypeScript Strict Mode**: Maximum type safety
 - **Husky Git Hooks**: Pre-commit linting and testing
@@ -200,11 +222,13 @@ Every component is designed with multi-tenancy in mind:
 ## Deployment & DevOps
 
 ### Environment Strategy
+
 - **Development**: Local development with hot reloading
 - **Staging**: Production-like environment for testing
 - **Production**: Scalable cloud deployment with monitoring
 
 ### CI/CD Pipeline
+
 - **GitHub Actions**: Automated testing and deployment
 - **Docker Containers**: Consistent deployment environments
 - **Database Migrations**: Safe, automated schema updates
@@ -213,15 +237,18 @@ Every component is designed with multi-tenancy in mind:
 ## Business Context
 
 ### Market Position
+
 LogiVox addresses the gap between simple inventory apps and complex ERP systems, providing enterprise-grade warehouse management with modern user experience.
 
 ### Target Users
+
 - **Warehouse Managers**: Oversight and operational control
 - **Inventory Staff**: Daily stock management and scanning
 - **Procurement Teams**: Purchase order management and supplier relations
 - **IT Administrators**: System configuration and user management
 
 ### Success Metrics
+
 - **User Adoption**: Daily active users and feature engagement
 - **Operational Efficiency**: Reduction in inventory errors and processing time
 - **Integration Success**: ERP sync accuracy and reliability
@@ -230,6 +257,7 @@ LogiVox addresses the gap between simple inventory apps and complex ERP systems,
 ## Getting Started for AI Assistants
 
 When working on LogiVox:
+
 1. **Understand the Context**: This is a SaaS warehouse management platform
 2. **Follow Patterns**: Use established conventions for new features
 3. **Think Multi-tenant**: Every feature must work across organizations

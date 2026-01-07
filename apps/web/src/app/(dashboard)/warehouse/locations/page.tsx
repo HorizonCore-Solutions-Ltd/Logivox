@@ -210,7 +210,8 @@ export default function LocationsPage() {
           </div>
         ) : locations.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            No locations found. Create your first warehouse location to get started.
+            No locations found. Create your first warehouse location to get
+            started.
           </div>
         ) : (
           <>

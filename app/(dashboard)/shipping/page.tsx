@@ -3,27 +3,33 @@
  * Comprehensive UI for outbound shipments, carrier selection, rate shopping, and tracking
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Truck, 
-  Package, 
-  DollarSign, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Truck,
+  Package,
+  DollarSign,
   MapPin,
   TrendingUp,
   AlertCircle,
   CheckCircle,
   Clock,
   Plane,
-  Ship
-} from 'lucide-react';
+  Ship,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -31,14 +37,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 
 interface Shipment {
   id: string;
@@ -48,7 +54,15 @@ interface Shipment {
   carrierName: string;
   serviceLevel: string;
   trackingNumber: string;
-  status: 'DRAFT' | 'PENDING' | 'PICKED' | 'PACKED' | 'SHIPPED' | 'IN_TRANSIT' | 'DELIVERED' | 'CANCELLED';
+  status:
+    | "DRAFT"
+    | "PENDING"
+    | "PICKED"
+    | "PACKED"
+    | "SHIPPED"
+    | "IN_TRANSIT"
+    | "DELIVERED"
+    | "CANCELLED";
   totalWeight: number;
   shippingCost: number;
   destination: string;
@@ -93,14 +107,14 @@ export default function ShippingDashboard() {
   const [shipments, setShipments] = useState<Shipment[]>([]);
   const [stats, setStats] = useState<ShippingStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [carrierRates, setCarrierRates] = useState<CarrierRate[]>([]);
   const [trackingInfo, setTrackingInfo] = useState<TrackingInfo | null>(null);
 
   // Form states
-  const [newShipmentOrder, setNewShipmentOrder] = useState('');
-  const [newShipmentCarrier, setNewShipmentCarrier] = useState('');
-  const [trackingSearch, setTrackingSearch] = useState('');
+  const [newShipmentOrder, setNewShipmentOrder] = useState("");
+  const [newShipmentCarrier, setNewShipmentCarrier] = useState("");
+  const [trackingSearch, setTrackingSearch] = useState("");
 
   useEffect(() => {
     loadDashboardData();
@@ -109,19 +123,20 @@ export default function ShippingDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load shipments
-      const shipmentsResponse = await fetch('/api/shipping?action=list-shipments');
+      const shipmentsResponse = await fetch(
+        "/api/shipping?action=list-shipments",
+      );
       const shipmentsData = await shipmentsResponse.json();
       setShipments(shipmentsData.shipments || []);
 
       // Load statistics
-      const statsResponse = await fetch('/api/shipping?action=statistics');
+      const statsResponse = await fetch("/api/shipping?action=statistics");
       const statsData = await statsResponse.json();
       setStats(statsData);
-
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -129,130 +144,137 @@ export default function ShippingDashboard() {
 
   const createShipment = async () => {
     try {
-      const response = await fetch('/api/shipping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/shipping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'create-shipment',
+          action: "create-shipment",
           orderId: newShipmentOrder,
           carrierCode: newShipmentCarrier,
-          serviceLevel: 'STANDARD',
+          serviceLevel: "STANDARD",
           destination: {
-            address: '123 Main St',
-            city: 'New York',
-            state: 'NY',
-            zip: '10001',
-            country: 'US'
-          }
-        })
+            address: "123 Main St",
+            city: "New York",
+            state: "NY",
+            zip: "10001",
+            country: "US",
+          },
+        }),
       });
 
       if (response.ok) {
-        setNewShipmentOrder('');
-        setNewShipmentCarrier('');
+        setNewShipmentOrder("");
+        setNewShipmentCarrier("");
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to create shipment:', error);
+      console.error("Failed to create shipment:", error);
     }
   };
 
   const getRates = async (shipmentId: string) => {
     try {
-      const response = await fetch('/api/shipping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/shipping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'get-rates',
+          action: "get-rates",
           shipmentId,
-          carriers: ['UPS', 'FedEx', 'USPS', 'DHL']
-        })
+          carriers: ["UPS", "FedEx", "USPS", "DHL"],
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
         setCarrierRates(data.rates || []);
-        setActiveTab('rate-shopping');
+        setActiveTab("rate-shopping");
       }
     } catch (error) {
-      console.error('Failed to get rates:', error);
+      console.error("Failed to get rates:", error);
     }
   };
 
-  const selectCarrier = async (shipmentId: string, carrierId: string, rateId: string) => {
+  const selectCarrier = async (
+    shipmentId: string,
+    carrierId: string,
+    rateId: string,
+  ) => {
     try {
-      const response = await fetch('/api/shipping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/shipping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'select-carrier',
+          action: "select-carrier",
           shipmentId,
           carrierId,
-          rateId
-        })
+          rateId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to select carrier:', error);
+      console.error("Failed to select carrier:", error);
     }
   };
 
   const generateLabel = async (shipmentId: string) => {
     try {
-      const response = await fetch('/api/shipping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/shipping", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'generate-label',
-          shipmentId
-        })
+          action: "generate-label",
+          shipmentId,
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
         // Download label
         if (data.labelUrl) {
-          window.open(data.labelUrl, '_blank');
+          window.open(data.labelUrl, "_blank");
         }
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to generate label:', error);
+      console.error("Failed to generate label:", error);
     }
   };
 
   const trackShipment = async () => {
     try {
-      const response = await fetch(`/api/shipping?action=track&trackingNumber=${trackingSearch}`);
+      const response = await fetch(
+        `/api/shipping?action=track&trackingNumber=${trackingSearch}`,
+      );
       const data = await response.json();
       setTrackingInfo(data.tracking);
     } catch (error) {
-      console.error('Failed to track shipment:', error);
+      console.error("Failed to track shipment:", error);
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      DRAFT: { variant: 'secondary' as const, icon: Clock },
-      PENDING: { variant: 'secondary' as const, icon: Clock },
-      PICKED: { variant: 'default' as const, icon: Package },
-      PACKED: { variant: 'default' as const, icon: Package },
-      SHIPPED: { variant: 'default' as const, icon: Truck },
-      IN_TRANSIT: { variant: 'default' as const, icon: Plane },
-      DELIVERED: { variant: 'success' as const, icon: CheckCircle },
-      CANCELLED: { variant: 'destructive' as const, icon: AlertCircle },
+      DRAFT: { variant: "secondary" as const, icon: Clock },
+      PENDING: { variant: "secondary" as const, icon: Clock },
+      PICKED: { variant: "default" as const, icon: Package },
+      PACKED: { variant: "default" as const, icon: Package },
+      SHIPPED: { variant: "default" as const, icon: Truck },
+      IN_TRANSIT: { variant: "default" as const, icon: Plane },
+      DELIVERED: { variant: "success" as const, icon: CheckCircle },
+      CANCELLED: { variant: "destructive" as const, icon: AlertCircle },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     const Icon = config.icon;
 
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
-        {status.replace('_', ' ')}
+        {status.replace("_", " ")}
       </Badge>
     );
   };
@@ -281,7 +303,7 @@ export default function ShippingDashboard() {
             Manage outbound shipments, carrier selection, and tracking
           </p>
         </div>
-        <Button onClick={() => setActiveTab('create-shipment')}>
+        <Button onClick={() => setActiveTab("create-shipment")}>
           <Package className="mr-2 h-4 w-4" />
           Create Shipment
         </Button>
@@ -292,7 +314,9 @@ export default function ShippingDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Shipments</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Shipments
+              </CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -331,7 +355,9 @@ export default function ShippingDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Shipping Cost</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Shipping Cost
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -380,23 +406,31 @@ export default function ShippingDashboard() {
                 <TableBody>
                   {shipments.slice(0, 10).map((shipment) => (
                     <TableRow key={shipment.id}>
-                      <TableCell className="font-medium">{shipment.shipmentNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {shipment.shipmentNumber}
+                      </TableCell>
                       <TableCell>{shipment.orderNumber}</TableCell>
                       <TableCell>{shipment.customerName}</TableCell>
                       <TableCell>{shipment.carrierName}</TableCell>
                       <TableCell className="font-mono text-xs">
-                        {shipment.trackingNumber || '-'}
+                        {shipment.trackingNumber || "-"}
                       </TableCell>
                       <TableCell>{getStatusBadge(shipment.status)}</TableCell>
                       <TableCell>${shipment.shippingCost.toFixed(2)}</TableCell>
                       <TableCell>
-                        {shipment.status === 'PENDING' && (
-                          <Button size="sm" onClick={() => getRates(shipment.id)}>
+                        {shipment.status === "PENDING" && (
+                          <Button
+                            size="sm"
+                            onClick={() => getRates(shipment.id)}
+                          >
                             Get Rates
                           </Button>
                         )}
-                        {shipment.status === 'PACKED' && (
-                          <Button size="sm" onClick={() => generateLabel(shipment.id)}>
+                        {shipment.status === "PACKED" && (
+                          <Button
+                            size="sm"
+                            onClick={() => generateLabel(shipment.id)}
+                          >
                             Print Label
                           </Button>
                         )}
@@ -434,7 +468,9 @@ export default function ShippingDashboard() {
                 <TableBody>
                   {shipments.map((shipment) => (
                     <TableRow key={shipment.id}>
-                      <TableCell className="font-medium">{shipment.shipmentNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {shipment.shipmentNumber}
+                      </TableCell>
                       <TableCell>{shipment.orderNumber}</TableCell>
                       <TableCell>{shipment.customerName}</TableCell>
                       <TableCell>{shipment.carrierName}</TableCell>
@@ -458,7 +494,9 @@ export default function ShippingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Carrier Rate Comparison</CardTitle>
-              <CardDescription>Compare rates from different carriers</CardDescription>
+              <CardDescription>
+                Compare rates from different carriers
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {carrierRates.length > 0 ? (
@@ -476,7 +514,9 @@ export default function ShippingDashboard() {
                   <TableBody>
                     {carrierRates.map((rate, index) => (
                       <TableRow key={index}>
-                        <TableCell className="font-medium">{rate.carrier}</TableCell>
+                        <TableCell className="font-medium">
+                          {rate.carrier}
+                        </TableCell>
                         <TableCell>{rate.service}</TableCell>
                         <TableCell className="text-lg font-bold">
                           ${rate.cost.toFixed(2)}
@@ -486,9 +526,15 @@ export default function ShippingDashboard() {
                           {new Date(rate.deliveryDate).toLocaleDateString()}
                         </TableCell>
                         <TableCell>
-                          <Button 
-                            size="sm" 
-                            onClick={() => selectCarrier('shipment-id', rate.carrier, 'rate-id')}
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              selectCarrier(
+                                "shipment-id",
+                                rate.carrier,
+                                "rate-id",
+                              )
+                            }
                           >
                             Select
                           </Button>
@@ -499,7 +545,8 @@ export default function ShippingDashboard() {
                 </Table>
               ) : (
                 <p className="text-center text-muted-foreground py-8">
-                  No rates to display. Click "Get Rates" on a shipment to compare carriers.
+                  No rates to display. Click "Get Rates" on a shipment to
+                  compare carriers.
                 </p>
               )}
             </CardContent>
@@ -510,7 +557,9 @@ export default function ShippingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Track Shipment</CardTitle>
-              <CardDescription>Enter tracking number to track a shipment</CardDescription>
+              <CardDescription>
+                Enter tracking number to track a shipment
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
@@ -533,15 +582,21 @@ export default function ShippingDashboard() {
                     </div>
                     <div>
                       <p className="text-sm font-medium">Carrier</p>
-                      <p className="text-sm text-muted-foreground">{trackingInfo.carrier}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {trackingInfo.carrier}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm font-medium">Current Status</p>
-                      <p className="text-sm text-muted-foreground">{trackingInfo.status}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {trackingInfo.status}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm font-medium">Current Location</p>
-                      <p className="text-sm text-muted-foreground">{trackingInfo.location}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {trackingInfo.location}
+                      </p>
                     </div>
                   </div>
 
@@ -549,9 +604,14 @@ export default function ShippingDashboard() {
                     <h3 className="font-medium mb-2">Tracking Events</h3>
                     <div className="space-y-2">
                       {trackingInfo.events.map((event, index) => (
-                        <div key={index} className="border-l-2 border-primary pl-4 pb-2">
+                        <div
+                          key={index}
+                          className="border-l-2 border-primary pl-4 pb-2"
+                        >
                           <p className="text-sm font-medium">{event.status}</p>
-                          <p className="text-xs text-muted-foreground">{event.location}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {event.location}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {new Date(event.timestamp).toLocaleString()}
                           </p>
@@ -570,7 +630,9 @@ export default function ShippingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Create New Shipment</CardTitle>
-              <CardDescription>Create a new shipment for an order</CardDescription>
+              <CardDescription>
+                Create a new shipment for an order
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -585,7 +647,10 @@ export default function ShippingDashboard() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="carrier">Carrier Code</Label>
-                  <Select value={newShipmentCarrier} onValueChange={setNewShipmentCarrier}>
+                  <Select
+                    value={newShipmentCarrier}
+                    onValueChange={setNewShipmentCarrier}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select carrier" />
                     </SelectTrigger>
@@ -598,7 +663,10 @@ export default function ShippingDashboard() {
                   </Select>
                 </div>
               </div>
-              <Button onClick={createShipment} disabled={!newShipmentOrder || !newShipmentCarrier}>
+              <Button
+                onClick={createShipment}
+                disabled={!newShipmentOrder || !newShipmentCarrier}
+              >
                 Create Shipment
               </Button>
             </CardContent>
@@ -609,11 +677,14 @@ export default function ShippingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Bulk Ship Orders</CardTitle>
-              <CardDescription>Process multiple shipments at once</CardDescription>
+              <CardDescription>
+                Process multiple shipments at once
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                Select orders to ship in bulk. Rates will be automatically selected based on cost optimization.
+                Select orders to ship in bulk. Rates will be automatically
+                selected based on cost optimization.
               </p>
               <Button className="mt-4">Select Orders</Button>
             </CardContent>

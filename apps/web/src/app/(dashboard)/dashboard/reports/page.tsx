@@ -1,42 +1,48 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import { format } from "date-fns"
-import { CalendarIcon, FileText, Filter, Download } from "lucide-react"
-import { DateRange } from "react-day-picker"
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
+import { CalendarIcon, FileText, Filter, Download } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
 interface ReportConfig {
-  name: string
-  description: string
-  metrics: string[]
-  groupBy: string
-  dateRange: DateRange | undefined
+  name: string;
+  description: string;
+  metrics: string[];
+  groupBy: string;
+  dateRange: DateRange | undefined;
   filters: {
-    warehouseId?: string
-    categoryId?: string
-    customerId?: string
-    status?: string
-  }
+    warehouseId?: string;
+    categoryId?: string;
+    customerId?: string;
+    status?: string;
+  };
 }
 
 const AVAILABLE_METRICS = [
@@ -46,10 +52,14 @@ const AVAILABLE_METRICS = [
   { id: "stock_movements", label: "Stock Movements", category: "inventory" },
   { id: "booking_count", label: "Booking Count", category: "bookings" },
   { id: "booking_revenue", label: "Booking Revenue", category: "bookings" },
-  { id: "avg_booking_value", label: "Average Booking Value", category: "bookings" },
+  {
+    id: "avg_booking_value",
+    label: "Average Booking Value",
+    category: "bookings",
+  },
   { id: "customer_count", label: "Customer Count", category: "customers" },
   { id: "top_customers", label: "Top Customers", category: "customers" },
-]
+];
 
 const GROUP_BY_OPTIONS = [
   { value: "day", label: "By Day" },
@@ -59,7 +69,7 @@ const GROUP_BY_OPTIONS = [
   { value: "category", label: "By Category" },
   { value: "customer", label: "By Customer" },
   { value: "status", label: "By Status" },
-]
+];
 
 export default function ReportsPage() {
   const [config, setConfig] = useState<ReportConfig>({
@@ -69,25 +79,25 @@ export default function ReportsPage() {
     groupBy: "day",
     dateRange: undefined,
     filters: {},
-  })
+  });
 
   const { data: warehouses } = useQuery({
     queryKey: ["warehouses"],
     queryFn: async () => {
-      const res = await fetch("/api/warehouses")
-      if (!res.ok) throw new Error("Failed to fetch warehouses")
-      return res.json()
+      const res = await fetch("/api/warehouses");
+      if (!res.ok) throw new Error("Failed to fetch warehouses");
+      return res.json();
     },
-  })
+  });
 
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const res = await fetch("/api/categories")
-      if (!res.ok) throw new Error("Failed to fetch categories")
-      return res.json()
+      const res = await fetch("/api/categories");
+      if (!res.ok) throw new Error("Failed to fetch categories");
+      return res.json();
     },
-  })
+  });
 
   const handleMetricToggle = (metricId: string) => {
     setConfig((prev) => ({
@@ -95,18 +105,18 @@ export default function ReportsPage() {
       metrics: prev.metrics.includes(metricId)
         ? prev.metrics.filter((m) => m !== metricId)
         : [...prev.metrics, metricId],
-    }))
-  }
+    }));
+  };
 
   const handleGenerateReport = () => {
     // TODO: Implement report generation
-    console.log("Generate report with config:", config)
-  }
+    console.log("Generate report with config:", config);
+  };
 
   const handleSaveTemplate = () => {
     // TODO: Implement template saving
-    console.log("Save template:", config)
-  }
+    console.log("Save template:", config);
+  };
 
   return (
     <div className="space-y-6">
@@ -126,7 +136,9 @@ export default function ReportsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Report Details</CardTitle>
-              <CardDescription>Give your report a name and description</CardDescription>
+              <CardDescription>
+                Give your report a name and description
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -135,7 +147,9 @@ export default function ReportsPage() {
                   id="name"
                   placeholder="e.g., Monthly Inventory Summary"
                   value={config.name}
-                  onChange={(e) => setConfig({ ...config, name: e.target.value })}
+                  onChange={(e) =>
+                    setConfig({ ...config, name: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -144,7 +158,9 @@ export default function ReportsPage() {
                   id="description"
                   placeholder="e.g., Overview of inventory levels and movements"
                   value={config.description}
-                  onChange={(e) => setConfig({ ...config, description: e.target.value })}
+                  onChange={(e) =>
+                    setConfig({ ...config, description: e.target.value })
+                  }
                 />
               </div>
             </CardContent>
@@ -154,7 +170,9 @@ export default function ReportsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Select Metrics</CardTitle>
-              <CardDescription>Choose the metrics to include in your report</CardDescription>
+              <CardDescription>
+                Choose the metrics to include in your report
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -162,23 +180,26 @@ export default function ReportsPage() {
                 <div>
                   <h3 className="font-medium mb-3">Inventory Metrics</h3>
                   <div className="space-y-2">
-                    {AVAILABLE_METRICS.filter((m) => m.category === "inventory").map(
-                      (metric) => (
-                        <div key={metric.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={metric.id}
-                            checked={config.metrics.includes(metric.id)}
-                            onCheckedChange={() => handleMetricToggle(metric.id)}
-                          />
-                          <label
-                            htmlFor={metric.id}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {metric.label}
-                          </label>
-                        </div>
-                      )
-                    )}
+                    {AVAILABLE_METRICS.filter(
+                      (m) => m.category === "inventory",
+                    ).map((metric) => (
+                      <div
+                        key={metric.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={metric.id}
+                          checked={config.metrics.includes(metric.id)}
+                          onCheckedChange={() => handleMetricToggle(metric.id)}
+                        />
+                        <label
+                          htmlFor={metric.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {metric.label}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -186,23 +207,26 @@ export default function ReportsPage() {
                 <div>
                   <h3 className="font-medium mb-3">Booking Metrics</h3>
                   <div className="space-y-2">
-                    {AVAILABLE_METRICS.filter((m) => m.category === "bookings").map(
-                      (metric) => (
-                        <div key={metric.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={metric.id}
-                            checked={config.metrics.includes(metric.id)}
-                            onCheckedChange={() => handleMetricToggle(metric.id)}
-                          />
-                          <label
-                            htmlFor={metric.id}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {metric.label}
-                          </label>
-                        </div>
-                      )
-                    )}
+                    {AVAILABLE_METRICS.filter(
+                      (m) => m.category === "bookings",
+                    ).map((metric) => (
+                      <div
+                        key={metric.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={metric.id}
+                          checked={config.metrics.includes(metric.id)}
+                          onCheckedChange={() => handleMetricToggle(metric.id)}
+                        />
+                        <label
+                          htmlFor={metric.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {metric.label}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -210,23 +234,26 @@ export default function ReportsPage() {
                 <div>
                   <h3 className="font-medium mb-3">Customer Metrics</h3>
                   <div className="space-y-2">
-                    {AVAILABLE_METRICS.filter((m) => m.category === "customers").map(
-                      (metric) => (
-                        <div key={metric.id} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={metric.id}
-                            checked={config.metrics.includes(metric.id)}
-                            onCheckedChange={() => handleMetricToggle(metric.id)}
-                          />
-                          <label
-                            htmlFor={metric.id}
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            {metric.label}
-                          </label>
-                        </div>
-                      )
-                    )}
+                    {AVAILABLE_METRICS.filter(
+                      (m) => m.category === "customers",
+                    ).map((metric) => (
+                      <div
+                        key={metric.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={metric.id}
+                          checked={config.metrics.includes(metric.id)}
+                          onCheckedChange={() => handleMetricToggle(metric.id)}
+                        />
+                        <label
+                          htmlFor={metric.id}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {metric.label}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -237,12 +264,19 @@ export default function ReportsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Grouping & Time Period</CardTitle>
-              <CardDescription>How to organize and filter the data</CardDescription>
+              <CardDescription>
+                How to organize and filter the data
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <Label>Group By</Label>
-                <Select value={config.groupBy} onValueChange={(value) => setConfig({ ...config, groupBy: value })}>
+                <Select
+                  value={config.groupBy}
+                  onValueChange={(value) =>
+                    setConfig({ ...config, groupBy: value })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -264,7 +298,7 @@ export default function ReportsPage() {
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left font-normal",
-                        !config.dateRange && "text-muted-foreground"
+                        !config.dateRange && "text-muted-foreground",
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -288,7 +322,9 @@ export default function ReportsPage() {
                       mode="range"
                       defaultMonth={config.dateRange?.from}
                       selected={config.dateRange}
-                      onSelect={(range: DateRange | undefined) => setConfig({ ...config, dateRange: range })}
+                      onSelect={(range: DateRange | undefined) =>
+                        setConfig({ ...config, dateRange: range })
+                      }
                       numberOfMonths={2}
                     />
                   </PopoverContent>
@@ -301,7 +337,9 @@ export default function ReportsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Filters</CardTitle>
-              <CardDescription>Apply additional filters to your report</CardDescription>
+              <CardDescription>
+                Apply additional filters to your report
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -396,7 +434,10 @@ export default function ReportsPage() {
               <div>
                 <p className="text-sm font-medium">Group By</p>
                 <p className="text-sm text-muted-foreground">
-                  {GROUP_BY_OPTIONS.find((opt) => opt.value === config.groupBy)?.label}
+                  {
+                    GROUP_BY_OPTIONS.find((opt) => opt.value === config.groupBy)
+                      ?.label
+                  }
                 </p>
               </div>
               {config.dateRange?.from && (
@@ -404,14 +445,16 @@ export default function ReportsPage() {
                   <p className="text-sm font-medium">Date Range</p>
                   <p className="text-sm text-muted-foreground">
                     {format(config.dateRange.from, "MMM dd, yyyy")}
-                    {config.dateRange.to && ` - ${format(config.dateRange.to, "MMM dd, yyyy")}`}
+                    {config.dateRange.to &&
+                      ` - ${format(config.dateRange.to, "MMM dd, yyyy")}`}
                   </p>
                 </div>
               )}
               <div>
                 <p className="text-sm font-medium">Active Filters</p>
                 <p className="text-sm text-muted-foreground">
-                  {Object.values(config.filters).filter(Boolean).length || "None"}
+                  {Object.values(config.filters).filter(Boolean).length ||
+                    "None"}
                 </p>
               </div>
             </CardContent>
@@ -457,5 +500,5 @@ export default function ReportsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

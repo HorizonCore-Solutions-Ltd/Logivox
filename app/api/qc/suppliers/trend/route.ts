@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import SupplierScorecardService from '@/lib/services/supplier-scorecard.service';
+import { NextResponse } from "next/server";
+import SupplierScorecardService from "@/lib/services/supplier-scorecard.service";
 
 /**
  * GET /api/qc/suppliers/trend
@@ -8,20 +8,20 @@ import SupplierScorecardService from '@/lib/services/supplier-scorecard.service'
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    
-    const supplierId = searchParams.get('supplierId');
-    const periods = parseInt(searchParams.get('periods') || '6', 10);
+
+    const supplierId = searchParams.get("supplierId");
+    const periods = parseInt(searchParams.get("periods") || "6", 10);
 
     if (!supplierId) {
       return NextResponse.json(
-        { error: 'supplierId is required' },
-        { status: 400 }
+        { error: "supplierId is required" },
+        { status: 400 },
       );
     }
 
     const trend = await SupplierScorecardService.getScorecardTrend(
       supplierId,
-      periods
+      periods,
     );
 
     return NextResponse.json({
@@ -29,15 +29,14 @@ export async function GET(request: Request) {
       data: trend,
       meta: {
         supplierId,
-        periods
-      }
+        periods,
+      },
     });
-
   } catch (error: any) {
-    console.error('Supplier trend error:', error);
+    console.error("Supplier trend error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to calculate trend' },
-      { status: 500 }
+      { error: error.message || "Failed to calculate trend" },
+      { status: 500 },
     );
   }
 }

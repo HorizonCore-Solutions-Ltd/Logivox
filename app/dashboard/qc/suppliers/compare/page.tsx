@@ -1,13 +1,44 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { TrendingUp, TrendingDown, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertCircle,
+  CheckCircle2,
+} from "lucide-react";
 
 interface Supplier {
   id: string;
@@ -29,8 +60,8 @@ interface Supplier {
 
 const mockSuppliers: Supplier[] = [
   {
-    id: 'SUP001',
-    name: 'Acme Manufacturing Co.',
+    id: "SUP001",
+    name: "Acme Manufacturing Co.",
     qualityScore: 95,
     deliveryScore: 92,
     costScore: 88,
@@ -43,11 +74,11 @@ const mockSuppliers: Supplier[] = [
     priceVariance: -2.1,
     activeNCRs: 1,
     resolvedNCRs: 12,
-    certifications: ['ISO 9001', 'ISO 14001', 'AS9100'],
+    certifications: ["ISO 9001", "ISO 14001", "AS9100"],
   },
   {
-    id: 'SUP002',
-    name: 'Global Parts Ltd.',
+    id: "SUP002",
+    name: "Global Parts Ltd.",
     qualityScore: 88,
     deliveryScore: 94,
     costScore: 92,
@@ -60,11 +91,11 @@ const mockSuppliers: Supplier[] = [
     priceVariance: 1.5,
     activeNCRs: 2,
     resolvedNCRs: 18,
-    certifications: ['ISO 9001'],
+    certifications: ["ISO 9001"],
   },
   {
-    id: 'SUP003',
-    name: 'Precision Components Inc.',
+    id: "SUP003",
+    name: "Precision Components Inc.",
     qualityScore: 92,
     deliveryScore: 85,
     costScore: 90,
@@ -77,11 +108,11 @@ const mockSuppliers: Supplier[] = [
     priceVariance: -1.2,
     activeNCRs: 4,
     resolvedNCRs: 15,
-    certifications: ['ISO 9001', 'IATF 16949'],
+    certifications: ["ISO 9001", "IATF 16949"],
   },
   {
-    id: 'SUP004',
-    name: 'Tech Solutions Corp.',
+    id: "SUP004",
+    name: "Tech Solutions Corp.",
     qualityScore: 85,
     deliveryScore: 88,
     costScore: 85,
@@ -94,7 +125,7 @@ const mockSuppliers: Supplier[] = [
     priceVariance: 3.2,
     activeNCRs: 3,
     resolvedNCRs: 10,
-    certifications: ['ISO 9001'],
+    certifications: ["ISO 9001"],
   },
 ];
 
@@ -102,32 +133,32 @@ export default function SupplierComparisonPage() {
   const [supplier1Id, setSupplier1Id] = useState<string>(mockSuppliers[0].id);
   const [supplier2Id, setSupplier2Id] = useState<string>(mockSuppliers[1].id);
 
-  const supplier1 = mockSuppliers.find(s => s.id === supplier1Id)!;
-  const supplier2 = mockSuppliers.find(s => s.id === supplier2Id)!;
+  const supplier1 = mockSuppliers.find((s) => s.id === supplier1Id)!;
+  const supplier2 = mockSuppliers.find((s) => s.id === supplier2Id)!;
 
   const radarData = [
     {
-      metric: 'Quality',
+      metric: "Quality",
       [supplier1.name]: supplier1.qualityScore,
       [supplier2.name]: supplier2.qualityScore,
     },
     {
-      metric: 'Delivery',
+      metric: "Delivery",
       [supplier1.name]: supplier1.deliveryScore,
       [supplier2.name]: supplier2.deliveryScore,
     },
     {
-      metric: 'Cost',
+      metric: "Cost",
       [supplier1.name]: supplier1.costScore,
       [supplier2.name]: supplier2.costScore,
     },
     {
-      metric: 'Responsive',
+      metric: "Responsive",
       [supplier1.name]: supplier1.responsiveScore,
       [supplier2.name]: supplier2.responsiveScore,
     },
     {
-      metric: 'Compliance',
+      metric: "Compliance",
       [supplier1.name]: supplier1.complianceScore,
       [supplier2.name]: supplier2.complianceScore,
     },
@@ -135,22 +166,22 @@ export default function SupplierComparisonPage() {
 
   const barData = [
     {
-      metric: 'On-Time Delivery %',
+      metric: "On-Time Delivery %",
       [supplier1.name]: supplier1.onTimeDelivery,
       [supplier2.name]: supplier2.onTimeDelivery,
     },
     {
-      metric: 'Defect Rate %',
+      metric: "Defect Rate %",
       [supplier1.name]: supplier1.defectRate,
       [supplier2.name]: supplier2.defectRate,
     },
     {
-      metric: 'Avg Lead Time (days)',
+      metric: "Avg Lead Time (days)",
       [supplier1.name]: supplier1.avgLeadTime,
       [supplier2.name]: supplier2.avgLeadTime,
     },
     {
-      metric: 'Active NCRs',
+      metric: "Active NCRs",
       [supplier1.name]: supplier1.activeNCRs,
       [supplier2.name]: supplier2.activeNCRs,
     },
@@ -160,46 +191,64 @@ export default function SupplierComparisonPage() {
     label,
     value1,
     value2,
-    format = 'number',
+    format = "number",
     inverse = false,
   }: {
     label: string;
     value1: number;
     value2: number;
-    format?: 'number' | 'percent' | 'days';
+    format?: "number" | "percent" | "days";
     inverse?: boolean;
   }) => {
     const better = inverse ? value1 < value2 : value1 > value2;
     const worse = inverse ? value1 > value2 : value1 < value2;
 
     const formatValue = (val: number) => {
-      if (format === 'percent') return `${val}%`;
-      if (format === 'days') return `${val} days`;
+      if (format === "percent") return `${val}%`;
+      if (format === "days") return `${val} days`;
       return val;
     };
 
     return (
       <div className="grid grid-cols-3 gap-4 py-3 border-b">
         <div className="flex items-center gap-2">
-          <span className={better ? 'font-semibold text-green-600' : worse ? 'text-red-600' : ''}>
+          <span
+            className={
+              better
+                ? "font-semibold text-green-600"
+                : worse
+                  ? "text-red-600"
+                  : ""
+            }
+          >
             {formatValue(value1)}
           </span>
           {better && <CheckCircle2 className="h-4 w-4 text-green-600" />}
           {worse && <AlertCircle className="h-4 w-4 text-red-600" />}
         </div>
-        <div className="text-center font-medium text-muted-foreground">{label}</div>
+        <div className="text-center font-medium text-muted-foreground">
+          {label}
+        </div>
         <div className="flex items-center justify-end gap-2">
-          {value2 > value1 && !inverse && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-          {value2 < value1 && inverse && <CheckCircle2 className="h-4 w-4 text-green-600" />}
-          {value2 > value1 && inverse && <AlertCircle className="h-4 w-4 text-red-600" />}
-          {value2 < value1 && !inverse && <AlertCircle className="h-4 w-4 text-red-600" />}
+          {value2 > value1 && !inverse && (
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+          )}
+          {value2 < value1 && inverse && (
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+          )}
+          {value2 > value1 && inverse && (
+            <AlertCircle className="h-4 w-4 text-red-600" />
+          )}
+          {value2 < value1 && !inverse && (
+            <AlertCircle className="h-4 w-4 text-red-600" />
+          )}
           <span
             className={
               (!inverse && value2 > value1) || (inverse && value2 < value1)
-                ? 'font-semibold text-green-600'
+                ? "font-semibold text-green-600"
                 : (!inverse && value2 < value1) || (inverse && value2 > value1)
-                ? 'text-red-600'
-                : ''
+                  ? "text-red-600"
+                  : ""
             }
           >
             {formatValue(value2)}
@@ -232,8 +281,8 @@ export default function SupplierComparisonPage() {
               </SelectTrigger>
               <SelectContent>
                 {mockSuppliers
-                  .filter(s => s.id !== supplier2Id)
-                  .map(s => (
+                  .filter((s) => s.id !== supplier2Id)
+                  .map((s) => (
                     <SelectItem key={s.id} value={s.id}>
                       {s.name}
                     </SelectItem>
@@ -249,8 +298,8 @@ export default function SupplierComparisonPage() {
               </SelectTrigger>
               <SelectContent>
                 {mockSuppliers
-                  .filter(s => s.id !== supplier1Id)
-                  .map(s => (
+                  .filter((s) => s.id !== supplier1Id)
+                  .map((s) => (
                     <SelectItem key={s.id} value={s.id}>
                       {s.name}
                     </SelectItem>
@@ -270,18 +319,22 @@ export default function SupplierComparisonPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <div className="text-5xl font-bold text-blue-600">{supplier1.overallScore}</div>
+              <div className="text-5xl font-bold text-blue-600">
+                {supplier1.overallScore}
+              </div>
               <div className="text-sm text-muted-foreground">Overall Score</div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center flex-wrap gap-1">
-                {supplier1.certifications.map(cert => (
+                {supplier1.certifications.map((cert) => (
                   <Badge key={cert} variant="outline">
                     {cert}
                   </Badge>
                 ))}
                 {supplier1.certifications.length === 0 && (
-                  <span className="text-sm text-muted-foreground">No certifications</span>
+                  <span className="text-sm text-muted-foreground">
+                    No certifications
+                  </span>
                 )}
               </div>
             </div>
@@ -295,18 +348,22 @@ export default function SupplierComparisonPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-center">
-              <div className="text-5xl font-bold text-purple-600">{supplier2.overallScore}</div>
+              <div className="text-5xl font-bold text-purple-600">
+                {supplier2.overallScore}
+              </div>
               <div className="text-sm text-muted-foreground">Overall Score</div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center flex-wrap gap-1">
-                {supplier2.certifications.map(cert => (
+                {supplier2.certifications.map((cert) => (
                   <Badge key={cert} variant="outline">
                     {cert}
                   </Badge>
                 ))}
                 {supplier2.certifications.length === 0 && (
-                  <span className="text-sm text-muted-foreground">No certifications</span>
+                  <span className="text-sm text-muted-foreground">
+                    No certifications
+                  </span>
                 )}
               </div>
             </div>
@@ -318,7 +375,9 @@ export default function SupplierComparisonPage() {
       <Card>
         <CardHeader>
           <CardTitle>Performance Radar</CardTitle>
-          <CardDescription>Multi-dimensional performance comparison</CardDescription>
+          <CardDescription>
+            Multi-dimensional performance comparison
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
@@ -431,14 +490,17 @@ export default function SupplierComparisonPage() {
                   : supplier2.name}
               </h3>
               <p className="text-green-700">
-                Leads with an overall score of{' '}
-                {Math.max(supplier1.overallScore, supplier2.overallScore)} vs{' '}
+                Leads with an overall score of{" "}
+                {Math.max(supplier1.overallScore, supplier2.overallScore)} vs{" "}
                 {Math.min(supplier1.overallScore, supplier2.overallScore)}
               </p>
             </div>
             <div className="text-right">
               <div className="text-3xl font-bold text-green-600">
-                +{Math.abs(supplier1.overallScore - supplier2.overallScore).toFixed(1)}
+                +
+                {Math.abs(
+                  supplier1.overallScore - supplier2.overallScore,
+                ).toFixed(1)}
               </div>
               <div className="text-sm text-green-700">Point Advantage</div>
             </div>

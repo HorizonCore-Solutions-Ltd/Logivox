@@ -1,13 +1,13 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { sendEmail } from '@/lib/services/email-service';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { sendEmail } from "@/lib/services/email-service";
 
 const updateInvoiceSchema = z.object({
-  status: z.enum(['DRAFT', 'SENT', 'PAID', 'OVERDUE', 'CANCELLED']).optional(),
+  status: z.enum(["DRAFT", "SENT", "PAID", "OVERDUE", "CANCELLED"]).optional(),
   notes: z.string().optional(),
 });
 
@@ -21,21 +21,26 @@ const sendInvoiceSchema = z.object({
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -49,19 +54,22 @@ export async function GET(
         customer: true,
         lineItems: true,
         payments: {
-          orderBy: { paymentDate: 'desc' },
+          orderBy: { paymentDate: "desc" },
         },
       },
     });
 
     if (!invoice) {
-      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
     return NextResponse.json(invoice);
   } catch (error: any) {
-    console.error('Error fetching invoice:', error);
-    return NextResponse.json({ error: 'Failed to fetch invoice' }, { status: 500 });
+    console.error("Error fetching invoice:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch invoice" },
+      { status: 500 },
+    );
   }
 }
 
@@ -71,21 +79,26 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -100,7 +113,7 @@ export async function PUT(
     });
 
     if (!existingInvoice) {
-      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
     const invoice = await prisma.invoice.update({
@@ -118,8 +131,8 @@ export async function PUT(
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'INVOICE_UPDATED',
-        entityType: 'Invoice',
+        action: "INVOICE_UPDATED",
+        entityType: "Invoice",
         entityId: invoice.id,
         metadata: {
           invoiceNumber: invoice.invoiceNumber,
@@ -131,10 +144,16 @@ export async function PUT(
     return NextResponse.json(invoice);
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error updating invoice:', error);
-    return NextResponse.json({ error: 'Failed to update invoice' }, { status: 500 });
+    console.error("Error updating invoice:", error);
+    return NextResponse.json(
+      { error: "Failed to update invoice" },
+      { status: 500 },
+    );
   }
 }
 
@@ -144,21 +163,26 @@ export async function PUT(
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -178,12 +202,15 @@ export async function POST(
     });
 
     if (!invoice) {
-      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
     const toEmail = recipientEmail || invoice.customer.email;
     if (!toEmail) {
-      return NextResponse.json({ error: 'No recipient email available' }, { status: 400 });
+      return NextResponse.json(
+        { error: "No recipient email available" },
+        { status: 400 },
+      );
     }
 
     // Send invoice email
@@ -210,14 +237,18 @@ export async function POST(
             <th>Unit Price</th>
             <th>Amount</th>
           </tr>
-          ${invoice.lineItems.map(item => `
+          ${invoice.lineItems
+            .map(
+              (item) => `
             <tr>
               <td>${item.description}</td>
               <td>${item.quantity}</td>
               <td>$${item.unitPrice.toFixed(2)}</td>
               <td>$${item.amount.toFixed(2)}</td>
             </tr>
-          `).join('')}
+          `,
+            )
+            .join("")}
         </table>
         
         <p><strong>Subtotal:</strong> $${invoice.subtotal.toFixed(2)}</p>
@@ -231,8 +262,8 @@ export async function POST(
     // Update invoice status to SENT
     await prisma.invoice.update({
       where: { id: params.id },
-      data: { 
-        status: 'SENT',
+      data: {
+        status: "SENT",
         sentAt: new Date(),
       },
     });
@@ -242,8 +273,8 @@ export async function POST(
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'INVOICE_SENT',
-        entityType: 'Invoice',
+        action: "INVOICE_SENT",
+        entityType: "Invoice",
         entityId: invoice.id,
         metadata: {
           invoiceNumber: invoice.invoiceNumber,
@@ -252,13 +283,16 @@ export async function POST(
       },
     });
 
-    return NextResponse.json({ 
-      success: true, 
-      message: 'Invoice sent successfully',
+    return NextResponse.json({
+      success: true,
+      message: "Invoice sent successfully",
       sentTo: toEmail,
     });
   } catch (error: any) {
-    console.error('Error sending invoice:', error);
-    return NextResponse.json({ error: 'Failed to send invoice' }, { status: 500 });
+    console.error("Error sending invoice:", error);
+    return NextResponse.json(
+      { error: "Failed to send invoice" },
+      { status: 500 },
+    );
   }
 }

@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * Kubernetes/Docker liveness probe endpoint
@@ -11,10 +11,10 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   return NextResponse.json(
     {
-      status: 'alive',
+      status: "alive",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
     },
-    { status: 200 }
+    { status: 200 },
   );
 }

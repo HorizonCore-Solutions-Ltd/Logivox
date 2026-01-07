@@ -1,6 +1,7 @@
 # Performance Optimization Guide
 
 ## Overview
+
 This guide provides comprehensive strategies and implementation details for optimizing LogiVox WMS performance across all layers of the application.
 
 ---
@@ -8,15 +9,18 @@ This guide provides comprehensive strategies and implementation details for opti
 ## 1. Database Performance
 
 ### Indexing Strategy
+
 All critical database queries are optimized with appropriate indexes. See `prisma/indexes-schema.txt` for complete index definitions.
 
 **Key Indexes:**
+
 - **Inventory**: SKU, warehouse+status, reorder point queries
 - **Orders**: Order number, customer+status, warehouse+status
 - **Users**: Email, role, status
 - **Audit Logs**: User+timestamp, event type, severity
 
 **Index Guidelines:**
+
 ```typescript
 // Good: Composite index for common query
 @@index([warehouseId, status], name: "idx_inventory_warehouse_status")
@@ -29,10 +33,11 @@ All critical database queries are optimized with appropriate indexes. See `prism
 ```
 
 ### Query Optimization
+
 Use the Query Optimizer utilities in `lib/db/query-optimizer.ts`:
 
 ```typescript
-import { SelectFields, OptimizedIncludes } from '@/lib/db/query-optimizer';
+import { SelectFields, OptimizedIncludes } from "@/lib/db/query-optimizer";
 
 // Only select needed fields
 const inventory = await prisma.inventory.findMany({
@@ -41,22 +46,18 @@ const inventory = await prisma.inventory.findMany({
 });
 
 // Use pagination
-const { data, pagination } = buildPaginatedResult(
-  items,
-  total,
-  page,
-  limit
-);
+const { data, pagination } = buildPaginatedResult(items, total, page, limit);
 ```
 
 ### Connection Pooling
+
 Configure Prisma connection pool in `schema.prisma`:
 
 ```prisma
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  
+
   // Connection pool settings
   pool_timeout = 10
   connection_limit = 20
@@ -68,16 +69,17 @@ datasource db {
 ## 2. Caching Strategy
 
 ### Redis Caching
+
 Implement multi-layer caching with `lib/cache/redis-cache.ts`:
 
 ```typescript
-import { cache, CachePrefix, CacheTTL } from '@/lib/cache/redis-cache';
+import { cache, CachePrefix, CacheTTL } from "@/lib/cache/redis-cache";
 
 // Get or compute and cache
 const inventory = await cache.getOrSet(
   `${CachePrefix.INVENTORY}${id}`,
   async () => fetchInventoryFromDB(id),
-  CacheTTL.MEDIUM // 5 minutes
+  CacheTTL.MEDIUM, // 5 minutes
 );
 
 // Invalidate on updates
@@ -85,6 +87,7 @@ await invalidateInventoryCache(id);
 ```
 
 **Cache TTL Recommendations:**
+
 - **User data**: 5 minutes (MEDIUM)
 - **Inventory**: 5 minutes (MEDIUM)
 - **Orders**: 1 minute (SHORT)
@@ -92,6 +95,7 @@ await invalidateInventoryCache(id);
 - **Settings**: 24 hours (VERY_LONG)
 
 ### Cache Invalidation
+
 Always invalidate cache after data mutations:
 
 ```typescript
@@ -109,31 +113,34 @@ await invalidateStatsCache();
 ## 3. API Response Optimization
 
 ### Compression
+
 Enable response compression with `lib/performance/compression.ts`:
 
 ```typescript
-import { compressedJson } from '@/lib/performance/compression';
+import { compressedJson } from "@/lib/performance/compression";
 
 // In API route
 export async function GET(req: NextRequest) {
   const data = await fetchLargeDataset();
-  
+
   // Automatically compresses if > 1KB and client supports it
   return compressedJson(data, req);
 }
 ```
 
 **Compression Benefits:**
+
 - 60-80% size reduction for JSON
 - Reduces bandwidth costs
 - Faster response times
 - Automatic gzip/deflate negotiation
 
 ### Pagination
+
 Always paginate large datasets:
 
 ```typescript
-import { getPaginationParams } from '@/lib/db/query-optimizer';
+import { getPaginationParams } from "@/lib/db/query-optimizer";
 
 const { page, limit, skip, take } = getPaginationParams({
   page: 1,
@@ -147,6 +154,7 @@ const [items, total] = await Promise.all([
 ```
 
 ### Field Selection
+
 Only return necessary fields:
 
 ```typescript
@@ -168,6 +176,7 @@ const users = await prisma.user.findMany({
 ## 4. Frontend Optimization
 
 ### Code Splitting
+
 Use lazy loading for routes and components:
 
 ```typescript
@@ -185,6 +194,7 @@ const InventoryTable = lazyLoad(
 ```
 
 **Components to Lazy Load:**
+
 - Dashboard charts
 - Report viewers
 - Modal dialogs
@@ -192,10 +202,14 @@ const InventoryTable = lazyLoad(
 - Maps and visualizations
 
 ### Image Optimization
+
 Optimize images with `lib/performance/image-optimization.ts`:
 
 ```typescript
-import { ImageSizePresets, getOptimizedImageUrl } from '@/lib/performance/image-optimization';
+import {
+  ImageSizePresets,
+  getOptimizedImageUrl,
+} from "@/lib/performance/image-optimization";
 
 // Use optimized URLs
 const thumbnailUrl = getOptimizedImageUrl(src, ImageSizePresets.thumbnail);
@@ -205,6 +219,7 @@ const srcSet = generateSrcSet(src, [640, 1024, 1920]);
 ```
 
 **Image Best Practices:**
+
 - Use WebP format (25-35% smaller)
 - Implement lazy loading
 - Add blur placeholders
@@ -212,6 +227,7 @@ const srcSet = generateSrcSet(src, [640, 1024, 1920]);
 - Use appropriate sizes
 
 ### Bundle Size Optimization
+
 ```bash
 # Analyze bundle size
 npm run build -- --analyze
@@ -225,6 +241,7 @@ npm run build -- --analyze
 ## 5. Performance Monitoring
 
 ### Track Performance Metrics
+
 Use Performance Monitor from `lib/performance/monitoring.ts`:
 
 ```typescript
@@ -246,10 +263,11 @@ const summary = performanceMonitor.getSummary();
 ```
 
 ### Web Vitals Monitoring
+
 Track Core Web Vitals:
 
 ```typescript
-import { trackWebVitals } from '@/lib/performance/monitoring';
+import { trackWebVitals } from "@/lib/performance/monitoring";
 
 // In _app.tsx
 export function reportWebVitals(metric: any) {
@@ -258,6 +276,7 @@ export function reportWebVitals(metric: any) {
 ```
 
 **Target Metrics:**
+
 - **LCP** (Largest Contentful Paint): < 2.5s
 - **FID** (First Input Delay): < 100ms
 - **CLS** (Cumulative Layout Shift): < 0.1
@@ -268,6 +287,7 @@ export function reportWebVitals(metric: any) {
 ## 6. Backend Optimization
 
 ### Database Query Monitoring
+
 Track slow queries:
 
 ```typescript
@@ -285,21 +305,23 @@ async function getInventoryWithMovements(id: string) {
 ```
 
 ### Batch Operations
+
 Process large datasets in batches:
 
 ```typescript
-import { batchProcess } from '@/lib/db/query-optimizer';
+import { batchProcess } from "@/lib/db/query-optimizer";
 
 const results = await batchProcess(
   items,
   async (batch) => {
     return prisma.inventory.createMany({ data: batch });
   },
-  100 // batch size
+  100, // batch size
 );
 ```
 
 ### Connection Management
+
 - Use connection pooling (configured in Prisma)
 - Close connections properly
 - Implement connection retry logic
@@ -310,13 +332,17 @@ const results = await batchProcess(
 ## 7. CDN & Asset Delivery
 
 ### CDN Configuration
+
 Configure CDN for static assets:
 
 ```typescript
-import { getCDNImageUrl, CDNConfig } from '@/lib/performance/image-optimization';
+import {
+  getCDNImageUrl,
+  CDNConfig,
+} from "@/lib/performance/image-optimization";
 
 const cdn: CDNConfig = {
-  provider: 'cloudflare',
+  provider: "cloudflare",
   baseUrl: process.env.CDN_URL,
 };
 
@@ -324,6 +350,7 @@ const optimizedUrl = getCDNImageUrl(src, config, cdn);
 ```
 
 **CDN Best Practices:**
+
 - Host images on CDN
 - Enable automatic compression
 - Set long cache headers (1 year)
@@ -335,6 +362,7 @@ const optimizedUrl = getCDNImageUrl(src, config, cdn);
 ## 8. Performance Budget
 
 ### Budget Thresholds
+
 ```typescript
 const BUDGETS = {
   apiCall: 500, // ms
@@ -346,8 +374,9 @@ const BUDGETS = {
 ```
 
 ### Monitoring Budget
+
 ```typescript
-import { checkPerformanceBudgets } from '@/lib/performance/monitoring';
+import { checkPerformanceBudgets } from "@/lib/performance/monitoring";
 
 const budgets = checkPerformanceBudgets();
 budgets.forEach(({ budget, exceeded, value }) => {
@@ -362,33 +391,34 @@ budgets.forEach(({ budget, exceeded, value }) => {
 ## 9. Production Optimizations
 
 ### Next.js Configuration
+
 ```javascript
 // next.config.js
 module.exports = {
   // Enable SWC minification
   swcMinify: true,
-  
+
   // Image optimization
   images: {
-    domains: ['cdn.yourapp.com'],
-    formats: ['image/avif', 'image/webp'],
+    domains: ["cdn.yourapp.com"],
+    formats: ["image/avif", "image/webp"],
   },
-  
+
   // Compression
   compress: true,
-  
+
   // Production optimizations
   productionBrowserSourceMaps: false,
-  
+
   // Headers for caching
   async headers() {
     return [
       {
-        source: '/static/:path*',
+        source: "/static/:path*",
         headers: [
           {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },
@@ -398,6 +428,7 @@ module.exports = {
 ```
 
 ### Environment Variables
+
 ```env
 # Production optimizations
 NODE_ENV=production
@@ -419,6 +450,7 @@ CDN_URL=https://cdn.yourapp.com
 ## 10. Performance Checklist
 
 ### Before Deployment
+
 - [ ] Add database indexes for all frequent queries
 - [ ] Enable Redis caching for read-heavy data
 - [ ] Implement API response compression
@@ -431,6 +463,7 @@ CDN_URL=https://cdn.yourapp.com
 - [ ] Remove source maps in production
 
 ### Regular Monitoring
+
 - [ ] Review slow query logs weekly
 - [ ] Check cache hit rates
 - [ ] Monitor Web Vitals
@@ -441,6 +474,7 @@ CDN_URL=https://cdn.yourapp.com
 - [ ] Check memory usage
 
 ### Optimization Priorities
+
 1. **Database**: Indexes, query optimization, connection pooling
 2. **Caching**: Redis for reads, intelligent invalidation
 3. **API**: Compression, pagination, field selection

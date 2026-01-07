@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import DocumentService from '@/lib/services/document.service';
+import { NextResponse } from "next/server";
+import DocumentService from "@/lib/services/document.service";
 
 /**
  * POST /api/qc/documents/[id]/training
@@ -7,7 +7,7 @@ import DocumentService from '@/lib/services/document.service';
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -18,19 +18,18 @@ export async function POST(
       userName: body.userName,
       signature: body.signature,
       passed: body.passed,
-      notes: body.notes
+      notes: body.notes,
     });
 
     return NextResponse.json({
       success: true,
-      data: training
+      data: training,
     });
-
   } catch (error: any) {
-    console.error('Record training error:', error);
+    console.error("Record training error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to record training' },
-      { status: 500 }
+      { error: error.message || "Failed to record training" },
+      { status: 500 },
     );
   }
 }

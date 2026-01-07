@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const updateEmployeeSchema = z.object({
   firstName: z.string().min(1).optional(),
@@ -14,7 +14,7 @@ const updateEmployeeSchema = z.object({
   department: z.string().optional(),
   position: z.string().optional(),
   hourlyRate: z.number().positive().optional(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'ON_LEAVE', 'TERMINATED']).optional(),
+  status: z.enum(["ACTIVE", "INACTIVE", "ON_LEAVE", "TERMINATED"]).optional(),
   isFullTime: z.boolean().optional(),
   skills: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
@@ -26,21 +26,26 @@ const updateEmployeeSchema = z.object({
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -54,27 +59,33 @@ export async function GET(
         warehouse: true,
         shifts: {
           take: 10,
-          orderBy: { startTime: 'desc' },
+          orderBy: { startTime: "desc" },
         },
         timeEntries: {
           take: 20,
-          orderBy: { clockIn: 'desc' },
+          orderBy: { clockIn: "desc" },
         },
         productivityRecords: {
           take: 10,
-          orderBy: { date: 'desc' },
+          orderBy: { date: "desc" },
         },
       },
     });
 
     if (!employee) {
-      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(employee);
   } catch (error: any) {
-    console.error('Error fetching employee:', error);
-    return NextResponse.json({ error: 'Failed to fetch employee' }, { status: 500 });
+    console.error("Error fetching employee:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch employee" },
+      { status: 500 },
+    );
   }
 }
 
@@ -84,21 +95,26 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -113,7 +129,10 @@ export async function PUT(
     });
 
     if (!existingEmployee) {
-      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 },
+      );
     }
 
     const employee = await prisma.employee.update({
@@ -129,8 +148,8 @@ export async function PUT(
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'EMPLOYEE_UPDATED',
-        entityType: 'Employee',
+        action: "EMPLOYEE_UPDATED",
+        entityType: "Employee",
         entityId: employee.id,
         metadata: {
           employeeNumber: employee.employeeNumber,
@@ -142,10 +161,16 @@ export async function PUT(
     return NextResponse.json(employee);
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error updating employee:', error);
-    return NextResponse.json({ error: 'Failed to update employee' }, { status: 500 });
+    console.error("Error updating employee:", error);
+    return NextResponse.json(
+      { error: "Failed to update employee" },
+      { status: 500 },
+    );
   }
 }
 
@@ -155,21 +180,26 @@ export async function PUT(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -182,13 +212,16 @@ export async function DELETE(
     });
 
     if (!employee) {
-      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 },
+      );
     }
 
     // Soft delete by setting status to TERMINATED
     await prisma.employee.update({
       where: { id: params.id },
-      data: { status: 'TERMINATED' },
+      data: { status: "TERMINATED" },
     });
 
     // Log activity
@@ -196,8 +229,8 @@ export async function DELETE(
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'EMPLOYEE_TERMINATED',
-        entityType: 'Employee',
+        action: "EMPLOYEE_TERMINATED",
+        entityType: "Employee",
         entityId: employee.id,
         metadata: {
           employeeNumber: employee.employeeNumber,
@@ -206,9 +239,12 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json({ success: true, message: 'Employee terminated' });
+    return NextResponse.json({ success: true, message: "Employee terminated" });
   } catch (error: any) {
-    console.error('Error deleting employee:', error);
-    return NextResponse.json({ error: 'Failed to delete employee' }, { status: 500 });
+    console.error("Error deleting employee:", error);
+    return NextResponse.json(
+      { error: "Failed to delete employee" },
+      { status: 500 },
+    );
   }
 }

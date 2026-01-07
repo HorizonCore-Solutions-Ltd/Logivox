@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,7 +12,9 @@ const createSOSchema = z.object({
   warehouseId: z.string().optional(),
   requestedDate: z.string().optional(),
   promisedDate: z.string().optional(),
-  shippingMethod: z.enum(["STANDARD", "EXPRESS", "OVERNIGHT", "PICKUP", "FREIGHT"]).optional(),
+  shippingMethod: z
+    .enum(["STANDARD", "EXPRESS", "OVERNIGHT", "PICKUP", "FREIGHT"])
+    .optional(),
   shippingAddress: z.string().optional(),
   shippingCity: z.string().optional(),
   shippingState: z.string().optional(),
@@ -33,7 +35,7 @@ const createSOSchema = z.object({
       binLocation: z.string().optional(),
       batchNumber: z.string().optional(),
       notes: z.string().optional(),
-    })
+    }),
   ),
 });
 
@@ -47,7 +49,10 @@ export async function GET(request: NextRequest) {
 
     const organizationId = (session.user as any).organizations?.[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -129,7 +134,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching sales orders:", error);
     return NextResponse.json(
       { error: "Failed to fetch sales orders" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -146,7 +151,10 @@ export async function POST(request: NextRequest) {
     const userId = session.user.id;
 
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const body = await request.json();
@@ -203,79 +211,86 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    const total = subtotal + taxAmount + (validatedData.shippingAddress ? 0 : 0);
+    const total =
+      subtotal + taxAmount + (validatedData.shippingAddress ? 0 : 0);
 
     // Create sales order with items
-    const salesOrder = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const so = await tx.salesOrder.create({
-        data: {
-          organizationId,
-          soNumber,
-          customerId: validatedData.customerId,
-          warehouseId: validatedData.warehouseId,
-          status: (validatedData.status as any) || "DRAFT",
-          orderDate: new Date(),
-          requestedDate: validatedData.requestedDate ? new Date(validatedData.requestedDate) : null,
-          promisedDate: validatedData.promisedDate ? new Date(validatedData.promisedDate) : null,
-          shippingMethod: validatedData.shippingMethod as any,
-          shippingAddress: validatedData.shippingAddress,
-          shippingCity: validatedData.shippingCity,
-          shippingState: validatedData.shippingState,
-          shippingZip: validatedData.shippingZip,
-          shippingCountry: validatedData.shippingCountry,
-          subtotal,
-          taxAmount,
-          shippingCost: 0,
-          discount: 0,
-          total,
-          paymentStatus: "UNPAID",
-          paymentMethod: validatedData.paymentMethod,
-          paidAmount: 0,
-          priority: validatedData.priority || 0,
-          notes: validatedData.notes,
-          internalNotes: validatedData.internalNotes,
-          createdById: userId,
-          items: {
-            create: itemsToCreate,
-          },
-        },
-        include: {
-          items: {
-            include: {
-              inventoryItem: true,
-            },
-          },
-          customer: true,
-          warehouse: true,
-          createdBy: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-        },
-      });
-
-      // Log activity
-      await tx.activityLog.create({
-        data: {
-          organizationId,
-          userId,
-          action: "SALES_ORDER_CREATED",
-          entityType: "SalesOrder",
-          entityId: so.id,
-          metadata: {
-            soNumber: so.soNumber,
+    const salesOrder = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const so = await tx.salesOrder.create({
+          data: {
+            organizationId,
+            soNumber,
             customerId: validatedData.customerId,
-            total: total.toString(),
-            itemCount: items.length,
+            warehouseId: validatedData.warehouseId,
+            status: (validatedData.status as any) || "DRAFT",
+            orderDate: new Date(),
+            requestedDate: validatedData.requestedDate
+              ? new Date(validatedData.requestedDate)
+              : null,
+            promisedDate: validatedData.promisedDate
+              ? new Date(validatedData.promisedDate)
+              : null,
+            shippingMethod: validatedData.shippingMethod as any,
+            shippingAddress: validatedData.shippingAddress,
+            shippingCity: validatedData.shippingCity,
+            shippingState: validatedData.shippingState,
+            shippingZip: validatedData.shippingZip,
+            shippingCountry: validatedData.shippingCountry,
+            subtotal,
+            taxAmount,
+            shippingCost: 0,
+            discount: 0,
+            total,
+            paymentStatus: "UNPAID",
+            paymentMethod: validatedData.paymentMethod,
+            paidAmount: 0,
+            priority: validatedData.priority || 0,
+            notes: validatedData.notes,
+            internalNotes: validatedData.internalNotes,
+            createdById: userId,
+            items: {
+              create: itemsToCreate,
+            },
           },
-        },
-      });
+          include: {
+            items: {
+              include: {
+                inventoryItem: true,
+              },
+            },
+            customer: true,
+            warehouse: true,
+            createdBy: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+          },
+        });
 
-      return so;
-    });
+        // Log activity
+        await tx.activityLog.create({
+          data: {
+            organizationId,
+            userId,
+            action: "SALES_ORDER_CREATED",
+            entityType: "SalesOrder",
+            entityId: so.id,
+            metadata: {
+              soNumber: so.soNumber,
+              customerId: validatedData.customerId,
+              total: total.toString(),
+              itemCount: items.length,
+            },
+          },
+        });
+
+        return so;
+      },
+    );
 
     return NextResponse.json(salesOrder, { status: 201 });
   } catch (error) {
@@ -285,7 +300,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating sales order:", error);
     return NextResponse.json(
       { error: "Failed to create sales order" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

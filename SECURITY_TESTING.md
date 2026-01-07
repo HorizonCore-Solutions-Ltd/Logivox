@@ -1,11 +1,13 @@
 # Security and Testing Infrastructure
 
 ## Overview
+
 Military-grade security scanning and 100% test coverage for LogiVox WMS.
 
 ## Security Scanning Tools (Free/Open Source)
 
 ### 1. Dependency Scanning
+
 ```bash
 # NPM Audit (Built-in)
 npm audit --audit-level=high
@@ -21,6 +23,7 @@ docker run --rm -v $(pwd):/src owasp/dependency-check \
 ```
 
 ### 2. Static Application Security Testing (SAST)
+
 ```bash
 # ESLint Security Plugin
 npm install --save-dev eslint-plugin-security
@@ -34,6 +37,7 @@ semgrep --config=auto .
 ```
 
 ### 3. Dynamic Application Security Testing (DAST)
+
 ```bash
 # OWASP ZAP (Free)
 docker run -t owasp/zap2docker-stable zap-baseline.py \
@@ -44,6 +48,7 @@ docker run --rm sullo/nikto -h http://localhost:3000
 ```
 
 ### 4. Container Security
+
 ```bash
 # Trivy (Free)
 docker run aquasec/trivy image node:18-alpine
@@ -53,6 +58,7 @@ docker run --rm -i hadolint/hadolint < Dockerfile
 ```
 
 ### 5. Secret Scanning
+
 ```bash
 # GitLeaks (Free)
 docker run -v $(pwd):/path zricethezav/gitleaks:latest \
@@ -66,13 +72,14 @@ docker run -it -v $(pwd):/pwd trufflesecurity/trufflehog:latest \
 ## Automated Security Scanning Setup
 
 ### Daily Automated Scans
+
 Add to `.github/workflows/security-scan.yml`:
 
 ```yaml
 name: Security Scan
 on:
   schedule:
-    - cron: '0 2 * * *'  # Run daily at 2 AM
+    - cron: "0 2 * * *" # Run daily at 2 AM
   push:
     branches: [main, develop]
   pull_request:
@@ -82,36 +89,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       # Dependency vulnerabilities
       - name: Run npm audit
         run: npm audit --audit-level=moderate
-        
+
       # SAST scanning
       - name: Run Semgrep
         uses: returntocorp/semgrep-action@v1
-        
+
       # Secret scanning
       - name: GitLeaks scan
         uses: gitleaks/gitleaks-action@v2
-        
+
       # Container scanning
       - name: Run Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          
+          scan-type: "fs"
+          scan-ref: "."
+
       # OWASP Dependency Check
       - name: OWASP Dependency-Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
-          project: 'LogiVox'
-          path: '.'
-          format: 'HTML'
+          project: "LogiVox"
+          path: "."
+          format: "HTML"
 ```
 
 ### Pre-commit Security Hooks
+
 Add to `.husky/pre-commit`:
 
 ```bash
@@ -136,16 +144,17 @@ echo "✅ Security checks passed"
 ## 100% Test Coverage Configuration
 
 ### Update jest.config.js
+
 ```javascript
 module.exports = {
   collectCoverageFrom: [
-    'app/**/*.{js,jsx,ts,tsx}',
-    'components/**/*.{js,jsx,ts,tsx}',
-    'lib/**/*.{js,jsx,ts,tsx}',
-    'api/**/*.{js,jsx,ts,tsx}',
-    '!**/*.d.ts',
-    '!**/node_modules/**',
-    '!**/.next/**',
+    "app/**/*.{js,jsx,ts,tsx}",
+    "components/**/*.{js,jsx,ts,tsx}",
+    "lib/**/*.{js,jsx,ts,tsx}",
+    "api/**/*.{js,jsx,ts,tsx}",
+    "!**/*.d.ts",
+    "!**/node_modules/**",
+    "!**/.next/**",
   ],
   coverageThreshold: {
     global: {
@@ -155,30 +164,34 @@ module.exports = {
       statements: 100,
     },
   },
-  coverageReporters: ['text', 'lcov', 'html', 'json-summary'],
-}
+  coverageReporters: ["text", "lcov", "html", "json-summary"],
+};
 ```
 
 ## Test Categories
 
 ### 1. Unit Tests
+
 - Components: 100% coverage
 - Utilities: 100% coverage
 - Business logic: 100% coverage
 
 ### 2. Integration Tests
+
 - API routes
 - Database operations
 - Authentication flows
 - External service integrations
 
 ### 3. E2E Tests
+
 - Critical user journeys
 - Order fulfillment workflow
 - Inventory management
 - User authentication
 
 ### 4. Security Tests
+
 - SQL injection attempts
 - XSS prevention
 - CSRF protection
@@ -190,12 +203,14 @@ module.exports = {
 ## Annual Penetration Testing
 
 ### Recommended Services (Pay Once/Year)
+
 1. **Synack** - Crowdsourced penetration testing
 2. **HackerOne** - Bug bounty platform
 3. **Cobalt.io** - Pentest as a Service
 4. **Bishop Fox** - Professional pentest team
 
 ### Internal Preparation Checklist
+
 Before hiring external pentesters:
 
 - [ ] Complete OWASP Top 10 self-assessment
@@ -209,18 +224,17 @@ Before hiring external pentesters:
 - [ ] Audit logging and monitoring
 
 ### Scope for Annual Pentest
+
 1. **Web Application**
    - Authentication/Authorization
    - Session management
    - Input validation
    - Business logic flaws
-   
 2. **API Security**
    - REST API endpoints
    - GraphQL queries
    - WebSocket connections
    - OAuth2 flows
-   
 3. **Infrastructure**
    - Network security
    - Server hardening
@@ -235,6 +249,7 @@ Before hiring external pentesters:
 ## Security Monitoring Dashboard
 
 ### Setup Grafana + Prometheus
+
 ```bash
 # Monitor security metrics
 docker-compose up -d grafana prometheus
@@ -250,6 +265,7 @@ docker-compose up -d grafana prometheus
 ## Compliance & Standards
 
 ### Security Frameworks
+
 - ✅ OWASP Top 10 (2021)
 - ✅ CWE Top 25
 - ✅ SANS Top 25
@@ -258,6 +274,7 @@ docker-compose up -d grafana prometheus
 - ✅ ISO 27001 aligned
 
 ### Data Protection
+
 - ✅ GDPR compliant
 - ✅ CCPA ready
 - ✅ PCI DSS (if processing payments)
@@ -266,26 +283,31 @@ docker-compose up -d grafana prometheus
 ## Quick Start Commands
 
 ### Run All Security Scans
+
 ```bash
 npm run security:scan
 ```
 
 ### Run Full Test Suite
+
 ```bash
 npm run test:all
 ```
 
 ### Generate Coverage Report
+
 ```bash
 npm run test:coverage
 ```
 
 ### Run E2E Security Tests
+
 ```bash
 npm run test:security:e2e
 ```
 
 ### Check for Vulnerabilities
+
 ```bash
 npm run audit:full
 ```
@@ -293,6 +315,7 @@ npm run audit:full
 ## Cost Breakdown
 
 ### Free (Continuous)
+
 - NPM Audit: $0
 - ESLint Security: $0
 - OWASP ZAP: $0
@@ -303,6 +326,7 @@ npm run audit:full
 - GitHub Actions: $0 (public repos)
 
 ### Paid (Annual)
+
 - Professional Pentest: $5,000-15,000/year
 - Bug Bounty Program: $0 base + bounties
 - Extended Snyk: $0-1,000/year (if needed)
@@ -312,24 +336,28 @@ npm run audit:full
 ## Implementation Timeline
 
 ### Week 1: Setup
+
 - Configure all security scanning tools
 - Update CI/CD pipelines
 - Set up pre-commit hooks
 - Configure coverage reporting
 
 ### Week 2: Testing
+
 - Write comprehensive unit tests
 - Create integration test suite
 - Develop E2E security tests
 - Achieve 80%+ coverage
 
 ### Week 3: Security
+
 - Run full security audit
 - Fix identified vulnerabilities
 - Document security controls
 - Create incident response plan
 
 ### Week 4: Hardening
+
 - Implement security headers
 - Add rate limiting
 - Configure CORS properly
@@ -337,6 +365,7 @@ npm run audit:full
 - Achieve 100% coverage
 
 ### Ongoing
+
 - Daily automated security scans
 - Weekly vulnerability reviews
 - Monthly security team meetings
@@ -346,6 +375,7 @@ npm run audit:full
 ## Success Metrics
 
 ### Coverage Goals
+
 - Unit Test Coverage: 100%
 - Integration Test Coverage: 100%
 - E2E Test Coverage: 90%+
@@ -353,6 +383,7 @@ npm run audit:full
 - Function Coverage: 100%
 
 ### Security Goals
+
 - Zero high/critical vulnerabilities
 - < 5 medium vulnerabilities
 - All dependencies up-to-date
@@ -363,17 +394,20 @@ npm run audit:full
 ## Resources
 
 ### Documentation
+
 - [OWASP Testing Guide](https://owasp.org/www-project-web-security-testing-guide/)
 - [NIST Cybersecurity Framework](https://www.nist.gov/cyberframework)
 - [CWE Top 25](https://cwe.mitre.org/top25/)
 
 ### Tools Documentation
+
 - [OWASP ZAP](https://www.zaproxy.org/docs/)
 - [Semgrep](https://semgrep.dev/docs/)
 - [Trivy](https://aquasecurity.github.io/trivy/)
 - [Snyk](https://docs.snyk.io/)
 
 ### Training
+
 - [OWASP WebGoat](https://owasp.org/www-project-webgoat/)
 - [PortSwigger Web Security Academy](https://portswigger.net/web-security)
 - [HackTheBox](https://www.hackthebox.com/)

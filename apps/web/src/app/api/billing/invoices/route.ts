@@ -1,23 +1,25 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const invoiceSchema = z.object({
   customerId: z.string(),
   invoiceNumber: z.string().optional(),
-  billingPeriodStart: z.string().transform(str => new Date(str)),
-  billingPeriodEnd: z.string().transform(str => new Date(str)),
-  dueDate: z.string().transform(str => new Date(str)),
+  billingPeriodStart: z.string().transform((str) => new Date(str)),
+  billingPeriodEnd: z.string().transform((str) => new Date(str)),
+  dueDate: z.string().transform((str) => new Date(str)),
   notes: z.string().optional(),
-  lineItems: z.array(z.object({
-    description: z.string(),
-    quantity: z.number().positive(),
-    unitPrice: z.number().positive(),
-    amount: z.number().positive(),
-  })),
+  lineItems: z.array(
+    z.object({
+      description: z.string(),
+      quantity: z.number().positive(),
+      unitPrice: z.number().positive(),
+      amount: z.number().positive(),
+    }),
+  ),
 });
 
 /**
@@ -28,24 +30,29 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { searchParams } = new URL(req.url);
-    const customerId = searchParams.get('customerId');
-    const status = searchParams.get('status');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const customerId = searchParams.get("customerId");
+    const status = searchParams.get("status");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     const invoices = await prisma.invoice.findMany({
       where: {
@@ -62,13 +69,16 @@ export async function GET(req: NextRequest) {
         lineItems: true,
         payments: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(invoices);
   } catch (error: any) {
-    console.error('Error fetching invoices:', error);
-    return NextResponse.json({ error: 'Failed to fetch invoices' }, { status: 500 });
+    console.error("Error fetching invoices:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch invoices" },
+      { status: 500 },
+    );
   }
 }
 
@@ -80,16 +90,21 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -112,7 +127,7 @@ export async function POST(req: NextRequest) {
         subtotal,
         taxAmount,
         totalAmount,
-        status: 'DRAFT',
+        status: "DRAFT",
         lineItems: {
           create: lineItems,
         },
@@ -130,8 +145,8 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'INVOICE_CREATED',
-        entityType: 'Invoice',
+        action: "INVOICE_CREATED",
+        entityType: "Invoice",
         entityId: invoice.id,
         metadata: {
           invoiceNumber: invoice.invoiceNumber,
@@ -144,9 +159,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(invoice, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error creating invoice:', error);
-    return NextResponse.json({ error: 'Failed to create invoice' }, { status: 500 });
+    console.error("Error creating invoice:", error);
+    return NextResponse.json(
+      { error: "Failed to create invoice" },
+      { status: 500 },
+    );
   }
 }

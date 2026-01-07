@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 // POST /api/warehouse-transfers/[id]/approve - Approve transfer
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,7 +23,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -31,7 +31,7 @@ export async function POST(
     if (!["MANAGER", "ADMIN"].includes(membership.role)) {
       return NextResponse.json(
         { error: "Insufficient permissions to approve transfers" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -50,14 +50,14 @@ export async function POST(
     if (!transfer) {
       return NextResponse.json(
         { error: "Transfer not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (transfer.status !== "PENDING") {
       return NextResponse.json(
         { error: "Only pending transfers can be approved" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -106,7 +106,7 @@ export async function POST(
     console.error("Error approving transfer:", error);
     return NextResponse.json(
       { error: error.message || "Failed to approve transfer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

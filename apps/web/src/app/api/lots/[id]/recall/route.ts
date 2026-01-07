@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -15,7 +15,7 @@ const recallSchema = z.object({
 // POST /api/lots/[id]/recall - Issue a recall for a lot
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -34,7 +34,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -74,7 +74,7 @@ export async function POST(
     if (lot.isRecalled) {
       return NextResponse.json(
         { error: "Lot is already recalled" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -119,7 +119,7 @@ export async function POST(
             affectedCustomers: new Set(
               lot.serialNumbers
                 .filter((sn: any) => sn.customer)
-                .map((sn: any) => sn.customer?.id)
+                .map((sn: any) => sn.customer?.id),
             ).size,
           },
         },
@@ -142,14 +142,14 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error recalling lot:", error);
     return NextResponse.json(
       { error: "Failed to recall lot" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -157,7 +157,7 @@ export async function POST(
 // GET /api/lots/[id]/recall - Get recall details and impact
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -175,7 +175,7 @@ export async function GET(
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization membership" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -230,7 +230,10 @@ export async function GET(
     });
 
     if (!lot) {
-      return NextResponse.json({ error: "Recalled lot not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Recalled lot not found" },
+        { status: 404 },
+      );
     }
 
     // Get downstream affected lots (lots created using this lot as ingredient)
@@ -247,13 +250,14 @@ export async function GET(
       },
       impact: {
         totalSerialNumbers: lot.serialNumbers.length,
-        soldSerialNumbers: lot.serialNumbers.filter((sn: any) => sn.status === "RETURNED")
-          .length,
+        soldSerialNumbers: lot.serialNumbers.filter(
+          (sn: any) => sn.status === "RETURNED",
+        ).length,
         affectedCustomers: [
           ...new Map(
             lot.serialNumbers
               .filter((sn: any) => sn.customer)
-              .map((sn: any) => [sn.customer!.id, sn.customer!])
+              .map((sn: any) => [sn.customer!.id, sn.customer!]),
           ).values(),
         ],
         downstreamLots,
@@ -264,7 +268,7 @@ export async function GET(
     console.error("Error fetching recall details:", error);
     return NextResponse.json(
       { error: "Failed to fetch recall details" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

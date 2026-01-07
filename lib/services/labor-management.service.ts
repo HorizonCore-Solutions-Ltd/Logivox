@@ -1,17 +1,16 @@
 /**
  * Labor Management Service
- * 
+ *
  * Simplified labor management based on actual schema:
  * - TimeEntry model (employeeId, startTime, endTime, duration)
  * - ProductivityRecord model (employeeId, tasksCompleted, etc)
  * - Employee model (not User)
  */
 
-import { prisma } from '@/lib/prisma';
-import { TimeEntryType, TimeEntryStatus } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { TimeEntryType, TimeEntryStatus } from "@prisma/client";
 
 export class LaborManagementService {
-  
   /**
    * Clock in - create time entry
    */
@@ -31,7 +30,7 @@ export class LaborManagementService {
     });
 
     if (active) {
-      throw new Error('Employee already clocked in');
+      throw new Error("Employee already clocked in");
     }
 
     return prisma.timeEntry.create({
@@ -41,7 +40,7 @@ export class LaborManagementService {
         warehouseId: params.warehouseId,
         zoneId: params.zoneId,
         startTime: new Date(),
-        entryType: params.entryType || 'CLOCK_IN_OUT',
+        entryType: params.entryType || "CLOCK_IN_OUT",
         status: TimeEntryStatus.PENDING,
       },
       include: {
@@ -66,11 +65,12 @@ export class LaborManagementService {
     });
 
     if (!entry) {
-      throw new Error('No active time entry');
+      throw new Error("No active time entry");
     }
 
     const endTime = new Date();
-    const durationHours = (endTime.getTime() - entry.startTime.getTime()) / (1000 * 60 * 60);
+    const durationHours =
+      (endTime.getTime() - entry.startTime.getTime()) / (1000 * 60 * 60);
     const breakHours = params.breakDuration || 0;
     const netHours = durationHours - breakHours;
 
@@ -117,7 +117,7 @@ export class LaborManagementService {
         employee: true,
       },
       orderBy: {
-        startTime: 'desc',
+        startTime: "desc",
       },
     });
   }
@@ -177,9 +177,13 @@ export class LaborManagementService {
       },
     });
 
-    const tasksCompleted = records.reduce((sum, r) => sum + r.tasksCompleted, 0);
+    const tasksCompleted = records.reduce(
+      (sum, r) => sum + r.tasksCompleted,
+      0,
+    );
     const tasksAssigned = records.reduce((sum, r) => sum + r.tasksAssigned, 0);
-    const completionRate = tasksAssigned > 0 ? (tasksCompleted / tasksAssigned) * 100 : 0;
+    const completionRate =
+      tasksAssigned > 0 ? (tasksCompleted / tasksAssigned) * 100 : 0;
 
     return {
       employeeId: params.employeeId,
@@ -198,7 +202,8 @@ export class LaborManagementService {
     startDate?: Date;
     endDate?: Date;
   }) {
-    const start = params.startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const start =
+      params.startDate || new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const end = params.endDate || new Date();
 
     const entries = await prisma.timeEntry.findMany({
@@ -212,8 +217,11 @@ export class LaborManagementService {
     });
 
     const totalHours = entries.reduce((sum, e) => sum + (e.duration || 0), 0);
-    const totalPay = entries.reduce((sum, e) => sum + Number(e.totalPay || 0), 0);
-    const workers = new Set(entries.map(e => e.employeeId)).size;
+    const totalPay = entries.reduce(
+      (sum, e) => sum + Number(e.totalPay || 0),
+      0,
+    );
+    const workers = new Set(entries.map((e) => e.employeeId)).size;
 
     return {
       warehouseId: params.warehouseId,
@@ -240,11 +248,14 @@ export class LaborManagementService {
       },
     });
 
-    return active.map(entry => ({
+    return active.map((entry) => ({
       employeeId: entry.employeeId,
       employeeName: `${entry.employee.firstName} ${entry.employee.lastName}`,
       startTime: entry.startTime,
-      hoursWorked: ((new Date().getTime() - entry.startTime.getTime()) / (1000 * 60 * 60)).toFixed(1),
+      hoursWorked: (
+        (new Date().getTime() - entry.startTime.getTime()) /
+        (1000 * 60 * 60)
+      ).toFixed(1),
     }));
   }
 
@@ -269,7 +280,10 @@ export class LaborManagementService {
 
     const entries = await prisma.timeEntry.findMany({ where });
 
-    const totalCost = entries.reduce((sum, e) => sum + Number(e.totalPay || 0), 0);
+    const totalCost = entries.reduce(
+      (sum, e) => sum + Number(e.totalPay || 0),
+      0,
+    );
     const totalHours = entries.reduce((sum, e) => sum + (e.duration || 0), 0);
 
     return {
@@ -305,7 +319,7 @@ export class LaborManagementService {
 
     for (const entry of entries) {
       const empId = entry.employeeId;
-      
+
       if (!attendance[empId]) {
         attendance[empId] = {
           employeeId: empId,
@@ -322,7 +336,8 @@ export class LaborManagementService {
     // Add averages
     for (const empId in attendance) {
       const att = attendance[empId];
-      att.averageHours = att.daysWorked > 0 ? (att.totalHours / att.daysWorked).toFixed(2) : 0;
+      att.averageHours =
+        att.daysWorked > 0 ? (att.totalHours / att.daysWorked).toFixed(2) : 0;
     }
 
     return {

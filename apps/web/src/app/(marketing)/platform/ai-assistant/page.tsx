@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Bot,
   MessageSquare,
@@ -20,36 +26,40 @@ import {
   Cpu,
   Database,
   Cloud,
-  WifiOff
-} from "lucide-react"
+  WifiOff,
+} from "lucide-react";
 
 export default function AIAssistantPage() {
   const assistantFeatures = [
     {
       icon: WifiOff,
       title: "Works Without Internet (Public Pages)",
-      description: "Public-facing AI assistant available on all marketing pages without requiring internet connection. Instant responses for pre-sales questions.",
-      badge: "Public Access"
+      description:
+        "Public-facing AI assistant available on all marketing pages without requiring internet connection. Instant responses for pre-sales questions.",
+      badge: "Public Access",
     },
     {
       icon: Users,
       title: "Tenant-Aware AI (Logged-In Users)",
-      description: "Intelligent AI assistant that understands your organization's data, workflows, and context. Provides personalized help based on your tenant.",
-      badge: "Enterprise"
+      description:
+        "Intelligent AI assistant that understands your organization's data, workflows, and context. Provides personalized help based on your tenant.",
+      badge: "Enterprise",
     },
     {
       icon: Brain,
       title: "Context-Aware Intelligence",
-      description: "AI understands your inventory, orders, warehouse layouts, and operations to provide relevant, actionable insights.",
-      badge: "Smart"
+      description:
+        "AI understands your inventory, orders, warehouse layouts, and operations to provide relevant, actionable insights.",
+      badge: "Smart",
     },
     {
       icon: Lock,
       title: "Secure & Private",
-      description: "All AI interactions are encrypted and tenant-isolated. Your data never leaves your secure environment.",
-      badge: "Military-Grade"
-    }
-  ]
+      description:
+        "All AI interactions are encrypted and tenant-isolated. Your data never leaves your secure environment.",
+      badge: "Military-Grade",
+    },
+  ];
 
   const publicAssistantCapabilities = [
     "Answer product questions",
@@ -57,8 +67,8 @@ export default function AIAssistantPage() {
     "Help with navigation",
     "Provide technical documentation",
     "Schedule demos",
-    "Connect with sales team"
-  ]
+    "Connect with sales team",
+  ];
 
   const enterpriseAssistantCapabilities = [
     "Search inventory across warehouses",
@@ -70,31 +80,31 @@ export default function AIAssistantPage() {
     "Provide workflow guidance",
     "Answer policy questions",
     "Create cycle count tasks",
-    "Optimize warehouse operations"
-  ]
+    "Optimize warehouse operations",
+  ];
 
   const securityFeatures = [
     {
       icon: Shield,
       title: "Military-Grade Encryption",
-      description: "All AI conversations encrypted with AES-256"
+      description: "All AI conversations encrypted with AES-256",
     },
     {
       icon: Database,
       title: "Tenant Isolation",
-      description: "Complete data separation between organizations"
+      description: "Complete data separation between organizations",
     },
     {
       icon: Lock,
       title: "Role-Based Access",
-      description: "AI respects your user permissions and roles"
+      description: "AI respects your user permissions and roles",
     },
     {
       icon: Cloud,
       title: "Private Deployment",
-      description: "Option for on-premise or private cloud hosting"
-    }
-  ]
+      description: "Option for on-premise or private cloud hosting",
+    },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -110,8 +120,9 @@ export default function AIAssistantPage() {
               </span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Get instant help with our AI assistant. Available on public pages without internet, 
-              and fully tenant-aware for logged-in users with access to your warehouse data.
+              Get instant help with our AI assistant. Available on public pages
+              without internet, and fully tenant-aware for logged-in users with
+              access to your warehouse data.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -135,7 +146,9 @@ export default function AIAssistantPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Two Modes, One Intelligence</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Two Modes, One Intelligence
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Public assistant for visitors, enterprise assistant for your team
             </p>
@@ -143,7 +156,7 @@ export default function AIAssistantPage() {
 
           <div className="grid gap-8 lg:grid-cols-2">
             {assistantFeatures.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <Card key={feature.title} className="relative overflow-hidden">
                   <div className="absolute top-4 right-4">
@@ -154,10 +167,12 @@ export default function AIAssistantPage() {
                       <Icon className="h-6 w-6 text-primary" />
                     </div>
                     <CardTitle>{feature.title}</CardTitle>
-                    <CardDescription className="text-base">{feature.description}</CardDescription>
+                    <CardDescription className="text-base">
+                      {feature.description}
+                    </CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -176,7 +191,9 @@ export default function AIAssistantPage() {
                   </div>
                   <div>
                     <CardTitle>Public Assistant</CardTitle>
-                    <CardDescription>Available to all visitors (no login required)</CardDescription>
+                    <CardDescription>
+                      Available to all visitors (no login required)
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -192,7 +209,9 @@ export default function AIAssistantPage() {
                 <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                   <div className="flex items-center space-x-2 text-sm text-blue-700 dark:text-blue-300">
                     <WifiOff className="h-4 w-4" />
-                    <span className="font-medium">Works without internet connection</span>
+                    <span className="font-medium">
+                      Works without internet connection
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -207,7 +226,9 @@ export default function AIAssistantPage() {
                   </div>
                   <div>
                     <CardTitle>Enterprise Assistant</CardTitle>
-                    <CardDescription>Tenant-aware for logged-in users</CardDescription>
+                    <CardDescription>
+                      Tenant-aware for logged-in users
+                    </CardDescription>
                   </div>
                 </div>
                 <Badge className="w-fit">Most Popular</Badge>
@@ -224,7 +245,9 @@ export default function AIAssistantPage() {
                 <div className="mt-6 p-4 bg-primary/5 rounded-lg">
                   <div className="flex items-center space-x-2 text-sm text-primary">
                     <Sparkles className="h-4 w-4" />
-                    <span className="font-medium">Access to your complete warehouse data</span>
+                    <span className="font-medium">
+                      Access to your complete warehouse data
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -237,7 +260,9 @@ export default function AIAssistantPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Enterprise Security & Privacy</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Enterprise Security & Privacy
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Military-grade security with complete tenant isolation
             </p>
@@ -245,7 +270,7 @@ export default function AIAssistantPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {securityFeatures.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <Card key={feature.title}>
                   <CardHeader>
@@ -256,7 +281,7 @@ export default function AIAssistantPage() {
                     <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -278,7 +303,8 @@ export default function AIAssistantPage() {
                 <MessageSquare className="h-8 w-8 text-primary mb-3" />
                 <CardTitle>Natural Language Queries</CardTitle>
                 <CardDescription className="text-base">
-                  "Show me all SKUs in warehouse A with less than 100 units" — Get instant results
+                  "Show me all SKUs in warehouse A with less than 100 units" —
+                  Get instant results
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -288,7 +314,8 @@ export default function AIAssistantPage() {
                 <Zap className="h-8 w-8 text-primary mb-3" />
                 <CardTitle>Workflow Assistance</CardTitle>
                 <CardDescription className="text-base">
-                  "Walk me through the receiving process for hazmat items" — Step-by-step guidance
+                  "Walk me through the receiving process for hazmat items" —
+                  Step-by-step guidance
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -298,7 +325,8 @@ export default function AIAssistantPage() {
                 <Cpu className="h-8 w-8 text-primary mb-3" />
                 <CardTitle>Predictive Insights</CardTitle>
                 <CardDescription className="text-base">
-                  "Which items are likely to stock out next week?" — AI-powered forecasting
+                  "Which items are likely to stock out next week?" — AI-powered
+                  forecasting
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -316,7 +344,8 @@ export default function AIAssistantPage() {
                 Experience Intelligent Warehouse Management
               </h2>
               <p className="text-xl text-primary-50 mb-8 max-w-2xl mx-auto">
-                Start with our public AI assistant today, upgrade to enterprise features when ready.
+                Start with our public AI assistant today, upgrade to enterprise
+                features when ready.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="secondary" asChild>
@@ -325,10 +354,13 @@ export default function AIAssistantPage() {
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="bg-white/10 text-white border-white/20 hover:bg-white/20" asChild>
-                  <Link href="/contact">
-                    Contact Sales
-                  </Link>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-white/10 text-white border-white/20 hover:bg-white/20"
+                  asChild
+                >
+                  <Link href="/contact">Contact Sales</Link>
                 </Button>
               </div>
             </CardContent>
@@ -336,5 +368,5 @@ export default function AIAssistantPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

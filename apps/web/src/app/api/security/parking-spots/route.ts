@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const createSpotSchema = z.object({
   spotNumber: z.string().min(1),
   zone: z.string().min(1),
-  type: z.enum(['STANDARD', 'OVERSIZED', 'REFRIGERATED', 'HAZMAT']),
+  type: z.enum(["STANDARD", "OVERSIZED", "REFRIGERATED", "HAZMAT"]),
   warehouseId: z.string(),
   maxVehicleLength: z.number().optional(),
   maxVehicleWidth: z.number().optional(),
@@ -22,7 +22,7 @@ const createSpotSchema = z.object({
 
 const findAvailableSchema = z.object({
   warehouseId: z.string(),
-  type: z.enum(['STANDARD', 'OVERSIZED', 'REFRIGERATED', 'HAZMAT']).optional(),
+  type: z.enum(["STANDARD", "OVERSIZED", "REFRIGERATED", "HAZMAT"]).optional(),
   requiresElectricity: z.string().optional(),
   requiresRefrigeration: z.string().optional(),
   requiresHazmat: z.string().optional(),
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Spot number already exists' },
-        { status: 400 }
+        { error: "Spot number already exists" },
+        { status: 400 },
       );
     }
 
@@ -69,15 +69,15 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating parking spot:', error);
+    console.error("Error creating parking spot:", error);
     return NextResponse.json(
-      { error: 'Failed to create parking spot' },
-      { status: 500 }
+      { error: "Failed to create parking spot" },
+      { status: 500 },
     );
   }
 }
@@ -86,14 +86,14 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const warehouseId = searchParams.get('warehouseId');
-    const status = searchParams.get('status');
-    const type = searchParams.get('type');
-    const zone = searchParams.get('zone');
+    const warehouseId = searchParams.get("warehouseId");
+    const status = searchParams.get("status");
+    const type = searchParams.get("type");
+    const zone = searchParams.get("zone");
 
     const where: any = {
       organizationId: session.user.organizationId,
@@ -134,18 +134,15 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: [
-        { zone: 'asc' },
-        { spotNumber: 'asc' },
-      ],
+      orderBy: [{ zone: "asc" }, { spotNumber: "asc" }],
     });
 
     return NextResponse.json({ spots });
   } catch (error) {
-    console.error('Error fetching parking spots:', error);
+    console.error("Error fetching parking spots:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch parking spots' },
-      { status: 500 }
+      { error: "Failed to fetch parking spots" },
+      { status: 500 },
     );
   }
 }

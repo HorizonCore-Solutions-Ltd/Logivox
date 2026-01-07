@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { ReorderAlertEngine } from '@/lib/alerts';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { ReorderAlertEngine } from "@/lib/alerts";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/alerts/[id]/acknowledge
@@ -11,16 +11,13 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const alertId = params.id;
@@ -32,10 +29,10 @@ export async function POST(
       alert,
     });
   } catch (error) {
-    console.error('[POST /api/alerts/:id/acknowledge] Error:', error);
+    console.error("[POST /api/alerts/:id/acknowledge] Error:", error);
     return NextResponse.json(
-      { error: 'Failed to acknowledge alert' },
-      { status: 500 }
+      { error: "Failed to acknowledge alert" },
+      { status: 500 },
     );
   }
 }

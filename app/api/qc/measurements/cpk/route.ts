@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { QualityMeasurementService } from '@/lib/services/qc/quality-measurement-service';
+import { NextRequest, NextResponse } from "next/server";
+import { QualityMeasurementService } from "@/lib/services/qc/quality-measurement-service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +15,11 @@ export async function POST(request: NextRequest) {
 
     if (!organizationId || !referenceType || !referenceId || !measurementName) {
       return NextResponse.json(
-        { error: 'organizationId, referenceType, referenceId, and measurementName are required' },
-        { status: 400 }
+        {
+          error:
+            "organizationId, referenceType, referenceId, and measurementName are required",
+        },
+        { status: 400 },
       );
     }
 
@@ -31,17 +34,17 @@ export async function POST(request: NextRequest) {
 
     if (!cpk) {
       return NextResponse.json(
-        { error: 'Insufficient data to calculate CPK' },
-        { status: 404 }
+        { error: "Insufficient data to calculate CPK" },
+        { status: 404 },
       );
     }
 
     return NextResponse.json(cpk);
   } catch (error: any) {
-    console.error('Error calculating CPK:', error);
+    console.error("Error calculating CPK:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to calculate CPK' },
-      { status: 500 }
+      { error: error.message || "Failed to calculate CPK" },
+      { status: 500 },
     );
   }
 }

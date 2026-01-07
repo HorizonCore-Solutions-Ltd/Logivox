@@ -1,4 +1,5 @@
 # 🚀 LogiVox - Production Readiness Plan
+
 **Transform to Turnkey Enterprise Solution**
 
 **Date:** January 3, 2026  
@@ -10,7 +11,9 @@
 ## 📋 Executive Summary
 
 ### Current State Assessment
+
 LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
+
 - ✅ **32+ Core Modules** fully implemented
 - ✅ **8,278-line Prisma Schema** (150+ models)
 - ✅ **228+ API Endpoints** with authentication
@@ -21,45 +24,51 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 ### Gap Analysis Summary
 
-| Category | Status | Completeness | Priority |
-|----------|--------|--------------|----------|
-| **1. CRUD Completeness** | 🟡 Good | 85% | High |
-| **2. UI Consistency** | 🟢 Excellent | 95% | Low |
-| **3. Security & Compliance** | 🟢 Excellent | 90% | Medium |
-| **4. Business Continuity** | 🟡 Good | 75% | High |
-| **5. Integration & Wiring** | 🟡 Good | 80% | High |
-| **6. Deployment Readiness** | 🟡 Good | 70% | **CRITICAL** |
-| **7. Code Quality** | 🟢 Excellent | 90% | Low |
+| Category                     | Status       | Completeness | Priority     |
+| ---------------------------- | ------------ | ------------ | ------------ |
+| **1. CRUD Completeness**     | 🟡 Good      | 85%          | High         |
+| **2. UI Consistency**        | 🟢 Excellent | 95%          | Low          |
+| **3. Security & Compliance** | 🟢 Excellent | 90%          | Medium       |
+| **4. Business Continuity**   | 🟡 Good      | 75%          | High         |
+| **5. Integration & Wiring**  | 🟡 Good      | 80%          | High         |
+| **6. Deployment Readiness**  | 🟡 Good      | 70%          | **CRITICAL** |
+| **7. Code Quality**          | 🟢 Excellent | 90%          | Low          |
 
 ---
 
 ## 🎯 CONTEXT
 
 ### Application Details
+
 - **Name:** LogiVox (Enterprise WMS)
 - **Tech Stack:** Next.js 14, React 18, TypeScript, Prisma, PostgreSQL
 - **Architecture:** Monorepo (apps/web/, packages/, lib/, components/)
 - **Target:** Docker + Kubernetes + Cloud (Azure/AWS/GCP ready)
 
 ### Core Domains (32+ Modules)
+
 **Warehouse Operations:**
+
 - Inventory, Locations, Receiving (GRN), Picking, Packing, Shipping
 - Returns (RMA), Replenishment, Cycle Counting, Stock Adjustments
 - Wave Management, Task Automation, Routing
 
 **Advanced Features:**
+
 - Voice Operations (500-700+ commands)
 - Quality Control (QC), Assembly & Kitting, Bill of Materials (BOM)
 - Lot & Serial Tracking, Cross-Docking
 - Yard Management, Gate & Security, Guard Management
 
 **Analytics & Integration:**
+
 - AI-Powered Forecasting, Dashboards, Reports
 - ERP Integration (SAP, Oracle, NetSuite)
 - E-commerce Sync (Shopify, WooCommerce)
 - Carrier Integration (FedEx, UPS)
 
 **Multi-Tenant:**
+
 - Organizations, Users, Roles, Permissions
 - Complete tenant isolation, RBAC, audit logging
 
@@ -70,6 +79,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 ### 1. CRUD COMPLETENESS (85% Complete)
 
 #### ✅ COMPLETED Entities (Full CRUD)
+
 1. **Users** - Create, Read, Update, Soft-Delete ✅
 2. **Organizations** - Full CRUD + Member Management ✅
 3. **Warehouses** - Full CRUD ✅
@@ -102,6 +112,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 30. **Guard Patrols** - Full CRUD + Check-ins ✅
 
 #### 🟡 PARTIAL Entities (Needs Completion)
+
 31. **Locations** (Storage Locations)
     - ✅ Database Model
     - ✅ GET API
@@ -174,24 +185,25 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 #### 📊 CRUD Status by Module
 
-| Module | Create | Read | Update | Delete | UI | Status |
-|--------|--------|------|--------|--------|----|----|
-| Users | ✅ | ✅ | ✅ | ✅ | ✅ | **Complete** |
-| Organizations | ✅ | ✅ | ✅ | ✅ | ✅ | **Complete** |
-| Inventory | ✅ | ✅ | ✅ | ✅ | ✅ | **Complete** |
-| Locations | ❌ | ✅ | ❌ | ❌ | ⚠️ | **Partial** |
-| Carriers | ❌ | ❌ | ❌ | ❌ | ❌ | **Missing** |
-| Slotting | ❌ | ❌ | ❌ | ❌ | ❌ | **Missing** |
-| Load Planning | ⚠️ | ✅ | ⚠️ | ❌ | ⚠️ | **Partial** |
-| Billing | ❌ | ❌ | ❌ | ❌ | ❌ | **Missing** |
-| IoT Devices | ❌ | ❌ | ❌ | ❌ | ❌ | **Missing** |
-| Labor Mgmt | ❌ | ❌ | ❌ | ❌ | ❌ | **Missing** |
+| Module        | Create | Read | Update | Delete | UI  | Status       |
+| ------------- | ------ | ---- | ------ | ------ | --- | ------------ |
+| Users         | ✅     | ✅   | ✅     | ✅     | ✅  | **Complete** |
+| Organizations | ✅     | ✅   | ✅     | ✅     | ✅  | **Complete** |
+| Inventory     | ✅     | ✅   | ✅     | ✅     | ✅  | **Complete** |
+| Locations     | ❌     | ✅   | ❌     | ❌     | ⚠️  | **Partial**  |
+| Carriers      | ❌     | ❌   | ❌     | ❌     | ❌  | **Missing**  |
+| Slotting      | ❌     | ❌   | ❌     | ❌     | ❌  | **Missing**  |
+| Load Planning | ⚠️     | ✅   | ⚠️     | ❌     | ⚠️  | **Partial**  |
+| Billing       | ❌     | ❌   | ❌     | ❌     | ❌  | **Missing**  |
+| IoT Devices   | ❌     | ❌   | ❌     | ❌     | ❌  | **Missing**  |
+| Labor Mgmt    | ❌     | ❌   | ❌     | ❌     | ❌  | **Missing**  |
 
 ---
 
 ### 2. UI CONSISTENCY & BUTTONS (95% Complete)
 
 #### ✅ STRENGTHS
+
 - **Centralized Component Library:** `apps/web/src/components/ui/`
   - ✅ Button component with 6 variants (default, destructive, outline, secondary, ghost, link)
   - ✅ Consistent sizes (sm, default, lg, icon)
@@ -221,21 +233,21 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 #### 📝 UI Components Inventory
 
-| Component | Exists | Variants | Used Consistently | Status |
-|-----------|--------|----------|-------------------|--------|
-| Button | ✅ | 6 variants | ✅ | **Complete** |
-| Input | ✅ | Multiple types | ✅ | **Complete** |
-| Select | ✅ | Standard | ✅ | **Complete** |
-| Table | ✅ | Sortable | ✅ | **Complete** |
-| Dialog | ✅ | Modal | ✅ | **Complete** |
-| Sheet | ✅ | Side panel | ✅ | **Complete** |
-| Card | ✅ | Multiple styles | ✅ | **Complete** |
-| Form | ✅ | RHF + Zod | ✅ | **Complete** |
-| Alert | ✅ | 4 variants | ✅ | **Complete** |
-| Toast | ✅ | Notifications | ✅ | **Complete** |
-| Badge | ✅ | Status indicators | ✅ | **Complete** |
-| Calendar | ✅ | Date picker | ✅ | **Complete** |
-| Command | ✅ | Search | ✅ | **Complete** |
+| Component | Exists | Variants          | Used Consistently | Status       |
+| --------- | ------ | ----------------- | ----------------- | ------------ |
+| Button    | ✅     | 6 variants        | ✅                | **Complete** |
+| Input     | ✅     | Multiple types    | ✅                | **Complete** |
+| Select    | ✅     | Standard          | ✅                | **Complete** |
+| Table     | ✅     | Sortable          | ✅                | **Complete** |
+| Dialog    | ✅     | Modal             | ✅                | **Complete** |
+| Sheet     | ✅     | Side panel        | ✅                | **Complete** |
+| Card      | ✅     | Multiple styles   | ✅                | **Complete** |
+| Form      | ✅     | RHF + Zod         | ✅                | **Complete** |
+| Alert     | ✅     | 4 variants        | ✅                | **Complete** |
+| Toast     | ✅     | Notifications     | ✅                | **Complete** |
+| Badge     | ✅     | Status indicators | ✅                | **Complete** |
+| Calendar  | ✅     | Date picker       | ✅                | **Complete** |
+| Command   | ✅     | Search            | ✅                | **Complete** |
 
 ---
 
@@ -244,6 +256,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 #### ✅ IMPLEMENTED Security Features
 
 **Authentication:**
+
 - ✅ NextAuth.js with session management
 - ✅ Multiple providers (Google, GitHub, Credentials)
 - ✅ Bcrypt password hashing (12 rounds)
@@ -253,6 +266,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 - ⚠️ MFA (TOTP) - Documented but not fully implemented in UI
 
 **Authorization:**
+
 - ✅ Role-Based Access Control (RBAC)
 - ✅ 5 user roles (SUPER_ADMIN, ADMIN, MANAGER, USER, VIEWER)
 - ✅ 40+ granular permissions (inventory:create, orders:approve, etc.)
@@ -261,6 +275,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 - ✅ Tenant isolation (organization-based)
 
 **Security Hardening:**
+
 - ✅ Rate limiting (`lib/middleware/rate-limiter.ts`)
 - ✅ CSRF protection (`lib/middleware/csrf-protection.ts`)
 - ✅ Security headers (`lib/middleware/security-headers.ts`)
@@ -269,6 +284,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 - ✅ XSS protection (React auto-escaping + sanitization)
 
 **Audit & Compliance:**
+
 - ✅ Audit logging (`ActivityLog` model with 4,200+ lines)
 - ✅ Who/What/When tracking on all critical actions
 - ✅ IP address and user agent capture
@@ -305,18 +321,18 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 #### 🔐 Security Checklist Status
 
-| Threat | Mitigation | Status | Evidence |
-|--------|-----------|--------|----------|
-| SQL Injection | Prisma ORM | ✅ | All DB queries use Prisma |
-| XSS | React escaping + sanitization | ✅ | DOMPurify where needed |
-| CSRF | CSRF tokens | ✅ | `lib/middleware/csrf-protection.ts` |
-| Authentication | NextAuth + bcrypt | ✅ | `apps/web/src/lib/auth.ts` |
-| Authorization | RBAC + middleware | ✅ | `lib/middleware/authorization.ts` |
-| Rate Limiting | Token bucket | ✅ | `lib/middleware/rate-limiter.ts` |
-| Security Headers | Helmet-style headers | ✅ | `lib/middleware/security-headers.ts` |
-| IDOR | Tenant checks | ✅ | All APIs validate organizationId |
-| Sensitive Data | Encryption at rest | ⚠️ | Document encryption strategy |
-| Audit Logging | Activity logs | ✅ | `ActivityLog` model |
+| Threat           | Mitigation                    | Status | Evidence                             |
+| ---------------- | ----------------------------- | ------ | ------------------------------------ |
+| SQL Injection    | Prisma ORM                    | ✅     | All DB queries use Prisma            |
+| XSS              | React escaping + sanitization | ✅     | DOMPurify where needed               |
+| CSRF             | CSRF tokens                   | ✅     | `lib/middleware/csrf-protection.ts`  |
+| Authentication   | NextAuth + bcrypt             | ✅     | `apps/web/src/lib/auth.ts`           |
+| Authorization    | RBAC + middleware             | ✅     | `lib/middleware/authorization.ts`    |
+| Rate Limiting    | Token bucket                  | ✅     | `lib/middleware/rate-limiter.ts`     |
+| Security Headers | Helmet-style headers          | ✅     | `lib/middleware/security-headers.ts` |
+| IDOR             | Tenant checks                 | ✅     | All APIs validate organizationId     |
+| Sensitive Data   | Encryption at rest            | ⚠️     | Document encryption strategy         |
+| Audit Logging    | Activity logs                 | ✅     | `ActivityLog` model                  |
 
 ---
 
@@ -325,22 +341,26 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 #### ✅ IMPLEMENTED
 
 **Health Checks:**
+
 - ✅ Health check API (`/api/admin/health`)
 - ✅ Database connectivity check
 - ✅ Memory usage monitoring
 - ⚠️ Disk usage (placeholder)
 
 **Audit Trail:**
+
 - ✅ Comprehensive ActivityLog model
 - ✅ Automatic logging on CREATE/UPDATE/DELETE
 - ✅ IP address and user agent tracking
 - ✅ Admin audit log UI
 
 **Data Retention:**
+
 - ✅ Soft-delete on most entities (`isActive: Boolean`)
 - ⚠️ No automated archival strategy
 
 **Logging:**
+
 - ✅ Console.error for API errors
 - ⚠️ Not structured (needs JSON logs)
 - ⚠️ No log aggregation setup
@@ -377,19 +397,19 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 #### 📊 Business Continuity Checklist
 
-| Requirement | Status | Notes |
-|-------------|--------|-------|
-| Health Check Endpoint | ✅ | `/api/admin/health` |
-| Readiness Check | ⚠️ | Add DB connection pool check |
-| Liveness Check | ✅ | Basic HTTP response |
-| Structured Logging | ❌ | Needs Winston/Pino |
-| Log Aggregation | ❌ | Needs ELK/CloudWatch setup |
-| Metrics Export | ❌ | Needs Prometheus format |
-| Audit Logging | ✅ | ActivityLog model |
-| Backup Automation | ⚠️ | UI exists, automation missing |
-| Backup Testing | ❌ | No restore tests |
-| DR Documentation | ❌ | Needs runbook |
-| Data Archival | ❌ | Needs cron job |
+| Requirement           | Status | Notes                         |
+| --------------------- | ------ | ----------------------------- |
+| Health Check Endpoint | ✅     | `/api/admin/health`           |
+| Readiness Check       | ⚠️     | Add DB connection pool check  |
+| Liveness Check        | ✅     | Basic HTTP response           |
+| Structured Logging    | ❌     | Needs Winston/Pino            |
+| Log Aggregation       | ❌     | Needs ELK/CloudWatch setup    |
+| Metrics Export        | ❌     | Needs Prometheus format       |
+| Audit Logging         | ✅     | ActivityLog model             |
+| Backup Automation     | ⚠️     | UI exists, automation missing |
+| Backup Testing        | ❌     | No restore tests              |
+| DR Documentation      | ❌     | Needs runbook                 |
+| Data Archival         | ❌     | Needs cron job                |
 
 ---
 
@@ -451,17 +471,17 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 #### 🔌 Integration Status
 
-| Integration | Framework | API Wrapper | UI | Docs | Status |
-|-------------|-----------|-------------|----|----|--------|
-| Google OAuth | ✅ | ✅ | ✅ | ✅ | **Live** |
-| GitHub OAuth | ✅ | ✅ | ✅ | ✅ | **Live** |
-| Email (SMTP) | ✅ | ⚠️ | ✅ | ✅ | **Config Needed** |
-| SMS (Twilio) | ⚠️ | ❌ | ❌ | ⚠️ | **Missing** |
-| SAP | ✅ | ❌ | ✅ | ⚠️ | **Framework Only** |
-| Oracle | ✅ | ❌ | ✅ | ⚠️ | **Framework Only** |
-| Shopify | ✅ | ❌ | ✅ | ⚠️ | **Framework Only** |
-| FedEx | ⚠️ | ❌ | ⚠️ | ❌ | **Missing** |
-| UPS | ⚠️ | ❌ | ⚠️ | ❌ | **Missing** |
+| Integration  | Framework | API Wrapper | UI  | Docs | Status             |
+| ------------ | --------- | ----------- | --- | ---- | ------------------ |
+| Google OAuth | ✅        | ✅          | ✅  | ✅   | **Live**           |
+| GitHub OAuth | ✅        | ✅          | ✅  | ✅   | **Live**           |
+| Email (SMTP) | ✅        | ⚠️          | ✅  | ✅   | **Config Needed**  |
+| SMS (Twilio) | ⚠️        | ❌          | ❌  | ⚠️   | **Missing**        |
+| SAP          | ✅        | ❌          | ✅  | ⚠️   | **Framework Only** |
+| Oracle       | ✅        | ❌          | ✅  | ⚠️   | **Framework Only** |
+| Shopify      | ✅        | ❌          | ✅  | ⚠️   | **Framework Only** |
+| FedEx        | ⚠️        | ❌          | ⚠️  | ❌   | **Missing**        |
+| UPS          | ⚠️        | ❌          | ⚠️  | ❌   | **Missing**        |
 
 ---
 
@@ -534,21 +554,21 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 #### 🚀 Deployment Checklist
 
-| Task | Status | Blocker | Priority |
-|------|--------|---------|----------|
-| Build passes locally | ✅ | None | - |
-| Docker image builds | ✅ | None | - |
-| DB migrations run | ✅ | None | - |
-| Environment vars documented | ⚠️ | Incomplete | High |
-| CI/CD pipeline | ❌ | Not created | **CRITICAL** |
-| Kubernetes manifests validated | ⚠️ | Review needed | High |
-| SSL/TLS setup | ❌ | Not configured | High |
-| Monitoring stack | ❌ | Not deployed | Medium |
-| Log aggregation | ❌ | Not configured | Medium |
-| Backup automation | ❌ | Not scripted | High |
-| Staging environment | ❌ | Not created | High |
-| Load testing | ❌ | Not performed | Medium |
-| Security scan | ❌ | Not run | **CRITICAL** |
+| Task                           | Status | Blocker        | Priority     |
+| ------------------------------ | ------ | -------------- | ------------ |
+| Build passes locally           | ✅     | None           | -            |
+| Docker image builds            | ✅     | None           | -            |
+| DB migrations run              | ✅     | None           | -            |
+| Environment vars documented    | ⚠️     | Incomplete     | High         |
+| CI/CD pipeline                 | ❌     | Not created    | **CRITICAL** |
+| Kubernetes manifests validated | ⚠️     | Review needed  | High         |
+| SSL/TLS setup                  | ❌     | Not configured | High         |
+| Monitoring stack               | ❌     | Not deployed   | Medium       |
+| Log aggregation                | ❌     | Not configured | Medium       |
+| Backup automation              | ❌     | Not scripted   | High         |
+| Staging environment            | ❌     | Not created    | High         |
+| Load testing                   | ❌     | Not performed  | Medium       |
+| Security scan                  | ❌     | Not run        | **CRITICAL** |
 
 ---
 
@@ -557,6 +577,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 #### ✅ STRENGTHS
 
 **Code Organization:**
+
 - ✅ Clean folder structure (monorepo)
 - ✅ Consistent naming conventions
 - ✅ TypeScript strict mode
@@ -564,18 +585,21 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 - ✅ Prettier for formatting
 
 **Type Safety:**
+
 - ✅ Strong TypeScript usage
 - ✅ Prisma-generated types
 - ✅ Zod validation schemas
 - ✅ Few `any` types (< 1%)
 
 **Documentation:**
+
 - ✅ Extensive docs (50+ markdown files)
 - ✅ API documentation
 - ✅ Module guides
 - ✅ Security guidelines
 
 **Testing Infrastructure:**
+
 - ✅ Jest configured (`jest.config.js`)
 - ✅ Playwright for E2E (`playwright.config.ts`)
 - ✅ Test setup files
@@ -608,14 +632,14 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 
 #### 🧪 Testing Status
 
-| Test Type | Framework | Coverage | Priority |
-|-----------|-----------|----------|----------|
-| Unit Tests | Jest | ~5% | **High** |
-| Integration Tests | Jest | ~2% | High |
-| E2E Tests | Playwright | Minimal | Medium |
-| API Tests | Jest + Supertest | ~10% | High |
-| Load Tests | None | 0% | Medium |
-| Security Tests | None | 0% | **Critical** |
+| Test Type         | Framework        | Coverage | Priority     |
+| ----------------- | ---------------- | -------- | ------------ |
+| Unit Tests        | Jest             | ~5%      | **High**     |
+| Integration Tests | Jest             | ~2%      | High         |
+| E2E Tests         | Playwright       | Minimal  | Medium       |
+| API Tests         | Jest + Supertest | ~10%     | High         |
+| Load Tests        | None             | 0%       | Medium       |
+| Security Tests    | None             | 0%       | **Critical** |
 
 ---
 
@@ -626,6 +650,7 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 **Goal:** Make the application deployable to production
 
 #### Priority 1.1: CI/CD Pipeline (2 days)
+
 ```yaml
 # .github/workflows/ci.yml
 - Automated builds
@@ -646,12 +671,14 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 ```
 
 **Deliverables:**
+
 - ✅ `.github/workflows/ci.yml`
 - ✅ `.github/workflows/deploy-staging.yml`
 - ✅ `.github/workflows/deploy-production.yml`
 - ✅ Docker image in registry
 
 #### Priority 1.2: Environment Configuration (1 day)
+
 - ✅ Audit all environment variables
 - ✅ Update `.env.example` with all vars + descriptions
 - ✅ Create `.env.staging.example`
@@ -659,11 +686,13 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 - ✅ Document secrets management strategy
 
 **Deliverables:**
+
 - ✅ Complete `.env.example`
 - ✅ `docs/ENVIRONMENT_VARIABLES.md`
 - ✅ Secrets management guide
 
 #### Priority 1.3: Kubernetes Production Config (2 days)
+
 - ✅ Review existing `/k8s/` manifests
 - ✅ Add production-ready configs:
   - HPA (Horizontal Pod Autoscaler)
@@ -674,10 +703,12 @@ LogiVox is a **comprehensive Enterprise Warehouse Management System** with:
 - ✅ Create namespace separation (dev/staging/prod)
 
 **Deliverables:**
+
 - ✅ Production K8s manifests
 - ✅ `docs/KUBERNETES_DEPLOYMENT.md`
 
 #### Priority 1.4: Database Backup Automation (1 day)
+
 ```bash
 # scripts/backup-db.sh
 #!/bin/bash
@@ -686,6 +717,7 @@ pg_dump $DATABASE_URL | gzip > backup-$(date +%Y%m%d-%H%M%S).sql.gz
 ```
 
 **Deliverables:**
+
 - ✅ `scripts/backup-db.sh`
 - ✅ `scripts/restore-db.sh`
 - ✅ Cron job configuration
@@ -696,6 +728,7 @@ pg_dump $DATABASE_URL | gzip > backup-$(date +%Y%m%d-%H%M%S).sql.gz
 ### Phase 2: **HIGH - Security Hardening** (Week 2)
 
 #### Priority 2.1: MFA Implementation (2 days)
+
 - ✅ MFA enrollment UI (`/dashboard/settings/security/mfa`)
 - ✅ QR code generation for TOTP
 - ✅ Backup codes generation
@@ -703,11 +736,13 @@ pg_dump $DATABASE_URL | gzip > backup-$(date +%Y%m%d-%H%M%S).sql.gz
 - ✅ Recovery flow
 
 **Files to Create:**
+
 - `/apps/web/src/app/(dashboard)/dashboard/settings/security/mfa/page.tsx`
 - `/apps/web/src/app/(dashboard)/dashboard/settings/security/mfa/enroll/page.tsx`
 - `/lib/auth/mfa-service.ts` (use existing from docs)
 
 #### Priority 2.2: Security Audit (1 day)
+
 - ✅ Run OWASP ZAP scan
 - ✅ Run npm audit
 - ✅ Check for exposed secrets (git-secrets)
@@ -715,25 +750,30 @@ pg_dump $DATABASE_URL | gzip > backup-$(date +%Y%m%d-%H%M%S).sql.gz
 - ✅ Test rate limiting
 
 **Deliverables:**
+
 - ✅ `SECURITY_AUDIT_REPORT.md`
 - ✅ Fix any critical vulnerabilities
 
 #### Priority 2.3: Session Management Enhancement (1 day)
+
 - ✅ Concurrent session limit enforcement
 - ✅ Active sessions UI
 - ✅ Force logout other sessions
 - ✅ Session activity tracking
 
 **Files to Create:**
+
 - `/apps/web/src/app/(dashboard)/dashboard/settings/security/sessions/page.tsx`
 - `/apps/web/src/app/api/auth/sessions/route.ts`
 
 #### Priority 2.4: API Key Expiry Automation (1 day)
+
 - ✅ Cron job to check expiring keys
 - ✅ Email notifications for expiring keys
 - ✅ Automatic deactivation of expired keys
 
 **Deliverables:**
+
 - ✅ `scripts/check-api-key-expiry.ts`
 - ✅ Cron configuration
 
@@ -742,6 +782,7 @@ pg_dump $DATABASE_URL | gzip > backup-$(date +%Y%m%d-%H%M%S).sql.gz
 ### Phase 3: **HIGH - Complete Missing CRUD** (Week 3)
 
 #### Priority 3.1: Locations Management (1 day)
+
 ```typescript
 // /apps/web/src/app/api/locations/route.ts
 POST /api/locations - Create location
@@ -756,6 +797,7 @@ DELETE /api/locations/[id] - Delete location
 ```
 
 #### Priority 3.2: Carrier Configuration (1 day)
+
 ```typescript
 // /apps/web/src/app/api/carriers/route.ts
 POST /api/carriers - Create carrier
@@ -770,6 +812,7 @@ DELETE /api/carriers/[id] - Delete carrier
 ```
 
 #### Priority 3.3: Slotting Optimization (2 days)
+
 ```typescript
 // /apps/web/src/app/api/slotting/route.ts
 POST /api/slotting/rules - Create rule
@@ -785,6 +828,7 @@ GET /api/slotting/recommendations - Get recommendations
 ```
 
 #### Priority 3.4: Labor Management (2 days)
+
 ```typescript
 // /apps/web/src/app/api/employees/route.ts
 POST /api/employees - Create employee
@@ -813,54 +857,57 @@ GET /api/time-entries - View timesheets
 ### Phase 4: **MEDIUM - Observability & Monitoring** (Week 4)
 
 #### Priority 4.1: Structured Logging (1 day)
+
 ```typescript
 // /lib/logger.ts
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, transports } from "winston";
 
 export const logger = createLogger({
-  level: process.env.LOG_LEVEL || 'info',
+  level: process.env.LOG_LEVEL || "info",
   format: format.combine(
     format.timestamp(),
     format.errors({ stack: true }),
-    format.json()
+    format.json(),
   ),
-  defaultMeta: { service: 'logivox-wms' },
+  defaultMeta: { service: "logivox-wms" },
   transports: [
     new transports.Console(),
-    new transports.File({ filename: 'error.log', level: 'error' }),
-    new transports.File({ filename: 'combined.log' })
-  ]
+    new transports.File({ filename: "error.log", level: "error" }),
+    new transports.File({ filename: "combined.log" }),
+  ],
 });
 ```
 
 **Action:** Replace all `console.log/error` with structured logger
 
 #### Priority 4.2: Metrics Export (1 day)
+
 ```typescript
 // /lib/metrics.ts
-import { Counter, Histogram, register } from 'prom-client';
+import { Counter, Histogram, register } from "prom-client";
 
 export const httpRequestDuration = new Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in seconds',
-  labelNames: ['method', 'route', 'status_code']
+  name: "http_request_duration_seconds",
+  help: "Duration of HTTP requests in seconds",
+  labelNames: ["method", "route", "status_code"],
 });
 
 export const httpRequestTotal = new Counter({
-  name: 'http_requests_total',
-  help: 'Total number of HTTP requests',
-  labelNames: ['method', 'route', 'status_code']
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status_code"],
 });
 
 // /app/api/metrics/route.ts
 export async function GET() {
   return new Response(await register.metrics(), {
-    headers: { 'Content-Type': register.contentType }
+    headers: { "Content-Type": register.contentType },
   });
 }
 ```
 
 #### Priority 4.3: Monitoring Stack Deployment (2 days)
+
 - ✅ Deploy Prometheus to K8s
 - ✅ Deploy Grafana to K8s
 - ✅ Create dashboards:
@@ -871,11 +918,13 @@ export async function GET() {
 - ✅ Set up alerts
 
 **Deliverables:**
+
 - ✅ `/k8s/monitoring/` manifests
 - ✅ Grafana dashboards JSON
 - ✅ Alert rules YAML
 
 #### Priority 4.4: Log Aggregation (1 day)
+
 - ✅ Deploy Fluentd/Fluent Bit to K8s
 - ✅ Configure log shipping to CloudWatch/Elasticsearch
 - ✅ Create log queries for common issues
@@ -885,51 +934,54 @@ export async function GET() {
 ### Phase 5: **MEDIUM - Testing & Quality** (Week 5)
 
 #### Priority 5.1: Critical Path Testing (3 days)
+
 ```typescript
 // __tests__/auth.test.ts
-describe('Authentication', () => {
-  it('should register a new user', async () => {});
-  it('should login with valid credentials', async () => {});
-  it('should reject invalid credentials', async () => {});
+describe("Authentication", () => {
+  it("should register a new user", async () => {});
+  it("should login with valid credentials", async () => {});
+  it("should reject invalid credentials", async () => {});
 });
 
 // __tests__/inventory.test.ts
-describe('Inventory CRUD', () => {
-  it('should create an inventory item', async () => {});
-  it('should list inventory items', async () => {});
-  it('should update an inventory item', async () => {});
-  it('should soft-delete an inventory item', async () => {});
+describe("Inventory CRUD", () => {
+  it("should create an inventory item", async () => {});
+  it("should list inventory items", async () => {});
+  it("should update an inventory item", async () => {});
+  it("should soft-delete an inventory item", async () => {});
 });
 
 // __tests__/order-fulfillment.test.ts
-describe('Order Fulfillment Flow', () => {
-  it('should create a sales order', async () => {});
-  it('should generate a pick list', async () => {});
-  it('should complete picking', async () => {});
-  it('should pack the order', async () => {});
-  it('should create a shipment', async () => {});
+describe("Order Fulfillment Flow", () => {
+  it("should create a sales order", async () => {});
+  it("should generate a pick list", async () => {});
+  it("should complete picking", async () => {});
+  it("should pack the order", async () => {});
+  it("should create a shipment", async () => {});
 });
 ```
 
 **Target:** 50%+ coverage on critical paths
 
 #### Priority 5.2: E2E Smoke Tests (1 day)
+
 ```typescript
 // e2e/smoke.spec.ts
-test('user can login and view dashboard', async ({ page }) => {
-  await page.goto('/sign-in');
-  await page.fill('[name=email]', 'test@example.com');
-  await page.fill('[name=password]', 'password');
-  await page.click('button[type=submit]');
-  await expect(page).toHaveURL('/dashboard');
+test("user can login and view dashboard", async ({ page }) => {
+  await page.goto("/sign-in");
+  await page.fill("[name=email]", "test@example.com");
+  await page.fill("[name=password]", "password");
+  await page.click("button[type=submit]");
+  await expect(page).toHaveURL("/dashboard");
 });
 
-test('user can create inventory item', async ({ page }) => {
+test("user can create inventory item", async ({ page }) => {
   // ... full flow
 });
 ```
 
 #### Priority 5.3: Security Testing (1 day)
+
 - ✅ Run OWASP ZAP against all endpoints
 - ✅ Test authentication bypass attempts
 - ✅ Test authorization bypass attempts
@@ -937,6 +989,7 @@ test('user can create inventory item', async ({ page }) => {
 - ✅ Test XSS on all text fields
 
 **Deliverables:**
+
 - ✅ Security test results
 - ✅ Remediation plan for any findings
 
@@ -945,20 +998,21 @@ test('user can create inventory item', async ({ page }) => {
 ### Phase 6: **LOW - Integrations & Polish** (Week 6)
 
 #### Priority 6.1: SMS Integration (1 day)
+
 ```typescript
 // /lib/services/sms.ts
-import twilio from 'twilio';
+import twilio from "twilio";
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
-  process.env.TWILIO_AUTH_TOKEN
+  process.env.TWILIO_AUTH_TOKEN,
 );
 
 export async function sendSMS(to: string, message: string) {
   await client.messages.create({
     body: message,
     to,
-    from: process.env.TWILIO_PHONE_NUMBER
+    from: process.env.TWILIO_PHONE_NUMBER,
   });
 }
 
@@ -969,9 +1023,10 @@ export async function sendSMS(to: string, message: string) {
 ```
 
 #### Priority 6.2: Email Service Integration (1 day)
+
 ```typescript
 // /lib/services/email.ts
-import sendgrid from '@sendgrid/mail';
+import sendgrid from "@sendgrid/mail";
 
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -980,7 +1035,7 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
     to,
     from: process.env.FROM_EMAIL,
     subject,
-    html
+    html,
   });
 }
 
@@ -992,6 +1047,7 @@ export async function sendEmail({ to, subject, html }: EmailOptions) {
 ```
 
 #### Priority 6.3: Carrier API Integration (2 days)
+
 ```typescript
 // /lib/integrations/fedex.ts
 export class FedExClient {
@@ -1010,6 +1066,7 @@ export class FedExClient {
 ```
 
 #### Priority 6.4: UI Polish (1 day)
+
 - ✅ Add loading skeletons to all list pages
 - ✅ Add empty states with helpful CTAs
 - ✅ Add inline form validation errors
@@ -1023,104 +1080,123 @@ export class FedExClient {
 ### Essential Documents
 
 1. **`SECURITY_CHECKLIST.md`** (Priority: High)
+
 ```markdown
 # Security Checklist
 
 ## Authentication
+
 - ✅ Multi-factor authentication
 - ✅ Password complexity requirements
 - ✅ Session management
-...
+  ...
 
 ## RBAC Model
+
 - Roles: SUPER_ADMIN, ADMIN, MANAGER, USER, VIEWER
 - Permissions: 40+ granular permissions
-...
+  ...
 
 ## OWASP Top 10 Mitigations
+
 - SQL Injection: Prisma ORM
 - XSS: React escaping + DOMPurify
-...
+  ...
 ```
 
 2. **`COMPLIANCE_AND_BC.md`** (Priority: High)
+
 ```markdown
 # Compliance & Business Continuity
 
 ## Audit Logging
+
 - All CREATE/UPDATE/DELETE actions logged
 - IP address and user agent captured
 - Retention: 7 years
-...
+  ...
 
 ## Data Retention
+
 - Soft-delete strategy
 - Archive after 2 years
-...
+  ...
 
 ## Backup Strategy
+
 - Automated daily backups
 - 30-day retention
 - Point-in-time recovery
-...
+  ...
 
 ## Disaster Recovery
+
 - RTO: 1 hour
 - RPO: 15 minutes
 - Failover procedures
-...
+  ...
 ```
 
 3. **`DEPLOYMENT_PRODUCTION.md`** (Priority: Critical)
+
 ```markdown
 # Production Deployment Guide
 
 ## Prerequisites
+
 - Kubernetes cluster (1.25+)
 - PostgreSQL 14+ (managed service recommended)
 - Domain with DNS access
 - SSL certificate (Let's Encrypt)
-...
+  ...
 
 ## Step-by-Step Deployment
+
 1. Create namespaces
 2. Deploy database
 3. Run migrations
 4. Deploy application
 5. Configure ingress
 6. Set up monitoring
-...
+   ...
 
 ## Post-Deployment Verification
+
 - Health check: curl https://api.logivox.ai/api/health
 - Smoke tests
 - Performance tests
-...
+  ...
 ```
 
 4. **`TESTING.md`** (Priority: Medium)
-```markdown
+
+````markdown
 # Testing Guide
 
 ## Running Tests
+
 ```bash
 npm run test # Unit tests
 npm run test:integration # Integration tests
 npm run test:e2e # E2E tests
 ```
+````
 
 ## Test Coverage
+
 - Unit: 50%+
 - Integration: 40%+
 - E2E: Critical paths
-...
+  ...
 
 ## Writing Tests
+
 - Use Jest for unit/integration
 - Use Playwright for E2E
 - Follow AAA pattern (Arrange, Act, Assert)
-...
-```
+  ...
+
+````
 
 5. **`UI_COMPONENTS.md`** (Priority: Low)
 ```markdown
@@ -1131,13 +1207,14 @@ npm run test:e2e # E2E tests
 <Button variant="default" size="md" onClick={() => {}}>
   Click Me
 </Button>
-```
+````
 
 Variants: default, destructive, outline, secondary, ghost, link
 Sizes: sm, default, lg, icon
 ...
 
 ## Form Component
+
 ```tsx
 <Form {...form}>
   <FormField
@@ -1154,7 +1231,9 @@ Sizes: sm, default, lg, icon
   />
 </Form>
 ```
+
 ...
+
 ```
 
 6. **`API_DOCUMENTATION.md`** (Enhancement)
@@ -1337,6 +1416,7 @@ Sizes: sm, default, lg, icon
 - Focus on "Must Have" items first, "Nice to Have" items can be deferred post-launch
 - Security and deployment are non-negotiable - these must be 100% before production
 
-**Last Updated:** January 3, 2026  
-**Version:** 1.0  
+**Last Updated:** January 3, 2026
+**Version:** 1.0
 **Author:** Enterprise Solution Architect
+```

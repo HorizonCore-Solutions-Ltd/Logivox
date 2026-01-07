@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -11,16 +11,13 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const packId = params.id;
@@ -31,15 +28,15 @@ export async function GET(
       include: {
         organizationMemberships: {
           where: { isActive: true },
-          include: { organization: true }
-        }
-      }
+          include: { organization: true },
+        },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -49,7 +46,7 @@ export async function GET(
     const pack = await prisma.pack.findFirst({
       where: {
         id: packId,
-        organizationId
+        organizationId,
       },
       include: {
         salesOrder: {
@@ -59,8 +56,8 @@ export async function GET(
                 id: true,
                 name: true,
                 code: true,
-                email: true
-              }
+                email: true,
+              },
             },
             items: {
               include: {
@@ -69,41 +66,41 @@ export async function GET(
                     id: true,
                     name: true,
                     sku: true,
-                    binLocation: true
-                  }
-                }
-              }
-            }
-          }
+                    binLocation: true,
+                  },
+                },
+              },
+            },
+          },
         },
         warehouse: {
           select: {
             id: true,
             name: true,
-            code: true
-          }
+            code: true,
+          },
         },
         pickList: {
           select: {
             id: true,
             pickListNumber: true,
             status: true,
-            completedDate: true
-          }
+            completedDate: true,
+          },
         },
         packedBy: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         createdBy: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         packages: {
           include: {
@@ -113,46 +110,44 @@ export async function GET(
                   select: {
                     id: true,
                     name: true,
-                    sku: true
-                  }
+                    sku: true,
+                  },
                 },
                 salesOrderItem: {
                   select: {
                     id: true,
                     quantity: true,
                     quantityPicked: true,
-                    quantityPacked: true
-                  }
-                }
-              }
-            }
+                    quantityPacked: true,
+                  },
+                },
+              },
+            },
           },
           orderBy: {
-            packageNumber: 'asc'
-          }
-        }
-      }
+            packageNumber: "asc",
+          },
+        },
+      },
     });
 
     if (!pack) {
-      return NextResponse.json(
-        { error: "Pack not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Pack not found" }, { status: 404 });
     }
 
     // Calculate packing statistics
     const totalItemsToPack = pack.salesOrder.items.reduce(
       (sum: number, item: any) => sum + item.quantityPicked,
-      0
+      0,
     );
     const totalItemsPacked = pack.salesOrder.items.reduce(
       (sum: number, item: any) => sum + item.quantityPacked,
-      0
+      0,
     );
-    const progressPercent = totalItemsToPack > 0
-      ? Math.round((totalItemsPacked / totalItemsToPack) * 100)
-      : 0;
+    const progressPercent =
+      totalItemsToPack > 0
+        ? Math.round((totalItemsPacked / totalItemsToPack) * 100)
+        : 0;
 
     return NextResponse.json({
       ...pack,
@@ -162,15 +157,14 @@ export async function GET(
         totalItemsPacked,
         progressPercent,
         totalWeight: pack.totalWeight,
-        weightUnit: pack.weightUnit
-      }
+        weightUnit: pack.weightUnit,
+      },
     });
-
   } catch (error: any) {
     console.error("Error fetching pack:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch pack" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

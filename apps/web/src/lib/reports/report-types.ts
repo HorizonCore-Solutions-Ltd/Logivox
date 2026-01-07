@@ -1,6 +1,6 @@
 /**
  * Report Types & Categories for LogiVox
- * 
+ *
  * Defines all available report types, their metadata, and categorization.
  * Used by the report builder and report engine.
  */
@@ -10,21 +10,21 @@
 // ============================================================================
 
 export enum ReportCategory {
-  INVENTORY = 'inventory',
-  SALES = 'sales',
-  FINANCIAL = 'financial',
-  OPERATIONS = 'operations',
-  CUSTOMERS = 'customers',
-  CUSTOM = 'custom',
+  INVENTORY = "inventory",
+  SALES = "sales",
+  FINANCIAL = "financial",
+  OPERATIONS = "operations",
+  CUSTOMERS = "customers",
+  CUSTOM = "custom",
 }
 
 export const REPORT_CATEGORY_LABELS: Record<ReportCategory, string> = {
-  [ReportCategory.INVENTORY]: 'Inventory',
-  [ReportCategory.SALES]: 'Sales',
-  [ReportCategory.FINANCIAL]: 'Financial',
-  [ReportCategory.OPERATIONS]: 'Operations',
-  [ReportCategory.CUSTOMERS]: 'Customers',
-  [ReportCategory.CUSTOM]: 'Custom',
+  [ReportCategory.INVENTORY]: "Inventory",
+  [ReportCategory.SALES]: "Sales",
+  [ReportCategory.FINANCIAL]: "Financial",
+  [ReportCategory.OPERATIONS]: "Operations",
+  [ReportCategory.CUSTOMERS]: "Customers",
+  [ReportCategory.CUSTOM]: "Custom",
 };
 
 // ============================================================================
@@ -32,41 +32,41 @@ export const REPORT_CATEGORY_LABELS: Record<ReportCategory, string> = {
 // ============================================================================
 
 export enum FieldType {
-  STRING = 'string',
-  NUMBER = 'number',
-  CURRENCY = 'currency',
-  PERCENTAGE = 'percentage',
-  DATE = 'date',
-  DATETIME = 'datetime',
-  BOOLEAN = 'boolean',
-  ENUM = 'enum',
+  STRING = "string",
+  NUMBER = "number",
+  CURRENCY = "currency",
+  PERCENTAGE = "percentage",
+  DATE = "date",
+  DATETIME = "datetime",
+  BOOLEAN = "boolean",
+  ENUM = "enum",
 }
 
 export enum AggregationType {
-  SUM = 'sum',
-  AVG = 'avg',
-  COUNT = 'count',
-  MIN = 'min',
-  MAX = 'max',
-  DISTINCT_COUNT = 'distinct_count',
+  SUM = "sum",
+  AVG = "avg",
+  COUNT = "count",
+  MIN = "min",
+  MAX = "max",
+  DISTINCT_COUNT = "distinct_count",
 }
 
 export enum FilterOperator {
-  EQUALS = 'equals',
-  NOT_EQUALS = 'not_equals',
-  GREATER_THAN = 'greater_than',
-  LESS_THAN = 'less_than',
-  GREATER_OR_EQUAL = 'greater_or_equal',
-  LESS_OR_EQUAL = 'less_or_equal',
-  CONTAINS = 'contains',
-  NOT_CONTAINS = 'not_contains',
-  STARTS_WITH = 'starts_with',
-  ENDS_WITH = 'ends_with',
-  IN = 'in',
-  NOT_IN = 'not_in',
-  BETWEEN = 'between',
-  IS_NULL = 'is_null',
-  IS_NOT_NULL = 'is_not_null',
+  EQUALS = "equals",
+  NOT_EQUALS = "not_equals",
+  GREATER_THAN = "greater_than",
+  LESS_THAN = "less_than",
+  GREATER_OR_EQUAL = "greater_or_equal",
+  LESS_OR_EQUAL = "less_or_equal",
+  CONTAINS = "contains",
+  NOT_CONTAINS = "not_contains",
+  STARTS_WITH = "starts_with",
+  ENDS_WITH = "ends_with",
+  IN = "in",
+  NOT_IN = "not_in",
+  BETWEEN = "between",
+  IS_NULL = "is_null",
+  IS_NOT_NULL = "is_not_null",
 }
 
 // ============================================================================
@@ -104,7 +104,7 @@ export interface ReportFilter {
 
 export interface ReportSort {
   field: string;
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
 }
 
 // ============================================================================
@@ -142,13 +142,13 @@ export interface ReportConfig {
 // ============================================================================
 
 export enum ChartType {
-  TABLE = 'table',
-  BAR = 'bar',
-  LINE = 'line',
-  PIE = 'pie',
-  AREA = 'area',
-  SCATTER = 'scatter',
-  COMBO = 'combo',
+  TABLE = "table",
+  BAR = "bar",
+  LINE = "line",
+  PIE = "pie",
+  AREA = "area",
+  SCATTER = "scatter",
+  COMBO = "combo",
 }
 
 // ============================================================================
@@ -157,40 +157,40 @@ export enum ChartType {
 
 export const INVENTORY_FIELDS: ReportField[] = [
   {
-    id: 'product_name',
-    name: 'Product Name',
+    id: "product_name",
+    name: "Product Name",
     type: FieldType.STRING,
-    category: 'Product',
+    category: "Product",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'product_sku',
-    name: 'SKU',
+    id: "product_sku",
+    name: "SKU",
     type: FieldType.STRING,
-    category: 'Product',
+    category: "Product",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'category',
-    name: 'Category',
+    id: "category",
+    name: "Category",
     type: FieldType.STRING,
-    category: 'Product',
+    category: "Product",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'quantity',
-    name: 'Quantity on Hand',
+    id: "quantity",
+    name: "Quantity on Hand",
     type: FieldType.NUMBER,
-    category: 'Inventory',
+    category: "Inventory",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -198,30 +198,30 @@ export const INVENTORY_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.SUM,
   },
   {
-    id: 'reorder_point',
-    name: 'Reorder Point',
+    id: "reorder_point",
+    name: "Reorder Point",
     type: FieldType.NUMBER,
-    category: 'Inventory',
+    category: "Inventory",
     aggregatable: true,
     filterable: true,
     sortable: true,
     groupable: false,
   },
   {
-    id: 'reorder_quantity',
-    name: 'Reorder Quantity',
+    id: "reorder_quantity",
+    name: "Reorder Quantity",
     type: FieldType.NUMBER,
-    category: 'Inventory',
+    category: "Inventory",
     aggregatable: true,
     filterable: true,
     sortable: true,
     groupable: false,
   },
   {
-    id: 'unit_cost',
-    name: 'Unit Cost',
+    id: "unit_cost",
+    name: "Unit Cost",
     type: FieldType.CURRENCY,
-    category: 'Financial',
+    category: "Financial",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -229,10 +229,10 @@ export const INVENTORY_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.AVG,
   },
   {
-    id: 'unit_price',
-    name: 'Unit Price',
+    id: "unit_price",
+    name: "Unit Price",
     type: FieldType.CURRENCY,
-    category: 'Financial',
+    category: "Financial",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -240,10 +240,10 @@ export const INVENTORY_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.AVG,
   },
   {
-    id: 'total_value',
-    name: 'Total Value',
+    id: "total_value",
+    name: "Total Value",
     type: FieldType.CURRENCY,
-    category: 'Financial',
+    category: "Financial",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -251,59 +251,59 @@ export const INVENTORY_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.SUM,
   },
   {
-    id: 'status',
-    name: 'Status',
+    id: "status",
+    name: "Status",
     type: FieldType.ENUM,
-    category: 'Inventory',
+    category: "Inventory",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
     enumValues: [
-      { value: 'in_stock', label: 'In Stock' },
-      { value: 'low_stock', label: 'Low Stock' },
-      { value: 'out_of_stock', label: 'Out of Stock' },
-      { value: 'reorder_needed', label: 'Reorder Needed' },
+      { value: "in_stock", label: "In Stock" },
+      { value: "low_stock", label: "Low Stock" },
+      { value: "out_of_stock", label: "Out of Stock" },
+      { value: "reorder_needed", label: "Reorder Needed" },
     ],
   },
 ];
 
 export const SALES_FIELDS: ReportField[] = [
   {
-    id: 'booking_id',
-    name: 'Booking ID',
+    id: "booking_id",
+    name: "Booking ID",
     type: FieldType.STRING,
-    category: 'Booking',
+    category: "Booking",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: false,
   },
   {
-    id: 'customer_name',
-    name: 'Customer Name',
+    id: "customer_name",
+    name: "Customer Name",
     type: FieldType.STRING,
-    category: 'Customer',
+    category: "Customer",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'product_name',
-    name: 'Product Name',
+    id: "product_name",
+    name: "Product Name",
     type: FieldType.STRING,
-    category: 'Product',
+    category: "Product",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'quantity_sold',
-    name: 'Quantity Sold',
+    id: "quantity_sold",
+    name: "Quantity Sold",
     type: FieldType.NUMBER,
-    category: 'Sales',
+    category: "Sales",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -311,10 +311,10 @@ export const SALES_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.SUM,
   },
   {
-    id: 'unit_price',
-    name: 'Unit Price',
+    id: "unit_price",
+    name: "Unit Price",
     type: FieldType.CURRENCY,
-    category: 'Sales',
+    category: "Sales",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -322,10 +322,10 @@ export const SALES_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.AVG,
   },
   {
-    id: 'total_amount',
-    name: 'Total Amount',
+    id: "total_amount",
+    name: "Total Amount",
     type: FieldType.CURRENCY,
-    category: 'Sales',
+    category: "Sales",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -333,79 +333,79 @@ export const SALES_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.SUM,
   },
   {
-    id: 'booking_date',
-    name: 'Booking Date',
+    id: "booking_date",
+    name: "Booking Date",
     type: FieldType.DATE,
-    category: 'Booking',
+    category: "Booking",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'pickup_date',
-    name: 'Pickup Date',
+    id: "pickup_date",
+    name: "Pickup Date",
     type: FieldType.DATE,
-    category: 'Booking',
+    category: "Booking",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'status',
-    name: 'Status',
+    id: "status",
+    name: "Status",
     type: FieldType.ENUM,
-    category: 'Booking',
+    category: "Booking",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
     enumValues: [
-      { value: 'pending', label: 'Pending' },
-      { value: 'confirmed', label: 'Confirmed' },
-      { value: 'completed', label: 'Completed' },
-      { value: 'cancelled', label: 'Cancelled' },
+      { value: "pending", label: "Pending" },
+      { value: "confirmed", label: "Confirmed" },
+      { value: "completed", label: "Completed" },
+      { value: "cancelled", label: "Cancelled" },
     ],
   },
 ];
 
 export const CUSTOMER_FIELDS: ReportField[] = [
   {
-    id: 'customer_name',
-    name: 'Customer Name',
+    id: "customer_name",
+    name: "Customer Name",
     type: FieldType.STRING,
-    category: 'Customer',
+    category: "Customer",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: true,
   },
   {
-    id: 'email',
-    name: 'Email',
+    id: "email",
+    name: "Email",
     type: FieldType.STRING,
-    category: 'Customer',
+    category: "Customer",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: false,
   },
   {
-    id: 'phone',
-    name: 'Phone',
+    id: "phone",
+    name: "Phone",
     type: FieldType.STRING,
-    category: 'Customer',
+    category: "Customer",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: false,
   },
   {
-    id: 'total_bookings',
-    name: 'Total Bookings',
+    id: "total_bookings",
+    name: "Total Bookings",
     type: FieldType.NUMBER,
-    category: 'Activity',
+    category: "Activity",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -413,10 +413,10 @@ export const CUSTOMER_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.SUM,
   },
   {
-    id: 'total_spent',
-    name: 'Total Spent',
+    id: "total_spent",
+    name: "Total Spent",
     type: FieldType.CURRENCY,
-    category: 'Activity',
+    category: "Activity",
     aggregatable: true,
     filterable: true,
     sortable: true,
@@ -424,20 +424,20 @@ export const CUSTOMER_FIELDS: ReportField[] = [
     defaultAggregation: AggregationType.SUM,
   },
   {
-    id: 'last_booking_date',
-    name: 'Last Booking Date',
+    id: "last_booking_date",
+    name: "Last Booking Date",
     type: FieldType.DATE,
-    category: 'Activity',
+    category: "Activity",
     aggregatable: false,
     filterable: true,
     sortable: true,
     groupable: false,
   },
   {
-    id: 'created_at',
-    name: 'Registration Date',
+    id: "created_at",
+    name: "Registration Date",
     type: FieldType.DATE,
-    category: 'Customer',
+    category: "Customer",
     aggregatable: false,
     filterable: true,
     sortable: true,
@@ -455,14 +455,21 @@ export const ALL_FIELDS: Record<ReportCategory, ReportField[]> = {
   [ReportCategory.CUSTOMERS]: CUSTOMER_FIELDS,
   [ReportCategory.FINANCIAL]: [...INVENTORY_FIELDS, ...SALES_FIELDS],
   [ReportCategory.OPERATIONS]: [...INVENTORY_FIELDS, ...SALES_FIELDS],
-  [ReportCategory.CUSTOM]: [...INVENTORY_FIELDS, ...SALES_FIELDS, ...CUSTOMER_FIELDS],
+  [ReportCategory.CUSTOM]: [
+    ...INVENTORY_FIELDS,
+    ...SALES_FIELDS,
+    ...CUSTOMER_FIELDS,
+  ],
 };
 
 // ============================================================================
 // Helper Functions
 // ============================================================================
 
-export function getFieldById(fieldId: string, category: ReportCategory): ReportField | undefined {
+export function getFieldById(
+  fieldId: string,
+  category: ReportCategory,
+): ReportField | undefined {
   return ALL_FIELDS[category]?.find((f) => f.id === fieldId);
 }
 
@@ -490,7 +497,9 @@ export function getAggregatableFields(category: ReportCategory): ReportField[] {
 // Filter Operator Helpers
 // ============================================================================
 
-export function getOperatorsForFieldType(fieldType: FieldType): FilterOperator[] {
+export function getOperatorsForFieldType(
+  fieldType: FieldType,
+): FilterOperator[] {
   switch (fieldType) {
     case FieldType.STRING:
       return [
@@ -551,21 +560,21 @@ export function getOperatorsForFieldType(fieldType: FieldType): FilterOperator[]
 
 export function getOperatorLabel(operator: FilterOperator): string {
   const labels: Record<FilterOperator, string> = {
-    [FilterOperator.EQUALS]: 'Equals',
-    [FilterOperator.NOT_EQUALS]: 'Not Equals',
-    [FilterOperator.GREATER_THAN]: 'Greater Than',
-    [FilterOperator.LESS_THAN]: 'Less Than',
-    [FilterOperator.GREATER_OR_EQUAL]: 'Greater or Equal',
-    [FilterOperator.LESS_OR_EQUAL]: 'Less or Equal',
-    [FilterOperator.CONTAINS]: 'Contains',
-    [FilterOperator.NOT_CONTAINS]: 'Not Contains',
-    [FilterOperator.STARTS_WITH]: 'Starts With',
-    [FilterOperator.ENDS_WITH]: 'Ends With',
-    [FilterOperator.IN]: 'In',
-    [FilterOperator.NOT_IN]: 'Not In',
-    [FilterOperator.BETWEEN]: 'Between',
-    [FilterOperator.IS_NULL]: 'Is Null',
-    [FilterOperator.IS_NOT_NULL]: 'Is Not Null',
+    [FilterOperator.EQUALS]: "Equals",
+    [FilterOperator.NOT_EQUALS]: "Not Equals",
+    [FilterOperator.GREATER_THAN]: "Greater Than",
+    [FilterOperator.LESS_THAN]: "Less Than",
+    [FilterOperator.GREATER_OR_EQUAL]: "Greater or Equal",
+    [FilterOperator.LESS_OR_EQUAL]: "Less or Equal",
+    [FilterOperator.CONTAINS]: "Contains",
+    [FilterOperator.NOT_CONTAINS]: "Not Contains",
+    [FilterOperator.STARTS_WITH]: "Starts With",
+    [FilterOperator.ENDS_WITH]: "Ends With",
+    [FilterOperator.IN]: "In",
+    [FilterOperator.NOT_IN]: "Not In",
+    [FilterOperator.BETWEEN]: "Between",
+    [FilterOperator.IS_NULL]: "Is Null",
+    [FilterOperator.IS_NOT_NULL]: "Is Not Null",
   };
 
   return labels[operator];

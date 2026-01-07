@@ -1,10 +1,10 @@
 // =============================================================================
 // CRITICAL PATH TESTS - Order Fulfillment
 // =============================================================================
-import { describe, test, expect, beforeEach } from '@jest/globals';
-import { prisma } from '@/lib/prisma';
+import { describe, test, expect, beforeEach } from "@jest/globals";
+import { prisma } from "@/lib/prisma";
 
-describe('Order Fulfillment Critical Path', () => {
+describe("Order Fulfillment Critical Path", () => {
   let organizationId: string;
   let warehouseId: string;
   let customerId: string;
@@ -15,7 +15,7 @@ describe('Order Fulfillment Critical Path', () => {
     // Create test organization
     const org = await prisma.organization.create({
       data: {
-        name: 'Test Org',
+        name: "Test Org",
         slug: `test-${Date.now()}`,
       },
     });
@@ -25,8 +25,8 @@ describe('Order Fulfillment Critical Path', () => {
     const user = await prisma.user.create({
       data: {
         email: `user-${Date.now()}@test.com`,
-        name: 'Test User',
-        password: 'hashed',
+        name: "Test User",
+        password: "hashed",
       },
     });
     userId = user.id;
@@ -34,14 +34,14 @@ describe('Order Fulfillment Critical Path', () => {
     // Create warehouse
     const warehouse = await prisma.warehouse.create({
       data: {
-        name: 'Main Warehouse',
+        name: "Main Warehouse",
         code: `WH-${Date.now()}`,
         organizationId,
-        address: '123 Main St',
-        city: 'City',
-        state: 'ST',
-        country: 'Country',
-        postalCode: '12345',
+        address: "123 Main St",
+        city: "City",
+        state: "ST",
+        country: "Country",
+        postalCode: "12345",
       },
     });
     warehouseId = warehouse.id;
@@ -51,9 +51,9 @@ describe('Order Fulfillment Critical Path', () => {
       data: {
         organizationId,
         customerNumber: `CUST-${Date.now()}`,
-        name: 'Test Customer',
-        email: 'customer@test.com',
-        phone: '1234567890',
+        name: "Test Customer",
+        email: "customer@test.com",
+        phone: "1234567890",
       },
     });
     customerId = customer.id;
@@ -64,8 +64,8 @@ describe('Order Fulfillment Critical Path', () => {
         organizationId,
         warehouseId,
         locationCode: `LOC-${Date.now()}`,
-        name: 'Storage',
-        type: 'BIN',
+        name: "Storage",
+        type: "BIN",
         isActive: true,
       },
     });
@@ -74,11 +74,11 @@ describe('Order Fulfillment Critical Path', () => {
       data: {
         organizationId,
         sku: `SKU-${Date.now()}`,
-        name: 'Test Product',
+        name: "Test Product",
         quantity: 1000,
         locationId: location.id,
         warehouseId,
-        unitPrice: 10.00,
+        unitPrice: 10.0,
       },
     });
     inventoryItemId = item.id;
@@ -86,7 +86,9 @@ describe('Order Fulfillment Critical Path', () => {
 
   afterEach(async () => {
     // Cleanup in reverse order
-    await prisma.salesOrderLine.deleteMany({ where: { order: { organizationId } } });
+    await prisma.salesOrderLine.deleteMany({
+      where: { order: { organizationId } },
+    });
     await prisma.salesOrder.deleteMany({ where: { organizationId } });
     await prisma.customer.deleteMany({ where: { organizationId } });
     await prisma.inventoryItem.deleteMany({ where: { organizationId } });
@@ -97,8 +99,8 @@ describe('Order Fulfillment Critical Path', () => {
     await prisma.user.deleteMany({ where: { id: userId } });
   });
 
-  describe('Sales Order Creation', () => {
-    test('should create a sales order with line items', async () => {
+  describe("Sales Order Creation", () => {
+    test("should create a sales order with line items", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -106,15 +108,15 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'PENDING',
-          totalAmount: 100.00,
+          status: "PENDING",
+          totalAmount: 100.0,
           lines: {
             create: [
               {
                 inventoryItemId,
                 quantity: 10,
-                unitPrice: 10.00,
-                totalPrice: 100.00,
+                unitPrice: 10.0,
+                totalPrice: 100.0,
               },
             ],
           },
@@ -123,27 +125,27 @@ describe('Order Fulfillment Critical Path', () => {
       });
 
       expect(order).toBeDefined();
-      expect(order.status).toBe('PENDING');
+      expect(order.status).toBe("PENDING");
       expect(order.lines.length).toBe(1);
       expect(order.lines[0].quantity).toBe(10);
-      expect(order.totalAmount).toBe(100.00);
+      expect(order.totalAmount).toBe(100.0);
     });
 
-    test('should calculate order total correctly', async () => {
+    test("should calculate order total correctly", async () => {
       const lineItems = [
-        { quantity: 10, unitPrice: 10.00 },
-        { quantity: 5, unitPrice: 20.00 },
+        { quantity: 10, unitPrice: 10.0 },
+        { quantity: 5, unitPrice: 20.0 },
       ];
 
       const totalAmount = lineItems.reduce(
         (sum, item) => sum + item.quantity * item.unitPrice,
-        0
+        0,
       );
 
-      expect(totalAmount).toBe(200.00);
+      expect(totalAmount).toBe(200.0);
     });
 
-    test('should validate stock availability', async () => {
+    test("should validate stock availability", async () => {
       const item = await prisma.inventoryItem.findUnique({
         where: { id: inventoryItemId },
       });
@@ -154,7 +156,7 @@ describe('Order Fulfillment Critical Path', () => {
       expect(isAvailable).toBe(true);
     });
 
-    test('should reject order if insufficient stock', async () => {
+    test("should reject order if insufficient stock", async () => {
       const item = await prisma.inventoryItem.findUnique({
         where: { id: inventoryItemId },
       });
@@ -166,8 +168,8 @@ describe('Order Fulfillment Critical Path', () => {
     });
   });
 
-  describe('Order Status Workflow', () => {
-    test('should transition order from PENDING to CONFIRMED', async () => {
+  describe("Order Status Workflow", () => {
+    test("should transition order from PENDING to CONFIRMED", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -175,20 +177,20 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'PENDING',
-          totalAmount: 50.00,
+          status: "PENDING",
+          totalAmount: 50.0,
         },
       });
 
       const updated = await prisma.salesOrder.update({
         where: { id: order.id },
-        data: { status: 'CONFIRMED' },
+        data: { status: "CONFIRMED" },
       });
 
-      expect(updated.status).toBe('CONFIRMED');
+      expect(updated.status).toBe("CONFIRMED");
     });
 
-    test('should track order status history', async () => {
+    test("should track order status history", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -196,51 +198,51 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'PENDING',
-          totalAmount: 50.00,
+          status: "PENDING",
+          totalAmount: 50.0,
         },
       });
 
-      const statuses: string[] = ['PENDING'];
+      const statuses: string[] = ["PENDING"];
 
       // Confirm
       await prisma.salesOrder.update({
         where: { id: order.id },
-        data: { status: 'CONFIRMED' },
+        data: { status: "CONFIRMED" },
       });
-      statuses.push('CONFIRMED');
+      statuses.push("CONFIRMED");
 
       // Pick
       await prisma.salesOrder.update({
         where: { id: order.id },
-        data: { status: 'PICKING' },
+        data: { status: "PICKING" },
       });
-      statuses.push('PICKING');
+      statuses.push("PICKING");
 
       // Pack
       await prisma.salesOrder.update({
         where: { id: order.id },
-        data: { status: 'PACKING' },
+        data: { status: "PACKING" },
       });
-      statuses.push('PACKING');
+      statuses.push("PACKING");
 
       // Ship
       await prisma.salesOrder.update({
         where: { id: order.id },
-        data: { status: 'SHIPPED' },
+        data: { status: "SHIPPED" },
       });
-      statuses.push('SHIPPED');
+      statuses.push("SHIPPED");
 
-      expect(statuses).toContain('PENDING');
-      expect(statuses).toContain('CONFIRMED');
-      expect(statuses).toContain('PICKING');
-      expect(statuses).toContain('PACKING');
-      expect(statuses).toContain('SHIPPED');
+      expect(statuses).toContain("PENDING");
+      expect(statuses).toContain("CONFIRMED");
+      expect(statuses).toContain("PICKING");
+      expect(statuses).toContain("PACKING");
+      expect(statuses).toContain("SHIPPED");
     });
   });
 
-  describe('Picking Process', () => {
-    test('should create pick list from order', async () => {
+  describe("Picking Process", () => {
+    test("should create pick list from order", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -248,15 +250,15 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'CONFIRMED',
-          totalAmount: 100.00,
+          status: "CONFIRMED",
+          totalAmount: 100.0,
           lines: {
             create: [
               {
                 inventoryItemId,
                 quantity: 10,
-                unitPrice: 10.00,
-                totalPrice: 100.00,
+                unitPrice: 10.0,
+                totalPrice: 100.0,
               },
             ],
           },
@@ -268,17 +270,17 @@ describe('Order Fulfillment Critical Path', () => {
           organizationId,
           warehouseId,
           pickListNumber: `PL-${Date.now()}`,
-          status: 'PENDING',
+          status: "PENDING",
           orderId: order.id,
         },
       });
 
       expect(pickList).toBeDefined();
-      expect(pickList.status).toBe('PENDING');
+      expect(pickList.status).toBe("PENDING");
       expect(pickList.orderId).toBe(order.id);
     });
 
-    test('should assign picker to pick list', async () => {
+    test("should assign picker to pick list", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -286,8 +288,8 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'CONFIRMED',
-          totalAmount: 100.00,
+          status: "CONFIRMED",
+          totalAmount: 100.0,
         },
       });
 
@@ -296,7 +298,7 @@ describe('Order Fulfillment Critical Path', () => {
           organizationId,
           warehouseId,
           pickListNumber: `PL-${Date.now()}`,
-          status: 'PENDING',
+          status: "PENDING",
           orderId: order.id,
           assignedToId: userId,
         },
@@ -305,7 +307,7 @@ describe('Order Fulfillment Critical Path', () => {
       expect(pickList.assignedToId).toBe(userId);
     });
 
-    test('should complete picking and update inventory', async () => {
+    test("should complete picking and update inventory", async () => {
       const item = await prisma.inventoryItem.findUnique({
         where: { id: inventoryItemId },
       });
@@ -322,8 +324,8 @@ describe('Order Fulfillment Critical Path', () => {
     });
   });
 
-  describe('Packing Process', () => {
-    test('should create packing slip', async () => {
+  describe("Packing Process", () => {
+    test("should create packing slip", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -331,8 +333,8 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'PICKING',
-          totalAmount: 100.00,
+          status: "PICKING",
+          totalAmount: 100.0,
         },
       });
 
@@ -342,7 +344,7 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderId: order.id,
           packingSlipNumber: `PS-${Date.now()}`,
-          status: 'PENDING',
+          status: "PENDING",
         },
       });
 
@@ -351,8 +353,8 @@ describe('Order Fulfillment Critical Path', () => {
     });
   });
 
-  describe('Shipping Process', () => {
-    test('should create shipment with tracking', async () => {
+  describe("Shipping Process", () => {
+    test("should create shipment with tracking", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -360,8 +362,8 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'PACKING',
-          totalAmount: 100.00,
+          status: "PACKING",
+          totalAmount: 100.0,
         },
       });
 
@@ -372,15 +374,15 @@ describe('Order Fulfillment Critical Path', () => {
           orderId: order.id,
           shipmentNumber: `SHIP-${Date.now()}`,
           trackingNumber: `TRACK-${Date.now()}`,
-          status: 'PENDING',
+          status: "PENDING",
         },
       });
 
       expect(shipment).toBeDefined();
-      expect(shipment.trackingNumber).toContain('TRACK-');
+      expect(shipment.trackingNumber).toContain("TRACK-");
     });
 
-    test('should complete order after shipment', async () => {
+    test("should complete order after shipment", async () => {
       const order = await prisma.salesOrder.create({
         data: {
           organizationId,
@@ -388,8 +390,8 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderNumber: `SO-${Date.now()}`,
           orderDate: new Date(),
-          status: 'PACKING',
-          totalAmount: 100.00,
+          status: "PACKING",
+          totalAmount: 100.0,
         },
       });
 
@@ -400,17 +402,17 @@ describe('Order Fulfillment Critical Path', () => {
           warehouseId,
           orderId: order.id,
           shipmentNumber: `SHIP-${Date.now()}`,
-          status: 'SHIPPED',
+          status: "SHIPPED",
         },
       });
 
       // Complete order
       const completed = await prisma.salesOrder.update({
         where: { id: order.id },
-        data: { status: 'SHIPPED' },
+        data: { status: "SHIPPED" },
       });
 
-      expect(completed.status).toBe('SHIPPED');
+      expect(completed.status).toBe("SHIPPED");
     });
   });
 });

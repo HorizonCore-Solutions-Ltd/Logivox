@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { AlertTriangle, Shield, FileText } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { AlertTriangle, Shield, FileText } from "lucide-react";
 
 interface HazmatRecord {
   id: string;
@@ -24,7 +24,7 @@ interface HazmatRecord {
 export default function HazmatRecordsPage() {
   const [records, setRecords] = useState<HazmatRecord[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('active');
+  const [filter, setFilter] = useState("active");
 
   useEffect(() => {
     fetchRecords();
@@ -33,7 +33,7 @@ export default function HazmatRecordsPage() {
   const fetchRecords = async () => {
     try {
       const params = new URLSearchParams();
-      if (filter === 'active') params.append('isActive', 'true');
+      if (filter === "active") params.append("isActive", "true");
 
       const res = await fetch(`/api/hazmat-records?${params.toString()}`);
       if (res.ok) {
@@ -41,16 +41,17 @@ export default function HazmatRecordsPage() {
         setRecords(data);
       }
     } catch (error) {
-      console.error('Error fetching hazmat records:', error);
+      console.error("Error fetching hazmat records:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const activeRecords = records.filter(r => r.isActive);
-  const expiringSoon = records.filter(r => {
+  const activeRecords = records.filter((r) => r.isActive);
+  const expiringSoon = records.filter((r) => {
     if (!r.expiryDate) return false;
-    const daysUntilExpiry = (new Date(r.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
+    const daysUntilExpiry =
+      (new Date(r.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
     return daysUntilExpiry <= 30 && daysUntilExpiry > 0;
   });
 
@@ -59,7 +60,9 @@ export default function HazmatRecordsPage() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Hazmat Records</h1>
-          <p className="text-gray-600 mt-1">Hazardous materials compliance tracking</p>
+          <p className="text-gray-600 mt-1">
+            Hazardous materials compliance tracking
+          </p>
         </div>
       </div>
 
@@ -78,7 +81,9 @@ export default function HazmatRecordsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Expiring Soon</p>
-              <p className="text-2xl font-bold text-yellow-600">{expiringSoon.length}</p>
+              <p className="text-2xl font-bold text-yellow-600">
+                {expiringSoon.length}
+              </p>
             </div>
             <AlertTriangle className="w-8 h-8 text-yellow-600" />
           </div>
@@ -151,11 +156,17 @@ export default function HazmatRecordsPage() {
               records.map((record) => (
                 <tr key={record.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{record.product.name}</div>
-                    <div className="text-sm text-gray-500">{record.product.sku}</div>
+                    <div className="text-sm font-medium text-gray-900">
+                      {record.product.name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {record.product.sku}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-medium text-red-600">{record.unNumber}</span>
+                    <span className="text-sm font-medium text-red-600">
+                      {record.unNumber}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
@@ -166,10 +177,10 @@ export default function HazmatRecordsPage() {
                     {record.properShippingName}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {record.packingGroup || '-'}
+                    {record.packingGroup || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {record.certificationNumber || '-'}
+                    {record.certificationNumber || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     {record.msdsUrl ? (
@@ -182,7 +193,7 @@ export default function HazmatRecordsPage() {
                         View MSDS
                       </a>
                     ) : (
-                      '-'
+                      "-"
                     )}
                   </td>
                 </tr>

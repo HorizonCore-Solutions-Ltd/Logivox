@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { MRBService } from '@/lib/services/qc/mrb.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { MRBService } from "@/lib/services/qc/mrb.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       affectedCharacteristics: body.affectedCharacteristics,
       measurementData: body.measurementData,
       photos: body.photos,
-      submittedBy: session.user.email || '',
+      submittedBy: session.user.email || "",
       urgency: body.urgency,
       customerImpact: body.customerImpact,
       estimatedValue: body.estimatedValue,
@@ -40,16 +40,19 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const organizationId = searchParams.get('organizationId');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const organizationId = searchParams.get("organizationId");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     if (!organizationId) {
-      return NextResponse.json({ error: 'organizationId required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "organizationId required" },
+        { status: 400 },
+      );
     }
 
     const stats = await MRBService.getStatistics({

@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const weighVehicleSchema = z.object({
-  direction: z.enum(['IN', 'OUT']),
+  direction: z.enum(["IN", "OUT"]),
   weight: z.number().positive(),
   bridgeId: z.string().min(1),
   operatorId: z.string().optional(),
@@ -15,12 +15,12 @@ const weighVehicleSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const gateEntryId = params.id;
@@ -34,7 +34,10 @@ export async function POST(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     const body = await req.json();
@@ -56,26 +59,29 @@ export async function POST(
     // Get all weigh records for this gate entry
     const allWeighs = await prisma.gateWeighBridge.findMany({
       where: { gateEntryId },
-      orderBy: { weighTime: 'asc' },
+      orderBy: { weighTime: "asc" },
     });
 
     // Calculate variance if we have both IN and OUT weights
-    const inWeight = allWeighs.find((w) => w.direction === 'IN');
-    const outWeight = allWeighs.find((w) => w.direction === 'OUT');
+    const inWeight = allWeighs.find((w) => w.direction === "IN");
+    const outWeight = allWeighs.find((w) => w.direction === "OUT");
 
     let variance = null;
     let variancePercentage = null;
     let alert = null;
 
     if (inWeight && outWeight) {
-      variance = parseFloat(outWeight.weight.toString()) - parseFloat(inWeight.weight.toString());
-      variancePercentage = (Math.abs(variance) / parseFloat(inWeight.weight.toString())) * 100;
+      variance =
+        parseFloat(outWeight.weight.toString()) -
+        parseFloat(inWeight.weight.toString());
+      variancePercentage =
+        (Math.abs(variance) / parseFloat(inWeight.weight.toString())) * 100;
 
       // Alert if variance is > 5%
       if (variancePercentage > 5) {
         alert = {
-          type: 'WEIGHT_VARIANCE',
-          severity: variancePercentage > 10 ? 'HIGH' : 'MEDIUM',
+          type: "WEIGHT_VARIANCE",
+          severity: variancePercentage > 10 ? "HIGH" : "MEDIUM",
           message: `Significant weight variance detected: ${variance.toFixed(2)}kg (${variancePercentage.toFixed(2)}%)`,
         };
 
@@ -83,8 +89,8 @@ export async function POST(
         await prisma.securityAlert.create({
           data: {
             organizationId: session.user.organizationId,
-            type: 'WEIGHT_VARIANCE',
-            severity: variancePercentage > 10 ? 'HIGH' : 'MEDIUM',
+            type: "WEIGHT_VARIANCE",
+            severity: variancePercentage > 10 ? "HIGH" : "MEDIUM",
             message: alert.message,
             metadata: {
               gateEntryId,
@@ -98,40 +104,43 @@ export async function POST(
       }
     }
 
-    return NextResponse.json({
-      weighRecord,
-      summary: {
-        inWeight: inWeight ? parseFloat(inWeight.weight.toString()) : null,
-        outWeight: outWeight ? parseFloat(outWeight.weight.toString()) : null,
-        variance,
-        variancePercentage,
-        alert,
+    return NextResponse.json(
+      {
+        weighRecord,
+        summary: {
+          inWeight: inWeight ? parseFloat(inWeight.weight.toString()) : null,
+          outWeight: outWeight ? parseFloat(outWeight.weight.toString()) : null,
+          variance,
+          variancePercentage,
+          alert,
+        },
       },
-    }, { status: 201 });
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating weigh record:', error);
+    console.error("Error creating weigh record:", error);
     return NextResponse.json(
-      { error: 'Failed to create weigh record' },
-      { status: 500 }
+      { error: "Failed to create weigh record" },
+      { status: 500 },
     );
   }
 }
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const gateEntryId = params.id;
@@ -145,24 +154,30 @@ export async function GET(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     const weighRecords = await prisma.gateWeighBridge.findMany({
       where: { gateEntryId },
-      orderBy: { weighTime: 'asc' },
+      orderBy: { weighTime: "asc" },
     });
 
     // Calculate summary
-    const inWeight = weighRecords.find((w) => w.direction === 'IN');
-    const outWeight = weighRecords.find((w) => w.direction === 'OUT');
+    const inWeight = weighRecords.find((w) => w.direction === "IN");
+    const outWeight = weighRecords.find((w) => w.direction === "OUT");
 
     let variance = null;
     let variancePercentage = null;
 
     if (inWeight && outWeight) {
-      variance = parseFloat(outWeight.weight.toString()) - parseFloat(inWeight.weight.toString());
-      variancePercentage = (Math.abs(variance) / parseFloat(inWeight.weight.toString())) * 100;
+      variance =
+        parseFloat(outWeight.weight.toString()) -
+        parseFloat(inWeight.weight.toString());
+      variancePercentage =
+        (Math.abs(variance) / parseFloat(inWeight.weight.toString())) * 100;
     }
 
     return NextResponse.json({
@@ -175,10 +190,10 @@ export async function GET(
       },
     });
   } catch (error) {
-    console.error('Error fetching weigh records:', error);
+    console.error("Error fetching weigh records:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch weigh records' },
-      { status: 500 }
+      { error: "Failed to fetch weigh records" },
+      { status: 500 },
     );
   }
 }

@@ -6,19 +6,19 @@
  * POST /api/returns/refurb/templates - Create template
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { RefurbishmentService } from '@/lib/services/returns/refurbishment';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { RefurbishmentService } from "@/lib/services/returns/refurbishment";
 
 const createWorkOrderSchema = z.object({
   rmaItemId: z.string(),
   productId: z.string(),
   templateId: z.string().optional(),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).default('MEDIUM'),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).default("MEDIUM"),
   estimatedDays: z.number().optional(),
   notes: z.string().optional(),
 });
@@ -27,29 +27,39 @@ const createTemplateSchema = z.object({
   name: z.string(),
   category: z.string(),
   estimatedDays: z.number(),
-  steps: z.array(z.object({
-    name: z.string(),
-    description: z.string().optional(),
-    estimatedMinutes: z.number(),
-    requiredSkills: z.array(z.string()).optional(),
-    requiredParts: z.array(z.object({
-      partNumber: z.string(),
-      quantity: z.number(),
-      description: z.string().optional(),
-    })).optional(),
-    qualityChecks: z.array(z.object({
+  steps: z.array(
+    z.object({
       name: z.string(),
-      criteria: z.string(),
-      required: z.boolean().default(true),
-    })).optional(),
-  })),
+      description: z.string().optional(),
+      estimatedMinutes: z.number(),
+      requiredSkills: z.array(z.string()).optional(),
+      requiredParts: z
+        .array(
+          z.object({
+            partNumber: z.string(),
+            quantity: z.number(),
+            description: z.string().optional(),
+          }),
+        )
+        .optional(),
+      qualityChecks: z
+        .array(
+          z.object({
+            name: z.string(),
+            criteria: z.string(),
+            required: z.boolean().default(true),
+          }),
+        )
+        .optional(),
+    }),
+  ),
 });
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -57,15 +67,18 @@ export async function GET(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const priority = searchParams.get('priority');
-    const type = searchParams.get('type'); // work-orders or templates
+    const status = searchParams.get("status");
+    const priority = searchParams.get("priority");
+    const type = searchParams.get("type"); // work-orders or templates
 
-    if (type === 'templates') {
+    if (type === "templates") {
       const templates = await prisma.$queryRaw`
         SELECT * FROM refurb_templates
         WHERE organization_id = ${membership.organizationId}
@@ -115,10 +128,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ workOrders });
   } catch (error) {
-    console.error('Error fetching refurb data:', error);
+    console.error("Error fetching refurb data:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch refurbishment data' },
-      { status: 500 }
+      { error: "Failed to fetch refurbishment data" },
+      { status: 500 },
     );
   }
 }
@@ -127,7 +140,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -135,14 +148,17 @@ export async function POST(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
+    const type = searchParams.get("type");
 
-    if (type === 'template') {
+    if (type === "template") {
       const data = createTemplateSchema.parse(body);
 
       const refurbService = new RefurbishmentService();
@@ -161,7 +177,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         template,
-        message: 'Refurbishment template created',
+        message: "Refurbishment template created",
       });
     }
 
@@ -178,17 +194,20 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rmaItem || rmaItem.rma.organizationId !== membership.organizationId) {
-      return NextResponse.json({ error: 'RMA item not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "RMA item not found" },
+        { status: 404 },
+      );
     }
 
     // Get template if specified
     let steps = [];
     if (data.templateId) {
-      const template = await prisma.$queryRaw`
+      const template = (await prisma.$queryRaw`
         SELECT * FROM refurb_templates
         WHERE id = ${data.templateId}
           AND organization_id = ${membership.organizationId}
-      ` as any[];
+      `) as any[];
 
       if (template.length > 0) {
         steps = template[0].steps;
@@ -199,8 +218,8 @@ export async function POST(request: NextRequest) {
     const workOrder = await refurbService.createWorkOrder({
       rmaItemId: data.rmaItemId,
       productId: data.productId,
-      sku: rmaItem.sku || '',
-      condition: rmaItem.condition || 'USED',
+      sku: rmaItem.sku || "",
+      condition: rmaItem.condition || "USED",
       priority: data.priority,
       estimatedDays: data.estimatedDays,
       steps,
@@ -224,15 +243,15 @@ export async function POST(request: NextRequest) {
     // Update RMA item
     await prisma.rMAItem.update({
       where: { id: data.rmaItemId },
-      data: { disposition: 'REFURBISH' },
+      data: { disposition: "REFURBISH" },
     });
 
     await prisma.activityLog.create({
       data: {
         organizationId: membership.organizationId,
         userId: session.user.id,
-        action: 'REFURB_WORK_ORDER_CREATED',
-        entityType: 'REFURB_WORK_ORDER',
+        action: "REFURB_WORK_ORDER_CREATED",
+        entityType: "REFURB_WORK_ORDER",
         entityId: workOrder.id,
         metadata: {
           rmaNumber: rmaItem.rma.rmaNumber,
@@ -244,20 +263,23 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       workOrder,
-      message: 'Work order created successfully',
+      message: "Work order created successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating refurb data:', error);
+    console.error("Error creating refurb data:", error);
     return NextResponse.json(
-      { error: 'Failed to create refurbishment data', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to create refurbishment data",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

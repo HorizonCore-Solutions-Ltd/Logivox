@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,12 +12,17 @@ export async function GET(request: NextRequest) {
     }
 
     const searchParams = request.nextUrl.searchParams;
-    const limit = searchParams.get("limit") ? parseInt(searchParams.get("limit")!) : 50;
+    const limit = searchParams.get("limit")
+      ? parseInt(searchParams.get("limit")!)
+      : 50;
 
     // Use first organization as tenant
     const tenantId = session.user.organizations[0]?.id;
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     const forecasts = await generateAllForecasts(tenantId, limit);
@@ -27,7 +32,7 @@ export async function GET(request: NextRequest) {
     console.error("Error generating bulk forecasts:", error);
     return NextResponse.json(
       { error: "Failed to generate forecasts" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

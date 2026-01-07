@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 /**
  * Chart Components for LogiVox Reports
- * 
+ *
  * Data visualization using Recharts library.
  * Supports: Bar, Line, Pie, Area, and Combo charts.
  */
 
-import React from 'react';
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -24,8 +24,8 @@ import {
   Legend,
   ResponsiveContainer,
   Cell,
-} from 'recharts';
-import { ChartType } from '@/lib/reports/report-types';
+} from "recharts";
+import { ChartType } from "@/lib/reports/report-types";
 
 // ============================================================================
 // Types
@@ -50,16 +50,16 @@ export interface ReportChartProps {
 // ============================================================================
 
 const CHART_COLORS = [
-  '#0066cc', // Primary blue
-  '#00b894', // Green
-  '#6c5ce7', // Purple
-  '#fdcb6e', // Yellow
-  '#e17055', // Orange
-  '#74b9ff', // Light blue
-  '#a29bfe', // Light purple
-  '#ffeaa7', // Light yellow
-  '#fab1a0', // Light orange
-  '#81ecec', // Cyan
+  "#0066cc", // Primary blue
+  "#00b894", // Green
+  "#6c5ce7", // Purple
+  "#fdcb6e", // Yellow
+  "#e17055", // Orange
+  "#74b9ff", // Light blue
+  "#a29bfe", // Light purple
+  "#ffeaa7", // Light yellow
+  "#fab1a0", // Light orange
+  "#81ecec", // Cyan
 ];
 
 // ============================================================================
@@ -71,19 +71,20 @@ export function ReportChart({
   type,
   xAxisKey,
   yAxisKeys = [],
-  width = '100%',
+  width = "100%",
   height = 400,
   title,
 }: ReportChartProps) {
   // Auto-detect keys if not provided
   const firstRow = data.length > 0 ? data[0] : undefined;
-  const autoXAxisKey = xAxisKey || (firstRow ? Object.keys(firstRow)[0] || '' : '');
+  const autoXAxisKey =
+    xAxisKey || (firstRow ? Object.keys(firstRow)[0] || "" : "");
   const autoYAxisKeys =
     yAxisKeys.length > 0
       ? yAxisKeys
       : firstRow
-      ? Object.keys(firstRow).filter((key) => key !== autoXAxisKey)
-      : [];
+        ? Object.keys(firstRow).filter((key) => key !== autoXAxisKey)
+        : [];
 
   // Render appropriate chart type
   const renderChart = () => {
@@ -113,7 +114,7 @@ export function ReportChart({
           <PieChartComponent
             data={data}
             nameKey={autoXAxisKey}
-            valueKey={autoYAxisKeys[0] || ''}
+            valueKey={autoYAxisKeys[0] || ""}
             height={height}
           />
         );
@@ -149,7 +150,9 @@ export function ReportChart({
 
   return (
     <div className="w-full">
-      {title && <h3 className="mb-4 text-lg font-semibold text-gray-900">{title}</h3>}
+      {title && (
+        <h3 className="mb-4 text-lg font-semibold text-gray-900">{title}</h3>
+      )}
       {renderChart()}
     </div>
   );
@@ -166,7 +169,12 @@ interface BarChartProps {
   height: number;
 }
 
-function BarChartComponent({ data, xAxisKey, yAxisKeys, height }: BarChartProps) {
+function BarChartComponent({
+  data,
+  xAxisKey,
+  yAxisKeys,
+  height,
+}: BarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
@@ -174,14 +182,14 @@ function BarChartComponent({ data, xAxisKey, yAxisKeys, height }: BarChartProps)
         <XAxis
           dataKey={xAxisKey}
           stroke="#6b7280"
-          tick={{ fill: '#6b7280', fontSize: 12 }}
+          tick={{ fill: "#6b7280", fontSize: 12 }}
         />
-        <YAxis stroke="#6b7280" tick={{ fill: '#6b7280', fontSize: 12 }} />
+        <YAxis stroke="#6b7280" tick={{ fill: "#6b7280", fontSize: 12 }} />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            borderRadius: '6px',
+            backgroundColor: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "6px",
           }}
         />
         <Legend />
@@ -209,22 +217,30 @@ interface LineChartProps {
   height: number;
 }
 
-function LineChartComponent({ data, xAxisKey, yAxisKeys, height }: LineChartProps) {
+function LineChartComponent({
+  data,
+  xAxisKey,
+  yAxisKeys,
+  height,
+}: LineChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+      <LineChart
+        data={data}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
         <XAxis
           dataKey={xAxisKey}
           stroke="#6b7280"
-          tick={{ fill: '#6b7280', fontSize: 12 }}
+          tick={{ fill: "#6b7280", fontSize: 12 }}
         />
-        <YAxis stroke="#6b7280" tick={{ fill: '#6b7280', fontSize: 12 }} />
+        <YAxis stroke="#6b7280" tick={{ fill: "#6b7280", fontSize: 12 }} />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            borderRadius: '6px',
+            backgroundColor: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "6px",
           }}
         />
         <Legend />
@@ -275,7 +291,7 @@ function PieChartComponent({ data, nameKey, valueKey, height }: PieChartProps) {
         x={x}
         y={y}
         fill="white"
-        textAnchor={x > cx ? 'start' : 'end'}
+        textAnchor={x > cx ? "start" : "end"}
         dominantBaseline="central"
         fontSize={12}
         fontWeight={600}
@@ -300,14 +316,17 @@ function PieChartComponent({ data, nameKey, valueKey, height }: PieChartProps) {
           nameKey={nameKey}
         >
           {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+            <Cell
+              key={`cell-${index}`}
+              fill={CHART_COLORS[index % CHART_COLORS.length]}
+            />
           ))}
         </Pie>
         <Tooltip
           contentStyle={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            borderRadius: '6px',
+            backgroundColor: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "6px",
           }}
         />
         <Legend />
@@ -327,13 +346,28 @@ interface AreaChartProps {
   height: number;
 }
 
-function AreaChartComponent({ data, xAxisKey, yAxisKeys, height }: AreaChartProps) {
+function AreaChartComponent({
+  data,
+  xAxisKey,
+  yAxisKeys,
+  height,
+}: AreaChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <AreaChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+      <AreaChart
+        data={data}
+        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+      >
         <defs>
           {yAxisKeys.map((key, index) => (
-            <linearGradient key={key} id={`color${index}`} x1="0" y1="0" x2="0" y2="1">
+            <linearGradient
+              key={key}
+              id={`color${index}`}
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
               <stop
                 offset="5%"
                 stopColor={CHART_COLORS[index % CHART_COLORS.length]}
@@ -351,14 +385,14 @@ function AreaChartComponent({ data, xAxisKey, yAxisKeys, height }: AreaChartProp
         <XAxis
           dataKey={xAxisKey}
           stroke="#6b7280"
-          tick={{ fill: '#6b7280', fontSize: 12 }}
+          tick={{ fill: "#6b7280", fontSize: 12 }}
         />
-        <YAxis stroke="#6b7280" tick={{ fill: '#6b7280', fontSize: 12 }} />
+        <YAxis stroke="#6b7280" tick={{ fill: "#6b7280", fontSize: 12 }} />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            borderRadius: '6px',
+            backgroundColor: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "6px",
           }}
         />
         <Legend />
@@ -388,7 +422,12 @@ interface ComboChartProps {
   height: number;
 }
 
-function ComboChartComponent({ data, xAxisKey, yAxisKeys, height }: ComboChartProps) {
+function ComboChartComponent({
+  data,
+  xAxisKey,
+  yAxisKeys,
+  height,
+}: ComboChartProps) {
   // Split keys: first half as bars, second half as lines
   const midPoint = Math.ceil(yAxisKeys.length / 2);
   const barKeys = yAxisKeys.slice(0, midPoint);
@@ -401,14 +440,14 @@ function ComboChartComponent({ data, xAxisKey, yAxisKeys, height }: ComboChartPr
         <XAxis
           dataKey={xAxisKey}
           stroke="#6b7280"
-          tick={{ fill: '#6b7280', fontSize: 12 }}
+          tick={{ fill: "#6b7280", fontSize: 12 }}
         />
-        <YAxis stroke="#6b7280" tick={{ fill: '#6b7280', fontSize: 12 }} />
+        <YAxis stroke="#6b7280" tick={{ fill: "#6b7280", fontSize: 12 }} />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#ffffff',
-            border: '1px solid #e5e7eb',
-            borderRadius: '6px',
+            backgroundColor: "#ffffff",
+            border: "1px solid #e5e7eb",
+            borderRadius: "6px",
           }}
         />
         <Legend />
@@ -425,9 +464,16 @@ function ComboChartComponent({ data, xAxisKey, yAxisKeys, height }: ComboChartPr
             key={key}
             type="monotone"
             dataKey={key}
-            stroke={CHART_COLORS[(index + barKeys.length) % CHART_COLORS.length]}
+            stroke={
+              CHART_COLORS[(index + barKeys.length) % CHART_COLORS.length]
+            }
             strokeWidth={2}
-            dot={{ fill: CHART_COLORS[(index + barKeys.length) % CHART_COLORS.length], r: 4 }}
+            dot={{
+              fill: CHART_COLORS[
+                (index + barKeys.length) % CHART_COLORS.length
+              ],
+              r: 4,
+            }}
           />
         ))}
       </BarChart>
@@ -439,8 +485,11 @@ function ComboChartComponent({ data, xAxisKey, yAxisKeys, height }: ComboChartPr
 // Export Chart as Image
 // ============================================================================
 
-export function exportChartAsImage(chartElement: HTMLElement, filename: string): void {
+export function exportChartAsImage(
+  chartElement: HTMLElement,
+  filename: string,
+): void {
   // In production, use html2canvas or similar library
-  console.log('Export chart as image:', filename);
-  alert('Chart export coming soon!');
+  console.log("Export chart as image:", filename);
+  alert("Chart export coming soon!");
 }

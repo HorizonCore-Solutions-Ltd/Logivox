@@ -9,7 +9,7 @@
 export interface PerformanceMetric {
   name: string;
   value: number;
-  unit: 'ms' | 'bytes' | 'count';
+  unit: "ms" | "bytes" | "count";
   timestamp: Date;
   metadata?: Record<string, any>;
 }
@@ -49,7 +49,7 @@ export class PerformanceMonitor {
     }
 
     const duration = Date.now() - startTime;
-    this.record(name, duration, 'ms', metadata);
+    this.record(name, duration, "ms", metadata);
     this.startTimes.delete(name);
     return duration;
   }
@@ -60,8 +60,8 @@ export class PerformanceMonitor {
   record(
     name: string,
     value: number,
-    unit: 'ms' | 'bytes' | 'count' = 'ms',
-    metadata?: Record<string, any>
+    unit: "ms" | "bytes" | "count" = "ms",
+    metadata?: Record<string, any>,
   ): void {
     const metric: PerformanceMetric = {
       name,
@@ -115,20 +115,23 @@ export class PerformanceMonitor {
   /**
    * Get all metrics summary
    */
-  getSummary(): Record<string, {
-    count: number;
-    avg: number;
-    min: number;
-    max: number;
-    p50: number;
-    p95: number;
-    p99: number;
-  }> {
+  getSummary(): Record<
+    string,
+    {
+      count: number;
+      avg: number;
+      min: number;
+      max: number;
+      p50: number;
+      p95: number;
+      p99: number;
+    }
+  > {
     const summary: Record<string, any> = {};
 
     for (const [name, metrics] of this.metrics.entries()) {
       const values = metrics.map((m) => m.value).sort((a, b) => a - b);
-      
+
       summary[name] = {
         count: values.length,
         avg: values.reduce((a, b) => a + b, 0) / values.length,
@@ -176,7 +179,7 @@ export function Measure(metricName?: string) {
   return function (
     target: any,
     propertyKey: string,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
   ) {
     const originalMethod = descriptor.value;
     const name = metricName || `${target.constructor.name}.${propertyKey}`;
@@ -187,7 +190,7 @@ export function Measure(metricName?: string) {
         return await originalMethod.apply(this, args);
       } finally {
         const duration = performanceMonitor.end(name);
-        
+
         // Log slow operations (> 1 second)
         if (duration > 1000) {
           console.warn(`Slow operation: ${name} took ${duration}ms`);
@@ -212,10 +215,10 @@ export interface WebVitals {
 
 export function trackWebVitals(metric: WebVitals): void {
   performanceMonitor.record(
-    'web_vitals',
+    "web_vitals",
     Object.values(metric)[0] || 0,
-    'ms',
-    metric
+    "ms",
+    metric,
   );
 
   // Log poor Core Web Vitals
@@ -234,11 +237,11 @@ export function trackWebVitals(metric: WebVitals): void {
  * Memory usage tracking
  */
 export function trackMemoryUsage(): void {
-  if (typeof window !== 'undefined' && 'memory' in performance) {
+  if (typeof window !== "undefined" && "memory" in performance) {
     const memory = (performance as any).memory;
-    performanceMonitor.record('memory_used', memory.usedJSHeapSize, 'bytes');
-    performanceMonitor.record('memory_total', memory.totalJSHeapSize, 'bytes');
-    performanceMonitor.record('memory_limit', memory.jsHeapSizeLimit, 'bytes');
+    performanceMonitor.record("memory_used", memory.usedJSHeapSize, "bytes");
+    performanceMonitor.record("memory_total", memory.totalJSHeapSize, "bytes");
+    performanceMonitor.record("memory_limit", memory.jsHeapSizeLimit, "bytes");
   }
 }
 
@@ -247,7 +250,7 @@ export function trackMemoryUsage(): void {
  */
 export async function measureApiCall<T>(
   name: string,
-  apiCall: () => Promise<T>
+  apiCall: () => Promise<T>,
 ): Promise<T> {
   performanceMonitor.start(`api_${name}`);
   try {
@@ -262,11 +265,11 @@ export async function measureApiCall<T>(
  */
 export function measureRender(componentName: string): () => void {
   const startTime = Date.now();
-  
+
   return () => {
     const duration = Date.now() - startTime;
-    performanceMonitor.record(`render_${componentName}`, duration, 'ms');
-    
+    performanceMonitor.record(`render_${componentName}`, duration, "ms");
+
     // Log slow renders (> 16ms = 60fps)
     if (duration > 16) {
       console.warn(`Slow render: ${componentName} took ${duration}ms`);
@@ -279,14 +282,14 @@ export function measureRender(componentName: string): () => void {
  */
 export async function measureQuery<T>(
   queryName: string,
-  query: () => Promise<T>
+  query: () => Promise<T>,
 ): Promise<T> {
   performanceMonitor.start(`query_${queryName}`);
   try {
     return await query();
   } finally {
     const duration = performanceMonitor.end(`query_${queryName}`);
-    
+
     // Log slow queries (> 100ms)
     if (duration > 100) {
       console.warn(`Slow query: ${queryName} took ${duration}ms`);
@@ -300,15 +303,15 @@ export async function measureQuery<T>(
 export interface PerformanceBudget {
   name: string;
   threshold: number;
-  unit: 'ms' | 'bytes' | 'count';
+  unit: "ms" | "bytes" | "count";
 }
 
 export const PERFORMANCE_BUDGETS: PerformanceBudget[] = [
-  { name: 'api_call', threshold: 500, unit: 'ms' },
-  { name: 'database_query', threshold: 100, unit: 'ms' },
-  { name: 'page_load', threshold: 3000, unit: 'ms' },
-  { name: 'component_render', threshold: 16, unit: 'ms' },
-  { name: 'bundle_size', threshold: 500000, unit: 'bytes' }, // 500KB
+  { name: "api_call", threshold: 500, unit: "ms" },
+  { name: "database_query", threshold: 100, unit: "ms" },
+  { name: "page_load", threshold: 3000, unit: "ms" },
+  { name: "component_render", threshold: 16, unit: "ms" },
+  { name: "bundle_size", threshold: 500000, unit: "bytes" }, // 500KB
 ];
 
 export function checkPerformanceBudgets(): Array<{
@@ -333,10 +336,10 @@ export function generatePerformanceReport(): string {
   const summary = performanceMonitor.getSummary();
   const budgets = checkPerformanceBudgets();
 
-  let report = '# Performance Report\n\n';
+  let report = "# Performance Report\n\n";
   report += `Generated: ${new Date().toISOString()}\n\n`;
 
-  report += '## Metrics Summary\n\n';
+  report += "## Metrics Summary\n\n";
   for (const [name, stats] of Object.entries(summary)) {
     report += `### ${name}\n`;
     report += `- Count: ${stats.count}\n`;
@@ -348,9 +351,9 @@ export function generatePerformanceReport(): string {
     report += `- P99: ${stats.p99.toFixed(2)}ms\n\n`;
   }
 
-  report += '## Performance Budget Status\n\n';
+  report += "## Performance Budget Status\n\n";
   for (const { budget, exceeded, value } of budgets) {
-    const status = exceeded ? '❌ EXCEEDED' : '✅ OK';
+    const status = exceeded ? "❌ EXCEEDED" : "✅ OK";
     report += `- ${budget.name}: ${status} (${value.toFixed(2)}${budget.unit} / ${budget.threshold}${budget.unit})\n`;
   }
 
@@ -362,31 +365,31 @@ export function generatePerformanceReport(): string {
  */
 export const OPTIMIZATION_TIPS = {
   api: [
-    'Implement response caching',
-    'Use compression for responses',
-    'Optimize database queries',
-    'Implement pagination',
-    'Use connection pooling',
+    "Implement response caching",
+    "Use compression for responses",
+    "Optimize database queries",
+    "Implement pagination",
+    "Use connection pooling",
   ],
   database: [
-    'Add appropriate indexes',
-    'Use query optimization',
-    'Implement connection pooling',
-    'Cache frequent queries',
-    'Use read replicas for scaling',
+    "Add appropriate indexes",
+    "Use query optimization",
+    "Implement connection pooling",
+    "Cache frequent queries",
+    "Use read replicas for scaling",
   ],
   frontend: [
-    'Implement code splitting',
-    'Use lazy loading',
-    'Optimize images',
-    'Minimize bundle size',
-    'Use service workers for caching',
+    "Implement code splitting",
+    "Use lazy loading",
+    "Optimize images",
+    "Minimize bundle size",
+    "Use service workers for caching",
   ],
   rendering: [
-    'Avoid unnecessary re-renders',
-    'Use React.memo for expensive components',
-    'Implement virtualization for long lists',
-    'Optimize CSS and animations',
-    'Use debouncing and throttling',
+    "Avoid unnecessary re-renders",
+    "Use React.memo for expensive components",
+    "Implement virtualization for long lists",
+    "Optimize CSS and animations",
+    "Use debouncing and throttling",
   ],
 };

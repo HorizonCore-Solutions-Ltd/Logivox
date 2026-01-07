@@ -3,27 +3,33 @@
  * Comprehensive UI for wave management, pick optimization, and execution tracking
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Waves, 
-  Package, 
-  TrendingUp, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Waves,
+  Package,
+  TrendingUp,
   Users,
   Clock,
   CheckCircle,
   AlertCircle,
   BarChart3,
   MapPin,
-  Target
-} from 'lucide-react';
+  Target,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -31,28 +37,28 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Progress } from '@/components/ui/progress';
+} from "@/components/ui/select";
+import { Progress } from "@/components/ui/progress";
 
 interface Wave {
   id: string;
   waveNumber: string;
-  type: 'DISCRETE' | 'BATCH' | 'ZONE' | 'CLUSTER';
-  status: 'CREATED' | 'RELEASED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  type: "DISCRETE" | "BATCH" | "ZONE" | "CLUSTER";
+  status: "CREATED" | "RELEASED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   totalOrders: number;
   totalLines: number;
   totalUnits: number;
   pickedLines: number;
   pickedUnits: number;
   assignedPickers: number;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   createdAt: string;
   releasedAt?: string;
   completedAt?: string;
@@ -70,7 +76,7 @@ interface PickTask {
   quantityPicked: number;
   pickerId: string;
   pickerName: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'SHORT_PICKED';
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SHORT_PICKED";
   pickSequence: number;
   zone: string;
 }
@@ -83,7 +89,7 @@ interface PickerPerformance {
   unitsPerHour: number;
   accuracy: number;
   activeWave: string;
-  status: 'ACTIVE' | 'IDLE' | 'BREAK';
+  status: "ACTIVE" | "IDLE" | "BREAK";
 }
 
 interface WaveStats {
@@ -103,12 +109,12 @@ export default function WavePickingDashboard() {
   const [pickers, setPickers] = useState<PickerPerformance[]>([]);
   const [stats, setStats] = useState<WaveStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Form states
-  const [newWaveType, setNewWaveType] = useState('BATCH');
-  const [newWavePriority, setNewWavePriority] = useState('MEDIUM');
-  const [newWaveOrders, setNewWaveOrders] = useState('');
+  const [newWaveType, setNewWaveType] = useState("BATCH");
+  const [newWavePriority, setNewWavePriority] = useState("MEDIUM");
+  const [newWaveOrders, setNewWaveOrders] = useState("");
 
   useEffect(() => {
     loadDashboardData();
@@ -120,29 +126,30 @@ export default function WavePickingDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load waves
-      const wavesResponse = await fetch('/api/wave-picking?action=list-waves');
+      const wavesResponse = await fetch("/api/wave-picking?action=list-waves");
       const wavesData = await wavesResponse.json();
       setWaves(wavesData.waves || []);
 
       // Load statistics
-      const statsResponse = await fetch('/api/wave-picking?action=statistics');
+      const statsResponse = await fetch("/api/wave-picking?action=statistics");
       const statsData = await statsResponse.json();
       setStats(statsData);
 
       // Load pick tasks
-      const tasksResponse = await fetch('/api/wave-picking?action=pick-tasks');
+      const tasksResponse = await fetch("/api/wave-picking?action=pick-tasks");
       const tasksData = await tasksResponse.json();
       setPickTasks(tasksData.tasks || []);
 
       // Load picker performance
-      const pickersResponse = await fetch('/api/wave-picking?action=picker-performance');
+      const pickersResponse = await fetch(
+        "/api/wave-picking?action=picker-performance",
+      );
       const pickersData = await pickersResponse.json();
       setPickers(pickersData.pickers || []);
-
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -150,148 +157,147 @@ export default function WavePickingDashboard() {
 
   const createWave = async () => {
     try {
-      const orderIds = newWaveOrders.split(',').map(o => o.trim());
-      
-      const response = await fetch('/api/wave-picking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const orderIds = newWaveOrders.split(",").map((o) => o.trim());
+
+      const response = await fetch("/api/wave-picking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'create-wave',
+          action: "create-wave",
           waveType: newWaveType,
           orderIds,
           priority: newWavePriority,
-          warehouseId: 'default-warehouse'
-        })
+          warehouseId: "default-warehouse",
+        }),
       });
 
       if (response.ok) {
-        setNewWaveOrders('');
+        setNewWaveOrders("");
         loadDashboardData();
-        setActiveTab('waves');
+        setActiveTab("waves");
       }
     } catch (error) {
-      console.error('Failed to create wave:', error);
+      console.error("Failed to create wave:", error);
     }
   };
 
   const releaseWave = async (waveId: string) => {
     try {
-      const response = await fetch('/api/wave-picking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/wave-picking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'release-wave',
-          waveId
-        })
+          action: "release-wave",
+          waveId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to release wave:', error);
+      console.error("Failed to release wave:", error);
     }
   };
 
   const optimizeSequence = async (waveId: string) => {
     try {
-      const response = await fetch('/api/wave-picking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/wave-picking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'optimize-sequence',
+          action: "optimize-sequence",
           waveId,
-          strategy: 'ZONE_BASED'
-        })
+          strategy: "ZONE_BASED",
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to optimize wave:', error);
+      console.error("Failed to optimize wave:", error);
     }
   };
 
   const recordPick = async (taskId: string, quantity: number) => {
     try {
-      const response = await fetch('/api/wave-picking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/wave-picking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'record-pick',
+          action: "record-pick",
           taskId,
-          quantityPicked: quantity
-        })
+          quantityPicked: quantity,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to record pick:', error);
+      console.error("Failed to record pick:", error);
     }
   };
 
   const completeWave = async (waveId: string) => {
     try {
-      const response = await fetch('/api/wave-picking', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/wave-picking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'complete-wave',
-          waveId
-        })
+          action: "complete-wave",
+          waveId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to complete wave:', error);
+      console.error("Failed to complete wave:", error);
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      CREATED: { variant: 'secondary' as const, icon: Clock },
-      RELEASED: { variant: 'default' as const, icon: TrendingUp },
-      IN_PROGRESS: { variant: 'default' as const, icon: Package },
-      COMPLETED: { variant: 'success' as const, icon: CheckCircle },
-      CANCELLED: { variant: 'destructive' as const, icon: AlertCircle },
-      PENDING: { variant: 'secondary' as const, icon: Clock },
-      SHORT_PICKED: { variant: 'warning' as const, icon: AlertCircle },
-      ACTIVE: { variant: 'success' as const, icon: CheckCircle },
-      IDLE: { variant: 'secondary' as const, icon: Clock },
-      BREAK: { variant: 'warning' as const, icon: Clock },
+      CREATED: { variant: "secondary" as const, icon: Clock },
+      RELEASED: { variant: "default" as const, icon: TrendingUp },
+      IN_PROGRESS: { variant: "default" as const, icon: Package },
+      COMPLETED: { variant: "success" as const, icon: CheckCircle },
+      CANCELLED: { variant: "destructive" as const, icon: AlertCircle },
+      PENDING: { variant: "secondary" as const, icon: Clock },
+      SHORT_PICKED: { variant: "warning" as const, icon: AlertCircle },
+      ACTIVE: { variant: "success" as const, icon: CheckCircle },
+      IDLE: { variant: "secondary" as const, icon: Clock },
+      BREAK: { variant: "warning" as const, icon: Clock },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     const Icon = config.icon;
 
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
-        {status.replace('_', ' ')}
+        {status.replace("_", " ")}
       </Badge>
     );
   };
 
   const getPriorityBadge = (priority: string) => {
     const priorityConfig = {
-      LOW: { variant: 'secondary' as const },
-      MEDIUM: { variant: 'default' as const },
-      HIGH: { variant: 'warning' as const },
-      URGENT: { variant: 'destructive' as const },
+      LOW: { variant: "secondary" as const },
+      MEDIUM: { variant: "default" as const },
+      HIGH: { variant: "warning" as const },
+      URGENT: { variant: "destructive" as const },
     };
 
-    const config = priorityConfig[priority as keyof typeof priorityConfig] || priorityConfig.MEDIUM;
+    const config =
+      priorityConfig[priority as keyof typeof priorityConfig] ||
+      priorityConfig.MEDIUM;
 
-    return (
-      <Badge variant={config.variant}>
-        {priority}
-      </Badge>
-    );
+    return <Badge variant={config.variant}>{priority}</Badge>;
   };
 
   const calculateProgress = (wave: Wave) => {
@@ -323,7 +329,7 @@ export default function WavePickingDashboard() {
             Manage wave creation, optimization, and pick execution
           </p>
         </div>
-        <Button onClick={() => setActiveTab('create-wave')}>
+        <Button onClick={() => setActiveTab("create-wave")}>
           <Waves className="mr-2 h-4 w-4" />
           Create Wave
         </Button>
@@ -334,7 +340,9 @@ export default function WavePickingDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Waves</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Waves
+              </CardTitle>
               <Waves className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -364,7 +372,9 @@ export default function WavePickingDashboard() {
               <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.avgAccuracy.toFixed(1)}%</div>
+              <div className="text-2xl font-bold">
+                {stats.avgAccuracy.toFixed(1)}%
+              </div>
               <p className="text-xs text-muted-foreground">
                 Overall pick accuracy
               </p>
@@ -373,7 +383,9 @@ export default function WavePickingDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Pickers</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Pickers
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -405,25 +417,34 @@ export default function WavePickingDashboard() {
                 <CardDescription>Waves currently in progress</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {waves.filter(w => w.status === 'IN_PROGRESS' || w.status === 'RELEASED').slice(0, 5).map((wave) => (
-                  <div key={wave.id} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{wave.waveNumber}</span>
-                        {getStatusBadge(wave.status)}
-                        {getPriorityBadge(wave.priority)}
+                {waves
+                  .filter(
+                    (w) =>
+                      w.status === "IN_PROGRESS" || w.status === "RELEASED",
+                  )
+                  .slice(0, 5)
+                  .map((wave) => (
+                    <div key={wave.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{wave.waveNumber}</span>
+                          {getStatusBadge(wave.status)}
+                          {getPriorityBadge(wave.priority)}
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {wave.pickedLines}/{wave.totalLines} lines
+                        </span>
                       </div>
-                      <span className="text-sm text-muted-foreground">
-                        {wave.pickedLines}/{wave.totalLines} lines
-                      </span>
+                      <Progress
+                        value={calculateProgress(wave)}
+                        className="h-2"
+                      />
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{wave.assignedPickers} pickers</span>
+                        <span>{wave.totalOrders} orders</span>
+                      </div>
                     </div>
-                    <Progress value={calculateProgress(wave)} className="h-2" />
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{wave.assignedPickers} pickers</span>
-                      <span>{wave.totalOrders} orders</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </CardContent>
             </Card>
 
@@ -445,9 +466,13 @@ export default function WavePickingDashboard() {
                   <TableBody>
                     {pickers.slice(0, 5).map((picker) => (
                       <TableRow key={picker.pickerId}>
-                        <TableCell className="font-medium">{picker.pickerName}</TableCell>
+                        <TableCell className="font-medium">
+                          {picker.pickerName}
+                        </TableCell>
                         <TableCell>{getStatusBadge(picker.status)}</TableCell>
-                        <TableCell>{picker.completedTasks}/{picker.assignedTasks}</TableCell>
+                        <TableCell>
+                          {picker.completedTasks}/{picker.assignedTasks}
+                        </TableCell>
                         <TableCell>{picker.unitsPerHour.toFixed(0)}</TableCell>
                       </TableRow>
                     ))}
@@ -482,14 +507,19 @@ export default function WavePickingDashboard() {
                 <TableBody>
                   {waves.map((wave) => (
                     <TableRow key={wave.id}>
-                      <TableCell className="font-medium">{wave.waveNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {wave.waveNumber}
+                      </TableCell>
                       <TableCell>{wave.type}</TableCell>
                       <TableCell>{getPriorityBadge(wave.priority)}</TableCell>
                       <TableCell>{getStatusBadge(wave.status)}</TableCell>
                       <TableCell>{wave.totalOrders}</TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <Progress value={calculateProgress(wave)} className="h-2" />
+                          <Progress
+                            value={calculateProgress(wave)}
+                            className="h-2"
+                          />
                           <span className="text-xs text-muted-foreground">
                             {wave.pickedLines}/{wave.totalLines}
                           </span>
@@ -501,18 +531,28 @@ export default function WavePickingDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          {wave.status === 'CREATED' && (
+                          {wave.status === "CREATED" && (
                             <>
-                              <Button size="sm" variant="outline" onClick={() => optimizeSequence(wave.id)}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => optimizeSequence(wave.id)}
+                              >
                                 Optimize
                               </Button>
-                              <Button size="sm" onClick={() => releaseWave(wave.id)}>
+                              <Button
+                                size="sm"
+                                onClick={() => releaseWave(wave.id)}
+                              >
                                 Release
                               </Button>
                             </>
                           )}
-                          {wave.status === 'IN_PROGRESS' && (
-                            <Button size="sm" onClick={() => completeWave(wave.id)}>
+                          {wave.status === "IN_PROGRESS" && (
+                            <Button
+                              size="sm"
+                              onClick={() => completeWave(wave.id)}
+                            >
                               Complete
                             </Button>
                           )}
@@ -553,11 +593,17 @@ export default function WavePickingDashboard() {
                   {pickTasks.map((task) => (
                     <TableRow key={task.id}>
                       <TableCell>{task.pickSequence}</TableCell>
-                      <TableCell className="font-medium">{task.waveNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {task.waveNumber}
+                      </TableCell>
                       <TableCell>{task.orderNumber}</TableCell>
-                      <TableCell className="font-mono text-xs">{task.productSku}</TableCell>
+                      <TableCell className="font-mono text-xs">
+                        {task.productSku}
+                      </TableCell>
                       <TableCell>{task.productName}</TableCell>
-                      <TableCell className="font-mono">{task.locationCode}</TableCell>
+                      <TableCell className="font-mono">
+                        {task.locationCode}
+                      </TableCell>
                       <TableCell>{task.zone}</TableCell>
                       <TableCell>
                         {task.quantityPicked}/{task.quantityToPick}
@@ -565,10 +611,12 @@ export default function WavePickingDashboard() {
                       <TableCell>{task.pickerName}</TableCell>
                       <TableCell>{getStatusBadge(task.status)}</TableCell>
                       <TableCell>
-                        {task.status === 'IN_PROGRESS' && (
-                          <Button 
-                            size="sm" 
-                            onClick={() => recordPick(task.id, task.quantityToPick)}
+                        {task.status === "IN_PROGRESS" && (
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              recordPick(task.id, task.quantityToPick)
+                            }
                           >
                             Complete
                           </Button>
@@ -586,7 +634,9 @@ export default function WavePickingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Picker Performance</CardTitle>
-              <CardDescription>Real-time picker productivity and metrics</CardDescription>
+              <CardDescription>
+                Real-time picker productivity and metrics
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -604,9 +654,11 @@ export default function WavePickingDashboard() {
                 <TableBody>
                   {pickers.map((picker) => (
                     <TableRow key={picker.pickerId}>
-                      <TableCell className="font-medium">{picker.pickerName}</TableCell>
+                      <TableCell className="font-medium">
+                        {picker.pickerName}
+                      </TableCell>
                       <TableCell>{getStatusBadge(picker.status)}</TableCell>
-                      <TableCell>{picker.activeWave || '-'}</TableCell>
+                      <TableCell>{picker.activeWave || "-"}</TableCell>
                       <TableCell>{picker.assignedTasks}</TableCell>
                       <TableCell>{picker.completedTasks}</TableCell>
                       <TableCell className="text-lg font-bold">
@@ -614,8 +666,13 @@ export default function WavePickingDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={picker.accuracy} className="h-2 w-16" />
-                          <span className="text-sm">{picker.accuracy.toFixed(0)}%</span>
+                          <Progress
+                            value={picker.accuracy}
+                            className="h-2 w-16"
+                          />
+                          <span className="text-sm">
+                            {picker.accuracy.toFixed(0)}%
+                          </span>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -630,7 +687,9 @@ export default function WavePickingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Create New Wave</CardTitle>
-              <CardDescription>Configure and create a new picking wave</CardDescription>
+              <CardDescription>
+                Configure and create a new picking wave
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
@@ -641,16 +700,25 @@ export default function WavePickingDashboard() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="DISCRETE">Discrete (One order per picker)</SelectItem>
-                      <SelectItem value="BATCH">Batch (Multiple orders)</SelectItem>
+                      <SelectItem value="DISCRETE">
+                        Discrete (One order per picker)
+                      </SelectItem>
+                      <SelectItem value="BATCH">
+                        Batch (Multiple orders)
+                      </SelectItem>
                       <SelectItem value="ZONE">Zone (Zone-based)</SelectItem>
-                      <SelectItem value="CLUSTER">Cluster (Multi-order cart)</SelectItem>
+                      <SelectItem value="CLUSTER">
+                        Cluster (Multi-order cart)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="priority">Priority</Label>
-                  <Select value={newWavePriority} onValueChange={setNewWavePriority}>
+                  <Select
+                    value={newWavePriority}
+                    onValueChange={setNewWavePriority}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -688,7 +756,9 @@ export default function WavePickingDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-4xl font-bold">{stats?.completedToday}</div>
+                  <div className="text-4xl font-bold">
+                    {stats?.completedToday}
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     Average time: {stats?.avgWaveTime.toFixed(0)} minutes
                   </p>
@@ -707,12 +777,19 @@ export default function WavePickingDashboard() {
                     <span className="text-sm font-medium">Pick Rate</span>
                     <span className="text-sm">{stats?.avgPickRate} UPH</span>
                   </div>
-                  <Progress value={Math.min((stats?.avgPickRate || 0) / 150 * 100, 100)} />
+                  <Progress
+                    value={Math.min(
+                      ((stats?.avgPickRate || 0) / 150) * 100,
+                      100,
+                    )}
+                  />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">Accuracy</span>
-                    <span className="text-sm">{stats?.avgAccuracy.toFixed(1)}%</span>
+                    <span className="text-sm">
+                      {stats?.avgAccuracy.toFixed(1)}%
+                    </span>
                   </div>
                   <Progress value={stats?.avgAccuracy || 0} />
                 </div>

@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { qrReturnService } from '@/lib/services/returns/qr-return-service';
+import { NextRequest, NextResponse } from "next/server";
+import { qrReturnService } from "@/lib/services/returns/qr-return-service";
 
 /**
  * POST /api/returns/qr-code/scan
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
 
     if (!qrCode) {
       return NextResponse.json(
-        { error: 'Missing required field: qrCode' },
-        { status: 400 }
+        { error: "Missing required field: qrCode" },
+        { status: 400 },
       );
     }
 
@@ -28,10 +28,10 @@ export async function POST(request: NextRequest) {
       ...result,
     });
   } catch (error: any) {
-    console.error('QR scan error:', error);
+    console.error("QR scan error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to scan QR code' },
-      { status: 500 }
+      { error: error.message || "Failed to scan QR code" },
+      { status: 500 },
     );
   }
 }

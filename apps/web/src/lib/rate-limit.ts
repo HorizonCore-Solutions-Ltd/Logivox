@@ -1,9 +1,9 @@
 /**
  * Rate Limiting System for LogiVox
- * 
+ *
  * Implements token bucket algorithm for API rate limiting.
  * Protects against brute force, DDoS, and API abuse.
- * 
+ *
  * Features:
  * - Token bucket algorithm (smooth rate limiting)
  * - Per-IP and per-user limits
@@ -11,13 +11,13 @@
  * - Automatic token refill
  * - Memory-efficient with LRU cache
  * - Redis support for distributed systems
- * 
+ *
  * @example
  * ```ts
  * // In API route
  * const limiter = new RateLimiter({ tokensPerInterval: 10, interval: 60000 });
  * const result = await limiter.check(req, 'user-123');
- * 
+ *
  * if (!result.success) {
  *   return NextResponse.json(
  *     { error: 'Too many requests' },
@@ -27,7 +27,7 @@
  * ```
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
 
 // ============================================================================
 // Types
@@ -80,10 +80,7 @@ export class RateLimiter {
   /**
    * Check if request should be rate limited
    */
-  async check(
-    req: NextRequest,
-    identifier?: string
-  ): Promise<RateLimitResult> {
+  async check(req: NextRequest, identifier?: string): Promise<RateLimitResult> {
     const key = identifier || this.getIdentifier(req);
 
     if (this.config.redis) {
@@ -112,10 +109,11 @@ export class RateLimiter {
 
     // Refill tokens based on time passed
     const timePassed = now - bucket.lastRefill;
-    const refillAmount = (timePassed / this.config.interval) * this.config.tokensPerInterval;
+    const refillAmount =
+      (timePassed / this.config.interval) * this.config.tokensPerInterval;
     bucket.tokens = Math.min(
       this.config.tokensPerInterval,
-      bucket.tokens + refillAmount
+      bucket.tokens + refillAmount,
     );
     bucket.lastRefill = now;
 
@@ -141,11 +139,11 @@ export class RateLimiter {
    */
   private async checkRedis(key: string): Promise<RateLimitResult> {
     if (!this.config.redis) {
-      throw new Error('Redis not configured');
+      throw new Error("Redis not configured");
     }
 
     const now = Date.now();
-    const redisKey = `${this.config.redis.keyPrefix || 'ratelimit'}:${key}`;
+    const redisKey = `${this.config.redis.keyPrefix || "ratelimit"}:${key}`;
     const client = this.config.redis.client;
 
     try {
@@ -164,10 +162,11 @@ export class RateLimiter {
 
       // Refill tokens
       const timePassed = now - bucket.lastRefill;
-      const refillAmount = (timePassed / this.config.interval) * this.config.tokensPerInterval;
+      const refillAmount =
+        (timePassed / this.config.interval) * this.config.tokensPerInterval;
       bucket.tokens = Math.min(
         this.config.tokensPerInterval,
-        bucket.tokens + refillAmount
+        bucket.tokens + refillAmount,
       );
       bucket.lastRefill = now;
 
@@ -181,8 +180,8 @@ export class RateLimiter {
       await client.set(
         redisKey,
         JSON.stringify(bucket),
-        'EX',
-        Math.ceil(this.config.interval / 1000)
+        "EX",
+        Math.ceil(this.config.interval / 1000),
       );
 
       const remaining = Math.floor(bucket.tokens);
@@ -195,7 +194,7 @@ export class RateLimiter {
         headers: this.getHeaders(remaining, resetTime),
       };
     } catch (error) {
-      console.error('Redis rate limit error:', error);
+      console.error("Redis rate limit error:", error);
       // Fail open (allow request) on Redis errors
       return {
         success: true,
@@ -211,21 +210,25 @@ export class RateLimiter {
    */
   private getIdentifier(req: NextRequest): string {
     // Try to get IP address
-    const forwarded = req.headers.get('x-forwarded-for');
-    const ip = forwarded?.split(',')[0] || req.headers.get('x-real-ip') || 'unknown';
-    
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip =
+      forwarded?.split(",")[0] || req.headers.get("x-real-ip") || "unknown";
+
     return ip;
   }
 
   /**
    * Get rate limit headers
    */
-  private getHeaders(remaining: number, resetTime: number): Record<string, string> {
+  private getHeaders(
+    remaining: number,
+    resetTime: number,
+  ): Record<string, string> {
     return {
-      'X-RateLimit-Limit': this.config.tokensPerInterval.toString(),
-      'X-RateLimit-Remaining': remaining.toString(),
-      'X-RateLimit-Reset': Math.ceil(resetTime / 1000).toString(),
-      'Retry-After': Math.ceil((resetTime - Date.now()) / 1000).toString(),
+      "X-RateLimit-Limit": this.config.tokensPerInterval.toString(),
+      "X-RateLimit-Remaining": remaining.toString(),
+      "X-RateLimit-Reset": Math.ceil(resetTime / 1000).toString(),
+      "Retry-After": Math.ceil((resetTime - Date.now()) / 1000).toString(),
     };
   }
 
@@ -236,7 +239,7 @@ export class RateLimiter {
     if (this.buckets.size > this.maxBuckets) {
       const keysToDelete = Array.from(this.buckets.keys()).slice(
         0,
-        this.buckets.size - this.maxBuckets
+        this.buckets.size - this.maxBuckets,
       );
       keysToDelete.forEach((key) => this.buckets.delete(key));
     }
@@ -247,7 +250,7 @@ export class RateLimiter {
    */
   async reset(identifier: string): Promise<void> {
     if (this.config.redis) {
-      const redisKey = `${this.config.redis.keyPrefix || 'ratelimit'}:${identifier}`;
+      const redisKey = `${this.config.redis.keyPrefix || "ratelimit"}:${identifier}`;
       await this.config.redis.client.del(redisKey);
     } else {
       this.buckets.delete(identifier);
@@ -259,7 +262,7 @@ export class RateLimiter {
    */
   async getStatus(identifier: string): Promise<TokenBucket | null> {
     if (this.config.redis) {
-      const redisKey = `${this.config.redis.keyPrefix || 'ratelimit'}:${identifier}`;
+      const redisKey = `${this.config.redis.keyPrefix || "ratelimit"}:${identifier}`;
       const data = await this.config.redis.client.get(redisKey);
       return data ? JSON.parse(data) : null;
     }
@@ -275,25 +278,25 @@ export class RateLimiter {
 /** Strict rate limiting for authentication endpoints */
 export const authRateLimiter = new RateLimiter({
   tokensPerInterval: 5, // 5 attempts
-  interval: 60000,      // per minute
+  interval: 60000, // per minute
 });
 
 /** Standard rate limiting for API endpoints */
 export const apiRateLimiter = new RateLimiter({
-  tokensPerInterval: 60,  // 60 requests
-  interval: 60000,        // per minute
+  tokensPerInterval: 60, // 60 requests
+  interval: 60000, // per minute
 });
 
 /** Generous rate limiting for read-only endpoints */
 export const readRateLimiter = new RateLimiter({
   tokensPerInterval: 120, // 120 requests
-  interval: 60000,        // per minute
+  interval: 60000, // per minute
 });
 
 /** Very strict rate limiting for sensitive operations */
 export const sensitiveRateLimiter = new RateLimiter({
-  tokensPerInterval: 3,  // 3 attempts
-  interval: 300000,      // per 5 minutes
+  tokensPerInterval: 3, // 3 attempts
+  interval: 300000, // per 5 minutes
 });
 
 // ============================================================================
@@ -302,19 +305,19 @@ export const sensitiveRateLimiter = new RateLimiter({
 
 /**
  * Middleware function to apply rate limiting to API routes
- * 
+ *
  * @example
  * ```ts
  * export async function POST(req: NextRequest) {
  *   const rateLimitResult = await applyRateLimit(req, authRateLimiter);
- *   
+ *
  *   if (!rateLimitResult.success) {
  *     return NextResponse.json(
  *       { error: 'Too many requests. Please try again later.' },
  *       { status: 429, headers: rateLimitResult.headers }
  *     );
  *   }
- *   
+ *
  *   // Process request...
  * }
  * ```
@@ -322,21 +325,21 @@ export const sensitiveRateLimiter = new RateLimiter({
 export async function applyRateLimit(
   req: NextRequest,
   limiter: RateLimiter = apiRateLimiter,
-  identifier?: string
+  identifier?: string,
 ): Promise<RateLimitResult> {
   return limiter.check(req, identifier);
 }
 
 /**
  * Higher-order function to wrap API routes with rate limiting
- * 
+ *
  * @example
  * ```ts
  * const handler = withRateLimit(async (req: NextRequest) => {
  *   // Your handler logic
  *   return NextResponse.json({ data: 'success' });
  * }, authRateLimiter);
- * 
+ *
  * export { handler as POST };
  * ```
  */
@@ -346,7 +349,7 @@ export function withRateLimit(
   options?: {
     identifier?: (req: NextRequest) => string;
     onRateLimit?: (result: RateLimitResult) => Response;
-  }
+  },
 ) {
   return async (req: NextRequest): Promise<Response> => {
     const identifier = options?.identifier?.(req);
@@ -359,17 +362,17 @@ export function withRateLimit(
 
       return new Response(
         JSON.stringify({
-          error: 'Too many requests',
-          message: 'You have exceeded the rate limit. Please try again later.',
-          retryAfter: result.headers['Retry-After'],
+          error: "Too many requests",
+          message: "You have exceeded the rate limit. Please try again later.",
+          retryAfter: result.headers["Retry-After"],
         }),
         {
           status: 429,
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
             ...result.headers,
           },
-        }
+        },
       );
     }
 
@@ -400,8 +403,8 @@ export function createRateLimiter(config: RateLimitConfig): RateLimiter {
 export function getUserIdentifier(req: NextRequest): string | undefined {
   // This would be replaced with actual session/token parsing
   // Example: extract from JWT or session cookie
-  const authHeader = req.headers.get('authorization');
-  if (authHeader?.startsWith('Bearer ')) {
+  const authHeader = req.headers.get("authorization");
+  if (authHeader?.startsWith("Bearer ")) {
     try {
       // Parse JWT or session token
       // const token = authHeader.substring(7);
@@ -419,11 +422,12 @@ export function getUserIdentifier(req: NextRequest): string | undefined {
  * Combine IP and user ID for rate limiting (dual limiting)
  */
 export function getCombinedIdentifier(req: NextRequest): string {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 
-             req.headers.get('x-real-ip') || 
-             'unknown';
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0] ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
   const userId = getUserIdentifier(req);
-  
+
   return userId ? `user:${userId}` : `ip:${ip}`;
 }
 
@@ -437,10 +441,10 @@ export function getCombinedIdentifier(req: NextRequest): string {
 export async function resetAllRateLimits(): Promise<void> {
   // Clear all rate limiters
   await Promise.all([
-    authRateLimiter.reset('*'),
-    apiRateLimiter.reset('*'),
-    readRateLimiter.reset('*'),
-    sensitiveRateLimiter.reset('*'),
+    authRateLimiter.reset("*"),
+    apiRateLimiter.reset("*"),
+    readRateLimiter.reset("*"),
+    sensitiveRateLimiter.reset("*"),
   ]);
 }
 
@@ -453,6 +457,7 @@ export async function getRateLimitStats(): Promise<{
   // Note: Stats collection would require exposing bucket counts via public methods
   // For now, return a simple message
   return {
-    message: 'Rate limiting is active for auth, API, read, and sensitive endpoints',
+    message:
+      "Rate limiting is active for auth, API, read, and sensitive endpoints",
   };
 }

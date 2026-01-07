@@ -1,15 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Shield, 
-  CheckCircle2, 
-  Clock, 
+import {
+  Shield,
+  CheckCircle2,
+  Clock,
   Link as LinkIcon,
   Package,
   TrendingUp,
@@ -17,18 +23,22 @@ import {
   Download,
   ExternalLink,
   Lock,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+} from "lucide-react";
 
 interface BlockchainTransaction {
   id: string;
   transactionHash: string;
   blockNumber: number;
-  transactionType: 'SHIPMENT_CREATED' | 'STATUS_UPDATE' | 'OWNERSHIP_TRANSFER' | 'QUALITY_CHECK';
+  transactionType:
+    | "SHIPMENT_CREATED"
+    | "STATUS_UPDATE"
+    | "OWNERSHIP_TRANSFER"
+    | "QUALITY_CHECK";
   entityType: string;
   entityId: string;
   timestamp: string;
-  status: 'PENDING' | 'CONFIRMED' | 'FAILED';
+  status: "PENDING" | "CONFIRMED" | "FAILED";
   gasUsed?: number;
   from: string;
   to: string;
@@ -51,9 +61,11 @@ interface ShipmentTrace {
 
 export default function BlockchainDashboard() {
   const [transactions, setTransactions] = useState<BlockchainTransaction[]>([]);
-  const [shipmentTrace, setShipmentTrace] = useState<ShipmentTrace | null>(null);
+  const [shipmentTrace, setShipmentTrace] = useState<ShipmentTrace | null>(
+    null,
+  );
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchTransactions();
@@ -62,13 +74,13 @@ export default function BlockchainDashboard() {
   const fetchTransactions = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/blockchain/transactions');
+      const res = await fetch("/api/blockchain/transactions");
       if (res.ok) {
         const data = await res.json();
         setTransactions(data);
       }
     } catch (error) {
-      console.error('Error fetching blockchain transactions:', error);
+      console.error("Error fetching blockchain transactions:", error);
     } finally {
       setLoading(false);
     }
@@ -83,23 +95,30 @@ export default function BlockchainDashboard() {
         setShipmentTrace(data);
       }
     } catch (error) {
-      console.error('Error tracing shipment:', error);
+      console.error("Error tracing shipment:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const confirmedTxns = transactions.filter(t => t.status === 'CONFIRMED').length;
-  const pendingTxns = transactions.filter(t => t.status === 'PENDING').length;
-  const failedTxns = transactions.filter(t => t.status === 'FAILED').length;
+  const confirmedTxns = transactions.filter(
+    (t) => t.status === "CONFIRMED",
+  ).length;
+  const pendingTxns = transactions.filter((t) => t.status === "PENDING").length;
+  const failedTxns = transactions.filter((t) => t.status === "FAILED").length;
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'SHIPMENT_CREATED': return 'bg-blue-100 text-blue-800';
-      case 'STATUS_UPDATE': return 'bg-purple-100 text-purple-800';
-      case 'OWNERSHIP_TRANSFER': return 'bg-orange-100 text-orange-800';
-      case 'QUALITY_CHECK': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "SHIPMENT_CREATED":
+        return "bg-blue-100 text-blue-800";
+      case "STATUS_UPDATE":
+        return "bg-purple-100 text-purple-800";
+      case "OWNERSHIP_TRANSFER":
+        return "bg-orange-100 text-orange-800";
+      case "QUALITY_CHECK":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -108,7 +127,9 @@ export default function BlockchainDashboard() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Blockchain Traceability</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Blockchain Traceability
+          </h1>
           <p className="text-gray-600 mt-1">
             Immutable shipment tracking and supply chain verification
           </p>
@@ -143,7 +164,9 @@ export default function BlockchainDashboard() {
             <CheckCircle2 className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{confirmedTxns}</div>
+            <div className="text-3xl font-bold text-green-600">
+              {confirmedTxns}
+            </div>
             <p className="text-xs text-gray-500 mt-1">On-chain verified</p>
           </CardContent>
         </Card>
@@ -156,7 +179,9 @@ export default function BlockchainDashboard() {
             <Clock className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-yellow-600">{pendingTxns}</div>
+            <div className="text-3xl font-bold text-yellow-600">
+              {pendingTxns}
+            </div>
             <p className="text-xs text-gray-500 mt-1">Awaiting confirmation</p>
           </CardContent>
         </Card>
@@ -200,20 +225,25 @@ export default function BlockchainDashboard() {
             <CardContent>
               <div className="space-y-3">
                 {transactions.map((txn) => (
-                  <div 
+                  <div
                     key={txn.id}
                     className="flex items-center justify-between border-b pb-4 last:border-0"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge variant="outline" className={getTypeColor(txn.transactionType)}>
-                          {txn.transactionType.replace('_', ' ')}
+                        <Badge
+                          variant="outline"
+                          className={getTypeColor(txn.transactionType)}
+                        >
+                          {txn.transactionType.replace("_", " ")}
                         </Badge>
-                        <Badge 
+                        <Badge
                           variant={
-                            txn.status === 'CONFIRMED' ? 'default' :
-                            txn.status === 'FAILED' ? 'destructive' :
-                            'secondary'
+                            txn.status === "CONFIRMED"
+                              ? "default"
+                              : txn.status === "FAILED"
+                                ? "destructive"
+                                : "secondary"
                           }
                         >
                           {txn.status}
@@ -224,7 +254,8 @@ export default function BlockchainDashboard() {
                         {txn.transactionHash}
                       </div>
                       <div className="text-xs text-gray-500">
-                        Block #{txn.blockNumber} • {new Date(txn.timestamp).toLocaleString()}
+                        Block #{txn.blockNumber} •{" "}
+                        {new Date(txn.timestamp).toLocaleString()}
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
                         {txn.entityType} ID: {txn.entityId}
@@ -234,7 +265,9 @@ export default function BlockchainDashboard() {
                       {txn.gasUsed && (
                         <div className="text-right">
                           <div className="text-xs text-gray-600">Gas Used</div>
-                          <div className="text-sm font-medium">{txn.gasUsed.toLocaleString()}</div>
+                          <div className="text-sm font-medium">
+                            {txn.gasUsed.toLocaleString()}
+                          </div>
                         </div>
                       )}
                       <Button variant="ghost" size="sm">
@@ -254,7 +287,8 @@ export default function BlockchainDashboard() {
             <CardHeader>
               <CardTitle>Trace Shipment</CardTitle>
               <CardDescription>
-                Search for a shipment to view its complete blockchain-verified history
+                Search for a shipment to view its complete blockchain-verified
+                history
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -263,9 +297,14 @@ export default function BlockchainDashboard() {
                   placeholder="Enter shipment ID or tracking number..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && traceShipment(searchQuery)}
+                  onKeyDown={(e) =>
+                    e.key === "Enter" && traceShipment(searchQuery)
+                  }
                 />
-                <Button onClick={() => traceShipment(searchQuery)} disabled={!searchQuery}>
+                <Button
+                  onClick={() => traceShipment(searchQuery)}
+                  disabled={!searchQuery}
+                >
                   <Search className="h-4 w-4 mr-2" />
                   Trace
                 </Button>
@@ -277,20 +316,32 @@ export default function BlockchainDashboard() {
                   <div className="bg-blue-50 p-4 rounded-lg">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <div className="text-xs text-gray-600 mb-1">Shipment ID</div>
-                        <div className="font-mono text-sm font-medium">{shipmentTrace.shipmentId}</div>
+                        <div className="text-xs text-gray-600 mb-1">
+                          Shipment ID
+                        </div>
+                        <div className="font-mono text-sm font-medium">
+                          {shipmentTrace.shipmentId}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-600 mb-1">Current Status</div>
+                        <div className="text-xs text-gray-600 mb-1">
+                          Current Status
+                        </div>
                         <Badge>{shipmentTrace.currentStatus}</Badge>
                       </div>
                       <div>
                         <div className="text-xs text-gray-600 mb-1">Origin</div>
-                        <div className="text-sm font-medium">{shipmentTrace.origin}</div>
+                        <div className="text-sm font-medium">
+                          {shipmentTrace.origin}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-600 mb-1">Destination</div>
-                        <div className="text-sm font-medium">{shipmentTrace.destination}</div>
+                        <div className="text-xs text-gray-600 mb-1">
+                          Destination
+                        </div>
+                        <div className="text-sm font-medium">
+                          {shipmentTrace.destination}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -308,12 +359,18 @@ export default function BlockchainDashboard() {
                             <CardContent className="pt-4">
                               <div className="flex justify-between items-start mb-2">
                                 <div>
-                                  <div className="font-medium text-gray-900">{checkpoint.status}</div>
-                                  <div className="text-sm text-gray-600">{checkpoint.location}</div>
+                                  <div className="font-medium text-gray-900">
+                                    {checkpoint.status}
+                                  </div>
+                                  <div className="text-sm text-gray-600">
+                                    {checkpoint.location}
+                                  </div>
                                 </div>
                                 <div className="text-right">
                                   <div className="text-xs text-gray-500">
-                                    {new Date(checkpoint.timestamp).toLocaleString()}
+                                    {new Date(
+                                      checkpoint.timestamp,
+                                    ).toLocaleString()}
                                   </div>
                                 </div>
                               </div>
@@ -325,7 +382,11 @@ export default function BlockchainDashboard() {
                                 <span className="text-xs font-mono text-gray-600">
                                   {checkpoint.blockchainHash}
                                 </span>
-                                <Button variant="ghost" size="sm" className="h-6 ml-auto">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 ml-auto"
+                                >
                                   <ExternalLink className="h-3 w-3" />
                                 </Button>
                               </div>

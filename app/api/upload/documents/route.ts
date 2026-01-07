@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { NextResponse } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
+import { existsSync } from "fs";
 
 /**
  * POST /api/upload/documents
@@ -10,17 +10,14 @@ import { existsSync } from 'fs';
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json(
-        { error: 'No file provided' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
     // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'documents');
+    const uploadsDir = join(process.cwd(), "public", "uploads", "documents");
     if (!existsSync(uploadsDir)) {
       await mkdir(uploadsDir, { recursive: true });
     }
@@ -42,14 +39,13 @@ export async function POST(request: Request) {
       success: true,
       path: relativePath,
       filename: file.name,
-      size: file.size
+      size: file.size,
     });
-
   } catch (error: any) {
-    console.error('Document upload error:', error);
+    console.error("Document upload error:", error);
     return NextResponse.json(
-      { error: error.message || 'Upload failed' },
-      { status: 500 }
+      { error: error.message || "Upload failed" },
+      { status: 500 },
     );
   }
 }

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { 
-  Building2, 
-  Mail, 
-  Phone, 
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Building2,
+  Mail,
+  Phone,
   MapPin,
   Twitter,
   Linkedin,
@@ -26,17 +26,20 @@ import {
   Package,
   ClipboardCheck,
   Truck,
-  Globe
-} from "lucide-react"
+  Globe,
+} from "lucide-react";
 
 export function Footer() {
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date().getFullYear();
 
   const footerSections = [
     {
       title: "Solutions",
       links: [
-        { name: "Warehouse Management", href: "/solutions/warehouse-management" },
+        {
+          name: "Warehouse Management",
+          href: "/solutions/warehouse-management",
+        },
         { name: "Voice Operations", href: "/solutions/voice-operations" },
         { name: "Inventory Tracking", href: "/solutions/inventory" },
         { name: "Order Fulfillment", href: "/solutions/fulfillment" },
@@ -74,7 +77,7 @@ export function Footer() {
         { name: "Partners", href: "/partners" },
       ],
     },
-  ]
+  ];
 
   const legalLinks = [
     { name: "Privacy Policy", href: "/privacy" },
@@ -82,14 +85,18 @@ export function Footer() {
     { name: "Cookie Policy", href: "/cookies" },
     { name: "Security", href: "/security" },
     { name: "Status", href: "/status" },
-  ]
+  ];
 
   const socialLinks = [
     { name: "Twitter", href: "https://twitter.com/flowstock", icon: Twitter },
-    { name: "LinkedIn", href: "https://linkedin.com/company/flowstock", icon: Linkedin },
+    {
+      name: "LinkedIn",
+      href: "https://linkedin.com/company/flowstock",
+      icon: Linkedin,
+    },
     { name: "GitHub", href: "https://github.com/flowstock", icon: Github },
     { name: "YouTube", href: "https://youtube.com/flowstock", icon: Youtube },
-  ]
+  ];
 
   return (
     <footer className="bg-slate-950 border-t border-slate-800">
@@ -105,10 +112,10 @@ export function Footer() {
               <span className="text-xl font-bold text-white">LogiVox</span>
             </div>
             <p className="text-slate-400 mb-6 max-w-sm text-sm leading-relaxed">
-              Complete warehouse management system with wave picking, real-time inventory tracking, 
-              and intelligent order fulfillment.
+              Complete warehouse management system with wave picking, real-time
+              inventory tracking, and intelligent order fulfillment.
             </p>
-            
+
             {/* Contact info */}
             <div className="space-y-3 mb-6">
               <div className="flex items-center space-x-3 text-sm text-slate-400">
@@ -135,7 +142,11 @@ export function Footer() {
                   className="h-9 w-9"
                   asChild
                 >
-                  <Link href={social.href} target="_blank" rel="noopener noreferrer">
+                  <Link
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <social.icon className="h-4 w-4" />
                     <span className="sr-only">{social.name}</span>
                   </Link>
@@ -147,7 +158,9 @@ export function Footer() {
           {/* Footer sections */}
           {footerSections.map((section) => (
             <div key={section.title} className="">
-              <h3 className="font-semibold text-white mb-4 text-sm">{section.title}</h3>
+              <h3 className="font-semibold text-white mb-4 text-sm">
+                {section.title}
+              </h3>
               <ul className="space-y-2.5">
                 {section.links.map((link) => (
                   <li key={link.name}>
@@ -168,7 +181,9 @@ export function Footer() {
         <div className="border-t border-slate-800 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
             <div>
-              <h3 className="text-lg font-semibold text-white mb-2">Stay updated</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">
+                Stay updated
+              </h3>
               <p className="text-sm text-slate-400">
                 Get the latest updates on warehouse automation and new features.
               </p>
@@ -179,7 +194,9 @@ export function Footer() {
                 placeholder="Enter your email"
                 className="flex-1 px-4 py-2 border border-slate-700 bg-slate-900 rounded-md text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
-              <Button type="submit" className="sm:w-auto">Subscribe</Button>
+              <Button type="submit" className="sm:w-auto">
+                Subscribe
+              </Button>
             </div>
           </div>
         </div>
@@ -190,7 +207,7 @@ export function Footer() {
             <div className="text-sm text-slate-500">
               © {currentYear} LogiVox. All rights reserved.
             </div>
-            
+
             {/* Legal links */}
             <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
               {legalLinks.map((link) => (
@@ -227,5 +244,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

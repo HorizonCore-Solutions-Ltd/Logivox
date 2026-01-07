@@ -13,6 +13,7 @@ Appointment Scheduling coordinates inbound receiving and outbound shipping by ma
 Part 1 provides the enterprise baseline: appointment requests, confirmations, reschedules, dock door assignment, check-in, and operational exceptions.
 
 ### Core Capabilities
+
 - **Inbound & Outbound Appointments** (receipts, ASNs, POs, shipments, transfers)
 - **Capacity & Slotting** (doors, lanes, shifts, constraints)
 - **Carrier Self-Scheduling** (portal/API) with approvals
@@ -25,26 +26,26 @@ Part 1 provides the enterprise baseline: appointment requests, confirmations, re
 ## 🧱 1. Core Data Model
 
 ```typescript
-type AppointmentDirection = 'INBOUND' | 'OUTBOUND' | 'TRANSFER' | 'OTHER';
+type AppointmentDirection = "INBOUND" | "OUTBOUND" | "TRANSFER" | "OTHER";
 
 type AppointmentStatus =
-  | 'REQUESTED'
-  | 'PENDING_APPROVAL'
-  | 'SCHEDULED'
-  | 'CONFIRMED'
-  | 'CHECKED_IN'
-  | 'AT_DOOR'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'NO_SHOW'
-  | 'CANCELLED'
-  | 'EXCEPTION';
+  | "REQUESTED"
+  | "PENDING_APPROVAL"
+  | "SCHEDULED"
+  | "CONFIRMED"
+  | "CHECKED_IN"
+  | "AT_DOOR"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "NO_SHOW"
+  | "CANCELLED"
+  | "EXCEPTION";
 
-type AppointmentPriority = 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL';
+type AppointmentPriority = "LOW" | "NORMAL" | "HIGH" | "CRITICAL";
 
-type AppointmentSource = 'UI' | 'CARRIER_PORTAL' | 'API' | 'EDI' | 'SYSTEM';
+type AppointmentSource = "UI" | "CARRIER_PORTAL" | "API" | "EDI" | "SYSTEM";
 
-type TimeWindowType = 'FIXED' | 'FLEX' | 'OPEN';
+type TimeWindowType = "FIXED" | "FLEX" | "OPEN";
 
 interface AppointmentSystem {
   // Policies & capacity
@@ -54,21 +55,33 @@ interface AppointmentSystem {
 
   // Appointment lifecycle
   requestAppointment: (request: AppointmentRequest) => Promise<Appointment>;
-  approveAppointment: (appointmentId: string, approverId: string) => Promise<void>;
+  approveAppointment: (
+    appointmentId: string,
+    approverId: string,
+  ) => Promise<void>;
   confirmAppointment: (appointmentId: string) => Promise<void>;
-  rescheduleAppointment: (appointmentId: string, input: RescheduleInput) => Promise<void>;
+  rescheduleAppointment: (
+    appointmentId: string,
+    input: RescheduleInput,
+  ) => Promise<void>;
   cancelAppointment: (appointmentId: string, reason: string) => Promise<void>;
 
   // Arrival & execution
   checkIn: (appointmentId: string, input: CheckInInput) => Promise<void>;
-  assignDoor: (appointmentId: string, doorId: string, userId: string) => Promise<void>;
+  assignDoor: (
+    appointmentId: string,
+    doorId: string,
+    userId: string,
+  ) => Promise<void>;
   startService: (appointmentId: string, userId: string) => Promise<void>;
   completeService: (appointmentId: string, userId: string) => Promise<void>;
   checkOut: (appointmentId: string, input: CheckOutInput) => Promise<void>;
 
   // Visibility
   getAppointment: (appointmentId: string) => Promise<Appointment>;
-  searchAppointments: (filters: AppointmentSearchFilters) => Promise<Appointment[]>;
+  searchAppointments: (
+    filters: AppointmentSearchFilters,
+  ) => Promise<Appointment[]>;
   getKPIs: (period: DateRange) => Promise<AppointmentKPIs>;
 }
 
@@ -89,7 +102,7 @@ interface DockSchedule {
     name: string;
     daysOfWeek: number[]; // 0-6
     startTime: string; // HH:mm
-    endTime: string;   // HH:mm
+    endTime: string; // HH:mm
 
     // optional rules by shift
     defaultSlotMinutes: number;
@@ -142,7 +155,7 @@ interface CapacityRule {
     maxTrailersPerHour?: number;
 
     // Resource constraints
-    requiredDoorCapabilities?: Partial<DockDoor['capabilities']>;
+    requiredDoorCapabilities?: Partial<DockDoor["capabilities"]>;
 
     // Labor/equipment
     minForklifts?: number;
@@ -240,27 +253,27 @@ interface AppointmentException {
   at: Date;
 
   type:
-    | 'EARLY_ARRIVAL'
-    | 'LATE_ARRIVAL'
-    | 'NO_SHOW'
-    | 'WRONG_TRAILER'
-    | 'PAPERWORK_MISSING'
-    | 'DOOR_UNAVAILABLE'
-    | 'CAPACITY_OVERBOOK'
-    | 'SECURITY_HOLD'
-    | 'QC_HOLD'
-    | 'OTHER';
+    | "EARLY_ARRIVAL"
+    | "LATE_ARRIVAL"
+    | "NO_SHOW"
+    | "WRONG_TRAILER"
+    | "PAPERWORK_MISSING"
+    | "DOOR_UNAVAILABLE"
+    | "CAPACITY_OVERBOOK"
+    | "SECURITY_HOLD"
+    | "QC_HOLD"
+    | "OTHER";
 
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   message: string;
 
   recommendedAction:
-    | 'RESCHEDULE'
-    | 'HOLD_IN_YARD'
-    | 'CHANGE_DOOR'
-    | 'ESCALATE'
-    | 'ALLOW_EXCEPTION'
-    | 'CANCEL';
+    | "RESCHEDULE"
+    | "HOLD_IN_YARD"
+    | "CHANGE_DOOR"
+    | "ESCALATE"
+    | "ALLOW_EXCEPTION"
+    | "CANCEL";
 
   resolved: boolean;
   resolvedAt?: Date;
@@ -313,7 +326,7 @@ interface AvailableSlot {
 
   // reason codes for ranking
   score: {
-    fit: number;        // 0-100
+    fit: number; // 0-100
     congestion: number; // 0-100 (lower is better)
     notes?: string[];
   };
@@ -327,10 +340,10 @@ interface AppointmentRequest {
   priority?: AppointmentPriority;
   source: AppointmentSource;
 
-  reference: Appointment['reference'];
+  reference: Appointment["reference"];
 
-  carrier: Appointment['carrier'];
-  trailer: Appointment['trailer'];
+  carrier: Appointment["carrier"];
+  trailer: Appointment["trailer"];
 
   requested: {
     windowType: TimeWindowType;
@@ -404,7 +417,9 @@ interface AppointmentOps {
   calculateKPI: (appointmentId: string) => Promise<AppointmentDerivedTimes>;
 
   // Enforcement
-  enforceArrivalWindow: (appointmentId: string) => Promise<ArrivalWindowDecision>;
+  enforceArrivalWindow: (
+    appointmentId: string,
+  ) => Promise<ArrivalWindowDecision>;
 }
 
 interface AppointmentDerivedTimes {
@@ -425,7 +440,7 @@ interface AppointmentDerivedTimes {
 interface ArrivalWindowDecision {
   decisionAt: Date;
 
-  action: 'ALLOW' | 'HOLD_IN_YARD' | 'RESCHEDULE_REQUIRED' | 'ESCALATE';
+  action: "ALLOW" | "HOLD_IN_YARD" | "RESCHEDULE_REQUIRED" | "ESCALATE";
   reason: string;
 
   // guardrails
@@ -448,17 +463,21 @@ const APPOINTMENT_EXECUTION_VOICE_COMMANDS = [
 ## 🔁 4. Integration Touchpoints (Core)
 
 ### Receiving
+
 - Appointment linked to `asnId`/`receiptId`
 - Check-in can trigger **pre-receiving** and create a receiving task
 
 ### Shipping
+
 - Appointment linked to `shipmentId`/`routeId`
 - Door assignment informs staging lane priority and cutoff risk
 
 ### Yard Management
+
 - Optional `yardSpotId` and gate check-in/out events
 
 ### Wave Planning
+
 - Outbound appointment time windows should constrain wave release and pick/pack completion targets
 
 ---
@@ -497,6 +516,7 @@ interface AppointmentKPIs {
 ## 📌 Part 1 Summary
 
 ### Enterprise Features Covered
+
 ✅ Dock schedules + doors/lanes + shift hours  
 ✅ Capacity rules (labor/equipment/resource constraints)  
 ✅ Slot search + carrier portal/API booking + approvals  
@@ -507,6 +527,7 @@ interface AppointmentKPIs {
 **Voice Commands in Part 1**: 20+ commands
 
 **Coming in Part 2 (Advanced)**:
+
 - AI slot optimization and dynamic pricing / priority bidding
 - Predictive no-show and late arrival scoring
 - Disruption-aware auto-reschedules with multi-party negotiation

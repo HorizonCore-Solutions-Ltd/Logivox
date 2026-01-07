@@ -3,25 +3,25 @@
  * Real-time messaging between collaboration participants
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 // GET - List messages for a collaboration request
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const requestId = searchParams.get('requestId');
+    const requestId = searchParams.get("requestId");
 
     if (!requestId) {
       return NextResponse.json(
-        { error: 'Request ID is required' },
-        { status: 400 }
+        { error: "Request ID is required" },
+        { status: 400 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { timestamp: 'asc' },
+      orderBy: { timestamp: "asc" },
     });
 
     return NextResponse.json({
@@ -44,10 +44,10 @@ export async function GET(req: NextRequest) {
       total: messages.length,
     });
   } catch (error) {
-    console.error('Messages GET error:', error);
+    console.error("Messages GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch messages' },
-      { status: 500 }
+      { error: "Failed to fetch messages" },
+      { status: 500 },
     );
   }
 }
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -65,8 +65,8 @@ export async function POST(req: NextRequest) {
 
     if (!requestId || !content) {
       return NextResponse.json(
-        { error: 'Request ID and content are required' },
-        { status: 400 }
+        { error: "Request ID and content are required" },
+        { status: 400 },
       );
     }
 
@@ -76,7 +76,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!request) {
-      return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+      return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
 
     if (
@@ -84,8 +84,8 @@ export async function POST(req: NextRequest) {
       request.assigneeId !== session.user.id
     ) {
       return NextResponse.json(
-        { error: 'You are not a participant in this collaboration' },
-        { status: 403 }
+        { error: "You are not a participant in this collaboration" },
+        { status: 403 },
       );
     }
 
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
         requestId,
         senderId: session.user.id,
         content,
-        messageType: messageType || 'TEXT',
+        messageType: messageType || "TEXT",
         metadata,
       },
       include: {
@@ -116,10 +116,10 @@ export async function POST(req: NextRequest) {
       message,
     });
   } catch (error) {
-    console.error('Messages POST error:', error);
+    console.error("Messages POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to send message' },
-      { status: 500 }
+      { error: "Failed to send message" },
+      { status: 500 },
     );
   }
 }

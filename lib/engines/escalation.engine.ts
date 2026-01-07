@@ -3,7 +3,7 @@
  * Automatically escalates quality issues based on configurable rules
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -24,19 +24,20 @@ export class EscalationEngine {
   static async checkCriticalNCRWithoutCAPA() {
     const criticalNCRs = await prisma.nonConformanceReport.findMany({
       where: {
-        severity: 'CRITICAL',
+        severity: "CRITICAL",
         status: {
-          in: ['OPEN', 'INVESTIGATING']
+          in: ["OPEN", "INVESTIGATING"],
         },
         capaRequired: true,
         capaIds: {
-          isEmpty: true
-        }
-      }
+          isEmpty: true,
+        },
+      },
     });
 
     for (const ncr of criticalNCRs) {
-      const hoursSinceCreation = (Date.now() - new Date(ncr.createdAt).getTime()) / (1000 * 60 * 60);
+      const hoursSinceCreation =
+        (Date.now() - new Date(ncr.createdAt).getTime()) / (1000 * 60 * 60);
 
       if (hoursSinceCreation > 24) {
         // Auto-create CAPA
@@ -44,43 +45,47 @@ export class EscalationEngine {
           data: {
             capaNumber: `CAPA-AUTO-${Date.now()}`,
             organizationId: ncr.organizationId,
-            capaType: 'CORRECTIVE',
-            actionCategory: 'PROCESS',
-            sourceType: 'NCR',
+            capaType: "CORRECTIVE",
+            actionCategory: "PROCESS",
+            sourceType: "NCR",
             sourceId: ncr.id,
             ncrId: ncr.id,
             problemStatement: `Auto-generated CAPA for critical NCR ${ncr.ncrNumber}: ${ncr.title}`,
-            problemSeverity: 'CRITICAL',
-            rootCauseMethod: '5_WHYS',
+            problemSeverity: "CRITICAL",
+            rootCauseMethod: "5_WHYS",
             rootCauseAnalysis: {},
-            rootCause: 'To be determined',
+            rootCause: "To be determined",
             immediateActions: [],
             correctiveActions: [],
             preventiveActions: [],
-            status: 'OPEN',
-            targetCompletionDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+            status: "OPEN",
+            targetCompletionDate: new Date(
+              Date.now() + 7 * 24 * 60 * 60 * 1000,
+            ), // 7 days
             responsiblePerson: ncr.createdBy,
-            createdBy: 'SYSTEM',
-          }
+            createdBy: "SYSTEM",
+          },
         });
 
         // Update NCR with CAPA ID
         await prisma.nonConformanceReport.update({
           where: { id: ncr.id },
           data: {
-            capaIds: [capa.id]
-          }
+            capaIds: [capa.id],
+          },
         });
 
         // Send notification
         await this.sendEscalationEmail({
-          type: 'CAPA_AUTO_CREATED',
+          type: "CAPA_AUTO_CREATED",
           ncrId: ncr.id,
           capaId: capa.id,
-          reason: 'Critical NCR exceeded 24 hours without CAPA'
+          reason: "Critical NCR exceeded 24 hours without CAPA",
         });
 
-        console.log(`Auto-created CAPA ${capa.capaNumber} for NCR ${ncr.ncrNumber}`);
+        console.log(
+          `Auto-created CAPA ${capa.capaNumber} for NCR ${ncr.ncrNumber}`,
+        );
       }
     }
   }
@@ -95,15 +100,15 @@ export class EscalationEngine {
         ncrs: {
           where: {
             createdAt: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
-            }
+              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // Last 30 days
+            },
           },
           orderBy: {
-            createdAt: 'desc'
+            createdAt: "desc",
           },
-          take: 10
-        }
-      }
+          take: 10,
+        },
+      },
     });
 
     for (const supplier of suppliers) {
@@ -113,16 +118,18 @@ export class EscalationEngine {
         // Check if all 3 are within 7 days
         const firstNCRDate = new Date(recentNCRs[2].createdAt);
         const lastNCRDate = new Date(recentNCRs[0].createdAt);
-        const daysDiff = (lastNCRDate.getTime() - firstNCRDate.getTime()) / (1000 * 60 * 60 * 24);
+        const daysDiff =
+          (lastNCRDate.getTime() - firstNCRDate.getTime()) /
+          (1000 * 60 * 60 * 24);
 
         if (daysDiff <= 7) {
           // Create quality hold
           try {
             const existingHold = await prisma.qualityHold.findFirst({
               where: {
-                holdType: 'VENDOR',
-                status: 'ACTIVE'
-              }
+                holdType: "VENDOR",
+                status: "ACTIVE",
+              },
             });
 
             if (!existingHold) {
@@ -130,32 +137,32 @@ export class EscalationEngine {
                 data: {
                   holdNumber: `QH-VENDOR-${Date.now()}`,
                   organizationId: supplier.organizationId,
-                  holdType: 'VENDOR',
-                  holdLevel: 'VENDOR_LEVEL',
-                  holdReason: 'REPEAT_FAILURES',
+                  holdType: "VENDOR",
+                  holdLevel: "VENDOR_LEVEL",
+                  holdReason: "REPEAT_FAILURES",
                   holdDescription: `Automatic quality hold due to 3 NCRs within 7 days for supplier ${supplier.name}`,
-                  sourceType: 'NCR',
-                  severity: 'HIGH',
-                  status: 'ACTIVE',
-                  initiatedBy: 'SYSTEM',
+                  sourceType: "NCR",
+                  severity: "HIGH",
+                  status: "ACTIVE",
+                  initiatedBy: "SYSTEM",
                   initiatedDate: new Date(),
                   estimatedValue: 0,
                   quantityOnHold: 0,
                   quantityRemaining: 0,
-                  createdBy: 'SYSTEM'
-                }
+                  createdBy: "SYSTEM",
+                },
               });
 
               await this.sendEscalationEmail({
-                type: 'QUALITY_HOLD_CREATED',
+                type: "QUALITY_HOLD_CREATED",
                 supplierId: supplier.id,
-                reason: '3 consecutive NCRs within 7 days'
+                reason: "3 consecutive NCRs within 7 days",
               });
 
               console.log(`Created quality hold for supplier ${supplier.name}`);
             }
           } catch (error) {
-            console.error('Error creating quality hold:', error);
+            console.error("Error creating quality hold:", error);
           }
         }
       }
@@ -169,9 +176,9 @@ export class EscalationEngine {
     const highRiskCapas = await prisma.correctivePreventiveAction.findMany({
       where: {
         status: {
-          in: ['OPEN', 'IN_PROGRESS']
-        }
-      }
+          in: ["OPEN", "IN_PROGRESS"],
+        },
+      },
     });
 
     for (const capa of highRiskCapas) {
@@ -186,19 +193,21 @@ export class EscalationEngine {
             rootCauseAnalysis: {
               ...rca,
               managementApprovalRequired: true,
-              escalatedDate: new Date()
-            }
-          }
+              escalatedDate: new Date(),
+            },
+          },
         });
 
         await this.sendEscalationEmail({
-          type: 'HIGH_RPN_APPROVAL',
+          type: "HIGH_RPN_APPROVAL",
           capaId: capa.id,
           rpn,
-          reason: 'RPN exceeds 200, requires management approval'
+          reason: "RPN exceeds 200, requires management approval",
         });
 
-        console.log(`Escalated CAPA ${capa.capaNumber} for management approval (RPN: ${rpn})`);
+        console.log(
+          `Escalated CAPA ${capa.capaNumber} for management approval (RPN: ${rpn})`,
+        );
       }
     }
   }
@@ -210,26 +219,31 @@ export class EscalationEngine {
     const overdueCapas = await prisma.correctivePreventiveAction.findMany({
       where: {
         status: {
-          in: ['OPEN', 'IN_PROGRESS']
+          in: ["OPEN", "IN_PROGRESS"],
         },
         targetCompletionDate: {
-          lt: new Date()
-        }
-      }
+          lt: new Date(),
+        },
+      },
     });
 
     for (const capa of overdueCapas) {
-      const daysOverdue = Math.floor((Date.now() - new Date(capa.targetCompletionDate).getTime()) / (1000 * 60 * 60 * 24));
+      const daysOverdue = Math.floor(
+        (Date.now() - new Date(capa.targetCompletionDate).getTime()) /
+          (1000 * 60 * 60 * 24),
+      );
 
       if (daysOverdue > 7) {
         await this.sendEscalationEmail({
-          type: 'CAPA_OVERDUE',
+          type: "CAPA_OVERDUE",
           capaId: capa.id,
           daysOverdue,
-          reason: `CAPA is ${daysOverdue} days overdue`
+          reason: `CAPA is ${daysOverdue} days overdue`,
         });
 
-        console.log(`Escalated overdue CAPA ${capa.capaNumber} (${daysOverdue} days)`);
+        console.log(
+          `Escalated overdue CAPA ${capa.capaNumber} (${daysOverdue} days)`,
+        );
       }
     }
   }
@@ -240,24 +254,26 @@ export class EscalationEngine {
   static async adjustSamplingPlans() {
     const failedInspections = await prisma.qualityMeasurement.findMany({
       where: {
-        conformanceStatus: 'NON_CONFORMING',
+        conformanceStatus: "NON_CONFORMING",
         createdAt: {
-          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
-        }
-      }
+          gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
+        },
+      },
     });
 
     // Group by product
     const failuresByProduct: { [key: string]: number } = {};
-    failedInspections.forEach(inspection => {
-      const key = inspection.productSku || 'unknown';
+    failedInspections.forEach((inspection) => {
+      const key = inspection.productSku || "unknown";
       failuresByProduct[key] = (failuresByProduct[key] || 0) + 1;
     });
 
     for (const [productSku, failures] of Object.entries(failuresByProduct)) {
       if (failures >= 3) {
         // Skip sampling plan update - schema investigation needed
-        console.log(`Would tighten sampling plan for product ${productSku} (${failures} failures)`);
+        console.log(
+          `Would tighten sampling plan for product ${productSku} (${failures} failures)`,
+        );
       }
     }
   }
@@ -272,26 +288,30 @@ export class EscalationEngine {
         ncrs: {
           where: {
             createdAt: {
-              gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
-            }
-          }
-        }
-      }
+              gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+            },
+          },
+        },
+      },
     });
 
     for (const supplier of suppliers) {
-      const criticalNCRs = supplier.ncrs.filter(n => n.severity === 'CRITICAL').length;
+      const criticalNCRs = supplier.ncrs.filter(
+        (n) => n.severity === "CRITICAL",
+      ).length;
       const totalNCRs = supplier.ncrs.length;
 
       if (criticalNCRs >= 2 || totalNCRs >= 5) {
         // Check if audit already scheduled
         // Note: This would check Audit model once it's created
-        console.log(`Supplier ${supplier.name} requires audit: ${criticalNCRs} critical, ${totalNCRs} total NCRs`);
-        
+        console.log(
+          `Supplier ${supplier.name} requires audit: ${criticalNCRs} critical, ${totalNCRs} total NCRs`,
+        );
+
         await this.sendEscalationEmail({
-          type: 'SUPPLIER_AUDIT_REQUIRED',
+          type: "SUPPLIER_AUDIT_REQUIRED",
           supplierId: supplier.id,
-          reason: `${criticalNCRs} critical NCRs and ${totalNCRs} total NCRs in 90 days`
+          reason: `${criticalNCRs} critical NCRs and ${totalNCRs} total NCRs in 90 days`,
         });
       }
     }
@@ -302,16 +322,16 @@ export class EscalationEngine {
    */
   private static async sendEscalationEmail(data: any) {
     try {
-      await fetch('/api/qc/notifications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/qc/notifications", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: 'ESCALATION',
-          ...data
-        })
+          type: "ESCALATION",
+          ...data,
+        }),
       });
     } catch (error) {
-      console.error('Failed to send escalation email:', error);
+      console.error("Failed to send escalation email:", error);
     }
   }
 
@@ -319,7 +339,7 @@ export class EscalationEngine {
    * Run all escalation rules
    */
   static async runAllRules() {
-    console.log('Running escalation rules...');
+    console.log("Running escalation rules...");
 
     try {
       await this.checkCriticalNCRWithoutCAPA();
@@ -329,9 +349,9 @@ export class EscalationEngine {
       await this.adjustSamplingPlans();
       await this.triggerSupplierAudits();
 
-      console.log('Escalation rules completed');
+      console.log("Escalation rules completed");
     } catch (error) {
-      console.error('Error running escalation rules:', error);
+      console.error("Error running escalation rules:", error);
     }
   }
 }

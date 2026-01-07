@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     const user = session.user as any;
-    
+
     // Only allow CUSTOMER role
     if (user.role !== "CUSTOMER") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -29,56 +29,64 @@ export async function GET(request: NextRequest) {
     });
 
     if (!customer?.customerId) {
-      return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Customer not found" },
+        { status: 404 },
+      );
     }
 
     // Get statistics
-    const [totalOrders, pendingOrders, shippedOrders, completedOrders, recentOrders] =
-      await Promise.all([
-        // Total orders
-        prisma.salesOrder.count({
-          where: { customerId: customer.customerId },
-        }),
-        // Pending orders
-        prisma.salesOrder.count({
-          where: {
-            customerId: customer.customerId,
-            status: { in: ["PENDING", "PENDING_APPROVAL", "APPROVED"] },
-          },
-        }),
-        // Shipped orders
-        prisma.salesOrder.count({
-          where: {
-            customerId: customer.customerId,
-            status: "SHIPPED",
-          },
-        }),
-        // Completed orders
-        prisma.salesOrder.count({
-          where: {
-            customerId: customer.customerId,
-            status: "DELIVERED",
-          },
-        }),
-        // Recent orders (last 10)
-        prisma.salesOrder.findMany({
-          where: { customerId: customer.customerId },
-          orderBy: { orderDate: "desc" },
-          take: 10,
-          select: {
-            id: true,
-            soNumber: true,
-            orderDate: true,
-            status: true,
-            total: true,
-            items: {
-              select: {
-                id: true,
-              },
+    const [
+      totalOrders,
+      pendingOrders,
+      shippedOrders,
+      completedOrders,
+      recentOrders,
+    ] = await Promise.all([
+      // Total orders
+      prisma.salesOrder.count({
+        where: { customerId: customer.customerId },
+      }),
+      // Pending orders
+      prisma.salesOrder.count({
+        where: {
+          customerId: customer.customerId,
+          status: { in: ["PENDING", "PENDING_APPROVAL", "APPROVED"] },
+        },
+      }),
+      // Shipped orders
+      prisma.salesOrder.count({
+        where: {
+          customerId: customer.customerId,
+          status: "SHIPPED",
+        },
+      }),
+      // Completed orders
+      prisma.salesOrder.count({
+        where: {
+          customerId: customer.customerId,
+          status: "DELIVERED",
+        },
+      }),
+      // Recent orders (last 10)
+      prisma.salesOrder.findMany({
+        where: { customerId: customer.customerId },
+        orderBy: { orderDate: "desc" },
+        take: 10,
+        select: {
+          id: true,
+          soNumber: true,
+          orderDate: true,
+          status: true,
+          total: true,
+          items: {
+            select: {
+              id: true,
             },
           },
-        }),
-      ]);
+        },
+      }),
+    ]);
 
     const recentOrdersFormatted = recentOrders.map((order) => ({
       id: order.id,
@@ -100,7 +108,7 @@ export async function GET(request: NextRequest) {
     console.error("Portal dashboard error:", error);
     return NextResponse.json(
       { error: "Failed to fetch dashboard data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -3,21 +3,21 @@
  * Allow customers to upload delivery photos
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import { join } from "path";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const photo = formData.get('photo') as File;
-    const loadSheetId = formData.get('loadSheetId') as string;
+    const photo = formData.get("photo") as File;
+    const loadSheetId = formData.get("loadSheetId") as string;
 
     if (!photo || !loadSheetId) {
       return NextResponse.json(
-        { error: 'Photo and load sheet ID are required' },
-        { status: 400 }
+        { error: "Photo and load sheet ID are required" },
+        { status: 400 },
       );
     }
 
@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
 
     if (!loadSheet) {
       return NextResponse.json(
-        { error: 'Load sheet not found' },
-        { status: 404 }
+        { error: "Load sheet not found" },
+        { status: 404 },
       );
     }
 
@@ -38,7 +38,12 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(bytes);
 
     // Create uploads directory if it doesn't exist
-    const uploadDir = join(process.cwd(), 'public', 'uploads', 'delivery-photos');
+    const uploadDir = join(
+      process.cwd(),
+      "public",
+      "uploads",
+      "delivery-photos",
+    );
     try {
       await mkdir(uploadDir, { recursive: true });
     } catch (err) {
@@ -47,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     // Generate unique filename
     const timestamp = Date.now();
-    const extension = photo.name.split('.').pop();
+    const extension = photo.name.split(".").pop();
     const filename = `${loadSheet.loadSheetNumber}-${timestamp}.${extension}`;
     const filepath = join(uploadDir, filename);
 
@@ -59,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     // Store photo reference in database
     const photoUrl = `/uploads/delivery-photos/${filename}`;
-    
+
     // Add to load sheet metadata or create new table for photos
     await prisma.loadSheet.update({
       where: { id: loadSheetId },
@@ -80,13 +85,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       photoUrl,
-      message: 'Photo uploaded successfully',
+      message: "Photo uploaded successfully",
     });
   } catch (error) {
-    console.error('Photo upload error:', error);
+    console.error("Photo upload error:", error);
     return NextResponse.json(
-      { error: 'Failed to upload photo' },
-      { status: 500 }
+      { error: "Failed to upload photo" },
+      { status: 500 },
     );
   }
 }

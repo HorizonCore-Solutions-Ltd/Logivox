@@ -1,20 +1,27 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, Edit, Trash2, Package, TrendingUp, TrendingDown } from "lucide-react"
-import { format } from "date-fns"
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  ArrowLeft,
+  Edit,
+  Trash2,
+  Package,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
+import { format } from "date-fns";
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -22,83 +29,85 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { useToast } from "@/hooks/use-toast"
-import { StockAdjustmentDialog } from "@/components/inventory/stock-adjustment-dialog"
+} from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { StockAdjustmentDialog } from "@/components/inventory/stock-adjustment-dialog";
 
 interface InventoryItemDetailProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 export default function InventoryItemDetailPage({
   params,
 }: InventoryItemDetailProps) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
-  const [adjustDialogOpen, setAdjustDialogOpen] = React.useState(false)
+  const router = useRouter();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [adjustDialogOpen, setAdjustDialogOpen] = React.useState(false);
 
   // Fetch item details
   const { data: item, isLoading } = useQuery({
     queryKey: ["inventory", params.id],
     queryFn: async () => {
-      const res = await fetch(`/api/inventory/${params.id}`)
-      if (!res.ok) throw new Error("Failed to fetch item")
-      return res.json()
+      const res = await fetch(`/api/inventory/${params.id}`);
+      if (!res.ok) throw new Error("Failed to fetch item");
+      return res.json();
     },
-  })
+  });
 
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const res = await fetch(`/api/inventory/${params.id}`, {
         method: "DELETE",
-      })
-      if (!res.ok) throw new Error("Failed to delete item")
-      return res.json()
+      });
+      if (!res.ok) throw new Error("Failed to delete item");
+      return res.json();
     },
     onSuccess: () => {
       toast({
         title: "Success",
         description: "Inventory item deleted successfully",
-      })
-      router.push("/dashboard/inventory")
+      });
+      router.push("/dashboard/inventory");
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const handleDelete = () => {
     if (
       confirm(
-        `Are you sure you want to delete ${item?.name}? This action cannot be undone.`
+        `Are you sure you want to delete ${item?.name}? This action cannot be undone.`,
       )
     ) {
-      deleteMutation.mutate()
+      deleteMutation.mutate();
     }
-  }
+  };
 
   const handleAdjustmentSuccess = () => {
-    queryClient.invalidateQueries({ queryKey: ["inventory", params.id] })
-    setAdjustDialogOpen(false)
-  }
+    queryClient.invalidateQueries({ queryKey: ["inventory", params.id] });
+    setAdjustDialogOpen(false);
+  };
 
   if (isLoading) {
     return (
       <div className="flex h-[450px] items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-sm text-muted-foreground">Loading item details...</p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Loading item details...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   if (!item) {
@@ -115,14 +124,14 @@ export default function InventoryItemDetailPage({
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
-  const profitMargin = item.sellingPrice - item.costPrice
+  const profitMargin = item.sellingPrice - item.costPrice;
   const profitPercentage =
     item.costPrice > 0
       ? ((profitMargin / item.costPrice) * 100).toFixed(2)
-      : "0.00"
+      : "0.00";
 
   return (
     <div className="space-y-6">
@@ -140,7 +149,9 @@ export default function InventoryItemDetailPage({
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/inventory/${params.id}/edit`)}
+            onClick={() =>
+              router.push(`/dashboard/inventory/${params.id}/edit`)
+            }
           >
             <Edit className="mr-2 h-4 w-4" />
             Edit
@@ -164,7 +175,9 @@ export default function InventoryItemDetailPage({
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Quantity</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Quantity
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -187,8 +200,8 @@ export default function InventoryItemDetailPage({
                 item.status === "ACTIVE"
                   ? "success"
                   : item.status === "LOW_STOCK"
-                  ? "warning"
-                  : "destructive"
+                    ? "warning"
+                    : "destructive"
               }
               className="text-base"
             >
@@ -264,7 +277,9 @@ export default function InventoryItemDetailPage({
                 <p className="text-sm">{item.warehouse.name}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground">Unit</p>
+                <p className="text-sm font-medium text-muted-foreground">
+                  Unit
+                </p>
                 <p className="text-sm">{item.unit}</p>
               </div>
             </div>
@@ -332,7 +347,9 @@ export default function InventoryItemDetailPage({
       <Card>
         <CardHeader>
           <CardTitle>Recent Movements</CardTitle>
-          <CardDescription>Last 10 stock movements for this item</CardDescription>
+          <CardDescription>
+            Last 10 stock movements for this item
+          </CardDescription>
         </CardHeader>
         <CardContent>
           {item.movements && item.movements.length > 0 ? (
@@ -350,7 +367,10 @@ export default function InventoryItemDetailPage({
                 {item.movements.map((movement: any) => (
                   <TableRow key={movement.id}>
                     <TableCell>
-                      {format(new Date(movement.createdAt), "MMM dd, yyyy HH:mm")}
+                      {format(
+                        new Date(movement.createdAt),
+                        "MMM dd, yyyy HH:mm",
+                      )}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline">
@@ -360,14 +380,14 @@ export default function InventoryItemDetailPage({
                     <TableCell
                       className={
                         ["PURCHASE", "RETURN", "ADJUSTMENT"].includes(
-                          movement.movementType
+                          movement.movementType,
                         )
                           ? "text-green-600"
                           : "text-red-600"
                       }
                     >
                       {["PURCHASE", "RETURN", "ADJUSTMENT"].includes(
-                        movement.movementType
+                        movement.movementType,
                       )
                         ? "+"
                         : "-"}
@@ -400,5 +420,5 @@ export default function InventoryItemDetailPage({
         onSuccess={handleAdjustmentSuccess}
       />
     </div>
-  )
+  );
 }

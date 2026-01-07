@@ -3,10 +3,10 @@
  * Test complete order fulfillment flow from order creation to shipment
  */
 
-import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
-import { prisma } from '@/lib/prisma';
+import { describe, expect, test, beforeAll, afterAll } from "@jest/globals";
+import { prisma } from "@/lib/prisma";
 
-describe('Order Fulfillment Flow', () => {
+describe("Order Fulfillment Flow", () => {
   let testOrg: any;
   let testWarehouse: any;
   let testUser: any;
@@ -26,29 +26,29 @@ describe('Order Fulfillment Flow', () => {
     testUser = await prisma.user.create({
       data: {
         email: `test-order-${Date.now()}@example.com`,
-        name: 'Test Order User',
-        password: 'hashed',
-        role: 'USER',
+        name: "Test Order User",
+        password: "hashed",
+        role: "USER",
         organizationId: testOrg.id,
       },
     });
 
     testWarehouse = await prisma.warehouse.create({
       data: {
-        name: 'Test Warehouse',
+        name: "Test Warehouse",
         code: `TWH-${Date.now()}`,
         organizationId: testOrg.id,
-        address: '123 Test St',
-        city: 'Test City',
-        state: 'TS',
-        zipCode: '12345',
-        country: 'US',
+        address: "123 Test St",
+        city: "Test City",
+        state: "TS",
+        zipCode: "12345",
+        country: "US",
       },
     });
 
     testCustomer = await prisma.customer.create({
       data: {
-        name: 'Test Customer',
+        name: "Test Customer",
         email: `customer-${Date.now()}@example.com`,
         organizationId: testOrg.id,
       },
@@ -57,7 +57,7 @@ describe('Order Fulfillment Flow', () => {
     testItem = await prisma.inventoryItem.create({
       data: {
         sku: `SKU-${Date.now()}`,
-        name: 'Test Product',
+        name: "Test Product",
         organizationId: testOrg.id,
         unitPrice: 29.99,
         quantity: 1000,
@@ -69,7 +69,9 @@ describe('Order Fulfillment Flow', () => {
   afterAll(async () => {
     // Cleanup
     if (testOrder) {
-      await prisma.salesOrderItem.deleteMany({ where: { orderId: testOrder.id } });
+      await prisma.salesOrderItem.deleteMany({
+        where: { orderId: testOrder.id },
+      });
       await prisma.salesOrder.delete({ where: { id: testOrder.id } });
     }
     if (testItem) {
@@ -90,15 +92,15 @@ describe('Order Fulfillment Flow', () => {
     await prisma.$disconnect();
   });
 
-  describe('Order Creation', () => {
-    test('should create a sales order with items', async () => {
+  describe("Order Creation", () => {
+    test("should create a sales order with items", async () => {
       testOrder = await prisma.salesOrder.create({
         data: {
           orderNumber: `ORD-${Date.now()}`,
           customerId: testCustomer.id,
           organizationId: testOrg.id,
           warehouseId: testWarehouse.id,
-          status: 'PENDING',
+          status: "PENDING",
           orderDate: new Date(),
           totalAmount: 59.98,
           createdBy: testUser.id,
@@ -119,28 +121,28 @@ describe('Order Fulfillment Flow', () => {
       });
 
       expect(testOrder).toBeDefined();
-      expect(testOrder.status).toBe('PENDING');
+      expect(testOrder.status).toBe("PENDING");
       expect(testOrder.items.length).toBe(1);
       expect(testOrder.items[0].quantity).toBe(2);
     });
 
-    test('should calculate total amount correctly', async () => {
+    test("should calculate total amount correctly", async () => {
       expect(testOrder.totalAmount).toBe(59.98);
       expect(testOrder.items[0].totalPrice).toBe(59.98);
     });
   });
 
-  describe('Order Processing', () => {
-    test('should update order status to processing', async () => {
+  describe("Order Processing", () => {
+    test("should update order status to processing", async () => {
       const updatedOrder = await prisma.salesOrder.update({
         where: { id: testOrder.id },
-        data: { status: 'PROCESSING' },
+        data: { status: "PROCESSING" },
       });
 
-      expect(updatedOrder.status).toBe('PROCESSING');
+      expect(updatedOrder.status).toBe("PROCESSING");
     });
 
-    test('should reserve inventory for order', async () => {
+    test("should reserve inventory for order", async () => {
       const orderQuantity = testOrder.items[0].quantity;
       const currentQuantity = testItem.quantity;
 
@@ -157,21 +159,21 @@ describe('Order Fulfillment Flow', () => {
     });
   });
 
-  describe('Pick List Generation', () => {
-    test('should create a pick list for the order', async () => {
+  describe("Pick List Generation", () => {
+    test("should create a pick list for the order", async () => {
       const pickList = await prisma.pickList.create({
         data: {
           pickNumber: `PICK-${Date.now()}`,
           orderId: testOrder.id,
           warehouseId: testWarehouse.id,
-          status: 'PENDING',
+          status: "PENDING",
           assignedTo: testUser.id,
           organizationId: testOrg.id,
         },
       });
 
       expect(pickList).toBeDefined();
-      expect(pickList.status).toBe('PENDING');
+      expect(pickList.status).toBe("PENDING");
       expect(pickList.orderId).toBe(testOrder.id);
 
       // Cleanup
@@ -179,14 +181,14 @@ describe('Order Fulfillment Flow', () => {
     });
   });
 
-  describe('Order Shipment', () => {
-    test('should create shipment for order', async () => {
+  describe("Order Shipment", () => {
+    test("should create shipment for order", async () => {
       const shipment = await prisma.shipment.create({
         data: {
           shipmentNumber: `SHIP-${Date.now()}`,
           orderId: testOrder.id,
           warehouseId: testWarehouse.id,
-          status: 'PENDING',
+          status: "PENDING",
           trackingNumber: `TRACK-${Date.now()}`,
           organizationId: testOrg.id,
           createdBy: testUser.id,
@@ -195,41 +197,41 @@ describe('Order Fulfillment Flow', () => {
 
       expect(shipment).toBeDefined();
       expect(shipment.orderId).toBe(testOrder.id);
-      expect(shipment.trackingNumber).toContain('TRACK-');
+      expect(shipment.trackingNumber).toContain("TRACK-");
 
       // Cleanup
       await prisma.shipment.delete({ where: { id: shipment.id } });
     });
 
-    test('should update order status to shipped', async () => {
+    test("should update order status to shipped", async () => {
       const updatedOrder = await prisma.salesOrder.update({
         where: { id: testOrder.id },
         data: {
-          status: 'SHIPPED',
+          status: "SHIPPED",
           shippedAt: new Date(),
         },
       });
 
-      expect(updatedOrder.status).toBe('SHIPPED');
+      expect(updatedOrder.status).toBe("SHIPPED");
       expect(updatedOrder.shippedAt).toBeDefined();
     });
   });
 
-  describe('Order Completion', () => {
-    test('should mark order as completed', async () => {
+  describe("Order Completion", () => {
+    test("should mark order as completed", async () => {
       const completedOrder = await prisma.salesOrder.update({
         where: { id: testOrder.id },
         data: {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           completedAt: new Date(),
         },
       });
 
-      expect(completedOrder.status).toBe('COMPLETED');
+      expect(completedOrder.status).toBe("COMPLETED");
       expect(completedOrder.completedAt).toBeDefined();
     });
 
-    test('should track order lifecycle timestamps', async () => {
+    test("should track order lifecycle timestamps", async () => {
       const order = await prisma.salesOrder.findUnique({
         where: { id: testOrder.id },
       });
@@ -240,15 +242,15 @@ describe('Order Fulfillment Flow', () => {
     });
   });
 
-  describe('Order Cancellation', () => {
-    test('should allow cancellation of pending orders', async () => {
+  describe("Order Cancellation", () => {
+    test("should allow cancellation of pending orders", async () => {
       const cancelOrder = await prisma.salesOrder.create({
         data: {
           orderNumber: `ORD-CANCEL-${Date.now()}`,
           customerId: testCustomer.id,
           organizationId: testOrg.id,
           warehouseId: testWarehouse.id,
-          status: 'PENDING',
+          status: "PENDING",
           orderDate: new Date(),
           totalAmount: 29.99,
           createdBy: testUser.id,
@@ -258,12 +260,12 @@ describe('Order Fulfillment Flow', () => {
       const cancelledOrder = await prisma.salesOrder.update({
         where: { id: cancelOrder.id },
         data: {
-          status: 'CANCELLED',
+          status: "CANCELLED",
           cancelledAt: new Date(),
         },
       });
 
-      expect(cancelledOrder.status).toBe('CANCELLED');
+      expect(cancelledOrder.status).toBe("CANCELLED");
       expect(cancelledOrder.cancelledAt).toBeDefined();
 
       // Cleanup

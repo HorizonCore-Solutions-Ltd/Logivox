@@ -3,6 +3,7 @@
 ## 1. Next-Generation Code Architecture Guidelines
 
 ### 1.1 Enterprise Component Organization
+
 ```typescript
 // ✅ Enterprise-grade component structure with AI integration
 components/
@@ -52,6 +53,7 @@ components/
 ### 1.2 Advanced TypeScript Standards
 
 #### 1.2.1 Enterprise Interface Definitions
+
 ```typescript
 // ✅ Enterprise-grade interfaces with comprehensive typing
 export interface AdvancedInventoryItem {
@@ -61,30 +63,30 @@ export interface AdvancedInventoryItem {
   name: string;
   description: string;
   category: ItemCategory;
-  
+
   // Multi-warehouse support
   warehouses: WarehouseInventory[];
   currentLocation: WarehouseLocation;
   reservations: StockReservation[];
-  
+
   // AI/ML enhanced properties
   demandForecast: PredictiveData;
   smartRecommendations: AIRecommendation[];
   qualityScore: QualityMetrics;
-  
+
   // Advanced metadata
   supplierInfo: SupplierDetails;
   labelTemplates: LabelTemplate[];
   integrationData: ERPIntegrationData;
-  
+
   // Audit & compliance
   auditTrail: AuditLogEntry[];
   complianceFlags: ComplianceStatus[];
-  
+
   // Multi-tenant properties
   tenantId: string;
   tenantConfig: TenantConfiguration;
-  
+
   // Timestamps with timezone support
   createdAt: ISO8601DateTime;
   updatedAt: ISO8601DateTime;
@@ -102,8 +104,8 @@ export interface PredictiveData {
 }
 
 export interface AIRecommendation {
-  type: 'reorder' | 'relocate' | 'bundle' | 'optimize';
-  priority: 'low' | 'medium' | 'high' | 'critical';
+  type: "reorder" | "relocate" | "bundle" | "optimize";
+  priority: "low" | "medium" | "high" | "critical";
   confidence: number;
   recommendation: string;
   expectedBenefit: BenefitMetrics;
@@ -115,7 +117,11 @@ export interface AIRecommendation {
 export interface MultiTenantEntity {
   tenantId: string;
   tenantName: string;
-  subscriptionTier: 'starter' | 'professional' | 'enterprise' | 'enterprise_plus';
+  subscriptionTier:
+    | "starter"
+    | "professional"
+    | "enterprise"
+    | "enterprise_plus";
   featureFlags: Record<string, boolean>;
   customizations: TenantCustomizations;
   billingInfo: BillingInformation;
@@ -123,6 +129,7 @@ export interface MultiTenantEntity {
 ```
 
 #### 1.2.2 Advanced Error Handling
+
 ```typescript
 // ✅ Comprehensive error handling for enterprise systems
 export class LogiVoxError extends Error {
@@ -144,27 +151,27 @@ export enum ErrorCode {
   INVALID_CREDENTIALS = 'AUTH_001',
   INSUFFICIENT_PERMISSIONS = 'AUTH_002',
   TENANT_ACCESS_DENIED = 'AUTH_003',
-  
+
   // Stock Management
   STOCK_NOT_FOUND = 'STOCK_001',
   INSUFFICIENT_INVENTORY = 'STOCK_002',
   WAREHOUSE_CAPACITY_EXCEEDED = 'STOCK_003',
-  
+
   // ERP Integration
   ERP_CONNECTION_FAILED = 'ERP_001',
   ERP_DATA_SYNC_ERROR = 'ERP_002',
   ERP_AUTHENTICATION_FAILED = 'ERP_003',
-  
+
   // AI/ML
   ML_MODEL_UNAVAILABLE = 'AI_001',
   PREDICTION_FAILED = 'AI_002',
   RECOMMENDATION_ERROR = 'AI_003',
-  
+
   // Printing
   PRINTER_OFFLINE = 'PRINT_001',
   TEMPLATE_INVALID = 'PRINT_002',
   PRINT_QUEUE_FULL = 'PRINT_003',
-  
+
   // System
   DATABASE_ERROR = 'SYS_001',
   NETWORK_ERROR = 'SYS_002',
@@ -207,6 +214,7 @@ export class ErrorBoundary extends React.Component<
 ### 1.3 Enterprise State Management Standards
 
 #### 1.3.1 Zustand Store Architecture
+
 ```typescript
 // ✅ Enterprise-grade state management with Zustand
 interface AppStore {
@@ -214,28 +222,28 @@ interface AppStore {
   auth: AuthState;
   user: UserProfile;
   tenant: TenantConfiguration;
-  
+
   // Core Business State
   inventory: InventoryState;
   warehouses: WarehouseState;
   suppliers: SupplierState;
   orders: OrderState;
-  
+
   // AI/ML State
   predictions: PredictionState;
   recommendations: RecommendationState;
-  
+
   // UI State
   ui: UIState;
   notifications: NotificationState;
   modals: ModalState;
-  
+
   // Real-time State
   realtime: RealtimeState;
-  
+
   // Offline State
   offline: OfflineState;
-  
+
   // Actions
   actions: AppActions;
 }
@@ -259,31 +267,32 @@ const useAppStore = create<AppStore>()(
         modals: initialModalState,
         realtime: initialRealtimeState,
         offline: initialOfflineState,
-        
+
         // Actions
-        actions: createAppActions(set, get)
+        actions: createAppActions(set, get),
       })),
       {
-        name: 'logivox-store',
+        name: "logivox-store",
         partialize: (state) => ({
           user: state.user,
           tenant: state.tenant,
           ui: state.ui,
-          offline: state.offline
-        })
-      }
-    )
-  )
+          offline: state.offline,
+        }),
+      },
+    ),
+  ),
 );
 
 // Typed selectors for optimal performance
-export const useAuth = () => useAppStore(state => state.auth);
-export const useInventory = () => useAppStore(state => state.inventory);
-export const useWarehouses = () => useAppStore(state => state.warehouses);
-export const useRealtimeUpdates = () => useAppStore(state => state.realtime);
+export const useAuth = () => useAppStore((state) => state.auth);
+export const useInventory = () => useAppStore((state) => state.inventory);
+export const useWarehouses = () => useAppStore((state) => state.warehouses);
+export const useRealtimeUpdates = () => useAppStore((state) => state.realtime);
 ```
 
 #### 1.3.2 React Query Integration
+
 ```typescript
 // ✅ Advanced data fetching with React Query and enterprise caching
 export const queryClient = new QueryClient({
@@ -293,12 +302,12 @@ export const queryClient = new QueryClient({
       cacheTime: 30 * 60 * 1000, // 30 minutes
       retry: (failureCount, error) => {
         if (error instanceof LogiVoxError) {
-          return error.severity !== 'critical' && failureCount < 3;
+          return error.severity !== "critical" && failureCount < 3;
         }
         return failureCount < 2;
       },
       refetchOnWindowFocus: false,
-      refetchOnReconnect: true
+      refetchOnReconnect: true,
     },
     mutations: {
       retry: 1,
@@ -307,77 +316,82 @@ export const queryClient = new QueryClient({
           notificationService.showError(error.message);
           logError(error);
         }
-      }
-    }
-  }
+      },
+    },
+  },
 });
 
 // Advanced query hooks with optimistic updates
 export const useInventoryItems = (warehouseId?: string) => {
   const { tenantId } = useAuth();
-  
+
   return useQuery({
-    queryKey: ['inventory', tenantId, warehouseId],
+    queryKey: ["inventory", tenantId, warehouseId],
     queryFn: () => inventoryService.getItems({ warehouseId, tenantId }),
     enabled: !!tenantId,
-    select: (data) => data.filter(item => item.isActive),
+    select: (data) => data.filter((item) => item.isActive),
     onError: (error) => {
-      logError(error, { context: 'inventory-fetch', warehouseId, tenantId });
-    }
+      logError(error, { context: "inventory-fetch", warehouseId, tenantId });
+    },
   });
 };
 
 export const useCreateInventoryItem = () => {
   const queryClient = useQueryClient();
   const { tenantId } = useAuth();
-  
+
   return useMutation({
     mutationFn: inventoryService.createItem,
     onMutate: async (newItem) => {
       // Optimistic update
-      await queryClient.cancelQueries(['inventory', tenantId]);
-      const previousItems = queryClient.getQueryData(['inventory', tenantId]);
-      
-      queryClient.setQueryData(['inventory', tenantId], (old: InventoryItem[]) => [
-        ...old,
-        { ...newItem, id: `temp-${Date.now()}`, status: 'creating' }
-      ]);
-      
+      await queryClient.cancelQueries(["inventory", tenantId]);
+      const previousItems = queryClient.getQueryData(["inventory", tenantId]);
+
+      queryClient.setQueryData(
+        ["inventory", tenantId],
+        (old: InventoryItem[]) => [
+          ...old,
+          { ...newItem, id: `temp-${Date.now()}`, status: "creating" },
+        ],
+      );
+
       return { previousItems };
     },
     onError: (error, newItem, context) => {
-      queryClient.setQueryData(['inventory', tenantId], context?.previousItems);
+      queryClient.setQueryData(["inventory", tenantId], context?.previousItems);
     },
     onSettled: () => {
-      queryClient.invalidateQueries(['inventory', tenantId]);
-    }
+      queryClient.invalidateQueries(["inventory", tenantId]);
+    },
   });
 };
 ```
-  id: string;
-  name: string;
-  sku: string;
-  warehouseId: string;
-  organizationId: string;
-  currentStock: number;
-  minimumStock: number;
-  createdAt: Date;
-  updatedAt: Date;
+
+id: string;
+name: string;
+sku: string;
+warehouseId: string;
+organizationId: string;
+currentStock: number;
+minimumStock: number;
+createdAt: Date;
+updatedAt: Date;
 }
 
 // ✅ Good: API response types
 export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
+success: boolean;
+data?: T;
+error?: string;
+message?: string;
 }
 
 // ❌ Bad: Generic or unclear naming
 interface Item {
-  stuff: any;
+stuff: any;
 }
-```
+
+````
 
 #### Function Signatures
 ```typescript
@@ -393,11 +407,12 @@ async function createInventoryItem(
 function doStuff(data: any): any {
   // Implementation
 }
-```
+````
 
 ### React Component Standards
 
 #### Functional Components with Hooks
+
 ```typescript
 // ✅ Good: Modern React patterns
 interface InventoryListProps {
@@ -432,7 +447,7 @@ export default function InventoryList({ warehouseId, onItemSelect }: InventoryLi
   return (
     <div className="space-y-4">
       {items.map(item => (
-        <InventoryCard 
+        <InventoryCard
           key={item.id}
           item={item}
           onClick={() => onItemSelect(item)}
@@ -446,19 +461,21 @@ export default function InventoryList({ warehouseId, onItemSelect }: InventoryLi
 ### API Route Standards
 
 #### Express Route Structure
+
 ```typescript
 // ✅ Good: Well-structured API routes
-import { Router } from 'express';
-import { authenticateToken, requirePermission } from '../middleware/auth';
-import { validateInventoryItem } from '../middleware/validation';
-import * as inventoryService from '../services/inventoryService';
+import { Router } from "express";
+import { authenticateToken, requirePermission } from "../middleware/auth";
+import { validateInventoryItem } from "../middleware/validation";
+import * as inventoryService from "../services/inventoryService";
 
 const router = Router();
 
 // GET /api/inventory
-router.get('/', 
+router.get(
+  "/",
   authenticateToken,
-  requirePermission('inventory:read'),
+  requirePermission("inventory:read"),
   async (req, res) => {
     try {
       const { warehouseId, page = 1, limit = 20 } = req.query;
@@ -466,51 +483,52 @@ router.get('/',
         organizationId: req.user.organizationId,
         warehouseId: warehouseId as string,
         page: Number(page),
-        limit: Number(limit)
+        limit: Number(limit),
       });
-      
+
       res.json({
         success: true,
         data: items,
         pagination: {
           page: Number(page),
           limit: Number(limit),
-          total: items.length
-        }
+          total: items.length,
+        },
       });
     } catch (error) {
       res.status(500).json({
         success: false,
-        error: 'Failed to fetch inventory items'
+        error: "Failed to fetch inventory items",
       });
     }
-  }
+  },
 );
 
 // POST /api/inventory
-router.post('/',
+router.post(
+  "/",
   authenticateToken,
-  requirePermission('inventory:write'),
+  requirePermission("inventory:write"),
   validateInventoryItem,
   async (req, res) => {
     try {
       const item = await inventoryService.createInventoryItem({
         ...req.body,
-        organizationId: req.user.organizationId
+        organizationId: req.user.organizationId,
       });
-      
+
       res.status(201).json({
         success: true,
         data: item,
-        message: 'Inventory item created successfully'
+        message: "Inventory item created successfully",
       });
     } catch (error) {
       res.status(400).json({
         success: false,
-        error: error.message
+        error: error.message,
       });
     }
-  }
+  },
 );
 
 export default router;
@@ -519,6 +537,7 @@ export default router;
 ### Database Standards
 
 #### Prisma Schema Patterns
+
 ```prisma
 // ✅ Good: Consistent model definitions
 model InventoryItem {
@@ -530,23 +549,23 @@ model InventoryItem {
   minimumStock  Int      @default(0)
   maximumStock  Int?
   unitPrice     Decimal  @db.Decimal(10, 2)
-  
+
   // Relationships
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
+
   warehouseId String
   warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
-  
+
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id])
-  
+
   // Audit fields
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   createdBy String?
   updatedBy String?
-  
+
   // Indexes
   @@index([organizationId, warehouseId])
   @@index([sku])
@@ -558,6 +577,7 @@ model InventoryItem {
 ### Error Handling Standards
 
 #### Frontend Error Boundaries
+
 ```typescript
 // ✅ Good: Comprehensive error boundary
 interface ErrorBoundaryState {
@@ -594,7 +614,7 @@ export class ErrorBoundary extends Component<
             <p className="text-gray-600 mb-6">
               We apologize for the inconvenience. Please try refreshing the page.
             </p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="btn-primary"
             >
@@ -611,47 +631,48 @@ export class ErrorBoundary extends Component<
 ```
 
 #### Backend Error Handling
+
 ```typescript
 // ✅ Good: Centralized error handling middleware
 export function errorHandler(
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
-  console.error('Error occurred:', err);
+  console.error("Error occurred:", err);
 
   // Prisma errors
   if (err instanceof PrismaClientKnownRequestError) {
-    if (err.code === 'P2002') {
+    if (err.code === "P2002") {
       return res.status(400).json({
         success: false,
-        error: 'A record with this information already exists'
+        error: "A record with this information already exists",
       });
     }
   }
 
   // Validation errors
-  if (err.name === 'ValidationError') {
+  if (err.name === "ValidationError") {
     return res.status(400).json({
       success: false,
-      error: 'Validation failed',
-      details: err.message
+      error: "Validation failed",
+      details: err.message,
     });
   }
 
   // Authentication errors
-  if (err.name === 'UnauthorizedError') {
+  if (err.name === "UnauthorizedError") {
     return res.status(401).json({
       success: false,
-      error: 'Authentication required'
+      error: "Authentication required",
     });
   }
 
   // Default error
   res.status(500).json({
     success: false,
-    error: 'Internal server error'
+    error: "Internal server error",
   });
 }
 ```
@@ -659,31 +680,32 @@ export function errorHandler(
 ### Security Standards
 
 #### Authentication Middleware
+
 ```typescript
 // ✅ Good: Secure authentication middleware
 export async function authenticateToken(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({
       success: false,
-      error: 'Access token required'
+      error: "Access token required",
     });
   }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     const user = await getUserById(decoded.userId);
-    
+
     if (!user) {
       return res.status(401).json({
         success: false,
-        error: 'Invalid token'
+        error: "Invalid token",
       });
     }
 
@@ -692,19 +714,20 @@ export async function authenticateToken(
   } catch (error) {
     res.status(403).json({
       success: false,
-      error: 'Invalid token'
+      error: "Invalid token",
     });
   }
 }
 ```
 
 #### Input Validation
+
 ```typescript
 // ✅ Good: Input validation middleware
 export function validateInventoryItem(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const schema = z.object({
     name: z.string().min(1).max(255),
@@ -713,7 +736,7 @@ export function validateInventoryItem(
     currentStock: z.number().int().min(0),
     minimumStock: z.number().int().min(0),
     unitPrice: z.number().positive(),
-    warehouseId: z.string().cuid()
+    warehouseId: z.string().cuid(),
   });
 
   try {
@@ -722,8 +745,8 @@ export function validateInventoryItem(
   } catch (error) {
     res.status(400).json({
       success: false,
-      error: 'Validation failed',
-      details: error.errors
+      error: "Validation failed",
+      details: error.errors,
     });
   }
 }
@@ -732,6 +755,7 @@ export function validateInventoryItem(
 ### Performance Standards
 
 #### Database Query Optimization
+
 ```typescript
 // ✅ Good: Optimized database queries
 export async function getInventoryItems(params: {
@@ -746,10 +770,10 @@ export async function getInventoryItems(params: {
     ...(params.warehouseId && { warehouseId: params.warehouseId }),
     ...(params.search && {
       OR: [
-        { name: { contains: params.search, mode: 'insensitive' } },
-        { sku: { contains: params.search, mode: 'insensitive' } }
-      ]
-    })
+        { name: { contains: params.search, mode: "insensitive" } },
+        { sku: { contains: params.search, mode: "insensitive" } },
+      ],
+    }),
   };
 
   const [items, total] = await Promise.all([
@@ -757,13 +781,13 @@ export async function getInventoryItems(params: {
       where,
       include: {
         warehouse: { select: { name: true } },
-        category: { select: { name: true } }
+        category: { select: { name: true } },
       },
       skip: (params.page - 1) * params.limit,
       take: params.limit,
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     }),
-    prisma.inventoryItem.count({ where })
+    prisma.inventoryItem.count({ where }),
   ]);
 
   return { items, total };
@@ -773,6 +797,7 @@ export async function getInventoryItems(params: {
 ### Testing Standards
 
 #### Component Testing
+
 ```typescript
 // ✅ Good: Comprehensive component tests
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -784,7 +809,7 @@ describe('InventoryList', () => {
     const queryClient = new QueryClient({
       defaultOptions: { queries: { retry: false } }
     });
-    
+
     return ({ children }: { children: React.ReactNode }) => (
       <QueryClientProvider client={queryClient}>
         {children}
@@ -799,9 +824,9 @@ describe('InventoryList', () => {
     ];
 
     render(
-      <InventoryList 
-        warehouseId="warehouse-1" 
-        onItemSelect={jest.fn()} 
+      <InventoryList
+        warehouseId="warehouse-1"
+        onItemSelect={jest.fn()}
       />,
       { wrapper: createWrapper() }
     );
@@ -814,9 +839,9 @@ describe('InventoryList', () => {
 
   test('handles item selection', async () => {
     const onItemSelect = jest.fn();
-    
+
     render(
-      <InventoryList 
+      <InventoryList
   });
 };
 ```
@@ -824,6 +849,7 @@ describe('InventoryList', () => {
 ## 2. Enterprise Testing Standards
 
 ### 2.1 Comprehensive Testing Strategy
+
 ```typescript
 // ✅ Enterprise testing with React Testing Library and MSW
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
@@ -842,7 +868,7 @@ const server = setupServer(
       ])
     );
   }),
-  
+
   rest.post('/api/inventory', async (req, res, ctx) => {
     const data = await req.json();
     return res(
@@ -863,7 +889,7 @@ const createTestWrapper = ({ initialState = {}, tenantId = 'test-tenant' } = {})
       mutations: { retry: false }
     }
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
       <AuthProvider tenantId={tenantId}>
@@ -882,17 +908,17 @@ describe('InventoryWidget Enterprise Tests', () => {
   it('should handle multi-tenant data isolation', async () => {
     const tenantAWrapper = createTestWrapper({ tenantId: 'tenant-a' });
     const tenantBWrapper = createTestWrapper({ tenantId: 'tenant-b' });
-    
+
     // Test tenant A
     const { rerender } = render(
       <InventoryWidget warehouseId="warehouse-1" />,
       { wrapper: tenantAWrapper }
     );
-    
+
     await waitFor(() => {
       expect(screen.getByText('Widget A')).toBeInTheDocument();
     });
-    
+
     // Test tenant B isolation
     rerender(<InventoryWidget warehouseId="warehouse-1" />);
     // Should not see tenant A data
@@ -905,15 +931,15 @@ describe('InventoryWidget Enterprise Tests', () => {
         return res.networkError('Network unavailable');
       })
     );
-    
+
     render(
-      <InventoryWidget 
-        warehouseId="warehouse-1" 
+      <InventoryWidget
+        warehouseId="warehouse-1"
         enableOfflineMode={true}
       />,
       { wrapper: createTestWrapper() }
     );
-    
+
     await waitFor(() => {
       expect(screen.getByText('Working offline')).toBeInTheDocument();
     });
@@ -933,15 +959,15 @@ describe('InventoryWidget Enterprise Tests', () => {
         );
       })
     );
-    
+
     render(
-      <InventoryWidget 
-        warehouseId="warehouse-1" 
+      <InventoryWidget
+        warehouseId="warehouse-1"
         enableAIPredictions={true}
       />,
       { wrapper: createTestWrapper() }
     );
-    
+
     await waitFor(() => {
       expect(screen.getByText('AI Prediction: 150 units')).toBeInTheDocument();
       expect(screen.getByText('Reorder recommended')).toBeInTheDocument();
@@ -957,24 +983,24 @@ describe('Performance Tests', () => {
       name: `Item ${i}`,
       sku: `SKU-${i.toString().padStart(4, '0')}`
     }));
-    
+
     server.use(
       rest.get('/api/inventory/:warehouseId', (req, res, ctx) => {
         return res(ctx.json(largeDataset));
       })
     );
-    
+
     const startTime = performance.now();
-    
+
     render(
       <InventoryWidget warehouseId="warehouse-1" />,
       { wrapper: createTestWrapper() }
     );
-    
+
     await waitFor(() => {
       expect(screen.getByText('Item 999')).toBeInTheDocument();
     });
-    
+
     const endTime = performance.now();
     expect(endTime - startTime).toBeLessThan(3000); // Should render within 3 seconds
   });
@@ -982,93 +1008,97 @@ describe('Performance Tests', () => {
 ```
 
 ### 2.2 API Testing Standards
+
 ```typescript
 // ✅ Comprehensive API testing with Vitest and Supertest
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import request from 'supertest';
-import { app } from '../app';
-import { setupTestDatabase, teardownTestDatabase } from '../test-utils/database';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import request from "supertest";
+import { app } from "../app";
+import {
+  setupTestDatabase,
+  teardownTestDatabase,
+} from "../test-utils/database";
 
-describe('Inventory API Enterprise Tests', () => {
+describe("Inventory API Enterprise Tests", () => {
   beforeAll(async () => {
     await setupTestDatabase();
   });
-  
+
   afterAll(async () => {
     await teardownTestDatabase();
   });
 
-  describe('POST /api/inventory', () => {
-    it('should create inventory item with multi-tenant isolation', async () => {
+  describe("POST /api/inventory", () => {
+    it("should create inventory item with multi-tenant isolation", async () => {
       const response = await request(app)
-        .post('/api/inventory')
-        .set('Authorization', 'Bearer tenant-a-token')
+        .post("/api/inventory")
+        .set("Authorization", "Bearer tenant-a-token")
         .send({
-          name: 'Test Widget',
-          sku: 'TEST-001',
-          warehouseId: 'warehouse-1',
-          quantity: 100
+          name: "Test Widget",
+          sku: "TEST-001",
+          warehouseId: "warehouse-1",
+          quantity: 100,
         })
         .expect(201);
-      
+
       expect(response.body).toMatchObject({
-        name: 'Test Widget',
-        sku: 'TEST-001',
-        tenantId: 'tenant-a'
+        name: "Test Widget",
+        sku: "TEST-001",
+        tenantId: "tenant-a",
       });
-      
+
       // Verify tenant isolation
       const tenantBResponse = await request(app)
-        .get('/api/inventory')
-        .set('Authorization', 'Bearer tenant-b-token')
+        .get("/api/inventory")
+        .set("Authorization", "Bearer tenant-b-token")
         .expect(200);
-      
+
       expect(tenantBResponse.body).not.toContainEqual(
-        expect.objectContaining({ sku: 'TEST-001' })
+        expect.objectContaining({ sku: "TEST-001" }),
       );
     });
 
-    it('should handle ERP integration sync', async () => {
+    it("should handle ERP integration sync", async () => {
       const response = await request(app)
-        .post('/api/inventory')
-        .set('Authorization', 'Bearer valid-token')
+        .post("/api/inventory")
+        .set("Authorization", "Bearer valid-token")
         .send({
-          name: 'ERP Synced Item',
-          sku: 'ERP-001',
-          erpId: 'oracle-12345',
-          syncToERP: true
+          name: "ERP Synced Item",
+          sku: "ERP-001",
+          erpId: "oracle-12345",
+          syncToERP: true,
         })
         .expect(201);
-      
-      expect(response.body.integrationStatus).toBe('syncing');
-      
+
+      expect(response.body.integrationStatus).toBe("syncing");
+
       // Verify ERP sync was triggered
       // This would be mocked in real tests
       expect(mockERPService.syncItem).toHaveBeenCalledWith(
-        expect.objectContaining({ erpId: 'oracle-12345' })
+        expect.objectContaining({ erpId: "oracle-12345" }),
       );
     });
 
-    it('should validate required fields with proper error messages', async () => {
+    it("should validate required fields with proper error messages", async () => {
       const response = await request(app)
-        .post('/api/inventory')
-        .set('Authorization', 'Bearer valid-token')
+        .post("/api/inventory")
+        .set("Authorization", "Bearer valid-token")
         .send({
-          name: '', // Invalid: empty name
-          sku: 'TEST-002'
+          name: "", // Invalid: empty name
+          sku: "TEST-002",
           // Missing: warehouseId
         })
         .expect(400);
-      
+
       expect(response.body.errors).toEqual([
-        { field: 'name', message: 'Name is required and cannot be empty' },
-        { field: 'warehouseId', message: 'Warehouse ID is required' }
+        { field: "name", message: "Name is required and cannot be empty" },
+        { field: "warehouseId", message: "Warehouse ID is required" },
       ]);
     });
   });
 
-  describe('GraphQL API Tests', () => {
-    it('should handle complex queries with nested data', async () => {
+  describe("GraphQL API Tests", () => {
+    it("should handle complex queries with nested data", async () => {
       const query = `
         query GetInventoryWithPredictions($warehouseId: ID!) {
           inventory(warehouseId: $warehouseId) {
@@ -1092,28 +1122,28 @@ describe('Inventory API Enterprise Tests', () => {
           }
         }
       `;
-      
+
       const response = await request(app)
-        .post('/graphql')
-        .set('Authorization', 'Bearer valid-token')
+        .post("/graphql")
+        .set("Authorization", "Bearer valid-token")
         .send({
           query,
-          variables: { warehouseId: 'warehouse-1' }
+          variables: { warehouseId: "warehouse-1" },
         })
         .expect(200);
-      
+
       expect(response.body.data.inventory).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
             predictions: expect.objectContaining({
               demandForecast: expect.any(Number),
-              confidence: expect.any(Number)
+              confidence: expect.any(Number),
             }),
             warehouse: expect.objectContaining({
-              name: expect.any(String)
-            })
-          })
-        ])
+              name: expect.any(String),
+            }),
+          }),
+        ]),
       );
     });
   });
@@ -1123,54 +1153,59 @@ describe('Inventory API Enterprise Tests', () => {
 ## 3. Enterprise Security Standards
 
 ### 3.1 Authentication & Authorization
+
 ```typescript
 // ✅ Enterprise authentication with JWT and RBAC
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcryptjs';
-import { RateLimiterRedis } from 'rate-limiter-flexible';
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import { RateLimiterRedis } from "rate-limiter-flexible";
 
 // Rate limiting for authentication endpoints
 const authLimiter = new RateLimiterRedis({
   storeClient: redisClient,
-  keyPrefix: 'auth_fail',
+  keyPrefix: "auth_fail",
   points: 5, // Number of attempts
   duration: 300, // Per 5 minutes
-  blockDuration: 900 // Block for 15 minutes
+  blockDuration: 900, // Block for 15 minutes
 });
 
 // Multi-tenant JWT authentication middleware
-export const authenticateJWT = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticateJWT = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+    const token = req.header("Authorization")?.replace("Bearer ", "");
+
     if (!token) {
-      return res.status(401).json({ error: 'Access token required' });
+      return res.status(401).json({ error: "Access token required" });
     }
-    
+
     // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JWTPayload;
-    
+
     // Validate tenant access
     const tenant = await validateTenantAccess(decoded.tenantId);
     if (!tenant.isActive) {
-      return res.status(403).json({ error: 'Tenant access suspended' });
+      return res.status(403).json({ error: "Tenant access suspended" });
     }
-    
+
     // Check subscription limits
     if (await hasExceededSubscriptionLimits(tenant.id, decoded.userId)) {
-      return res.status(429).json({ error: 'Subscription limits exceeded' });
+      return res.status(429).json({ error: "Subscription limits exceeded" });
     }
-    
+
     // Attach user and tenant context
     req.user = decoded;
     req.tenant = tenant;
-    
+
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: "Invalid token" });
     }
-    return res.status(500).json({ error: 'Authentication failed' });
+    return res.status(500).json({ error: "Authentication failed" });
   }
 };
 
@@ -1178,19 +1213,22 @@ export const authenticateJWT = async (req: Request, res: Response, next: NextFun
 export const requirePermission = (permission: Permission) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const userPermissions = await getUserPermissions(req.user.id, req.tenant.id);
-      
+      const userPermissions = await getUserPermissions(
+        req.user.id,
+        req.tenant.id,
+      );
+
       if (!userPermissions.includes(permission)) {
-        return res.status(403).json({ 
-          error: 'Insufficient permissions',
+        return res.status(403).json({
+          error: "Insufficient permissions",
           required: permission,
-          available: userPermissions
+          available: userPermissions,
         });
       }
-      
+
       next();
     } catch (error) {
-      return res.status(500).json({ error: 'Permission check failed' });
+      return res.status(500).json({ error: "Permission check failed" });
     }
   };
 };
@@ -1201,20 +1239,27 @@ export const hashPassword = async (password: string): Promise<string> => {
   return await bcrypt.hash(password, saltRounds);
 };
 
-export const validatePassword = async (password: string, hash: string): Promise<boolean> => {
+export const validatePassword = async (
+  password: string,
+  hash: string,
+): Promise<boolean> => {
   return await bcrypt.compare(password, hash);
 };
 
 // Input sanitization middleware
-export const sanitizeInput = (req: Request, res: Response, next: NextFunction) => {
+export const sanitizeInput = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const sanitizeObject = (obj: any): any => {
-    if (typeof obj !== 'object' || obj === null) return obj;
-    
+    if (typeof obj !== "object" || obj === null) return obj;
+
     const sanitized: any = {};
     for (const [key, value] of Object.entries(obj)) {
-      if (typeof value === 'string') {
+      if (typeof value === "string") {
         sanitized[key] = validator.escape(value.trim());
-      } else if (typeof value === 'object') {
+      } else if (typeof value === "object") {
         sanitized[key] = sanitizeObject(value);
       } else {
         sanitized[key] = value;
@@ -1222,123 +1267,138 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction) =
     }
     return sanitized;
   };
-  
+
   req.body = sanitizeObject(req.body);
   req.query = sanitizeObject(req.query);
   req.params = sanitizeObject(req.params);
-  
+
   next();
 };
 ```
 
 ### 3.2 Data Protection & Privacy
+
 ```typescript
 // ✅ Enterprise data protection with encryption
-import crypto from 'crypto';
-import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+import crypto from "crypto";
+import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
 
 // AES-256-GCM encryption for sensitive data
 export class DataEncryption {
-  private static readonly algorithm = 'aes-256-gcm';
+  private static readonly algorithm = "aes-256-gcm";
   private static readonly keyLength = 32;
   private static readonly ivLength = 16;
   private static readonly tagLength = 16;
-  
+
   static encrypt(text: string, key: Buffer): EncryptedData {
     const iv = randomBytes(this.ivLength);
     const cipher = createCipheriv(this.algorithm, key, iv);
-    
-    let encrypted = cipher.update(text, 'utf8', 'hex');
-    encrypted += cipher.final('hex');
-    
+
+    let encrypted = cipher.update(text, "utf8", "hex");
+    encrypted += cipher.final("hex");
+
     const authTag = cipher.getAuthTag();
-    
+
     return {
       encrypted,
-      iv: iv.toString('hex'),
-      authTag: authTag.toString('hex')
+      iv: iv.toString("hex"),
+      authTag: authTag.toString("hex"),
     };
   }
-  
+
   static decrypt(data: EncryptedData, key: Buffer): string {
-    const iv = Buffer.from(data.iv, 'hex');
-    const authTag = Buffer.from(data.authTag, 'hex');
+    const iv = Buffer.from(data.iv, "hex");
+    const authTag = Buffer.from(data.authTag, "hex");
     const decipher = createDecipheriv(this.algorithm, key, iv);
-    
+
     decipher.setAuthTag(authTag);
-    
-    let decrypted = decipher.update(data.encrypted, 'hex', 'utf8');
-    decrypted += decipher.final('utf8');
-    
+
+    let decrypted = decipher.update(data.encrypted, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+
     return decrypted;
   }
 }
 
 // PII data masking for logs and analytics
 export const maskSensitiveData = (obj: any): any => {
-  const sensitiveFields = ['password', 'ssn', 'creditCard', 'bankAccount', 'token'];
-  
+  const sensitiveFields = [
+    "password",
+    "ssn",
+    "creditCard",
+    "bankAccount",
+    "token",
+  ];
+
   const mask = (value: any, key: string): any => {
-    if (sensitiveFields.some(field => key.toLowerCase().includes(field))) {
-      if (typeof value === 'string') {
-        return '***REDACTED***';
+    if (sensitiveFields.some((field) => key.toLowerCase().includes(field))) {
+      if (typeof value === "string") {
+        return "***REDACTED***";
       }
       return value;
     }
-    
-    if (typeof value === 'object' && value !== null) {
+
+    if (typeof value === "object" && value !== null) {
       const masked: any = {};
       for (const [k, v] of Object.entries(value)) {
         masked[k] = mask(v, k);
       }
       return masked;
     }
-    
+
     return value;
   };
-  
-  return mask(obj, '');
+
+  return mask(obj, "");
 };
 
 // GDPR compliance utilities
 export class GDPRCompliance {
-  static async exportUserData(userId: string, tenantId: string): Promise<UserDataExport> {
+  static async exportUserData(
+    userId: string,
+    tenantId: string,
+  ): Promise<UserDataExport> {
     const userData = await Promise.all([
       getUserProfile(userId),
       getUserActivityLog(userId),
       getUserPreferences(userId),
-      getInventoryInteractions(userId)
+      getInventoryInteractions(userId),
     ]);
-    
+
     return {
       exportDate: new Date().toISOString(),
       userId,
       tenantId,
       data: userData,
-      format: 'JSON',
-      version: '1.0'
+      format: "JSON",
+      version: "1.0",
     };
   }
-  
-  static async deleteUserData(userId: string, tenantId: string): Promise<DeletionReport> {
+
+  static async deleteUserData(
+    userId: string,
+    tenantId: string,
+  ): Promise<DeletionReport> {
     const deletionTasks = [
       () => deleteUserProfile(userId),
       () => anonymizeActivityLogs(userId),
       () => removeUserPreferences(userId),
-      () => clearUserSessions(userId)
+      () => clearUserSessions(userId),
     ];
-    
-    const results = await Promise.allSettled(deletionTasks.map(task => task()));
-    
+
+    const results = await Promise.allSettled(
+      deletionTasks.map((task) => task()),
+    );
+
     return {
       deletionDate: new Date().toISOString(),
       userId,
       tenantId,
-      tasksCompleted: results.filter(r => r.status === 'fulfilled').length,
-      tasksFailed: results.filter(r => r.status === 'rejected').length,
+      tasksCompleted: results.filter((r) => r.status === "fulfilled").length,
+      tasksFailed: results.filter((r) => r.status === "rejected").length,
       errors: results
-        .filter(r => r.status === 'rejected')
-        .map(r => (r as PromiseRejectedResult).reason)
+        .filter((r) => r.status === "rejected")
+        .map((r) => (r as PromiseRejectedResult).reason),
     };
   }
 }
@@ -1347,19 +1407,20 @@ export class GDPRCompliance {
 ## 4. Enterprise Performance Standards
 
 ### 4.1 Code Optimization Guidelines
+
 ```typescript
 // ✅ Performance optimization with React.memo and useMemo
 import React, { memo, useMemo, useCallback, useState } from 'react';
 import { debounce } from 'lodash-es';
 
 // Optimized component with proper memoization
-export const InventorySearchWidget = memo<InventorySearchProps>(({ 
-  items, 
-  onSearch, 
-  filters 
+export const InventorySearchWidget = memo<InventorySearchProps>(({
+  items,
+  onSearch,
+  filters
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   // Debounced search to avoid excessive API calls
   const debouncedSearch = useCallback(
     debounce((term: string) => {
@@ -1367,45 +1428,45 @@ export const InventorySearchWidget = memo<InventorySearchProps>(({
     }, 300),
     [onSearch]
   );
-  
+
   // Memoized filtered results for large datasets
   const filteredItems = useMemo(() => {
     if (!searchTerm) return items;
-    
-    return items.filter(item => 
+
+    return items.filter(item =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.sku.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [items, searchTerm]);
-  
+
   // Memoized expensive calculations
   const statistics = useMemo(() => {
     return {
       totalItems: filteredItems.length,
       totalValue: filteredItems.reduce((sum, item) => sum + item.value, 0),
-      averageValue: filteredItems.length > 0 
-        ? filteredItems.reduce((sum, item) => sum + item.value, 0) / filteredItems.length 
+      averageValue: filteredItems.length > 0
+        ? filteredItems.reduce((sum, item) => sum + item.value, 0) / filteredItems.length
         : 0
     };
   }, [filteredItems]);
-  
+
   const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
     debouncedSearch(value);
   }, [debouncedSearch]);
-  
+
   return (
     <div className="inventory-search-widget">
-      <SearchInput 
+      <SearchInput
         value={searchTerm}
         onChange={handleSearchChange}
         placeholder="Search inventory..."
       />
-      
+
       <StatisticsPanel {...statistics} />
-      
-      <VirtualizedList 
+
+      <VirtualizedList
         items={filteredItems}
         renderItem={renderInventoryItem}
         height={400}
@@ -1416,30 +1477,30 @@ export const InventorySearchWidget = memo<InventorySearchProps>(({
 });
 
 // Virtualized list for large datasets
-const VirtualizedList = memo<VirtualizedListProps>(({ 
-  items, 
-  renderItem, 
-  height, 
-  itemHeight 
+const VirtualizedList = memo<VirtualizedListProps>(({
+  items,
+  renderItem,
+  height,
+  itemHeight
 }) => {
   const [scrollTop, setScrollTop] = useState(0);
-  
+
   const visibleItems = useMemo(() => {
     const startIndex = Math.floor(scrollTop / itemHeight);
     const endIndex = Math.min(
       startIndex + Math.ceil(height / itemHeight) + 1,
       items.length
     );
-    
+
     return items.slice(startIndex, endIndex).map((item, index) => ({
       item,
       index: startIndex + index,
       top: (startIndex + index) * itemHeight
     }));
   }, [items, scrollTop, itemHeight, height]);
-  
+
   return (
-    <div 
+    <div
       className="virtualized-list"
       style={{ height, overflow: 'auto' }}
       onScroll={e => setScrollTop(e.currentTarget.scrollTop)}
@@ -1466,9 +1527,10 @@ const VirtualizedList = memo<VirtualizedListProps>(({
 ```
 
 ### 4.2 Database Performance Standards
+
 ```typescript
 // ✅ Optimized database queries with proper indexing
-import { Prisma } from '@prisma/client';
+import { Prisma } from "@prisma/client";
 
 // Efficient paginated queries with cursor-based pagination
 export const getInventoryItems = async ({
@@ -1476,84 +1538,87 @@ export const getInventoryItems = async ({
   warehouseId,
   searchTerm,
   cursor,
-  limit = 50
+  limit = 50,
 }: GetInventoryItemsParams): Promise<PaginatedInventoryItems> => {
   const where: Prisma.InventoryItemWhereInput = {
     tenantId,
     ...(warehouseId && { warehouseId }),
     ...(searchTerm && {
       OR: [
-        { name: { contains: searchTerm, mode: 'insensitive' } },
-        { sku: { contains: searchTerm, mode: 'insensitive' } },
-        { description: { contains: searchTerm, mode: 'insensitive' } }
-      ]
-    })
+        { name: { contains: searchTerm, mode: "insensitive" } },
+        { sku: { contains: searchTerm, mode: "insensitive" } },
+        { description: { contains: searchTerm, mode: "insensitive" } },
+      ],
+    }),
   };
-  
+
   const items = await prisma.inventoryItem.findMany({
     where,
     include: {
       warehouse: {
-        select: { id: true, name: true, location: true }
+        select: { id: true, name: true, location: true },
       },
       supplier: {
-        select: { id: true, name: true, contactEmail: true }
+        select: { id: true, name: true, contactEmail: true },
       },
       _count: {
-        select: { transactions: true, reservations: true }
-      }
+        select: { transactions: true, reservations: true },
+      },
     },
-    orderBy: { updatedAt: 'desc' },
+    orderBy: { updatedAt: "desc" },
     take: limit + 1,
-    ...(cursor && { cursor: { id: cursor }, skip: 1 })
+    ...(cursor && { cursor: { id: cursor }, skip: 1 }),
   });
-  
+
   const hasNextPage = items.length > limit;
   if (hasNextPage) items.pop();
-  
+
   return {
     items,
     hasNextPage,
-    nextCursor: hasNextPage ? items[items.length - 1].id : null
+    nextCursor: hasNextPage ? items[items.length - 1].id : null,
   };
 };
 
 // Bulk operations for performance
 export const bulkUpdateInventoryItems = async (
-  updates: InventoryItemUpdate[]
+  updates: InventoryItemUpdate[],
 ): Promise<BatchOperationResult> => {
   const transaction = await prisma.$transaction(async (tx) => {
     const results = await Promise.allSettled(
-      updates.map(update => 
+      updates.map((update) =>
         tx.inventoryItem.update({
           where: { id: update.id },
-          data: update.data
-        })
-      )
+          data: update.data,
+        }),
+      ),
     );
-    
+
     return results;
   });
-  
-  const successful = transaction.filter(r => r.status === 'fulfilled');
-  const failed = transaction.filter(r => r.status === 'rejected');
-  
+
+  const successful = transaction.filter((r) => r.status === "fulfilled");
+  const failed = transaction.filter((r) => r.status === "rejected");
+
   return {
     totalOperations: updates.length,
     successful: successful.length,
     failed: failed.length,
-    errors: failed.map(f => (f as PromiseRejectedResult).reason)
+    errors: failed.map((f) => (f as PromiseRejectedResult).reason),
   };
 };
 
 // Database connection optimization
 export const optimizedPrismaClient = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn'] : ['error'],
+  log:
+    process.env.NODE_ENV === "development"
+      ? ["query", "info", "warn"]
+      : ["error"],
   datasources: {
     db: {
-      url: process.env.DATABASE_URL
-    }
-  }
+      url: process.env.DATABASE_URL,
+    },
+  },
 }).$extends({
   query: {
     $allModels: {
@@ -1561,22 +1626,25 @@ export const optimizedPrismaClient = new PrismaClient({
         const start = Date.now();
         const result = await query(args);
         const end = Date.now();
-        
+
         // Log slow queries
         if (end - start > 1000) {
-          logger.warn(`Slow query detected: ${model}.${operation} took ${end - start}ms`);
+          logger.warn(
+            `Slow query detected: ${model}.${operation} took ${end - start}ms`,
+          );
         }
-        
+
         return result;
-      }
-    }
-  }
+      },
+    },
+  },
 });
 ```
 
 ## 5. Enterprise Documentation Standards
 
 ### 5.1 API Documentation Standards
+
 ```typescript
 /**
  * @swagger
@@ -1629,7 +1697,7 @@ export const optimizedPrismaClient = new PrismaClient({
  *         description: Insufficient permissions
  *       409:
  *         description: SKU already exists
- * 
+ *
  * components:
  *   schemas:
  *     CreateInventoryItemRequest:
@@ -1670,13 +1738,14 @@ export const optimizedPrismaClient = new PrismaClient({
 ```
 
 ### 5.2 Component Documentation Standards
-```typescript
+
+````typescript
 /**
  * InventorySearchWidget - Enterprise inventory search and filtering component
- * 
+ *
  * A high-performance, virtualized search widget for enterprise inventory management
  * with real-time filtering, AI-powered suggestions, and multi-tenant isolation.
- * 
+ *
  * @example
  * ```tsx
  * <InventorySearchWidget
@@ -1691,7 +1760,7 @@ export const optimizedPrismaClient = new PrismaClient({
  *   virtualizeAfter={100}
  * />
  * ```
- * 
+ *
  * @param warehouseId - Warehouse to search within (required for multi-warehouse setups)
  * @param onItemSelect - Callback fired when user selects an inventory item
  * @param enableAISuggestions - Enable AI-powered search suggestions (default: false)
@@ -1699,7 +1768,7 @@ export const optimizedPrismaClient = new PrismaClient({
  * @param filters - Advanced filtering options for search results
  * @param virtualizeAfter - Number of items after which to enable virtualization (default: 50)
  * @param searchDebounceMs - Debounce delay for search input (default: 300ms)
- * 
+ *
  * @features
  * - Real-time search with debounced input
  * - Virtualized rendering for large datasets (1000+ items)
@@ -1710,28 +1779,28 @@ export const optimizedPrismaClient = new PrismaClient({
  * - Offline-first functionality with sync indicators
  * - Accessibility compliant (WCAG 2.1 AA)
  * - Mobile-responsive design
- * 
+ *
  * @performance
  * - Handles 10,000+ inventory items efficiently
  * - Search results appear within 150ms
  * - Virtual scrolling reduces DOM nodes by 90%
  * - Optimistic updates for immediate feedback
- * 
+ *
  * @accessibility
  * - Full keyboard navigation support
  * - Screen reader announcements for search results
  * - High contrast mode support
  * - Focus management for modal interactions
- * 
+ *
  * @testing
  * ```typescript
  * // Unit test example
  * test('should filter inventory items by search term', async () => {
  *   render(<InventorySearchWidget warehouseId="test-warehouse" />);
- *   
+ *
  *   const searchInput = screen.getByRole('searchbox');
  *   fireEvent.change(searchInput, { target: { value: 'widget' } });
- *   
+ *
  *   await waitFor(() => {
  *     expect(screen.getByText('Widget A')).toBeInTheDocument();
  *     expect(screen.queryByText('Different Item')).not.toBeInTheDocument();
@@ -1748,9 +1817,9 @@ export interface InventorySearchWidgetProps {
   virtualizeAfter?: number;
   searchDebounceMs?: number;
   className?: string;
-  'data-testid'?: string;
+  "data-testid"?: string;
 }
-```
+````
 
 This comprehensive enterprise development standards document ensures LogiVox maintains the highest quality, security, and performance standards throughout its development lifecycle. These standards support the platform's evolution into a next-generation enterprise solution while maintaining developer productivity and code maintainability.
 

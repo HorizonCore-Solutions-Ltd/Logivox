@@ -1,19 +1,19 @@
-import { useSession } from "next-auth/react"
+import { useSession } from "next-auth/react";
 
-export type Role = "ADMIN" | "MEMBER" | "VIEWER"
+export type Role = "ADMIN" | "MEMBER" | "VIEWER";
 
 export interface Permission {
-  canView: boolean
-  canCreate: boolean
-  canEdit: boolean
-  canDelete: boolean
-  canManageMembers: boolean
-  canManageSettings: boolean
+  canView: boolean;
+  canCreate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+  canManageMembers: boolean;
+  canManageSettings: boolean;
 }
 
 export function usePermissions(): Permission {
-  const { data: session } = useSession()
-  const role = session?.user?.organizations?.[0]?.role as Role | undefined
+  const { data: session } = useSession();
+  const role = session?.user?.organizations?.[0]?.role as Role | undefined;
 
   if (!role) {
     return {
@@ -23,7 +23,7 @@ export function usePermissions(): Permission {
       canDelete: false,
       canManageMembers: false,
       canManageSettings: false,
-    }
+    };
   }
 
   switch (role) {
@@ -35,7 +35,7 @@ export function usePermissions(): Permission {
         canDelete: true,
         canManageMembers: true,
         canManageSettings: true,
-      }
+      };
     case "MEMBER":
       return {
         canView: true,
@@ -44,7 +44,7 @@ export function usePermissions(): Permission {
         canDelete: false,
         canManageMembers: false,
         canManageSettings: false,
-      }
+      };
     case "VIEWER":
       return {
         canView: true,
@@ -53,7 +53,7 @@ export function usePermissions(): Permission {
         canDelete: false,
         canManageMembers: false,
         canManageSettings: false,
-      }
+      };
     default:
       return {
         canView: false,
@@ -62,29 +62,31 @@ export function usePermissions(): Permission {
         canDelete: false,
         canManageMembers: false,
         canManageSettings: false,
-      }
+      };
   }
 }
 
-export function useHasPermission(requiredPermission: keyof Permission): boolean {
-  const permissions = usePermissions()
-  return permissions[requiredPermission]
+export function useHasPermission(
+  requiredPermission: keyof Permission,
+): boolean {
+  const permissions = usePermissions();
+  return permissions[requiredPermission];
 }
 
 export function useIsAdmin(): boolean {
-  const { data: session } = useSession()
-  const role = session?.user?.organizations?.[0]?.role
-  return role === "ADMIN"
+  const { data: session } = useSession();
+  const role = session?.user?.organizations?.[0]?.role;
+  return role === "ADMIN";
 }
 
 export function useIsMember(): boolean {
-  const { data: session } = useSession()
-  const role = session?.user?.organizations?.[0]?.role
-  return role === "MEMBER" || role === "ADMIN"
+  const { data: session } = useSession();
+  const role = session?.user?.organizations?.[0]?.role;
+  return role === "MEMBER" || role === "ADMIN";
 }
 
 export function useIsViewer(): boolean {
-  const { data: session } = useSession()
-  const role = session?.user?.organizations?.[0]?.role
-  return role === "VIEWER"
+  const { data: session } = useSession();
+  const role = session?.user?.organizations?.[0]?.role;
+  return role === "VIEWER";
 }

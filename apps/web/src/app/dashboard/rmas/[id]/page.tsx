@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -148,7 +154,9 @@ export default function RMADetailsPage({ params }: { params: { id: string } }) {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{rma.rmaNumber}</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {rma.rmaNumber}
+            </h1>
             <p className="text-muted-foreground">Return details and tracking</p>
           </div>
         </div>
@@ -264,11 +272,15 @@ export default function RMADetailsPage({ params }: { params: { id: string } }) {
           <CardContent className="space-y-2">
             <div>
               <p className="text-sm font-medium">Name</p>
-              <p className="text-sm text-muted-foreground">{rma.customer.name}</p>
+              <p className="text-sm text-muted-foreground">
+                {rma.customer.name}
+              </p>
             </div>
             <div>
               <p className="text-sm font-medium">Email</p>
-              <p className="text-sm text-muted-foreground">{rma.customer.email}</p>
+              <p className="text-sm text-muted-foreground">
+                {rma.customer.email}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -288,7 +300,9 @@ export default function RMADetailsPage({ params }: { params: { id: string } }) {
             {rma.customerNotes && (
               <div>
                 <p className="text-sm font-medium">Customer Notes</p>
-                <p className="text-sm text-muted-foreground">{rma.customerNotes}</p>
+                <p className="text-sm text-muted-foreground">
+                  {rma.customerNotes}
+                </p>
               </div>
             )}
           </CardContent>
@@ -304,10 +318,15 @@ export default function RMADetailsPage({ params }: { params: { id: string } }) {
         <CardContent>
           <div className="space-y-4">
             {rma.items.map((item) => (
-              <div key={item.id} className="flex items-start justify-between border-b pb-4">
+              <div
+                key={item.id}
+                className="flex items-start justify-between border-b pb-4"
+              >
                 <div className="flex-1">
                   <p className="font-medium">{item.inventoryItem.name}</p>
-                  <p className="text-sm text-muted-foreground">SKU: {item.inventoryItem.sku}</p>
+                  <p className="text-sm text-muted-foreground">
+                    SKU: {item.inventoryItem.sku}
+                  </p>
                   <div className="mt-2 flex gap-4 text-sm">
                     <span>Qty Requested: {item.quantityRequested}</span>
                     {item.quantityReceived !== null && (
@@ -327,7 +346,9 @@ export default function RMADetailsPage({ params }: { params: { id: string } }) {
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">{formatCurrency(item.unitPrice)}</p>
+                  <p className="font-medium">
+                    {formatCurrency(item.unitPrice)}
+                  </p>
                   <Badge className="mt-2">{item.action}</Badge>
                   {item.refundAmount > 0 && (
                     <p className="mt-2 text-sm text-green-600">
@@ -345,7 +366,9 @@ export default function RMADetailsPage({ params }: { params: { id: string } }) {
             {rma.restockingFee && rma.restockingFee > 0 && (
               <div className="flex justify-between text-sm">
                 <span>Restocking Fee</span>
-                <span className="text-red-600">-{formatCurrency(rma.restockingFee)}</span>
+                <span className="text-red-600">
+                  -{formatCurrency(rma.restockingFee)}
+                </span>
               </div>
             )}
             <div className="flex justify-between font-medium">

@@ -1,6 +1,7 @@
 # Quality Operating System - Phase 2 Development Roadmap
 
 ## Overview
+
 This document outlines all features needed to complete the Quality Operating System (QOS) to achieve 100% specification compliance and enterprise readiness.
 
 **Current Status**: 80% Complete  
@@ -12,14 +13,16 @@ This document outlines all features needed to complete the Quality Operating Sys
 ## PRIORITY 1: CRITICAL FEATURES (Weeks 1-2)
 
 ### 1.1 SPC Control Charts & Advanced Analytics
+
 **Status**: 🔴 Not Started  
 **Priority**: CRITICAL  
 **Effort**: 1 week  
 **Impact**: Prevents defects before they occur
 
 #### Features to Build
+
 - [ ] X-bar (Average) Chart
-- [ ] R (Range) Chart  
+- [ ] R (Range) Chart
 - [ ] Individuals Chart
 - [ ] Moving Range Chart
 - [ ] Statistical calculations:
@@ -34,6 +37,7 @@ This document outlines all features needed to complete the Quality Operating Sys
 - [ ] Process capability analysis
 
 #### Files to Create
+
 ```
 /app/dashboard/qc/spc/
   ├── page.tsx                    # SPC Dashboard
@@ -48,6 +52,7 @@ This document outlines all features needed to complete the Quality Operating Sys
 ```
 
 #### Technical Requirements
+
 - **Charts**: Recharts or Chart.js
 - **Calculations**: Statistical formulas
 - **Real-time**: WebSocket updates for live charting
@@ -56,12 +61,14 @@ This document outlines all features needed to complete the Quality Operating Sys
 ---
 
 ### 1.2 Supplier Portal (Self-Service)
+
 **Status**: 🔴 Not Started  
 **Priority**: CRITICAL  
 **Effort**: 1.5 weeks  
 **Impact**: Eliminates 80% of email back-and-forth
 
 #### Features to Build
+
 - [ ] Supplier authentication system
 - [ ] Supplier dashboard
 - [ ] View assigned NCRs
@@ -75,6 +82,7 @@ This document outlines all features needed to complete the Quality Operating Sys
 - [ ] Multi-language support (optional)
 
 #### Files to Create
+
 ```
 /app/supplier/
   ├── login/page.tsx              # Supplier login
@@ -94,6 +102,7 @@ This document outlines all features needed to complete the Quality Operating Sys
 ```
 
 #### Database Changes
+
 ```prisma
 model SupplierUser {
   id         String   @id @default(cuid())
@@ -120,12 +129,14 @@ model SupplierResponse {
 ---
 
 ### 1.3 Auto-Escalation & Business Rules Engine
+
 **Status**: 🔴 Not Started  
 **Priority**: HIGH  
 **Effort**: 3 days  
 **Impact**: Ensures critical issues never slip through
 
 #### Features to Build
+
 - [ ] Configurable escalation rules
 - [ ] Auto-create CAPA from critical NCR
 - [ ] Auto-quarantine based on defect threshold
@@ -135,9 +146,10 @@ model SupplierResponse {
 - [ ] Escalation history tracking
 
 #### Rules Examples
+
 ```typescript
 // Rule: Critical NCR must have CAPA within 24h
-if (ncr.severity === 'CRITICAL' && !ncr.capaId) {
+if (ncr.severity === "CRITICAL" && !ncr.capaId) {
   if (hoursSinceCreation > 24) {
     await escalateToManagement(ncr);
     await autoCreateCAPA(ncr);
@@ -147,9 +159,9 @@ if (ncr.severity === 'CRITICAL' && !ncr.capaId) {
 // Rule: 3 failures → Quality hold
 if (consecutiveFailures >= 3) {
   await createQualityHold({
-    type: 'SUPPLIER',
+    type: "SUPPLIER",
     supplierId: ncr.supplierId,
-    reason: 'REPEAT_FAILURES'
+    reason: "REPEAT_FAILURES",
   });
 }
 
@@ -161,6 +173,7 @@ if (capa.rpn > 200) {
 ```
 
 #### Files to Create
+
 ```
 /lib/engines/escalation.engine.ts
 /lib/engines/business-rules.engine.ts
@@ -175,12 +188,14 @@ if (capa.rpn > 200) {
 ## PRIORITY 2: COMPLIANCE REQUIREMENTS (Weeks 3-4)
 
 ### 2.1 Risk Management Module
+
 **Status**: 🔴 Not Started  
 **Priority**: HIGH (ISO 9001:2015 requirement)  
 **Effort**: 1.5 weeks  
 **Impact**: Required for certification
 
 #### Features to Build
+
 - [ ] Risk register
 - [ ] Risk assessment (S × O × D)
 - [ ] Risk categories:
@@ -196,6 +211,7 @@ if (capa.rpn > 200) {
 - [ ] Risk trend analysis
 
 #### Files to Create
+
 ```
 /app/dashboard/qc/risk/
   ├── page.tsx                    # Risk register list
@@ -209,6 +225,7 @@ if (capa.rpn > 200) {
 ```
 
 #### Database Schema
+
 ```prisma
 model RiskRegister {
   id              String   @id @default(cuid())
@@ -253,12 +270,14 @@ enum RiskStatus {
 ---
 
 ### 2.2 Audit Management Module
+
 **Status**: 🔴 Not Started  
 **Priority**: HIGH (All standards require it)  
 **Effort**: 2 weeks  
 **Impact**: 70% faster audit cycles
 
 #### Features to Build
+
 - [ ] Audit planning & scheduling
 - [ ] Audit types:
   - [ ] Internal audits
@@ -278,6 +297,7 @@ enum RiskStatus {
 - [ ] Audit follow-up workflow
 
 #### Files to Create
+
 ```
 /app/dashboard/qc/audits/
   ├── page.tsx                    # Audit list & calendar
@@ -297,6 +317,7 @@ enum RiskStatus {
 ```
 
 #### Database Schema
+
 ```prisma
 model Audit {
   id            String   @id @default(cuid())
@@ -363,12 +384,14 @@ enum FindingStatus {
 ---
 
 ### 2.3 Document Control Module
+
 **Status**: 🔴 Not Started  
 **Priority**: HIGH (FDA & ISO 13485 requirement)  
 **Effort**: 2 weeks  
 **Impact**: Essential for medical device/pharma
 
 #### Features to Build
+
 - [ ] Document repository
 - [ ] Version control
 - [ ] Approval workflow (multi-level)
@@ -392,6 +415,7 @@ enum FindingStatus {
 - [ ] Change control
 
 #### Files to Create
+
 ```
 /app/dashboard/qc/documents/
   ├── page.tsx                    # Document library
@@ -412,6 +436,7 @@ enum FindingStatus {
 ```
 
 #### Database Schema
+
 ```prisma
 model Document {
   id              String   @id @default(cuid())
@@ -482,12 +507,14 @@ enum DocumentStatus {
 ## PRIORITY 3: ENHANCEMENTS (Weeks 5-6)
 
 ### 3.1 FMEA Integration
+
 **Status**: 🔴 Not Started  
 **Priority**: MEDIUM  
 **Effort**: 1 week  
 **Impact**: Required for automotive (IATF 16949)
 
 #### Features to Build
+
 - [ ] Process FMEA
 - [ ] Design FMEA
 - [ ] FMEA templates
@@ -501,6 +528,7 @@ enum DocumentStatus {
 - [ ] Before/After RPN comparison
 
 #### Files to Create
+
 ```
 /app/dashboard/qc/fmea/
   ├── page.tsx                    # FMEA list
@@ -514,12 +542,14 @@ enum DocumentStatus {
 ---
 
 ### 3.2 Advanced Root Cause Analysis Tools
+
 **Status**: 🟡 Partial (5-Why documented)  
 **Priority**: MEDIUM  
 **Effort**: 1 week  
 **Impact**: Better problem solving
 
 #### Features to Build
+
 - [ ] Interactive 5-Why tool
 - [ ] Fishbone (Ishikawa) diagram builder
 - [ ] Fault Tree Analysis (FTA)
@@ -531,6 +561,7 @@ enum DocumentStatus {
 - [ ] Link to CAPA
 
 #### Files to Create
+
 ```
 /app/dashboard/qc/tools/
   ├── five-why/page.tsx           # 5-Why interactive
@@ -547,12 +578,14 @@ enum DocumentStatus {
 ---
 
 ### 3.3 Advanced Supplier Analytics
+
 **Status**: 🟡 Partial (Basic tracking exists)  
 **Priority**: MEDIUM  
 **Effort**: 1 week  
 **Impact**: Data-driven supplier decisions
 
 #### Features to Build
+
 - [ ] Supplier scorecard calculation engine
 - [ ] Multi-metric scoring:
   - [ ] NCR rate
@@ -569,6 +602,7 @@ enum DocumentStatus {
 - [ ] Supplier improvement plans
 
 #### Files to Create
+
 ```
 /app/dashboard/qc/suppliers/
   ├── page.tsx                    # Supplier list with scores
@@ -589,12 +623,14 @@ enum DocumentStatus {
 ## PRIORITY 4: ADVANCED FEATURES (Weeks 7-8)
 
 ### 4.1 Real-Time WMS Integration (Optional)
+
 **Status**: 🔴 Not Started  
 **Priority**: MEDIUM (if WMS exists)  
 **Effort**: 2 weeks  
 **Impact**: Zero manual stock adjustments
 
 #### Features to Build
+
 - [ ] Webhook system for WMS events
 - [ ] Auto-quarantine on quality hold
 - [ ] Auto-release on disposition
@@ -605,6 +641,7 @@ enum DocumentStatus {
 - [ ] Integration dashboard
 
 #### Files to Create
+
 ```
 /app/api/webhooks/
   ├── wms/route.ts                # WMS webhook receiver
@@ -618,12 +655,14 @@ enum DocumentStatus {
 ---
 
 ### 4.2 IoT Device Integration
+
 **Status**: 🔴 Not Started  
 **Priority**: LOW  
 **Effort**: 2 weeks  
 **Impact**: Automatic data collection
 
 #### Features to Build
+
 - [ ] Connect to digital scales
 - [ ] Connect to digital calipers
 - [ ] Connect to temperature sensors
@@ -636,12 +675,14 @@ enum DocumentStatus {
 ---
 
 ### 4.3 Mobile App (Native)
+
 **Status**: 🟢 Web mobile ready  
 **Priority**: LOW  
 **Effort**: 4 weeks  
 **Impact**: Better UX for inspectors
 
 #### Features to Build
+
 - [ ] React Native or Flutter app
 - [ ] Offline mode
 - [ ] Camera integration
@@ -655,12 +696,14 @@ enum DocumentStatus {
 ## PRIORITY 5: AI/ML FEATURES (Weeks 9-10+)
 
 ### 5.1 AI-Powered Features
+
 **Status**: 🔴 Not Started  
 **Priority**: LOW (Future)  
 **Effort**: 4+ weeks  
 **Impact**: Automation & prediction
 
 #### Features to Build
+
 - [ ] AI-generated 5-Why analysis
 - [ ] AI-suggested corrective actions
 - [ ] Predictive NCR (which suppliers will fail)
@@ -671,6 +714,7 @@ enum DocumentStatus {
 - [ ] Quality cost prediction
 
 #### Technology Stack
+
 - OpenAI GPT-4 or similar
 - TensorFlow for ML models
 - Python microservice for ML processing
@@ -680,6 +724,7 @@ enum DocumentStatus {
 ## TECHNICAL DEBT & IMPROVEMENTS
 
 ### System Architecture Enhancements
+
 - [ ] Add Redis caching layer
 - [ ] Implement message queue (BullMQ)
 - [ ] Add webhook system
@@ -690,6 +735,7 @@ enum DocumentStatus {
 - [ ] Implement search with Elasticsearch
 
 ### Testing & Quality
+
 - [ ] Unit tests (Jest)
 - [ ] Integration tests
 - [ ] E2E tests (Playwright)
@@ -698,6 +744,7 @@ enum DocumentStatus {
 - [ ] Accessibility (WCAG 2.1)
 
 ### DevOps
+
 - [ ] CI/CD pipeline
 - [ ] Docker containers
 - [ ] Kubernetes deployment
@@ -710,15 +757,17 @@ enum DocumentStatus {
 ## SUMMARY
 
 ### Completion Metrics
-| Priority | Features | Estimated Effort | Business Value |
-|----------|----------|------------------|----------------|
-| P1 - Critical | 3 modules | 2 weeks | ⭐⭐⭐⭐⭐ |
-| P2 - Compliance | 3 modules | 4 weeks | ⭐⭐⭐⭐⭐ |
-| P3 - Enhancement | 3 modules | 3 weeks | ⭐⭐⭐⭐ |
-| P4 - Advanced | 2 modules | 4 weeks | ⭐⭐⭐ |
-| P5 - AI/ML | 1 module | 4+ weeks | ⭐⭐⭐ |
+
+| Priority         | Features  | Estimated Effort | Business Value |
+| ---------------- | --------- | ---------------- | -------------- |
+| P1 - Critical    | 3 modules | 2 weeks          | ⭐⭐⭐⭐⭐     |
+| P2 - Compliance  | 3 modules | 4 weeks          | ⭐⭐⭐⭐⭐     |
+| P3 - Enhancement | 3 modules | 3 weeks          | ⭐⭐⭐⭐       |
+| P4 - Advanced    | 2 modules | 4 weeks          | ⭐⭐⭐         |
+| P5 - AI/ML       | 1 module  | 4+ weeks         | ⭐⭐⭐         |
 
 ### Timeline
+
 - **Week 1-2**: SPC Charts, Supplier Portal, Auto-Escalation
 - **Week 3-4**: Risk Management, Audit Management
 - **Week 5-6**: Document Control, FMEA
@@ -726,6 +775,7 @@ enum DocumentStatus {
 - **Week 9-10+**: AI Features (optional)
 
 ### Resource Requirements
+
 - **Developers**: 2-3 full-stack
 - **QA Engineer**: 1
 - **DevOps**: 1 (part-time)

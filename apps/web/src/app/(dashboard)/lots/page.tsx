@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Package, 
-  Search, 
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Package,
+  Search,
   AlertTriangle,
   CheckCircle2,
   Clock,
   Barcode,
-  TrendingUp
-} from 'lucide-react';
+  TrendingUp,
+} from "lucide-react";
 
 interface LotTracking {
   id: string;
@@ -24,7 +24,7 @@ interface LotTracking {
   quantity: number;
   manufacturingDate: string;
   expiryDate: string;
-  status: 'ACTIVE' | 'QUARANTINE' | 'EXPIRED' | 'RECALLED';
+  status: "ACTIVE" | "QUARANTINE" | "EXPIRED" | "RECALLED";
   warehouseId: string;
   warehouseName: string;
   locationZone: string;
@@ -34,9 +34,9 @@ interface LotTracking {
 
 export default function LotTrackingPage() {
   const [lots, setLots] = useState<LotTracking[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('ALL');
-  const [expiryFilter, setExpiryFilter] = useState<string>('ALL');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [expiryFilter, setExpiryFilter] = useState<string>("ALL");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -47,23 +47,24 @@ export default function LotTrackingPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (statusFilter !== 'ALL') params.append('status', statusFilter);
-      if (expiryFilter !== 'ALL') params.append('expiry', expiryFilter);
+      if (statusFilter !== "ALL") params.append("status", statusFilter);
+      if (expiryFilter !== "ALL") params.append("expiry", expiryFilter);
 
       const response = await fetch(`/api/lots?${params}`);
       const data = await response.json();
-      
+
       // Calculate days until expiry
       const lotsWithExpiry = (data.lots || []).map((lot: any) => ({
         ...lot,
         daysUntilExpiry: Math.floor(
-          (new Date(lot.expiryDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)
-        )
+          (new Date(lot.expiryDate).getTime() - new Date().getTime()) /
+            (1000 * 60 * 60 * 24),
+        ),
       }));
-      
+
       setLots(lotsWithExpiry);
     } catch (error) {
-      console.error('Error fetching lots:', error);
+      console.error("Error fetching lots:", error);
     } finally {
       setLoading(false);
     }
@@ -72,77 +73,93 @@ export default function LotTrackingPage() {
   const quarantineLot = async (lotId: string) => {
     try {
       const response = await fetch(`/api/lots/${lotId}/quarantine`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'Manual quarantine' })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "Manual quarantine" }),
       });
 
       if (response.ok) {
         fetchLots();
       }
     } catch (error) {
-      console.error('Error quarantining lot:', error);
+      console.error("Error quarantining lot:", error);
     }
   };
 
   const recallLot = async (lotId: string) => {
-    if (!confirm('Are you sure you want to recall this lot? This action cannot be undone.')) {
+    if (
+      !confirm(
+        "Are you sure you want to recall this lot? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
     try {
       const response = await fetch(`/api/lots/${lotId}/recall`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: 'Product recall' })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: "Product recall" }),
       });
 
       if (response.ok) {
-        alert('Lot recalled successfully. All orders with this lot have been flagged.');
+        alert(
+          "Lot recalled successfully. All orders with this lot have been flagged.",
+        );
         fetchLots();
       }
     } catch (error) {
-      console.error('Error recalling lot:', error);
+      console.error("Error recalling lot:", error);
     }
   };
 
-  const filteredLots = lots.filter(lot => {
-    const matchesSearch = 
+  const filteredLots = lots.filter((lot) => {
+    const matchesSearch =
       lot.lotNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lot.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       lot.sku.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesSearch;
   });
 
   const getStatusBadge = (status: string) => {
     const styles = {
-      ACTIVE: 'bg-green-100 text-green-800',
-      QUARANTINE: 'bg-yellow-100 text-yellow-800',
-      EXPIRED: 'bg-red-100 text-red-800',
-      RECALLED: 'bg-red-100 text-red-800'
+      ACTIVE: "bg-green-100 text-green-800",
+      QUARANTINE: "bg-yellow-100 text-yellow-800",
+      EXPIRED: "bg-red-100 text-red-800",
+      RECALLED: "bg-red-100 text-red-800",
     };
     return styles[status as keyof typeof styles] || styles.ACTIVE;
   };
 
   const getExpiryBadge = (days: number) => {
     if (days < 0) {
-      return { icon: AlertTriangle, color: 'text-red-600', text: 'EXPIRED' };
+      return { icon: AlertTriangle, color: "text-red-600", text: "EXPIRED" };
     } else if (days <= 30) {
-      return { icon: AlertTriangle, color: 'text-orange-600', text: `${days} days` };
+      return {
+        icon: AlertTriangle,
+        color: "text-orange-600",
+        text: `${days} days`,
+      };
     } else if (days <= 90) {
-      return { icon: Clock, color: 'text-yellow-600', text: `${days} days` };
+      return { icon: Clock, color: "text-yellow-600", text: `${days} days` };
     }
-    return { icon: CheckCircle2, color: 'text-green-600', text: `${days} days` };
+    return {
+      icon: CheckCircle2,
+      color: "text-green-600",
+      text: `${days} days`,
+    };
   };
 
   // Calculate statistics
   const stats = {
     total: lots.length,
-    active: lots.filter(l => l.status === 'ACTIVE').length,
-    expiringSoon: lots.filter(l => l.daysUntilExpiry > 0 && l.daysUntilExpiry <= 30).length,
-    expired: lots.filter(l => l.daysUntilExpiry < 0).length,
-    quarantine: lots.filter(l => l.status === 'QUARANTINE').length
+    active: lots.filter((l) => l.status === "ACTIVE").length,
+    expiringSoon: lots.filter(
+      (l) => l.daysUntilExpiry > 0 && l.daysUntilExpiry <= 30,
+    ).length,
+    expired: lots.filter((l) => l.daysUntilExpiry < 0).length,
+    quarantine: lots.filter((l) => l.status === "QUARANTINE").length,
   };
 
   return (
@@ -171,7 +188,9 @@ export default function LotTrackingPage() {
             <CardTitle className="text-sm font-medium">Active</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.active}
+            </div>
           </CardContent>
         </Card>
 
@@ -180,10 +199,10 @@ export default function LotTrackingPage() {
             <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.expiringSoon}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Within 30 days
-            </p>
+            <div className="text-2xl font-bold text-orange-600">
+              {stats.expiringSoon}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">Within 30 days</p>
           </CardContent>
         </Card>
 
@@ -192,7 +211,9 @@ export default function LotTrackingPage() {
             <CardTitle className="text-sm font-medium">Expired</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.expired}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.expired}
+            </div>
           </CardContent>
         </Card>
 
@@ -201,7 +222,9 @@ export default function LotTrackingPage() {
             <CardTitle className="text-sm font-medium">Quarantined</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.quarantine}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {stats.quarantine}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -281,7 +304,7 @@ export default function LotTrackingPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredLots.map(lot => {
+                  {filteredLots.map((lot) => {
                     const expiryBadge = getExpiryBadge(lot.daysUntilExpiry);
                     const ExpiryIcon = expiryBadge.icon;
 
@@ -308,7 +331,9 @@ export default function LotTrackingPage() {
                         </td>
                         <td className="p-4">
                           <div>
-                            <div className="font-medium">{lot.warehouseName}</div>
+                            <div className="font-medium">
+                              {lot.warehouseName}
+                            </div>
                             <div className="text-sm text-muted-foreground">
                               Zone: {lot.locationZone}
                             </div>
@@ -316,12 +341,16 @@ export default function LotTrackingPage() {
                         </td>
                         <td className="p-4">
                           <div className="text-sm">
-                            {new Date(lot.manufacturingDate).toLocaleDateString()}
+                            {new Date(
+                              lot.manufacturingDate,
+                            ).toLocaleDateString()}
                           </div>
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            <ExpiryIcon className={`h-4 w-4 ${expiryBadge.color}`} />
+                            <ExpiryIcon
+                              className={`h-4 w-4 ${expiryBadge.color}`}
+                            />
                             <div>
                               <div className="text-sm font-medium">
                                 {new Date(lot.expiryDate).toLocaleDateString()}
@@ -339,7 +368,7 @@ export default function LotTrackingPage() {
                         </td>
                         <td className="p-4">
                           <div className="flex gap-2">
-                            {lot.status === 'ACTIVE' && (
+                            {lot.status === "ACTIVE" && (
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -348,7 +377,8 @@ export default function LotTrackingPage() {
                                 Quarantine
                               </Button>
                             )}
-                            {(lot.status === 'ACTIVE' || lot.status === 'QUARANTINE') && (
+                            {(lot.status === "ACTIVE" ||
+                              lot.status === "QUARANTINE") && (
                               <Button
                                 size="sm"
                                 variant="destructive"
@@ -381,9 +411,11 @@ export default function LotTrackingPage() {
           <CardContent>
             <div className="space-y-3">
               {filteredLots
-                .filter(lot => lot.daysUntilExpiry > 0 && lot.daysUntilExpiry <= 30)
+                .filter(
+                  (lot) => lot.daysUntilExpiry > 0 && lot.daysUntilExpiry <= 30,
+                )
                 .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry)
-                .map(lot => (
+                .map((lot) => (
                   <div
                     key={lot.id}
                     className="flex items-center justify-between p-3 rounded-lg border bg-card"

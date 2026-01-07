@@ -3,25 +3,31 @@
  * Comprehensive UI for time tracking, productivity monitoring, and labor cost analysis
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Users, 
-  Clock, 
-  TrendingUp, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Users,
+  Clock,
+  TrendingUp,
   DollarSign,
   Activity,
   CheckCircle,
   AlertCircle,
   CalendarDays,
   Timer,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -29,8 +35,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Progress } from '@/components/ui/progress';
+} from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
 
 interface TimeEntry {
   id: string;
@@ -41,7 +47,7 @@ interface TimeEntry {
   hoursWorked: number;
   regularHours: number;
   overtimeHours: number;
-  status: 'CLOCKED_IN' | 'CLOCKED_OUT' | 'BREAK';
+  status: "CLOCKED_IN" | "CLOCKED_OUT" | "BREAK";
   shift: string;
   department: string;
 }
@@ -67,7 +73,7 @@ interface EmployeePerformance {
   productivity: number;
   efficiency: number;
   attendance: number;
-  status: 'ACTIVE' | 'IDLE' | 'BREAK' | 'OFFLINE';
+  status: "ACTIVE" | "IDLE" | "BREAK" | "OFFLINE";
 }
 
 interface LaborStats {
@@ -99,7 +105,7 @@ export default function LaborManagementDashboard() {
   const [stats, setStats] = useState<LaborStats | null>(null);
   const [costBreakdown, setCostBreakdown] = useState<LaborCostBreakdown[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     loadDashboardData();
@@ -111,34 +117,43 @@ export default function LaborManagementDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load time entries
-      const entriesResponse = await fetch('/api/labor-management?action=time-entries');
+      const entriesResponse = await fetch(
+        "/api/labor-management?action=time-entries",
+      );
       const entriesData = await entriesResponse.json();
       setTimeEntries(entriesData.entries || []);
 
       // Load statistics
-      const statsResponse = await fetch('/api/labor-management?action=statistics');
+      const statsResponse = await fetch(
+        "/api/labor-management?action=statistics",
+      );
       const statsData = await statsResponse.json();
       setStats(statsData);
 
       // Load activities
-      const activitiesResponse = await fetch('/api/labor-management?action=activities');
+      const activitiesResponse = await fetch(
+        "/api/labor-management?action=activities",
+      );
       const activitiesData = await activitiesResponse.json();
       setActivities(activitiesData.activities || []);
 
       // Load productivity
-      const productivityResponse = await fetch('/api/labor-management?action=productivity');
+      const productivityResponse = await fetch(
+        "/api/labor-management?action=productivity",
+      );
       const productivityData = await productivityResponse.json();
       setEmployees(productivityData.employees || []);
 
       // Load labor cost
-      const costResponse = await fetch('/api/labor-management?action=labor-cost');
+      const costResponse = await fetch(
+        "/api/labor-management?action=labor-cost",
+      );
       const costData = await costResponse.json();
       setCostBreakdown(costData.breakdown || []);
-
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -146,82 +161,87 @@ export default function LaborManagementDashboard() {
 
   const clockIn = async (employeeId: string) => {
     try {
-      const response = await fetch('/api/labor-management', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/labor-management", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'clock-in',
+          action: "clock-in",
           employeeId,
-          warehouseId: 'default-warehouse'
-        })
+          warehouseId: "default-warehouse",
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to clock in:', error);
+      console.error("Failed to clock in:", error);
     }
   };
 
   const clockOut = async (employeeId: string) => {
     try {
-      const response = await fetch('/api/labor-management', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/labor-management", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'clock-out',
-          employeeId
-        })
+          action: "clock-out",
+          employeeId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to clock out:', error);
+      console.error("Failed to clock out:", error);
     }
   };
 
-  const recordActivity = async (employeeId: string, activity: string, units: number) => {
+  const recordActivity = async (
+    employeeId: string,
+    activity: string,
+    units: number,
+  ) => {
     try {
-      const response = await fetch('/api/labor-management', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/labor-management", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'record-activity',
+          action: "record-activity",
           employeeId,
           activityType: activity,
           unitsProcessed: units,
-          duration: 60 // minutes
-        })
+          duration: 60, // minutes
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to record activity:', error);
+      console.error("Failed to record activity:", error);
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      ACTIVE: { variant: 'success' as const, icon: CheckCircle },
-      CLOCKED_IN: { variant: 'success' as const, icon: CheckCircle },
-      IDLE: { variant: 'warning' as const, icon: Clock },
-      BREAK: { variant: 'warning' as const, icon: Timer },
-      CLOCKED_OUT: { variant: 'secondary' as const, icon: AlertCircle },
-      OFFLINE: { variant: 'destructive' as const, icon: AlertCircle },
+      ACTIVE: { variant: "success" as const, icon: CheckCircle },
+      CLOCKED_IN: { variant: "success" as const, icon: CheckCircle },
+      IDLE: { variant: "warning" as const, icon: Clock },
+      BREAK: { variant: "warning" as const, icon: Timer },
+      CLOCKED_OUT: { variant: "secondary" as const, icon: AlertCircle },
+      OFFLINE: { variant: "destructive" as const, icon: AlertCircle },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.OFFLINE;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.OFFLINE;
     const Icon = config.icon;
 
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
-        {status.replace('_', ' ')}
+        {status.replace("_", " ")}
       </Badge>
     );
   };
@@ -276,7 +296,9 @@ export default function LaborManagementDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Productivity</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Productivity
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -293,7 +315,9 @@ export default function LaborManagementDashboard() {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.utilizationRate.toFixed(1)}%</div>
+              <div className="text-2xl font-bold">
+                {stats.utilizationRate.toFixed(1)}%
+              </div>
               <p className="text-xs text-muted-foreground">
                 Overall utilization
               </p>
@@ -306,7 +330,9 @@ export default function LaborManagementDashboard() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.totalLaborCost.toFixed(0)}</div>
+              <div className="text-2xl font-bold">
+                ${stats.totalLaborCost.toFixed(0)}
+              </div>
               <p className="text-xs text-muted-foreground">
                 ${stats.avgLaborCost.toFixed(2)}/employee
               </p>
@@ -319,10 +345,10 @@ export default function LaborManagementDashboard() {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.overtimeHours.toFixed(1)}</div>
-              <p className="text-xs text-muted-foreground">
-                hours today
-              </p>
+              <div className="text-2xl font-bold">
+                {stats.overtimeHours.toFixed(1)}
+              </div>
+              <p className="text-xs text-muted-foreground">hours today</p>
             </CardContent>
           </Card>
         </div>
@@ -357,14 +383,19 @@ export default function LaborManagementDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {timeEntries.filter(e => e.status === 'CLOCKED_IN').slice(0, 5).map((entry) => (
-                      <TableRow key={entry.id}>
-                        <TableCell className="font-medium">{entry.employeeName}</TableCell>
-                        <TableCell>{entry.department}</TableCell>
-                        <TableCell>{entry.hoursWorked.toFixed(1)}h</TableCell>
-                        <TableCell>{getStatusBadge(entry.status)}</TableCell>
-                      </TableRow>
-                    ))}
+                    {timeEntries
+                      .filter((e) => e.status === "CLOCKED_IN")
+                      .slice(0, 5)
+                      .map((entry) => (
+                        <TableRow key={entry.id}>
+                          <TableCell className="font-medium">
+                            {entry.employeeName}
+                          </TableCell>
+                          <TableCell>{entry.department}</TableCell>
+                          <TableCell>{entry.hoursWorked.toFixed(1)}h</TableCell>
+                          <TableCell>{getStatusBadge(entry.status)}</TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -386,16 +417,26 @@ export default function LaborManagementDashboard() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {employees.sort((a, b) => b.productivity - a.productivity).slice(0, 5).map((emp) => (
-                      <TableRow key={emp.employeeId}>
-                        <TableCell className="font-medium">{emp.employeeName}</TableCell>
-                        <TableCell>{emp.unitsProcessed}</TableCell>
-                        <TableCell className="font-bold">{emp.productivity.toFixed(0)}</TableCell>
-                        <TableCell>
-                          <Progress value={emp.efficiency} className="h-2 w-16" />
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {employees
+                      .sort((a, b) => b.productivity - a.productivity)
+                      .slice(0, 5)
+                      .map((emp) => (
+                        <TableRow key={emp.employeeId}>
+                          <TableCell className="font-medium">
+                            {emp.employeeName}
+                          </TableCell>
+                          <TableCell>{emp.unitsProcessed}</TableCell>
+                          <TableCell className="font-bold">
+                            {emp.productivity.toFixed(0)}
+                          </TableCell>
+                          <TableCell>
+                            <Progress
+                              value={emp.efficiency}
+                              className="h-2 w-16"
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
                   </TableBody>
                 </Table>
               </CardContent>
@@ -427,19 +468,28 @@ export default function LaborManagementDashboard() {
                 <TableBody>
                   {timeEntries.map((entry) => (
                     <TableRow key={entry.id}>
-                      <TableCell className="font-medium">{entry.employeeName}</TableCell>
+                      <TableCell className="font-medium">
+                        {entry.employeeName}
+                      </TableCell>
                       <TableCell>{entry.department}</TableCell>
                       <TableCell>{entry.shift}</TableCell>
-                      <TableCell>{new Date(entry.clockIn).toLocaleTimeString()}</TableCell>
                       <TableCell>
-                        {entry.clockOut ? new Date(entry.clockOut).toLocaleTimeString() : '-'}
+                        {new Date(entry.clockIn).toLocaleTimeString()}
+                      </TableCell>
+                      <TableCell>
+                        {entry.clockOut
+                          ? new Date(entry.clockOut).toLocaleTimeString()
+                          : "-"}
                       </TableCell>
                       <TableCell>{entry.regularHours.toFixed(1)}h</TableCell>
                       <TableCell>{entry.overtimeHours.toFixed(1)}h</TableCell>
                       <TableCell>{getStatusBadge(entry.status)}</TableCell>
                       <TableCell>
-                        {entry.status === 'CLOCKED_IN' && (
-                          <Button size="sm" onClick={() => clockOut(entry.employeeId)}>
+                        {entry.status === "CLOCKED_IN" && (
+                          <Button
+                            size="sm"
+                            onClick={() => clockOut(entry.employeeId)}
+                          >
                             Clock Out
                           </Button>
                         )}
@@ -456,7 +506,9 @@ export default function LaborManagementDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Employee Productivity</CardTitle>
-              <CardDescription>Performance metrics and efficiency</CardDescription>
+              <CardDescription>
+                Performance metrics and efficiency
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -475,7 +527,9 @@ export default function LaborManagementDashboard() {
                 <TableBody>
                   {employees.map((emp) => (
                     <TableRow key={emp.employeeId}>
-                      <TableCell className="font-medium">{emp.employeeName}</TableCell>
+                      <TableCell className="font-medium">
+                        {emp.employeeName}
+                      </TableCell>
                       <TableCell>{emp.department}</TableCell>
                       <TableCell>{getStatusBadge(emp.status)}</TableCell>
                       <TableCell>{emp.hoursToday.toFixed(1)}h</TableCell>
@@ -485,14 +539,24 @@ export default function LaborManagementDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={emp.efficiency} className="h-2 w-16" />
-                          <span className="text-sm">{emp.efficiency.toFixed(0)}%</span>
+                          <Progress
+                            value={emp.efficiency}
+                            className="h-2 w-16"
+                          />
+                          <span className="text-sm">
+                            {emp.efficiency.toFixed(0)}%
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={emp.attendance} className="h-2 w-16" />
-                          <span className="text-sm">{emp.attendance.toFixed(0)}%</span>
+                          <Progress
+                            value={emp.attendance}
+                            className="h-2 w-16"
+                          />
+                          <span className="text-sm">
+                            {emp.attendance.toFixed(0)}%
+                          </span>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -525,7 +589,9 @@ export default function LaborManagementDashboard() {
                 <TableBody>
                   {activities.map((activity) => (
                     <TableRow key={activity.id}>
-                      <TableCell className="font-medium">{activity.employeeName}</TableCell>
+                      <TableCell className="font-medium">
+                        {activity.employeeName}
+                      </TableCell>
                       <TableCell>{activity.activity}</TableCell>
                       <TableCell>{activity.zone}</TableCell>
                       <TableCell>{formatDuration(activity.duration)}</TableCell>
@@ -548,7 +614,9 @@ export default function LaborManagementDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Labor Cost Breakdown</CardTitle>
-              <CardDescription>Department-wise labor cost analysis</CardDescription>
+              <CardDescription>
+                Department-wise labor cost analysis
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -565,7 +633,9 @@ export default function LaborManagementDashboard() {
                 <TableBody>
                   {costBreakdown.map((dept, index) => (
                     <TableRow key={index}>
-                      <TableCell className="font-medium">{dept.department}</TableCell>
+                      <TableCell className="font-medium">
+                        {dept.department}
+                      </TableCell>
                       <TableCell>{dept.employees}</TableCell>
                       <TableCell>{dept.hours.toFixed(1)}h</TableCell>
                       <TableCell>${dept.regularCost.toFixed(2)}</TableCell>
@@ -581,16 +651,28 @@ export default function LaborManagementDashboard() {
                       {costBreakdown.reduce((sum, d) => sum + d.employees, 0)}
                     </TableCell>
                     <TableCell>
-                      {costBreakdown.reduce((sum, d) => sum + d.hours, 0).toFixed(1)}h
+                      {costBreakdown
+                        .reduce((sum, d) => sum + d.hours, 0)
+                        .toFixed(1)}
+                      h
                     </TableCell>
                     <TableCell>
-                      ${costBreakdown.reduce((sum, d) => sum + d.regularCost, 0).toFixed(2)}
+                      $
+                      {costBreakdown
+                        .reduce((sum, d) => sum + d.regularCost, 0)
+                        .toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      ${costBreakdown.reduce((sum, d) => sum + d.overtimeCost, 0).toFixed(2)}
+                      $
+                      {costBreakdown
+                        .reduce((sum, d) => sum + d.overtimeCost, 0)
+                        .toFixed(2)}
                     </TableCell>
                     <TableCell>
-                      ${costBreakdown.reduce((sum, d) => sum + d.totalCost, 0).toFixed(2)}
+                      $
+                      {costBreakdown
+                        .reduce((sum, d) => sum + d.totalCost, 0)
+                        .toFixed(2)}
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -607,10 +689,15 @@ export default function LaborManagementDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-center py-8">
-                <div className="text-4xl font-bold">{stats?.attendanceRate.toFixed(1)}%</div>
-                <p className="text-sm text-muted-foreground">Overall attendance rate</p>
+                <div className="text-4xl font-bold">
+                  {stats?.attendanceRate.toFixed(1)}%
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Overall attendance rate
+                </p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  {stats?.clockedIn} of {stats?.totalEmployees} employees present
+                  {stats?.clockedIn} of {stats?.totalEmployees} employees
+                  present
                 </p>
               </div>
             </CardContent>

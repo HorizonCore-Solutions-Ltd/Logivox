@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -18,14 +18,14 @@ const qcSchema = z.object({
       hasDefects: z.boolean().default(false),
       defectDescription: z.string().optional(),
       qcNotes: z.string().optional(),
-    })
+    }),
   ),
 });
 
 // POST /api/grn/[id]/quality-check - Perform quality check
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -35,7 +35,10 @@ export async function POST(
 
     const organizationId = session.user.organizations[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const body = await request.json();
@@ -60,7 +63,7 @@ export async function POST(
     if (!["PENDING", "QUALITY_CHECK"].includes(grn.status)) {
       return NextResponse.json(
         { error: "GRN must be in PENDING or QUALITY_CHECK status for QC" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -147,13 +150,13 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error performing quality check:", error);
     return NextResponse.json(
       { error: "Failed to perform quality check" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

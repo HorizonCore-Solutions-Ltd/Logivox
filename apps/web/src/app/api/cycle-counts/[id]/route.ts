@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -6,7 +6,10 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const updateCycleCountSchema = z.object({
-  scheduledDate: z.string().transform((val) => new Date(val)).optional(),
+  scheduledDate: z
+    .string()
+    .transform((val) => new Date(val))
+    .optional(),
   assignedToId: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -14,7 +17,7 @@ const updateCycleCountSchema = z.object({
 // GET /api/cycle-counts/[id] - Get cycle count details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -29,7 +32,7 @@ export async function GET(
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -92,7 +95,7 @@ export async function GET(
     if (!cycleCount) {
       return NextResponse.json(
         { error: "Cycle count not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -101,7 +104,7 @@ export async function GET(
     console.error("Error fetching cycle count:", error);
     return NextResponse.json(
       { error: "Failed to fetch cycle count" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -109,7 +112,7 @@ export async function GET(
 // PUT /api/cycle-counts/[id] - Update cycle count
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -124,7 +127,7 @@ export async function PUT(
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -138,7 +141,7 @@ export async function PUT(
     if (!cycleCount) {
       return NextResponse.json(
         { error: "Cycle count not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -146,7 +149,7 @@ export async function PUT(
     if (["COMPLETED", "APPROVED"].includes(cycleCount.status)) {
       return NextResponse.json(
         { error: "Cannot update completed or approved cycle count" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -188,14 +191,14 @@ export async function PUT(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error updating cycle count:", error);
     return NextResponse.json(
       { error: "Failed to update cycle count" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -203,7 +206,7 @@ export async function PUT(
 // DELETE /api/cycle-counts/[id] - Delete cycle count
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -222,7 +225,7 @@ export async function DELETE(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -236,7 +239,7 @@ export async function DELETE(
     if (!cycleCount) {
       return NextResponse.json(
         { error: "Cycle count not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -244,7 +247,7 @@ export async function DELETE(
     if (cycleCount.status !== "PLANNED") {
       return NextResponse.json(
         { error: "Can only delete planned cycle counts" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -271,7 +274,7 @@ export async function DELETE(
     console.error("Error deleting cycle count:", error);
     return NextResponse.json(
       { error: "Failed to delete cycle count" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

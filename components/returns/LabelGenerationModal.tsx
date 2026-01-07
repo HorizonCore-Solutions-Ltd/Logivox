@@ -1,14 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Package, Printer, Download, QrCode, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Package, Printer, Download, QrCode, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface LabelGenerationModalProps {
   open: boolean;
@@ -24,45 +36,45 @@ export default function LabelGenerationModal({
   rmaNumber,
 }: LabelGenerationModalProps) {
   const [loading, setLoading] = useState(false);
-  const [carrier, setCarrier] = useState('UPS');
-  const [serviceLevel, setServiceLevel] = useState('GROUND');
+  const [carrier, setCarrier] = useState("UPS");
+  const [serviceLevel, setServiceLevel] = useState("GROUND");
   const [label, setLabel] = useState<any>(null);
 
   const [shipFrom, setShipFrom] = useState({
-    name: '',
-    address1: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'US',
+    name: "",
+    address1: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "US",
   });
 
   const [shipTo, setShipTo] = useState({
-    name: '',
-    address1: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'US',
+    name: "",
+    address1: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "US",
   });
 
   const [packageInfo, setPackageInfo] = useState({
     weight: 5,
-    weightUnit: 'lb',
+    weightUnit: "lb",
   });
 
   const handleGenerate = async () => {
     try {
       setLoading(true);
 
-      const response = await fetch('/api/returns/labels', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/returns/labels", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           rmaId,
           carrier,
           serviceLevel,
-          type: 'PREPAID',
+          type: "PREPAID",
           shipFrom,
           shipTo,
           package: packageInfo,
@@ -71,15 +83,17 @@ export default function LabelGenerationModal({
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || 'Failed to generate label');
+        throw new Error(error.error || "Failed to generate label");
       }
 
       const data = await response.json();
       setLabel(data.label);
-      toast.success('Label generated successfully!');
+      toast.success("Label generated successfully!");
     } catch (error) {
-      console.error('Error generating label:', error);
-      toast.error(error instanceof Error ? error.message : 'Failed to generate label');
+      console.error("Error generating label:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to generate label",
+      );
     } finally {
       setLoading(false);
     }
@@ -87,13 +101,13 @@ export default function LabelGenerationModal({
 
   const handlePrint = () => {
     if (label?.labelUrl) {
-      window.open(label.labelUrl, '_blank');
+      window.open(label.labelUrl, "_blank");
     }
   };
 
   const handleDownload = () => {
     if (label?.labelUrl) {
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = label.labelUrl;
       link.download = `${rmaNumber}-label.pdf`;
       link.click();
@@ -153,28 +167,38 @@ export default function LabelGenerationModal({
                 <Input
                   placeholder="Company Name"
                   value={shipFrom.name}
-                  onChange={(e) => setShipFrom({ ...shipFrom, name: e.target.value })}
+                  onChange={(e) =>
+                    setShipFrom({ ...shipFrom, name: e.target.value })
+                  }
                 />
                 <Input
                   placeholder="Address"
                   value={shipFrom.address1}
-                  onChange={(e) => setShipFrom({ ...shipFrom, address1: e.target.value })}
+                  onChange={(e) =>
+                    setShipFrom({ ...shipFrom, address1: e.target.value })
+                  }
                 />
                 <div className="grid grid-cols-3 gap-2">
                   <Input
                     placeholder="City"
                     value={shipFrom.city}
-                    onChange={(e) => setShipFrom({ ...shipFrom, city: e.target.value })}
+                    onChange={(e) =>
+                      setShipFrom({ ...shipFrom, city: e.target.value })
+                    }
                   />
                   <Input
                     placeholder="State"
                     value={shipFrom.state}
-                    onChange={(e) => setShipFrom({ ...shipFrom, state: e.target.value })}
+                    onChange={(e) =>
+                      setShipFrom({ ...shipFrom, state: e.target.value })
+                    }
                   />
                   <Input
                     placeholder="ZIP"
                     value={shipFrom.postalCode}
-                    onChange={(e) => setShipFrom({ ...shipFrom, postalCode: e.target.value })}
+                    onChange={(e) =>
+                      setShipFrom({ ...shipFrom, postalCode: e.target.value })
+                    }
                   />
                 </div>
               </CardContent>
@@ -189,28 +213,38 @@ export default function LabelGenerationModal({
                 <Input
                   placeholder="Customer Name"
                   value={shipTo.name}
-                  onChange={(e) => setShipTo({ ...shipTo, name: e.target.value })}
+                  onChange={(e) =>
+                    setShipTo({ ...shipTo, name: e.target.value })
+                  }
                 />
                 <Input
                   placeholder="Address"
                   value={shipTo.address1}
-                  onChange={(e) => setShipTo({ ...shipTo, address1: e.target.value })}
+                  onChange={(e) =>
+                    setShipTo({ ...shipTo, address1: e.target.value })
+                  }
                 />
                 <div className="grid grid-cols-3 gap-2">
                   <Input
                     placeholder="City"
                     value={shipTo.city}
-                    onChange={(e) => setShipTo({ ...shipTo, city: e.target.value })}
+                    onChange={(e) =>
+                      setShipTo({ ...shipTo, city: e.target.value })
+                    }
                   />
                   <Input
                     placeholder="State"
                     value={shipTo.state}
-                    onChange={(e) => setShipTo({ ...shipTo, state: e.target.value })}
+                    onChange={(e) =>
+                      setShipTo({ ...shipTo, state: e.target.value })
+                    }
                   />
                   <Input
                     placeholder="ZIP"
                     value={shipTo.postalCode}
-                    onChange={(e) => setShipTo({ ...shipTo, postalCode: e.target.value })}
+                    onChange={(e) =>
+                      setShipTo({ ...shipTo, postalCode: e.target.value })
+                    }
                   />
                 </div>
               </CardContent>
@@ -224,7 +258,10 @@ export default function LabelGenerationModal({
                   type="number"
                   value={packageInfo.weight}
                   onChange={(e) =>
-                    setPackageInfo({ ...packageInfo, weight: parseFloat(e.target.value) })
+                    setPackageInfo({
+                      ...packageInfo,
+                      weight: parseFloat(e.target.value),
+                    })
                   }
                 />
               </div>
@@ -259,7 +296,8 @@ export default function LabelGenerationModal({
                   <div>
                     <div className="text-muted-foreground">Cost</div>
                     <div className="font-medium">
-                      ${label.cost?.amount || '0.00'} {label.cost?.currency || 'USD'}
+                      ${label.cost?.amount || "0.00"}{" "}
+                      {label.cost?.currency || "USD"}
                     </div>
                   </div>
                   <div>
@@ -285,7 +323,11 @@ export default function LabelGenerationModal({
                 <Printer className="w-4 h-4 mr-2" />
                 Print Label
               </Button>
-              <Button onClick={handleDownload} variant="outline" className="flex-1">
+              <Button
+                onClick={handleDownload}
+                variant="outline"
+                className="flex-1"
+              >
                 <Download className="w-4 h-4 mr-2" />
                 Download PDF
               </Button>

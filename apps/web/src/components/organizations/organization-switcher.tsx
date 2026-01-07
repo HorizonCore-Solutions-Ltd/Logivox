@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Check, ChevronsUpDown, Plus, Building2 } from "lucide-react"
-import { useQuery } from "@tanstack/react-query"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { Check, ChevronsUpDown, Plus, Building2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -13,44 +13,44 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from "@/components/ui/command"
+} from "@/components/ui/command";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 interface Organization {
-  id: string
-  name: string
+  id: string;
+  name: string;
   _count?: {
-    members: number
-    inventoryItems: number
-    bookings: number
-  }
+    members: number;
+    inventoryItems: number;
+    bookings: number;
+  };
 }
 
 interface OrganizationSwitcherProps {
-  currentOrgId: string
-  onSwitch: (orgId: string) => void
+  currentOrgId: string;
+  onSwitch: (orgId: string) => void;
 }
 
 export function OrganizationSwitcher({
   currentOrgId,
   onSwitch,
 }: OrganizationSwitcherProps) {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
 
   const { data: organizations, isLoading } = useQuery<Organization[]>({
     queryKey: ["organizations"],
     queryFn: async () => {
-      const response = await fetch("/api/organizations")
-      if (!response.ok) throw new Error("Failed to fetch organizations")
-      return response.json()
+      const response = await fetch("/api/organizations");
+      if (!response.ok) throw new Error("Failed to fetch organizations");
+      return response.json();
     },
-  })
+  });
 
-  const currentOrg = organizations?.find((org) => org.id === currentOrgId)
+  const currentOrg = organizations?.find((org) => org.id === currentOrgId);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -78,8 +78,8 @@ export function OrganizationSwitcher({
                   key={org.id}
                   value={org.name}
                   onSelect={() => {
-                    onSwitch(org.id)
-                    setOpen(false)
+                    onSwitch(org.id);
+                    setOpen(false);
                   }}
                 >
                   <Building2 className="mr-2 h-4 w-4" />
@@ -94,7 +94,7 @@ export function OrganizationSwitcher({
                   <Check
                     className={cn(
                       "ml-auto h-4 w-4",
-                      currentOrgId === org.id ? "opacity-100" : "opacity-0"
+                      currentOrgId === org.id ? "opacity-100" : "opacity-0",
                     )}
                   />
                 </CommandItem>
@@ -104,9 +104,9 @@ export function OrganizationSwitcher({
             <CommandGroup>
               <CommandItem
                 onSelect={() => {
-                  setOpen(false)
+                  setOpen(false);
                   // TODO: Open create organization dialog
-                  console.log("Create new organization")
+                  console.log("Create new organization");
                 }}
               >
                 <Plus className="mr-2 h-4 w-4" />
@@ -117,5 +117,5 @@ export function OrganizationSwitcher({
         </Command>
       </PopoverContent>
     </Popover>
-  )
+  );
 }

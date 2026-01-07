@@ -1,4 +1,5 @@
 # Oracle E-Business Suite (EBS) - Complete Module Overview
+
 ## Integration Reference for LogiVox WMS
 
 **Last Updated:** January 4, 2026  
@@ -22,12 +23,14 @@ Oracle E-Business Suite (EBS) is Oracle's legacy integrated application suite fo
 ## 🏗️ Oracle EBS Architecture
 
 ### Core Layers
+
 1. **Database Layer**: Oracle Database (11g, 12c, 19c)
 2. **Application Layer**: Forms, Concurrent Processing, Workflow
 3. **Integration Layer**: XML Gateway, SOA Suite, APIs
 4. **User Interface**: Forms (old), OA Framework (newer), REST APIs
 
 ### Integration Methods
+
 - **XML Gateway**: Canonical message-based integration
 - **APIs**: PL/SQL packages (e.g., `INV_TRANSFER_ORDER_PUB`)
 - **Web Services**: SOAP/REST endpoints
@@ -42,9 +45,11 @@ Oracle E-Business Suite (EBS) is Oracle's legacy integrated application suite fo
 ### 1. **Supply Chain Management (SCM)** - Critical for WMS
 
 #### Inventory Management (INV) ⭐⭐⭐
+
 **Integration Priority: CRITICAL**
 
 **Key Functions:**
+
 - Item master management
 - On-hand inventory tracking
 - Transaction processing (receipts, issues, transfers)
@@ -54,12 +59,14 @@ Oracle E-Business Suite (EBS) is Oracle's legacy integrated application suite fo
 - Min-max planning
 
 **Key Tables:**
+
 - `MTL_SYSTEM_ITEMS_B` - Item master
 - `MTL_ONHAND_QUANTITIES` - On-hand inventory
 - `MTL_MATERIAL_TRANSACTIONS` - Transaction history
 - `MTL_TRANSACTION_TYPES` - Transaction codes
 
 **Key APIs:**
+
 ```sql
 -- Create inventory transaction
 INV_TRANSACTION_MANAGER_PUB.PROCESS_TRANSACTIONS()
@@ -72,6 +79,7 @@ INV_CYCLE_COUNT_PUB.CREATE_CYCLE_COUNT()
 ```
 
 **WMS Integration Points:**
+
 - **Inbound**: Receive item master updates, on-hand quantities
 - **Outbound**: Send inventory transactions (picks, puts, adjustments)
 - **Real-time**: Sync inventory balances every 5-15 minutes
@@ -79,9 +87,11 @@ INV_CYCLE_COUNT_PUB.CREATE_CYCLE_COUNT()
 ---
 
 #### Order Management (OM) ⭐⭐⭐
+
 **Integration Priority: CRITICAL**
 
 **Key Functions:**
+
 - Sales order entry
 - Order promising (ATP)
 - Pick release
@@ -90,12 +100,14 @@ INV_CYCLE_COUNT_PUB.CREATE_CYCLE_COUNT()
 - Returns management
 
 **Key Tables:**
+
 - `OE_ORDER_HEADERS_ALL` - Order headers
 - `OE_ORDER_LINES_ALL` - Order lines
 - `WSH_DELIVERY_DETAILS` - Shipping details
 - `WSH_NEW_DELIVERIES` - Deliveries
 
 **Key APIs:**
+
 ```sql
 -- Create sales order
 OE_ORDER_PUB.PROCESS_ORDER()
@@ -110,6 +122,7 @@ WSH_DELIVERIES_PUB.DELIVERY_ACTION(
 ```
 
 **WMS Integration Points:**
+
 - **Inbound**: Receive sales orders for picking
 - **Outbound**: Send pick confirmations, pack lists, ship confirmations
 - **Real-time**: Order status updates
@@ -117,9 +130,11 @@ WSH_DELIVERIES_PUB.DELIVERY_ACTION(
 ---
 
 #### Purchasing (PO) ⭐⭐⭐
+
 **Integration Priority: CRITICAL**
 
 **Key Functions:**
+
 - Purchase requisitions
 - Purchase orders
 - Receiving
@@ -127,12 +142,14 @@ WSH_DELIVERIES_PUB.DELIVERY_ACTION(
 - Vendor invoicing
 
 **Key Tables:**
+
 - `PO_HEADERS_ALL` - PO headers
 - `PO_LINES_ALL` - PO lines
 - `RCV_SHIPMENT_HEADERS` - Receipt headers
 - `RCV_TRANSACTIONS` - Receipt transactions
 
 **Key APIs:**
+
 ```sql
 -- Create PO
 PO_CREATE_DOCUMENT_PVT.CREATE_PURCHASE_ORDER()
@@ -145,6 +162,7 @@ RCV_ROI_HEADER_REC_TYPE.PROCESS_ASN()
 ```
 
 **WMS Integration Points:**
+
 - **Inbound**: Receive ASNs (Advanced Ship Notices), POs for expected receipts
 - **Outbound**: Send receipt confirmations (GRNs), put-away completions
 - **Real-time**: Receipt status updates
@@ -152,11 +170,13 @@ RCV_ROI_HEADER_REC_TYPE.PROCESS_ASN()
 ---
 
 #### Warehouse Management (WMS) ⭐⭐
+
 **Integration Priority: HIGH (Overlap)**
 
 **Note:** Oracle has its own WMS module, but many companies replace it with specialized WMS like LogiVox.
 
 **Key Functions:**
+
 - Task management (picks, puts, replenishments)
 - Directed put-away
 - Wave planning
@@ -165,6 +185,7 @@ RCV_ROI_HEADER_REC_TYPE.PROCESS_ASN()
 - Mobile RF devices
 
 **Why Companies Replace Oracle WMS:**
+
 - Complex implementation (12-18 months)
 - Expensive licensing ($$$)
 - Rigid workflows
@@ -173,6 +194,7 @@ RCV_ROI_HEADER_REC_TYPE.PROCESS_ASN()
 - Limited voice-directed capabilities ❌
 
 **LogiVox Advantages:**
+
 - ✅ Voice-directed operations
 - ✅ AI supervision
 - ✅ Real-time analytics
@@ -181,6 +203,7 @@ RCV_ROI_HEADER_REC_TYPE.PROCESS_ASN()
 - ✅ Lower total cost of ownership
 
 **Integration Strategy:**
+
 - Replace Oracle WMS with LogiVox
 - Keep Oracle INV for item master and on-hand tracking
 - Bidirectional sync: Oracle INV ↔ LogiVox
@@ -188,9 +211,11 @@ RCV_ROI_HEADER_REC_TYPE.PROCESS_ASN()
 ---
 
 #### Manufacturing (WIP, BOM, Routing) ⭐⭐
+
 **Integration Priority: MEDIUM**
 
 **Key Functions:**
+
 - Bill of materials (BOM)
 - Routings
 - Work orders
@@ -199,6 +224,7 @@ RCV_ROI_HEADER_REC_TYPE.PROCESS_ASN()
 - Shop floor control
 
 **Key APIs:**
+
 ```sql
 -- Create work order
 WIP_JOB_SCHEDULE_INTERFACE
@@ -211,6 +237,7 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ```
 
 **WMS Integration Points:**
+
 - **Inbound**: Receive work orders, component picks
 - **Outbound**: Send component issues, finished goods receipts
 - **Batch**: Nightly BOM/routing sync
@@ -218,9 +245,11 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ---
 
 #### Advanced Supply Chain Planning (ASCP) ⭐
+
 **Integration Priority: LOW**
 
 **Key Functions:**
+
 - Demand planning
 - Supply planning
 - MRP/MPS
@@ -228,6 +257,7 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 - Supplier collaboration
 
 **WMS Integration Points:**
+
 - **Inbound**: Receive planned orders
 - **Read-only**: Query safety stock levels
 
@@ -236,56 +266,68 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ### 2. **Financials (FIN)** - Moderate for WMS
 
 #### General Ledger (GL) ⭐
+
 **Integration Priority: LOW**
 
 **Key Functions:**
+
 - Chart of accounts
 - Journal entries
 - Financial reporting
 - Period close
 
 **WMS Integration Points:**
+
 - **Outbound**: Cost accounting entries (inventory value changes)
 - **Batch**: Daily/monthly GL interface
 
 ---
 
 #### Accounts Payable (AP) ⭐
+
 **Integration Priority: LOW**
 
 **Key Functions:**
+
 - Vendor invoices
 - Payment processing
 - Expense reports
 
 **WMS Integration Points:**
+
 - **Inbound**: 3PL warehouse invoices (if applicable)
 - **Batch**: Monthly invoice uploads
 
 ---
 
 #### Accounts Receivable (AR) ⭐
+
 **Integration Priority: LOW**
 
 **Key Functions:**
+
 - Customer invoices
 - Payment receipts
 - Credit management
 
 **WMS Integration Points:**
+
 - **None directly** (unless WMS handles invoicing)
 
 ---
 
 #### Fixed Assets (FA) ⭐
+
 **Integration Priority: NONE**
 
 **Key Functions:**
+
 - Asset tracking
 - Depreciation
 - Lease management
 
 **WMS Integration Points:**
+
 - **None** (warehouse equipment tracking separate)
 
 ---
@@ -293,34 +335,41 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ### 3. **Human Capital Management (HCM)** - Low for WMS
 
 #### Human Resources (HR) ⭐
+
 **Integration Priority: LOW**
 
 **Key Functions:**
+
 - Employee master
 - Organization hierarchy
 - Compensation
 - Benefits
 
 **WMS Integration Points:**
+
 - **Inbound**: Employee roster for user provisioning
 - **Batch**: Daily employee sync
 
 ---
 
 #### Payroll (PAY) ⭐
+
 **Integration Priority: NONE**
 
 ---
 
 #### Time & Labor (OTL) ⭐
+
 **Integration Priority: MEDIUM**
 
 **Key Functions:**
+
 - Timecard entry
 - Labor reporting
 - Absence tracking
 
 **WMS Integration Points:**
+
 - **Outbound**: Worker hours from LogiVox AI supervision
 - **Real-time**: Clock in/out via WMS
 
@@ -329,15 +378,19 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ### 4. **Customer Relationship Management (CRM)** - Low for WMS
 
 #### Sales (SLS) ⭐
+
 **Integration Priority: NONE**
 
 #### Marketing (MKT) ⭐
+
 **Integration Priority: NONE**
 
 #### Service (CS) ⭐
+
 **Integration Priority: LOW**
 
 **WMS Integration Points:**
+
 - **Inbound**: RMA (return) orders
 - **Outbound**: Return receipts, refurb inventory
 
@@ -346,6 +399,7 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ### 5. **Project Management (PROJ)** - None for WMS
 
 #### Projects (PA) ⭐
+
 **Integration Priority: NONE**
 
 ---
@@ -353,9 +407,11 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ### 6. **Procurement (PROC)** - Covered by PO
 
 #### Sourcing (SRC) ⭐
+
 **Integration Priority: NONE**
 
 #### Contracts (OCM) ⭐
+
 **Integration Priority: NONE**
 
 ---
@@ -363,9 +419,11 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ### 7. **Product Lifecycle Management (PLM)** - Low for WMS
 
 #### Product Hub (PHB) ⭐
+
 **Integration Priority: LOW**
 
 **WMS Integration Points:**
+
 - **Inbound**: New product introductions
 - **Batch**: Weekly product attribute sync
 
@@ -419,6 +477,7 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ### Integration Scenarios
 
 #### Scenario 1: Inbound Sales Order (OM → LogiVox)
+
 **Frequency:** Real-time (as orders are entered)
 
 ```
@@ -442,20 +501,21 @@ WIP_MOVPROC_PUB.MOVE_TRANSACTION()
 ```
 
 **Oracle API:**
+
 ```sql
 -- Query orders for WMS
-SELECT 
+SELECT
   ooh.order_number,
   ooh.header_id,
   ool.line_number,
   msi.segment1 AS item_number,
   ool.ordered_quantity,
   ool.ship_to_org_id
-FROM 
+FROM
   oe_order_headers_all ooh,
   oe_order_lines_all ool,
   mtl_system_items_b msi
-WHERE 
+WHERE
   ooh.header_id = ool.header_id
   AND ool.inventory_item_id = msi.inventory_item_id
   AND ooh.flow_status_code = 'AWAITING_SHIPPING'
@@ -465,6 +525,7 @@ WHERE
 ---
 
 #### Scenario 2: Outbound Shipment Confirmation (LogiVox → OM)
+
 **Frequency:** Real-time (as shipments depart)
 
 ```
@@ -485,6 +546,7 @@ WHERE
 ---
 
 #### Scenario 3: Inventory Adjustment (LogiVox → INV)
+
 **Frequency:** Near real-time (every 5-15 minutes batch)
 
 ```
@@ -512,6 +574,7 @@ WHERE
 ---
 
 #### Scenario 4: Inbound Receipt (PO → LogiVox)
+
 **Frequency:** Real-time (as ASNs arrive)
 
 ```
@@ -540,18 +603,18 @@ WHERE
 
 ## 📊 Oracle EBS Module Integration Priority Matrix
 
-| Module | Integration | Frequency | Direction | APIs Used | Priority |
-|--------|-------------|-----------|-----------|-----------|----------|
-| **Inventory (INV)** | Item master, on-hand | 15 min | Bidirectional | INV_TRANSACTION_MANAGER_PUB | 🔴 CRITICAL |
+| Module              | Integration             | Frequency | Direction     | APIs Used                        | Priority    |
+| ------------------- | ----------------------- | --------- | ------------- | -------------------------------- | ----------- |
+| **Inventory (INV)** | Item master, on-hand    | 15 min    | Bidirectional | INV_TRANSACTION_MANAGER_PUB      | 🔴 CRITICAL |
 | **Order Mgmt (OM)** | Sales orders, shipments | Real-time | Bidirectional | OE_ORDER_PUB, WSH_DELIVERIES_PUB | 🔴 CRITICAL |
-| **Purchasing (PO)** | POs, ASNs, receipts | Real-time | Bidirectional | RCV_TRANSACTION_API | 🔴 CRITICAL |
-| **WIP** | Work orders, components | Hourly | Bidirectional | WIP_JOB_SCHEDULE_INTERFACE | 🟡 MEDIUM |
-| **HR** | Employee roster | Daily | Inbound | PER_PEOPLE_F table | 🟡 MEDIUM |
-| **Time & Labor** | Work hours | Daily | Outbound | HXC_TIME_BUILDING_BLOCKS | 🟡 MEDIUM |
-| **GL** | Cost accounting | Daily | Outbound | GL_INTERFACE | 🟢 LOW |
-| **Service (CS)** | RMA orders | Ad-hoc | Bidirectional | OE_ORDER_PUB (RMA) | 🟢 LOW |
-| **ASCP** | Planned orders | Nightly | Inbound | MSC_ST_SUPPLIES table | 🟢 LOW |
-| **All others** | - | - | - | - | ⚪ NONE |
+| **Purchasing (PO)** | POs, ASNs, receipts     | Real-time | Bidirectional | RCV_TRANSACTION_API              | 🔴 CRITICAL |
+| **WIP**             | Work orders, components | Hourly    | Bidirectional | WIP_JOB_SCHEDULE_INTERFACE       | 🟡 MEDIUM   |
+| **HR**              | Employee roster         | Daily     | Inbound       | PER_PEOPLE_F table               | 🟡 MEDIUM   |
+| **Time & Labor**    | Work hours              | Daily     | Outbound      | HXC_TIME_BUILDING_BLOCKS         | 🟡 MEDIUM   |
+| **GL**              | Cost accounting         | Daily     | Outbound      | GL_INTERFACE                     | 🟢 LOW      |
+| **Service (CS)**    | RMA orders              | Ad-hoc    | Bidirectional | OE_ORDER_PUB (RMA)               | 🟢 LOW      |
+| **ASCP**            | Planned orders          | Nightly   | Inbound       | MSC_ST_SUPPLIES table            | 🟢 LOW      |
+| **All others**      | -                       | -         | -             | -                                | ⚪ NONE     |
 
 ---
 
@@ -562,18 +625,18 @@ WHERE
 ```javascript
 // OAuth 2.0 (Oracle EBS 12.2.5+)
 const getOracleToken = async () => {
-  const response = await fetch('https://oracle-ebs.company.com/oauth/token', {
-    method: 'POST',
+  const response = await fetch("https://oracle-ebs.company.com/oauth/token", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
+      "Content-Type": "application/x-www-form-urlencoded",
     },
     body: new URLSearchParams({
-      grant_type: 'client_credentials',
+      grant_type: "client_credentials",
       client_id: process.env.ORACLE_CLIENT_ID,
       client_secret: process.env.ORACLE_CLIENT_SECRET,
     }),
   });
-  
+
   const { access_token } = await response.json();
   return access_token;
 };
@@ -581,16 +644,19 @@ const getOracleToken = async () => {
 // Call Oracle REST API
 const callOracleAPI = async (endpoint, payload) => {
   const token = await getOracleToken();
-  
-  const response = await fetch(`https://oracle-ebs.company.com/fscmRestApi/resources/${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
+
+  const response = await fetch(
+    `https://oracle-ebs.company.com/fscmRestApi/resources/${endpoint}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify(payload),
-  });
-  
+  );
+
   return response.json();
 };
 ```
@@ -626,7 +692,7 @@ CONNECT TO apps_readonly IDENTIFIED BY password
 USING '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle-db.company.com)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=EBSPROD)))';
 
 -- Query Oracle from LogiVox
-SELECT 
+SELECT
   segment1 AS item_number,
   primary_uom_code,
   list_price_per_unit
@@ -640,26 +706,31 @@ WHERE organization_id = 204
 ## 🚨 Common Oracle EBS Integration Pitfalls
 
 ### 1. **Multi-Org Complexity**
+
 - Oracle uses `ORG_ID` for multi-org security
 - Must set context: `FND_GLOBAL.APPS_INITIALIZE(user_id, resp_id, resp_appl_id)`
 - LogiVox must map warehouses to Oracle orgs
 
 ### 2. **UOM Conversions**
+
 - Oracle has complex UOM class hierarchy
 - Must convert between EA, CS, PL, etc.
 - Use `INV_CONVERT.INV_UM_CONVERT()` function
 
 ### 3. **Lot/Serial Tracking**
+
 - Oracle enforces lot/serial at transaction time
 - LogiVox must capture and pass through
 - Validation at Oracle layer (not bypassed)
 
 ### 4. **Transaction Date Control**
+
 - Oracle enforces accounting period open/close
 - Transactions must be in open period
 - LogiVox must handle date rejection errors
 
 ### 5. **Approval Workflows**
+
 - Some Oracle transactions require approval
 - Async processing (concurrent programs)
 - LogiVox must poll for completion status
@@ -669,6 +740,7 @@ WHERE organization_id = 204
 ## 💡 Recommendations for LogiVox ↔ Oracle EBS
 
 ### Phase 1: Foundation (Weeks 1-4)
+
 1. ✅ Set up middleware (Oracle OIC or MuleSoft)
 2. ✅ Implement Oracle authentication (OAuth)
 3. ✅ Build item master sync (INV → LogiVox)
@@ -676,18 +748,21 @@ WHERE organization_id = 204
 5. ✅ Test with 100 SKUs in dev environment
 
 ### Phase 2: Order Fulfillment (Weeks 5-8)
+
 1. ✅ Implement sales order inbound (OM → LogiVox)
 2. ✅ Build pick confirmation outbound (LogiVox → OM)
 3. ✅ Build ship confirmation (LogiVox → OM)
 4. ✅ Test end-to-end order flow (10 orders)
 
 ### Phase 3: Receiving (Weeks 9-12)
+
 1. ✅ Implement ASN inbound (PO → LogiVox)
 2. ✅ Build receipt confirmation (LogiVox → PO)
 3. ✅ Build put-away completion (LogiVox → INV)
 4. ✅ Test receiving flow (10 POs)
 
 ### Phase 4: Production (Weeks 13-16)
+
 1. ✅ User acceptance testing
 2. ✅ Performance testing (1000 orders/day)
 3. ✅ Cutover planning
@@ -698,16 +773,19 @@ WHERE organization_id = 204
 ## 📚 Resources
 
 ### Oracle Documentation
+
 - **Oracle E-Business Suite Integrated SOA Gateway Developer's Guide**: https://docs.oracle.com/cd/E26401_01/doc.122/e20927/toc.htm
 - **Oracle Integration Repository**: https://irep.oracle.com (requires login)
 - **Oracle Process Manufacturing APIs**: https://docs.oracle.com/cd/E51367_01/apirefs/index.htm
 
 ### Community Resources
+
 - **Oracle EBS Community**: https://community.oracle.com/mosc/categories/ebs-oracleebusinesssuiteapplications
 - **Oracle-Base**: https://oracle-base.com
 - **Metalink/MOS**: https://support.oracle.com (requires support contract)
 
 ### Tools
+
 - **SOAP UI**: Test Oracle SOAP APIs
 - **Postman**: Test Oracle REST APIs
 - **SQL Developer**: Query Oracle database
@@ -728,10 +806,11 @@ WHERE organization_id = 204
 ---
 
 **For LogiVox integration implementation, see:**
+
 - `/app/api/integrations/route.ts` - Integration API (already built!)
 - `/lib/integrations/oracle-ebs.ts` - Oracle-specific logic (to be created)
 - `/docs/ORACLE_INTEGRATION_GUIDE.md` - Detailed technical guide (to be created)
 
 **Status:** 📋 Reference Guide Complete - Ready for Implementation Planning
 
-*Last Updated: January 4, 2026*
+_Last Updated: January 4, 2026_

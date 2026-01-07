@@ -158,7 +158,9 @@ export default function NCRDetailPage() {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">{ncr.ncrNumber}</h1>
-            <p className="text-muted-foreground">Non-Conformance Report Details</p>
+            <p className="text-muted-foreground">
+              Non-Conformance Report Details
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -221,7 +223,9 @@ export default function NCRDetailPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground">Affected Quantity</p>
+                  <p className="text-sm text-muted-foreground">
+                    Affected Quantity
+                  </p>
                   <p className="text-2xl font-bold">{ncr.affectedQuantity}</p>
                 </div>
                 <div>
@@ -233,8 +237,12 @@ export default function NCRDetailPage() {
               </div>
               {ncr.dispositionMethod && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Disposition Method</p>
-                  <Badge variant="outline">{ncr.dispositionMethod.replace("_", " ")}</Badge>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Disposition Method
+                  </p>
+                  <Badge variant="outline">
+                    {ncr.dispositionMethod.replace("_", " ")}
+                  </Badge>
                 </div>
               )}
             </CardContent>
@@ -253,19 +261,29 @@ export default function NCRDetailPage() {
                 {ncr.rootCause && (
                   <div>
                     <p className="text-sm font-medium mb-1">Root Cause</p>
-                    <p className="text-sm text-muted-foreground">{ncr.rootCause}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {ncr.rootCause}
+                    </p>
                   </div>
                 )}
                 {ncr.correctiveAction && (
                   <div>
-                    <p className="text-sm font-medium mb-1">Corrective Action</p>
-                    <p className="text-sm text-muted-foreground">{ncr.correctiveAction}</p>
+                    <p className="text-sm font-medium mb-1">
+                      Corrective Action
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {ncr.correctiveAction}
+                    </p>
                   </div>
                 )}
                 {ncr.preventiveAction && (
                   <div>
-                    <p className="text-sm font-medium mb-1">Preventive Action</p>
-                    <p className="text-sm text-muted-foreground">{ncr.preventiveAction}</p>
+                    <p className="text-sm font-medium mb-1">
+                      Preventive Action
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {ncr.preventiveAction}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -283,22 +301,30 @@ export default function NCRDetailPage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Claim Amount</span>
+                  <span className="text-sm text-muted-foreground">
+                    Claim Amount
+                  </span>
                   <span className="text-xl font-bold text-green-600">
                     ${ncr.supplierClaimAmount.toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-muted-foreground">Status</span>
-                  <Badge className={claimStatusColors[ncr.supplierClaimStatus || ""]}>
+                  <Badge
+                    className={claimStatusColors[ncr.supplierClaimStatus || ""]}
+                  >
                     {ncr.supplierClaimStatus}
                   </Badge>
                 </div>
                 {ncr.supplierClaimSubmittedAt && (
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Submitted</span>
+                    <span className="text-sm text-muted-foreground">
+                      Submitted
+                    </span>
                     <span className="text-sm">
-                      {new Date(ncr.supplierClaimSubmittedAt).toLocaleDateString()}
+                      {new Date(
+                        ncr.supplierClaimSubmittedAt,
+                      ).toLocaleDateString()}
                     </span>
                   </div>
                 )}
@@ -322,24 +348,32 @@ export default function NCRDetailPage() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Supplier</p>
                   <p className="text-sm font-medium">{ncr.supplier.name}</p>
-                  <p className="text-xs text-muted-foreground">{ncr.supplier.code}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {ncr.supplier.code}
+                  </p>
                 </div>
               )}
               {ncr.product && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Product</p>
                   <p className="text-sm font-medium">{ncr.product.name}</p>
-                  <p className="text-xs text-muted-foreground">{ncr.product.sku}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {ncr.product.sku}
+                  </p>
                 </div>
               )}
               {ncr.inspection && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Inspection</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Inspection
+                  </p>
                   <Button
                     variant="link"
                     className="p-0 h-auto text-sm"
                     onClick={() =>
-                      router.push(`/dashboard/qc/inspections/${ncr.inspection?.id}`)
+                      router.push(
+                        `/dashboard/qc/inspections/${ncr.inspection?.id}`,
+                      )
                     }
                   >
                     {ncr.inspection.inspectionNumber}
@@ -360,25 +394,37 @@ export default function NCRDetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Created</p>
-                <p className="text-sm">{new Date(ncr.createdAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(ncr.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Detected</p>
-                <p className="text-sm">{new Date(ncr.detectedAt).toLocaleString()}</p>
-                <p className="text-xs text-muted-foreground">By: {ncr.detectedBy}</p>
+                <p className="text-sm">
+                  {new Date(ncr.detectedAt).toLocaleString()}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  By: {ncr.detectedBy}
+                </p>
               </div>
               {ncr.closedAt && (
                 <div>
                   <p className="text-sm text-muted-foreground">Closed</p>
-                  <p className="text-sm">{new Date(ncr.closedAt).toLocaleString()}</p>
+                  <p className="text-sm">
+                    {new Date(ncr.closedAt).toLocaleString()}
+                  </p>
                   {ncr.closedBy && (
-                    <p className="text-xs text-muted-foreground">By: {ncr.closedBy}</p>
+                    <p className="text-xs text-muted-foreground">
+                      By: {ncr.closedBy}
+                    </p>
                   )}
                 </div>
               )}
               <div>
                 <p className="text-sm text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{new Date(ncr.updatedAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(ncr.updatedAt).toLocaleString()}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -392,7 +438,9 @@ export default function NCRDetailPage() {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => router.push(`/dashboard/qc/capa/create?ncrId=${ncr.id}`)}
+                onClick={() =>
+                  router.push(`/dashboard/qc/capa/create?ncrId=${ncr.id}`)
+                }
               >
                 <AlertTriangle className="w-4 h-4 mr-2" />
                 Create CAPA

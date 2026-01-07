@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const TriggerPanicSchema = z.object({
   guardId: z.string(),
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const json = await req.json();
@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     // Create panic alert
@@ -41,7 +44,7 @@ export async function POST(req: NextRequest) {
         gpsLng: body.gpsLng,
         audioUrl: body.audioUrl,
         videoUrl: body.videoUrl,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
     });
 
@@ -61,23 +64,23 @@ export async function POST(req: NextRequest) {
             gte: new Date(Date.now() - 5 * 60 * 1000), // Last 5 minutes
           },
         },
-        orderBy: { timestamp: 'desc' },
-        distinct: ['guardId'],
+        orderBy: { timestamp: "desc" },
+        distinct: ["guardId"],
         take: 5,
       });
 
       // Calculate distances and sort by proximity
       const nearbyGuards = recentGuardLocations
-        .map(loc => {
+        .map((loc) => {
           const R = 6371000; // meters
-          const φ1 = body.gpsLat! * Math.PI / 180;
-          const φ2 = loc.gpsLat * Math.PI / 180;
-          const Δφ = (loc.gpsLat - body.gpsLat!) * Math.PI / 180;
-          const Δλ = (loc.gpsLng - body.gpsLng!) * Math.PI / 180;
+          const φ1 = (body.gpsLat! * Math.PI) / 180;
+          const φ2 = (loc.gpsLat * Math.PI) / 180;
+          const Δφ = ((loc.gpsLat - body.gpsLat!) * Math.PI) / 180;
+          const Δλ = ((loc.gpsLng - body.gpsLng!) * Math.PI) / 180;
 
-          const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-            Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+          const a =
+            Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
           const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
           const distance = R * c;
 
@@ -92,20 +95,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({
         alert,
         nearbyGuards,
-        message: 'Panic alert triggered. Nearby guards notified.',
+        message: "Panic alert triggered. Nearby guards notified.",
       });
     }
 
     return NextResponse.json({
       alert,
-      message: 'Panic alert triggered. All guards notified.',
+      message: "Panic alert triggered. All guards notified.",
     });
   } catch (error: any) {
-    console.error('Error triggering panic alert:', error);
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 });
+    console.error("Error triggering panic alert:", error);
+    if (error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -114,16 +123,19 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
+    const status = searchParams.get("status");
 
     const alerts = await prisma.panicAlert.findMany({
       where: {
@@ -132,15 +144,18 @@ export async function GET(req: NextRequest) {
       },
       include: {
         responses: {
-          orderBy: { responseTime: 'asc' },
+          orderBy: { responseTime: "asc" },
         },
       },
-      orderBy: { triggeredAt: 'desc' },
+      orderBy: { triggeredAt: "desc" },
     });
 
     return NextResponse.json(alerts);
   } catch (error: any) {
-    console.error('Error fetching panic alerts:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching panic alerts:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

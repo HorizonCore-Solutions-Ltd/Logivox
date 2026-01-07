@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const optimizeRoutesSchema = z.object({
   warehouseId: z.string(),
@@ -11,7 +11,9 @@ const optimizeRoutesSchema = z.object({
   maxVehicles: z.number().int().positive().optional().default(10),
   maxStopsPerRoute: z.number().int().positive().optional().default(25),
   vehicleCapacity: z.number().positive().optional(),
-  optimizationGoal: z.enum(['DISTANCE', 'TIME', 'COST', 'BALANCED']).default('BALANCED'),
+  optimizationGoal: z
+    .enum(["DISTANCE", "TIME", "COST", "BALANCED"])
+    .default("BALANCED"),
 });
 
 interface Stop {
@@ -41,22 +43,32 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const body = await req.json();
-    const { warehouseId, shipments, maxVehicles, maxStopsPerRoute, optimizationGoal } =
-      optimizeRoutesSchema.parse(body);
+    const {
+      warehouseId,
+      shipments,
+      maxVehicles,
+      maxStopsPerRoute,
+      optimizationGoal,
+    } = optimizeRoutesSchema.parse(body);
 
     // Fetch shipment details
     const shipmentRecords = await prisma.shipment.findMany({
@@ -74,7 +86,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (shipmentRecords.length === 0) {
-      return NextResponse.json({ error: 'No shipments found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No shipments found" },
+        { status: 404 },
+      );
     }
 
     // Get warehouse location (depot)
@@ -83,13 +98,16 @@ export async function POST(req: NextRequest) {
     });
 
     if (!warehouse) {
-      return NextResponse.json({ error: 'Warehouse not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Warehouse not found" },
+        { status: 404 },
+      );
     }
 
     // Transform shipments to stops
     const stops: Stop[] = shipmentRecords.map((shipment, index) => ({
       id: shipment.id,
-      address: shipment.shippingAddress || 'Unknown',
+      address: shipment.shippingAddress || "Unknown",
       priority: shipment.priority || 1,
       serviceTime: 15, // Default 15 minutes per stop
       lat: undefined, // Would need geocoding service
@@ -135,9 +153,13 @@ export async function POST(req: NextRequest) {
       totalStops: routes.reduce((sum, r) => sum + r.stops.length, 0),
       totalDistance: routes.reduce((sum, r) => sum + r.totalDistance, 0),
       totalDuration: routes.reduce((sum, r) => sum + r.estimatedDuration, 0),
-      averageStopsPerRoute: routes.length > 0
-        ? Math.round(routes.reduce((sum, r) => sum + r.stops.length, 0) / routes.length)
-        : 0,
+      averageStopsPerRoute:
+        routes.length > 0
+          ? Math.round(
+              routes.reduce((sum, r) => sum + r.stops.length, 0) /
+                routes.length,
+            )
+          : 0,
       optimizationGoal,
     };
 
@@ -146,8 +168,8 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'ROUTES_OPTIMIZED',
-        entityType: 'Route',
+        action: "ROUTES_OPTIMIZED",
+        entityType: "Route",
         entityId: warehouseId,
         metadata: {
           shipmentCount: shipments.length,
@@ -165,10 +187,16 @@ export async function POST(req: NextRequest) {
     });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error optimizing routes:', error);
-    return NextResponse.json({ error: 'Failed to optimize routes' }, { status: 500 });
+    console.error("Error optimizing routes:", error);
+    return NextResponse.json(
+      { error: "Failed to optimize routes" },
+      { status: 500 },
+    );
   }
 }
 
@@ -180,16 +208,21 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -198,15 +231,18 @@ export async function GET(req: NextRequest) {
     const activities = await prisma.activityLog.findMany({
       where: {
         organizationId,
-        action: 'ROUTES_OPTIMIZED',
+        action: "ROUTES_OPTIMIZED",
       },
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
       take: 50,
     });
 
     return NextResponse.json(activities);
   } catch (error: any) {
-    console.error('Error fetching route history:', error);
-    return NextResponse.json({ error: 'Failed to fetch route history' }, { status: 500 });
+    console.error("Error fetching route history:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch route history" },
+      { status: 500 },
+    );
   }
 }

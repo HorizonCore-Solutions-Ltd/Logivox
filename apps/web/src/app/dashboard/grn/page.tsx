@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,9 +27,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  Package, 
-  Search, 
+import {
+  Package,
+  Search,
   Plus,
   CheckCircle,
   Clock,
@@ -112,12 +118,13 @@ export default function GRNListPage() {
           (acc: Statistics, grn: GRN) => {
             acc.total++;
             if (grn.status === "DRAFT") acc.draft++;
-            if (grn.status === "PENDING" || grn.status === "QUALITY_CHECK") acc.pending++;
+            if (grn.status === "PENDING" || grn.status === "QUALITY_CHECK")
+              acc.pending++;
             if (grn.status === "APPROVED") acc.approved++;
             if (grn.status === "COMPLETED") acc.completed++;
             return acc;
           },
-          { total: 0, draft: 0, pending: 0, approved: 0, completed: 0 }
+          { total: 0, draft: 0, pending: 0, approved: 0, completed: 0 },
         );
         setStatistics(stats);
       }
@@ -166,7 +173,9 @@ export default function GRNListPage() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Goods Receipt Notes</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Goods Receipt Notes
+          </h1>
           <p className="text-muted-foreground">
             Manage incoming inventory receipts and quality control
           </p>
@@ -234,7 +243,9 @@ export default function GRNListPage() {
       <Card>
         <CardHeader>
           <CardTitle>Filter GRNs</CardTitle>
-          <CardDescription>Search and filter goods receipt notes</CardDescription>
+          <CardDescription>
+            Search and filter goods receipt notes
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4">
@@ -271,9 +282,7 @@ export default function GRNListPage() {
       <Card>
         <CardHeader>
           <CardTitle>Receipt History</CardTitle>
-          <CardDescription>
-            {pagination.total} total receipts
-          </CardDescription>
+          <CardDescription>{pagination.total} total receipts</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -309,7 +318,10 @@ export default function GRNListPage() {
                       <TableCell className="font-medium">
                         {grn.grnNumber}
                         {grn.hasDiscrepancy && (
-                          <Badge variant="outline" className="ml-2 bg-yellow-50">
+                          <Badge
+                            variant="outline"
+                            className="ml-2 bg-yellow-50"
+                          >
                             Discrepancy
                           </Badge>
                         )}
@@ -373,7 +385,10 @@ export default function GRNListPage() {
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page - 1,
+                        }))
                       }
                       disabled={pagination.page === 1}
                     >
@@ -383,7 +398,10 @@ export default function GRNListPage() {
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page + 1,
+                        }))
                       }
                       disabled={pagination.page === pagination.pages}
                     >

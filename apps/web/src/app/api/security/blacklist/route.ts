@@ -1,20 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const createBlacklistSchema = z.object({
   licensePlate: z.string().min(1),
   reason: z.string().min(1),
-  severity: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'PERMANENT']),
+  severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL", "PERMANENT"]),
   bannedUntil: z.string().datetime().optional(),
   notes: z.string().optional(),
 });
 
 const listSchema = z.object({
   isActive: z.string().optional(),
-  severity: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'PERMANENT']).optional(),
+  severity: z
+    .enum(["LOW", "MEDIUM", "HIGH", "CRITICAL", "PERMANENT"])
+    .optional(),
   search: z.string().optional(),
   page: z.string().optional(),
   limit: z.string().optional(),
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -41,8 +43,8 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Vehicle is already blacklisted' },
-        { status: 400 }
+        { error: "Vehicle is already blacklisted" },
+        { status: 400 },
       );
     }
 
@@ -62,15 +64,15 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating blacklist entry:', error);
+    console.error("Error creating blacklist entry:", error);
     return NextResponse.json(
-      { error: 'Failed to create blacklist entry' },
-      { status: 500 }
+      { error: "Failed to create blacklist entry" },
+      { status: 500 },
     );
   }
 }
@@ -79,16 +81,16 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const params = listSchema.parse({
-      isActive: searchParams.get('isActive') || undefined,
-      severity: searchParams.get('severity') || undefined,
-      search: searchParams.get('search') || undefined,
-      page: searchParams.get('page') || '1',
-      limit: searchParams.get('limit') || '50',
+      isActive: searchParams.get("isActive") || undefined,
+      severity: searchParams.get("severity") || undefined,
+      search: searchParams.get("search") || undefined,
+      page: searchParams.get("page") || "1",
+      limit: searchParams.get("limit") || "50",
     });
 
     const page = parseInt(params.page);
@@ -100,7 +102,7 @@ export async function GET(req: NextRequest) {
     };
 
     if (params.isActive !== undefined) {
-      where.isActive = params.isActive === 'true';
+      where.isActive = params.isActive === "true";
     }
 
     if (params.severity) {
@@ -109,8 +111,8 @@ export async function GET(req: NextRequest) {
 
     if (params.search) {
       where.OR = [
-        { licensePlate: { contains: params.search, mode: 'insensitive' } },
-        { reason: { contains: params.search, mode: 'insensitive' } },
+        { licensePlate: { contains: params.search, mode: "insensitive" } },
+        { reason: { contains: params.search, mode: "insensitive" } },
       ];
     }
 
@@ -119,7 +121,7 @@ export async function GET(req: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { bannedDate: 'desc' },
+        orderBy: { bannedDate: "desc" },
       }),
       prisma.vehicleBlacklist.count({ where }),
     ]);
@@ -134,10 +136,10 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching blacklist:', error);
+    console.error("Error fetching blacklist:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch blacklist' },
-      { status: 500 }
+      { error: "Failed to fetch blacklist" },
+      { status: 500 },
     );
   }
 }

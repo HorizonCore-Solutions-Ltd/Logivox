@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   BarChart3,
   TrendingUp,
@@ -19,69 +25,99 @@ import {
   AlertTriangle,
   Eye,
   FileText,
-  Database
-} from "lucide-react"
+  Database,
+} from "lucide-react";
 
 export default function AnalyticsPage() {
   const features = [
     {
       icon: BarChart3,
       title: "Real-Time Dashboards",
-      description: "Monitor inventory performance with live metrics and customizable KPI tracking."
+      description:
+        "Monitor inventory performance with live metrics and customizable KPI tracking.",
     },
     {
       icon: Brain,
       title: "AI-Powered Insights",
-      description: "Machine learning algorithms detect patterns and predict future trends automatically."
+      description:
+        "Machine learning algorithms detect patterns and predict future trends automatically.",
     },
     {
       icon: TrendingUp,
       title: "Demand Forecasting",
-      description: "Predict future demand with 95% accuracy using historical data and market trends."
+      description:
+        "Predict future demand with 95% accuracy using historical data and market trends.",
     },
     {
       icon: Target,
       title: "Performance Analytics",
-      description: "Track turnover rates, stock velocity, and operational efficiency metrics."
+      description:
+        "Track turnover rates, stock velocity, and operational efficiency metrics.",
     },
     {
       icon: AlertTriangle,
       title: "Smart Alerts",
-      description: "Receive proactive notifications for anomalies, trends, and critical thresholds."
+      description:
+        "Receive proactive notifications for anomalies, trends, and critical thresholds.",
     },
     {
       icon: FileText,
       title: "Custom Reports",
-      description: "Generate detailed reports with drill-down capabilities and export options."
-    }
-  ]
+      description:
+        "Generate detailed reports with drill-down capabilities and export options.",
+    },
+  ];
 
   const analyticsModules = [
     {
       title: "Inventory Analytics",
-      description: "Stock levels, turnover rates, aging analysis, and valuation metrics",
+      description:
+        "Stock levels, turnover rates, aging analysis, and valuation metrics",
       icon: Database,
-      metrics: ["ABC Analysis", "Stock Velocity", "Carrying Costs", "Dead Stock Identification"]
+      metrics: [
+        "ABC Analysis",
+        "Stock Velocity",
+        "Carrying Costs",
+        "Dead Stock Identification",
+      ],
     },
     {
       title: "Sales Analytics",
-      description: "Revenue trends, customer behavior, and product performance insights",
+      description:
+        "Revenue trends, customer behavior, and product performance insights",
       icon: TrendingUp,
-      metrics: ["Revenue by Product", "Customer Segmentation", "Sales Trends", "Margin Analysis"]
+      metrics: [
+        "Revenue by Product",
+        "Customer Segmentation",
+        "Sales Trends",
+        "Margin Analysis",
+      ],
     },
     {
       title: "Operational Analytics",
-      description: "Warehouse efficiency, fulfillment rates, and process optimization",
+      description:
+        "Warehouse efficiency, fulfillment rates, and process optimization",
       icon: Activity,
-      metrics: ["Pick Accuracy", "Cycle Time", "Labor Productivity", "Space Utilization"]
+      metrics: [
+        "Pick Accuracy",
+        "Cycle Time",
+        "Labor Productivity",
+        "Space Utilization",
+      ],
     },
     {
       title: "Predictive Analytics",
-      description: "AI-driven forecasts for demand, supply chain, and business planning",
+      description:
+        "AI-driven forecasts for demand, supply chain, and business planning",
       icon: Brain,
-      metrics: ["Demand Forecast", "Reorder Point Optimization", "Seasonality Detection", "Risk Assessment"]
-    }
-  ]
+      metrics: [
+        "Demand Forecast",
+        "Reorder Point Optimization",
+        "Seasonality Detection",
+        "Risk Assessment",
+      ],
+    },
+  ];
 
   const benefits = [
     "Reduce excess inventory by 35% with demand forecasting",
@@ -91,15 +127,31 @@ export default function AnalyticsPage() {
     "Identify cost-saving opportunities worth 20% of inventory value",
     "Real-time visibility across all locations and channels",
     "Mobile-responsive dashboards for on-the-go insights",
-    "Automated anomaly detection and root cause analysis"
-  ]
+    "Automated anomaly detection and root cause analysis",
+  ];
 
   const visualizationTypes = [
-    { name: "Line Charts", icon: LineChart, description: "Trend analysis over time" },
-    { name: "Bar Charts", icon: BarChart3, description: "Compare categories and segments" },
-    { name: "Pie Charts", icon: PieChart, description: "Composition and distribution" },
-    { name: "Heat Maps", icon: Activity, description: "Pattern recognition and density" }
-  ]
+    {
+      name: "Line Charts",
+      icon: LineChart,
+      description: "Trend analysis over time",
+    },
+    {
+      name: "Bar Charts",
+      icon: BarChart3,
+      description: "Compare categories and segments",
+    },
+    {
+      name: "Pie Charts",
+      icon: PieChart,
+      description: "Composition and distribution",
+    },
+    {
+      name: "Heat Maps",
+      icon: Activity,
+      description: "Pattern recognition and density",
+    },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -112,7 +164,9 @@ export default function AnalyticsPage() {
               Advanced Analytics
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Transform raw data into actionable insights. Make data-driven decisions with AI-powered analytics, real-time dashboards, and predictive intelligence.
+              Transform raw data into actionable insights. Make data-driven
+              decisions with AI-powered analytics, real-time dashboards, and
+              predictive intelligence.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -133,7 +187,9 @@ export default function AnalyticsPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Powerful Analytics Features</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Powerful Analytics Features
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Everything you need to understand and optimize your inventory
             </p>
@@ -141,7 +197,7 @@ export default function AnalyticsPage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <Card key={feature.title}>
                   <CardHeader>
@@ -152,7 +208,7 @@ export default function AnalyticsPage() {
                     <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -162,7 +218,9 @@ export default function AnalyticsPage() {
       <section className="py-20 lg:py-28 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Comprehensive Analytics Modules</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Comprehensive Analytics Modules
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Deep insights across every aspect of your business
             </p>
@@ -170,7 +228,7 @@ export default function AnalyticsPage() {
 
           <div className="grid gap-8 lg:grid-cols-2">
             {analyticsModules.map((module) => {
-              const Icon = module.icon
+              const Icon = module.icon;
               return (
                 <Card key={module.title}>
                   <CardHeader>
@@ -180,10 +238,16 @@ export default function AnalyticsPage() {
                       </div>
                       <div className="flex-1">
                         <CardTitle className="mb-2">{module.title}</CardTitle>
-                        <CardDescription className="mb-4">{module.description}</CardDescription>
+                        <CardDescription className="mb-4">
+                          {module.description}
+                        </CardDescription>
                         <div className="flex flex-wrap gap-2">
                           {module.metrics.map((metric) => (
-                            <Badge key={metric} variant="secondary" className="text-xs">
+                            <Badge
+                              key={metric}
+                              variant="secondary"
+                              className="text-xs"
+                            >
                               {metric}
                             </Badge>
                           ))}
@@ -192,7 +256,7 @@ export default function AnalyticsPage() {
                     </div>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -202,7 +266,9 @@ export default function AnalyticsPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Rich Data Visualizations</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Rich Data Visualizations
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Multiple chart types for every analytical need
             </p>
@@ -210,7 +276,7 @@ export default function AnalyticsPage() {
 
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {visualizationTypes.map((viz) => {
-              const Icon = viz.icon
+              const Icon = viz.icon;
               return (
                 <Card key={viz.name} className="text-center">
                   <CardHeader>
@@ -221,7 +287,7 @@ export default function AnalyticsPage() {
                     <CardDescription>{viz.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -237,7 +303,8 @@ export default function AnalyticsPage() {
                 Data-Driven Decision Making
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our analytics platform delivers measurable improvements across your business.
+                Our analytics platform delivers measurable improvements across
+                your business.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -253,7 +320,9 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Analytics Dashboard</CardTitle>
-                  <CardDescription>Real-time insights at your fingertips</CardDescription>
+                  <CardDescription>
+                    Real-time insights at your fingertips
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-video bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg flex items-center justify-center border-2 border-dashed">
@@ -286,21 +355,24 @@ export default function AnalyticsPage() {
             {[
               {
                 title: "Anomaly Detection",
-                description: "Automatically identify unusual patterns and potential issues before they impact operations",
-                icon: Eye
+                description:
+                  "Automatically identify unusual patterns and potential issues before they impact operations",
+                icon: Eye,
               },
               {
                 title: "Trend Prediction",
-                description: "Forecast future demand with machine learning models trained on your historical data",
-                icon: TrendingUp
+                description:
+                  "Forecast future demand with machine learning models trained on your historical data",
+                icon: TrendingUp,
               },
               {
                 title: "Optimization Recommendations",
-                description: "Receive actionable suggestions to improve efficiency and reduce costs",
-                icon: Zap
-              }
+                description:
+                  "Receive actionable suggestions to improve efficiency and reduce costs",
+                icon: Zap,
+              },
             ].map((capability) => {
-              const Icon = capability.icon
+              const Icon = capability.icon;
               return (
                 <Card key={capability.title}>
                   <CardHeader>
@@ -311,7 +383,7 @@ export default function AnalyticsPage() {
                     <CardDescription>{capability.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -333,12 +405,17 @@ export default function AnalyticsPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 border-white text-white hover:bg-white/20" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-white/10 border-white text-white hover:bg-white/20"
+              asChild
+            >
               <Link href="/contact">Request Analytics Demo</Link>
             </Button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

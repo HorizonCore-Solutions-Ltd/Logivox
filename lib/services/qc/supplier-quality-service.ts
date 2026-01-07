@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -27,14 +27,14 @@ export class SupplierQualityService {
    */
   static async calculateQualityMetrics(
     supplierId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<QualityMetrics> {
     // Get all completed inspections
     const inspections = await prisma.qCReceivingInspection.findMany({
       where: {
         supplierId,
         organizationId,
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
       include: {
         defects: true,
@@ -55,56 +55,83 @@ export class SupplierQualityService {
         supplierId,
         organizationId,
         status: {
-          in: ['RECEIVED', 'CLOSED'],
+          in: ["RECEIVED", "CLOSED"],
         },
       },
     });
 
     // Calculate lifetime metrics
-    const totalUnitsReceived = inspections.reduce((sum, insp) => sum + insp.totalUnits, 0);
+    const totalUnitsReceived = inspections.reduce(
+      (sum, insp) => sum + insp.totalUnits,
+      0,
+    );
     const totalDefectiveUnits = inspections.reduce((sum, insp) => {
-      return sum + insp.defects.reduce((defectSum, defect) => defectSum + defect.quantityAffected, 0);
+      return (
+        sum +
+        insp.defects.reduce(
+          (defectSum, defect) => defectSum + defect.quantityAffected,
+          0,
+        )
+      );
     }, 0);
 
-    const lifetimeDefectRate = totalUnitsReceived > 0
-      ? (totalDefectiveUnits / totalUnitsReceived) * 100
-      : 0;
+    const lifetimeDefectRate =
+      totalUnitsReceived > 0
+        ? (totalDefectiveUnits / totalUnitsReceived) * 100
+        : 0;
 
     // Calculate 90-day metrics
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
 
     const recent90Inspections = inspections.filter(
-      insp => new Date(insp.createdAt) >= ninetyDaysAgo
+      (insp) => new Date(insp.createdAt) >= ninetyDaysAgo,
     );
 
-    const recent90Units = recent90Inspections.reduce((sum, insp) => sum + insp.totalUnits, 0);
+    const recent90Units = recent90Inspections.reduce(
+      (sum, insp) => sum + insp.totalUnits,
+      0,
+    );
     const recent90Defects = recent90Inspections.reduce((sum, insp) => {
-      return sum + insp.defects.reduce((defectSum, defect) => defectSum + defect.quantityAffected, 0);
+      return (
+        sum +
+        insp.defects.reduce(
+          (defectSum, defect) => defectSum + defect.quantityAffected,
+          0,
+        )
+      );
     }, 0);
 
-    const recent90DefectRate = recent90Units > 0
-      ? (recent90Defects / recent90Units) * 100
-      : 0;
+    const recent90DefectRate =
+      recent90Units > 0 ? (recent90Defects / recent90Units) * 100 : 0;
 
     // Calculate average resolution days for RTVs
-    const creditedRTVs = rtvs.filter(rtv => rtv.creditedAt);
-    const avgResolutionDays = creditedRTVs.length > 0
-      ? creditedRTVs.reduce((sum, rtv) => {
-          const created = new Date(rtv.createdAt).getTime();
-          const credited = new Date(rtv.creditedAt!).getTime();
-          return sum + (credited - created) / (1000 * 60 * 60 * 24);
-        }, 0) / creditedRTVs.length
-      : null;
+    const creditedRTVs = rtvs.filter((rtv) => rtv.creditedAt);
+    const avgResolutionDays =
+      creditedRTVs.length > 0
+        ? creditedRTVs.reduce((sum, rtv) => {
+            const created = new Date(rtv.createdAt).getTime();
+            const credited = new Date(rtv.creditedAt!).getTime();
+            return sum + (credited - created) / (1000 * 60 * 60 * 24);
+          }, 0) / creditedRTVs.length
+        : null;
 
     // Calculate total RTV value
-    const totalRtvValue = rtvs.reduce((sum, rtv) => sum + parseFloat(rtv.value.toString()), 0);
+    const totalRtvValue = rtvs.reduce(
+      (sum, rtv) => sum + parseFloat(rtv.value.toString()),
+      0,
+    );
 
     // Calculate scores (0-100)
     const qualityScore = this.calculateQualityScore(recent90DefectRate);
-    const reliabilityScore = this.calculateReliabilityScore(poCount, inspections.length);
+    const reliabilityScore = this.calculateReliabilityScore(
+      poCount,
+      inspections.length,
+    );
     const responseScore = this.calculateResponseScore(avgResolutionDays);
-    const overallScore = Math.round((qualityScore + reliabilityScore + responseScore) / 3);
+    const overallScore = Math.round(
+      (qualityScore + reliabilityScore + responseScore) / 3,
+    );
 
     // Determine status and tier
     const status = this.determineStatus(overallScore, recent90DefectRate);
@@ -147,11 +174,14 @@ export class SupplierQualityService {
   /**
    * Calculate reliability score based on order history
    */
-  private static calculateReliabilityScore(poCount: number, inspectionCount: number): number {
+  private static calculateReliabilityScore(
+    poCount: number,
+    inspectionCount: number,
+  ): number {
     if (poCount === 0) return 100; // New supplier, benefit of doubt
-    
+
     const inspectionRate = inspectionCount / poCount;
-    
+
     // Penalize if high inspection rate (indicates quality issues)
     if (inspectionRate < 0.1) return 100; // Very few inspections needed
     if (inspectionRate < 0.3) return 90;
@@ -163,9 +193,11 @@ export class SupplierQualityService {
   /**
    * Calculate response score based on RTV resolution time
    */
-  private static calculateResponseScore(avgResolutionDays: number | null): number {
+  private static calculateResponseScore(
+    avgResolutionDays: number | null,
+  ): number {
     if (avgResolutionDays === null) return 100; // No RTVs, good sign
-    
+
     if (avgResolutionDays <= 5) return 100;
     if (avgResolutionDays <= 10) return 90;
     if (avgResolutionDays <= 15) return 75;
@@ -177,44 +209,53 @@ export class SupplierQualityService {
   /**
    * Determine supplier status
    */
-  private static determineStatus(overallScore: number, defectRate: number): string {
+  private static determineStatus(
+    overallScore: number,
+    defectRate: number,
+  ): string {
     if (defectRate > 10 || overallScore < 40) {
-      return 'BLOCKED';
+      return "BLOCKED";
     }
     if (defectRate > 5 || overallScore < 60) {
-      return 'SUSPENDED';
+      return "SUSPENDED";
     }
     if (defectRate > 2 || overallScore < 75) {
-      return 'PROBATION';
+      return "PROBATION";
     }
-    return 'APPROVED';
+    return "APPROVED";
   }
 
   /**
    * Determine supplier tier
    */
   private static determineTier(overallScore: number): string {
-    if (overallScore >= 95) return 'PREMIUM';
-    if (overallScore >= 80) return 'STANDARD';
-    if (overallScore >= 60) return 'BASIC';
-    return 'POOR';
+    if (overallScore >= 95) return "PREMIUM";
+    if (overallScore >= 80) return "STANDARD";
+    if (overallScore >= 60) return "BASIC";
+    return "POOR";
   }
 
   /**
    * Update supplier quality score
    */
-  static async updateSupplierQuality(supplierId: string, organizationId: string) {
-    const metrics = await this.calculateQualityMetrics(supplierId, organizationId);
+  static async updateSupplierQuality(
+    supplierId: string,
+    organizationId: string,
+  ) {
+    const metrics = await this.calculateQualityMetrics(
+      supplierId,
+      organizationId,
+    );
 
     // Get recent dates
     const inspections = await prisma.qCReceivingInspection.findMany({
       where: {
         supplierId,
         organizationId,
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
       orderBy: {
-        completedAt: 'desc',
+        completedAt: "desc",
       },
       take: 100,
     });
@@ -227,7 +268,7 @@ export class SupplierQualityService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: 1,
     });
@@ -238,7 +279,7 @@ export class SupplierQualityService {
         organizationId,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: 1,
     });
@@ -247,7 +288,7 @@ export class SupplierQualityService {
     const recentInspections = inspections.slice(0, 10);
     let consecutiveGoodOrders = 0;
     for (const insp of recentInspections) {
-      if (insp.result === 'PASS') {
+      if (insp.result === "PASS") {
         consecutiveGoodOrders++;
       } else {
         break;
@@ -267,12 +308,20 @@ export class SupplierQualityService {
     });
 
     const recent90Inspections = inspections.filter(
-      insp => new Date(insp.createdAt) >= ninetyDaysAgo
+      (insp) => new Date(insp.createdAt) >= ninetyDaysAgo,
     );
 
-    const recent90Units = recent90Inspections.reduce((sum, insp) => sum + insp.totalUnits, 0);
-    const recent90Defects = recent90Inspections.reduce((sum, insp) => sum + insp.failedUnits, 0);
-    const recent90Rtvs = rtvs.filter(rtv => new Date(rtv.createdAt) >= ninetyDaysAgo).length;
+    const recent90Units = recent90Inspections.reduce(
+      (sum, insp) => sum + insp.totalUnits,
+      0,
+    );
+    const recent90Defects = recent90Inspections.reduce(
+      (sum, insp) => sum + insp.failedUnits,
+      0,
+    );
+    const recent90Rtvs = rtvs.filter(
+      (rtv) => new Date(rtv.createdAt) >= ninetyDaysAgo,
+    ).length;
 
     // Upsert quality score
     const qualityScore = await prisma.vendorQualityScore.upsert({
@@ -296,7 +345,9 @@ export class SupplierQualityService {
         recent90DaysRtv: recent90Rtvs,
         lifetimeDefectRate: metrics.lifetimeDefectRate,
         recent90DefectRate: metrics.recent90DefectRate,
-        avgResolutionDays: metrics.avgResolutionDays ? Math.round(metrics.avgResolutionDays) : null,
+        avgResolutionDays: metrics.avgResolutionDays
+          ? Math.round(metrics.avgResolutionDays)
+          : null,
         qualityScore: metrics.qualityScore,
         reliabilityScore: metrics.reliabilityScore,
         responseScore: metrics.responseScore,
@@ -320,7 +371,9 @@ export class SupplierQualityService {
         recent90DaysRtv: recent90Rtvs,
         lifetimeDefectRate: metrics.lifetimeDefectRate,
         recent90DefectRate: metrics.recent90DefectRate,
-        avgResolutionDays: metrics.avgResolutionDays ? Math.round(metrics.avgResolutionDays) : null,
+        avgResolutionDays: metrics.avgResolutionDays
+          ? Math.round(metrics.avgResolutionDays)
+          : null,
         qualityScore: metrics.qualityScore,
         reliabilityScore: metrics.reliabilityScore,
         responseScore: metrics.responseScore,
@@ -364,7 +417,7 @@ export class SupplierQualityService {
       tier?: string;
       minScore?: number;
       maxScore?: number;
-    } = {}
+    } = {},
   ) {
     const where: any = {
       organizationId,
@@ -384,7 +437,7 @@ export class SupplierQualityService {
         supplier: true,
       },
       orderBy: {
-        overallScore: 'desc',
+        overallScore: "desc",
       },
     });
   }
@@ -395,7 +448,7 @@ export class SupplierQualityService {
   static async getQualityTrends(
     supplierId: string,
     organizationId: string,
-    months: number = 6
+    months: number = 6,
   ) {
     const startDate = new Date();
     startDate.setMonth(startDate.getMonth() - months);
@@ -404,7 +457,7 @@ export class SupplierQualityService {
       where: {
         supplierId,
         organizationId,
-        status: 'COMPLETED',
+        status: "COMPLETED",
         completedAt: {
           gte: startDate,
         },
@@ -413,7 +466,7 @@ export class SupplierQualityService {
         defects: true,
       },
       orderBy: {
-        completedAt: 'asc',
+        completedAt: "asc",
       },
     });
 
@@ -422,8 +475,10 @@ export class SupplierQualityService {
     const monthsMap = new Map<string, any>();
 
     for (const inspection of inspections) {
-      const monthKey = new Date(inspection.completedAt!).toISOString().substring(0, 7); // YYYY-MM
-      
+      const monthKey = new Date(inspection.completedAt!)
+        .toISOString()
+        .substring(0, 7); // YYYY-MM
+
       if (!monthsMap.has(monthKey)) {
         monthsMap.set(monthKey, {
           month: monthKey,
@@ -439,16 +494,22 @@ export class SupplierQualityService {
       const data = monthsMap.get(monthKey);
       data.totalInspections++;
       data.totalUnits += inspection.totalUnits;
-      data.defectiveUnits += inspection.defects.reduce((sum, d) => sum + d.quantityAffected, 0);
-      if (inspection.result === 'PASS') data.passedInspections++;
-      if (inspection.result === 'FAIL') data.failedInspections++;
+      data.defectiveUnits += inspection.defects.reduce(
+        (sum, d) => sum + d.quantityAffected,
+        0,
+      );
+      if (inspection.result === "PASS") data.passedInspections++;
+      if (inspection.result === "FAIL") data.failedInspections++;
     }
 
     // Calculate defect rates
     for (const [month, data] of monthsMap.entries()) {
-      data.defectRate = data.totalUnits > 0
-        ? parseFloat(((data.defectiveUnits / data.totalUnits) * 100).toFixed(2))
-        : 0;
+      data.defectRate =
+        data.totalUnits > 0
+          ? parseFloat(
+              ((data.defectiveUnits / data.totalUnits) * 100).toFixed(2),
+            )
+          : 0;
       trends.push(data);
     }
 
@@ -458,10 +519,7 @@ export class SupplierQualityService {
   /**
    * Compare suppliers
    */
-  static async compareSuppliers(
-    organizationId: string,
-    supplierIds: string[]
-  ) {
+  static async compareSuppliers(organizationId: string, supplierIds: string[]) {
     const suppliers = await prisma.vendorQualityScore.findMany({
       where: {
         organizationId,
@@ -474,7 +532,7 @@ export class SupplierQualityService {
       },
     });
 
-    return suppliers.map(s => ({
+    return suppliers.map((s) => ({
       supplierId: s.supplierId,
       supplierName: s.supplier.name,
       overallScore: s.overallScore,
@@ -501,7 +559,10 @@ export class SupplierQualityService {
     const results = [];
     for (const supplier of suppliers) {
       try {
-        const qualityScore = await this.updateSupplierQuality(supplier.id, organizationId);
+        const qualityScore = await this.updateSupplierQuality(
+          supplier.id,
+          organizationId,
+        );
         results.push({ supplierId: supplier.id, success: true, qualityScore });
       } catch (error) {
         results.push({ supplierId: supplier.id, success: false, error });

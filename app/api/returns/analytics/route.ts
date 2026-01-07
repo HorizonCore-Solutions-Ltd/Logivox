@@ -6,13 +6,13 @@
  * GET /api/returns/analytics/staffing - Get staffing recommendations
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { ReturnsForecastingService } from '@/lib/services/returns/predictive-analytics';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { ReturnsForecastingService } from "@/lib/services/returns/predictive-analytics";
 
 const generateForecastSchema = z.object({
   periodDays: z.number().min(1).max(365).default(30),
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -32,13 +32,16 @@ export async function GET(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type'); // forecasts, trends, staffing
+    const type = searchParams.get("type"); // forecasts, trends, staffing
 
-    if (type === 'trends') {
+    if (type === "trends") {
       // Get return trends
       const trends = await prisma.$queryRaw`
         SELECT 
@@ -95,11 +98,11 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    if (type === 'staffing') {
+    if (type === "staffing") {
       const forecastingService = new ReturnsForecastingService();
       const staffing = await forecastingService.recommendStaffing(
         membership.organizationId,
-        30 // next 30 days
+        30, // next 30 days
       );
 
       return NextResponse.json({ staffing });
@@ -115,10 +118,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ forecasts });
   } catch (error) {
-    console.error('Error fetching analytics:', error);
+    console.error("Error fetching analytics:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch analytics data' },
-      { status: 500 }
+      { error: "Failed to fetch analytics data" },
+      { status: 500 },
     );
   }
 }
@@ -127,7 +130,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -135,14 +138,17 @@ export async function POST(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
     const data = generateForecastSchema.parse(body);
 
     // Get historical return data
-    const historicalData = await prisma.$queryRaw`
+    const historicalData = (await prisma.$queryRaw`
       SELECT 
         DATE_TRUNC('day', created_at) as date,
         COUNT(*) as return_count,
@@ -153,10 +159,10 @@ export async function POST(request: NextRequest) {
         AND created_at >= NOW() - INTERVAL '365 days'
       GROUP BY DATE_TRUNC('day', created_at)
       ORDER BY date
-    ` as any[];
+    `) as any[];
 
     // Get seasonal patterns
-    const seasonalData = await prisma.$queryRaw`
+    const seasonalData = (await prisma.$queryRaw`
       SELECT 
         EXTRACT(DOW FROM created_at) as day_of_week,
         EXTRACT(MONTH FROM created_at) as month,
@@ -166,7 +172,7 @@ export async function POST(request: NextRequest) {
       WHERE organization_id = ${membership.organizationId}
         AND created_at >= NOW() - INTERVAL '365 days'
       GROUP BY EXTRACT(DOW FROM created_at), EXTRACT(MONTH FROM created_at)
-    ` as any[];
+    `) as any[];
 
     const forecastingService = new ReturnsForecastingService();
     const forecast = await forecastingService.generateForecast({
@@ -201,8 +207,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: membership.organizationId,
         userId: session.user.id,
-        action: 'FORECAST_GENERATED',
-        entityType: 'FORECAST',
+        action: "FORECAST_GENERATED",
+        entityType: "FORECAST",
         entityId: forecast.id,
         metadata: {
           periodDays: data.periodDays,
@@ -214,20 +220,23 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       forecast,
-      message: 'Forecast generated successfully',
+      message: "Forecast generated successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error generating forecast:', error);
+    console.error("Error generating forecast:", error);
     return NextResponse.json(
-      { error: 'Failed to generate forecast', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to generate forecast",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

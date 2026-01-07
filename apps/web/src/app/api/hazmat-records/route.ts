@@ -1,21 +1,24 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const hazmatSchema = z.object({
   productId: z.string(),
-  unNumber: z.string().min(1, 'UN Number is required'), // UN identification number
-  hazardClass: z.string().min(1, 'Hazard class is required'),
-  packingGroup: z.enum(['I', 'II', 'III']).optional(),
-  properShippingName: z.string().min(1, 'Proper shipping name is required'),
+  unNumber: z.string().min(1, "UN Number is required"), // UN identification number
+  hazardClass: z.string().min(1, "Hazard class is required"),
+  packingGroup: z.enum(["I", "II", "III"]).optional(),
+  properShippingName: z.string().min(1, "Proper shipping name is required"),
   msdsUrl: z.string().url().optional(), // Material Safety Data Sheet
   storageRequirements: z.string().optional(),
   handlingInstructions: z.string().optional(),
   emergencyContact: z.string().optional(),
-  expiryDate: z.string().transform(str => new Date(str)).optional(),
+  expiryDate: z
+    .string()
+    .transform((str) => new Date(str))
+    .optional(),
   certificationNumber: z.string().optional(),
   isActive: z.boolean().default(true),
 });
@@ -28,30 +31,35 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { searchParams } = new URL(req.url);
-    const productId = searchParams.get('productId');
-    const hazardClass = searchParams.get('hazardClass');
-    const isActive = searchParams.get('isActive');
+    const productId = searchParams.get("productId");
+    const hazardClass = searchParams.get("hazardClass");
+    const isActive = searchParams.get("isActive");
 
     const records = await prisma.hazmatRecord.findMany({
       where: {
         organizationId,
         ...(productId && { productId }),
         ...(hazardClass && { hazardClass }),
-        ...(isActive !== null && { isActive: isActive === 'true' }),
+        ...(isActive !== null && { isActive: isActive === "true" }),
       },
       include: {
         product: {
@@ -63,13 +71,16 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(records);
   } catch (error: any) {
-    console.error('Error fetching hazmat records:', error);
-    return NextResponse.json({ error: 'Failed to fetch hazmat records' }, { status: 500 });
+    console.error("Error fetching hazmat records:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch hazmat records" },
+      { status: 500 },
+    );
   }
 }
 
@@ -81,16 +92,21 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -106,7 +122,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
     // Check if hazmat record already exists for this product
@@ -120,8 +136,8 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Active hazmat record already exists for this product' },
-        { status: 400 }
+        { error: "Active hazmat record already exists for this product" },
+        { status: 400 },
       );
     }
 
@@ -153,8 +169,8 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'HAZMAT_RECORD_CREATED',
-        entityType: 'HazmatRecord',
+        action: "HAZMAT_RECORD_CREATED",
+        entityType: "HazmatRecord",
         entityId: record.id,
         metadata: {
           productId: product.id,
@@ -168,9 +184,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(record, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error creating hazmat record:', error);
-    return NextResponse.json({ error: 'Failed to create hazmat record' }, { status: 500 });
+    console.error("Error creating hazmat record:", error);
+    return NextResponse.json(
+      { error: "Failed to create hazmat record" },
+      { status: 500 },
+    );
   }
 }

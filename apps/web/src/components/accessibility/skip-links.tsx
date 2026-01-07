@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 /**
  * Skip Links Component
@@ -6,38 +6,42 @@
  * Links are hidden until focused, then appear at the top of the page
  */
 
-import Link from 'next/link'
-import { DEFAULT_SKIP_LINKS, handleSkipLinkClick, type SkipLink } from '@/lib/accessibility'
+import Link from "next/link";
+import {
+  DEFAULT_SKIP_LINKS,
+  handleSkipLinkClick,
+  type SkipLink,
+} from "@/lib/accessibility";
 
 interface SkipLinksProps {
   /**
    * Custom skip links to display (defaults to DEFAULT_SKIP_LINKS)
    */
-  links?: SkipLink[]
-  
+  links?: SkipLink[];
+
   /**
    * Additional CSS classes
    */
-  className?: string
+  className?: string;
 }
 
 /**
  * Skip Links - Accessibility feature for keyboard navigation
- * 
+ *
  * Provides quick links to jump to main content sections, bypassing
  * repetitive navigation. Links are visually hidden until focused.
- * 
+ *
  * @example
  * ```tsx
  * <SkipLinks />
  * ```
  */
-export function SkipLinks({ links = DEFAULT_SKIP_LINKS, className }: SkipLinksProps) {
+export function SkipLinks({
+  links = DEFAULT_SKIP_LINKS,
+  className,
+}: SkipLinksProps) {
   return (
-    <nav
-      aria-label="Skip links"
-      className={className}
-    >
+    <nav aria-label="Skip links" className={className}>
       <ul className="sr-only-focusable">
         {links.map((link) => (
           <li key={link.id}>
@@ -52,13 +56,13 @@ export function SkipLinks({ links = DEFAULT_SKIP_LINKS, className }: SkipLinksPr
         ))}
       </ul>
     </nav>
-  )
+  );
 }
 
 /**
  * Skip Link Target Component
  * Marks a section as a skip link target
- * 
+ *
  * @example
  * ```tsx
  * <SkipLinkTarget id="main-content">
@@ -71,13 +75,13 @@ export function SkipLinkTarget({
   children,
   className,
 }: {
-  id: string
-  children: React.ReactNode
-  className?: string
+  id: string;
+  children: React.ReactNode;
+  className?: string;
 }) {
   return (
     <div id={id} tabIndex={-1} className={className}>
       {children}
     </div>
-  )
+  );
 }

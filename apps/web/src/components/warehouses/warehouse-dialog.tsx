@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useMutation } from "@tanstack/react-query"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
+import * as React from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 
 import {
   Dialog,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,31 +21,31 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 // Form schema
 const warehouseSchema = z.object({
   name: z.string().min(1, "Name is required"),
   location: z.string().optional(),
   description: z.string().optional(),
-})
+});
 
-type WarehouseFormValues = z.infer<typeof warehouseSchema>
+type WarehouseFormValues = z.infer<typeof warehouseSchema>;
 
 interface WarehouseDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   warehouse?: {
-    id: string
-    name: string
-    location: string | null
-    description: string | null
-  } | null
-  onSuccess?: () => void
+    id: string;
+    name: string;
+    location: string | null;
+    description: string | null;
+  } | null;
+  onSuccess?: () => void;
 }
 
 export function WarehouseDialog({
@@ -54,8 +54,8 @@ export function WarehouseDialog({
   warehouse,
   onSuccess,
 }: WarehouseDialogProps) {
-  const { toast } = useToast()
-  const isEditing = !!warehouse
+  const { toast } = useToast();
+  const isEditing = !!warehouse;
 
   const form = useForm<WarehouseFormValues>({
     resolver: zodResolver(warehouseSchema),
@@ -64,7 +64,7 @@ export function WarehouseDialog({
       location: warehouse?.location || "",
       description: warehouse?.description || "",
     },
-  })
+  });
 
   // Reset form when warehouse changes
   React.useEffect(() => {
@@ -73,57 +73,57 @@ export function WarehouseDialog({
         name: warehouse.name,
         location: warehouse.location || "",
         description: warehouse.description || "",
-      })
+      });
     } else {
       form.reset({
         name: "",
         location: "",
         description: "",
-      })
+      });
     }
-  }, [warehouse, form])
+  }, [warehouse, form]);
 
   // Create/Update mutation
   const mutation = useMutation({
     mutationFn: async (values: WarehouseFormValues) => {
       const url = isEditing
         ? `/api/warehouses/${warehouse.id}`
-        : "/api/warehouses"
-      const method = isEditing ? "PUT" : "POST"
+        : "/api/warehouses";
+      const method = isEditing ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
-      })
+      });
 
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.message || "Failed to save warehouse")
+        const error = await res.json();
+        throw new Error(error.message || "Failed to save warehouse");
       }
 
-      return res.json()
+      return res.json();
     },
     onSuccess: () => {
       toast({
         title: "Success",
         description: `Warehouse ${isEditing ? "updated" : "created"} successfully`,
-      })
-      form.reset()
-      onSuccess?.()
+      });
+      form.reset();
+      onSuccess?.();
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const onSubmit = (values: WarehouseFormValues) => {
-    mutation.mutate(values)
-  }
+    mutation.mutate(values);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -208,13 +208,13 @@ export function WarehouseDialog({
                     ? "Updating..."
                     : "Creating..."
                   : isEditing
-                  ? "Update"
-                  : "Create"}
+                    ? "Update"
+                    : "Create"}
               </Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

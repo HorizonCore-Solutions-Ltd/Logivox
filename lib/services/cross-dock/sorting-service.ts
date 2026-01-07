@@ -3,8 +3,8 @@
  * Manages sorting operations, worker assignments, and progress tracking
  */
 
-import { prisma } from '@/lib/prisma';
-import type { SortingMethod } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import type { SortingMethod } from "@prisma/client";
 
 interface CreateSortingTaskInput {
   organizationId: string;
@@ -39,7 +39,14 @@ interface PickingUpdateInput {
  * Create a sorting task for an appointment
  */
 export async function createSortingTask(input: CreateSortingTaskInput) {
-  const { organizationId, appointmentId, sortingMethod, sortingAreaId, assignedWorkerId, teamSize } = input;
+  const {
+    organizationId,
+    appointmentId,
+    sortingMethod,
+    sortingAreaId,
+    assignedWorkerId,
+    teamSize,
+  } = input;
 
   // Get appointment details
   const appointment = await prisma.crossDockingAppointment.findUnique({
@@ -54,13 +61,18 @@ export async function createSortingTask(input: CreateSortingTaskInput) {
   });
 
   if (!appointment) {
-    throw new Error('Appointment not found');
+    throw new Error("Appointment not found");
   }
 
   // Calculate total units to sort
   const totalUnits = appointment.receipts.reduce(
-    (sum, receipt) => sum + receipt.items.reduce((itemSum, item) => itemSum + item.quantityReceived, 0),
-    0
+    (sum, receipt) =>
+      sum +
+      receipt.items.reduce(
+        (itemSum, item) => itemSum + item.quantityReceived,
+        0,
+      ),
+    0,
   );
 
   // Create sorting task
@@ -74,7 +86,7 @@ export async function createSortingTask(input: CreateSortingTaskInput) {
       teamSize: teamSize || 1,
       totalUnits,
       sortedUnits: 0,
-      status: 'PENDING',
+      status: "PENDING",
     },
   });
 
@@ -92,24 +104,25 @@ export async function updateSortingProgress(input: UpdateSortingProgressInput) {
   });
 
   if (!sorting) {
-    throw new Error('Sorting task not found');
+    throw new Error("Sorting task not found");
   }
 
   const updateData: any = {
     sortedUnits: Math.min(sortedUnits, sorting.totalUnits),
-    status: sortedUnits >= sorting.totalUnits ? 'COMPLETED' : 'IN_PROGRESS',
+    status: sortedUnits >= sorting.totalUnits ? "COMPLETED" : "IN_PROGRESS",
   };
 
-  if (sorting.status === 'PENDING' && sortedUnits > 0) {
+  if (sorting.status === "PENDING" && sortedUnits > 0) {
     updateData.startedAt = new Date();
   }
 
   if (sortedUnits >= sorting.totalUnits) {
     updateData.completedAt = new Date();
-    
+
     // Calculate actual duration
     if (sorting.startedAt) {
-      const duration = (new Date().getTime() - sorting.startedAt.getTime()) / (1000 * 60 * 60); // hours
+      const duration =
+        (new Date().getTime() - sorting.startedAt.getTime()) / (1000 * 60 * 60); // hours
       if (duration > 0) {
         updateData.unitsPerHour = Math.round(sorting.totalUnits / duration);
       }
@@ -171,7 +184,7 @@ export async function getSortingTasks(filters: {
       },
       sortingArea: true,
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 }
 
@@ -190,11 +203,14 @@ export async function updateAllocationPicking(input: PickingUpdateInput) {
   });
 
   if (!allocation) {
-    throw new Error('Allocation not found');
+    throw new Error("Allocation not found");
   }
 
-  if (quantityPicked > allocation.quantityAllocated - allocation.quantityPicked) {
-    throw new Error('Picked quantity exceeds allocated quantity');
+  if (
+    quantityPicked >
+    allocation.quantityAllocated - allocation.quantityPicked
+  ) {
+    throw new Error("Picked quantity exceeds allocated quantity");
   }
 
   const newQuantityPicked = allocation.quantityPicked + quantityPicked;
@@ -205,7 +221,7 @@ export async function updateAllocationPicking(input: PickingUpdateInput) {
     where: { id: allocationId },
     data: {
       quantityPicked: newQuantityPicked,
-      status: isFullyPicked ? 'PICKED' : 'PICKING',
+      status: isFullyPicked ? "PICKED" : "PICKING",
       assignedTo: allocation.assignedTo || userId,
     },
   });
@@ -226,24 +242,27 @@ export async function updateAllocationPicking(input: PickingUpdateInput) {
 /**
  * Stage allocation (mark as ready for loading)
  */
-export async function stageAllocation(allocationId: string, locationId?: string) {
+export async function stageAllocation(
+  allocationId: string,
+  locationId?: string,
+) {
   const allocation = await prisma.crossDockAllocation.findUnique({
     where: { id: allocationId },
   });
 
   if (!allocation) {
-    throw new Error('Allocation not found');
+    throw new Error("Allocation not found");
   }
 
-  if (allocation.status !== 'PICKED') {
-    throw new Error('Can only stage picked allocations');
+  if (allocation.status !== "PICKED") {
+    throw new Error("Can only stage picked allocations");
   }
 
   // Update allocation status
   const updated = await prisma.crossDockAllocation.update({
     where: { id: allocationId },
     data: {
-      status: 'STAGED',
+      status: "STAGED",
     },
   });
 
@@ -272,18 +291,18 @@ export async function loadAllocation(allocationId: string) {
   });
 
   if (!allocation) {
-    throw new Error('Allocation not found');
+    throw new Error("Allocation not found");
   }
 
-  if (allocation.status !== 'STAGED') {
-    throw new Error('Can only load staged allocations');
+  if (allocation.status !== "STAGED") {
+    throw new Error("Can only load staged allocations");
   }
 
   // Update allocation
   const updated = await prisma.crossDockAllocation.update({
     where: { id: allocationId },
     data: {
-      status: 'LOADED',
+      status: "LOADED",
     },
   });
 
@@ -310,14 +329,14 @@ export async function shipAllocation(allocationId: string) {
   });
 
   if (!allocation) {
-    throw new Error('Allocation not found');
+    throw new Error("Allocation not found");
   }
 
   // Update allocation
   const updated = await prisma.crossDockAllocation.update({
     where: { id: allocationId },
     data: {
-      status: 'SHIPPED',
+      status: "SHIPPED",
       quantityShipped: allocation.quantityPicked,
     },
   });
@@ -327,13 +346,15 @@ export async function shipAllocation(allocationId: string) {
     where: { shipmentId: allocation.shipmentId },
   });
 
-  const allShipped = allAllocations.every((alloc) => alloc.status === 'SHIPPED');
+  const allShipped = allAllocations.every(
+    (alloc) => alloc.status === "SHIPPED",
+  );
 
   if (allShipped) {
     await prisma.crossDockShipment.update({
       where: { id: allocation.shipmentId },
       data: {
-        status: 'SHIPPED',
+        status: "SHIPPED",
         actualShipDate: new Date(),
       },
     });
@@ -348,7 +369,7 @@ export async function shipAllocation(allocationId: string) {
 export async function bulkUpdateAllocations(
   allocationIds: string[],
   status: string,
-  userId?: string
+  userId?: string,
 ) {
   const updated = await prisma.crossDockAllocation.updateMany({
     where: {
@@ -379,7 +400,7 @@ export async function getAllocationWorkflow(shipmentId: string) {
             },
           },
         },
-        orderBy: { allocatedAt: 'asc' },
+        orderBy: { allocatedAt: "asc" },
       },
       appointment: true,
       customer: true,
@@ -396,19 +417,31 @@ export async function getAllocationWorkflow(shipmentId: string) {
   });
 
   if (!shipment) {
-    throw new Error('Shipment not found');
+    throw new Error("Shipment not found");
   }
 
   // Calculate workflow status
   const totalAllocations = shipment.allocations.length;
-  const statusCounts = shipment.allocations.reduce((acc, alloc) => {
-    acc[alloc.status] = (acc[alloc.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const statusCounts = shipment.allocations.reduce(
+    (acc, alloc) => {
+      acc[alloc.status] = (acc[alloc.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-  const totalQuantity = shipment.allocations.reduce((sum, a) => sum + a.quantityAllocated, 0);
-  const pickedQuantity = shipment.allocations.reduce((sum, a) => sum + a.quantityPicked, 0);
-  const shippedQuantity = shipment.allocations.reduce((sum, a) => sum + a.quantityShipped, 0);
+  const totalQuantity = shipment.allocations.reduce(
+    (sum, a) => sum + a.quantityAllocated,
+    0,
+  );
+  const pickedQuantity = shipment.allocations.reduce(
+    (sum, a) => sum + a.quantityPicked,
+    0,
+  );
+  const shippedQuantity = shipment.allocations.reduce(
+    (sum, a) => sum + a.quantityShipped,
+    0,
+  );
 
   return {
     shipment,
@@ -419,8 +452,10 @@ export async function getAllocationWorkflow(shipmentId: string) {
         totalQuantity,
         pickedQuantity,
         shippedQuantity,
-        pickingProgress: totalQuantity > 0 ? (pickedQuantity / totalQuantity) * 100 : 0,
-        shippingProgress: totalQuantity > 0 ? (shippedQuantity / totalQuantity) * 100 : 0,
+        pickingProgress:
+          totalQuantity > 0 ? (pickedQuantity / totalQuantity) * 100 : 0,
+        shippingProgress:
+          totalQuantity > 0 ? (shippedQuantity / totalQuantity) * 100 : 0,
       },
     },
   };
@@ -461,17 +496,35 @@ export async function getWorkerPerformance(filters: {
   });
 
   // Aggregate metrics
-  const totalTasksCompleted = sortingTasks.filter((t) => t.status === 'COMPLETED').length;
-  const totalUnitsSorted = sortingTasks.reduce((sum, t) => sum + t.sortedUnits, 0);
-  const avgUnitsPerHour = sortingTasks.length > 0
-    ? sortingTasks.reduce((sum, t) => sum + (t.unitsPerHour || 0), 0) / sortingTasks.length
-    : 0;
-  const avgAccuracy = sortingTasks.length > 0
-    ? sortingTasks.reduce((sum, t) => sum + (t.accuracy || 100), 0) / sortingTasks.length
-    : 100;
+  const totalTasksCompleted = sortingTasks.filter(
+    (t) => t.status === "COMPLETED",
+  ).length;
+  const totalUnitsSorted = sortingTasks.reduce(
+    (sum, t) => sum + t.sortedUnits,
+    0,
+  );
+  const avgUnitsPerHour =
+    sortingTasks.length > 0
+      ? sortingTasks.reduce((sum, t) => sum + (t.unitsPerHour || 0), 0) /
+        sortingTasks.length
+      : 0;
+  const avgAccuracy =
+    sortingTasks.length > 0
+      ? sortingTasks.reduce((sum, t) => sum + (t.accuracy || 100), 0) /
+        sortingTasks.length
+      : 100;
 
-  const totalAllocationsPicked = allocations.filter((a) => a.status === 'PICKED' || a.status === 'STAGED' || a.status === 'LOADED' || a.status === 'SHIPPED').length;
-  const totalUnitsPicked = allocations.reduce((sum, a) => sum + a.quantityPicked, 0);
+  const totalAllocationsPicked = allocations.filter(
+    (a) =>
+      a.status === "PICKED" ||
+      a.status === "STAGED" ||
+      a.status === "LOADED" ||
+      a.status === "SHIPPED",
+  ).length;
+  const totalUnitsPicked = allocations.reduce(
+    (sum, a) => sum + a.quantityPicked,
+    0,
+  );
 
   return {
     workerId: filters.workerId,
@@ -523,44 +576,49 @@ export async function getSortingAreaUtilization(filters: {
   });
 
   // Group by sorting area
-  const areaStats = sortingTasks.reduce((acc, task) => {
-    const areaId = task.sortingAreaId || 'unassigned';
-    if (!acc[areaId]) {
-      acc[areaId] = {
-        areaId,
-        areaName: task.sortingArea?.name || 'Unassigned',
-        totalTasks: 0,
-        completedTasks: 0,
-        totalUnits: 0,
-        sortedUnits: 0,
-        avgUnitsPerHour: 0,
-        avgAccuracy: 0,
-        taskCount: 0,
-      };
-    }
+  const areaStats = sortingTasks.reduce(
+    (acc, task) => {
+      const areaId = task.sortingAreaId || "unassigned";
+      if (!acc[areaId]) {
+        acc[areaId] = {
+          areaId,
+          areaName: task.sortingArea?.name || "Unassigned",
+          totalTasks: 0,
+          completedTasks: 0,
+          totalUnits: 0,
+          sortedUnits: 0,
+          avgUnitsPerHour: 0,
+          avgAccuracy: 0,
+          taskCount: 0,
+        };
+      }
 
-    acc[areaId].totalTasks++;
-    if (task.status === 'COMPLETED') acc[areaId].completedTasks++;
-    acc[areaId].totalUnits += task.totalUnits;
-    acc[areaId].sortedUnits += task.sortedUnits;
-    if (task.unitsPerHour) {
-      acc[areaId].avgUnitsPerHour += task.unitsPerHour;
-      acc[areaId].taskCount++;
-    }
-    if (task.accuracy) {
-      acc[areaId].avgAccuracy += task.accuracy;
-    }
+      acc[areaId].totalTasks++;
+      if (task.status === "COMPLETED") acc[areaId].completedTasks++;
+      acc[areaId].totalUnits += task.totalUnits;
+      acc[areaId].sortedUnits += task.sortedUnits;
+      if (task.unitsPerHour) {
+        acc[areaId].avgUnitsPerHour += task.unitsPerHour;
+        acc[areaId].taskCount++;
+      }
+      if (task.accuracy) {
+        acc[areaId].avgAccuracy += task.accuracy;
+      }
 
-    return acc;
-  }, {} as Record<string, any>);
+      return acc;
+    },
+    {} as Record<string, any>,
+  );
 
   // Calculate averages
   Object.values(areaStats).forEach((area: any) => {
     if (area.taskCount > 0) {
       area.avgUnitsPerHour = Math.round(area.avgUnitsPerHour / area.taskCount);
-      area.avgAccuracy = Math.round((area.avgAccuracy / area.totalTasks) * 10) / 10;
+      area.avgAccuracy =
+        Math.round((area.avgAccuracy / area.totalTasks) * 10) / 10;
     }
-    area.utilizationRate = area.totalUnits > 0 ? (area.sortedUnits / area.totalUnits) * 100 : 0;
+    area.utilizationRate =
+      area.totalUnits > 0 ? (area.sortedUnits / area.totalUnits) * 100 : 0;
   });
 
   return Object.values(areaStats);

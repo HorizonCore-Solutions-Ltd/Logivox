@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Warehouse,
   Package,
@@ -21,47 +27,54 @@ import {
   TrendingUp,
   Box,
   Scan,
-  Database
-} from "lucide-react"
+  Database,
+} from "lucide-react";
 
 export default function WarehouseManagementPage() {
   const coreFeatures = [
     {
       icon: Package,
       title: "Inventory Control",
-      description: "Real-time tracking of all stock with bin-level accuracy, serial number tracking, and batch management."
+      description:
+        "Real-time tracking of all stock with bin-level accuracy, serial number tracking, and batch management.",
     },
     {
       icon: MapPin,
       title: "Location Management",
-      description: "Optimize warehouse space with zone-based storage, putaway strategies, and dynamic slotting."
+      description:
+        "Optimize warehouse space with zone-based storage, putaway strategies, and dynamic slotting.",
     },
     {
       icon: Scan,
       title: "Barcode Scanning",
-      description: "Mobile barcode scanning for receiving, picking, packing, and cycle counting operations."
+      description:
+        "Mobile barcode scanning for receiving, picking, packing, and cycle counting operations.",
     },
     {
       icon: ClipboardCheck,
       title: "Order Fulfillment",
-      description: "Streamline picking, packing, and shipping with wave planning and batch processing."
+      description:
+        "Streamline picking, packing, and shipping with wave planning and batch processing.",
     },
     {
       icon: Users,
       title: "Labor Management",
-      description: "Track productivity, manage shifts, and optimize workforce allocation across warehouse zones."
+      description:
+        "Track productivity, manage shifts, and optimize workforce allocation across warehouse zones.",
     },
     {
       icon: BarChart3,
       title: "Real-Time Analytics",
-      description: "Live dashboards with KPIs, performance metrics, and actionable insights for continuous improvement."
-    }
-  ]
+      description:
+        "Live dashboards with KPIs, performance metrics, and actionable insights for continuous improvement.",
+    },
+  ];
 
   const modules = [
     {
       title: "Receiving Operations",
-      description: "Streamline inbound logistics with advanced receiving workflows",
+      description:
+        "Streamline inbound logistics with advanced receiving workflows",
       icon: Truck,
       capabilities: [
         "ASN (Advanced Shipping Notice) integration",
@@ -69,12 +82,13 @@ export default function WarehouseManagementPage() {
         "Quality inspection checkpoints",
         "Putaway optimization algorithms",
         "Vendor compliance tracking",
-        "Blind receiving support"
-      ]
+        "Blind receiving support",
+      ],
     },
     {
       title: "Inventory Management",
-      description: "Complete visibility and control over all warehouse inventory",
+      description:
+        "Complete visibility and control over all warehouse inventory",
       icon: Database,
       capabilities: [
         "Multi-location inventory tracking",
@@ -82,8 +96,8 @@ export default function WarehouseManagementPage() {
         "Expiration date (FEFO) tracking",
         "Cycle counting and physical inventory",
         "Min/max replenishment rules",
-        "Inventory reservations and allocations"
-      ]
+        "Inventory reservations and allocations",
+      ],
     },
     {
       title: "Order Processing",
@@ -95,8 +109,8 @@ export default function WarehouseManagementPage() {
         "Pick-to-light and RF-directed picking",
         "Packing and cartonization",
         "Shipping label generation",
-        "Rate shopping and carrier integration"
-      ]
+        "Rate shopping and carrier integration",
+      ],
     },
     {
       title: "Warehouse Optimization",
@@ -108,37 +122,37 @@ export default function WarehouseManagementPage() {
         "Route optimization for pickers",
         "Space utilization analytics",
         "ABC analysis for strategic placement",
-        "Seasonal demand adjustment"
-      ]
-    }
-  ]
+        "Seasonal demand adjustment",
+      ],
+    },
+  ];
 
   const benefits = [
     {
       metric: "99.9%",
-      description: "Inventory accuracy with real-time tracking"
+      description: "Inventory accuracy with real-time tracking",
     },
     {
       metric: "40%",
-      description: "Increase in picking productivity"
+      description: "Increase in picking productivity",
     },
     {
       metric: "60%",
-      description: "Reduction in order processing time"
+      description: "Reduction in order processing time",
     },
     {
       metric: "35%",
-      description: "Improvement in space utilization"
+      description: "Improvement in space utilization",
     },
     {
       metric: "50%",
-      description: "Decrease in labor costs through optimization"
+      description: "Decrease in labor costs through optimization",
     },
     {
       metric: "95%",
-      description: "On-time shipping performance"
-    }
-  ]
+      description: "On-time shipping performance",
+    },
+  ];
 
   const integrations = [
     "ERP Systems (SAP, Oracle, NetSuite, Microsoft Dynamics)",
@@ -146,8 +160,8 @@ export default function WarehouseManagementPage() {
     "Shipping Carriers (FedEx, UPS, DHL, USPS)",
     "3PL Provider Networks",
     "EDI and API Integrations",
-    "Accounting Software (QuickBooks, Xero)"
-  ]
+    "Accounting Software (QuickBooks, Xero)",
+  ];
 
   return (
     <div className="flex flex-col">
@@ -162,9 +176,9 @@ export default function WarehouseManagementPage() {
               Enterprise Warehouse Management Built for Scale
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Transform your warehouse operations with our comprehensive WMS platform. 
-              Real-time inventory control, optimized workflows, and powerful analytics 
-              to maximize efficiency and reduce costs.
+              Transform your warehouse operations with our comprehensive WMS
+              platform. Real-time inventory control, optimized workflows, and
+              powerful analytics to maximize efficiency and reduce costs.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -232,7 +246,9 @@ export default function WarehouseManagementPage() {
                     </div>
                     <div>
                       <CardTitle className="text-xl">{module.title}</CardTitle>
-                      <CardDescription className="mt-1">{module.description}</CardDescription>
+                      <CardDescription className="mt-1">
+                        {module.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -267,8 +283,12 @@ export default function WarehouseManagementPage() {
             {benefits.map((benefit, index) => (
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">{benefit.metric}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{benefit.description}</p>
+                  <div className="text-4xl font-bold text-primary">
+                    {benefit.metric}
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {benefit.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -310,7 +330,8 @@ export default function WarehouseManagementPage() {
               Ready to Transform Your Warehouse?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join hundreds of companies optimizing their warehouse operations with LogiVox
+              Join hundreds of companies optimizing their warehouse operations
+              with LogiVox
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -326,5 +347,5 @@ export default function WarehouseManagementPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

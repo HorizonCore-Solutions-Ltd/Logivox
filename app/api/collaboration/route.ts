@@ -3,23 +3,23 @@
  * H2H (Human-to-Human), H2R (Human-to-Robot), R2R (Robot-to-Robot), Predictive collaboration
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 // GET - List collaboration requests
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const requestId = searchParams.get('requestId');
-    const requestType = searchParams.get('requestType');
-    const status = searchParams.get('status');
-    const userId = searchParams.get('userId');
+    const requestId = searchParams.get("requestId");
+    const requestType = searchParams.get("requestType");
+    const status = searchParams.get("status");
+    const userId = searchParams.get("userId");
 
     // Get specific request
     if (requestId) {
@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
             },
           },
           messages: {
-            orderBy: { timestamp: 'asc' },
+            orderBy: { timestamp: "asc" },
             include: {
               sender: {
                 select: {
@@ -56,7 +56,10 @@ export async function GET(req: NextRequest) {
       });
 
       if (!request) {
-        return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+        return NextResponse.json(
+          { error: "Request not found" },
+          { status: 404 },
+        );
       }
 
       return NextResponse.json({ request });
@@ -74,10 +77,7 @@ export async function GET(req: NextRequest) {
     }
 
     if (userId) {
-      where.OR = [
-        { requesterId: userId },
-        { assigneeId: userId },
-      ];
+      where.OR = [{ requesterId: userId }, { assigneeId: userId }];
     }
 
     // List requests
@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 100,
     });
 
@@ -113,10 +113,10 @@ export async function GET(req: NextRequest) {
       total: requests.length,
     });
   } catch (error) {
-    console.error('Collaboration GET error:', error);
+    console.error("Collaboration GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch collaboration requests' },
-      { status: 500 }
+      { error: "Failed to fetch collaboration requests" },
+      { status: 500 },
     );
   }
 }
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -144,8 +144,8 @@ export async function POST(req: NextRequest) {
 
     if (!requestType || !taskType) {
       return NextResponse.json(
-        { error: 'Request type and task type are required' },
-        { status: 400 }
+        { error: "Request type and task type are required" },
+        { status: 400 },
       );
     }
 
@@ -155,8 +155,8 @@ export async function POST(req: NextRequest) {
         requesterId: session.user.id,
         requestType: requestType as any,
         taskType,
-        priority: priority || 'MEDIUM',
-        status: 'PENDING',
+        priority: priority || "MEDIUM",
+        status: "PENDING",
         description,
         locationInfo,
         estimatedDuration,
@@ -183,13 +183,13 @@ export async function POST(req: NextRequest) {
     });
 
     // Auto-route request based on type
-    if (requestType === 'H2H') {
+    if (requestType === "H2H") {
       // Find available peer workers
       await autoAssignPeerWorker(request.id);
-    } else if (requestType === 'H2R') {
+    } else if (requestType === "H2R") {
       // Find available robot
       await autoAssignRobot(request.id, taskType);
-    } else if (requestType === 'PREDICTIVE') {
+    } else if (requestType === "PREDICTIVE") {
       // Analyze and predict need
       await analyzePredictiveRequest(request.id);
     }
@@ -199,13 +199,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       request,
-      message: 'Collaboration request created',
+      message: "Collaboration request created",
     });
   } catch (error) {
-    console.error('Collaboration POST error:', error);
+    console.error("Collaboration POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to create collaboration request' },
-      { status: 500 }
+      { error: "Failed to create collaboration request" },
+      { status: 500 },
     );
   }
 }
@@ -215,7 +215,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -223,8 +223,8 @@ export async function PATCH(req: NextRequest) {
 
     if (!requestId) {
       return NextResponse.json(
-        { error: 'Request ID is required' },
-        { status: 400 }
+        { error: "Request ID is required" },
+        { status: 400 },
       );
     }
 
@@ -233,48 +233,48 @@ export async function PATCH(req: NextRequest) {
     });
 
     if (!request) {
-      return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+      return NextResponse.json({ error: "Request not found" }, { status: 404 });
     }
 
     let updatedRequest;
 
-    if (action === 'accept' && assigneeId) {
+    if (action === "accept" && assigneeId) {
       updatedRequest = await prisma.collaborationRequest.update({
         where: { id: requestId },
         data: {
-          status: 'IN_PROGRESS',
+          status: "IN_PROGRESS",
           assigneeId,
           acceptedAt: new Date(),
         },
       });
-    } else if (action === 'start') {
+    } else if (action === "start") {
       updatedRequest = await prisma.collaborationRequest.update({
         where: { id: requestId },
         data: {
-          status: 'IN_PROGRESS',
+          status: "IN_PROGRESS",
           acceptedAt: request.acceptedAt || new Date(),
         },
       });
-    } else if (action === 'complete') {
+    } else if (action === "complete") {
       updatedRequest = await prisma.collaborationRequest.update({
         where: { id: requestId },
         data: {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           completedAt: new Date(),
           resolution,
         },
       });
-    } else if (action === 'cancel') {
+    } else if (action === "cancel") {
       updatedRequest = await prisma.collaborationRequest.update({
         where: { id: requestId },
         data: {
-          status: 'CANCELLED',
+          status: "CANCELLED",
           completedAt: new Date(),
-          resolution: resolution || 'Cancelled by user',
+          resolution: resolution || "Cancelled by user",
         },
       });
     } else {
-      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
     return NextResponse.json({
@@ -282,10 +282,10 @@ export async function PATCH(req: NextRequest) {
       request: updatedRequest,
     });
   } catch (error) {
-    console.error('Collaboration PATCH error:', error);
+    console.error("Collaboration PATCH error:", error);
     return NextResponse.json(
-      { error: 'Failed to update collaboration request' },
-      { status: 500 }
+      { error: "Failed to update collaboration request" },
+      { status: 500 },
     );
   }
 }
@@ -304,9 +304,9 @@ async function autoAssignPeerWorker(requestId: string) {
     // For now, just notify all workers
 
     // TODO: Send notification via WebSocket
-    console.log('Notifying peer workers for H2H collaboration:', requestId);
+    console.log("Notifying peer workers for H2H collaboration:", requestId);
   } catch (error) {
-    console.error('Auto-assign peer worker error:', error);
+    console.error("Auto-assign peer worker error:", error);
   }
 }
 
@@ -323,14 +323,14 @@ async function autoAssignRobot(requestId: string, taskType: string) {
     // TODO: Integrate with robot fleet management system
     // For now, log the request
 
-    console.log('Auto-assigning robot for H2R collaboration:', {
+    console.log("Auto-assigning robot for H2R collaboration:", {
       requestId,
       taskType,
     });
 
     // TODO: Send dispatch command to robot
   } catch (error) {
-    console.error('Auto-assign robot error:', error);
+    console.error("Auto-assign robot error:", error);
   }
 }
 
@@ -346,11 +346,11 @@ async function analyzePredictiveRequest(requestId: string) {
     // TODO: Use AI/ML to predict collaboration needs
     // Analyze patterns, workload, timing, etc.
 
-    console.log('Analyzing predictive collaboration request:', requestId);
+    console.log("Analyzing predictive collaboration request:", requestId);
 
     // Auto-trigger assistance based on prediction
     // For now, just log
   } catch (error) {
-    console.error('Analyze predictive request error:', error);
+    console.error("Analyze predictive request error:", error);
   }
 }

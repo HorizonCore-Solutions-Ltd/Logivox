@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -45,7 +45,7 @@ const updateLocationSchema = z.object({
 // GET /api/locations/[id] - Get location details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -62,7 +62,7 @@ export async function GET(
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -103,7 +103,7 @@ export async function GET(
     if (!location) {
       return NextResponse.json(
         { error: "Location not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -112,7 +112,7 @@ export async function GET(
     console.error("Error fetching location:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch location" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -120,7 +120,7 @@ export async function GET(
 // PUT /api/locations/[id] - Update location
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -137,7 +137,7 @@ export async function PUT(
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -152,7 +152,7 @@ export async function PUT(
     if (!existingLocation) {
       return NextResponse.json(
         { error: "Location not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -175,7 +175,7 @@ export async function PUT(
       if (codeExists) {
         return NextResponse.json(
           { error: "Location code already exists" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -195,7 +195,7 @@ export async function PUT(
       if (barcodeExists) {
         return NextResponse.json(
           { error: "Barcode already exists" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -238,13 +238,13 @@ export async function PUT(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Failed to update location" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -252,7 +252,7 @@ export async function PUT(
 // DELETE /api/locations/[id] - Delete location
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -269,7 +269,7 @@ export async function DELETE(
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -294,7 +294,7 @@ export async function DELETE(
     if (!location) {
       return NextResponse.json(
         { error: "Location not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -302,7 +302,7 @@ export async function DELETE(
     if (location._count.children > 0) {
       return NextResponse.json(
         { error: "Cannot delete location with child locations" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -310,7 +310,7 @@ export async function DELETE(
     if (location._count.transfersFrom > 0 || location._count.transfersTo > 0) {
       return NextResponse.json(
         { error: "Cannot delete location with active transfers" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -339,7 +339,7 @@ export async function DELETE(
     console.error("Error deleting location:", error);
     return NextResponse.json(
       { error: error.message || "Failed to delete location" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

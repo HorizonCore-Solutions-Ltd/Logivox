@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'supplier-portal-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || "supplier-portal-secret-key";
 
 /**
  * POST /api/supplier/auth
@@ -17,8 +17,8 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
+        { error: "Email and password are required" },
+        { status: 400 },
       );
     }
 
@@ -26,38 +26,41 @@ export async function POST(request: Request) {
     const supplierUser = await prisma.supplierUser.findUnique({
       where: { email },
       include: {
-        supplier: true
-      }
+        supplier: true,
+      },
     });
 
     if (!supplierUser) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+        { error: "Invalid credentials" },
+        { status: 401 },
       );
     }
 
     if (!supplierUser.active) {
       return NextResponse.json(
-        { error: 'Account is inactive. Please contact support.' },
-        { status: 403 }
+        { error: "Account is inactive. Please contact support." },
+        { status: 403 },
       );
     }
 
     // Verify password
-    const isValidPassword = await bcrypt.compare(password, supplierUser.password);
+    const isValidPassword = await bcrypt.compare(
+      password,
+      supplierUser.password,
+    );
 
     if (!isValidPassword) {
       return NextResponse.json(
-        { error: 'Invalid credentials' },
-        { status: 401 }
+        { error: "Invalid credentials" },
+        { status: 401 },
       );
     }
 
     // Update last login
     await prisma.supplierUser.update({
       where: { id: supplierUser.id },
-      data: { lastLogin: new Date() }
+      data: { lastLogin: new Date() },
     });
 
     // Generate JWT token
@@ -66,10 +69,10 @@ export async function POST(request: Request) {
         userId: supplierUser.id,
         supplierId: supplierUser.supplierId,
         email: supplierUser.email,
-        role: supplierUser.role
+        role: supplierUser.role,
       },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: "24h" },
     );
 
     return NextResponse.json({
@@ -84,17 +87,16 @@ export async function POST(request: Request) {
           supplier: {
             id: supplierUser.supplier.id,
             name: supplierUser.supplier.name,
-            code: supplierUser.supplier.code
-          }
-        }
-      }
+            code: supplierUser.supplier.code,
+          },
+        },
+      },
     });
-
   } catch (error: any) {
-    console.error('Supplier auth error:', error);
+    console.error("Supplier auth error:", error);
     return NextResponse.json(
-      { error: 'Authentication failed' },
-      { status: 500 }
+      { error: "Authentication failed" },
+      { status: 500 },
     );
   }
 }
@@ -110,32 +112,32 @@ export async function PUT(request: Request) {
 
     if (!supplierId || !email || !name || !password) {
       return NextResponse.json(
-        { error: 'All fields are required' },
-        { status: 400 }
+        { error: "All fields are required" },
+        { status: 400 },
       );
     }
 
     // Check if supplier exists
     const supplier = await prisma.supplier.findUnique({
-      where: { id: supplierId }
+      where: { id: supplierId },
     });
 
     if (!supplier) {
       return NextResponse.json(
-        { error: 'Supplier not found' },
-        { status: 404 }
+        { error: "Supplier not found" },
+        { status: 404 },
       );
     }
 
     // Check if email already exists
     const existingUser = await prisma.supplierUser.findUnique({
-      where: { email }
+      where: { email },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'Email already registered' },
-        { status: 409 }
+        { error: "Email already registered" },
+        { status: 409 },
       );
     }
 
@@ -149,8 +151,8 @@ export async function PUT(request: Request) {
         email,
         name,
         password: hashedPassword,
-        role: 'ADMIN' // First user is admin
-      }
+        role: "ADMIN", // First user is admin
+      },
     });
 
     return NextResponse.json({
@@ -159,15 +161,14 @@ export async function PUT(request: Request) {
         id: supplierUser.id,
         email: supplierUser.email,
         name: supplierUser.name,
-        role: supplierUser.role
-      }
+        role: supplierUser.role,
+      },
     });
-
   } catch (error: any) {
-    console.error('Create supplier user error:', error);
+    console.error("Create supplier user error:", error);
     return NextResponse.json(
-      { error: 'Failed to create supplier user' },
-      { status: 500 }
+      { error: "Failed to create supplier user" },
+      { status: 500 },
     );
   }
 }

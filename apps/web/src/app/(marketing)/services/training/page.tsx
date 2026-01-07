@@ -1,13 +1,29 @@
-import { Metadata } from "next"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, ArrowRight, GraduationCap, Users, Video, BookOpen, Award, Target } from "lucide-react"
-import Link from "next/link"
+import { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CheckCircle2,
+  ArrowRight,
+  GraduationCap,
+  Users,
+  Video,
+  BookOpen,
+  Award,
+  Target,
+} from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Training & Certification | LogiVox WMS",
-  description: "Professional WMS training programs and certification courses. Empower your team with the skills to maximize system efficiency.",
-}
+  description:
+    "Professional WMS training programs and certification courses. Empower your team with the skills to maximize system efficiency.",
+};
 
 export default function TrainingPage() {
   return (
@@ -23,7 +39,9 @@ export default function TrainingPage() {
               Training & Certification Programs
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Empower your team with expert-led training. From end-users to administrators, we offer comprehensive programs to maximize your WMS investment.
+              Empower your team with expert-led training. From end-users to
+              administrators, we offer comprehensive programs to maximize your
+              WMS investment.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -112,7 +130,14 @@ export default function TrainingPage() {
                 certification: "LogiVox Certified Administrator",
               },
             ].map((program) => (
-              <Card key={program.name} className={program.featured ? "border-2 border-primary-600 shadow-lg" : ""}>
+              <Card
+                key={program.name}
+                className={
+                  program.featured
+                    ? "border-2 border-primary-600 shadow-lg"
+                    : ""
+                }
+              >
                 {program.featured && (
                   <div className="bg-primary-600 text-white text-center py-2 text-sm font-semibold">
                     MOST POPULAR
@@ -125,20 +150,28 @@ export default function TrainingPage() {
                     </div>
                     {program.name}
                   </CardTitle>
-                  <div className="text-2xl font-bold text-primary-600">{program.price}</div>
+                  <div className="text-2xl font-bold text-primary-600">
+                    {program.price}
+                  </div>
                   <CardDescription>{program.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <p className="text-sm font-semibold mb-1">Duration: {program.duration}</p>
-                    <p className="text-sm text-muted-foreground mb-3">For: {program.audience}</p>
+                    <p className="text-sm font-semibold mb-1">
+                      Duration: {program.duration}
+                    </p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      For: {program.audience}
+                    </p>
                     <div className="inline-flex items-center text-sm font-medium text-primary-600">
                       <Award className="h-4 w-4 mr-1" />
                       {program.certification}
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold mb-3">Topics Covered:</p>
+                    <p className="text-sm font-semibold mb-3">
+                      Topics Covered:
+                    </p>
                     <ul className="space-y-2">
                       {program.topics.map((topic, idx) => (
                         <li key={idx} className="flex items-start space-x-2">
@@ -148,8 +181,14 @@ export default function TrainingPage() {
                       ))}
                     </ul>
                   </div>
-                  <Button className="w-full" variant={program.featured ? "default" : "outline"} asChild>
-                    <Link href={`/contact?service=training&program=${program.name.toLowerCase().replace(' ', '-')}`}>
+                  <Button
+                    className="w-full"
+                    variant={program.featured ? "default" : "outline"}
+                    asChild
+                  >
+                    <Link
+                      href={`/contact?service=training&program=${program.name.toLowerCase().replace(" ", "-")}`}
+                    >
                       Enroll Now
                     </Link>
                   </Button>
@@ -164,7 +203,9 @@ export default function TrainingPage() {
       <section className="py-20 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Flexible Training Options</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Flexible Training Options
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Choose the format that works best for your team
             </p>
@@ -216,7 +257,10 @@ export default function TrainingPage() {
                 ideal: "Ongoing training, new hires",
               },
             ].map((option) => (
-              <Card key={option.format} className={option.featured ? "border-2 border-primary-600" : ""}>
+              <Card
+                key={option.format}
+                className={option.featured ? "border-2 border-primary-600" : ""}
+              >
                 <CardHeader>
                   <CardTitle className="text-xl flex items-center gap-3">
                     <div className="inline-flex p-2 rounded-lg bg-primary-100 text-primary-700 flex-shrink-0">
@@ -236,11 +280,21 @@ export default function TrainingPage() {
                     ))}
                   </ul>
                   <div>
-                    <p className="font-semibold text-primary-600 text-lg mb-2">{option.pricing}</p>
-                    <p className="text-sm text-muted-foreground">Ideal for: {option.ideal}</p>
+                    <p className="font-semibold text-primary-600 text-lg mb-2">
+                      {option.pricing}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Ideal for: {option.ideal}
+                    </p>
                   </div>
-                  <Button className="w-full" variant={option.featured ? "default" : "outline"} asChild>
-                    <Link href={`/contact?service=training&format=${option.format.toLowerCase().replace(' ', '-')}`}>
+                  <Button
+                    className="w-full"
+                    variant={option.featured ? "default" : "outline"}
+                    asChild
+                  >
+                    <Link
+                      href={`/contact?service=training&format=${option.format.toLowerCase().replace(" ", "-")}`}
+                    >
                       Get Started
                     </Link>
                   </Button>
@@ -273,21 +327,24 @@ export default function TrainingPage() {
                 },
                 {
                   level: "Level 2: Certified Power User",
-                  requirements: "Level 1 + Complete Power User Training + Pass exam (85%)",
+                  requirements:
+                    "Level 1 + Complete Power User Training + Pass exam (85%)",
                   duration: "3 days additional training + 3-hour exam",
                   benefits: "Qualifies for supervisor/coordinator roles",
                   badge: "🥈",
                 },
                 {
                   level: "Level 3: Certified Administrator",
-                  requirements: "Level 2 + Complete Admin Training + Pass exam (90%) + Practical assessment",
+                  requirements:
+                    "Level 2 + Complete Admin Training + Pass exam (90%) + Practical assessment",
                   duration: "5 days additional training + 4-hour exam",
                   benefits: "Full system administration and configuration",
                   badge: "🥇",
                 },
                 {
                   level: "Level 4: Certified Architect (Coming Soon)",
-                  requirements: "Level 3 + 1 year experience + Multi-site implementation project",
+                  requirements:
+                    "Level 3 + 1 year experience + Multi-site implementation project",
                   duration: "Advanced program (TBD)",
                   benefits: "Design and architect enterprise deployments",
                   badge: "💎",
@@ -301,19 +358,29 @@ export default function TrainingPage() {
                           <span className="text-3xl mr-3">{cert.badge}</span>
                           {cert.level}
                         </CardTitle>
-                        <CardDescription className="text-base">{cert.requirements}</CardDescription>
+                        <CardDescription className="text-base">
+                          {cert.requirements}
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
-                        <p className="text-sm font-semibold mb-1">Training Duration:</p>
-                        <p className="text-sm text-muted-foreground">{cert.duration}</p>
+                        <p className="text-sm font-semibold mb-1">
+                          Training Duration:
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {cert.duration}
+                        </p>
                       </div>
                       <div>
-                        <p className="text-sm font-semibold mb-1">Career Benefits:</p>
-                        <p className="text-sm text-muted-foreground">{cert.benefits}</p>
+                        <p className="text-sm font-semibold mb-1">
+                          Career Benefits:
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {cert.benefits}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -328,14 +395,17 @@ export default function TrainingPage() {
       <section className="py-20 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Additional Training Services</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Additional Training Services
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 title: "Custom Training",
-                description: "Tailored to your specific workflows and requirements",
+                description:
+                  "Tailored to your specific workflows and requirements",
                 price: "Custom pricing",
               },
               {
@@ -360,7 +430,9 @@ export default function TrainingPage() {
                   <CardDescription>{service.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-semibold text-primary-600">{service.price}</p>
+                  <p className="font-semibold text-primary-600">
+                    {service.price}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -374,17 +446,26 @@ export default function TrainingPage() {
           <Card className="bg-gradient-to-br from-primary-600 to-primary-700 text-white border-0">
             <CardContent className="p-12 text-center">
               <GraduationCap className="h-16 w-16 mx-auto mb-6 opacity-90" />
-              <h2 className="text-3xl font-bold mb-4">Ready to Train Your Team?</h2>
+              <h2 className="text-3xl font-bold mb-4">
+                Ready to Train Your Team?
+              </h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Invest in your team's success with professional WMS training. Schedule a consultation to discuss your training needs.
+                Invest in your team's success with professional WMS training.
+                Schedule a consultation to discuss your training needs.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="secondary" asChild>
                   <Link href="/contact?service=training">
-                    Schedule Consultation <ArrowRight className="ml-2 h-5 w-5" />
+                    Schedule Consultation{" "}
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-transparent border-white text-white hover:bg-white/10"
+                  asChild
+                >
                   <Link href="/docs">View Training Materials</Link>
                 </Button>
               </div>
@@ -393,5 +474,5 @@ export default function TrainingPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

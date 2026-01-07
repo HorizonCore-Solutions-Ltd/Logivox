@@ -1,19 +1,19 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { 
-  ScanIcon, 
-  PackageIcon, 
+import { useEffect, useState, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
+import {
+  ScanIcon,
+  PackageIcon,
   TruckIcon,
   CheckCircle2Icon,
   AlertCircleIcon,
   TimerIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Allocation {
   id: string;
@@ -64,9 +64,12 @@ interface SortingTask {
 export default function SortingStation() {
   const [sortingTask, setSortingTask] = useState<SortingTask | null>(null);
   const [allocations, setAllocations] = useState<Allocation[]>([]);
-  const [selectedAllocation, setSelectedAllocation] = useState<Allocation | null>(null);
-  const [scanInput, setScanInput] = useState('');
-  const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [selectedAllocation, setSelectedAllocation] =
+    useState<Allocation | null>(null);
+  const [scanInput, setScanInput] = useState("");
+  const [scanStatus, setScanStatus] = useState<"idle" | "success" | "error">(
+    "idle",
+  );
   const [pickQuantity, setPickQuantity] = useState(1);
   const [sessionStats, setSessionStats] = useState({
     unitsPicked: 0,
@@ -84,49 +87,53 @@ export default function SortingStation() {
   const loadActiveTasks = async () => {
     try {
       // Load worker's active sorting task
-      const sortingRes = await fetch('/api/cross-dock/sorting?status=IN_PROGRESS');
+      const sortingRes = await fetch(
+        "/api/cross-dock/sorting?status=IN_PROGRESS",
+      );
       const sortingData = await sortingRes.json();
-      
+
       if (sortingData.length > 0) {
         setSortingTask(sortingData[0]);
-        
+
         // Load allocations for the appointment
         const allocRes = await fetch(
-          `/api/cross-dock/allocations?appointmentId=${sortingData[0].appointment.id}&status=ALLOCATED&status=PICKING`
+          `/api/cross-dock/allocations?appointmentId=${sortingData[0].appointment.id}&status=ALLOCATED&status=PICKING`,
         );
         const allocData = await allocRes.json();
         setAllocations(allocData);
       }
     } catch (error) {
-      console.error('Failed to load tasks:', error);
+      console.error("Failed to load tasks:", error);
     }
   };
 
   const handleScan = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!scanInput.trim()) return;
 
     // Find matching allocation by SKU
     const allocation = allocations.find(
-      (a) => a.receiptItem.sku === scanInput.trim() || a.receiptItem.inventory.sku === scanInput.trim()
+      (a) =>
+        a.receiptItem.sku === scanInput.trim() ||
+        a.receiptItem.inventory.sku === scanInput.trim(),
     );
 
     if (allocation) {
-      setScanStatus('success');
+      setScanStatus("success");
       setSelectedAllocation(allocation);
-      
+
       // Auto-pick if quantity is 1
       if (pickQuantity === 1) {
         await handlePick(allocation);
       }
     } else {
-      setScanStatus('error');
+      setScanStatus("error");
       setSessionStats((prev) => ({ ...prev, errors: prev.errors + 1 }));
-      
+
       setTimeout(() => {
-        setScanStatus('idle');
-        setScanInput('');
+        setScanStatus("idle");
+        setScanInput("");
       }, 2000);
     }
   };
@@ -134,10 +141,10 @@ export default function SortingStation() {
   const handlePick = async (allocation: Allocation) => {
     try {
       const res = await fetch(`/api/cross-dock/allocations/${allocation.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'pick',
+          action: "pick",
           quantityPicked: pickQuantity,
         }),
       });
@@ -150,10 +157,13 @@ export default function SortingStation() {
               ? {
                   ...a,
                   quantityPicked: a.quantityPicked + pickQuantity,
-                  status: a.quantityPicked + pickQuantity >= a.quantityAllocated ? 'PICKED' : 'PICKING',
+                  status:
+                    a.quantityPicked + pickQuantity >= a.quantityAllocated
+                      ? "PICKED"
+                      : "PICKING",
                 }
-              : a
-          )
+              : a,
+          ),
         );
 
         // Update session stats
@@ -165,43 +175,47 @@ export default function SortingStation() {
         // Update sorting task progress
         if (sortingTask) {
           await fetch(`/api/cross-dock/sorting/${sortingTask.id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              action: 'updateProgress',
+              action: "updateProgress",
               sortedUnits: sortingTask.sortedUnits + pickQuantity,
             }),
           });
         }
 
         // Reset for next scan
-        setScanStatus('idle');
-        setScanInput('');
+        setScanStatus("idle");
+        setScanInput("");
         setSelectedAllocation(null);
         setPickQuantity(1);
         scanInputRef.current?.focus();
       }
     } catch (error) {
-      console.error('Failed to pick:', error);
-      setScanStatus('error');
+      console.error("Failed to pick:", error);
+      setScanStatus("error");
     }
   };
 
   const calculateUnitsPerHour = () => {
-    const elapsed = (new Date().getTime() - sessionStats.startTime.getTime()) / (1000 * 60 * 60);
+    const elapsed =
+      (new Date().getTime() - sessionStats.startTime.getTime()) /
+      (1000 * 60 * 60);
     return elapsed > 0 ? Math.round(sessionStats.unitsPicked / elapsed) : 0;
   };
 
   const calculateAccuracy = () => {
     const total = sessionStats.unitsPicked + sessionStats.errors;
-    return total > 0 ? Math.round((sessionStats.unitsPicked / total) * 100) : 100;
+    return total > 0
+      ? Math.round((sessionStats.unitsPicked / total) * 100)
+      : 100;
   };
 
   const getStatusIcon = () => {
     switch (scanStatus) {
-      case 'success':
+      case "success":
         return <CheckCircle2Icon className="h-6 w-6 text-green-500" />;
-      case 'error':
+      case "error":
         return <AlertCircleIcon className="h-6 w-6 text-red-500" />;
       default:
         return <ScanIcon className="h-6 w-6 text-muted-foreground" />;
@@ -214,18 +228,21 @@ export default function SortingStation() {
         <PackageIcon className="h-16 w-16 text-muted-foreground" />
         <div className="text-center">
           <h2 className="text-xl font-semibold">No Active Sorting Task</h2>
-          <p className="text-muted-foreground">Please check with your supervisor to get assigned</p>
+          <p className="text-muted-foreground">
+            Please check with your supervisor to get assigned
+          </p>
         </div>
       </div>
     );
   }
 
-  const progress = sortingTask.totalUnits > 0 
-    ? (sortingTask.sortedUnits / sortingTask.totalUnits) * 100 
-    : 0;
+  const progress =
+    sortingTask.totalUnits > 0
+      ? (sortingTask.sortedUnits / sortingTask.totalUnits) * 100
+      : 0;
 
   const pendingAllocations = allocations.filter(
-    (a) => a.status === 'ALLOCATED' || a.status === 'PICKING'
+    (a) => a.status === "ALLOCATED" || a.status === "PICKING",
   );
 
   return (
@@ -235,7 +252,8 @@ export default function SortingStation() {
         <div>
           <h1 className="text-3xl font-bold">Sorting Station</h1>
           <p className="text-muted-foreground">
-            {sortingTask.appointment.appointmentNumber} - {sortingTask.appointment.warehouse.name}
+            {sortingTask.appointment.appointmentNumber} -{" "}
+            {sortingTask.appointment.warehouse.name}
           </p>
         </div>
         <Badge className="text-lg px-4 py-2">{sortingTask.sortingMethod}</Badge>
@@ -274,7 +292,9 @@ export default function SortingStation() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{calculateAccuracy()}%</div>
-            <p className="text-xs text-muted-foreground">{sessionStats.errors} errors</p>
+            <p className="text-xs text-muted-foreground">
+              {sessionStats.errors} errors
+            </p>
           </CardContent>
         </Card>
 
@@ -306,14 +326,18 @@ export default function SortingStation() {
                 onChange={(e) => setScanInput(e.target.value)}
                 placeholder="Scan barcode or enter SKU"
                 className="text-lg"
-                disabled={scanStatus === 'success'}
+                disabled={scanStatus === "success"}
               />
-              <Button type="submit" size="lg" disabled={scanStatus === 'success'}>
+              <Button
+                type="submit"
+                size="lg"
+                disabled={scanStatus === "success"}
+              >
                 Scan
               </Button>
             </div>
 
-            {scanStatus === 'error' && (
+            {scanStatus === "error" && (
               <div className="text-red-500 text-sm">
                 Item not found in current allocations. Please try again.
               </div>
@@ -321,12 +345,14 @@ export default function SortingStation() {
           </form>
 
           {/* Selected Item Details */}
-          {selectedAllocation && scanStatus === 'success' && (
+          {selectedAllocation && scanStatus === "success" && (
             <div className="mt-4 p-4 border rounded-lg bg-accent/20">
               <div className="space-y-3">
                 <div>
                   <div className="text-sm text-muted-foreground">Product</div>
-                  <div className="font-semibold">{selectedAllocation.receiptItem.productName}</div>
+                  <div className="font-semibold">
+                    {selectedAllocation.receiptItem.productName}
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     SKU: {selectedAllocation.receiptItem.sku}
                   </div>
@@ -334,7 +360,9 @@ export default function SortingStation() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">From (Receipt)</div>
+                    <div className="text-sm text-muted-foreground">
+                      From (Receipt)
+                    </div>
                     <div className="font-medium">
                       {selectedAllocation.receiptItem.receipt.receiptNumber}
                     </div>
@@ -344,8 +372,12 @@ export default function SortingStation() {
                   </div>
 
                   <div>
-                    <div className="text-sm text-muted-foreground">To (Shipment)</div>
-                    <div className="font-medium">{selectedAllocation.shipment.shipmentNumber}</div>
+                    <div className="text-sm text-muted-foreground">
+                      To (Shipment)
+                    </div>
+                    <div className="font-medium">
+                      {selectedAllocation.shipment.shipmentNumber}
+                    </div>
                     <div className="text-xs text-muted-foreground">
                       {selectedAllocation.shipment.customer.name}
                     </div>
@@ -354,17 +386,23 @@ export default function SortingStation() {
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-sm text-muted-foreground">Quantity to Pick</div>
+                    <div className="text-sm text-muted-foreground">
+                      Quantity to Pick
+                    </div>
                     <div className="flex items-center gap-2 mt-1">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        onClick={() => setPickQuantity(Math.max(1, pickQuantity - 1))}
+                        onClick={() =>
+                          setPickQuantity(Math.max(1, pickQuantity - 1))
+                        }
                       >
                         -
                       </Button>
-                      <span className="font-bold text-lg w-12 text-center">{pickQuantity}</span>
+                      <span className="font-bold text-lg w-12 text-center">
+                        {pickQuantity}
+                      </span>
                       <Button
                         type="button"
                         variant="outline"
@@ -374,8 +412,8 @@ export default function SortingStation() {
                             Math.min(
                               selectedAllocation.quantityAllocated -
                                 selectedAllocation.quantityPicked,
-                              pickQuantity + 1
-                            )
+                              pickQuantity + 1,
+                            ),
                           )
                         }
                       >
@@ -419,7 +457,9 @@ export default function SortingStation() {
                   <div className="flex items-center gap-3">
                     <PackageIcon className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <div className="font-medium">{allocation.receiptItem.productName}</div>
+                      <div className="font-medium">
+                        {allocation.receiptItem.productName}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         SKU: {allocation.receiptItem.sku}
                       </div>
@@ -429,13 +469,18 @@ export default function SortingStation() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <div className="font-semibold">
-                        {allocation.quantityPicked}/{allocation.quantityAllocated}
+                        {allocation.quantityPicked}/
+                        {allocation.quantityAllocated}
                       </div>
-                      <div className="text-xs text-muted-foreground">picked</div>
+                      <div className="text-xs text-muted-foreground">
+                        picked
+                      </div>
                     </div>
                     <TruckIcon className="h-5 w-5 text-muted-foreground" />
                     <div className="text-sm">
-                      <div className="font-medium">{allocation.shipment.customer.name}</div>
+                      <div className="font-medium">
+                        {allocation.shipment.customer.name}
+                      </div>
                       <div className="text-xs text-muted-foreground">
                         {allocation.shipment.shipmentNumber}
                       </div>

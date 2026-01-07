@@ -7,7 +7,7 @@
  * FDA 21 CFR Part 820.198 - Complaint Files
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 export class CustomerComplaintService {
   /**
@@ -62,7 +62,7 @@ export class CustomerComplaintService {
         complaintDescription: params.complaintDescription,
         severity: params.severity,
         category: params.category,
-        status: 'OPEN',
+        status: "OPEN",
         isReportable,
         reportedBy: params.reportedBy,
         attachments: params.attachments,
@@ -94,7 +94,7 @@ export class CustomerComplaintService {
     // Log communication
     await this.logCommunication({
       complaintId: params.complaintId,
-      communicationType: 'ACKNOWLEDGEMENT',
+      communicationType: "ACKNOWLEDGEMENT",
       content: params.responseText,
       sentBy: params.acknowledgedBy,
     });
@@ -121,7 +121,7 @@ export class CustomerComplaintService {
     const complaint = await prisma.customerComplaint.update({
       where: { id: params.complaintId },
       data: {
-        status: 'INVESTIGATION',
+        status: "INVESTIGATION",
         investigatorId: params.investigatorId,
         investigationStartDate: new Date(),
         investigationFindings: params.investigationFindings,
@@ -163,7 +163,7 @@ export class CustomerComplaintService {
     const complaint = await prisma.customerComplaint.update({
       where: { id: params.complaintId },
       data: {
-        status: 'RESOLVED',
+        status: "RESOLVED",
         resolutionDescription: params.resolutionDescription,
         resolutionType: params.resolutionType,
         compensationAmount: params.compensationAmount,
@@ -178,7 +178,7 @@ export class CustomerComplaintService {
     if (params.customerNotified) {
       await this.logCommunication({
         complaintId: params.complaintId,
-        communicationType: 'RESOLUTION',
+        communicationType: "RESOLUTION",
         content: params.resolutionDescription,
         sentBy: params.resolvedBy,
       });
@@ -200,7 +200,7 @@ export class CustomerComplaintService {
     return await prisma.customerComplaint.update({
       where: { id: params.complaintId },
       data: {
-        status: 'CLOSED',
+        status: "CLOSED",
         closedDate: new Date(),
         closedBy: params.closedBy,
         customerSatisfied: params.customerSatisfied,
@@ -258,54 +258,64 @@ export class CustomerComplaintService {
     const bySeverity: any = {};
     const byStatus: any = {};
 
-    complaints.forEach(complaint => {
-      byCategory[complaint.category] = (byCategory[complaint.category] || 0) + 1;
-      bySeverity[complaint.severity] = (bySeverity[complaint.severity] || 0) + 1;
+    complaints.forEach((complaint) => {
+      byCategory[complaint.category] =
+        (byCategory[complaint.category] || 0) + 1;
+      bySeverity[complaint.severity] =
+        (bySeverity[complaint.severity] || 0) + 1;
       byStatus[complaint.status] = (byStatus[complaint.status] || 0) + 1;
     });
 
     // Calculate response times
     const responseTimes = complaints
-      .filter(c => c.acknowledgementDate)
-      .map(c => {
+      .filter((c) => c.acknowledgementDate)
+      .map((c) => {
         const hours = Math.floor(
-          (new Date(c.acknowledgementDate!).getTime() - new Date(c.receivedDate).getTime()) / 
-          (1000 * 60 * 60)
+          (new Date(c.acknowledgementDate!).getTime() -
+            new Date(c.receivedDate).getTime()) /
+            (1000 * 60 * 60),
         );
         return hours;
       });
 
-    const avgResponseTime = responseTimes.length > 0
-      ? responseTimes.reduce((sum, t) => sum + t, 0) / responseTimes.length
-      : 0;
+    const avgResponseTime =
+      responseTimes.length > 0
+        ? responseTimes.reduce((sum, t) => sum + t, 0) / responseTimes.length
+        : 0;
 
     // Calculate resolution times
     const resolutionTimes = complaints
-      .filter(c => c.resolutionDate)
-      .map(c => {
+      .filter((c) => c.resolutionDate)
+      .map((c) => {
         const days = Math.floor(
-          (new Date(c.resolutionDate!).getTime() - new Date(c.receivedDate).getTime()) / 
-          (1000 * 60 * 60 * 24)
+          (new Date(c.resolutionDate!).getTime() -
+            new Date(c.receivedDate).getTime()) /
+            (1000 * 60 * 60 * 24),
         );
         return days;
       });
 
-    const avgResolutionTime = resolutionTimes.length > 0
-      ? resolutionTimes.reduce((sum, t) => sum + t, 0) / resolutionTimes.length
-      : 0;
+    const avgResolutionTime =
+      resolutionTimes.length > 0
+        ? resolutionTimes.reduce((sum, t) => sum + t, 0) /
+          resolutionTimes.length
+        : 0;
 
-    const resolved = complaints.filter(c => c.status === 'RESOLVED' || c.status === 'CLOSED');
-    const satisfied = complaints.filter(c => c.customerSatisfied === true);
+    const resolved = complaints.filter(
+      (c) => c.status === "RESOLVED" || c.status === "CLOSED",
+    );
+    const satisfied = complaints.filter((c) => c.customerSatisfied === true);
 
     return {
       summary: {
         total: complaints.length,
-        open: complaints.filter(c => c.status === 'OPEN').length,
-        investigation: complaints.filter(c => c.status === 'INVESTIGATION').length,
+        open: complaints.filter((c) => c.status === "OPEN").length,
+        investigation: complaints.filter((c) => c.status === "INVESTIGATION")
+          .length,
         resolved: resolved.length,
-        closed: complaints.filter(c => c.status === 'CLOSED').length,
-        validComplaints: complaints.filter(c => c.isValidComplaint).length,
-        reportable: complaints.filter(c => c.isReportable).length,
+        closed: complaints.filter((c) => c.status === "CLOSED").length,
+        validComplaints: complaints.filter((c) => c.isValidComplaint).length,
+        reportable: complaints.filter((c) => c.isReportable).length,
       },
       byCategory,
       bySeverity,
@@ -315,9 +325,11 @@ export class CustomerComplaintService {
         averageResolutionTimeDays: Math.round(avgResolutionTime),
       },
       quality: {
-        capaRequired: complaints.filter(c => c.requiresCAPA).length,
-        productReturns: complaints.filter(c => c.productReturnRequired).length,
-        customerSatisfactionRate: (satisfied.length / resolved.length) * 100 || 0,
+        capaRequired: complaints.filter((c) => c.requiresCAPA).length,
+        productReturns: complaints.filter((c) => c.productReturnRequired)
+          .length,
+        customerSatisfactionRate:
+          (satisfied.length / resolved.length) * 100 || 0,
       },
       topProducts: this.getTopComplaintProducts(complaints),
       topCustomers: this.getTopComplaintCustomers(complaints),
@@ -334,16 +346,22 @@ export class CustomerComplaintService {
   }): Promise<boolean> {
     // Simplified logic - in reality this would be more complex
     // and might involve regulatory rules engine
-    
+
     // Critical severity always reportable
-    if (params.severity === 'CRITICAL') return true;
+    if (params.severity === "CRITICAL") return true;
 
     // Major quality issues may be reportable
-    if (params.severity === 'MAJOR' && params.category === 'QUALITY') {
+    if (params.severity === "MAJOR" && params.category === "QUALITY") {
       // Check for safety keywords
-      const safetyKeywords = ['injury', 'harm', 'safety', 'death', 'hospitalization'];
-      const hasKeyword = safetyKeywords.some(keyword => 
-        params.description.toLowerCase().includes(keyword)
+      const safetyKeywords = [
+        "injury",
+        "harm",
+        "safety",
+        "death",
+        "hospitalization",
+      ];
+      const hasKeyword = safetyKeywords.some((keyword) =>
+        params.description.toLowerCase().includes(keyword),
       );
       return hasKeyword;
     }
@@ -372,8 +390,8 @@ export class CustomerComplaintService {
    */
   private static getTopComplaintProducts(complaints: any[]): any[] {
     const productCounts: any = {};
-    
-    complaints.forEach(c => {
+
+    complaints.forEach((c) => {
       if (c.productName) {
         if (!productCounts[c.productName]) {
           productCounts[c.productName] = { name: c.productName, count: 0 };
@@ -392,8 +410,8 @@ export class CustomerComplaintService {
    */
   private static getTopComplaintCustomers(complaints: any[]): any[] {
     const customerCounts: any = {};
-    
-    complaints.forEach(c => {
+
+    complaints.forEach((c) => {
       if (!customerCounts[c.customerName]) {
         customerCounts[c.customerName] = { name: c.customerName, count: 0 };
       }

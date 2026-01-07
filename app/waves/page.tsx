@@ -85,9 +85,12 @@ export default function WavesPage() {
 
       // Calculate stats
       const total = data.waves?.length || 0;
-      const planned = data.waves?.filter((w: Wave) => w.status === "PLANNED").length || 0;
-      const inProgress = data.waves?.filter((w: Wave) => w.status === "IN_PROGRESS").length || 0;
-      const completed = data.waves?.filter((w: Wave) => w.status === "COMPLETED").length || 0;
+      const planned =
+        data.waves?.filter((w: Wave) => w.status === "PLANNED").length || 0;
+      const inProgress =
+        data.waves?.filter((w: Wave) => w.status === "IN_PROGRESS").length || 0;
+      const completed =
+        data.waves?.filter((w: Wave) => w.status === "COMPLETED").length || 0;
 
       setStats({
         total,
@@ -324,7 +327,7 @@ export default function WavesPage() {
                   <div className="flex items-center gap-3 mb-2">
                     <div
                       className={`w-1 h-8 rounded-full ${getPriorityColor(
-                        wave.priority
+                        wave.priority,
                       )}`}
                     ></div>
                     <div>
@@ -339,7 +342,7 @@ export default function WavesPage() {
                 <div className="flex items-center gap-2">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
-                      wave.status
+                      wave.status,
                     )}`}
                   >
                     {getStatusIcon(wave.status)}

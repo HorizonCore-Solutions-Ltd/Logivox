@@ -1,6 +1,6 @@
 /**
  * AI-Powered Inventory Forecasting System for LogiVox
- * 
+ *
  * Machine learning models for demand prediction, seasonal pattern detection,
  * and intelligent reorder suggestions.
  */
@@ -19,13 +19,13 @@ export interface ForecastData {
   reorderPoint: number;
   suggestedOrderQuantity: number;
   confidence: number;
-  trend: 'increasing' | 'decreasing' | 'stable';
+  trend: "increasing" | "decreasing" | "stable";
   seasonality: SeasonalityPattern | null;
   lastUpdated: Date;
 }
 
 export interface SeasonalityPattern {
-  type: 'weekly' | 'monthly' | 'yearly';
+  type: "weekly" | "monthly" | "yearly";
   peaks: number[]; // Day/week/month indices with highest demand
   troughs: number[]; // Day/week/month indices with lowest demand
   strength: number; // 0-1, how strong the pattern is
@@ -45,7 +45,7 @@ export interface StockOptimization {
   optimalStock: number;
   overstock: number;
   understock: number;
-  recommendation: 'order' | 'reduce' | 'maintain';
+  recommendation: "order" | "reduce" | "maintain";
   suggestedAction: string;
   estimatedCostSavings: number;
 }
@@ -160,7 +160,10 @@ export function calculateLinearRegression(data: number[]): TrendLine {
 // Seasonality Detection
 // ============================================================================
 
-export function detectSeasonality(data: number[], period: number): SeasonalityPattern | null {
+export function detectSeasonality(
+  data: number[],
+  period: number,
+): SeasonalityPattern | null {
   if (data.length < period * 2) {
     return null; // Need at least 2 full cycles
   }
@@ -180,7 +183,8 @@ export function detectSeasonality(data: number[], period: number): SeasonalityPa
   }
 
   // Normalize indices
-  const overallMean = seasonalIndices.reduce((a, b) => a + b, 0) / seasonalIndices.length;
+  const overallMean =
+    seasonalIndices.reduce((a, b) => a + b, 0) / seasonalIndices.length;
   const normalizedIndices = seasonalIndices.map((val) => val / overallMean);
 
   // Find peaks and troughs
@@ -198,7 +202,8 @@ export function detectSeasonality(data: number[], period: number): SeasonalityPa
 
   // Calculate strength (variance from mean)
   const variance =
-    normalizedIndices.reduce((sum, val) => sum + (val - 1) ** 2, 0) / normalizedIndices.length;
+    normalizedIndices.reduce((sum, val) => sum + (val - 1) ** 2, 0) /
+    normalizedIndices.length;
   const strength = Math.min(Math.sqrt(variance), 1);
 
   // Only return pattern if it's strong enough
@@ -206,7 +211,7 @@ export function detectSeasonality(data: number[], period: number): SeasonalityPa
     return null;
   }
 
-  const type = period === 7 ? 'weekly' : period === 30 ? 'monthly' : 'yearly';
+  const type = period === 7 ? "weekly" : period === 30 ? "monthly" : "yearly";
 
   return {
     type,
@@ -223,11 +228,11 @@ export function detectSeasonality(data: number[], period: number): SeasonalityPa
 export function forecastDemand(
   historicalData: number[],
   daysToForecast: number,
-  method: 'sma' | 'ema' | 'linear' | 'hybrid' = 'hybrid'
+  method: "sma" | "ema" | "linear" | "hybrid" = "hybrid",
 ): DemandPrediction[] {
   const predictions: DemandPrediction[] = [];
 
-  if (method === 'sma') {
+  if (method === "sma") {
     // Simple Moving Average forecast
     const period = Math.min(7, historicalData.length);
     const lastSMA =
@@ -245,7 +250,7 @@ export function forecastDemand(
         confidence: 0.7,
       });
     }
-  } else if (method === 'ema') {
+  } else if (method === "ema") {
     // Exponential Moving Average forecast
     const period = Math.min(7, historicalData.length);
     const ema = calculateEMA(historicalData, period);
@@ -265,7 +270,7 @@ export function forecastDemand(
         });
       }
     }
-  } else if (method === 'linear') {
+  } else if (method === "linear") {
     // Linear regression forecast
     const trend = calculateLinearRegression(historicalData);
     const n = historicalData.length;
@@ -304,12 +309,15 @@ export function forecastDemand(
         const seasonalFactor = seasonality.peaks.includes(dayOfWeek)
           ? 1.2
           : seasonality.troughs.includes(dayOfWeek)
-          ? 0.8
-          : 1.0;
+            ? 0.8
+            : 1.0;
         predicted *= seasonalFactor;
       }
 
-      const confidence = Math.max(0.6, Math.min(0.9, trend.r2 + (seasonality?.strength || 0) * 0.2));
+      const confidence = Math.max(
+        0.6,
+        Math.min(0.9, trend.r2 + (seasonality?.strength || 0) * 0.2),
+      );
 
       predictions.push({
         date,
@@ -333,16 +341,17 @@ export function calculateSafetyStock(
   maxDemand: number,
   averageLeadTime: number,
   maxLeadTime: number,
-  serviceLevel: number = 0.95 // 95% service level
+  serviceLevel: number = 0.95, // 95% service level
 ): number {
   // Z-score for service level (95% = 1.65, 99% = 2.33)
-  const zScore = serviceLevel >= 0.99 ? 2.33 : serviceLevel >= 0.95 ? 1.65 : 1.28;
+  const zScore =
+    serviceLevel >= 0.99 ? 2.33 : serviceLevel >= 0.95 ? 1.65 : 1.28;
 
   // Safety stock formula
   const safetyStock =
     zScore *
     Math.sqrt(
-      maxLeadTime * averageDemand ** 2 + averageLeadTime ** 2 * maxDemand ** 2
+      maxLeadTime * averageDemand ** 2 + averageLeadTime ** 2 * maxDemand ** 2,
     );
 
   return Math.ceil(safetyStock);
@@ -355,7 +364,7 @@ export function calculateSafetyStock(
 export function calculateEOQ(
   annualDemand: number,
   orderCost: number,
-  holdingCost: number
+  holdingCost: number,
 ): number {
   if (holdingCost === 0) {
     return Math.ceil(annualDemand / 12); // Monthly order if no holding cost
@@ -372,7 +381,7 @@ export function calculateEOQ(
 export function calculateReorderPoint(
   averageDailyDemand: number,
   leadTimeDays: number,
-  safetyStock: number
+  safetyStock: number,
 ): number {
   const reorderPoint = averageDailyDemand * leadTimeDays + safetyStock;
   return Math.ceil(reorderPoint);
@@ -384,14 +393,14 @@ export function calculateReorderPoint(
 
 export interface ABCClassification {
   productId: string;
-  class: 'A' | 'B' | 'C';
+  class: "A" | "B" | "C";
   value: number;
   percentage: number;
   cumulativePercentage: number;
 }
 
 export function performABCAnalysis(
-  products: Array<{ id: string; annualValue: number }>
+  products: Array<{ id: string; annualValue: number }>,
 ): ABCClassification[] {
   // Sort by value (descending)
   const sorted = [...products].sort((a, b) => b.annualValue - a.annualValue);
@@ -408,13 +417,13 @@ export function performABCAnalysis(
     const percentage = (product.annualValue / totalValue) * 100;
     const cumulativePercentage = (cumulativeValue / totalValue) * 100;
 
-    let productClass: 'A' | 'B' | 'C';
+    let productClass: "A" | "B" | "C";
     if (cumulativePercentage <= 70) {
-      productClass = 'A'; // Top 70% of value
+      productClass = "A"; // Top 70% of value
     } else if (cumulativePercentage <= 90) {
-      productClass = 'B'; // Next 20% of value
+      productClass = "B"; // Next 20% of value
     } else {
-      productClass = 'C'; // Bottom 10% of value
+      productClass = "C"; // Bottom 10% of value
     }
 
     classifications.push({
@@ -437,37 +446,39 @@ export interface TurnoverAnalysis {
   productId: string;
   turnoverRate: number;
   daysInInventory: number;
-  status: 'fast-moving' | 'medium-moving' | 'slow-moving' | 'obsolete';
+  status: "fast-moving" | "medium-moving" | "slow-moving" | "obsolete";
   recommendation: string;
 }
 
 export function analyzeStockTurnover(
   soldQuantity: number,
   averageStock: number,
-  periodDays: number = 365
+  periodDays: number = 365,
 ): TurnoverAnalysis {
   const turnoverRate = averageStock > 0 ? soldQuantity / averageStock : 0;
-  const daysInInventory = turnoverRate > 0 ? periodDays / turnoverRate : Infinity;
+  const daysInInventory =
+    turnoverRate > 0 ? periodDays / turnoverRate : Infinity;
 
-  let status: TurnoverAnalysis['status'];
+  let status: TurnoverAnalysis["status"];
   let recommendation: string;
 
   if (daysInInventory < 30) {
-    status = 'fast-moving';
-    recommendation = 'High demand - ensure stock availability';
+    status = "fast-moving";
+    recommendation = "High demand - ensure stock availability";
   } else if (daysInInventory < 90) {
-    status = 'medium-moving';
-    recommendation = 'Moderate demand - maintain optimal stock levels';
+    status = "medium-moving";
+    recommendation = "Moderate demand - maintain optimal stock levels";
   } else if (daysInInventory < 180) {
-    status = 'slow-moving';
-    recommendation = 'Low demand - consider reducing stock levels';
+    status = "slow-moving";
+    recommendation = "Low demand - consider reducing stock levels";
   } else {
-    status = 'obsolete';
-    recommendation = 'Very low demand - consider liquidation or discontinuation';
+    status = "obsolete";
+    recommendation =
+      "Very low demand - consider liquidation or discontinuation";
   }
 
   return {
-    productId: '',
+    productId: "",
     turnoverRate: Math.round(turnoverRate * 100) / 100,
     daysInInventory: Math.round(daysInInventory),
     status,
@@ -483,7 +494,7 @@ export function calculateDemandVariability(data: number[]): {
   mean: number;
   standardDeviation: number;
   coefficientOfVariation: number;
-  variability: 'low' | 'medium' | 'high';
+  variability: "low" | "medium" | "high";
 } {
   const mean = data.reduce((a, b) => a + b, 0) / data.length;
 
@@ -493,13 +504,13 @@ export function calculateDemandVariability(data: number[]): {
 
   const coefficientOfVariation = mean > 0 ? standardDeviation / mean : 0;
 
-  let variability: 'low' | 'medium' | 'high';
+  let variability: "low" | "medium" | "high";
   if (coefficientOfVariation < 0.3) {
-    variability = 'low';
+    variability = "low";
   } else if (coefficientOfVariation < 0.6) {
-    variability = 'medium';
+    variability = "medium";
   } else {
-    variability = 'high';
+    variability = "high";
   }
 
   return {
@@ -520,7 +531,7 @@ export async function generateForecast(
   currentStock: number,
   leadTimeDays: number = 7,
   orderCost: number = 50,
-  holdingCostPerUnit: number = 5
+  holdingCostPerUnit: number = 5,
 ): Promise<ForecastData> {
   // Calculate basic statistics
   const avgDailySales =
@@ -529,14 +540,18 @@ export async function generateForecast(
 
   // Detect trend
   const trend = calculateLinearRegression(historicalSales);
-  const trendDirection: ForecastData['trend'] =
-    trend.slope > 0.1 ? 'increasing' : trend.slope < -0.1 ? 'decreasing' : 'stable';
+  const trendDirection: ForecastData["trend"] =
+    trend.slope > 0.1
+      ? "increasing"
+      : trend.slope < -0.1
+        ? "decreasing"
+        : "stable";
 
   // Detect seasonality
   const seasonality = detectSeasonality(historicalSales, 7);
 
   // Forecast demand for next 30 days
-  const predictions = forecastDemand(historicalSales, 30, 'hybrid');
+  const predictions = forecastDemand(historicalSales, 30, "hybrid");
   const predictedDemand = predictions.map((p) => p.predictedQuantity);
 
   // Calculate safety stock
@@ -544,31 +559,33 @@ export async function generateForecast(
     avgDailySales,
     maxDailySales,
     leadTimeDays,
-    leadTimeDays + 2
+    leadTimeDays + 2,
   );
 
   // Calculate reorder point
-  const reorderPoint = calculateReorderPoint(avgDailySales, leadTimeDays, safetyStock);
+  const reorderPoint = calculateReorderPoint(
+    avgDailySales,
+    leadTimeDays,
+    safetyStock,
+  );
 
   // Calculate EOQ
   const annualDemand = avgDailySales * 365;
   const eoq = calculateEOQ(annualDemand, orderCost, holdingCostPerUnit);
 
   // Calculate days of supply
-  const daysOfSupply = avgDailySales > 0 ? currentStock / avgDailySales : Infinity;
+  const daysOfSupply =
+    avgDailySales > 0 ? currentStock / avgDailySales : Infinity;
 
   // Confidence based on data quality and trend strength
   const confidence = Math.min(
     0.95,
-    Math.max(
-      0.5,
-      trend.r2 * 0.6 + (seasonality?.strength || 0) * 0.3 + 0.1
-    )
+    Math.max(0.5, trend.r2 * 0.6 + (seasonality?.strength || 0) * 0.3 + 0.1),
   );
 
   return {
     productId,
-    productName: '', // Will be populated from database
+    productName: "", // Will be populated from database
     currentStock,
     averageDailySales: Math.round(avgDailySales * 100) / 100,
     predictedDemand,

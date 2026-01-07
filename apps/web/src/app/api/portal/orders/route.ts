@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,7 +12,7 @@ const createOrderSchema = z.object({
       quantity: z.number().positive(),
       unitPrice: z.number().nonnegative(),
       notes: z.string().optional(),
-    })
+    }),
   ),
   shippingMethod: z.enum(["STANDARD", "EXPRESS", "OVERNIGHT"]).optional(),
   shippingAddress: z.string().min(1),
@@ -47,7 +47,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!customer?.customerId) {
-      return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Customer not found" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -111,7 +114,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error("Portal orders list error:", error);
-    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch orders" },
+      { status: 500 },
+    );
   }
 }
 
@@ -144,7 +150,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!customerUser?.customerId || !customerUser.customer) {
-      return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Customer not found" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -157,7 +166,12 @@ export async function POST(request: NextRequest) {
     }
 
     const taxAmount = subtotal * 0.1; // 10% tax (customize as needed)
-    const shippingCost = validated.shippingMethod === "OVERNIGHT" ? 50 : validated.shippingMethod === "EXPRESS" ? 25 : 10;
+    const shippingCost =
+      validated.shippingMethod === "OVERNIGHT"
+        ? 50
+        : validated.shippingMethod === "EXPRESS"
+          ? 25
+          : 10;
     const total = subtotal + taxAmount + shippingCost;
 
     // Generate order number
@@ -188,7 +202,9 @@ export async function POST(request: NextRequest) {
         shippingState: validated.shippingState,
         shippingZip: validated.shippingZip,
         shippingCountry: validated.shippingCountry,
-        requestedDate: validated.requestedDate ? new Date(validated.requestedDate) : null,
+        requestedDate: validated.requestedDate
+          ? new Date(validated.requestedDate)
+          : null,
         notes: validated.notes,
         createdById: user.id,
         items: {
@@ -212,8 +228,14 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     console.error("Portal order creation error:", error);
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Invalid input", details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid input", details: error.errors },
+        { status: 400 },
+      );
     }
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create order" },
+      { status: 500 },
+    );
   }
 }

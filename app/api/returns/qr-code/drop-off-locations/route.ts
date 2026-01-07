@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { qrReturnService } from '@/lib/services/returns/qr-return-service';
+import { NextRequest, NextResponse } from "next/server";
+import { qrReturnService } from "@/lib/services/returns/qr-return-service";
 
 /**
  * GET /api/returns/qr-code/drop-off-locations?zip=xxxxx&carrier=UPS&radius=25
@@ -8,14 +8,14 @@ import { qrReturnService } from '@/lib/services/returns/qr-return-service';
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const zip = searchParams.get('zip');
-    const carrier = searchParams.get('carrier');
-    const radius = parseInt(searchParams.get('radius') || '25');
+    const zip = searchParams.get("zip");
+    const carrier = searchParams.get("carrier");
+    const radius = parseInt(searchParams.get("radius") || "25");
 
     if (!zip) {
       return NextResponse.json(
-        { error: 'Missing required parameter: zip' },
-        { status: 400 }
+        { error: "Missing required parameter: zip" },
+        { status: 400 },
       );
     }
 
@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
       locations,
     });
   } catch (error: any) {
-    console.error('Find locations error:', error);
+    console.error("Find locations error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to find drop-off locations' },
-      { status: 500 }
+      { error: error.message || "Failed to find drop-off locations" },
+      { status: 500 },
     );
   }
 }

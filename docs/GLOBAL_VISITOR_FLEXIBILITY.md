@@ -5,6 +5,7 @@
 **Organizations operate differently across the globe:**
 
 ### Enterprise (USA/EU)
+
 - Strict security protocols
 - Background checks required
 - Escorts mandatory
@@ -12,24 +13,28 @@
 - GDPR/OSHA compliance
 
 ### SMB (Casual)
+
 - Simple logbook replacement
 - Walk-ins welcome
 - Minimal bureaucracy
 - Fast turnaround
 
 ### Manufacturing (Safety-Critical)
+
 - Safety briefings required
 - PPE enforcement
 - Restricted zones
 - OSHA compliance
 
 ### 3PL (Multi-Tenant)
+
 - 24/7 operations
 - Client-specific zones
 - High volume visitors
 - Fast processing
 
 ### Regional Differences
+
 - **EU**: GDPR strict (30-day retention, right to erasure)
 - **USA**: OSHA compliance for manufacturing
 - **Asia**: Less paperwork, faster processing
@@ -42,6 +47,7 @@
 ### **5 Pre-Built Configurations**
 
 #### 1. **ENTERPRISE** 🏢 (High Security)
+
 ```json
 {
   "preRegistrationRequired": true,
@@ -55,9 +61,11 @@
   "dataRetentionDays": 365
 }
 ```
+
 **Use Case**: Corporate headquarters, data centers, government facilities
 
 **Workflow**:
+
 1. Visitor pre-registers online (3 days advance)
 2. Host approves
 3. Background check runs
@@ -68,6 +76,7 @@
 ---
 
 #### 2. **SMB_CASUAL** 🏪 (Relaxed)
+
 ```json
 {
   "preRegistrationRequired": false,
@@ -79,9 +88,11 @@
   "dataRetentionDays": 90
 }
 ```
+
 **Use Case**: Small warehouses, retail, casual offices
 
 **Workflow**:
+
 1. Visitor walks in
 2. Self-service kiosk → Name + Company + Purpose
 3. Digital badge on phone
@@ -91,6 +102,7 @@
 ---
 
 #### 3. **MANUFACTURING** 🏭 (Safety-First)
+
 ```json
 {
   "preRegistrationRequired": true,
@@ -101,9 +113,11 @@
   "dataRetentionDays": 365
 }
 ```
+
 **Use Case**: Factories, chemical plants, construction sites
 
 **Workflow**:
+
 1. Pre-register with emergency contact
 2. Arrive → Safety briefing (15 min)
 3. PPE issued (hard hat, vest, goggles)
@@ -113,6 +127,7 @@
 ---
 
 #### 4. **THREE_PL** 📦 (High Volume, Multi-Tenant)
+
 ```json
 {
   "preRegistrationRequired": true,
@@ -123,9 +138,11 @@
   "automatedGates": true
 }
 ```
+
 **Use Case**: 3PL warehouses, fulfillment centers
 
 **Workflow**:
+
 1. Client drivers pre-register OR walk-in
 2. LPR auto-checks license plate
 3. Assigned to client-specific zone
@@ -135,6 +152,7 @@
 ---
 
 #### 5. **EU_GDPR** 🇪🇺 (Privacy-Strict)
+
 ```json
 {
   "photoCapture": false,
@@ -144,9 +162,11 @@
   "gdprCompliance": true
 }
 ```
+
 **Use Case**: EU-based operations
 
 **Workflow**:
+
 1. Explicit consent collected
 2. No biometric data (photos require consent)
 3. Data deleted after 30 days
@@ -158,6 +178,7 @@
 ## 🎛️ How It Works
 
 ### **Setup (One-Time)**
+
 ```typescript
 // Administrator chooses preset for their organization
 PUT /api/security/settings
@@ -167,6 +188,7 @@ PUT /api/security/settings
 ```
 
 ### **Automatic Enforcement**
+
 - All visitor APIs automatically check organization settings
 - Reject walk-ins if `walkInsAllowed: false`
 - Require pre-registration if `preRegistrationRequired: true`
@@ -174,6 +196,7 @@ PUT /api/security/settings
 - Auto-delete data per `dataRetentionDays`
 
 ### **Customization**
+
 ```typescript
 // Mix and match settings
 PUT /api/security/settings
@@ -196,6 +219,7 @@ PUT /api/security/settings
 ## 📊 Configuration Options
 
 ### **Visitor Policy** (30+ settings)
+
 - Registration requirements
 - Identification & verification
 - Badge management
@@ -206,11 +230,13 @@ PUT /api/security/settings
 - Notification preferences
 
 ### **Gate Control** (8 settings)
+
 - Automated vs manual gates
 - Vehicle inspection requirements
 - After-hours policies
 
 ### **Compliance** (9 settings)
+
 - Report frequency
 - Alert thresholds
 - Compliance standards (OSHA, ISO, GDPR)
@@ -220,6 +246,7 @@ PUT /api/security/settings
 ## 🌐 Regional Examples
 
 ### **🇺🇸 USA Enterprise**
+
 - Preset: `ENTERPRISE`
 - OSHA compliance ON
 - Background checks required
@@ -227,6 +254,7 @@ PUT /api/security/settings
 - NDA required
 
 ### **🇪🇺 EU Warehouse**
+
 - Preset: `EU_GDPR`
 - 30-day data retention (GDPR minimum)
 - No photo capture (biometric data requires consent)
@@ -234,6 +262,7 @@ PUT /api/security/settings
 - Explicit consent required
 
 ### **🇨🇳 China 3PL**
+
 - Preset: `THREE_PL`
 - 24/7 operations
 - High volume processing
@@ -241,6 +270,7 @@ PUT /api/security/settings
 - Zone-based access
 
 ### **🇦🇺 Australia Manufacturing**
+
 - Preset: `MANUFACTURING`
 - Safety briefings mandatory
 - Emergency contacts required
@@ -248,6 +278,7 @@ PUT /api/security/settings
 - OSHA-equivalent compliance
 
 ### **🇮🇳 India SMB**
+
 - Preset: `SMB_CASUAL`
 - Walk-ins welcome
 - Simple digital logbook
@@ -259,12 +290,14 @@ PUT /api/security/settings
 ## 💡 Benefits
 
 ### **For LogiVox**
+
 ✅ **One codebase, global operations** - No separate builds
 ✅ **Compliance built-in** - GDPR, OSHA, ISO pre-configured
 ✅ **No customization work** - Clients choose preset
 ✅ **Market to all segments** - Enterprise to SMB
 
 ### **For Customers**
+
 ✅ **Works their way** - Not forced into rigid workflow
 ✅ **Instant setup** - Choose preset, done in 2 minutes
 ✅ **Compliant by default** - GDPR/OSHA pre-configured
@@ -275,14 +308,18 @@ PUT /api/security/settings
 ## 🚀 API Usage
 
 ### **Get Current Settings**
+
 ```bash
 GET /api/security/settings
 ```
 
 Response:
+
 ```json
 {
-  "currentSettings": { /* Active config */ },
+  "currentSettings": {
+    /* Active config */
+  },
   "availablePresets": [
     "ENTERPRISE",
     "SMB_CASUAL",
@@ -290,11 +327,14 @@ Response:
     "THREE_PL",
     "EU_GDPR"
   ],
-  "presets": { /* All preset details */ }
+  "presets": {
+    /* All preset details */
+  }
 }
 ```
 
 ### **Apply Preset**
+
 ```bash
 PUT /api/security/settings
 {
@@ -303,6 +343,7 @@ PUT /api/security/settings
 ```
 
 ### **Custom Configuration**
+
 ```bash
 PUT /api/security/settings
 {
@@ -317,6 +358,7 @@ PUT /api/security/settings
 ```
 
 ### **Visitor Check-In (Automatic Enforcement)**
+
 ```bash
 POST /api/security/visitors
 {
@@ -328,6 +370,7 @@ POST /api/security/visitors
 ```
 
 If organization has `walkInsAllowed: false`:
+
 ```json
 {
   "error": "Walk-in visitors not allowed. Pre-registration required.",
@@ -346,6 +389,7 @@ If organization has `walkInsAllowed: false`:
 ✅ **Activity logging** - Configuration changes tracked
 
 ### **Next Steps** (Optional Enhancements)
+
 - 🔲 UI for configuration (settings page)
 - 🔲 Preset comparison tool
 - 🔲 Compliance checker (validates against regional laws)
@@ -360,7 +404,8 @@ If organization has `walkInsAllowed: false`:
 
 **Solution**: 5 pre-built security presets + 30+ customizable settings
 
-**Result**: 
+**Result**:
+
 - ✅ Works for enterprise (strict) and SMB (casual)
 - ✅ Compliant with GDPR, OSHA, ISO
 - ✅ No code changes per customer

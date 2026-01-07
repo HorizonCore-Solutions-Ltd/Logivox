@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { ReorderAlertEngine, getAlertStatistics } from '@/lib/alerts';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { ReorderAlertEngine, getAlertStatistics } from "@/lib/alerts";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/alerts
@@ -12,22 +12,19 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // TODO: Get organizationId from session/user
-    const organizationId = 'org_example'; // Replace with actual org ID from session
+    const organizationId = "org_example"; // Replace with actual org ID from session
 
     const searchParams = request.nextUrl.searchParams;
-    const status = searchParams.get('status');
-    const days = parseInt(searchParams.get('days') || '30');
+    const status = searchParams.get("status");
+    const days = parseInt(searchParams.get("days") || "30");
 
-    if (searchParams.has('stats')) {
+    if (searchParams.has("stats")) {
       // Return statistics
       const stats = await getAlertStatistics(organizationId, days);
       return NextResponse.json(stats);
@@ -38,10 +35,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ alerts });
   } catch (error) {
-    console.error('[GET /api/alerts] Error:', error);
+    console.error("[GET /api/alerts] Error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch alerts' },
-      { status: 500 }
+      { error: "Failed to fetch alerts" },
+      { status: 500 },
     );
   }
 }
@@ -53,16 +50,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // TODO: Get organizationId from session/user
-    const organizationId = 'org_example'; // Replace with actual org ID from session
+    const organizationId = "org_example"; // Replace with actual org ID from session
 
     const engine = new ReorderAlertEngine({
       organizationId,
@@ -82,10 +76,10 @@ export async function POST(request: NextRequest) {
       results,
     });
   } catch (error) {
-    console.error('[POST /api/alerts/check] Error:', error);
+    console.error("[POST /api/alerts/check] Error:", error);
     return NextResponse.json(
-      { error: 'Failed to check inventory' },
-      { status: 500 }
+      { error: "Failed to check inventory" },
+      { status: 500 },
     );
   }
 }

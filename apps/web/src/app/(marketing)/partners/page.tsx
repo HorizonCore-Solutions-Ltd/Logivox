@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Handshake,
   Users,
@@ -17,8 +23,8 @@ import {
   Building2,
   Target,
   DollarSign,
-  BarChart3
-} from "lucide-react"
+  BarChart3,
+} from "lucide-react";
 
 export default function PartnersPage() {
   const partnerTypes = [
@@ -30,8 +36,8 @@ export default function PartnersPage() {
         "Technical integration support",
         "Co-marketing opportunities",
         "Partner portal access",
-        "Joint customer success"
-      ]
+        "Joint customer success",
+      ],
     },
     {
       icon: Users,
@@ -41,8 +47,8 @@ export default function PartnersPage() {
         "Implementation training",
         "Sales enablement resources",
         "Deal registration program",
-        "Partner margin incentives"
-      ]
+        "Partner margin incentives",
+      ],
     },
     {
       icon: TrendingUp,
@@ -52,8 +58,8 @@ export default function PartnersPage() {
         "Competitive reseller margins",
         "Sales and technical training",
         "Marketing development funds",
-        "Dedicated partner manager"
-      ]
+        "Dedicated partner manager",
+      ],
     },
     {
       icon: Globe,
@@ -63,85 +69,94 @@ export default function PartnersPage() {
         "Simple referral process",
         "Attractive commission structure",
         "No implementation required",
-        "Partner dashboard tracking"
-      ]
-    }
-  ]
+        "Partner dashboard tracking",
+      ],
+    },
+  ];
 
   const benefits = [
     {
       icon: DollarSign,
       title: "Revenue Growth",
-      description: "Expand your offerings and create new revenue streams with our platform"
+      description:
+        "Expand your offerings and create new revenue streams with our platform",
     },
     {
       icon: Users,
       title: "Customer Value",
-      description: "Deliver more value to your customers with integrated solutions"
+      description:
+        "Deliver more value to your customers with integrated solutions",
     },
     {
       icon: Award,
       title: "Training & Certification",
-      description: "Access comprehensive training programs and certification paths"
+      description:
+        "Access comprehensive training programs and certification paths",
     },
     {
       icon: BarChart3,
       title: "Marketing Support",
-      description: "Co-marketing opportunities, MDF, and sales enablement resources"
+      description:
+        "Co-marketing opportunities, MDF, and sales enablement resources",
     },
     {
       icon: Target,
       title: "Deal Registration",
-      description: "Protect your deals with our partner-friendly deal registration program"
+      description:
+        "Protect your deals with our partner-friendly deal registration program",
     },
     {
       icon: Handshake,
       title: "Dedicated Support",
-      description: "Work with a dedicated partner manager and technical support team"
-    }
-  ]
+      description:
+        "Work with a dedicated partner manager and technical support team",
+    },
+  ];
 
   const currentPartners = [
     {
       name: "ERP Integrations",
-      partners: ["SAP", "Oracle NetSuite", "Microsoft Dynamics", "Infor"]
+      partners: ["SAP", "Oracle NetSuite", "Microsoft Dynamics", "Infor"],
     },
     {
       name: "Shipping Carriers",
-      partners: ["FedEx", "UPS", "DHL", "USPS"]
+      partners: ["FedEx", "UPS", "DHL", "USPS"],
     },
     {
       name: "Hardware Vendors",
-      partners: ["Zebra Technologies", "Honeywell", "Datalogic", "Advantech"]
+      partners: ["Zebra Technologies", "Honeywell", "Datalogic", "Advantech"],
     },
     {
       name: "Implementation Consultants",
-      partners: ["15+ certified implementation partners globally"]
-    }
-  ]
+      partners: ["15+ certified implementation partners globally"],
+    },
+  ];
 
   const process = [
     {
       step: "1",
       title: "Apply",
-      description: "Submit your partner application with details about your business"
+      description:
+        "Submit your partner application with details about your business",
     },
     {
       step: "2",
       title: "Review",
-      description: "Our team reviews your application and schedules a discovery call"
+      description:
+        "Our team reviews your application and schedules a discovery call",
     },
     {
       step: "3",
       title: "Onboard",
-      description: "Complete partner training and get access to our partner portal"
+      description:
+        "Complete partner training and get access to our partner portal",
     },
     {
       step: "4",
       title: "Launch",
-      description: "Start selling, implementing, or integrating with LogiVox"
-    }
-  ]
+      description: "Start selling, implementing, or integrating with LogiVox",
+    },
+  ];
 
   return (
     <div className="flex flex-col">
@@ -156,9 +171,9 @@ export default function PartnersPage() {
               Grow Your Business with LogiVox
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Join our partner ecosystem and deliver enterprise warehouse management solutions 
-              to your customers. Access competitive margins, technical support, and co-marketing 
-              opportunities.
+              Join our partner ecosystem and deliver enterprise warehouse
+              management solutions to your customers. Access competitive
+              margins, technical support, and co-marketing opportunities.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -197,7 +212,9 @@ export default function PartnersPage() {
                       <CardTitle className="text-xl">{type.title}</CardTitle>
                     </div>
                   </div>
-                  <CardDescription className="text-base">{type.description}</CardDescription>
+                  <CardDescription className="text-base">
+                    {type.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
@@ -291,7 +308,9 @@ export default function PartnersPage() {
                     {item.step}
                   </div>
                   <h3 className="font-semibold mb-2">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -307,7 +326,8 @@ export default function PartnersPage() {
               Ready to Partner with Us?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join our partner ecosystem and grow your business with LogiVox enterprise solutions
+              Join our partner ecosystem and grow your business with LogiVox
+              enterprise solutions
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -323,5 +343,5 @@ export default function PartnersPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

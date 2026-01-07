@@ -1,6 +1,6 @@
 /**
  * Yard Management Service
- * 
+ *
  * Handles yard operations including:
  * - Dock appointment scheduling
  * - Yard location management
@@ -10,8 +10,12 @@
  * - Yard utilization metrics
  */
 
-import { prisma } from '@/lib/prisma';
-import { YardLocationType, DockAppointmentType, AppointmentStatus } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import {
+  YardLocationType,
+  DockAppointmentType,
+  AppointmentStatus,
+} from "@prisma/client";
 
 interface CreateAppointmentParams {
   organizationId: string;
@@ -44,15 +48,18 @@ interface YardLocationParams {
 }
 
 export class YardManagementService {
-  
   /**
    * Create dock appointment
    */
   static async createAppointment(params: CreateAppointmentParams) {
-    const appointmentNumber = await this.generateAppointmentNumber(params.organizationId);
+    const appointmentNumber = await this.generateAppointmentNumber(
+      params.organizationId,
+    );
 
     // Calculate duration in hours
-    const duration = (params.scheduledEnd.getTime() - params.scheduledStart.getTime()) / (1000 * 60 * 60);
+    const duration =
+      (params.scheduledEnd.getTime() - params.scheduledStart.getTime()) /
+      (1000 * 60 * 60);
 
     const appointment = await prisma.dockAppointment.create({
       data: {
@@ -97,11 +104,11 @@ export class YardManagementService {
     });
 
     if (!location) {
-      throw new Error('Yard location not found');
+      throw new Error("Yard location not found");
     }
 
     if (location.isOccupied) {
-      throw new Error('Yard location is already occupied');
+      throw new Error("Yard location is already occupied");
     }
 
     // Assign location
@@ -140,7 +147,7 @@ export class YardManagementService {
     });
 
     if (!appointment) {
-      throw new Error('Appointment not found');
+      throw new Error("Appointment not found");
     }
 
     const actualArrival = params.actualArrival || new Date();
@@ -165,8 +172,8 @@ export class YardManagementService {
         organizationId: appointment.organizationId,
         entryNumber: `ENTRY-${Date.now()}`,
         appointmentId: params.appointmentId,
-        entryType: 'DELIVERY',
-        direction: 'INBOUND',
+        entryType: "DELIVERY",
+        direction: "INBOUND",
         entryTime: actualArrival,
         vehicleNumber: appointment.vehicleNumber,
         driverName: appointment.driverName,
@@ -204,14 +211,16 @@ export class YardManagementService {
     });
 
     if (!appointment) {
-      throw new Error('Appointment not found');
+      throw new Error("Appointment not found");
     }
 
     const actualEnd = new Date();
     let actualDuration = 0;
 
     if (appointment.actualStart) {
-      actualDuration = (actualEnd.getTime() - appointment.actualStart.getTime()) / (1000 * 60 * 60);
+      actualDuration =
+        (actualEnd.getTime() - appointment.actualStart.getTime()) /
+        (1000 * 60 * 60);
     }
 
     const updated = await prisma.dockAppointment.update({
@@ -253,7 +262,7 @@ export class YardManagementService {
     });
 
     if (!appointment) {
-      throw new Error('Appointment not found');
+      throw new Error("Appointment not found");
     }
 
     const updated = await prisma.dockAppointment.update({
@@ -270,8 +279,8 @@ export class YardManagementService {
         organizationId: appointment.organizationId,
         entryNumber: `EXIT-${Date.now()}`,
         appointmentId: params.appointmentId,
-        entryType: 'DELIVERY',
-        direction: 'OUTBOUND',
+        entryType: "DELIVERY",
+        direction: "OUTBOUND",
         entryTime: new Date(),
         vehicleNumber: appointment.vehicleNumber,
         driverName: appointment.driverName,
@@ -294,7 +303,7 @@ export class YardManagementService {
     });
 
     if (!appointment) {
-      throw new Error('Appointment not found');
+      throw new Error("Appointment not found");
     }
 
     const updated = await prisma.dockAppointment.update({
@@ -331,7 +340,8 @@ export class YardManagementService {
 
     if (params.warehouseId) where.warehouseId = params.warehouseId;
     if (params.status) where.status = params.status;
-    if (params.carrierName) where.carrierName = { contains: params.carrierName };
+    if (params.carrierName)
+      where.carrierName = { contains: params.carrierName };
 
     if (params.startDate || params.endDate) {
       where.scheduledDate = {};
@@ -345,7 +355,7 @@ export class YardManagementService {
         yardLocation: true,
       },
       orderBy: {
-        scheduledStart: 'asc',
+        scheduledStart: "asc",
       },
     });
   }
@@ -405,13 +415,17 @@ export class YardManagementService {
         appointments: {
           where: {
             status: {
-              in: [AppointmentStatus.SCHEDULED, AppointmentStatus.CHECKED_IN, AppointmentStatus.IN_PROGRESS],
+              in: [
+                AppointmentStatus.SCHEDULED,
+                AppointmentStatus.CHECKED_IN,
+                AppointmentStatus.IN_PROGRESS,
+              ],
             },
           },
         },
       },
       orderBy: {
-        locationCode: 'asc',
+        locationCode: "asc",
       },
     });
   }
@@ -462,7 +476,7 @@ export class YardManagementService {
     return prisma.yardLocation.findMany({
       where,
       orderBy: {
-        locationCode: 'asc',
+        locationCode: "asc",
       },
     });
   }
@@ -485,9 +499,10 @@ export class YardManagementService {
     });
 
     const totalLocations = locations.length;
-    const occupiedLocations = locations.filter(l => l.isOccupied).length;
+    const occupiedLocations = locations.filter((l) => l.isOccupied).length;
     const availableLocations = totalLocations - occupiedLocations;
-    const utilizationRate = totalLocations > 0 ? (occupiedLocations / totalLocations) * 100 : 0;
+    const utilizationRate =
+      totalLocations > 0 ? (occupiedLocations / totalLocations) * 100 : 0;
 
     // Get appointments in period
     const appointmentWhere: any = {};
@@ -495,7 +510,8 @@ export class YardManagementService {
 
     if (params.startDate || params.endDate) {
       appointmentWhere.scheduledDate = {};
-      if (params.startDate) appointmentWhere.scheduledDate.gte = params.startDate;
+      if (params.startDate)
+        appointmentWhere.scheduledDate.gte = params.startDate;
       if (params.endDate) appointmentWhere.scheduledDate.lte = params.endDate;
     }
 
@@ -504,14 +520,24 @@ export class YardManagementService {
     });
 
     const totalAppointments = appointments.length;
-    const completedAppointments = appointments.filter(a => a.status === AppointmentStatus.COMPLETED).length;
-    const cancelledAppointments = appointments.filter(a => a.status === AppointmentStatus.CANCELLED).length;
+    const completedAppointments = appointments.filter(
+      (a) => a.status === AppointmentStatus.COMPLETED,
+    ).length;
+    const cancelledAppointments = appointments.filter(
+      (a) => a.status === AppointmentStatus.CANCELLED,
+    ).length;
 
     // Calculate average turnaround time
-    const completedWithDuration = appointments.filter(a => a.actualDuration && a.actualDuration > 0);
-    const avgTurnaround = completedWithDuration.length > 0
-      ? completedWithDuration.reduce((sum, a) => sum + (a.actualDuration || 0), 0) / completedWithDuration.length
-      : 0;
+    const completedWithDuration = appointments.filter(
+      (a) => a.actualDuration && a.actualDuration > 0,
+    );
+    const avgTurnaround =
+      completedWithDuration.length > 0
+        ? completedWithDuration.reduce(
+            (sum, a) => sum + (a.actualDuration || 0),
+            0,
+          ) / completedWithDuration.length
+        : 0;
 
     return {
       warehouseId: params.warehouseId,
@@ -519,11 +545,14 @@ export class YardManagementService {
       totalLocations,
       occupiedLocations,
       availableLocations,
-      utilizationRate: utilizationRate.toFixed(2) + '%',
+      utilizationRate: utilizationRate.toFixed(2) + "%",
       totalAppointments,
       completedAppointments,
       cancelledAppointments,
-      completionRate: totalAppointments > 0 ? ((completedAppointments / totalAppointments) * 100).toFixed(2) + '%' : '0%',
+      completionRate:
+        totalAppointments > 0
+          ? ((completedAppointments / totalAppointments) * 100).toFixed(2) + "%"
+          : "0%",
       averageTurnaroundHours: avgTurnaround.toFixed(2),
     };
   }
@@ -531,10 +560,7 @@ export class YardManagementService {
   /**
    * Get dock schedule for specific date
    */
-  static async getDockSchedule(params: {
-    warehouseId?: string;
-    date: Date;
-  }) {
+  static async getDockSchedule(params: { warehouseId?: string; date: Date }) {
     const startOfDay = new Date(params.date);
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -553,7 +579,7 @@ export class YardManagementService {
         yardLocation: true,
       },
       orderBy: {
-        scheduledStart: 'asc',
+        scheduledStart: "asc",
       },
     });
 
@@ -562,7 +588,7 @@ export class YardManagementService {
 
     for (const appointment of appointments) {
       const hour = appointment.scheduledStart.getHours();
-      const key = `${hour.toString().padStart(2, '0')}:00`;
+      const key = `${hour.toString().padStart(2, "0")}:00`;
 
       if (!schedule[key]) {
         schedule[key] = [];
@@ -612,24 +638,40 @@ export class YardManagementService {
     });
 
     const totalAppointments = appointments.length;
-    const completedAppointments = appointments.filter(a => a.status === AppointmentStatus.COMPLETED);
-    const lateArrivals = appointments.filter(a => 
-      a.actualArrival && a.scheduledStart && a.actualArrival > a.scheduledStart
+    const completedAppointments = appointments.filter(
+      (a) => a.status === AppointmentStatus.COMPLETED,
+    );
+    const lateArrivals = appointments.filter(
+      (a) =>
+        a.actualArrival &&
+        a.scheduledStart &&
+        a.actualArrival > a.scheduledStart,
     ).length;
 
     // Calculate on-time rate
-    const onTimeRate = totalAppointments > 0 
-      ? ((totalAppointments - lateArrivals) / totalAppointments) * 100 
-      : 100;
+    const onTimeRate =
+      totalAppointments > 0
+        ? ((totalAppointments - lateArrivals) / totalAppointments) * 100
+        : 100;
 
     // Calculate average delay
     const delays = appointments
-      .filter(a => a.actualArrival && a.scheduledStart && a.actualArrival > a.scheduledStart)
-      .map(a => (a.actualArrival!.getTime() - a.scheduledStart.getTime()) / (1000 * 60)); // minutes
+      .filter(
+        (a) =>
+          a.actualArrival &&
+          a.scheduledStart &&
+          a.actualArrival > a.scheduledStart,
+      )
+      .map(
+        (a) =>
+          (a.actualArrival!.getTime() - a.scheduledStart.getTime()) /
+          (1000 * 60),
+      ); // minutes
 
-    const avgDelay = delays.length > 0
-      ? delays.reduce((sum, d) => sum + d, 0) / delays.length
-      : 0;
+    const avgDelay =
+      delays.length > 0
+        ? delays.reduce((sum, d) => sum + d, 0) / delays.length
+        : 0;
 
     return {
       carrierName: params.carrierName,
@@ -637,7 +679,7 @@ export class YardManagementService {
       totalAppointments,
       completedAppointments: completedAppointments.length,
       lateArrivals,
-      onTimeRate: onTimeRate.toFixed(2) + '%',
+      onTimeRate: onTimeRate.toFixed(2) + "%",
       averageDelayMinutes: avgDelay.toFixed(0),
     };
   }
@@ -649,7 +691,7 @@ export class YardManagementService {
     warehouseId?: string;
     startDate?: Date;
     endDate?: Date;
-    entryType?: 'ENTRY' | 'EXIT';
+    entryType?: "ENTRY" | "EXIT";
   }) {
     const where: any = {};
 
@@ -667,7 +709,7 @@ export class YardManagementService {
         appointment: true,
       },
       orderBy: {
-        entryTime: 'desc',
+        entryTime: "desc",
       },
     });
 
@@ -678,13 +720,15 @@ export class YardManagementService {
   // PRIVATE HELPER METHODS
   // ==========================================
 
-  private static async generateAppointmentNumber(organizationId: string): Promise<string> {
+  private static async generateAppointmentNumber(
+    organizationId: string,
+  ): Promise<string> {
     const today = new Date();
-    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-    
+    const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
+
     const startOfDay = new Date(today);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const count = await prisma.dockAppointment.count({
       where: {
         organizationId,
@@ -694,6 +738,6 @@ export class YardManagementService {
       },
     });
 
-    return `APPT-${dateStr}-${String(count + 1).padStart(4, '0')}`;
+    return `APPT-${dateStr}-${String(count + 1).padStart(4, "0")}`;
   }
 }

@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Package,
   Calendar,
@@ -16,42 +22,48 @@ import {
   ArrowRight,
   Zap,
   BarChart3,
-  Lock
-} from "lucide-react"
+  Lock,
+} from "lucide-react";
 
 export default function StockBookingPage() {
   const features = [
     {
       icon: Calendar,
       title: "Real-Time Availability",
-      description: "See accurate stock levels across all warehouses and locations instantly."
+      description:
+        "See accurate stock levels across all warehouses and locations instantly.",
     },
     {
       icon: Clock,
       title: "Instant Reservations",
-      description: "Book inventory in seconds with automated confirmation and allocation."
+      description:
+        "Book inventory in seconds with automated confirmation and allocation.",
     },
     {
       icon: Shield,
       title: "Guaranteed Allocation",
-      description: "Once booked, your stock is secured and protected from double-booking."
+      description:
+        "Once booked, your stock is secured and protected from double-booking.",
     },
     {
       icon: Users,
       title: "Multi-Party Access",
-      description: "Enable customers, partners, and teams to book inventory with role-based permissions."
+      description:
+        "Enable customers, partners, and teams to book inventory with role-based permissions.",
     },
     {
       icon: TrendingUp,
       title: "Demand Forecasting",
-      description: "AI-powered insights help predict and optimize booking patterns."
+      description:
+        "AI-powered insights help predict and optimize booking patterns.",
     },
     {
       icon: BarChart3,
       title: "Booking Analytics",
-      description: "Track booking trends, customer behavior, and inventory utilization."
-    }
-  ]
+      description:
+        "Track booking trends, customer behavior, and inventory utilization.",
+    },
+  ];
 
   const benefits = [
     "Reduce stock-outs by 65% with predictive booking",
@@ -61,26 +73,29 @@ export default function StockBookingPage() {
     "Real-time sync with ERP and warehouse systems",
     "Mobile-friendly booking interface",
     "Automated notifications and confirmations",
-    "Complete audit trail for compliance"
-  ]
+    "Complete audit trail for compliance",
+  ];
 
   const useCases = [
     {
       title: "Wholesale Distribution",
-      description: "Enable B2B customers to reserve inventory before delivery, reducing stockouts and improving cash flow.",
-      icon: Package
+      description:
+        "Enable B2B customers to reserve inventory before delivery, reducing stockouts and improving cash flow.",
+      icon: Package,
     },
     {
       title: "Manufacturing",
-      description: "Book raw materials and components across multiple production facilities with real-time visibility.",
-      icon: Zap
+      description:
+        "Book raw materials and components across multiple production facilities with real-time visibility.",
+      icon: Zap,
     },
     {
       title: "Retail & E-commerce",
-      description: "Synchronize online and in-store inventory with automated booking and reservation systems.",
-      icon: TrendingUp
-    }
-  ]
+      description:
+        "Synchronize online and in-store inventory with automated booking and reservation systems.",
+      icon: TrendingUp,
+    },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -93,7 +108,9 @@ export default function StockBookingPage() {
               Stock Booking System
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Empower your customers and teams to reserve inventory in real-time with our intelligent booking platform. Eliminate errors, reduce stockouts, and accelerate order fulfillment.
+              Empower your customers and teams to reserve inventory in real-time
+              with our intelligent booking platform. Eliminate errors, reduce
+              stockouts, and accelerate order fulfillment.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -114,7 +131,9 @@ export default function StockBookingPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Powerful Booking Features</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Powerful Booking Features
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Everything you need to manage stock reservations at scale
             </p>
@@ -122,7 +141,7 @@ export default function StockBookingPage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <Card key={feature.title}>
                   <CardHeader>
@@ -133,7 +152,7 @@ export default function StockBookingPage() {
                     <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -149,7 +168,8 @@ export default function StockBookingPage() {
                 Transform Your Inventory Operations
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our stock booking system delivers measurable improvements across your entire supply chain.
+                Our stock booking system delivers measurable improvements across
+                your entire supply chain.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -165,7 +185,9 @@ export default function StockBookingPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Booking Dashboard</CardTitle>
-                  <CardDescription>Manage all reservations from one place</CardDescription>
+                  <CardDescription>
+                    Manage all reservations from one place
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-video bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg flex items-center justify-center border-2 border-dashed">
@@ -195,7 +217,7 @@ export default function StockBookingPage() {
 
           <div className="grid gap-8 lg:grid-cols-3">
             {useCases.map((useCase) => {
-              const Icon = useCase.icon
+              const Icon = useCase.icon;
               return (
                 <Card key={useCase.title} className="text-center">
                   <CardHeader>
@@ -208,7 +230,7 @@ export default function StockBookingPage() {
                     </CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -221,7 +243,8 @@ export default function StockBookingPage() {
             Ready to Optimize Your Stock Bookings?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join hundreds of companies using LogiVox to streamline inventory reservations
+            Join hundreds of companies using LogiVox to streamline inventory
+            reservations
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
@@ -230,12 +253,17 @@ export default function StockBookingPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 border-white text-white hover:bg-white/20" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-white/10 border-white text-white hover:bg-white/20"
+              asChild
+            >
               <Link href="/contact">Contact Sales</Link>
             </Button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

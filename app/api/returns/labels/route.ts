@@ -6,19 +6,19 @@
  * GET /api/returns/labels/[id]/track - Track shipment
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { LabelServiceFactory } from '@/lib/services/returns/label-service';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { LabelServiceFactory } from "@/lib/services/returns/label-service";
 
 const generateLabelSchema = z.object({
   rmaId: z.string(),
-  carrier: z.enum(['UPS', 'FedEx', 'USPS', 'DHL', 'CanadaPost']),
+  carrier: z.enum(["UPS", "FedEx", "USPS", "DHL", "CanadaPost"]),
   serviceLevel: z.string().optional(),
-  type: z.enum(['PREPAID', 'CUSTOMER_PAID', 'COLLECT']).default('PREPAID'),
+  type: z.enum(["PREPAID", "CUSTOMER_PAID", "COLLECT"]).default("PREPAID"),
   shipFrom: z.object({
     name: z.string(),
     address1: z.string(),
@@ -40,7 +40,7 @@ const generateLabelSchema = z.object({
   }),
   package: z.object({
     weight: z.number(),
-    weightUnit: z.enum(['lb', 'kg']),
+    weightUnit: z.enum(["lb", "kg"]),
     length: z.number().optional(),
     width: z.number().optional(),
     height: z.number().optional(),
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -60,7 +60,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -79,22 +82,26 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rma) {
-      return NextResponse.json({ error: 'RMA not found' }, { status: 404 });
+      return NextResponse.json({ error: "RMA not found" }, { status: 404 });
     }
 
     // Get label service settings
-    const settings = await prisma.$queryRaw`
+    const settings = (await prisma.$queryRaw`
       SELECT * FROM return_settings WHERE organization_id = ${membership.organizationId}
-    ` as any[];
+    `) as any[];
 
     const labelSettings = settings[0]?.labels || {};
-    
+
     if (!labelSettings.enabled) {
-      return NextResponse.json({ error: 'Label generation not enabled' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Label generation not enabled" },
+        { status: 400 },
+      );
     }
 
     // Get appropriate label service
-    const provider = labelSettings.provider || process.env.LABEL_PROVIDER || 'shipstation';
+    const provider =
+      labelSettings.provider || process.env.LABEL_PROVIDER || "shipstation";
     const labelService = LabelServiceFactory.create(provider, {
       apiKey: process.env[`${provider.toUpperCase()}_API_KEY`],
       apiSecret: process.env[`${provider.toUpperCase()}_API_SECRET`],
@@ -141,8 +148,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: membership.organizationId,
         userId: session.user.id,
-        action: 'RETURN_LABEL_GENERATED',
-        entityType: 'RMA',
+        action: "RETURN_LABEL_GENERATED",
+        entityType: "RMA",
         entityId: rma.id,
         metadata: {
           rmaNumber: rma.rmaNumber,
@@ -154,20 +161,23 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       label,
-      message: 'Return label generated successfully',
+      message: "Return label generated successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error generating label:', error);
+    console.error("Error generating label:", error);
     return NextResponse.json(
-      { error: 'Failed to generate label', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to generate label",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

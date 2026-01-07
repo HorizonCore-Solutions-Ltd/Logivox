@@ -3,7 +3,7 @@
  * Implements ISO 9001:2015 risk-based thinking
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -29,7 +29,11 @@ export class RiskService {
   /**
    * Calculate Risk Priority Number (RPN)
    */
-  static calculateRPN(severity: number, occurrence: number, detection: number): number {
+  static calculateRPN(
+    severity: number,
+    occurrence: number,
+    detection: number,
+  ): number {
     return severity * occurrence * detection;
   }
 
@@ -43,27 +47,27 @@ export class RiskService {
   } {
     if (rpn >= 200) {
       return {
-        level: 'CRITICAL',
-        color: 'red',
-        action: 'Immediate action required. Stop process if necessary.'
+        level: "CRITICAL",
+        color: "red",
+        action: "Immediate action required. Stop process if necessary.",
       };
     } else if (rpn >= 125) {
       return {
-        level: 'HIGH',
-        color: 'orange',
-        action: 'Priority mitigation required within 30 days.'
+        level: "HIGH",
+        color: "orange",
+        action: "Priority mitigation required within 30 days.",
       };
     } else if (rpn >= 50) {
       return {
-        level: 'MEDIUM',
-        color: 'yellow',
-        action: 'Mitigation recommended within 90 days.'
+        level: "MEDIUM",
+        color: "yellow",
+        action: "Mitigation recommended within 90 days.",
       };
     } else {
       return {
-        level: 'LOW',
-        color: 'green',
-        action: 'Monitor and review periodically.'
+        level: "LOW",
+        color: "green",
+        action: "Monitor and review periodically.",
       };
     }
   }
@@ -83,7 +87,11 @@ export class RiskService {
     owner: string;
     createdBy: string;
   }) {
-    const rpn = this.calculateRPN(data.severity, data.occurrence, data.detection);
+    const rpn = this.calculateRPN(
+      data.severity,
+      data.occurrence,
+      data.detection,
+    );
 
     const risk = await prisma.riskRegister.create({
       data: {
@@ -97,11 +105,11 @@ export class RiskService {
         occurrence: data.occurrence,
         detection: data.detection,
         rpn,
-        status: 'IDENTIFIED',
+        status: "IDENTIFIED",
         owner: data.owner,
         createdBy: data.createdBy,
-        nextReviewDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) // 90 days
-      }
+        nextReviewDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 90 days
+      },
     });
 
     return risk;
@@ -114,12 +122,12 @@ export class RiskService {
     riskId: string,
     mitigationPlan: string,
     mitigationOwner: string,
-    residualAssessment: RiskAssessment
+    residualAssessment: RiskAssessment,
   ) {
     const residualRPN = this.calculateRPN(
       residualAssessment.severity,
       residualAssessment.occurrence,
-      residualAssessment.detection
+      residualAssessment.detection,
     );
 
     return await prisma.riskRegister.update({
@@ -131,27 +139,29 @@ export class RiskService {
         residualOccurrence: residualAssessment.occurrence,
         residualDetection: residualAssessment.detection,
         residualRPN,
-        status: 'MITIGATION_PLANNED'
-      }
+        status: "MITIGATION_PLANNED",
+      },
     });
   }
 
   /**
    * Get risk heatmap data
    */
-  static async getRiskHeatmap(organizationId: string): Promise<RiskHeatmapData[]> {
+  static async getRiskHeatmap(
+    organizationId: string,
+  ): Promise<RiskHeatmapData[]> {
     const risks = await prisma.riskRegister.findMany({
       where: {
         organizationId,
         status: {
-          not: 'CLOSED'
-        }
-      }
+          not: "CLOSED",
+        },
+      },
     });
 
     // Group by category
     const grouped: { [key: string]: any[] } = {};
-    risks.forEach(risk => {
+    risks.forEach((risk) => {
       if (!grouped[risk.category]) {
         grouped[risk.category] = [];
       }
@@ -160,13 +170,13 @@ export class RiskService {
         title: risk.title,
         severity: risk.severity,
         occurrence: risk.occurrence,
-        rpn: risk.rpn
+        rpn: risk.rpn,
       });
     });
 
-    return Object.keys(grouped).map(category => ({
+    return Object.keys(grouped).map((category) => ({
       category,
-      risks: grouped[category]
+      risks: grouped[category],
     }));
   }
 
@@ -178,15 +188,15 @@ export class RiskService {
       where: {
         organizationId,
         rpn: {
-          gte: 125
+          gte: 125,
         },
         status: {
-          not: 'CLOSED'
-        }
+          not: "CLOSED",
+        },
       },
       orderBy: {
-        rpn: 'desc'
-      }
+        rpn: "desc",
+      },
     });
   }
 
@@ -195,16 +205,16 @@ export class RiskService {
    */
   static async linkToNCR(riskId: string, ncrId: string) {
     const risk = await prisma.riskRegister.findUnique({
-      where: { id: riskId }
+      where: { id: riskId },
     });
 
-    if (!risk) throw new Error('Risk not found');
+    if (!risk) throw new Error("Risk not found");
 
     const linkedNCRIds = [...risk.linkedNCRIds, ncrId];
 
     return await prisma.riskRegister.update({
       where: { id: riskId },
-      data: { linkedNCRIds }
+      data: { linkedNCRIds },
     });
   }
 
@@ -213,16 +223,16 @@ export class RiskService {
    */
   static async linkToCAPA(riskId: string, capaId: string) {
     const risk = await prisma.riskRegister.findUnique({
-      where: { id: riskId }
+      where: { id: riskId },
     });
 
-    if (!risk) throw new Error('Risk not found');
+    if (!risk) throw new Error("Risk not found");
 
     const linkedCAPAIds = [...risk.linkedCAPAIds, capaId];
 
     return await prisma.riskRegister.update({
       where: { id: riskId },
-      data: { linkedCAPAIds }
+      data: { linkedCAPAIds },
     });
   }
 
@@ -233,22 +243,25 @@ export class RiskService {
     return await prisma.riskRegister.findMany({
       where: {
         nextReviewDate: {
-          lte: new Date()
+          lte: new Date(),
         },
         status: {
-          not: 'CLOSED'
-        }
+          not: "CLOSED",
+        },
       },
       orderBy: {
-        nextReviewDate: 'asc'
-      }
+        nextReviewDate: "asc",
+      },
     });
   }
 
   /**
    * Calculate risk reduction after mitigation
    */
-  static calculateRiskReduction(initialRPN: number, residualRPN: number): {
+  static calculateRiskReduction(
+    initialRPN: number,
+    residualRPN: number,
+  ): {
     reduction: number;
     percentage: number;
   } {
@@ -257,7 +270,7 @@ export class RiskService {
 
     return {
       reduction,
-      percentage: Math.round(percentage)
+      percentage: Math.round(percentage),
     };
   }
 }

@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const UpdateLocationSchema = z.object({
   guardId: z.string(),
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const json = await req.json();
@@ -27,7 +27,10 @@ export async function POST(req: NextRequest) {
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     // Create location record
@@ -55,14 +58,21 @@ export async function POST(req: NextRequest) {
     const violations = [];
     for (const geofence of geofences) {
       // Check if guard is allowed in this zone
-      if (geofence.allowedGuards.length > 0 && !geofence.allowedGuards.includes(body.guardId)) {
+      if (
+        geofence.allowedGuards.length > 0 &&
+        !geofence.allowedGuards.includes(body.guardId)
+      ) {
         // Guard not in allowed list, check if they're inside
-        const isInside = checkPointInGeofence(body.gpsLat, body.gpsLng, geofence);
-        
-        if (isInside && geofence.zoneType === 'RESTRICTED') {
+        const isInside = checkPointInGeofence(
+          body.gpsLat,
+          body.gpsLng,
+          geofence,
+        );
+
+        if (isInside && geofence.zoneType === "RESTRICTED") {
           violations.push({
             geofenceId: geofence.id,
-            type: 'ENTERED_RESTRICTED',
+            type: "ENTERED_RESTRICTED",
           });
         }
       }
@@ -71,11 +81,11 @@ export async function POST(req: NextRequest) {
     // Create violation records
     if (violations.length > 0) {
       await prisma.geofenceViolation.createMany({
-        data: violations.map(v => ({
+        data: violations.map((v) => ({
           organizationId,
           geofenceId: v.geofenceId,
           guardId: body.guardId,
-          guardName: '', // TODO: Fetch from SecurityPersonnel
+          guardName: "", // TODO: Fetch from SecurityPersonnel
           violationType: v.type,
           gpsLat: body.gpsLat,
           gpsLng: body.gpsLng,
@@ -88,11 +98,17 @@ export async function POST(req: NextRequest) {
       violations: violations.length > 0 ? violations : undefined,
     });
   } catch (error: any) {
-    console.error('Error updating guard location:', error);
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 });
+    console.error("Error updating guard location:", error);
+    if (error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -101,16 +117,19 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
-    const since = searchParams.get('since'); // Minutes ago
+    const since = searchParams.get("since"); // Minutes ago
 
     const sinceDate = since
       ? new Date(Date.now() - parseInt(since) * 60 * 1000)
@@ -122,29 +141,36 @@ export async function GET(req: NextRequest) {
         organizationId,
         timestamp: { gte: sinceDate },
       },
-      orderBy: { timestamp: 'desc' },
-      distinct: ['guardId'],
+      orderBy: { timestamp: "desc" },
+      distinct: ["guardId"],
     });
 
     return NextResponse.json(locations);
   } catch (error: any) {
-    console.error('Error fetching guard locations:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching guard locations:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
-function checkPointInGeofence(lat: number, lng: number, geofence: any): boolean {
+function checkPointInGeofence(
+  lat: number,
+  lng: number,
+  geofence: any,
+): boolean {
   // Simple circular geofence check
   if (geofence.centerLat && geofence.centerLng && geofence.radius) {
     const R = 6371000; // meters
-    const φ1 = lat * Math.PI / 180;
-    const φ2 = geofence.centerLat * Math.PI / 180;
-    const Δφ = (geofence.centerLat - lat) * Math.PI / 180;
-    const Δλ = (geofence.centerLng - lng) * Math.PI / 180;
+    const φ1 = (lat * Math.PI) / 180;
+    const φ2 = (geofence.centerLat * Math.PI) / 180;
+    const Δφ = ((geofence.centerLat - lat) * Math.PI) / 180;
+    const Δλ = ((geofence.centerLng - lng) * Math.PI) / 180;
 
-    const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-      Math.cos(φ1) * Math.cos(φ2) *
-      Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    const a =
+      Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+      Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     const distance = R * c;
 

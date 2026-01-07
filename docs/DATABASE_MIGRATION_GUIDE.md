@@ -11,6 +11,7 @@
 This migration adds **7 new tables** and enhances **6 existing tables** to support the Advanced Inventory Management System with AI forecasting, autonomous operations, and IoT integration.
 
 ### New Tables (7)
+
 1. `autonomous_decisions` - AI-driven inventory decisions
 2. `demand_forecasts` - ML prediction storage
 3. `iot_readings` - Time-series IoT data
@@ -20,6 +21,7 @@ This migration adds **7 new tables** and enhances **6 existing tables** to suppo
 7. `autonomous_configs` - Organization settings
 
 ### Enhanced Tables (6)
+
 1. `organizations` - Added autonomous relations
 2. `inventory_items` - Added forecasting relations
 3. `iot_devices` - Added signal/calibration fields
@@ -269,9 +271,9 @@ ALTER TABLE iot_devices
 
 ```sql
 -- Check new tables exist
-SELECT table_name 
-FROM information_schema.tables 
-WHERE table_schema = 'public' 
+SELECT table_name
+FROM information_schema.tables
+WHERE table_schema = 'public'
   AND table_name IN (
     'autonomous_decisions',
     'demand_forecasts',
@@ -289,10 +291,10 @@ Expected: 7 rows
 
 ```sql
 -- Check indexes
-SELECT tablename, indexname 
-FROM pg_indexes 
-WHERE schemaname = 'public' 
-  AND tablename LIKE '%autonomous%' 
+SELECT tablename, indexname
+FROM pg_indexes
+WHERE schemaname = 'public'
+  AND tablename LIKE '%autonomous%'
    OR tablename LIKE '%forecast%'
    OR tablename LIKE '%velocity%'
    OR tablename LIKE '%twin%';
@@ -332,37 +334,37 @@ Expected: 10+ constraints
 ### 4. Test Prisma Client
 
 ```typescript
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 // Test autonomous decision creation
 const decision = await prisma.autonomousDecision.create({
   data: {
-    organizationId: 'test-org',
-    productId: 'test-product',
-    decisionType: 'REORDER',
+    organizationId: "test-org",
+    productId: "test-product",
+    decisionType: "REORDER",
     confidence: 92.5,
     reasoning: { test: true },
-    estimatedCost: 1000.00
-  }
+    estimatedCost: 1000.0,
+  },
 });
 
-console.log('✅ AutonomousDecision created:', decision.id);
+console.log("✅ AutonomousDecision created:", decision.id);
 
 // Test demand forecast creation
 const forecast = await prisma.demandForecast.create({
   data: {
-    productId: 'test-product',
+    productId: "test-product",
     horizonDays: 90,
     predictions: [{ day: 1, demand: 10, confidence: 95 }],
     avgDailyDemand: 10.5,
     confidence: 95.0,
-    modelType: 'ENSEMBLE'
-  }
+    modelType: "ENSEMBLE",
+  },
 });
 
-console.log('✅ DemandForecast created:', forecast.id);
+console.log("✅ DemandForecast created:", forecast.id);
 ```
 
 ---
@@ -433,7 +435,7 @@ WHERE timestamp < NOW() - INTERVAL '90 days';
 
 ```sql
 -- Check table sizes
-SELECT 
+SELECT
   schemaname,
   tablename,
   pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
@@ -455,7 +457,7 @@ ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 
 ```sql
 -- Monitor daily growth
-SELECT 
+SELECT
   DATE(created_at) AS date,
   COUNT(*) AS decisions,
   SUM(estimated_cost) AS total_cost,
@@ -499,7 +501,7 @@ npx prisma migrate dev
 
 ```sql
 -- Check orphaned records
-SELECT i.id 
+SELECT i.id
 FROM inventory_items i
 LEFT JOIN organizations o ON i.organization_id = o.id
 WHERE o.id IS NULL;
@@ -522,6 +524,7 @@ VACUUM FULL iot_readings;
 ## 📞 SUPPORT
 
 For issues or questions:
+
 - Check logs: `tail -f /var/log/postgresql/postgresql.log`
 - Prisma docs: https://www.prisma.io/docs/concepts/components/prisma-migrate
 - GitHub Issues: https://github.com/your-org/flowstock/issues
@@ -535,4 +538,4 @@ For issues or questions:
 
 ---
 
-*Last Updated: January 4, 2026*
+_Last Updated: January 4, 2026_

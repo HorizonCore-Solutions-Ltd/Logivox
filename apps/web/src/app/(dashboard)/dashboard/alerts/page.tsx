@@ -1,22 +1,28 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { 
-  AlertCircle, 
-  AlertTriangle, 
-  CheckCircle2, 
-  X, 
-  RefreshCw, 
+import { useEffect, useState } from "react";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  X,
+  RefreshCw,
   Calendar,
   Package,
   TrendingDown,
   Bell,
   ChevronRight,
-} from 'lucide-react';
-import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+} from "lucide-react";
+import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
@@ -24,9 +30,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 // ==========================================
 // TYPES
@@ -80,8 +86,10 @@ export default function AlertsPage() {
   const [checkingInventory, setCheckingInventory] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<ReorderAlert | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [dialogType, setDialogType] = useState<'resolve' | 'dismiss' | null>(null);
-  const [notes, setNotes] = useState('');
+  const [dialogType, setDialogType] = useState<"resolve" | "dismiss" | null>(
+    null,
+  );
+  const [notes, setNotes] = useState("");
 
   // Fetch alerts on mount
   useEffect(() => {
@@ -91,12 +99,12 @@ export default function AlertsPage() {
 
   const fetchAlerts = async () => {
     try {
-      const res = await fetch('/api/alerts');
+      const res = await fetch("/api/alerts");
       const data = await res.json();
       setAlerts(data.alerts || []);
     } catch (error) {
-      console.error('Failed to fetch alerts:', error);
-      toast.error('Failed to load alerts');
+      console.error("Failed to fetch alerts:", error);
+      toast.error("Failed to load alerts");
     } finally {
       setLoading(false);
     }
@@ -104,28 +112,30 @@ export default function AlertsPage() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/alerts?stats=true');
+      const res = await fetch("/api/alerts?stats=true");
       const data = await res.json();
       setStats(data);
     } catch (error) {
-      console.error('Failed to fetch stats:', error);
+      console.error("Failed to fetch stats:", error);
     }
   };
 
   const checkInventory = async () => {
     setCheckingInventory(true);
     try {
-      const res = await fetch('/api/alerts/check', { method: 'POST' });
+      const res = await fetch("/api/alerts/check", { method: "POST" });
       const data = await res.json();
-      
-      toast.success(`Inventory checked! ${data.alertsCreated} new alerts created.`);
-      
+
+      toast.success(
+        `Inventory checked! ${data.alertsCreated} new alerts created.`,
+      );
+
       // Refresh alerts
       await fetchAlerts();
       await fetchStats();
     } catch (error) {
-      console.error('Failed to check inventory:', error);
-      toast.error('Failed to check inventory');
+      console.error("Failed to check inventory:", error);
+      toast.error("Failed to check inventory");
     } finally {
       setCheckingInventory(false);
     }
@@ -133,28 +143,28 @@ export default function AlertsPage() {
 
   const acknowledgeAlert = async (alertId: string) => {
     try {
-      await fetch(`/api/alerts/${alertId}/acknowledge`, { method: 'POST' });
-      toast.success('Alert acknowledged');
+      await fetch(`/api/alerts/${alertId}/acknowledge`, { method: "POST" });
+      toast.success("Alert acknowledged");
       fetchAlerts();
       fetchStats();
     } catch (error) {
-      console.error('Failed to acknowledge alert:', error);
-      toast.error('Failed to acknowledge alert');
+      console.error("Failed to acknowledge alert:", error);
+      toast.error("Failed to acknowledge alert");
     }
   };
 
   const openResolveDialog = (alert: ReorderAlert) => {
     setSelectedAlert(alert);
-    setDialogType('resolve');
+    setDialogType("resolve");
     setDialogOpen(true);
-    setNotes('');
+    setNotes("");
   };
 
   const openDismissDialog = (alert: ReorderAlert) => {
     setSelectedAlert(alert);
-    setDialogType('dismiss');
+    setDialogType("dismiss");
     setDialogOpen(true);
-    setNotes('');
+    setNotes("");
   };
 
   const handleDialogAction = async () => {
@@ -163,15 +173,15 @@ export default function AlertsPage() {
     try {
       const url = `/api/alerts/${selectedAlert.id}/${dialogType}`;
       await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ notes }),
       });
 
       toast.success(`Alert ${dialogType}d successfully`);
       setDialogOpen(false);
       setSelectedAlert(null);
-      setNotes('');
+      setNotes("");
       fetchAlerts();
       fetchStats();
     } catch (error) {
@@ -182,23 +192,23 @@ export default function AlertsPage() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity.toLowerCase()) {
-      case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'high':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'medium':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case "critical":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "high":
+        return "bg-orange-100 text-orange-800 border-orange-200";
+      case "medium":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return "bg-blue-100 text-blue-800 border-blue-200";
     }
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity.toLowerCase()) {
-      case 'critical':
-      case 'high':
+      case "critical":
+      case "high":
         return <AlertCircle className="h-5 w-5 text-red-600" />;
-      case 'medium':
+      case "medium":
         return <AlertTriangle className="h-5 w-5 text-yellow-600" />;
       default:
         return <Bell className="h-5 w-5 text-blue-600" />;
@@ -234,7 +244,9 @@ export default function AlertsPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Alerts</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Alerts
+              </CardTitle>
               <Bell className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -260,7 +272,9 @@ export default function AlertsPage() {
               <TrendingDown className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.bySeverity.critical || 0}</div>
+              <div className="text-2xl font-bold">
+                {stats.bySeverity.critical || 0}
+              </div>
               <p className="text-xs text-muted-foreground">Stockout imminent</p>
             </CardContent>
           </Card>
@@ -278,7 +292,9 @@ export default function AlertsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Acknowledged</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Acknowledged
+              </CardTitle>
               <CheckCircle2 className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
@@ -328,18 +344,22 @@ export default function AlertsPage() {
                       <h4 className="font-semibold text-base">
                         {alert.inventoryItem.name}
                       </h4>
-                      <Badge variant="outline" className={getSeverityColor(alert.severity)}>
+                      <Badge
+                        variant="outline"
+                        className={getSeverityColor(alert.severity)}
+                      >
                         {alert.severity}
                       </Badge>
                       <Badge variant="outline">
-                        {alert.alertType.replace(/_/g, ' ')}
+                        {alert.alertType.replace(/_/g, " ")}
                       </Badge>
                     </div>
-                    
+
                     <p className="text-sm text-muted-foreground">
-                      SKU: {alert.inventoryItem.sku} • {alert.inventoryItem.warehouse.name}
+                      SKU: {alert.inventoryItem.sku} •{" "}
+                      {alert.inventoryItem.warehouse.name}
                     </p>
-                    
+
                     <div className="flex items-center gap-4 text-sm">
                       <span className="flex items-center gap-1">
                         <Package className="h-3 w-3" />
@@ -356,7 +376,11 @@ export default function AlertsPage() {
                       {alert.estimatedStockoutDate && (
                         <span className="flex items-center gap-1 text-red-600">
                           <Calendar className="h-3 w-3" />
-                          Stockout: {format(new Date(alert.estimatedStockoutDate), 'MMM dd, yyyy')}
+                          Stockout:{" "}
+                          {format(
+                            new Date(alert.estimatedStockoutDate),
+                            "MMM dd, yyyy",
+                          )}
                         </span>
                       )}
                     </div>
@@ -370,7 +394,7 @@ export default function AlertsPage() {
 
                   {/* Actions */}
                   <div className="flex gap-2">
-                    {alert.status === 'PENDING' && (
+                    {alert.status === "PENDING" && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -406,19 +430,21 @@ export default function AlertsPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              {dialogType === 'resolve' ? 'Resolve Alert' : 'Dismiss Alert'}
+              {dialogType === "resolve" ? "Resolve Alert" : "Dismiss Alert"}
             </DialogTitle>
             <DialogDescription>
-              {dialogType === 'resolve'
-                ? 'Mark this alert as resolved after placing a reorder.'
-                : 'Dismiss this alert if it does not require action.'}
+              {dialogType === "resolve"
+                ? "Mark this alert as resolved after placing a reorder."
+                : "Dismiss this alert if it does not require action."}
             </DialogDescription>
           </DialogHeader>
 
           {selectedAlert && (
             <div className="space-y-4">
               <div className="rounded-lg border p-4 bg-muted">
-                <h4 className="font-semibold">{selectedAlert.inventoryItem.name}</h4>
+                <h4 className="font-semibold">
+                  {selectedAlert.inventoryItem.name}
+                </h4>
                 <p className="text-sm text-muted-foreground">
                   SKU: {selectedAlert.inventoryItem.sku}
                 </p>
@@ -433,7 +459,7 @@ export default function AlertsPage() {
                 <label className="text-sm font-medium">Notes (Optional)</label>
                 <Textarea
                   placeholder={
-                    dialogType === 'resolve'
+                    dialogType === "resolve"
                       ? 'e.g., "Ordered 50 units from Supplier X, PO#12345"'
                       : 'e.g., "Supplier out of stock temporarily"'
                   }
@@ -451,7 +477,7 @@ export default function AlertsPage() {
               Cancel
             </Button>
             <Button onClick={handleDialogAction}>
-              {dialogType === 'resolve' ? 'Mark as Resolved' : 'Dismiss Alert'}
+              {dialogType === "resolve" ? "Mark as Resolved" : "Dismiss Alert"}
             </Button>
           </DialogFooter>
         </DialogContent>

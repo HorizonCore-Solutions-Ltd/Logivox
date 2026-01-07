@@ -38,7 +38,7 @@ export async function POST(request: Request) {
           },
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Mobile login error:", error);
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
           message: "Failed to authenticate",
         },
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 }

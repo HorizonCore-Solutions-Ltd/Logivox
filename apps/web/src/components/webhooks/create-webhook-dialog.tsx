@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Globe, Lock } from "lucide-react"
+import * as React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Globe, Lock } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,26 +13,26 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "sonner"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "sonner";
 
 const webhookSchema = z.object({
   url: z.string().url("Invalid URL"),
   description: z.string().optional(),
   secret: z.string().optional(),
   events: z.array(z.string()).min(1, "Select at least one event"),
-})
+});
 
-type WebhookFormData = z.infer<typeof webhookSchema>
+type WebhookFormData = z.infer<typeof webhookSchema>;
 
 interface CreateWebhookDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 const availableEvents = [
@@ -46,14 +46,14 @@ const availableEvents = [
   { value: "booking.cancelled", label: "Booking Cancelled" },
   { value: "customer.created", label: "Customer Created" },
   { value: "customer.updated", label: "Customer Updated" },
-]
+];
 
 export function CreateWebhookDialog({
   open,
   onOpenChange,
 }: CreateWebhookDialogProps) {
-  const queryClient = useQueryClient()
-  const [selectedEvents, setSelectedEvents] = React.useState<string[]>([])
+  const queryClient = useQueryClient();
+  const [selectedEvents, setSelectedEvents] = React.useState<string[]>([]);
 
   const {
     register,
@@ -69,11 +69,11 @@ export function CreateWebhookDialog({
       secret: "",
       events: [],
     },
-  })
+  });
 
   React.useEffect(() => {
-    setValue("events", selectedEvents)
-  }, [selectedEvents, setValue])
+    setValue("events", selectedEvents);
+  }, [selectedEvents, setValue]);
 
   const createMutation = useMutation({
     mutationFn: async (data: WebhookFormData) => {
@@ -81,36 +81,36 @@ export function CreateWebhookDialog({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to create webhook")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create webhook");
       }
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["webhooks"] })
-      toast.success("Webhook created successfully")
-      reset()
-      setSelectedEvents([])
-      onOpenChange(false)
+      queryClient.invalidateQueries({ queryKey: ["webhooks"] });
+      toast.success("Webhook created successfully");
+      reset();
+      setSelectedEvents([]);
+      onOpenChange(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
-  })
+  });
 
   const onSubmit = (data: WebhookFormData) => {
-    createMutation.mutate(data)
-  }
+    createMutation.mutate(data);
+  };
 
   const toggleEvent = (eventValue: string) => {
     setSelectedEvents((prev) =>
       prev.includes(eventValue)
         ? prev.filter((e) => e !== eventValue)
-        : [...prev, eventValue]
-    )
-  }
+        : [...prev, eventValue],
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -118,7 +118,8 @@ export function CreateWebhookDialog({
         <DialogHeader>
           <DialogTitle>Create Webhook</DialogTitle>
           <DialogDescription>
-            Configure a webhook endpoint to receive real-time event notifications
+            Configure a webhook endpoint to receive real-time event
+            notifications
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -186,10 +187,13 @@ export function CreateWebhookDialog({
               ))}
             </div>
             {errors.events && (
-              <p className="text-sm text-destructive">{errors.events.message}</p>
+              <p className="text-sm text-destructive">
+                {errors.events.message}
+              </p>
             )}
             <p className="text-xs text-muted-foreground">
-              Selected {selectedEvents.length} event{selectedEvents.length !== 1 ? "s" : ""}
+              Selected {selectedEvents.length} event
+              {selectedEvents.length !== 1 ? "s" : ""}
             </p>
           </div>
 
@@ -208,5 +212,5 @@ export function CreateWebhookDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

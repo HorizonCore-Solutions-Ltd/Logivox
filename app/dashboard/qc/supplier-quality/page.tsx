@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Award, TrendingUp, TrendingDown, AlertTriangle, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Award,
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
 
 interface SupplierQuality {
   id: string;
@@ -38,10 +44,10 @@ interface SupplierQuality {
 export default function SupplierQualityPage() {
   const [loading, setLoading] = useState(true);
   const [suppliers, setSuppliers] = useState<SupplierQuality[]>([]);
-  const [filterTier, setFilterTier] = useState('ALL');
-  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [filterTier, setFilterTier] = useState("ALL");
+  const [filterStatus, setFilterStatus] = useState("ALL");
 
-  const organizationId = 'org_123';
+  const organizationId = "org_123";
 
   useEffect(() => {
     fetchSupplierQuality();
@@ -51,14 +57,14 @@ export default function SupplierQualityPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams({ organizationId });
-      if (filterTier !== 'ALL') params.append('tier', filterTier);
-      if (filterStatus !== 'ALL') params.append('status', filterStatus);
+      if (filterTier !== "ALL") params.append("tier", filterTier);
+      if (filterStatus !== "ALL") params.append("status", filterStatus);
 
       const response = await fetch(`/api/qc/supplier-quality?${params}`);
       const data = await response.json();
       setSuppliers(data.suppliers || []);
     } catch (error) {
-      console.error('Error fetching supplier quality:', error);
+      console.error("Error fetching supplier quality:", error);
     } finally {
       setLoading(false);
     }
@@ -67,14 +73,14 @@ export default function SupplierQualityPage() {
   const updateAllScores = async () => {
     try {
       setLoading(true);
-      await fetch('/api/qc/supplier-quality', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'updateAll', organizationId }),
+      await fetch("/api/qc/supplier-quality", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "updateAll", organizationId }),
       });
       await fetchSupplierQuality();
     } catch (error) {
-      console.error('Error updating scores:', error);
+      console.error("Error updating scores:", error);
     } finally {
       setLoading(false);
     }
@@ -82,10 +88,10 @@ export default function SupplierQualityPage() {
 
   const getTierBadge = (tier: string) => {
     const config: Record<string, { color: string; icon: any }> = {
-      PREMIUM: { color: 'bg-purple-500', icon: '👑' },
-      STANDARD: { color: 'bg-blue-500', icon: '⭐' },
-      BASIC: { color: 'bg-yellow-500', icon: '⚠️' },
-      POOR: { color: 'bg-red-500', icon: '❌' },
+      PREMIUM: { color: "bg-purple-500", icon: "👑" },
+      STANDARD: { color: "bg-blue-500", icon: "⭐" },
+      BASIC: { color: "bg-yellow-500", icon: "⚠️" },
+      POOR: { color: "bg-red-500", icon: "❌" },
     };
 
     const { color, icon } = config[tier] || config.BASIC;
@@ -98,10 +104,10 @@ export default function SupplierQualityPage() {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { color: string; text: string }> = {
-      APPROVED: { color: 'bg-green-500', text: 'Approved' },
-      PROBATION: { color: 'bg-yellow-500', text: 'Probation' },
-      SUSPENDED: { color: 'bg-orange-500', text: 'Suspended' },
-      BLOCKED: { color: 'bg-red-500', text: 'Blocked' },
+      APPROVED: { color: "bg-green-500", text: "Approved" },
+      PROBATION: { color: "bg-yellow-500", text: "Probation" },
+      SUSPENDED: { color: "bg-orange-500", text: "Suspended" },
+      BLOCKED: { color: "bg-red-500", text: "Blocked" },
     };
 
     const { color, text } = config[status] || config.APPROVED;
@@ -109,17 +115,17 @@ export default function SupplierQualityPage() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 75) return 'text-blue-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 90) return "text-green-600";
+    if (score >= 75) return "text-blue-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
   };
 
   const getScoreBarColor = (score: number) => {
-    if (score >= 90) return 'bg-green-500';
-    if (score >= 75) return 'bg-blue-500';
-    if (score >= 60) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (score >= 90) return "bg-green-500";
+    if (score >= 75) return "bg-blue-500";
+    if (score >= 60) return "bg-yellow-500";
+    return "bg-red-500";
   };
 
   if (loading) {
@@ -160,15 +166,17 @@ export default function SupplierQualityPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {suppliers.filter((s) => s.tier === 'PREMIUM').length}
+              {suppliers.filter((s) => s.tier === "PREMIUM").length}
             </div>
-            <div className="text-sm text-muted-foreground">Premium Suppliers</div>
+            <div className="text-sm text-muted-foreground">
+              Premium Suppliers
+            </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-600">
-              {suppliers.filter((s) => s.status === 'APPROVED').length}
+              {suppliers.filter((s) => s.status === "APPROVED").length}
             </div>
             <div className="text-sm text-muted-foreground">Approved</div>
           </CardContent>
@@ -176,7 +184,7 @@ export default function SupplierQualityPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-yellow-600">
-              {suppliers.filter((s) => s.status === 'PROBATION').length}
+              {suppliers.filter((s) => s.status === "PROBATION").length}
             </div>
             <div className="text-sm text-muted-foreground">On Probation</div>
           </CardContent>
@@ -185,10 +193,13 @@ export default function SupplierQualityPage() {
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
               {(
-                suppliers.reduce((sum, s) => sum + s.overallScore, 0) / suppliers.length
+                suppliers.reduce((sum, s) => sum + s.overallScore, 0) /
+                suppliers.length
               ).toFixed(1)}
             </div>
-            <div className="text-sm text-muted-foreground">Avg Quality Score</div>
+            <div className="text-sm text-muted-foreground">
+              Avg Quality Score
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -199,10 +210,10 @@ export default function SupplierQualityPage() {
           <div className="flex flex-wrap gap-4">
             <div className="flex gap-2">
               <span className="text-sm font-medium">Tier:</span>
-              {['ALL', 'PREMIUM', 'STANDARD', 'BASIC', 'POOR'].map((tier) => (
+              {["ALL", "PREMIUM", "STANDARD", "BASIC", "POOR"].map((tier) => (
                 <Button
                   key={tier}
-                  variant={filterTier === tier ? 'default' : 'outline'}
+                  variant={filterTier === tier ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterTier(tier)}
                 >
@@ -212,16 +223,18 @@ export default function SupplierQualityPage() {
             </div>
             <div className="flex gap-2">
               <span className="text-sm font-medium">Status:</span>
-              {['ALL', 'APPROVED', 'PROBATION', 'SUSPENDED', 'BLOCKED'].map((status) => (
-                <Button
-                  key={status}
-                  variant={filterStatus === status ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setFilterStatus(status)}
-                >
-                  {status}
-                </Button>
-              ))}
+              {["ALL", "APPROVED", "PROBATION", "SUSPENDED", "BLOCKED"].map(
+                (status) => (
+                  <Button
+                    key={status}
+                    variant={filterStatus === status ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFilterStatus(status)}
+                  >
+                    {status}
+                  </Button>
+                ),
+              )}
             </div>
           </div>
         </CardContent>
@@ -233,7 +246,9 @@ export default function SupplierQualityPage() {
           <Card key={supplier.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">{supplier.supplier.name}</CardTitle>
+                <CardTitle className="text-xl">
+                  {supplier.supplier.name}
+                </CardTitle>
                 <div className="flex gap-2">
                   {getTierBadge(supplier.tier)}
                   {getStatusBadge(supplier.status)}
@@ -245,7 +260,9 @@ export default function SupplierQualityPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">Overall Score</span>
-                  <span className={`text-3xl font-bold ${getScoreColor(supplier.overallScore)}`}>
+                  <span
+                    className={`text-3xl font-bold ${getScoreColor(supplier.overallScore)}`}
+                  >
                     {supplier.overallScore.toFixed(0)}
                   </span>
                 </div>
@@ -260,19 +277,27 @@ export default function SupplierQualityPage() {
               {/* Score Breakdown */}
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="p-2 bg-gray-50 rounded">
-                  <div className={`text-2xl font-bold ${getScoreColor(supplier.qualityScore)}`}>
+                  <div
+                    className={`text-2xl font-bold ${getScoreColor(supplier.qualityScore)}`}
+                  >
                     {supplier.qualityScore.toFixed(0)}
                   </div>
                   <div className="text-xs text-muted-foreground">Quality</div>
                 </div>
                 <div className="p-2 bg-gray-50 rounded">
-                  <div className={`text-2xl font-bold ${getScoreColor(supplier.reliabilityScore)}`}>
+                  <div
+                    className={`text-2xl font-bold ${getScoreColor(supplier.reliabilityScore)}`}
+                  >
                     {supplier.reliabilityScore.toFixed(0)}
                   </div>
-                  <div className="text-xs text-muted-foreground">Reliability</div>
+                  <div className="text-xs text-muted-foreground">
+                    Reliability
+                  </div>
                 </div>
                 <div className="p-2 bg-gray-50 rounded">
-                  <div className={`text-2xl font-bold ${getScoreColor(supplier.responseScore)}`}>
+                  <div
+                    className={`text-2xl font-bold ${getScoreColor(supplier.responseScore)}`}
+                  >
                     {supplier.responseScore.toFixed(0)}
                   </div>
                   <div className="text-xs text-muted-foreground">Response</div>
@@ -286,28 +311,40 @@ export default function SupplierQualityPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Inspections:</span>{' '}
-                    <span className="font-medium">{supplier.totalInspections}</span>
+                    <span className="text-muted-foreground">Inspections:</span>{" "}
+                    <span className="font-medium">
+                      {supplier.totalInspections}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Units:</span>{' '}
-                    <span className="font-medium">{supplier.totalUnitsInspected.toLocaleString()}</span>
+                    <span className="text-muted-foreground">Units:</span>{" "}
+                    <span className="font-medium">
+                      {supplier.totalUnitsInspected.toLocaleString()}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Defects:</span>{' '}
-                    <span className="font-medium text-red-600">{supplier.totalDefects}</span>
+                    <span className="text-muted-foreground">Defects:</span>{" "}
+                    <span className="font-medium text-red-600">
+                      {supplier.totalDefects}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Defect Rate:</span>{' '}
-                    <span className="font-medium">{supplier.defectRate.toFixed(2)}%</span>
+                    <span className="text-muted-foreground">Defect Rate:</span>{" "}
+                    <span className="font-medium">
+                      {supplier.defectRate.toFixed(2)}%
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">RTVs:</span>{' '}
-                    <span className="font-medium">{supplier.totalRtvCount}</span>
+                    <span className="text-muted-foreground">RTVs:</span>{" "}
+                    <span className="font-medium">
+                      {supplier.totalRtvCount}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">RTV Value:</span>{' '}
-                    <span className="font-medium">${supplier.totalRtvValue.toFixed(0)}</span>
+                    <span className="text-muted-foreground">RTV Value:</span>{" "}
+                    <span className="font-medium">
+                      ${supplier.totalRtvValue.toFixed(0)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -319,20 +356,28 @@ export default function SupplierQualityPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-sm">
                   <div>
-                    <span className="text-muted-foreground">Inspections:</span>{' '}
-                    <span className="font-medium">{supplier.inspections90Days}</span>
+                    <span className="text-muted-foreground">Inspections:</span>{" "}
+                    <span className="font-medium">
+                      {supplier.inspections90Days}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Units:</span>{' '}
-                    <span className="font-medium">{supplier.unitsInspected90Days.toLocaleString()}</span>
+                    <span className="text-muted-foreground">Units:</span>{" "}
+                    <span className="font-medium">
+                      {supplier.unitsInspected90Days.toLocaleString()}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Defects:</span>{' '}
-                    <span className="font-medium text-red-600">{supplier.defects90Days}</span>
+                    <span className="text-muted-foreground">Defects:</span>{" "}
+                    <span className="font-medium text-red-600">
+                      {supplier.defects90Days}
+                    </span>
                   </div>
                   <div>
-                    <span className="text-muted-foreground">Defect Rate:</span>{' '}
-                    <span className="font-medium">{supplier.defectRate90Days.toFixed(2)}%</span>
+                    <span className="text-muted-foreground">Defect Rate:</span>{" "}
+                    <span className="font-medium">
+                      {supplier.defectRate90Days.toFixed(2)}%
+                    </span>
                   </div>
                 </div>
               </div>
@@ -376,7 +421,9 @@ export default function SupplierQualityPage() {
         <Card>
           <CardContent className="py-12 text-center">
             <Award className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground">No supplier quality data found</p>
+            <p className="text-muted-foreground">
+              No supplier quality data found
+            </p>
             <Button onClick={updateAllScores} className="mt-4">
               <RefreshCw className="w-4 h-4 mr-2" />
               Calculate Scores

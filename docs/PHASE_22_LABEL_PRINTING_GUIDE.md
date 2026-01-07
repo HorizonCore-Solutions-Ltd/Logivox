@@ -6,7 +6,7 @@ The LogiVox Label Template & Printing System is a **game-changing warehouse oper
 
 **Priority:** HIGH  
 **Estimated Time:** 20-25 hours  
-**Status:** Not Started  
+**Status:** Not Started
 
 ---
 
@@ -26,6 +26,7 @@ The LogiVox Label Template & Printing System is a **game-changing warehouse oper
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - **Canvas Library:** `react-konva` (recommended) or `fabric.js`
 - **Barcode Generation:** `jsbarcode` (Code128, Code39, EAN13)
 - **QR Code Generation:** `qrcode` or `qrcode.react`
@@ -34,17 +35,20 @@ The LogiVox Label Template & Printing System is a **game-changing warehouse oper
 - **Drag & Drop:** Built into react-konva or use `react-dnd`
 
 ### Backend
+
 - **PDF Generation:** `pdfkit` (Node.js) or `jsPDF` (client-side)
 - **ZPL Generation:** `zpl-image` (Zebra Programming Language)
 - **Image Processing:** `sharp` (resize, compress, convert)
 - **Printer API:** `printnode` (cloud printing service)
 
 ### Database
+
 - **ORM:** Prisma
 - **Models:** `LabelTemplate`, `PrintJob`
 - **Storage:** PostgreSQL for metadata, Vercel Blob/S3 for generated files
 
 ### Real-time Updates
+
 - **Option 1:** Pusher (WebSocket service)
 - **Option 2:** Socket.io (self-hosted)
 - **Option 3:** Polling (simple, less efficient)
@@ -66,31 +70,31 @@ model LabelTemplate {
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdBy       String
   creator         User     @relation(fields: [createdBy], references: [id])
-  
+
   // Label dimensions
   width           Float    // in mm
   height          Float    // in mm
   unit            String   @default("mm") // mm, cm, inch
   dpi             Int      @default(203) // 203, 300, 600
   orientation     String   @default("portrait") // portrait, landscape
-  
+
   // Design data
   designData      Json     // Canvas JSON with elements
   thumbnail       String?  // URL to thumbnail image
-  
+
   // Categorization
   isDefault       Boolean  @default(false)
   category        String?  // "Shipping", "Product", "Asset", "Compliance"
   tags            String[] // ["warehouse", "thermal", "barcode"]
-  
+
   // Metadata
   version         Int      @default(1)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   // Relations
   printJobs       PrintJob[]
-  
+
   @@index([organizationId])
   @@index([createdBy])
   @@index([category])
@@ -105,7 +109,7 @@ model PrintJob {
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdBy       String
   creator         User     @relation(fields: [createdBy], references: [id])
-  
+
   // Print settings
   status          String   @default("pending") // pending, processing, completed, failed, cancelled
   format          String   // "PDF", "ZPL", "PNG", "JPG"
@@ -113,25 +117,25 @@ model PrintJob {
   printerId       String?  // PrintNode printer ID
   quantity        Int      @default(1)
   copies          Int      @default(1)
-  
+
   // Data
   data            Json     // Data for label fields (itemName, sku, etc.)
   outputUrl       String?  // URL to generated file
-  
+
   // Error handling
   error           String?
   retryCount      Int      @default(0)
   maxRetries      Int      @default(3)
-  
+
   // Metadata
   metadata        Json?    // Additional tracking data (IP, user agent, etc.)
   processingTime  Int?     // Time in milliseconds
-  
+
   // Timestamps
   createdAt       DateTime @default(now())
   startedAt       DateTime?
   completedAt     DateTime?
-  
+
   @@index([organizationId])
   @@index([status])
   @@index([createdBy])
@@ -144,28 +148,28 @@ model Printer {
   name            String
   organizationId  String
   organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
+
   // Printer details
   printerId       String   // PrintNode printer ID
   printerType     String   // "Thermal", "Inkjet", "Laser"
   manufacturer    String?  // "Zebra", "Brother", "Dymo"
   model           String?
-  
+
   // Connection
   isOnline        Boolean  @default(false)
   isDefault       Boolean  @default(false)
   location        String?  // "Warehouse A", "Shipping Dock"
-  
+
   // Capabilities
   supportedFormats String[] // ["ZPL", "PDF", "PNG"]
   maxWidth        Float?   // Max label width in mm
   maxHeight       Float?   // Max label height in mm
-  
+
   // Metadata
   lastSeen        DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   @@unique([organizationId, printerId])
   @@index([organizationId])
   @@index([isDefault])
@@ -270,12 +274,12 @@ export default function LabelDesignerPage() {
     height: 50, // mm
     dpi: 203,
   });
-  
+
   const stageRef = useRef(null);
 
   // Convert mm to pixels (at given DPI)
   const mmToPx = (mm: number) => (mm * labelDimensions.dpi) / 25.4;
-  
+
   const stageWidth = mmToPx(labelDimensions.width);
   const stageHeight = mmToPx(labelDimensions.height);
 
@@ -337,7 +341,7 @@ export default function LabelDesignerPage() {
       {/* Left Sidebar - Tools */}
       <Card className="w-64 p-4 space-y-4">
         <h2 className="text-lg font-bold">Tools</h2>
-        
+
         <div className="space-y-2">
           <Button onClick={addTextElement} className="w-full">
             Add Text
@@ -401,7 +405,7 @@ export default function LabelDesignerPage() {
                 height={stageHeight}
                 fill="white"
               />
-              
+
               {/* Render elements */}
               {elements.map((element) => {
                 if (element.type === "text") {
@@ -438,7 +442,7 @@ export default function LabelDesignerPage() {
       {/* Right Sidebar - Properties */}
       <Card className="w-64 p-4">
         <h2 className="text-lg font-bold mb-4">Properties</h2>
-        
+
         {selectedId ? (
           <div className="space-y-4">
             {/* Properties for selected element */}
@@ -651,7 +655,7 @@ export class PrintEngine {
     elements: LabelElement[],
     data: LabelData,
     width: number,
-    height: number
+    height: number,
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const doc = new PDFKit({ size: [width, height], margin: 0 });
@@ -665,7 +669,7 @@ export class PrintEngine {
       elements.forEach((element) => {
         const resolvedText = this.resolveFieldMapping(
           element.text || element.fieldMapping || "",
-          data
+          data,
         );
 
         if (element.type === "text") {
@@ -694,7 +698,7 @@ export class PrintEngine {
     data: LabelData,
     width: number,
     height: number,
-    dpi: number = 203
+    dpi: number = 203,
   ): string {
     let zpl = `^XA\n`; // Start format
     zpl += `^FO0,0^GB${width},${height},2^FS\n`; // Border
@@ -702,7 +706,7 @@ export class PrintEngine {
     elements.forEach((element) => {
       const resolvedText = this.resolveFieldMapping(
         element.text || element.fieldMapping || "",
-        data
+        data,
       );
 
       if (element.type === "text") {
@@ -846,7 +850,7 @@ export async function POST(request: NextRequest) {
       template.designData as any,
       data,
       template.width,
-      template.height
+      template.height,
     );
     contentType = "application/pdf";
   } else if (format === "ZPL") {
@@ -855,7 +859,7 @@ export async function POST(request: NextRequest) {
       data,
       template.width,
       template.height,
-      template.dpi
+      template.dpi,
     );
     outputBuffer = Buffer.from(zpl, "utf-8");
     contentType = "text/plain";
@@ -915,11 +919,11 @@ export default function MobileScanPage() {
         undefined,
         "video"
       );
-      
+
       // Fetch item data based on scanned SKU
       const response = await fetch(`/api/inventory/by-sku/${result.getText()}`);
       const itemData = await response.json();
-      
+
       setScannedData(itemData);
       setScanning(false);
     } catch (error) {
@@ -968,7 +972,7 @@ export default function MobileScanPage() {
           <p>Name: {scannedData.name}</p>
           <p>SKU: {scannedData.sku}</p>
           <p>Stock: {scannedData.stockLevel}</p>
-          
+
           <Button onClick={printLabel} className="w-full mt-4">
             <Printer className="mr-2 h-4 w-4" />
             Print Label
@@ -1039,7 +1043,7 @@ describe("PrintEngine", () => {
     ];
     const data = {};
     const pdf = await PrintEngine.generatePDF(elements, data, 100, 50);
-    
+
     expect(pdf).toBeInstanceOf(Buffer);
     expect(pdf.length).toBeGreaterThan(0);
   });
@@ -1048,17 +1052,15 @@ describe("PrintEngine", () => {
     const text = "Item: {itemName}, SKU: {sku}";
     const data = { itemName: "Widget", sku: "WDG-001" };
     const result = PrintEngine["resolveFieldMapping"](text, data);
-    
+
     expect(result).toBe("Item: Widget, SKU: WDG-001");
   });
 
   it("should generate ZPL for barcode", () => {
-    const elements = [
-      { type: "barcode", x: 50, y: 50, fieldMapping: "{sku}" },
-    ];
+    const elements = [{ type: "barcode", x: 50, y: 50, fieldMapping: "{sku}" }];
     const data = { sku: "123456789" };
     const zpl = PrintEngine.generateZPL(elements, data, 100, 50);
-    
+
     expect(zpl).toContain("^XA");
     expect(zpl).toContain("^BC");
     expect(zpl).toContain("123456789");
@@ -1077,34 +1079,36 @@ import { test, expect } from "@playwright/test";
 test.describe("Label Printing", () => {
   test("should create new label template", async ({ page }) => {
     await page.goto("/dashboard/labels/designer");
-    
+
     // Add text element
     await page.click('button:has-text("Add Text")');
     await page.click("canvas");
-    
+
     // Save template
     await page.click('button:has-text("Save Template")');
     await page.fill('input[name="name"]', "Test Template");
     await page.click('button:has-text("Save")');
-    
-    await expect(page.locator('text="Template saved successfully"')).toBeVisible();
+
+    await expect(
+      page.locator('text="Template saved successfully"'),
+    ).toBeVisible();
   });
 
   test("should print label from inventory", async ({ page }) => {
     await page.goto("/dashboard/inventory");
-    
+
     // Select first item
     await page.click("tr:first-child");
-    
+
     // Click print button
     await page.click('button:has-text("Print Label")');
-    
+
     // Preview should open
     await expect(page.locator('[role="dialog"]')).toBeVisible();
-    
+
     // Confirm print
     await page.click('button:has-text("Print")');
-    
+
     await expect(page.locator('text="Print job submitted"')).toBeVisible();
   });
 });

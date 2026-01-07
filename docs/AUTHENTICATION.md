@@ -9,6 +9,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
 ## ✅ What's Implemented
 
 ### 1. **NextAuth.js Configuration**
+
 - **File:** `apps/web/src/lib/auth.ts`
 - **Providers:**
   - ✅ **Google OAuth** - Sign in with Google account
@@ -23,6 +24,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
 ### 2. **Authentication Pages**
 
 #### **Sign-In Page** (`/sign-in`)
+
 - **File:** `apps/web/src/app/(auth)/sign-in/page.tsx`
 - **Features:**
   - Email/password sign-in
@@ -35,6 +37,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
   - Loading states during authentication
 
 #### **Sign-Up Page** (`/sign-up`)
+
 - **File:** `apps/web/src/app/(auth)/sign-up/page.tsx`
 - **Features:**
   - User registration with name, email, password
@@ -49,6 +52,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
   - Error handling
 
 ### 3. **User Registration API**
+
 - **File:** `apps/web/src/app/api/auth/register/route.ts`
 - **Features:**
   - POST endpoint for user registration
@@ -64,29 +68,32 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
   - Transaction-safe database operations
 
 ### 4. **Custom Authentication Hooks**
+
 - **File:** `apps/web/src/hooks/use-auth.ts`
 - **Hooks:**
   ```typescript
-  useAuth()                    // Get current session & user
-  useCurrentUser()             // Get current user or null
-  useRequireAuth(redirectTo)   // Require auth or redirect
-  useHasRole(allowedRoles)     // Check if user has role
-  useOrganizations()           // Get user's organizations
-  useHasOrganizationRole()     // Check org-specific role
+  useAuth(); // Get current session & user
+  useCurrentUser(); // Get current user or null
+  useRequireAuth(redirectTo); // Require auth or redirect
+  useHasRole(allowedRoles); // Check if user has role
+  useOrganizations(); // Get user's organizations
+  useHasOrganizationRole(); // Check org-specific role
   ```
 
 ### 5. **Server-Side Auth Helpers**
+
 - **File:** `apps/web/src/lib/auth-helpers.ts`
 - **Functions:**
   ```typescript
-  getCurrentUser()                         // Get user or null
-  requireAuth()                            // Require auth or redirect
-  requireRole(allowedRoles)                // Require specific role
-  getCurrentOrganization(slug)             // Get user's org
-  requireOrganizationRole(slug, roles)     // Require org role
+  getCurrentUser(); // Get user or null
+  requireAuth(); // Require auth or redirect
+  requireRole(allowedRoles); // Require specific role
+  getCurrentOrganization(slug); // Get user's org
+  requireOrganizationRole(slug, roles); // Require org role
   ```
 
 ### 6. **Protected Routes Middleware**
+
 - **File:** `apps/web/src/middleware.ts`
 - **Features:**
   - Automatic protection for `/dashboard/*` routes
@@ -96,6 +103,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
   - Session-based access control
 
 ### 7. **Updated Header Component**
+
 - **File:** `apps/web/src/components/layout/Header.tsx`
 - **Features:**
   - Shows "Sign In" / "Start Free Trial" when logged out
@@ -110,6 +118,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
   - Responsive mobile menu
 
 ### 8. **Updated AuthProvider**
+
 - **File:** `apps/web/src/components/providers/auth-provider.tsx`
 - **Changes:**
   - Removed custom auth logic
@@ -123,6 +132,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
 ### For Users
 
 #### **Sign Up**
+
 1. Navigate to `/sign-up`
 2. Choose one of three options:
    - Click "Continue with Google"
@@ -134,6 +144,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
    - Your organization is created (if provided)
 
 #### **Sign In**
+
 1. Navigate to `/sign-in`
 2. Choose authentication method:
    - Click "Continue with Google"
@@ -144,6 +155,7 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
    - Session persists for 30 days (if "Remember me" checked)
 
 #### **Sign Out**
+
 1. Click your avatar in the header
 2. Click "Sign Out"
 3. You're redirected to the homepage
@@ -151,58 +163,62 @@ LogiVox now has a **fully functional authentication system** powered by NextAuth
 ### For Developers
 
 #### **Protect a Page (Client Component)**
-```tsx
-"use client"
 
-import { useRequireAuth } from "@/hooks/use-auth"
+```tsx
+"use client";
+
+import { useRequireAuth } from "@/hooks/use-auth";
 
 export default function ProtectedPage() {
-  const { isLoading } = useRequireAuth()
-  
-  if (isLoading) return <div>Loading...</div>
-  
-  return <div>Protected content</div>
+  const { isLoading } = useRequireAuth();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  return <div>Protected content</div>;
 }
 ```
 
 #### **Protect a Page (Server Component)**
+
 ```tsx
-import { requireAuth } from "@/lib/auth-helpers"
+import { requireAuth } from "@/lib/auth-helpers";
 
 export default async function ProtectedPage() {
-  const user = await requireAuth()
-  
-  return <div>Hello {user.name}</div>
+  const user = await requireAuth();
+
+  return <div>Hello {user.name}</div>;
 }
 ```
 
 #### **Check User Role**
+
 ```tsx
-import { useHasRole } from "@/hooks/use-auth"
+import { useHasRole } from "@/hooks/use-auth";
 
 export default function AdminPanel() {
-  const isAdmin = useHasRole(["ADMIN", "SUPER_ADMIN"])
-  
-  if (!isAdmin) return <div>Access Denied</div>
-  
-  return <div>Admin Panel</div>
+  const isAdmin = useHasRole(["ADMIN", "SUPER_ADMIN"]);
+
+  if (!isAdmin) return <div>Access Denied</div>;
+
+  return <div>Admin Panel</div>;
 }
 ```
 
 #### **Get Current User**
+
 ```tsx
-import { useCurrentUser } from "@/hooks/use-auth"
+import { useCurrentUser } from "@/hooks/use-auth";
 
 export default function Profile() {
-  const user = useCurrentUser()
-  
+  const user = useCurrentUser();
+
   return (
     <div>
       <h1>{user?.name}</h1>
       <p>{user?.email}</p>
       <p>Role: {user?.role}</p>
     </div>
-  )
+  );
 }
 ```
 
@@ -255,6 +271,7 @@ openssl rand -base64 32
 ## 📊 Database Schema
 
 ### User Model
+
 ```prisma
 model User {
   id            String    @id @default(cuid())
@@ -269,6 +286,7 @@ model User {
 ```
 
 ### Organization Model
+
 ```prisma
 model Organization {
   id               String   @id @default(cuid())
@@ -282,6 +300,7 @@ model Organization {
 ```
 
 ### OrganizationMember Model
+
 ```prisma
 model OrganizationMember {
   id             String           @id @default(cuid())
@@ -327,6 +346,7 @@ model OrganizationMember {
 ## 🎯 Authentication Flow
 
 ### Registration Flow
+
 ```
 1. User fills sign-up form
    ↓
@@ -352,6 +372,7 @@ model OrganizationMember {
 ```
 
 ### Sign-In Flow
+
 ```
 1. User submits credentials/clicks OAuth
    ↓
@@ -373,6 +394,7 @@ model OrganizationMember {
 ```
 
 ### Protected Route Access
+
 ```
 1. User navigates to /dashboard
    ↓
@@ -390,6 +412,7 @@ model OrganizationMember {
 ## 🧪 Testing Authentication
 
 ### Test User Registration
+
 ```bash
 curl -X POST http://localhost:3000/api/auth/register \
   -H "Content-Type: application/json" \
@@ -402,11 +425,13 @@ curl -X POST http://localhost:3000/api/auth/register \
 ```
 
 ### Test Sign-In
+
 1. Go to http://localhost:3000/sign-in
 2. Enter credentials or click OAuth button
 3. Should redirect to dashboard
 
 ### Test Protected Route
+
 1. Sign out
 2. Try to access http://localhost:3000/dashboard/dashboard
 3. Should redirect to /sign-in with callback URL
@@ -416,26 +441,31 @@ curl -X POST http://localhost:3000/api/auth/register \
 ## 🐛 Troubleshooting
 
 ### "Invalid email or password"
+
 - Check database has users (run `npx prisma studio`)
 - Verify password is at least 8 characters
 - Ensure email matches exactly
 
 ### "User already exists"
+
 - Email is already registered
 - Try signing in instead
 - Or use different email
 
 ### OAuth Not Working
+
 - Check `GOOGLE_CLIENT_ID` / `GITHUB_ID` in `.env`
 - Verify callback URLs in OAuth provider settings
 - Ensure `NEXTAUTH_URL` matches your domain
 
 ### Session Not Persisting
+
 - Check browser cookies are enabled
 - Verify `NEXTAUTH_SECRET` is set
 - Clear browser cookies and try again
 
 ### Middleware Redirecting Incorrectly
+
 - Check `middleware.ts` matcher patterns
 - Verify session is being created
 - Look for errors in browser console
@@ -471,6 +501,7 @@ Now that authentication is complete, you can:
 ## 🎉 Summary
 
 **Authentication is now fully functional!** Users can:
+
 - ✅ Sign up with email/password or OAuth
 - ✅ Sign in with multiple providers
 - ✅ Access protected dashboard routes

@@ -46,11 +46,13 @@ LogiVox WMS is a cloud-based warehouse management system designed to streamline 
 ### System Requirements
 
 **Web Application:**
+
 - Modern web browser (Chrome 90+, Firefox 88+, Safari 14+, Edge 90+)
 - Stable internet connection (minimum 5 Mbps recommended)
 - Screen resolution: 1366x768 or higher
 
 **Mobile Application:**
+
 - iOS 14+ or Android 10+
 - Camera for barcode scanning
 - Internet connection (4G/5G or Wi-Fi)
@@ -63,6 +65,7 @@ LogiVox WMS is a cloud-based warehouse management system designed to streamline 
 4. Click **"Sign In"**
 
 **First-time Login:**
+
 - You'll receive a welcome email with temporary credentials
 - Change your password immediately upon first login
 - Set up two-factor authentication for enhanced security
@@ -70,6 +73,7 @@ LogiVox WMS is a cloud-based warehouse management system designed to streamline 
 ### Password Requirements
 
 Your password must meet the following criteria:
+
 - Minimum 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
@@ -93,18 +97,21 @@ The dashboard is your command center, providing at-a-glance visibility into your
 ### Dashboard Widgets
 
 #### Inventory Summary
+
 - **Total Products**: Count of unique SKUs in your system
 - **Total Stock Value**: Monetary value of current inventory
 - **Low Stock Alerts**: Products below reorder point
 - **Out of Stock**: Products with zero quantity
 
 #### Order Statistics
+
 - **Pending Orders**: Orders awaiting processing
 - **Today's Orders**: Orders created today
 - **Shipped Orders**: Orders shipped this week
 - **Order Value**: Total revenue from orders
 
 #### Quick Actions
+
 - Create new order
 - Add product
 - Perform stock adjustment
@@ -112,6 +119,7 @@ The dashboard is your command center, providing at-a-glance visibility into your
 - Scan barcode
 
 #### Recent Activity
+
 - Latest orders placed
 - Recent inventory movements
 - User activity log
@@ -148,6 +156,7 @@ The dashboard is your command center, providing at-a-glance visibility into your
 5. Click **"Save Product"**
 
 **Bulk Import:**
+
 1. Navigate to **Inventory → Import**
 2. Download the CSV template
 3. Fill in product data following the template format
@@ -185,6 +194,7 @@ Transfer inventory between warehouses:
 8. Track transfer status until completion
 
 **Transfer Statuses:**
+
 - **Draft**: Transfer created but not submitted
 - **Pending**: Awaiting approval
 - **In Transit**: Items shipped from source
@@ -216,12 +226,14 @@ Organize products with categories:
 #### Scan Barcodes
 
 **Web Application:**
+
 1. Click the barcode icon (📷) in the search bar
 2. Allow camera access
 3. Point camera at barcode
 4. Product details will appear automatically
 
 **Mobile App:**
+
 1. Tap the **scan button** (📷)
 2. Align barcode within the frame
 3. Scan will happen automatically
@@ -251,12 +263,14 @@ Organize products with categories:
 ### Order Fulfillment Workflow
 
 #### Step 1: Order Confirmation
+
 - Review order details
 - Verify product availability
 - Check shipping address
 - Update order status to **"Confirmed"**
 
 #### Step 2: Picking
+
 1. Navigate to **Orders → Pick List**
 2. Select orders to pick
 3. Print pick list or use mobile app
@@ -265,6 +279,7 @@ Organize products with categories:
 6. Mark items as picked
 
 #### Step 3: Packing
+
 1. Navigate to **Orders → Pack Station**
 2. Select picked order
 3. Verify items against order
@@ -274,6 +289,7 @@ Organize products with categories:
 7. Mark as **"Packed"**
 
 #### Step 4: Shipping
+
 1. Navigate to **Orders → Ready to Ship**
 2. Select packed orders
 3. Assign to carrier
@@ -376,21 +392,25 @@ Regular inventory audits:
 Optimize order picking:
 
 #### Single Order Picking
+
 - Pick one order at a time
 - Best for small orders or urgent shipments
 - Enable: **Settings → Warehouse → Picking Strategy → Single**
 
 #### Batch Picking
+
 - Pick multiple orders simultaneously
 - Efficient for similar orders
 - Enable: **Settings → Warehouse → Picking Strategy → Batch**
 
 #### Wave Picking
+
 - Pick by zone in waves
 - Best for large warehouses
 - Enable: **Settings → Warehouse → Picking Strategy → Wave**
 
 #### Zone Picking
+
 - Assign pickers to specific zones
 - Each picker fulfills their zone
 - Enable: **Settings → Warehouse → Picking Strategy → Zone**
@@ -494,12 +514,14 @@ Create custom analytics dashboards:
 ### Installing the App
 
 **iOS:**
+
 1. Open App Store
 2. Search "LogiVox WMS"
 3. Tap "Get" then "Install"
 4. Open app when installed
 
 **Android:**
+
 1. Open Google Play Store
 2. Search "LogiVox WMS"
 3. Tap "Install"
@@ -508,26 +530,31 @@ Create custom analytics dashboards:
 ### Mobile App Features
 
 #### Quick Scan
+
 - Instant barcode scanning
 - View product details immediately
 - Check stock levels on-the-go
 
 #### Inventory Count
+
 - Perform cycle counts anywhere
 - Scan products to count
 - Submit counts directly to system
 
 #### Order Picking
+
 - Access pick lists on mobile
 - Scan to confirm picks
 - Mark orders as picked
 
 #### Stock Adjustment
+
 - Adjust inventory from warehouse floor
 - Scan product and enter new quantity
 - Instant sync with main system
 
 #### Receiving
+
 - Process purchase orders on mobile
 - Scan received items
 - Note discrepancies immediately
@@ -560,6 +587,7 @@ Create custom analytics dashboards:
 **Problem**: "Invalid credentials" error
 
 **Solutions:**
+
 1. Verify email and password are correct
 2. Check Caps Lock is off
 3. Clear browser cache
@@ -571,6 +599,7 @@ Create custom analytics dashboards:
 **Problem**: Barcode scanner not reading labels
 
 **Solutions:**
+
 1. Clean barcode label (no damage or smudges)
 2. Ensure good lighting
 3. Hold scanner at correct distance (2-6 inches)
@@ -582,6 +611,7 @@ Create custom analytics dashboards:
 **Problem**: Displayed quantity doesn't match physical count
 
 **Solutions:**
+
 1. Check recent transactions for product
 2. Verify stock adjustments were entered correctly
 3. Check for transfers in progress
@@ -593,6 +623,7 @@ Create custom analytics dashboards:
 **Problem**: Created order doesn't show in order list
 
 **Solutions:**
+
 1. Check order status filter (might be filtered out)
 2. Verify order was saved (not left as draft)
 3. Refresh the page
@@ -604,6 +635,7 @@ Create custom analytics dashboards:
 **Problem**: Application loading slowly
 
 **Solutions:**
+
 1. Check internet connection speed
 2. Clear browser cache and cookies
 3. Disable browser extensions
@@ -682,4 +714,4 @@ A: Cash, check, credit card, and custom payment terms. Payment processing integr
 
 **Thank you for choosing LogiVox WMS!** 🚀
 
-*This manual is regularly updated. Check for the latest version at https://docs.logivox.ai*
+_This manual is regularly updated. Check for the latest version at https://docs.logivox.ai_

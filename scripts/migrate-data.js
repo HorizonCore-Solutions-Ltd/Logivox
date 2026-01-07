@@ -2,22 +2,22 @@
 
 /**
  * FlowStock WMS - Data Migration Tool
- * 
+ *
  * This tool helps migrate data from legacy systems to FlowStock WMS.
  * Supports CSV, Excel, and JSON formats.
- * 
+ *
  * Usage:
  *   node scripts/migrate-data.js --type products --file data.csv
  *   node scripts/migrate-data.js --type orders --file orders.xlsx --dry-run
  *   node scripts/migrate-data.js --type customers --file customers.json
  */
 
-const fs = require('fs');
-const path = require('path');
-const csv = require('csv-parser');
-const XLSX = require('xlsx');
-const { PrismaClient } = require('@prisma/client');
-const { createObjectCsvWriter } = require('csv-writer');
+const fs = require("fs");
+const path = require("path");
+const csv = require("csv-parser");
+const XLSX = require("xlsx");
+const { PrismaClient } = require("@prisma/client");
+const { createObjectCsvWriter } = require("csv-writer");
 
 const prisma = new PrismaClient();
 
@@ -25,7 +25,7 @@ const prisma = new PrismaClient();
 const config = {
   batchSize: 100,
   maxErrors: 50,
-  outputDir: './migration-output',
+  outputDir: "./migration-output",
 };
 
 // Statistics
@@ -43,10 +43,10 @@ const stats = {
 async function migrate(options) {
   const { type, file, dryRun = false } = options;
 
-  console.log('\n🚀 FlowStock WMS Data Migration Tool\n');
+  console.log("\n🚀 FlowStock WMS Data Migration Tool\n");
   console.log(`Migration Type: ${type}`);
   console.log(`Source File: ${file}`);
-  console.log(`Dry Run: ${dryRun ? 'Yes' : 'No'}\n`);
+  console.log(`Dry Run: ${dryRun ? "Yes" : "No"}\n`);
 
   // Validate inputs
   if (!fs.existsSync(file)) {
@@ -68,22 +68,22 @@ async function migrate(options) {
 
     // Migrate based on type
     switch (type) {
-      case 'products':
+      case "products":
         await migrateProducts(data, dryRun);
         break;
-      case 'customers':
+      case "customers":
         await migrateCustomers(data, dryRun);
         break;
-      case 'suppliers':
+      case "suppliers":
         await migrateSuppliers(data, dryRun);
         break;
-      case 'orders':
+      case "orders":
         await migrateOrders(data, dryRun);
         break;
-      case 'locations':
+      case "locations":
         await migrateLocations(data, dryRun);
         break;
-      case 'inventory':
+      case "inventory":
         await migrateInventory(data, dryRun);
         break;
       default:
@@ -96,7 +96,6 @@ async function migrate(options) {
 
     // Display summary
     displaySummary();
-
   } catch (error) {
     console.error(`\n❌ Migration failed: ${error.message}`);
     console.error(error.stack);
@@ -112,11 +111,11 @@ async function migrate(options) {
 async function loadData(file) {
   const ext = path.extname(file).toLowerCase();
 
-  if (ext === '.csv') {
+  if (ext === ".csv") {
     return loadCSV(file);
-  } else if (ext === '.xlsx' || ext === '.xls') {
+  } else if (ext === ".xlsx" || ext === ".xls") {
     return loadExcel(file);
-  } else if (ext === '.json') {
+  } else if (ext === ".json") {
     return loadJSON(file);
   } else {
     throw new Error(`Unsupported file format: ${ext}`);
@@ -131,9 +130,9 @@ function loadCSV(file) {
     const results = [];
     fs.createReadStream(file)
       .pipe(csv())
-      .on('data', (data) => results.push(data))
-      .on('end', () => resolve(results))
-      .on('error', reject);
+      .on("data", (data) => results.push(data))
+      .on("end", () => resolve(results))
+      .on("error", reject);
   });
 }
 
@@ -151,7 +150,7 @@ function loadExcel(file) {
  * Load JSON file
  */
 function loadJSON(file) {
-  const content = fs.readFileSync(file, 'utf8');
+  const content = fs.readFileSync(file, "utf8");
   return JSON.parse(content);
 }
 
@@ -159,7 +158,7 @@ function loadJSON(file) {
  * Migrate Products
  */
 async function migrateProducts(data, dryRun) {
-  console.log('📦 Migrating Products...\n');
+  console.log("📦 Migrating Products...\n");
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];
@@ -168,7 +167,7 @@ async function migrateProducts(data, dryRun) {
     try {
       // Validate required fields
       if (!row.sku || !row.name) {
-        throw new Error('Missing required fields: sku, name');
+        throw new Error("Missing required fields: sku, name");
       }
 
       // Check for duplicates
@@ -178,7 +177,9 @@ async function migrateProducts(data, dryRun) {
         });
 
         if (existing) {
-          console.log(`${progress} ⚠️  Skipped: Product ${row.sku} already exists`);
+          console.log(
+            `${progress} ⚠️  Skipped: Product ${row.sku} already exists`,
+          );
           stats.skipped++;
           continue;
         }
@@ -189,8 +190,8 @@ async function migrateProducts(data, dryRun) {
         sku: row.sku.trim(),
         name: row.name.trim(),
         description: row.description || null,
-        category: row.category || 'GENERAL',
-        uom: row.uom || 'EA',
+        category: row.category || "GENERAL",
+        uom: row.uom || "EA",
         unitCost: parseFloat(row.unitCost || row.cost || 0),
         sellingPrice: parseFloat(row.sellingPrice || row.price || 0),
         reorderLevel: parseInt(row.reorderLevel || row.reorderPoint || 0),
@@ -200,16 +201,17 @@ async function migrateProducts(data, dryRun) {
         length: parseFloat(row.length || 0),
         width: parseFloat(row.width || 0),
         height: parseFloat(row.height || 0),
-        status: row.status || 'ACTIVE',
+        status: row.status || "ACTIVE",
       };
 
       if (!dryRun) {
         await prisma.product.create({ data: productData });
       }
 
-      console.log(`${progress} ✅ Migrated: ${productData.sku} - ${productData.name}`);
+      console.log(
+        `${progress} ✅ Migrated: ${productData.sku} - ${productData.name}`,
+      );
       stats.success++;
-
     } catch (error) {
       console.log(`${progress} ❌ Failed: ${row.sku} - ${error.message}`);
       stats.failed++;
@@ -220,7 +222,9 @@ async function migrateProducts(data, dryRun) {
       });
 
       if (stats.failed >= config.maxErrors) {
-        throw new Error(`Max errors (${config.maxErrors}) reached. Stopping migration.`);
+        throw new Error(
+          `Max errors (${config.maxErrors}) reached. Stopping migration.`,
+        );
       }
     }
   }
@@ -230,7 +234,7 @@ async function migrateProducts(data, dryRun) {
  * Migrate Customers
  */
 async function migrateCustomers(data, dryRun) {
-  console.log('👥 Migrating Customers...\n');
+  console.log("👥 Migrating Customers...\n");
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];
@@ -239,7 +243,7 @@ async function migrateCustomers(data, dryRun) {
     try {
       // Validate required fields
       if (!row.name || !row.email) {
-        throw new Error('Missing required fields: name, email');
+        throw new Error("Missing required fields: name, email");
       }
 
       // Check for duplicates
@@ -249,7 +253,9 @@ async function migrateCustomers(data, dryRun) {
         });
 
         if (existing) {
-          console.log(`${progress} ⚠️  Skipped: Customer ${row.email} already exists`);
+          console.log(
+            `${progress} ⚠️  Skipped: Customer ${row.email} already exists`,
+          );
           stats.skipped++;
           continue;
         }
@@ -266,22 +272,23 @@ async function migrateCustomers(data, dryRun) {
         billingCity: row.billingCity || null,
         billingState: row.billingState || null,
         billingZip: row.billingZip || null,
-        billingCountry: row.billingCountry || 'US',
+        billingCountry: row.billingCountry || "US",
         shippingAddress: row.shippingAddress || row.billingAddress || null,
         shippingCity: row.shippingCity || row.billingCity || null,
         shippingState: row.shippingState || row.billingState || null,
         shippingZip: row.shippingZip || row.billingZip || null,
-        shippingCountry: row.shippingCountry || row.billingCountry || 'US',
-        status: row.status || 'ACTIVE',
+        shippingCountry: row.shippingCountry || row.billingCountry || "US",
+        status: row.status || "ACTIVE",
       };
 
       if (!dryRun) {
         await prisma.customer.create({ data: customerData });
       }
 
-      console.log(`${progress} ✅ Migrated: ${customerData.name} (${customerData.email})`);
+      console.log(
+        `${progress} ✅ Migrated: ${customerData.name} (${customerData.email})`,
+      );
       stats.success++;
-
     } catch (error) {
       console.log(`${progress} ❌ Failed: ${row.email} - ${error.message}`);
       stats.failed++;
@@ -292,7 +299,9 @@ async function migrateCustomers(data, dryRun) {
       });
 
       if (stats.failed >= config.maxErrors) {
-        throw new Error(`Max errors (${config.maxErrors}) reached. Stopping migration.`);
+        throw new Error(
+          `Max errors (${config.maxErrors}) reached. Stopping migration.`,
+        );
       }
     }
   }
@@ -302,7 +311,7 @@ async function migrateCustomers(data, dryRun) {
  * Migrate Suppliers
  */
 async function migrateSuppliers(data, dryRun) {
-  console.log('🏭 Migrating Suppliers...\n');
+  console.log("🏭 Migrating Suppliers...\n");
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];
@@ -310,7 +319,7 @@ async function migrateSuppliers(data, dryRun) {
 
     try {
       if (!row.name || !row.email) {
-        throw new Error('Missing required fields: name, email');
+        throw new Error("Missing required fields: name, email");
       }
 
       if (!dryRun) {
@@ -319,7 +328,9 @@ async function migrateSuppliers(data, dryRun) {
         });
 
         if (existing) {
-          console.log(`${progress} ⚠️  Skipped: Supplier ${row.email} already exists`);
+          console.log(
+            `${progress} ⚠️  Skipped: Supplier ${row.email} already exists`,
+          );
           stats.skipped++;
           continue;
         }
@@ -335,19 +346,20 @@ async function migrateSuppliers(data, dryRun) {
         city: row.city || null,
         state: row.state || null,
         zip: row.zip || null,
-        country: row.country || 'US',
+        country: row.country || "US",
         leadTime: parseInt(row.leadTime || 7),
         rating: parseFloat(row.rating || 0),
-        status: row.status || 'ACTIVE',
+        status: row.status || "ACTIVE",
       };
 
       if (!dryRun) {
         await prisma.supplier.create({ data: supplierData });
       }
 
-      console.log(`${progress} ✅ Migrated: ${supplierData.name} (${supplierData.email})`);
+      console.log(
+        `${progress} ✅ Migrated: ${supplierData.name} (${supplierData.email})`,
+      );
       stats.success++;
-
     } catch (error) {
       console.log(`${progress} ❌ Failed: ${row.email} - ${error.message}`);
       stats.failed++;
@@ -368,7 +380,7 @@ async function migrateSuppliers(data, dryRun) {
  * Migrate Orders (Sales Orders)
  */
 async function migrateOrders(data, dryRun) {
-  console.log('📋 Migrating Orders...\n');
+  console.log("📋 Migrating Orders...\n");
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];
@@ -376,7 +388,7 @@ async function migrateOrders(data, dryRun) {
 
     try {
       if (!row.orderNumber || !row.customerEmail) {
-        throw new Error('Missing required fields: orderNumber, customerEmail');
+        throw new Error("Missing required fields: orderNumber, customerEmail");
       }
 
       // Find customer
@@ -394,7 +406,9 @@ async function migrateOrders(data, dryRun) {
         });
 
         if (existing) {
-          console.log(`${progress} ⚠️  Skipped: Order ${row.orderNumber} already exists`);
+          console.log(
+            `${progress} ⚠️  Skipped: Order ${row.orderNumber} already exists`,
+          );
           stats.skipped++;
           continue;
         }
@@ -404,10 +418,10 @@ async function migrateOrders(data, dryRun) {
         orderNumber: row.orderNumber.trim(),
         customerId: customer.id,
         orderDate: new Date(row.orderDate || Date.now()),
-        status: row.status || 'PENDING',
+        status: row.status || "PENDING",
         totalAmount: parseFloat(row.totalAmount || 0),
         notes: row.notes || null,
-        shippingMethod: row.shippingMethod || 'STANDARD',
+        shippingMethod: row.shippingMethod || "STANDARD",
         shippingAddress: row.shippingAddress || customer.shippingAddress,
         shippingCity: row.shippingCity || customer.shippingCity,
         shippingState: row.shippingState || customer.shippingState,
@@ -421,9 +435,10 @@ async function migrateOrders(data, dryRun) {
 
       console.log(`${progress} ✅ Migrated: Order ${orderData.orderNumber}`);
       stats.success++;
-
     } catch (error) {
-      console.log(`${progress} ❌ Failed: ${row.orderNumber} - ${error.message}`);
+      console.log(
+        `${progress} ❌ Failed: ${row.orderNumber} - ${error.message}`,
+      );
       stats.failed++;
       stats.errors.push({
         row: i + 1,
@@ -442,7 +457,7 @@ async function migrateOrders(data, dryRun) {
  * Migrate Locations
  */
 async function migrateLocations(data, dryRun) {
-  console.log('📍 Migrating Locations...\n');
+  console.log("📍 Migrating Locations...\n");
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];
@@ -450,7 +465,7 @@ async function migrateLocations(data, dryRun) {
 
     try {
       if (!row.locationCode || !row.warehouseId) {
-        throw new Error('Missing required fields: locationCode, warehouseId');
+        throw new Error("Missing required fields: locationCode, warehouseId");
       }
 
       if (!dryRun) {
@@ -462,7 +477,9 @@ async function migrateLocations(data, dryRun) {
         });
 
         if (existing) {
-          console.log(`${progress} ⚠️  Skipped: Location ${row.locationCode} already exists`);
+          console.log(
+            `${progress} ⚠️  Skipped: Location ${row.locationCode} already exists`,
+          );
           stats.skipped++;
           continue;
         }
@@ -476,20 +493,23 @@ async function migrateLocations(data, dryRun) {
         rack: row.rack || null,
         shelf: row.shelf || null,
         bin: row.bin || null,
-        locationType: row.locationType || 'STORAGE',
+        locationType: row.locationType || "STORAGE",
         capacity: parseInt(row.capacity || 100),
-        status: row.status || 'ACTIVE',
+        status: row.status || "ACTIVE",
       };
 
       if (!dryRun) {
         await prisma.location.create({ data: locationData });
       }
 
-      console.log(`${progress} ✅ Migrated: Location ${locationData.locationCode}`);
+      console.log(
+        `${progress} ✅ Migrated: Location ${locationData.locationCode}`,
+      );
       stats.success++;
-
     } catch (error) {
-      console.log(`${progress} ❌ Failed: ${row.locationCode} - ${error.message}`);
+      console.log(
+        `${progress} ❌ Failed: ${row.locationCode} - ${error.message}`,
+      );
       stats.failed++;
       stats.errors.push({
         row: i + 1,
@@ -508,7 +528,7 @@ async function migrateLocations(data, dryRun) {
  * Migrate Inventory Levels
  */
 async function migrateInventory(data, dryRun) {
-  console.log('📊 Migrating Inventory Levels...\n');
+  console.log("📊 Migrating Inventory Levels...\n");
 
   for (let i = 0; i < data.length; i++) {
     const row = data[i];
@@ -516,7 +536,7 @@ async function migrateInventory(data, dryRun) {
 
     try {
       if (!row.sku || !row.warehouseId) {
-        throw new Error('Missing required fields: sku, warehouseId');
+        throw new Error("Missing required fields: sku, warehouseId");
       }
 
       // Find product
@@ -555,9 +575,9 @@ async function migrateInventory(data, dryRun) {
           data: {
             productId: product.id,
             warehouseId: row.warehouseId,
-            type: 'ADJUSTMENT',
+            type: "ADJUSTMENT",
             quantity,
-            reason: 'DATA_MIGRATION',
+            reason: "DATA_MIGRATION",
             notes: `Migrated from legacy system on ${new Date().toISOString()}`,
           },
         });
@@ -565,7 +585,6 @@ async function migrateInventory(data, dryRun) {
 
       console.log(`${progress} ✅ Migrated: ${row.sku} - Qty: ${quantity}`);
       stats.success++;
-
     } catch (error) {
       console.log(`${progress} ❌ Failed: ${row.sku} - ${error.message}`);
       stats.failed++;
@@ -586,26 +605,30 @@ async function migrateInventory(data, dryRun) {
  * Generate migration report
  */
 async function generateReport(type) {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const reportFile = path.join(config.outputDir, `migration-report-${type}-${timestamp}.csv`);
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const reportFile = path.join(
+    config.outputDir,
+    `migration-report-${type}-${timestamp}.csv`,
+  );
 
   if (stats.errors.length === 0) {
-    console.log('\n✅ No errors to report.\n');
+    console.log("\n✅ No errors to report.\n");
     return;
   }
 
   const csvWriter = createObjectCsvWriter({
     path: reportFile,
     header: [
-      { id: 'row', title: 'Row Number' },
-      { id: 'identifier', title: 'Identifier' },
-      { id: 'error', title: 'Error Message' },
+      { id: "row", title: "Row Number" },
+      { id: "identifier", title: "Identifier" },
+      { id: "error", title: "Error Message" },
     ],
   });
 
   const records = stats.errors.map((err) => ({
     row: err.row,
-    identifier: err.sku || err.email || err.orderNumber || err.locationCode || 'N/A',
+    identifier:
+      err.sku || err.email || err.orderNumber || err.locationCode || "N/A",
     error: err.error,
   }));
 
@@ -617,18 +640,22 @@ async function generateReport(type) {
  * Display migration summary
  */
 function displaySummary() {
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 Migration Summary');
-  console.log('='.repeat(60));
+  console.log("\n" + "=".repeat(60));
+  console.log("📊 Migration Summary");
+  console.log("=".repeat(60));
   console.log(`Total Records:    ${stats.total}`);
   console.log(`✅ Successful:     ${stats.success}`);
   console.log(`⚠️  Skipped:        ${stats.skipped}`);
   console.log(`❌ Failed:         ${stats.failed}`);
-  console.log(`Success Rate:     ${((stats.success / stats.total) * 100).toFixed(2)}%`);
-  console.log('='.repeat(60) + '\n');
+  console.log(
+    `Success Rate:     ${((stats.success / stats.total) * 100).toFixed(2)}%`,
+  );
+  console.log("=".repeat(60) + "\n");
 
   if (stats.failed > 0) {
-    console.log('⚠️  Some records failed to migrate. Check the error report for details.\n');
+    console.log(
+      "⚠️  Some records failed to migrate. Check the error report for details.\n",
+    );
   }
 }
 
@@ -640,15 +667,15 @@ function parseArgs() {
   const options = {};
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--type' && args[i + 1]) {
+    if (args[i] === "--type" && args[i + 1]) {
       options.type = args[i + 1];
       i++;
-    } else if (args[i] === '--file' && args[i + 1]) {
+    } else if (args[i] === "--file" && args[i + 1]) {
       options.file = args[i + 1];
       i++;
-    } else if (args[i] === '--dry-run') {
+    } else if (args[i] === "--dry-run") {
       options.dryRun = true;
-    } else if (args[i] === '--help' || args[i] === '-h') {
+    } else if (args[i] === "--help" || args[i] === "-h") {
       displayHelp();
       process.exit(0);
     }
@@ -699,7 +726,7 @@ if (require.main === module) {
   const options = parseArgs();
 
   if (!options.type || !options.file) {
-    console.error('❌ Error: --type and --file arguments are required.\n');
+    console.error("❌ Error: --type and --file arguments are required.\n");
     displayHelp();
     process.exit(1);
   }

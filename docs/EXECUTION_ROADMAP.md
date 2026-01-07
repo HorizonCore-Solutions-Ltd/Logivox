@@ -11,8 +11,10 @@ Last Updated: October 15, 2025
 ## ✅ COMPLETED PHASES (100%) - Phases 1-13
 
 ### Phase 1: Project Setup & Foundation ✅
+
 **Status:** 100% Complete  
-**Completion Date:** Initial setup  
+**Completion Date:** Initial setup
+
 - ✅ Next.js 14 App Router with TypeScript
 - ✅ TailwindCSS + shadcn/ui component library
 - ✅ PostgreSQL database with Prisma ORM
@@ -21,7 +23,9 @@ Last Updated: October 15, 2025
 - ✅ Git repository initialization
 
 ### Phase 2: Authentication & User Management ✅
-**Status:** 100% Complete  
+
+**Status:** 100% Complete
+
 - ✅ NextAuth.js integration
 - ✅ Email/password authentication
 - ✅ User registration and login
@@ -30,7 +34,9 @@ Last Updated: October 15, 2025
 - ✅ Email verification system
 
 ### Phase 3: Core Inventory Management ✅
-**Status:** 100% Complete  
+
+**Status:** 100% Complete
+
 - ✅ Inventory CRUD operations (Create, Read, Update, Delete)
 - ✅ Real-time stock tracking
 - ✅ SKU management
@@ -39,7 +45,9 @@ Last Updated: October 15, 2025
 - ✅ Inventory search and filtering
 
 ### Phase 4: Customer & Booking Management ✅
-**Status:** 100% Complete  
+
+**Status:** 100% Complete
+
 - ✅ Customer database with CRUD operations
 - ✅ Booking system for inventory items
 - ✅ Booking status tracking (pending, confirmed, completed, cancelled)
@@ -48,7 +56,9 @@ Last Updated: October 15, 2025
 - ✅ Conflict detection for double bookings
 
 ### Phase 5: Advanced Features ✅
-**Status:** 100% Complete  
+
+**Status:** 100% Complete
+
 - ✅ Batch operations (bulk updates, imports)
 - ✅ CSV import/export functionality
 - ✅ Advanced search and filtering
@@ -57,7 +67,9 @@ Last Updated: October 15, 2025
 - ✅ Barcode generation and scanning
 
 ### Phase 6: Reporting & Analytics Foundation ✅
-**Status:** 100% Complete  
+
+**Status:** 100% Complete
+
 - ✅ Dashboard with key metrics
 - ✅ Recharts integration for visualizations
 - ✅ Stock value reports
@@ -67,8 +79,10 @@ Last Updated: October 15, 2025
 - ✅ Excel export with xlsx library
 
 ### Phase 7: Multi-Tenant & RBAC ✅
+
 **Status:** 100% Complete  
-**Key Achievement:** Enterprise-grade security  
+**Key Achievement:** Enterprise-grade security
+
 - ✅ Multi-tenant architecture with data isolation
 - ✅ Organization model with unique slugs
 - ✅ Role-Based Access Control (OWNER, ADMIN, MEMBER)
@@ -78,7 +92,9 @@ Last Updated: October 15, 2025
 - ✅ Organization switching UI
 
 ### Phase 8: ERP/API Integrations ✅
-**Status:** 100% Complete  
+
+**Status:** 100% Complete
+
 - ✅ RESTful API endpoints for inventory, customers, bookings
 - ✅ Webhook system with SHA-256/HMAC validation
 - ✅ API key management per organization
@@ -87,7 +103,9 @@ Last Updated: October 15, 2025
 - ✅ Oracle, SAP, NetSuite, QuickBooks integration pages
 
 ### Phase 9: Analytics & Reporting ✅
-**Status:** 100% Complete  
+
+**Status:** 100% Complete
+
 - ✅ Advanced analytics dashboard with Recharts
 - ✅ Real-time metrics (total items, low stock, bookings)
 - ✅ Interactive charts (bar, line, area, pie)
@@ -97,8 +115,10 @@ Last Updated: October 15, 2025
 - ✅ Custom date range selection
 
 ### Phase 10: Mobile & PWA ✅
+
 **Status:** 100% Complete  
-**Key Achievement:** Offline-first architecture  
+**Key Achievement:** Offline-first architecture
+
 - ✅ Progressive Web App (PWA) with next-pwa
 - ✅ Service worker configuration
 - ✅ Offline support with IndexedDB
@@ -109,8 +129,10 @@ Last Updated: October 15, 2025
 - ✅ Offline sync queue implementation
 
 ### Phase 11: Enterprise Landing Page & Marketing ✅
+
 **Status:** 100% Complete  
-**Completion Date:** Recent  
+**Completion Date:** Recent
+
 - ✅ Sticky navigation with scroll detection
 - ✅ Dropdown menus (Solutions, Platform, Resources)
 - ✅ Mobile responsive with Sheet component
@@ -124,8 +146,10 @@ Last Updated: October 15, 2025
 - ✅ About, Contact, Pricing, Blog pages created
 
 ### Phase 12: Complete Navigation & Pages ✅
+
 **Status:** 100% Complete  
-**Completion Date:** Recent  
+**Completion Date:** Recent
+
 - ✅ Solutions pages (stock-booking, erp-integration, analytics, multi-tenant)
 - ✅ Platform pages (security, integrations, enterprise)
 - ✅ Documentation hub page
@@ -135,9 +159,11 @@ Last Updated: October 15, 2025
 - ✅ Mobile navigation fully functional
 
 ### Phase 13: Testing & CI/CD Infrastructure ✅
+
 **Status:** 100% Complete  
 **Completion Date:** Just completed  
-**Test Results:** 10/10 tests passing ✅  
+**Test Results:** 10/10 tests passing ✅
+
 - ✅ Jest 29+ configuration with Next.js
 - ✅ React Testing Library setup
 - ✅ jest-environment-jsdom configured
@@ -166,17 +192,20 @@ Last Updated: October 15, 2025
 ## 🔄 IN PROGRESS PHASES (40-70%) - Phases 14-17
 
 ### Phase 14: Database Optimization ⏳
+
 **Status:** 60% Complete  
 **Priority:** HIGH - Critical for performance  
-**Estimated Time:** 4-6 hours  
+**Estimated Time:** 4-6 hours
 
 **✅ Completed:**
+
 - Prisma ORM fully configured
 - Basic database indexes on primary keys
 - Foreign key relationships optimized
 - Transaction support implemented
 
 **❌ Remaining Work:**
+
 1. **Redis Caching Layer** (2 hours)
    - Install ioredis package
    - Create `lib/redis.ts` configuration
@@ -206,24 +235,26 @@ Last Updated: October 15, 2025
    - Add database query logging in development
 
 **Next Steps:**
+
 ```bash
 npm install ioredis
 ```
 
 Create `lib/redis.ts`:
+
 ```typescript
-import Redis from 'ioredis';
+import Redis from "ioredis";
 
 export const redis = new Redis(process.env.REDIS_URL);
 
 export async function getCached<T>(
   key: string,
   fetcher: () => Promise<T>,
-  ttl: number = 300
+  ttl: number = 300,
 ): Promise<T> {
   const cached = await redis.get(key);
   if (cached) return JSON.parse(cached);
-  
+
   const data = await fetcher();
   await redis.setex(key, ttl, JSON.stringify(data));
   return data;
@@ -231,11 +262,13 @@ export async function getCached<T>(
 ```
 
 ### Phase 15: Security Enhancements ⏳
+
 **Status:** 70% Complete  
 **Priority:** HIGH - Critical for enterprise  
-**Estimated Time:** 6-8 hours  
+**Estimated Time:** 6-8 hours
 
 **✅ Completed:**
+
 - NextAuth.js authentication
 - RBAC system (OWNER, ADMIN, MEMBER)
 - Zero-trust architecture
@@ -244,12 +277,13 @@ export async function getCached<T>(
 - CSRF protection (NextAuth built-in)
 
 **❌ Remaining Work:**
+
 1. **Rate Limiting** (2 hours)
    - Install `@upstash/ratelimit` or `express-rate-limit`
    - Create `middleware/rate-limit.ts`
    - Implement per-IP rate limiting (100 req/min)
    - Implement per-user rate limiting (1000 req/hour)
-   - Add rate limit headers (X-RateLimit-*)
+   - Add rate limit headers (X-RateLimit-\*)
    - Return 429 Too Many Requests on exceed
 
 2. **Advanced Audit Logging** (2 hours)
@@ -277,22 +311,26 @@ export async function getCached<T>(
    - Add CAPTCHA on login (optional: hCaptcha/reCAPTCHA)
 
 **Next Steps:**
+
 ```bash
 npm install @upstash/ratelimit otplib qrcode
 ```
 
 ### Phase 16: Advanced Integration Wizards ⏳
+
 **Status:** 50% Complete  
 **Priority:** MEDIUM - Enhances product value  
-**Estimated Time:** 8-10 hours  
+**Estimated Time:** 8-10 hours
 
 **✅ Completed:**
+
 - RESTful API endpoints
 - Webhook system with HMAC validation
 - API key management
 - Integration marketplace pages (Oracle, SAP, NetSuite, QuickBooks)
 
 **❌ Remaining Work:**
+
 1. **Oracle ERP Integration Wizard** (2 hours)
    - Create `/dashboard/integrations/oracle/page.tsx`
    - Build multi-step wizard:
@@ -330,21 +368,25 @@ npm install @upstash/ratelimit otplib qrcode
    - Sync history with record counts
 
 **Next Steps:**
+
 ```bash
 npm install oracledb node-quickbooks
 ```
 
 ### Phase 17: Performance Optimization ⏳
+
 **Status:** 40% Complete  
 **Priority:** MEDIUM - Improves UX  
-**Estimated Time:** 5-7 hours  
+**Estimated Time:** 5-7 hours
 
 **✅ Completed:**
+
 - Next.js 14 App Router optimization
 - Automatic code splitting per route
 - Server components by default
 
 **❌ Remaining Work:**
+
 1. **Image Optimization** (2 hours)
    - Replace all `<img>` tags with `next/image`
    - Add proper width/height to all images
@@ -378,6 +420,7 @@ npm install oracledb node-quickbooks
    - Set up performance budgets
 
 **Next Steps:**
+
 ```bash
 npm install @next/bundle-analyzer
 ```
@@ -387,17 +430,20 @@ npm install @next/bundle-analyzer
 ## ❌ NOT STARTED PHASES (0%) - Phases 18-21
 
 ### Phase 18: Advanced Blog System 🆕
+
 **Status:** 0% Complete (Basic structure exists)  
 **Priority:** MEDIUM - Important for SEO/marketing  
-**Estimated Time:** 10-12 hours  
+**Estimated Time:** 10-12 hours
 
 **Current State:**
+
 - Blog list page exists with basic structure
 - Individual blog post pages exist
 - Categories and tags displayed
 - Search functionality present
 
 **Requirements:**
+
 1. **MDX Integration** (2 hours)
    - Install `next-mdx-remote` or `@next/mdx`
    - Create MDX content directory (`content/blog/`)
@@ -439,16 +485,19 @@ npm install @next/bundle-analyzer
    - Industry-specific examples
 
 **Next Steps:**
+
 ```bash
 npm install next-mdx-remote rehype-highlight remark-gfm gray-matter
 ```
 
 ### Phase 19: Organization Branding & Customization 🆕
+
 **Status:** 0% Complete  
 **Priority:** MEDIUM - Important for enterprise customers  
-**Estimated Time:** 8-10 hours  
+**Estimated Time:** 8-10 hours
 
 **Requirements:**
+
 1. **Logo Upload System** (3 hours)
    - Set up Vercel Blob or AWS S3 for file storage
    - Add `logoUrl` field to Organization model
@@ -482,16 +531,19 @@ npm install next-mdx-remote rehype-highlight remark-gfm gray-matter
    - Automatic routing to organization via domain
 
 **Next Steps:**
+
 ```bash
 npm install @vercel/blob sharp react-colorful
 ```
 
 ### Phase 20: AI Anti-Hallucination & RAG System 🆕
+
 **Status:** 0% Complete  
 **Priority:** LOW - Advanced feature, not blocking  
-**Estimated Time:** 12-15 hours  
+**Estimated Time:** 12-15 hours
 
 **Requirements:**
+
 1. **Vector Database Setup** (3 hours)
    - Choose provider: Pinecone (cloud) or pgvector (PostgreSQL extension)
    - Install SDK (`@pinecone-database/pinecone` or setup pgvector)
@@ -531,6 +583,7 @@ npm install @vercel/blob sharp react-colorful
    - Fallback to human support for uncertain answers
 
 **Next Steps:**
+
 ```bash
 npm install @pinecone-database/pinecone openai
 # OR
@@ -538,11 +591,13 @@ npm install @pinecone-database/pinecone openai
 ```
 
 ### Phase 21: Professional Seeded Data & Demo Content 🆕
+
 **Status:** 0% Complete  
 **Priority:** MEDIUM - Improves demo experience  
-**Estimated Time:** 6-8 hours  
+**Estimated Time:** 6-8 hours
 
 **Requirements:**
+
 1. **Realistic Company Data** (2 hours)
    - Create 3 demo organizations:
      - **Acme Manufacturing** (manufacturing industry)
@@ -588,9 +643,10 @@ Update `prisma/seed.ts` with professional data.
 ---
 
 ### Phase 22: Label Template & Printing System 🆕 ⭐
+
 **Status:** 0% Complete  
 **Priority:** HIGH - Game-changing feature for warehouse operations  
-**Estimated Time:** 20-25 hours  
+**Estimated Time:** 20-25 hours
 
 **Overview:**
 A modular, intelligent solution for designing, managing, and printing labels within warehouse and procurement operations. Supports dynamic field mapping, batch printing, and integrates with ERP systems and cloud/local printers.
@@ -598,231 +654,240 @@ A modular, intelligent solution for designing, managing, and printing labels wit
 **Requirements:**
 
 #### 1. **Label Designer UI** (6-8 hours)
-   - **Drag-and-Drop Canvas Builder**
-     - Install `react-konva` or `fabric.js` for canvas manipulation
-     - Create `/dashboard/labels/designer` page
-     - Canvas elements: Text, Barcode (Code128, QR), Images, Shapes, Lines
-     - Property panel: Font family, size, color, alignment, rotation
-     - Grid and snap-to-grid functionality
-     - Undo/redo functionality
-     - Ruler and guidelines
-   
-   - **Dynamic Field Mapping**
-     - Field variables: `{itemName}`, `{sku}`, `{poNumber}`, `{supplierName}`, `{deliveryDate}`, `{jobReference}`, `{quantity}`, `{location}`, `{barcode}`
-     - Auto-populate from inventory or purchase order data
-     - Conditional fields (e.g., "DAMAGED" tag, "FRAGILE" warning)
-     - Custom field builder for organization-specific data
-   
-   - **Label Dimensions & Formats**
-     - Preset sizes: 2"x1", 4"x6", A4, custom dimensions
-     - Units: inches, cm, mm
-     - DPI settings (203, 300, 600 DPI for thermal printers)
-     - Portrait/landscape orientation
+
+- **Drag-and-Drop Canvas Builder**
+  - Install `react-konva` or `fabric.js` for canvas manipulation
+  - Create `/dashboard/labels/designer` page
+  - Canvas elements: Text, Barcode (Code128, QR), Images, Shapes, Lines
+  - Property panel: Font family, size, color, alignment, rotation
+  - Grid and snap-to-grid functionality
+  - Undo/redo functionality
+  - Ruler and guidelines
+
+- **Dynamic Field Mapping**
+  - Field variables: `{itemName}`, `{sku}`, `{poNumber}`, `{supplierName}`, `{deliveryDate}`, `{jobReference}`, `{quantity}`, `{location}`, `{barcode}`
+  - Auto-populate from inventory or purchase order data
+  - Conditional fields (e.g., "DAMAGED" tag, "FRAGILE" warning)
+  - Custom field builder for organization-specific data
+
+- **Label Dimensions & Formats**
+  - Preset sizes: 2"x1", 4"x6", A4, custom dimensions
+  - Units: inches, cm, mm
+  - DPI settings (203, 300, 600 DPI for thermal printers)
+  - Portrait/landscape orientation
 
 #### 2. **Template Storage & Management** (3-4 hours)
-   - **Prisma Schema Addition**
-     ```typescript
-     model LabelTemplate {
-       id              String   @id @default(cuid())
-       name            String
-       description     String?
-       organizationId  String
-       organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-       createdBy       String
-       creator         User     @relation(fields: [createdBy], references: [id])
-       width           Float    // in mm
-       height          Float    // in mm
-       unit            String   @default("mm") // mm, cm, inch
-       dpi             Int      @default(203)
-       designData      Json     // Canvas JSON with elements
-       isDefault       Boolean  @default(false)
-       category        String?  // "Shipping", "Product", "Asset", "Compliance"
-       tags            String[] // ["warehouse", "thermal", "barcode"]
-       createdAt       DateTime @default(now())
-       updatedAt       DateTime @updatedAt
-       
-       printJobs       PrintJob[]
-       
-       @@index([organizationId])
-       @@index([createdBy])
-     }
-     
-     model PrintJob {
-       id              String   @id @default(cuid())
-       templateId      String
-       template        LabelTemplate @relation(fields: [templateId], references: [id])
-       organizationId  String
-       organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-       createdBy       String
-       creator         User     @relation(fields: [createdBy], references: [id])
-       status          String   @default("pending") // pending, processing, completed, failed
-       format          String   // "PDF", "ZPL", "PNG", "JPG"
-       printerName     String?
-       printerId       String?  // PrintNode printer ID
-       quantity        Int      @default(1)
-       data            Json     // Data for label fields
-       outputUrl       String?  // URL to generated file
-       error           String?
-       metadata        Json?    // Additional tracking data
-       createdAt       DateTime @default(now())
-       completedAt     DateTime?
-       
-       @@index([organizationId])
-       @@index([status])
-       @@index([createdBy])
-       @@index([createdAt])
-     }
-     ```
-   
-   - **Template Library Page** (`/dashboard/labels/templates`)
-     - Grid view with template thumbnails
-     - Search, filter by category/tags
-     - Duplicate, edit, delete templates
-     - Set default template per category
-     - Role-based access control (OWNER/ADMIN can manage)
-     - Export/import templates (JSON format)
+
+- **Prisma Schema Addition**
+
+  ```typescript
+  model LabelTemplate {
+    id              String   @id @default(cuid())
+    name            String
+    description     String?
+    organizationId  String
+    organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    createdBy       String
+    creator         User     @relation(fields: [createdBy], references: [id])
+    width           Float    // in mm
+    height          Float    // in mm
+    unit            String   @default("mm") // mm, cm, inch
+    dpi             Int      @default(203)
+    designData      Json     // Canvas JSON with elements
+    isDefault       Boolean  @default(false)
+    category        String?  // "Shipping", "Product", "Asset", "Compliance"
+    tags            String[] // ["warehouse", "thermal", "barcode"]
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+
+    printJobs       PrintJob[]
+
+    @@index([organizationId])
+    @@index([createdBy])
+  }
+
+  model PrintJob {
+    id              String   @id @default(cuid())
+    templateId      String
+    template        LabelTemplate @relation(fields: [templateId], references: [id])
+    organizationId  String
+    organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+    createdBy       String
+    creator         User     @relation(fields: [createdBy], references: [id])
+    status          String   @default("pending") // pending, processing, completed, failed
+    format          String   // "PDF", "ZPL", "PNG", "JPG"
+    printerName     String?
+    printerId       String?  // PrintNode printer ID
+    quantity        Int      @default(1)
+    data            Json     // Data for label fields
+    outputUrl       String?  // URL to generated file
+    error           String?
+    metadata        Json?    // Additional tracking data
+    createdAt       DateTime @default(now())
+    completedAt     DateTime?
+
+    @@index([organizationId])
+    @@index([status])
+    @@index([createdBy])
+    @@index([createdAt])
+  }
+  ```
+
+- **Template Library Page** (`/dashboard/labels/templates`)
+  - Grid view with template thumbnails
+  - Search, filter by category/tags
+  - Duplicate, edit, delete templates
+  - Set default template per category
+  - Role-based access control (OWNER/ADMIN can manage)
+  - Export/import templates (JSON format)
 
 #### 3. **Print Generation Engine** (4-5 hours)
-   - **PDF Generation**
-     - Install `pdfkit` or use existing `jsPDF`
-     - Render canvas design to PDF
-     - Support for embedded fonts
-     - Generate barcodes with `jsbarcode` library
-     - Generate QR codes with `qrcode` library
-   
-   - **ZPL Generation** (for Zebra thermal printers)
-     - Install `zpl-image` package
-     - Convert canvas to ZPL commands
-     - ZPL barcode commands (^BC for Code128, ^BQ for QR)
-     - ZPL text formatting (^A for fonts, ^FD for data)
-   
-   - **Image Export (PNG/JPG)**
-     - Use `html2canvas` or canvas `toDataURL()`
-     - High-resolution export (300+ DPI)
-     - Batch image generation
+
+- **PDF Generation**
+  - Install `pdfkit` or use existing `jsPDF`
+  - Render canvas design to PDF
+  - Support for embedded fonts
+  - Generate barcodes with `jsbarcode` library
+  - Generate QR codes with `qrcode` library
+
+- **ZPL Generation** (for Zebra thermal printers)
+  - Install `zpl-image` package
+  - Convert canvas to ZPL commands
+  - ZPL barcode commands (^BC for Code128, ^BQ for QR)
+  - ZPL text formatting (^A for fonts, ^FD for data)
+
+- **Image Export (PNG/JPG)**
+  - Use `html2canvas` or canvas `toDataURL()`
+  - High-resolution export (300+ DPI)
+  - Batch image generation
 
 #### 4. **Print Job Manager & Queue** (3-4 hours)
-   - **Print Queue System**
-     - Create `/dashboard/labels/print-queue` page
-     - Real-time status updates (pending, processing, completed, failed)
-     - Retry failed jobs
-     - Cancel pending jobs
-     - Batch operations (cancel all, retry all)
-   
-   - **Printer Integration**
-     - **Option 1: PrintNode API** (Cloud printing)
-       - Install `printnode` SDK
-       - Create `lib/print-node.ts`
-       - List available printers
-       - Submit print jobs
-       - Track job status via webhooks
-     
-     - **Option 2: Google Cloud Print** (Deprecated, but alternative)
-       - Use CUPS (Common Unix Printing System) for local printers
-     
-     - **Option 3: Zebra Browser Print SDK** (Direct browser printing)
-       - Install Zebra Browser Print on client machines
-       - Send ZPL directly to local Zebra printers
-   
-   - **Printer Management Page** (`/dashboard/settings/printers`)
-     - Add/remove printers
-     - Set default printer per label type
-     - Test print functionality
-     - Printer status monitoring
-     - Print history and analytics
+
+- **Print Queue System**
+  - Create `/dashboard/labels/print-queue` page
+  - Real-time status updates (pending, processing, completed, failed)
+  - Retry failed jobs
+  - Cancel pending jobs
+  - Batch operations (cancel all, retry all)
+
+- **Printer Integration**
+  - **Option 1: PrintNode API** (Cloud printing)
+    - Install `printnode` SDK
+    - Create `lib/print-node.ts`
+    - List available printers
+    - Submit print jobs
+    - Track job status via webhooks
+  - **Option 2: Google Cloud Print** (Deprecated, but alternative)
+    - Use CUPS (Common Unix Printing System) for local printers
+  - **Option 3: Zebra Browser Print SDK** (Direct browser printing)
+    - Install Zebra Browser Print on client machines
+    - Send ZPL directly to local Zebra printers
+
+- **Printer Management Page** (`/dashboard/settings/printers`)
+  - Add/remove printers
+  - Set default printer per label type
+  - Test print functionality
+  - Printer status monitoring
+  - Print history and analytics
 
 #### 5. **Print Workflows** (2-3 hours)
-   - **Single Item Print**
-     - From inventory detail page → "Print Label" button
-     - Auto-select template (or let user choose)
-     - Preview label with live data
-     - Send to printer or download
-   
-   - **Batch Printing**
-     - Select multiple inventory items
-     - Choose template
-     - Print all in sequence or as single PDF
-     - Progress indicator for batch jobs
-   
-   - **Scan-to-Print Mobile Flow**
-     - Mobile-optimized page at `/dashboard/labels/mobile`
-     - Camera barcode scanner (use `@zxing/library`)
-     - Scan SKU or PO barcode
-     - Auto-fetch item/order data
-     - One-tap print to default printer
-     - Toast notification with status
+
+- **Single Item Print**
+  - From inventory detail page → "Print Label" button
+  - Auto-select template (or let user choose)
+  - Preview label with live data
+  - Send to printer or download
+
+- **Batch Printing**
+  - Select multiple inventory items
+  - Choose template
+  - Print all in sequence or as single PDF
+  - Progress indicator for batch jobs
+
+- **Scan-to-Print Mobile Flow**
+  - Mobile-optimized page at `/dashboard/labels/mobile`
+  - Camera barcode scanner (use `@zxing/library`)
+  - Scan SKU or PO barcode
+  - Auto-fetch item/order data
+  - One-tap print to default printer
+  - Toast notification with status
 
 #### 6. **Advanced Features** (3-4 hours)
-   - **AI-Assisted Layout Suggestions**
-     - Analyze label content and suggest optimal layouts
-     - Auto-resize elements to fit label dimensions
-     - Font size recommendations for readability
-     - Color contrast checker for barcode readability
-   
-   - **Conditional Logic**
-     - Show/hide fields based on conditions
-     - Example: Show "FRAGILE" only if `item.fragile === true`
-     - Color-coded priority labels (red for urgent)
-     - Dynamic QR code content based on item type
-   
-   - **Multi-Language Support**
-     - Template field translations
-     - Language selector in designer
-     - RTL (right-to-left) support for Arabic/Hebrew
-   
-   - **Document Generation Beyond Labels**
-     - **Goods Received Notes (GRN)**
-       - Template for incoming shipments
-       - Line items table with quantities
-       - Signature fields
-     - **Packing Slips**
-       - Order summary with items
-       - Shipping address
-       - Tracking number
-     - **Invoices**
-       - Professional invoice templates
-       - Line items, taxes, totals
-       - Payment terms
-     - **Asset Tags**
-       - Equipment tracking labels
-       - Maintenance schedules
-       - QR code for asset lookup
+
+- **AI-Assisted Layout Suggestions**
+  - Analyze label content and suggest optimal layouts
+  - Auto-resize elements to fit label dimensions
+  - Font size recommendations for readability
+  - Color contrast checker for barcode readability
+
+- **Conditional Logic**
+  - Show/hide fields based on conditions
+  - Example: Show "FRAGILE" only if `item.fragile === true`
+  - Color-coded priority labels (red for urgent)
+  - Dynamic QR code content based on item type
+
+- **Multi-Language Support**
+  - Template field translations
+  - Language selector in designer
+  - RTL (right-to-left) support for Arabic/Hebrew
+
+- **Document Generation Beyond Labels**
+  - **Goods Received Notes (GRN)**
+    - Template for incoming shipments
+    - Line items table with quantities
+    - Signature fields
+  - **Packing Slips**
+    - Order summary with items
+    - Shipping address
+    - Tracking number
+  - **Invoices**
+    - Professional invoice templates
+    - Line items, taxes, totals
+    - Payment terms
+  - **Asset Tags**
+    - Equipment tracking labels
+    - Maintenance schedules
+    - QR code for asset lookup
 
 #### 7. **Dispatch & Logistics Module** (Optional - 4-5 hours)
-   - **Driver App** (`/dashboard/dispatch/driver`)
-     - Mobile-first interface
-     - View assigned deliveries
-     - Scan packages at pickup/delivery
-     - Capture signature on delivery
-     - GPS tracking and route optimization
-     - Proof of Delivery (POD) with photo
-   
-   - **Dispatch Dashboard** (`/dashboard/dispatch`)
-     - Create delivery orders
-     - Assign drivers
-     - Track deliveries in real-time
-     - View delivery history
-     - Performance analytics (on-time %, average time)
+
+- **Driver App** (`/dashboard/dispatch/driver`)
+  - Mobile-first interface
+  - View assigned deliveries
+  - Scan packages at pickup/delivery
+  - Capture signature on delivery
+  - GPS tracking and route optimization
+  - Proof of Delivery (POD) with photo
+
+- **Dispatch Dashboard** (`/dashboard/dispatch`)
+  - Create delivery orders
+  - Assign drivers
+  - Track deliveries in real-time
+  - View delivery history
+  - Performance analytics (on-time %, average time)
 
 #### 8. **Returns & Reverse Logistics** (Optional - 2-3 hours)
-   - **Returns Management** (`/dashboard/returns`)
-     - Create return authorization (RMA)
-     - Generate return labels
-     - Track return shipments
-     - Quality inspection workflow
-     - Restock or dispose logic
-     - Refund/credit processing
+
+- **Returns Management** (`/dashboard/returns`)
+  - Create return authorization (RMA)
+  - Generate return labels
+  - Track return shipments
+  - Quality inspection workflow
+  - Restock or dispose logic
+  - Refund/credit processing
 
 #### 9. **Testing & Quality Control** (Optional - 2-3 hours)
-   - **Quality Check Workflow** (`/dashboard/quality`)
-     - Inspection checklists
-     - Pass/fail criteria
-     - Photo documentation
-     - Defect categorization
-     - Quarantine management
-     - Reports and analytics
+
+- **Quality Check Workflow** (`/dashboard/quality`)
+  - Inspection checklists
+  - Pass/fail criteria
+  - Photo documentation
+  - Defect categorization
+  - Quarantine management
+  - Reports and analytics
 
 **Tech Stack:**
+
 - **Frontend:** React + TypeScript, `react-konva` or `fabric.js` (canvas), `@zxing/library` (barcode scanning)
 - **Backend:** Next.js API routes, `pdfkit` (PDF), `zpl-image` (ZPL), `jsbarcode`, `qrcode`
 - **Database:** PostgreSQL + Prisma (LabelTemplate, PrintJob models)
@@ -831,6 +896,7 @@ A modular, intelligent solution for designing, managing, and printing labels wit
 - **Real-time:** Pusher or Socket.io (print job status updates)
 
 **Next Steps:**
+
 ```bash
 # Install required packages
 npm install react-konva fabric jsbarcode qrcode pdfkit zpl-image printnode @zxing/library
@@ -841,6 +907,7 @@ npx prisma migrate dev --name add_label_printing_system
 ```
 
 **API Endpoints:**
+
 - `POST /api/labels/templates` - Create template
 - `GET /api/labels/templates` - List templates
 - `PUT /api/labels/templates/:id` - Update template
@@ -853,6 +920,7 @@ npx prisma migrate dev --name add_label_printing_system
 - `POST /api/printers/test` - Test printer connection
 
 **Pages to Create:**
+
 - `/dashboard/labels` - Label management hub
 - `/dashboard/labels/designer` - Label designer
 - `/dashboard/labels/templates` - Template library
@@ -865,6 +933,7 @@ npx prisma migrate dev --name add_label_printing_system
 - `/dashboard/quality` - Quality control (optional)
 
 **Success Metrics:**
+
 - Print job success rate > 95%
 - Average print time < 3 seconds
 - Template creation time < 5 minutes
@@ -877,8 +946,9 @@ npx prisma migrate dev --name add_label_printing_system
 ## 📅 Recommended Execution Order
 
 ### Sprint 1: Performance & Security (Week 1)
+
 **Focus:** Critical infrastructure improvements  
-**Estimated Time:** 10-14 hours  
+**Estimated Time:** 10-14 hours
 
 1. **Phase 14: Database Optimization** (4-6 hours) - HIGH PRIORITY
    - Redis caching layer
@@ -893,6 +963,7 @@ npx prisma migrate dev --name add_label_printing_system
    - Security headers
 
 **Deliverables:**
+
 - Faster API responses (Redis caching)
 - Better security compliance
 - Audit trail for all operations
@@ -901,8 +972,9 @@ npx prisma migrate dev --name add_label_printing_system
 ---
 
 ### Sprint 2: Label Printing & Core Features (Week 2) ⭐ NEW
+
 **Focus:** Game-changing warehouse features  
-**Estimated Time:** 20-25 hours  
+**Estimated Time:** 20-25 hours
 
 3. **Phase 22: Label Template & Printing System** (20-25 hours) - HIGH PRIORITY
    - Drag-and-drop label designer (6-8 hours)
@@ -913,6 +985,7 @@ npx prisma migrate dev --name add_label_printing_system
    - Advanced features (AI suggestions, conditionals, multi-language) (3-4 hours)
 
 **Deliverables:**
+
 - Professional label designer with drag-and-drop
 - Dynamic field mapping from inventory/PO data
 - Multi-format export (PDF, ZPL, PNG, JPG)
@@ -925,8 +998,9 @@ npx prisma migrate dev --name add_label_printing_system
 ---
 
 ### Sprint 3: Integrations & Performance (Week 3)
+
 **Focus:** Enterprise features and optimization  
-**Estimated Time:** 13-17 hours  
+**Estimated Time:** 13-17 hours
 
 4. **Phase 16: Advanced Integration Wizards** (8-10 hours) - MEDIUM PRIORITY
    - Oracle integration wizard
@@ -942,6 +1016,7 @@ npx prisma migrate dev --name add_label_printing_system
    - Performance monitoring
 
 **Deliverables:**
+
 - Easy-to-use integration wizards
 - Real SDK implementations
 - Faster page loads
@@ -950,8 +1025,9 @@ npx prisma migrate dev --name add_label_printing_system
 ---
 
 ### Sprint 4: Content & Branding (Week 4)
+
 **Focus:** Marketing and customization  
-**Estimated Time:** 18-22 hours  
+**Estimated Time:** 18-22 hours
 
 6. **Phase 18: Advanced Blog System** (10-12 hours) - MEDIUM PRIORITY
    - MDX integration
@@ -966,6 +1042,7 @@ npx prisma migrate dev --name add_label_printing_system
    - Custom domain support
 
 **Deliverables:**
+
 - Professional blog for SEO
 - 10+ high-quality blog posts
 - Organization branding customization
@@ -974,8 +1051,9 @@ npx prisma migrate dev --name add_label_printing_system
 ---
 
 ### Sprint 5: Advanced Features (Week 5)
+
 **Focus:** AI and demo improvements  
-**Estimated Time:** 18-23 hours  
+**Estimated Time:** 18-23 hours
 
 8. **Phase 21: Professional Seeded Data** (6-8 hours) - MEDIUM PRIORITY
    - Realistic company data
@@ -990,6 +1068,7 @@ npx prisma migrate dev --name add_label_printing_system
    - Hallucination detection
 
 **Deliverables:**
+
 - Professional demo data
 - AI validation system
 - Better AI accuracy
@@ -998,8 +1077,9 @@ npx prisma migrate dev --name add_label_printing_system
 ---
 
 ### Optional Sprint 6: Logistics & Operations (Week 6)
+
 **Focus:** Extended warehouse operations  
-**Estimated Time:** 12-16 hours  
+**Estimated Time:** 12-16 hours
 
 10. **Phase 22 Extensions: Dispatch & Logistics** (4-5 hours) - OPTIONAL
     - Driver mobile app with GPS tracking
@@ -1020,6 +1100,7 @@ npx prisma migrate dev --name add_label_printing_system
     - Marketplace integrations (Shopify, Zapier)
 
 **Deliverables:**
+
 - Complete dispatch system
 - Driver mobile app
 - Returns processing
@@ -1062,13 +1143,14 @@ npx prisma migrate dev --name add_label_printing_system
 ✅ **Multi-tenant with zero trust** - Implemented  
 ✅ **Data isolation** - Complete  
 ❌ **Organisation branding** - Not implemented (Phase 19)  
-✅ **Dark mode** - ThemeProvider exists  
+✅ **Dark mode** - ThemeProvider exists
 
 **Original Requirements: 23/30 complete (77%)**
 
 ### NEW Enterprise Features Added
 
 🆕 **Label Template & Printing System** - Game-changing warehouse feature (Phase 22)
+
 - Drag-and-drop label designer with dynamic fields
 - Multi-format export (PDF, ZPL, PNG, JPG)
 - Cloud and local printer integration
@@ -1086,6 +1168,7 @@ npx prisma migrate dev --name add_label_printing_system
 ### Feature Breakdown by Category
 
 **✅ Core Inventory Management (100%)**
+
 - Inventory CRUD operations
 - Stock tracking and alerts
 - SKU management
@@ -1095,6 +1178,7 @@ npx prisma migrate dev --name add_label_printing_system
 - CSV import/export
 
 **✅ Multi-Tenant & Security (90%)**
+
 - Multi-tenant architecture
 - RBAC (OWNER, ADMIN, MEMBER)
 - Zero-trust security
@@ -1105,6 +1189,7 @@ npx prisma migrate dev --name add_label_printing_system
 - ⏳ Rate limiting (pending Phase 15)
 
 **✅ Analytics & Reporting (100%)**
+
 - Real-time dashboard
 - Recharts visualizations
 - PDF export (jsPDF)
@@ -1114,12 +1199,14 @@ npx prisma migrate dev --name add_label_printing_system
 - Booking trends
 
 **✅ Integrations (50%)**
+
 - RESTful API endpoints
 - Webhook system (SHA-256/HMAC)
 - API key management
 - ⏳ Oracle/SAP/NetSuite/QuickBooks wizards (pending Phase 16)
 
 **✅ PWA & Mobile (100%)**
+
 - Progressive Web App
 - Service workers
 - Offline sync with IndexedDB
@@ -1128,6 +1215,7 @@ npx prisma migrate dev --name add_label_printing_system
 - Background sync
 
 **✅ Testing & CI/CD (100%)**
+
 - Jest + React Testing Library
 - Playwright E2E tests
 - 10/10 tests passing
@@ -1135,6 +1223,7 @@ npx prisma migrate dev --name add_label_printing_system
 - Test coverage 70%+
 
 **✅ Marketing & Landing (90%)**
+
 - Enterprise landing page
 - Sticky navigation
 - All marketing pages
@@ -1142,6 +1231,7 @@ npx prisma migrate dev --name add_label_printing_system
 - ⏳ Blog CMS (pending Phase 18)
 
 **⏳ Performance (40%)**
+
 - Next.js 14 optimization
 - Code splitting
 - ⏳ Redis caching (pending Phase 14)
@@ -1149,6 +1239,7 @@ npx prisma migrate dev --name add_label_printing_system
 - ⏳ Bundle optimization (pending Phase 17)
 
 **🆕 Warehouse Operations (0% - NEW)**
+
 - ⏳ Label designer (pending Phase 22)
 - ⏳ Print management (pending Phase 22)
 - ⏳ Dispatch system (pending Phase 22 optional)
@@ -1176,7 +1267,7 @@ Each phase is considered complete when:
 
 - **Current Token Budget:** 1,000,000 tokens available
 - **Test Coverage Goal:** 70% minimum (configured in jest.config.js)
-- **Performance Budget:** 
+- **Performance Budget:**
   - LCP (Largest Contentful Paint) < 2.5s
   - FID (First Input Delay) < 100ms
   - CLS (Cumulative Layout Shift) < 0.1

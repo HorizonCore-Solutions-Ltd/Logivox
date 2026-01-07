@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
   Check,
   ArrowRight,
   Star,
@@ -19,21 +25,23 @@ import {
   Clock,
   X,
   Calendar,
-  Video
-} from "lucide-react"
+  Video,
+} from "lucide-react";
 
 export function PricingSection() {
-  const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">("monthly")
-  
+  const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">(
+    "monthly",
+  );
+
   const getPrice = (monthlyPrice: string) => {
-    if (monthlyPrice === "Custom") return "Custom"
-    const price = parseInt(monthlyPrice.replace("$", ""))
+    if (monthlyPrice === "Custom") return "Custom";
+    const price = parseInt(monthlyPrice.replace("$", ""));
     if (billingCycle === "annual") {
-      const annualPrice = Math.floor(price * 0.8) // 20% discount
-      return `$${annualPrice}`
+      const annualPrice = Math.floor(price * 0.8); // 20% discount
+      return `$${annualPrice}`;
     }
-    return monthlyPrice
-  }
+    return monthlyPrice;
+  };
 
   const plans = [
     {
@@ -49,11 +57,11 @@ export function PricingSection() {
         "Order management",
         "Mobile app with barcode scanning",
         "Email support",
-        "Basic reporting"
+        "Basic reporting",
       ],
       cta: "Start Free 30-Day Trial",
       ctaVariant: "outline" as const,
-      popular: false
+      popular: false,
     },
     {
       name: "Professional",
@@ -71,11 +79,11 @@ export function PricingSection() {
         "Advanced analytics",
         "Returns management",
         "24/7 priority support",
-        "API access"
+        "API access",
       ],
       cta: "Start Free 30-Day Trial",
       ctaVariant: "default" as const,
-      popular: true
+      popular: true,
     },
     {
       name: "Enterprise",
@@ -96,68 +104,203 @@ export function PricingSection() {
         "Custom SLAs",
         "White-label solution",
         "99.99% uptime SLA",
-        "Custom SLA agreements"
+        "Custom SLA agreements",
       ],
       cta: "Contact Sales",
       ctaVariant: "outline" as const,
-      popular: false
-    }
-  ]
+      popular: false,
+    },
+  ];
 
   const comparisonFeatures = [
     {
       category: "Core Features",
       features: [
-        { name: "Warehouse Locations", starter: "1", professional: "Up to 5", enterprise: "Unlimited" },
-        { name: "SKU Limit", starter: "10,000", professional: "Unlimited", enterprise: "Unlimited" },
-        { name: "Users", starter: "Unlimited", professional: "Unlimited", enterprise: "Unlimited" },
-        { name: "Mobile App", starter: true, professional: true, enterprise: true },
-        { name: "Barcode Scanning", starter: true, professional: true, enterprise: true },
-      ]
+        {
+          name: "Warehouse Locations",
+          starter: "1",
+          professional: "Up to 5",
+          enterprise: "Unlimited",
+        },
+        {
+          name: "SKU Limit",
+          starter: "10,000",
+          professional: "Unlimited",
+          enterprise: "Unlimited",
+        },
+        {
+          name: "Users",
+          starter: "Unlimited",
+          professional: "Unlimited",
+          enterprise: "Unlimited",
+        },
+        {
+          name: "Mobile App",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Barcode Scanning",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+      ],
     },
     {
       category: "Warehouse Operations",
       features: [
-        { name: "Basic Inventory Tracking", starter: true, professional: true, enterprise: true },
-        { name: "Wave & Batch Picking", starter: false, professional: true, enterprise: true },
-        { name: "Quality Control", starter: false, professional: true, enterprise: true },
-        { name: "Returns Management", starter: false, professional: true, enterprise: true },
-        { name: "Assembly & Kitting", starter: false, professional: false, enterprise: true },
-        { name: "Cross-Docking", starter: false, professional: false, enterprise: true },
-        { name: "Cycle Counting", starter: false, professional: true, enterprise: true },
-      ]
+        {
+          name: "Basic Inventory Tracking",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Wave & Batch Picking",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Quality Control",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Returns Management",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Assembly & Kitting",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Cross-Docking",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Cycle Counting",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+      ],
     },
     {
       category: "Advanced Features",
       features: [
-        { name: "Voice-Enabled Operations", starter: false, professional: true, enterprise: true },
-        { name: "AI-Powered Forecasting", starter: false, professional: false, enterprise: true },
-        { name: "Yard Management", starter: false, professional: false, enterprise: true },
-        { name: "Gate & Security", starter: false, professional: false, enterprise: true },
-        { name: "Transportation Management", starter: false, professional: false, enterprise: true },
-      ]
+        {
+          name: "Voice-Enabled Operations",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "AI-Powered Forecasting",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Yard Management",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Gate & Security",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Transportation Management",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+      ],
     },
     {
       category: "Integrations",
       features: [
-        { name: "E-commerce Platform Sync", starter: false, professional: true, enterprise: true },
-        { name: "Built-in Carrier Integration", starter: false, professional: true, enterprise: true },
-        { name: "ERP System Integration", starter: false, professional: false, enterprise: true },
-        { name: "API Access", starter: false, professional: true, enterprise: true },
-        { name: "Custom Integrations", starter: false, professional: false, enterprise: true },
-      ]
+        {
+          name: "E-commerce Platform Sync",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Built-in Carrier Integration",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "ERP System Integration",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "API Access",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Custom Integrations",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+      ],
     },
     {
       category: "Support & Security",
       features: [
-        { name: "Email Support", starter: true, professional: true, enterprise: true },
-        { name: "24/7 Priority Support", starter: false, professional: true, enterprise: true },
-        { name: "Dedicated Success Manager", starter: false, professional: false, enterprise: true },
-        { name: "SSO & Advanced Security", starter: false, professional: false, enterprise: true },
-        { name: "99.99% Uptime SLA", starter: false, professional: false, enterprise: true },
-      ]
-    }
-  ]
+        {
+          name: "Email Support",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "24/7 Priority Support",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Dedicated Success Manager",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "SSO & Advanced Security",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "99.99% Uptime SLA",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+      ],
+    },
+  ];
 
   const addOns = [
     {
@@ -168,19 +311,19 @@ export function PricingSection() {
         "Custom label templates",
         "Barcode generation",
         "Thermal printer support",
-        "QR code support"
-      ]
+        "QR code support",
+      ],
     },
     {
       name: "Advanced Analytics",
       description: "Demand forecasting and inventory optimization",
-      price: "$30/user/month", 
+      price: "$30/user/month",
       features: [
         "AI-powered forecasting",
         "ABC/XYZ analysis",
         "Inventory optimization",
-        "Custom dashboards"
-      ]
+        "Custom dashboards",
+      ],
     },
     {
       name: "Professional Services",
@@ -190,29 +333,33 @@ export function PricingSection() {
         "Warehouse setup assistance",
         "Data migration",
         "Staff training",
-        "Process optimization"
-      ]
-    }
-  ]
+        "Process optimization",
+      ],
+    },
+  ];
 
   const faqs = [
     {
       question: "Can I change plans at any time?",
-      answer: "Yes, you can upgrade or downgrade your plan at any time. Changes will be prorated and reflected in your next billing cycle."
+      answer:
+        "Yes, you can upgrade or downgrade your plan at any time. Changes will be prorated and reflected in your next billing cycle.",
     },
     {
       question: "Is there a free trial?",
-      answer: "We offer a 14-day free trial for all plans. No credit card required to get started."
+      answer:
+        "We offer a 14-day free trial for all plans. No credit card required to get started.",
     },
     {
       question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards, ACH transfers, and can arrange annual invoicing for enterprise customers."
+      answer:
+        "We accept all major credit cards, ACH transfers, and can arrange annual invoicing for enterprise customers.",
     },
     {
       question: "Do you offer discounts for annual billing?",
-      answer: "Yes, we offer a 20% discount when you pay annually. Enterprise customers can also qualify for volume discounts."
-    }
-  ]
+      answer:
+        "Yes, we offer a 20% discount when you pay annually. Enterprise customers can also qualify for volume discounts.",
+    },
+  ];
 
   return (
     <section className="py-24">
@@ -229,8 +376,8 @@ export function PricingSection() {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Choose the perfect plan for your organization. Start with our 14-day free trial 
-            and scale as you grow. No hidden fees, cancel anytime.
+            Choose the perfect plan for your organization. Start with our 14-day
+            free trial and scale as you grow. No hidden fees, cancel anytime.
           </p>
 
           {/* Billing cycle toggle */}
@@ -249,7 +396,9 @@ export function PricingSection() {
               className="relative"
             >
               Annual
-              <Badge className="absolute -top-2 -right-2 bg-green-500">Save 20%</Badge>
+              <Badge className="absolute -top-2 -right-2 bg-green-500">
+                Save 20%
+              </Badge>
             </Button>
           </div>
         </div>
@@ -257,11 +406,11 @@ export function PricingSection() {
         {/* Pricing cards */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
           {plans.map((plan) => (
-            <Card 
-              key={plan.name} 
+            <Card
+              key={plan.name}
               className={`relative ${
-                plan.popular 
-                  ? "border-primary shadow-xl scale-105" 
+                plan.popular
+                  ? "border-primary shadow-xl scale-105"
                   : "hover:shadow-lg"
               } transition-all`}
             >
@@ -273,7 +422,7 @@ export function PricingSection() {
                   </Badge>
                 </div>
               )}
-              
+
               <CardHeader className="text-center pb-8">
                 <CardTitle className="text-2xl">{plan.name}</CardTitle>
                 <CardDescription className="text-base">
@@ -290,11 +439,12 @@ export function PricingSection() {
                       </span>
                     )}
                   </div>
-                  {billingCycle === "annual" && plan.monthlyPrice !== "Custom" && (
-                    <p className="text-sm text-green-600 mt-2">
-                      Billed annually • Save 20%
-                    </p>
-                  )}
+                  {billingCycle === "annual" &&
+                    plan.monthlyPrice !== "Custom" && (
+                      <p className="text-sm text-green-600 mt-2">
+                        Billed annually • Save 20%
+                      </p>
+                    )}
                 </div>
               </CardHeader>
 
@@ -308,13 +458,15 @@ export function PricingSection() {
                   ))}
                 </ul>
 
-                <Button 
-                  variant={plan.ctaVariant} 
-                  className="w-full" 
+                <Button
+                  variant={plan.ctaVariant}
+                  className="w-full"
                   size="lg"
                   asChild
                 >
-                  <Link href={plan.name === "Enterprise" ? "/contact" : "/sign-up"}>
+                  <Link
+                    href={plan.name === "Enterprise" ? "/contact" : "/sign-up"}
+                  >
                     {plan.cta}
                     {plan.name !== "Enterprise" && (
                       <ArrowRight className="ml-2 h-4 w-4" />
@@ -329,7 +481,9 @@ export function PricingSection() {
         {/* Feature Comparison Table */}
         <div className="mb-20">
           <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold mb-4">Detailed Feature Comparison</h3>
+            <h3 className="text-3xl font-bold mb-4">
+              Detailed Feature Comparison
+            </h3>
             <p className="text-muted-foreground text-lg">
               Compare all features across our plans
             </p>
@@ -341,7 +495,9 @@ export function PricingSection() {
                 <tr className="border-b">
                   <th className="text-left p-4 font-semibold">Feature</th>
                   <th className="text-center p-4 font-semibold">Starter</th>
-                  <th className="text-center p-4 font-semibold bg-primary/5">Professional</th>
+                  <th className="text-center p-4 font-semibold bg-primary/5">
+                    Professional
+                  </th>
                   <th className="text-center p-4 font-semibold">Enterprise</th>
                 </tr>
               </thead>
@@ -349,12 +505,18 @@ export function PricingSection() {
                 {comparisonFeatures.map((category) => (
                   <React.Fragment key={category.category}>
                     <tr className="bg-muted/50">
-                      <td colSpan={4} className="p-4 font-semibold text-sm uppercase tracking-wide">
+                      <td
+                        colSpan={4}
+                        className="p-4 font-semibold text-sm uppercase tracking-wide"
+                      >
                         {category.category}
                       </td>
                     </tr>
                     {category.features.map((feature, idx) => (
-                      <tr key={idx} className="border-b hover:bg-muted/30 transition-colors">
+                      <tr
+                        key={idx}
+                        className="border-b hover:bg-muted/30 transition-colors"
+                      >
                         <td className="p-4">{feature.name}</td>
                         <td className="text-center p-4">
                           {typeof feature.starter === "boolean" ? (
@@ -375,7 +537,9 @@ export function PricingSection() {
                               <X className="h-5 w-5 text-muted-foreground mx-auto" />
                             )
                           ) : (
-                            <span className="text-sm font-medium">{feature.professional}</span>
+                            <span className="text-sm font-medium">
+                              {feature.professional}
+                            </span>
                           )}
                         </td>
                         <td className="text-center p-4">
@@ -386,7 +550,9 @@ export function PricingSection() {
                               <X className="h-5 w-5 text-muted-foreground mx-auto" />
                             )
                           ) : (
-                            <span className="text-sm">{feature.enterprise}</span>
+                            <span className="text-sm">
+                              {feature.enterprise}
+                            </span>
                           )}
                         </td>
                       </tr>
@@ -409,7 +575,10 @@ export function PricingSection() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {addOns.map((addon) => (
-              <Card key={addon.name} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={addon.name}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{addon.name}</CardTitle>
@@ -420,7 +589,10 @@ export function PricingSection() {
                 <CardContent>
                   <ul className="space-y-2">
                     {addon.features.map((feature) => (
-                      <li key={feature} className="flex items-center space-x-2 text-sm">
+                      <li
+                        key={feature}
+                        className="flex items-center space-x-2 text-sm"
+                      >
                         <Check className="h-3 w-3 text-primary flex-shrink-0" />
                         <span>{feature}</span>
                       </li>
@@ -435,7 +607,9 @@ export function PricingSection() {
         {/* FAQ section */}
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold mb-4">Frequently Asked Questions</h3>
+            <h3 className="text-2xl font-bold mb-4">
+              Frequently Asked Questions
+            </h3>
             <p className="text-muted-foreground">
               Have questions? We have answers.
             </p>
@@ -479,19 +653,27 @@ export function PricingSection() {
               <ul className="space-y-2">
                 <li className="flex items-center space-x-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-sm">Explore features relevant to your business</span>
+                  <span className="text-sm">
+                    Explore features relevant to your business
+                  </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-sm">Ask questions about implementation</span>
+                  <span className="text-sm">
+                    Ask questions about implementation
+                  </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-sm">Discuss pricing and custom solutions</span>
+                  <span className="text-sm">
+                    Discuss pricing and custom solutions
+                  </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-sm">See a live warehouse workflow demonstration</span>
+                  <span className="text-sm">
+                    See a live warehouse workflow demonstration
+                  </span>
                 </li>
               </ul>
               <Button size="lg" className="w-full" asChild>
@@ -529,15 +711,21 @@ export function PricingSection() {
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-sm">Custom integrations with legacy systems</span>
+                  <span className="text-sm">
+                    Custom integrations with legacy systems
+                  </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-sm">Dedicated support and training</span>
+                  <span className="text-sm">
+                    Dedicated support and training
+                  </span>
                 </li>
                 <li className="flex items-center space-x-2">
                   <Check className="h-4 w-4 text-primary flex-shrink-0" />
-                  <span className="text-sm">Volume discounts and flexible contracts</span>
+                  <span className="text-sm">
+                    Volume discounts and flexible contracts
+                  </span>
                 </li>
               </ul>
               <div className="flex gap-3">
@@ -559,5 +747,5 @@ export function PricingSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

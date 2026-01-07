@@ -8,7 +8,9 @@ const updateBOMSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().optional(),
   version: z.string().optional(),
-  bomType: z.enum(['ASSEMBLY', 'DISASSEMBLY', 'KIT', 'RECIPE', 'CONFIGURATION']).optional(),
+  bomType: z
+    .enum(["ASSEMBLY", "DISASSEMBLY", "KIT", "RECIPE", "CONFIGURATION"])
+    .optional(),
   isActive: z.boolean().optional(),
   isDefault: z.boolean().optional(),
   estimatedTime: z.number().int().optional(),
@@ -22,7 +24,7 @@ const updateBOMSchema = z.object({
 // GET /api/boms/[id] - Get BOM details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,7 +59,7 @@ export async function GET(
               },
             },
           },
-          orderBy: { sequence: 'asc' },
+          orderBy: { sequence: "asc" },
         },
         approvedBy: {
           select: {
@@ -75,26 +77,20 @@ export async function GET(
     });
 
     if (!bom) {
-      return NextResponse.json(
-        { error: "BOM not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "BOM not found" }, { status: 404 });
     }
 
     return NextResponse.json(bom);
   } catch (error) {
     console.error("Error fetching BOM:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch BOM" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch BOM" }, { status: 500 });
   }
 }
 
 // PATCH /api/boms/[id] - Update BOM
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -107,19 +103,20 @@ export async function PATCH(
 
     // Check if BOM is used in any assembly orders
     const usageCount = await prisma.assemblyOrder.count({
-      where: { 
+      where: {
         bomId: params.id,
-        status: { in: ['PENDING', 'READY', 'IN_PROGRESS'] }
+        status: { in: ["PENDING", "READY", "IN_PROGRESS"] },
       },
     });
 
     if (usageCount > 0) {
       return NextResponse.json(
-        { 
-          error: "Cannot modify BOM that is being used in active assembly orders",
+        {
+          error:
+            "Cannot modify BOM that is being used in active assembly orders",
           activeOrders: usageCount,
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -132,7 +129,7 @@ export async function PATCH(
           include: {
             component: true,
           },
-          orderBy: { sequence: 'asc' },
+          orderBy: { sequence: "asc" },
         },
       },
     });
@@ -142,14 +139,14 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error updating BOM:", error);
     return NextResponse.json(
       { error: "Failed to update BOM" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -157,7 +154,7 @@ export async function PATCH(
 // DELETE /api/boms/[id] - Delete BOM
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -172,11 +169,11 @@ export async function DELETE(
 
     if (orderCount > 0) {
       return NextResponse.json(
-        { 
+        {
           error: "Cannot delete BOM that has been used in assembly orders",
           orderCount,
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -189,7 +186,7 @@ export async function DELETE(
     console.error("Error deleting BOM:", error);
     return NextResponse.json(
       { error: "Failed to delete BOM" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

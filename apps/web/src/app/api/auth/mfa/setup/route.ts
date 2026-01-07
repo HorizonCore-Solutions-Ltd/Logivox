@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import MFAService from '@/lib/services/mfa-service';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import MFAService from "@/lib/services/mfa-service";
 
 /**
  * GET /api/auth/mfa/setup
@@ -13,10 +13,7 @@ export async function GET(req: NextRequest) {
     // Check if user is authenticated
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get user from database
@@ -31,17 +28,14 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Check if MFA is already enabled
     if (user.mfaEnabled) {
       return NextResponse.json(
-        { error: 'MFA is already enabled for this account' },
-        { status: 400 }
+        { error: "MFA is already enabled for this account" },
+        { status: 400 },
       );
     }
 
@@ -49,12 +43,12 @@ export async function GET(req: NextRequest) {
     const setupData = await MFAService.generateMFASetup(
       user.id,
       user.email!,
-      'LogiVox WMS'
+      "LogiVox WMS",
     );
 
     // Hash backup codes for storage
     const hashedBackupCodes = await MFAService.hashBackupCodes(
-      setupData.backupCodes
+      setupData.backupCodes,
     );
 
     // Store secret and backup codes (temporarily, until verified)
@@ -73,10 +67,10 @@ export async function GET(req: NextRequest) {
       secret: setupData.secret, // For manual entry if QR code doesn't work
     });
   } catch (error: any) {
-    console.error('Error generating MFA setup:', error);
+    console.error("Error generating MFA setup:", error);
     return NextResponse.json(
-      { error: 'Failed to generate MFA setup' },
-      { status: 500 }
+      { error: "Failed to generate MFA setup" },
+      { status: 500 },
     );
   }
 }
@@ -90,19 +84,16 @@ export async function POST(req: NextRequest) {
     // Check if user is authenticated
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Parse request body
     const { token } = await req.json();
 
-    if (!token || typeof token !== 'string') {
+    if (!token || typeof token !== "string") {
       return NextResponse.json(
-        { error: 'Verification code is required' },
-        { status: 400 }
+        { error: "Verification code is required" },
+        { status: 400 },
       );
     }
 
@@ -119,8 +110,8 @@ export async function POST(req: NextRequest) {
 
     if (!user || !user.mfaSecret) {
       return NextResponse.json(
-        { error: 'MFA setup not initiated. Please start setup first.' },
-        { status: 400 }
+        { error: "MFA setup not initiated. Please start setup first." },
+        { status: 400 },
       );
     }
 
@@ -129,8 +120,8 @@ export async function POST(req: NextRequest) {
 
     if (!isValid) {
       return NextResponse.json(
-        { error: 'Invalid verification code. Please try again.' },
-        { status: 400 }
+        { error: "Invalid verification code. Please try again." },
+        { status: 400 },
       );
     }
 
@@ -147,27 +138,30 @@ export async function POST(req: NextRequest) {
     await prisma.activityLog.create({
       data: {
         userId: user.id,
-        action: 'SECURITY_MFA_ENABLED',
-        entityType: 'User',
+        action: "SECURITY_MFA_ENABLED",
+        entityType: "User",
         entityId: user.id,
         details: {
-          method: 'TOTP',
+          method: "TOTP",
           verifiedAt: new Date().toISOString(),
         },
-        ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown',
-        userAgent: req.headers.get('user-agent') || 'unknown',
+        ipAddress:
+          req.headers.get("x-forwarded-for") ||
+          req.headers.get("x-real-ip") ||
+          "unknown",
+        userAgent: req.headers.get("user-agent") || "unknown",
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'MFA enabled successfully',
+      message: "MFA enabled successfully",
     });
   } catch (error: any) {
-    console.error('Error enabling MFA:', error);
+    console.error("Error enabling MFA:", error);
     return NextResponse.json(
-      { error: 'Failed to enable MFA' },
-      { status: 500 }
+      { error: "Failed to enable MFA" },
+      { status: 500 },
     );
   }
 }
@@ -181,10 +175,7 @@ export async function DELETE(req: NextRequest) {
     // Check if user is authenticated
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Parse request body
@@ -192,8 +183,8 @@ export async function DELETE(req: NextRequest) {
 
     if (!password) {
       return NextResponse.json(
-        { error: 'Password is required to disable MFA' },
-        { status: 400 }
+        { error: "Password is required to disable MFA" },
+        { status: 400 },
       );
     }
 
@@ -210,37 +201,31 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Verify password
-    const bcrypt = require('bcrypt');
+    const bcrypt = require("bcrypt");
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {
-      return NextResponse.json(
-        { error: 'Invalid password' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
     }
 
     // If MFA is currently enabled, require MFA token as well
     if (user.mfaEnabled && user.mfaSecret) {
       if (!token) {
         return NextResponse.json(
-          { error: 'MFA verification code is required' },
-          { status: 400 }
+          { error: "MFA verification code is required" },
+          { status: 400 },
         );
       }
 
       const isValidToken = MFAService.verifyMFACode(user.mfaSecret, token);
       if (!isValidToken) {
         return NextResponse.json(
-          { error: 'Invalid MFA code' },
-          { status: 400 }
+          { error: "Invalid MFA code" },
+          { status: 400 },
         );
       }
     }
@@ -260,26 +245,29 @@ export async function DELETE(req: NextRequest) {
     await prisma.activityLog.create({
       data: {
         userId: user.id,
-        action: 'SECURITY_MFA_DISABLED',
-        entityType: 'User',
+        action: "SECURITY_MFA_DISABLED",
+        entityType: "User",
         entityId: user.id,
         details: {
           disabledAt: new Date().toISOString(),
         },
-        ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown',
-        userAgent: req.headers.get('user-agent') || 'unknown',
+        ipAddress:
+          req.headers.get("x-forwarded-for") ||
+          req.headers.get("x-real-ip") ||
+          "unknown",
+        userAgent: req.headers.get("user-agent") || "unknown",
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'MFA disabled successfully',
+      message: "MFA disabled successfully",
     });
   } catch (error: any) {
-    console.error('Error disabling MFA:', error);
+    console.error("Error disabling MFA:", error);
     return NextResponse.json(
-      { error: 'Failed to disable MFA' },
-      { status: 500 }
+      { error: "Failed to disable MFA" },
+      { status: 500 },
     );
   }
 }

@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,16 +12,13 @@ import { Prisma } from "@prisma/client";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const shipmentId = params.id;
@@ -32,15 +29,15 @@ export async function GET(
       include: {
         organizationMemberships: {
           where: { isActive: true },
-          include: { organization: true }
-        }
-      }
+          include: { organization: true },
+        },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -50,7 +47,7 @@ export async function GET(
     const shipment = await prisma.shipment.findFirst({
       where: {
         id: shipmentId,
-        organizationId
+        organizationId,
       },
       include: {
         salesOrder: {
@@ -61,8 +58,8 @@ export async function GET(
                 name: true,
                 code: true,
                 email: true,
-                phone: true
-              }
+                phone: true,
+              },
             },
             items: {
               include: {
@@ -70,12 +67,12 @@ export async function GET(
                   select: {
                     id: true,
                     name: true,
-                    sku: true
-                  }
-                }
-              }
-            }
-          }
+                    sku: true,
+                  },
+                },
+              },
+            },
+          },
         },
         pack: {
           include: {
@@ -87,39 +84,38 @@ export async function GET(
                       select: {
                         id: true,
                         name: true,
-                        sku: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+                        sku: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
         createdBy: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     });
 
     if (!shipment) {
       return NextResponse.json(
         { error: "Shipment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json(shipment);
-
   } catch (error: any) {
     console.error("Error fetching shipment:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch shipment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -131,16 +127,13 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const shipmentId = params.id;
@@ -152,15 +145,15 @@ export async function PUT(
       include: {
         organizationMemberships: {
           where: { isActive: true },
-          include: { organization: true }
-        }
-      }
+          include: { organization: true },
+        },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -170,14 +163,14 @@ export async function PUT(
     const shipment = await prisma.shipment.findFirst({
       where: {
         id: shipmentId,
-        organizationId
-      }
+        organizationId,
+      },
     });
 
     if (!shipment) {
       return NextResponse.json(
         { error: "Shipment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -185,7 +178,7 @@ export async function PUT(
     if (shipment.status === "DELIVERED") {
       return NextResponse.json(
         { error: "Cannot update delivered shipment" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -193,17 +186,16 @@ export async function PUT(
       where: { id: shipmentId },
       data: {
         ...body,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     });
 
     return NextResponse.json(updatedShipment);
-
   } catch (error: any) {
     console.error("Error updating shipment:", error);
     return NextResponse.json(
       { error: error.message || "Failed to update shipment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

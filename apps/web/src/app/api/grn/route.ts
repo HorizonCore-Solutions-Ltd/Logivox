@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -25,7 +25,7 @@ const createGRNSchema = z.object({
       batchNumber: z.string().optional(),
       expiryDate: z.string().optional(),
       notes: z.string().optional(),
-    })
+    }),
   ),
 });
 
@@ -39,7 +39,10 @@ export async function GET(request: NextRequest) {
 
     const organizationId = session.user.organizations[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -67,7 +70,11 @@ export async function GET(request: NextRequest) {
     if (search) {
       where.OR = [
         { grnNumber: { contains: search, mode: "insensitive" } },
-        { purchaseOrder: { poNumber: { contains: search, mode: "insensitive" } } },
+        {
+          purchaseOrder: {
+            poNumber: { contains: search, mode: "insensitive" },
+          },
+        },
       ];
     }
 
@@ -130,7 +137,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching GRNs:", error);
-    return NextResponse.json({ error: "Failed to fetch GRNs" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch GRNs" },
+      { status: 500 },
+    );
   }
 }
 
@@ -144,7 +154,10 @@ export async function POST(request: NextRequest) {
 
     const organizationId = session.user.organizations[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const body = await request.json();
@@ -162,7 +175,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!purchaseOrder) {
-      return NextResponse.json({ error: "Purchase order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Purchase order not found" },
+        { status: 404 },
+      );
     }
 
     // Generate GRN number (format: GRN-YYYYMMDD-XXX)
@@ -181,12 +197,12 @@ export async function POST(request: NextRequest) {
     // Calculate total received value
     const totalReceived = validatedData.items.reduce(
       (sum, item) => sum + item.receivedQuantity * item.unitCost,
-      0
+      0,
     );
 
     // Check for discrepancies
     const hasDiscrepancy = validatedData.items.some(
-      (item) => item.receivedQuantity !== item.orderedQuantity
+      (item) => item.receivedQuantity !== item.orderedQuantity,
     );
 
     // Create GRN with items in a transaction
@@ -217,7 +233,10 @@ export async function POST(request: NextRequest) {
               batchNumber: item.batchNumber,
               expiryDate: item.expiryDate ? new Date(item.expiryDate) : null,
               notes: item.notes,
-              qcStatus: item.receivedQuantity === item.acceptedQuantity ? "PENDING" : "PENDING",
+              qcStatus:
+                item.receivedQuantity === item.acceptedQuantity
+                  ? "PENDING"
+                  : "PENDING",
             })),
           },
         },
@@ -273,9 +292,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ grn }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Invalid request data", details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
     console.error("Error creating GRN:", error);
-    return NextResponse.json({ error: "Failed to create GRN" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to create GRN" },
+      { status: 500 },
+    );
   }
 }

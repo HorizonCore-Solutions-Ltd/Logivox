@@ -1,11 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { AutoSuggestSearch } from "@/components/ui/auto-suggest-search"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { AutoSuggestSearch } from "@/components/ui/auto-suggest-search";
 import {
   HelpCircle,
   BookOpen,
@@ -16,12 +22,19 @@ import {
   ArrowRight,
   CheckCircle2,
   Zap,
-  Phone
-} from "lucide-react"
+  Phone,
+} from "lucide-react";
 
 export default function HelpCenterPage() {
-  const [searchQuery, setSearchQuery] = React.useState("")
-  const [suggestions, setSuggestions] = React.useState<Array<{ id: string; text: string; type?: "popular" | "recent" | "category" | "page"; category?: string }>>([])
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [suggestions, setSuggestions] = React.useState<
+    Array<{
+      id: string;
+      text: string;
+      type?: "popular" | "recent" | "category" | "page";
+      category?: string;
+    }>
+  >([]);
 
   const helpCategories = [
     {
@@ -29,44 +42,44 @@ export default function HelpCenterPage() {
       title: "Getting Started",
       description: "Quick start guides and onboarding tutorials",
       articles: 24,
-      href: "/help/getting-started"
+      href: "/help/getting-started",
     },
     {
       icon: Zap,
       title: "Features & Functionality",
       description: "Learn how to use core features",
       articles: 58,
-      href: "/help/features"
+      href: "/help/features",
     },
     {
       icon: FileText,
       title: "API Documentation",
       description: "Integration guides and API references",
       articles: 42,
-      href: "/docs/api"
+      href: "/docs/api",
     },
     {
       icon: MessageSquare,
       title: "Troubleshooting",
       description: "Common issues and solutions",
       articles: 31,
-      href: "/help/troubleshooting"
+      href: "/help/troubleshooting",
     },
     {
       icon: CheckCircle2,
       title: "Best Practices",
       description: "Optimization tips and recommendations",
       articles: 19,
-      href: "/help/best-practices"
+      href: "/help/best-practices",
     },
     {
       icon: Video,
       title: "Video Tutorials",
       description: "Step-by-step video guides",
       articles: 15,
-      href: "/help/videos"
-    }
-  ]
+      href: "/help/videos",
+    },
+  ];
 
   const popularArticles = [
     "How to set up your first warehouse location",
@@ -76,8 +89,8 @@ export default function HelpCenterPage() {
     "Setting up cycle counting schedules",
     "Understanding inventory valuation methods",
     "Configuring shipping carrier integrations",
-    "Mobile app setup and usage"
-  ]
+    "Mobile app setup and usage",
+  ];
 
   const supportOptions = [
     {
@@ -85,23 +98,23 @@ export default function HelpCenterPage() {
       title: "Live Chat",
       description: "Chat with our support team",
       availability: "24/7",
-      action: "Start Chat"
+      action: "Start Chat",
     },
     {
       icon: Mail,
       title: "Email Support",
       description: "Get help via email",
       availability: "Response within 4 hours",
-      action: "Send Email"
+      action: "Send Email",
     },
     {
       icon: Phone,
       title: "Phone Support",
       description: "Speak with an expert",
       availability: "Mon-Fri, 9am-6pm EST",
-      action: "Call Now"
-    }
-  ]
+      action: "Call Now",
+    },
+  ];
 
   return (
     <div className="flex flex-col">
@@ -116,41 +129,49 @@ export default function HelpCenterPage() {
               How can we help you?
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Search our knowledge base or browse categories to find answers to your questions
+              Search our knowledge base or browse categories to find answers to
+              your questions
             </p>
             <div className="mt-8 max-w-2xl mx-auto">
               <AutoSuggestSearch
                 value={searchQuery}
                 onValueChange={(value) => {
-                  setSearchQuery(value)
+                  setSearchQuery(value);
                   // Generate help-specific suggestions
                   if (value.trim()) {
                     const categoryResults = helpCategories
-                      .filter(cat => 
-                        cat.title.toLowerCase().includes(value.toLowerCase()) ||
-                        cat.description.toLowerCase().includes(value.toLowerCase())
+                      .filter(
+                        (cat) =>
+                          cat.title
+                            .toLowerCase()
+                            .includes(value.toLowerCase()) ||
+                          cat.description
+                            .toLowerCase()
+                            .includes(value.toLowerCase()),
                       )
-                      .map(cat => ({
+                      .map((cat) => ({
                         id: cat.href,
                         text: cat.title,
                         type: "category" as const,
-                        category: cat.description
-                      }))
-                    
+                        category: cat.description,
+                      }));
+
                     const articleResults = popularArticles
-                      .filter(article => 
-                        article.toLowerCase().includes(value.toLowerCase())
+                      .filter((article) =>
+                        article.toLowerCase().includes(value.toLowerCase()),
                       )
                       .map((article, idx) => ({
                         id: `article-${idx}`,
                         text: article,
                         type: "page" as const,
-                        category: "Help Article"
-                      }))
-                    
-                    setSuggestions([...categoryResults, ...articleResults].slice(0, 6))
+                        category: "Help Article",
+                      }));
+
+                    setSuggestions(
+                      [...categoryResults, ...articleResults].slice(0, 6),
+                    );
                   } else {
-                    setSuggestions([])
+                    setSuggestions([]);
                   }
                 }}
                 suggestions={suggestions}
@@ -184,7 +205,9 @@ export default function HelpCenterPage() {
                       <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                         <category.icon className="h-6 w-6 text-primary" />
                       </div>
-                      <Badge variant="secondary">{category.articles} articles</Badge>
+                      <Badge variant="secondary">
+                        {category.articles} articles
+                      </Badge>
                     </div>
                     <CardTitle className="text-xl">{category.title}</CardTitle>
                     <CardDescription>{category.description}</CardDescription>
@@ -247,7 +270,9 @@ export default function HelpCenterPage() {
                     <option.icon className="h-8 w-8 text-primary" />
                   </div>
                   <CardTitle className="text-xl">{option.title}</CardTitle>
-                  <CardDescription className="mt-2">{option.description}</CardDescription>
+                  <CardDescription className="mt-2">
+                    {option.description}
+                  </CardDescription>
                   <div className="mt-2">
                     <Badge variant="secondary">{option.availability}</Badge>
                   </div>
@@ -287,5 +312,5 @@ export default function HelpCenterPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

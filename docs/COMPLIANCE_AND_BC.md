@@ -1,6 +1,7 @@
 # Compliance & Business Continuity Plan
 
 ## Table of Contents
+
 1. [Audit Logging](#audit-logging)
 2. [Data Retention](#data-retention)
 3. [Backup Strategy](#backup-strategy)
@@ -18,19 +19,20 @@ All user actions are tracked in the `ActivityLog` table with the following infor
 
 ```typescript
 {
-  userId: string          // Who performed the action
-  organizationId: string  // Which tenant
-  action: string          // What was done (CREATE, UPDATE, DELETE, VIEW, LOGIN, etc.)
-  entityType: string      // What was affected (User, Order, Inventory, etc.)
-  entityId: string        // Specific record ID
-  metadata: JSON          // Additional context (IP, user agent, changes, etc.)
-  timestamp: DateTime     // When it occurred
+  userId: string; // Who performed the action
+  organizationId: string; // Which tenant
+  action: string; // What was done (CREATE, UPDATE, DELETE, VIEW, LOGIN, etc.)
+  entityType: string; // What was affected (User, Order, Inventory, etc.)
+  entityId: string; // Specific record ID
+  metadata: JSON; // Additional context (IP, user agent, changes, etc.)
+  timestamp: DateTime; // When it occurred
 }
 ```
 
 ### Tracked Actions
 
 **Authentication Events:**
+
 - User login/logout
 - Failed login attempts
 - Password changes
@@ -39,6 +41,7 @@ All user actions are tracked in the `ActivityLog` table with the following infor
 - API key usage
 
 **Data Operations:**
+
 - Create, Read, Update, Delete on all entities
 - Bulk operations
 - Data exports
@@ -46,6 +49,7 @@ All user actions are tracked in the `ActivityLog` table with the following infor
 - Configuration changes
 
 **Security Events:**
+
 - Permission changes
 - Role assignments
 - Organization access modifications
@@ -99,18 +103,18 @@ export async function logActivity({
 
 ### Retention Policies
 
-| Data Type | Retention Period | Storage Location | Archive Method |
-|-----------|------------------|------------------|----------------|
-| User accounts (active) | Indefinite | Primary DB | N/A |
-| User accounts (inactive) | 3 years | Primary DB | Soft delete |
-| Orders (completed) | 7 years | Primary DB → Cold storage | Annual archive |
-| Inventory transactions | 5 years | Primary DB → Cold storage | Quarterly archive |
-| Financial records | 7 years | Primary DB → Cold storage | Never delete |
-| Activity logs | 90 days → 7 years | Primary DB → S3/Azure | Monthly archive |
-| Session data | 30 days | Primary DB | Auto-purge |
-| Temporary files | 7 days | File storage | Auto-delete |
-| Shipment tracking | 3 years | Primary DB → Cold storage | Annual archive |
-| Customer data (GDPR) | Until deletion request | Primary DB | Right to erasure |
+| Data Type                | Retention Period       | Storage Location          | Archive Method    |
+| ------------------------ | ---------------------- | ------------------------- | ----------------- |
+| User accounts (active)   | Indefinite             | Primary DB                | N/A               |
+| User accounts (inactive) | 3 years                | Primary DB                | Soft delete       |
+| Orders (completed)       | 7 years                | Primary DB → Cold storage | Annual archive    |
+| Inventory transactions   | 5 years                | Primary DB → Cold storage | Quarterly archive |
+| Financial records        | 7 years                | Primary DB → Cold storage | Never delete      |
+| Activity logs            | 90 days → 7 years      | Primary DB → S3/Azure     | Monthly archive   |
+| Session data             | 30 days                | Primary DB                | Auto-purge        |
+| Temporary files          | 7 days                 | File storage              | Auto-delete       |
+| Shipment tracking        | 3 years                | Primary DB → Cold storage | Annual archive    |
+| Customer data (GDPR)     | Until deletion request | Primary DB                | Right to erasure  |
 
 ### Automated Archival
 
@@ -144,7 +148,10 @@ aws s3 cp /backup/activity_logs_archive_*.csv s3://logivox-archives/activity-log
 
 ```typescript
 // app/api/users/[id]/delete-data/route.ts
-export async function POST(req: Request, { params }: { params: { id: string } }) {
+export async function POST(
+  req: Request,
+  { params }: { params: { id: string } },
+) {
   const userId = params.id;
 
   // 1. Anonymize user data
@@ -152,7 +159,7 @@ export async function POST(req: Request, { params }: { params: { id: string } })
     where: { id: userId },
     data: {
       email: `deleted_${userId}@example.com`,
-      name: 'Deleted User',
+      name: "Deleted User",
       phone: null,
       address: null,
       deletedAt: new Date(),
@@ -170,11 +177,11 @@ export async function POST(req: Request, { params }: { params: { id: string } })
   // 3. Log the deletion request
   await logActivity({
     userId,
-    action: 'USER_DATA_DELETED',
-    entityType: 'User',
+    action: "USER_DATA_DELETED",
+    entityType: "User",
     entityId: userId,
     organizationId: null,
-    metadata: { reason: 'GDPR Right to Erasure' },
+    metadata: { reason: "GDPR Right to Erasure" },
   });
 
   return NextResponse.json({ success: true });
@@ -188,12 +195,14 @@ export async function POST(req: Request, { params }: { params: { id: string } })
 ### Database Backups
 
 **Production:**
+
 - **Full backups:** Daily at 2 AM UTC
 - **Incremental backups:** Every 6 hours
 - **Transaction logs:** Continuous WAL archival
 - **Retention:** 30 daily, 12 weekly, 12 monthly
 
 **Staging:**
+
 - **Full backups:** Weekly
 - **Retention:** 4 weekly backups
 
@@ -306,16 +315,19 @@ kubectl rollout status deployment/logivox-web
 ### Failover Strategy
 
 **Primary Region (US-East):**
+
 - PostgreSQL RDS (Multi-AZ)
 - EKS Cluster (3 AZs)
 - S3 Standard
 
 **Secondary Region (US-West):**
+
 - PostgreSQL Read Replica (promoted on failure)
 - EKS Cluster (standby)
 - S3 Cross-Region Replication
 
 **Failover Trigger:**
+
 - Automated health checks fail for 5 minutes
 - Manual trigger via ops dashboard
 - RDS automatic failover (< 2 minutes)
@@ -327,6 +339,7 @@ kubectl rollout status deployment/logivox-web
 ### SOC 2 Type II
 
 **Security Controls:**
+
 - ✅ Encrypted data at rest (AES-256)
 - ✅ Encrypted data in transit (TLS 1.3)
 - ✅ Multi-factor authentication
@@ -337,6 +350,7 @@ kubectl rollout status deployment/logivox-web
 - ✅ Security awareness training
 
 **Availability Controls:**
+
 - ✅ 99.9% uptime SLA
 - ✅ Multi-region architecture
 - ✅ Automated backups
@@ -344,6 +358,7 @@ kubectl rollout status deployment/logivox-web
 - ✅ Incident response procedures
 
 **Confidentiality Controls:**
+
 - ✅ Data classification policy
 - ✅ Encryption key management
 - ✅ Secure credential storage
@@ -411,21 +426,25 @@ kubectl rollout status deployment/logivox-web
 #### Severity Levels
 
 **SEV-1 (Critical):**
+
 - Complete system outage
 - Data breach
 - Data loss
 - Response: Immediate escalation, 24/7 response
 
 **SEV-2 (High):**
+
 - Partial functionality loss
 - Performance degradation
 - Response: 1-hour response during business hours
 
 **SEV-3 (Medium):**
+
 - Non-critical feature issues
 - Response: 4-hour response during business hours
 
 **SEV-4 (Low):**
+
 - Minor bugs, cosmetic issues
 - Response: Next business day
 
@@ -446,11 +465,13 @@ kubectl rollout status deployment/logivox-web
 ### Communication Plan
 
 **Internal:**
+
 - Slack #incidents channel
 - PagerDuty alerts
 - Email escalation
 
 **External:**
+
 - Status page (status.logivox.com)
 - Email notifications to affected customers
 - In-app banners

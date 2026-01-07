@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -11,16 +11,13 @@ import { prisma } from "@/lib/prisma";
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const pickListId = params.id;
@@ -31,15 +28,15 @@ export async function GET(
       include: {
         organizationMemberships: {
           where: { isActive: true },
-          include: { organization: true }
-        }
-      }
+          include: { organization: true },
+        },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -49,28 +46,28 @@ export async function GET(
     const pickList = await prisma.pickList.findFirst({
       where: {
         id: pickListId,
-        organizationId
+        organizationId,
       },
       include: {
         salesOrder: {
           include: {
-            customer: true
-          }
+            customer: true,
+          },
         },
         warehouse: true,
         assignedTo: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         createdBy: {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         items: {
           include: {
@@ -81,49 +78,50 @@ export async function GET(
                 sku: true,
                 binLocation: true,
                 availableQty: true,
-                reservedQty: true
-              }
+                reservedQty: true,
+              },
             },
             salesOrderItem: {
               select: {
                 id: true,
                 quantity: true,
-                quantityPicked: true
-              }
-            }
+                quantityPicked: true,
+              },
+            },
           },
           orderBy: {
             inventoryItem: {
-              binLocation: 'asc'
-            }
-          }
-        }
-      }
+              binLocation: "asc",
+            },
+          },
+        },
+      },
     });
 
     if (!pickList) {
       return NextResponse.json(
         { error: "Pick list not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // Calculate picking statistics
     const totalItems = pickList.items.length;
     const totalQuantityToPick = pickList.items.reduce(
-      (sum: number, item: any) => sum + item.quantityToPick, 
-      0
+      (sum: number, item: any) => sum + item.quantityToPick,
+      0,
     );
     const totalQuantityPicked = pickList.items.reduce(
-      (sum: number, item: any) => sum + item.quantityPicked, 
-      0
+      (sum: number, item: any) => sum + item.quantityPicked,
+      0,
     );
     const completedItems = pickList.items.filter(
-      (item: any) => item.quantityPicked >= item.quantityToPick
+      (item: any) => item.quantityPicked >= item.quantityToPick,
     ).length;
-    const progressPercent = totalQuantityToPick > 0 
-      ? Math.round((totalQuantityPicked / totalQuantityToPick) * 100)
-      : 0;
+    const progressPercent =
+      totalQuantityToPick > 0
+        ? Math.round((totalQuantityPicked / totalQuantityToPick) * 100)
+        : 0;
 
     return NextResponse.json({
       ...pickList,
@@ -132,15 +130,14 @@ export async function GET(
         completedItems,
         totalQuantityToPick,
         totalQuantityPicked,
-        progressPercent
-      }
+        progressPercent,
+      },
     });
-
   } catch (error: any) {
     console.error("Error fetching pick list:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch pick list" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

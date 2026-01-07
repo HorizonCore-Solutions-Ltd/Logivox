@@ -29,7 +29,7 @@ export async function POST(request: Request) {
           success: false,
           error: { code: "UNAUTHORIZED", message: "Authentication required" },
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -165,7 +165,7 @@ export async function POST(request: Request) {
           message: "Failed to sync data",
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

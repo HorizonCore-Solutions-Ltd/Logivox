@@ -1,16 +1,20 @@
-'use client';
+"use client";
 
 /**
  * Report Viewer Component for LogiVox
- * 
+ *
  * Displays executed report results with tables, charts, and export options.
  */
 
-import React, { useState, useEffect } from 'react';
-import { ReportConfig, ChartType } from '@/lib/reports/report-types';
-import { executeReport } from '@/lib/reports/report-engine';
-import { exportReport, ExportFormat, downloadReport } from '@/lib/reports/report-exporter';
-import { ReportChart } from '@/components/reports/charts';
+import React, { useState, useEffect } from "react";
+import { ReportConfig, ChartType } from "@/lib/reports/report-types";
+import { executeReport } from "@/lib/reports/report-engine";
+import {
+  exportReport,
+  ExportFormat,
+  downloadReport,
+} from "@/lib/reports/report-exporter";
+import { ReportChart } from "@/components/reports/charts";
 
 // ============================================================================
 // Types
@@ -43,7 +47,9 @@ export function ReportViewer({
   const [reportData, setReportData] = useState<ReportData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [exportFormat, setExportFormat] = useState<ExportFormat>(ExportFormat.PDF);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>(
+    ExportFormat.PDF,
+  );
   const [exporting, setExporting] = useState(false);
 
   // Load report data
@@ -60,8 +66,8 @@ export function ReportViewer({
       const result = await executeReport(config, tenantId);
       setReportData(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load report');
-      console.error('Report execution error:', err);
+      setError(err instanceof Error ? err.message : "Failed to load report");
+      console.error("Report execution error:", err);
     } finally {
       setLoading(false);
     }
@@ -84,8 +90,8 @@ export function ReportViewer({
 
       downloadReport(blob, config.name, exportFormat);
     } catch (err) {
-      console.error('Export error:', err);
-      alert('Failed to export report. Please try again.');
+      console.error("Export error:", err);
+      alert("Failed to export report. Please try again.");
     } finally {
       setExporting(false);
     }
@@ -116,11 +122,23 @@ export function ReportViewer({
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
-            <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="h-6 w-6 text-red-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </div>
-          <p className="mt-4 text-sm font-medium text-gray-900">Failed to load report</p>
+          <p className="mt-4 text-sm font-medium text-gray-900">
+            Failed to load report
+          </p>
           <p className="mt-1 text-sm text-gray-500">{error}</p>
           <button
             onClick={loadReport}
@@ -138,7 +156,9 @@ export function ReportViewer({
       <div className="flex h-full items-center justify-center">
         <div className="text-center">
           <div className="text-4xl">📊</div>
-          <p className="mt-4 text-sm font-medium text-gray-900">No data found</p>
+          <p className="mt-4 text-sm font-medium text-gray-900">
+            No data found
+          </p>
           <p className="mt-1 text-sm text-gray-500">
             This report doesn't have any data to display
           </p>
@@ -157,7 +177,9 @@ export function ReportViewer({
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-gray-900">{config.name}</h1>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {config.name}
+              </h1>
               <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium capitalize text-blue-700">
                 {config.category}
               </span>
@@ -169,20 +191,50 @@ export function ReportViewer({
             {/* Stats */}
             <div className="mt-4 flex items-center gap-6 text-sm text-gray-600">
               <div className="flex items-center gap-2">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
                 <span>{reportData.totalRows} rows</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <span>{reportData.executionTime}ms</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
                 <span>{new Date().toLocaleString()}</span>
               </div>
@@ -196,8 +248,18 @@ export function ReportViewer({
               className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
               title="Print Report"
             >
-              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+                />
               </svg>
             </button>
 
@@ -207,8 +269,18 @@ export function ReportViewer({
                 className="rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 title="Schedule Report"
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                  />
                 </svg>
               </button>
             )}
@@ -216,7 +288,9 @@ export function ReportViewer({
             <div className="flex items-center gap-2 rounded-md border border-gray-300">
               <select
                 value={exportFormat}
-                onChange={(e) => setExportFormat(e.target.value as ExportFormat)}
+                onChange={(e) =>
+                  setExportFormat(e.target.value as ExportFormat)
+                }
                 className="rounded-l-md border-0 bg-transparent px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none"
               >
                 <option value={ExportFormat.PDF}>PDF</option>
@@ -229,7 +303,7 @@ export function ReportViewer({
                 disabled={exporting}
                 className="rounded-r-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
               >
-                {exporting ? 'Exporting...' : 'Export'}
+                {exporting ? "Exporting..." : "Export"}
               </button>
             </div>
 
@@ -274,7 +348,7 @@ export function ReportViewer({
                       key={fieldId}
                       className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500"
                     >
-                      {fieldId.replace(/_/g, ' ')}
+                      {fieldId.replace(/_/g, " ")}
                     </th>
                   ))}
                 </tr>
@@ -314,10 +388,10 @@ export function ReportViewer({
 
 function formatCellValue(value: any): string {
   if (value === null || value === undefined) {
-    return '-';
+    return "-";
   }
 
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     // Check if it looks like currency
     if (Number.isInteger(value) && value > 100) {
       return value.toLocaleString();
@@ -329,8 +403,8 @@ function formatCellValue(value: any): string {
     return value.toLocaleDateString();
   }
 
-  if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
+  if (typeof value === "boolean") {
+    return value ? "Yes" : "No";
   }
 
   return String(value);

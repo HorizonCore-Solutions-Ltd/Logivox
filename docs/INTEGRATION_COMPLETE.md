@@ -11,17 +11,17 @@ The simple vehicle types library is now fully integrated with load optimization:
 
 // 1. Recommend vehicle for orders
 loadOptimizationService.recommendVehicleForOrders({
-  orderIds: ['ord_123', 'ord_456'],
-  warehouseId: 'wh_789',
-  region: 'UK',
-  prioritize: 'utilization',
+  orderIds: ["ord_123", "ord_456"],
+  warehouseId: "wh_789",
+  region: "UK",
+  prioritize: "utilization",
 });
 
 // 2. Complete load optimization with vehicle recommendation
 loadOptimizationService.optimizeLoadWithVehicle({
-  orderIds: ['ord_123', 'ord_456'],
-  warehouseId: 'wh_789',
-  region: 'UK',
+  orderIds: ["ord_123", "ord_456"],
+  warehouseId: "wh_789",
+  region: "UK",
 });
 ```
 
@@ -133,12 +133,18 @@ POST /api/load-optimization/recommend-vehicle
 ### **1. LoadOptimizationService** (`lib/services/load-optimization-service.ts`)
 
 Added two new methods:
+
 - ✅ `recommendVehicleForOrders()` - Get vehicle recommendation
 - ✅ `optimizeLoadWithVehicle()` - Complete optimization with vehicle
 
 **Integration:**
+
 ```typescript
-import { recommendVehicle, findSuitableVehicles, type VehicleType } from '@/lib/vehicle-types';
+import {
+  recommendVehicle,
+  findSuitableVehicles,
+  type VehicleType,
+} from "@/lib/vehicle-types";
 
 // Method calculates order totals → calls recommendVehicle() → returns result
 ```
@@ -146,6 +152,7 @@ import { recommendVehicle, findSuitableVehicles, type VehicleType } from '@/lib/
 ### **2. Voice Control** (`apps/web/src/lib/voice-control.ts`)
 
 Added 6 new voice commands:
+
 - ✅ Recommend vehicle for order
 - ✅ What vehicle fits X cubic feet
 - ✅ Optimize load for order
@@ -155,6 +162,7 @@ Added 6 new voice commands:
 ### **3. Load Optimization API** (`app/api/load-optimization/route.ts`)
 
 Added two new endpoint handlers:
+
 - ✅ `POST_RECOMMEND_VEHICLE` - Vehicle recommendation only
 - ✅ `POST_OPTIMIZE_WITH_VEHICLE` - Full load optimization
 
@@ -163,6 +171,7 @@ Added two new endpoint handlers:
 ## 🎤 Voice Command Examples
 
 ### **Get Vehicle Recommendation:**
+
 ```
 User: "Recommend vehicle for order 123"
 System: "Recommended 7.5 Tonne Box Truck. 86 percent utilization."
@@ -175,6 +184,7 @@ System: "Recommended 53ft Articulated Lorry. 91 percent utilization."
 ```
 
 ### **Search by Volume:**
+
 ```
 User: "What vehicle fits 1000 cubic feet"
 System: "Luton Van 3.5T can fit 1000 cubic feet. Total capacity 1100 cubic feet."
@@ -184,6 +194,7 @@ System: "Ford Transit LWB can fit 500 cubic feet. Total capacity 487 cubic feet.
 ```
 
 ### **Optimize Load:**
+
 ```
 User: "Optimize load for order 123"
 System: "Load plan created. 7.5 Tonne Box Truck with 86 percent utilization."
@@ -193,6 +204,7 @@ System: "Load plan created. Transit van with 72 percent utilization."
 ```
 
 ### **Browse Vehicles:**
+
 ```
 User: "Show vehicle types"
 System: [Navigates to vehicle types page]
@@ -221,6 +233,7 @@ curl -X POST http://localhost:3000/api/load-optimization/recommend-vehicle \
 ```
 
 **Expected:**
+
 - Vehicle recommendation (e.g., UK_RIGID_7.5T)
 - Utilization percentages
 - Alternatives list
@@ -238,6 +251,7 @@ curl -X POST http://localhost:3000/api/load-optimization/optimize-with-vehicle \
 ```
 
 **Expected:**
+
 - Vehicle recommendation
 - Complete 3D load plan
 - Item positions
@@ -329,12 +343,14 @@ curl -X POST http://localhost:3000/api/load-optimization/optimize-with-vehicle \
 ## 🎯 What This Achieves
 
 **Before:**
+
 - LoadOptimizationService assumed fixed trailer types
 - No vehicle recommendations
 - Manual vehicle selection
 - No voice integration
 
 **After:**
+
 - ✅ Automatic vehicle recommendation based on order volume/weight
 - ✅ Global vehicle support (UK, EU, US, Asia)
 - ✅ Voice-enabled vehicle selection

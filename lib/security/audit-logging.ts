@@ -3,78 +3,78 @@
  * Tracks all important system events and user actions
  */
 
-import prisma from '@/lib/prisma';
+import prisma from "@/lib/prisma";
 
 /**
  * Audit event types
  */
 export enum AuditEventType {
   // Authentication events
-  USER_LOGIN = 'USER_LOGIN',
-  USER_LOGOUT = 'USER_LOGOUT',
-  USER_LOGIN_FAILED = 'USER_LOGIN_FAILED',
-  PASSWORD_CHANGED = 'PASSWORD_CHANGED',
-  PASSWORD_RESET_REQUESTED = 'PASSWORD_RESET_REQUESTED',
-  PASSWORD_RESET_COMPLETED = 'PASSWORD_RESET_COMPLETED',
-  TWO_FACTOR_ENABLED = 'TWO_FACTOR_ENABLED',
-  TWO_FACTOR_DISABLED = 'TWO_FACTOR_DISABLED',
+  USER_LOGIN = "USER_LOGIN",
+  USER_LOGOUT = "USER_LOGOUT",
+  USER_LOGIN_FAILED = "USER_LOGIN_FAILED",
+  PASSWORD_CHANGED = "PASSWORD_CHANGED",
+  PASSWORD_RESET_REQUESTED = "PASSWORD_RESET_REQUESTED",
+  PASSWORD_RESET_COMPLETED = "PASSWORD_RESET_COMPLETED",
+  TWO_FACTOR_ENABLED = "TWO_FACTOR_ENABLED",
+  TWO_FACTOR_DISABLED = "TWO_FACTOR_DISABLED",
 
   // User management events
-  USER_CREATED = 'USER_CREATED',
-  USER_UPDATED = 'USER_UPDATED',
-  USER_DELETED = 'USER_DELETED',
-  USER_ROLE_CHANGED = 'USER_ROLE_CHANGED',
-  USER_SUSPENDED = 'USER_SUSPENDED',
-  USER_ACTIVATED = 'USER_ACTIVATED',
+  USER_CREATED = "USER_CREATED",
+  USER_UPDATED = "USER_UPDATED",
+  USER_DELETED = "USER_DELETED",
+  USER_ROLE_CHANGED = "USER_ROLE_CHANGED",
+  USER_SUSPENDED = "USER_SUSPENDED",
+  USER_ACTIVATED = "USER_ACTIVATED",
 
   // Inventory events
-  INVENTORY_CREATED = 'INVENTORY_CREATED',
-  INVENTORY_UPDATED = 'INVENTORY_UPDATED',
-  INVENTORY_DELETED = 'INVENTORY_DELETED',
-  STOCK_ADJUSTED = 'STOCK_ADJUSTED',
-  STOCK_TRANSFERRED = 'STOCK_TRANSFERRED',
-  REORDER_POINT_CHANGED = 'REORDER_POINT_CHANGED',
+  INVENTORY_CREATED = "INVENTORY_CREATED",
+  INVENTORY_UPDATED = "INVENTORY_UPDATED",
+  INVENTORY_DELETED = "INVENTORY_DELETED",
+  STOCK_ADJUSTED = "STOCK_ADJUSTED",
+  STOCK_TRANSFERRED = "STOCK_TRANSFERRED",
+  REORDER_POINT_CHANGED = "REORDER_POINT_CHANGED",
 
   // Order events
-  ORDER_CREATED = 'ORDER_CREATED',
-  ORDER_UPDATED = 'ORDER_UPDATED',
-  ORDER_CANCELLED = 'ORDER_CANCELLED',
-  ORDER_CONFIRMED = 'ORDER_CONFIRMED',
-  ORDER_SHIPPED = 'ORDER_SHIPPED',
-  ORDER_COMPLETED = 'ORDER_COMPLETED',
+  ORDER_CREATED = "ORDER_CREATED",
+  ORDER_UPDATED = "ORDER_UPDATED",
+  ORDER_CANCELLED = "ORDER_CANCELLED",
+  ORDER_CONFIRMED = "ORDER_CONFIRMED",
+  ORDER_SHIPPED = "ORDER_SHIPPED",
+  ORDER_COMPLETED = "ORDER_COMPLETED",
 
   // Warehouse events
-  WAREHOUSE_CREATED = 'WAREHOUSE_CREATED',
-  WAREHOUSE_UPDATED = 'WAREHOUSE_UPDATED',
-  LOCATION_CREATED = 'LOCATION_CREATED',
-  LOCATION_UPDATED = 'LOCATION_UPDATED',
-  WAVE_CREATED = 'WAVE_CREATED',
-  TASK_ASSIGNED = 'TASK_ASSIGNED',
-  TASK_COMPLETED = 'TASK_COMPLETED',
+  WAREHOUSE_CREATED = "WAREHOUSE_CREATED",
+  WAREHOUSE_UPDATED = "WAREHOUSE_UPDATED",
+  LOCATION_CREATED = "LOCATION_CREATED",
+  LOCATION_UPDATED = "LOCATION_UPDATED",
+  WAVE_CREATED = "WAVE_CREATED",
+  TASK_ASSIGNED = "TASK_ASSIGNED",
+  TASK_COMPLETED = "TASK_COMPLETED",
 
   // Security events
-  UNAUTHORIZED_ACCESS_ATTEMPT = 'UNAUTHORIZED_ACCESS_ATTEMPT',
-  PERMISSION_DENIED = 'PERMISSION_DENIED',
-  SUSPICIOUS_ACTIVITY = 'SUSPICIOUS_ACTIVITY',
-  API_KEY_CREATED = 'API_KEY_CREATED',
-  API_KEY_REVOKED = 'API_KEY_REVOKED',
+  UNAUTHORIZED_ACCESS_ATTEMPT = "UNAUTHORIZED_ACCESS_ATTEMPT",
+  PERMISSION_DENIED = "PERMISSION_DENIED",
+  SUSPICIOUS_ACTIVITY = "SUSPICIOUS_ACTIVITY",
+  API_KEY_CREATED = "API_KEY_CREATED",
+  API_KEY_REVOKED = "API_KEY_REVOKED",
 
   // System events
-  SETTINGS_CHANGED = 'SETTINGS_CHANGED',
-  INTEGRATION_CONFIGURED = 'INTEGRATION_CONFIGURED',
-  BACKUP_CREATED = 'BACKUP_CREATED',
-  DATA_EXPORTED = 'DATA_EXPORTED',
-  DATA_IMPORTED = 'DATA_IMPORTED',
+  SETTINGS_CHANGED = "SETTINGS_CHANGED",
+  INTEGRATION_CONFIGURED = "INTEGRATION_CONFIGURED",
+  BACKUP_CREATED = "BACKUP_CREATED",
+  DATA_EXPORTED = "DATA_EXPORTED",
+  DATA_IMPORTED = "DATA_IMPORTED",
 }
 
 /**
  * Audit event severity levels
  */
 export enum AuditSeverity {
-  INFO = 'INFO',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  CRITICAL = 'CRITICAL',
+  INFO = "INFO",
+  WARNING = "WARNING",
+  ERROR = "ERROR",
+  CRITICAL = "CRITICAL",
 }
 
 /**
@@ -122,7 +122,7 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
       },
     });
   } catch (error) {
-    console.error('Failed to log audit event:', error);
+    console.error("Failed to log audit event:", error);
     // Don't throw - logging failure shouldn't break the application
   }
 }
@@ -132,8 +132,11 @@ export async function logAuditEvent(entry: AuditLogEntry): Promise<void> {
  */
 export function extractRequestMetadata(req: Request) {
   return {
-    ipAddress: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown',
-    userAgent: req.headers.get('user-agent') || 'unknown',
+    ipAddress:
+      req.headers.get("x-forwarded-for") ||
+      req.headers.get("x-real-ip") ||
+      "unknown",
+    userAgent: req.headers.get("user-agent") || "unknown",
   };
 }
 
@@ -146,7 +149,7 @@ export async function logAuthEvent(
   email: string,
   success: boolean,
   req: Request,
-  errorMessage?: string
+  errorMessage?: string,
 ): Promise<void> {
   const { ipAddress, userAgent } = extractRequestMetadata(req);
 
@@ -170,7 +173,7 @@ export async function logUserManagementEvent(
   performedBy: { id: string; name: string; email: string },
   targetUser: { id?: string; email: string },
   changes?: Record<string, any>,
-  req?: Request
+  req?: Request,
 ): Promise<void> {
   const metadata = req ? extractRequestMetadata(req) : {};
 
@@ -180,7 +183,7 @@ export async function logUserManagementEvent(
     userId: performedBy.id,
     userName: performedBy.name,
     userEmail: performedBy.email,
-    resource: 'user',
+    resource: "user",
     resourceId: targetUser.id,
     changes,
     metadata: {
@@ -199,7 +202,7 @@ export async function logInventoryEvent(
   user: { id: string; name: string; email: string },
   inventoryItemId: string,
   changes?: Record<string, any>,
-  req?: Request
+  req?: Request,
 ): Promise<void> {
   const metadata = req ? extractRequestMetadata(req) : {};
 
@@ -209,7 +212,7 @@ export async function logInventoryEvent(
     userId: user.id,
     userName: user.name,
     userEmail: user.email,
-    resource: 'inventory',
+    resource: "inventory",
     resourceId: inventoryItemId,
     changes,
     ...metadata,
@@ -226,7 +229,7 @@ export async function logOrderEvent(
   orderId: string,
   orderNumber: string,
   changes?: Record<string, any>,
-  req?: Request
+  req?: Request,
 ): Promise<void> {
   const metadata = req ? extractRequestMetadata(req) : {};
 
@@ -236,7 +239,7 @@ export async function logOrderEvent(
     userId: user.id,
     userName: user.name,
     userEmail: user.email,
-    resource: 'order',
+    resource: "order",
     resourceId: orderId,
     changes,
     metadata: {
@@ -259,7 +262,7 @@ export async function logSecurityEvent(
     action?: string;
     errorMessage?: string;
   },
-  req: Request
+  req: Request,
 ): Promise<void> {
   const { ipAddress, userAgent } = extractRequestMetadata(req);
 
@@ -284,7 +287,7 @@ export async function logDataExportEvent(
   user: { id: string; name: string; email: string },
   exportType: string,
   recordCount: number,
-  req?: Request
+  req?: Request,
 ): Promise<void> {
   const metadata = req ? extractRequestMetadata(req) : {};
 
@@ -336,7 +339,7 @@ export async function queryAuditLogs(filters: {
   const [logs, total] = await Promise.all([
     prisma.auditLog.findMany({
       where,
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
       skip,
       take: limit,
     }),
@@ -355,18 +358,18 @@ export async function queryAuditLogs(filters: {
 /**
  * Get audit statistics
  */
-export async function getAuditStatistics(period: 'day' | 'week' | 'month') {
+export async function getAuditStatistics(period: "day" | "week" | "month") {
   const now = new Date();
   const startDate = new Date();
 
   switch (period) {
-    case 'day':
+    case "day":
       startDate.setDate(now.getDate() - 1);
       break;
-    case 'week':
+    case "week":
       startDate.setDate(now.getDate() - 7);
       break;
-    case 'month':
+    case "month":
       startDate.setMonth(now.getMonth() - 1);
       break;
   }
@@ -390,7 +393,8 @@ export async function getAuditStatistics(period: 'day' | 'week' | 'month') {
   };
 
   logs.forEach((log) => {
-    stats.byEventType[log.eventType] = (stats.byEventType[log.eventType] || 0) + 1;
+    stats.byEventType[log.eventType] =
+      (stats.byEventType[log.eventType] || 0) + 1;
     stats.bySeverity[log.severity] = (stats.bySeverity[log.severity] || 0) + 1;
   });
 

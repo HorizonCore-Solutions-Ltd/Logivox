@@ -3,23 +3,23 @@
  * CRUD operations for dock bay doors
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 // GET - List bay doors or get specific door
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const doorId = searchParams.get('doorId');
-    const warehouseId = searchParams.get('warehouseId');
-    const status = searchParams.get('status');
-    const available = searchParams.get('available');
+    const doorId = searchParams.get("doorId");
+    const warehouseId = searchParams.get("warehouseId");
+    const status = searchParams.get("status");
+    const available = searchParams.get("available");
 
     // Get specific door
     if (doorId) {
@@ -34,14 +34,17 @@ export async function GET(req: NextRequest) {
             },
           },
           events: {
-            orderBy: { timestamp: 'desc' },
+            orderBy: { timestamp: "desc" },
             take: 10,
           },
         },
       });
 
       if (!door) {
-        return NextResponse.json({ error: 'Bay door not found' }, { status: 404 });
+        return NextResponse.json(
+          { error: "Bay door not found" },
+          { status: 404 },
+        );
       }
 
       return NextResponse.json({ door });
@@ -58,8 +61,8 @@ export async function GET(req: NextRequest) {
       where.status = status;
     }
 
-    if (available === 'true') {
-      where.status = 'AVAILABLE';
+    if (available === "true") {
+      where.status = "AVAILABLE";
       where.currentLoadSheetId = null;
     }
 
@@ -84,7 +87,7 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { doorNumber: 'asc' },
+      orderBy: { doorNumber: "asc" },
     });
 
     return NextResponse.json({
@@ -92,10 +95,10 @@ export async function GET(req: NextRequest) {
       total: doors.length,
     });
   } catch (error) {
-    console.error('Bay door GET error:', error);
+    console.error("Bay door GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch bay doors' },
-      { status: 500 }
+      { error: "Failed to fetch bay doors" },
+      { status: 500 },
     );
   }
 }
@@ -105,7 +108,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -122,8 +125,8 @@ export async function POST(req: NextRequest) {
     // Validate required fields
     if (!warehouseId || !doorNumber) {
       return NextResponse.json(
-        { error: 'Warehouse ID and door number are required' },
-        { status: 400 }
+        { error: "Warehouse ID and door number are required" },
+        { status: 400 },
       );
     }
 
@@ -138,7 +141,7 @@ export async function POST(req: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: `Bay door ${doorNumber} already exists in this warehouse` },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -147,8 +150,8 @@ export async function POST(req: NextRequest) {
       data: {
         warehouseId,
         doorNumber,
-        doorType: doorType || 'LOADING',
-        status: 'AVAILABLE',
+        doorType: doorType || "LOADING",
+        status: "AVAILABLE",
         maxWeight: maxWeight || 25000,
         maxVolume: maxVolume || 80,
         iotSensorId,
@@ -163,7 +166,7 @@ export async function POST(req: NextRequest) {
     await prisma.bayDoorEvent.create({
       data: {
         bayDoorId: door.id,
-        eventType: 'OPENED',
+        eventType: "OPENED",
         description: `Bay door ${doorNumber} created and opened for use`,
         performedBy: session.user.id,
       },
@@ -175,10 +178,10 @@ export async function POST(req: NextRequest) {
       message: `Bay door ${doorNumber} created successfully`,
     });
   } catch (error) {
-    console.error('Bay door POST error:', error);
+    console.error("Bay door POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to create bay door' },
-      { status: 500 }
+      { error: "Failed to create bay door" },
+      { status: 500 },
     );
   }
 }
@@ -188,7 +191,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -202,8 +205,8 @@ export async function PATCH(req: NextRequest) {
 
     if (!doorId) {
       return NextResponse.json(
-        { error: 'Door ID is required' },
-        { status: 400 }
+        { error: "Door ID is required" },
+        { status: 400 },
       );
     }
 
@@ -212,7 +215,10 @@ export async function PATCH(req: NextRequest) {
     });
 
     if (!door) {
-      return NextResponse.json({ error: 'Bay door not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Bay door not found" },
+        { status: 404 },
+      );
     }
 
     let updatedDoor;
@@ -220,19 +226,19 @@ export async function PATCH(req: NextRequest) {
     let eventDescription: string;
 
     // Handle actions
-    if (action === 'assign' && loadSheetId) {
+    if (action === "assign" && loadSheetId) {
       // Assign load sheet to door
-      if (door.status !== 'AVAILABLE') {
+      if (door.status !== "AVAILABLE") {
         return NextResponse.json(
-          { error: 'Bay door is not available for assignment' },
-          { status: 400 }
+          { error: "Bay door is not available for assignment" },
+          { status: 400 },
         );
       }
 
       updatedDoor = await prisma.bayDoor.update({
         where: { id: doorId },
         data: {
-          status: 'OCCUPIED',
+          status: "OCCUPIED",
           currentLoadSheetId: loadSheetId,
         },
         include: {
@@ -246,52 +252,52 @@ export async function PATCH(req: NextRequest) {
         data: { bayDoorId: doorId },
       });
 
-      eventType = 'ASSIGNED';
+      eventType = "ASSIGNED";
       eventDescription = `Load sheet assigned to bay door ${door.doorNumber}`;
-    } else if (action === 'release') {
+    } else if (action === "release") {
       // Release door (clear assignment)
       updatedDoor = await prisma.bayDoor.update({
         where: { id: doorId },
         data: {
-          status: 'AVAILABLE',
+          status: "AVAILABLE",
           currentLoadSheetId: null,
         },
       });
 
-      eventType = 'RELEASED';
+      eventType = "RELEASED";
       eventDescription = `Bay door ${door.doorNumber} released and marked available`;
-    } else if (action === 'open') {
+    } else if (action === "open") {
       // Open door
       updatedDoor = await prisma.bayDoor.update({
         where: { id: doorId },
-        data: { status: 'AVAILABLE' },
+        data: { status: "AVAILABLE" },
       });
 
-      eventType = 'OPENED';
+      eventType = "OPENED";
       eventDescription = `Bay door ${door.doorNumber} opened`;
-    } else if (action === 'close') {
+    } else if (action === "close") {
       // Close door
       updatedDoor = await prisma.bayDoor.update({
         where: { id: doorId },
         data: {
-          status: 'CLOSED',
+          status: "CLOSED",
           currentLoadSheetId: null,
         },
       });
 
-      eventType = 'CLOSED';
+      eventType = "CLOSED";
       eventDescription = `Bay door ${door.doorNumber} closed`;
-    } else if (action === 'maintenance') {
+    } else if (action === "maintenance") {
       // Put door in maintenance
       updatedDoor = await prisma.bayDoor.update({
         where: { id: doorId },
         data: {
-          status: 'MAINTENANCE',
+          status: "MAINTENANCE",
           currentLoadSheetId: null,
         },
       });
 
-      eventType = 'MAINTENANCE';
+      eventType = "MAINTENANCE";
       eventDescription = `Bay door ${door.doorNumber} placed under maintenance`;
     } else {
       // General update
@@ -303,7 +309,7 @@ export async function PATCH(req: NextRequest) {
         },
       });
 
-      eventType = 'MODIFIED';
+      eventType = "MODIFIED";
       eventDescription = `Bay door ${door.doorNumber} updated`;
     }
 
@@ -324,10 +330,10 @@ export async function PATCH(req: NextRequest) {
       message: `Bay door updated successfully`,
     });
   } catch (error) {
-    console.error('Bay door PATCH error:', error);
+    console.error("Bay door PATCH error:", error);
     return NextResponse.json(
-      { error: 'Failed to update bay door' },
-      { status: 500 }
+      { error: "Failed to update bay door" },
+      { status: 500 },
     );
   }
 }
@@ -337,16 +343,16 @@ export async function DELETE(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const doorId = searchParams.get('doorId');
+    const doorId = searchParams.get("doorId");
 
     if (!doorId) {
       return NextResponse.json(
-        { error: 'Door ID is required' },
-        { status: 400 }
+        { error: "Door ID is required" },
+        { status: 400 },
       );
     }
 
@@ -359,14 +365,17 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (!door) {
-      return NextResponse.json({ error: 'Bay door not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Bay door not found" },
+        { status: 404 },
+      );
     }
 
     // Prevent deletion if door is occupied
     if (door.currentLoadSheetId) {
       return NextResponse.json(
-        { error: 'Cannot delete bay door while occupied' },
-        { status: 400 }
+        { error: "Cannot delete bay door while occupied" },
+        { status: 400 },
       );
     }
 
@@ -380,10 +389,10 @@ export async function DELETE(req: NextRequest) {
       message: `Bay door ${door.doorNumber} deleted successfully`,
     });
   } catch (error) {
-    console.error('Bay door DELETE error:', error);
+    console.error("Bay door DELETE error:", error);
     return NextResponse.json(
-      { error: 'Failed to delete bay door' },
-      { status: 500 }
+      { error: "Failed to delete bay door" },
+      { status: 500 },
     );
   }
 }

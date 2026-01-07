@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/task-automations/[id] - Get automation details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -46,7 +46,7 @@ export async function GET(
     if (!automation) {
       return NextResponse.json(
         { error: "Automation not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -55,7 +55,7 @@ export async function GET(
     console.error("Error fetching automation:", error);
     return NextResponse.json(
       { error: "Failed to fetch automation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -63,7 +63,7 @@ export async function GET(
 // PATCH /api/task-automations/[id] - Update automation
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -86,7 +86,7 @@ export async function PATCH(
         default:
           return NextResponse.json(
             { error: "Invalid action" },
-            { status: 400 }
+            { status: 400 },
           );
       }
     }
@@ -114,7 +114,7 @@ export async function PATCH(
     console.error("Error updating automation:", error);
     return NextResponse.json(
       { error: "Failed to update automation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -122,7 +122,7 @@ export async function PATCH(
 // DELETE /api/task-automations/[id] - Delete automation
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -139,7 +139,7 @@ export async function DELETE(
     console.error("Error deleting automation:", error);
     return NextResponse.json(
       { error: "Failed to delete automation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -165,7 +165,7 @@ async function handleManualExecution(automationId: string, userId: string) {
   if (!automation) {
     return NextResponse.json(
       { error: "Automation not found" },
-      { status: 404 }
+      { status: 404 },
     );
   }
 

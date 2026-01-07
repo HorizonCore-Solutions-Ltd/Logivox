@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 
 export interface ProgressProps extends React.HTMLAttributes<HTMLDivElement> {
-  value?: number
-  max?: number
+  value?: number;
+  max?: number;
 }
 
 const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
   ({ value = 0, max = 100, className, ...props }, ref) => {
-    const percentage = Math.min(100, Math.max(0, (value / max) * 100))
+    const percentage = Math.min(100, Math.max(0, (value / max) * 100));
 
     return (
       <div
         ref={ref}
-        className={`relative h-4 w-full overflow-hidden rounded-full bg-gray-200 ${className || ''}`}
+        className={`relative h-4 w-full overflow-hidden rounded-full bg-gray-200 ${className || ""}`}
         {...props}
       >
         <div
@@ -22,10 +22,10 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
           style={{ width: `${percentage}%` }}
         />
       </div>
-    )
-  }
-)
+    );
+  },
+);
 
-Progress.displayName = "Progress"
+Progress.displayName = "Progress";
 
-export { Progress }
+export { Progress };

@@ -1,21 +1,21 @@
 /**
  * Report Scheduler for LogiVox
- * 
+ *
  * Handles scheduled report generation and delivery via email.
  * Supports daily, weekly, and monthly schedules.
  */
 
-import { ReportConfig } from './report-types';
+import { ReportConfig } from "./report-types";
 
 // ============================================================================
 // Schedule Types
 // ============================================================================
 
 export enum ScheduleFrequency {
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-  CUSTOM = 'custom',
+  DAILY = "daily",
+  WEEKLY = "weekly",
+  MONTHLY = "monthly",
+  CUSTOM = "custom",
 }
 
 export enum DayOfWeek {
@@ -41,7 +41,7 @@ export interface ScheduledReport {
   reportConfig: ReportConfig;
   schedule: Schedule;
   recipients: string[]; // Email addresses
-  format: 'pdf' | 'csv' | 'xlsx';
+  format: "pdf" | "csv" | "xlsx";
   enabled: boolean;
   lastRun?: Date;
   nextRun?: Date;
@@ -53,9 +53,12 @@ export interface ScheduledReport {
 // Schedule Helpers
 // ============================================================================
 
-export function calculateNextRun(schedule: Schedule, from: Date = new Date()): Date {
+export function calculateNextRun(
+  schedule: Schedule,
+  from: Date = new Date(),
+): Date {
   const next = new Date(from);
-  const timeParts = schedule.time.split(':').map(Number);
+  const timeParts = schedule.time.split(":").map(Number);
   const hours = timeParts[0] || 0;
   const minutes = timeParts[1] || 0;
 
@@ -114,7 +117,15 @@ export function getScheduleDescription(schedule: Schedule): string {
 
     case ScheduleFrequency.WEEKLY:
       if (dayOfWeek !== undefined) {
-        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const days = [
+          "Sunday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+        ];
         return `Every ${days[dayOfWeek]} at ${time}`;
       }
       return `Weekly at ${time}`;
@@ -135,17 +146,17 @@ export function getScheduleDescription(schedule: Schedule): string {
 }
 
 function getDayOrdinalSuffix(day: number): string {
-  if (day >= 11 && day <= 13) return 'th';
+  if (day >= 11 && day <= 13) return "th";
 
   switch (day % 10) {
     case 1:
-      return 'st';
+      return "st";
     case 2:
-      return 'nd';
+      return "nd";
     case 3:
-      return 'rd';
+      return "rd";
     default:
-      return 'th';
+      return "th";
   }
 }
 
@@ -155,7 +166,7 @@ function getDayOrdinalSuffix(day: number): string {
 
 export function generateReportEmail(
   scheduledReport: ScheduledReport,
-  reportData: { totalRows: number; executionTime: number }
+  reportData: { totalRows: number; executionTime: number },
 ): {
   subject: string;
   html: string;
@@ -241,7 +252,7 @@ export function generateReportEmail(
   <div class="content">
     <h2>${reportConfig.name}</h2>
     
-    ${reportConfig.description ? `<p>${reportConfig.description}</p>` : ''}
+    ${reportConfig.description ? `<p>${reportConfig.description}</p>` : ""}
 
     <div class="info-box">
       <div class="info-item">
@@ -281,7 +292,7 @@ export function generateReportEmail(
   const text = `
 LogiVox Report: ${reportConfig.name}
 
-${reportConfig.description || ''}
+${reportConfig.description || ""}
 
 Report Details:
 - Category: ${reportConfig.category}
@@ -314,23 +325,23 @@ export function validateSchedule(schedule: Schedule): {
   // Validate time format
   const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
   if (!timeRegex.test(schedule.time)) {
-    errors.push('Time must be in HH:mm format (e.g., 09:00, 14:30)');
+    errors.push("Time must be in HH:mm format (e.g., 09:00, 14:30)");
   }
 
   // Validate frequency-specific fields
   if (schedule.frequency === ScheduleFrequency.WEEKLY) {
     if (schedule.dayOfWeek === undefined) {
-      errors.push('Day of week is required for weekly schedules');
+      errors.push("Day of week is required for weekly schedules");
     } else if (schedule.dayOfWeek < 0 || schedule.dayOfWeek > 6) {
-      errors.push('Day of week must be between 0 (Sunday) and 6 (Saturday)');
+      errors.push("Day of week must be between 0 (Sunday) and 6 (Saturday)");
     }
   }
 
   if (schedule.frequency === ScheduleFrequency.MONTHLY) {
     if (schedule.dayOfMonth === undefined) {
-      errors.push('Day of month is required for monthly schedules');
+      errors.push("Day of month is required for monthly schedules");
     } else if (schedule.dayOfMonth < 1 || schedule.dayOfMonth > 31) {
-      errors.push('Day of month must be between 1 and 31');
+      errors.push("Day of month must be between 1 and 31");
     }
   }
 
@@ -347,11 +358,11 @@ export function validateScheduledReport(report: Partial<ScheduledReport>): {
   const errors: string[] = [];
 
   if (!report.reportConfig) {
-    errors.push('Report configuration is required');
+    errors.push("Report configuration is required");
   }
 
   if (!report.schedule) {
-    errors.push('Schedule is required');
+    errors.push("Schedule is required");
   } else {
     const scheduleValidation = validateSchedule(report.schedule);
     if (!scheduleValidation.valid) {
@@ -360,21 +371,23 @@ export function validateScheduledReport(report: Partial<ScheduledReport>): {
   }
 
   if (!report.recipients || report.recipients.length === 0) {
-    errors.push('At least one recipient email is required');
+    errors.push("At least one recipient email is required");
   } else {
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     report.recipients.forEach((email, index) => {
       if (!emailRegex.test(email)) {
-        errors.push(`Invalid email format for recipient ${index + 1}: ${email}`);
+        errors.push(
+          `Invalid email format for recipient ${index + 1}: ${email}`,
+        );
       }
     });
   }
 
   if (!report.format) {
-    errors.push('Export format is required');
-  } else if (!['pdf', 'csv', 'xlsx'].includes(report.format)) {
-    errors.push('Format must be pdf, csv, or xlsx');
+    errors.push("Export format is required");
+  } else if (!["pdf", "csv", "xlsx"].includes(report.format)) {
+    errors.push("Format must be pdf, csv, or xlsx");
   }
 
   return {
@@ -395,19 +408,19 @@ export function convertToTimezone(date: Date, timezone: string): Date {
 
 export function getSupportedTimezones(): string[] {
   return [
-    'America/New_York',
-    'America/Chicago',
-    'America/Denver',
-    'America/Los_Angeles',
-    'America/Phoenix',
-    'Europe/London',
-    'Europe/Paris',
-    'Europe/Berlin',
-    'Asia/Tokyo',
-    'Asia/Shanghai',
-    'Asia/Dubai',
-    'Australia/Sydney',
-    'Pacific/Auckland',
-    'UTC',
+    "America/New_York",
+    "America/Chicago",
+    "America/Denver",
+    "America/Los_Angeles",
+    "America/Phoenix",
+    "Europe/London",
+    "Europe/Paris",
+    "Europe/Berlin",
+    "Asia/Tokyo",
+    "Asia/Shanghai",
+    "Asia/Dubai",
+    "Australia/Sydney",
+    "Pacific/Auckland",
+    "UTC",
   ];
 }

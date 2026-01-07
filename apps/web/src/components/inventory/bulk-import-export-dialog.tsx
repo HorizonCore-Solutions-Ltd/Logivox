@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useMutation } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/hooks/use-toast"
+import * as React from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -11,16 +11,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Upload, Download, FileSpreadsheet, AlertCircle } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Upload, Download, FileSpreadsheet, AlertCircle } from "lucide-react";
 
 interface BulkImportExportDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  mode: "import" | "export"
-  onSuccess?: () => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  mode: "import" | "export";
+  onSuccess?: () => void;
 }
 
 export function BulkImportExportDialog({
@@ -29,62 +29,62 @@ export function BulkImportExportDialog({
   mode,
   onSuccess,
 }: BulkImportExportDialogProps) {
-  const { toast } = useToast()
-  const [file, setFile] = React.useState<File | null>(null)
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
+  const { toast } = useToast();
+  const [file, setFile] = React.useState<File | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Export mutation
   const exportMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch("/api/inventory/export")
-      if (!res.ok) throw new Error("Failed to export inventory")
-      
-      const blob = await res.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.href = url
-      a.download = `inventory-export-${new Date().toISOString().split("T")[0]}.csv`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-      
-      return true
+      const res = await fetch("/api/inventory/export");
+      if (!res.ok) throw new Error("Failed to export inventory");
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `inventory-export-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      return true;
     },
     onSuccess: () => {
       toast({
         title: "Success",
         description: "Inventory exported successfully",
-      })
-      onOpenChange(false)
-      onSuccess?.()
+      });
+      onOpenChange(false);
+      onSuccess?.();
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   // Import mutation
   const importMutation = useMutation({
     mutationFn: async (file: File) => {
-      const formData = new FormData()
-      formData.append("file", file)
+      const formData = new FormData();
+      formData.append("file", file);
 
       const res = await fetch("/api/inventory/import", {
         method: "POST",
         body: formData,
-      })
+      });
 
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.message || "Failed to import inventory")
+        const error = await res.json();
+        throw new Error(error.message || "Failed to import inventory");
       }
 
-      return res.json()
+      return res.json();
     },
     onSuccess: (data) => {
       toast({
@@ -92,59 +92,59 @@ export function BulkImportExportDialog({
         description: `Imported ${data.imported} items successfully${
           data.failed > 0 ? `. ${data.failed} items failed.` : ""
         }`,
-      })
-      setFile(null)
+      });
+      setFile(null);
       if (fileInputRef.current) {
-        fileInputRef.current.value = ""
+        fileInputRef.current.value = "";
       }
-      onOpenChange(false)
-      onSuccess?.()
+      onOpenChange(false);
+      onSuccess?.();
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
+      setFile(e.target.files[0]);
     }
-  }
+  };
 
   const handleImport = () => {
     if (file) {
-      importMutation.mutate(file)
+      importMutation.mutate(file);
     }
-  }
+  };
 
   const handleExport = () => {
-    exportMutation.mutate()
-  }
+    exportMutation.mutate();
+  };
 
   const downloadTemplate = () => {
     const template = `name,sku,description,barcode,quantity,minStockLevel,reorderPoint,costPrice,sellingPrice,unit,warehouseId,categoryId
 Sample Item,SKU-001,Sample description,123456789,100,10,20,10.00,15.00,pcs,,
-Another Item,SKU-002,Another description,987654321,50,5,10,20.00,30.00,kg,,`
+Another Item,SKU-002,Another description,987654321,50,5,10,20.00,30.00,kg,,`;
 
-    const blob = new Blob([template], { type: "text/csv" })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement("a")
-    a.href = url
-    a.download = "inventory-template.csv"
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
+    const blob = new Blob([template], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "inventory-template.csv";
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
 
     toast({
       title: "Template Downloaded",
       description: "Use this template to prepare your inventory data",
-    })
-  }
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -201,9 +201,9 @@ Another Item,SKU-002,Another description,987654321,50,5,10,20.00,30.00,kg,,`
                     variant="ghost"
                     size="sm"
                     onClick={() => {
-                      setFile(null)
+                      setFile(null);
                       if (fileInputRef.current) {
-                        fileInputRef.current.value = ""
+                        fileInputRef.current.value = "";
                       }
                     }}
                   >
@@ -275,10 +275,7 @@ Another Item,SKU-002,Another description,987654321,50,5,10,20.00,30.00,kg,,`
               )}
             </Button>
           ) : (
-            <Button
-              onClick={handleExport}
-              disabled={exportMutation.isPending}
-            >
+            <Button onClick={handleExport} disabled={exportMutation.isPending}>
               {exportMutation.isPending ? (
                 <>Exporting...</>
               ) : (
@@ -292,5 +289,5 @@ Another Item,SKU-002,Another description,987654321,50,5,10,20.00,30.00,kg,,`
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

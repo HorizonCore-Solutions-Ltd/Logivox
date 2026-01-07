@@ -59,7 +59,8 @@ export default function IntegrationsPage() {
       const params = new URLSearchParams();
       if (filter.category) params.append("category", filter.category);
       if (filter.status) params.append("status", filter.status);
-      if (filter.healthStatus) params.append("healthStatus", filter.healthStatus);
+      if (filter.healthStatus)
+        params.append("healthStatus", filter.healthStatus);
       if (filter.search) params.append("search", filter.search);
 
       const response = await fetch(`/api/integrations?${params}`);
@@ -72,7 +73,8 @@ export default function IntegrationsPage() {
       setStats({
         total: data.length,
         active: data.filter((i: Integration) => i.status === "ACTIVE").length,
-        healthy: data.filter((i: Integration) => i.healthStatus === "HEALTHY").length,
+        healthy: data.filter((i: Integration) => i.healthStatus === "HEALTHY")
+          .length,
         errors: data.filter((i: Integration) => i.status === "ERROR").length,
       });
     } catch (error) {
@@ -139,7 +141,8 @@ export default function IntegrationsPage() {
             🔌 External Integrations
           </h1>
           <p className="text-gray-600">
-            Connect your WMS with external systems like QuickBooks, Shopify, and shipping carriers
+            Connect your WMS with external systems like QuickBooks, Shopify, and
+            shipping carriers
           </p>
         </div>
 
@@ -149,7 +152,9 @@ export default function IntegrationsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Integrations</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
               </div>
               <div className="text-3xl">🔌</div>
             </div>
@@ -159,7 +164,9 @@ export default function IntegrationsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-green-600">{stats.active}</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {stats.active}
+                </p>
               </div>
               <div className="text-3xl">✅</div>
             </div>
@@ -169,7 +176,9 @@ export default function IntegrationsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Healthy</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.healthy}</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {stats.healthy}
+                </p>
               </div>
               <div className="text-3xl">💚</div>
             </div>
@@ -179,7 +188,9 @@ export default function IntegrationsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Errors</p>
-                <p className="text-2xl font-bold text-red-600">{stats.errors}</p>
+                <p className="text-2xl font-bold text-red-600">
+                  {stats.errors}
+                </p>
               </div>
               <div className="text-3xl">⚠️</div>
             </div>
@@ -197,7 +208,9 @@ export default function IntegrationsPage() {
                 type="text"
                 placeholder="Search integrations..."
                 value={filter.search}
-                onChange={(e) => setFilter({ ...filter, search: e.target.value })}
+                onChange={(e) =>
+                  setFilter({ ...filter, search: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -208,7 +221,9 @@ export default function IntegrationsPage() {
               </label>
               <select
                 value={filter.category}
-                onChange={(e) => setFilter({ ...filter, category: e.target.value })}
+                onChange={(e) =>
+                  setFilter({ ...filter, category: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Categories</option>
@@ -228,7 +243,9 @@ export default function IntegrationsPage() {
               </label>
               <select
                 value={filter.status}
-                onChange={(e) => setFilter({ ...filter, status: e.target.value })}
+                onChange={(e) =>
+                  setFilter({ ...filter, status: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Statuses</option>
@@ -247,7 +264,9 @@ export default function IntegrationsPage() {
               </label>
               <select
                 value={filter.healthStatus}
-                onChange={(e) => setFilter({ ...filter, healthStatus: e.target.value })}
+                onChange={(e) =>
+                  setFilter({ ...filter, healthStatus: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Health</option>
@@ -308,10 +327,14 @@ export default function IntegrationsPage() {
                       <h3 className="text-lg font-semibold text-gray-900">
                         {integration.name}
                       </h3>
-                      <p className="text-sm text-gray-500">{integration.code}</p>
+                      <p className="text-sm text-gray-500">
+                        {integration.code}
+                      </p>
                     </div>
                   </div>
-                  <div className={`text-2xl ${getHealthColor(integration.healthStatus)}`}>
+                  <div
+                    className={`text-2xl ${getHealthColor(integration.healthStatus)}`}
+                  >
                     {integration.healthStatus === "HEALTHY" && "💚"}
                     {integration.healthStatus === "DEGRADED" && "💛"}
                     {integration.healthStatus === "UNHEALTHY" && "❤️"}
@@ -328,10 +351,14 @@ export default function IntegrationsPage() {
 
                 {/* Tags */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(integration.category)}`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${getCategoryColor(integration.category)}`}
+                  >
                     {integration.category}
                   </span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(integration.status)}`}>
+                  <span
+                    className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(integration.status)}`}
+                  >
                     {integration.status}
                   </span>
                 </div>
@@ -352,36 +379,42 @@ export default function IntegrationsPage() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-500">Errors</p>
-                    <p className={`text-sm font-semibold ${integration.errorCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                    <p
+                      className={`text-sm font-semibold ${integration.errorCount > 0 ? "text-red-600" : "text-gray-900"}`}
+                    >
                       {integration.errorCount}
                     </p>
                   </div>
                 </div>
 
                 {/* Uptime */}
-                {integration.uptime !== null && integration.uptime !== undefined && (
-                  <div className="mt-4">
-                    <div className="flex justify-between text-xs text-gray-600 mb-1">
-                      <span>Uptime</span>
-                      <span>{integration.uptime}%</span>
+                {integration.uptime !== null &&
+                  integration.uptime !== undefined && (
+                    <div className="mt-4">
+                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                        <span>Uptime</span>
+                        <span>{integration.uptime}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            integration.uptime >= 99
+                              ? "bg-green-500"
+                              : integration.uptime >= 95
+                                ? "bg-yellow-500"
+                                : "bg-red-500"
+                          }`}
+                          style={{ width: `${integration.uptime}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full ${
-                          integration.uptime >= 99 ? 'bg-green-500' :
-                          integration.uptime >= 95 ? 'bg-yellow-500' :
-                          'bg-red-500'
-                        }`}
-                        style={{ width: `${integration.uptime}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
+                  )}
 
                 {/* Last Sync */}
                 {integration.lastSyncAt && (
                   <div className="mt-3 text-xs text-gray-500">
-                    Last synced: {new Date(integration.lastSyncAt).toLocaleString()}
+                    Last synced:{" "}
+                    {new Date(integration.lastSyncAt).toLocaleString()}
                   </div>
                 )}
               </div>

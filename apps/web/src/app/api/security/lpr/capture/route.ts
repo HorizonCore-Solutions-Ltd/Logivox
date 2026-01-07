@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const lprCaptureSchema = z.object({
   licensePlate: z.string().min(1),
@@ -8,7 +8,7 @@ const lprCaptureSchema = z.object({
   gateId: z.string(),
   imageUrl: z.string().url().optional(),
   timestamp: z.string().datetime(),
-  direction: z.enum(['IN', 'OUT']),
+  direction: z.enum(["IN", "OUT"]),
   cameraId: z.string().optional(),
   vehicleType: z.string().optional(),
   organizationId: z.string(), // API key will map to organization
@@ -17,9 +17,9 @@ const lprCaptureSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     // Verify API key from headers
-    const apiKey = req.headers.get('x-api-key');
+    const apiKey = req.headers.get("x-api-key");
     if (!apiKey) {
-      return NextResponse.json({ error: 'API key required' }, { status: 401 });
+      return NextResponse.json({ error: "API key required" }, { status: 401 });
     }
 
     // Validate API key and get organization
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!validApiKey) {
-      return NextResponse.json({ error: 'Invalid API key' }, { status: 401 });
+      return NextResponse.json({ error: "Invalid API key" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -46,8 +46,8 @@ export async function POST(req: NextRequest) {
     // Only process high-confidence reads (> 80%)
     if (data.confidence < 80) {
       return NextResponse.json({
-        status: 'LOW_CONFIDENCE',
-        message: 'Confidence too low for automatic processing',
+        status: "LOW_CONFIDENCE",
+        message: "Confidence too low for automatic processing",
         requiresManualReview: true,
       });
     }
@@ -60,10 +60,7 @@ export async function POST(req: NextRequest) {
         organizationId: validApiKey.organizationId,
         licensePlate,
         isActive: true,
-        OR: [
-          { bannedUntil: null },
-          { bannedUntil: { gte: new Date() } },
-        ],
+        OR: [{ bannedUntil: null }, { bannedUntil: { gte: new Date() } }],
       },
     });
 
@@ -72,10 +69,12 @@ export async function POST(req: NextRequest) {
       await prisma.securityAlert.create({
         data: {
           organizationId: validApiKey.organizationId,
-          type: 'BLACKLISTED_VEHICLE',
-          severity: blacklisted.severity === 'PERMANENT' || blacklisted.severity === 'CRITICAL'
-            ? 'CRITICAL'
-            : 'HIGH',
+          type: "BLACKLISTED_VEHICLE",
+          severity:
+            blacklisted.severity === "PERMANENT" ||
+            blacklisted.severity === "CRITICAL"
+              ? "CRITICAL"
+              : "HIGH",
           message: `BLACKLISTED VEHICLE DETECTED: ${licensePlate} - ${blacklisted.reason}`,
           metadata: {
             licensePlate,
@@ -88,8 +87,8 @@ export async function POST(req: NextRequest) {
       });
 
       return NextResponse.json({
-        status: 'BLOCKED',
-        reason: 'BLACKLISTED',
+        status: "BLOCKED",
+        reason: "BLACKLISTED",
         severity: blacklisted.severity,
         message: blacklisted.reason,
         alert: true,
@@ -100,14 +99,11 @@ export async function POST(req: NextRequest) {
     const whitelisted = await prisma.vehicleWhitelist.findFirst({
       where: {
         organizationId: validApiKey.organizationId,
-        type: 'VEHICLE',
+        type: "VEHICLE",
         identifier: licensePlate,
         isActive: true,
         validFrom: { lte: new Date() },
-        OR: [
-          { validUntil: null },
-          { validUntil: { gte: new Date() } },
-        ],
+        OR: [{ validUntil: null }, { validUntil: { gte: new Date() } }],
       },
     });
 
@@ -120,7 +116,7 @@ export async function POST(req: NextRequest) {
           gte: new Date(Date.now() - 4 * 60 * 60 * 1000), // -4 hours
           lte: new Date(Date.now() + 4 * 60 * 60 * 1000), // +4 hours
         },
-        status: { in: ['SCHEDULED', 'CHECKED_IN'] },
+        status: { in: ["SCHEDULED", "CHECKED_IN"] },
       },
     });
 
@@ -134,7 +130,7 @@ export async function POST(req: NextRequest) {
         data: {
           organizationId: validApiKey.organizationId,
           entryNumber: `LPR-${Date.now()}`,
-          entryType: 'DELIVERY',
+          entryType: "DELIVERY",
           direction: data.direction,
           warehouseId: gate?.warehouseId,
           gateNumber: gate?.gateNumber,
@@ -144,7 +140,7 @@ export async function POST(req: NextRequest) {
           securityCheckPassed: whitelisted?.skipInspection || false,
           appointmentId: appointment?.id,
           metadata: {
-            source: 'LPR_AUTO',
+            source: "LPR_AUTO",
             confidence: data.confidence,
             cameraId: data.cameraId,
             imageUrl: data.imageUrl,
@@ -157,7 +153,7 @@ export async function POST(req: NextRequest) {
         await prisma.gatePhoto.create({
           data: {
             gateEntryId: gateEntry.id,
-            photoType: 'LICENSE_PLATE',
+            photoType: "LICENSE_PLATE",
             photoUrl: data.imageUrl,
             capturedAt: new Date(data.timestamp),
             description: `LPR Auto-capture (${data.confidence}% confidence)`,
@@ -166,8 +162,8 @@ export async function POST(req: NextRequest) {
       }
 
       return NextResponse.json({
-        status: 'AUTO_APPROVED',
-        reason: whitelisted ? 'WHITELISTED' : 'HAS_APPOINTMENT',
+        status: "AUTO_APPROVED",
+        reason: whitelisted ? "WHITELISTED" : "HAS_APPOINTMENT",
         gateEntry,
         skipWeighBridge: whitelisted?.skipWeighBridge || false,
         skipInspection: whitelisted?.skipInspection || false,
@@ -180,15 +176,16 @@ export async function POST(req: NextRequest) {
         organizationId: validApiKey.organizationId,
         licensePlate,
         gateId: data.gateId,
-        position: await prisma.gateQueue.count({
-          where: {
-            organizationId: validApiKey.organizationId,
-            status: { in: ['WAITING', 'CALLED'] },
-          },
-        }) + 1,
-        status: 'WAITING',
+        position:
+          (await prisma.gateQueue.count({
+            where: {
+              organizationId: validApiKey.organizationId,
+              status: { in: ["WAITING", "CALLED"] },
+            },
+          })) + 1,
+        status: "WAITING",
         metadata: {
-          source: 'LPR',
+          source: "LPR",
           confidence: data.confidence,
           cameraId: data.cameraId,
           imageUrl: data.imageUrl,
@@ -197,23 +194,23 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      status: 'PENDING_MANUAL_REVIEW',
-      reason: 'NOT_WHITELISTED',
+      status: "PENDING_MANUAL_REVIEW",
+      reason: "NOT_WHITELISTED",
       queueEntry,
       requiresApproval: true,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error processing LPR capture:', error);
+    console.error("Error processing LPR capture:", error);
     return NextResponse.json(
-      { error: 'Failed to process LPR capture' },
-      { status: 500 }
+      { error: "Failed to process LPR capture" },
+      { status: 500 },
     );
   }
 }

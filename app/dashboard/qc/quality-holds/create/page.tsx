@@ -1,32 +1,44 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle } from 'lucide-react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertTriangle } from "lucide-react";
 
 export default function CreateQualityHoldPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    type: 'LOT',
-    reason: 'FAILED_INSPECTION',
-    productId: '',
-    lotNumber: '',
-    locationId: '',
-    vendorId: '',
-    orderId: '',
-    quantity: '',
-    estimatedValue: '',
-    description: '',
-    initiatedBy: '',
+    type: "LOT",
+    reason: "FAILED_INSPECTION",
+    productId: "",
+    lotNumber: "",
+    locationId: "",
+    vendorId: "",
+    orderId: "",
+    quantity: "",
+    estimatedValue: "",
+    description: "",
+    initiatedBy: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,9 +46,9 @@ export default function CreateQualityHoldPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/qc/quality-holds', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/quality-holds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           quantity: parseInt(formData.quantity) || 0,
@@ -44,13 +56,13 @@ export default function CreateQualityHoldPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to create quality hold');
+      if (!response.ok) throw new Error("Failed to create quality hold");
 
       const data = await response.json();
       router.push(`/dashboard/qc/quality-holds/${data.id}`);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to create quality hold');
+      console.error("Error:", error);
+      alert("Failed to create quality hold");
     } finally {
       setLoading(false);
     }
@@ -73,7 +85,8 @@ export default function CreateQualityHoldPage() {
       <Alert className="border-orange-500 bg-orange-50">
         <AlertTriangle className="h-4 w-4 text-orange-600" />
         <AlertDescription className="text-orange-600">
-          This action will immediately quarantine the specified inventory and block all movements
+          This action will immediately quarantine the specified inventory and
+          block all movements
         </AlertDescription>
       </Alert>
 
@@ -89,13 +102,17 @@ export default function CreateQualityHoldPage() {
                   <Label htmlFor="type">Hold Type *</Label>
                   <Select
                     value={formData.type}
-                    onValueChange={(value) => setFormData({ ...formData, type: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, type: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="PRODUCT">Product (All lots)</SelectItem>
+                      <SelectItem value="PRODUCT">
+                        Product (All lots)
+                      </SelectItem>
                       <SelectItem value="LOT">Specific Lot</SelectItem>
                       <SelectItem value="LOCATION">Location Hold</SelectItem>
                       <SelectItem value="VENDOR">Vendor Hold</SelectItem>
@@ -108,17 +125,29 @@ export default function CreateQualityHoldPage() {
                   <Label htmlFor="reason">Reason *</Label>
                   <Select
                     value={formData.reason}
-                    onValueChange={(value) => setFormData({ ...formData, reason: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, reason: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="FAILED_INSPECTION">Failed Inspection</SelectItem>
-                      <SelectItem value="CUSTOMER_COMPLAINT">Customer Complaint</SelectItem>
-                      <SelectItem value="SUPPLIER_ISSUE">Supplier Issue</SelectItem>
-                      <SelectItem value="REGULATORY">Regulatory Hold</SelectItem>
-                      <SelectItem value="INVESTIGATION">Under Investigation</SelectItem>
+                      <SelectItem value="FAILED_INSPECTION">
+                        Failed Inspection
+                      </SelectItem>
+                      <SelectItem value="CUSTOMER_COMPLAINT">
+                        Customer Complaint
+                      </SelectItem>
+                      <SelectItem value="SUPPLIER_ISSUE">
+                        Supplier Issue
+                      </SelectItem>
+                      <SelectItem value="REGULATORY">
+                        Regulatory Hold
+                      </SelectItem>
+                      <SelectItem value="INVESTIGATION">
+                        Under Investigation
+                      </SelectItem>
                       <SelectItem value="OTHER">Other</SelectItem>
                     </SelectContent>
                   </Select>
@@ -135,20 +164,22 @@ export default function CreateQualityHoldPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {formData.type === 'PRODUCT' && (
+              {formData.type === "PRODUCT" && (
                 <div className="space-y-2">
                   <Label htmlFor="productId">Product ID *</Label>
                   <Input
                     id="productId"
                     required
                     value={formData.productId}
-                    onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, productId: e.target.value })
+                    }
                     placeholder="Product identifier"
                   />
                 </div>
               )}
 
-              {formData.type === 'LOT' && (
+              {formData.type === "LOT" && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="productId">Product ID *</Label>
@@ -156,7 +187,9 @@ export default function CreateQualityHoldPage() {
                       id="productId"
                       required
                       value={formData.productId}
-                      onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, productId: e.target.value })
+                      }
                       placeholder="Product identifier"
                     />
                   </div>
@@ -166,47 +199,55 @@ export default function CreateQualityHoldPage() {
                       id="lotNumber"
                       required
                       value={formData.lotNumber}
-                      onChange={(e) => setFormData({ ...formData, lotNumber: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, lotNumber: e.target.value })
+                      }
                       placeholder="Lot/batch number"
                     />
                   </div>
                 </div>
               )}
 
-              {formData.type === 'LOCATION' && (
+              {formData.type === "LOCATION" && (
                 <div className="space-y-2">
                   <Label htmlFor="locationId">Location ID *</Label>
                   <Input
                     id="locationId"
                     required
                     value={formData.locationId}
-                    onChange={(e) => setFormData({ ...formData, locationId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, locationId: e.target.value })
+                    }
                     placeholder="Warehouse location"
                   />
                 </div>
               )}
 
-              {formData.type === 'VENDOR' && (
+              {formData.type === "VENDOR" && (
                 <div className="space-y-2">
                   <Label htmlFor="vendorId">Vendor ID *</Label>
                   <Input
                     id="vendorId"
                     required
                     value={formData.vendorId}
-                    onChange={(e) => setFormData({ ...formData, vendorId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, vendorId: e.target.value })
+                    }
                     placeholder="Vendor/supplier identifier"
                   />
                 </div>
               )}
 
-              {formData.type === 'ORDER' && (
+              {formData.type === "ORDER" && (
                 <div className="space-y-2">
                   <Label htmlFor="orderId">Order ID *</Label>
                   <Input
                     id="orderId"
                     required
                     value={formData.orderId}
-                    onChange={(e) => setFormData({ ...formData, orderId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, orderId: e.target.value })
+                    }
                     placeholder="Purchase order number"
                   />
                 </div>
@@ -220,7 +261,9 @@ export default function CreateQualityHoldPage() {
                     type="number"
                     required
                     value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, quantity: e.target.value })
+                    }
                     placeholder="Number of units"
                   />
                 </div>
@@ -232,7 +275,12 @@ export default function CreateQualityHoldPage() {
                     type="number"
                     step="0.01"
                     value={formData.estimatedValue}
-                    onChange={(e) => setFormData({ ...formData, estimatedValue: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        estimatedValue: e.target.value,
+                      })
+                    }
                     placeholder="0.00"
                   />
                 </div>
@@ -252,7 +300,9 @@ export default function CreateQualityHoldPage() {
                   required
                   rows={4}
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Detailed description of the quality issue requiring this hold..."
                 />
               </div>
@@ -263,7 +313,9 @@ export default function CreateQualityHoldPage() {
                   id="initiatedBy"
                   required
                   value={formData.initiatedBy}
-                  onChange={(e) => setFormData({ ...formData, initiatedBy: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, initiatedBy: e.target.value })
+                  }
                   placeholder="Your name"
                 />
               </div>
@@ -281,7 +333,7 @@ export default function CreateQualityHoldPage() {
             </Button>
             <Button type="submit" disabled={loading} variant="destructive">
               <AlertTriangle className="mr-2 h-4 w-4" />
-              {loading ? 'Creating Hold...' : 'Place on Hold'}
+              {loading ? "Creating Hold..." : "Place on Hold"}
             </Button>
           </div>
         </div>

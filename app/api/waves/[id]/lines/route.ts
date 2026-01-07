@@ -18,7 +18,7 @@ const addLineSchema = z.object({
 // GET /api/waves/[id]/lines - Get wave lines
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -103,7 +103,7 @@ export async function GET(
     console.error("Error fetching wave lines:", error);
     return NextResponse.json(
       { error: "Failed to fetch wave lines" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -111,7 +111,7 @@ export async function GET(
 // POST /api/waves/[id]/lines - Add lines to wave
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -140,7 +140,7 @@ export async function POST(
     if (wave.status !== "PLANNED") {
       return NextResponse.json(
         { error: "Cannot add lines to wave in current status" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -148,7 +148,7 @@ export async function POST(
     if (wave.maxLines && wave.totalLines >= wave.maxLines) {
       return NextResponse.json(
         { error: "Wave has reached maximum lines limit" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -214,13 +214,13 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error adding wave line:", error);
     return NextResponse.json(
       { error: "Failed to add wave line" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

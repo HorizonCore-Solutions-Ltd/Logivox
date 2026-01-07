@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Clock, Play, Square, Calendar } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Clock, Play, Square, Calendar } from "lucide-react";
 
 interface TimeEntry {
   id: string;
@@ -20,7 +20,9 @@ interface TimeEntry {
 export default function TimeClockPage() {
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
 
   useEffect(() => {
     fetchTimeEntries();
@@ -29,8 +31,8 @@ export default function TimeClockPage() {
   const fetchTimeEntries = async () => {
     try {
       const params = new URLSearchParams();
-      params.append('startDate', selectedDate);
-      params.append('endDate', selectedDate);
+      params.append("startDate", selectedDate);
+      params.append("endDate", selectedDate);
 
       const res = await fetch(`/api/time-entries?${params.toString()}`);
       if (res.ok) {
@@ -38,29 +40,32 @@ export default function TimeClockPage() {
         setTimeEntries(data);
       }
     } catch (error) {
-      console.error('Error fetching time entries:', error);
+      console.error("Error fetching time entries:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString('en-US', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return new Date(dateStr).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const formatDuration = (hours?: number) => {
-    if (!hours) return '-';
+    if (!hours) return "-";
     const h = Math.floor(hours);
     const m = Math.round((hours - h) * 60);
     return `${h}h ${m}m`;
   };
 
-  const activeEntries = timeEntries.filter(e => !e.clockOut);
-  const completedEntries = timeEntries.filter(e => e.clockOut);
-  const totalHours = completedEntries.reduce((sum, e) => sum + (e.hoursWorked || 0), 0);
+  const activeEntries = timeEntries.filter((e) => !e.clockOut);
+  const completedEntries = timeEntries.filter((e) => e.clockOut);
+  const totalHours = completedEntries.reduce(
+    (sum, e) => sum + (e.hoursWorked || 0),
+    0,
+  );
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -85,7 +90,9 @@ export default function TimeClockPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Currently Clocked In</p>
-              <p className="text-2xl font-bold text-green-600">{activeEntries.length}</p>
+              <p className="text-2xl font-bold text-green-600">
+                {activeEntries.length}
+              </p>
             </div>
             <Play className="w-8 h-8 text-green-600" />
           </div>
@@ -134,14 +141,18 @@ export default function TimeClockPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {activeEntries.map((entry) => {
-                  const elapsed = (Date.now() - new Date(entry.clockIn).getTime()) / (1000 * 60 * 60);
+                  const elapsed =
+                    (Date.now() - new Date(entry.clockIn).getTime()) /
+                    (1000 * 60 * 60);
                   return (
                     <tr key={entry.id} className="bg-green-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">
                           {entry.employee.firstName} {entry.employee.lastName}
                         </div>
-                        <div className="text-sm text-gray-500">{entry.employee.employeeNumber}</div>
+                        <div className="text-sm text-gray-500">
+                          {entry.employee.employeeNumber}
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {entry.warehouse.name}
@@ -190,13 +201,19 @@ export default function TimeClockPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                  <td
+                    colSpan={5}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
                     Loading...
                   </td>
                 </tr>
               ) : completedEntries.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                  <td
+                    colSpan={5}
+                    className="px-6 py-4 text-center text-gray-500"
+                  >
                     No completed time entries for this date
                   </td>
                 </tr>
@@ -207,7 +224,9 @@ export default function TimeClockPage() {
                       <div className="text-sm font-medium text-gray-900">
                         {entry.employee.firstName} {entry.employee.lastName}
                       </div>
-                      <div className="text-sm text-gray-500">{entry.employee.employeeNumber}</div>
+                      <div className="text-sm text-gray-500">
+                        {entry.employee.employeeNumber}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {entry.warehouse.name}
@@ -216,7 +235,7 @@ export default function TimeClockPage() {
                       {formatTime(entry.clockIn)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {entry.clockOut ? formatTime(entry.clockOut) : '-'}
+                      {entry.clockOut ? formatTime(entry.clockOut) : "-"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm font-medium text-blue-600">

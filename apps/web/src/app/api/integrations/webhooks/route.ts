@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -46,7 +46,10 @@ export async function GET(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -97,7 +100,7 @@ export async function GET(request: Request) {
     console.error("Error fetching webhooks:", error);
     return NextResponse.json(
       { error: "Failed to fetch webhooks" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -122,7 +125,10 @@ export async function POST(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -138,7 +144,7 @@ export async function POST(request: Request) {
     if (!integration) {
       return NextResponse.json(
         { error: "Integration not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -172,13 +178,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating webhook:", error);
     return NextResponse.json(
       { error: "Failed to create webhook" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

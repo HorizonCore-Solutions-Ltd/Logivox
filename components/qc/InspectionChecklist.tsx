@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { CheckCircle, XCircle, AlertCircle } from "lucide-react";
 
 interface ChecklistItem {
   id: string;
   label: string;
   required: boolean;
-  type: 'checkbox' | 'text' | 'number' | 'measurement';
+  type: "checkbox" | "text" | "number" | "measurement";
   value?: any;
   passed?: boolean;
   notes?: string;
@@ -41,13 +41,18 @@ export default function InspectionChecklist({
 
   const getCompletionStats = () => {
     const total = items.filter((item) => item.required).length;
-    const completed = items.filter((item) => item.required && item.passed !== undefined).length;
-    const passed = items.filter((item) => item.required && item.passed === true).length;
+    const completed = items.filter(
+      (item) => item.required && item.passed !== undefined,
+    ).length;
+    const passed = items.filter(
+      (item) => item.required && item.passed === true,
+    ).length;
     return { total, completed, passed };
   };
 
   const stats = getCompletionStats();
-  const completionRate = stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
+  const completionRate =
+    stats.total > 0 ? (stats.completed / stats.total) * 100 : 0;
 
   return (
     <div className="space-y-4">
@@ -86,14 +91,23 @@ export default function InspectionChecklist({
       {/* Checklist Items */}
       <div className="space-y-3">
         {items.map((item, index) => (
-          <Card key={item.id} className={item.passed === false ? 'border-red-300' : ''}>
+          <Card
+            key={item.id}
+            className={item.passed === false ? "border-red-300" : ""}
+          >
             <CardContent className="pt-4">
               <div className="flex items-start gap-4">
                 {/* Status Icon */}
                 <div className="mt-1">
-                  {item.passed === true && <CheckCircle className="w-5 h-5 text-green-600" />}
-                  {item.passed === false && <XCircle className="w-5 h-5 text-red-600" />}
-                  {item.passed === undefined && <AlertCircle className="w-5 h-5 text-gray-400" />}
+                  {item.passed === true && (
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  )}
+                  {item.passed === false && (
+                    <XCircle className="w-5 h-5 text-red-600" />
+                  )}
+                  {item.passed === undefined && (
+                    <AlertCircle className="w-5 h-5 text-gray-400" />
+                  )}
                 </div>
 
                 {/* Content */}
@@ -101,19 +115,21 @@ export default function InspectionChecklist({
                   <div className="flex items-center justify-between">
                     <Label className="text-base font-medium">
                       {item.label}
-                      {item.required && <span className="text-red-500 ml-1">*</span>}
+                      {item.required && (
+                        <span className="text-red-500 ml-1">*</span>
+                      )}
                     </Label>
                   </div>
 
                   {/* Input based on type */}
-                  {item.type === 'checkbox' && !readOnly && (
+                  {item.type === "checkbox" && !readOnly && (
                     <div className="flex gap-4">
                       <button
                         onClick={() => updateItem(index, { passed: true })}
                         className={`px-4 py-2 rounded border ${
                           item.passed === true
-                            ? 'bg-green-500 text-white border-green-500'
-                            : 'border-gray-300'
+                            ? "bg-green-500 text-white border-green-500"
+                            : "border-gray-300"
                         }`}
                       >
                         Pass
@@ -122,8 +138,8 @@ export default function InspectionChecklist({
                         onClick={() => updateItem(index, { passed: false })}
                         className={`px-4 py-2 rounded border ${
                           item.passed === false
-                            ? 'bg-red-500 text-white border-red-500'
-                            : 'border-gray-300'
+                            ? "bg-red-500 text-white border-red-500"
+                            : "border-gray-300"
                         }`}
                       >
                         Fail
@@ -131,35 +147,43 @@ export default function InspectionChecklist({
                     </div>
                   )}
 
-                  {item.type === 'text' && !readOnly && (
+                  {item.type === "text" && !readOnly && (
                     <Input
-                      value={item.value || ''}
-                      onChange={(e) => updateItem(index, { value: e.target.value })}
+                      value={item.value || ""}
+                      onChange={(e) =>
+                        updateItem(index, { value: e.target.value })
+                      }
                       placeholder="Enter value..."
                     />
                   )}
 
-                  {item.type === 'number' && !readOnly && (
+                  {item.type === "number" && !readOnly && (
                     <Input
                       type="number"
-                      value={item.value || ''}
-                      onChange={(e) => updateItem(index, { value: parseFloat(e.target.value) })}
+                      value={item.value || ""}
+                      onChange={(e) =>
+                        updateItem(index, { value: parseFloat(e.target.value) })
+                      }
                       placeholder="Enter numeric value..."
                     />
                   )}
 
-                  {item.type === 'measurement' && !readOnly && (
+                  {item.type === "measurement" && !readOnly && (
                     <div className="flex gap-2">
                       <Input
                         type="number"
                         step="0.01"
-                        value={item.value || ''}
-                        onChange={(e) => updateItem(index, { value: parseFloat(e.target.value) })}
+                        value={item.value || ""}
+                        onChange={(e) =>
+                          updateItem(index, {
+                            value: parseFloat(e.target.value),
+                          })
+                        }
                         placeholder="Measurement..."
                         className="flex-1"
                       />
                       <span className="flex items-center px-3 bg-gray-100 rounded border">
-                        {item.unit || 'unit'}
+                        {item.unit || "unit"}
                       </span>
                     </div>
                   )}
@@ -167,14 +191,18 @@ export default function InspectionChecklist({
                   {/* Read-only display */}
                   {readOnly && (
                     <div className="text-sm">
-                      {item.type === 'checkbox' && (
-                        <span className={item.passed ? 'text-green-600' : 'text-red-600'}>
-                          {item.passed ? 'PASSED' : 'FAILED'}
+                      {item.type === "checkbox" && (
+                        <span
+                          className={
+                            item.passed ? "text-green-600" : "text-red-600"
+                          }
+                        >
+                          {item.passed ? "PASSED" : "FAILED"}
                         </span>
                       )}
-                      {item.type !== 'checkbox' && (
+                      {item.type !== "checkbox" && (
                         <span className="font-medium">
-                          {item.value} {item.unit || ''}
+                          {item.value} {item.unit || ""}
                         </span>
                       )}
                     </div>
@@ -183,8 +211,10 @@ export default function InspectionChecklist({
                   {/* Notes */}
                   {!readOnly && (
                     <Textarea
-                      value={item.notes || ''}
-                      onChange={(e) => updateItem(index, { notes: e.target.value })}
+                      value={item.notes || ""}
+                      onChange={(e) =>
+                        updateItem(index, { notes: e.target.value })
+                      }
                       placeholder="Add notes (optional)..."
                       rows={2}
                       className="text-sm"

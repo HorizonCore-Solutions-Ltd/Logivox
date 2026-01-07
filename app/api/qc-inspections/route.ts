@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const createInspectionSchema = z.object({
   templateId: z.string().min(1, "Template ID is required"),
-  category: z.enum(['INCOMING', 'IN_PROCESS', 'FINAL', 'RANDOM', 'COMPLAINT']),
+  category: z.enum(["INCOMING", "IN_PROCESS", "FINAL", "RANDOM", "COMPLAINT"]),
   inventoryId: z.string().min(1, "Inventory ID is required"),
   quantity: z.number().int().min(1),
   sampleSize: z.number().int().min(1).optional(),
@@ -19,10 +19,12 @@ const createInspectionSchema = z.object({
 });
 
 // Helper function to generate inspection number
-async function generateInspectionNumber(organizationId: string): Promise<string> {
+async function generateInspectionNumber(
+  organizationId: string,
+): Promise<string> {
   const today = new Date();
-  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-  
+  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
+
   const lastInspection = await prisma.qCInspection.findFirst({
     where: {
       organizationId,
@@ -30,16 +32,18 @@ async function generateInspectionNumber(organizationId: string): Promise<string>
         startsWith: `QC-${dateStr}`,
       },
     },
-    orderBy: { inspectionNumber: 'desc' },
+    orderBy: { inspectionNumber: "desc" },
   });
 
   let sequence = 1;
   if (lastInspection) {
-    const lastSequence = parseInt(lastInspection.inspectionNumber.split('-')[2]);
+    const lastSequence = parseInt(
+      lastInspection.inspectionNumber.split("-")[2],
+    );
     sequence = lastSequence + 1;
   }
 
-  return `QC-${dateStr}-${sequence.toString().padStart(3, '0')}`;
+  return `QC-${dateStr}-${sequence.toString().padStart(3, "0")}`;
 }
 
 // Helper function to calculate sample size
@@ -47,16 +51,16 @@ function calculateSampleSize(
   samplingType: string,
   quantity: number,
   sampleSize?: number,
-  samplePercentage?: number
+  samplePercentage?: number,
 ): number {
   switch (samplingType) {
-    case 'FULL':
+    case "FULL":
       return quantity;
-    case 'STATISTICAL':
+    case "STATISTICAL":
       return sampleSize || Math.min(quantity, 100); // Default AQL sample
-    case 'PERCENTAGE':
+    case "PERCENTAGE":
       return Math.ceil(quantity * ((samplePercentage || 10) / 100));
-    case 'RANDOM':
+    case "RANDOM":
       return sampleSize || Math.min(quantity, 10); // Default random sample
     default:
       return quantity;
@@ -84,7 +88,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -138,7 +142,7 @@ export async function GET(request: Request) {
     console.error("Error fetching inspections:", error);
     return NextResponse.json(
       { error: "Failed to fetch inspections" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -167,7 +171,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -181,7 +185,7 @@ export async function POST(request: Request) {
     if (!template) {
       return NextResponse.json(
         { error: "Template not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -190,7 +194,7 @@ export async function POST(request: Request) {
       template.samplingType,
       validatedData.quantity,
       validatedData.sampleSize || template.sampleSize || undefined,
-      template.samplePercentage || undefined
+      template.samplePercentage || undefined,
     );
 
     // Generate inspection number
@@ -211,7 +215,7 @@ export async function POST(request: Request) {
         grnId: validatedData.grnId,
         salesOrderId: validatedData.salesOrderId,
         lotId: validatedData.lotId,
-        status: 'PENDING',
+        status: "PENDING",
         inspectedById: session.user.id,
         notes: validatedData.notes,
         // Create checkpoints from template
@@ -225,7 +229,7 @@ export async function POST(request: Request) {
             expectedValue: cp.expectedValue,
             tolerance: cp.tolerance,
             unit: cp.unit,
-            status: 'PENDING',
+            status: "PENDING",
             performedById: session.user.id,
           })),
         },
@@ -234,11 +238,11 @@ export async function POST(request: Request) {
           approvals: {
             create: {
               level: 1,
-              status: 'PENDING',
+              status: "PENDING",
             },
           },
           currentApprovalLevel: 1,
-          approvalStatus: 'PENDING',
+          approvalStatus: "PENDING",
         }),
       },
       include: {
@@ -254,14 +258,14 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating inspection:", error);
     return NextResponse.json(
       { error: "Failed to create inspection" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

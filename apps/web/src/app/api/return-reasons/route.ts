@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -11,7 +11,9 @@ const createReturnReasonSchema = z.object({
   description: z.string().optional(),
   autoApprove: z.boolean().optional().default(false),
   requiresQC: z.boolean().optional().default(true),
-  defaultAction: z.enum(["REFUND", "EXCHANGE", "STORE_CREDIT", "REPAIR", "DISPOSE"]).optional(),
+  defaultAction: z
+    .enum(["REFUND", "EXCHANGE", "STORE_CREDIT", "REPAIR", "DISPOSE"])
+    .optional(),
   allowedDays: z.number().int().positive().optional(),
   restockable: z.boolean().optional().default(true),
   sortOrder: z.number().int().optional().default(0),
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -57,7 +59,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching return reasons:", error);
     return NextResponse.json(
       { error: "Failed to fetch return reasons" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -81,7 +83,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -101,7 +103,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: "Return reason code already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -140,14 +142,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating return reason:", error);
     return NextResponse.json(
       { error: "Failed to create return reason" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

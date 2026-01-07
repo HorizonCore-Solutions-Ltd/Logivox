@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -9,8 +9,15 @@ import { z } from "zod";
 const createSyncSchema = z.object({
   integrationId: z.string(),
   syncType: z.enum([
-    "PRODUCTS", "ORDERS", "CUSTOMERS", "INVENTORY", 
-    "INVOICES", "PAYMENTS", "SHIPMENTS", "RETURNS", "CUSTOM"
+    "PRODUCTS",
+    "ORDERS",
+    "CUSTOMERS",
+    "INVENTORY",
+    "INVOICES",
+    "PAYMENTS",
+    "SHIPMENTS",
+    "RETURNS",
+    "CUSTOM",
   ]),
   direction: z.enum(["IMPORT", "EXPORT", "BIDIRECTIONAL"]),
   entityType: z.string(),
@@ -77,7 +84,10 @@ export async function GET(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -132,7 +142,7 @@ export async function GET(request: Request) {
     console.error("Error fetching syncs:", error);
     return NextResponse.json(
       { error: "Failed to fetch syncs" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -157,7 +167,10 @@ export async function POST(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -173,7 +186,7 @@ export async function POST(request: Request) {
     if (!integration) {
       return NextResponse.json(
         { error: "Integration not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -189,7 +202,7 @@ export async function POST(request: Request) {
     if (!connection) {
       return NextResponse.json(
         { error: "No active connection found for this integration" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -203,7 +216,9 @@ export async function POST(request: Request) {
         syncNumber,
         triggeredBy: "MANUAL",
         triggeredByUserId: session.user.id,
-        scheduledFor: validatedData.scheduledFor ? new Date(validatedData.scheduledFor) : null,
+        scheduledFor: validatedData.scheduledFor
+          ? new Date(validatedData.scheduledFor)
+          : null,
         status: validatedData.scheduledFor ? "PENDING" : "RUNNING",
         startedAt: validatedData.scheduledFor ? null : new Date(),
       },
@@ -234,13 +249,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating sync:", error);
     return NextResponse.json(
       { error: "Failed to create sync" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

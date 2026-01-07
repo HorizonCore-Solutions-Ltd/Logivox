@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ChangeControlService } from '@/lib/services/qc/change-control.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { ChangeControlService } from "@/lib/services/qc/change-control.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();

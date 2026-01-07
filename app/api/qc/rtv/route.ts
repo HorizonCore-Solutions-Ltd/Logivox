@@ -1,15 +1,18 @@
-import { NextResponse } from 'next/server';
-import RTVService from '@/lib/services/qc/rtv-service';
+import { NextResponse } from "next/server";
+import RTVService from "@/lib/services/qc/rtv-service";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
-    const supplierId = searchParams.get('supplierId');
-    const status = searchParams.get('status');
+    const organizationId = searchParams.get("organizationId");
+    const supplierId = searchParams.get("supplierId");
+    const status = searchParams.get("status");
 
     if (!organizationId) {
-      return NextResponse.json({ error: 'organizationId required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "organizationId required" },
+        { status: 400 },
+      );
     }
 
     const rtvs = await RTVService.listRTVs(organizationId, {
@@ -19,7 +22,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ rtvs });
   } catch (error: any) {
-    console.error('Error fetching RTVs:', error);
+    console.error("Error fetching RTVs:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -27,7 +30,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     const rtv = await RTVService.createRTV({
       organizationId: body.organizationId,
       defectId: body.defectId,
@@ -43,7 +46,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ rtv }, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating RTV:', error);
+    console.error("Error creating RTV:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

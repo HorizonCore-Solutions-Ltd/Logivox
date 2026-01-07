@@ -1,15 +1,16 @@
-import { Metadata } from "next"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { ArrowLeft, CheckCircle2, Settings, Lightbulb } from "lucide-react"
+import { Metadata } from "next";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { ArrowLeft, CheckCircle2, Settings, Lightbulb } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Customize Workflows | LogiVox Help Center",
-  description: "Adapt LogiVox to your specific warehouse processes with custom workflows, rules, and automation.",
-}
+  description:
+    "Adapt LogiVox to your specific warehouse processes with custom workflows, rules, and automation.",
+};
 
 export default function CustomizeWorkflowsPage() {
   return (
@@ -17,9 +18,13 @@ export default function CustomizeWorkflowsPage() {
       <section className="bg-gradient-to-b from-primary-50 to-white border-b py-8">
         <div className="container-enterprise max-w-4xl">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-            <Link href="/help" className="hover:text-primary">Help Center</Link>
+            <Link href="/help" className="hover:text-primary">
+              Help Center
+            </Link>
             <span>/</span>
-            <Link href="/help/getting-started" className="hover:text-primary">Getting Started</Link>
+            <Link href="/help/getting-started" className="hover:text-primary">
+              Getting Started
+            </Link>
             <span>/</span>
             <span>Customize Workflows</span>
           </div>
@@ -29,7 +34,8 @@ export default function CustomizeWorkflowsPage() {
           </div>
           <h1 className="text-4xl font-bold mb-4">Customize Workflows</h1>
           <p className="text-xl text-muted-foreground">
-            Adapt LogiVox to your specific warehouse processes with custom workflows, automation rules, and business logic.
+            Adapt LogiVox to your specific warehouse processes with custom
+            workflows, automation rules, and business logic.
           </p>
         </div>
       </section>
@@ -40,15 +46,21 @@ export default function CustomizeWorkflowsPage() {
             <Settings className="h-4 w-4" />
             <AlertTitle>Flexible Configuration</AlertTitle>
             <AlertDescription>
-              Every warehouse operates differently. LogiVox provides extensive customization options to match your unique processes without custom development.
+              Every warehouse operates differently. LogiVox provides extensive
+              customization options to match your unique processes without
+              custom development.
             </AlertDescription>
           </Alert>
 
-          <h2 className="text-2xl font-bold mb-4">Workflow Customization Areas</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Workflow Customization Areas
+          </h2>
           <div className="grid gap-4 md:grid-cols-2 mb-8">
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2">Receiving Workflows</h3>
+                <h3 className="font-semibold text-lg mb-2">
+                  Receiving Workflows
+                </h3>
                 <p className="text-sm text-muted-foreground mb-3">
                   Configure how incoming inventory is processed
                 </p>
@@ -62,7 +74,9 @@ export default function CustomizeWorkflowsPage() {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2">Picking Workflows</h3>
+                <h3 className="font-semibold text-lg mb-2">
+                  Picking Workflows
+                </h3>
                 <p className="text-sm text-muted-foreground mb-3">
                   Define how orders are fulfilled
                 </p>
@@ -76,7 +90,9 @@ export default function CustomizeWorkflowsPage() {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2">Packing Workflows</h3>
+                <h3 className="font-semibold text-lg mb-2">
+                  Packing Workflows
+                </h3>
                 <p className="text-sm text-muted-foreground mb-3">
                   Control packing station operations
                 </p>
@@ -90,7 +106,9 @@ export default function CustomizeWorkflowsPage() {
 
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-semibold text-lg mb-2">Shipping Workflows</h3>
+                <h3 className="font-semibold text-lg mb-2">
+                  Shipping Workflows
+                </h3>
                 <p className="text-sm text-muted-foreground mb-3">
                   Manage outbound shipment processing
                 </p>
@@ -103,10 +121,14 @@ export default function CustomizeWorkflowsPage() {
             </Card>
           </div>
 
-          <h2 className="text-2xl font-bold mb-4">Customizing Receiving Workflows</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Customizing Receiving Workflows
+          </h2>
           <Card className="mb-8">
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">Configure Inspection Requirements</h3>
+              <h3 className="font-semibold mb-4">
+                Configure Inspection Requirements
+              </h3>
               <ol className="space-y-3 mb-6">
                 <li className="flex gap-3">
                   <span className="font-semibold text-primary-600">1.</span>
@@ -125,98 +147,148 @@ export default function CustomizeWorkflowsPage() {
               <div className="ml-6 space-y-4 border-l-2 border-primary-200 pl-4 mb-6">
                 <div>
                   <p className="font-medium text-sm">Inspect All Items</p>
-                  <p className="text-xs text-muted-foreground">Every received item requires inspection before putaway</p>
+                  <p className="text-xs text-muted-foreground">
+                    Every received item requires inspection before putaway
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium text-sm">Inspect by Value</p>
-                  <p className="text-xs text-muted-foreground">Only high-value items (set threshold, e.g., over $100)</p>
+                  <p className="text-xs text-muted-foreground">
+                    Only high-value items (set threshold, e.g., over $100)
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium text-sm">Inspect by Category</p>
-                  <p className="text-xs text-muted-foreground">Specific product categories (e.g., electronics, perishables)</p>
+                  <p className="text-xs text-muted-foreground">
+                    Specific product categories (e.g., electronics, perishables)
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium text-sm">Random Sampling</p>
-                  <p className="text-xs text-muted-foreground">Inspect X% of received items randomly</p>
+                  <p className="text-xs text-muted-foreground">
+                    Inspect X% of received items randomly
+                  </p>
                 </div>
               </div>
 
-              <h3 className="font-semibold mb-4">Configure Putaway Strategies</h3>
+              <h3 className="font-semibold mb-4">
+                Configure Putaway Strategies
+              </h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">System-Directed (Recommended)</p>
-                    <p className="text-sm text-muted-foreground">LogiVox suggests optimal locations based on rules</p>
+                    <p className="text-sm text-muted-foreground">
+                      LogiVox suggests optimal locations based on rules
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Fixed Location</p>
-                    <p className="text-sm text-muted-foreground">Each SKU always goes to same location</p>
+                    <p className="text-sm text-muted-foreground">
+                      Each SKU always goes to same location
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Velocity-Based</p>
-                    <p className="text-sm text-muted-foreground">Fast-movers near shipping, slow-movers in bulk</p>
+                    <p className="text-sm text-muted-foreground">
+                      Fast-movers near shipping, slow-movers in bulk
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium">FEFO (First Expired, First Out)</p>
-                    <p className="text-sm text-muted-foreground">For perishables - prioritize by expiration date</p>
+                    <p className="font-medium">
+                      FEFO (First Expired, First Out)
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      For perishables - prioritize by expiration date
+                    </p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <h2 className="text-2xl font-bold mb-4">Customizing Picking Workflows</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Customizing Picking Workflows
+          </h2>
           <Card className="mb-8">
             <CardContent className="p-6">
               <h3 className="font-semibold mb-4">Select Picking Method</h3>
-              <p className="text-muted-foreground mb-4">Navigate to Settings, Workflows, Picking</p>
-              
+              <p className="text-muted-foreground mb-4">
+                Navigate to Settings, Workflows, Picking
+              </p>
+
               <div className="space-y-4 mb-6">
                 <div className="p-4 border-l-4 border-primary-600">
-                  <h4 className="font-semibold mb-2">Discrete Picking (Pick-to-Order)</h4>
-                  <p className="text-sm text-muted-foreground mb-2">One picker handles one complete order</p>
-                  <p className="text-xs"><strong>Best for:</strong> Low volume, large orders, custom fulfillment</p>
+                  <h4 className="font-semibold mb-2">
+                    Discrete Picking (Pick-to-Order)
+                  </h4>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    One picker handles one complete order
+                  </p>
+                  <p className="text-xs">
+                    <strong>Best for:</strong> Low volume, large orders, custom
+                    fulfillment
+                  </p>
                 </div>
 
                 <div className="p-4 border-l-4 border-primary-500">
                   <h4 className="font-semibold mb-2">Wave Picking</h4>
-                  <p className="text-sm text-muted-foreground mb-2">Multiple orders picked together at scheduled times</p>
-                  <p className="text-xs"><strong>Best for:</strong> High volume, similar shipping schedules</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Multiple orders picked together at scheduled times
+                  </p>
+                  <p className="text-xs">
+                    <strong>Best for:</strong> High volume, similar shipping
+                    schedules
+                  </p>
                 </div>
 
                 <div className="p-4 border-l-4 border-primary-400">
                   <h4 className="font-semibold mb-2">Batch Picking</h4>
-                  <p className="text-sm text-muted-foreground mb-2">Pick one SKU for multiple orders in one pass</p>
-                  <p className="text-xs"><strong>Best for:</strong> Many small orders with overlapping items</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Pick one SKU for multiple orders in one pass
+                  </p>
+                  <p className="text-xs">
+                    <strong>Best for:</strong> Many small orders with
+                    overlapping items
+                  </p>
                 </div>
 
                 <div className="p-4 border-l-4 border-primary-300">
                   <h4 className="font-semibold mb-2">Zone Picking</h4>
-                  <p className="text-sm text-muted-foreground mb-2">Each picker assigned to specific warehouse zone</p>
-                  <p className="text-xs"><strong>Best for:</strong> Large warehouses, specialized product knowledge</p>
+                  <p className="text-sm text-muted-foreground mb-2">
+                    Each picker assigned to specific warehouse zone
+                  </p>
+                  <p className="text-xs">
+                    <strong>Best for:</strong> Large warehouses, specialized
+                    product knowledge
+                  </p>
                 </div>
               </div>
 
               <Alert>
                 <Lightbulb className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Hybrid Approach:</strong> You can combine methods. For example, use wave picking for standard orders and discrete picking for rush or custom orders.
+                  <strong>Hybrid Approach:</strong> You can combine methods. For
+                  example, use wave picking for standard orders and discrete
+                  picking for rush or custom orders.
                 </AlertDescription>
               </Alert>
             </CardContent>
           </Card>
 
-          <h3 className="text-xl font-semibold mb-4">Configure Pick Path Optimization</h3>
+          <h3 className="text-xl font-semibold mb-4">
+            Configure Pick Path Optimization
+          </h3>
           <Card className="mb-8">
             <CardContent className="p-6">
               <p className="text-muted-foreground mb-4">
@@ -227,28 +299,36 @@ export default function CustomizeWorkflowsPage() {
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Shortest Path</p>
-                    <p className="text-sm text-muted-foreground">Minimize walking distance</p>
+                    <p className="text-sm text-muted-foreground">
+                      Minimize walking distance
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Sequential by Aisle</p>
-                    <p className="text-sm text-muted-foreground">Pick all items in Aisle A, then B, then C</p>
+                    <p className="text-sm text-muted-foreground">
+                      Pick all items in Aisle A, then B, then C
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Serpentine (Snake)</p>
-                    <p className="text-sm text-muted-foreground">Zigzag through aisles without backtracking</p>
+                    <p className="text-sm text-muted-foreground">
+                      Zigzag through aisles without backtracking
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Return Path</p>
-                    <p className="text-sm text-muted-foreground">Pick down one side, return on other side</p>
+                    <p className="text-sm text-muted-foreground">
+                      Pick down one side, return on other side
+                    </p>
                   </div>
                 </div>
               </div>
@@ -263,51 +343,71 @@ export default function CustomizeWorkflowsPage() {
           <Card className="mb-8">
             <CardContent className="p-6">
               <h3 className="font-semibold mb-4">Example Automation Rules</h3>
-              
+
               <div className="space-y-4">
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <h4 className="font-semibold mb-2">Auto-Create Purchase Orders</h4>
+                  <h4 className="font-semibold mb-2">
+                    Auto-Create Purchase Orders
+                  </h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    <strong>When:</strong> Inventory falls below reorder point<br />
+                    <strong>When:</strong> Inventory falls below reorder point
+                    <br />
                     <strong>Then:</strong> Create purchase order for supplier
                   </p>
-                  <p className="text-xs">Navigate to Settings, Automation, Inventory Rules</p>
+                  <p className="text-xs">
+                    Navigate to Settings, Automation, Inventory Rules
+                  </p>
                 </div>
 
                 <div className="p-4 bg-muted/50 rounded-lg">
-                  <h4 className="font-semibold mb-2">Priority Order Flagging</h4>
+                  <h4 className="font-semibold mb-2">
+                    Priority Order Flagging
+                  </h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    <strong>When:</strong> Order tagged as "Rush" or "Express"<br />
-                    <strong>Then:</strong> Move to front of pick queue, send notification
+                    <strong>When:</strong> Order tagged as "Rush" or "Express"
+                    <br />
+                    <strong>Then:</strong> Move to front of pick queue, send
+                    notification
                   </p>
-                  <p className="text-xs">Navigate to Settings, Automation, Order Rules</p>
+                  <p className="text-xs">
+                    Navigate to Settings, Automation, Order Rules
+                  </p>
                 </div>
 
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <h4 className="font-semibold mb-2">Carrier Selection</h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    <strong>When:</strong> Order weight over 50 lbs<br />
+                    <strong>When:</strong> Order weight over 50 lbs
+                    <br />
                     <strong>Then:</strong> Use freight carrier instead of parcel
                   </p>
-                  <p className="text-xs">Navigate to Settings, Automation, Shipping Rules</p>
+                  <p className="text-xs">
+                    Navigate to Settings, Automation, Shipping Rules
+                  </p>
                 </div>
 
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <h4 className="font-semibold mb-2">Customer Notifications</h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    <strong>When:</strong> Order shipped<br />
+                    <strong>When:</strong> Order shipped
+                    <br />
                     <strong>Then:</strong> Send email with tracking number
                   </p>
-                  <p className="text-xs">Navigate to Settings, Automation, Notification Rules</p>
+                  <p className="text-xs">
+                    Navigate to Settings, Automation, Notification Rules
+                  </p>
                 </div>
 
                 <div className="p-4 bg-muted/50 rounded-lg">
                   <h4 className="font-semibold mb-2">Cycle Count Scheduling</h4>
                   <p className="text-sm text-muted-foreground mb-2">
-                    <strong>When:</strong> Location not counted in 90 days<br />
+                    <strong>When:</strong> Location not counted in 90 days
+                    <br />
                     <strong>Then:</strong> Add to cycle count queue
                   </p>
-                  <p className="text-xs">Navigate to Settings, Automation, Inventory Rules</p>
+                  <p className="text-xs">
+                    Navigate to Settings, Automation, Inventory Rules
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -319,7 +419,7 @@ export default function CustomizeWorkflowsPage() {
               <p className="text-muted-foreground mb-4">
                 Add custom data fields specific to your business:
               </p>
-              
+
               <h3 className="font-semibold mb-4">How to Add Custom Fields</h3>
               <ol className="space-y-3 mb-6">
                 <li className="flex gap-3">
@@ -328,7 +428,9 @@ export default function CustomizeWorkflowsPage() {
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold text-primary-600">2.</span>
-                  <span>Select entity type (Products, Orders, Customers, Locations)</span>
+                  <span>
+                    Select entity type (Products, Orders, Customers, Locations)
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold text-primary-600">3.</span>
@@ -336,7 +438,9 @@ export default function CustomizeWorkflowsPage() {
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold text-primary-600">4.</span>
-                  <span>Choose field type (Text, Number, Date, Dropdown, Checkbox)</span>
+                  <span>
+                    Choose field type (Text, Number, Date, Dropdown, Checkbox)
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold text-primary-600">5.</span>
@@ -348,7 +452,9 @@ export default function CustomizeWorkflowsPage() {
                 </li>
               </ol>
 
-              <h3 className="font-semibold mb-4">Common Custom Field Examples</h3>
+              <h3 className="font-semibold mb-4">
+                Common Custom Field Examples
+              </h3>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="text-sm">
                   <p className="font-medium">Products</p>
@@ -390,13 +496,15 @@ export default function CustomizeWorkflowsPage() {
             </CardContent>
           </Card>
 
-          <h2 className="text-2xl font-bold mb-4">User Permissions and Roles</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            User Permissions and Roles
+          </h2>
           <Card className="mb-8">
             <CardContent className="p-6">
               <p className="text-muted-foreground mb-4">
                 Customize what each user role can see and do:
               </p>
-              
+
               <h3 className="font-semibold mb-4">Configure Role Permissions</h3>
               <ol className="space-y-3 mb-6">
                 <li className="flex gap-3">
@@ -413,7 +521,9 @@ export default function CustomizeWorkflowsPage() {
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold text-primary-600">4.</span>
-                  <span>Set granular permissions (View, Create, Edit, Delete)</span>
+                  <span>
+                    Set granular permissions (View, Create, Edit, Delete)
+                  </span>
                 </li>
                 <li className="flex gap-3">
                   <span className="font-semibold text-primary-600">5.</span>
@@ -424,7 +534,9 @@ export default function CustomizeWorkflowsPage() {
               <Alert>
                 <Lightbulb className="h-4 w-4" />
                 <AlertDescription>
-                  <strong>Principle of Least Privilege:</strong> Grant users only the permissions they need for their job. This improves security and reduces accidental errors.
+                  <strong>Principle of Least Privilege:</strong> Grant users
+                  only the permissions they need for their job. This improves
+                  security and reduces accidental errors.
                 </AlertDescription>
               </Alert>
             </CardContent>
@@ -433,41 +545,54 @@ export default function CustomizeWorkflowsPage() {
           <h2 className="text-2xl font-bold mb-4">Dashboard Customization</h2>
           <Card className="mb-8">
             <CardContent className="p-6">
-              <h3 className="font-semibold mb-4">Create Role-Specific Dashboards</h3>
+              <h3 className="font-semibold mb-4">
+                Create Role-Specific Dashboards
+              </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Warehouse Manager Dashboard</p>
-                    <p className="text-sm text-muted-foreground">Order volume, pick rates, inventory accuracy, labor productivity</p>
+                    <p className="text-sm text-muted-foreground">
+                      Order volume, pick rates, inventory accuracy, labor
+                      productivity
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Picker Dashboard</p>
-                    <p className="text-sm text-muted-foreground">Assigned tasks, pick list, personal performance metrics</p>
+                    <p className="text-sm text-muted-foreground">
+                      Assigned tasks, pick list, personal performance metrics
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Executive Dashboard</p>
-                    <p className="text-sm text-muted-foreground">High-level KPIs, financial metrics, capacity utilization</p>
+                    <p className="text-sm text-muted-foreground">
+                      High-level KPIs, financial metrics, capacity utilization
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Customer Service Dashboard</p>
-                    <p className="text-sm text-muted-foreground">Order status, tracking numbers, returns queue</p>
+                    <p className="text-sm text-muted-foreground">
+                      Order status, tracking numbers, returns queue
+                    </p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <h2 className="text-2xl font-bold mb-4">Testing Your Customizations</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            Testing Your Customizations
+          </h2>
           <Card className="mb-8">
             <CardContent className="p-6">
               <h3 className="font-semibold mb-4">Best Practices</h3>
@@ -475,36 +600,48 @@ export default function CustomizeWorkflowsPage() {
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="font-medium">Test in staging environment first</p>
-                    <p className="text-sm text-muted-foreground">Use test data before applying to production</p>
+                    <p className="font-medium">
+                      Test in staging environment first
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Use test data before applying to production
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Run pilot with small team</p>
-                    <p className="text-sm text-muted-foreground">Validate workflows with a few users before full rollout</p>
+                    <p className="text-sm text-muted-foreground">
+                      Validate workflows with a few users before full rollout
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Document your customizations</p>
-                    <p className="text-sm text-muted-foreground">Keep notes on why you made specific configuration choices</p>
+                    <p className="text-sm text-muted-foreground">
+                      Keep notes on why you made specific configuration choices
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Monitor performance metrics</p>
-                    <p className="text-sm text-muted-foreground">Track KPIs before and after to measure improvement</p>
+                    <p className="text-sm text-muted-foreground">
+                      Track KPIs before and after to measure improvement
+                    </p>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary-600 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Get user feedback</p>
-                    <p className="text-sm text-muted-foreground">Warehouse staff will identify issues you might miss</p>
+                    <p className="text-sm text-muted-foreground">
+                      Warehouse staff will identify issues you might miss
+                    </p>
                   </div>
                 </li>
               </ul>
@@ -517,7 +654,8 @@ export default function CustomizeWorkflowsPage() {
               <CardContent className="p-4">
                 <h4 className="font-semibold mb-2">Workflow Consultation</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Our implementation team can help design optimal workflows for your operation.
+                  Our implementation team can help design optimal workflows for
+                  your operation.
                 </p>
                 <Button size="sm" variant="outline" asChild>
                   <Link href="/contact">Schedule Consultation</Link>
@@ -529,7 +667,8 @@ export default function CustomizeWorkflowsPage() {
               <CardContent className="p-4">
                 <h4 className="font-semibold mb-2">Advanced Training</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  In-depth training on configuration and automation for power users.
+                  In-depth training on configuration and automation for power
+                  users.
                 </p>
                 <Button size="sm" variant="outline" asChild>
                   <Link href="/training">View Training Options</Link>
@@ -542,7 +681,9 @@ export default function CustomizeWorkflowsPage() {
             <Lightbulb className="h-4 w-4" />
             <AlertTitle>Congratulations!</AlertTitle>
             <AlertDescription>
-              You've completed the Getting Started guide! You now have a solid foundation for using LogiVox. Explore additional help articles for advanced features and optimization strategies.
+              You've completed the Getting Started guide! You now have a solid
+              foundation for using LogiVox. Explore additional help articles for
+              advanced features and optimization strategies.
             </AlertDescription>
           </Alert>
 
@@ -553,7 +694,10 @@ export default function CustomizeWorkflowsPage() {
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">Inventory Management</h3>
-                    <p className="text-sm text-muted-foreground">Deep dive into inventory controls, cycle counting, and optimization</p>
+                    <p className="text-sm text-muted-foreground">
+                      Deep dive into inventory controls, cycle counting, and
+                      optimization
+                    </p>
                   </div>
                   <Badge>Advanced</Badge>
                 </CardContent>
@@ -565,7 +709,9 @@ export default function CustomizeWorkflowsPage() {
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">Order Fulfillment</h3>
-                    <p className="text-sm text-muted-foreground">Master picking strategies, wave management, and packing</p>
+                    <p className="text-sm text-muted-foreground">
+                      Master picking strategies, wave management, and packing
+                    </p>
                   </div>
                   <Badge>Advanced</Badge>
                 </CardContent>
@@ -577,7 +723,9 @@ export default function CustomizeWorkflowsPage() {
                 <CardContent className="p-6 flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold">Reporting & Analytics</h3>
-                    <p className="text-sm text-muted-foreground">Build custom reports and leverage business intelligence</p>
+                    <p className="text-sm text-muted-foreground">
+                      Build custom reports and leverage business intelligence
+                    </p>
                   </div>
                   <Badge>Advanced</Badge>
                 </CardContent>
@@ -597,9 +745,7 @@ export default function CustomizeWorkflowsPage() {
               </Link>
             </Button>
             <Button asChild>
-              <Link href="/help">
-                Back to Help Center
-              </Link>
+              <Link href="/help">Back to Help Center</Link>
             </Button>
           </div>
         </div>
@@ -613,10 +759,13 @@ export default function CustomizeWorkflowsPage() {
             <Button variant="outline">No, I need more help</Button>
           </div>
           <p className="text-sm text-muted-foreground mt-6">
-            Need assistance? <Link href="/contact" className="text-primary hover:underline">Contact our support team</Link>
+            Need assistance?{" "}
+            <Link href="/contact" className="text-primary hover:underline">
+              Contact our support team
+            </Link>
           </p>
         </div>
       </section>
     </div>
-  )
+  );
 }

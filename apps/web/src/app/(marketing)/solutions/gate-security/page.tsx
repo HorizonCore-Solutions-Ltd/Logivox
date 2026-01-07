@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   ShieldCheck,
   Radio,
@@ -21,42 +27,48 @@ import {
   FileText,
   Shield,
   Navigation,
-  Package
-} from "lucide-react"
+  Package,
+} from "lucide-react";
 
 export default function GateSecurityPage() {
   const features = [
     {
       icon: ShieldCheck,
       title: "Gate Entry Management",
-      description: "Complete visitor, contractor, and delivery tracking with document verification and badge printing."
+      description:
+        "Complete visitor, contractor, and delivery tracking with document verification and badge printing.",
     },
     {
       icon: Radio,
       title: "Guard Management",
-      description: "Digital patrol routes, panic buttons, GPS tracking, and shift handover for security personnel."
+      description:
+        "Digital patrol routes, panic buttons, GPS tracking, and shift handover for security personnel.",
     },
     {
       icon: MapPin,
       title: "Real-Time GPS Tracking",
-      description: "Live location monitoring of all security guards with geofencing and violation alerts."
+      description:
+        "Live location monitoring of all security guards with geofencing and violation alerts.",
     },
     {
       icon: AlertTriangle,
       title: "Panic Alert System",
-      description: "Instant emergency response with auto-dispatch to 3 nearest guards and supervisor notification."
+      description:
+        "Instant emergency response with auto-dispatch to 3 nearest guards and supervisor notification.",
     },
     {
       icon: ClipboardCheck,
       title: "Digital Patrol Verification",
-      description: "QR code, NFC, and GPS checkpoint verification with photo evidence and incident reporting."
+      description:
+        "QR code, NFC, and GPS checkpoint verification with photo evidence and incident reporting.",
     },
     {
       icon: Camera,
       title: "Incident Management",
-      description: "Complete incident documentation with photos, videos, witness statements, and investigation tracking."
-    }
-  ]
+      description:
+        "Complete incident documentation with photos, videos, witness statements, and investigation tracking.",
+    },
+  ];
 
   const gateOperations = [
     {
@@ -71,8 +83,8 @@ export default function GateSecurityPage() {
         "Parking pass issuance",
         "Automatic exit processing",
         "Visitor analytics and reporting",
-        "VIP visitor handling"
-      ]
+        "VIP visitor handling",
+      ],
     },
     {
       title: "Delivery & Carrier Management",
@@ -86,8 +98,8 @@ export default function GateSecurityPage() {
         "Hazmat documentation compliance",
         "Appointment matching and scheduling",
         "Carrier performance tracking",
-        "Dwell time monitoring"
-      ]
+        "Dwell time monitoring",
+      ],
     },
     {
       title: "Security Patrols",
@@ -101,8 +113,8 @@ export default function GateSecurityPage() {
         "Patrol completion analytics",
         "Incident documentation",
         "Route optimization",
-        "Historical patrol data"
-      ]
+        "Historical patrol data",
+      ],
     },
     {
       title: "Equipment & Asset Tracking",
@@ -116,105 +128,110 @@ export default function GateSecurityPage() {
         "Condition assessments",
         "Replacement alerts",
         "Cost tracking",
-        "Usage analytics"
-      ]
-    }
-  ]
+        "Usage analytics",
+      ],
+    },
+  ];
 
   const guardFeatures = [
     {
       title: "Patrol Routes",
-      description: "Create routes with checkpoints, verification methods, and time requirements"
+      description:
+        "Create routes with checkpoints, verification methods, and time requirements",
     },
     {
       title: "GPS Tracking",
-      description: "Real-time location of all active guards with history playback"
+      description:
+        "Real-time location of all active guards with history playback",
     },
     {
       title: "Panic Button",
-      description: "Emergency alert with auto-dispatch and audio recording"
+      description: "Emergency alert with auto-dispatch and audio recording",
     },
     {
       title: "Daily Reports",
-      description: "End-of-shift activity summaries and incident documentation"
+      description: "End-of-shift activity summaries and incident documentation",
     },
     {
       title: "Equipment Management",
-      description: "Asset tracking with maintenance schedules and check-out logs"
+      description:
+        "Asset tracking with maintenance schedules and check-out logs",
     },
     {
       title: "Shift Handover",
-      description: "Digital handover notes between outgoing and incoming shifts"
+      description:
+        "Digital handover notes between outgoing and incoming shifts",
     },
     {
       title: "Training & Certifications",
-      description: "Track licenses, certifications, and expiration alerts"
+      description: "Track licenses, certifications, and expiration alerts",
     },
     {
       title: "Geofencing",
-      description: "Virtual boundaries with entry/exit alerts and violation tracking"
-    }
-  ]
+      description:
+        "Virtual boundaries with entry/exit alerts and violation tracking",
+    },
+  ];
 
   const benefits = [
     {
       metric: "60%",
-      description: "Faster gate processing times"
+      description: "Faster gate processing times",
     },
     {
       metric: "100%",
-      description: "Patrol completion verification"
+      description: "Patrol completion verification",
     },
     {
       metric: "< 2 min",
-      description: "Emergency response time with panic alerts"
+      description: "Emergency response time with panic alerts",
     },
     {
       metric: "95%",
-      description: "Reduction in manual paperwork"
+      description: "Reduction in manual paperwork",
     },
     {
       metric: "24/7",
-      description: "Real-time guard location monitoring"
+      description: "Real-time guard location monitoring",
     },
     {
       metric: "Zero",
-      description: "Lost or untracked security equipment"
-    }
-  ]
+      description: "Lost or untracked security equipment",
+    },
+  ];
 
   const entryWorkflow = [
     {
       step: "Vehicle Arrival",
       description: "Driver presents documentation at gate",
-      icon: Truck
+      icon: Truck,
     },
     {
       step: "Identity Verification",
       description: "Guard scans ID and validates credentials",
-      icon: ShieldCheck
+      icon: ShieldCheck,
     },
     {
       step: "Document Capture",
       description: "BOL, manifest, and required docs photographed",
-      icon: FileText
+      icon: FileText,
     },
     {
       step: "System Check",
       description: "Automated verification against appointments and watchlists",
-      icon: CheckCircle2
+      icon: CheckCircle2,
     },
     {
       step: "Badge Issuance",
       description: "Temporary badge printed with photo and access level",
-      icon: Users
+      icon: Users,
     },
     {
       step: "Location Assignment",
       description: "Yard management assigns parking or dock",
-      icon: MapPin
-    }
-  ]
+      icon: MapPin,
+    },
+  ];
 
   const complianceFeatures = [
     "Complete audit trail for all entries and exits",
@@ -224,8 +241,8 @@ export default function GateSecurityPage() {
     "Insurance certificate validation",
     "DOT hours of service tracking",
     "Customizable compliance checklists",
-    "Regulatory report generation"
-  ]
+    "Regulatory report generation",
+  ];
 
   return (
     <div className="flex flex-col">
@@ -240,9 +257,10 @@ export default function GateSecurityPage() {
               Gate Entry & Security Guard Management System
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Comprehensive security solution combining gate operations, guard management, 
-              and incident tracking. Real-time GPS monitoring, digital patrols, and instant 
-              emergency response for complete facility protection.
+              Comprehensive security solution combining gate operations, guard
+              management, and incident tracking. Real-time GPS monitoring,
+              digital patrols, and instant emergency response for complete
+              facility protection.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -309,8 +327,12 @@ export default function GateSecurityPage() {
                       <operation.icon className="h-6 w-6" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">{operation.title}</CardTitle>
-                      <CardDescription className="mt-1">{operation.description}</CardDescription>
+                      <CardTitle className="text-xl">
+                        {operation.title}
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        {operation.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -350,7 +372,9 @@ export default function GateSecurityPage() {
                       <item.icon className="h-6 w-6" />
                     </div>
                     <h3 className="mt-3 font-semibold">{item.step}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {item.description}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -375,7 +399,9 @@ export default function GateSecurityPage() {
               <Card key={index}>
                 <CardContent className="pt-6">
                   <h3 className="font-semibold">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -398,8 +424,12 @@ export default function GateSecurityPage() {
             {benefits.map((benefit, index) => (
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">{benefit.metric}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{benefit.description}</p>
+                  <div className="text-4xl font-bold text-primary">
+                    {benefit.metric}
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {benefit.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -441,7 +471,8 @@ export default function GateSecurityPage() {
               Enhance Your Facility Security
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join organizations modernizing their security operations with LogiVox
+              Join organizations modernizing their security operations with
+              LogiVox
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -457,5 +488,5 @@ export default function GateSecurityPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

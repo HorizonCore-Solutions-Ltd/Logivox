@@ -12,34 +12,34 @@ erDiagram
     Organization ||--o{ Warehouse : owns
     Organization ||--o{ Supplier : manages
     Organization ||--o{ Integration : configures
-    
+
     User ||--o{ AuditLog : creates
     User ||--o{ UserSession : has
     User ||--o{ UserRole : assigned
     User ||--o{ PurchaseOrder : creates
-    
+
     Warehouse ||--o{ InventoryItem : stores
     Warehouse ||--o{ Location : contains
     Warehouse ||--o{ Receiving : processes
-    
+
     Location ||--o{ InventoryItem : locates
     Location ||--o{ Location : contains
-    
+
     InventoryItem ||--o{ StockMovement : tracks
     InventoryItem ||--o{ PurchaseOrderItem : references
     InventoryItem ||--o{ ReceivingItem : receives
-    
+
     Supplier ||--o{ PurchaseOrder : fulfills
     Supplier ||--o{ SupplierContact : has
-    
+
     PurchaseOrder ||--o{ PurchaseOrderItem : contains
     PurchaseOrder ||--o{ Receiving : generates
-    
+
     Receiving ||--o{ ReceivingItem : includes
-    
+
     Role ||--o{ UserRole : defines
     Role ||--o{ RolePermission : grants
-    
+
     Permission ||--o{ RolePermission : enables
     Permission ||--o{ UserPermission : allows
 ```
@@ -67,6 +67,7 @@ Table: organizations
 ```
 
 **Key Features:**
+
 - Unique slug for organization identification
 - Optional branding (logo, website)
 - Industry categorization for analytics
@@ -92,6 +93,7 @@ Table: users
 ```
 
 **Relationships:**
+
 - Belongs to one Organization
 - Has many UserRoles (many-to-many with Roles)
 - Has many UserPermissions (direct permissions)
@@ -117,6 +119,7 @@ Table: warehouses
 ```
 
 **Address JSON Structure:**
+
 ```json
 {
   "street": "123 Industrial Ave",
@@ -128,6 +131,7 @@ Table: warehouses
 ```
 
 **Location JSON Structure:**
+
 ```json
 {
   "latitude": 37.7749,
@@ -155,6 +159,7 @@ Table: locations
 ```
 
 **Hierarchy Example:**
+
 ```
 Warehouse: Main Warehouse
 ├── Aisle: A1
@@ -203,6 +208,7 @@ UNIQUE CONSTRAINT: (sku, warehouse_id)
 ```
 
 **Dimensions JSON Structure:**
+
 ```json
 {
   "length": 10.5,
@@ -260,7 +266,7 @@ Purchase order management with line items.
 Table: purchase_orders
 - id (String, Primary Key)
 - number (String, Unique) -- Auto-generated: PO-2024-001
-- status (Enum: DRAFT, PENDING_APPROVAL, APPROVED, SENT, CONFIRMED, 
+- status (Enum: DRAFT, PENDING_APPROVAL, APPROVED, SENT, CONFIRMED,
           PARTIALLY_RECEIVED, RECEIVED, CANCELLED, CLOSED)
 - order_date (DateTime)
 - expected_date (DateTime, Optional)
@@ -410,6 +416,7 @@ Table: integrations
 ```
 
 **Config JSON Example:**
+
 ```json
 {
   "apiUrl": "https://your-oracle.com/api",
@@ -540,8 +547,8 @@ Common migration scenarios and field mappings:
 -- Inventory migration mapping
 INSERT INTO inventory_items (
   sku, name, description, category, quantity, cost_price, warehouse_id
-) 
-SELECT 
+)
+SELECT
   UPPER(TRIM(excel_sku)),
   TRIM(excel_name),
   TRIM(excel_description),

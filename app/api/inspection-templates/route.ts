@@ -8,7 +8,14 @@ import { z } from "zod";
 const checkpointSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
-  type: z.enum(['VISUAL', 'MEASUREMENT', 'FUNCTIONAL', 'DOCUMENTATION', 'PACKAGING', 'LABELING']),
+  type: z.enum([
+    "VISUAL",
+    "MEASUREMENT",
+    "FUNCTIONAL",
+    "DOCUMENTATION",
+    "PACKAGING",
+    "LABELING",
+  ]),
   sequence: z.number().int().min(1),
   isRequired: z.boolean().default(true),
   expectedValue: z.string().optional(),
@@ -20,16 +27,20 @@ const createTemplateSchema = z.object({
   name: z.string().min(1, "Template name is required"),
   code: z.string().min(1, "Template code is required"),
   description: z.string().optional(),
-  category: z.enum(['INCOMING', 'IN_PROCESS', 'FINAL', 'RANDOM', 'COMPLAINT']),
+  category: z.enum(["INCOMING", "IN_PROCESS", "FINAL", "RANDOM", "COMPLAINT"]),
   inventoryIds: z.array(z.string()).optional(), // null means all items
   supplierIds: z.array(z.string()).optional(), // null means all suppliers
-  samplingType: z.enum(['FULL', 'STATISTICAL', 'PERCENTAGE', 'RANDOM']).default('FULL'),
+  samplingType: z
+    .enum(["FULL", "STATISTICAL", "PERCENTAGE", "RANDOM"])
+    .default("FULL"),
   sampleSize: z.number().int().min(1).optional(),
   samplePercentage: z.number().min(0).max(100).optional(),
   requiresApproval: z.boolean().default(false),
   approvalLevels: z.number().int().min(1).max(10).default(1),
   autoQuarantine: z.boolean().default(false),
-  checkpoints: z.array(checkpointSchema).min(1, "At least one checkpoint is required"),
+  checkpoints: z
+    .array(checkpointSchema)
+    .min(1, "At least one checkpoint is required"),
   isActive: z.boolean().default(true),
 });
 
@@ -55,7 +66,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -83,7 +94,7 @@ export async function GET(request: Request) {
     console.error("Error fetching inspection templates:", error);
     return NextResponse.json(
       { error: "Failed to fetch inspection templates" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -113,7 +124,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -132,22 +143,28 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Template code already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     // Validate sampling configuration
-    if (validatedData.samplingType === 'STATISTICAL' && !validatedData.sampleSize) {
+    if (
+      validatedData.samplingType === "STATISTICAL" &&
+      !validatedData.sampleSize
+    ) {
       return NextResponse.json(
         { error: "Sample size required for statistical sampling" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    if (validatedData.samplingType === 'PERCENTAGE' && !validatedData.samplePercentage) {
+    if (
+      validatedData.samplingType === "PERCENTAGE" &&
+      !validatedData.samplePercentage
+    ) {
       return NextResponse.json(
         { error: "Sample percentage required for percentage sampling" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -177,14 +194,14 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating inspection template:", error);
     return NextResponse.json(
       { error: "Failed to create inspection template" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

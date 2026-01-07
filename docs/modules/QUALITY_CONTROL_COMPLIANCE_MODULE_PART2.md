@@ -12,6 +12,7 @@
 Part 2 delivers next-generation quality capabilities that move QC from reactive inspection to **predictive, automated, and provably traceable** quality. It adds AI prediction, computer vision inspection, IoT sensor fusion, blockchain-grade audit trails, and autonomous containment/release decisions.
 
 ### Advanced Capabilities
+
 - **Predictive Quality Intelligence**: Forecast defect risk before it happens
 - **Computer Vision Inspection**: Automated defect detection at scale
 - **IoT Sensor Quality**: Temperature/humidity/shock/light exposure quality monitoring
@@ -24,30 +25,38 @@ Part 2 delivers next-generation quality capabilities that move QC from reactive 
 ## 🧠 1. Predictive Quality Intelligence
 
 ### Predict failures before they ship
+
 ```typescript
-type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+type RiskLevel = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 type RiskDriver =
-  | 'SUPPLIER_HISTORY'
-  | 'LANE_TEMP_EXCURSION'
-  | 'HUMIDITY_EXCURSION'
-  | 'SHOCK_EVENT'
-  | 'AGING_RISK'
-  | 'PACKAGING_VARIANCE'
-  | 'LABEL_VARIANCE'
-  | 'PROCESS_DEVIATION'
-  | 'DOCUMENT_MISSING'
-  | 'MODEL_ANOMALY';
+  | "SUPPLIER_HISTORY"
+  | "LANE_TEMP_EXCURSION"
+  | "HUMIDITY_EXCURSION"
+  | "SHOCK_EVENT"
+  | "AGING_RISK"
+  | "PACKAGING_VARIANCE"
+  | "LABEL_VARIANCE"
+  | "PROCESS_DEVIATION"
+  | "DOCUMENT_MISSING"
+  | "MODEL_ANOMALY";
 
 interface QualityPredictionSystem {
   // Predictive models
   scoreInboundRisk: (request: InboundRiskRequest) => Promise<QualityRiskScore>;
   scorePickPackRisk: (request: ProcessRiskRequest) => Promise<QualityRiskScore>;
-  scoreShipmentRisk: (request: ShipmentRiskRequest) => Promise<QualityRiskScore>;
+  scoreShipmentRisk: (
+    request: ShipmentRiskRequest,
+  ) => Promise<QualityRiskScore>;
 
   // Actions
-  recommendControls: (risk: QualityRiskScore) => Promise<QualityControlRecommendation[]>;
-  adjustSamplingDynamically: (target: string, risk: QualityRiskScore) => Promise<DynamicSamplingDecision>;
+  recommendControls: (
+    risk: QualityRiskScore,
+  ) => Promise<QualityControlRecommendation[]>;
+  adjustSamplingDynamically: (
+    target: string,
+    risk: QualityRiskScore,
+  ) => Promise<DynamicSamplingDecision>;
 
   // Monitoring
   streamAnomalies: () => Stream<QualityAnomaly>;
@@ -85,7 +94,13 @@ interface InboundRiskRequest {
 }
 
 interface ProcessRiskRequest {
-  processStep: 'RECEIVING' | 'PUTAWAY' | 'REPLENISHMENT' | 'PICKING' | 'PACKING' | 'SHIPPING';
+  processStep:
+    | "RECEIVING"
+    | "PUTAWAY"
+    | "REPLENISHMENT"
+    | "PICKING"
+    | "PACKING"
+    | "SHIPPING";
   sku: string;
   lot?: string;
   location?: string;
@@ -135,7 +150,13 @@ interface ShipmentRiskRequest {
 
 interface QualityRiskScore {
   scoredAt: Date;
-  targetType: 'RECEIPT' | 'PROCESS_STEP' | 'SHIPMENT' | 'LOT' | 'SKU' | 'SUPPLIER';
+  targetType:
+    | "RECEIPT"
+    | "PROCESS_STEP"
+    | "SHIPMENT"
+    | "LOT"
+    | "SKU"
+    | "SUPPLIER";
   targetId: string;
 
   // Score
@@ -151,8 +172,14 @@ interface QualityRiskScore {
 
   // Suggested actions
   suggestedActions: {
-    action: 'INCREASE_SAMPLING' | 'FULL_INSPECTION' | 'AUTO_QUARANTINE' | 'DOCUMENT_REVIEW' | 'BLOCK_SHIPMENT' | 'MANAGER_REVIEW';
-    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+    action:
+      | "INCREASE_SAMPLING"
+      | "FULL_INSPECTION"
+      | "AUTO_QUARANTINE"
+      | "DOCUMENT_REVIEW"
+      | "BLOCK_SHIPMENT"
+      | "MANAGER_REVIEW";
+    priority: "HIGH" | "MEDIUM" | "LOW";
     reason: string;
   }[];
 
@@ -207,7 +234,7 @@ interface DynamicSamplingDecision {
 interface QualityAnomaly {
   id: string;
   detectedAt: Date;
-  source: 'MODEL' | 'IOT' | 'VISION' | 'PROCESS_MINING';
+  source: "MODEL" | "IOT" | "VISION" | "PROCESS_MINING";
 
   target: {
     type: string;
@@ -220,23 +247,28 @@ interface QualityAnomaly {
   evidence: string[];
 
   recommendedResponse: {
-    action: 'AUTO_QUARANTINE' | 'INCREASE_SAMPLING' | 'HOLD_SHIPMENT' | 'CREATE_DEFECT' | 'CREATE_CAPA';
+    action:
+      | "AUTO_QUARANTINE"
+      | "INCREASE_SAMPLING"
+      | "HOLD_SHIPMENT"
+      | "CREATE_DEFECT"
+      | "CREATE_CAPA";
     justification: string;
   };
 
-  status: 'OPEN' | 'ACKNOWLEDGED' | 'AUTO_REMEDIATED' | 'RESOLVED';
+  status: "OPEN" | "ACKNOWLEDGED" | "AUTO_REMEDIATED" | "RESOLVED";
 }
 
 interface SensorSummary {
   // Exposure
-  temperature: { min: number; max: number; unit: 'C' | 'F' };
-  humidity?: { min: number; max: number; unit: '%' };
+  temperature: { min: number; max: number; unit: "C" | "F" };
+  humidity?: { min: number; max: number; unit: "%" };
   shock?: { events: number; maxG?: number };
   light?: { exposureMinutes?: number; maxLux?: number };
 
   // Excursions
   excursions: {
-    type: 'TEMP' | 'HUMIDITY' | 'SHOCK' | 'LIGHT';
+    type: "TEMP" | "HUMIDITY" | "SHOCK" | "LIGHT";
     count: number;
     worst?: string;
   }[];
@@ -293,24 +325,25 @@ const PREDICTIVE_QC_VOICE_COMMANDS = [
 ## 👁️ 2. Computer Vision Inspection
 
 ### Automated visual QC at receiving + packing
+
 ```typescript
 type VisionDefectType =
-  | 'SCRATCH'
-  | 'DENT'
-  | 'CRACK'
-  | 'BROKEN_SEAL'
-  | 'LEAK'
-  | 'DIRT_CONTAMINATION'
-  | 'MISLABEL'
-  | 'MISSING_LABEL'
-  | 'WRONG_LABEL'
-  | 'BARCODE_UNREADABLE'
-  | 'PACKAGING_DAMAGE'
-  | 'WRONG_ITEM'
-  | 'MISSING_COMPONENT'
-  | 'COLOR_MISMATCH'
-  | 'DIMENSION_OUT_OF_SPEC'
-  | 'OTHER';
+  | "SCRATCH"
+  | "DENT"
+  | "CRACK"
+  | "BROKEN_SEAL"
+  | "LEAK"
+  | "DIRT_CONTAMINATION"
+  | "MISLABEL"
+  | "MISSING_LABEL"
+  | "WRONG_LABEL"
+  | "BARCODE_UNREADABLE"
+  | "PACKAGING_DAMAGE"
+  | "WRONG_ITEM"
+  | "MISSING_COMPONENT"
+  | "COLOR_MISMATCH"
+  | "DIMENSION_OUT_OF_SPEC"
+  | "OTHER";
 
 interface VisionInspectionSystem {
   // Capture
@@ -319,12 +352,21 @@ interface VisionInspectionSystem {
   stopCapture: (stationId: string) => Promise<void>;
 
   // Inference
-  runInspection: (request: VisionInspectionRequest) => Promise<VisionInspectionResult>;
+  runInspection: (
+    request: VisionInspectionRequest,
+  ) => Promise<VisionInspectionResult>;
   streamDetections: (stationId: string) => Stream<VisionDetectionEvent>;
 
   // Governance
-  approveDetection: (detectionId: string, decision: 'CONFIRM' | 'REJECT', reviewerId: string) => Promise<void>;
-  labelFeedback: (detectionId: string, correctLabel: VisionDefectType) => Promise<void>;
+  approveDetection: (
+    detectionId: string,
+    decision: "CONFIRM" | "REJECT",
+    reviewerId: string,
+  ) => Promise<void>;
+  labelFeedback: (
+    detectionId: string,
+    correctLabel: VisionDefectType,
+  ) => Promise<void>;
 
   // Model lifecycle
   getModelRegistry: () => Promise<VisionModelRegistry>;
@@ -337,7 +379,7 @@ interface VisionCamera {
   name: string;
 
   // Hardware
-  resolution: '720P' | '1080P' | '4K';
+  resolution: "720P" | "1080P" | "4K";
   fps: number;
   lens: string;
 
@@ -350,13 +392,13 @@ interface VisionCamera {
   };
 
   // Lighting
-  lightingProfile: 'STANDARD' | 'LOW_LIGHT' | 'HIGH_GLARE' | 'BACKLIT';
+  lightingProfile: "STANDARD" | "LOW_LIGHT" | "HIGH_GLARE" | "BACKLIT";
 
   // Calibration
   calibratedAt: Date;
   calibrationConfidence: number; // 0-1
 
-  status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
+  status: "ACTIVE" | "INACTIVE" | "MAINTENANCE";
 }
 
 interface VisionInspectionRequest {
@@ -365,7 +407,7 @@ interface VisionInspectionRequest {
 
   // Target
   target: {
-    type: 'RECEIPT' | 'PALLET' | 'CARTON' | 'EACH' | 'PACKAGE' | 'LABEL';
+    type: "RECEIPT" | "PALLET" | "CARTON" | "EACH" | "PACKAGE" | "LABEL";
     id: string;
     sku?: string;
     lot?: string;
@@ -402,13 +444,13 @@ interface VisionInspectionResult {
   completedAt: Date;
 
   // Outcome
-  overall: 'PASS' | 'FAIL' | 'REVIEW';
+  overall: "PASS" | "FAIL" | "REVIEW";
   confidence: number; // 0-1
 
   // Defects
   defects: {
     defectType: VisionDefectType;
-    severity: 'CRITICAL' | 'MAJOR' | 'MINOR';
+    severity: "CRITICAL" | "MAJOR" | "MINOR";
     confidence: number; // 0-1
 
     // Evidence
@@ -418,11 +460,11 @@ interface VisionInspectionResult {
 
     // Suggested actions
     suggestedAction:
-      | 'AUTO_QUARANTINE'
-      | 'CREATE_DEFECT'
-      | 'REWORK'
-      | 'RELABEL'
-      | 'MANUAL_REVIEW';
+      | "AUTO_QUARANTINE"
+      | "CREATE_DEFECT"
+      | "REWORK"
+      | "RELABEL"
+      | "MANUAL_REVIEW";
   }[];
 
   // Reads
@@ -457,7 +499,7 @@ interface VisionDetectionEvent {
   bbox: { x: number; y: number; w: number; h: number };
 
   // Status
-  status: 'OPEN' | 'CONFIRMED' | 'REJECTED' | 'AUTO_HANDLED';
+  status: "OPEN" | "CONFIRMED" | "REJECTED" | "AUTO_HANDLED";
 }
 
 interface VisionModelRegistry {
@@ -474,7 +516,7 @@ interface VisionModelRegistry {
       f1: number;
     };
 
-    status: 'STABLE' | 'CANDIDATE' | 'DEPRECATED';
+    status: "STABLE" | "CANDIDATE" | "DEPRECATED";
   }[];
 }
 
@@ -493,10 +535,24 @@ const VISION_QC_VOICE_COMMANDS = [
 ## 🌡️ 3. IoT Quality Sensors & Exposure Monitoring
 
 ### Prove cold-chain and handling quality
-```typescript
-type SensorType = 'TEMP' | 'HUMIDITY' | 'SHOCK' | 'LIGHT' | 'AIR_QUALITY' | 'VIBRATION';
 
-type SensorScope = 'TRAILER' | 'PALLET' | 'TOTE' | 'ROOM' | 'ZONE' | 'LOCATION' | 'PACKAGE';
+```typescript
+type SensorType =
+  | "TEMP"
+  | "HUMIDITY"
+  | "SHOCK"
+  | "LIGHT"
+  | "AIR_QUALITY"
+  | "VIBRATION";
+
+type SensorScope =
+  | "TRAILER"
+  | "PALLET"
+  | "TOTE"
+  | "ROOM"
+  | "ZONE"
+  | "LOCATION"
+  | "PACKAGE";
 
 interface IoTQualitySystem {
   registerSensor: (sensor: QualitySensor) => Promise<string>;
@@ -527,7 +583,7 @@ interface QualitySensor {
 
   // Operational
   reportingIntervalSeconds: number;
-  status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
+  status: "ACTIVE" | "INACTIVE" | "MAINTENANCE";
 
   // Location (optional)
   location?: {
@@ -570,8 +626,8 @@ interface QualityPolicy {
 
   // Limits
   limits: {
-    temperature?: { min: number; max: number; unit: 'C' | 'F' };
-    humidity?: { min: number; max: number; unit: '%' };
+    temperature?: { min: number; max: number; unit: "C" | "F" };
+    humidity?: { min: number; max: number; unit: "%" };
     shock?: { maxG: number; maxEvents: number };
     light?: { maxLux: number; maxMinutes: number };
   };
@@ -599,7 +655,7 @@ interface PolicyEvaluation {
 
   // Score
   compliancePercent: number;
-  outcome: 'COMPLIANT' | 'WARNING' | 'VIOLATION';
+  outcome: "COMPLIANT" | "WARNING" | "VIOLATION";
 
   // Evidence
   excursions: {
@@ -613,7 +669,7 @@ interface PolicyEvaluation {
 
   // Action
   actionTaken?: {
-    action: 'WARN' | 'AUTO_QUARANTINE' | 'BLOCK_SHIPMENT' | 'CREATE_DEFECT';
+    action: "WARN" | "AUTO_QUARANTINE" | "BLOCK_SHIPMENT" | "CREATE_DEFECT";
     referenceId?: string;
     at: Date;
   };
@@ -638,7 +694,12 @@ interface ExcursionAlert {
 
   // Suggested response
   suggestedResponse: {
-    action: 'MOVE_TO_COLD_ZONE' | 'QUARANTINE' | 'INSPECT' | 'NOTIFY_CUSTOMER' | 'DISPOSE';
+    action:
+      | "MOVE_TO_COLD_ZONE"
+      | "QUARANTINE"
+      | "INSPECT"
+      | "NOTIFY_CUSTOMER"
+      | "DISPOSE";
     reason: string;
   };
 }
@@ -677,21 +738,29 @@ const IOT_QC_VOICE_COMMANDS = [
 ## 🔐 4. Tamper-Evident Quality Traceability (Audit-Grade)
 
 ### Chain-of-custody across inspections, COAs, sensors, and disposition
+
 ```typescript
-type EvidenceType = 'PHOTO' | 'VIDEO' | 'DOCUMENT' | 'SENSOR' | 'VISION' | 'SIGNATURE' | 'SYSTEM_EVENT';
+type EvidenceType =
+  | "PHOTO"
+  | "VIDEO"
+  | "DOCUMENT"
+  | "SENSOR"
+  | "VISION"
+  | "SIGNATURE"
+  | "SYSTEM_EVENT";
 
 type LedgerAction =
-  | 'INSPECTION_CREATED'
-  | 'INSPECTION_COMPLETED'
-  | 'DEFECT_RECORDED'
-  | 'COA_UPLOADED'
-  | 'COA_VALIDATED'
-  | 'POLICY_VIOLATION'
-  | 'AUTO_QUARANTINE'
-  | 'QUARANTINE_RELEASED'
-  | 'DISPOSITION_EXECUTED'
-  | 'SHIPMENT_BLOCKED'
-  | 'SHIPMENT_RELEASED';
+  | "INSPECTION_CREATED"
+  | "INSPECTION_COMPLETED"
+  | "DEFECT_RECORDED"
+  | "COA_UPLOADED"
+  | "COA_VALIDATED"
+  | "POLICY_VIOLATION"
+  | "AUTO_QUARANTINE"
+  | "QUARANTINE_RELEASED"
+  | "DISPOSITION_EXECUTED"
+  | "SHIPMENT_BLOCKED"
+  | "SHIPMENT_RELEASED";
 
 interface TraceabilityLedger {
   appendEvent: (event: LedgerEvent) => Promise<string>;
@@ -705,14 +774,21 @@ interface LedgerEvent {
 
   // Target
   target: {
-    type: 'SKU' | 'LOT' | 'SERIAL' | 'RECEIPT' | 'SHIPMENT' | 'QUARANTINE' | 'INSPECTION';
+    type:
+      | "SKU"
+      | "LOT"
+      | "SERIAL"
+      | "RECEIPT"
+      | "SHIPMENT"
+      | "QUARANTINE"
+      | "INSPECTION";
     id: string;
   };
 
   action: LedgerAction;
   actor: {
     actorId: string;
-    actorType: 'USER' | 'SYSTEM' | 'DEVICE';
+    actorType: "USER" | "SYSTEM" | "DEVICE";
     role?: string;
   };
 
@@ -741,12 +817,12 @@ interface IntegrityVerification {
   validEvents: number;
   invalidEvents: number;
 
-  result: 'VALID' | 'TAMPER_DETECTED' | 'INCOMPLETE';
+  result: "VALID" | "TAMPER_DETECTED" | "INCOMPLETE";
 
   issues?: {
     eventId: string;
     issue: string;
-    severity: 'HIGH' | 'MEDIUM' | 'LOW';
+    severity: "HIGH" | "MEDIUM" | "LOW";
   }[];
 }
 
@@ -778,6 +854,7 @@ const TRACEABILITY_VOICE_COMMANDS = [
 ## 🧬 5. Advanced Root Cause Analysis (RCA)
 
 ### From symptom → cause using data, not guesses
+
 ```typescript
 interface AdvancedRCA {
   // Inputs
@@ -794,7 +871,13 @@ interface AdvancedRCA {
 interface QualitySignalBatch {
   period: DateRange;
   signals: {
-    source: 'INSPECTION' | 'DEFECT' | 'IOT' | 'VISION' | 'WMS_EVENT' | 'SUPPLIER';
+    source:
+      | "INSPECTION"
+      | "DEFECT"
+      | "IOT"
+      | "VISION"
+      | "WMS_EVENT"
+      | "SUPPLIER";
     at: Date;
     key: string;
     value: string | number | boolean;
@@ -808,7 +891,12 @@ interface QualitySignalBatch {
 
 interface RCARequest {
   incidentId: string;
-  incidentType: 'DEFECT_CLUSTER' | 'RECALL' | 'CUSTOMER_COMPLAINT' | 'POLICY_VIOLATION' | 'VISION_SPIKE';
+  incidentType:
+    | "DEFECT_CLUSTER"
+    | "RECALL"
+    | "CUSTOMER_COMPLAINT"
+    | "POLICY_VIOLATION"
+    | "VISION_SPIKE";
 
   focus: {
     sku?: string;
@@ -848,7 +936,14 @@ interface RCAReport {
   candidates: {
     cause: string;
     probability: number; // 0-1
-    category: 'SUPPLIER' | 'PROCESS' | 'EQUIPMENT' | 'STORAGE' | 'LABELING' | 'HUMAN_ERROR' | 'UNKNOWN';
+    category:
+      | "SUPPLIER"
+      | "PROCESS"
+      | "EQUIPMENT"
+      | "STORAGE"
+      | "LABELING"
+      | "HUMAN_ERROR"
+      | "UNKNOWN";
     evidence: string[];
   }[];
 
@@ -863,7 +958,7 @@ interface RCAReport {
   // Recommendations
   recommendedActions: {
     action: string;
-    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+    priority: "HIGH" | "MEDIUM" | "LOW";
     ownerRole: string;
     dueDays: number;
     expectedImpact: string;
@@ -880,7 +975,15 @@ interface CausalGraph {
   nodes: {
     id: string;
     label: string;
-    type: 'SUPPLIER' | 'SKU' | 'PROCESS_STEP' | 'STATION' | 'ZONE' | 'EQUIPMENT' | 'POLICY' | 'DEFECT';
+    type:
+      | "SUPPLIER"
+      | "SKU"
+      | "PROCESS_STEP"
+      | "STATION"
+      | "ZONE"
+      | "EQUIPMENT"
+      | "POLICY"
+      | "DEFECT";
   }[];
 
   edges: {
@@ -939,6 +1042,7 @@ const ADVANCED_RCA_VOICE_COMMANDS = [
 ## 🤝 6. Autonomous Quality Controls
 
 ### Auto quarantine / release gates with governance
+
 ```typescript
 interface AutonomousQualityControls {
   // Policy-based triggers
@@ -950,12 +1054,16 @@ interface AutonomousQualityControls {
 
   // Human-in-the-loop
   requestApproval: (request: ApprovalRequest) => Promise<string>;
-  recordApproval: (approvalId: string, decision: 'APPROVE' | 'REJECT', notes?: string) => Promise<void>;
+  recordApproval: (
+    approvalId: string,
+    decision: "APPROVE" | "REJECT",
+    notes?: string,
+  ) => Promise<void>;
 }
 
 interface QualityEvent {
   at: Date;
-  source: 'VISION' | 'IOT' | 'MODEL' | 'INSPECTION' | 'COMPLIANCE';
+  source: "VISION" | "IOT" | "MODEL" | "INSPECTION" | "COMPLIANCE";
   target: { type: string; id: string };
   severity: RiskLevel;
   summary: string;
@@ -965,8 +1073,14 @@ interface QualityEvent {
 interface AutonomousDecision {
   decidedAt: Date;
   targetId: string;
-  
-  action: 'NO_ACTION' | 'WARN' | 'AUTO_QUARANTINE' | 'HOLD_FOR_REVIEW' | 'BLOCK_SHIPMENT' | 'CREATE_CAPA';
+
+  action:
+    | "NO_ACTION"
+    | "WARN"
+    | "AUTO_QUARANTINE"
+    | "HOLD_FOR_REVIEW"
+    | "BLOCK_SHIPMENT"
+    | "CREATE_CAPA";
   reason: string;
 
   // Safety rails
@@ -1009,6 +1123,7 @@ const AUTONOMOUS_QC_VOICE_COMMANDS = [
 ## 🎤 Voice Commands Summary (Part 2)
 
 **Total Commands in Part 2**: 30+ commands covering:
+
 - Predictive risk scoring
 - Vision inspection review
 - IoT excursion response

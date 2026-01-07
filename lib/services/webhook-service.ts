@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
-import fetch from 'node-fetch';
+import { prisma } from "@/lib/prisma";
+import fetch from "node-fetch";
 
 interface WebhookPayload {
   event: string;
@@ -26,7 +26,7 @@ const DEFAULT_CONFIG: Required<WebhookRetryConfig> = {
 export async function sendWebhook(
   url: string,
   payload: WebhookPayload,
-  config: WebhookRetryConfig = {}
+  config: WebhookRetryConfig = {},
 ): Promise<{ success: boolean; attempts: number; error?: string }> {
   const { maxRetries, retryDelays, timeout } = { ...DEFAULT_CONFIG, ...config };
   let attempts = 0;
@@ -39,7 +39,7 @@ export async function sendWebhook(
       event: payload.event,
       payload,
       organizationId: payload.organizationId,
-      status: 'PENDING',
+      status: "PENDING",
       attempts: 0,
     },
   });
@@ -52,11 +52,11 @@ export async function sendWebhook(
       const timeoutId = setTimeout(() => controller.abort(), timeout);
 
       const response = await fetch(url, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'LogiVox-WMS-Webhook/1.0',
-          'X-Webhook-Signature': generateSignature(payload),
+          "Content-Type": "application/json",
+          "User-Agent": "LogiVox-WMS-Webhook/1.0",
+          "X-Webhook-Signature": generateSignature(payload),
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
@@ -69,7 +69,7 @@ export async function sendWebhook(
         await prisma.webhookLog.update({
           where: { id: webhookLog.id },
           data: {
-            status: 'SUCCESS',
+            status: "SUCCESS",
             attempts,
             responseStatus: response.status,
             responseBody: await response.text(),
@@ -82,25 +82,31 @@ export async function sendWebhook(
 
       // Non-2xx response
       lastError = `HTTP ${response.status}: ${response.statusText}`;
-      await updateWebhookLogError(webhookLog.id, attempts, lastError, response.status);
+      await updateWebhookLogError(
+        webhookLog.id,
+        attempts,
+        lastError,
+        response.status,
+      );
 
       // Don't retry on 4xx errors (client errors - bad request, auth, etc.)
       if (response.status >= 400 && response.status < 500) {
         break;
       }
     } catch (error: any) {
-      lastError = error.message || 'Unknown error';
+      lastError = error.message || "Unknown error";
       await updateWebhookLogError(webhookLog.id, attempts, lastError);
 
       // Don't retry on network timeouts beyond certain threshold
-      if (error.name === 'AbortError' && attempts >= 3) {
+      if (error.name === "AbortError" && attempts >= 3) {
         break;
       }
     }
 
     // Wait before retrying (exponential backoff)
     if (attempts < maxRetries) {
-      const delay = retryDelays[attempts - 1] || retryDelays[retryDelays.length - 1];
+      const delay =
+        retryDelays[attempts - 1] || retryDelays[retryDelays.length - 1];
       await sleep(delay * 1000);
     }
   }
@@ -109,7 +115,7 @@ export async function sendWebhook(
   await prisma.webhookLog.update({
     where: { id: webhookLog.id },
     data: {
-      status: 'FAILED',
+      status: "FAILED",
       attempts,
       errorMessage: lastError,
       completedAt: new Date(),
@@ -126,12 +132,12 @@ async function updateWebhookLogError(
   logId: string,
   attempts: number,
   errorMessage: string,
-  responseStatus?: number
+  responseStatus?: number,
 ) {
   await prisma.webhookLog.update({
     where: { id: logId },
     data: {
-      status: 'RETRYING',
+      status: "RETRYING",
       attempts,
       errorMessage,
       responseStatus,
@@ -144,19 +150,19 @@ async function updateWebhookLogError(
  * Generate HMAC signature for webhook payload
  */
 function generateSignature(payload: any): string {
-  const crypto = require('crypto');
-  const secret = process.env.WEBHOOK_SECRET || 'default-webhook-secret';
+  const crypto = require("crypto");
+  const secret = process.env.WEBHOOK_SECRET || "default-webhook-secret";
   return crypto
-    .createHmac('sha256', secret)
+    .createHmac("sha256", secret)
     .update(JSON.stringify(payload))
-    .digest('hex');
+    .digest("hex");
 }
 
 /**
  * Sleep utility
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 /**
@@ -165,7 +171,7 @@ function sleep(ms: number): Promise<void> {
 export async function retryFailedWebhooks() {
   const failedWebhooks = await prisma.webhookLog.findMany({
     where: {
-      status: 'FAILED',
+      status: "FAILED",
       attempts: { lt: 5 },
       createdAt: {
         gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
@@ -179,12 +185,12 @@ export async function retryFailedWebhooks() {
       return sendWebhook(webhook.url, webhook.payload as WebhookPayload, {
         maxRetries: 5 - webhook.attempts, // Remaining retries
       });
-    })
+    }),
   );
 
   return {
     total: failedWebhooks.length,
-    succeeded: results.filter(r => r.status === 'fulfilled').length,
-    failed: results.filter(r => r.status === 'rejected').length,
+    succeeded: results.filter((r) => r.status === "fulfilled").length,
+    failed: results.filter((r) => r.status === "rejected").length,
   };
 }

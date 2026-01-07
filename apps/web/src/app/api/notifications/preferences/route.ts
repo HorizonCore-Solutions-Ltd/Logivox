@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -16,7 +16,7 @@ const updatePreferencesSchema = z.object({
   quietHoursStart: z.string().optional(),
   quietHoursEnd: z.string().optional(),
   digestEnabled: z.boolean().optional(),
-  digestFrequency: z.enum(['DAILY', 'WEEKLY']).optional(),
+  digestFrequency: z.enum(["DAILY", "WEEKLY"]).optional(),
   digestTime: z.string().optional(),
   alertEmailEnabled: z.boolean().optional(),
   alertSmsEnabled: z.boolean().optional(),
@@ -53,7 +53,7 @@ export async function GET(request: Request) {
     console.error("Error fetching preferences:", error);
     return NextResponse.json(
       { error: "Failed to fetch preferences" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -84,13 +84,13 @@ export async function PATCH(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating preferences:", error);
     return NextResponse.json(
       { error: "Failed to update preferences" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

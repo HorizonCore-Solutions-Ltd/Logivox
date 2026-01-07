@@ -3,12 +3,12 @@
  * Real-time weight monitoring with quantity estimation
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { iotMonitoringService } from '@/lib/services/inventory/iot-monitoring-service';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { iotMonitoringService } from "@/lib/services/inventory/iot-monitoring-service";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/inventory/iot/weight/reading
@@ -18,29 +18,20 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const {
-      deviceId,
-      productId,
-      weight,
-      unitWeight,
-      temperature,
-      location
-    } = body;
+    const { deviceId, productId, weight, unitWeight, temperature, location } =
+      body;
 
     if (!deviceId || !productId || weight === undefined) {
       return NextResponse.json(
         {
-          error: 'Missing required fields: deviceId, productId, weight',
-          code: 'VALIDATION_ERROR'
+          error: "Missing required fields: deviceId, productId, weight",
+          code: "VALIDATION_ERROR",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -51,24 +42,24 @@ export async function POST(request: NextRequest) {
       unitWeight,
       temperature,
       timestamp: new Date(),
-      location
+      location,
     };
 
-    const result = await iotMonitoringService.processWeightSensorReading(reading);
+    const result =
+      await iotMonitoringService.processWeightSensorReading(reading);
 
     return NextResponse.json({
       success: true,
-      data: result
+      data: result,
     });
-
   } catch (error: any) {
-    console.error('Weight sensor processing error:', error);
+    console.error("Weight sensor processing error:", error);
     return NextResponse.json(
       {
-        error: 'Failed to process weight sensor reading',
-        message: error.message
+        error: "Failed to process weight sensor reading",
+        message: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

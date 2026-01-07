@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching locations:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch locations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -171,7 +171,7 @@ export async function POST(request: NextRequest) {
     if (existing) {
       return NextResponse.json(
         { error: "Location code already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -184,7 +184,7 @@ export async function POST(request: NextRequest) {
       if (barcodeExists) {
         return NextResponse.json(
           { error: "Barcode already exists" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -230,13 +230,13 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Failed to create location" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

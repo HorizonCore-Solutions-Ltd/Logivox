@@ -21,6 +21,7 @@ Authorization: Bearer <token>
 ## Response Format
 
 ### Success Response
+
 ```json
 {
   "success": true,
@@ -29,6 +30,7 @@ Authorization: Bearer <token>
 ```
 
 ### Error Response
+
 ```json
 {
   "success": false,
@@ -42,11 +44,13 @@ Authorization: Bearer <token>
 ## NCR Endpoints
 
 ### List NCRs
+
 ```http
 GET /api/qc/ncr
 ```
 
 **Query Parameters:**
+
 - `status` (string): Filter by status (OPEN, INVESTIGATING, RESOLVED, CLOSED)
 - `severity` (string): Filter by severity (CRITICAL, MAJOR, MINOR)
 - `category` (string): Filter by category
@@ -58,6 +62,7 @@ GET /api/qc/ncr
 - `limit` (number): Results per page (default: 50)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -72,7 +77,7 @@ GET /api/qc/ncr
       "detectedAt": "2026-01-05T10:00:00Z",
       "detectedBy": "John Smith",
       "affectedQuantity": 150,
-      "costImpact": 2250.00,
+      "costImpact": 2250.0,
       "supplier": {
         "id": "uuid",
         "name": "Acme Corp",
@@ -84,7 +89,7 @@ GET /api/qc/ncr
         "sku": "W-001"
       },
       "supplierClaimStatus": "PENDING",
-      "supplierClaimAmount": 2250.00,
+      "supplierClaimAmount": 2250.0,
       "createdAt": "2026-01-05T10:05:00Z",
       "updatedAt": "2026-01-05T10:05:00Z"
     }
@@ -99,6 +104,7 @@ GET /api/qc/ncr
 ```
 
 ### Get NCR by ID
+
 ```http
 GET /api/qc/ncr/:id
 ```
@@ -106,11 +112,13 @@ GET /api/qc/ncr/:id
 **Response:** Single NCR object (same structure as list item)
 
 ### Create NCR
+
 ```http
 POST /api/qc/ncr
 ```
 
 **Request Body:**
+
 ```json
 {
   "description": "Packaging damage during transit",
@@ -119,7 +127,7 @@ POST /api/qc/ncr
   "detectedAt": "2026-01-05T10:00:00Z",
   "detectedBy": "John Smith",
   "affectedQuantity": 150,
-  "costImpact": 2250.00,
+  "costImpact": 2250.0,
   "supplierId": "uuid",
   "productId": "uuid",
   "inspectionId": "uuid" // optional
@@ -129,6 +137,7 @@ POST /api/qc/ncr
 **Response:** Created NCR object with auto-generated ncrNumber
 
 ### Update NCR
+
 ```http
 PATCH /api/qc/ncr/:id
 ```
@@ -138,11 +147,13 @@ PATCH /api/qc/ncr/:id
 **Response:** Updated NCR object
 
 ### Delete NCR
+
 ```http
 DELETE /api/qc/ncr/:id
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -151,6 +162,7 @@ DELETE /api/qc/ncr/:id
 ```
 
 ### Get NCR Statistics
+
 ```http
 GET /api/qc/ncr/stats
 ```
@@ -158,6 +170,7 @@ GET /api/qc/ncr/stats
 **Query Parameters:** Same filters as list endpoint
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -180,10 +193,8 @@ GET /api/qc/ncr/stats
       "SHIPPING": 13
     },
     "costImpact": {
-      "total": 245678.90,
-      "byMonth": [
-        { "month": "2026-01", "amount": 45678.90 }
-      ]
+      "total": 245678.9,
+      "byMonth": [{ "month": "2026-01", "amount": 45678.9 }]
     }
   }
 }
@@ -192,11 +203,13 @@ GET /api/qc/ncr/stats
 ## CAPA Endpoints
 
 ### List CAPAs
+
 ```http
 GET /api/qc/capa
 ```
 
 **Query Parameters:**
+
 - `status` (string): OPEN, IN_PROGRESS, PENDING_VERIFICATION, VERIFIED, CLOSED
 - `type` (string): CORRECTIVE, PREVENTIVE, BOTH
 - `priority` (string): CRITICAL, HIGH, MEDIUM, LOW
@@ -207,11 +220,13 @@ GET /api/qc/capa
 **Response:** Similar structure to NCR list
 
 ### Get Overdue CAPAs
+
 ```http
 GET /api/qc/capa/overdue
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -233,11 +248,13 @@ GET /api/qc/capa/overdue
 ```
 
 ### Get CAPA Statistics
+
 ```http
 GET /api/qc/capa/stats
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -265,11 +282,13 @@ GET /api/qc/capa/stats
 ```
 
 ### Create CAPA
+
 ```http
 POST /api/qc/capa
 ```
 
 **Request Body:**
+
 ```json
 {
   "title": "Implement barcode scanning for shipping labels",
@@ -288,6 +307,7 @@ POST /api/qc/capa
 **Response:** Created CAPA with auto-calculated RPN (280 in this example)
 
 ### Update CAPA
+
 ```http
 PATCH /api/qc/capa/:id
 ```
@@ -295,11 +315,13 @@ PATCH /api/qc/capa/:id
 **Request Body:** Partial CAPA object
 
 ### Verify CAPA Effectiveness
+
 ```http
 POST /api/qc/capa/:id/verify
 ```
 
 **Request Body:**
+
 ```json
 {
   "verificationResult": "EFFECTIVE",
@@ -311,22 +333,26 @@ POST /api/qc/capa/:id/verify
 ## Quality Holds Endpoints
 
 ### List Quality Holds
+
 ```http
 GET /api/qc/quality-holds
 ```
 
 **Query Parameters:**
+
 - `status`: ACTIVE, RELEASED, REJECTED, PARTIAL
 - `holdType`: PRODUCT, LOT, LOCATION, VENDOR, ORDER
 - `severity`: CRITICAL, HIGH, MEDIUM, LOW
 - `startDate`, `endDate`, `search`, `page`, `limit`
 
 ### Get Quality Holds Statistics
+
 ```http
 GET /api/qc/quality-holds/stats
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -353,18 +379,20 @@ GET /api/qc/quality-holds/stats
 ```
 
 ### Create Quality Hold
+
 ```http
 POST /api/qc/quality-holds
 ```
 
 **Request Body:**
+
 ```json
 {
   "holdType": "PRODUCT",
   "severity": "HIGH",
   "reason": "Failed dimensional inspection",
   "quantityOnHold": 500,
-  "estimatedValue": 7500.00,
+  "estimatedValue": 7500.0,
   "productId": "uuid",
   "lotId": "uuid",
   "inspectionId": "uuid",
@@ -373,11 +401,13 @@ POST /api/qc/quality-holds
 ```
 
 ### Release Quality Hold
+
 ```http
 POST /api/qc/quality-holds/:id/release
 ```
 
 **Request Body:**
+
 ```json
 {
   "quantityToRelease": 450,
@@ -387,11 +417,13 @@ POST /api/qc/quality-holds/:id/release
 ```
 
 ### Reject Quality Hold
+
 ```http
 POST /api/qc/quality-holds/:id/reject
 ```
 
 **Request Body:**
+
 ```json
 {
   "quantityToReject": 50,
@@ -404,22 +436,26 @@ POST /api/qc/quality-holds/:id/reject
 ## Sampling Plans Endpoints
 
 ### List Sampling Plans
+
 ```http
 GET /api/qc/sampling-plans
 ```
 
 **Query Parameters:**
+
 - `status`: ACTIVE, INACTIVE, EXPIRED, DRAFT
 - `inspectionLevel`: I, II, III, S1, S2, S3, S4
 - `inspectionType`: NORMAL, TIGHTENED, REDUCED
 - `productCategory`, `search`, `page`, `limit`
 
 ### Get Sampling Plan Statistics
+
 ```http
 GET /api/qc/sampling-plans/stats
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -441,11 +477,13 @@ GET /api/qc/sampling-plans/stats
 ```
 
 ### Calculate Sample Size
+
 ```http
 POST /api/qc/sampling-plans/calculate
 ```
 
 **Request Body:**
+
 ```json
 {
   "lotSize": 5000,
@@ -455,6 +493,7 @@ POST /api/qc/sampling-plans/calculate
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -470,11 +509,13 @@ POST /api/qc/sampling-plans/calculate
 ```
 
 ### Create Sampling Plan
+
 ```http
 POST /api/qc/sampling-plans
 ```
 
 **Request Body:**
+
 ```json
 {
   "planName": "General Receiving Inspection",
@@ -495,21 +536,25 @@ POST /api/qc/sampling-plans
 ## Quality Measurements Endpoints
 
 ### List Measurements
+
 ```http
 GET /api/qc/measurements
 ```
 
 **Query Parameters:**
+
 - `measurementType`: DIMENSION, WEIGHT, TEMPERATURE, PRESSURE, HARDNESS, VISCOSITY, pH, OTHER
 - `conformanceStatus`: CONFORMING, NON_CONFORMING, MARGINAL
 - `productId`, `lotId`, `startDate`, `endDate`, `search`, `page`, `limit`
 
 ### Get Measurement Statistics
+
 ```http
 GET /api/qc/measurements/stats
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -535,11 +580,13 @@ GET /api/qc/measurements/stats
 ```
 
 ### Create Measurement
+
 ```http
 POST /api/qc/measurements
 ```
 
 **Request Body:**
+
 ```json
 {
   "measurementType": "DIMENSION",
@@ -548,7 +595,7 @@ POST /api/qc/measurements
   "unit": "mm",
   "specMin": 24.95,
   "specMax": 25.05,
-  "targetValue": 25.00,
+  "targetValue": 25.0,
   "measurementDate": "2026-01-05T14:30:00Z",
   "measuredBy": "Robert Johnson",
   "equipmentUsed": "CMM-001",
@@ -560,34 +607,38 @@ POST /api/qc/measurements
 ```
 
 **Response:** Created measurement with auto-calculated:
+
 - `deviation`: 0.02
 - `conformanceStatus`: CONFORMING
 - `cpk`: 1.67 (if enough historical data)
 
 ### Get SPC Data
+
 ```http
 GET /api/qc/measurements/spc
 ```
 
 **Query Parameters:**
+
 - `productId` (required)
 - `characteristic` (required)
 - `startDate`, `endDate`
 - `limit`: Number of data points (default: 100)
 
 **Response:**
+
 ```json
 {
   "success": true,
   "data": {
     "characteristic": "Shaft Diameter",
     "unit": "mm",
-    "targetValue": 25.00,
+    "targetValue": 25.0,
     "specMin": 24.95,
     "specMax": 25.05,
     "controlLimits": {
       "ucl": 25.03,
-      "centerLine": 25.00,
+      "centerLine": 25.0,
       "lcl": 24.97
     },
     "processCapability": {
@@ -611,22 +662,26 @@ GET /api/qc/measurements/spc
 ## Quality Reports Endpoints
 
 ### List Reports
+
 ```http
 GET /api/qc/reports
 ```
 
 **Query Parameters:**
+
 - `reportType`: DAILY, WEEKLY, MONTHLY, QUARTERLY, ANNUAL, AD_HOC
 - `category`: INSPECTION_SUMMARY, NCR_ANALYSIS, CAPA_EFFECTIVENESS, SUPPLIER_PERFORMANCE, QUALITY_TRENDS, COMPLIANCE, EXECUTIVE_SUMMARY
 - `status`: DRAFT, PENDING_REVIEW, APPROVED, PUBLISHED
 - `startDate`, `endDate`, `search`, `page`, `limit`
 
 ### Create Report
+
 ```http
 POST /api/qc/reports
 ```
 
 **Request Body:**
+
 ```json
 {
   "reportType": "MONTHLY",
@@ -640,6 +695,7 @@ POST /api/qc/reports
 ```
 
 **Response:** Report with auto-generated:
+
 - `reportNumber`: REPORT-20260201-001
 - `summary`: Auto-generated executive summary
 - `keyFindings`: Auto-analyzed findings
@@ -647,11 +703,13 @@ POST /api/qc/reports
 - `status`: DRAFT
 
 ### Export Report to PDF
+
 ```http
 POST /api/qc/reports/:id/export
 ```
 
 **Request Body:**
+
 ```json
 {
   "format": "PDF",
@@ -663,11 +721,13 @@ POST /api/qc/reports/:id/export
 **Response:** Binary PDF file
 
 ### Email Report
+
 ```http
 POST /api/qc/reports/:id/email
 ```
 
 **Request Body:**
+
 ```json
 {
   "recipients": ["manager@company.com", "director@company.com"],
@@ -678,6 +738,7 @@ POST /api/qc/reports/:id/email
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -694,26 +755,23 @@ Subscribe to real-time events:
 
 ```javascript
 // NCR Events
-- ncr.created
-- ncr.updated
-- ncr.status_changed
-- ncr.claim_submitted
-
-// CAPA Events
-- capa.created
-- capa.assigned
-- capa.overdue
-- capa.verified
-- capa.closed
-
-// Quality Hold Events
-- hold.created
-- hold.released
-- hold.rejected
-
-// Measurement Events
-- measurement.non_conforming
-- measurement.cpk_below_threshold
+-ncr.created -
+  ncr.updated -
+  ncr.status_changed -
+  ncr.claim_submitted -
+  // CAPA Events
+  capa.created -
+  capa.assigned -
+  capa.overdue -
+  capa.verified -
+  capa.closed -
+  // Quality Hold Events
+  hold.created -
+  hold.released -
+  hold.rejected -
+  // Measurement Events
+  measurement.non_conforming -
+  measurement.cpk_below_threshold;
 ```
 
 ### Webhook Payload Example
@@ -741,17 +799,17 @@ Subscribe to real-time events:
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-| `AUTH_REQUIRED` | Authentication required |
-| `AUTH_INVALID` | Invalid token |
-| `FORBIDDEN` | Insufficient permissions |
-| `NOT_FOUND` | Resource not found |
-| `VALIDATION_ERROR` | Invalid request data |
-| `DUPLICATE` | Resource already exists |
-| `CONFLICT` | Operation conflict |
-| `RATE_LIMIT` | Too many requests |
-| `SERVER_ERROR` | Internal server error |
+| Code               | Description              |
+| ------------------ | ------------------------ |
+| `AUTH_REQUIRED`    | Authentication required  |
+| `AUTH_INVALID`     | Invalid token            |
+| `FORBIDDEN`        | Insufficient permissions |
+| `NOT_FOUND`        | Resource not found       |
+| `VALIDATION_ERROR` | Invalid request data     |
+| `DUPLICATE`        | Resource already exists  |
+| `CONFLICT`         | Operation conflict       |
+| `RATE_LIMIT`       | Too many requests        |
+| `SERVER_ERROR`     | Internal server error    |
 
 ## Code Examples
 
@@ -759,31 +817,31 @@ Subscribe to real-time events:
 
 ```javascript
 // Fetch NCRs
-const response = await fetch('/api/qc/ncr?status=OPEN', {
+const response = await fetch("/api/qc/ncr?status=OPEN", {
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  },
 });
 const data = await response.json();
 
 // Create CAPA
-const capa = await fetch('/api/qc/capa', {
-  method: 'POST',
+const capa = await fetch("/api/qc/capa", {
+  method: "POST",
   headers: {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json'
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    title: 'Fix packaging issues',
-    type: 'CORRECTIVE',
-    priority: 'HIGH',
+    title: "Fix packaging issues",
+    type: "CORRECTIVE",
+    priority: "HIGH",
     severity: 8,
     occurrence: 5,
     detection: 7,
-    assignedTo: 'John Smith',
-    targetDate: '2026-02-01'
-  })
+    assignedTo: "John Smith",
+    targetDate: "2026-02-01",
+  }),
 });
 ```
 

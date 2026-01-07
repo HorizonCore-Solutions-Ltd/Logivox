@@ -1,13 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const gateEntrySchema = z.object({
-  entryType: z.enum(['VEHICLE', 'VISITOR', 'EMPLOYEE', 'DELIVERY', 'OTHER']),
-  direction: z.enum(['IN', 'OUT']),
-  vehicleType: z.enum(['TRUCK', 'VAN', 'CAR', 'TRAILER', 'CONTAINER', 'FORKLIFT', 'OTHER']).optional(),
+  entryType: z.enum(["VEHICLE", "VISITOR", "EMPLOYEE", "DELIVERY", "OTHER"]),
+  direction: z.enum(["IN", "OUT"]),
+  vehicleType: z
+    .enum(["TRUCK", "VAN", "CAR", "TRAILER", "CONTAINER", "FORKLIFT", "OTHER"])
+    .optional(),
   vehicleNumber: z.string().optional(),
   licensePlate: z.string().optional(),
   trailerNumber: z.string().optional(),
@@ -34,22 +36,22 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
     const skip = (page - 1) * limit;
 
     // Filters
-    const entryType = searchParams.get('entryType');
-    const direction = searchParams.get('direction');
-    const licensePlate = searchParams.get('licensePlate');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    const securityPersonnelId = searchParams.get('securityPersonnelId');
-    const securityCheckPassed = searchParams.get('securityCheckPassed');
+    const entryType = searchParams.get("entryType");
+    const direction = searchParams.get("direction");
+    const licensePlate = searchParams.get("licensePlate");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+    const securityPersonnelId = searchParams.get("securityPersonnelId");
+    const securityCheckPassed = searchParams.get("securityCheckPassed");
 
     const where: any = {
       organizationId: session.user.organizationId,
@@ -57,10 +59,12 @@ export async function GET(request: NextRequest) {
 
     if (entryType) where.entryType = entryType;
     if (direction) where.direction = direction;
-    if (licensePlate) where.licensePlate = { contains: licensePlate, mode: 'insensitive' };
+    if (licensePlate)
+      where.licensePlate = { contains: licensePlate, mode: "insensitive" };
     if (securityPersonnelId) where.securityPersonnelId = securityPersonnelId;
-    if (securityCheckPassed !== null) where.securityCheckPassed = securityCheckPassed === 'true';
-    
+    if (securityCheckPassed !== null)
+      where.securityCheckPassed = securityCheckPassed === "true";
+
     if (startDate || endDate) {
       where.entryTime = {};
       if (startDate) where.entryTime.gte = new Date(startDate);
@@ -72,7 +76,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { entryTime: 'desc' },
+        orderBy: { entryTime: "desc" },
         include: {
           securityPersonnel: {
             select: {
@@ -105,10 +109,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching gate entries:', error);
+    console.error("Error fetching gate entries:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch gate entries' },
-      { status: 500 }
+      { error: "Failed to fetch gate entries" },
+      { status: 500 },
     );
   }
 }
@@ -117,7 +121,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -126,14 +130,14 @@ export async function POST(request: NextRequest) {
     // Generate entry number
     const lastEntry = await prisma.gateEntry.findFirst({
       where: { organizationId: session.user.organizationId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: { entryNumber: true },
     });
 
-    const lastNumber = lastEntry?.entryNumber 
-      ? parseInt(lastEntry.entryNumber.replace(/\D/g, '')) 
+    const lastNumber = lastEntry?.entryNumber
+      ? parseInt(lastEntry.entryNumber.replace(/\D/g, ""))
       : 0;
-    const entryNumber = `GE${String(lastNumber + 1).padStart(6, '0')}`;
+    const entryNumber = `GE${String(lastNumber + 1).padStart(6, "0")}`;
 
     const entry = await prisma.gateEntry.create({
       data: {
@@ -141,7 +145,9 @@ export async function POST(request: NextRequest) {
         organizationId: session.user.organizationId,
         entryNumber,
         entryTime: new Date(validatedData.entryTime),
-        exitTime: validatedData.exitTime ? new Date(validatedData.exitTime) : null,
+        exitTime: validatedData.exitTime
+          ? new Date(validatedData.exitTime)
+          : null,
       },
       include: {
         securityPersonnel: {
@@ -168,8 +174,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'CREATE',
-        entity: 'GATE_ENTRY',
+        action: "CREATE",
+        entity: "GATE_ENTRY",
         entityId: entry.id,
         description: `Created gate entry ${entryNumber} for ${validatedData.entryType}`,
         metadata: {
@@ -183,14 +189,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
-    console.error('Error creating gate entry:', error);
+    console.error("Error creating gate entry:", error);
     return NextResponse.json(
-      { error: 'Failed to create gate entry' },
-      { status: 500 }
+      { error: "Failed to create gate entry" },
+      { status: 500 },
     );
   }
 }

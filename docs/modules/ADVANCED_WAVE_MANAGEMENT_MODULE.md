@@ -11,6 +11,7 @@
 The Advanced Wave Management module enables intelligent grouping, optimization, and execution of orders for maximum efficiency. LogiVox Wave Management combines **enterprise-grade wave planning** with **AI-powered optimization, dynamic wave adjustment, multi-method picking strategies, and voice-guided execution**.
 
 ### Business Value
+
 - **Productivity**: 25-40% increase in picks per hour with optimized waves
 - **Labor Efficiency**: 20-30% reduction in travel time
 - **Throughput**: 35-50% more orders shipped per day
@@ -18,22 +19,24 @@ The Advanced Wave Management module enables intelligent grouping, optimization, 
 - **Flexibility**: Dynamic waves adapt to real-time conditions
 
 ### Market Impact
+
 **Basic Wave Management**: Manual grouping → inefficient, rigid  
 **Advanced Wave Management**: AI-optimized, dynamic → LogiVox competitive advantage
 
 ### Competitive Position
-| Feature | Oracle | SAP | Manhattan | Blue Yonder | **LogiVox** |
-|---------|--------|-----|-----------|-------------|-------------|
-| Wave Planning | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ **AI-Enhanced** |
-| Multi-Method Waves | ✅ Yes | ✅ Yes | ✅ Yes | ⚠️ Limited | ✅ **Advanced** |
-| Dynamic Wave Release | ⚠️ Limited | ⚠️ Limited | ✅ Yes | ⚠️ Limited | ✅ **Real-Time** |
-| Wave Optimization | ⚠️ Basic | ✅ Yes | ✅ Yes | ✅ Yes | ✅ **AI-Powered** |
-| Pick Path Optimization | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ **ML-Enhanced** |
-| Voice-Guided Picking | ❌ No | ❌ No | ⚠️ $100K+ | ⚠️ $100K+ | ✅ **Free** |
-| Predictive Wave Planning | ❌ No | ❌ No | ❌ No | ⚠️ Limited | ✅ **Yes** |
-| Auto Wave Rebalancing | ❌ No | ❌ No | ⚠️ Limited | ❌ No | ✅ **Real-Time** |
-| Cross-Dock Waves | ⚠️ Limited | ✅ Yes | ✅ Yes | ⚠️ Limited | ✅ **Advanced** |
-| Multi-Warehouse Waves | ⚠️ Limited | ✅ Yes | ✅ Yes | ⚠️ Limited | ✅ **Yes** |
+
+| Feature                  | Oracle     | SAP        | Manhattan  | Blue Yonder | **LogiVox**        |
+| ------------------------ | ---------- | ---------- | ---------- | ----------- | ------------------ |
+| Wave Planning            | ✅ Yes     | ✅ Yes     | ✅ Yes     | ✅ Yes      | ✅ **AI-Enhanced** |
+| Multi-Method Waves       | ✅ Yes     | ✅ Yes     | ✅ Yes     | ⚠️ Limited  | ✅ **Advanced**    |
+| Dynamic Wave Release     | ⚠️ Limited | ⚠️ Limited | ✅ Yes     | ⚠️ Limited  | ✅ **Real-Time**   |
+| Wave Optimization        | ⚠️ Basic   | ✅ Yes     | ✅ Yes     | ✅ Yes      | ✅ **AI-Powered**  |
+| Pick Path Optimization   | ✅ Yes     | ✅ Yes     | ✅ Yes     | ✅ Yes      | ✅ **ML-Enhanced** |
+| Voice-Guided Picking     | ❌ No      | ❌ No      | ⚠️ $100K+  | ⚠️ $100K+   | ✅ **Free**        |
+| Predictive Wave Planning | ❌ No      | ❌ No      | ❌ No      | ⚠️ Limited  | ✅ **Yes**         |
+| Auto Wave Rebalancing    | ❌ No      | ❌ No      | ⚠️ Limited | ❌ No       | ✅ **Real-Time**   |
+| Cross-Dock Waves         | ⚠️ Limited | ✅ Yes     | ✅ Yes     | ⚠️ Limited  | ✅ **Advanced**    |
+| Multi-Warehouse Waves    | ⚠️ Limited | ✅ Yes     | ✅ Yes     | ⚠️ Limited  | ✅ **Yes**         |
 
 ---
 
@@ -42,117 +45,130 @@ The Advanced Wave Management module enables intelligent grouping, optimization, 
 ### 1. Wave Planning & Configuration
 
 #### Wave Templates & Rules
+
 ```typescript
 interface WaveTemplate {
   id: string;
   templateCode: string;
   templateName: string;
   description?: string;
-  
+
   // Wave Type
   waveType: WaveType;
-  
+
   // Selection Criteria
   selectionRules: WaveSelectionRule[];
-  
+
   // Grouping Strategy
   groupBy: WaveGrouping[];
   maxOrdersPerWave?: number;
   maxLinesPerWave?: number;
   maxUnitsPerWave?: number;
-  
+
   // Picking Strategy
   pickingMethod: PickingMethod;
   pickingStrategy: PickingStrategy;
-  
+
   // Timing
-  scheduleType: 'MANUAL' | 'SCHEDULED' | 'AUTOMATIC' | 'DEMAND_BASED';
-  scheduledTimes?: string[];  // "09:00", "13:00", "17:00"
-  
+  scheduleType: "MANUAL" | "SCHEDULED" | "AUTOMATIC" | "DEMAND_BASED";
+  scheduledTimes?: string[]; // "09:00", "13:00", "17:00"
+
   // Priority Rules
   priorityRules: PriorityRule[];
-  
+
   // Cutoff Rules
   cutoffTime?: string;
-  maxWaitTime?: number;  // minutes
-  
+  maxWaitTime?: number; // minutes
+
   // Allocation
-  allocationStrategy: 'IMMEDIATE' | 'DEFERRED' | 'OPTIMIZED';
+  allocationStrategy: "IMMEDIATE" | "DEFERRED" | "OPTIMIZED";
   allowPartialAllocation: boolean;
-  
+
   // Assignment
   autoAssign: boolean;
-  assignmentMethod: 'ROUND_ROBIN' | 'BALANCED' | 'SKILL_BASED' | 'ZONE_BASED' | 'AI_OPTIMIZED';
-  
+  assignmentMethod:
+    | "ROUND_ROBIN"
+    | "BALANCED"
+    | "SKILL_BASED"
+    | "ZONE_BASED"
+    | "AI_OPTIMIZED";
+
   // Equipment
-  equipmentType?: 'RF' | 'CART' | 'FORKLIFT' | 'PALLET_JACK' | 'VOICE' | 'ANY';
-  
+  equipmentType?: "RF" | "CART" | "FORKLIFT" | "PALLET_JACK" | "VOICE" | "ANY";
+
   // Quality
   qcRequired: boolean;
-  qcPercentage?: number;  // % of wave
-  
+  qcPercentage?: number; // % of wave
+
   // Status
-  status: 'ACTIVE' | 'INACTIVE' | 'DRAFT';
-  
+  status: "ACTIVE" | "INACTIVE" | "DRAFT";
+
   createdAt: Date;
   updatedAt: Date;
 }
 
-type WaveType = 
-  | 'STANDARD'           // Normal fulfillment
-  | 'BATCH'              // Batch picking
-  | 'CLUSTER'            // Multi-order picking
-  | 'ZONE'               // Zone picking
-  | 'DISCRETE'           // Single-order picking
-  | 'CROSS_DOCK'         // Flow-through
-  | 'PRIORITY'           // Rush orders
-  | 'REPLENISHMENT'      // Pick to replenish
-  | 'VALUE_ADDED'        // VAS orders
-  | 'RETURNS'            // Returns processing
-  | 'CYCLE_COUNT';       // Inventory count
+type WaveType =
+  | "STANDARD" // Normal fulfillment
+  | "BATCH" // Batch picking
+  | "CLUSTER" // Multi-order picking
+  | "ZONE" // Zone picking
+  | "DISCRETE" // Single-order picking
+  | "CROSS_DOCK" // Flow-through
+  | "PRIORITY" // Rush orders
+  | "REPLENISHMENT" // Pick to replenish
+  | "VALUE_ADDED" // VAS orders
+  | "RETURNS" // Returns processing
+  | "CYCLE_COUNT"; // Inventory count
 
-type PickingMethod = 
-  | 'DISCRETE'           // One order at a time
-  | 'BATCH'              // Pick multiple orders simultaneously
-  | 'CLUSTER'            // Pick to multiple totes/carts
-  | 'ZONE'               // Each picker covers a zone
-  | 'WAVE_ZONE'          // Wave distributed across zones
-  | 'MIXED';             // Combine methods
+type PickingMethod =
+  | "DISCRETE" // One order at a time
+  | "BATCH" // Pick multiple orders simultaneously
+  | "CLUSTER" // Pick to multiple totes/carts
+  | "ZONE" // Each picker covers a zone
+  | "WAVE_ZONE" // Wave distributed across zones
+  | "MIXED"; // Combine methods
 
-type PickingStrategy = 
-  | 'ORDER_BASED'        // Pick complete orders
-  | 'LINE_BASED'         // Pick all lines, consolidate later
-  | 'ITEM_BASED'         // Pick by item across orders
-  | 'CASE_BASED'         // Pick full cases first
-  | 'EACH_BASED'        // Pick eaches first
-  | 'HYBRID';            // Intelligent mix
+type PickingStrategy =
+  | "ORDER_BASED" // Pick complete orders
+  | "LINE_BASED" // Pick all lines, consolidate later
+  | "ITEM_BASED" // Pick by item across orders
+  | "CASE_BASED" // Pick full cases first
+  | "EACH_BASED" // Pick eaches first
+  | "HYBRID"; // Intelligent mix
 
 interface WaveSelectionRule {
-  field: string;  // "priority", "shipDate", "carrier", "orderType"
-  operator: 'EQUALS' | 'NOT_EQUALS' | 'GREATER_THAN' | 'LESS_THAN' | 'IN' | 'NOT_IN' | 'BETWEEN';
+  field: string; // "priority", "shipDate", "carrier", "orderType"
+  operator:
+    | "EQUALS"
+    | "NOT_EQUALS"
+    | "GREATER_THAN"
+    | "LESS_THAN"
+    | "IN"
+    | "NOT_IN"
+    | "BETWEEN";
   value: any;
-  
+
   // Examples:
   // { field: "shipDate", operator: "EQUALS", value: "today" }
   // { field: "priority", operator: "GREATER_THAN", value: 5 }
   // { field: "carrier", operator: "IN", value: ["UPS", "FedEx"] }
 }
 
-type WaveGrouping = 
-  | 'SHIP_DATE'
-  | 'CARRIER'
-  | 'SERVICE_LEVEL'
-  | 'CUSTOMER'
-  | 'ORDER_TYPE'
-  | 'PRIORITY'
-  | 'WAREHOUSE_ZONE'
-  | 'ITEM_CATEGORY'
-  | 'DESTINATION_ZONE';
+type WaveGrouping =
+  | "SHIP_DATE"
+  | "CARRIER"
+  | "SERVICE_LEVEL"
+  | "CUSTOMER"
+  | "ORDER_TYPE"
+  | "PRIORITY"
+  | "WAREHOUSE_ZONE"
+  | "ITEM_CATEGORY"
+  | "DESTINATION_ZONE";
 
 interface PriorityRule {
   condition: string;
   priorityBoost: number;
-  
+
   // Examples:
   // { condition: "rushOrder == true", priorityBoost: 100 }
   // { condition: "shipDate == today", priorityBoost: 50 }
@@ -170,111 +186,112 @@ const WAVE_CONFIG_VOICE_COMMANDS = [
 ```
 
 #### Wave Creation & Release
+
 ```typescript
 interface Wave {
   id: string;
   waveNumber: string;
   waveName?: string;
-  
+
   // Template
   templateId: string;
   templateName: string;
-  
+
   // Type & Method
   waveType: WaveType;
   pickingMethod: PickingMethod;
-  
+
   // Orders
   orders: WaveOrder[];
   orderCount: number;
   lineCount: number;
   unitCount: number;
-  
+
   // Inventory
   allocatedInventory: AllocatedInventory[];
-  allocationStatus: 'PENDING' | 'PARTIAL' | 'COMPLETE' | 'FAILED';
+  allocationStatus: "PENDING" | "PARTIAL" | "COMPLETE" | "FAILED";
   shortages: InventoryShortage[];
-  
+
   // Picking Tasks
   pickTasks: PickTask[];
   taskCount: number;
-  
+
   // Assignment
   assignedTo: string[];
   workerCount: number;
-  
+
   // Priority
   priority: number;
   rushWave: boolean;
-  
+
   // Timing
   plannedReleaseTime?: Date;
   actualReleaseTime?: Date;
   targetCompletionTime?: Date;
-  estimatedDuration: number;  // minutes
-  
+  estimatedDuration: number; // minutes
+
   // Status
   status: WaveStatus;
-  
+
   // Progress
   percentComplete: number;
   linesCompleted: number;
   unitsPicked: number;
-  
+
   // Performance
   picksPerHour?: number;
   avgPickTime?: number;
-  efficiency?: number;  // % vs. standard
-  
+  efficiency?: number; // % vs. standard
+
   // Quality
-  accuracy?: number;  // %
-  
+  accuracy?: number; // %
+
   // Exceptions
   exceptions: WaveException[];
-  
+
   createdAt: Date;
   releasedAt?: Date;
   completedAt?: Date;
-  
+
   createdBy: string;
   releasedBy?: string;
 }
 
-type WaveStatus = 
-  | 'PLANNED'            // Created but not released
-  | 'RELEASED'           // Released, ready to pick
-  | 'IN_PROGRESS'        // Being picked
-  | 'PICKING_COMPLETE'   // All picked, pending pack/ship
-  | 'COMPLETED'          // Fully complete
-  | 'CANCELLED'          // Cancelled
-  | 'ON_HOLD';           // Temporarily paused
+type WaveStatus =
+  | "PLANNED" // Created but not released
+  | "RELEASED" // Released, ready to pick
+  | "IN_PROGRESS" // Being picked
+  | "PICKING_COMPLETE" // All picked, pending pack/ship
+  | "COMPLETED" // Fully complete
+  | "CANCELLED" // Cancelled
+  | "ON_HOLD"; // Temporarily paused
 
 interface WaveOrder {
   orderId: string;
   orderNumber: string;
-  
+
   // Priority
   priority: number;
-  
+
   // Quantities
   lineCount: number;
   unitCount: number;
-  
+
   // Status
-  status: 'PENDING' | 'ALLOCATED' | 'PICKING' | 'PICKED' | 'PACKED' | 'SHIPPED';
-  
+  status: "PENDING" | "ALLOCATED" | "PICKING" | "PICKED" | "PACKED" | "SHIPPED";
+
   // Progress
   linesPicked: number;
   unitsPicked: number;
   percentComplete: number;
-  
+
   // Assignment
   assignedTo?: string;
-  
+
   // Timing
   pickStarted?: Date;
   pickCompleted?: Date;
-  
+
   // Exceptions
   exceptions?: string[];
 }
@@ -283,51 +300,56 @@ interface PickTask {
   id: string;
   waveId: string;
   taskNumber: string;
-  
+
   // Type
-  taskType: 'PICK' | 'BATCH_PICK' | 'CLUSTER_PICK' | 'ZONE_PICK' | 'REPLENISHMENT';
-  
+  taskType:
+    | "PICK"
+    | "BATCH_PICK"
+    | "CLUSTER_PICK"
+    | "ZONE_PICK"
+    | "REPLENISHMENT";
+
   // Orders
-  orders: string[];  // order IDs
+  orders: string[]; // order IDs
   orderCount: number;
-  
+
   // Items
   items: PickTaskItem[];
   itemCount: number;
   unitCount: number;
-  
+
   // Location
   zone?: string;
-  locations: string[];  // sorted by pick path
-  
+  locations: string[]; // sorted by pick path
+
   // Assignment
   assignedTo?: string;
   assignedAt?: Date;
-  
+
   // Equipment
   equipment?: string;
   containerType?: string;
   containerCount?: number;
-  
+
   // Status
-  status: 'PENDING' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
-  
+  status: "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
+
   // Progress
   itemsPicked: number;
   percentComplete: number;
-  
+
   // Timing
-  estimatedDuration: number;  // minutes
+  estimatedDuration: number; // minutes
   startedAt?: Date;
   completedAt?: Date;
   actualDuration?: number;
-  
+
   // Performance
   picksPerHour?: number;
-  
+
   // Priority
   priority: number;
-  
+
   createdAt: Date;
 }
 
@@ -335,42 +357,42 @@ interface PickTaskItem {
   lineId: string;
   orderId: string;
   orderNumber: string;
-  
+
   // Item
   sku: string;
   description: string;
-  
+
   // Location
   locationId: string;
   locationCode: string;
   aisle?: string;
   bay?: string;
   level?: string;
-  
+
   // Quantity
   quantityToPick: number;
   quantityPicked?: number;
   uom: string;
-  
+
   // Lot Tracking
   lotControlled: boolean;
   lotNumber?: string;
   expiryDate?: Date;
-  
+
   // Serial Tracking
   serialControlled: boolean;
   serialNumbers?: string[];
-  
+
   // Status
-  status: 'PENDING' | 'PICKED' | 'SHORT' | 'SKIPPED';
-  
+  status: "PENDING" | "PICKED" | "SHORT" | "SKIPPED";
+
   // Sequence
-  sequenceNumber: number;  // pick path order
-  
+  sequenceNumber: number; // pick path order
+
   // Verification
   verificationRequired: boolean;
   verified?: boolean;
-  
+
   pickedAt?: Date;
   pickedBy?: string;
 }
@@ -391,37 +413,41 @@ const WAVE_RELEASE_VOICE_COMMANDS = [
 ### 2. Intelligent Wave Optimization
 
 #### AI-Powered Wave Planning
+
 ```typescript
 interface WaveOptimization {
   // Optimization Goals
   objectives: OptimizationObjective[];
-  
+
   // Constraints
   constraints: WaveConstraint[];
-  
+
   // Optimization Engine
-  optimize: (orders: Order[], resources: Resource[]) => Promise<OptimizedWave[]>;
-  
+  optimize: (
+    orders: Order[],
+    resources: Resource[],
+  ) => Promise<OptimizedWave[]>;
+
   // What-If Analysis
   simulateWave: (config: WaveConfig) => Promise<WaveSimulation>;
-  
+
   // Performance Prediction
   predictWavePerformance: (wave: Wave) => Promise<PerformancePrediction>;
 }
 
-type OptimizationObjective = 
-  | 'MAXIMIZE_THROUGHPUT'      // Most orders per hour
-  | 'MINIMIZE_TRAVEL'          // Shortest pick paths
-  | 'MINIMIZE_LABOR'           // Fewest worker hours
-  | 'BALANCE_WORKLOAD'         // Equal distribution
-  | 'MAXIMIZE_CONSOLIDATION'   // Group similar items
-  | 'MINIMIZE_TOUCHES'         // Reduce handling
-  | 'OPTIMIZE_SHIP_TIME';      // Meet cutoffs
+type OptimizationObjective =
+  | "MAXIMIZE_THROUGHPUT" // Most orders per hour
+  | "MINIMIZE_TRAVEL" // Shortest pick paths
+  | "MINIMIZE_LABOR" // Fewest worker hours
+  | "BALANCE_WORKLOAD" // Equal distribution
+  | "MAXIMIZE_CONSOLIDATION" // Group similar items
+  | "MINIMIZE_TOUCHES" // Reduce handling
+  | "OPTIMIZE_SHIP_TIME"; // Meet cutoffs
 
 interface WaveConstraint {
   type: string;
   value: any;
-  
+
   // Examples:
   // { type: "MAX_ORDERS_PER_WAVE", value: 100 }
   // { type: "MAX_WAVE_DURATION", value: 120 }  // minutes
@@ -431,26 +457,26 @@ interface WaveConstraint {
 
 interface OptimizedWave {
   waveNumber: string;
-  
+
   // Orders
   orders: string[];
   orderCount: number;
-  
+
   // Optimization Scores
-  consolidationScore: number;  // 0-100
-  efficiencyScore: number;     // 0-100
-  balanceScore: number;        // 0-100
-  overallScore: number;        // 0-100
-  
+  consolidationScore: number; // 0-100
+  efficiencyScore: number; // 0-100
+  balanceScore: number; // 0-100
+  overallScore: number; // 0-100
+
   // Predicted Performance
-  estimatedPickTime: number;    // minutes
-  estimatedTravel: number;      // feet
+  estimatedPickTime: number; // minutes
+  estimatedTravel: number; // feet
   estimatedPicksPerHour: number;
-  
+
   // Resource Requirements
   workersRequired: number;
   equipmentRequired: string[];
-  
+
   // Justification
   optimizationReason: string;
   improvements: string[];
@@ -458,53 +484,58 @@ interface OptimizedWave {
 
 interface WaveSimulation {
   waveConfig: WaveConfig;
-  
+
   // Simulation Results
-  estimatedDuration: number;    // minutes
+  estimatedDuration: number; // minutes
   estimatedPicksPerHour: number;
-  estimatedAccuracy: number;    // %
+  estimatedAccuracy: number; // %
   estimatedLaborCost: number;
-  
+
   // Resource Usage
   workersUsed: number;
   equipmentUsed: string[];
-  
+
   // Bottlenecks
   bottlenecks: Bottleneck[];
-  
+
   // Recommendations
   recommendations: string[];
-  
+
   // Confidence
-  confidence: number;  // 0-1
+  confidence: number; // 0-1
 }
 
 interface PerformancePrediction {
   waveId: string;
-  
+
   // Time Predictions
   estimatedCompletionTime: Date;
-  estimatedDuration: number;    // minutes
-  confidence: number;           // 0-1
-  
+  estimatedDuration: number; // minutes
+  confidence: number; // 0-1
+
   // Efficiency Predictions
   estimatedPicksPerHour: number;
-  estimatedTravelDistance: number;  // feet
-  estimatedEfficiency: number;      // % vs. standard
-  
+  estimatedTravelDistance: number; // feet
+  estimatedEfficiency: number; // % vs. standard
+
   // Risk Factors
   risks: RiskFactor[];
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
-  
+  riskLevel: "LOW" | "MEDIUM" | "HIGH";
+
   // Recommendations
   recommendations: string[];
 }
 
 interface RiskFactor {
-  type: 'INVENTORY_SHORTAGE' | 'WORKER_SHORTAGE' | 'EQUIPMENT_UNAVAILABLE' | 'COMPLEXITY' | 'TIGHT_DEADLINE';
+  type:
+    | "INVENTORY_SHORTAGE"
+    | "WORKER_SHORTAGE"
+    | "EQUIPMENT_UNAVAILABLE"
+    | "COMPLEXITY"
+    | "TIGHT_DEADLINE";
   description: string;
-  severity: 'LOW' | 'MEDIUM' | 'HIGH';
-  probability: number;  // 0-1
+  severity: "LOW" | "MEDIUM" | "HIGH";
+  probability: number; // 0-1
   mitigation?: string;
 }
 
@@ -522,24 +553,33 @@ const OPTIMIZATION_VOICE_COMMANDS = [
 ### 3. Dynamic Wave Management
 
 #### Real-Time Wave Adjustment
+
 ```typescript
 interface DynamicWaveManager {
   // Real-Time Monitoring
   monitorWaveProgress: (waveId: string) => Stream<WaveProgress>;
-  
+
   // Dynamic Adjustments
   rebalanceWave: (waveId: string) => Promise<RebalanceResult>;
   reassignTasks: (waveId: string, criteria: ReassignCriteria) => Promise<void>;
   splitWave: (waveId: string, splitCriteria: SplitCriteria) => Promise<Wave[]>;
   mergeWaves: (waveIds: string[]) => Promise<Wave>;
-  
+
   // Hot Orders
   injectHotOrder: (waveId: string, orderId: string) => Promise<void>;
-  prioritizeOrder: (waveId: string, orderId: string, newPriority: number) => Promise<void>;
-  
+  prioritizeOrder: (
+    waveId: string,
+    orderId: string,
+    newPriority: number,
+  ) => Promise<void>;
+
   // Resource Reallocation
-  reallocateWorkers: (fromWave: string, toWave: string, count: number) => Promise<void>;
-  
+  reallocateWorkers: (
+    fromWave: string,
+    toWave: string,
+    count: number,
+  ) => Promise<void>;
+
   // Exception Handling
   handleException: (exception: WaveException) => Promise<Resolution>;
 }
@@ -547,47 +587,47 @@ interface DynamicWaveManager {
 interface WaveProgress {
   waveId: string;
   timestamp: Date;
-  
+
   // Progress Metrics
   percentComplete: number;
   linesCompleted: number;
   linesPending: number;
   unitsPicked: number;
   unitsPending: number;
-  
+
   // Performance
   picksPerHour: number;
   avgPickTime: number;
-  efficiency: number;  // % vs. plan
-  
+  efficiency: number; // % vs. plan
+
   // Workers
   activeWorkers: number;
   workerPerformance: WorkerPerformance[];
-  
+
   // On-Track Status
   onTrack: boolean;
   estimatedCompletionTime: Date;
-  varianceFromPlan: number;  // minutes
-  
+  varianceFromPlan: number; // minutes
+
   // Issues
   currentIssues: Issue[];
 }
 
 interface RebalanceResult {
   waveId: string;
-  
+
   // Changes Made
   tasksReassigned: number;
   workersReassigned: number;
-  
+
   // Before/After
-  beforeBalance: number;  // 0-100 (100 = perfectly balanced)
+  beforeBalance: number; // 0-100 (100 = perfectly balanced)
   afterBalance: number;
-  improvement: number;    // %
-  
+  improvement: number; // %
+
   // Impact
-  estimatedTimeReduction: number;  // minutes
-  
+  estimatedTimeReduction: number; // minutes
+
   // New Assignments
   newAssignments: TaskAssignment[];
 }
@@ -602,47 +642,54 @@ interface TaskAssignment {
 interface WaveException {
   id: string;
   waveId: string;
-  
+
   // Exception Type
   type: ExceptionType;
   description: string;
-  
+
   // Severity
-  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-  
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+
   // Impact
   ordersAffected: number;
   linesAffected: number;
-  
+
   // Status
-  status: 'OPEN' | 'INVESTIGATING' | 'RESOLVED' | 'ESCALATED';
-  
+  status: "OPEN" | "INVESTIGATING" | "RESOLVED" | "ESCALATED";
+
   // Resolution
   resolution?: ExceptionResolution;
-  
+
   // Timing
   occurredAt: Date;
   resolvedAt?: Date;
-  
+
   reportedBy: string;
 }
 
-type ExceptionType = 
-  | 'INVENTORY_SHORT'
-  | 'LOCATION_BLOCKED'
-  | 'EQUIPMENT_FAILURE'
-  | 'WORKER_UNAVAILABLE'
-  | 'DAMAGED_PRODUCT'
-  | 'WRONG_QUANTITY'
-  | 'ITEM_NOT_FOUND'
-  | 'SYSTEM_ERROR'
-  | 'QUALITY_ISSUE';
+type ExceptionType =
+  | "INVENTORY_SHORT"
+  | "LOCATION_BLOCKED"
+  | "EQUIPMENT_FAILURE"
+  | "WORKER_UNAVAILABLE"
+  | "DAMAGED_PRODUCT"
+  | "WRONG_QUANTITY"
+  | "ITEM_NOT_FOUND"
+  | "SYSTEM_ERROR"
+  | "QUALITY_ISSUE";
 
 interface ExceptionResolution {
-  action: 'SUBSTITUTE' | 'BACKORDER' | 'SKIP' | 'REROUTE' | 'SPLIT' | 'CANCEL' | 'MANUAL_INTERVENTION';
+  action:
+    | "SUBSTITUTE"
+    | "BACKORDER"
+    | "SKIP"
+    | "REROUTE"
+    | "SPLIT"
+    | "CANCEL"
+    | "MANUAL_INTERVENTION";
   details: string;
   resolvedBy: string;
-  
+
   // Follow-Up
   followUpRequired: boolean;
   followUpAction?: string;
@@ -664,96 +711,103 @@ const DYNAMIC_WAVE_VOICE_COMMANDS = [
 ### 4. Pick Path Optimization
 
 #### Intelligent Pick Path Generation
+
 ```typescript
 interface PickPathOptimization {
   // Path Generation
   generatePickPath: (pickTask: PickTask) => Promise<PickPath>;
   optimizeMultiPath: (pickTasks: PickTask[]) => Promise<PickPath[]>;
-  
+
   // Algorithms
-  algorithm: 'S_SHAPE' | 'RETURN' | 'MID_POINT' | 'LARGEST_GAP' | 'COMPOSITE' | 'AI_OPTIMIZED';
-  
+  algorithm:
+    | "S_SHAPE"
+    | "RETURN"
+    | "MID_POINT"
+    | "LARGEST_GAP"
+    | "COMPOSITE"
+    | "AI_OPTIMIZED";
+
   // Constraints
   respectCongestion: boolean;
   avoidBlockedAisles: boolean;
   considerPriority: boolean;
-  
+
   // Learning
   learnFromHistory: () => Promise<void>;
   improveAccuracy: () => Promise<void>;
 }
 
-type PickPathAlgorithm = 
-  | 'S_SHAPE'          // Traverse each aisle fully
-  | 'RETURN'           // Enter and exit each aisle
-  | 'MID_POINT'        // Enter aisle from closer end
-  | 'LARGEST_GAP'      // Skip largest gaps between picks
-  | 'COMPOSITE'        // Combine strategies
-  | 'AI_OPTIMIZED';    // ML-based optimization
+type PickPathAlgorithm =
+  | "S_SHAPE" // Traverse each aisle fully
+  | "RETURN" // Enter and exit each aisle
+  | "MID_POINT" // Enter aisle from closer end
+  | "LARGEST_GAP" // Skip largest gaps between picks
+  | "COMPOSITE" // Combine strategies
+  | "AI_OPTIMIZED"; // ML-based optimization
 
 interface PickPath {
   taskId: string;
-  
+
   // Sequence
   sequence: PickPathStep[];
   stepCount: number;
-  
+
   // Distance
-  totalDistance: number;  // feet
-  
+  totalDistance: number; // feet
+
   // Optimization
   algorithm: PickPathAlgorithm;
-  optimizationScore: number;  // 0-100
-  
+  optimizationScore: number; // 0-100
+
   // Alternatives
   alternativePaths?: PickPath[];
-  
+
   // Estimated Time
-  estimatedTime: number;  // minutes
-  
+  estimatedTime: number; // minutes
+
   // Instructions
   voiceInstructions: string[];
 }
 
 interface PickPathStep {
   stepNumber: number;
-  
+
   // Location
   locationId: string;
   locationCode: string;
   aisle: string;
   bay: string;
   level: string;
-  
+
   // Item
   sku: string;
   description: string;
   quantityToPick: number;
-  
+
   // Order
   orderNumber: string;
-  
+
   // Distance
-  distanceFromPrevious: number;  // feet
+  distanceFromPrevious: number; // feet
   cumulativeDistance: number;
-  
+
   // Voice Guidance
   voicePrompt: string;
   voiceConfirmation: string;
-  
+
   // Container
-  containerSlot?: string;  // for cluster picking
+  containerSlot?: string; // for cluster picking
 }
 
 interface PathOptimizationResult {
   originalPath: PickPath;
   optimizedPath: PickPath;
-  
+
   // Improvements
-  distanceReduction: number;    // feet
-  timeReduction: number;        // minutes
-  improvementPercent: number;   // %
-  
+  distanceReduction: number; // feet
+  timeReduction: number; // minutes
+  improvementPercent: number; // %
+
   // Method
   optimizationMethod: string;
 }
@@ -773,21 +827,22 @@ const PICK_PATH_VOICE_COMMANDS = [
 ### 5. Wave Performance Monitoring
 
 #### Real-Time Performance Tracking
+
 ```typescript
 interface WavePerformanceMonitoring {
   // Live Metrics
   liveMetrics: (waveId: string) => Stream<WaveMetrics>;
-  
+
   // Dashboards
   waveDashboard: WaveDashboard;
-  
+
   // Alerts
   performanceAlerts: PerformanceAlert[];
-  
+
   // Analytics
   analyzeWavePerformance: (waveId: string) => Promise<WaveAnalysis>;
   compareWaves: (waveIds: string[]) => Promise<WaveComparison>;
-  
+
   // Historical
   waveHistory: (filter: WaveFilter) => Promise<WaveHistory[]>;
 }
@@ -795,39 +850,39 @@ interface WavePerformanceMonitoring {
 interface WaveMetrics {
   waveId: string;
   timestamp: Date;
-  
+
   // Progress
   percentComplete: number;
   linesCompleted: number;
   unitsPicked: number;
-  
+
   // Speed
   picksPerHour: number;
   unitsPerHour: number;
   linesPerHour: number;
-  
+
   // Efficiency
-  efficiency: number;          // % vs. standard
-  utilization: number;         // % of time picking
-  travelTime: number;          // % of total time
-  pickTime: number;            // % of total time
-  
+  efficiency: number; // % vs. standard
+  utilization: number; // % of time picking
+  travelTime: number; // % of total time
+  pickTime: number; // % of total time
+
   // Quality
-  accuracy: number;            // %
+  accuracy: number; // %
   shortages: number;
   exceptions: number;
-  
+
   // Workers
   activeWorkers: number;
   avgWorkerEfficiency: number;
   topPerformer: string;
-  
+
   // Timing
   startTime: Date;
-  elapsedTime: number;         // minutes
+  elapsedTime: number; // minutes
   estimatedCompletion: Date;
-  varianceFromPlan: number;    // minutes
-  
+  varianceFromPlan: number; // minutes
+
   // Cost
   laborCost: number;
   costPerLine: number;
@@ -839,26 +894,26 @@ interface WaveDashboard {
   totalWaves: number;
   activeWaves: number;
   completedToday: number;
-  
+
   // Performance
   avgPicksPerHour: number;
   avgEfficiency: number;
   avgAccuracy: number;
-  
+
   // Progress
   wavesOnTrack: number;
   wavesBehind: number;
   wavesAhead: number;
-  
+
   // Issues
   criticalAlerts: number;
   exceptions: number;
-  
+
   // Charts
   performanceTrend: ChartData;
   efficiencyByWave: ChartData;
   workerPerformance: ChartData;
-  
+
   // Live Waves
   liveWaves: WaveProgress[];
 }
@@ -866,45 +921,50 @@ interface WaveDashboard {
 interface PerformanceAlert {
   id: string;
   waveId: string;
-  
+
   // Alert Type
-  type: 'BEHIND_SCHEDULE' | 'LOW_EFFICIENCY' | 'HIGH_EXCEPTIONS' | 'INVENTORY_SHORT' | 'WORKER_SHORTAGE';
-  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-  
+  type:
+    | "BEHIND_SCHEDULE"
+    | "LOW_EFFICIENCY"
+    | "HIGH_EXCEPTIONS"
+    | "INVENTORY_SHORT"
+    | "WORKER_SHORTAGE";
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+
   // Details
   message: string;
   impact: string;
-  
+
   // Metrics
   currentValue: number;
   thresholdValue: number;
   variance: number;
-  
+
   // Recommendations
   recommendations: string[];
-  
+
   // Status
   acknowledged: boolean;
   resolved: boolean;
-  
+
   triggeredAt: Date;
   acknowledgedBy?: string;
 }
 
 interface WaveAnalysis {
   waveId: string;
-  
+
   // Performance Summary
   performanceSummary: {
-    overallScore: number;        // 0-100
+    overallScore: number; // 0-100
     efficiencyScore: number;
     qualityScore: number;
     speedScore: number;
   };
-  
+
   // Detailed Metrics
   metrics: WaveMetrics;
-  
+
   // Comparisons
   vsStandard: {
     efficiencyVariance: number;
@@ -916,25 +976,25 @@ interface WaveAnalysis {
     speedVsAvg: number;
     accuracyVsAvg: number;
   };
-  
+
   // Strengths & Weaknesses
   strengths: string[];
   weaknesses: string[];
-  
+
   // Root Cause Analysis
   delays: { reason: string; impact: number }[];
   inefficiencies: { area: string; cost: number }[];
-  
+
   // Recommendations
   recommendations: Recommendation[];
 }
 
 interface Recommendation {
-  type: 'PROCESS' | 'STAFFING' | 'LAYOUT' | 'EQUIPMENT' | 'TRAINING';
+  type: "PROCESS" | "STAFFING" | "LAYOUT" | "EQUIPMENT" | "TRAINING";
   recommendation: string;
   expectedImpact: string;
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
-  effortLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  priority: "HIGH" | "MEDIUM" | "LOW";
+  effortLevel: "LOW" | "MEDIUM" | "HIGH";
 }
 
 // Voice Commands for Performance Monitoring
@@ -952,17 +1012,18 @@ const PERFORMANCE_VOICE_COMMANDS = [
 ### 6. Multi-Method Wave Support
 
 #### Batch, Cluster, Zone Picking
+
 ```typescript
 interface MultiMethodWaveSupport {
   // Batch Picking
   createBatchWave: (config: BatchWaveConfig) => Promise<Wave>;
-  
+
   // Cluster Picking
   createClusterWave: (config: ClusterWaveConfig) => Promise<Wave>;
-  
+
   // Zone Picking
   createZoneWave: (config: ZoneWaveConfig) => Promise<Wave>;
-  
+
   // Mixed Methods
   createHybridWave: (config: HybridWaveConfig) => Promise<Wave>;
 }
@@ -970,14 +1031,14 @@ interface MultiMethodWaveSupport {
 interface BatchWaveConfig {
   // Orders
   orders: string[];
-  batchSize: number;  // orders per batch
-  
+  batchSize: number; // orders per batch
+
   // Grouping
-  groupBy: 'ZONE' | 'ITEM' | 'VELOCITY' | 'SIMILARITY';
-  
+  groupBy: "ZONE" | "ITEM" | "VELOCITY" | "SIMILARITY";
+
   // Consolidation
-  consolidationMethod: 'PUT_WALL' | 'SORT_TO_LIGHT' | 'CART' | 'TOTE';
-  
+  consolidationMethod: "PUT_WALL" | "SORT_TO_LIGHT" | "CART" | "TOTE";
+
   // Optimization
   optimizeForTravel: boolean;
   optimizeForConsolidation: boolean;
@@ -986,15 +1047,15 @@ interface BatchWaveConfig {
 interface ClusterWaveConfig {
   // Orders
   orders: string[];
-  ordersPerCart: number;  // typically 4-12
-  
+  ordersPerCart: number; // typically 4-12
+
   // Equipment
   cartType: string;
   containerSlots: number;
-  
+
   // Assignment
-  containerAssignment: 'DYNAMIC' | 'FIXED';
-  
+  containerAssignment: "DYNAMIC" | "FIXED";
+
   // Optimization
   minimizeConflicts: boolean;
 }
@@ -1002,14 +1063,14 @@ interface ClusterWaveConfig {
 interface ZoneWaveConfig {
   // Orders
   orders: string[];
-  
+
   // Zones
   zones: ZoneDefinition[];
-  
+
   // Handoff
-  handoffMethod: 'CONVEYOR' | 'CART' | 'TOTE' | 'PASS_ALONG';
+  handoffMethod: "CONVEYOR" | "CART" | "TOTE" | "PASS_ALONG";
   handoffLocations: string[];
-  
+
   // Balancing
   balanceWorkload: boolean;
 }
@@ -1017,16 +1078,16 @@ interface ZoneWaveConfig {
 interface ZoneDefinition {
   zoneId: string;
   zoneName: string;
-  
+
   // Locations
   locations: string[];
   aisles?: string[];
-  
+
   // Workers
   workersAssigned: number;
-  
+
   // Performance
-  pickVelocity: 'HIGH' | 'MEDIUM' | 'LOW';
+  pickVelocity: "HIGH" | "MEDIUM" | "LOW";
 }
 
 interface HybridWaveConfig {
@@ -1036,10 +1097,10 @@ interface HybridWaveConfig {
     orderTypes: string[];
     percentage: number;
   }[];
-  
+
   // Routing
   routingLogic: string;
-  
+
   // Consolidation
   consolidationPoint: string;
 }
@@ -1066,70 +1127,70 @@ const MULTI_METHOD_VOICE_COMMANDS = [
 interface PredictiveWavePlanning {
   // Demand Forecasting
   forecastDemand: (timeframe: DateRange) => Promise<DemandForecast>;
-  
+
   // Capacity Planning
   predictCapacity: (date: Date) => Promise<CapacityPrediction>;
-  
+
   // Optimal Wave Schedule
   generateOptimalSchedule: (date: Date) => Promise<WaveSchedule>;
-  
+
   // What-If Analysis
   simulateSchedule: (schedule: WaveSchedule) => Promise<ScheduleSimulation>;
-  
+
   // Auto-Adjustment
   autoAdjustSchedule: (realTimeData: RealTimeData) => Promise<AdjustedSchedule>;
-  
+
   // Machine Learning
-  mlModel: 'GPT-4' | 'CUSTOM_WAVE_MODEL';
+  mlModel: "GPT-4" | "CUSTOM_WAVE_MODEL";
   trainModel: () => Promise<ModelMetrics>;
 }
 
 interface DemandForecast {
   date: Date;
-  
+
   // Order Predictions
   predictedOrders: number;
   predictedLines: number;
   predictedUnits: number;
-  
+
   // By Time Window
   hourlyForecast: { hour: number; orders: number }[];
-  
+
   // Peak Periods
   peakTime: string;
   peakOrders: number;
-  
+
   // Order Types
   orderTypeBreakdown: { type: string; count: number }[];
-  
+
   // Confidence
-  confidence: number;  // 0-1
-  
+  confidence: number; // 0-1
+
   // Historical Comparison
-  vsLastWeek: number;  // % change
-  vsLastYear: number;  // % change
+  vsLastWeek: number; // % change
+  vsLastYear: number; // % change
 }
 
 interface OptimalWaveSchedule {
   date: Date;
-  
+
   // Recommended Waves
   waves: PlannedWave[];
   waveCount: number;
-  
+
   // Resource Requirements
   totalWorkersRequired: number;
   peakWorkers: number;
   equipmentRequired: string[];
-  
+
   // Performance Estimates
-  estimatedThroughput: number;  // orders per day
-  estimatedEfficiency: number;  // %
+  estimatedThroughput: number; // orders per day
+  estimatedEfficiency: number; // %
   estimatedCost: number;
-  
+
   // Optimization Score
-  optimizationScore: number;  // 0-100
-  
+  optimizationScore: number; // 0-100
+
   // Justification
   reasoning: string;
   alternatives: AlternativeSchedule[];
@@ -1138,47 +1199,47 @@ interface OptimalWaveSchedule {
 interface PlannedWave {
   waveNumber: string;
   scheduledTime: string;
-  
+
   // Orders
   estimatedOrderCount: number;
   estimatedLineCount: number;
-  
+
   // Resources
   workersRequired: number;
-  duration: number;  // minutes
-  
+  duration: number; // minutes
+
   // Type
   waveType: WaveType;
   pickingMethod: PickingMethod;
-  
+
   // Priority
   priority: number;
 }
 
 interface ScheduleSimulation {
   schedule: WaveSchedule;
-  
+
   // Simulation Results
-  successProbability: number;  // 0-1
+  successProbability: number; // 0-1
   estimatedOnTimeRate: number; // %
-  
+
   // Bottlenecks
   bottlenecks: ScheduleBottleneck[];
-  
+
   // Resource Conflicts
   conflicts: ResourceConflict[];
-  
+
   // Recommendations
   recommendations: string[];
-  
+
   // Risk Assessment
   risks: RiskAssessment[];
 }
 
 interface ScheduleBottleneck {
   time: string;
-  type: 'LABOR' | 'EQUIPMENT' | 'INVENTORY' | 'SPACE';
-  severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  type: "LABOR" | "EQUIPMENT" | "INVENTORY" | "SPACE";
+  severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
   impact: string;
   mitigation?: string;
 }
@@ -1202,14 +1263,14 @@ interface AIWaveLearning {
   learnPickPatterns: () => Promise<PatternInsights>;
   learnWorkerBehavior: () => Promise<BehaviorInsights>;
   identifyBottlenecks: () => Promise<BottleneckInsights>;
-  
+
   // Continuous Improvement
   improveWaveStrategy: () => Promise<StrategyImprovements>;
   optimizeParameters: () => Promise<ParameterOptimization>;
-  
+
   // Anomaly Detection
   detectAnomalies: (wave: Wave) => Promise<Anomaly[]>;
-  
+
   // Recommendation Engine
   recommendImprovements: () => Promise<Improvement[]>;
 }
@@ -1218,14 +1279,14 @@ interface PatternInsights {
   // Pick Patterns
   commonPickSequences: PickSequence[];
   inefficientPatterns: InefficiencyPattern[];
-  
+
   // Item Associations
   frequentItemPairs: { item1: string; item2: string; frequency: number }[];
-  
+
   // Time Patterns
   timeOfDayEffects: { hour: number; efficiencyMultiplier: number }[];
   dayOfWeekEffects: { day: string; efficiencyMultiplier: number }[];
-  
+
   // Recommendations
   slottingRecommendations: SlottingRecommendation[];
   waveTimingRecommendations: string[];
@@ -1235,47 +1296,47 @@ interface StrategyImprovements {
   // Current Performance
   currentStrategy: WaveStrategy;
   currentPerformance: PerformanceMetrics;
-  
+
   // Recommended Changes
   recommendedStrategy: WaveStrategy;
   predictedPerformance: PerformanceMetrics;
-  
+
   // Expected Impact
   expectedImprovements: {
-    efficiencyGain: number;      // %
-    throughputGain: number;      // %
-    costReduction: number;       // $
-    timeReduction: number;       // minutes per wave
+    efficiencyGain: number; // %
+    throughputGain: number; // %
+    costReduction: number; // $
+    timeReduction: number; // minutes per wave
   };
-  
+
   // Confidence
-  confidence: number;  // 0-1
-  
+  confidence: number; // 0-1
+
   // Implementation
   implementationSteps: string[];
-  estimatedEffort: 'LOW' | 'MEDIUM' | 'HIGH';
+  estimatedEffort: "LOW" | "MEDIUM" | "HIGH";
 }
 
 interface Anomaly {
   waveId: string;
-  type: 'PERFORMANCE' | 'EFFICIENCY' | 'QUALITY' | 'TIMING';
+  type: "PERFORMANCE" | "EFFICIENCY" | "QUALITY" | "TIMING";
   description: string;
-  severity: 'HIGH' | 'MEDIUM' | 'LOW';
-  
+  severity: "HIGH" | "MEDIUM" | "LOW";
+
   // Metrics
   expectedValue: number;
   actualValue: number;
-  deviation: number;  // %
-  
+  deviation: number; // %
+
   // Root Cause
   possibleCauses: string[];
-  
+
   // Impact
   impact: string;
-  
+
   // Detection
   detectedAt: Date;
-  confidence: number;  // 0-1
+  confidence: number; // 0-1
 }
 
 // Voice Commands for AI Learning
@@ -1293,40 +1354,50 @@ const AI_LEARNING_VOICE_COMMANDS = [
 ```typescript
 interface CrossFacilityWaveManagement {
   // Multi-Warehouse Waves
-  createMultiFacilityWave: (facilities: string[], orders: Order[]) => Promise<DistributedWave>;
-  
+  createMultiFacilityWave: (
+    facilities: string[],
+    orders: Order[],
+  ) => Promise<DistributedWave>;
+
   // Load Balancing
   balanceAcrossFacilities: (orders: Order[]) => Promise<FacilityAllocation>;
-  
+
   // Transfer Waves
-  createTransferWave: (fromFacility: string, toFacility: string, items: Item[]) => Promise<Wave>;
-  
+  createTransferWave: (
+    fromFacility: string,
+    toFacility: string,
+    items: Item[],
+  ) => Promise<Wave>;
+
   // Split Shipments
-  coordinateSplitShipments: (order: Order, facilities: string[]) => Promise<SplitPlan>;
-  
+  coordinateSplitShipments: (
+    order: Order,
+    facilities: string[],
+  ) => Promise<SplitPlan>;
+
   // Synchronized Release
   synchronizeWaveRelease: (waveIds: string[]) => Promise<void>;
 }
 
 interface DistributedWave {
   id: string;
-  
+
   // Facilities
   facilities: FacilityWave[];
-  
+
   // Coordination
-  coordinationType: 'INDEPENDENT' | 'SEQUENTIAL' | 'PARALLEL';
-  
+  coordinationType: "INDEPENDENT" | "SEQUENTIAL" | "PARALLEL";
+
   // Orders
   totalOrders: number;
-  orderDistribution: Map<string, number>;  // facility -> order count
-  
+  orderDistribution: Map<string, number>; // facility -> order count
+
   // Timing
   scheduledStart: Date;
   estimatedCompletion: Date;
-  
+
   // Status
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED';
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED";
   facilitiesCompleted: number;
 }
 
@@ -1334,15 +1405,15 @@ interface FacilityWave {
   facilityId: string;
   facilityName: string;
   waveId: string;
-  
+
   // Orders
   orders: string[];
   orderCount: number;
-  
+
   // Status
   status: WaveStatus;
   percentComplete: number;
-  
+
   // Performance
   picksPerHour?: number;
   efficiency?: number;
@@ -1350,7 +1421,7 @@ interface FacilityWave {
 
 interface FacilityAllocation {
   orders: Order[];
-  
+
   // Allocation
   allocations: {
     facilityId: string;
@@ -1358,13 +1429,13 @@ interface FacilityAllocation {
     capacity: number;
     utilization: number;
   }[];
-  
+
   // Optimization
-  balanceScore: number;  // 0-100 (100 = perfectly balanced)
-  
+  balanceScore: number; // 0-100 (100 = perfectly balanced)
+
   // Reasoning
   allocationReason: string;
-  
+
   // Performance
   estimatedCompletionTime: Date;
   totalCost: number;
@@ -1386,56 +1457,65 @@ const CROSS_FACILITY_VOICE_COMMANDS = [
 interface VoiceGuidedWavePicking {
   // Voice Prompts
   startWaveVoice: (waveId: string, workerId: string) => Promise<VoiceSession>;
-  
+
   // Pick Guidance
   providePickGuidance: (pickTask: PickTask) => Stream<VoicePrompt>;
-  
+
   // Voice Commands
-  processVoiceCommand: (command: string, context: PickContext) => Promise<VoiceResponse>;
-  
+  processVoiceCommand: (
+    command: string,
+    context: PickContext,
+  ) => Promise<VoiceResponse>;
+
   // Verification
-  voiceVerification: (quantity: number, location: string) => Promise<VerificationResult>;
-  
+  voiceVerification: (
+    quantity: number,
+    location: string,
+  ) => Promise<VerificationResult>;
+
   // Navigation
-  voiceNavigation: (currentLocation: string, nextLocation: string) => Promise<VoiceDirections>;
+  voiceNavigation: (
+    currentLocation: string,
+    nextLocation: string,
+  ) => Promise<VoiceDirections>;
 }
 
 interface VoiceSession {
   sessionId: string;
   waveId: string;
   workerId: string;
-  
+
   // Session State
   currentTask?: PickTask;
   currentStep: number;
   totalSteps: number;
-  
+
   // Voice Settings
   voiceEnabled: boolean;
   language: string;
   speechRate: number;
-  
+
   // Progress
   itemsPicked: number;
   itemsRemaining: number;
-  
+
   startedAt: Date;
 }
 
 interface VoicePrompt {
   promptId: string;
-  promptType: 'NAVIGATION' | 'PICK' | 'VERIFICATION' | 'INSTRUCTION' | 'ALERT';
-  
+  promptType: "NAVIGATION" | "PICK" | "VERIFICATION" | "INSTRUCTION" | "ALERT";
+
   // Message
   message: string;
-  ssml?: string;  // Speech Synthesis Markup Language
-  
+  ssml?: string; // Speech Synthesis Markup Language
+
   // Expected Response
   expectedResponse?: string[];
   requiresConfirmation: boolean;
-  
+
   // Priority
-  priority: 'IMMEDIATE' | 'NORMAL' | 'LOW';
+  priority: "IMMEDIATE" | "NORMAL" | "LOW";
   urgent: boolean;
 }
 
@@ -1456,7 +1536,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Show my waves",
     "Show available waves",
   ],
-  
+
   // Navigation (12)
   NAVIGATION: [
     "Next location",
@@ -1472,7 +1552,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Recalculate path",
     "Optimize remaining path",
   ],
-  
+
   // Picking (15)
   PICKING: [
     "Picked {quantity}",
@@ -1491,7 +1571,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Skip pick",
     "Undo pick",
   ],
-  
+
   // Container Management (10)
   CONTAINER: [
     "Scan container",
@@ -1505,7 +1585,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Label container",
     "Stage container",
   ],
-  
+
   // Order Management (8)
   ORDER: [
     "Next order",
@@ -1517,7 +1597,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Show remaining orders",
     "Priority order",
   ],
-  
+
   // Quality Control (8)
   QUALITY: [
     "Start quality check",
@@ -1529,7 +1609,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Check expiry date",
     "Verify condition",
   ],
-  
+
   // Exceptions (10)
   EXCEPTIONS: [
     "Report exception",
@@ -1543,7 +1623,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Need manager approval",
     "Escalate issue",
   ],
-  
+
   // Status & Info (15)
   STATUS: [
     "Show progress",
@@ -1562,7 +1642,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Show leaderboard",
     "Show target",
   ],
-  
+
   // Break Management (7)
   BREAKS: [
     "Start break",
@@ -1573,7 +1653,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Sign in",
     "Transfer wave",
   ],
-  
+
   // Help & Support (10)
   HELP: [
     "Help",
@@ -1587,7 +1667,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Demo mode",
     "Reset session",
   ],
-  
+
   // System Control (10)
   SYSTEM: [
     "Voice on",
@@ -1601,7 +1681,7 @@ const WAVE_PICKING_VOICE_COMMANDS = {
     "Report bug",
     "Feedback",
   ],
-  
+
   // Analytics (10)
   ANALYTICS: [
     "Show wave performance",
@@ -1625,17 +1705,23 @@ const WAVE_PICKING_VOICE_COMMANDS = {
 ## 📊 Wave Analytics & Reporting
 
 ### Wave Performance Reports
+
 ```typescript
 interface WaveAnalyticsReporting {
   // Standard Reports
-  wavePerformanceReport: (filter: ReportFilter) => Promise<WavePerformanceReport>;
+  wavePerformanceReport: (
+    filter: ReportFilter,
+  ) => Promise<WavePerformanceReport>;
   waveSummaryReport: (date: Date) => Promise<WaveSummaryReport>;
   workerPerformanceReport: (filter: ReportFilter) => Promise<WorkerReport>;
-  
+
   // Advanced Analytics
-  trendAnalysis: (metric: string, timeframe: DateRange) => Promise<TrendAnalysis>;
+  trendAnalysis: (
+    metric: string,
+    timeframe: DateRange,
+  ) => Promise<TrendAnalysis>;
   comparativeAnalysis: (waves: string[]) => Promise<ComparativeAnalysis>;
-  
+
   // Dashboards
   executiveDashboard: ExecutiveDashboard;
   operationalDashboard: OperationalDashboard;
@@ -1643,27 +1729,27 @@ interface WaveAnalyticsReporting {
 
 interface WavePerformanceReport {
   period: DateRange;
-  
+
   // Summary
   totalWaves: number;
   totalOrders: number;
   totalLines: number;
   totalUnits: number;
-  
+
   // Performance Metrics
   avgPicksPerHour: number;
   avgEfficiency: number;
   avgAccuracy: number;
   avgWaveDuration: number;
-  
+
   // Best/Worst
   bestWave: { waveId: string; score: number };
   worstWave: { waveId: string; score: number };
-  
+
   // Trends
-  efficiencyTrend: 'IMPROVING' | 'STABLE' | 'DECLINING';
-  throughputTrend: 'INCREASING' | 'STABLE' | 'DECREASING';
-  
+  efficiencyTrend: "IMPROVING" | "STABLE" | "DECLINING";
+  throughputTrend: "INCREASING" | "STABLE" | "DECREASING";
+
   // Charts
   charts: {
     wavesPerDay: ChartData;
@@ -1683,18 +1769,18 @@ interface ExecutiveDashboard {
     laborEfficiency: number;
     orderAccuracy: number;
   };
-  
+
   // Trends
   trends: {
-    throughputTrend: 'UP' | 'FLAT' | 'DOWN';
-    efficiencyTrend: 'UP' | 'FLAT' | 'DOWN';
-    qualityTrend: 'UP' | 'FLAT' | 'DOWN';
+    throughputTrend: "UP" | "FLAT" | "DOWN";
+    efficiencyTrend: "UP" | "FLAT" | "DOWN";
+    qualityTrend: "UP" | "FLAT" | "DOWN";
   };
-  
+
   // Alerts
   criticalIssues: number;
   atRiskWaves: number;
-  
+
   // Financial
   laborCostToday: number;
   costPerOrder: number;
@@ -1709,6 +1795,7 @@ interface ExecutiveDashboard {
 **Total Voice Commands**: 120+ commands covering all wave operations
 
 **Categories**:
+
 - Wave Start & Selection: 5 commands
 - Navigation: 12 commands
 - Picking Operations: 15 commands
@@ -1748,24 +1835,28 @@ interface ExecutiveDashboard {
 ## 📁 Implementation Phases
 
 ### Phase 1: Core Wave Management (4-6 weeks)
+
 - Wave templates & configuration
 - Wave planning & release
 - Pick task generation
 - Basic pick path optimization
 
 ### Phase 2: Multi-Method Support (3-4 weeks)
+
 - Batch picking
 - Cluster picking
 - Zone picking
 - Hybrid waves
 
 ### Phase 3: Optimization & Monitoring (4-5 weeks)
+
 - AI wave optimization
 - Real-time performance monitoring
 - Dynamic wave adjustment
 - Exception handling
 
 ### Phase 4: Advanced Intelligence (5-7 weeks)
+
 - Predictive wave planning
 - ML pick path optimization
 - AI learning & improvements

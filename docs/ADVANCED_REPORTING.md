@@ -9,6 +9,7 @@ The LogiVox Advanced Reporting Dashboard provides enterprise-grade business inte
 Access ready-to-use reports across five categories:
 
 #### **Inventory Reports (8 templates)**
+
 - **Inventory Summary**: Complete inventory overview with quantities and values
 - **Low Stock Items**: Products below reorder point
 - **Out of Stock**: Currently unavailable products
@@ -19,6 +20,7 @@ Access ready-to-use reports across five categories:
 - **Total Inventory Valuation**: By category breakdown
 
 #### **Sales Reports (8 templates)**
+
 - **Sales Summary**: All sales transactions
 - **Daily Sales**: Grouped by day (Line chart)
 - **Sales by Product**: Total sales per product (Bar chart)
@@ -29,6 +31,7 @@ Access ready-to-use reports across five categories:
 - **Completed Bookings**: Finished transactions
 
 #### **Financial Reports (5 templates)**
+
 - **Revenue Summary**: Total revenue and transaction count
 - **Profit Margin Analysis**: Revenue vs cost
 - **Cost of Goods Sold (COGS)**: Pie chart breakdown
@@ -36,6 +39,7 @@ Access ready-to-use reports across five categories:
 - **Average Transaction Value**: Trends over time
 
 #### **Customer Reports (5 templates)**
+
 - **Customer List**: All customers
 - **Top 20 Customers**: Highest spending (Bar chart)
 - **New Customers**: Recently registered
@@ -43,6 +47,7 @@ Access ready-to-use reports across five categories:
 - **Customer Lifetime Value**: Total value analysis
 
 #### **Operations Reports (4 templates)**
+
 - **Pickup Schedule**: Upcoming pickups
 - **Booking Fulfillment Rate**: Completed vs cancelled (Pie chart)
 - **Daily Operations Summary**: Bookings, pickups, revenue
@@ -53,12 +58,14 @@ Access ready-to-use reports across five categories:
 Create custom reports with drag-and-drop interface:
 
 #### **Field Selection**
+
 - Select from 27+ available fields
 - Organized by category (Inventory, Sales, Customers)
 - Multi-select with checkboxes
 - "Select All" and "Clear" options
 
 #### **Filtering (15 Operators)**
+
 - **Comparison**: Equals, Not Equals, Greater Than, Less Than, Greater or Equal, Less or Equal
 - **String**: Contains, Not Contains, Starts With, Ends With
 - **List**: In, Not In
@@ -66,11 +73,13 @@ Create custom reports with drag-and-drop interface:
 - **Null**: Is Null, Is Not Null
 
 #### **Sorting**
+
 - Multi-field sorting
 - Ascending or Descending
 - Drag to reorder priority
 
 #### **Grouping & Aggregations**
+
 - Group by any field
 - Add multiple aggregations:
   - **Sum**: Total values
@@ -81,6 +90,7 @@ Create custom reports with drag-and-drop interface:
   - **Distinct Count**: Unique values
 
 #### **Chart Types**
+
 - Table (default)
 - Bar Chart
 - Line Chart
@@ -89,6 +99,7 @@ Create custom reports with drag-and-drop interface:
 - Combo Chart (Bar + Line)
 
 #### **Advanced Options**
+
 - Limit results (Top N)
 - Chart type selection
 - Template loading
@@ -98,6 +109,7 @@ Create custom reports with drag-and-drop interface:
 Export reports in four professional formats:
 
 #### **PDF Export**
+
 - Professional styling with LogiVox branding
 - Headers and footers
 - Summary statistics
@@ -105,18 +117,21 @@ Export reports in four professional formats:
 - Portrait or landscape orientation
 
 #### **Excel Export**
+
 - Tab-delimited format (production uses XLSX library)
 - Headers and metadata
 - Summary calculations
 - Compatible with Microsoft Excel, Google Sheets
 
 #### **CSV Export**
+
 - Comma-delimited format
 - Proper CSV escaping
 - Universal compatibility
 - Easy import to any system
 
 #### **JSON Export**
+
 - Structured data format
 - Complete metadata
 - Execution statistics
@@ -127,12 +142,14 @@ Export reports in four professional formats:
 Automate report generation and email delivery:
 
 #### **Schedule Types**
+
 - **Daily**: Every day at specified time
 - **Weekly**: Specific day of week
 - **Monthly**: Specific day of month
 - **Custom**: Advanced cron expressions
 
 #### **Email Delivery**
+
 - Professional email templates
 - LogiVox branding
 - Report attached in chosen format
@@ -140,6 +157,7 @@ Automate report generation and email delivery:
 - Multiple recipients supported
 
 #### **Schedule Management**
+
 - Enable/disable schedules
 - View next run time
 - See last execution
@@ -151,6 +169,7 @@ Automate report generation and email delivery:
 Interactive charts powered by Recharts:
 
 #### **Chart Features**
+
 - Responsive sizing
 - Interactive tooltips
 - Color-coded data
@@ -159,6 +178,7 @@ Interactive charts powered by Recharts:
 - Professional styling
 
 #### **Chart Types**
+
 - **Bar Chart**: Compare categories
 - **Line Chart**: Show trends over time
 - **Pie Chart**: Show proportions
@@ -228,6 +248,7 @@ Interactive charts powered by Recharts:
 ## 📋 Available Fields
 
 ### Inventory Fields
+
 - Product Name
 - SKU
 - Category
@@ -240,6 +261,7 @@ Interactive charts powered by Recharts:
 - Status
 
 ### Sales Fields
+
 - Booking ID
 - Customer Name
 - Product Name
@@ -251,6 +273,7 @@ Interactive charts powered by Recharts:
 - Status
 
 ### Customer Fields
+
 - Customer Name
 - Email
 - Phone
@@ -347,16 +370,19 @@ app/dashboard/reports/
 ### Common Issues
 
 **Q: Report is slow to execute**
+
 - Add filters to reduce data volume
 - Use limit for top-N reports
 - Contact support for index optimization
 
 **Q: Export fails**
+
 - Check data volume (large exports may timeout)
 - Try different format
 - Contact support if issue persists
 
 **Q: Schedule not delivering**
+
 - Check email addresses are correct
 - Verify schedule is enabled
 - Check spam/junk folders

@@ -22,9 +22,11 @@
 ## Authentication
 
 ### POST /auth/login
+
 Authenticate user and receive access token.
 
 **Request:**
+
 ```json
 {
   "email": "user@example.com",
@@ -33,6 +35,7 @@ Authenticate user and receive access token.
 ```
 
 **Response:**
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIs...",
@@ -48,9 +51,11 @@ Authenticate user and receive access token.
 ```
 
 ### POST /auth/refresh
+
 Refresh access token using refresh token.
 
 **Request:**
+
 ```json
 {
   "refreshToken": "eyJhbGciOiJIUzI1NiIs..."
@@ -58,6 +63,7 @@ Refresh access token using refresh token.
 ```
 
 **Response:**
+
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIs...",
@@ -70,9 +76,11 @@ Refresh access token using refresh token.
 ## Inventory Management
 
 ### GET /inventory/items
+
 List all inventory items with filtering and pagination.
 
 **Query Parameters:**
+
 - `page` (integer): Page number (default: 1)
 - `limit` (integer): Items per page (default: 50, max: 100)
 - `search` (string): Search by SKU, name, or description
@@ -82,6 +90,7 @@ List all inventory items with filtering and pagination.
 - `warehouseId` (string): Filter by warehouse
 
 **Response:**
+
 ```json
 {
   "items": [
@@ -97,7 +106,7 @@ List all inventory items with filtering and pagination.
       "stockOnHand": 145,
       "stockReserved": 30,
       "stockAvailable": 115,
-      "averageCost": 12.50,
+      "averageCost": 12.5,
       "retailPrice": 24.99,
       "status": "ACTIVE",
       "createdAt": "2025-01-15T10:30:00Z",
@@ -114,9 +123,11 @@ List all inventory items with filtering and pagination.
 ```
 
 ### POST /inventory/items
+
 Create new inventory item.
 
 **Request:**
+
 ```json
 {
   "sku": "WIDGET-002",
@@ -126,7 +137,7 @@ Create new inventory item.
   "uom": "EA",
   "reorderPoint": 30,
   "reorderQuantity": 150,
-  "averageCost": 8.50,
+  "averageCost": 8.5,
   "retailPrice": 17.99,
   "supplier": {
     "id": "supplier_456",
@@ -144,6 +155,7 @@ Create new inventory item.
 ```
 
 **Response:**
+
 ```json
 {
   "id": "item_124",
@@ -155,9 +167,11 @@ Create new inventory item.
 ```
 
 ### GET /inventory/items/{id}
+
 Get detailed information about a specific inventory item.
 
 **Response:**
+
 ```json
 {
   "id": "item_123",
@@ -204,9 +218,11 @@ Get detailed information about a specific inventory item.
 ```
 
 ### PATCH /inventory/items/{id}
+
 Update inventory item.
 
 **Request:**
+
 ```json
 {
   "name": "Premium Widget Pro",
@@ -220,9 +236,11 @@ Update inventory item.
 ## Order Management
 
 ### GET /orders/sales
+
 List sales orders with filtering.
 
 **Query Parameters:**
+
 - `page` (integer): Page number
 - `limit` (integer): Orders per page
 - `status` (string): DRAFT, PENDING, CONFIRMED, PICKING, PACKED, SHIPPED, DELIVERED, CANCELLED
@@ -232,6 +250,7 @@ List sales orders with filtering.
 - `priority` (string): LOW, NORMAL, HIGH, URGENT
 
 **Response:**
+
 ```json
 {
   "orders": [
@@ -259,7 +278,7 @@ List sales orders with filtering.
           },
           "quantity": 50,
           "unitPrice": 24.99,
-          "lineTotal": 1249.50,
+          "lineTotal": 1249.5,
           "status": "PENDING"
         }
       ]
@@ -275,9 +294,11 @@ List sales orders with filtering.
 ```
 
 ### POST /orders/sales
+
 Create new sales order.
 
 **Request:**
+
 ```json
 {
   "customerId": "cust_456",
@@ -308,17 +329,19 @@ Create new sales order.
 ```
 
 **Response:**
+
 ```json
 {
   "id": "so_124",
   "soNumber": "SO-20251016-0002",
   "status": "DRAFT",
-  "totalAmount": 3048.50,
+  "totalAmount": 3048.5,
   "createdAt": "2025-10-16T10:30:00Z"
 }
 ```
 
 ### GET /orders/purchase
+
 List purchase orders.
 
 **Response:** Similar structure to sales orders.
@@ -328,9 +351,11 @@ List purchase orders.
 ## Warehouse Operations
 
 ### GET /warehouses
+
 List all warehouses.
 
 **Response:**
+
 ```json
 {
   "warehouses": [
@@ -357,15 +382,18 @@ List all warehouses.
 ```
 
 ### GET /locations
+
 List warehouse locations.
 
 **Query Parameters:**
+
 - `warehouseId` (string): Filter by warehouse
 - `zone` (string): Filter by zone
 - `locationType` (string): STORAGE, RECEIVING, SHIPPING, PACKING, STAGING
 - `isEmpty` (boolean): Filter empty locations
 
 **Response:**
+
 ```json
 {
   "locations": [
@@ -395,9 +423,11 @@ List warehouse locations.
 ```
 
 ### POST /transfers
+
 Create inventory transfer between locations.
 
 **Request:**
+
 ```json
 {
   "fromLocationId": "loc_001",
@@ -414,9 +444,11 @@ Create inventory transfer between locations.
 ## Advanced Operations
 
 ### POST /waves
+
 Create wave picking batch.
 
 **Request:**
+
 ```json
 {
   "warehouseId": "wh_001",
@@ -435,6 +467,7 @@ Create wave picking batch.
 ```
 
 **Response:**
+
 ```json
 {
   "id": "wave_001",
@@ -447,9 +480,11 @@ Create wave picking batch.
 ```
 
 ### PATCH /waves/{id}
+
 Update wave or perform action.
 
 **Request (Release Wave):**
+
 ```json
 {
   "action": "release"
@@ -457,6 +492,7 @@ Update wave or perform action.
 ```
 
 **Request (Assign Wave):**
+
 ```json
 {
   "action": "assign",
@@ -465,15 +501,18 @@ Update wave or perform action.
 ```
 
 ### GET /picking-tasks
+
 List picking tasks.
 
 **Query Parameters:**
+
 - `status` (string): PENDING, ASSIGNED, IN_PROGRESS, COMPLETED
 - `assignedToId` (string): Filter by assigned user
 - `priority` (string): LOW, NORMAL, HIGH, URGENT
 - `warehouseId` (string): Filter by warehouse
 
 **Response:**
+
 ```json
 {
   "tasks": [
@@ -500,9 +539,11 @@ List picking tasks.
 ```
 
 ### POST /routes/optimize
+
 Calculate optimized picking route.
 
 **Request:**
+
 ```json
 {
   "warehouseId": "wh_001",
@@ -515,6 +556,7 @@ Calculate optimized picking route.
 ```
 
 **Response:**
+
 ```json
 {
   "id": "route_001",
@@ -540,9 +582,11 @@ Calculate optimized picking route.
 ```
 
 ### POST /task-automations
+
 Create task automation rule.
 
 **Request:**
+
 ```json
 {
   "name": "Auto Replenishment",
@@ -569,14 +613,17 @@ Create task automation rule.
 ## Analytics & Reporting
 
 ### GET /analytics/dashboard
+
 Get dashboard statistics.
 
 **Query Parameters:**
+
 - `dateFrom` (string): Start date
 - `dateTo` (string): End date
 - `warehouseId` (string): Filter by warehouse
 
 **Response:**
+
 ```json
 {
   "period": {
@@ -590,7 +637,7 @@ Get dashboard statistics.
     "averagePickTime": 12.5,
     "inventoryTurnover": 8.2,
     "stockAccuracy": 99.1,
-    "revenue": 145678.90
+    "revenue": 145678.9
   },
   "trends": {
     "ordersGrowth": 12.5,
@@ -600,9 +647,11 @@ Get dashboard statistics.
 ```
 
 ### POST /reports/generate
+
 Generate custom report.
 
 **Request:**
+
 ```json
 {
   "reportType": "INVENTORY_VALUATION",
@@ -617,6 +666,7 @@ Generate custom report.
 ```
 
 **Response:**
+
 ```json
 {
   "id": "report_001",
@@ -627,9 +677,11 @@ Generate custom report.
 ```
 
 ### GET /reports/{id}
+
 Check report status and download.
 
 **Response:**
+
 ```json
 {
   "id": "report_001",
@@ -644,9 +696,11 @@ Check report status and download.
 ## External Integrations
 
 ### GET /integrations
+
 List configured integrations.
 
 **Response:**
+
 ```json
 {
   "integrations": [
@@ -664,9 +718,11 @@ List configured integrations.
 ```
 
 ### POST /integrations/{id}/sync
+
 Trigger manual sync.
 
 **Request:**
+
 ```json
 {
   "syncType": "EXPORT",
@@ -698,6 +754,7 @@ All errors follow this structure:
 ```
 
 **Common Error Codes:**
+
 - `AUTHENTICATION_FAILED` (401)
 - `UNAUTHORIZED` (403)
 - `NOT_FOUND` (404)
@@ -715,6 +772,7 @@ All errors follow this structure:
 - **Enterprise tier:** Unlimited
 
 Rate limit headers:
+
 ```
 X-RateLimit-Limit: 1000
 X-RateLimit-Remaining: 847
@@ -728,9 +786,11 @@ X-RateLimit-Reset: 1697472000
 Subscribe to real-time events.
 
 ### POST /webhooks
+
 Register webhook endpoint.
 
 **Request:**
+
 ```json
 {
   "url": "https://yourapp.com/webhooks/flowstock",
@@ -745,6 +805,7 @@ Register webhook endpoint.
 ```
 
 **Webhook Payload Example:**
+
 ```json
 {
   "event": "order.shipped",

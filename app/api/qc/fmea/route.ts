@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -7,8 +7,8 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get('type');
-    const status = searchParams.get('status');
+    const type = searchParams.get("type");
+    const status = searchParams.get("status");
 
     const where: any = {};
     if (type) where.type = type;
@@ -21,20 +21,20 @@ export async function GET(req: NextRequest) {
           select: {
             id: true,
             rpn: true,
-            status: true
-          }
-        }
+            status: true,
+          },
+        },
       },
       orderBy: {
-        createdAt: 'desc'
-      }
+        createdAt: "desc",
+      },
     });
 
     return NextResponse.json({ success: true, data: fmeas });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
       teamMembers,
       failureModes,
       organizationId,
-      createdBy
+      createdBy,
     } = body;
 
     // Generate FMEA number
@@ -66,14 +66,14 @@ export async function POST(req: NextRequest) {
         scope,
         teamLead,
         teamMembers: JSON.stringify(teamMembers || []),
-        status: 'IN_PROGRESS',
+        status: "IN_PROGRESS",
         startDate: new Date(),
         organizationId,
         createdBy,
         failureModes: {
           create: failureModes.map((fm: any) => ({
             processStep: fm.processStep,
-            processFunction: '',
+            processFunction: "",
             failureMode: fm.failureMode,
             effectsOfFailure: fm.effects,
             potentialCauses: fm.causes,
@@ -84,21 +84,21 @@ export async function POST(req: NextRequest) {
             rpn: fm.rpn,
             recommendedActions: fm.actions,
             responsiblePerson: fm.responsible,
-            status: 'OPEN'
-          }))
-        }
+            status: "OPEN",
+          })),
+        },
       },
       include: {
-        failureModes: true
-      }
+        failureModes: true,
+      },
     });
 
     return NextResponse.json({ success: true, data: fmea });
   } catch (error: any) {
-    console.error('Error creating FMEA:', error);
+    console.error("Error creating FMEA:", error);
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -27,6 +27,7 @@
 Access the admin dashboard at `/admin` (requires Super Admin or Admin role).
 
 **Key Sections:**
+
 - System Settings
 - User Management
 - System Health
@@ -36,6 +37,7 @@ Access the admin dashboard at `/admin` (requires Super Admin or Admin role).
 ### System Requirements
 
 **Production Environment:**
+
 - **Server**: 8 CPU cores, 16GB RAM minimum
 - **Database**: PostgreSQL 16+
 - **Cache**: Redis 7+
@@ -44,6 +46,7 @@ Access the admin dashboard at `/admin` (requires Super Admin or Admin role).
 - **SSL/TLS**: Required for production
 
 **Development Environment:**
+
 - **Server**: 4 CPU cores, 8GB RAM
 - **Database**: PostgreSQL 14+
 - **Cache**: Redis 6+
@@ -68,6 +71,7 @@ Access the admin dashboard at `/admin` (requires Super Admin or Admin role).
 6. Click **"Create User"**
 
 **Password Requirements:**
+
 - Minimum 8 characters (configurable)
 - Uppercase, lowercase, number, special character
 - Cannot reuse last 5 passwords
@@ -76,6 +80,7 @@ Access the admin dashboard at `/admin` (requires Super Admin or Admin role).
 ### Managing User Accounts
 
 #### Deactivating Users
+
 1. Navigate to **Admin → Users**
 2. Find user in list
 3. Click **Actions** → **"Deactivate"**
@@ -83,6 +88,7 @@ Access the admin dashboard at `/admin` (requires Super Admin or Admin role).
 5. User can no longer log in
 
 #### Resetting Passwords
+
 1. Navigate to **Admin → Users**
 2. Find user in list
 3. Click **Actions** → **"Reset Password"**
@@ -92,6 +98,7 @@ Access the admin dashboard at `/admin` (requires Super Admin or Admin role).
 5. User must change password on next login
 
 #### Unlocking Accounts
+
 Accounts lock after 5 failed login attempts (configurable).
 
 1. Navigate to **Admin → Users**
@@ -124,7 +131,9 @@ Import multiple users:
 LogiVox WMS includes 7 predefined roles:
 
 #### 1. SUPER_ADMIN
+
 **Full system access**
+
 - All permissions
 - System configuration
 - User management
@@ -132,14 +141,18 @@ LogiVox WMS includes 7 predefined roles:
 - Cannot be deleted or demoted
 
 #### 2. ADMIN
+
 **Administrative access**
+
 - User management
 - System settings (limited)
 - Report access
 - No security settings
 
 #### 3. MANAGER
+
 **Operational management**
+
 - View all orders and inventory
 - Approve orders
 - Generate reports
@@ -147,7 +160,9 @@ LogiVox WMS includes 7 predefined roles:
 - No system configuration
 
 #### 4. WAREHOUSE_STAFF
+
 **Warehouse operations**
+
 - Process orders
 - Adjust inventory
 - Scan products
@@ -155,7 +170,9 @@ LogiVox WMS includes 7 predefined roles:
 - No administrative access
 
 #### 5. SALES
+
 **Sales operations**
+
 - Create sales orders
 - View customers
 - Process orders
@@ -163,7 +180,9 @@ LogiVox WMS includes 7 predefined roles:
 - No warehouse operations
 
 #### 6. ACCOUNTANT
+
 **Financial operations**
+
 - View orders and invoices
 - Generate financial reports
 - View inventory valuation
@@ -171,25 +190,28 @@ LogiVox WMS includes 7 predefined roles:
 - No inventory adjustments
 
 #### 7. USER
+
 **Limited access**
+
 - View-only dashboard
 - Basic reports
 - Cannot modify data
 
 ### Permission Matrix
 
-| Permission | Super Admin | Admin | Manager | Warehouse | Sales | Accountant | User |
-|-----------|-------------|-------|---------|-----------|-------|------------|------|
-| System Settings | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| User Management | ✅ | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
-| Create Orders | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| Process Orders | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| Inventory Adjustments | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| View Reports | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ⚠️ |
-| Backups | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Audit Logs | ✅ | ✅ | ⚠️ | ❌ | ❌ | ❌ | ❌ |
+| Permission            | Super Admin | Admin | Manager | Warehouse | Sales | Accountant | User |
+| --------------------- | ----------- | ----- | ------- | --------- | ----- | ---------- | ---- |
+| System Settings       | ✅          | ⚠️    | ❌      | ❌        | ❌    | ❌         | ❌   |
+| User Management       | ✅          | ✅    | ⚠️      | ❌        | ❌    | ❌         | ❌   |
+| Create Orders         | ✅          | ✅    | ✅      | ✅        | ✅    | ❌         | ❌   |
+| Process Orders        | ✅          | ✅    | ✅      | ✅        | ❌    | ❌         | ❌   |
+| Inventory Adjustments | ✅          | ✅    | ✅      | ✅        | ❌    | ❌         | ❌   |
+| View Reports          | ✅          | ✅    | ✅      | ⚠️        | ⚠️    | ✅         | ⚠️   |
+| Backups               | ✅          | ⚠️    | ❌      | ❌        | ❌    | ❌         | ❌   |
+| Audit Logs            | ✅          | ✅    | ⚠️      | ❌        | ❌    | ❌         | ❌   |
 
 **Legend:**
+
 - ✅ Full access
 - ⚠️ Limited access
 - ❌ No access
@@ -219,6 +241,7 @@ Create granular permissions:
 Navigate to **Admin → Settings → General**
 
 #### Application Settings
+
 - **Application Name**: Display name (default: "LogiVox WMS")
 - **Application URL**: Base URL for the application
 - **Company Name**: Your company name
@@ -232,6 +255,7 @@ Navigate to **Admin → Settings → General**
 Navigate to **Admin → Settings → Email**
 
 #### SMTP Settings
+
 ```
 SMTP Host: smtp.gmail.com
 SMTP Port: 587 (TLS) or 465 (SSL)
@@ -242,6 +266,7 @@ From Name: LogiVox WMS
 ```
 
 #### Testing Email
+
 1. Enter SMTP configuration
 2. Click **"Test Connection"**
 3. Enter test recipient email
@@ -249,6 +274,7 @@ From Name: LogiVox WMS
 5. Verify email received
 
 **Email Templates Configured:**
+
 - Welcome email (new user)
 - Password reset
 - Order confirmation
@@ -261,11 +287,13 @@ From Name: LogiVox WMS
 Navigate to **Admin → Settings → Notifications**
 
 #### Available Channels
+
 - **Email Notifications**: ✅ Enabled
 - **SMS Notifications**: ⚠️ Requires Twilio integration
 - **Push Notifications**: ⚠️ Requires mobile app
 
 #### Alert Types
+
 - ✅ Low Stock Alerts (when stock ≤ reorder level)
 - ✅ Order Alerts (new orders, status changes)
 - ✅ System Alerts (errors, warnings, updates)
@@ -276,11 +304,13 @@ Navigate to **Admin → Settings → Notifications**
 Navigate to **Admin → Settings → Security**
 
 #### Session Management
+
 - **Session Timeout**: 60 minutes (idle timeout)
 - **Max Session Duration**: 8 hours (absolute timeout)
 - **Remember Me**: 30 days
 
 #### Password Policy
+
 - **Minimum Length**: 8 characters
 - **Require Uppercase**: ✅ Yes
 - **Require Numbers**: ✅ Yes
@@ -289,11 +319,13 @@ Navigate to **Admin → Settings → Security**
 - **Password Expiry**: 90 days
 
 #### Two-Factor Authentication
+
 - **2FA Enabled**: ✅ Optional (can be enforced)
 - **Methods**: TOTP (Google Authenticator, Authy)
 - **Backup Codes**: 10 codes generated per user
 
 #### Account Lockout
+
 - **Max Login Attempts**: 5 attempts
 - **Lockout Duration**: 15 minutes
 - **IP-based Lockout**: ✅ Enabled
@@ -303,6 +335,7 @@ Navigate to **Admin → Settings → Security**
 Navigate to **Admin → Settings → Inventory**
 
 #### Stock Management
+
 - **Auto Reorder**: ✅ Enabled (create draft POs when low stock)
 - **Reorder Lead Time**: 7 days
 - **Allow Negative Stock**: ❌ Disabled (prevent overselling)
@@ -310,6 +343,7 @@ Navigate to **Admin → Settings → Inventory**
 - **Track Batch Numbers**: ✅ Enabled
 
 #### Stock Valuation Methods
+
 - **FIFO** (First In, First Out) - Default
 - **LIFO** (Last In, First Out)
 - **Average Cost**
@@ -386,6 +420,7 @@ Configure zone types:
 #### Payment Processing
 
 **Stripe Integration**
+
 1. Navigate to **Admin → Settings → Integrations**
 2. Toggle **"Stripe Enabled"** to ON
 3. Enter credentials:
@@ -395,6 +430,7 @@ Configure zone types:
 5. Click **"Save"**
 
 **Supported Features:**
+
 - Payment processing
 - Refunds
 - Subscription billing
@@ -403,6 +439,7 @@ Configure zone types:
 #### Shipping Carriers
 
 **Supported Carriers:**
+
 - FedEx
 - UPS
 - USPS
@@ -410,6 +447,7 @@ Configure zone types:
 - Custom carriers
 
 **Configuration:**
+
 1. Navigate to **Admin → Integrations → Shipping**
 2. Select carrier
 3. Enter API credentials
@@ -420,6 +458,7 @@ Configure zone types:
 #### Accounting Software
 
 **QuickBooks Integration**
+
 1. Navigate to **Admin → Integrations → Accounting**
 2. Click **"Connect QuickBooks"**
 3. Authorize access
@@ -438,6 +477,7 @@ Similar process to QuickBooks.
 #### E-commerce Platforms
 
 **Shopify Integration**
+
 1. Install LogiVox WMS app from Shopify App Store
 2. Authorize access
 3. Configure sync settings:
@@ -448,6 +488,7 @@ Similar process to QuickBooks.
 5. Click **"Save"**
 
 **WooCommerce Integration**
+
 1. Install LogiVox WMS plugin on WordPress
 2. Enter API credentials
 3. Configure sync settings
@@ -456,6 +497,7 @@ Similar process to QuickBooks.
 #### Communication
 
 **Slack Integration**
+
 1. Navigate to **Admin → Integrations → Slack**
 2. Click **"Add to Slack"**
 3. Select Slack channel for notifications
@@ -466,6 +508,7 @@ Similar process to QuickBooks.
 5. Click **"Save"**
 
 **Twilio (SMS) Integration**
+
 1. Navigate to **Admin → Integrations → Twilio**
 2. Enter credentials:
    - Account SID
@@ -498,6 +541,7 @@ Grant API access to external systems:
 ### Automated Backups
 
 **Schedule Configuration:**
+
 1. Navigate to **Admin → Backups**
 2. View backup schedule:
    - **Frequency**: Daily at 2:00 AM UTC
@@ -521,6 +565,7 @@ Create on-demand backups:
 7. Download when complete
 
 **Backup includes:**
+
 - Database (all tables)
 - User-uploaded files
 - System configuration
@@ -545,6 +590,7 @@ Create on-demand backups:
 
 **Emergency Restore:**
 If web interface unavailable, use command line:
+
 ```bash
 ./scripts/restore.sh /path/to/backup.sql.gz
 ```
@@ -555,6 +601,7 @@ If web interface unavailable, use command line:
 **Recovery Point Objective (RPO)**: 24 hours
 
 **Steps:**
+
 1. Identify incident and severity
 2. Notify stakeholders
 3. Activate disaster recovery team
@@ -573,14 +620,18 @@ If web interface unavailable, use command line:
 Navigate to **Admin → Security**
 
 #### Failed Login Attempts
+
 Monitor suspicious login activity:
+
 - View failed login attempts
 - See IP addresses
 - Review user agents
 - Block suspicious IPs
 
 #### Active Sessions
+
 View all active user sessions:
+
 - User name
 - Login time
 - IP address
@@ -589,7 +640,9 @@ View all active user sessions:
 - Force logout capability
 
 #### IP Blacklist
+
 Block malicious IP addresses:
+
 1. Navigate to **Admin → Security → IP Blacklist**
 2. Click **"+ Add IP"**
 3. Enter IP address or range
@@ -602,12 +655,14 @@ Block malicious IP addresses:
 Regular security checks:
 
 #### Weekly Tasks
+
 - [ ] Review failed login attempts
 - [ ] Check for locked accounts
 - [ ] Review API usage logs
 - [ ] Verify backup completion
 
 #### Monthly Tasks
+
 - [ ] Review user permissions
 - [ ] Audit user activity logs
 - [ ] Check for inactive users
@@ -615,6 +670,7 @@ Regular security checks:
 - [ ] Verify SSL certificate validity
 
 #### Quarterly Tasks
+
 - [ ] Full security audit
 - [ ] Penetration testing
 - [ ] Password policy review
@@ -626,6 +682,7 @@ Regular security checks:
 #### Data Privacy (GDPR, CCPA)
 
 **User Data Requests:**
+
 1. Navigate to **Admin → Compliance**
 2. Click **"Data Request"**
 3. Enter user email
@@ -636,6 +693,7 @@ Regular security checks:
 6. Data package generated within 30 days
 
 **Data Retention:**
+
 - User data: Retained while account active
 - Deleted accounts: 30-day retention before permanent deletion
 - Audit logs: 7 years
@@ -645,6 +703,7 @@ Regular security checks:
 #### SOC 2 Compliance
 
 LogiVox WMS meets SOC 2 Type II requirements:
+
 - ✅ Security controls
 - ✅ Availability monitoring
 - ✅ Processing integrity
@@ -662,24 +721,28 @@ LogiVox WMS meets SOC 2 Type II requirements:
 Navigate to **Admin → Health**
 
 #### Server Metrics
+
 - **CPU Usage**: Current: 45%, Threshold: 80%
 - **Memory Usage**: Current: 62%, Threshold: 85%
 - **Disk Usage**: Current: 38%, Threshold: 90%
 - **Uptime**: 45 days, 12 hours
 
 #### Database Performance
+
 - **Active Connections**: 15 / 100
 - **Average Query Time**: 12ms (Excellent)
 - **Database Size**: 2.3 GB
 - **Slow Queries**: 0 (last 24 hours)
 
 #### Cache Performance
+
 - **Redis Status**: ✅ Healthy
 - **Hit Rate**: 94% (Excellent)
 - **Memory Used**: 128 MB / 1 GB
 - **Total Keys**: 45,231
 
 #### API Performance
+
 - **Requests/Minute**: 850
 - **Average Response Time**: 85ms
 - **Error Rate**: 0.02% (Excellent)
@@ -690,9 +753,10 @@ Navigate to **Admin → Health**
 #### Database Optimization
 
 **Index Management:**
+
 ```sql
 -- Check missing indexes
-SELECT * FROM pg_stat_user_tables 
+SELECT * FROM pg_stat_user_tables
 WHERE idx_scan = 0 AND seq_scan > 1000;
 
 -- Create indexes for slow queries
@@ -701,12 +765,14 @@ CREATE INDEX idx_orders_created_at ON orders(created_at);
 ```
 
 **Query Optimization:**
+
 1. Navigate to **Admin → Performance → Slow Queries**
 2. Review queries taking > 100ms
 3. Click **"Optimize"** for suggestions
 4. Apply recommendations
 
 **Vacuum and Analyze:**
+
 ```bash
 # Automated weekly maintenance
 psql $DATABASE_URL -c "VACUUM ANALYZE;"
@@ -715,6 +781,7 @@ psql $DATABASE_URL -c "VACUUM ANALYZE;"
 #### Cache Optimization
 
 **Redis Configuration:**
+
 ```bash
 # Increase memory limit
 maxmemory 2gb
@@ -727,6 +794,7 @@ save 60 10000
 ```
 
 **Cache Strategy:**
+
 - Product data: 1 hour TTL
 - User sessions: Session duration
 - Reports: 15 minutes TTL
@@ -735,17 +803,20 @@ save 60 10000
 #### Application Optimization
 
 **Code Splitting:**
+
 - Lazy load dashboard widgets
 - Dynamic imports for heavy components
 - Route-based code splitting
 
 **Image Optimization:**
+
 - WebP format with fallback
 - Responsive images
 - Lazy loading
 - CDN delivery
 
 **API Optimization:**
+
 - Response compression (gzip/brotli)
 - Pagination for large datasets
 - Field selection (GraphQL-style)
@@ -754,12 +825,14 @@ save 60 10000
 ### Monitoring Tools
 
 **Integrated Monitoring:**
+
 - **Sentry**: Error tracking and monitoring
 - **Prometheus**: Metrics collection
 - **Grafana**: Visualization dashboards
 - **Uptime Robot**: Availability monitoring
 
 **Alerts Configuration:**
+
 1. Navigate to **Admin → Monitoring → Alerts**
 2. Configure thresholds:
    - CPU > 80% for 5 minutes
@@ -783,20 +856,24 @@ Navigate to **Admin → Audit Logs**
 #### Tracked Events (40+ types)
 
 **User Events:**
+
 - `user_created`, `user_updated`, `user_deleted`
 - `login_success`, `login_failed`, `logout`
 - `password_changed`, `2fa_enabled`, `2fa_disabled`
 
 **Inventory Events:**
+
 - `product_created`, `product_updated`, `product_deleted`
 - `stock_adjusted`, `stock_transferred`
 - `location_assigned`
 
 **Order Events:**
+
 - `order_created`, `order_updated`, `order_cancelled`
 - `order_picked`, `order_packed`, `order_shipped`
 
 **System Events:**
+
 - `settings_updated`, `integration_enabled`
 - `backup_created`, `backup_restored`
 - `user_permission_changed`
@@ -804,6 +881,7 @@ Navigate to **Admin → Audit Logs**
 #### Audit Log Details
 
 Each log entry includes:
+
 - **Timestamp**: UTC timestamp
 - **User**: Who performed the action
 - **Action**: What was done
@@ -816,6 +894,7 @@ Each log entry includes:
 #### Searching Audit Logs
 
 **Filters:**
+
 - Date range
 - User
 - Action type
@@ -823,6 +902,7 @@ Each log entry includes:
 - IP address
 
 **Export Options:**
+
 - CSV (Excel-compatible)
 - JSON (for analysis)
 - PDF (for reporting)
@@ -891,20 +971,23 @@ Preserve data for legal proceedings:
 ## Support & Resources
 
 **Administrator Support:**
+
 - 📧 Email: admin-support@logivox.ai
 - 📞 Phone: 1-800-LOGIVOX (24/7 for critical issues)
 - 💬 Slack: LogiVox Administrators Community
 - 📚 Knowledge Base: https://admin.logivox.ai
 
 **Training:**
+
 - 🎓 Administrator Certification Program
 - 📹 Video Tutorials: https://learn.logivox.ai/admin
 - 📖 API Documentation: https://api.logivox.ai/docs
 
 **Release Notes:**
+
 - https://changelog.logivox.ai
 
 ---
 
 **LogiVox WMS Administrator Guide - Version 1.0**  
-*For questions or feedback: documentation@logivox.ai*
+_For questions or feedback: documentation@logivox.ai_

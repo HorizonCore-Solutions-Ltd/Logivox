@@ -109,7 +109,7 @@ export default function CreateShipmentPage() {
     try {
       setLoadingOrders(true);
       const response = await fetch(
-        "/api/sales-orders?status=PACKED&status=PACKING&status=SHIPPING&limit=100"
+        "/api/sales-orders?status=PACKED&status=PACKING&status=SHIPPING&limit=100",
       );
       const data = await response.json();
 
@@ -308,7 +308,7 @@ export default function CreateShipmentPage() {
                     {selectedOrder.items
                       .map(
                         (item) =>
-                          `${item.inventory.productName} (${item.quantityPacked})`
+                          `${item.inventory.productName} (${item.quantityPacked})`,
                       )
                       .join(", ")}
                   </div>
@@ -552,8 +552,8 @@ export default function CreateShipmentPage() {
                     selectedRate === rate
                       ? "border-blue-500 bg-blue-50"
                       : rate.available
-                      ? "border-gray-200 hover:border-gray-300"
-                      : "border-gray-100 bg-gray-50 cursor-not-allowed opacity-50"
+                        ? "border-gray-200 hover:border-gray-300"
+                        : "border-gray-100 bg-gray-50 cursor-not-allowed opacity-50"
                   }`}
                 >
                   <div className="flex justify-between items-start">

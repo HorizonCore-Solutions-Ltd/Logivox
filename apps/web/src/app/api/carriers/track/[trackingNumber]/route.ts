@@ -1,37 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { carrierService } from '@/lib/services/carrier-integrations';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { carrierService } from "@/lib/services/carrier-integrations";
+import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/carriers/track/:trackingNumber
- * 
+ *
  * Track a shipment by tracking number
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { trackingNumber: string } }
+  { params }: { params: { trackingNumber: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { trackingNumber } = params;
     const { searchParams } = new URL(request.url);
-    const carrier = searchParams.get('carrier');
+    const carrier = searchParams.get("carrier");
 
     if (!carrier) {
       return NextResponse.json(
-        { error: 'Carrier parameter is required' },
-        { status: 400 }
+        { error: "Carrier parameter is required" },
+        { status: 400 },
       );
     }
 
     // Get tracking info from carrier
-    const trackingInfo = await carrierService.trackShipment(carrier, trackingNumber);
+    const trackingInfo = await carrierService.trackShipment(
+      carrier,
+      trackingNumber,
+    );
 
     // Update shipment record if exists
     const shipment = await prisma.shipment.findFirst({
@@ -83,15 +86,14 @@ export async function GET(
       trackingInfo,
       shipmentId: shipment?.id,
     });
-
   } catch (error: any) {
-    console.error('Error tracking shipment:', error);
+    console.error("Error tracking shipment:", error);
     return NextResponse.json(
-      { 
-        error: 'Failed to track shipment',
-        message: error.message 
+      {
+        error: "Failed to track shipment",
+        message: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

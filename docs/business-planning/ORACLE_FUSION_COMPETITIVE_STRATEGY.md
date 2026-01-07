@@ -29,36 +29,43 @@
 
 ### Oracle Fusion WMS vs LogiVox (Current State)
 
-| Feature | Oracle Fusion | LogiVox Now | Target | Priority |
-|---------|---------------|-------------|---------|----------|
-| **IoT/RFID** | ✅ Full | ❌ Barcode only | ✅ Full | 🔴 P0 |
-| **AI/ML** | ✅ Advanced | ❌ None | ✅ Surpass | 🔴 P0 |
-| **3PL Billing** | ✅ Full | ❌ None | ✅ Full | 🟡 P1 |
-| **Robotics** | ✅ Full | ⚠️ Basic | ✅ Full | 🔴 P0 |
-| **Blockchain** | ✅ Full | ❌ None | ✅ Full | 🟡 P1 |
-| **Voice Picking** | ❌ None | ✅ Full | ✅ **Advantage** | ✅ Done |
-| **Customer Portal** | ⚠️ Extra $ | ✅ Full | ✅ **Advantage** | ✅ Done |
-| **Modern UI** | ⚠️ Legacy | ✅ Next.js | ✅ **Advantage** | ✅ Done |
-| **Cost** | 💰💰💰💰💰 | 💰 | 💰 | ✅ **Advantage** |
-| **Deployment Speed** | 🐌 6+ months | ⚡ 2-4 weeks | ⚡ 2-4 weeks | ✅ **Advantage** |
+| Feature              | Oracle Fusion | LogiVox Now     | Target           | Priority         |
+| -------------------- | ------------- | --------------- | ---------------- | ---------------- |
+| **IoT/RFID**         | ✅ Full       | ❌ Barcode only | ✅ Full          | 🔴 P0            |
+| **AI/ML**            | ✅ Advanced   | ❌ None         | ✅ Surpass       | 🔴 P0            |
+| **3PL Billing**      | ✅ Full       | ❌ None         | ✅ Full          | 🟡 P1            |
+| **Robotics**         | ✅ Full       | ⚠️ Basic        | ✅ Full          | 🔴 P0            |
+| **Blockchain**       | ✅ Full       | ❌ None         | ✅ Full          | 🟡 P1            |
+| **Voice Picking**    | ❌ None       | ✅ Full         | ✅ **Advantage** | ✅ Done          |
+| **Customer Portal**  | ⚠️ Extra $    | ✅ Full         | ✅ **Advantage** | ✅ Done          |
+| **Modern UI**        | ⚠️ Legacy     | ✅ Next.js      | ✅ **Advantage** | ✅ Done          |
+| **Cost**             | 💰💰💰💰💰    | 💰              | 💰               | ✅ **Advantage** |
+| **Deployment Speed** | 🐌 6+ months  | ⚡ 2-4 weeks    | ⚡ 2-4 weeks     | ✅ **Advantage** |
 
 ---
 
 ## 🚀 IMPLEMENTATION ROADMAP
 
 ### **PHASE 1: IoT & Sensor Integration** (6-8 weeks)
+
 **Goal**: Match Oracle's IoT capabilities with RFID, sensors, and GPS tracking
 
 #### Week 1-2: IoT Architecture Foundation
+
 ```typescript
 // New modules to create:
-- /lib/services/iot/rfid-integration.ts
-- /lib/services/iot/sensor-monitoring.ts
-- /lib/services/iot/gps-tracking.ts
-- /lib/services/iot/iot-gateway.ts
+-/lib/ceeirssv / iot / rfid -
+  integration.ts -
+  /lib/ceeirssv / iot / sensor -
+  monitoring.ts -
+  /lib/ceeirssv / iot / gps -
+  tracking.ts -
+  /lib/ceeirssv / iot / iot -
+  gateway.ts;
 ```
 
 **Features to Build**:
+
 - ✅ RFID reader integration (Zebra, Impinj, Alien)
 - ✅ Temperature/humidity sensors (cold chain)
 - ✅ GPS asset tracking
@@ -68,6 +75,7 @@
 - ✅ IoT device management portal
 
 **Database Schema**:
+
 ```prisma
 model IoTDevice {
   id             String   @id @default(cuid())
@@ -110,6 +118,7 @@ model IoTAlert {
 ```
 
 **API Endpoints**:
+
 - `POST /api/iot/devices` - Register IoT device
 - `GET /api/iot/devices` - List all IoT devices
 - `POST /api/iot/readings` - Receive sensor readings
@@ -118,6 +127,7 @@ model IoTAlert {
 - `POST /api/iot/alerts/:id/resolve` - Resolve alert
 
 **Deliverables**:
+
 - RFID-enabled receiving (scan pallets on arrival)
 - Cold chain monitoring with alerts
 - Asset tracking dashboard
@@ -126,9 +136,11 @@ model IoTAlert {
 ---
 
 ### **PHASE 2: AI/ML Intelligence Layer** (10-12 weeks)
+
 **Goal**: Surpass Oracle with modern ML capabilities using Python & TensorFlow
 
 #### Week 1-3: ML Infrastructure
+
 ```typescript
 // Python ML microservice architecture
 ml-service/
@@ -183,6 +195,7 @@ ml-service/
    - Equipment failure prediction
 
 **Technology Stack**:
+
 ```yaml
 Backend: Python FastAPI microservice
 ML Frameworks: TensorFlow, PyTorch, scikit-learn
@@ -194,6 +207,7 @@ Monitoring: Prometheus + Grafana
 ```
 
 **Database Schema**:
+
 ```prisma
 model MLModel {
   id            String   @id @default(cuid())
@@ -234,6 +248,7 @@ model DemandForecast {
 ```
 
 **Deliverables**:
+
 - ML prediction API service
 - Demand forecasting dashboard
 - Auto-slotting recommendations
@@ -243,6 +258,7 @@ model DemandForecast {
 ---
 
 ### **PHASE 3: 3PL Billing & Multi-Client Management** (6-8 weeks)
+
 **Goal**: Match Oracle's 3PL capabilities for warehouse service providers
 
 #### Features to Build:
@@ -273,6 +289,7 @@ model DemandForecast {
    - Dispute resolution workflow
 
 **Database Schema**:
+
 ```prisma
 model BillingClient {
   id              String   @id @default(cuid())
@@ -334,6 +351,7 @@ model Invoice {
 ```
 
 **API Endpoints**:
+
 - `POST /api/billing/activities` - Capture billable activity
 - `GET /api/billing/clients/:id/activities` - Get client activities
 - `POST /api/billing/invoices/generate` - Generate invoice
@@ -341,6 +359,7 @@ model Invoice {
 - `GET /api/billing/reports/revenue` - Revenue reports
 
 **UI Components**:
+
 - Client billing dashboard
 - Rate card management
 - Invoice generation
@@ -351,6 +370,7 @@ model Invoice {
 ---
 
 ### **PHASE 4: Advanced Automation Orchestration** (8-10 weeks)
+
 **Goal**: Match Oracle's robotics and automation capabilities
 
 #### Features to Build:
@@ -389,6 +409,7 @@ model Invoice {
    - Performance monitoring
 
 **Database Schema**:
+
 ```prisma
 model AutomationDevice {
   id             String   @id @default(cuid())
@@ -436,6 +457,7 @@ model RobotFleet {
 ```
 
 **Integration Protocols**:
+
 - REST API for modern systems
 - MQTT for IoT devices
 - WebSocket for real-time updates
@@ -445,6 +467,7 @@ model RobotFleet {
 ---
 
 ### **PHASE 5: Blockchain Integration** (6-8 weeks)
+
 **Goal**: Match Oracle's blockchain capabilities for supply chain transparency
 
 #### Features to Build:
@@ -471,6 +494,7 @@ model RobotFleet {
    - Recall management
 
 **Technology Stack**:
+
 ```yaml
 Blockchain: Hyperledger Fabric (private/permissioned)
 Alternative: Ethereum (public) or Polygon (L2)
@@ -480,6 +504,7 @@ Storage: IPFS for documents
 ```
 
 **Database Schema**:
+
 ```prisma
 model BlockchainTransaction {
   id              String   @id @default(cuid())
@@ -522,6 +547,7 @@ model SmartContract {
 ---
 
 ### **PHASE 6: Enterprise Analytics & BI** (4-6 weeks)
+
 **Goal**: Surpass Oracle with modern real-time dashboards
 
 #### Features to Build:
@@ -550,6 +576,7 @@ model SmartContract {
    - Opportunity analysis
 
 **Technology Stack**:
+
 ```yaml
 Visualization: Recharts, D3.js, Apache ECharts
 Real-time: WebSocket updates
@@ -605,18 +632,21 @@ Caching: Redis for performance
 ## 📈 SUCCESS METRICS
 
 ### **Technical Metrics**:
+
 - ✅ Feature parity: 95%+ of Oracle Fusion WMS capabilities
 - ✅ Performance: <200ms API response time
 - ✅ Uptime: 99.9% availability
 - ✅ Scalability: Handle 10M+ transactions/day
 
 ### **Business Metrics**:
+
 - 🎯 Enterprise deals: 5+ customers with $100M+ revenue
 - 🎯 Market position: Top 10 WMS platform by Q4 2026
 - 🎯 Customer satisfaction: 4.8+ stars average
 - 🎯 Implementation speed: 2-4 weeks average
 
 ### **Competitive Metrics**:
+
 - 🎯 Win rate vs Oracle: 60%+ in head-to-head deals
 - 🎯 Price advantage: 5-10x lower total cost
 - 🎯 Feature advantage: Voice WMS (unique)
@@ -627,6 +657,7 @@ Caching: Redis for performance
 ## 💰 INVESTMENT REQUIRED
 
 ### **Development Resources**:
+
 - **6 months** of focused development
 - **4-5 full-time developers**
 - **1 ML engineer** (for AI/ML phase)
@@ -634,17 +665,20 @@ Caching: Redis for performance
 - **1 QA engineer** (for testing)
 
 ### **Technology Costs**:
+
 - ML infrastructure: ~$500/month (AWS/GCP)
 - Blockchain infrastructure: ~$200/month
 - IoT testing devices: ~$5,000 one-time
 - Testing environment: ~$300/month
 
 ### **Total Estimated Cost**:
+
 - **Personnel**: ~$300K-$400K (6 months)
 - **Infrastructure**: ~$10K
 - **Total**: ~$310K-$410K
 
 ### **Expected ROI**:
+
 - 2-3 enterprise deals = $200K-$500K ARR
 - 10-15 mid-market deals = $300K-$600K ARR
 - **Total ARR**: $500K-$1.1M
@@ -675,11 +709,13 @@ Caching: Redis for performance
    - Seeking modern alternative
 
 ### **Positioning**:
+
 - **Tagline**: "Enterprise WMS. Without the Enterprise Headache."
 - **Value Prop**: "Oracle Fusion features at 1/5th the cost, 10x faster deployment"
 - **Differentiators**: Voice-first, AI-powered, customer portal included
 
 ### **Pricing Strategy**:
+
 - **Starter**: $2,000/month (1 warehouse, 10 users)
 - **Professional**: $5,000/month (3 warehouses, 50 users, IoT)
 - **Enterprise**: $15,000/month (unlimited, full features, ML)
@@ -690,6 +726,7 @@ Caching: Redis for performance
 ## ✅ EXECUTION CHECKLIST
 
 ### **Month 1-2: IoT Foundation**
+
 - [ ] IoT device management system
 - [ ] RFID reader integration
 - [ ] Temperature/humidity sensors
@@ -698,6 +735,7 @@ Caching: Redis for performance
 - [ ] Alert system
 
 ### **Month 2-4: AI/ML Intelligence**
+
 - [ ] ML infrastructure setup
 - [ ] Demand forecasting model
 - [ ] Slotting optimization engine
@@ -706,6 +744,7 @@ Caching: Redis for performance
 - [ ] Performance monitoring
 
 ### **Month 3-5: 3PL Billing**
+
 - [ ] Multi-client architecture
 - [ ] Activity capture system
 - [ ] Billing rule engine
@@ -714,6 +753,7 @@ Caching: Redis for performance
 - [ ] Revenue analytics
 
 ### **Month 4-6: Automation**
+
 - [ ] Robot fleet management
 - [ ] AS/RS integration
 - [ ] Goods-to-person systems
@@ -722,6 +762,7 @@ Caching: Redis for performance
 - [ ] Performance tracking
 
 ### **Month 5-6: Blockchain**
+
 - [ ] Blockchain infrastructure
 - [ ] Track & trace implementation
 - [ ] Smart contract framework
@@ -729,6 +770,7 @@ Caching: Redis for performance
 - [ ] Product provenance
 
 ### **Month 6: Polish & Launch**
+
 - [ ] Integration testing
 - [ ] Performance optimization
 - [ ] Documentation
@@ -745,9 +787,10 @@ With this 6-month roadmap, LogiVox will:
 ✅ **Match** Oracle Fusion in all critical capabilities  
 ✅ **Surpass** Oracle with voice-first, modern UX, and faster deployment  
 ✅ **Dominate** mid-market segment with 5-10x cost advantage  
-✅ **Disrupt** enterprise WMS market with modern technology  
+✅ **Disrupt** enterprise WMS market with modern technology
 
 **Next Steps**:
+
 1. Approve roadmap and budget
 2. Assemble development team
 3. Begin Phase 1 (IoT) immediately

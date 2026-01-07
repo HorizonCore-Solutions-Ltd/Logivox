@@ -1,4 +1,5 @@
 # 💰 LogiVox - Financial Model & Projections
+
 ## 5-Year Revenue, Expenses, and Cash Flow Analysis
 
 > **Last Updated:** October 15, 2025  
@@ -11,17 +12,17 @@
 
 ### Key Financial Metrics (5-Year)
 
-| Metric | Year 1 | Year 2 | Year 3 | Year 4 | Year 5 |
-|--------|--------|--------|--------|--------|--------|
-| **Revenue (ARR)** | $8.0M | $32.0M | $84.0M | $196.0M | $420.0M |
-| **Growth Rate** | - | 300% | 162% | 133% | 114% |
-| **Customers** | 2,000 | 6,500 | 14,000 | 28,000 | 52,500 |
-| **ARPU (Annual)** | $4,000 | $4,923 | $6,000 | $7,000 | $8,000 |
-| **Gross Margin** | 85% | 87% | 88% | 89% | 90% |
-| **EBITDA** | -$2.8M | -$0.5M | $12.0M | $49.0M | $147.0M |
-| **EBITDA Margin** | -35% | -2% | 14% | 25% | 35% |
-| **Cash Balance** | $2.2M | $1.7M | $13.7M | $62.7M | $209.7M |
-| **Burn Rate** | $400K/mo | $250K/mo | Profitable | Profitable | Profitable |
+| Metric            | Year 1   | Year 2   | Year 3     | Year 4     | Year 5     |
+| ----------------- | -------- | -------- | ---------- | ---------- | ---------- |
+| **Revenue (ARR)** | $8.0M    | $32.0M   | $84.0M     | $196.0M    | $420.0M    |
+| **Growth Rate**   | -        | 300%     | 162%       | 133%       | 114%       |
+| **Customers**     | 2,000    | 6,500    | 14,000     | 28,000     | 52,500     |
+| **ARPU (Annual)** | $4,000   | $4,923   | $6,000     | $7,000     | $8,000     |
+| **Gross Margin**  | 85%      | 87%      | 88%        | 89%        | 90%        |
+| **EBITDA**        | -$2.8M   | -$0.5M   | $12.0M     | $49.0M     | $147.0M    |
+| **EBITDA Margin** | -35%     | -2%      | 14%        | 25%        | 35%        |
+| **Cash Balance**  | $2.2M    | $1.7M    | $13.7M     | $62.7M     | $209.7M    |
+| **Burn Rate**     | $400K/mo | $250K/mo | Profitable | Profitable | Profitable |
 
 ---
 
@@ -30,6 +31,7 @@
 ### Customer Acquisition Assumptions
 
 **Year 1 (2026):**
+
 ```
 Month 1-3 (Launch):
 ├─ New Customers: 50/month
@@ -57,6 +59,7 @@ Total Year 1:
 ```
 
 **Year 2 (2027):**
+
 ```
 Customer Acquisition:
 ├─ New Customers: 5,500 (458/month avg)
@@ -74,6 +77,7 @@ Growth Drivers:
 ```
 
 **Year 3 (2028):**
+
 ```
 Customer Acquisition:
 ├─ New Customers: 9,500 (792/month avg)
@@ -91,6 +95,7 @@ Growth Drivers:
 ```
 
 **Year 4 (2029):**
+
 ```
 Customer Acquisition:
 ├─ New Customers: 17,000 (1,417/month avg)
@@ -102,6 +107,7 @@ Customer Acquisition:
 ```
 
 **Year 5 (2030):**
+
 ```
 Customer Acquisition:
 ├─ New Customers: 29,500 (2,458/month avg)
@@ -139,6 +145,7 @@ Customer Acquisition:
 ### Customer Acquisition Cost (CAC)
 
 **Blended CAC by Channel:**
+
 ```
 Year 1:
 ├─ Organic (Free trial, SEO, Product Hunt): $200
@@ -160,6 +167,7 @@ Year 5:
 ### Lifetime Value (LTV)
 
 **LTV Calculation:**
+
 ```
 Year 1:
 ├─ Average ARR: $4,000
@@ -208,6 +216,7 @@ Why low churn:
 ### Year 1 Operating Budget ($5.8M total)
 
 **Sales & Marketing: $2.4M (41%)**
+
 ```
 Team Salaries:
 ├─ VP Sales: $150K + $150K commission = $300K
@@ -230,6 +239,7 @@ Total S&M: $1,550K (first 6 months) + $850K (second half) = $2.4M
 ```
 
 **Product & Engineering: $1.8M (31%)**
+
 ```
 Team Salaries:
 ├─ CTO: $180K
@@ -260,6 +270,7 @@ Total Engineering: $1,720K
 ```
 
 **Customer Success: $600K (10%)**
+
 ```
 Team Salaries:
 ├─ Head of CS: $120K
@@ -282,6 +293,7 @@ Total Customer Success: $600K
 ```
 
 **Compliance & Security: $650K (11%)**
+
 ```
 Certifications:
 ├─ SOC 2 Type II Audit: $100K
@@ -304,6 +316,7 @@ Total Compliance: $650K
 ```
 
 **Operations & Admin: $350K (6%)**
+
 ```
 Team:
 ├─ Operations Manager: $80K
@@ -326,17 +339,18 @@ Total Operations: $350K
 
 ### Operating Expenses (Years 2-5)
 
-| Category | Year 2 | Year 3 | Year 4 | Year 5 |
-|----------|--------|--------|--------|--------|
-| **Sales & Marketing** | $6.4M | $12.6M | $23.5M | $42.0M |
-| **Product & Engineering** | $3.6M | $6.7M | $11.8M | $18.9M |
-| **Customer Success** | $1.6M | $3.4M | $7.8M | $14.7M |
-| **Compliance & Security** | $0.8M | $1.3M | $2.0M | $2.9M |
-| **Operations & Admin** | $0.6M | $1.0M | $1.9M | $3.5M |
-| **G&A (General Admin)** | $1.5M | $3.0M | $6.0M | $12.0M |
-| **Total OpEx** | $14.5M | $28.0M | $53.0M | $94.0M |
+| Category                  | Year 2 | Year 3 | Year 4 | Year 5 |
+| ------------------------- | ------ | ------ | ------ | ------ |
+| **Sales & Marketing**     | $6.4M  | $12.6M | $23.5M | $42.0M |
+| **Product & Engineering** | $3.6M  | $6.7M  | $11.8M | $18.9M |
+| **Customer Success**      | $1.6M  | $3.4M  | $7.8M  | $14.7M |
+| **Compliance & Security** | $0.8M  | $1.3M  | $2.0M  | $2.9M  |
+| **Operations & Admin**    | $0.6M  | $1.0M  | $1.9M  | $3.5M  |
+| **G&A (General Admin)**   | $1.5M  | $3.0M  | $6.0M  | $12.0M |
+| **Total OpEx**            | $14.5M | $28.0M | $53.0M | $94.0M |
 
 **OpEx as % of Revenue:**
+
 - Year 1: 73% (investment phase)
 - Year 2: 45% (scaling)
 - Year 3: 33% (efficiency)
@@ -349,42 +363,42 @@ Total Operations: $350K
 
 ### 5-Year Profit & Loss Summary
 
-| Line Item | Year 1 | Year 2 | Year 3 | Year 4 | Year 5 |
-|-----------|--------|--------|--------|--------|--------|
-| **Revenue** | | | | | |
-| Subscription Revenue | $6,000K | $26,000K | $70,000K | $168,000K | $364,000K |
-| Add-on Revenue | $1,500K | $5,000K | $12,000K | $24,000K | $48,000K |
-| Professional Services | $500K | $1,000K | $2,000K | $4,000K | $8,000K |
-| **Total Revenue** | **$8,000K** | **$32,000K** | **$84,000K** | **$196,000K** | **$420,000K** |
-| | | | | | |
-| **Cost of Revenue** | | | | | |
-| Infrastructure & Hosting | $380K | $1,000K | $2,500K | $5,500K | $10,500K |
-| Third-Party Services | $140K | $400K | $900K | $1,900K | $3,500K |
-| Support Costs | $200K | $600K | $1,400K | $3,100K | $6,000K |
-| Payment Processing (2.9%) | $232K | $928K | $2,436K | $5,684K | $12,180K |
-| **Total CoR** | **$952K** | **$2,928K** | **$7,236K** | **$16,184K** | **$32,180K** |
-| | | | | | |
-| **Gross Profit** | **$7,048K** | **$29,072K** | **$76,764K** | **$179,816K** | **$387,820K** |
-| **Gross Margin** | **88%** | **91%** | **91%** | **92%** | **92%** |
-| | | | | | |
-| **Operating Expenses** | | | | | |
-| Sales & Marketing | $2,400K | $9,600K | $25,200K | $58,800K | $126,000K |
-| Product & Engineering | $1,800K | $3,200K | $6,720K | $13,720K | $25,200K |
-| Customer Success | $600K | $1,600K | $3,360K | $7,840K | $16,800K |
-| Compliance & Security | $650K | $800K | $1,260K | $1,960K | $2,940K |
-| Operations & Admin | $350K | $600K | $1,008K | $1,960K | $3,780K |
-| General & Admin | $0K | $3,200K | $8,400K | $19,600K | $42,000K |
-| **Total OpEx** | **$5,800K** | **$19,000K** | **$45,948K** | **$103,880K** | **$216,720K** |
-| | | | | | |
-| **EBITDA** | **$1,248K** | **$10,072K** | **$30,816K** | **$75,936K** | **$171,100K** |
-| **EBITDA Margin** | **16%** | **31%** | **37%** | **39%** | **41%** |
-| | | | | | |
-| D&A (Depreciation) | $100K | $200K | $400K | $800K | $1,600K |
-| Interest Expense | $0K | $0K | $0K | $0K | $0K |
-| Interest Income | $50K | $100K | $400K | $1,500K | $5,000K |
-| | | | | | |
-| **Net Income** | **$1,198K** | **$9,972K** | **$30,816K** | **$76,636K** | **$174,500K** |
-| **Net Margin** | **15%** | **31%** | **37%** | **39%** | **42%** |
+| Line Item                 | Year 1      | Year 2       | Year 3       | Year 4        | Year 5        |
+| ------------------------- | ----------- | ------------ | ------------ | ------------- | ------------- |
+| **Revenue**               |             |              |              |               |               |
+| Subscription Revenue      | $6,000K     | $26,000K     | $70,000K     | $168,000K     | $364,000K     |
+| Add-on Revenue            | $1,500K     | $5,000K      | $12,000K     | $24,000K      | $48,000K      |
+| Professional Services     | $500K       | $1,000K      | $2,000K      | $4,000K       | $8,000K       |
+| **Total Revenue**         | **$8,000K** | **$32,000K** | **$84,000K** | **$196,000K** | **$420,000K** |
+|                           |             |              |              |               |               |
+| **Cost of Revenue**       |             |              |              |               |               |
+| Infrastructure & Hosting  | $380K       | $1,000K      | $2,500K      | $5,500K       | $10,500K      |
+| Third-Party Services      | $140K       | $400K        | $900K        | $1,900K       | $3,500K       |
+| Support Costs             | $200K       | $600K        | $1,400K      | $3,100K       | $6,000K       |
+| Payment Processing (2.9%) | $232K       | $928K        | $2,436K      | $5,684K       | $12,180K      |
+| **Total CoR**             | **$952K**   | **$2,928K**  | **$7,236K**  | **$16,184K**  | **$32,180K**  |
+|                           |             |              |              |               |               |
+| **Gross Profit**          | **$7,048K** | **$29,072K** | **$76,764K** | **$179,816K** | **$387,820K** |
+| **Gross Margin**          | **88%**     | **91%**      | **91%**      | **92%**       | **92%**       |
+|                           |             |              |              |               |               |
+| **Operating Expenses**    |             |              |              |               |               |
+| Sales & Marketing         | $2,400K     | $9,600K      | $25,200K     | $58,800K      | $126,000K     |
+| Product & Engineering     | $1,800K     | $3,200K      | $6,720K      | $13,720K      | $25,200K      |
+| Customer Success          | $600K       | $1,600K      | $3,360K      | $7,840K       | $16,800K      |
+| Compliance & Security     | $650K       | $800K        | $1,260K      | $1,960K       | $2,940K       |
+| Operations & Admin        | $350K       | $600K        | $1,008K      | $1,960K       | $3,780K       |
+| General & Admin           | $0K         | $3,200K      | $8,400K      | $19,600K      | $42,000K      |
+| **Total OpEx**            | **$5,800K** | **$19,000K** | **$45,948K** | **$103,880K** | **$216,720K** |
+|                           |             |              |              |               |               |
+| **EBITDA**                | **$1,248K** | **$10,072K** | **$30,816K** | **$75,936K**  | **$171,100K** |
+| **EBITDA Margin**         | **16%**     | **31%**      | **37%**      | **39%**       | **41%**       |
+|                           |             |              |              |               |               |
+| D&A (Depreciation)        | $100K       | $200K        | $400K        | $800K         | $1,600K       |
+| Interest Expense          | $0K         | $0K          | $0K          | $0K           | $0K           |
+| Interest Income           | $50K        | $100K        | $400K        | $1,500K       | $5,000K       |
+|                           |             |              |              |               |               |
+| **Net Income**            | **$1,198K** | **$9,972K**  | **$30,816K** | **$76,636K**  | **$174,500K** |
+| **Net Margin**            | **15%**     | **31%**      | **37%**      | **39%**       | **42%**       |
 
 ---
 
@@ -392,29 +406,29 @@ Total Operations: $350K
 
 ### 5-Year Cash Flow Summary
 
-| Line Item | Year 1 | Year 2 | Year 3 | Year 4 | Year 5 |
-|-----------|--------|--------|--------|--------|--------|
-| **Operating Activities** | | | | | |
-| Net Income | $1,198K | $9,972K | $30,816K | $76,636K | $174,500K |
-| Add: Depreciation | $100K | $200K | $400K | $800K | $1,600K |
-| Changes in Working Capital | -$500K | -$1,000K | -$2,000K | -$3,500K | -$5,000K |
-| **Cash from Operations** | **$798K** | **$9,172K** | **$29,216K** | **$73,936K** | **$171,100K** |
-| | | | | | |
-| **Investing Activities** | | | | | |
-| CapEx (Equipment, Software) | -$200K | -$300K | -$500K | -$1,000K | -$2,000K |
-| **Cash from Investing** | **-$200K** | **-$300K** | **-$500K** | **-$1,000K** | **-$2,000K** |
-| | | | | | |
-| **Financing Activities** | | | | | |
-| Equity Raised | $5,000K | $0K | $0K | $0K | $0K |
-| Debt Raised | $0K | $0K | $0K | $0K | $0K |
-| Debt Repayment | $0K | $0K | $0K | $0K | $0K |
-| **Cash from Financing** | **$5,000K** | **$0K** | **$0K** | **$0K** | **$0K** |
-| | | | | | |
-| **Net Change in Cash** | **$5,598K** | **$8,872K** | **$28,716K** | **$72,936K** | **$169,100K** |
-| Beginning Cash Balance | $0K | $5,598K | $14,470K | $43,186K | $116,122K |
-| **Ending Cash Balance** | **$5,598K** | **$14,470K** | **$43,186K** | **$116,122K** | **$285,222K** |
-| | | | | | |
-| **Months of Runway** | **58 months** | **Infinite** | **Infinite** | **Infinite** | **Infinite** |
+| Line Item                   | Year 1        | Year 2       | Year 3       | Year 4        | Year 5        |
+| --------------------------- | ------------- | ------------ | ------------ | ------------- | ------------- |
+| **Operating Activities**    |               |              |              |               |               |
+| Net Income                  | $1,198K       | $9,972K      | $30,816K     | $76,636K      | $174,500K     |
+| Add: Depreciation           | $100K         | $200K        | $400K        | $800K         | $1,600K       |
+| Changes in Working Capital  | -$500K        | -$1,000K     | -$2,000K     | -$3,500K      | -$5,000K      |
+| **Cash from Operations**    | **$798K**     | **$9,172K**  | **$29,216K** | **$73,936K**  | **$171,100K** |
+|                             |               |              |              |               |               |
+| **Investing Activities**    |               |              |              |               |               |
+| CapEx (Equipment, Software) | -$200K        | -$300K       | -$500K       | -$1,000K      | -$2,000K      |
+| **Cash from Investing**     | **-$200K**    | **-$300K**   | **-$500K**   | **-$1,000K**  | **-$2,000K**  |
+|                             |               |              |              |               |               |
+| **Financing Activities**    |               |              |              |               |               |
+| Equity Raised               | $5,000K       | $0K          | $0K          | $0K           | $0K           |
+| Debt Raised                 | $0K           | $0K          | $0K          | $0K           | $0K           |
+| Debt Repayment              | $0K           | $0K          | $0K          | $0K           | $0K           |
+| **Cash from Financing**     | **$5,000K**   | **$0K**      | **$0K**      | **$0K**       | **$0K**       |
+|                             |               |              |              |               |               |
+| **Net Change in Cash**      | **$5,598K**   | **$8,872K**  | **$28,716K** | **$72,936K**  | **$169,100K** |
+| Beginning Cash Balance      | $0K           | $5,598K      | $14,470K     | $43,186K      | $116,122K     |
+| **Ending Cash Balance**     | **$5,598K**   | **$14,470K** | **$43,186K** | **$116,122K** | **$285,222K** |
+|                             |               |              |              |               |               |
+| **Months of Runway**        | **58 months** | **Infinite** | **Infinite** | **Infinite**  | **Infinite**  |
 
 **Note:** With $5M raise, we achieve profitability in Month 18 and never need to raise again!
 
@@ -425,30 +439,35 @@ Total Operations: $350K
 ### Monthly Tracking Metrics
 
 **Revenue Metrics:**
+
 - Monthly Recurring Revenue (MRR)
 - Annual Recurring Revenue (ARR)
 - Average Revenue Per User (ARPU)
 - Customer Lifetime Value (LTV)
 
 **Growth Metrics:**
+
 - MRR Growth Rate (%)
 - Customer Growth Rate (%)
 - Net Revenue Retention (NRR)
 - Gross Revenue Retention (GRR)
 
 **Efficiency Metrics:**
+
 - Customer Acquisition Cost (CAC)
 - LTV:CAC Ratio
 - CAC Payback Period (months)
 - Magic Number (Sales Efficiency)
 
 **Engagement Metrics:**
+
 - Monthly Active Users (MAU)
 - Daily Active Users (DAU)
 - Training Completion Rate (%)
 - Feature Adoption Rate (%)
 
 **Financial Metrics:**
+
 - Gross Margin (%)
 - EBITDA Margin (%)
 - Net Margin (%)
@@ -462,18 +481,21 @@ Total Operations: $350K
 ### Path to Profitability
 
 **EBITDA Break-Even:**
+
 - **Month 18** (Q2 2027)
 - Customers: 3,500
 - MRR: $1.75M
 - ARR: $21M
 
 **Cash Flow Break-Even:**
+
 - **Month 16** (Q4 2026)
 - Customers: 3,000
 - MRR: $1.5M
 - ARR: $18M
 
 **Why So Fast:**
+
 1. High gross margins (85-90%)
 2. Low CAC ($1,200 → $900)
 3. Fast payback (4.2 months)
@@ -486,37 +508,37 @@ Total Operations: $350K
 
 ### Conservative Case (-30% Growth)
 
-| Year | Customers | ARR | EBITDA |
-|------|-----------|-----|--------|
-| 1 | 1,400 | $5.6M | -$3.5M |
-| 2 | 4,550 | $22.4M | -$2.0M |
-| 3 | 9,800 | $58.8M | $4.2M |
-| 4 | 19,600 | $137.2M | $24.5M |
-| 5 | 36,750 | $294.0M | $88.2M |
+| Year | Customers | ARR     | EBITDA |
+| ---- | --------- | ------- | ------ |
+| 1    | 1,400     | $5.6M   | -$3.5M |
+| 2    | 4,550     | $22.4M  | -$2.0M |
+| 3    | 9,800     | $58.8M  | $4.2M  |
+| 4    | 19,600    | $137.2M | $24.5M |
+| 5    | 36,750    | $294.0M | $88.2M |
 
 **Exit:** Year 5 - $294M ARR × 10x = **$2.9B acquisition**
 
 ### Base Case (As Modeled)
 
-| Year | Customers | ARR | EBITDA |
-|------|-----------|-----|--------|
-| 1 | 2,000 | $8.0M | $1.2M |
-| 2 | 6,500 | $32.0M | $10.0M |
-| 3 | 14,000 | $84.0M | $30.8M |
-| 4 | 28,000 | $196.0M | $75.9M |
-| 5 | 52,500 | $420.0M | $171.1M |
+| Year | Customers | ARR     | EBITDA  |
+| ---- | --------- | ------- | ------- |
+| 1    | 2,000     | $8.0M   | $1.2M   |
+| 2    | 6,500     | $32.0M  | $10.0M  |
+| 3    | 14,000    | $84.0M  | $30.8M  |
+| 4    | 28,000    | $196.0M | $75.9M  |
+| 5    | 52,500    | $420.0M | $171.1M |
 
 **Exit:** Year 5 - $420M ARR × 12x = **$5.0B acquisition**
 
 ### Aggressive Case (+30% Growth)
 
-| Year | Customers | ARR | EBITDA |
-|------|-----------|-----|--------|
-| 1 | 2,600 | $10.4M | $2.8M |
-| 2 | 8,450 | $41.6M | $18.0M |
-| 3 | 18,200 | $109.2M | $51.4M |
-| 4 | 36,400 | $254.8M | $127.3M |
-| 5 | 68,250 | $546.0M | $253.4M |
+| Year | Customers | ARR     | EBITDA  |
+| ---- | --------- | ------- | ------- |
+| 1    | 2,600     | $10.4M  | $2.8M   |
+| 2    | 8,450     | $41.6M  | $18.0M  |
+| 3    | 18,200    | $109.2M | $51.4M  |
+| 4    | 36,400    | $254.8M | $127.3M |
+| 5    | 68,250    | $546.0M | $253.4M |
 
 **Exit:** Year 5 - $546M ARR × 15x = **$8.2B acquisition**
 
@@ -553,15 +575,15 @@ Total Operations: $350K
 
 ### LogiVox vs. SaaS Industry Standards
 
-| Metric | LogiVox (Year 3) | SaaS Industry Avg | Status |
-|--------|--------------------|--------------------|--------|
-| **LTV:CAC** | 14.2:1 | 3:1 | ✅ 4.7x better |
-| **CAC Payback** | 4.2 months | 12 months | ✅ 2.9x faster |
-| **Gross Margin** | 91% | 70-80% | ✅ 11-21% better |
-| **EBITDA Margin** | 37% | 10-20% | ✅ 17-27% better |
-| **Monthly Churn** | 1.8% | 5-7% | ✅ 3-5% better |
-| **NRR** | 120%+ | 100-110% | ✅ 10-20% better |
-| **Growth Rate** | 162% | 40-60% | ✅ 102-122% better |
+| Metric            | LogiVox (Year 3) | SaaS Industry Avg | Status             |
+| ----------------- | ---------------- | ----------------- | ------------------ |
+| **LTV:CAC**       | 14.2:1           | 3:1               | ✅ 4.7x better     |
+| **CAC Payback**   | 4.2 months       | 12 months         | ✅ 2.9x faster     |
+| **Gross Margin**  | 91%              | 70-80%            | ✅ 11-21% better   |
+| **EBITDA Margin** | 37%              | 10-20%            | ✅ 17-27% better   |
+| **Monthly Churn** | 1.8%             | 5-7%              | ✅ 3-5% better     |
+| **NRR**           | 120%+            | 100-110%          | ✅ 10-20% better   |
+| **Growth Rate**   | 162%             | 40-60%            | ✅ 102-122% better |
 
 **Result:** LogiVox outperforms industry benchmarks across ALL key metrics! 🚀
 
@@ -571,31 +593,33 @@ Total Operations: $350K
 
 ### Comparable SaaS Companies (Public)
 
-| Company | ARR | Valuation | Multiple | Notes |
-|---------|-----|-----------|----------|-------|
-| **Salesforce** | $34B | $290B | 8.5x | CRM leader |
-| **ServiceNow** | $8.6B | $138B | 16x | Enterprise workflow |
-| **Datadog** | $2.1B | $42B | 20x | Monitoring/observability |
-| **Snowflake** | $3.0B | $60B | 20x | Data warehouse |
-| **Shopify** | $7.1B | $98B | 14x | E-commerce platform |
-| **Average** | - | - | **15.7x** | - |
+| Company        | ARR   | Valuation | Multiple  | Notes                    |
+| -------------- | ----- | --------- | --------- | ------------------------ |
+| **Salesforce** | $34B  | $290B     | 8.5x      | CRM leader               |
+| **ServiceNow** | $8.6B | $138B     | 16x       | Enterprise workflow      |
+| **Datadog**    | $2.1B | $42B      | 20x       | Monitoring/observability |
+| **Snowflake**  | $3.0B | $60B      | 20x       | Data warehouse           |
+| **Shopify**    | $7.1B | $98B      | 14x       | E-commerce platform      |
+| **Average**    | -     | -         | **15.7x** | -                        |
 
 **LogiVox Year 5 Valuation:**
+
 - ARR: $420M
 - Multiple: 12-15x (conservative vs. 15.7x avg)
 - Valuation: **$5.0-6.3B**
 
 ### Private Market Comps (Recent Acquisitions)
 
-| Company | Acquired By | ARR | Price | Multiple |
-|---------|-------------|-----|-------|----------|
-| **Anaplan** | Thoma Bravo | $600M | $10.4B | 17.3x |
-| **SailPoint** | Thoma Bravo | $500M | $6.9B | 13.8x |
-| **Proofpoint** | Thoma Bravo | $1.1B | $12.3B | 11.2x |
-| **Momentive** | ZenDesk (now Momentive Global) | $400M | $4.1B | 10.3x |
-| **Average** | - | - | - | **13.2x** |
+| Company        | Acquired By                    | ARR   | Price  | Multiple  |
+| -------------- | ------------------------------ | ----- | ------ | --------- |
+| **Anaplan**    | Thoma Bravo                    | $600M | $10.4B | 17.3x     |
+| **SailPoint**  | Thoma Bravo                    | $500M | $6.9B  | 13.8x     |
+| **Proofpoint** | Thoma Bravo                    | $1.1B | $12.3B | 11.2x     |
+| **Momentive**  | ZenDesk (now Momentive Global) | $400M | $4.1B  | 10.3x     |
+| **Average**    | -                              | -     | -      | **13.2x** |
 
 **LogiVox Acquisition Potential:**
+
 - Year 3: $84M ARR × 12x = **$1.0B**
 - Year 5: $420M ARR × 13x = **$5.5B**
 

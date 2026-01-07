@@ -9,6 +9,7 @@
 **✅ 100% COMPLETE ENTERPRISE WMS + LOGIVOX** - Production-ready warehouse management:
 
 ### Traditional WMS (Complete)
+
 - ✅ **Marketing Pages** (4): Landing, About, Contact, Blog
 - ✅ **Authentication** (2): Sign-in, Sign-up (OAuth + Email)
 - ✅ **Core WMS** (15+): Inventory, Receiving (GRN), Picking, Packing, Shipping, Quality Control
@@ -17,6 +18,7 @@
 - ✅ **Analytics** (5): Real-time Dashboard, Reports, Forecasting, KPI Tracking
 
 ### LogiVox Voice System (100% Complete - 33 Files)
+
 - ✅ **Voice-Directed Operations**: OpenAI Whisper + GPT-4 + TTS (real integration)
 - ✅ **Container & Load Sheet Management**: Auto-numbering, workflow automation
 - ✅ **Bay Door Allocation**: 6-criteria scoring algorithm with IoT
@@ -32,6 +34,7 @@
 - ✅ **Mobile Apps**: Picker & Marshal progressive web apps
 
 **Production-Ready Statistics:**
+
 - **189 functional API endpoints** (173 WMS + 16 LogiVox)
 - **33 LogiVox production files** (~12,000 lines)
 - **25+ database models** for LogiVox
@@ -54,6 +57,7 @@ To provide the most adaptable and efficient warehouse management system for mode
 ## 🏗️ Enterprise Architecture
 
 ### Modern Tech Stack
+
 - **Frontend**: Next.js 14, React 18, TypeScript, Tailwind CSS, ShadCN UI
 - **Mobile**: React Native with Expo (iOS/Android barcode scanning)
 - **Backend**: Next.js API Routes with TypeScript
@@ -67,6 +71,7 @@ To provide the most adaptable and efficient warehouse management system for mode
 - **Queue**: Background job processing for async operations
 
 ### Monorepo Structure
+
 ```
 logivox/
 ├── apps/
@@ -94,6 +99,7 @@ logivox/
 ## 🧩 Core Platform Modules
 
 ### 1. Intelligent Stock Booking Engine
+
 - **Barcode/QR Scanning**: Mobile and desktop camera integration
 - **Smart Entry**: AI-powered auto-suggestions and validation
 - **Photo Documentation**: Delivery verification and damage reporting
@@ -101,6 +107,7 @@ logivox/
 - **Real-Time Updates**: WebSocket-based live synchronization
 
 ### 2. Advanced ERP Integration Framework
+
 - **Oracle Integration**: REST API connector with real-time sync
 - **SAP Business One**: RFC/BAPI connections and data mapping
 - **NetSuite**: SuiteScript integration and workflow automation
@@ -109,6 +116,7 @@ logivox/
 - **Custom APIs**: Webhook system for proprietary ERPs
 
 ### 3. Enterprise Warehouse Management
+
 - **Multi-Location**: Global inventory tracking across facilities
 - **Batch/Serial Tracking**: Complete traceability and compliance
 - **Quality Control**: QC checkpoints with photo documentation
@@ -116,6 +124,7 @@ logivox/
 - **AI Forecasting**: Predictive restocking and demand planning
 
 ### 4. Advanced Label Printing System
+
 - **Template Designer**: Drag-and-drop label creation with AI suggestions
 - **Print Queue**: Enterprise-grade queue management with failover
 - **Multi-Format**: PDF, ZPL, EPL support for all printer types
@@ -123,6 +132,7 @@ logivox/
 - **Batch Processing**: Bulk label generation and printing
 
 ### 5. Comprehensive Supplier Portal
+
 - **Order Management**: Confirmation system and delivery tracking
 - **Document Upload**: Invoice and certificate management
 - **Communication Hub**: Centralized messaging and notifications
@@ -130,6 +140,7 @@ logivox/
 - **Integration APIs**: Direct ERP connection for suppliers
 
 ### 6. AI-Powered Analytics & Intelligence
+
 - **Predictive Analytics**: Demand forecasting and trend analysis
 - **Smart Dashboards**: Real-time KPI monitoring with AI insights
 - **Anomaly Detection**: Automated error and pattern recognition
@@ -137,6 +148,7 @@ logivox/
 - **Chatbot Assistant**: Natural language queries and support
 
 ### 7. Enterprise Security & Compliance
+
 - **Role-Based Access**: Granular permissions with audit trails
 - **Data Encryption**: AES-256 at rest and in transit
 - **Compliance Ready**: GDPR, ISO 27001, SOC 2, industry-specific
@@ -147,13 +159,14 @@ logivox/
 
 ### Tiered Pricing Strategy
 
-| Tier | Price | Features | User Limit | Target Market |
-|------|-------|----------|------------|---------------|
-| **🟢 Starter** | £29/month | Manual entry, basic reporting, 1 warehouse | 5 users | Small businesses |
-| **🔵 Pro** | £99/month | Barcode scanning, ERP integration, mobile app, dashboards | 25 users | Growing teams |
-| **🟣 Enterprise** | £499+/month | All features, unlimited warehouses, SLA, white-label | Unlimited | Large organizations |
+| Tier              | Price       | Features                                                  | User Limit | Target Market       |
+| ----------------- | ----------- | --------------------------------------------------------- | ---------- | ------------------- |
+| **🟢 Starter**    | £29/month   | Manual entry, basic reporting, 1 warehouse                | 5 users    | Small businesses    |
+| **🔵 Pro**        | £99/month   | Barcode scanning, ERP integration, mobile app, dashboards | 25 users   | Growing teams       |
+| **🟣 Enterprise** | £499+/month | All features, unlimited warehouses, SLA, white-label      | Unlimited  | Large organizations |
 
 ### Modular Add-Ons
+
 - **Label Printing Pro**: £19/month (Advanced templates and print queue)
 - **Supplier Portal**: £49/month (Self-service supplier management)
 - **Advanced Analytics**: £79/month (AI-powered insights and forecasting)
@@ -161,6 +174,7 @@ logivox/
 - **Onboarding Concierge**: £299 one-time (Dedicated setup assistance)
 
 ### Target Markets
+
 - **Primary**: Businesses across all industries needing ERP integration
 - **Secondary**: Warehouses transitioning from Excel/Access workflows
 - **Tertiary**: Multi-location enterprises requiring AI-powered automation
@@ -169,6 +183,7 @@ logivox/
 ## 🚀 Development Roadmap
 
 ### Phase 1: MVP Foundation (Months 1-3)
+
 - [x] Project architecture and monorepo setup
 - [x] Comprehensive requirements specification
 - [ ] Multi-tenant database schema design
@@ -177,6 +192,7 @@ logivox/
 - [ ] Oracle ERP integration foundation
 
 ### Phase 2: Core Platform (Months 4-6)
+
 - [ ] Advanced barcode scanning (mobile/desktop)
 - [ ] Label printing system with templates
 - [ ] Supplier portal development
@@ -184,6 +200,7 @@ logivox/
 - [ ] Basic analytics and reporting
 
 ### Phase 3: AI & Enterprise Features (Months 7-9)
+
 - [ ] AI-powered smart matching and suggestions
 - [ ] Predictive analytics and forecasting
 - [ ] Advanced ERP integrations (SAP, NetSuite)
@@ -191,6 +208,7 @@ logivox/
 - [ ] White-label and multi-tenant features
 
 ### Phase 4: Advanced Modules (Months 10-12)
+
 - [ ] Migration system with AI-assisted mapping
 - [ ] Advanced procurement suite
 - [ ] Quality control and batch tracking
@@ -200,6 +218,7 @@ logivox/
 ## 🛠️ Development Setup
 
 ### Prerequisites
+
 - Node.js 18+ and npm/yarn
 - PostgreSQL 14+ or Supabase account
 - Docker for local development
@@ -207,6 +226,7 @@ logivox/
 - Clerk account for authentication
 
 ### Quick Start
+
 ```bash
 # Clone the repository
 git clone https://github.com/your-org/logivox.git
@@ -234,6 +254,7 @@ npm run dev
 ```
 
 ### Environment Configuration
+
 ```bash
 # Database
 DATABASE_URL="postgresql://user:password@localhost:5432/logivox"
@@ -276,6 +297,7 @@ AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 ## � Competitive Advantages
 
 ### What Makes LogiVox Different
+
 - **🧠 AI-First**: Smart matching, predictive analytics, and automation
 - **🔌 API-Native**: Extensible architecture with webhook system
 - **📱 Mobile-First**: Designed for warehouse operations on mobile devices
@@ -285,6 +307,7 @@ AWS_SECRET_ACCESS_KEY="your-aws-secret-key"
 - **🔒 Enterprise-Ready**: Security, compliance, and white-label capabilities
 
 ### Market Position
+
 LogiVox is positioned as the **world's first voice-native WMS** - a hands-free, AI-powered warehouse management platform that enables workers to operate at peak efficiency without touching a screen.
 
 ## 🤝 Contributing

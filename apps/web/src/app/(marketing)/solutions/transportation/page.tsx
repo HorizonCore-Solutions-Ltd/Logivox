@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Truck,
   Route,
@@ -19,42 +25,48 @@ import {
   Clock,
   Fuel,
   Calendar,
-  Users
-} from "lucide-react"
+  Users,
+} from "lucide-react";
 
 export default function TransportationPage() {
   const features = [
     {
       icon: Route,
       title: "Load Planning",
-      description: "3D load optimization considering weight, dimensions, and stacking constraints for maximum cube utilization."
+      description:
+        "3D load optimization considering weight, dimensions, and stacking constraints for maximum cube utilization.",
     },
     {
       icon: Navigation,
       title: "Route Optimization",
-      description: "AI-powered routing that minimizes miles, fuel costs, and delivery time while meeting time windows."
+      description:
+        "AI-powered routing that minimizes miles, fuel costs, and delivery time while meeting time windows.",
     },
     {
       icon: MapPin,
       title: "Real-Time Tracking",
-      description: "GPS tracking of all shipments with ETA calculations and proactive delay notifications."
+      description:
+        "GPS tracking of all shipments with ETA calculations and proactive delay notifications.",
     },
     {
       icon: DollarSign,
       title: "Freight Cost Management",
-      description: "Rate shopping, carrier bidding, and freight audit to ensure lowest transportation costs."
+      description:
+        "Rate shopping, carrier bidding, and freight audit to ensure lowest transportation costs.",
     },
     {
       icon: Calendar,
       title: "Appointment Scheduling",
-      description: "Automated dock appointment booking and coordination with carriers and customers."
+      description:
+        "Automated dock appointment booking and coordination with carriers and customers.",
     },
     {
       icon: BarChart3,
       title: "Transportation Analytics",
-      description: "Comprehensive metrics on costs, on-time performance, carrier KPIs, and optimization opportunities."
-    }
-  ]
+      description:
+        "Comprehensive metrics on costs, on-time performance, carrier KPIs, and optimization opportunities.",
+    },
+  ];
 
   const capabilities = [
     {
@@ -69,8 +81,8 @@ export default function TransportationPage() {
         "Multi-stop load planning",
         "Consolidation opportunities",
         "Container load plans",
-        "Visual load diagrams"
-      ]
+        "Visual load diagrams",
+      ],
     },
     {
       title: "Route Planning",
@@ -84,8 +96,8 @@ export default function TransportationPage() {
         "Fuel efficiency routing",
         "Toll cost avoidance",
         "Delivery sequence optimization",
-        "Dynamic route adjustment"
-      ]
+        "Dynamic route adjustment",
+      ],
     },
     {
       title: "Carrier Management",
@@ -99,8 +111,8 @@ export default function TransportationPage() {
         "Automated load tendering",
         "Freight bill audit and payment",
         "Insurance verification",
-        "Compliance tracking (DOT, safety)"
-      ]
+        "Compliance tracking (DOT, safety)",
+      ],
     },
     {
       title: "Freight Management",
@@ -114,109 +126,113 @@ export default function TransportationPage() {
         "Claims management",
         "Accessorial charge validation",
         "Freight class determination",
-        "Shipping document management"
-      ]
-    }
-  ]
+        "Shipping document management",
+      ],
+    },
+  ];
 
   const workflow = [
     {
       step: "Order Release",
-      description: "Orders ready for shipment released to transportation planning",
+      description:
+        "Orders ready for shipment released to transportation planning",
       time: "Day 0",
-      icon: Package
+      icon: Package,
     },
     {
       step: "Load Planning",
       description: "System optimizes load configuration and carrier selection",
       time: "+1 hour",
-      icon: Route
+      icon: Route,
     },
     {
       step: "Carrier Assignment",
-      description: "Automated tendering to selected carrier with acceptance tracking",
+      description:
+        "Automated tendering to selected carrier with acceptance tracking",
       time: "+2 hours",
-      icon: Truck
+      icon: Truck,
     },
     {
       step: "Pickup Execution",
       description: "Carrier picks up shipment with BOL and load photos",
       time: "Day 1",
-      icon: CheckCircle2
+      icon: CheckCircle2,
     },
     {
       step: "In-Transit Tracking",
-      description: "Real-time GPS tracking with ETA updates and exception alerts",
+      description:
+        "Real-time GPS tracking with ETA updates and exception alerts",
       time: "Day 1-3",
-      icon: Navigation
+      icon: Navigation,
     },
     {
       step: "Delivery & POD",
-      description: "Delivery completion with proof of delivery and customer notification",
+      description:
+        "Delivery completion with proof of delivery and customer notification",
       time: "Day 3",
-      icon: MapPin
-    }
-  ]
+      icon: MapPin,
+    },
+  ];
 
   const benefits = [
     {
       metric: "25%",
-      description: "Reduction in transportation costs"
+      description: "Reduction in transportation costs",
     },
     {
       metric: "98%",
-      description: "On-time delivery performance"
+      description: "On-time delivery performance",
     },
     {
       metric: "35%",
-      description: "Improvement in load utilization"
+      description: "Improvement in load utilization",
     },
     {
       metric: "40%",
-      description: "Decrease in empty miles"
+      description: "Decrease in empty miles",
     },
     {
       metric: "50%",
-      description: "Faster route planning time"
+      description: "Faster route planning time",
     },
     {
       metric: "Real-time",
-      description: "Shipment visibility and tracking"
-    }
-  ]
+      description: "Shipment visibility and tracking",
+    },
+  ];
 
   const modes = [
     {
       mode: "Truckload (FTL)",
       description: "Full trailer dedicated shipments",
-      use: "Large volume, single destination"
+      use: "Large volume, single destination",
     },
     {
       mode: "Less-Than-Truckload (LTL)",
       description: "Consolidated multi-customer shipments",
-      use: "Smaller shipments, cost optimization"
+      use: "Smaller shipments, cost optimization",
     },
     {
       mode: "Parcel",
       description: "Small package shipping via FedEx, UPS, USPS",
-      use: "E-commerce, small orders"
+      use: "E-commerce, small orders",
     },
     {
       mode: "Intermodal",
       description: "Rail and truck combination shipping",
-      use: "Long distance, cost savings"
+      use: "Long distance, cost savings",
     },
     {
       mode: "Air Freight",
       description: "Expedited air shipping",
-      use: "Time-sensitive, high-value items"
+      use: "Time-sensitive, high-value items",
     },
     {
       mode: "Ocean Freight",
       description: "International container shipping",
-      use: "Import/export, bulk quantities"
-    }
-  ]
+      use: "Import/export, bulk quantities",
+    },
+  ];
 
   const integrations = [
     "ELD (Electronic Logging Device) systems",
@@ -226,8 +242,8 @@ export default function TransportationPage() {
     "Fuel card providers",
     "ERP systems for order data",
     "TMS marketplace integrations",
-    "Telematics platforms"
-  ]
+    "Telematics platforms",
+  ];
 
   return (
     <div className="flex flex-col">
@@ -242,9 +258,9 @@ export default function TransportationPage() {
               Optimize Shipping with Intelligent Transportation Management
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Reduce transportation costs by 25% with smart load planning, route optimization, 
-              and carrier management. Achieve 98% on-time delivery with real-time tracking 
-              and proactive exception management.
+              Reduce transportation costs by 25% with smart load planning, route
+              optimization, and carrier management. Achieve 98% on-time delivery
+              with real-time tracking and proactive exception management.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -311,8 +327,12 @@ export default function TransportationPage() {
                       <capability.icon className="h-6 w-6" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">{capability.title}</CardTitle>
-                      <CardDescription className="mt-1">{capability.description}</CardDescription>
+                      <CardTitle className="text-xl">
+                        {capability.title}
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        {capability.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -346,7 +366,10 @@ export default function TransportationPage() {
           <div className="mx-auto max-w-4xl">
             <div className="relative">
               {workflow.map((item, index) => (
-                <div key={index} className="relative mb-8 flex items-start space-x-4">
+                <div
+                  key={index}
+                  className="relative mb-8 flex items-start space-x-4"
+                >
                   <div className="flex flex-col items-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                       <item.icon className="h-6 w-6" />
@@ -360,7 +383,9 @@ export default function TransportationPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="font-semibold">{item.step}</h3>
-                          <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {item.description}
+                          </p>
                         </div>
                         <Badge variant="secondary">{item.time}</Badge>
                       </div>
@@ -390,7 +415,9 @@ export default function TransportationPage() {
                 <CardContent className="pt-6">
                   <Truck className="h-8 w-8 text-primary mb-3" />
                   <h3 className="font-semibold">{mode.mode}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{mode.description}</p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {mode.description}
+                  </p>
                   <Badge variant="secondary" className="mt-2">
                     {mode.use}
                   </Badge>
@@ -416,8 +443,12 @@ export default function TransportationPage() {
             {benefits.map((benefit, index) => (
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">{benefit.metric}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{benefit.description}</p>
+                  <div className="text-4xl font-bold text-primary">
+                    {benefit.metric}
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {benefit.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -459,7 +490,8 @@ export default function TransportationPage() {
               Transform Your Transportation Operations
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join companies reducing costs by 25% and achieving 98% on-time delivery with LogiVox
+              Join companies reducing costs by 25% and achieving 98% on-time
+              delivery with LogiVox
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -475,5 +507,5 @@ export default function TransportationPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

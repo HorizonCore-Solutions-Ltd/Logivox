@@ -5,7 +5,12 @@
  * batch picking, and performance tracking
  */
 
-import { PrismaClient, WaveStatus, PickingStrategy, Prisma } from '@prisma/client';
+import {
+  PrismaClient,
+  WaveStatus,
+  PickingStrategy,
+  Prisma,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -99,7 +104,7 @@ export class WavePickingService {
    */
   private async generateWaveNumber(organizationId: string): Promise<string> {
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+    const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
 
     const lastWave = await prisma.wave.findFirst({
       where: {
@@ -109,17 +114,17 @@ export class WavePickingService {
         },
       },
       orderBy: {
-        waveNumber: 'desc',
+        waveNumber: "desc",
       },
     });
 
     let sequence = 1;
     if (lastWave) {
-      const lastSequence = parseInt(lastWave.waveNumber.split('-')[2]);
+      const lastSequence = parseInt(lastWave.waveNumber.split("-")[2]);
       sequence = lastSequence + 1;
     }
 
-    return `WAVE-${dateStr}-${sequence.toString().padStart(3, '0')}`;
+    return `WAVE-${dateStr}-${sequence.toString().padStart(3, "0")}`;
   }
 
   /**
@@ -128,13 +133,16 @@ export class WavePickingService {
   async createWave(
     organizationId: string,
     userId: string,
-    request: CreateWaveRequest
+    request: CreateWaveRequest,
   ): Promise<any> {
     // Get eligible sales orders
-    const eligibleOrders = await this.getEligibleOrders(organizationId, request);
+    const eligibleOrders = await this.getEligibleOrders(
+      organizationId,
+      request,
+    );
 
     if (eligibleOrders.length === 0) {
-      throw new Error('No eligible orders found for wave creation');
+      throw new Error("No eligible orders found for wave creation");
     }
 
     // Generate wave number
@@ -144,12 +152,13 @@ export class WavePickingService {
     const totalOrders = eligibleOrders.length;
     const totalLines = eligibleOrders.reduce(
       (sum, order) => sum + order.items.length,
-      0
+      0,
     );
     const totalUnits = eligibleOrders.reduce(
       (sum, order) =>
-        sum + order.items.reduce((s: number, item: any) => s + item.quantity, 0),
-      0
+        sum +
+        order.items.reduce((s: number, item: any) => s + item.quantity, 0),
+      0,
     );
 
     // Create wave
@@ -158,7 +167,7 @@ export class WavePickingService {
         organizationId,
         waveNumber,
         name: request.name || `Wave ${waveNumber}`,
-        status: 'PENDING',
+        status: "PENDING",
         strategy: request.strategy,
         totalOrders,
         totalLines,
@@ -180,7 +189,7 @@ export class WavePickingService {
       },
       data: {
         waveId: wave.id,
-        status: 'IN_WAVE',
+        status: "IN_WAVE",
       },
     });
 
@@ -206,11 +215,11 @@ export class WavePickingService {
    */
   private async getEligibleOrders(
     organizationId: string,
-    request: CreateWaveRequest
+    request: CreateWaveRequest,
   ): Promise<any[]> {
     const where: any = {
       organizationId,
-      status: 'RELEASED',
+      status: "RELEASED",
       waveId: null,
     };
 
@@ -241,9 +250,9 @@ export class WavePickingService {
         customer: true,
       },
       orderBy: [
-        { priority: 'desc' },
-        { promisedDate: 'asc' },
-        { createdAt: 'asc' },
+        { priority: "desc" },
+        { promisedDate: "asc" },
+        { createdAt: "asc" },
       ],
       take: request.maxOrdersPerWave || 100,
     });
@@ -257,7 +266,7 @@ export class WavePickingService {
   private async generatePickingTasks(
     waveId: string,
     orders: any[],
-    strategy: PickingStrategy
+    strategy: PickingStrategy,
   ): Promise<void> {
     const tasks: any[] = [];
 
@@ -267,7 +276,7 @@ export class WavePickingService {
         const location = await this.findBestPickLocation(
           item.productId,
           item.quantity,
-          strategy
+          strategy,
         );
 
         if (location) {
@@ -278,7 +287,7 @@ export class WavePickingService {
             productId: item.productId,
             locationId: location.id,
             quantityToPick: item.quantity,
-            status: 'PENDING',
+            status: "PENDING",
             priority: order.priority || 5,
           });
         }
@@ -297,7 +306,7 @@ export class WavePickingService {
   private async findBestPickLocation(
     productId: string,
     quantity: number,
-    strategy: PickingStrategy
+    strategy: PickingStrategy,
   ): Promise<any | null> {
     const locations = await prisma.inventoryLocation.findMany({
       where: {
@@ -312,11 +321,11 @@ export class WavePickingService {
         location: true,
       },
       orderBy:
-        strategy === 'FIFO'
-          ? { receivedDate: 'asc' }
-          : strategy === 'LIFO'
-          ? { receivedDate: 'desc' }
-          : { location: { sequenceNumber: 'asc' } }, // Zone-based
+        strategy === "FIFO"
+          ? { receivedDate: "asc" }
+          : strategy === "LIFO"
+            ? { receivedDate: "desc" }
+            : { location: { sequenceNumber: "asc" } }, // Zone-based
     });
 
     return locations[0]?.location || null;
@@ -328,7 +337,7 @@ export class WavePickingService {
   async optimizeWave(
     waveId: string,
     organizationId: string,
-    criteria: WaveOptimizationCriteria
+    criteria: WaveOptimizationCriteria,
   ): Promise<any> {
     const wave = await prisma.wave.findFirst({
       where: {
@@ -347,7 +356,7 @@ export class WavePickingService {
     });
 
     if (!wave) {
-      throw new Error('Wave not found');
+      throw new Error("Wave not found");
     }
 
     // Group tasks by picker assignment strategy
@@ -370,7 +379,7 @@ export class WavePickingService {
     await prisma.wave.update({
       where: { id: waveId },
       data: {
-        status: 'OPTIMIZED',
+        status: "OPTIMIZED",
       },
     });
 
@@ -385,18 +394,18 @@ export class WavePickingService {
    */
   private async assignTasks(
     tasks: any[],
-    criteria: WaveOptimizationCriteria
+    criteria: WaveOptimizationCriteria,
   ): Promise<PickerAssignment[]> {
     // Get available pickers
     const pickers = await prisma.user.findMany({
       where: {
-        role: 'PICKER',
+        role: "PICKER",
         isActive: true,
       },
     });
 
     if (pickers.length === 0) {
-      throw new Error('No pickers available');
+      throw new Error("No pickers available");
     }
 
     // Sort tasks by priority and location
@@ -405,9 +414,11 @@ export class WavePickingService {
         return b.priority - a.priority;
       }
       if (criteria.groupByZone && a.location?.zoneId !== b.location?.zoneId) {
-        return (a.location?.zoneId || '').localeCompare(b.location?.zoneId || '');
+        return (a.location?.zoneId || "").localeCompare(
+          b.location?.zoneId || "",
+        );
       }
-      return (a.location?.name || '').localeCompare(b.location?.name || '');
+      return (a.location?.name || "").localeCompare(b.location?.name || "");
     });
 
     // Distribute tasks across pickers
@@ -418,13 +429,16 @@ export class WavePickingService {
       const picker = pickers[i];
       const pickerTasks = sortedTasks.slice(
         i * tasksPerPicker,
-        (i + 1) * tasksPerPicker
+        (i + 1) * tasksPerPicker,
       );
 
       if (pickerTasks.length === 0) continue;
 
       const totalLines = pickerTasks.length;
-      const totalUnits = pickerTasks.reduce((sum, t) => sum + t.quantityToPick, 0);
+      const totalUnits = pickerTasks.reduce(
+        (sum, t) => sum + t.quantityToPick,
+        0,
+      );
       const estimatedTime = Math.ceil(totalUnits * 0.5); // 30 seconds per unit
 
       assignments.push({
@@ -439,7 +453,7 @@ export class WavePickingService {
           taskId: t.id,
           orderId: t.salesOrderId,
           productId: t.productId,
-          location: t.location?.name || '',
+          location: t.location?.name || "",
           quantity: t.quantityToPick,
           sequenceNumber: idx + 1,
         })),
@@ -455,7 +469,7 @@ export class WavePickingService {
   async startWave(
     waveId: string,
     organizationId: string,
-    userId: string
+    userId: string,
   ): Promise<any> {
     const wave = await prisma.wave.findFirst({
       where: {
@@ -465,17 +479,17 @@ export class WavePickingService {
     });
 
     if (!wave) {
-      throw new Error('Wave not found');
+      throw new Error("Wave not found");
     }
 
-    if (wave.status !== 'PENDING' && wave.status !== 'OPTIMIZED') {
-      throw new Error('Wave must be pending or optimized to start');
+    if (wave.status !== "PENDING" && wave.status !== "OPTIMIZED") {
+      throw new Error("Wave must be pending or optimized to start");
     }
 
     return await prisma.wave.update({
       where: { id: waveId },
       data: {
-        status: 'IN_PROGRESS',
+        status: "IN_PROGRESS",
         startedAt: new Date(),
         startedById: userId,
       },
@@ -499,7 +513,7 @@ export class WavePickingService {
       batchNumber?: string;
       serialNumber?: string;
       notes?: string;
-    }
+    },
   ): Promise<any> {
     const task = await prisma.pickingTask.findFirst({
       where: {
@@ -515,14 +529,14 @@ export class WavePickingService {
     });
 
     if (!task) {
-      throw new Error('Picking task not found');
+      throw new Error("Picking task not found");
     }
 
     // Update task
     const updatedTask = await prisma.pickingTask.update({
       where: { id: taskId },
       data: {
-        status: 'COMPLETED',
+        status: "COMPLETED",
         quantityPicked: data.quantityPicked,
         pickedAt: new Date(),
         pickedById: userId,
@@ -556,7 +570,7 @@ export class WavePickingService {
     const incompleteTasks = await prisma.pickingTask.count({
       where: {
         waveId,
-        status: { not: 'COMPLETED' },
+        status: { not: "COMPLETED" },
       },
     });
 
@@ -564,7 +578,7 @@ export class WavePickingService {
       await prisma.wave.update({
         where: { id: waveId },
         data: {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           completedAt: new Date(),
         },
       });
@@ -572,7 +586,7 @@ export class WavePickingService {
       // Update orders to PICKED
       await prisma.salesOrder.updateMany({
         where: { waveId },
-        data: { status: 'PICKED' },
+        data: { status: "PICKED" },
       });
     }
   }
@@ -583,13 +597,13 @@ export class WavePickingService {
   async calculatePickingRoute(
     waveId: string,
     pickerId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<OptimizedRoute> {
     const tasks = await prisma.pickingTask.findMany({
       where: {
         waveId,
         assignedToId: pickerId,
-        status: 'PENDING',
+        status: "PENDING",
         wave: {
           organizationId,
         },
@@ -599,13 +613,13 @@ export class WavePickingService {
         location: true,
         salesOrder: true,
       },
-      orderBy: [{ priority: 'desc' }, { sequenceNumber: 'asc' }],
+      orderBy: [{ priority: "desc" }, { sequenceNumber: "asc" }],
     });
 
     // Simple route optimization (would use more sophisticated algorithm)
     const sortedTasks = [...tasks].sort((a, b) => {
-      const locA = a.location?.name || '';
-      const locB = b.location?.name || '';
+      const locA = a.location?.name || "";
+      const locB = b.location?.name || "";
       return locA.localeCompare(locB);
     });
 
@@ -618,9 +632,9 @@ export class WavePickingService {
       totalTime,
       pickSequence: sortedTasks.map((task, idx) => ({
         sequenceNumber: idx + 1,
-        location: task.location?.name || '',
+        location: task.location?.name || "",
         productId: task.productId,
-        productName: task.product?.name || '',
+        productName: task.product?.name || "",
         quantity: task.quantityToPick,
         orderId: task.salesOrderId,
       })),
@@ -633,7 +647,7 @@ export class WavePickingService {
   async getWavePickingMetrics(
     organizationId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<WavePickingMetrics> {
     const dateFilter: any = { organizationId };
 
@@ -647,11 +661,11 @@ export class WavePickingService {
     const totalWaves = await prisma.wave.count({ where: dateFilter });
 
     const activeWaves = await prisma.wave.count({
-      where: { ...dateFilter, status: 'IN_PROGRESS' },
+      where: { ...dateFilter, status: "IN_PROGRESS" },
     });
 
     const completedWaves = await prisma.wave.count({
-      where: { ...dateFilter, status: 'COMPLETED' },
+      where: { ...dateFilter, status: "COMPLETED" },
     });
 
     // Aggregate statistics
@@ -668,9 +682,7 @@ export class WavePickingService {
     const totalUnits = waves.reduce((sum, w) => sum + (w.totalUnits || 0), 0);
 
     // Calculate average picks per hour
-    const completedWithTime = waves.filter(
-      (w) => w.startedAt && w.completedAt
-    );
+    const completedWithTime = waves.filter((w) => w.startedAt && w.completedAt);
     const totalHours = completedWithTime.reduce((sum, w) => {
       const start = w.startedAt!.getTime();
       const end = w.completedAt!.getTime();
@@ -692,9 +704,9 @@ export class WavePickingService {
 
     // Top pickers
     const pickerStats = await prisma.pickingTask.groupBy({
-      by: ['pickedById'],
+      by: ["pickedById"],
       where: {
-        status: 'COMPLETED',
+        status: "COMPLETED",
         wave: dateFilter,
       },
       _count: { id: true },
@@ -711,12 +723,12 @@ export class WavePickingService {
 
         return {
           pickerId: stat.pickedById,
-          pickerName: picker?.name || 'Unknown',
+          pickerName: picker?.name || "Unknown",
           totalPicks: stat._count.id,
           accuracy: 98, // Placeholder
           avgPicksPerHour: 45, // Placeholder
         };
-      })
+      }),
     );
 
     // Recent waves
@@ -730,7 +742,7 @@ export class WavePickingService {
         startedAt: true,
         completedAt: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 10,
     });
 
@@ -794,7 +806,7 @@ export class WavePickingService {
       search?: string;
       page?: number;
       limit?: number;
-    }
+    },
   ): Promise<{ waves: any[]; total: number; page: number; pages: number }> {
     const page = filters.page || 1;
     const limit = filters.limit || 20;
@@ -812,8 +824,8 @@ export class WavePickingService {
 
     if (filters.search) {
       where.OR = [
-        { waveNumber: { contains: filters.search, mode: 'insensitive' } },
-        { name: { contains: filters.search, mode: 'insensitive' } },
+        { waveNumber: { contains: filters.search, mode: "insensitive" } },
+        { name: { contains: filters.search, mode: "insensitive" } },
       ];
     }
 
@@ -824,11 +836,11 @@ export class WavePickingService {
         include: {
           orders: true,
           pickingTasks: {
-            where: { status: { not: 'COMPLETED' } },
+            where: { status: { not: "COMPLETED" } },
           },
           createdBy: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
@@ -848,7 +860,7 @@ export class WavePickingService {
   async cancelWave(
     waveId: string,
     organizationId: string,
-    reason: string
+    reason: string,
   ): Promise<any> {
     const wave = await prisma.wave.findFirst({
       where: {
@@ -858,18 +870,18 @@ export class WavePickingService {
     });
 
     if (!wave) {
-      throw new Error('Wave not found');
+      throw new Error("Wave not found");
     }
 
-    if (wave.status === 'COMPLETED') {
-      throw new Error('Cannot cancel completed wave');
+    if (wave.status === "COMPLETED") {
+      throw new Error("Cannot cancel completed wave");
     }
 
     // Update wave
     await prisma.wave.update({
       where: { id: waveId },
       data: {
-        status: 'CANCELLED',
+        status: "CANCELLED",
         notes: `Cancelled: ${reason}`,
       },
     });
@@ -879,7 +891,7 @@ export class WavePickingService {
       where: { waveId },
       data: {
         waveId: null,
-        status: 'RELEASED',
+        status: "RELEASED",
       },
     });
 
@@ -887,7 +899,7 @@ export class WavePickingService {
     await prisma.pickingTask.deleteMany({
       where: {
         waveId,
-        status: 'PENDING',
+        status: "PENDING",
       },
     });
 

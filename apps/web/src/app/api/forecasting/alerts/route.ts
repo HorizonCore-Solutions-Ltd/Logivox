@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -14,7 +14,10 @@ export async function GET(request: NextRequest) {
     // Use first organization as tenant
     const tenantId = session.user.organizations[0]?.id;
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     const alerts = await generateReorderAlerts(tenantId);
@@ -24,7 +27,7 @@ export async function GET(request: NextRequest) {
     console.error("Error generating reorder alerts:", error);
     return NextResponse.json(
       { error: "Failed to generate alerts" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

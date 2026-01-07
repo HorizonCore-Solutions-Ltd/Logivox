@@ -5,7 +5,7 @@
  * data synchronization, and third-party integrations
  */
 
-import { PrismaClient, IntegrationStatus, Prisma } from '@prisma/client';
+import { PrismaClient, IntegrationStatus, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -26,22 +26,22 @@ export interface IntegrationConfig {
 }
 
 export type IntegrationType =
-  | 'ERP'
-  | 'ECOMMERCE'
-  | 'SHIPPING_CARRIER'
-  | 'ACCOUNTING'
-  | '3PL'
-  | 'MARKETPLACE'
-  | 'CRM'
-  | 'PAYMENT'
-  | 'CUSTOM';
+  | "ERP"
+  | "ECOMMERCE"
+  | "SHIPPING_CARRIER"
+  | "ACCOUNTING"
+  | "3PL"
+  | "MARKETPLACE"
+  | "CRM"
+  | "PAYMENT"
+  | "CUSTOM";
 
 export interface WebhookEvent {
   id: string;
   integrationId: string;
   eventType: string;
   payload: any;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
   attempts: number;
   lastAttemptAt?: Date;
   error?: string;
@@ -52,9 +52,9 @@ export interface SyncJob {
   id: string;
   integrationId: string;
   integrationName: string;
-  direction: 'INBOUND' | 'OUTBOUND' | 'BIDIRECTIONAL';
+  direction: "INBOUND" | "OUTBOUND" | "BIDIRECTIONAL";
   entityType: string;
-  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED';
+  status: "PENDING" | "RUNNING" | "COMPLETED" | "FAILED";
   totalRecords: number;
   processedRecords: number;
   failedRecords: number;
@@ -80,7 +80,7 @@ export interface IntegrationMetrics {
     status: IntegrationStatus;
     lastSyncAt?: Date;
     errorCount: number;
-    health: 'HEALTHY' | 'DEGRADED' | 'UNHEALTHY';
+    health: "HEALTHY" | "DEGRADED" | "UNHEALTHY";
   }>;
   recentActivity: Array<{
     id: string;
@@ -109,7 +109,7 @@ export class IntegrationService {
   async createIntegration(
     organizationId: string,
     userId: string,
-    config: IntegrationConfig
+    config: IntegrationConfig,
   ): Promise<any> {
     // Validate credentials
     await this.validateCredentials(config.type, config.credentials);
@@ -125,7 +125,7 @@ export class IntegrationService {
         credentials: JSON.stringify(config.credentials),
         settings: config.settings ? JSON.stringify(config.settings) : null,
         webhookUrl: config.webhookUrl,
-        status: 'ACTIVE',
+        status: "ACTIVE",
         createdById: userId,
       },
     });
@@ -141,21 +141,21 @@ export class IntegrationService {
    */
   private async validateCredentials(
     type: IntegrationType,
-    credentials: any
+    credentials: any,
   ): Promise<boolean> {
     // Would implement actual credential validation
     // Make test API call to verify credentials
 
     switch (type) {
-      case 'ERP':
+      case "ERP":
         // Validate ERP credentials
         return true;
 
-      case 'ECOMMERCE':
+      case "ECOMMERCE":
         // Validate e-commerce platform credentials
         return true;
 
-      case 'SHIPPING_CARRIER':
+      case "SHIPPING_CARRIER":
         // Validate carrier credentials
         return true;
 
@@ -192,7 +192,7 @@ export class IntegrationService {
   async handleWebhook(
     integrationId: string,
     eventType: string,
-    payload: any
+    payload: any,
   ): Promise<WebhookEvent> {
     // Create webhook event
     const event = await prisma.webhookEvent.create({
@@ -200,7 +200,7 @@ export class IntegrationService {
         integrationId,
         eventType,
         payload: JSON.stringify(payload),
-        status: 'PENDING',
+        status: "PENDING",
         attempts: 0,
       },
     });
@@ -215,7 +215,7 @@ export class IntegrationService {
       integrationId: event.integrationId,
       eventType: event.eventType,
       payload,
-      status: event.status as 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED',
+      status: event.status as "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED",
       attempts: event.attempts,
       createdAt: event.createdAt,
     };
@@ -239,7 +239,7 @@ export class IntegrationService {
       await prisma.webhookEvent.update({
         where: { id: eventId },
         data: {
-          status: 'PROCESSING',
+          status: "PROCESSING",
           attempts: event.attempts + 1,
           lastAttemptAt: new Date(),
         },
@@ -249,15 +249,15 @@ export class IntegrationService {
       const payload = JSON.parse(event.payload);
 
       switch (event.eventType) {
-        case 'order.created':
+        case "order.created":
           await this.handleOrderCreated(event.integration, payload);
           break;
 
-        case 'inventory.updated':
+        case "inventory.updated":
           await this.handleInventoryUpdated(event.integration, payload);
           break;
 
-        case 'shipment.updated':
+        case "shipment.updated":
           await this.handleShipmentUpdated(event.integration, payload);
           break;
 
@@ -268,14 +268,14 @@ export class IntegrationService {
       // Mark as completed
       await prisma.webhookEvent.update({
         where: { id: eventId },
-        data: { status: 'COMPLETED' },
+        data: { status: "COMPLETED" },
       });
     } catch (error: any) {
       // Mark as failed
       await prisma.webhookEvent.update({
         where: { id: eventId },
         data: {
-          status: 'FAILED',
+          status: "FAILED",
           error: error.message,
         },
       });
@@ -290,26 +290,35 @@ export class IntegrationService {
   /**
    * Handle order created webhook
    */
-  private async handleOrderCreated(integration: any, payload: any): Promise<void> {
+  private async handleOrderCreated(
+    integration: any,
+    payload: any,
+  ): Promise<void> {
     // Transform external order to internal format
     // Create sales order in WMS
-    console.log('Processing order.created webhook');
+    console.log("Processing order.created webhook");
   }
 
   /**
    * Handle inventory updated webhook
    */
-  private async handleInventoryUpdated(integration: any, payload: any): Promise<void> {
+  private async handleInventoryUpdated(
+    integration: any,
+    payload: any,
+  ): Promise<void> {
     // Update inventory levels
-    console.log('Processing inventory.updated webhook');
+    console.log("Processing inventory.updated webhook");
   }
 
   /**
    * Handle shipment updated webhook
    */
-  private async handleShipmentUpdated(integration: any, payload: any): Promise<void> {
+  private async handleShipmentUpdated(
+    integration: any,
+    payload: any,
+  ): Promise<void> {
     // Update shipment tracking
-    console.log('Processing shipment.updated webhook');
+    console.log("Processing shipment.updated webhook");
   }
 
   /**
@@ -319,10 +328,10 @@ export class IntegrationService {
     integrationId: string,
     organizationId: string,
     options: {
-      direction: 'INBOUND' | 'OUTBOUND' | 'BIDIRECTIONAL';
+      direction: "INBOUND" | "OUTBOUND" | "BIDIRECTIONAL";
       entityType: string;
       filters?: Record<string, any>;
-    }
+    },
   ): Promise<SyncJob> {
     const integration = await prisma.integration.findFirst({
       where: {
@@ -332,11 +341,11 @@ export class IntegrationService {
     });
 
     if (!integration) {
-      throw new Error('Integration not found');
+      throw new Error("Integration not found");
     }
 
     if (!integration.isActive) {
-      throw new Error('Integration is not active');
+      throw new Error("Integration is not active");
     }
 
     // Create sync job
@@ -346,7 +355,7 @@ export class IntegrationService {
         direction: options.direction,
         entityType: options.entityType,
         filters: options.filters ? JSON.stringify(options.filters) : null,
-        status: 'PENDING',
+        status: "PENDING",
         totalRecords: 0,
         processedRecords: 0,
         failedRecords: 0,
@@ -362,9 +371,9 @@ export class IntegrationService {
       id: job.id,
       integrationId: job.integrationId,
       integrationName: integration.name,
-      direction: job.direction as 'INBOUND' | 'OUTBOUND' | 'BIDIRECTIONAL',
+      direction: job.direction as "INBOUND" | "OUTBOUND" | "BIDIRECTIONAL",
       entityType: job.entityType,
-      status: job.status as 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED',
+      status: job.status as "PENDING" | "RUNNING" | "COMPLETED" | "FAILED",
       totalRecords: job.totalRecords,
       processedRecords: job.processedRecords,
       failedRecords: job.failedRecords,
@@ -389,7 +398,7 @@ export class IntegrationService {
       await prisma.syncJob.update({
         where: { id: jobId },
         data: {
-          status: 'RUNNING',
+          status: "RUNNING",
           startedAt: new Date(),
         },
       });
@@ -398,11 +407,11 @@ export class IntegrationService {
       let totalRecords = 0;
       let processedRecords = 0;
 
-      if (job.direction === 'INBOUND' || job.direction === 'BIDIRECTIONAL') {
+      if (job.direction === "INBOUND" || job.direction === "BIDIRECTIONAL") {
         // Fetch data from external system
         const externalData = await this.fetchExternalData(
           job.integration,
-          job.entityType
+          job.entityType,
         );
 
         totalRecords = externalData.length;
@@ -413,16 +422,16 @@ export class IntegrationService {
             await this.importRecord(job.integration, job.entityType, record);
             processedRecords++;
           } catch (error) {
-            console.error('Error importing record:', error);
+            console.error("Error importing record:", error);
           }
         }
       }
 
-      if (job.direction === 'OUTBOUND' || job.direction === 'BIDIRECTIONAL') {
+      if (job.direction === "OUTBOUND" || job.direction === "BIDIRECTIONAL") {
         // Export data to external system
         const internalData = await this.fetchInternalData(
           job.integration.organizationId,
-          job.entityType
+          job.entityType,
         );
 
         totalRecords += internalData.length;
@@ -432,7 +441,7 @@ export class IntegrationService {
             await this.exportRecord(job.integration, job.entityType, record);
             processedRecords++;
           } catch (error) {
-            console.error('Error exporting record:', error);
+            console.error("Error exporting record:", error);
           }
         }
       }
@@ -441,7 +450,7 @@ export class IntegrationService {
       await prisma.syncJob.update({
         where: { id: jobId },
         data: {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           completedAt: new Date(),
           totalRecords,
           processedRecords,
@@ -461,7 +470,7 @@ export class IntegrationService {
       await prisma.syncJob.update({
         where: { id: jobId },
         data: {
-          status: 'FAILED',
+          status: "FAILED",
           completedAt: new Date(),
           error: error.message,
         },
@@ -471,7 +480,7 @@ export class IntegrationService {
       await prisma.integration.update({
         where: { id: job.integrationId },
         data: {
-          status: 'ERROR',
+          status: "ERROR",
         },
       });
     }
@@ -482,7 +491,7 @@ export class IntegrationService {
    */
   private async fetchExternalData(
     integration: any,
-    entityType: string
+    entityType: string,
   ): Promise<any[]> {
     // Would make API call to external system
     // Return mock data for now
@@ -494,22 +503,22 @@ export class IntegrationService {
    */
   private async fetchInternalData(
     organizationId: string,
-    entityType: string
+    entityType: string,
   ): Promise<any[]> {
     switch (entityType) {
-      case 'products':
+      case "products":
         return await prisma.product.findMany({
           where: { organizationId },
           take: 100,
         });
 
-      case 'orders':
+      case "orders":
         return await prisma.salesOrder.findMany({
           where: { organizationId },
           take: 100,
         });
 
-      case 'inventory':
+      case "inventory":
         return await prisma.inventoryLocation.findMany({
           where: {
             location: {
@@ -530,7 +539,7 @@ export class IntegrationService {
   private async importRecord(
     integration: any,
     entityType: string,
-    record: any
+    record: any,
   ): Promise<void> {
     // Transform and import based on entity type
     console.log(`Importing ${entityType} record`);
@@ -542,7 +551,7 @@ export class IntegrationService {
   private async exportRecord(
     integration: any,
     entityType: string,
-    record: any
+    record: any,
   ): Promise<void> {
     // Transform and export based on entity type
     console.log(`Exporting ${entityType} record`);
@@ -554,7 +563,7 @@ export class IntegrationService {
   async getIntegrationMetrics(
     organizationId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<IntegrationMetrics> {
     // Total integrations
     const totalIntegrations = await prisma.integration.count({
@@ -584,18 +593,19 @@ export class IntegrationService {
     const successfulSyncs = await prisma.syncJob.count({
       where: {
         ...dateFilter,
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
     });
 
     const failedSyncs = await prisma.syncJob.count({
       where: {
         ...dateFilter,
-        status: 'FAILED',
+        status: "FAILED",
       },
     });
 
-    const successRate = totalSyncJobs > 0 ? (successfulSyncs / totalSyncJobs) * 100 : 0;
+    const successRate =
+      totalSyncJobs > 0 ? (successfulSyncs / totalSyncJobs) * 100 : 0;
 
     // Webhooks
     const totalWebhooks = await prisma.webhookEvent.count({
@@ -609,7 +619,7 @@ export class IntegrationService {
       where: {
         integration: { organizationId },
         ...dateFilter,
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
     });
 
@@ -621,7 +631,7 @@ export class IntegrationService {
       where: { organizationId },
       include: {
         syncJobs: {
-          where: { status: 'FAILED' },
+          where: { status: "FAILED" },
           take: 10,
         },
       },
@@ -630,9 +640,9 @@ export class IntegrationService {
     const integrationHealth = integrations.map((integration) => {
       const errorCount = integration.syncJobs.length;
 
-      let health: 'HEALTHY' | 'DEGRADED' | 'UNHEALTHY' = 'HEALTHY';
-      if (errorCount >= 5) health = 'UNHEALTHY';
-      else if (errorCount >= 2) health = 'DEGRADED';
+      let health: "HEALTHY" | "DEGRADED" | "UNHEALTHY" = "HEALTHY";
+      if (errorCount >= 5) health = "UNHEALTHY";
+      else if (errorCount >= 2) health = "DEGRADED";
 
       return {
         integrationId: integration.id,
@@ -648,7 +658,7 @@ export class IntegrationService {
     // Recent activity
     const recentSyncs = await prisma.syncJob.findMany({
       where: { integration: { organizationId } },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 10,
       include: {
         integration: true,
@@ -681,7 +691,10 @@ export class IntegrationService {
   /**
    * Test integration connection
    */
-  async testConnection(integrationId: string, organizationId: string): Promise<{
+  async testConnection(
+    integrationId: string,
+    organizationId: string,
+  ): Promise<{
     success: boolean;
     message: string;
     responseTime: number;
@@ -694,7 +707,7 @@ export class IntegrationService {
     });
 
     if (!integration) {
-      throw new Error('Integration not found');
+      throw new Error("Integration not found");
     }
 
     const startTime = Date.now();
@@ -708,7 +721,7 @@ export class IntegrationService {
 
       return {
         success: true,
-        message: 'Connection successful',
+        message: "Connection successful",
         responseTime,
       };
     } catch (error: any) {
@@ -726,7 +739,7 @@ export class IntegrationService {
   async updateIntegration(
     integrationId: string,
     organizationId: string,
-    updates: Partial<IntegrationConfig>
+    updates: Partial<IntegrationConfig>,
   ): Promise<any> {
     const integration = await prisma.integration.findFirst({
       where: {
@@ -736,7 +749,7 @@ export class IntegrationService {
     });
 
     if (!integration) {
-      throw new Error('Integration not found');
+      throw new Error("Integration not found");
     }
 
     return await prisma.integration.update({
@@ -758,7 +771,7 @@ export class IntegrationService {
    */
   async deleteIntegration(
     integrationId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<void> {
     const integration = await prisma.integration.findFirst({
       where: {
@@ -768,7 +781,7 @@ export class IntegrationService {
     });
 
     if (!integration) {
-      throw new Error('Integration not found');
+      throw new Error("Integration not found");
     }
 
     // Delete related records
@@ -791,7 +804,7 @@ export class IntegrationService {
    */
   async getIntegrationById(
     integrationId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<any> {
     return await prisma.integration.findFirst({
       where: {
@@ -800,11 +813,11 @@ export class IntegrationService {
       },
       include: {
         syncJobs: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 10,
         },
         webhookEvents: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           take: 10,
         },
       },
@@ -819,7 +832,7 @@ export class IntegrationService {
     filters?: {
       type?: IntegrationType;
       isActive?: boolean;
-    }
+    },
   ): Promise<any[]> {
     const where: any = { organizationId };
 
@@ -828,7 +841,7 @@ export class IntegrationService {
 
     return await prisma.integration.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 }

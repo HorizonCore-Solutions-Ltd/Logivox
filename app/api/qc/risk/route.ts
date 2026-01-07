@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import RiskService from '@/lib/services/risk.service';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import RiskService from "@/lib/services/risk.service";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -11,23 +11,22 @@ const prisma = new PrismaClient();
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId') || 'org-1';
+    const organizationId = searchParams.get("organizationId") || "org-1";
 
     const risks = await prisma.riskRegister.findMany({
       where: { organizationId },
-      orderBy: { rpn: 'desc' }
+      orderBy: { rpn: "desc" },
     });
 
     return NextResponse.json({
       success: true,
-      data: risks
+      data: risks,
     });
-
   } catch (error: any) {
-    console.error('Get risks error:', error);
+    console.error("Get risks error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get risks' },
-      { status: 500 }
+      { error: error.message || "Failed to get risks" },
+      { status: 500 },
     );
   }
 }
@@ -50,19 +49,18 @@ export async function POST(request: Request) {
       occurrence: body.occurrence,
       detection: body.detection,
       owner: body.owner,
-      createdBy: body.createdBy
+      createdBy: body.createdBy,
     });
 
     return NextResponse.json({
       success: true,
-      data: risk
+      data: risk,
     });
-
   } catch (error: any) {
-    console.error('Create risk error:', error);
+    console.error("Create risk error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create risk' },
-      { status: 500 }
+      { error: error.message || "Failed to create risk" },
+      { status: 500 },
     );
   }
 }

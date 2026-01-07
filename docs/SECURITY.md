@@ -1,14 +1,17 @@
 # Security Implementation Guide
 
 ## Overview
+
 This document describes the comprehensive security features implemented in LogiVox WMS to protect against common vulnerabilities and attacks.
 
 ## Security Features
 
 ### 1. Rate Limiting
+
 **Purpose:** Prevent brute force attacks and API abuse
 
 **Implementation:**
+
 - Redis-based distributed rate limiting
 - Memory store fallback for development
 - Different limits for different endpoint types:
@@ -19,8 +22,9 @@ This document describes the comprehensive security features implemented in LogiV
   - Password reset: 3 requests per hour
 
 **Usage:**
+
 ```typescript
-import { rateLimit, RateLimitPresets } from '@/lib/middleware/rate-limiter';
+import { rateLimit, RateLimitPresets } from "@/lib/middleware/rate-limiter";
 
 // In API route
 const limitCheck = await rateLimit(req, RateLimitPresets.API);
@@ -30,29 +34,34 @@ if (limitCheck?.status === 429) {
 ```
 
 ### 2. Security Headers
+
 **Purpose:** Protect against XSS, clickjacking, and other attacks
 
 **Headers Applied:**
+
 - **Content-Security-Policy:** Restricts resource loading
 - **Strict-Transport-Security (HSTS):** Forces HTTPS
 - **X-Frame-Options:** Prevents clickjacking
 - **X-Content-Type-Options:** Prevents MIME sniffing
 - **Referrer-Policy:** Controls referrer information
 - **Permissions-Policy:** Restricts browser features
-- **Cross-Origin-*-Policy:** Controls cross-origin behavior
+- **Cross-Origin-\*-Policy:** Controls cross-origin behavior
 
 **Configuration:**
+
 ```typescript
-import { securityHeaders } from '@/lib/middleware/security-headers';
+import { securityHeaders } from "@/lib/middleware/security-headers";
 
 // Apply to all responses
 const response = securityHeaders()(req);
 ```
 
 ### 3. Input Sanitization
+
 **Purpose:** Prevent XSS and injection attacks
 
 **Functions:**
+
 - `sanitizeHtml()`: Clean HTML while allowing safe tags
 - `stripHtml()`: Remove all HTML tags
 - `sanitizeSql()`: Remove SQL injection patterns
@@ -62,17 +71,20 @@ const response = securityHeaders()(req);
 - `sanitizeObject()`: Recursive object sanitization
 
 **Usage:**
+
 ```typescript
-import { sanitizeHtml, stripHtml } from '@/lib/security/sanitization';
+import { sanitizeHtml, stripHtml } from "@/lib/security/sanitization";
 
 const cleanDescription = sanitizeHtml(userInput);
 const plainText = stripHtml(userInput);
 ```
 
 ### 4. Authentication Security
+
 **Purpose:** Secure password handling and token management
 
 **Features:**
+
 - Bcrypt password hashing (12 rounds)
 - Password strength validation
 - Common password detection
@@ -84,8 +96,13 @@ const plainText = stripHtml(userInput);
 - Constant-time string comparison
 
 **Usage:**
+
 ```typescript
-import { hashPassword, verifyPassword, checkPasswordStrength } from '@/lib/security/authentication';
+import {
+  hashPassword,
+  verifyPassword,
+  checkPasswordStrength,
+} from "@/lib/security/authentication";
 
 // Hash password
 const hash = await hashPassword(password);
@@ -98,9 +115,11 @@ const { valid, errors } = checkPasswordStrength(password);
 ```
 
 ### 5. Authorization & RBAC
+
 **Purpose:** Role-based access control
 
 **Roles:**
+
 - ADMIN: Full system access
 - WAREHOUSE_MANAGER: Warehouse operations
 - WAREHOUSE_OPERATOR: Basic operations
@@ -110,6 +129,7 @@ const { valid, errors } = checkPasswordStrength(password);
 - VIEWER: Read-only access
 
 **Permissions:**
+
 - Inventory: view, create, edit, delete, adjust
 - Orders: view, create, edit, delete, approve, cancel
 - Warehouse: view, manage, location.manage, wave.create
@@ -118,8 +138,9 @@ const { valid, errors } = checkPasswordStrength(password);
 - System: settings.view, settings.manage, audit.view
 
 **Usage:**
+
 ```typescript
-import { authorize, Permission } from '@/lib/middleware/authorization';
+import { authorize, Permission } from "@/lib/middleware/authorization";
 
 // Check permission
 const authCheck = await authorize(req, {
@@ -129,17 +150,20 @@ if (authCheck) return authCheck; // 403 Forbidden
 ```
 
 ### 6. CSRF Protection
+
 **Purpose:** Prevent Cross-Site Request Forgery attacks
 
 **Implementation:**
+
 - Token-based protection
 - Cookie + header verification
 - Automatic token generation
 - Exempt safe methods (GET, HEAD, OPTIONS)
 
 **Usage:**
+
 ```typescript
-import { csrfProtection } from '@/lib/middleware/csrf-protection';
+import { csrfProtection } from "@/lib/middleware/csrf-protection";
 
 // Apply to mutation endpoints
 const csrfCheck = await csrfProtection(req);
@@ -149,24 +173,27 @@ if (csrfCheck?.status === 403) {
 ```
 
 **Client-side:**
+
 ```typescript
 // Get CSRF token
-const response = await fetch('/api/csrf-token');
+const response = await fetch("/api/csrf-token");
 const { token } = await response.json();
 
 // Include in requests
-await fetch('/api/endpoint', {
-  method: 'POST',
+await fetch("/api/endpoint", {
+  method: "POST",
   headers: {
-    'X-CSRF-Token': token,
+    "X-CSRF-Token": token,
   },
 });
 ```
 
 ### 7. Audit Logging
+
 **Purpose:** Track all important system events
 
 **Event Types:**
+
 - Authentication: login, logout, failed attempts
 - User management: create, update, delete, role changes
 - Inventory: create, update, delete, adjustments
@@ -175,14 +202,15 @@ await fetch('/api/endpoint', {
 - System: settings changes, exports, backups
 
 **Usage:**
+
 ```typescript
-import { logAuditEvent, AuditEventType } from '@/lib/security/audit-logging';
+import { logAuditEvent, AuditEventType } from "@/lib/security/audit-logging";
 
 await logAuditEvent({
   eventType: AuditEventType.INVENTORY_CREATED,
   userId: user.id,
   userName: user.name,
-  resource: 'inventory',
+  resource: "inventory",
   resourceId: item.id,
   success: true,
 });
@@ -191,6 +219,7 @@ await logAuditEvent({
 ## Security Best Practices
 
 ### Password Requirements
+
 - Minimum 8 characters
 - At least one uppercase letter
 - At least one lowercase letter
@@ -199,12 +228,14 @@ await logAuditEvent({
 - Not in common passwords list
 
 ### Session Management
+
 - 24-hour session expiry
 - Secure, HTTP-only cookies
 - SameSite=Lax for CSRF protection
 - Session rotation on privilege escalation
 
 ### API Security
+
 - Always use HTTPS in production
 - Include authentication tokens in headers
 - Validate all input data
@@ -212,6 +243,7 @@ await logAuditEvent({
 - Implement request signing for sensitive operations
 
 ### File Upload Security
+
 - Validate file types and sizes
 - Scan uploads for malware
 - Store files outside web root
@@ -219,6 +251,7 @@ await logAuditEvent({
 - Implement access controls
 
 ### Database Security
+
 - Use Prisma ORM (prevents SQL injection)
 - Implement row-level security
 - Encrypt sensitive data at rest
@@ -228,6 +261,7 @@ await logAuditEvent({
 ## Environment Variables
 
 **Required:**
+
 ```env
 DATABASE_URL=
 NEXTAUTH_SECRET=
@@ -237,6 +271,7 @@ UPSTASH_REDIS_REST_TOKEN=
 ```
 
 **Recommended:**
+
 ```env
 SMTP_HOST=
 SMTP_USER=
@@ -247,6 +282,7 @@ SENTRY_DSN=
 ## Security Checklist
 
 ### Before Deployment
+
 - [ ] Update all secrets and tokens
 - [ ] Enable HTTPS/TLS
 - [ ] Configure Redis for rate limiting
@@ -259,6 +295,7 @@ SENTRY_DSN=
 - [ ] Set up monitoring and alerts
 
 ### Regular Maintenance
+
 - [ ] Review audit logs weekly
 - [ ] Update dependencies monthly
 - [ ] Rotate secrets quarterly
@@ -269,6 +306,7 @@ SENTRY_DSN=
 ## Incident Response
 
 ### If Security Breach Detected:
+
 1. **Contain:** Disable affected accounts/features
 2. **Investigate:** Review audit logs for attack vector
 3. **Remediate:** Patch vulnerability
@@ -277,6 +315,7 @@ SENTRY_DSN=
 6. **Document:** Record incident details
 
 ### Emergency Contacts:
+
 - Security Team: security@yourcompany.com
 - DevOps: devops@yourcompany.com
 - Management: cto@yourcompany.com
@@ -291,6 +330,7 @@ SENTRY_DSN=
 ## Support
 
 For security concerns or questions:
+
 - Email: security@yourcompany.com
 - Internal Wiki: https://wiki.yourcompany.com/security
 - Slack: #security-team

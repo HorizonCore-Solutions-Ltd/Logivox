@@ -3,13 +3,19 @@
  * Real-time system metrics and health monitoring
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Activity,
   Server,
@@ -25,32 +31,32 @@ import {
   Users,
   ShoppingCart,
   Package,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface SystemMetrics {
   server: {
-    status: 'healthy' | 'degraded' | 'down';
+    status: "healthy" | "degraded" | "down";
     uptime: number;
     cpu: number;
     memory: number;
     disk: number;
   };
   database: {
-    status: 'healthy' | 'degraded' | 'down';
+    status: "healthy" | "degraded" | "down";
     connections: number;
     maxConnections: number;
     queryTime: number;
     size: number;
   };
   cache: {
-    status: 'healthy' | 'degraded' | 'down';
+    status: "healthy" | "degraded" | "down";
     hitRate: number;
     memoryUsed: number;
     memoryMax: number;
     keys: number;
   };
   api: {
-    status: 'healthy' | 'degraded' | 'down';
+    status: "healthy" | "degraded" | "down";
     requestsPerMinute: number;
     averageResponseTime: number;
     errorRate: number;
@@ -76,14 +82,14 @@ export default function SystemHealthPage() {
 
   const fetchMetrics = async () => {
     try {
-      const response = await fetch('/api/admin/health');
+      const response = await fetch("/api/admin/health");
       if (response.ok) {
         const data = await response.json();
         setMetrics(data);
         setLastUpdate(new Date());
       }
     } catch (error) {
-      console.error('Failed to fetch metrics:', error);
+      console.error("Failed to fetch metrics:", error);
     } finally {
       setLoading(false);
     }
@@ -91,21 +97,21 @@ export default function SystemHealthPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'healthy':
+      case "healthy":
         return (
           <Badge className="bg-green-500">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Healthy
           </Badge>
         );
-      case 'degraded':
+      case "degraded":
         return (
           <Badge className="bg-yellow-500">
             <AlertCircle className="h-3 w-3 mr-1" />
             Degraded
           </Badge>
         );
-      case 'down':
+      case "down":
         return (
           <Badge className="bg-red-500">
             <AlertCircle className="h-3 w-3 mr-1" />
@@ -125,11 +131,11 @@ export default function SystemHealthPage() {
   };
 
   const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
   if (loading || !metrics) {
@@ -186,7 +192,8 @@ export default function SystemHealthPage() {
           <CardContent>
             {getStatusBadge(metrics.database.status)}
             <p className="text-xs text-muted-foreground mt-2">
-              {metrics.database.connections}/{metrics.database.maxConnections} connections
+              {metrics.database.connections}/{metrics.database.maxConnections}{" "}
+              connections
             </p>
           </CardContent>
         </Card>
@@ -226,7 +233,9 @@ export default function SystemHealthPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.business.activeUsers}</div>
+            <div className="text-2xl font-bold">
+              {metrics.business.activeUsers}
+            </div>
             <p className="text-xs text-muted-foreground flex items-center">
               <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
               +12% from yesterday
@@ -240,7 +249,9 @@ export default function SystemHealthPage() {
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{metrics.business.ordersToday}</div>
+            <div className="text-2xl font-bold">
+              {metrics.business.ordersToday}
+            </div>
             <p className="text-xs text-muted-foreground flex items-center">
               <TrendingUp className="h-3 w-3 mr-1 text-green-500" />
               +8% from yesterday
@@ -250,7 +261,9 @@ export default function SystemHealthPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inventory Items</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Inventory Items
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -266,16 +279,16 @@ export default function SystemHealthPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Low Stock Alerts
+            </CardTitle>
             <AlertCircle className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-500">
               {metrics.business.lowStockAlerts}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Requires attention
-            </p>
+            <p className="text-xs text-muted-foreground">Requires attention</p>
           </CardContent>
         </Card>
       </div>
@@ -353,14 +366,21 @@ export default function SystemHealthPage() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Active Connections</p>
+                  <p className="text-sm text-muted-foreground">
+                    Active Connections
+                  </p>
                   <p className="text-2xl font-bold">
-                    {metrics.database.connections} / {metrics.database.maxConnections}
+                    {metrics.database.connections} /{" "}
+                    {metrics.database.maxConnections}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Average Query Time</p>
-                  <p className="text-2xl font-bold">{metrics.database.queryTime}ms</p>
+                  <p className="text-sm text-muted-foreground">
+                    Average Query Time
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {metrics.database.queryTime}ms
+                  </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Database Size</p>
@@ -370,7 +390,9 @@ export default function SystemHealthPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Status</p>
-                  <div className="mt-2">{getStatusBadge(metrics.database.status)}</div>
+                  <div className="mt-2">
+                    {getStatusBadge(metrics.database.status)}
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -413,13 +435,21 @@ export default function SystemHealthPage() {
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Memory Utilization</span>
+                  <span className="text-sm font-medium">
+                    Memory Utilization
+                  </span>
                   <span className="text-sm text-muted-foreground">
-                    {Math.round((metrics.cache.memoryUsed / metrics.cache.memoryMax) * 100)}%
+                    {Math.round(
+                      (metrics.cache.memoryUsed / metrics.cache.memoryMax) *
+                        100,
+                    )}
+                    %
                   </span>
                 </div>
                 <Progress
-                  value={(metrics.cache.memoryUsed / metrics.cache.memoryMax) * 100}
+                  value={
+                    (metrics.cache.memoryUsed / metrics.cache.memoryMax) * 100
+                  }
                 />
               </div>
             </CardContent>
@@ -438,12 +468,20 @@ export default function SystemHealthPage() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-3">
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Requests/Minute</p>
-                  <p className="text-2xl font-bold">{metrics.api.requestsPerMinute}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Requests/Minute
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {metrics.api.requestsPerMinute}
+                  </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">Avg Response Time</p>
-                  <p className="text-2xl font-bold">{metrics.api.averageResponseTime}ms</p>
+                  <p className="text-sm text-muted-foreground">
+                    Avg Response Time
+                  </p>
+                  <p className="text-2xl font-bold">
+                    {metrics.api.averageResponseTime}ms
+                  </p>
                 </div>
                 <div className="space-y-1">
                   <p className="text-sm text-muted-foreground">Error Rate</p>

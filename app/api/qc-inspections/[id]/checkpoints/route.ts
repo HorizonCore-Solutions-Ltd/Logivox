@@ -6,10 +6,10 @@ import { z } from "zod";
 
 const updateCheckpointSchema = z.object({
   checkpointId: z.string(),
-  status: z.enum(['PENDING', 'IN_PROGRESS', 'COMPLETED', 'SKIPPED']).optional(),
+  status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED", "SKIPPED"]).optional(),
   actualValue: z.string().optional(),
-  result: z.enum(['PASS', 'FAIL', 'NA']).optional(),
-  defectType: z.enum(['CRITICAL', 'MAJOR', 'MINOR']).optional(),
+  result: z.enum(["PASS", "FAIL", "NA"]).optional(),
+  defectType: z.enum(["CRITICAL", "MAJOR", "MINOR"]).optional(),
   defectDescription: z.string().optional(),
   photos: z.array(z.string()).optional(),
   performedDate: z.string().optional(),
@@ -22,7 +22,7 @@ const updateCheckpointsSchema = z.object({
 // PATCH /api/qc-inspections/[id]/checkpoints - Update checkpoint results
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -45,7 +45,7 @@ export async function PATCH(
     if (!inspection) {
       return NextResponse.json(
         { error: "Inspection not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -61,9 +61,11 @@ export async function PATCH(
           defectDescription: cp.defectDescription,
           photos: cp.photos,
           performedById: session.user.id,
-          performedDate: cp.performedDate ? new Date(cp.performedDate) : new Date(),
+          performedDate: cp.performedDate
+            ? new Date(cp.performedDate)
+            : new Date(),
         },
-      })
+      }),
     );
 
     await Promise.all(updatePromises);
@@ -74,41 +76,42 @@ export async function PATCH(
     });
 
     const passedCount = updatedCheckpoints.filter(
-      (cp) => cp.result === 'PASS'
+      (cp) => cp.result === "PASS",
     ).length;
     const failedCount = updatedCheckpoints.filter(
-      (cp) => cp.result === 'FAIL'
+      (cp) => cp.result === "FAIL",
     ).length;
     const criticalDefects = updatedCheckpoints.filter(
-      (cp) => cp.defectType === 'CRITICAL'
+      (cp) => cp.defectType === "CRITICAL",
     ).length;
     const majorDefects = updatedCheckpoints.filter(
-      (cp) => cp.defectType === 'MAJOR'
+      (cp) => cp.defectType === "MAJOR",
     ).length;
     const minorDefects = updatedCheckpoints.filter(
-      (cp) => cp.defectType === 'MINOR'
+      (cp) => cp.defectType === "MINOR",
     ).length;
     const defectCount = criticalDefects + majorDefects + minorDefects;
 
     const completedCount = updatedCheckpoints.filter(
-      (cp) => cp.status === 'COMPLETED'
+      (cp) => cp.status === "COMPLETED",
     ).length;
     const totalCheckpoints = updatedCheckpoints.length;
 
     // Determine overall result
-    let result: 'PASS' | 'FAIL' | 'PASS_WITH_NOTES' | 'CONDITIONAL' = 'PASS';
+    let result: "PASS" | "FAIL" | "PASS_WITH_NOTES" | "CONDITIONAL" = "PASS";
     if (criticalDefects > 0) {
-      result = 'FAIL';
+      result = "FAIL";
     } else if (failedCount > 0) {
-      result = 'FAIL';
+      result = "FAIL";
     } else if (minorDefects > 0) {
-      result = 'PASS_WITH_NOTES';
+      result = "PASS_WITH_NOTES";
     }
 
     // Calculate quality score
-    const qualityScore = totalCheckpoints > 0
-      ? Math.round((passedCount / totalCheckpoints) * 100)
-      : 0;
+    const qualityScore =
+      totalCheckpoints > 0
+        ? Math.round((passedCount / totalCheckpoints) * 100)
+        : 0;
 
     // Update inspection
     const updatedInspection = await prisma.qCInspection.update({
@@ -121,17 +124,22 @@ export async function PATCH(
         majorDefects,
         minorDefects,
         qualityScore,
-        result: completedCount === totalCheckpoints ? result : inspection.result,
-        status: completedCount === totalCheckpoints ? 'AWAITING_APPROVAL' : 'IN_PROGRESS',
+        result:
+          completedCount === totalCheckpoints ? result : inspection.result,
+        status:
+          completedCount === totalCheckpoints
+            ? "AWAITING_APPROVAL"
+            : "IN_PROGRESS",
         // Auto-quarantine if failed and template requires it
-        ...(result === 'FAIL' && inspection.template.autoQuarantine && {
-          isQuarantined: true,
-          quarantineReason: `Failed QC inspection with ${criticalDefects} critical, ${majorDefects} major, ${minorDefects} minor defects`,
-        }),
+        ...(result === "FAIL" &&
+          inspection.template.autoQuarantine && {
+            isQuarantined: true,
+            quarantineReason: `Failed QC inspection with ${criticalDefects} critical, ${majorDefects} major, ${minorDefects} minor defects`,
+          }),
       },
       include: {
         checkpoints: {
-          orderBy: { sequence: 'asc' },
+          orderBy: { sequence: "asc" },
         },
       },
     });
@@ -141,14 +149,14 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error updating checkpoints:", error);
     return NextResponse.json(
       { error: "Failed to update checkpoints" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

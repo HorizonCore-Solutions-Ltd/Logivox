@@ -1,13 +1,17 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const updateCarrierSchema = z.object({
   name: z.string().min(1).optional(),
-  type: z.enum(['PARCEL', 'LTL', 'FTL', 'COURIER', 'POSTAL', 'OTHER']).optional(),
-  apiProvider: z.enum(['FEDEX', 'UPS', 'USPS', 'DHL', 'CUSTOM', 'NONE']).optional(),
+  type: z
+    .enum(["PARCEL", "LTL", "FTL", "COURIER", "POSTAL", "OTHER"])
+    .optional(),
+  apiProvider: z
+    .enum(["FEDEX", "UPS", "USPS", "DHL", "CUSTOM", "NONE"])
+    .optional(),
   apiKey: z.string().optional(),
   apiSecret: z.string().optional(),
   accountNumber: z.string().optional(),
@@ -29,12 +33,12 @@ const updateCarrierSchema = z.object({
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const carrier = await prisma.carrier.findFirst({
@@ -45,7 +49,7 @@ export async function GET(
       include: {
         shipments: {
           take: 10,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           select: {
             id: true,
             trackingNumber: true,
@@ -62,18 +66,15 @@ export async function GET(
     });
 
     if (!carrier) {
-      return NextResponse.json(
-        { error: 'Carrier not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Carrier not found" }, { status: 404 });
     }
 
     return NextResponse.json(carrier);
   } catch (error: any) {
-    console.error('Error fetching carrier:', error);
+    console.error("Error fetching carrier:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch carrier' },
-      { status: 500 }
+      { error: "Failed to fetch carrier" },
+      { status: 500 },
     );
   }
 }
@@ -84,12 +85,12 @@ export async function GET(
  */
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -104,10 +105,7 @@ export async function PUT(
     });
 
     if (!existingCarrier) {
-      return NextResponse.json(
-        { error: 'Carrier not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Carrier not found" }, { status: 404 });
     }
 
     // If setting as default, unset other defaults
@@ -136,15 +134,15 @@ export async function PUT(
     await prisma.activityLog.create({
       data: {
         userId: session.user.id,
-        action: 'CARRIER_UPDATED',
-        entityType: 'Carrier',
+        action: "CARRIER_UPDATED",
+        entityType: "Carrier",
         entityId: carrier.id,
         details: {
           carrierName: carrier.name,
           changes: validatedData,
         },
-        ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: req.headers.get('user-agent') || 'unknown',
+        ipAddress: req.headers.get("x-forwarded-for") || "unknown",
+        userAgent: req.headers.get("user-agent") || "unknown",
       },
     });
 
@@ -152,15 +150,15 @@ export async function PUT(
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error updating carrier:', error);
+    console.error("Error updating carrier:", error);
     return NextResponse.json(
-      { error: 'Failed to update carrier' },
-      { status: 500 }
+      { error: "Failed to update carrier" },
+      { status: 500 },
     );
   }
 }
@@ -171,12 +169,12 @@ export async function PUT(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if carrier exists and belongs to user's organization
@@ -195,10 +193,7 @@ export async function DELETE(
     });
 
     if (!carrier) {
-      return NextResponse.json(
-        { error: 'Carrier not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Carrier not found" }, { status: 404 });
     }
 
     // Check if carrier has shipments
@@ -223,24 +218,24 @@ export async function DELETE(
     await prisma.activityLog.create({
       data: {
         userId: session.user.id,
-        action: 'CARRIER_DELETED',
-        entityType: 'Carrier',
+        action: "CARRIER_DELETED",
+        entityType: "Carrier",
         entityId: carrier.id,
         details: {
           carrierName: carrier.name,
           carrierCode: carrier.code,
         },
-        ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: req.headers.get('user-agent') || 'unknown',
+        ipAddress: req.headers.get("x-forwarded-for") || "unknown",
+        userAgent: req.headers.get("user-agent") || "unknown",
       },
     });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Error deleting carrier:', error);
+    console.error("Error deleting carrier:", error);
     return NextResponse.json(
-      { error: 'Failed to delete carrier' },
-      { status: 500 }
+      { error: "Failed to delete carrier" },
+      { status: 500 },
     );
   }
 }

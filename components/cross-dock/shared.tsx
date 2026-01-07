@@ -3,16 +3,16 @@
  * Reusable components for cross-dock operations
  */
 
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { 
-  TruckIcon, 
-  PackageIcon, 
-  ClockIcon, 
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  TruckIcon,
+  PackageIcon,
+  ClockIcon,
   ArrowRightIcon,
   AlertTriangleIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface AppointmentCardProps {
   appointment: {
@@ -35,28 +35,31 @@ interface AppointmentCardProps {
   onClick?: () => void;
 }
 
-export function AppointmentCard({ appointment, onClick }: AppointmentCardProps) {
+export function AppointmentCard({
+  appointment,
+  onClick,
+}: AppointmentCardProps) {
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      SCHEDULED: 'bg-blue-500',
-      RECEIVING: 'bg-yellow-500',
-      SORTING: 'bg-purple-500',
-      STAGED: 'bg-indigo-500',
-      LOADING: 'bg-orange-500',
-      COMPLETED: 'bg-green-500',
-      CANCELLED: 'bg-gray-500',
+      SCHEDULED: "bg-blue-500",
+      RECEIVING: "bg-yellow-500",
+      SORTING: "bg-purple-500",
+      STAGED: "bg-indigo-500",
+      LOADING: "bg-orange-500",
+      COMPLETED: "bg-green-500",
+      CANCELLED: "bg-gray-500",
     };
-    return colors[status] || 'bg-gray-500';
+    return colors[status] || "bg-gray-500";
   };
 
   const getPriorityVariant = (priority: string) => {
     const variants: Record<string, any> = {
-      URGENT: 'destructive',
-      HIGH: 'destructive',
-      MEDIUM: 'default',
-      LOW: 'secondary',
+      URGENT: "destructive",
+      HIGH: "destructive",
+      MEDIUM: "default",
+      LOW: "secondary",
     };
-    return variants[priority] || 'default';
+    return variants[priority] || "default";
   };
 
   const isDwellTimeWarning = () => {
@@ -65,12 +68,13 @@ export function AppointmentCard({ appointment, onClick }: AppointmentCardProps) 
     return appointment.dwellTimeMinutes > maxMinutes * 0.8;
   };
 
-  const progress = appointment.totalUnits > 0 
-    ? (appointment.shippedUnits / appointment.totalUnits) * 100 
-    : 0;
+  const progress =
+    appointment.totalUnits > 0
+      ? (appointment.shippedUnits / appointment.totalUnits) * 100
+      : 0;
 
   return (
-    <Card 
+    <Card
       className="hover:bg-accent/50 transition-colors cursor-pointer"
       onClick={onClick}
     >
@@ -78,7 +82,9 @@ export function AppointmentCard({ appointment, onClick }: AppointmentCardProps) 
         <div className="space-y-3">
           {/* Header */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold">{appointment.appointmentNumber}</span>
+            <span className="font-semibold">
+              {appointment.appointmentNumber}
+            </span>
             <Badge variant={getPriorityVariant(appointment.priority)}>
               {appointment.priority}
             </Badge>
@@ -98,12 +104,12 @@ export function AppointmentCard({ appointment, onClick }: AppointmentCardProps) 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <TruckIcon className="h-4 w-4" />
-              <span>In: {appointment.inboundCarrier || 'N/A'}</span>
+              <span>In: {appointment.inboundCarrier || "N/A"}</span>
             </div>
             <ArrowRightIcon className="h-4 w-4" />
             <div className="flex items-center gap-1">
               <TruckIcon className="h-4 w-4" />
-              <span>Out: {appointment.outboundCarrier || 'N/A'}</span>
+              <span>Out: {appointment.outboundCarrier || "N/A"}</span>
             </div>
           </div>
 
@@ -133,12 +139,17 @@ export function AppointmentCard({ appointment, onClick }: AppointmentCardProps) 
           {appointment.dwellTimeMinutes && (
             <div className="text-sm">
               <span className="text-muted-foreground">Dwell Time: </span>
-              <span className={isDwellTimeWarning() ? 'text-destructive font-medium' : ''}>
-                {Math.floor(appointment.dwellTimeMinutes / 60)}h{' '}
+              <span
+                className={
+                  isDwellTimeWarning() ? "text-destructive font-medium" : ""
+                }
+              >
+                {Math.floor(appointment.dwellTimeMinutes / 60)}h{" "}
                 {appointment.dwellTimeMinutes % 60}m
               </span>
               <span className="text-muted-foreground">
-                {' '}/ {appointment.maxDwellTimeHours}h max
+                {" "}
+                / {appointment.maxDwellTimeHours}h max
               </span>
             </div>
           )}
@@ -181,17 +192,20 @@ interface AllocationListProps {
   onAllocationClick?: (allocationId: string) => void;
 }
 
-export function AllocationList({ allocations, onAllocationClick }: AllocationListProps) {
+export function AllocationList({
+  allocations,
+  onAllocationClick,
+}: AllocationListProps) {
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      ALLOCATED: 'bg-blue-500',
-      PICKING: 'bg-yellow-500',
-      PICKED: 'bg-purple-500',
-      STAGED: 'bg-indigo-500',
-      LOADED: 'bg-orange-500',
-      SHIPPED: 'bg-green-500',
+      ALLOCATED: "bg-blue-500",
+      PICKING: "bg-yellow-500",
+      PICKED: "bg-purple-500",
+      STAGED: "bg-indigo-500",
+      LOADED: "bg-orange-500",
+      SHIPPED: "bg-green-500",
     };
-    return colors[status] || 'bg-gray-500';
+    return colors[status] || "bg-gray-500";
   };
 
   if (allocations.length === 0) {
@@ -213,7 +227,9 @@ export function AllocationList({ allocations, onAllocationClick }: AllocationLis
           <div className="flex items-center gap-3 flex-1">
             <PackageIcon className="h-5 w-5 text-muted-foreground" />
             <div className="flex-1">
-              <div className="font-medium">{allocation.receiptItem.productName}</div>
+              <div className="font-medium">
+                {allocation.receiptItem.productName}
+              </div>
               <div className="text-sm text-muted-foreground">
                 SKU: {allocation.receiptItem.sku}
               </div>
@@ -223,14 +239,18 @@ export function AllocationList({ allocations, onAllocationClick }: AllocationLis
           <div className="flex items-center gap-4">
             <div className="text-right">
               <div className="text-sm text-muted-foreground">From</div>
-              <div className="font-medium">{allocation.receiptItem.receipt.receiptNumber}</div>
+              <div className="font-medium">
+                {allocation.receiptItem.receipt.receiptNumber}
+              </div>
             </div>
 
             <ArrowRightIcon className="h-4 w-4 text-muted-foreground" />
 
             <div className="text-right">
               <div className="text-sm text-muted-foreground">To</div>
-              <div className="font-medium">{allocation.shipment.customer.name}</div>
+              <div className="font-medium">
+                {allocation.shipment.customer.name}
+              </div>
               <div className="text-xs text-muted-foreground">
                 {allocation.shipment.shipmentNumber}
               </div>
@@ -255,13 +275,13 @@ export function AllocationList({ allocations, onAllocationClick }: AllocationLis
 interface DwellTimeIndicatorProps {
   dwellTimeMinutes?: number;
   maxDwellTimeHours: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 }
 
-export function DwellTimeIndicator({ 
-  dwellTimeMinutes, 
+export function DwellTimeIndicator({
+  dwellTimeMinutes,
   maxDwellTimeHours,
-  size = 'md' 
+  size = "md",
 }: DwellTimeIndicatorProps) {
   if (!dwellTimeMinutes) {
     return null;
@@ -273,24 +293,38 @@ export function DwellTimeIndicator({
   const isCritical = percentage > 100;
 
   const sizeClasses = {
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-lg',
+    sm: "text-sm",
+    md: "text-base",
+    lg: "text-lg",
   };
 
   return (
     <div className={`flex items-center gap-2 ${sizeClasses[size]}`}>
-      <ClockIcon 
+      <ClockIcon
         className={`h-4 w-4 ${
-          isCritical ? 'text-red-500' : isWarning ? 'text-orange-500' : 'text-muted-foreground'
-        }`} 
+          isCritical
+            ? "text-red-500"
+            : isWarning
+              ? "text-orange-500"
+              : "text-muted-foreground"
+        }`}
       />
-      <span className={isCritical ? 'text-red-500 font-bold' : isWarning ? 'text-orange-500 font-medium' : ''}>
+      <span
+        className={
+          isCritical
+            ? "text-red-500 font-bold"
+            : isWarning
+              ? "text-orange-500 font-medium"
+              : ""
+        }
+      >
         {Math.floor(dwellTimeMinutes / 60)}h {dwellTimeMinutes % 60}m
       </span>
       <span className="text-muted-foreground">/ {maxDwellTimeHours}h</span>
       {isWarning && (
-        <AlertTriangleIcon className={`h-4 w-4 ${isCritical ? 'text-red-500' : 'text-orange-500'}`} />
+        <AlertTriangleIcon
+          className={`h-4 w-4 ${isCritical ? "text-red-500" : "text-orange-500"}`}
+        />
       )}
     </div>
   );
@@ -316,7 +350,9 @@ export function CrossDockStatsGrid({ stats }: CrossDockStatsGridProps) {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-muted-foreground">Active</div>
-              <div className="text-2xl font-bold">{stats.activeAppointments}</div>
+              <div className="text-2xl font-bold">
+                {stats.activeAppointments}
+              </div>
             </div>
             <TruckIcon className="h-8 w-8 text-muted-foreground" />
           </div>
@@ -341,9 +377,10 @@ export function CrossDockStatsGrid({ stats }: CrossDockStatsGridProps) {
             <div>
               <div className="text-sm text-muted-foreground">Throughput</div>
               <div className="text-2xl font-bold">
-                {stats.totalUnits > 0 
-                  ? Math.round((stats.shippedUnits / stats.totalUnits) * 100) 
-                  : 0}%
+                {stats.totalUnits > 0
+                  ? Math.round((stats.shippedUnits / stats.totalUnits) * 100)
+                  : 0}
+                %
               </div>
             </div>
             <ArrowRightIcon className="h-8 w-8 text-muted-foreground" />
@@ -356,7 +393,9 @@ export function CrossDockStatsGrid({ stats }: CrossDockStatsGridProps) {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm text-muted-foreground">On-Time</div>
-              <div className="text-2xl font-bold">{Math.round(stats.onTimeRate)}%</div>
+              <div className="text-2xl font-bold">
+                {Math.round(stats.onTimeRate)}%
+              </div>
             </div>
             <ClockIcon className="h-8 w-8 text-muted-foreground" />
           </div>

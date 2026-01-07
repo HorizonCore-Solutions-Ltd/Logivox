@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Mic,
   Volume2,
@@ -21,47 +27,54 @@ import {
   Scan,
   MapPin,
   Users,
-  BarChart3
-} from "lucide-react"
+  BarChart3,
+} from "lucide-react";
 
 export default function VoiceOperationsPage() {
   const features = [
     {
       icon: Mic,
       title: "Voice-Directed Picking",
-      description: "Hands-free picking operations with voice commands for maximum efficiency and accuracy."
+      description:
+        "Hands-free picking operations with voice commands for maximum efficiency and accuracy.",
     },
     {
       icon: Volume2,
       title: "Real-Time Voice Feedback",
-      description: "Instant audio confirmation and guidance for every warehouse task and operation."
+      description:
+        "Instant audio confirmation and guidance for every warehouse task and operation.",
     },
     {
       icon: Headphones,
       title: "Noise-Canceling Technology",
-      description: "Crystal-clear voice recognition even in loud warehouse environments."
+      description:
+        "Crystal-clear voice recognition even in loud warehouse environments.",
     },
     {
       icon: Globe,
       title: "Multi-Language Support",
-      description: "Support for 30+ languages with natural language processing and local accents."
+      description:
+        "Support for 30+ languages with natural language processing and local accents.",
     },
     {
       icon: Zap,
       title: "Instant Task Switching",
-      description: "Seamlessly switch between picking, putaway, cycle counting, and other tasks via voice."
+      description:
+        "Seamlessly switch between picking, putaway, cycle counting, and other tasks via voice.",
     },
     {
       icon: Shield,
       title: "Voice Authentication",
-      description: "Secure user identification through voiceprint biometrics and authentication."
-    }
-  ]
+      description:
+        "Secure user identification through voiceprint biometrics and authentication.",
+    },
+  ];
 
   const operations = [
     {
       title: "Voice-Directed Picking",
-      description: "Transform picking operations with hands-free voice commands",
+      description:
+        "Transform picking operations with hands-free voice commands",
       icon: Package,
       benefits: [
         "40% faster picking rates compared to paper-based systems",
@@ -69,8 +82,8 @@ export default function VoiceOperationsPage() {
         "Reduced training time from days to hours",
         "Hands and eyes free for safer operations",
         "Real-time inventory updates and confirmations",
-        "Dynamic pick path optimization via voice guidance"
-      ]
+        "Dynamic pick path optimization via voice guidance",
+      ],
     },
     {
       title: "Voice-Enabled Receiving",
@@ -82,8 +95,8 @@ export default function VoiceOperationsPage() {
         "Automatic ASN matching and confirmation",
         "Voice-guided optimal putaway location selection",
         "Exception handling through natural conversation",
-        "Integration with mobile scanning devices"
-      ]
+        "Integration with mobile scanning devices",
+      ],
     },
     {
       title: "Voice Cycle Counting",
@@ -95,8 +108,8 @@ export default function VoiceOperationsPage() {
         "Instant discrepancy alerts and resolution",
         "Blind counting support for maximum accuracy",
         "Multi-location counting in single session",
-        "Real-time inventory adjustments"
-      ]
+        "Real-time inventory adjustments",
+      ],
     },
     {
       title: "Voice Replenishment",
@@ -108,53 +121,89 @@ export default function VoiceOperationsPage() {
         "Priority-based task sequencing",
         "Real-time slot availability confirmation",
         "Cross-aisle replenishment coordination",
-        "Bulk replenishment task batching"
-      ]
-    }
-  ]
+        "Bulk replenishment task batching",
+      ],
+    },
+  ];
 
   const metrics = [
     {
       metric: "40%",
-      description: "Increase in picking productivity"
+      description: "Increase in picking productivity",
     },
     {
       metric: "99.9%",
-      description: "Order accuracy rate achieved"
+      description: "Order accuracy rate achieved",
     },
     {
       metric: "70%",
-      description: "Reduction in training time for new workers"
+      description: "Reduction in training time for new workers",
     },
     {
       metric: "35%",
-      description: "Decrease in picking errors"
+      description: "Decrease in picking errors",
     },
     {
       metric: "25%",
-      description: "Improvement in employee satisfaction"
+      description: "Improvement in employee satisfaction",
     },
     {
       metric: "50%",
-      description: "Faster task completion times"
-    }
-  ]
+      description: "Faster task completion times",
+    },
+  ];
 
   const workflowExample = [
-    { step: 1, action: "System assigns pick task", voice: "\"Navigate to aisle 12, bin B4\"" },
-    { step: 2, action: "Worker arrives at location", voice: "\"Arriving aisle 12, bin B4\"" },
-    { step: 3, action: "System confirms location", voice: "\"Pick 15 units of SKU 45789\"" },
-    { step: 4, action: "Worker picks items", voice: "\"Picked 15\"" },
-    { step: 5, action: "System verifies quantity", voice: "\"Confirmed. Next location: aisle 14, bin C2\"" },
-    { step: 6, action: "Process repeats", voice: "Hands-free, seamless workflow" }
-  ]
+    {
+      step: 1,
+      action: "System assigns pick task",
+      voice: '"Navigate to aisle 12, bin B4"',
+    },
+    {
+      step: 2,
+      action: "Worker arrives at location",
+      voice: '"Arriving aisle 12, bin B4"',
+    },
+    {
+      step: 3,
+      action: "System confirms location",
+      voice: '"Pick 15 units of SKU 45789"',
+    },
+    { step: 4, action: "Worker picks items", voice: '"Picked 15"' },
+    {
+      step: 5,
+      action: "System verifies quantity",
+      voice: '"Confirmed. Next location: aisle 14, bin C2"',
+    },
+    {
+      step: 6,
+      action: "Process repeats",
+      voice: "Hands-free, seamless workflow",
+    },
+  ];
 
   const languages = [
-    "English (US, UK, AU)", "Spanish (Spain, Mexico)", "French", "German",
-    "Italian", "Portuguese (Brazil)", "Mandarin Chinese", "Japanese",
-    "Korean", "Hindi", "Arabic", "Russian", "Polish", "Dutch",
-    "Swedish", "Danish", "Norwegian", "Finnish", "Czech", "Thai"
-  ]
+    "English (US, UK, AU)",
+    "Spanish (Spain, Mexico)",
+    "French",
+    "German",
+    "Italian",
+    "Portuguese (Brazil)",
+    "Mandarin Chinese",
+    "Japanese",
+    "Korean",
+    "Hindi",
+    "Arabic",
+    "Russian",
+    "Polish",
+    "Dutch",
+    "Swedish",
+    "Danish",
+    "Norwegian",
+    "Finnish",
+    "Czech",
+    "Thai",
+  ];
 
   return (
     <div className="flex flex-col">
@@ -169,9 +218,9 @@ export default function VoiceOperationsPage() {
               Hands-Free Warehouse Operations with Voice Commands
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Transform your warehouse productivity with voice-directed workflows. 
-              Increase accuracy by 99.9%, boost picking rates by 40%, and empower 
-              your workforce with intuitive, hands-free operations.
+              Transform your warehouse productivity with voice-directed
+              workflows. Increase accuracy by 99.9%, boost picking rates by 40%,
+              and empower your workforce with intuitive, hands-free operations.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -238,8 +287,12 @@ export default function VoiceOperationsPage() {
                       <operation.icon className="h-6 w-6" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">{operation.title}</CardTitle>
-                      <CardDescription className="mt-1">{operation.description}</CardDescription>
+                      <CardTitle className="text-xl">
+                        {operation.title}
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        {operation.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -306,8 +359,12 @@ export default function VoiceOperationsPage() {
             {metrics.map((metric, index) => (
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">{metric.metric}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{metric.description}</p>
+                  <div className="text-4xl font-bold text-primary">
+                    {metric.metric}
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {metric.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -330,7 +387,10 @@ export default function VoiceOperationsPage() {
             <CardContent className="pt-6">
               <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {languages.map((language, index) => (
-                  <div key={index} className="flex items-center space-x-2 text-sm">
+                  <div
+                    key={index}
+                    className="flex items-center space-x-2 text-sm"
+                  >
                     <Globe className="h-4 w-4 text-primary" />
                     <span>{language}</span>
                   </div>
@@ -349,7 +409,8 @@ export default function VoiceOperationsPage() {
               Experience the Future of Warehouse Operations
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join forward-thinking companies using voice technology to revolutionize their warehouses
+              Join forward-thinking companies using voice technology to
+              revolutionize their warehouses
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -365,5 +426,5 @@ export default function VoiceOperationsPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

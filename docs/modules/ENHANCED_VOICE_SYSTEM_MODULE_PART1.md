@@ -13,6 +13,7 @@ The Enhanced Voice System transforms LogiVox into a truly voice-first WMS, enabl
 Part 1 establishes the enterprise-grade voice foundation: speech recognition, command parsing, context management, multi-language support, voice feedback, and accessibility features.
 
 ### Core Capabilities
+
 - **Speech Recognition Engine** (Web Speech API, cloud providers, offline models)
 - **Natural Language Command Parser** (intent detection, entity extraction)
 - **Context-Aware Routing** (user, role, location, active workflow)
@@ -26,13 +27,27 @@ Part 1 establishes the enterprise-grade voice foundation: speech recognition, co
 ## 🧱 1. Core Voice Architecture
 
 ```typescript
-type VoiceEngine = 'WEB_SPEECH_API' | 'GOOGLE_CLOUD' | 'AWS_TRANSCRIBE' | 'AZURE_SPEECH' | 'OFFLINE_MODEL';
+type VoiceEngine =
+  | "WEB_SPEECH_API"
+  | "GOOGLE_CLOUD"
+  | "AWS_TRANSCRIBE"
+  | "AZURE_SPEECH"
+  | "OFFLINE_MODEL";
 
-type RecognitionMode = 'CONTINUOUS' | 'PUSH_TO_TALK' | 'VOICE_ACTIVITY_DETECTION';
+type RecognitionMode =
+  | "CONTINUOUS"
+  | "PUSH_TO_TALK"
+  | "VOICE_ACTIVITY_DETECTION";
 
-type CommandStatus = 'LISTENING' | 'PROCESSING' | 'EXECUTED' | 'FAILED' | 'AMBIGUOUS' | 'REJECTED';
+type CommandStatus =
+  | "LISTENING"
+  | "PROCESSING"
+  | "EXECUTED"
+  | "FAILED"
+  | "AMBIGUOUS"
+  | "REJECTED";
 
-type FeedbackMode = 'VOICE_ONLY' | 'VOICE_AND_VISUAL' | 'VISUAL_ONLY';
+type FeedbackMode = "VOICE_ONLY" | "VOICE_AND_VISUAL" | "VISUAL_ONLY";
 
 interface VoiceSystem {
   // Engine management
@@ -41,7 +56,10 @@ interface VoiceSystem {
   getEngineStatus: () => Promise<EngineStatus>;
 
   // Session management
-  startVoiceSession: (userId: string, deviceId: string) => Promise<VoiceSession>;
+  startVoiceSession: (
+    userId: string,
+    deviceId: string,
+  ) => Promise<VoiceSession>;
   endVoiceSession: (sessionId: string) => Promise<void>;
 
   // Command processing
@@ -77,7 +95,7 @@ interface VoiceEngineConfig {
   // Text-to-speech
   tts: {
     voice: string; // e.g., 'en-US-Wavenet-D'
-    rate: number;  // 0.5 - 2.0
+    rate: number; // 0.5 - 2.0
     pitch: number; // -20 to +20
     volume: number; // 0 - 1
   };
@@ -96,7 +114,7 @@ interface VoiceEngineConfig {
 
 interface EngineStatus {
   engine: VoiceEngine;
-  status: 'READY' | 'INITIALIZING' | 'ERROR' | 'OFFLINE';
+  status: "READY" | "INITIALIZING" | "ERROR" | "OFFLINE";
 
   capabilities: {
     stt: boolean;
@@ -194,17 +212,17 @@ interface CommandIntent {
 }
 
 type AudioCue =
-  | 'SUCCESS'
-  | 'ERROR'
-  | 'WARNING'
-  | 'CONFIRM'
-  | 'ATTENTION'
-  | 'COMPLETE'
-  | 'SCANNING'
-  | 'PROCESSING';
+  | "SUCCESS"
+  | "ERROR"
+  | "WARNING"
+  | "CONFIRM"
+  | "ATTENTION"
+  | "COMPLETE"
+  | "SCANNING"
+  | "PROCESSING";
 
 interface SpeakOptions {
-  priority: 'HIGH' | 'NORMAL' | 'LOW'; // interrupt or queue
+  priority: "HIGH" | "NORMAL" | "LOW"; // interrupt or queue
   interruptible: boolean;
   language?: string;
 }
@@ -226,14 +244,18 @@ const CORE_VOICE_COMMANDS = [
 ## 🧠 2. Natural Language Command Parser
 
 ### Goal
+
 Parse spoken commands into actionable intents with high accuracy, even with warehouse noise and accents.
 
 ```typescript
-type ParsingStrategy = 'RULE_BASED' | 'ML_NLU' | 'HYBRID';
+type ParsingStrategy = "RULE_BASED" | "ML_NLU" | "HYBRID";
 
 interface CommandParser {
   registerIntent: (intent: IntentDefinition) => Promise<void>;
-  parseCommand: (transcript: string, context: VoiceSession['context']) => Promise<ParseResult>;
+  parseCommand: (
+    transcript: string,
+    context: VoiceSession["context"],
+  ) => Promise<ParseResult>;
 
   // Training (if ML)
   trainModel: (trainingData: TrainingExample[]) => Promise<ModelTrainingResult>;
@@ -291,7 +313,7 @@ interface NLUModelStatus {
   accuracy?: number;
   coverage?: number; // % of intents with training data
 
-  status: 'NOT_TRAINED' | 'TRAINING' | 'READY' | 'STALE';
+  status: "NOT_TRAINED" | "TRAINING" | "READY" | "STALE";
 }
 
 const COMMAND_PARSER_VOICE_COMMANDS = [
@@ -306,6 +328,7 @@ const COMMAND_PARSER_VOICE_COMMANDS = [
 ## 🌍 3. Multi-Language & Localization
 
 ### Goal
+
 Support global warehouses with 20+ languages, regional dialects, and cultural nuances.
 
 ```typescript
@@ -317,11 +340,17 @@ interface LanguageSupport {
   getUserLanguage: (userId: string) => Promise<string>;
 
   // Translation
-  translateCommand: (intent: CommandIntent, targetLanguage: string) => Promise<CommandIntent>;
+  translateCommand: (
+    intent: CommandIntent,
+    targetLanguage: string,
+  ) => Promise<CommandIntent>;
   translateFeedback: (text: string, targetLanguage: string) => Promise<string>;
 
   // Localization
-  getLocalizedPrompts: (module: string, language: string) => Promise<PromptLibrary>;
+  getLocalizedPrompts: (
+    module: string,
+    language: string,
+  ) => Promise<PromptLibrary>;
 }
 
 interface Language {
@@ -331,8 +360,8 @@ interface Language {
 
   dialects?: { code: string; region: string }[];
 
-  sttSupport: 'FULL' | 'PARTIAL' | 'NONE';
-  ttsSupport: 'FULL' | 'PARTIAL' | 'NONE';
+  sttSupport: "FULL" | "PARTIAL" | "NONE";
+  ttsSupport: "FULL" | "PARTIAL" | "NONE";
 
   customVocabulary?: string[];
 }
@@ -349,26 +378,66 @@ interface PromptLibrary {
 }
 
 const SUPPORTED_LANGUAGES = [
-  { code: 'en-US', name: 'English (US)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'es-MX', name: 'Spanish (Mexico)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'es-ES', name: 'Spanish (Spain)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'fr-FR', name: 'French (France)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'de-DE', name: 'German (Germany)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'pt-BR', name: 'Portuguese (Brazil)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'zh-CN', name: 'Chinese (Mandarin)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'ja-JP', name: 'Japanese', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'ko-KR', name: 'Korean', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'pl-PL', name: 'Polish', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'ru-RU', name: 'Russian', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'it-IT', name: 'Italian', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'nl-NL', name: 'Dutch', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'sv-SE', name: 'Swedish', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'da-DK', name: 'Danish', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'no-NO', name: 'Norwegian', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'fi-FI', name: 'Finnish', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'tr-TR', name: 'Turkish', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'ar-SA', name: 'Arabic (Saudi)', sttSupport: 'FULL', ttsSupport: 'FULL' },
-  { code: 'hi-IN', name: 'Hindi', sttSupport: 'FULL', ttsSupport: 'FULL' },
+  {
+    code: "en-US",
+    name: "English (US)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  {
+    code: "es-MX",
+    name: "Spanish (Mexico)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  {
+    code: "es-ES",
+    name: "Spanish (Spain)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  {
+    code: "fr-FR",
+    name: "French (France)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  {
+    code: "de-DE",
+    name: "German (Germany)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  {
+    code: "pt-BR",
+    name: "Portuguese (Brazil)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  {
+    code: "zh-CN",
+    name: "Chinese (Mandarin)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  { code: "ja-JP", name: "Japanese", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "ko-KR", name: "Korean", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "pl-PL", name: "Polish", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "ru-RU", name: "Russian", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "it-IT", name: "Italian", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "nl-NL", name: "Dutch", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "sv-SE", name: "Swedish", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "da-DK", name: "Danish", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "no-NO", name: "Norwegian", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "fi-FI", name: "Finnish", sttSupport: "FULL", ttsSupport: "FULL" },
+  { code: "tr-TR", name: "Turkish", sttSupport: "FULL", ttsSupport: "FULL" },
+  {
+    code: "ar-SA",
+    name: "Arabic (Saudi)",
+    sttSupport: "FULL",
+    ttsSupport: "FULL",
+  },
+  { code: "hi-IN", name: "Hindi", sttSupport: "FULL", ttsSupport: "FULL" },
   // + more as needed
 ];
 
@@ -385,15 +454,30 @@ const MULTI_LANGUAGE_VOICE_COMMANDS = [
 ## 🛠️ 4. Hands-Free Workflow Integration
 
 ### Goal
+
 Enable complete task execution without touching a screen or keyboard.
 
 ```typescript
-type VoiceWorkflow = 'PICKING' | 'RECEIVING' | 'PUTAWAY' | 'CYCLE_COUNT' | 'QC_INSPECTION' | 'PACKING' | 'SHIPPING';
+type VoiceWorkflow =
+  | "PICKING"
+  | "RECEIVING"
+  | "PUTAWAY"
+  | "CYCLE_COUNT"
+  | "QC_INSPECTION"
+  | "PACKING"
+  | "SHIPPING";
 
 interface WorkflowVoiceAdapter {
   registerWorkflow: (workflow: VoiceWorkflowDefinition) => Promise<void>;
-  startWorkflow: (sessionId: string, workflow: VoiceWorkflow, params?: unknown) => Promise<void>;
-  handleWorkflowCommand: (sessionId: string, intent: CommandIntent) => Promise<WorkflowCommandResult>;
+  startWorkflow: (
+    sessionId: string,
+    workflow: VoiceWorkflow,
+    params?: unknown,
+  ) => Promise<void>;
+  handleWorkflowCommand: (
+    sessionId: string,
+    intent: CommandIntent,
+  ) => Promise<WorkflowCommandResult>;
 }
 
 interface VoiceWorkflowDefinition {
@@ -448,56 +532,91 @@ interface WorkflowCommandResult {
 
 // Example: Voice-Driven Picking Workflow
 const VOICE_PICKING_WORKFLOW: VoiceWorkflowDefinition = {
-  workflow: 'PICKING',
+  workflow: "PICKING",
   steps: [
     {
-      stepId: 'START',
-      name: 'Start Pick Task',
+      stepId: "START",
+      name: "Start Pick Task",
       prompt: 'Say "start picking" or scan your badge',
-      expectedIntents: ['START_PICKING', 'SCAN_BADGE'],
-      onSuccess: { nextStep: 'GET_LOCATION', speak: 'Pick task started', audioCue: 'SUCCESS' },
-      onError: { speak: 'Could not start task. Please try again.', maxRetries: 3 },
+      expectedIntents: ["START_PICKING", "SCAN_BADGE"],
+      onSuccess: {
+        nextStep: "GET_LOCATION",
+        speak: "Pick task started",
+        audioCue: "SUCCESS",
+      },
+      onError: {
+        speak: "Could not start task. Please try again.",
+        maxRetries: 3,
+      },
     },
     {
-      stepId: 'GET_LOCATION',
-      name: 'Navigate to Location',
+      stepId: "GET_LOCATION",
+      name: "Navigate to Location",
       prompt: 'Go to location {location}. Say "arrived" when ready.',
-      expectedIntents: ['CONFIRM_ARRIVAL', 'ARRIVED_AT_LOCATION'],
-      validation: { required: ['location'] },
-      onSuccess: { nextStep: 'CONFIRM_ITEM', speak: 'Location confirmed. Pick {quantity} units of {sku}', audioCue: 'CONFIRM' },
-      onError: { speak: 'Location not confirmed. Say "arrived" or "skip location".', maxRetries: 3, escalate: true },
+      expectedIntents: ["CONFIRM_ARRIVAL", "ARRIVED_AT_LOCATION"],
+      validation: { required: ["location"] },
+      onSuccess: {
+        nextStep: "CONFIRM_ITEM",
+        speak: "Location confirmed. Pick {quantity} units of {sku}",
+        audioCue: "CONFIRM",
+      },
+      onError: {
+        speak: 'Location not confirmed. Say "arrived" or "skip location".',
+        maxRetries: 3,
+        escalate: true,
+      },
     },
     {
-      stepId: 'CONFIRM_ITEM',
-      name: 'Confirm Item',
-      prompt: 'Scan or say the SKU.',
-      expectedIntents: ['SCAN_ITEM', 'SAY_SKU'],
-      validation: { required: ['sku'] },
-      onSuccess: { nextStep: 'CONFIRM_QUANTITY', speak: 'SKU confirmed. Pick {quantity} units.', audioCue: 'SUCCESS' },
-      onError: { speak: 'SKU mismatch. Please try again or say "exception".', maxRetries: 3, escalate: true },
+      stepId: "CONFIRM_ITEM",
+      name: "Confirm Item",
+      prompt: "Scan or say the SKU.",
+      expectedIntents: ["SCAN_ITEM", "SAY_SKU"],
+      validation: { required: ["sku"] },
+      onSuccess: {
+        nextStep: "CONFIRM_QUANTITY",
+        speak: "SKU confirmed. Pick {quantity} units.",
+        audioCue: "SUCCESS",
+      },
+      onError: {
+        speak: 'SKU mismatch. Please try again or say "exception".',
+        maxRetries: 3,
+        escalate: true,
+      },
     },
     {
-      stepId: 'CONFIRM_QUANTITY',
-      name: 'Confirm Quantity',
-      prompt: 'Say the quantity picked.',
-      expectedIntents: ['SAY_QUANTITY'],
-      validation: { required: ['quantity'] },
-      onSuccess: { nextStep: 'COMPLETE', speak: 'Quantity confirmed. Item picked.', audioCue: 'COMPLETE' },
-      onError: { speak: 'Quantity error. Say the number again or "short pick".', maxRetries: 3 },
+      stepId: "CONFIRM_QUANTITY",
+      name: "Confirm Quantity",
+      prompt: "Say the quantity picked.",
+      expectedIntents: ["SAY_QUANTITY"],
+      validation: { required: ["quantity"] },
+      onSuccess: {
+        nextStep: "COMPLETE",
+        speak: "Quantity confirmed. Item picked.",
+        audioCue: "COMPLETE",
+      },
+      onError: {
+        speak: 'Quantity error. Say the number again or "short pick".',
+        maxRetries: 3,
+      },
     },
     {
-      stepId: 'COMPLETE',
-      name: 'Complete Pick',
-      prompt: 'Pick complete. Say "next" for next item or "finish" to complete wave.',
-      expectedIntents: ['NEXT_ITEM', 'FINISH_WAVE'],
-      onSuccess: { speak: 'Great job!', audioCue: 'SUCCESS' },
-      onError: { speak: 'Error completing pick.', maxRetries: 2 },
+      stepId: "COMPLETE",
+      name: "Complete Pick",
+      prompt:
+        'Pick complete. Say "next" for next item or "finish" to complete wave.',
+      expectedIntents: ["NEXT_ITEM", "FINISH_WAVE"],
+      onSuccess: { speak: "Great job!", audioCue: "SUCCESS" },
+      onError: { speak: "Error completing pick.", maxRetries: 2 },
     },
   ],
   shortcuts: [
-    { command: 'skip', intent: 'SKIP_ITEM', description: 'Skip this item' },
-    { command: 'exception', intent: 'REPORT_EXCEPTION', description: 'Report an exception' },
-    { command: 'help', intent: 'GET_HELP', description: 'Get help' },
+    { command: "skip", intent: "SKIP_ITEM", description: "Skip this item" },
+    {
+      command: "exception",
+      intent: "REPORT_EXCEPTION",
+      description: "Report an exception",
+    },
+    { command: "help", intent: "GET_HELP", description: "Get help" },
   ],
 };
 
@@ -518,6 +637,7 @@ const WORKFLOW_VOICE_COMMANDS = [
 ## 🎯 5. Voice Feedback & Accessibility
 
 ### Goal
+
 Ensure voice feedback is clear, timely, and accessible to all users, including those with disabilities.
 
 ```typescript
@@ -549,7 +669,10 @@ interface VoiceAccessibility {
   getUserSettings: (userId: string) => Promise<AccessibilitySettings>;
 
   // Adaptive feedback
-  provideFeedback: (sessionId: string, feedback: VoiceFeedback) => Promise<void>;
+  provideFeedback: (
+    sessionId: string,
+    feedback: VoiceFeedback,
+  ) => Promise<void>;
 }
 
 interface VoiceFeedback {
@@ -557,12 +680,12 @@ interface VoiceFeedback {
   visualText?: string;
   audioCue?: AudioCue;
 
-  priority: 'HIGH' | 'NORMAL' | 'LOW';
+  priority: "HIGH" | "NORMAL" | "LOW";
   interruptible: boolean;
 
   // Adaptive
   adaptToNoiseLevel?: boolean; // louder in noisy environments
-  adaptToUserSpeed?: boolean;  // faster for experienced users
+  adaptToUserSpeed?: boolean; // faster for experienced users
 }
 
 const ACCESSIBILITY_VOICE_COMMANDS = [
@@ -581,6 +704,7 @@ const ACCESSIBILITY_VOICE_COMMANDS = [
 ## 📊 6. Voice Analytics & Adoption Metrics
 
 ### Goal
+
 Track voice system usage, accuracy, and identify areas for improvement.
 
 ```typescript
@@ -663,6 +787,7 @@ const ANALYTICS_VOICE_COMMANDS = [
 ## 📌 Part 1 Summary
 
 ### Enterprise Features Covered
+
 ✅ Multi-engine voice recognition (Web Speech API, Google, AWS, Azure, offline)  
 ✅ Natural language command parser with intent detection  
 ✅ Context-aware command routing (user, role, location, workflow)  
@@ -675,6 +800,7 @@ const ANALYTICS_VOICE_COMMANDS = [
 **Voice Commands in Part 1**: 50+ commands across all workflows
 
 **Coming in Part 2 (Advanced)**:
+
 - AI voice assistant with conversational context
 - Predictive command suggestions based on workflow patterns
 - Emotion/stress detection for safety and support

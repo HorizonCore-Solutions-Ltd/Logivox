@@ -1,16 +1,16 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { authenticateApiKey } from "@/lib/api-auth"
-import { prisma } from "@/lib/prisma"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { authenticateApiKey } from "@/lib/api-auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   // Authenticate with API key
-  const auth = await authenticateApiKey(request)
+  const auth = await authenticateApiKey(request);
   if (!auth.authenticated) {
-    return auth.error
+    return auth.error;
   }
 
   try {
@@ -45,21 +45,21 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
     if (!item) {
       return NextResponse.json(
         { message: "Inventory item not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json({ data: item })
+    return NextResponse.json({ data: item });
   } catch (error) {
-    console.error("API inventory item fetch error:", error)
+    console.error("API inventory item fetch error:", error);
     return NextResponse.json(
       { message: "Failed to fetch inventory item" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   MapPin,
   Truck,
@@ -19,42 +25,48 @@ import {
   Timer,
   MapPinned,
   ParkingCircle,
-  Building
-} from "lucide-react"
+  Building,
+} from "lucide-react";
 
 export default function YardManagementPage() {
   const features = [
     {
       icon: MapPin,
       title: "Smart Parking Assignment",
-      description: "AI-powered algorithms automatically assign optimal parking spots based on delivery priority and cargo type."
+      description:
+        "AI-powered algorithms automatically assign optimal parking spots based on delivery priority and cargo type.",
     },
     {
       icon: Calendar,
       title: "Dock Scheduling",
-      description: "Advanced appointment system prevents congestion and optimizes dock door utilization."
+      description:
+        "Advanced appointment system prevents congestion and optimizes dock door utilization.",
     },
     {
       icon: Navigation,
       title: "Real-Time Vehicle Tracking",
-      description: "GPS tracking and geofencing for complete visibility of all vehicles in your yard."
+      description:
+        "GPS tracking and geofencing for complete visibility of all vehicles in your yard.",
     },
     {
       icon: Timer,
       title: "Dwell Time Management",
-      description: "Monitor and minimize vehicle wait times with automated alerts and priority handling."
+      description:
+        "Monitor and minimize vehicle wait times with automated alerts and priority handling.",
     },
     {
       icon: ParkingCircle,
       title: "Yard Location Management",
-      description: "Organize docks, staging areas, parking spots, and maintenance bays with precision."
+      description:
+        "Organize docks, staging areas, parking spots, and maintenance bays with precision.",
     },
     {
       icon: BarChart3,
       title: "Yard Analytics",
-      description: "Comprehensive metrics on utilization, turnaround times, and operational efficiency."
-    }
-  ]
+      description:
+        "Comprehensive metrics on utilization, turnaround times, and operational efficiency.",
+    },
+  ];
 
   const yardTypes = [
     {
@@ -67,8 +79,8 @@ export default function YardManagementPage() {
         "Automated loading sequence planning",
         "Real-time dock availability tracking",
         "Cross-dock optimization",
-        "Door sensor integration"
-      ]
+        "Door sensor integration",
+      ],
     },
     {
       title: "Receiving Docks",
@@ -80,8 +92,8 @@ export default function YardManagementPage() {
         "Blind receiving support",
         "Quality inspection integration",
         "Putaway workflow coordination",
-        "Carrier compliance tracking"
-      ]
+        "Carrier compliance tracking",
+      ],
     },
     {
       title: "Staging Areas",
@@ -93,8 +105,8 @@ export default function YardManagementPage() {
         "Quick turnaround optimization",
         "Overflow routing algorithms",
         "Trailer pool management",
-        "Cross-dock staging coordination"
-      ]
+        "Cross-dock staging coordination",
+      ],
     },
     {
       title: "Long-Term Parking",
@@ -106,79 +118,103 @@ export default function YardManagementPage() {
         "Automated yard moves",
         "Equipment condition monitoring",
         "Retrieval time optimization",
-        "Security patrol integration"
-      ]
-    }
-  ]
+        "Security patrol integration",
+      ],
+    },
+  ];
 
   const workflow = [
     {
       step: "Gate Entry",
       description: "Security clears vehicle and captures documentation",
       time: "0 min",
-      icon: Building
+      icon: Building,
     },
     {
       step: "Smart Assignment",
       description: "Algorithm assigns optimal parking or dock location",
       time: "< 1 min",
-      icon: Zap
+      icon: Zap,
     },
     {
       step: "Yard Navigation",
       description: "Driver receives directions to assigned location",
       time: "2-5 min",
-      icon: Navigation
+      icon: Navigation,
     },
     {
       step: "Loading/Unloading",
       description: "Warehouse operations with real-time progress tracking",
       time: "30-90 min",
-      icon: Package
+      icon: Package,
     },
     {
       step: "Departure",
       description: "Automated exit processing and gate clearance",
       time: "< 2 min",
-      icon: CheckCircle2
-    }
-  ]
+      icon: CheckCircle2,
+    },
+  ];
 
   const benefits = [
     {
       metric: "45%",
-      description: "Reduction in average dwell time"
+      description: "Reduction in average dwell time",
     },
     {
       metric: "60%",
-      description: "Improvement in dock utilization"
+      description: "Improvement in dock utilization",
     },
     {
       metric: "35%",
-      description: "Decrease in yard congestion"
+      description: "Decrease in yard congestion",
     },
     {
       metric: "90%",
-      description: "On-time appointment adherence"
+      description: "On-time appointment adherence",
     },
     {
       metric: "50%",
-      description: "Faster check-in/check-out processing"
+      description: "Faster check-in/check-out processing",
     },
     {
       metric: "99%",
-      description: "Accurate vehicle location tracking"
-    }
-  ]
+      description: "Accurate vehicle location tracking",
+    },
+  ];
 
   const appointmentStatuses = [
-    { status: "Scheduled", description: "Future appointment with confirmed time slot", color: "bg-blue-100 text-blue-800" },
-    { status: "Confirmed", description: "Carrier acknowledged appointment details", color: "bg-green-100 text-green-800" },
-    { status: "Checked In", description: "Vehicle arrived and cleared gate security", color: "bg-yellow-100 text-yellow-800" },
-    { status: "In Progress", description: "Active loading or unloading operations", color: "bg-orange-100 text-orange-800" },
-    { status: "Completed", description: "Operations finished, ready for departure", color: "bg-purple-100 text-purple-800" },
-    { status: "Cancelled", description: "Appointment cancelled by carrier or facility", color: "bg-red-100 text-red-800" }
-  ]
+    {
+      status: "Scheduled",
+      description: "Future appointment with confirmed time slot",
+      color: "bg-blue-100 text-blue-800",
+    },
+    {
+      status: "Confirmed",
+      description: "Carrier acknowledged appointment details",
+      color: "bg-green-100 text-green-800",
+    },
+    {
+      status: "Checked In",
+      description: "Vehicle arrived and cleared gate security",
+      color: "bg-yellow-100 text-yellow-800",
+    },
+    {
+      status: "In Progress",
+      description: "Active loading or unloading operations",
+      color: "bg-orange-100 text-orange-800",
+    },
+    {
+      status: "Completed",
+      description: "Operations finished, ready for departure",
+      color: "bg-purple-100 text-purple-800",
+    },
+    {
+      status: "Cancelled",
+      description: "Appointment cancelled by carrier or facility",
+      color: "bg-red-100 text-red-800",
+    },
+  ];
 
   const integrationPoints = [
     "Gate security system for seamless entry/exit",
@@ -188,8 +224,8 @@ export default function YardManagementPage() {
     "GPS tracking for real-time vehicle location",
     "Security patrol checkpoints at yard locations",
     "Weather monitoring for outdoor operations",
-    "Access control for restricted areas"
-  ]
+    "Access control for restricted areas",
+  ];
 
   return (
     <div className="flex flex-col">
@@ -204,9 +240,9 @@ export default function YardManagementPage() {
               Optimize Your Yard Operations with Smart Technology
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Transform yard chaos into organized efficiency. Smart parking assignments, 
-              real-time tracking, and optimized dock scheduling reduce dwell times by 45% 
-              and maximize your facility throughput.
+              Transform yard chaos into organized efficiency. Smart parking
+              assignments, real-time tracking, and optimized dock scheduling
+              reduce dwell times by 45% and maximize your facility throughput.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -274,7 +310,9 @@ export default function YardManagementPage() {
                     </div>
                     <div>
                       <CardTitle className="text-xl">{type.title}</CardTitle>
-                      <CardDescription className="mt-1">{type.description}</CardDescription>
+                      <CardDescription className="mt-1">
+                        {type.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -308,7 +346,10 @@ export default function YardManagementPage() {
           <div className="mx-auto max-w-4xl">
             <div className="relative">
               {workflow.map((item, index) => (
-                <div key={index} className="relative mb-8 flex items-start space-x-4">
+                <div
+                  key={index}
+                  className="relative mb-8 flex items-start space-x-4"
+                >
                   <div className="flex flex-col items-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                       <item.icon className="h-6 w-6" />
@@ -322,7 +363,9 @@ export default function YardManagementPage() {
                       <div className="flex items-start justify-between">
                         <div>
                           <h3 className="font-semibold">{item.step}</h3>
-                          <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {item.description}
+                          </p>
                         </div>
                         <Badge variant="secondary">{item.time}</Badge>
                       </div>
@@ -353,7 +396,9 @@ export default function YardManagementPage() {
                   <div className="flex items-center space-x-3">
                     <Badge className={item.color}>{item.status}</Badge>
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">{item.description}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -376,8 +421,12 @@ export default function YardManagementPage() {
             {benefits.map((benefit, index) => (
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">{benefit.metric}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{benefit.description}</p>
+                  <div className="text-4xl font-bold text-primary">
+                    {benefit.metric}
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {benefit.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -419,7 +468,8 @@ export default function YardManagementPage() {
               Ready to Optimize Your Yard?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join companies reducing dwell times and maximizing dock utilization with LogiVox
+              Join companies reducing dwell times and maximizing dock
+              utilization with LogiVox
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -435,5 +485,5 @@ export default function YardManagementPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

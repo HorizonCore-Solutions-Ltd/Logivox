@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const createEventSchema = z.object({
-  eventType: z.enum(['USER_ACTION', 'SYSTEM_EVENT', 'BUSINESS_EVENT']),
+  eventType: z.enum(["USER_ACTION", "SYSTEM_EVENT", "BUSINESS_EVENT"]),
   eventName: z.string().min(1, "Event name is required"),
   category: z.string().optional(),
   properties: z.record(z.any()).optional(),
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -47,8 +47,9 @@ export async function POST(request: Request) {
 
     // Get request metadata
     const headers = request.headers;
-    const ipAddress = headers.get('x-forwarded-for') || headers.get('x-real-ip') || 'unknown';
-    const userAgent = headers.get('user-agent') || 'unknown';
+    const ipAddress =
+      headers.get("x-forwarded-for") || headers.get("x-real-ip") || "unknown";
+    const userAgent = headers.get("user-agent") || "unknown";
 
     // Create event
     const event = await prisma.analyticsEvent.create({
@@ -73,13 +74,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error tracking event:", error);
     return NextResponse.json(
       { error: "Failed to track event" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -105,7 +106,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -132,7 +133,7 @@ export async function GET(request: Request) {
     if (category) where.category = category;
     if (userId) where.userId = userId;
     if (success !== null && success !== undefined) {
-      where.success = success === 'true';
+      where.success = success === "true";
     }
     if (startDate || endDate) {
       where.createdAt = {};
@@ -152,7 +153,7 @@ export async function GET(request: Request) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip: offset,
         take: limit,
       }),
@@ -172,7 +173,7 @@ export async function GET(request: Request) {
     console.error("Error fetching events:", error);
     return NextResponse.json(
       { error: "Failed to fetch events" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

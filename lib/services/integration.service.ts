@@ -1,6 +1,6 @@
 /**
  * Integration Service
- * 
+ *
  * External system integrations and connectors:
  * - ERP system integration
  * - E-commerce platform sync
@@ -13,8 +13,8 @@
  * - Data synchronization
  */
 
-import { prisma } from '@/lib/prisma';
-import { IntegrationType } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { IntegrationType } from "@prisma/client";
 
 export interface IntegrationConfig {
   apiEndpoint: string;
@@ -24,7 +24,7 @@ export interface IntegrationConfig {
   syncInterval?: number; //in minutes
   autoSync?: boolean;
   settings?: Record<string, any>;
-  [key: string]: any;  // Index signature for JSON compatibility
+  [key: string]: any; // Index signature for JSON compatibility
 }
 
 export interface SyncResult {
@@ -36,7 +36,6 @@ export interface SyncResult {
 }
 
 export class IntegrationService {
-  
   /**
    * Register a new integration
    */
@@ -74,12 +73,12 @@ export class IntegrationService {
     });
 
     if (!currentIntegration) {
-      throw new Error('Integration not found');
+      throw new Error("Integration not found");
     }
 
     // Merge configurations
     const currentConfig = currentIntegration.config as IntegrationConfig;
-    const updatedConfig = params.config 
+    const updatedConfig = params.config
       ? { ...currentConfig, ...params.config }
       : currentConfig;
 
@@ -107,7 +106,7 @@ export class IntegrationService {
     });
 
     if (!integration) {
-      return { success: false, message: 'Integration not found' };
+      return { success: false, message: "Integration not found" };
     }
 
     const config = integration.config as IntegrationConfig;
@@ -116,10 +115,10 @@ export class IntegrationService {
     try {
       // Test connection to API endpoint
       const response = await fetch(config.apiEndpoint, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${config.apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${config.apiKey}`,
+          "Content-Type": "application/json",
         },
         signal: AbortSignal.timeout(10000), // 10 second timeout
       });
@@ -127,21 +126,21 @@ export class IntegrationService {
       const latency = Date.now() - startTime;
 
       if (response.ok) {
-        return { 
-          success: true, 
-          message: 'Connection successful',
-          latency 
+        return {
+          success: true,
+          message: "Connection successful",
+          latency,
         };
       } else {
-        return { 
-          success: false, 
-          message: `Connection failed: ${response.statusText}` 
+        return {
+          success: false,
+          message: `Connection failed: ${response.statusText}`,
         };
       }
     } catch (error: any) {
-      return { 
-        success: false, 
-        message: `Connection error: ${error.message}` 
+      return {
+        success: false,
+        message: `Connection error: ${error.message}`,
       };
     }
   }
@@ -159,7 +158,7 @@ export class IntegrationService {
     });
 
     if (!integration || !integration.isActive) {
-      throw new Error('Integration not found or inactive');
+      throw new Error("Integration not found or inactive");
     }
 
     const config = integration.config as IntegrationConfig;
@@ -199,10 +198,10 @@ export class IntegrationService {
 
         // Send to external system
         const response = await fetch(`${config.apiEndpoint}/inventory/sync`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${config.apiKey}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
         });
@@ -249,11 +248,11 @@ export class IntegrationService {
     });
 
     if (!integration || !integration.isActive) {
-      throw new Error('Integration not found or inactive');
+      throw new Error("Integration not found or inactive");
     }
 
     if (integration.type !== IntegrationType.ECOMMERCE) {
-      throw new Error('Integration must be of type ECOMMERCE');
+      throw new Error("Integration must be of type ECOMMERCE");
     }
 
     const config = integration.config as IntegrationConfig;
@@ -266,14 +265,14 @@ export class IntegrationService {
       // Fetch orders from e-commerce platform
       const url = new URL(`${config.apiEndpoint}/orders`);
       if (params.since) {
-        url.searchParams.append('since', params.since.toISOString());
+        url.searchParams.append("since", params.since.toISOString());
       }
 
       const response = await fetch(url.toString(), {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${config.apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${config.apiKey}`,
+          "Content-Type": "application/json",
         },
       });
 
@@ -300,7 +299,9 @@ export class IntegrationService {
               data: {
                 organizationId: params.organizationId,
                 code: `CUST-${Date.now()}`,
-                name: `${order.customer?.firstName || ''} ${order.customer?.lastName || ''}`.trim() || 'Unknown',
+                name:
+                  `${order.customer?.firstName || ""} ${order.customer?.lastName || ""}`.trim() ||
+                  "Unknown",
                 email: order.customerEmail,
                 phone: order.customer?.phone,
               },
@@ -313,9 +314,11 @@ export class IntegrationService {
               organizationId: params.organizationId,
               soNumber: order.orderNumber || `SO-EC-${Date.now()}`,
               customerId: customer.id,
-              status: 'DRAFT',
+              status: "DRAFT",
               orderDate: new Date(order.orderDate || Date.now()),
-              requestedDate: order.requestedDate ? new Date(order.requestedDate) : null,
+              requestedDate: order.requestedDate
+                ? new Date(order.requestedDate)
+                : null,
               shippingAddress: order.shipping?.address,
               shippingCity: order.shipping?.city,
               shippingState: order.shipping?.state,
@@ -326,12 +329,12 @@ export class IntegrationService {
               shippingCost: order.shippingCost || 0,
               discount: order.discount || 0,
               total: order.total || 0,
-              currency: order.currency || 'USD',
-              paymentStatus: order.paymentStatus || 'UNPAID',
-              createdById: '', // System import
+              currency: order.currency || "USD",
+              paymentStatus: order.paymentStatus || "UNPAID",
+              createdById: "", // System import
               items: {
                 create: (order.items || []).map((item: any) => ({
-                  inventoryItemId: item.inventoryItemId || '',
+                  inventoryItemId: item.inventoryItemId || "",
                   quantity: item.quantity || 1,
                   unitPrice: item.unitPrice || 0,
                   discount: item.discount || 0,
@@ -345,7 +348,9 @@ export class IntegrationService {
           processed++;
         } catch (error: any) {
           failed++;
-          errors.push(`Failed to import order ${order.orderNumber}: ${error.message}`);
+          errors.push(
+            `Failed to import order ${order.orderNumber}: ${error.message}`,
+          );
         }
       }
     } catch (error: any) {
@@ -386,15 +391,15 @@ export class IntegrationService {
     ]);
 
     if (!shipment) {
-      return { success: false, error: 'Shipment not found' };
+      return { success: false, error: "Shipment not found" };
     }
 
     if (!integration || !integration.isActive) {
-      return { success: false, error: 'Integration not found or inactive' };
+      return { success: false, error: "Integration not found or inactive" };
     }
 
     if (integration.type !== IntegrationType.SHIPPING) {
-      return { success: false, error: 'Integration must be of type SHIPPING' };
+      return { success: false, error: "Integration must be of type SHIPPING" };
     }
 
     const config = integration.config as IntegrationConfig;
@@ -422,10 +427,10 @@ export class IntegrationService {
 
       // Send to carrier API
       const response = await fetch(`${config.apiEndpoint}/shipments`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${config.apiKey}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${config.apiKey}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(payload),
       });
@@ -439,7 +444,7 @@ export class IntegrationService {
           where: { id: params.shipmentId },
           data: {
             trackingNumber,
-            status: 'SHIPPED',
+            status: "SHIPPED",
             shippedDate: new Date(),
           },
         });
@@ -447,10 +452,16 @@ export class IntegrationService {
         return { success: true, trackingNumber };
       } else {
         const errorText = await response.text();
-        return { success: false, error: `Carrier API error: ${response.statusText} - ${errorText}` };
+        return {
+          success: false,
+          error: `Carrier API error: ${response.statusText} - ${errorText}`,
+        };
       }
     } catch (error: any) {
-      return { success: false, error: `Failed to export shipment: ${error.message}` };
+      return {
+        success: false,
+        error: `Failed to export shipment: ${error.message}`,
+      };
     }
   }
 
@@ -466,11 +477,11 @@ export class IntegrationService {
     });
 
     if (!integration || !integration.isActive) {
-      throw new Error('Integration not found or inactive');
+      throw new Error("Integration not found or inactive");
     }
 
     if (integration.type !== IntegrationType.CRM) {
-      throw new Error('Integration must be of type CRM');
+      throw new Error("Integration must be of type CRM");
     }
 
     const config = integration.config as IntegrationConfig;
@@ -498,10 +509,10 @@ export class IntegrationService {
         };
 
         const response = await fetch(`${config.apiEndpoint}/contacts`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${config.apiKey}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${config.apiKey}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(payload),
         });
@@ -510,11 +521,15 @@ export class IntegrationService {
           processed++;
         } else {
           failed++;
-          errors.push(`Failed to sync customer ${customer.email}: ${response.statusText}`);
+          errors.push(
+            `Failed to sync customer ${customer.email}: ${response.statusText}`,
+          );
         }
       } catch (error: any) {
         failed++;
-        errors.push(`Error syncing customer ${customer.email}: ${error.message}`);
+        errors.push(
+          `Error syncing customer ${customer.email}: ${error.message}`,
+        );
       }
     }
 
@@ -535,15 +550,13 @@ export class IntegrationService {
   /**
    * Get integration status and configuration
    */
-  static async getIntegrationStatus(params: {
-    integrationId: string;
-  }) {
+  static async getIntegrationStatus(params: { integrationId: string }) {
     const integration = await prisma.integration.findUnique({
       where: { id: params.integrationId },
     });
 
     if (!integration) {
-      throw new Error('Integration not found');
+      throw new Error("Integration not found");
     }
 
     return {
@@ -576,10 +589,10 @@ export class IntegrationService {
 
     const integrations = await prisma.integration.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
-    return integrations.map(integration => ({
+    return integrations.map((integration) => ({
       id: integration.id,
       type: integration.type,
       name: integration.name,
@@ -592,9 +605,7 @@ export class IntegrationService {
   /**
    * Deactivate integration
    */
-  static async deactivateIntegration(params: {
-    integrationId: string;
-  }) {
+  static async deactivateIntegration(params: { integrationId: string }) {
     const integration = await prisma.integration.update({
       where: { id: params.integrationId },
       data: {
@@ -609,9 +620,7 @@ export class IntegrationService {
   /**
    * Delete integration
    */
-  static async deleteIntegration(params: {
-    integrationId: string;
-  }) {
+  static async deleteIntegration(params: { integrationId: string }) {
     await prisma.integration.delete({
       where: { id: params.integrationId },
     });

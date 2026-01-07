@@ -1,6 +1,7 @@
 # UI Components Guide
 
 ## Table of Contents
+
 1. [Component Library Overview](#component-library-overview)
 2. [Design System](#design-system)
 3. [Core Components](#core-components)
@@ -48,25 +49,25 @@ components/
 // Tailwind config
 const colors = {
   primary: {
-    50: '#eff6ff',
-    100: '#dbeafe',
-    500: '#3b82f6',  // Main brand color
-    600: '#2563eb',
-    700: '#1d4ed8',
+    50: "#eff6ff",
+    100: "#dbeafe",
+    500: "#3b82f6", // Main brand color
+    600: "#2563eb",
+    700: "#1d4ed8",
   },
   success: {
-    500: '#22c55e',
+    500: "#22c55e",
   },
   warning: {
-    500: '#f59e0b',
+    500: "#f59e0b",
   },
   error: {
-    500: '#ef4444',
+    500: "#ef4444",
   },
   neutral: {
-    100: '#f3f4f6',
-    500: '#6b7280',
-    900: '#111827',
+    100: "#f3f4f6",
+    500: "#6b7280",
+    900: "#111827",
   },
 };
 ```
@@ -95,12 +96,12 @@ font-bold     // 700
 
 ```typescript
 // Margin and padding scale (based on 4px)
-p-1  // 0.25rem (4px)
-p-2  // 0.5rem (8px)
-p-4  // 1rem (16px)
-p-6  // 1.5rem (24px)
-p-8  // 2rem (32px)
-p-12 // 3rem (48px)
+p - 1; // 0.25rem (4px)
+p - 2; // 0.5rem (8px)
+p - 4; // 1rem (16px)
+p - 6; // 1.5rem (24px)
+p - 8; // 2rem (32px)
+p - 12; // 3rem (48px)
 ```
 
 ### Breakpoints
@@ -123,31 +124,47 @@ Primary interactive element for actions.
 
 ```tsx
 // components/ui/Button.tsx
-import { ButtonHTMLAttributes, forwardRef } from 'react';
-import { cn } from '@/lib/utils';
+import { ButtonHTMLAttributes, forwardRef } from "react";
+import { cn } from "@/lib/utils";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  size?: "sm" | "md" | "lg";
   isLoading?: boolean;
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'primary', size = 'md', isLoading, children, className, disabled, ...props }, ref) => {
-    const baseStyles = 'inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50';
-    
+  (
+    {
+      variant = "primary",
+      size = "md",
+      isLoading,
+      children,
+      className,
+      disabled,
+      ...props
+    },
+    ref,
+  ) => {
+    const baseStyles =
+      "inline-flex items-center justify-center rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50";
+
     const variants = {
-      primary: 'bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500',
-      secondary: 'bg-neutral-200 text-neutral-900 hover:bg-neutral-300 focus-visible:ring-neutral-500',
-      outline: 'border-2 border-neutral-300 bg-transparent hover:bg-neutral-100 focus-visible:ring-neutral-500',
-      ghost: 'hover:bg-neutral-100 focus-visible:ring-neutral-500',
-      danger: 'bg-error-500 text-white hover:bg-error-600 focus-visible:ring-error-500',
+      primary:
+        "bg-primary-600 text-white hover:bg-primary-700 focus-visible:ring-primary-500",
+      secondary:
+        "bg-neutral-200 text-neutral-900 hover:bg-neutral-300 focus-visible:ring-neutral-500",
+      outline:
+        "border-2 border-neutral-300 bg-transparent hover:bg-neutral-100 focus-visible:ring-neutral-500",
+      ghost: "hover:bg-neutral-100 focus-visible:ring-neutral-500",
+      danger:
+        "bg-error-500 text-white hover:bg-error-600 focus-visible:ring-error-500",
     };
-    
+
     const sizes = {
-      sm: 'h-9 px-3 text-sm',
-      md: 'h-10 px-4 text-base',
-      lg: 'h-12 px-6 text-lg',
+      sm: "h-9 px-3 text-sm",
+      md: "h-10 px-4 text-base",
+      lg: "h-12 px-6 text-lg",
     };
 
     return (
@@ -159,17 +176,29 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {isLoading && (
           <svg className="mr-2 h-4 w-4 animate-spin" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+              fill="none"
+            />
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            />
           </svg>
         )}
         {children}
       </button>
     );
-  }
+  },
 );
 
-Button.displayName = 'Button';
+Button.displayName = "Button";
 export default Button;
 ```
 
@@ -204,22 +233,32 @@ Display status indicators and labels.
 ```tsx
 // components/ui/Badge.tsx
 interface BadgeProps {
-  variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
+  variant?: "default" | "success" | "warning" | "error" | "info";
   children: React.ReactNode;
   className?: string;
 }
 
-export function Badge({ variant = 'default', children, className }: BadgeProps) {
+export function Badge({
+  variant = "default",
+  children,
+  className,
+}: BadgeProps) {
   const variants = {
-    default: 'bg-neutral-100 text-neutral-900',
-    success: 'bg-green-100 text-green-800',
-    warning: 'bg-yellow-100 text-yellow-800',
-    error: 'bg-red-100 text-red-800',
-    info: 'bg-blue-100 text-blue-800',
+    default: "bg-neutral-100 text-neutral-900",
+    success: "bg-green-100 text-green-800",
+    warning: "bg-yellow-100 text-yellow-800",
+    error: "bg-red-100 text-red-800",
+    info: "bg-blue-100 text-blue-800",
   };
 
   return (
-    <span className={cn('inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium', variants[variant], className)}>
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium",
+        variants[variant],
+        className,
+      )}
+    >
       {children}
     </span>
   );
@@ -250,18 +289,27 @@ interface CardProps {
 
 export function Card({ children, className }: CardProps) {
   return (
-    <div className={cn('rounded-lg border border-neutral-200 bg-white p-6 shadow-sm', className)}>
+    <div
+      className={cn(
+        "rounded-lg border border-neutral-200 bg-white p-6 shadow-sm",
+        className,
+      )}
+    >
       {children}
     </div>
   );
 }
 
 export function CardHeader({ children, className }: CardProps) {
-  return <div className={cn('mb-4', className)}>{children}</div>;
+  return <div className={cn("mb-4", className)}>{children}</div>;
 }
 
 export function CardTitle({ children, className }: CardProps) {
-  return <h3 className={cn('text-lg font-semibold text-neutral-900', className)}>{children}</h3>;
+  return (
+    <h3 className={cn("text-lg font-semibold text-neutral-900", className)}>
+      {children}
+    </h3>
+  );
 }
 
 export function CardContent({ children, className }: CardProps) {
@@ -269,14 +317,24 @@ export function CardContent({ children, className }: CardProps) {
 }
 
 export function CardFooter({ children, className }: CardProps) {
-  return <div className={cn('mt-4 flex items-center justify-end gap-2', className)}>{children}</div>;
+  return (
+    <div className={cn("mt-4 flex items-center justify-end gap-2", className)}>
+      {children}
+    </div>
+  );
 }
 ```
 
 **Usage:**
 
 ```tsx
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/Card';
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/Card";
 
 <Card>
   <CardHeader>
@@ -289,7 +347,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
     <Button variant="outline">Cancel</Button>
     <Button>Approve</Button>
   </CardFooter>
-</Card>
+</Card>;
 ```
 
 ---
@@ -302,8 +360,8 @@ Text input field with validation support.
 
 ```tsx
 // components/ui/Input.tsx
-import { forwardRef, InputHTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
+import { forwardRef, InputHTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -324,22 +382,25 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           className={cn(
-            'w-full rounded-md border border-neutral-300 px-3 py-2 text-sm transition-colors',
-            'focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50',
-            'disabled:cursor-not-allowed disabled:bg-neutral-50 disabled:text-neutral-500',
-            error && 'border-error-500 focus:border-error-500 focus:ring-error-500',
-            className
+            "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm transition-colors",
+            "focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50",
+            "disabled:cursor-not-allowed disabled:bg-neutral-50 disabled:text-neutral-500",
+            error &&
+              "border-error-500 focus:border-error-500 focus:ring-error-500",
+            className,
           )}
           {...props}
         />
         {error && <p className="mt-1 text-xs text-error-500">{error}</p>}
-        {helperText && !error && <p className="mt-1 text-xs text-neutral-500">{helperText}</p>}
+        {helperText && !error && (
+          <p className="mt-1 text-xs text-neutral-500">{helperText}</p>
+        )}
       </div>
     );
-  }
+  },
 );
 
-Input.displayName = 'Input';
+Input.displayName = "Input";
 export default Input;
 ```
 
@@ -395,10 +456,11 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         <select
           ref={ref}
           className={cn(
-            'w-full rounded-md border border-neutral-300 px-3 py-2 text-sm transition-colors',
-            'focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500',
-            error && 'border-error-500 focus:border-error-500 focus:ring-error-500',
-            className
+            "w-full rounded-md border border-neutral-300 px-3 py-2 text-sm transition-colors",
+            "focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500",
+            error &&
+              "border-error-500 focus:border-error-500 focus:ring-error-500",
+            className,
           )}
           {...props}
         >
@@ -412,7 +474,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {error && <p className="mt-1 text-xs text-error-500">{error}</p>}
       </div>
     );
-  }
+  },
 );
 ```
 
@@ -422,8 +484,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
 <Select
   label="Status"
   options={[
-    { value: 'active', label: 'Active' },
-    { value: 'inactive', label: 'Inactive' },
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
   ]}
   placeholder="Select status"
 />
@@ -448,21 +510,27 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           ref={ref}
           type="checkbox"
           className={cn(
-            'mt-0.5 h-4 w-4 rounded border-neutral-300 text-primary-600',
-            'focus:ring-2 focus:ring-primary-500 focus:ring-offset-0',
-            className
+            "mt-0.5 h-4 w-4 rounded border-neutral-300 text-primary-600",
+            "focus:ring-2 focus:ring-primary-500 focus:ring-offset-0",
+            className,
           )}
           {...props}
         />
         {(label || description) && (
           <div className="ml-2">
-            {label && <label className="text-sm font-medium text-neutral-900">{label}</label>}
-            {description && <p className="text-xs text-neutral-500">{description}</p>}
+            {label && (
+              <label className="text-sm font-medium text-neutral-900">
+                {label}
+              </label>
+            )}
+            {description && (
+              <p className="text-xs text-neutral-500">{description}</p>
+            )}
           </div>
         )}
       </div>
     );
-  }
+  },
 );
 ```
 
@@ -486,10 +554,16 @@ Display tabular data with sorting and pagination.
 
 ```tsx
 // components/ui/Table.tsx
-export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
+export function Table({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className="overflow-x-auto">
-      <table className={cn('w-full border-collapse', className)}>
+      <table className={cn("w-full border-collapse", className)}>
         {children}
       </table>
     </div>
@@ -504,27 +578,61 @@ export function TableBody({ children }: { children: React.ReactNode }) {
   return <tbody className="divide-y divide-neutral-200">{children}</tbody>;
 }
 
-export function TableRow({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <tr className={cn('hover:bg-neutral-50', className)}>{children}</tr>;
+export function TableRow({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <tr className={cn("hover:bg-neutral-50", className)}>{children}</tr>;
 }
 
-export function TableHead({ children, className }: { children: React.ReactNode; className?: string }) {
+export function TableHead({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
-    <th className={cn('px-4 py-3 text-left text-sm font-semibold text-neutral-900', className)}>
+    <th
+      className={cn(
+        "px-4 py-3 text-left text-sm font-semibold text-neutral-900",
+        className,
+      )}
+    >
       {children}
     </th>
   );
 }
 
-export function TableCell({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <td className={cn('px-4 py-3 text-sm text-neutral-700', className)}>{children}</td>;
+export function TableCell({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <td className={cn("px-4 py-3 text-sm text-neutral-700", className)}>
+      {children}
+    </td>
+  );
 }
 ```
 
 **Usage:**
 
 ```tsx
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/Table";
 
 <Table>
   <TableHeader>
@@ -541,7 +649,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
         <TableCell>{order.orderNumber}</TableCell>
         <TableCell>{order.customer.name}</TableCell>
         <TableCell>
-          <Badge variant={order.status === 'COMPLETED' ? 'success' : 'warning'}>
+          <Badge variant={order.status === "COMPLETED" ? "success" : "warning"}>
             {order.status}
           </Badge>
         </TableCell>
@@ -549,7 +657,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
       </TableRow>
     ))}
   </TableBody>
-</Table>
+</Table>;
 ```
 
 ### DataGrid
@@ -569,7 +677,12 @@ interface DataGridProps<T> {
   isLoading?: boolean;
 }
 
-export function DataGrid<T>({ data, columns, pageSize = 10, isLoading }: DataGridProps<T>) {
+export function DataGrid<T>({
+  data,
+  columns,
+  pageSize = 10,
+  isLoading,
+}: DataGridProps<T>) {
   // Implementation with sorting, filtering, pagination
   // ...
 }
@@ -585,29 +698,29 @@ Show temporary notifications.
 
 ```tsx
 // components/ui/Toast.tsx (using react-hot-toast)
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 export const showToast = {
   success: (message: string) => toast.success(message),
   error: (message: string) => toast.error(message),
   loading: (message: string) => toast.loading(message),
-  info: (message: string) => toast(message, { icon: 'ℹ️' }),
+  info: (message: string) => toast(message, { icon: "ℹ️" }),
 };
 ```
 
 **Usage:**
 
 ```tsx
-import { showToast } from '@/components/ui/Toast';
+import { showToast } from "@/components/ui/Toast";
 
 // Success toast
-showToast.success('Order created successfully');
+showToast.success("Order created successfully");
 
 // Error toast
-showToast.error('Failed to save changes');
+showToast.error("Failed to save changes");
 
 // Loading toast
-const toastId = showToast.loading('Processing...');
+const toastId = showToast.loading("Processing...");
 // Dismiss: toast.dismiss(toastId);
 ```
 
@@ -622,29 +735,43 @@ interface ModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
-export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  title,
+  children,
+  size = "md",
+}: ModalProps) {
   if (!isOpen) return null;
 
   const sizes = {
-    sm: 'max-w-md',
-    md: 'max-w-lg',
-    lg: 'max-w-2xl',
-    xl: 'max-w-4xl',
+    sm: "max-w-md",
+    md: "max-w-lg",
+    lg: "max-w-2xl",
+    xl: "max-w-4xl",
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
-      
+
       {/* Modal */}
-      <div className={cn('relative z-10 w-full rounded-lg bg-white p-6 shadow-xl', sizes[size])}>
+      <div
+        className={cn(
+          "relative z-10 w-full rounded-lg bg-white p-6 shadow-xl",
+          sizes[size],
+        )}
+      >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">{title}</h2>
-          <button onClick={onClose} className="text-neutral-500 hover:text-neutral-700">
+          <button
+            onClick={onClose}
+            className="text-neutral-500 hover:text-neutral-700"
+          >
             ✕
           </button>
         </div>
@@ -670,7 +797,7 @@ const [isOpen, setIsOpen] = useState(false);
       Delete
     </Button>
   </div>
-</Modal>
+</Modal>;
 ```
 
 ---
@@ -690,7 +817,12 @@ interface PageHeaderProps {
   actions?: React.ReactNode;
 }
 
-export function PageHeader({ title, description, breadcrumbs, actions }: PageHeaderProps) {
+export function PageHeader({
+  title,
+  description,
+  breadcrumbs,
+  actions,
+}: PageHeaderProps) {
   return (
     <div className="mb-6">
       {breadcrumbs && (
@@ -712,7 +844,9 @@ export function PageHeader({ title, description, breadcrumbs, actions }: PageHea
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold text-neutral-900">{title}</h1>
-          {description && <p className="mt-1 text-neutral-600">{description}</p>}
+          {description && (
+            <p className="mt-1 text-neutral-600">{description}</p>
+          )}
         </div>
         {actions && <div className="flex gap-2">{actions}</div>}
       </div>
@@ -728,8 +862,8 @@ export function PageHeader({ title, description, breadcrumbs, actions }: PageHea
   title="Orders"
   description="Manage and track all your orders"
   breadcrumbs={[
-    { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Orders' },
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Orders" },
   ]}
   actions={
     <>
@@ -747,40 +881,44 @@ export function PageHeader({ title, description, breadcrumbs, actions }: PageHea
 ### Complete Form Example
 
 ```tsx
-'use client';
+"use client";
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
-import Button from '@/components/ui/Button';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+import Button from "@/components/ui/Button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/Card";
 
 const schema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters'),
-  email: z.string().email('Invalid email address'),
-  role: z.string().min(1, 'Role is required'),
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  email: z.string().email("Invalid email address"),
+  role: z.string().min(1, "Role is required"),
 });
 
 type FormData = z.infer<typeof schema>;
 
 export function UserForm() {
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
   const onSubmit = async (data: FormData) => {
-    const response = await fetch('/api/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    const response = await fetch("/api/users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
 
     if (response.ok) {
-      showToast.success('User created successfully');
+      showToast.success("User created successfully");
     } else {
-      showToast.error('Failed to create user');
+      showToast.error("Failed to create user");
     }
   };
 
@@ -793,31 +931,31 @@ export function UserForm() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <Input
             label="Name"
-            {...register('name')}
+            {...register("name")}
             error={errors.name?.message}
             required
           />
-          
+
           <Input
             label="Email"
             type="email"
-            {...register('email')}
+            {...register("email")}
             error={errors.email?.message}
             required
           />
-          
+
           <Select
             label="Role"
-            {...register('role')}
+            {...register("role")}
             options={[
-              { value: 'USER', label: 'User' },
-              { value: 'ADMIN', label: 'Admin' },
+              { value: "USER", label: "User" },
+              { value: "ADMIN", label: "Admin" },
             ]}
             placeholder="Select a role"
             error={errors.role?.message}
             required
           />
-          
+
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline">
               Cancel

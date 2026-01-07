@@ -5,23 +5,20 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Only allow CUSTOMER role access to portal
     if (session.user.role !== "CUSTOMER") {
       return NextResponse.json(
         { error: "Forbidden - Customer access only" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -33,7 +30,7 @@ export async function GET(
     if (!user?.customerId) {
       return NextResponse.json(
         { error: "Customer not linked" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -70,10 +67,7 @@ export async function GET(
     });
 
     if (!order) {
-      return NextResponse.json(
-        { error: "Order not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     return NextResponse.json(order);
@@ -81,7 +75,7 @@ export async function GET(
     console.error("Error fetching order detail:", error);
     return NextResponse.json(
       { error: "Failed to fetch order detail" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

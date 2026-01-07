@@ -5,13 +5,16 @@
  * GET /api/returns/fraud/stats - Get fraud statistics
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { FraudDetectionService, FraudMonitoringService } from '@/lib/services/returns/fraud-detection';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import {
+  FraudDetectionService,
+  FraudMonitoringService,
+} from "@/lib/services/returns/fraud-detection";
 
 const analyzeSchema = z.object({
   rmaId: z.string(),
@@ -21,7 +24,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -29,7 +32,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -55,7 +61,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rma) {
-      return NextResponse.json({ error: 'RMA not found' }, { status: 404 });
+      return NextResponse.json({ error: "RMA not found" }, { status: 404 });
     }
 
     // Get customer return history
@@ -67,7 +73,7 @@ export async function POST(request: NextRequest) {
           gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last 365 days
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     // Calculate return metrics
@@ -78,9 +84,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const returnRate = totalOrders > 0 ? (returnHistory.length / totalOrders) * 100 : 0;
+    const returnRate =
+      totalOrders > 0 ? (returnHistory.length / totalOrders) * 100 : 0;
 
-    const totalReturned = returnHistory.reduce((sum, r) => sum + (r.totalAmount?.toNumber() || 0), 0);
+    const totalReturned = returnHistory.reduce(
+      (sum, r) => sum + (r.totalAmount?.toNumber() || 0),
+      0,
+    );
 
     // Run fraud detection
     const fraudService = new FraudDetectionService();
@@ -90,22 +100,23 @@ export async function POST(request: NextRequest) {
       orderDate: rma.salesOrder?.orderDate || rma.createdAt,
       returnDate: rma.createdAt,
       totalAmount: rma.totalAmount?.toNumber() || 0,
-      items: rma.items.map(item => ({
-        sku: item.product?.sku || '',
+      items: rma.items.map((item) => ({
+        sku: item.product?.sku || "",
         quantity: item.quantity,
         price: item.unitPrice?.toNumber() || 0,
-        condition: item.condition || 'UNKNOWN',
+        condition: item.condition || "UNKNOWN",
       })),
-      reason: rma.returnReason?.reason || '',
+      reason: rma.returnReason?.reason || "",
       customerHistory: {
         totalReturns: returnHistory.length,
         returnRate,
         totalReturned,
-        avgReturnValue: returnHistory.length > 0 ? totalReturned / returnHistory.length : 0,
+        avgReturnValue:
+          returnHistory.length > 0 ? totalReturned / returnHistory.length : 0,
         firstOrderDate: rma.customer?.createdAt || new Date(),
       },
       shippingAddress: rma.returnShippingAddress as any,
-      metadata: rma.metadata as any || {},
+      metadata: (rma.metadata as any) || {},
     });
 
     // Save analysis
@@ -127,22 +138,23 @@ export async function POST(request: NextRequest) {
       where: { id: rmaId },
       data: {
         metadata: {
-          ...(rma.metadata as any || {}),
+          ...((rma.metadata as any) || {}),
           fraudScore: analysis.riskScore,
           fraudLevel: analysis.riskLevel,
-          flaggedForReview: analysis.riskLevel === 'HIGH' || analysis.riskLevel === 'CRITICAL',
+          flaggedForReview:
+            analysis.riskLevel === "HIGH" || analysis.riskLevel === "CRITICAL",
         },
       },
     });
 
     // If high risk, create alert
-    if (analysis.riskLevel === 'HIGH' || analysis.riskLevel === 'CRITICAL') {
+    if (analysis.riskLevel === "HIGH" || analysis.riskLevel === "CRITICAL") {
       await prisma.activityLog.create({
         data: {
           organizationId: membership.organizationId,
           userId: session.user.id,
-          action: 'FRAUD_ALERT',
-          entityType: 'RMA',
+          action: "FRAUD_ALERT",
+          entityType: "RMA",
           entityId: rmaId,
           metadata: {
             rmaNumber: rma.rmaNumber,
@@ -156,20 +168,23 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       analysis,
-      message: 'Fraud analysis completed',
+      message: "Fraud analysis completed",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error analyzing fraud:', error);
+    console.error("Error analyzing fraud:", error);
     return NextResponse.json(
-      { error: 'Failed to analyze fraud', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to analyze fraud",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }
@@ -178,7 +193,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -186,11 +201,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     // Get fraud statistics
-    const stats = await prisma.$queryRaw`
+    const stats = (await prisma.$queryRaw`
       SELECT 
         COUNT(*) as total_analyses,
         AVG(risk_score) as avg_risk_score,
@@ -202,9 +220,9 @@ export async function GET(request: NextRequest) {
       JOIN "RMA" r ON r.id = fa.rma_id
       WHERE r.organization_id = ${membership.organizationId}
         AND fa.created_at >= NOW() - INTERVAL '30 days'
-    ` as any[];
+    `) as any[];
 
-    const topSignals = await prisma.$queryRaw`
+    const topSignals = (await prisma.$queryRaw`
       SELECT 
         signal->>'type' as signal_type,
         COUNT(*) as occurrences,
@@ -217,10 +235,12 @@ export async function GET(request: NextRequest) {
       GROUP BY signal->>'type'
       ORDER BY occurrences DESC
       LIMIT 10
-    ` as any[];
+    `) as any[];
 
     const monitoringService = new FraudMonitoringService();
-    const monitoring = await monitoringService.getStatistics(membership.organizationId);
+    const monitoring = await monitoringService.getStatistics(
+      membership.organizationId,
+    );
 
     return NextResponse.json({
       stats: stats[0],
@@ -228,10 +248,10 @@ export async function GET(request: NextRequest) {
       monitoring,
     });
   } catch (error) {
-    console.error('Error fetching fraud stats:', error);
+    console.error("Error fetching fraud stats:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch fraud statistics' },
-      { status: 500 }
+      { error: "Failed to fetch fraud statistics" },
+      { status: 500 },
     );
   }
 }

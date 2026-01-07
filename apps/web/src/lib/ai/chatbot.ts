@@ -37,10 +37,8 @@ const INTENT_PATTERNS = {
     /^(hi|hello|hey|good\s+(morning|afternoon|evening))/i,
     /^how\s+are\s+you/i,
   ],
-  
-  goodbye: [
-    /^(bye|goodbye|see\s+you|thanks|thank\s+you)/i,
-  ],
+
+  goodbye: [/^(bye|goodbye|see\s+you|thanks|thank\s+you)/i],
 
   stock_check: [
     /how\s+(much|many).*stock/i,
@@ -86,18 +84,9 @@ const INTENT_PATTERNS = {
     /performance/i,
   ],
 
-  help: [
-    /help/i,
-    /what.*can.*you.*do/i,
-    /how.*to/i,
-    /need.*assistance/i,
-  ],
+  help: [/help/i, /what.*can.*you.*do/i, /how.*to/i, /need.*assistance/i],
 
-  price_inquiry: [
-    /how\s+much.*cost/i,
-    /what.*price/i,
-    /price.*of/i,
-  ],
+  price_inquiry: [/how\s+much.*cost/i, /what.*price/i, /price.*of/i],
 };
 
 /**
@@ -109,11 +98,13 @@ function extractEntities(message: string): Record<string, any> {
   // Extract numbers
   const numbers = message.match(/\d+/g);
   if (numbers) {
-    entities.numbers = numbers.map(n => parseInt(n));
+    entities.numbers = numbers.map((n) => parseInt(n));
   }
 
   // Extract product names (simple heuristic - words after "for", "of", "about")
-  const productMatch = message.match(/(?:for|of|about)\s+([a-z\s]+?)(?:\s|$|,|\.|\?)/i);
+  const productMatch = message.match(
+    /(?:for|of|about)\s+([a-z\s]+?)(?:\s|$|,|\.|\?)/i,
+  );
   if (productMatch?.[1]) {
     entities.product = productMatch[1].trim();
   }
@@ -126,9 +117,9 @@ function extractEntities(message: string): Record<string, any> {
     /this\s+month/i,
   ];
 
-  datePatterns.forEach(pattern => {
+  datePatterns.forEach((pattern) => {
     if (pattern.test(message)) {
-      entities.timeframe = pattern.source.replace(/\\/g, '').replace(/i$/, '');
+      entities.timeframe = pattern.source.replace(/\\/g, "").replace(/i$/, "");
     }
   });
 
@@ -242,9 +233,12 @@ export class Chatbot {
   /**
    * Start a new chat session
    */
-  startSession(userId: string, userProfile?: ChatContext["userProfile"]): string {
+  startSession(
+    userId: string,
+    userProfile?: ChatContext["userProfile"],
+  ): string {
     const sessionId = Math.random().toString(36).substring(7);
-    
+
     this.contexts.set(sessionId, {
       userId,
       sessionId,
@@ -387,8 +381,16 @@ export function formatRichResponse(intent: Intent, data?: any): RichResponse {
         data,
         actions: data?.product
           ? [
-              { label: "Create Order", action: "create_order", data: data.product },
-              { label: "View Details", action: "view_product", data: data.product },
+              {
+                label: "Create Order",
+                action: "create_order",
+                data: data.product,
+              },
+              {
+                label: "View Details",
+                action: "view_product",
+                data: data.product,
+              },
             ]
           : undefined,
       };
@@ -410,7 +412,11 @@ export function formatRichResponse(intent: Intent, data?: any): RichResponse {
         type: "report",
         data,
         actions: [
-          { label: "Download PDF", action: "download_report", data: { format: "pdf" } },
+          {
+            label: "Download PDF",
+            action: "download_report",
+            data: { format: "pdf" },
+          },
           { label: "View Details", action: "view_full_report" },
         ],
       };

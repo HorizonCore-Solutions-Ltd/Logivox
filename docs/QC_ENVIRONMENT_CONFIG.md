@@ -27,6 +27,7 @@ SMTP_REPLY_TO=qc-team@flowstock.com
 ### Alternative Email Providers
 
 #### SendGrid
+
 ```bash
 SMTP_HOST=smtp.sendgrid.net
 SMTP_PORT=587
@@ -35,6 +36,7 @@ SMTP_PASS=SG.your_api_key_here
 ```
 
 #### AWS SES
+
 ```bash
 SMTP_HOST=email-smtp.us-east-1.amazonaws.com
 SMTP_PORT=587
@@ -43,6 +45,7 @@ SMTP_PASS=your_ses_secret_key
 ```
 
 #### Gmail (Development Only)
+
 ```bash
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -51,6 +54,7 @@ SMTP_PASS=your_app_password
 ```
 
 #### Mailgun
+
 ```bash
 SMTP_HOST=smtp.mailgun.org
 SMTP_PORT=587
@@ -230,26 +234,26 @@ QC_AQL_MINOR=4.0
 
 ## Environment Variable Reference
 
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `SMTP_HOST` | Yes | - | SMTP server hostname |
-| `SMTP_PORT` | Yes | 587 | SMTP server port |
-| `SMTP_SECURE` | No | false | Use TLS (true for port 465) |
-| `SMTP_USER` | Yes | - | SMTP authentication username |
-| `SMTP_PASS` | Yes | - | SMTP authentication password |
-| `SMTP_FROM_EMAIL` | Yes | - | Sender email address |
-| `SMTP_FROM_NAME` | No | Flowstock QC | Sender display name |
-| `QC_AQL_CRITICAL` | No | 0.0 | Critical defect AQL level |
-| `QC_AQL_MAJOR` | No | 2.5 | Major defect AQL level |
-| `QC_AQL_MINOR` | No | 4.0 | Minor defect AQL level |
-| `QC_MIN_SAMPLE_SIZE` | No | 5 | Minimum inspection sample |
-| `QC_MAX_SAMPLE_SIZE` | No | 200 | Maximum inspection sample |
-| `QC_SAMPLING_LEVEL` | No | II | ISO 2859-1 inspection level |
-| `AWS_ACCESS_KEY_ID` | Yes* | - | AWS access key for S3 |
-| `AWS_SECRET_ACCESS_KEY` | Yes* | - | AWS secret key for S3 |
-| `AWS_S3_BUCKET` | Yes* | - | S3 bucket for media storage |
+| Variable                | Required | Default      | Description                  |
+| ----------------------- | -------- | ------------ | ---------------------------- |
+| `SMTP_HOST`             | Yes      | -            | SMTP server hostname         |
+| `SMTP_PORT`             | Yes      | 587          | SMTP server port             |
+| `SMTP_SECURE`           | No       | false        | Use TLS (true for port 465)  |
+| `SMTP_USER`             | Yes      | -            | SMTP authentication username |
+| `SMTP_PASS`             | Yes      | -            | SMTP authentication password |
+| `SMTP_FROM_EMAIL`       | Yes      | -            | Sender email address         |
+| `SMTP_FROM_NAME`        | No       | Flowstock QC | Sender display name          |
+| `QC_AQL_CRITICAL`       | No       | 0.0          | Critical defect AQL level    |
+| `QC_AQL_MAJOR`          | No       | 2.5          | Major defect AQL level       |
+| `QC_AQL_MINOR`          | No       | 4.0          | Minor defect AQL level       |
+| `QC_MIN_SAMPLE_SIZE`    | No       | 5            | Minimum inspection sample    |
+| `QC_MAX_SAMPLE_SIZE`    | No       | 200          | Maximum inspection sample    |
+| `QC_SAMPLING_LEVEL`     | No       | II           | ISO 2859-1 inspection level  |
+| `AWS_ACCESS_KEY_ID`     | Yes\*    | -            | AWS access key for S3        |
+| `AWS_SECRET_ACCESS_KEY` | Yes\*    | -            | AWS secret key for S3        |
+| `AWS_S3_BUCKET`         | Yes\*    | -            | S3 bucket for media storage  |
 
-*Required if using AWS S3 for file storage
+\*Required if using AWS S3 for file storage
 
 ## Testing Email Configuration
 

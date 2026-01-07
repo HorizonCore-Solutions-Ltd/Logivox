@@ -24,6 +24,7 @@
 ## 1. Patrol System
 
 ### Create Patrol Route
+
 ```http
 POST /api/security/patrol-routes
 Content-Type: application/json
@@ -49,6 +50,7 @@ Content-Type: application/json
 ```
 
 ### Start Patrol
+
 ```http
 POST /api/security/patrols/start
 
@@ -59,6 +61,7 @@ POST /api/security/patrols/start
 ```
 
 ### Scan Checkpoint
+
 ```http
 POST /api/security/patrols/{patrolId}/scans
 
@@ -75,6 +78,7 @@ POST /api/security/patrols/{patrolId}/scans
 ```
 
 ### Complete Patrol
+
 ```http
 POST /api/security/patrols/{patrolId}/complete
 
@@ -88,6 +92,7 @@ POST /api/security/patrols/{patrolId}/complete
 ## 2. Panic Button
 
 ### Trigger Panic Alert
+
 ```http
 POST /api/security/panic
 
@@ -104,6 +109,7 @@ POST /api/security/panic
 **Response:** Includes nearest 3 guards by GPS proximity
 
 ### Respond to Alert
+
 ```http
 POST /api/security/panic/{alertId}/respond
 
@@ -116,6 +122,7 @@ POST /api/security/panic/{alertId}/respond
 ```
 
 ### Resolve Alert
+
 ```http
 PATCH /api/security/panic/{alertId}/resolve
 
@@ -131,6 +138,7 @@ PATCH /api/security/panic/{alertId}/resolve
 ## 3. GPS Tracking
 
 ### Update Guard Location
+
 ```http
 POST /api/security/location
 
@@ -148,11 +156,13 @@ POST /api/security/location
 **Response:** Includes any geofence violations detected
 
 ### Get All Guard Locations
+
 ```http
 GET /api/security/location?since=15
 ```
 
 ### Create Geofence
+
 ```http
 POST /api/security/geofences
 
@@ -169,6 +179,7 @@ POST /api/security/geofences
 ```
 
 ### List Geofence Violations
+
 ```http
 GET /api/security/geofences/violations?acknowledged=false
 ```
@@ -178,6 +189,7 @@ GET /api/security/geofences/violations?acknowledged=false
 ## 4. Daily Activity Reports
 
 ### Create Report
+
 ```http
 POST /api/security/daily-reports
 
@@ -199,10 +211,12 @@ POST /api/security/daily-reports
 ```
 
 **Auto-populated:**
+
 - `gateEntries`, `gateExits`, `visitorsCheckIns`
 - `incidentsReported`, `patrolsCompleted`, `checkpointsScanned`
 
 ### Submit Report
+
 ```http
 POST /api/security/daily-reports/{reportId}/submit
 
@@ -212,6 +226,7 @@ POST /api/security/daily-reports/{reportId}/submit
 ```
 
 ### Approve Report
+
 ```http
 POST /api/security/daily-reports/{reportId}/approve
 
@@ -225,6 +240,7 @@ POST /api/security/daily-reports/{reportId}/approve
 ## 5. Equipment Tracking
 
 ### Create Equipment
+
 ```http
 POST /api/security/equipment
 
@@ -239,6 +255,7 @@ POST /api/security/equipment
 ```
 
 ### Checkout Equipment
+
 ```http
 POST /api/security/equipment/{equipmentId}/checkout
 
@@ -251,6 +268,7 @@ POST /api/security/equipment/{equipmentId}/checkout
 ```
 
 ### Checkin Equipment
+
 ```http
 POST /api/security/equipment/{equipmentId}/checkin
 
@@ -262,6 +280,7 @@ POST /api/security/equipment/{equipmentId}/checkin
 ```
 
 ### Log Maintenance
+
 ```http
 POST /api/security/equipment/{equipmentId}/maintenance
 
@@ -276,6 +295,7 @@ POST /api/security/equipment/{equipmentId}/maintenance
 ```
 
 ### Get Available Equipment
+
 ```http
 GET /api/security/equipment/available?type=RADIO
 ```
@@ -285,6 +305,7 @@ GET /api/security/equipment/available?type=RADIO
 ## 6. Shift Handover
 
 ### Create Handover
+
 ```http
 POST /api/security/handover
 
@@ -311,10 +332,12 @@ POST /api/security/handover
 ```
 
 **Auto-populated:**
+
 - `gateEntriesCount`, `gateExitsCount`, `currentVehiclesOnSite`
 - `visitorsCount`, `incidentsCount`, `patrolsCompleted`
 
 ### Approve Handover
+
 ```http
 POST /api/security/handover/{handoverId}/approve
 
@@ -328,6 +351,7 @@ POST /api/security/handover/{handoverId}/approve
 ## 7. Training & Certifications
 
 ### Add Certification
+
 ```http
 POST /api/security/certifications
 
@@ -347,11 +371,13 @@ POST /api/security/certifications
 **Auto-calculated:** Status based on expiry date
 
 ### Get Expiring Certifications
+
 ```http
 GET /api/security/certifications/expiring?days=30
 ```
 
 ### Create Training Course
+
 ```http
 POST /api/security/training-courses
 
@@ -368,6 +394,7 @@ POST /api/security/training-courses
 ```
 
 ### Complete Training
+
 ```http
 POST /api/security/training-courses/{courseId}/complete
 
@@ -380,7 +407,8 @@ POST /api/security/training-courses/{courseId}/complete
 }
 ```
 
-**Auto-calculated:** 
+**Auto-calculated:**
+
 - `passed` based on passing score
 - `expiryDate` based on validity period
 
@@ -389,6 +417,7 @@ POST /api/security/training-courses/{courseId}/complete
 ## 8. Manifest Tracking
 
 ### Create Manifest
+
 ```http
 POST /api/security/manifests
 
@@ -407,6 +436,7 @@ POST /api/security/manifests
 **Auto-calculated:** `hasDiscrepancy` if expected ≠ actual
 
 ### Verify Manifest
+
 ```http
 PATCH /api/security/manifests/{manifestId}/verify
 
@@ -417,6 +447,7 @@ PATCH /api/security/manifests/{manifestId}/verify
 ```
 
 ### List Manifests with Discrepancies
+
 ```http
 GET /api/security/manifests?hasDiscrepancy=true
 ```
@@ -426,11 +457,13 @@ GET /api/security/manifests?hasDiscrepancy=true
 ## 9. Weather Integration
 
 ### Get Current Weather
+
 ```http
 GET /api/security/weather?warehouseId=wh_123
 ```
 
 ### Log Weather (Webhook)
+
 ```http
 POST /api/security/weather
 
@@ -458,6 +491,7 @@ POST /api/security/weather
 ## 📊 Response Formats
 
 ### Success Response
+
 ```json
 {
   "id": "resource_123",
@@ -469,6 +503,7 @@ POST /api/security/weather
 ```
 
 ### Error Response
+
 ```json
 {
   "error": "Invalid request data",
@@ -482,6 +517,7 @@ POST /api/security/weather
 ```
 
 ### Validation Errors (400)
+
 ```json
 {
   "error": "Invalid request data",
@@ -490,6 +526,7 @@ POST /api/security/weather
 ```
 
 ### Authentication Errors (401)
+
 ```json
 {
   "error": "Unauthorized"
@@ -497,6 +534,7 @@ POST /api/security/weather
 ```
 
 ### Not Found (404)
+
 ```json
 {
   "error": "Resource not found"
@@ -510,22 +548,26 @@ POST /api/security/weather
 ### Common Filters
 
 **Pagination:**
+
 ```
 ?page=1&limit=50
 ```
 
 **Date Ranges:**
+
 ```
 ?from=2026-01-01&to=2026-01-31
 ```
 
 **Status Filters:**
+
 ```
 ?status=ACTIVE
 ?isActive=true
 ```
 
 **Entity Filters:**
+
 ```
 ?guardId=guard_456
 ?warehouseId=wh_123
@@ -555,6 +597,7 @@ POST /api/security/weather
 7. **Submit DAR** → POST `/api/security/daily-reports/{id}/submit`
 
 ### Background Services:
+
 - GPS tracking (every 30 seconds)
 - Panic button (always available)
 - Geofence monitoring (continuous)

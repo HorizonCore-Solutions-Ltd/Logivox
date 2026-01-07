@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
@@ -150,9 +156,12 @@ export default function SalesOrderDetailPage() {
     if (!salesOrder) return;
 
     try {
-      const response = await fetch(`/api/sales-orders/${salesOrder.id}/approve`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `/api/sales-orders/${salesOrder.id}/approve`,
+        {
+          method: "POST",
+        },
+      );
 
       if (response.ok) {
         toast({
@@ -183,9 +192,12 @@ export default function SalesOrderDetailPage() {
     if (!salesOrder) return;
 
     try {
-      const response = await fetch(`/api/sales-orders/${salesOrder.id}/cancel`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `/api/sales-orders/${salesOrder.id}/cancel`,
+        {
+          method: "POST",
+        },
+      );
 
       if (response.ok) {
         toast({
@@ -216,14 +228,17 @@ export default function SalesOrderDetailPage() {
     if (!salesOrder || !salesOrder.warehouse) return;
 
     try {
-      const response = await fetch(`/api/sales-orders/${salesOrder.id}/create-pick-list`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          warehouseId: salesOrder.warehouse.id,
-          priority: salesOrder.priority,
-        }),
-      });
+      const response = await fetch(
+        `/api/sales-orders/${salesOrder.id}/create-pick-list`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            warehouseId: salesOrder.warehouse.id,
+            priority: salesOrder.priority,
+          }),
+        },
+      );
 
       if (response.ok) {
         toast({
@@ -276,7 +291,9 @@ export default function SalesOrderDetailPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">Loading...</div>
+    );
   }
 
   if (!salesOrder) {
@@ -292,12 +309,15 @@ export default function SalesOrderDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{salesOrder.soNumber}</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {salesOrder.soNumber}
+            </h1>
             <p className="text-muted-foreground">Sales Order Details</p>
           </div>
         </div>
         <div className="flex gap-2">
-          {salesOrder.status === "DRAFT" || salesOrder.status === "PENDING_APPROVAL" ? (
+          {salesOrder.status === "DRAFT" ||
+          salesOrder.status === "PENDING_APPROVAL" ? (
             <Button onClick={() => setApproveDialogOpen(true)}>
               <CheckCircle className="mr-2 h-4 w-4" />
               Approve
@@ -309,8 +329,13 @@ export default function SalesOrderDetailPage() {
               Create Pick List
             </Button>
           )}
-          {!["SHIPPED", "DELIVERED", "CANCELLED"].includes(salesOrder.status) && (
-            <Button variant="destructive" onClick={() => setCancelDialogOpen(true)}>
+          {!["SHIPPED", "DELIVERED", "CANCELLED"].includes(
+            salesOrder.status,
+          ) && (
+            <Button
+              variant="destructive"
+              onClick={() => setCancelDialogOpen(true)}
+            >
               <XCircle className="mr-2 h-4 w-4" />
               Cancel Order
             </Button>
@@ -353,10 +378,18 @@ export default function SalesOrderDetailPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Payment Status</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Payment Status
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <Badge className={salesOrder.paymentStatus === "PAID" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+            <Badge
+              className={
+                salesOrder.paymentStatus === "PAID"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }
+            >
               {salesOrder.paymentStatus}
             </Badge>
             <div className="text-xs text-muted-foreground mt-1">
@@ -413,7 +446,8 @@ export default function SalesOrderDetailPage() {
                 <Label className="text-muted-foreground">Address</Label>
                 <div className="font-medium">{salesOrder.shippingAddress}</div>
                 <div className="text-sm text-muted-foreground">
-                  {salesOrder.shippingCity}, {salesOrder.shippingState} {salesOrder.shippingZip}
+                  {salesOrder.shippingCity}, {salesOrder.shippingState}{" "}
+                  {salesOrder.shippingZip}
                 </div>
                 <div className="text-sm text-muted-foreground">
                   {salesOrder.shippingCountry}
@@ -457,7 +491,9 @@ export default function SalesOrderDetailPage() {
             </div>
             {salesOrder.requestedDate && (
               <div>
-                <Label className="text-muted-foreground">Requested Delivery</Label>
+                <Label className="text-muted-foreground">
+                  Requested Delivery
+                </Label>
                 <div className="font-medium">
                   {new Date(salesOrder.requestedDate).toLocaleDateString()}
                 </div>
@@ -465,7 +501,9 @@ export default function SalesOrderDetailPage() {
             )}
             {salesOrder.promisedDate && (
               <div>
-                <Label className="text-muted-foreground">Promised Delivery</Label>
+                <Label className="text-muted-foreground">
+                  Promised Delivery
+                </Label>
                 <div className="font-medium">
                   {new Date(salesOrder.promisedDate).toLocaleDateString()}
                 </div>
@@ -486,7 +524,9 @@ export default function SalesOrderDetailPage() {
             <div>
               <Label className="text-muted-foreground">Warehouse</Label>
               <div className="font-medium">
-                {salesOrder.warehouse ? salesOrder.warehouse.name : "Not assigned"}
+                {salesOrder.warehouse
+                  ? salesOrder.warehouse.name
+                  : "Not assigned"}
               </div>
             </div>
             <div>
@@ -628,7 +668,9 @@ export default function SalesOrderDetailPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleApprove}>Approve</AlertDialogAction>
+            <AlertDialogAction onClick={handleApprove}>
+              Approve
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -639,12 +681,16 @@ export default function SalesOrderDetailPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel Sales Order?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will cancel the order and release any reserved inventory. This action cannot be undone.
+              This will cancel the order and release any reserved inventory.
+              This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>No, Keep Order</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCancel} className="bg-destructive">
+            <AlertDialogAction
+              onClick={handleCancel}
+              className="bg-destructive"
+            >
               Yes, Cancel Order
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -652,12 +698,16 @@ export default function SalesOrderDetailPage() {
       </AlertDialog>
 
       {/* Create Pick List Dialog */}
-      <AlertDialog open={pickListDialogOpen} onOpenChange={setPickListDialogOpen}>
+      <AlertDialog
+        open={pickListDialogOpen}
+        onOpenChange={setPickListDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Create Pick List?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will create a pick list for warehouse staff to pick items for this order.
+              This will create a pick list for warehouse staff to pick items for
+              this order.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

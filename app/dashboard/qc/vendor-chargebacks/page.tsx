@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   DollarSign,
   RefreshCw,
@@ -15,8 +15,8 @@ import {
   Clock,
   XCircle,
   TrendingUp,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface Chargeback {
   id: string;
@@ -35,10 +35,10 @@ export default function VendorChargebacksPage() {
   const [loading, setLoading] = useState(true);
   const [chargebacks, setChargebacks] = useState<Chargeback[]>([]);
   const [stats, setStats] = useState<any>(null);
-  const [filterStatus, setFilterStatus] = useState('ALL');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const organizationId = 'org_123';
+  const organizationId = "org_123";
 
   useEffect(() => {
     fetchChargebacks();
@@ -51,44 +51,44 @@ export default function VendorChargebacksPage() {
       // TODO: Replace with actual API call
       const mockChargebacks: Chargeback[] = [
         {
-          id: '1',
-          chargebackNumber: 'CB-202601-0001',
-          vendor: { id: 'v1', name: 'Acme Suppliers Inc.' },
-          totalAmount: 15420.50,
-          status: 'INVOICED',
-          invoiceDate: '2026-01-03',
-          paymentDue: '2026-02-02',
+          id: "1",
+          chargebackNumber: "CB-202601-0001",
+          vendor: { id: "v1", name: "Acme Suppliers Inc." },
+          totalAmount: 15420.5,
+          status: "INVOICED",
+          invoiceDate: "2026-01-03",
+          paymentDue: "2026-02-02",
           disputed: false,
-          rtvIds: ['RTV-001', 'RTV-002'],
+          rtvIds: ["RTV-001", "RTV-002"],
         },
         {
-          id: '2',
-          chargebackNumber: 'CB-202601-0002',
-          vendor: { id: 'v2', name: 'Global Trade Co.' },
-          totalAmount: 8750.00,
-          status: 'DISPUTED',
-          invoiceDate: '2026-01-02',
-          paymentDue: '2026-02-01',
+          id: "2",
+          chargebackNumber: "CB-202601-0002",
+          vendor: { id: "v2", name: "Global Trade Co." },
+          totalAmount: 8750.0,
+          status: "DISPUTED",
+          invoiceDate: "2026-01-02",
+          paymentDue: "2026-02-01",
           disputed: true,
-          rtvIds: ['RTV-003'],
+          rtvIds: ["RTV-003"],
         },
         {
-          id: '3',
-          chargebackNumber: 'CB-202512-0045',
-          vendor: { id: 'v3', name: 'Best Products Ltd.' },
+          id: "3",
+          chargebackNumber: "CB-202512-0045",
+          vendor: { id: "v3", name: "Best Products Ltd." },
           totalAmount: 22340.75,
-          status: 'PAID',
-          invoiceDate: '2025-12-15',
-          paymentDue: '2026-01-14',
+          status: "PAID",
+          invoiceDate: "2025-12-15",
+          paymentDue: "2026-01-14",
           disputed: false,
           paidAmount: 22340.75,
-          rtvIds: ['RTV-004', 'RTV-005', 'RTV-006'],
+          rtvIds: ["RTV-004", "RTV-005", "RTV-006"],
         },
       ];
 
       setChargebacks(mockChargebacks);
     } catch (error) {
-      console.error('Error fetching chargebacks:', error);
+      console.error("Error fetching chargebacks:", error);
     } finally {
       setLoading(false);
     }
@@ -100,25 +100,25 @@ export default function VendorChargebacksPage() {
       setStats({
         totalChargebacks: 48,
         totalAmount: 187650.25,
-        paidAmount: 142320.50,
-        pendingAmount: 38580.00,
+        paidAmount: 142320.5,
+        pendingAmount: 38580.0,
         disputedAmount: 6749.75,
         collectionRate: 76,
         avgChargebackValue: 3909.38,
       });
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error("Error fetching stats:", error);
     }
   };
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { color: string; icon: any; text: string }> = {
-      PENDING: { color: 'bg-yellow-500', icon: Clock, text: 'Pending' },
-      APPROVED: { color: 'bg-blue-500', icon: CheckCircle, text: 'Approved' },
-      INVOICED: { color: 'bg-purple-500', icon: FileText, text: 'Invoiced' },
-      PAID: { color: 'bg-green-500', icon: DollarSign, text: 'Paid' },
-      DISPUTED: { color: 'bg-red-500', icon: AlertTriangle, text: 'Disputed' },
-      WRITTEN_OFF: { color: 'bg-gray-500', icon: XCircle, text: 'Written Off' },
+      PENDING: { color: "bg-yellow-500", icon: Clock, text: "Pending" },
+      APPROVED: { color: "bg-blue-500", icon: CheckCircle, text: "Approved" },
+      INVOICED: { color: "bg-purple-500", icon: FileText, text: "Invoiced" },
+      PAID: { color: "bg-green-500", icon: DollarSign, text: "Paid" },
+      DISPUTED: { color: "bg-red-500", icon: AlertTriangle, text: "Disputed" },
+      WRITTEN_OFF: { color: "bg-gray-500", icon: XCircle, text: "Written Off" },
     };
 
     const { color, icon: Icon, text } = config[status] || config.PENDING;
@@ -130,10 +130,11 @@ export default function VendorChargebacksPage() {
     );
   };
 
-  const filteredChargebacks = chargebacks.filter(cb => {
-    const matchesStatus = filterStatus === 'ALL' || cb.status === filterStatus;
-    const matchesSearch = cb.chargebackNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cb.vendor.name.toLowerCase().includes(searchTerm.toLowerCase());
+  const filteredChargebacks = chargebacks.filter((cb) => {
+    const matchesStatus = filterStatus === "ALL" || cb.status === filterStatus;
+    const matchesSearch =
+      cb.chargebackNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cb.vendor.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 
@@ -177,11 +178,15 @@ export default function VendorChargebacksPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Amount</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Amount
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${stats.totalAmount.toLocaleString()}</div>
+              <div className="text-2xl font-bold">
+                ${stats.totalAmount.toLocaleString()}
+              </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {stats.totalChargebacks} chargebacks
               </p>
@@ -227,9 +232,7 @@ export default function VendorChargebacksPage() {
               <div className="text-2xl font-bold text-red-600">
                 ${stats.disputedAmount.toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Under review
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Under review</p>
             </CardContent>
           </Card>
         </div>
@@ -244,16 +247,18 @@ export default function VendorChargebacksPage() {
           className="max-w-md"
         />
         <div className="flex gap-2">
-          {['ALL', 'PENDING', 'APPROVED', 'INVOICED', 'PAID', 'DISPUTED'].map((status) => (
-            <Button
-              key={status}
-              variant={filterStatus === status ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilterStatus(status)}
-            >
-              {status}
-            </Button>
-          ))}
+          {["ALL", "PENDING", "APPROVED", "INVOICED", "PAID", "DISPUTED"].map(
+            (status) => (
+              <Button
+                key={status}
+                variant={filterStatus === status ? "default" : "outline"}
+                size="sm"
+                onClick={() => setFilterStatus(status)}
+              >
+                {status}
+              </Button>
+            ),
+          )}
         </div>
       </div>
 
@@ -265,20 +270,25 @@ export default function VendorChargebacksPage() {
               <DollarSign className="w-12 h-12 text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold">No chargebacks found</h3>
               <p className="text-muted-foreground">
-                {searchTerm || filterStatus !== 'ALL'
-                  ? 'Try adjusting your filters'
-                  : 'Create your first chargeback to recover costs'}
+                {searchTerm || filterStatus !== "ALL"
+                  ? "Try adjusting your filters"
+                  : "Create your first chargeback to recover costs"}
               </p>
             </CardContent>
           </Card>
         ) : (
           filteredChargebacks.map((chargeback) => (
-            <Card key={chargeback.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={chargeback.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-lg">{chargeback.chargebackNumber}</h3>
+                      <h3 className="font-semibold text-lg">
+                        {chargeback.chargebackNumber}
+                      </h3>
                       {getStatusBadge(chargeback.status)}
                       {chargeback.disputed && (
                         <Badge variant="destructive">
@@ -300,7 +310,9 @@ export default function VendorChargebacksPage() {
                       <div>
                         <p className="text-muted-foreground">Invoice Date</p>
                         <p className="font-medium">
-                          {new Date(chargeback.invoiceDate).toLocaleDateString()}
+                          {new Date(
+                            chargeback.invoiceDate,
+                          ).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
@@ -311,7 +323,9 @@ export default function VendorChargebacksPage() {
                       </div>
                       <div>
                         <p className="text-muted-foreground">Related RTVs</p>
-                        <p className="font-medium">{chargeback.rtvIds.length} items</p>
+                        <p className="font-medium">
+                          {chargeback.rtvIds.length} items
+                        </p>
                       </div>
                     </div>
                     {chargeback.paidAmount && (
@@ -323,7 +337,9 @@ export default function VendorChargebacksPage() {
                       </div>
                     )}
                   </div>
-                  <Link href={`/dashboard/qc/vendor-chargebacks/${chargeback.id}`}>
+                  <Link
+                    href={`/dashboard/qc/vendor-chargebacks/${chargeback.id}`}
+                  >
                     <Button variant="outline" size="sm">
                       <Eye className="w-4 h-4 mr-2" />
                       View Details
@@ -348,15 +364,23 @@ export default function VendorChargebacksPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Average Chargeback Value</p>
-                <p className="text-2xl font-bold">${stats?.avgChargebackValue?.toLocaleString() || 0}</p>
+                <p className="text-sm text-muted-foreground">
+                  Average Chargeback Value
+                </p>
+                <p className="text-2xl font-bold">
+                  ${stats?.avgChargebackValue?.toLocaleString() || 0}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Collection Rate</p>
-                <p className="text-2xl font-bold">{stats?.collectionRate || 0}%</p>
+                <p className="text-2xl font-bold">
+                  {stats?.collectionRate || 0}%
+                </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Total Recovered (YTD)</p>
+                <p className="text-sm text-muted-foreground">
+                  Total Recovered (YTD)
+                </p>
                 <p className="text-2xl font-bold text-green-600">
                   ${stats?.paidAmount?.toLocaleString() || 0}
                 </p>

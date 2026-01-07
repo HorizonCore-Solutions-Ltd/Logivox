@@ -1,63 +1,65 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Hash, 
-  Upload, 
-  Download, 
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Hash,
+  Upload,
+  Download,
   CheckCircle2,
   AlertCircle,
-  Loader2
-} from 'lucide-react';
+  Loader2,
+} from "lucide-react";
 
 interface SerialNumber {
   serialNumber: string;
-  status: 'SUCCESS' | 'ERROR' | 'DUPLICATE';
+  status: "SUCCESS" | "ERROR" | "DUPLICATE";
   message?: string;
 }
 
 export default function SerialNumberBulkPage() {
-  const [serialNumbers, setSerialNumbers] = useState('');
+  const [serialNumbers, setSerialNumbers] = useState("");
   const [results, setResults] = useState<SerialNumber[]>([]);
   const [processing, setProcessing] = useState(false);
-  const [operation, setOperation] = useState<'CREATE' | 'UPDATE' | 'DELETE'>('CREATE');
+  const [operation, setOperation] = useState<"CREATE" | "UPDATE" | "DELETE">(
+    "CREATE",
+  );
 
   const processSerialNumbers = async () => {
     setProcessing(true);
     setResults([]);
 
     try {
-      const lines = serialNumbers.split('\n').filter(line => line.trim());
-      const response = await fetch('/api/serial-numbers/bulk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const lines = serialNumbers.split("\n").filter((line) => line.trim());
+      const response = await fetch("/api/serial-numbers/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           operation,
-          serialNumbers: lines
-        })
+          serialNumbers: lines,
+        }),
       });
 
       const data = await response.json();
       setResults(data.results || []);
     } catch (error) {
-      console.error('Error processing serial numbers:', error);
+      console.error("Error processing serial numbers:", error);
     } finally {
       setProcessing(false);
     }
   };
 
   const downloadTemplate = () => {
-    const template = 'SN001\nSN002\nSN003\n';
-    const blob = new Blob([template], { type: 'text/plain' });
+    const template = "SN001\nSN002\nSN003\n";
+    const blob = new Blob([template], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'serial-numbers-template.txt';
+    a.download = "serial-numbers-template.txt";
     a.click();
   };
 
@@ -75,9 +77,9 @@ export default function SerialNumberBulkPage() {
 
   const stats = {
     total: results.length,
-    success: results.filter(r => r.status === 'SUCCESS').length,
-    errors: results.filter(r => r.status === 'ERROR').length,
-    duplicates: results.filter(r => r.status === 'DUPLICATE').length
+    success: results.filter((r) => r.status === "SUCCESS").length,
+    errors: results.filter((r) => r.status === "ERROR").length,
+    duplicates: results.filter((r) => r.status === "DUPLICATE").length,
   };
 
   return (
@@ -110,7 +112,11 @@ export default function SerialNumberBulkPage() {
                 <option value="DELETE">Delete</option>
               </select>
 
-              <Button variant="outline" onClick={downloadTemplate} className="gap-2">
+              <Button
+                variant="outline"
+                onClick={downloadTemplate}
+                className="gap-2"
+              >
                 <Download className="h-4 w-4" />
                 Template
               </Button>
@@ -150,7 +156,11 @@ export default function SerialNumberBulkPage() {
                   Processing...
                 </>
               ) : (
-                <>Process {serialNumbers.split('\n').filter(l => l.trim()).length} Serial Numbers</>
+                <>
+                  Process{" "}
+                  {serialNumbers.split("\n").filter((l) => l.trim()).length}{" "}
+                  Serial Numbers
+                </>
               )}
             </Button>
           </CardContent>
@@ -166,7 +176,9 @@ export default function SerialNumberBulkPage() {
               <div className="text-center py-12 text-muted-foreground">
                 <Hash className="h-16 w-16 mx-auto mb-4 opacity-50" />
                 <p>No results yet</p>
-                <p className="text-sm mt-1">Process serial numbers to see results</p>
+                <p className="text-sm mt-1">
+                  Process serial numbers to see results
+                </p>
               </div>
             ) : (
               <>
@@ -177,16 +189,24 @@ export default function SerialNumberBulkPage() {
                     <div className="text-xs text-muted-foreground">Total</div>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-green-50">
-                    <div className="text-2xl font-bold text-green-600">{stats.success}</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {stats.success}
+                    </div>
                     <div className="text-xs text-muted-foreground">Success</div>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-red-50">
-                    <div className="text-2xl font-bold text-red-600">{stats.errors}</div>
+                    <div className="text-2xl font-bold text-red-600">
+                      {stats.errors}
+                    </div>
                     <div className="text-xs text-muted-foreground">Errors</div>
                   </div>
                   <div className="text-center p-3 rounded-lg bg-yellow-50">
-                    <div className="text-2xl font-bold text-yellow-600">{stats.duplicates}</div>
-                    <div className="text-xs text-muted-foreground">Duplicates</div>
+                    <div className="text-2xl font-bold text-yellow-600">
+                      {stats.duplicates}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Duplicates
+                    </div>
                   </div>
                 </div>
 
@@ -197,16 +217,16 @@ export default function SerialNumberBulkPage() {
                       key={index}
                       className={`
                         p-3 rounded-lg border-l-4 flex items-start justify-between
-                        ${result.status === 'SUCCESS' ? 'border-green-500 bg-green-50' : ''}
-                        ${result.status === 'ERROR' ? 'border-red-500 bg-red-50' : ''}
-                        ${result.status === 'DUPLICATE' ? 'border-yellow-500 bg-yellow-50' : ''}
+                        ${result.status === "SUCCESS" ? "border-green-500 bg-green-50" : ""}
+                        ${result.status === "ERROR" ? "border-red-500 bg-red-50" : ""}
+                        ${result.status === "DUPLICATE" ? "border-yellow-500 bg-yellow-50" : ""}
                       `}
                     >
                       <div className="flex items-start gap-3 flex-1">
-                        {result.status === 'SUCCESS' && (
+                        {result.status === "SUCCESS" && (
                           <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5" />
                         )}
-                        {result.status !== 'SUCCESS' && (
+                        {result.status !== "SUCCESS" && (
                           <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
                         )}
                         <div className="flex-1">
@@ -222,9 +242,9 @@ export default function SerialNumberBulkPage() {
                       </div>
                       <Badge
                         className={`
-                          ${result.status === 'SUCCESS' ? 'bg-green-100 text-green-800' : ''}
-                          ${result.status === 'ERROR' ? 'bg-red-100 text-red-800' : ''}
-                          ${result.status === 'DUPLICATE' ? 'bg-yellow-100 text-yellow-800' : ''}
+                          ${result.status === "SUCCESS" ? "bg-green-100 text-green-800" : ""}
+                          ${result.status === "ERROR" ? "bg-red-100 text-red-800" : ""}
+                          ${result.status === "DUPLICATE" ? "bg-yellow-100 text-yellow-800" : ""}
                         `}
                       >
                         {result.status}
@@ -248,21 +268,31 @@ export default function SerialNumberBulkPage() {
             <div>
               <div className="font-medium mb-1">Format:</div>
               <p className="text-muted-foreground">
-                Enter one serial number per line. Serial numbers can contain letters, numbers, and hyphens.
+                Enter one serial number per line. Serial numbers can contain
+                letters, numbers, and hyphens.
               </p>
             </div>
             <div>
               <div className="font-medium mb-1">Operations:</div>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                <li><strong>Create New:</strong> Add new serial numbers to the system</li>
-                <li><strong>Update Existing:</strong> Update information for existing serial numbers</li>
-                <li><strong>Delete:</strong> Remove serial numbers from the system</li>
+                <li>
+                  <strong>Create New:</strong> Add new serial numbers to the
+                  system
+                </li>
+                <li>
+                  <strong>Update Existing:</strong> Update information for
+                  existing serial numbers
+                </li>
+                <li>
+                  <strong>Delete:</strong> Remove serial numbers from the system
+                </li>
               </ul>
             </div>
             <div>
               <div className="font-medium mb-1">File Upload:</div>
               <p className="text-muted-foreground">
-                Upload a .txt or .csv file with serial numbers. Each serial number should be on a new line.
+                Upload a .txt or .csv file with serial numbers. Each serial
+                number should be on a new line.
               </p>
             </div>
           </div>

@@ -1,8 +1,8 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 // ============================================================================
 // POST /api/purchase-orders/[id]/approve - Approve purchase order
@@ -10,16 +10,13 @@ import { prisma } from '@/lib/prisma';
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if PO exists
@@ -32,16 +29,18 @@ export async function POST(
 
     if (!existingPO) {
       return NextResponse.json(
-        { error: 'Purchase order not found' },
-        { status: 404 }
+        { error: "Purchase order not found" },
+        { status: 404 },
       );
     }
 
     // Check if PO can be approved
-    if (existingPO.status !== 'PENDING' && existingPO.status !== 'DRAFT') {
+    if (existingPO.status !== "PENDING" && existingPO.status !== "DRAFT") {
       return NextResponse.json(
-        { error: `Cannot approve purchase order with status: ${existingPO.status}` },
-        { status: 400 }
+        {
+          error: `Cannot approve purchase order with status: ${existingPO.status}`,
+        },
+        { status: 400 },
       );
     }
 
@@ -49,7 +48,7 @@ export async function POST(
     const purchaseOrder = await prisma.purchaseOrder.update({
       where: { id: params.id },
       data: {
-        status: 'APPROVED',
+        status: "APPROVED",
         approvedDate: new Date(),
         approvedById: session.user.id,
       },
@@ -67,26 +66,25 @@ export async function POST(
       data: {
         organizationId: existingPO.organizationId,
         userId: session.user.id,
-        action: 'APPROVE',
-        entityType: 'PurchaseOrder',
+        action: "APPROVE",
+        entityType: "PurchaseOrder",
         entityId: purchaseOrder.id,
-        metadata: { 
+        metadata: {
           poNumber: purchaseOrder.poNumber,
-          status: 'APPROVED',
+          status: "APPROVED",
         },
       },
     });
 
     return NextResponse.json({
       purchaseOrder,
-      message: 'Purchase order approved successfully',
+      message: "Purchase order approved successfully",
     });
-
   } catch (error) {
-    console.error('Error approving purchase order:', error);
+    console.error("Error approving purchase order:", error);
     return NextResponse.json(
-      { error: 'Failed to approve purchase order' },
-      { status: 500 }
+      { error: "Failed to approve purchase order" },
+      { status: 500 },
     );
   }
 }

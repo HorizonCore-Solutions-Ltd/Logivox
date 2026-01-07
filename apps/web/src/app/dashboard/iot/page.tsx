@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -67,13 +73,19 @@ export default function IoTDevicesPage() {
       if (response.ok) {
         const data = await response.json();
         setDevices(data.devices || []);
-        
+
         // Calculate stats
         const total = data.devices.length;
-        const online = data.devices.filter((d: IoTDevice) => d.status === "ONLINE").length;
-        const offline = data.devices.filter((d: IoTDevice) => d.status === "OFFLINE").length;
-        const error = data.devices.filter((d: IoTDevice) => d.status === "ERROR").length;
-        
+        const online = data.devices.filter(
+          (d: IoTDevice) => d.status === "ONLINE",
+        ).length;
+        const offline = data.devices.filter(
+          (d: IoTDevice) => d.status === "OFFLINE",
+        ).length;
+        const error = data.devices.filter(
+          (d: IoTDevice) => d.status === "ERROR",
+        ).length;
+
         setStats({ total, online, offline, error });
       }
     } catch (error) {
@@ -91,7 +103,8 @@ export default function IoTDevicesPage() {
       MAINTENANCE: { color: "bg-yellow-100 text-yellow-800", icon: Activity },
     };
 
-    const statusConfig = (config[status as keyof typeof config] || config.OFFLINE) as { color: string; icon: any };
+    const statusConfig = (config[status as keyof typeof config] ||
+      config.OFFLINE) as { color: string; icon: any };
     const { color, icon: Icon } = statusConfig;
 
     return (
@@ -120,9 +133,12 @@ export default function IoTDevicesPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">IoT Device Management</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            IoT Device Management
+          </h1>
           <p className="text-gray-600 mt-1">
-            Monitor and manage all IoT sensors, RFID readers, and connected devices
+            Monitor and manage all IoT sensors, RFID readers, and connected
+            devices
           </p>
         </div>
         <div className="flex gap-2">
@@ -149,7 +165,9 @@ export default function IoTDevicesPage() {
             <Activity className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{stats.total}</div>
+            <div className="text-3xl font-bold text-gray-900">
+              {stats.total}
+            </div>
           </CardContent>
         </Card>
 
@@ -161,9 +179,14 @@ export default function IoTDevicesPage() {
             <Wifi className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{stats.online}</div>
+            <div className="text-3xl font-bold text-green-600">
+              {stats.online}
+            </div>
             <p className="text-xs text-gray-500 mt-1">
-              {stats.total > 0 ? Math.round((stats.online / stats.total) * 100) : 0}% uptime
+              {stats.total > 0
+                ? Math.round((stats.online / stats.total) * 100)
+                : 0}
+              % uptime
             </p>
           </CardContent>
         </Card>
@@ -176,7 +199,9 @@ export default function IoTDevicesPage() {
             <Wifi className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-600">{stats.offline}</div>
+            <div className="text-3xl font-bold text-gray-600">
+              {stats.offline}
+            </div>
           </CardContent>
         </Card>
 
@@ -238,8 +263,12 @@ export default function IoTDevicesPage() {
                           {getDeviceIcon(device.deviceType)}
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">{device.name}</p>
-                          <p className="text-sm text-gray-500 font-mono">{device.deviceId}</p>
+                          <p className="font-medium text-gray-900">
+                            {device.name}
+                          </p>
+                          <p className="text-sm text-gray-500 font-mono">
+                            {device.deviceId}
+                          </p>
                         </div>
                       </div>
                     </TableCell>
@@ -252,31 +281,38 @@ export default function IoTDevicesPage() {
                       <div>
                         <p className="text-sm">{device.location || "—"}</p>
                         {device.warehouse && (
-                          <p className="text-xs text-gray-500">{device.warehouse.name}</p>
+                          <p className="text-xs text-gray-500">
+                            {device.warehouse.name}
+                          </p>
                         )}
                       </div>
                     </TableCell>
                     <TableCell>{getStatusBadge(device.status)}</TableCell>
                     <TableCell>
-                      {device.batteryLevel !== null && device.batteryLevel !== undefined ? (
+                      {device.batteryLevel !== null &&
+                      device.batteryLevel !== undefined ? (
                         <div className="flex items-center space-x-2">
                           <Battery
                             className={`h-4 w-4 ${
                               device.batteryLevel > 50
                                 ? "text-green-600"
                                 : device.batteryLevel > 20
-                                ? "text-yellow-600"
-                                : "text-red-600"
+                                  ? "text-yellow-600"
+                                  : "text-red-600"
                             }`}
                           />
-                          <span className="text-sm">{device.batteryLevel}%</span>
+                          <span className="text-sm">
+                            {device.batteryLevel}%
+                          </span>
                         </div>
                       ) : (
                         <span className="text-sm text-gray-400">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{device._count.readings.toLocaleString()}</span>
+                      <span className="text-sm">
+                        {device._count.readings.toLocaleString()}
+                      </span>
                     </TableCell>
                     <TableCell>
                       {device._count.alerts > 0 ? (

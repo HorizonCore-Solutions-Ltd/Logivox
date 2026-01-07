@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const visitorSchema = z.object({
   firstName: z.string().min(1),
@@ -10,7 +10,15 @@ const visitorSchema = z.object({
   email: z.string().email().optional(),
   phone: z.string().optional(),
   company: z.string().optional(),
-  visitorType: z.enum(['CONTRACTOR', 'VENDOR', 'CUSTOMER', 'AUDITOR', 'CANDIDATE', 'GUEST', 'OTHER']),
+  visitorType: z.enum([
+    "CONTRACTOR",
+    "VENDOR",
+    "CUSTOMER",
+    "AUDITOR",
+    "CANDIDATE",
+    "GUEST",
+    "OTHER",
+  ]),
   purpose: z.string(),
   hostEmployeeId: z.string().optional(),
   hostName: z.string().optional(),
@@ -30,20 +38,20 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
     const skip = (page - 1) * limit;
 
     // Filters
-    const status = searchParams.get('status');
-    const visitorType = searchParams.get('visitorType');
-    const search = searchParams.get('search');
-    const date = searchParams.get('date');
-    const checkedIn = searchParams.get('checkedIn');
+    const status = searchParams.get("status");
+    const visitorType = searchParams.get("visitorType");
+    const search = searchParams.get("search");
+    const date = searchParams.get("date");
+    const checkedIn = searchParams.get("checkedIn");
 
     const where: any = {
       organizationId: session.user.organizationId,
@@ -61,16 +69,16 @@ export async function GET(request: NextRequest) {
         lte: endOfDay,
       };
     }
-    if (checkedIn === 'true') {
+    if (checkedIn === "true") {
       where.checkInTime = { not: null };
       where.checkOutTime = null;
     }
     if (search) {
       where.OR = [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
-        { company: { contains: search, mode: 'insensitive' } },
-        { badgeNumber: { contains: search, mode: 'insensitive' } },
+        { firstName: { contains: search, mode: "insensitive" } },
+        { lastName: { contains: search, mode: "insensitive" } },
+        { company: { contains: search, mode: "insensitive" } },
+        { badgeNumber: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -79,7 +87,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { checkInTime: 'desc' },
+        orderBy: { checkInTime: "desc" },
         include: {
           securityPersonnel: {
             select: {
@@ -104,10 +112,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching visitors:', error);
+    console.error("Error fetching visitors:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch visitors' },
-      { status: 500 }
+      { error: "Failed to fetch visitors" },
+      { status: 500 },
     );
   }
 }
@@ -116,7 +124,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get organization security settings
@@ -131,8 +139,8 @@ export async function POST(request: NextRequest) {
     // Validate based on organization policy
     if (visitorPolicy?.walkInsAllowed === false) {
       return NextResponse.json(
-        { error: 'Walk-in visitors not allowed. Pre-registration required.' },
-        { status: 403 }
+        { error: "Walk-in visitors not allowed. Pre-registration required." },
+        { status: 403 },
       );
     }
 
@@ -142,14 +150,14 @@ export async function POST(request: NextRequest) {
     // Generate badge number
     const lastVisitor = await prisma.visitor.findFirst({
       where: { organizationId: session.user.organizationId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: { badgeNumber: true },
     });
 
-    const lastNumber = lastVisitor?.badgeNumber 
-      ? parseInt(lastVisitor.badgeNumber.replace(/\D/g, '')) 
+    const lastNumber = lastVisitor?.badgeNumber
+      ? parseInt(lastVisitor.badgeNumber.replace(/\D/g, ""))
       : 0;
-    const badgeNumber = `VIS${String(lastNumber + 1).padStart(6, '0')}`;
+    const badgeNumber = `VIS${String(lastNumber + 1).padStart(6, "0")}`;
 
     const visitor = await prisma.visitor.create({
       data: {
@@ -157,10 +165,10 @@ export async function POST(request: NextRequest) {
         organizationId: session.user.organizationId,
         badgeNumber,
         badgeIssued: true,
-        status: 'CHECKED_IN',
+        status: "CHECKED_IN",
         checkInTime: new Date(validatedData.checkInTime),
-        expectedCheckOutTime: validatedData.expectedCheckOutTime 
-          ? new Date(validatedData.expectedCheckOutTime) 
+        expectedCheckOutTime: validatedData.expectedCheckOutTime
+          ? new Date(validatedData.expectedCheckOutTime)
           : null,
       },
       include: {
@@ -180,8 +188,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'CREATE',
-        entity: 'VISITOR',
+        action: "CREATE",
+        entity: "VISITOR",
         entityId: visitor.id,
         description: `Checked in visitor ${visitor.firstName} ${visitor.lastName} with badge ${badgeNumber}`,
         metadata: {
@@ -195,14 +203,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
-    console.error('Error creating visitor:', error);
+    console.error("Error creating visitor:", error);
     return NextResponse.json(
-      { error: 'Failed to create visitor' },
-      { status: 500 }
+      { error: "Failed to create visitor" },
+      { status: 500 },
     );
   }
 }

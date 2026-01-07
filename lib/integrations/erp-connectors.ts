@@ -1,6 +1,6 @@
-import axios from 'axios';
-import * as crypto from 'crypto';
-import * as qs from 'querystring';
+import axios from "axios";
+import * as crypto from "crypto";
+import * as qs from "querystring";
 
 /**
  * NetSuite REST API Connector
@@ -77,7 +77,9 @@ export class NetSuiteConnector {
 
   constructor(config: NetSuiteConfig) {
     this.config = config;
-    this.baseUrl = config.baseUrl || `https://${config.accountId}.suitetalk.api.netsuite.com`;
+    this.baseUrl =
+      config.baseUrl ||
+      `https://${config.accountId}.suitetalk.api.netsuite.com`;
   }
 
   /**
@@ -86,32 +88,32 @@ export class NetSuiteConnector {
   private generateOAuthSignature(
     method: string,
     url: string,
-    params: Record<string, string>
+    params: Record<string, string>,
   ): string {
     // Sort parameters
     const sortedParams = Object.keys(params)
       .sort()
-      .map(key => `${key}=${encodeURIComponent(params[key])}`)
-      .join('&');
+      .map((key) => `${key}=${encodeURIComponent(params[key])}`)
+      .join("&");
 
     // Create signature base string
     const signatureBase = [
       method.toUpperCase(),
       encodeURIComponent(url),
-      encodeURIComponent(sortedParams)
-    ].join('&');
+      encodeURIComponent(sortedParams),
+    ].join("&");
 
     // Create signing key
     const signingKey = [
       encodeURIComponent(this.config.consumerSecret),
-      encodeURIComponent(this.config.tokenSecret)
-    ].join('&');
+      encodeURIComponent(this.config.tokenSecret),
+    ].join("&");
 
     // Generate HMAC-SHA256 signature
     const signature = crypto
-      .createHmac('sha256', signingKey)
+      .createHmac("sha256", signingKey)
       .update(signatureBase)
-      .digest('base64');
+      .digest("base64");
 
     return signature;
   }
@@ -121,24 +123,26 @@ export class NetSuiteConnector {
    */
   private getAuthHeader(method: string, url: string): string {
     const timestamp = Math.floor(Date.now() / 1000).toString();
-    const nonce = crypto.randomBytes(16).toString('hex');
+    const nonce = crypto.randomBytes(16).toString("hex");
 
     const oauthParams: Record<string, string> = {
       oauth_consumer_key: this.config.consumerKey,
       oauth_token: this.config.tokenId,
-      oauth_signature_method: 'HMAC-SHA256',
+      oauth_signature_method: "HMAC-SHA256",
       oauth_timestamp: timestamp,
       oauth_nonce: nonce,
-      oauth_version: '1.0',
-      realm: this.config.realm
+      oauth_version: "1.0",
+      realm: this.config.realm,
     };
 
     const signature = this.generateOAuthSignature(method, url, oauthParams);
     oauthParams.oauth_signature = signature;
 
-    const authHeader = 'OAuth ' + Object.keys(oauthParams)
-      .map(key => `${key}="${encodeURIComponent(oauthParams[key])}"`)
-      .join(', ');
+    const authHeader =
+      "OAuth " +
+      Object.keys(oauthParams)
+        .map((key) => `${key}="${encodeURIComponent(oauthParams[key])}"`)
+        .join(", ");
 
     return authHeader;
   }
@@ -149,25 +153,28 @@ export class NetSuiteConnector {
   private async request(
     method: string,
     endpoint: string,
-    data?: any
+    data?: any,
   ): Promise<any> {
     const url = `${this.baseUrl}/services/rest${endpoint}`;
-    
+
     try {
       const response = await axios({
         method,
         url,
         data,
         headers: {
-          'Authorization': this.getAuthHeader(method, url),
-          'Content-Type': 'application/json',
-          'prefer': 'transient'
-        }
+          Authorization: this.getAuthHeader(method, url),
+          "Content-Type": "application/json",
+          prefer: "transient",
+        },
       });
 
       return response.data;
     } catch (error: any) {
-      console.error('NetSuite API error:', error.response?.data || error.message);
+      console.error(
+        "NetSuite API error:",
+        error.response?.data || error.message,
+      );
       throw error;
     }
   }
@@ -177,13 +184,16 @@ export class NetSuiteConnector {
    */
 
   async getCustomers(limit: number = 100): Promise<NetSuiteCustomer[]> {
-    const response = await this.request('GET', `/record/v1/customer?limit=${limit}`);
+    const response = await this.request(
+      "GET",
+      `/record/v1/customer?limit=${limit}`,
+    );
     return response.items || [];
   }
 
   async getCustomer(id: string): Promise<NetSuiteCustomer | null> {
     try {
-      const response = await this.request('GET', `/record/v1/customer/${id}`);
+      const response = await this.request("GET", `/record/v1/customer/${id}`);
       return response;
     } catch (error) {
       return null;
@@ -192,16 +202,23 @@ export class NetSuiteConnector {
 
   async createCustomer(customer: NetSuiteCustomer): Promise<string | null> {
     try {
-      const response = await this.request('POST', '/record/v1/customer', customer);
+      const response = await this.request(
+        "POST",
+        "/record/v1/customer",
+        customer,
+      );
       return response.id;
     } catch (error) {
       return null;
     }
   }
 
-  async updateCustomer(id: string, customer: Partial<NetSuiteCustomer>): Promise<boolean> {
+  async updateCustomer(
+    id: string,
+    customer: Partial<NetSuiteCustomer>,
+  ): Promise<boolean> {
     try {
-      await this.request('PATCH', `/record/v1/customer/${id}`, customer);
+      await this.request("PATCH", `/record/v1/customer/${id}`, customer);
       return true;
     } catch (error) {
       return false;
@@ -213,13 +230,19 @@ export class NetSuiteConnector {
    */
 
   async getProducts(limit: number = 100): Promise<NetSuiteProduct[]> {
-    const response = await this.request('GET', `/record/v1/inventoryItem?limit=${limit}`);
+    const response = await this.request(
+      "GET",
+      `/record/v1/inventoryItem?limit=${limit}`,
+    );
     return response.items || [];
   }
 
   async getProduct(id: string): Promise<NetSuiteProduct | null> {
     try {
-      const response = await this.request('GET', `/record/v1/inventoryItem/${id}`);
+      const response = await this.request(
+        "GET",
+        `/record/v1/inventoryItem/${id}`,
+      );
       return response;
     } catch (error) {
       return null;
@@ -228,16 +251,23 @@ export class NetSuiteConnector {
 
   async createProduct(product: NetSuiteProduct): Promise<string | null> {
     try {
-      const response = await this.request('POST', '/record/v1/inventoryItem', product);
+      const response = await this.request(
+        "POST",
+        "/record/v1/inventoryItem",
+        product,
+      );
       return response.id;
     } catch (error) {
       return null;
     }
   }
 
-  async updateProduct(id: string, product: Partial<NetSuiteProduct>): Promise<boolean> {
+  async updateProduct(
+    id: string,
+    product: Partial<NetSuiteProduct>,
+  ): Promise<boolean> {
     try {
-      await this.request('PATCH', `/record/v1/inventoryItem/${id}`, product);
+      await this.request("PATCH", `/record/v1/inventoryItem/${id}`, product);
       return true;
     } catch (error) {
       return false;
@@ -253,13 +283,16 @@ export class NetSuiteConnector {
    */
 
   async getSalesOrders(limit: number = 100): Promise<NetSuiteSalesOrder[]> {
-    const response = await this.request('GET', `/record/v1/salesOrder?limit=${limit}`);
+    const response = await this.request(
+      "GET",
+      `/record/v1/salesOrder?limit=${limit}`,
+    );
     return response.items || [];
   }
 
   async getSalesOrder(id: string): Promise<NetSuiteSalesOrder | null> {
     try {
-      const response = await this.request('GET', `/record/v1/salesOrder/${id}`);
+      const response = await this.request("GET", `/record/v1/salesOrder/${id}`);
       return response;
     } catch (error) {
       return null;
@@ -268,16 +301,23 @@ export class NetSuiteConnector {
 
   async createSalesOrder(order: NetSuiteSalesOrder): Promise<string | null> {
     try {
-      const response = await this.request('POST', '/record/v1/salesOrder', order);
+      const response = await this.request(
+        "POST",
+        "/record/v1/salesOrder",
+        order,
+      );
       return response.id;
     } catch (error) {
       return null;
     }
   }
 
-  async updateSalesOrder(id: string, order: Partial<NetSuiteSalesOrder>): Promise<boolean> {
+  async updateSalesOrder(
+    id: string,
+    order: Partial<NetSuiteSalesOrder>,
+  ): Promise<boolean> {
     try {
-      await this.request('PATCH', `/record/v1/salesOrder/${id}`, order);
+      await this.request("PATCH", `/record/v1/salesOrder/${id}`, order);
       return true;
     } catch (error) {
       return false;
@@ -288,9 +328,15 @@ export class NetSuiteConnector {
    * INVENTORY ADJUSTMENTS
    */
 
-  async createInventoryAdjustment(adjustment: NetSuiteInventoryAdjustment): Promise<string | null> {
+  async createInventoryAdjustment(
+    adjustment: NetSuiteInventoryAdjustment,
+  ): Promise<string | null> {
     try {
-      const response = await this.request('POST', '/record/v1/inventoryAdjustment', adjustment);
+      const response = await this.request(
+        "POST",
+        "/record/v1/inventoryAdjustment",
+        adjustment,
+      );
       return response.id;
     } catch (error) {
       return null;
@@ -308,16 +354,22 @@ export class NetSuiteConnector {
         { q: query },
         {
           headers: {
-            'Authorization': this.getAuthHeader('POST', `${this.baseUrl}/services/rest/query/v1/suiteql`),
-            'Content-Type': 'application/json',
-            'prefer': 'transient'
-          }
-        }
+            Authorization: this.getAuthHeader(
+              "POST",
+              `${this.baseUrl}/services/rest/query/v1/suiteql`,
+            ),
+            "Content-Type": "application/json",
+            prefer: "transient",
+          },
+        },
       );
 
       return response.data.items || [];
     } catch (error: any) {
-      console.error('NetSuite search error:', error.response?.data || error.message);
+      console.error(
+        "NetSuite search error:",
+        error.response?.data || error.message,
+      );
       return [];
     }
   }
@@ -328,7 +380,7 @@ export class NetSuiteConnector {
 
   async testConnection(): Promise<boolean> {
     try {
-      await this.request('GET', '/record/v1/customer?limit=1');
+      await this.request("GET", "/record/v1/customer?limit=1");
       return true;
     } catch (error) {
       return false;
@@ -350,7 +402,7 @@ export interface SAPConfig {
 export interface SAPBusinessPartner {
   CardCode?: string;
   CardName: string;
-  CardType: 'cCustomer' | 'cSupplier';
+  CardType: "cCustomer" | "cSupplier";
   Phone1?: string;
   EmailAddress?: string;
   Address?: string;
@@ -397,20 +449,23 @@ export class SAPConnector {
         {
           CompanyDB: this.config.companyDB,
           UserName: this.config.username,
-          Password: this.config.password
-        }
+          Password: this.config.password,
+        },
       );
 
       this.sessionId = response.data.SessionId;
 
       // Auto-refresh session every 25 minutes (session timeout is 30 min)
-      this.sessionTimeout = setInterval(() => {
-        this.login();
-      }, 25 * 60 * 1000);
+      this.sessionTimeout = setInterval(
+        () => {
+          this.login();
+        },
+        25 * 60 * 1000,
+      );
 
       return true;
     } catch (error: any) {
-      console.error('SAP login error:', error.response?.data || error.message);
+      console.error("SAP login error:", error.response?.data || error.message);
       return false;
     }
   }
@@ -430,9 +485,9 @@ export class SAPConnector {
           {},
           {
             headers: {
-              'Cookie': `B1SESSION=${this.sessionId}`
-            }
-          }
+              Cookie: `B1SESSION=${this.sessionId}`,
+            },
+          },
         );
       } catch (error) {
         // Ignore logout errors
@@ -443,7 +498,11 @@ export class SAPConnector {
   /**
    * Make authenticated request
    */
-  private async request(method: string, endpoint: string, data?: any): Promise<any> {
+  private async request(
+    method: string,
+    endpoint: string,
+    data?: any,
+  ): Promise<any> {
     if (!this.sessionId) {
       await this.login();
     }
@@ -454,14 +513,14 @@ export class SAPConnector {
         url: `${this.config.serviceLayerUrl}/${endpoint}`,
         data,
         headers: {
-          'Cookie': `B1SESSION=${this.sessionId}`,
-          'Content-Type': 'application/json'
-        }
+          Cookie: `B1SESSION=${this.sessionId}`,
+          "Content-Type": "application/json",
+        },
       });
 
       return response.data;
     } catch (error: any) {
-      console.error('SAP API error:', error.response?.data || error.message);
+      console.error("SAP API error:", error.response?.data || error.message);
       throw error;
     }
   }
@@ -470,33 +529,45 @@ export class SAPConnector {
    * BUSINESS PARTNERS (Customers/Suppliers)
    */
 
-  async getBusinessPartners(type?: 'cCustomer' | 'cSupplier'): Promise<SAPBusinessPartner[]> {
-    const filter = type ? `?$filter=CardType eq '${type}'` : '';
-    const response = await this.request('GET', `BusinessPartners${filter}`);
+  async getBusinessPartners(
+    type?: "cCustomer" | "cSupplier",
+  ): Promise<SAPBusinessPartner[]> {
+    const filter = type ? `?$filter=CardType eq '${type}'` : "";
+    const response = await this.request("GET", `BusinessPartners${filter}`);
     return response.value || [];
   }
 
-  async getBusinessPartner(cardCode: string): Promise<SAPBusinessPartner | null> {
+  async getBusinessPartner(
+    cardCode: string,
+  ): Promise<SAPBusinessPartner | null> {
     try {
-      const response = await this.request('GET', `BusinessPartners('${cardCode}')`);
+      const response = await this.request(
+        "GET",
+        `BusinessPartners('${cardCode}')`,
+      );
       return response;
     } catch (error) {
       return null;
     }
   }
 
-  async createBusinessPartner(partner: SAPBusinessPartner): Promise<string | null> {
+  async createBusinessPartner(
+    partner: SAPBusinessPartner,
+  ): Promise<string | null> {
     try {
-      const response = await this.request('POST', 'BusinessPartners', partner);
+      const response = await this.request("POST", "BusinessPartners", partner);
       return response.CardCode;
     } catch (error) {
       return null;
     }
   }
 
-  async updateBusinessPartner(cardCode: string, partner: Partial<SAPBusinessPartner>): Promise<boolean> {
+  async updateBusinessPartner(
+    cardCode: string,
+    partner: Partial<SAPBusinessPartner>,
+  ): Promise<boolean> {
     try {
-      await this.request('PATCH', `BusinessPartners('${cardCode}')`, partner);
+      await this.request("PATCH", `BusinessPartners('${cardCode}')`, partner);
       return true;
     } catch (error) {
       return false;
@@ -508,13 +579,13 @@ export class SAPConnector {
    */
 
   async getItems(): Promise<SAPItem[]> {
-    const response = await this.request('GET', 'Items');
+    const response = await this.request("GET", "Items");
     return response.value || [];
   }
 
   async getItem(itemCode: string): Promise<SAPItem | null> {
     try {
-      const response = await this.request('GET', `Items('${itemCode}')`);
+      const response = await this.request("GET", `Items('${itemCode}')`);
       return response;
     } catch (error) {
       return null;
@@ -523,7 +594,7 @@ export class SAPConnector {
 
   async createItem(item: SAPItem): Promise<string | null> {
     try {
-      const response = await this.request('POST', 'Items', item);
+      const response = await this.request("POST", "Items", item);
       return response.ItemCode;
     } catch (error) {
       return null;
@@ -532,7 +603,7 @@ export class SAPConnector {
 
   async updateItem(itemCode: string, item: Partial<SAPItem>): Promise<boolean> {
     try {
-      await this.request('PATCH', `Items('${itemCode}')`, item);
+      await this.request("PATCH", `Items('${itemCode}')`, item);
       return true;
     } catch (error) {
       return false;
@@ -544,13 +615,13 @@ export class SAPConnector {
    */
 
   async getOrders(): Promise<SAPOrder[]> {
-    const response = await this.request('GET', 'Orders');
+    const response = await this.request("GET", "Orders");
     return response.value || [];
   }
 
   async getOrder(docEntry: number): Promise<SAPOrder | null> {
     try {
-      const response = await this.request('GET', `Orders(${docEntry})`);
+      const response = await this.request("GET", `Orders(${docEntry})`);
       return response;
     } catch (error) {
       return null;
@@ -559,16 +630,19 @@ export class SAPConnector {
 
   async createOrder(order: SAPOrder): Promise<number | null> {
     try {
-      const response = await this.request('POST', 'Orders', order);
+      const response = await this.request("POST", "Orders", order);
       return response.DocEntry;
     } catch (error) {
       return null;
     }
   }
 
-  async updateOrder(docEntry: number, order: Partial<SAPOrder>): Promise<boolean> {
+  async updateOrder(
+    docEntry: number,
+    order: Partial<SAPOrder>,
+  ): Promise<boolean> {
     try {
-      await this.request('PATCH', `Orders(${docEntry})`, order);
+      await this.request("PATCH", `Orders(${docEntry})`, order);
       return true;
     } catch (error) {
       return false;
@@ -580,8 +654,8 @@ export class SAPConnector {
    */
 
   async getInventory(itemCode?: string): Promise<any[]> {
-    const filter = itemCode ? `?$filter=ItemCode eq '${itemCode}'` : '';
-    const response = await this.request('GET', `InventoryGenEntries${filter}`);
+    const filter = itemCode ? `?$filter=ItemCode eq '${itemCode}'` : "";
+    const response = await this.request("GET", `InventoryGenEntries${filter}`);
     return response.value || [];
   }
 
@@ -592,7 +666,7 @@ export class SAPConnector {
   async testConnection(): Promise<boolean> {
     try {
       await this.login();
-      await this.request('GET', 'BusinessPartners?$top=1');
+      await this.request("GET", "BusinessPartners?$top=1");
       return true;
     } catch (error) {
       return false;
@@ -602,5 +676,5 @@ export class SAPConnector {
 
 export default {
   NetSuiteConnector,
-  SAPConnector
+  SAPConnector,
 };

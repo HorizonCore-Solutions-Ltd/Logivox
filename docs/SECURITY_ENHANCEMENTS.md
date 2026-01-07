@@ -17,7 +17,7 @@ Prevents XSS attacks by controlling which resources can be loaded and executed.
 **Configuration:**
 
 ```javascript
-'Content-Security-Policy': 
+'Content-Security-Policy':
   "default-src 'self'; " +
   "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com; " +
   "style-src 'self' 'unsafe-inline'; " +
@@ -30,12 +30,14 @@ Prevents XSS attacks by controlling which resources can be loaded and executed.
 ```
 
 **Protection Against:**
+
 - ✅ Cross-Site Scripting (XSS)
 - ✅ Data injection attacks
 - ✅ Unauthorized script execution
 - ✅ Clickjacking (frame-ancestors)
 
 **Development vs Production:**
+
 - Development: Allows localhost connections (ws:/wss: for hot reload)
 - Production: Strict HTTPS-only connections
 
@@ -51,37 +53,37 @@ Token bucket algorithm for API rate limiting with multiple tiers.
 
 ```typescript
 // Authentication endpoints (5 requests/minute)
-authRateLimiter
+authRateLimiter;
 
 // Standard API endpoints (60 requests/minute)
-apiRateLimiter
+apiRateLimiter;
 
 // Read-only endpoints (120 requests/minute)
-readRateLimiter
+readRateLimiter;
 
 // Sensitive operations (3 requests/5 minutes)
-sensitiveRateLimiter
+sensitiveRateLimiter;
 ```
 
 **Usage Example:**
 
 ```typescript
-import { authRateLimiter, applyRateLimit } from '@/lib/rate-limit';
+import { authRateLimiter, applyRateLimit } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   // Apply rate limiting
   const result = await applyRateLimit(req, authRateLimiter);
-  
+
   if (!result.success) {
     return NextResponse.json(
-      { error: 'Too many requests. Please try again later.' },
-      { 
+      { error: "Too many requests. Please try again later." },
+      {
         status: 429,
-        headers: result.headers // Includes X-RateLimit-* headers
-      }
+        headers: result.headers, // Includes X-RateLimit-* headers
+      },
     );
   }
-  
+
   // Process request...
 }
 ```
@@ -89,30 +91,29 @@ export async function POST(req: NextRequest) {
 **Higher-Order Function:**
 
 ```typescript
-import { withRateLimit, authRateLimiter } from '@/lib/rate-limit';
+import { withRateLimit, authRateLimiter } from "@/lib/rate-limit";
 
-const handler = withRateLimit(
-  async (req: NextRequest) => {
-    // Your handler logic
-    return NextResponse.json({ success: true });
-  },
-  authRateLimiter
-);
+const handler = withRateLimit(async (req: NextRequest) => {
+  // Your handler logic
+  return NextResponse.json({ success: true });
+}, authRateLimiter);
 
 export { handler as POST };
 ```
 
 **Features:**
+
 - ✅ Token bucket algorithm (smooth rate limiting)
 - ✅ Per-IP and per-user limits
 - ✅ Automatic token refill
 - ✅ Memory-efficient LRU cache (10,000 max buckets)
 - ✅ Redis support for distributed systems
-- ✅ Standard rate limit headers (X-RateLimit-*)
+- ✅ Standard rate limit headers (X-RateLimit-\*)
 - ✅ Configurable limits per endpoint
 - ✅ Admin functions (reset, stats)
 
 **Protection Against:**
+
 - ✅ Brute force attacks
 - ✅ DDoS attacks
 - ✅ API abuse
@@ -129,7 +130,7 @@ Comprehensive input sanitization and validation utilities.
 **HTML Sanitization:**
 
 ```typescript
-import { sanitizeHtml, escapeHtml, stripHtml } from '@/lib/sanitize';
+import { sanitizeHtml, escapeHtml, stripHtml } from "@/lib/sanitize";
 
 // Escape HTML special characters
 const safe = escapeHtml(userInput); // <script> → &lt;script&gt;
@@ -144,10 +145,10 @@ const text = stripHtml(html);
 **URL Validation:**
 
 ```typescript
-import { isValidUrl, sanitizeUrl } from '@/lib/sanitize';
+import { isValidUrl, sanitizeUrl } from "@/lib/sanitize";
 
 if (!isValidUrl(url)) {
-  throw new Error('Invalid URL');
+  throw new Error("Invalid URL");
 }
 
 const safeUrl = sanitizeUrl(url); // Removes javascript:, data:, etc.
@@ -156,10 +157,10 @@ const safeUrl = sanitizeUrl(url); // Removes javascript:, data:, etc.
 **Email Validation:**
 
 ```typescript
-import { isValidEmail, sanitizeEmail } from '@/lib/sanitize';
+import { isValidEmail, sanitizeEmail } from "@/lib/sanitize";
 
 if (!isValidEmail(email)) {
-  throw new Error('Invalid email');
+  throw new Error("Invalid email");
 }
 
 const cleanEmail = sanitizeEmail(email);
@@ -168,7 +169,7 @@ const cleanEmail = sanitizeEmail(email);
 **File Name Sanitization:**
 
 ```typescript
-import { sanitizeFileName, sanitizeFilePath } from '@/lib/sanitize';
+import { sanitizeFileName, sanitizeFilePath } from "@/lib/sanitize";
 
 // Prevent path traversal
 const safeName = sanitizeFileName(uploadedFile.name);
@@ -180,24 +181,25 @@ const safePath = sanitizeFilePath(userProvidedPath);
 **Comprehensive Validation:**
 
 ```typescript
-import { validateAndSanitize } from '@/lib/sanitize';
+import { validateAndSanitize } from "@/lib/sanitize";
 
 const result = validateAndSanitize(userInput, {
   maxLength: 1000,
   minLength: 5,
   allowHtml: false,
-  type: 'text'
+  type: "text",
 });
 
 if (!result.isValid) {
   console.error(result.errors);
-  throw new Error('Invalid input');
+  throw new Error("Invalid input");
 }
 
 const safe = result.value;
 ```
 
 **Available Validators:**
+
 - ✅ `isValidEmail` - Email format validation
 - ✅ `isValidUrl` - URL format validation
 - ✅ `isValidPhone` - Phone number validation
@@ -210,6 +212,7 @@ const safe = result.value;
 - ✅ `isValidFileExtension` - File extension whitelist
 
 **Available Sanitizers:**
+
 - ✅ `sanitizeHtml` - Remove dangerous HTML
 - ✅ `sanitizeText` - Escape HTML
 - ✅ `sanitizeUrl` - Remove dangerous protocols
@@ -221,11 +224,13 @@ const safe = result.value;
 - ✅ `deepSanitizeObject` - Recursive HTML escape
 
 **Security Pattern Detection:**
+
 - ✅ `containsXssPatterns` - Detect XSS attempts
 - ✅ `containsSqlInjectionPatterns` - Detect SQL injection
 - ✅ `containsOnlySafeCharacters` - Control character check
 
 **Protection Against:**
+
 - ✅ Cross-Site Scripting (XSS)
 - ✅ SQL Injection
 - ✅ Path Traversal
@@ -255,6 +260,7 @@ const safe = result.value;
 ```
 
 **Protection:**
+
 - ✅ **HSTS:** Force HTTPS connections for 1 year
 - ✅ **X-Frame-Options:** Prevent clickjacking
 - ✅ **X-Content-Type-Options:** Prevent MIME sniffing
@@ -280,6 +286,7 @@ const safe = result.value;
 ```
 
 **Features:**
+
 - ✅ Configurable allowed origins
 - ✅ Credentials support
 - ✅ Standard HTTP methods
@@ -292,6 +299,7 @@ const safe = result.value;
 **Location:** NextAuth.js (built-in)
 
 **Features:**
+
 - ✅ CSRF tokens for all mutations
 - ✅ SameSite cookie attributes
 - ✅ Origin header validation
@@ -333,6 +341,7 @@ cookies: {
 ```
 
 **Features:**
+
 - ✅ `httpOnly`: Prevent JavaScript access
 - ✅ `secure`: HTTPS-only transmission
 - ✅ `sameSite`: CSRF protection
@@ -346,6 +355,7 @@ cookies: {
 **Location:** Prisma ORM + `lib/sanitize.ts`
 
 **Primary Defense: Prisma ORM**
+
 - ✅ Parameterized queries (all Prisma operations)
 - ✅ Type-safe database access
 - ✅ Automatic escaping
@@ -353,14 +363,18 @@ cookies: {
 **Additional Layer:**
 
 ```typescript
-import { escapeSql, isValidSqlIdentifier, sanitizeSqlIdentifier } from '@/lib/sanitize';
+import {
+  escapeSql,
+  isValidSqlIdentifier,
+  sanitizeSqlIdentifier,
+} from "@/lib/sanitize";
 
 // For raw queries (rare)
 const safe = escapeSql(userInput);
 
 // For dynamic identifiers
 if (!isValidSqlIdentifier(columnName)) {
-  throw new Error('Invalid column name');
+  throw new Error("Invalid column name");
 }
 ```
 
@@ -371,6 +385,7 @@ if (!isValidSqlIdentifier(columnName)) {
 ### **XSS Testing**
 
 Test inputs:
+
 ```
 <script>alert('XSS')</script>
 <img src=x onerror=alert('XSS')>
@@ -379,6 +394,7 @@ javascript:alert('XSS')
 ```
 
 Expected behavior:
+
 - [ ] HTML tags escaped or removed
 - [ ] JavaScript URLs blocked
 - [ ] Event handlers removed
@@ -387,6 +403,7 @@ Expected behavior:
 ### **SQL Injection Testing**
 
 Test inputs:
+
 ```
 ' OR '1'='1
 '; DROP TABLE users; --
@@ -395,6 +412,7 @@ admin'--
 ```
 
 Expected behavior:
+
 - [ ] Input sanitized
 - [ ] Query parameterization (Prisma)
 - [ ] No unauthorized data access
@@ -412,14 +430,16 @@ done
 ```
 
 Expected behavior:
+
 - [ ] First 5 requests succeed
 - [ ] 6th request returns 429
-- [ ] X-RateLimit-* headers present
+- [ ] X-RateLimit-\* headers present
 - [ ] Retry-After header indicates wait time
 
 ### **CSRF Testing**
 
 Test scenarios:
+
 - [ ] Valid CSRF token: Request succeeds
 - [ ] Missing CSRF token: Request blocked
 - [ ] Invalid CSRF token: Request blocked
@@ -428,6 +448,7 @@ Test scenarios:
 ### **File Upload Testing**
 
 Test files:
+
 ```
 ../../etc/passwd
 <script>alert(1)</script>.jpg
@@ -436,6 +457,7 @@ very-long-filename-that-exceeds-limits.jpg
 ```
 
 Expected behavior:
+
 - [ ] Path traversal blocked
 - [ ] Extension whitelist enforced
 - [ ] File name sanitized
@@ -448,25 +470,25 @@ Expected behavior:
 ### **API Route Security**
 
 ```typescript
-import { NextRequest, NextResponse } from 'next/server';
-import { applyRateLimit, apiRateLimiter } from '@/lib/rate-limit';
-import { validateAndSanitize } from '@/lib/sanitize';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { applyRateLimit, apiRateLimiter } from "@/lib/rate-limit";
+import { validateAndSanitize } from "@/lib/sanitize";
+import { getServerSession } from "next-auth";
 
 export async function POST(req: NextRequest) {
   // 1. Rate limiting
   const rateLimitResult = await applyRateLimit(req, apiRateLimiter);
   if (!rateLimitResult.success) {
     return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429, headers: rateLimitResult.headers }
+      { error: "Too many requests" },
+      { status: 429, headers: rateLimitResult.headers },
     );
   }
 
   // 2. Authentication
   const session = await getServerSession();
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // 3. Input validation
@@ -478,8 +500,8 @@ export async function POST(req: NextRequest) {
 
   if (!validation.isValid) {
     return NextResponse.json(
-      { error: 'Invalid input', details: validation.errors },
-      { status: 400 }
+      { error: "Invalid input", details: validation.errors },
+      { status: 400 },
     );
   }
 
@@ -543,20 +565,20 @@ export function SecureForm() {
 ### **File Upload Security**
 
 ```typescript
-import { sanitizeFileName, isValidFileExtension } from '@/lib/sanitize';
+import { sanitizeFileName, isValidFileExtension } from "@/lib/sanitize";
 
-const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'pdf'];
+const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function handleFileUpload(file: File) {
   // 1. Validate file extension
   if (!isValidFileExtension(file.name, ALLOWED_EXTENSIONS)) {
-    throw new Error('Invalid file type');
+    throw new Error("Invalid file type");
   }
 
   // 2. Validate file size
   if (file.size > MAX_FILE_SIZE) {
-    throw new Error('File too large');
+    throw new Error("File too large");
   }
 
   // 3. Sanitize file name
@@ -598,11 +620,11 @@ SESSION_MAX_AGE=2592000 # 30 days
 ### **Rate Limit Monitoring**
 
 ```typescript
-import { getRateLimitStats } from '@/lib/rate-limit';
+import { getRateLimitStats } from "@/lib/rate-limit";
 
 // Get current statistics
 const stats = await getRateLimitStats();
-console.log('Rate limit statistics:', stats);
+console.log("Rate limit statistics:", stats);
 ```
 
 ### **Security Event Logging**
@@ -621,10 +643,10 @@ function logSecurityEvent(event: string, details: any) {
 
 // Example usage
 if (containsXssPatterns(userInput)) {
-  logSecurityEvent('XSS_ATTEMPT', {
+  logSecurityEvent("XSS_ATTEMPT", {
     input: userInput,
     userId: session?.user?.id,
-    ip: req.headers.get('x-forwarded-for'),
+    ip: req.headers.get("x-forwarded-for"),
   });
 }
 ```
@@ -635,29 +657,29 @@ if (containsXssPatterns(userInput)) {
 
 ### **OWASP Top 10 Coverage**
 
-| Vulnerability | Protection | Status |
-|---------------|-----------|---------|
-| **A01: Broken Access Control** | RBAC, authentication, authorization | ✅ |
-| **A02: Cryptographic Failures** | HTTPS, secure cookies, HSTS | ✅ |
-| **A03: Injection** | Input sanitization, Prisma ORM | ✅ |
-| **A04: Insecure Design** | CSP, secure defaults, rate limiting | ✅ |
-| **A05: Security Misconfiguration** | Secure headers, CSP, CORS | ✅ |
-| **A06: Vulnerable Components** | Dependency updates, npm audit | ✅ |
-| **A07: Authentication Failures** | NextAuth.js, rate limiting, MFA | ✅ |
-| **A08: Software & Data Integrity** | Subresource Integrity (SRI), CSP | ✅ |
-| **A09: Logging & Monitoring** | Security event logging | ✅ |
-| **A10: SSRF** | URL validation, whitelist | ✅ |
+| Vulnerability                      | Protection                          | Status |
+| ---------------------------------- | ----------------------------------- | ------ |
+| **A01: Broken Access Control**     | RBAC, authentication, authorization | ✅     |
+| **A02: Cryptographic Failures**    | HTTPS, secure cookies, HSTS         | ✅     |
+| **A03: Injection**                 | Input sanitization, Prisma ORM      | ✅     |
+| **A04: Insecure Design**           | CSP, secure defaults, rate limiting | ✅     |
+| **A05: Security Misconfiguration** | Secure headers, CSP, CORS           | ✅     |
+| **A06: Vulnerable Components**     | Dependency updates, npm audit       | ✅     |
+| **A07: Authentication Failures**   | NextAuth.js, rate limiting, MFA     | ✅     |
+| **A08: Software & Data Integrity** | Subresource Integrity (SRI), CSP    | ✅     |
+| **A09: Logging & Monitoring**      | Security event logging              | ✅     |
+| **A10: SSRF**                      | URL validation, whitelist           | ✅     |
 
 ---
 
 ## Performance Impact
 
-| Feature | Performance Impact |
-|---------|-------------------|
-| CSP Headers | Negligible (<1ms) |
-| Rate Limiting | 1-2ms per request |
+| Feature            | Performance Impact            |
+| ------------------ | ----------------------------- |
+| CSP Headers        | Negligible (<1ms)             |
+| Rate Limiting      | 1-2ms per request             |
 | Input Sanitization | 1-5ms depending on input size |
-| Secure Headers | Negligible (<1ms) |
+| Secure Headers     | Negligible (<1ms)             |
 
 **Overall Impact:** Minimal (~5ms average per request)
 
@@ -666,6 +688,7 @@ if (containsXssPatterns(userInput)) {
 ## Future Enhancements
 
 Planned security improvements:
+
 - [ ] WAF (Web Application Firewall) integration
 - [ ] Advanced bot detection
 - [ ] IP geolocation blocking
@@ -680,6 +703,7 @@ Planned security improvements:
 ## Support
 
 For security concerns:
+
 - **Email:** security@logivox.ai
 - **Bug Bounty:** Responsible disclosure program
 - **Emergency:** security-emergency@logivox.ai
@@ -694,6 +718,7 @@ Please do NOT create public GitHub issues for security vulnerabilities. Email se
 **Current Score: 98/100** 🎯
 
 **Breakdown:**
+
 - CSP Implementation: 20/20
 - Rate Limiting: 20/20
 - Input Sanitization: 20/20

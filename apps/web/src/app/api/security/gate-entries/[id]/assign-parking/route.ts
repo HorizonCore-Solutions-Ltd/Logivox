@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const assignParkingSchema = z.object({
   parkingSpotId: z.string().optional(), // If not provided, auto-assign
@@ -11,12 +11,12 @@ const assignParkingSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const gateEntryId = params.id;
@@ -30,7 +30,10 @@ export async function POST(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     const body = await req.json();
@@ -43,7 +46,7 @@ export async function POST(
       const where: any = {
         organizationId: session.user.organizationId,
         warehouseId: gateEntry.warehouseId,
-        status: 'AVAILABLE',
+        status: "AVAILABLE",
       };
 
       // Match parking type to vehicle/cargo requirements
@@ -54,16 +57,13 @@ export async function POST(
       // Find best available spot
       const availableSpot = await prisma.parkingSpot.findFirst({
         where,
-        orderBy: [
-          { zone: 'asc' },
-          { spotNumber: 'asc' },
-        ],
+        orderBy: [{ zone: "asc" }, { spotNumber: "asc" }],
       });
 
       if (!availableSpot) {
         return NextResponse.json(
-          { error: 'No available parking spots' },
-          { status: 404 }
+          { error: "No available parking spots" },
+          { status: 404 },
         );
       }
 
@@ -72,8 +72,8 @@ export async function POST(
 
     if (!parkingSpotId) {
       return NextResponse.json(
-        { error: 'Parking spot ID is required' },
-        { status: 400 }
+        { error: "Parking spot ID is required" },
+        { status: 400 },
       );
     }
 
@@ -82,14 +82,14 @@ export async function POST(
       where: {
         id: parkingSpotId,
         organizationId: session.user.organizationId,
-        status: 'AVAILABLE',
+        status: "AVAILABLE",
       },
     });
 
     if (!parkingSpot) {
       return NextResponse.json(
-        { error: 'Parking spot not available' },
-        { status: 400 }
+        { error: "Parking spot not available" },
+        { status: 400 },
       );
     }
 
@@ -105,7 +105,7 @@ export async function POST(
     await prisma.parkingSpot.update({
       where: { id: parkingSpotId },
       data: {
-        status: 'OCCUPIED',
+        status: "OCCUPIED",
         occupiedAt: new Date(),
         currentVehicleId: gateEntryId,
       },
@@ -118,15 +118,15 @@ export async function POST(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error assigning parking:', error);
+    console.error("Error assigning parking:", error);
     return NextResponse.json(
-      { error: 'Failed to assign parking' },
-      { status: 500 }
+      { error: "Failed to assign parking" },
+      { status: 500 },
     );
   }
 }

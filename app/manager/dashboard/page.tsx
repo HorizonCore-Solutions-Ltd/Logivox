@@ -3,10 +3,20 @@
  * Real-time load sheet review and one-click approval
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { CheckCircle, XCircle, Truck, Package, Clock, AlertTriangle, Send, Eye, FileText } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  CheckCircle,
+  XCircle,
+  Truck,
+  Package,
+  Clock,
+  AlertTriangle,
+  Send,
+  Eye,
+  FileText,
+} from "lucide-react";
 
 interface LoadSheet {
   id: string;
@@ -35,7 +45,9 @@ interface LoadSheet {
 export default function ManagerDashboard() {
   const [loadSheets, setLoadSheets] = useState<LoadSheet[]>([]);
   const [selectedSheet, setSelectedSheet] = useState<LoadSheet | null>(null);
-  const [filter, setFilter] = useState<'BUILDING' | 'READY' | 'CONFIRMED' | 'ALL'>('READY');
+  const [filter, setFilter] = useState<
+    "BUILDING" | "READY" | "CONFIRMED" | "ALL"
+  >("READY");
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -50,30 +62,30 @@ export default function ManagerDashboard() {
 
   const fetchLoadSheets = async () => {
     try {
-      const statusParam = filter !== 'ALL' ? `?status=${filter}` : '';
+      const statusParam = filter !== "ALL" ? `?status=${filter}` : "";
       const response = await fetch(`/api/loadsheets${statusParam}`);
       const data = await response.json();
-      
+
       if (data.loadSheets) {
         setLoadSheets(data.loadSheets);
       }
       setLoading(false);
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error("Fetch error:", error);
       setLoading(false);
     }
   };
 
   const approveLoadSheet = async (loadSheetId: string, notes?: string) => {
     setApproving(true);
-    
+
     try {
-      const response = await fetch('/api/loadsheets', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/loadsheets", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           loadSheetId,
-          action: 'approve',
+          action: "approve",
           approvalNotes: notes,
         }),
       });
@@ -85,22 +97,22 @@ export default function ManagerDashboard() {
         setLoadSheets((prev) =>
           prev.map((ls) =>
             ls.id === loadSheetId
-              ? { ...ls, status: 'CONFIRMED', approved: true }
-              : ls
-          )
+              ? { ...ls, status: "CONFIRMED", approved: true }
+              : ls,
+          ),
         );
-        
+
         if (selectedSheet?.id === loadSheetId) {
           setSelectedSheet(null);
         }
-        
-        alert('Load sheet approved successfully!');
+
+        alert("Load sheet approved successfully!");
       } else {
-        alert('Failed to approve load sheet');
+        alert("Failed to approve load sheet");
       }
     } catch (error) {
-      console.error('Approve error:', error);
-      alert('Error approving load sheet');
+      console.error("Approve error:", error);
+      alert("Error approving load sheet");
     } finally {
       setApproving(false);
     }
@@ -108,47 +120,56 @@ export default function ManagerDashboard() {
 
   const distributeLoadSheet = async (loadSheetId: string) => {
     try {
-      const response = await fetch('/api/loadsheets', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/loadsheets", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           loadSheetId,
-          action: 'distribute',
+          action: "distribute",
         }),
       });
 
       const data = await response.json();
 
       if (data.success) {
-        alert('Load sheet distributed to all recipients!');
+        alert("Load sheet distributed to all recipients!");
         fetchLoadSheets();
       }
     } catch (error) {
-      console.error('Distribute error:', error);
-      alert('Error distributing load sheet');
+      console.error("Distribute error:", error);
+      alert("Error distributing load sheet");
     }
   };
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      BUILDING: 'bg-blue-100 text-blue-800',
-      READY: 'bg-yellow-100 text-yellow-800',
-      CONFIRMED: 'bg-green-100 text-green-800',
-      DISTRIBUTED: 'bg-purple-100 text-purple-800',
-      DEPARTED: 'bg-gray-100 text-gray-800',
+      BUILDING: "bg-blue-100 text-blue-800",
+      READY: "bg-yellow-100 text-yellow-800",
+      CONFIRMED: "bg-green-100 text-green-800",
+      DISTRIBUTED: "bg-purple-100 text-purple-800",
+      DEPARTED: "bg-gray-100 text-gray-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const getPriorityBadge = (loadSheet: LoadSheet) => {
     const now = new Date();
     const shipmentDate = new Date(loadSheet.shipmentDate);
-    const hoursUntilShipment = (shipmentDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+    const hoursUntilShipment =
+      (shipmentDate.getTime() - now.getTime()) / (1000 * 60 * 60);
 
     if (hoursUntilShipment < 2) {
-      return <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded">URGENT</span>;
+      return (
+        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded">
+          URGENT
+        </span>
+      );
     } else if (hoursUntilShipment < 4) {
-      return <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded">HIGH</span>;
+      return (
+        <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs font-semibold rounded">
+          HIGH
+        </span>
+      );
     }
     return null;
   };
@@ -160,8 +181,12 @@ export default function ManagerDashboard() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Load Sheet Approval</h1>
-              <p className="text-sm text-gray-600 mt-1">Review and approve load sheets for departure</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Load Sheet Approval
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Review and approve load sheets for departure
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="w-5 h-5 text-gray-400" />
@@ -173,14 +198,14 @@ export default function ManagerDashboard() {
 
           {/* Filter Tabs */}
           <div className="flex gap-2 mt-4">
-            {['READY', 'BUILDING', 'CONFIRMED', 'ALL'].map((status) => (
+            {["READY", "BUILDING", "CONFIRMED", "ALL"].map((status) => (
               <button
                 key={status}
                 onClick={() => setFilter(status as any)}
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
                   filter === status
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 {status}
@@ -199,8 +224,12 @@ export default function ManagerDashboard() {
         ) : loadSheets.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Load Sheets</h3>
-            <p className="text-gray-600">No load sheets match the current filter</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              No Load Sheets
+            </h3>
+            <p className="text-gray-600">
+              No load sheets match the current filter
+            </p>
           </div>
         ) : (
           <div className="grid gap-4">
@@ -220,12 +249,14 @@ export default function ManagerDashboard() {
                         <h3 className="text-xl font-bold text-gray-900">
                           {loadSheet.loadSheetNumber}
                         </h3>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(loadSheet.status)}`}>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(loadSheet.status)}`}
+                        >
                           {loadSheet.status}
                         </span>
                         {getPriorityBadge(loadSheet)}
                       </div>
-                      
+
                       <div className="flex items-center gap-6 text-sm text-gray-600">
                         {loadSheet.customer && (
                           <div className="flex items-center gap-1">
@@ -242,13 +273,14 @@ export default function ManagerDashboard() {
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
                           <span>
-                            Ships: {new Date(loadSheet.shipmentDate).toLocaleString()}
+                            Ships:{" "}
+                            {new Date(loadSheet.shipmentDate).toLocaleString()}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {loadSheet.status === 'READY' && (
+                    {loadSheet.status === "READY" && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -262,7 +294,7 @@ export default function ManagerDashboard() {
                       </button>
                     )}
 
-                    {loadSheet.status === 'CONFIRMED' && (
+                    {loadSheet.status === "CONFIRMED" && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -314,17 +346,20 @@ export default function ManagerDashboard() {
                   <div className="flex items-center gap-6 mt-4 text-sm text-gray-600">
                     {loadSheet.driverName && (
                       <div>
-                        <span className="font-medium">Driver:</span> {loadSheet.driverName}
+                        <span className="font-medium">Driver:</span>{" "}
+                        {loadSheet.driverName}
                       </div>
                     )}
                     {loadSheet.trailerNumber && (
                       <div>
-                        <span className="font-medium">Trailer:</span> {loadSheet.trailerNumber}
+                        <span className="font-medium">Trailer:</span>{" "}
+                        {loadSheet.trailerNumber}
                       </div>
                     )}
                     {loadSheet.bayDoor && (
                       <div>
-                        <span className="font-medium">Bay:</span> {loadSheet.bayDoor.doorNumber}
+                        <span className="font-medium">Bay:</span>{" "}
+                        {loadSheet.bayDoor.doorNumber}
                       </div>
                     )}
                   </div>
@@ -358,39 +393,47 @@ export default function ManagerDashboard() {
               <h3 className="text-lg font-semibold mb-4">
                 Containers ({selectedSheet.containers.length})
               </h3>
-              
+
               <div className="space-y-3">
                 {selectedSheet.containers.map((container: any) => (
                   <div key={container.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="font-bold text-lg">{container.containerNumber}</div>
+                      <div className="font-bold text-lg">
+                        {container.containerNumber}
+                      </div>
                       <div className="text-sm text-gray-600">
                         {container.containerItems?.length || 0} items
                       </div>
                     </div>
-                    
-                    {container.containerItems && container.containerItems.length > 0 && (
-                      <div className="space-y-1 text-sm">
-                        {container.containerItems.slice(0, 5).map((item: any) => (
-                          <div key={item.id} className="flex justify-between text-gray-600">
-                            <span>{item.productName}</span>
-                            <span>Qty: {item.quantity}</span>
-                          </div>
-                        ))}
-                        {container.containerItems.length > 5 && (
-                          <div className="text-gray-400 text-xs">
-                            +{container.containerItems.length - 5} more items
-                          </div>
-                        )}
-                      </div>
-                    )}
+
+                    {container.containerItems &&
+                      container.containerItems.length > 0 && (
+                        <div className="space-y-1 text-sm">
+                          {container.containerItems
+                            .slice(0, 5)
+                            .map((item: any) => (
+                              <div
+                                key={item.id}
+                                className="flex justify-between text-gray-600"
+                              >
+                                <span>{item.productName}</span>
+                                <span>Qty: {item.quantity}</span>
+                              </div>
+                            ))}
+                          {container.containerItems.length > 5 && (
+                            <div className="text-gray-400 text-xs">
+                              +{container.containerItems.length - 5} more items
+                            </div>
+                          )}
+                        </div>
+                      )}
                   </div>
                 ))}
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-3 mt-6 pt-6 border-t">
-                {selectedSheet.status === 'READY' && (
+                {selectedSheet.status === "READY" && (
                   <>
                     <button
                       onClick={() => {
@@ -411,8 +454,8 @@ export default function ManagerDashboard() {
                     </button>
                   </>
                 )}
-                
-                {selectedSheet.status === 'CONFIRMED' && (
+
+                {selectedSheet.status === "CONFIRMED" && (
                   <button
                     onClick={() => {
                       distributeLoadSheet(selectedSheet.id);

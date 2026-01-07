@@ -106,10 +106,22 @@ export default function MeasurementDetailPage() {
   };
 
   const getCPKLevel = (cpk?: number) => {
-    if (!cpk) return { label: "N/A", color: "text-gray-600", bgColor: "bg-gray-100" };
-    if (cpk >= 2.0) return { label: "Excellent", color: "text-green-600", bgColor: "bg-green-100" };
-    if (cpk >= 1.33) return { label: "Good", color: "text-blue-600", bgColor: "bg-blue-100" };
-    if (cpk >= 1.0) return { label: "Adequate", color: "text-yellow-600", bgColor: "bg-yellow-100" };
+    if (!cpk)
+      return { label: "N/A", color: "text-gray-600", bgColor: "bg-gray-100" };
+    if (cpk >= 2.0)
+      return {
+        label: "Excellent",
+        color: "text-green-600",
+        bgColor: "bg-green-100",
+      };
+    if (cpk >= 1.33)
+      return { label: "Good", color: "text-blue-600", bgColor: "bg-blue-100" };
+    if (cpk >= 1.0)
+      return {
+        label: "Adequate",
+        color: "text-yellow-600",
+        bgColor: "bg-yellow-100",
+      };
     return { label: "Poor", color: "text-red-600", bgColor: "bg-red-100" };
   };
 
@@ -130,7 +142,9 @@ export default function MeasurementDetailPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Clock className="w-12 h-12 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading measurement details...</p>
+          <p className="text-muted-foreground">
+            Loading measurement details...
+          </p>
         </div>
       </div>
     );
@@ -162,14 +176,20 @@ export default function MeasurementDetailPage() {
             <ArrowLeft className="w-4 h-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">{measurement.measurementNumber}</h1>
-            <p className="text-muted-foreground">{measurement.characteristic}</p>
+            <h1 className="text-3xl font-bold">
+              {measurement.measurementNumber}
+            </h1>
+            <p className="text-muted-foreground">
+              {measurement.characteristic}
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/qc/measurements/${params.id}/edit`)}
+            onClick={() =>
+              router.push(`/dashboard/qc/measurements/${params.id}/edit`)
+            }
           >
             <Edit className="w-4 h-4 mr-2" />
             Edit
@@ -183,10 +203,16 @@ export default function MeasurementDetailPage() {
 
       {/* Status Badges */}
       <div className="flex gap-2 flex-wrap">
-        <Badge className={conformanceColors[measurement.conformanceStatus] || "bg-gray-100"}>
+        <Badge
+          className={
+            conformanceColors[measurement.conformanceStatus] || "bg-gray-100"
+          }
+        >
           {measurement.conformanceStatus.replace("_", " ")}
         </Badge>
-        <Badge className={typeColors[measurement.measurementType] || "bg-gray-100"}>
+        <Badge
+          className={typeColors[measurement.measurementType] || "bg-gray-100"}
+        >
           {measurement.measurementType}
         </Badge>
         {measurement.cpk && (
@@ -209,7 +235,9 @@ export default function MeasurementDetailPage() {
             </CardHeader>
             <CardContent>
               <div className="text-center py-6">
-                <p className="text-sm text-muted-foreground mb-2">Measured Value</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Measured Value
+                </p>
                 <p className="text-5xl font-bold mb-2">
                   {measurement.measuredValue}
                   <span className="text-2xl text-muted-foreground ml-2">
@@ -217,8 +245,11 @@ export default function MeasurementDetailPage() {
                   </span>
                 </p>
                 {measurement.deviation !== 0 && (
-                  <p className={`text-sm ${measurement.deviation > 0 ? "text-red-600" : "text-green-600"}`}>
-                    {measurement.deviation > 0 ? "+" : ""}{measurement.deviation} {measurement.unit} from target
+                  <p
+                    className={`text-sm ${measurement.deviation > 0 ? "text-red-600" : "text-green-600"}`}
+                  >
+                    {measurement.deviation > 0 ? "+" : ""}
+                    {measurement.deviation} {measurement.unit} from target
                   </p>
                 )}
               </div>
@@ -237,7 +268,7 @@ export default function MeasurementDetailPage() {
               {/* Visual Range */}
               <div className="relative py-8">
                 <div className="absolute w-full h-2 bg-gradient-to-r from-red-200 via-green-200 to-red-200 rounded-full" />
-                
+
                 {/* Min Marker */}
                 <div className="absolute left-0 top-0">
                   <div className="w-1 h-12 bg-red-500" />
@@ -300,9 +331,14 @@ export default function MeasurementDetailPage() {
 
               {/* Deviation */}
               <div className="text-center p-4 bg-muted rounded-lg">
-                <p className="text-sm text-muted-foreground mb-1">Deviation from Target</p>
-                <p className={`text-2xl font-bold ${measurement.deviation === 0 ? "text-green-600" : measurement.conformanceStatus === "CONFORMING" ? "text-yellow-600" : "text-red-600"}`}>
-                  {measurement.deviation > 0 ? "+" : ""}{measurement.deviation} {measurement.unit}
+                <p className="text-sm text-muted-foreground mb-1">
+                  Deviation from Target
+                </p>
+                <p
+                  className={`text-2xl font-bold ${measurement.deviation === 0 ? "text-green-600" : measurement.conformanceStatus === "CONFORMING" ? "text-yellow-600" : "text-red-600"}`}
+                >
+                  {measurement.deviation > 0 ? "+" : ""}
+                  {measurement.deviation} {measurement.unit}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
                   {getDeviationPercentage().toFixed(1)}% of specification range
@@ -321,16 +357,26 @@ export default function MeasurementDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className={`text-center p-6 rounded-lg ${cpkLevel.bgColor}`}>
-                  <p className="text-sm text-muted-foreground mb-2">CPK Value</p>
+                <div
+                  className={`text-center p-6 rounded-lg ${cpkLevel.bgColor}`}
+                >
+                  <p className="text-sm text-muted-foreground mb-2">
+                    CPK Value
+                  </p>
                   <p className={`text-4xl font-bold ${cpkLevel.color}`}>
                     {measurement.cpk.toFixed(2)}
                   </p>
-                  <p className={`text-lg ${cpkLevel.color} mt-2`}>{cpkLevel.label}</p>
+                  <p className={`text-lg ${cpkLevel.color} mt-2`}>
+                    {cpkLevel.label}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-4">
                     {measurement.cpk >= 2.0 && "World-class process capability"}
-                    {measurement.cpk >= 1.33 && measurement.cpk < 2.0 && "Good process control"}
-                    {measurement.cpk >= 1.0 && measurement.cpk < 1.33 && "Adequate, but improvement recommended"}
+                    {measurement.cpk >= 1.33 &&
+                      measurement.cpk < 2.0 &&
+                      "Good process control"}
+                    {measurement.cpk >= 1.0 &&
+                      measurement.cpk < 1.33 &&
+                      "Adequate, but improvement recommended"}
                     {measurement.cpk < 1.0 && "Process improvement required"}
                   </p>
                 </div>
@@ -370,20 +416,26 @@ export default function MeasurementDetailPage() {
                 <p className="text-sm font-medium">{measurement.measuredBy}</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Measurement Date</p>
+                <p className="text-sm text-muted-foreground">
+                  Measurement Date
+                </p>
                 <p className="text-sm">
                   {new Date(measurement.measurementDate).toLocaleString()}
                 </p>
               </div>
               {measurement.equipmentUsed && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Equipment Used</p>
+                  <p className="text-sm text-muted-foreground">
+                    Equipment Used
+                  </p>
                   <p className="text-sm">{measurement.equipmentUsed}</p>
                 </div>
               )}
               {measurement.calibrationDate && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Calibration Date</p>
+                  <p className="text-sm text-muted-foreground">
+                    Calibration Date
+                  </p>
                   <p className="text-sm">
                     {new Date(measurement.calibrationDate).toLocaleDateString()}
                   </p>
@@ -404,24 +456,34 @@ export default function MeasurementDetailPage() {
               {measurement.product && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Product</p>
-                  <p className="text-sm font-medium">{measurement.product.name}</p>
-                  <p className="text-xs text-muted-foreground">{measurement.product.sku}</p>
+                  <p className="text-sm font-medium">
+                    {measurement.product.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {measurement.product.sku}
+                  </p>
                 </div>
               )}
               {measurement.lot && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Lot</p>
-                  <p className="text-sm font-medium">{measurement.lot.lotNumber}</p>
+                  <p className="text-sm font-medium">
+                    {measurement.lot.lotNumber}
+                  </p>
                 </div>
               )}
               {measurement.inspection && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Inspection</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Inspection
+                  </p>
                   <Button
                     variant="link"
                     className="p-0 h-auto text-sm"
                     onClick={() =>
-                      router.push(`/dashboard/qc/inspections/${measurement.inspection?.id}`)
+                      router.push(
+                        `/dashboard/qc/inspections/${measurement.inspection?.id}`,
+                      )
                     }
                   >
                     {measurement.inspection.inspectionNumber}
@@ -442,11 +504,15 @@ export default function MeasurementDetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Created</p>
-                <p className="text-sm">{new Date(measurement.createdAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(measurement.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{new Date(measurement.updatedAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(measurement.updatedAt).toLocaleString()}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -460,7 +526,11 @@ export default function MeasurementDetailPage() {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => router.push(`/dashboard/qc/measurements/spc?productId=${measurement.product?.id}&characteristic=${measurement.characteristic}`)}
+                onClick={() =>
+                  router.push(
+                    `/dashboard/qc/measurements/spc?productId=${measurement.product?.id}&characteristic=${measurement.characteristic}`,
+                  )
+                }
               >
                 <BarChart3 className="w-4 h-4 mr-2" />
                 View SPC Chart
@@ -469,7 +539,11 @@ export default function MeasurementDetailPage() {
                 <Button
                   variant="outline"
                   className="w-full justify-start text-red-600 border-red-600 hover:bg-red-50"
-                  onClick={() => router.push(`/dashboard/qc/ncr/create?measurementId=${measurement.id}`)}
+                  onClick={() =>
+                    router.push(
+                      `/dashboard/qc/ncr/create?measurementId=${measurement.id}`,
+                    )
+                  }
                 >
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Create NCR

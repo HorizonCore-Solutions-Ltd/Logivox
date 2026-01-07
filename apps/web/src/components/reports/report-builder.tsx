@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
 /**
  * Report Builder Component for LogiVox
- * 
+ *
  * Drag-and-drop interface for building custom reports.
  * Supports field selection, filtering, sorting, grouping, and chart configuration.
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback } from "react";
 import {
   ReportConfig,
   ReportCategory,
@@ -25,8 +25,8 @@ import {
   getOperatorsForFieldType,
   getOperatorLabel,
   AggregationType,
-} from '@/lib/reports/report-types';
-import { getReportTemplatesByCategory } from '@/lib/reports/report-templates';
+} from "@/lib/reports/report-types";
+import { getReportTemplatesByCategory } from "@/lib/reports/report-templates";
 
 // ============================================================================
 // Types
@@ -55,23 +55,25 @@ export function ReportBuilder({
 }: ReportBuilderProps) {
   // State
   const [category, setCategory] = useState<ReportCategory>(
-    initialConfig?.category || ReportCategory.INVENTORY
+    initialConfig?.category || ReportCategory.INVENTORY,
   );
-  const [name, setName] = useState(initialConfig?.name || '');
-  const [description, setDescription] = useState(initialConfig?.description || '');
+  const [name, setName] = useState(initialConfig?.name || "");
+  const [description, setDescription] = useState(
+    initialConfig?.description || "",
+  );
   const [selectedFields, setSelectedFields] = useState<string[]>(
-    initialConfig?.fields || []
+    initialConfig?.fields || [],
   );
   const [filters, setFilters] = useState<ReportFilter[]>(
-    initialConfig?.filters || []
+    initialConfig?.filters || [],
   );
   const [sorts, setSorts] = useState<ReportSort[]>(initialConfig?.sorts || []);
   const [grouping, setGrouping] = useState<ReportGrouping | undefined>(
-    initialConfig?.grouping
+    initialConfig?.grouping,
   );
   const [limit, setLimit] = useState<number | undefined>(initialConfig?.limit);
   const [chartType, setChartType] = useState<ChartType>(
-    initialConfig?.chartType || ChartType.TABLE
+    initialConfig?.chartType || ChartType.TABLE,
   );
 
   // Get available fields for selected category
@@ -88,7 +90,7 @@ export function ReportBuilder({
     setSelectedFields((prev) =>
       prev.includes(fieldId)
         ? prev.filter((id) => id !== fieldId)
-        : [...prev, fieldId]
+        : [...prev, fieldId],
     );
   }, []);
 
@@ -109,10 +111,10 @@ export function ReportBuilder({
 
     const field = filterableFields[0];
     if (!field) return;
-    
+
     const operators = getOperatorsForFieldType(field.type);
     if (!operators || operators.length === 0) return;
-    
+
     const operator = operators[0];
     if (!operator) return;
 
@@ -121,7 +123,7 @@ export function ReportBuilder({
       {
         field: field.id,
         operator: operator,
-        value: '',
+        value: "",
       },
     ]);
   }, [filterableFields]);
@@ -129,10 +131,12 @@ export function ReportBuilder({
   const updateFilter = useCallback(
     (index: number, updates: Partial<ReportFilter>) => {
       setFilters((prev) =>
-        prev.map((filter, i) => (i === index ? { ...filter, ...updates } : filter))
+        prev.map((filter, i) =>
+          i === index ? { ...filter, ...updates } : filter,
+        ),
       );
     },
-    []
+    [],
   );
 
   const removeFilter = useCallback((index: number) => {
@@ -152,7 +156,7 @@ export function ReportBuilder({
       ...prev,
       {
         field: field.id,
-        direction: 'asc',
+        direction: "asc",
       },
     ]);
   }, [sortableFields]);
@@ -160,10 +164,10 @@ export function ReportBuilder({
   const updateSort = useCallback(
     (index: number, updates: Partial<ReportSort>) => {
       setSorts((prev) =>
-        prev.map((sort, i) => (i === index ? { ...sort, ...updates } : sort))
+        prev.map((sort, i) => (i === index ? { ...sort, ...updates } : sort)),
       );
     },
-    []
+    [],
   );
 
   const removeSort = useCallback((index: number) => {
@@ -180,7 +184,7 @@ export function ReportBuilder({
     } else if (groupableFields.length > 0) {
       const field = groupableFields[0];
       if (!field) return;
-      
+
       setGrouping({
         field: field.id,
         aggregations: [],
@@ -190,7 +194,7 @@ export function ReportBuilder({
 
   const updateGroupingField = useCallback((fieldId: string) => {
     setGrouping((prev) =>
-      prev ? { ...prev, field: fieldId } : { field: fieldId, aggregations: [] }
+      prev ? { ...prev, field: fieldId } : { field: fieldId, aggregations: [] },
     );
   }, []);
 
@@ -212,7 +216,7 @@ export function ReportBuilder({
               },
             ],
           }
-        : undefined
+        : undefined,
     );
   }, [category]);
 
@@ -223,7 +227,7 @@ export function ReportBuilder({
             ...prev,
             aggregations: prev.aggregations.filter((_, i) => i !== index),
           }
-        : undefined
+        : undefined,
     );
   }, []);
 
@@ -231,21 +235,24 @@ export function ReportBuilder({
   // Template Loading
   // ========================================================================
 
-  const loadTemplate = useCallback((templateId: string) => {
-    const templates = getReportTemplatesByCategory(category);
-    const template = templates.find((t) => t.id === templateId);
+  const loadTemplate = useCallback(
+    (templateId: string) => {
+      const templates = getReportTemplatesByCategory(category);
+      const template = templates.find((t) => t.id === templateId);
 
-    if (template) {
-      setName(template.name);
-      setDescription(template.description || '');
-      setSelectedFields(template.fields);
-      setFilters(template.filters || []);
-      setSorts(template.sorts || []);
-      setGrouping(template.grouping);
-      setLimit(template.limit);
-      setChartType(template.chartType || ChartType.TABLE);
-    }
-  }, [category]);
+      if (template) {
+        setName(template.name);
+        setDescription(template.description || "");
+        setSelectedFields(template.fields);
+        setFilters(template.filters || []);
+        setSorts(template.sorts || []);
+        setGrouping(template.grouping);
+        setLimit(template.limit);
+        setChartType(template.chartType || ChartType.TABLE);
+      }
+    },
+    [category],
+  );
 
   // ========================================================================
   // Save & Validation
@@ -253,12 +260,12 @@ export function ReportBuilder({
 
   const handleSave = useCallback(() => {
     if (!name.trim()) {
-      alert('Please enter a report name');
+      alert("Please enter a report name");
       return;
     }
 
     if (selectedFields.length === 0) {
-      alert('Please select at least one field');
+      alert("Please select at least one field");
       return;
     }
 
@@ -329,7 +336,9 @@ export function ReportBuilder({
         <div className="space-y-6 lg:col-span-2">
           {/* Basic Info */}
           <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 className="text-lg font-semibold text-gray-900">Basic Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Basic Information
+            </h2>
             <div className="mt-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -421,7 +430,9 @@ export function ReportBuilder({
                       {field.name}
                     </div>
                     {field.description && (
-                      <div className="text-xs text-gray-500">{field.description}</div>
+                      <div className="text-xs text-gray-500">
+                        {field.description}
+                      </div>
                     )}
                   </div>
                 </label>
@@ -446,7 +457,9 @@ export function ReportBuilder({
                 <p className="text-sm text-gray-500">No filters added</p>
               ) : (
                 filters.map((filter, index) => {
-                  const field = filterableFields.find((f) => f.id === filter.field);
+                  const field = filterableFields.find(
+                    (f) => f.id === filter.field,
+                  );
                   const operators = field
                     ? getOperatorsForFieldType(field.type)
                     : [];
@@ -487,7 +500,7 @@ export function ReportBuilder({
                         filter.operator !== FilterOperator.IS_NOT_NULL && (
                           <input
                             type="text"
-                            value={filter.value || ''}
+                            value={filter.value || ""}
                             onChange={(e) =>
                               updateFilter(index, { value: e.target.value })
                             }
@@ -529,7 +542,9 @@ export function ReportBuilder({
                   <div key={index} className="flex gap-2">
                     <select
                       value={sort.field}
-                      onChange={(e) => updateSort(index, { field: e.target.value })}
+                      onChange={(e) =>
+                        updateSort(index, { field: e.target.value })
+                      }
                       className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm"
                     >
                       {sortableFields.map((f) => (
@@ -543,7 +558,7 @@ export function ReportBuilder({
                       value={sort.direction}
                       onChange={(e) =>
                         updateSort(index, {
-                          direction: e.target.value as 'asc' | 'desc',
+                          direction: e.target.value as "asc" | "desc",
                         })
                       }
                       className="rounded-md border border-gray-300 px-3 py-2 text-sm"
@@ -566,7 +581,9 @@ export function ReportBuilder({
 
           {/* Advanced Options */}
           <div className="rounded-lg border border-gray-200 bg-white p-6">
-            <h2 className="text-lg font-semibold text-gray-900">Advanced Options</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Advanced Options
+            </h2>
 
             <div className="mt-4 space-y-4">
               <div>
@@ -636,8 +653,12 @@ export function ReportBuilder({
                                 className="rounded-md border border-gray-300 px-2 py-1 text-xs"
                               >
                                 <option value={AggregationType.SUM}>Sum</option>
-                                <option value={AggregationType.AVG}>Average</option>
-                                <option value={AggregationType.COUNT}>Count</option>
+                                <option value={AggregationType.AVG}>
+                                  Average
+                                </option>
+                                <option value={AggregationType.COUNT}>
+                                  Count
+                                </option>
                                 <option value={AggregationType.MIN}>Min</option>
                                 <option value={AggregationType.MAX}>Max</option>
                               </select>
@@ -662,9 +683,11 @@ export function ReportBuilder({
                 </label>
                 <input
                   type="number"
-                  value={limit || ''}
+                  value={limit || ""}
                   onChange={(e) =>
-                    setLimit(e.target.value ? parseInt(e.target.value) : undefined)
+                    setLimit(
+                      e.target.value ? parseInt(e.target.value) : undefined,
+                    )
                   }
                   className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
                   placeholder="No limit"
@@ -727,27 +750,27 @@ export function ReportBuilder({
 
             <div className="mt-4 space-y-3 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Category:</span>{' '}
+                <span className="font-medium text-gray-700">Category:</span>{" "}
                 <span className="text-gray-900">{category}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Fields:</span>{' '}
+                <span className="font-medium text-gray-700">Fields:</span>{" "}
                 <span className="text-gray-900">{selectedFields.length}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Filters:</span>{' '}
+                <span className="font-medium text-gray-700">Filters:</span>{" "}
                 <span className="text-gray-900">{filters.length}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Sorts:</span>{' '}
+                <span className="font-medium text-gray-700">Sorts:</span>{" "}
                 <span className="text-gray-900">{sorts.length}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Grouping:</span>{' '}
-                <span className="text-gray-900">{grouping ? 'Yes' : 'No'}</span>
+                <span className="font-medium text-gray-700">Grouping:</span>{" "}
+                <span className="text-gray-900">{grouping ? "Yes" : "No"}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Chart:</span>{' '}
+                <span className="font-medium text-gray-700">Chart:</span>{" "}
                 <span className="text-gray-900">{chartType}</span>
               </div>
             </div>

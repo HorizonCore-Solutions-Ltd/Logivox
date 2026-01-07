@@ -3,24 +3,24 @@
  * Auto-batching, wave management, and order release
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 // GET - List orders or waves
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const orderId = searchParams.get('orderId');
-    const waveId = searchParams.get('waveId');
-    const status = searchParams.get('status');
-    const customerId = searchParams.get('customerId');
-    const showWaves = searchParams.get('showWaves');
+    const orderId = searchParams.get("orderId");
+    const waveId = searchParams.get("waveId");
+    const status = searchParams.get("status");
+    const customerId = searchParams.get("customerId");
+    const showWaves = searchParams.get("showWaves");
 
     // Get specific order
     if (orderId) {
@@ -39,14 +39,14 @@ export async function GET(req: NextRequest) {
       });
 
       if (!order) {
-        return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+        return NextResponse.json({ error: "Order not found" }, { status: 404 });
       }
 
       return NextResponse.json({ order });
     }
 
     // List waves
-    if (showWaves === 'true') {
+    if (showWaves === "true") {
       const waves = await prisma.wavePickingBatch.findMany({
         where: waveId ? { id: waveId } : {},
         include: {
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 50,
       });
 
@@ -119,7 +119,7 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { orderDate: 'desc' },
+      orderBy: { orderDate: "desc" },
       take: 100,
     });
 
@@ -128,10 +128,10 @@ export async function GET(req: NextRequest) {
       total: orders.length,
     });
   } catch (error) {
-    console.error('Order GET error:', error);
+    console.error("Order GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch orders' },
-      { status: 500 }
+      { error: "Failed to fetch orders" },
+      { status: 500 },
     );
   }
 }
@@ -141,24 +141,24 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
     const { action, orderIds, warehouseId, priority, cutoffTime } = body;
 
-    if (action === 'createWave') {
+    if (action === "createWave") {
       // Create new wave and assign orders
       if (!orderIds || orderIds.length === 0) {
         return NextResponse.json(
-          { error: 'Order IDs are required' },
-          { status: 400 }
+          { error: "Order IDs are required" },
+          { status: 400 },
         );
       }
 
       // Generate wave number (WAVE-YYYYMMDD-NNN)
       const today = new Date();
-      const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+      const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
       const existingWaves = await prisma.wavePickingBatch.count({
         where: {
           createdAt: {
@@ -166,15 +166,15 @@ export async function POST(req: NextRequest) {
           },
         },
       });
-      const waveNumber = `WAVE-${dateStr}-${String(existingWaves + 1).padStart(3, '0')}`;
+      const waveNumber = `WAVE-${dateStr}-${String(existingWaves + 1).padStart(3, "0")}`;
 
       // Create wave
       const wave = await prisma.wavePickingBatch.create({
         data: {
           waveNumber,
           warehouseId,
-          status: 'PENDING',
-          priority: priority || 'NORMAL',
+          status: "PENDING",
+          priority: priority || "NORMAL",
           cutoffTime: cutoffTime ? new Date(cutoffTime) : undefined,
         },
       });
@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
         },
         data: {
           waveId: wave.id,
-          status: 'ASSIGNED_TO_WAVE',
+          status: "ASSIGNED_TO_WAVE",
         },
       });
 
@@ -208,21 +208,21 @@ export async function POST(req: NextRequest) {
         wave: waveWithOrders,
         message: `Wave ${waveNumber} created with ${orderIds.length} orders`,
       });
-    } else if (action === 'releaseWave') {
+    } else if (action === "releaseWave") {
       // Release wave for picking
       const { waveId } = body;
 
       if (!waveId) {
         return NextResponse.json(
-          { error: 'Wave ID is required' },
-          { status: 400 }
+          { error: "Wave ID is required" },
+          { status: 400 },
         );
       }
 
       const wave = await prisma.wavePickingBatch.update({
         where: { id: waveId },
         data: {
-          status: 'RELEASED',
+          status: "RELEASED",
           releasedAt: new Date(),
         },
         include: {
@@ -236,7 +236,7 @@ export async function POST(req: NextRequest) {
           waveId: waveId,
         },
         data: {
-          status: 'PICKING',
+          status: "PICKING",
         },
       });
 
@@ -245,7 +245,7 @@ export async function POST(req: NextRequest) {
         wave,
         message: `Wave ${wave.waveNumber} released for picking`,
       });
-    } else if (action === 'autoBatch') {
+    } else if (action === "autoBatch") {
       // Auto-batch orders into optimal waves
       const result = await autoBatchOrders(warehouseId);
 
@@ -255,15 +255,12 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(
-      { error: 'Invalid action' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Order POST error:', error);
+    console.error("Order POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process order action' },
-      { status: 500 }
+      { error: "Failed to process order action" },
+      { status: 500 },
     );
   }
 }
@@ -273,7 +270,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -285,7 +282,7 @@ export async function PATCH(req: NextRequest) {
         where: { id: waveId },
         data: {
           status: status || undefined,
-          completedAt: status === 'COMPLETED' ? new Date() : undefined,
+          completedAt: status === "COMPLETED" ? new Date() : undefined,
         },
       });
 
@@ -309,14 +306,14 @@ export async function PATCH(req: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Wave ID or Order ID is required' },
-      { status: 400 }
+      { error: "Wave ID or Order ID is required" },
+      { status: 400 },
     );
   } catch (error) {
-    console.error('Order PATCH error:', error);
+    console.error("Order PATCH error:", error);
     return NextResponse.json(
-      { error: 'Failed to update order/wave' },
-      { status: 500 }
+      { error: "Failed to update order/wave" },
+      { status: 500 },
     );
   }
 }
@@ -330,7 +327,7 @@ async function autoBatchOrders(warehouseId: string) {
     const unassignedOrders = await prisma.order.findMany({
       where: {
         warehouseId,
-        status: 'PENDING',
+        status: "PENDING",
         waveId: null,
       },
       include: {
@@ -345,7 +342,7 @@ async function autoBatchOrders(warehouseId: string) {
 
     if (unassignedOrders.length === 0) {
       return {
-        message: 'No unassigned orders to batch',
+        message: "No unassigned orders to batch",
         wavesCreated: 0,
       };
     }
@@ -356,7 +353,7 @@ async function autoBatchOrders(warehouseId: string) {
     // Criteria 1: Same customer + same ship date
     const customerDateGroups = new Map<string, any[]>();
     for (const order of unassignedOrders) {
-      const key = `${order.customerId}-${order.shipDate?.toISOString().split('T')[0] || 'no-date'}`;
+      const key = `${order.customerId}-${order.shipDate?.toISOString().split("T")[0] || "no-date"}`;
       if (!customerDateGroups.has(key)) {
         customerDateGroups.set(key, []);
       }
@@ -368,8 +365,8 @@ async function autoBatchOrders(warehouseId: string) {
       if (orders.length >= 3) {
         batches.push({
           orders,
-          priority: 'HIGH',
-          reason: 'Same customer, same ship date',
+          priority: "HIGH",
+          reason: "Same customer, same ship date",
         });
       }
     }
@@ -379,13 +376,14 @@ async function autoBatchOrders(warehouseId: string) {
 
     // Criteria 3: Order priority (urgent orders)
     const urgentOrders = unassignedOrders.filter(
-      (o) => o.priority === 'URGENT' && !batches.some((b) => b.orders.includes(o))
+      (o) =>
+        o.priority === "URGENT" && !batches.some((b) => b.orders.includes(o)),
     );
     if (urgentOrders.length > 0) {
       batches.push({
         orders: urgentOrders,
-        priority: 'URGENT',
-        reason: 'Urgent priority',
+        priority: "URGENT",
+        reason: "Urgent priority",
       });
     }
 
@@ -393,7 +391,7 @@ async function autoBatchOrders(warehouseId: string) {
     const wavesCreated = [];
     for (const batch of batches) {
       const today = new Date();
-      const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+      const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
       const existingWaves = await prisma.wavePickingBatch.count({
         where: {
           createdAt: {
@@ -401,13 +399,13 @@ async function autoBatchOrders(warehouseId: string) {
           },
         },
       });
-      const waveNumber = `WAVE-${dateStr}-${String(existingWaves + wavesCreated.length + 1).padStart(3, '0')}`;
+      const waveNumber = `WAVE-${dateStr}-${String(existingWaves + wavesCreated.length + 1).padStart(3, "0")}`;
 
       const wave = await prisma.wavePickingBatch.create({
         data: {
           waveNumber,
           warehouseId,
-          status: 'PENDING',
+          status: "PENDING",
           priority: batch.priority,
         },
       });
@@ -418,7 +416,7 @@ async function autoBatchOrders(warehouseId: string) {
         },
         data: {
           waveId: wave.id,
-          status: 'ASSIGNED_TO_WAVE',
+          status: "ASSIGNED_TO_WAVE",
         },
       });
 
@@ -434,7 +432,7 @@ async function autoBatchOrders(warehouseId: string) {
       wavesCreated,
     };
   } catch (error) {
-    console.error('Auto-batch error:', error);
+    console.error("Auto-batch error:", error);
     throw error;
   }
 }

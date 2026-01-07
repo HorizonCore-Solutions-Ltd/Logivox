@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization membership" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching lots:", error);
     return NextResponse.json(
       { error: "Failed to fetch lots" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -176,7 +176,7 @@ export async function POST(request: NextRequest) {
     if (!inventoryItem) {
       return NextResponse.json(
         { error: "Inventory item not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     if (existingLot) {
       return NextResponse.json(
         { error: "Lot number already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -204,10 +204,7 @@ export async function POST(request: NextRequest) {
         },
       });
       if (!grn) {
-        return NextResponse.json(
-          { error: "GRN not found" },
-          { status: 404 }
-        );
+        return NextResponse.json({ error: "GRN not found" }, { status: 404 });
       }
     }
 
@@ -221,7 +218,7 @@ export async function POST(request: NextRequest) {
       if (!location) {
         return NextResponse.json(
           { error: "Location not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
     }
@@ -297,14 +294,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating lot:", error);
     return NextResponse.json(
       { error: "Failed to create lot" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

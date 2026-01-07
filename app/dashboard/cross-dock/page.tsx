@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { 
-  TruckIcon, 
-  PackageIcon, 
-  ClockIcon, 
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  TruckIcon,
+  PackageIcon,
+  ClockIcon,
   ArrowRightIcon,
   AlertTriangleIcon,
   TrendingUpIcon,
   UsersIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface DashboardStats {
   totalAppointments: number;
@@ -46,7 +46,9 @@ interface Appointment {
 
 export default function CrossDockDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [activeAppointments, setActiveAppointments] = useState<Appointment[]>([]);
+  const [activeAppointments, setActiveAppointments] = useState<Appointment[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,8 +60,10 @@ export default function CrossDockDashboard() {
   const loadDashboardData = async () => {
     try {
       const [statsRes, appointmentsRes] = await Promise.all([
-        fetch('/api/cross-dock/appointments/stats'),
-        fetch('/api/cross-dock/appointments?status=RECEIVING&status=SORTING&status=LOADING'),
+        fetch("/api/cross-dock/appointments/stats"),
+        fetch(
+          "/api/cross-dock/appointments?status=RECEIVING&status=SORTING&status=LOADING",
+        ),
       ]);
 
       const statsData = await statsRes.json();
@@ -68,7 +72,7 @@ export default function CrossDockDashboard() {
       setStats(statsData);
       setActiveAppointments(appointmentsData.appointments || []);
     } catch (error) {
-      console.error('Failed to load dashboard:', error);
+      console.error("Failed to load dashboard:", error);
     } finally {
       setLoading(false);
     }
@@ -76,25 +80,25 @@ export default function CrossDockDashboard() {
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      SCHEDULED: 'bg-blue-500',
-      RECEIVING: 'bg-yellow-500',
-      SORTING: 'bg-purple-500',
-      STAGED: 'bg-indigo-500',
-      LOADING: 'bg-orange-500',
-      COMPLETED: 'bg-green-500',
-      CANCELLED: 'bg-gray-500',
+      SCHEDULED: "bg-blue-500",
+      RECEIVING: "bg-yellow-500",
+      SORTING: "bg-purple-500",
+      STAGED: "bg-indigo-500",
+      LOADING: "bg-orange-500",
+      COMPLETED: "bg-green-500",
+      CANCELLED: "bg-gray-500",
     };
-    return colors[status] || 'bg-gray-500';
+    return colors[status] || "bg-gray-500";
   };
 
   const getPriorityColor = (priority: string) => {
     const colors: Record<string, string> = {
-      URGENT: 'destructive',
-      HIGH: 'destructive',
-      MEDIUM: 'default',
-      LOW: 'secondary',
+      URGENT: "destructive",
+      HIGH: "destructive",
+      MEDIUM: "default",
+      LOW: "secondary",
     };
-    return colors[priority] || 'default';
+    return colors[priority] || "default";
   };
 
   const isDwellTimeWarning = (appointment: Appointment) => {
@@ -117,7 +121,9 @@ export default function CrossDockDashboard() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Cross-Docking Dashboard</h1>
-          <p className="text-muted-foreground">Real-time flow-through operations</p>
+          <p className="text-muted-foreground">
+            Real-time flow-through operations
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={loadDashboardData}>
@@ -132,11 +138,15 @@ export default function CrossDockDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Active Today</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Today
+              </CardTitle>
               <TruckIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalAppointments}</div>
+              <div className="text-2xl font-bold">
+                {stats.totalAppointments}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {stats.byStatus.COMPLETED || 0} completed
               </p>
@@ -163,12 +173,15 @@ export default function CrossDockDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Avg Dwell Time</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Dwell Time
+              </CardTitle>
               <ClockIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {Math.round(stats.avgDwellTime / 60)}h {stats.avgDwellTime % 60}m
+                {Math.round(stats.avgDwellTime / 60)}h {stats.avgDwellTime % 60}
+                m
               </div>
               <p className="text-xs text-muted-foreground">
                 Target: &lt; 4 hours
@@ -178,11 +191,15 @@ export default function CrossDockDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">On-Time Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                On-Time Rate
+              </CardTitle>
               <TrendingUpIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{Math.round(stats.onTimePercentage)}%</div>
+              <div className="text-2xl font-bold">
+                {Math.round(stats.onTimePercentage)}%
+              </div>
               <p className="text-xs text-muted-foreground">
                 {stats.utilizationRate}% utilization
               </p>
@@ -211,8 +228,14 @@ export default function CrossDockDashboard() {
                   <div className="flex items-start justify-between">
                     <div className="space-y-2 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold">{appointment.appointmentNumber}</span>
-                        <Badge variant={getPriorityColor(appointment.priority) as any}>
+                        <span className="font-semibold">
+                          {appointment.appointmentNumber}
+                        </span>
+                        <Badge
+                          variant={
+                            getPriorityColor(appointment.priority) as any
+                          }
+                        >
                           {appointment.priority}
                         </Badge>
                         <Badge className={getStatusColor(appointment.status)}>
@@ -220,7 +243,10 @@ export default function CrossDockDashboard() {
                         </Badge>
                         <Badge variant="outline">{appointment.type}</Badge>
                         {isDwellTimeWarning(appointment) && (
-                          <Badge variant="destructive" className="flex items-center gap-1">
+                          <Badge
+                            variant="destructive"
+                            className="flex items-center gap-1"
+                          >
                             <AlertTriangleIcon className="h-3 w-3" />
                             Dwell Time Warning
                           </Badge>
@@ -230,12 +256,14 @@ export default function CrossDockDashboard() {
                       <div className="flex items-center gap-6 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                           <TruckIcon className="h-4 w-4" />
-                          <span>In: {appointment.inboundCarrier || 'N/A'}</span>
+                          <span>In: {appointment.inboundCarrier || "N/A"}</span>
                         </div>
                         <ArrowRightIcon className="h-4 w-4" />
                         <div className="flex items-center gap-1">
                           <TruckIcon className="h-4 w-4" />
-                          <span>Out: {appointment.outboundCarrier || 'N/A'}</span>
+                          <span>
+                            Out: {appointment.outboundCarrier || "N/A"}
+                          </span>
                         </div>
                       </div>
 
@@ -243,17 +271,23 @@ export default function CrossDockDashboard() {
                         <div>
                           <span className="text-muted-foreground">Units: </span>
                           <span className="font-medium">
-                            {appointment.receivedUnits}/{appointment.totalUnits} received
+                            {appointment.receivedUnits}/{appointment.totalUnits}{" "}
+                            received
                           </span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Sorted: </span>
+                          <span className="text-muted-foreground">
+                            Sorted:{" "}
+                          </span>
                           <span className="font-medium">
-                            {appointment.sortedUnits}/{appointment.receivedUnits}
+                            {appointment.sortedUnits}/
+                            {appointment.receivedUnits}
                           </span>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Shipped: </span>
+                          <span className="text-muted-foreground">
+                            Shipped:{" "}
+                          </span>
                           <span className="font-medium">
                             {appointment.shippedUnits}/{appointment.totalUnits}
                           </span>
@@ -262,13 +296,22 @@ export default function CrossDockDashboard() {
 
                       {appointment.dwellTimeMinutes && (
                         <div className="text-sm">
-                          <span className="text-muted-foreground">Dwell Time: </span>
-                          <span className={isDwellTimeWarning(appointment) ? 'text-destructive font-medium' : ''}>
-                            {Math.floor(appointment.dwellTimeMinutes / 60)}h{' '}
+                          <span className="text-muted-foreground">
+                            Dwell Time:{" "}
+                          </span>
+                          <span
+                            className={
+                              isDwellTimeWarning(appointment)
+                                ? "text-destructive font-medium"
+                                : ""
+                            }
+                          >
+                            {Math.floor(appointment.dwellTimeMinutes / 60)}h{" "}
                             {appointment.dwellTimeMinutes % 60}m
                           </span>
                           <span className="text-muted-foreground">
-                            {' '}/ {appointment.maxDwellTimeHours}h max
+                            {" "}
+                            / {appointment.maxDwellTimeHours}h max
                           </span>
                         </div>
                       )}
@@ -279,7 +322,11 @@ export default function CrossDockDashboard() {
                           <span>Progress</span>
                           <span>
                             {appointment.totalUnits > 0
-                              ? Math.round((appointment.shippedUnits / appointment.totalUnits) * 100)
+                              ? Math.round(
+                                  (appointment.shippedUnits /
+                                    appointment.totalUnits) *
+                                    100,
+                                )
                               : 0}
                             %
                           </span>
@@ -290,7 +337,9 @@ export default function CrossDockDashboard() {
                             style={{
                               width: `${
                                 appointment.totalUnits > 0
-                                  ? (appointment.shippedUnits / appointment.totalUnits) * 100
+                                  ? (appointment.shippedUnits /
+                                      appointment.totalUnits) *
+                                    100
                                   : 0
                               }%`,
                             }}
@@ -320,9 +369,14 @@ export default function CrossDockDashboard() {
             <CardContent>
               <div className="space-y-2">
                 {Object.entries(stats.byStatus).map(([status, count]) => (
-                  <div key={status} className="flex items-center justify-between">
+                  <div
+                    key={status}
+                    className="flex items-center justify-between"
+                  >
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${getStatusColor(status)}`} />
+                      <div
+                        className={`w-3 h-3 rounded-full ${getStatusColor(status)}`}
+                      />
                       <span className="text-sm">{status}</span>
                     </div>
                     <span className="font-medium">{count}</span>

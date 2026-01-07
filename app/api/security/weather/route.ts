@@ -1,23 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 // GET /api/security/weather - Get current weather
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
-    const warehouseId = searchParams.get('warehouseId');
+    const warehouseId = searchParams.get("warehouseId");
 
     // Get latest weather log
     const latestWeather = await prisma.weatherLog.findFirst({
@@ -25,17 +28,23 @@ export async function GET(req: NextRequest) {
         organizationId,
         ...(warehouseId && { warehouseId }),
       },
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
     });
 
     if (!latestWeather) {
-      return NextResponse.json({ error: 'No weather data available' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No weather data available" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(latestWeather);
   } catch (error: any) {
-    console.error('Error fetching weather:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching weather:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -61,13 +70,16 @@ export async function POST(req: NextRequest) {
         alertType: json.alertType,
         alertSeverity: json.alertSeverity,
         alertMessage: json.alertMessage,
-        source: json.source || 'OpenWeather',
+        source: json.source || "OpenWeather",
       },
     });
 
     return NextResponse.json(weather);
   } catch (error: any) {
-    console.error('Error logging weather:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error logging weather:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

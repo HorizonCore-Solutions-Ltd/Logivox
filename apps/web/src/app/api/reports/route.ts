@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -9,25 +9,64 @@ const createReportSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   code: z.string().min(1, "Code is required"),
-  reportType: z.enum(['TABULAR', 'SUMMARY', 'CHART', 'COMBINED', 'PIVOT', 'MATRIX']),
-  category: z.enum(['INVENTORY', 'SALES', 'PURCHASING', 'WAREHOUSE', 'FINANCIAL', 'QUALITY', 'PRODUCTION', 'CUSTOM']),
+  reportType: z.enum([
+    "TABULAR",
+    "SUMMARY",
+    "CHART",
+    "COMBINED",
+    "PIVOT",
+    "MATRIX",
+  ]),
+  category: z.enum([
+    "INVENTORY",
+    "SALES",
+    "PURCHASING",
+    "WAREHOUSE",
+    "FINANCIAL",
+    "QUALITY",
+    "PRODUCTION",
+    "CUSTOM",
+  ]),
   dataSource: z.string().min(1, "Data source is required"),
   filters: z.record(z.any()).optional(),
   groupBy: z.array(z.string()).optional(),
-  sortBy: z.array(z.object({
-    field: z.string(),
-    direction: z.enum(['asc', 'desc']),
-  })).optional(),
-  columns: z.array(z.object({
-    field: z.string(),
-    label: z.string(),
-    type: z.string().optional(),
-    aggregation: z.string().optional(),
-  })).optional(),
-  chartType: z.enum(['BAR', 'LINE', 'PIE', 'DONUT', 'AREA', 'SCATTER', 'GAUGE', 'FUNNEL', 'HEATMAP', 'TABLE']).optional(),
+  sortBy: z
+    .array(
+      z.object({
+        field: z.string(),
+        direction: z.enum(["asc", "desc"]),
+      }),
+    )
+    .optional(),
+  columns: z
+    .array(
+      z.object({
+        field: z.string(),
+        label: z.string(),
+        type: z.string().optional(),
+        aggregation: z.string().optional(),
+      }),
+    )
+    .optional(),
+  chartType: z
+    .enum([
+      "BAR",
+      "LINE",
+      "PIE",
+      "DONUT",
+      "AREA",
+      "SCATTER",
+      "GAUGE",
+      "FUNNEL",
+      "HEATMAP",
+      "TABLE",
+    ])
+    .optional(),
   chartConfig: z.record(z.any()).optional(),
   isScheduled: z.boolean().default(false),
-  scheduleType: z.enum(['HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', 'CUSTOM']).optional(),
+  scheduleType: z
+    .enum(["HOURLY", "DAILY", "WEEKLY", "MONTHLY", "CUSTOM"])
+    .optional(),
   scheduleConfig: z.record(z.any()).optional(),
   emailRecipients: z.array(z.string()).optional(),
   webhookUrl: z.string().optional(),
@@ -58,7 +97,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -80,13 +119,13 @@ export async function GET(request: Request) {
     if (reportType) where.reportType = reportType;
     if (category) where.category = category;
     if (isActive !== null && isActive !== undefined) {
-      where.isActive = isActive === 'true';
+      where.isActive = isActive === "true";
     }
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { code: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { code: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -107,7 +146,7 @@ export async function GET(request: Request) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip: offset,
         take: limit,
       }),
@@ -127,7 +166,7 @@ export async function GET(request: Request) {
     console.error("Error fetching reports:", error);
     return NextResponse.json(
       { error: "Failed to fetch reports" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -153,7 +192,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -173,7 +212,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Report code already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -200,13 +239,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating report:", error);
     return NextResponse.json(
       { error: "Failed to create report" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

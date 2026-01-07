@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -9,9 +9,9 @@ export interface CreateInspectionData {
   supplierId: string;
   inspectorId: string;
   grnId?: string;
-  inspectionType: 'FULL' | 'SAMPLE' | 'VISUAL' | 'FUNCTIONAL';
+  inspectionType: "FULL" | "SAMPLE" | "VISUAL" | "FUNCTIONAL";
   totalUnits: number;
-  priority?: 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+  priority?: "URGENT" | "HIGH" | "MEDIUM" | "LOW";
   scheduledAt?: Date;
 }
 
@@ -21,7 +21,7 @@ export interface InspectionItemData {
   productName: string;
   expectedQty: number;
   inspectedQty: number;
-  result: 'PASS' | 'FAIL' | 'CONDITIONAL';
+  result: "PASS" | "FAIL" | "CONDITIONAL";
   checklistData: any;
   notes?: string;
   photoUrls?: string[];
@@ -29,7 +29,7 @@ export interface InspectionItemData {
 
 export interface DefectData {
   itemId: string;
-  defectType: 'CRITICAL' | 'MAJOR' | 'MINOR';
+  defectType: "CRITICAL" | "MAJOR" | "MINOR";
   defectCategory: string;
   description: string;
   quantityAffected: number;
@@ -42,13 +42,15 @@ export class QCInspectionService {
   /**
    * Generate next inspection number
    */
-  private static async generateInspectionNumber(organizationId: string): Promise<string> {
+  private static async generateInspectionNumber(
+    organizationId: string,
+  ): Promise<string> {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+
     const prefix = `QCI-${year}${month}`;
-    
+
     const lastInspection = await prisma.qCReceivingInspection.findFirst({
       where: {
         organizationId,
@@ -57,28 +59,32 @@ export class QCInspectionService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     let sequence = 1;
     if (lastInspection) {
-      const lastNumber = lastInspection.inspectionNumber.split('-').pop();
-      sequence = parseInt(lastNumber || '0') + 1;
+      const lastNumber = lastInspection.inspectionNumber.split("-").pop();
+      sequence = parseInt(lastNumber || "0") + 1;
     }
 
-    return `${prefix}-${String(sequence).padStart(6, '0')}`;
+    return `${prefix}-${String(sequence).padStart(6, "0")}`;
   }
 
   /**
    * Calculate sample size based on total units and inspection type
    */
-  private static calculateSampleSize(totalUnits: number, inspectionType: string, samplePercent: number = 10): number {
-    if (inspectionType === 'FULL') {
+  private static calculateSampleSize(
+    totalUnits: number,
+    inspectionType: string,
+    samplePercent: number = 10,
+  ): number {
+    if (inspectionType === "FULL") {
       return totalUnits;
     }
 
-    if (inspectionType === 'SAMPLE') {
+    if (inspectionType === "SAMPLE") {
       // Standard AQL sampling
       if (totalUnits <= 50) return Math.min(totalUnits, 8);
       if (totalUnits <= 150) return Math.min(totalUnits, 13);
@@ -97,12 +103,17 @@ export class QCInspectionService {
    * Create new QC inspection
    */
   static async createInspection(data: CreateInspectionData) {
-    const inspectionNumber = await this.generateInspectionNumber(data.organizationId);
-    
+    const inspectionNumber = await this.generateInspectionNumber(
+      data.organizationId,
+    );
+
     // Calculate sample size
     let sampleSize: number | null = null;
-    if (data.inspectionType === 'SAMPLE') {
-      sampleSize = this.calculateSampleSize(data.totalUnits, data.inspectionType);
+    if (data.inspectionType === "SAMPLE") {
+      sampleSize = this.calculateSampleSize(
+        data.totalUnits,
+        data.inspectionType,
+      );
     }
 
     const inspection = await prisma.qCReceivingInspection.create({
@@ -118,9 +129,9 @@ export class QCInspectionService {
         sampleSize,
         totalUnits: data.totalUnits,
         inspectedUnits: 0,
-        priority: data.priority || 'MEDIUM',
+        priority: data.priority || "MEDIUM",
         scheduledAt: data.scheduledAt,
-        status: 'PENDING',
+        status: "PENDING",
       },
       include: {
         purchaseOrder: true,
@@ -131,7 +142,12 @@ export class QCInspectionService {
     });
 
     // Log activity
-    await this.logActivity(inspection.id, 'CREATED', `Inspection ${inspectionNumber} created`, data.inspectorId);
+    await this.logActivity(
+      inspection.id,
+      "CREATED",
+      `Inspection ${inspectionNumber} created`,
+      data.inspectorId,
+    );
 
     return inspection;
   }
@@ -143,12 +159,17 @@ export class QCInspectionService {
     const inspection = await prisma.qCReceivingInspection.update({
       where: { id: inspectionId },
       data: {
-        status: 'IN_PROGRESS',
+        status: "IN_PROGRESS",
         startedAt: new Date(),
       },
     });
 
-    await this.logActivity(inspectionId, 'STARTED', 'Inspection started', userId);
+    await this.logActivity(
+      inspectionId,
+      "STARTED",
+      "Inspection started",
+      userId,
+    );
 
     return inspection;
   }
@@ -156,13 +177,16 @@ export class QCInspectionService {
   /**
    * Add inspection item
    */
-  static async addInspectionItem(inspectionId: string, data: InspectionItemData) {
+  static async addInspectionItem(
+    inspectionId: string,
+    data: InspectionItemData,
+  ) {
     const inspection = await prisma.qCReceivingInspection.findUnique({
       where: { id: inspectionId },
     });
 
     if (!inspection) {
-      throw new Error('Inspection not found');
+      throw new Error("Inspection not found");
     }
 
     const item = await prisma.qCInspectionItem.create({
@@ -173,8 +197,8 @@ export class QCInspectionService {
         productName: data.productName,
         expectedQty: data.expectedQty,
         inspectedQty: data.inspectedQty,
-        passedQty: data.result === 'PASS' ? data.inspectedQty : 0,
-        failedQty: data.result === 'FAIL' ? data.inspectedQty : 0,
+        passedQty: data.result === "PASS" ? data.inspectedQty : 0,
+        failedQty: data.result === "FAIL" ? data.inspectedQty : 0,
         result: data.result,
         checklistData: data.checklistData,
         notes: data.notes,
@@ -199,12 +223,12 @@ export class QCInspectionService {
     });
 
     if (!inspection) {
-      throw new Error('Inspection not found');
+      throw new Error("Inspection not found");
     }
 
-    const item = inspection.items.find(i => i.id === data.itemId);
+    const item = inspection.items.find((i) => i.id === data.itemId);
     if (!item) {
-      throw new Error('Inspection item not found');
+      throw new Error("Inspection item not found");
     }
 
     const defect = await prisma.qCDefect.create({
@@ -219,19 +243,22 @@ export class QCInspectionService {
         estimatedCost: data.estimatedCost,
         photoUrls: data.photoUrls || [],
         videoUrls: data.videoUrls || [],
-        resolutionStatus: 'PENDING',
+        resolutionStatus: "PENDING",
       },
     });
 
     // Update vendor quality score
-    await this.updateVendorQualityScore(inspection.supplierId, inspection.organizationId);
+    await this.updateVendorQualityScore(
+      inspection.supplierId,
+      inspection.organizationId,
+    );
 
     // Log activity
     await this.logActivity(
       inspectionId,
-      'DEFECT_RECORDED',
+      "DEFECT_RECORDED",
       `${data.defectType} defect recorded: ${data.description}`,
-      inspection.inspectorId
+      inspection.inspectorId,
     );
 
     return defect;
@@ -240,7 +267,11 @@ export class QCInspectionService {
   /**
    * Complete inspection
    */
-  static async completeInspection(inspectionId: string, userId: string, overallNotes?: string) {
+  static async completeInspection(
+    inspectionId: string,
+    userId: string,
+    overallNotes?: string,
+  ) {
     const inspection = await prisma.qCReceivingInspection.findUnique({
       where: { id: inspectionId },
       include: {
@@ -250,24 +281,28 @@ export class QCInspectionService {
     });
 
     if (!inspection) {
-      throw new Error('Inspection not found');
+      throw new Error("Inspection not found");
     }
 
     // Determine overall result
-    const hasFailedItems = inspection.items.some(item => item.result === 'FAIL');
-    const hasCriticalDefects = inspection.defects.some(defect => defect.defectType === 'CRITICAL');
-    
-    let result: 'PASS' | 'FAIL' | 'CONDITIONAL' = 'PASS';
+    const hasFailedItems = inspection.items.some(
+      (item) => item.result === "FAIL",
+    );
+    const hasCriticalDefects = inspection.defects.some(
+      (defect) => defect.defectType === "CRITICAL",
+    );
+
+    let result: "PASS" | "FAIL" | "CONDITIONAL" = "PASS";
     if (hasCriticalDefects) {
-      result = 'FAIL';
+      result = "FAIL";
     } else if (hasFailedItems || inspection.defects.length > 0) {
-      result = 'CONDITIONAL';
+      result = "CONDITIONAL";
     }
 
     const updatedInspection = await prisma.qCReceivingInspection.update({
       where: { id: inspectionId },
       data: {
-        status: 'COMPLETED',
+        status: "COMPLETED",
         result,
         completedAt: new Date(),
         overallNotes,
@@ -281,14 +316,17 @@ export class QCInspectionService {
     });
 
     // Update vendor quality score
-    await this.updateVendorQualityScore(inspection.supplierId, inspection.organizationId);
+    await this.updateVendorQualityScore(
+      inspection.supplierId,
+      inspection.organizationId,
+    );
 
     // Log activity
     await this.logActivity(
       inspectionId,
-      'COMPLETED',
+      "COMPLETED",
       `Inspection completed with result: ${result}`,
-      userId
+      userId,
     );
 
     return updatedInspection;
@@ -302,7 +340,10 @@ export class QCInspectionService {
       where: { inspectionId },
     });
 
-    const inspectedUnits = items.reduce((sum, item) => sum + item.inspectedQty, 0);
+    const inspectedUnits = items.reduce(
+      (sum, item) => sum + item.inspectedQty,
+      0,
+    );
     const passedUnits = items.reduce((sum, item) => sum + item.passedQty, 0);
     const failedUnits = items.reduce((sum, item) => sum + item.failedQty, 0);
 
@@ -319,22 +360,34 @@ export class QCInspectionService {
   /**
    * Update vendor quality score
    */
-  private static async updateVendorQualityScore(supplierId: string, organizationId: string) {
+  private static async updateVendorQualityScore(
+    supplierId: string,
+    organizationId: string,
+  ) {
     // Get all inspections for this vendor
     const inspections = await prisma.qCReceivingInspection.findMany({
       where: {
         supplierId,
         organizationId,
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
       include: {
         defects: true,
       },
     });
 
-    const totalUnits = inspections.reduce((sum, insp) => sum + insp.totalUnits, 0);
+    const totalUnits = inspections.reduce(
+      (sum, insp) => sum + insp.totalUnits,
+      0,
+    );
     const totalDefects = inspections.reduce((sum, insp) => {
-      return sum + insp.defects.reduce((defectSum, defect) => defectSum + defect.quantityAffected, 0);
+      return (
+        sum +
+        insp.defects.reduce(
+          (defectSum, defect) => defectSum + defect.quantityAffected,
+          0,
+        )
+      );
     }, 0);
 
     const defectRate = totalUnits > 0 ? (totalDefects / totalUnits) * 100 : 0;
@@ -382,7 +435,7 @@ export class QCInspectionService {
     inspectionId: string,
     activityType: string,
     description: string,
-    performedBy: string
+    performedBy: string,
   ) {
     await prisma.qCInspectionActivity.create({
       data: {
@@ -409,7 +462,7 @@ export class QCInspectionService {
         },
         defects: true,
         activities: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
         },
         purchaseOrder: true,
         supplier: true,
@@ -431,7 +484,7 @@ export class QCInspectionService {
       result?: string;
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ) {
     const where: any = {
       organizationId,
@@ -461,7 +514,7 @@ export class QCInspectionService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }
@@ -479,7 +532,7 @@ export class QCInspectionService {
         createdAt: {
           gte: startDate,
         },
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
       include: {
         defects: true,
@@ -487,13 +540,25 @@ export class QCInspectionService {
     });
 
     const totalInspections = inspections.length;
-    const totalUnits = inspections.reduce((sum, insp) => sum + insp.totalUnits, 0);
-    const totalDefects = inspections.reduce((sum, insp) => insp.defects.length + sum, 0);
-    const passedInspections = inspections.filter(insp => insp.result === 'PASS').length;
-    const failedInspections = inspections.filter(insp => insp.result === 'FAIL').length;
+    const totalUnits = inspections.reduce(
+      (sum, insp) => sum + insp.totalUnits,
+      0,
+    );
+    const totalDefects = inspections.reduce(
+      (sum, insp) => insp.defects.length + sum,
+      0,
+    );
+    const passedInspections = inspections.filter(
+      (insp) => insp.result === "PASS",
+    ).length;
+    const failedInspections = inspections.filter(
+      (insp) => insp.result === "FAIL",
+    ).length;
 
-    const avgDefectRate = totalUnits > 0 ? (totalDefects / totalUnits) * 100 : 0;
-    const passRate = totalInspections > 0 ? (passedInspections / totalInspections) * 100 : 0;
+    const avgDefectRate =
+      totalUnits > 0 ? (totalDefects / totalUnits) * 100 : 0;
+    const passRate =
+      totalInspections > 0 ? (passedInspections / totalInspections) * 100 : 0;
 
     return {
       totalInspections,

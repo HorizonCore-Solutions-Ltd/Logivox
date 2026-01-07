@@ -3,7 +3,7 @@
  * Handles email and SMS notifications for return events
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 export interface NotificationRecipient {
   email?: string;
@@ -33,15 +33,15 @@ export interface NotificationContext {
 }
 
 export type NotificationEvent =
-  | 'return_created'
-  | 'return_approved'
-  | 'return_rejected'
-  | 'label_generated'
-  | 'return_received'
-  | 'return_inspected'
-  | 'return_processed'
-  | 'refund_issued'
-  | 'fraud_alert';
+  | "return_created"
+  | "return_approved"
+  | "return_rejected"
+  | "label_generated"
+  | "return_received"
+  | "return_inspected"
+  | "return_processed"
+  | "refund_issued"
+  | "fraud_alert";
 
 export class ReturnsNotificationService {
   /**
@@ -50,14 +50,14 @@ export class ReturnsNotificationService {
   async sendNotification(
     event: NotificationEvent,
     recipient: NotificationRecipient,
-    context: NotificationContext
+    context: NotificationContext,
   ): Promise<void> {
     try {
       // Get notification settings
-      const settings = await prisma.$queryRaw`
+      const settings = (await prisma.$queryRaw`
         SELECT notifications FROM return_settings
         WHERE organization_id = ${context.organization.id}
-      ` as any[];
+      `) as any[];
 
       const notificationSettings = settings[0]?.notifications || {
         email: { enabled: true },
@@ -78,9 +78,9 @@ export class ReturnsNotificationService {
       await prisma.activityLog.create({
         data: {
           organizationId: context.organization.id,
-          userId: 'system',
-          action: 'NOTIFICATION_SENT',
-          entityType: 'RMA',
+          userId: "system",
+          action: "NOTIFICATION_SENT",
+          entityType: "RMA",
           entityId: context.rma.id,
           metadata: {
             event,
@@ -93,7 +93,7 @@ export class ReturnsNotificationService {
         },
       });
     } catch (error) {
-      console.error('Error sending notification:', error);
+      console.error("Error sending notification:", error);
       // Don't throw - notifications are non-critical
     }
   }
@@ -104,7 +104,7 @@ export class ReturnsNotificationService {
   private async sendEmail(
     event: NotificationEvent,
     email: string,
-    context: NotificationContext
+    context: NotificationContext,
   ): Promise<void> {
     const template = this.getEmailTemplate(event, context);
 
@@ -123,7 +123,7 @@ export class ReturnsNotificationService {
   private async sendSMS(
     event: NotificationEvent,
     phone: string,
-    context: NotificationContext
+    context: NotificationContext,
   ): Promise<void> {
     const message = this.getSMSTemplate(event, context);
 
@@ -140,15 +140,18 @@ export class ReturnsNotificationService {
    */
   private getEmailTemplate(
     event: NotificationEvent,
-    context: NotificationContext
+    context: NotificationContext,
   ): { subject: string; body: string } {
     const { rma, customer, organization } = context;
 
-    const templates: Record<NotificationEvent, { subject: string; body: string }> = {
+    const templates: Record<
+      NotificationEvent,
+      { subject: string; body: string }
+    > = {
       return_created: {
         subject: `Return Request Submitted - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           Your return request has been submitted successfully.
 
@@ -164,14 +167,14 @@ export class ReturnsNotificationService {
       return_approved: {
         subject: `Return Approved - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           Your return request has been approved.
 
           Return Number: ${rma.rmaNumber}
           Status: Approved
 
-          ${rma.trackingNumber ? `A prepaid return label has been generated. Tracking: ${rma.trackingNumber}` : 'Please package your items and ship them back to us.'}
+          ${rma.trackingNumber ? `A prepaid return label has been generated. Tracking: ${rma.trackingNumber}` : "Please package your items and ship them back to us."}
 
           Thank you,
           ${organization.name}
@@ -180,7 +183,7 @@ export class ReturnsNotificationService {
       return_rejected: {
         subject: `Return Request Update - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           We're unable to approve your return request at this time.
 
@@ -196,7 +199,7 @@ export class ReturnsNotificationService {
       label_generated: {
         subject: `Return Label Ready - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           Your prepaid return label is ready.
 
@@ -213,7 +216,7 @@ export class ReturnsNotificationService {
       return_received: {
         subject: `Return Received - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           We've received your return.
 
@@ -229,7 +232,7 @@ export class ReturnsNotificationService {
       return_inspected: {
         subject: `Return Inspected - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           Your return has been inspected.
 
@@ -245,14 +248,14 @@ export class ReturnsNotificationService {
       return_processed: {
         subject: `Return Processed - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           Your return has been processed.
 
           Return Number: ${rma.rmaNumber}
           Status: Complete
 
-          ${rma.totalRefundAmount ? `Refund Amount: $${rma.totalRefundAmount.toFixed(2)}` : ''}
+          ${rma.totalRefundAmount ? `Refund Amount: $${rma.totalRefundAmount.toFixed(2)}` : ""}
 
           Thank you,
           ${organization.name}
@@ -261,7 +264,7 @@ export class ReturnsNotificationService {
       refund_issued: {
         subject: `Refund Issued - ${rma.rmaNumber}`,
         body: `
-          Dear ${customer?.name || 'Customer'},
+          Dear ${customer?.name || "Customer"},
 
           Your refund has been issued.
 
@@ -299,13 +302,13 @@ export class ReturnsNotificationService {
    */
   private getSMSTemplate(
     event: NotificationEvent,
-    context: NotificationContext
+    context: NotificationContext,
   ): string {
     const { rma, organization } = context;
 
     const templates: Record<NotificationEvent, string> = {
       return_created: `${organization.name}: Your return ${rma.rmaNumber} has been submitted.`,
-      return_approved: `${organization.name}: Return ${rma.rmaNumber} approved. ${rma.trackingNumber ? `Track: ${rma.trackingNumber}` : ''}`,
+      return_approved: `${organization.name}: Return ${rma.rmaNumber} approved. ${rma.trackingNumber ? `Track: ${rma.trackingNumber}` : ""}`,
       return_rejected: `${organization.name}: Return ${rma.rmaNumber} could not be approved.`,
       label_generated: `${organization.name}: Return label ready for ${rma.rmaNumber}. Track: ${rma.trackingNumber}`,
       return_received: `${organization.name}: We received your return ${rma.rmaNumber}.`,
@@ -323,28 +326,28 @@ export class ReturnsNotificationService {
    */
   private async sendViaProvider(
     email: string,
-    template: { subject: string; body: string }
+    template: { subject: string; body: string },
   ): Promise<void> {
     // Example SendGrid implementation
     if (!process.env.SENDGRID_API_KEY) return;
 
     try {
-      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-        method: 'POST',
+      const response = await fetch("https://api.sendgrid.com/v3/mail/send", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${process.env.SENDGRID_API_KEY}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.SENDGRID_API_KEY}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           personalizations: [{ to: [{ email }] }],
           from: {
-            email: process.env.SENDGRID_FROM_EMAIL || 'returns@yourcompany.com',
-            name: process.env.SENDGRID_FROM_NAME || 'Returns Team',
+            email: process.env.SENDGRID_FROM_EMAIL || "returns@yourcompany.com",
+            name: process.env.SENDGRID_FROM_NAME || "Returns Team",
           },
           subject: template.subject,
           content: [
             {
-              type: 'text/plain',
+              type: "text/plain",
               value: template.body,
             },
           ],
@@ -355,7 +358,7 @@ export class ReturnsNotificationService {
         throw new Error(`SendGrid error: ${response.statusText}`);
       }
     } catch (error) {
-      console.error('SendGrid send error:', error);
+      console.error("SendGrid send error:", error);
       throw error;
     }
   }
@@ -363,35 +366,38 @@ export class ReturnsNotificationService {
   /**
    * Send SMS via provider (Twilio example)
    */
-  private async sendSMSViaProvider(phone: string, message: string): Promise<void> {
+  private async sendSMSViaProvider(
+    phone: string,
+    message: string,
+  ): Promise<void> {
     if (!process.env.TWILIO_ACCOUNT_SID) return;
 
     try {
       const auth = Buffer.from(
-        `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`
-      ).toString('base64');
+        `${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`,
+      ).toString("base64");
 
       const response = await fetch(
         `https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`,
         {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
+            Authorization: `Basic ${auth}`,
+            "Content-Type": "application/x-www-form-urlencoded",
           },
           body: new URLSearchParams({
             To: phone,
-            From: process.env.TWILIO_PHONE_NUMBER || '',
+            From: process.env.TWILIO_PHONE_NUMBER || "",
             Body: message,
           }),
-        }
+        },
       );
 
       if (!response.ok) {
         throw new Error(`Twilio error: ${response.statusText}`);
       }
     } catch (error) {
-      console.error('Twilio send error:', error);
+      console.error("Twilio send error:", error);
       throw error;
     }
   }
@@ -399,10 +405,7 @@ export class ReturnsNotificationService {
   /**
    * Notify customer of return status change
    */
-  async notifyCustomer(
-    event: NotificationEvent,
-    rmaId: string
-  ): Promise<void> {
+  async notifyCustomer(event: NotificationEvent, rmaId: string): Promise<void> {
     try {
       // Get RMA with customer details
       const rma = await prisma.rMA.findUnique({
@@ -442,10 +445,10 @@ export class ReturnsNotificationService {
           phone: rma.customer.phone || undefined,
           name: rma.customer.name,
         },
-        context
+        context,
       );
     } catch (error) {
-      console.error('Error notifying customer:', error);
+      console.error("Error notifying customer:", error);
       // Non-critical, don't throw
     }
   }

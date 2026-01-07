@@ -1,4 +1,5 @@
 # 🎓 LogiVox Academy - Training & Security Awareness System
+
 ## Enterprise Learning Platform (Like KnowBe4 but for Inventory Management)
 
 > **TRAINING LEVEL**: Enterprise-Grade User Education  
@@ -86,6 +87,7 @@
 **Completion Required**: Before accessing main features
 
 #### Lessons:
+
 1. **Welcome to LogiVox** (5 min)
    - Platform overview
    - Key features tour
@@ -135,6 +137,7 @@
 ### Module 2: Inventory Management (Required - 90 min)
 
 #### Lessons:
+
 1. **Inventory Basics** (10 min)
    - What is inventory management?
    - SKU naming conventions
@@ -193,6 +196,7 @@
 #### Section A: Password Security (20 min)
 
 **Lesson 1: Password Best Practices** (10 min)
+
 - Why passwords matter
 - Strong password creation
 - Password managers (1Password, LastPass, Bitwarden)
@@ -200,6 +204,7 @@
 - Changing passwords regularly
 
 **Lesson 2: Password Attacks** (10 min)
+
 - Brute force attacks
 - Dictionary attacks
 - Credential stuffing
@@ -213,12 +218,14 @@
 #### Section B: Phishing Detection (30 min)
 
 **Lesson 3: What is Phishing?** (10 min)
+
 - Definition and examples
 - Types of phishing (email, SMS, voice)
 - Real-world case studies
 - Cost of successful phishing attacks
 
 **Lesson 4: Spotting Phishing Emails** (10 min)
+
 - Suspicious sender addresses
 - Urgent/threatening language
 - Spelling and grammar errors
@@ -227,6 +234,7 @@
 - Requests for sensitive information
 
 **Lesson 5: Advanced Phishing Techniques** (10 min)
+
 - Spear phishing (targeted attacks)
 - Whaling (executive targeting)
 - Clone phishing
@@ -240,6 +248,7 @@
 #### Section C: Social Engineering (25 min)
 
 **Lesson 6: Social Engineering Tactics** (10 min)
+
 - Pretexting (fake scenarios)
 - Baiting (USB drops, fake offers)
 - Tailgating (physical access)
@@ -247,6 +256,7 @@
 - Authority exploitation
 
 **Lesson 7: Protecting Against Social Engineering** (10 min)
+
 - Verify requests through official channels
 - Don't share sensitive information
 - Report suspicious contacts
@@ -254,6 +264,7 @@
 - Incident reporting procedures
 
 **Lesson 8: Real-World Case Studies** (5 min)
+
 - Target data breach (2013)
 - Sony Pictures hack (2014)
 - Twitter Bitcoin scam (2020)
@@ -267,12 +278,14 @@
 #### Section D: Data Protection (25 min)
 
 **Lesson 9: Data Classification** (10 min)
+
 - Public vs. confidential vs. restricted
 - LogiVox data sensitivity levels
 - Handling customer data
 - GDPR and privacy laws
 
 **Lesson 10: Data Security Best Practices** (10 min)
+
 - Encryption importance
 - Secure file sharing
 - Email security
@@ -280,6 +293,7 @@
 - Remote work security
 
 **Lesson 11: Incident Response** (5 min)
+
 - What to do if you suspect a breach
 - Reporting procedures
 - Who to contact (CISO, IT)
@@ -293,12 +307,14 @@
 #### Section E: Multi-Factor Authentication (15 min)
 
 **Lesson 12: Why MFA Matters** (7 min)
+
 - Password limitations
 - MFA effectiveness (99.9% attack prevention)
 - Types of MFA (SMS, TOTP, hardware keys)
 - LogiVox MFA setup
 
 **Lesson 13: Setting Up MFA** (8 min)
+
 - Authenticator apps (Google, Microsoft, Authy)
 - Hardware security keys (YubiKey)
 - Backup codes
@@ -311,6 +327,7 @@
 #### Section F: Mobile Security (20 min)
 
 **Lesson 14: Mobile Threats** (10 min)
+
 - Malicious apps
 - Public Wi-Fi risks
 - Lost/stolen devices
@@ -318,6 +335,7 @@
 - App permissions
 
 **Lesson 15: Mobile Security Best Practices** (10 min)
+
 - Device encryption
 - Screen locks and biometrics
 - Remote wipe capabilities
@@ -331,6 +349,7 @@
 ### Module 4: LogiVox Security Features (30 min)
 
 **Lesson 16: LogiVox Security Overview** (10 min)
+
 - Zero-trust architecture
 - Encryption (at rest and in transit)
 - Audit logging
@@ -338,6 +357,7 @@
 - Session management
 
 **Lesson 17: User Responsibilities** (10 min)
+
 - Logout when finished
 - Don't share credentials
 - Report suspicious activity
@@ -345,6 +365,7 @@
 - Secure your workspace
 
 **Lesson 18: Compliance & Audits** (10 min)
+
 - SOC 2 compliance
 - GDPR requirements
 - Audit log review
@@ -364,7 +385,7 @@
 
 /**
  * Interactive Onboarding Flow
- * 
+ *
  * - Triggered on first login
  * - Cannot be skipped (compliance requirement)
  * - Progress saved automatically
@@ -374,212 +395,219 @@
 
 export const ONBOARDING_STEPS = [
   {
-    id: 'welcome',
-    title: 'Welcome to LogiVox! 🎉',
-    component: 'WelcomeScreen',
+    id: "welcome",
+    title: "Welcome to LogiVox! 🎉",
+    component: "WelcomeScreen",
     duration: 2,
     required: true,
     content: {
-      heading: 'Your Inventory Management Journey Starts Here',
-      description: 'In the next 15 minutes, we\'ll show you everything you need to get started.',
-      video: '/videos/onboarding/welcome.mp4',
+      heading: "Your Inventory Management Journey Starts Here",
+      description:
+        "In the next 15 minutes, we'll show you everything you need to get started.",
+      video: "/videos/onboarding/welcome.mp4",
       features: [
-        'Real-time inventory tracking',
-        'Customer & booking management',
-        'Advanced label printing',
-        'Mobile app & offline mode',
-        'Enterprise integrations',
+        "Real-time inventory tracking",
+        "Customer & booking management",
+        "Advanced label printing",
+        "Mobile app & offline mode",
+        "Enterprise integrations",
       ],
     },
   },
-  
+
   {
-    id: 'security-setup',
-    title: 'Secure Your Account 🔐',
-    component: 'SecuritySetupScreen',
+    id: "security-setup",
+    title: "Secure Your Account 🔐",
+    component: "SecuritySetupScreen",
     duration: 5,
     required: true,
     tasks: [
       {
-        id: 'strong-password',
-        title: 'Verify Strong Password',
-        description: 'Your password meets security requirements',
+        id: "strong-password",
+        title: "Verify Strong Password",
+        description: "Your password meets security requirements",
         auto: true, // Auto-check
       },
       {
-        id: 'mfa-setup',
-        title: 'Enable Multi-Factor Authentication',
-        description: 'Add an extra layer of security (REQUIRED)',
-        action: 'setup-mfa',
+        id: "mfa-setup",
+        title: "Enable Multi-Factor Authentication",
+        description: "Add an extra layer of security (REQUIRED)",
+        action: "setup-mfa",
         required: true,
       },
       {
-        id: 'backup-codes',
-        title: 'Save Recovery Codes',
-        description: 'Download and store your backup codes safely',
-        action: 'download-codes',
+        id: "backup-codes",
+        title: "Save Recovery Codes",
+        description: "Download and store your backup codes safely",
+        action: "download-codes",
         required: true,
       },
     ],
   },
 
   {
-    id: 'profile-setup',
-    title: 'Complete Your Profile',
-    component: 'ProfileSetupScreen',
+    id: "profile-setup",
+    title: "Complete Your Profile",
+    component: "ProfileSetupScreen",
     duration: 3,
     required: true,
     fields: [
-      { name: 'name', label: 'Full Name', required: true },
-      { name: 'phone', label: 'Phone Number', required: false },
-      { name: 'role', label: 'Your Role', required: true, type: 'select' },
-      { name: 'department', label: 'Department', required: false },
-      { name: 'photo', label: 'Profile Photo', required: false, type: 'upload' },
+      { name: "name", label: "Full Name", required: true },
+      { name: "phone", label: "Phone Number", required: false },
+      { name: "role", label: "Your Role", required: true, type: "select" },
+      { name: "department", label: "Department", required: false },
+      {
+        name: "photo",
+        label: "Profile Photo",
+        required: false,
+        type: "upload",
+      },
     ],
   },
 
   {
-    id: 'organization-setup',
-    title: 'Set Up Your Organization',
-    component: 'OrganizationSetupScreen',
+    id: "organization-setup",
+    title: "Set Up Your Organization",
+    component: "OrganizationSetupScreen",
     duration: 3,
     required: true,
-    conditional: (user) => user.role === 'OWNER',
+    conditional: (user) => user.role === "OWNER",
     fields: [
-      { name: 'name', label: 'Organization Name', required: true },
-      { name: 'industry', label: 'Industry', required: true, type: 'select' },
-      { name: 'size', label: 'Company Size', required: true, type: 'select' },
-      { name: 'timezone', label: 'Timezone', required: true },
-      { name: 'currency', label: 'Currency', required: true },
+      { name: "name", label: "Organization Name", required: true },
+      { name: "industry", label: "Industry", required: true, type: "select" },
+      { name: "size", label: "Company Size", required: true, type: "select" },
+      { name: "timezone", label: "Timezone", required: true },
+      { name: "currency", label: "Currency", required: true },
     ],
   },
 
   {
-    id: 'quick-tour',
-    title: 'Quick Product Tour 🚀',
-    component: 'ProductTourScreen',
+    id: "quick-tour",
+    title: "Quick Product Tour 🚀",
+    component: "ProductTourScreen",
     duration: 5,
     required: true,
     interactive: true,
     steps: [
       {
-        target: '#sidebar-inventory',
-        title: 'Inventory Management',
-        description: 'Add, track, and manage all your inventory items here.',
-        position: 'right',
+        target: "#sidebar-inventory",
+        title: "Inventory Management",
+        description: "Add, track, and manage all your inventory items here.",
+        position: "right",
       },
       {
-        target: '#sidebar-customers',
-        title: 'Customers',
-        description: 'Manage customer information and relationships.',
-        position: 'right',
+        target: "#sidebar-customers",
+        title: "Customers",
+        description: "Manage customer information and relationships.",
+        position: "right",
       },
       {
-        target: '#sidebar-bookings',
-        title: 'Bookings',
-        description: 'Create and track bookings for your customers.',
-        position: 'right',
+        target: "#sidebar-bookings",
+        title: "Bookings",
+        description: "Create and track bookings for your customers.",
+        position: "right",
       },
       {
-        target: '#sidebar-labels',
-        title: 'Label Printing',
-        description: 'Design and print professional labels.',
-        position: 'right',
+        target: "#sidebar-labels",
+        title: "Label Printing",
+        description: "Design and print professional labels.",
+        position: "right",
       },
       {
-        target: '#user-menu',
-        title: 'Your Account',
-        description: 'Access settings, help, and security options.',
-        position: 'left',
+        target: "#user-menu",
+        title: "Your Account",
+        description: "Access settings, help, and security options.",
+        position: "left",
       },
     ],
   },
 
   {
-    id: 'first-task',
-    title: 'Create Your First Item',
-    component: 'FirstTaskScreen',
+    id: "first-task",
+    title: "Create Your First Item",
+    component: "FirstTaskScreen",
     duration: 3,
     required: true,
     interactive: true,
     task: {
-      type: 'create-inventory-item',
-      guidance: 'step-by-step',
+      type: "create-inventory-item",
+      guidance: "step-by-step",
       validation: true,
       reward: {
-        badge: 'First Item Created',
+        badge: "First Item Created",
         points: 50,
       },
     },
   },
 
   {
-    id: 'mobile-setup',
-    title: 'Install Mobile App (Optional)',
-    component: 'MobileSetupScreen',
+    id: "mobile-setup",
+    title: "Install Mobile App (Optional)",
+    component: "MobileSetupScreen",
     duration: 2,
     required: false,
     content: {
-      heading: 'Take LogiVox Anywhere',
+      heading: "Take LogiVox Anywhere",
       qrCode: true, // Generate QR code for mobile install
-      platforms: ['iOS', 'Android', 'PWA'],
+      platforms: ["iOS", "Android", "PWA"],
       features: [
-        'Offline mode',
-        'Barcode scanning',
-        'Push notifications',
-        'Fast mobile access',
+        "Offline mode",
+        "Barcode scanning",
+        "Push notifications",
+        "Fast mobile access",
       ],
     },
   },
 
   {
-    id: 'training-enrollment',
-    title: 'Complete Your Training',
-    component: 'TrainingEnrollmentScreen',
+    id: "training-enrollment",
+    title: "Complete Your Training",
+    component: "TrainingEnrollmentScreen",
     duration: 1,
     required: true,
     content: {
-      heading: 'Security Awareness Training Required',
-      description: 'To protect our platform and your data, all users must complete security training.',
+      heading: "Security Awareness Training Required",
+      description:
+        "To protect our platform and your data, all users must complete security training.",
       modules: [
         {
-          id: 'security-basics',
-          title: 'Security Basics',
-          duration: '30 min',
+          id: "security-basics",
+          title: "Security Basics",
+          duration: "30 min",
           required: true,
-          deadline: '7 days from signup',
+          deadline: "7 days from signup",
         },
         {
-          id: 'phishing-awareness',
-          title: 'Phishing Awareness',
-          duration: '20 min',
+          id: "phishing-awareness",
+          title: "Phishing Awareness",
+          duration: "20 min",
           required: true,
-          deadline: '7 days from signup',
+          deadline: "7 days from signup",
         },
       ],
-      action: 'Enroll Now',
+      action: "Enroll Now",
     },
   },
 
   {
-    id: 'completion',
-    title: 'You\'re All Set! 🎉',
-    component: 'CompletionScreen',
+    id: "completion",
+    title: "You're All Set! 🎉",
+    component: "CompletionScreen",
     duration: 1,
     required: true,
     content: {
-      heading: 'Welcome to LogiVox!',
-      description: 'You\'re ready to start managing your inventory like a pro.',
+      heading: "Welcome to LogiVox!",
+      description: "You're ready to start managing your inventory like a pro.",
       nextSteps: [
-        'Explore the dashboard',
-        'Import your existing inventory',
-        'Invite your team members',
-        'Complete security training (Required within 7 days)',
+        "Explore the dashboard",
+        "Import your existing inventory",
+        "Invite your team members",
+        "Complete security training (Required within 7 days)",
       ],
       resources: [
-        { title: 'Help Center', url: '/help' },
-        { title: 'Video Tutorials', url: '/academy/videos' },
-        { title: 'Contact Support', url: '/support' },
+        { title: "Help Center", url: "/help" },
+        { title: "Video Tutorials", url: "/academy/videos" },
+        { title: "Contact Support", url: "/support" },
       ],
     },
   },
@@ -597,7 +625,7 @@ export const ONBOARDING_STEPS = [
 
 /**
  * Phishing Simulation System
- * 
+ *
  * - Sends realistic phishing emails to test users
  * - Tracks who clicks suspicious links
  * - Provides immediate education when clicked
@@ -609,23 +637,23 @@ export interface PhishingCampaign {
   id: string;
   name: string;
   organizationId: string;
-  
+
   // Campaign settings
   template: PhishingTemplate;
   targetUsers: string[]; // User IDs
   schedule: {
     startDate: Date;
-    frequency: 'weekly' | 'monthly' | 'quarterly';
+    frequency: "weekly" | "monthly" | "quarterly";
     randomize: boolean; // Random time within day
   };
-  
+
   // Tracking
   sent: number;
   opened: number;
   clicked: number;
   reported: number;
-  
-  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'COMPLETED';
+
+  status: "DRAFT" | "ACTIVE" | "PAUSED" | "COMPLETED";
   createdAt: Date;
   createdBy: string;
 }
@@ -633,21 +661,27 @@ export interface PhishingCampaign {
 export interface PhishingTemplate {
   id: string;
   name: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  category: 'CEO_FRAUD' | 'IT_SUPPORT' | 'HR_NOTICE' | 'SHIPPING' | 'PAYMENT' | 'SECURITY_ALERT';
-  
+  difficulty: "EASY" | "MEDIUM" | "HARD";
+  category:
+    | "CEO_FRAUD"
+    | "IT_SUPPORT"
+    | "HR_NOTICE"
+    | "SHIPPING"
+    | "PAYMENT"
+    | "SECURITY_ALERT";
+
   // Email content
   subject: string;
   from: string; // Spoofed sender
   fromName: string;
   body: string; // HTML email body
-  
+
   // Red flags (for training)
   redFlags: string[]; // What users should notice
-  
+
   // Landing page (if clicked)
   landingPage: {
-    type: 'EDUCATION' | 'DATA_COLLECTION';
+    type: "EDUCATION" | "DATA_COLLECTION";
     content: string;
     educationMessage?: string;
   };
@@ -656,13 +690,13 @@ export interface PhishingTemplate {
 // Example templates
 export const PHISHING_TEMPLATES: PhishingTemplate[] = [
   {
-    id: 'ceo-urgent-payment',
-    name: 'CEO Urgent Payment Request',
-    difficulty: 'MEDIUM',
-    category: 'CEO_FRAUD',
-    subject: 'URGENT: Wire Transfer Needed Today',
-    from: 'ceo@flowst0ck.com', // Note: 0 instead of o
-    fromName: 'CEO John Smith',
+    id: "ceo-urgent-payment",
+    name: "CEO Urgent Payment Request",
+    difficulty: "MEDIUM",
+    category: "CEO_FRAUD",
+    subject: "URGENT: Wire Transfer Needed Today",
+    from: "ceo@flowst0ck.com", // Note: 0 instead of o
+    fromName: "CEO John Smith",
     body: `
       <p>Hi,</p>
       <p>I'm in a meeting with a potential acquisition target and we need to transfer $50,000 immediately to secure the deal.</p>
@@ -675,15 +709,15 @@ export const PHISHING_TEMPLATES: PhishingTemplate[] = [
       <p style="font-size:10px;color:#999;">Sent from my iPhone</p>
     `,
     redFlags: [
-      'Urgent/pressure tactics',
-      'Unusual request (wire transfer)',
-      'Misspelled domain (flowst0ck instead of flowstock)',
-      'No verification process',
-      'Sent from personal device excuse',
+      "Urgent/pressure tactics",
+      "Unusual request (wire transfer)",
+      "Misspelled domain (flowst0ck instead of flowstock)",
+      "No verification process",
+      "Sent from personal device excuse",
     ],
     landingPage: {
-      type: 'EDUCATION',
-      content: 'education-ceo-fraud.html',
+      type: "EDUCATION",
+      content: "education-ceo-fraud.html",
       educationMessage: `
         <h2>⚠️ You Just Clicked a Simulated Phishing Link</h2>
         <p>This was a training exercise. In a real attack, you would have:</p>
@@ -713,13 +747,13 @@ export const PHISHING_TEMPLATES: PhishingTemplate[] = [
   },
 
   {
-    id: 'password-reset',
-    name: 'Fake Password Reset',
-    difficulty: 'EASY',
-    category: 'SECURITY_ALERT',
-    subject: 'LogiVox Security Alert: Password Reset Required',
-    from: 'security@logivox-security.com',
-    fromName: 'LogiVox Security Team',
+    id: "password-reset",
+    name: "Fake Password Reset",
+    difficulty: "EASY",
+    category: "SECURITY_ALERT",
+    subject: "LogiVox Security Alert: Password Reset Required",
+    from: "security@logivox-security.com",
+    fromName: "LogiVox Security Team",
     body: `
       <div style="font-family:Arial,sans-serif;">
         <img src="{{fakeLogo}}" alt="LogiVox" width="200">
@@ -737,26 +771,26 @@ export const PHISHING_TEMPLATES: PhishingTemplate[] = [
       </div>
     `,
     redFlags: [
-      'Suspicious domain (logivox-security.com, not logivox.ai)',
+      "Suspicious domain (logivox-security.com, not logivox.ai)",
       'Creates panic with "suspicious activity"',
-      'Generic greeting (no personalization)',
-      'External link to reset password',
-      'Check actual from address',
+      "Generic greeting (no personalization)",
+      "External link to reset password",
+      "Check actual from address",
     ],
     landingPage: {
-      type: 'EDUCATION',
-      content: 'education-password-reset.html',
+      type: "EDUCATION",
+      content: "education-password-reset.html",
     },
   },
 
   {
-    id: 'shipping-notification',
-    name: 'Fake Package Delivery',
-    difficulty: 'HARD',
-    category: 'SHIPPING',
-    subject: 'Package Delivery Attempted - Action Required',
-    from: 'noreply@dhl-delivery.com',
-    fromName: 'DHL Express',
+    id: "shipping-notification",
+    name: "Fake Package Delivery",
+    difficulty: "HARD",
+    category: "SHIPPING",
+    subject: "Package Delivery Attempted - Action Required",
+    from: "noreply@dhl-delivery.com",
+    fromName: "DHL Express",
     body: `
       <div style="font-family:Arial,sans-serif;">
         <img src="{{dhlLogo}}" alt="DHL" width="150">
@@ -772,15 +806,15 @@ export const PHISHING_TEMPLATES: PhishingTemplate[] = [
       </div>
     `,
     redFlags: [
-      'Unsolicited package notification',
-      'Domain not official DHL domain',
-      'Creates urgency (48-hour deadline)',
+      "Unsolicited package notification",
+      "Domain not official DHL domain",
+      "Creates urgency (48-hour deadline)",
       'Generic "Dear Customer"',
-      'Check if you\'re actually expecting a package',
+      "Check if you're actually expecting a package",
     ],
     landingPage: {
-      type: 'EDUCATION',
-      content: 'education-shipping-scam.html',
+      type: "EDUCATION",
+      content: "education-shipping-scam.html",
     },
   },
 ];
@@ -798,10 +832,10 @@ export class PhishingSimulationService {
     template: PhishingTemplate;
   }): Promise<void> {
     const user = await prisma.user.findUnique({ where: { id: params.userId } });
-    if (!user) throw new Error('User not found');
+    if (!user) throw new Error("User not found");
 
     // Generate unique tracking link
-    const trackingToken = crypto.randomBytes(32).toString('hex');
+    const trackingToken = crypto.randomBytes(32).toString("hex");
     const trackingLink = `${process.env.NEXT_PUBLIC_APP_URL}/phishing-test/${trackingToken}`;
 
     // Send email
@@ -823,7 +857,7 @@ export class PhishingSimulationService {
         templateId: params.template.id,
         trackingToken,
         sentAt: new Date(),
-        status: 'SENT',
+        status: "SENT",
       },
     });
   }
@@ -838,14 +872,14 @@ export class PhishingSimulationService {
     });
 
     if (!test) {
-      return '/404';
+      return "/404";
     }
 
     // Update test record
     await prisma.phishingTest.update({
       where: { id: test.id },
       data: {
-        status: 'CLICKED',
+        status: "CLICKED",
         clickedAt: new Date(),
       },
     });
@@ -854,11 +888,11 @@ export class PhishingSimulationService {
     await prisma.auditLog.create({
       data: {
         userId: test.userId,
-        action: 'PHISHING_TEST_FAILED',
-        resource: 'PhishingTest',
+        action: "PHISHING_TEST_FAILED",
+        resource: "PhishingTest",
         resourceId: test.id,
-        ipAddress: 'SERVER',
-        userAgent: 'SERVER',
+        ipAddress: "SERVER",
+        userAgent: "SERVER",
         details: JSON.stringify({
           campaignId: test.campaignId,
           templateId: test.templateId,
@@ -889,7 +923,7 @@ export class PhishingSimulationService {
     const test = await prisma.phishingTest.findFirst({
       where: {
         userId: params.userId,
-        status: 'SENT',
+        status: "SENT",
         campaign: {
           template: {
             subject: params.emailSubject,
@@ -903,7 +937,7 @@ export class PhishingSimulationService {
       await prisma.phishingTest.update({
         where: { id: test.id },
         data: {
-          status: 'REPORTED',
+          status: "REPORTED",
           reportedAt: new Date(),
         },
       });
@@ -926,12 +960,12 @@ export class PhishingSimulationService {
 
   private static async notifyAdmin(params: any): Promise<void> {
     // Email CISO/security team
-    console.log('[PHISHING TEST] User clicked:', params);
+    console.log("[PHISHING TEST] User clicked:", params);
   }
 
   private static async forwardToSecurityTeam(params: any): Promise<void> {
     // Forward suspected phishing to security@logivox.ai
-    console.log('[PHISHING REPORT] User reported:', params);
+    console.log("[PHISHING REPORT] User reported:", params);
   }
 }
 ```
@@ -949,36 +983,36 @@ export class PhishingSimulationService {
 
 model TrainingModule {
   id          String   @id @default(cuid())
-  
+
   // Module details
   title       String
   slug        String   @unique
   description String?
   category    TrainingCategory
   difficulty  TrainingDifficulty @default(BEGINNER)
-  
+
   // Content
   content     String   @db.Text // MDX or HTML
   videoUrl    String?
   duration    Int      // Minutes
   order       Int      @default(0)
-  
+
   // Requirements
   required    Boolean  @default(false)
   prerequisites String[] // Other module IDs
-  
+
   // Lessons
   lessons     TrainingLesson[]
-  
+
   // Progress tracking
   progress    UserTrainingProgress[]
-  
+
   // Metadata
   published   Boolean  @default(false)
   publishedAt DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@index([category])
   @@index([required])
   @@index([published])
@@ -994,7 +1028,7 @@ enum TrainingCategory {
   ANALYTICS_REPORTING
   MOBILE_APP
   ADVANCED_FEATURES
-  
+
   // Security
   PASSWORD_SECURITY
   PHISHING_AWARENESS
@@ -1015,10 +1049,10 @@ enum TrainingDifficulty {
 
 model TrainingLesson {
   id          String   @id @default(cuid())
-  
+
   moduleId    String
   module      TrainingModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  
+
   // Lesson details
   title       String
   slug        String
@@ -1026,59 +1060,59 @@ model TrainingLesson {
   videoUrl    String?
   duration    Int      // Minutes
   order       Int      @default(0)
-  
+
   // Interactive elements
   hasQuiz     Boolean  @default(false)
   hasLab      Boolean  @default(false)
-  
+
   // Quiz questions
   quizQuestions Json?  // Array of questions
-  
+
   // Progress tracking
   completions UserLessonCompletion[]
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@unique([moduleId, slug])
   @@index([moduleId])
 }
 
 model UserTrainingProgress {
   id          String   @id @default(cuid())
-  
+
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   moduleId    String
   module      TrainingModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  
+
   // Progress
   status      TrainingStatus @default(NOT_STARTED)
   progress    Int      @default(0) // Percentage 0-100
-  
+
   // Timestamps
   startedAt   DateTime?
   completedAt DateTime?
   lastAccessedAt DateTime?
-  
+
   // Quiz results
   quizScore   Int?     // Percentage 0-100
   quizAttempts Int     @default(0)
   passed      Boolean  @default(false)
-  
+
   // Gamification
   points      Int      @default(0)
   badges      String[] // Badge IDs
-  
+
   // Certification
   certified   Boolean  @default(false)
   certifiedAt DateTime?
   certificateUrl String?
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@unique([userId, moduleId])
   @@index([userId])
   @@index([status])
@@ -1094,25 +1128,25 @@ enum TrainingStatus {
 
 model UserLessonCompletion {
   id          String   @id @default(cuid())
-  
+
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   lessonId    String
   lesson      TrainingLesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  
+
   // Progress
   completed   Boolean  @default(false)
   completedAt DateTime?
   timeSpent   Int      @default(0) // Seconds
-  
+
   // Quiz (if applicable)
   quizScore   Int?
   quizAnswers Json?
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@unique([userId, lessonId])
   @@index([userId])
   @@index([completed])
@@ -1124,40 +1158,40 @@ model UserLessonCompletion {
 
 model PhishingCampaign {
   id             String   @id @default(cuid())
-  
+
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
+
   // Campaign details
   name           String
   description    String?
   templateId     String
   template       PhishingTemplate @relation(fields: [templateId], references: [id])
-  
+
   // Targeting
   targetUserIds  String[] // Specific users or all
   targetAll      Boolean  @default(false)
-  
+
   // Schedule
   startDate      DateTime
   endDate        DateTime?
   frequency      PhishingFrequency?
   randomizeTime  Boolean  @default(true)
-  
+
   // Stats
   sent           Int      @default(0)
   opened         Int      @default(0)
   clicked        Int      @default(0)
   reported       Int      @default(0)
-  
+
   // Tests
   tests          PhishingTest[]
-  
+
   status         CampaignStatus @default(DRAFT)
   createdBy      String
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  
+
   @@index([organizationId])
   @@index([status])
 }
@@ -1177,35 +1211,35 @@ enum CampaignStatus {
 
 model PhishingTemplate {
   id          String   @id @default(cuid())
-  
+
   // Template details
   name        String
   difficulty  PhishingDifficulty
   category    PhishingCategory
-  
+
   // Email content
   subject     String
   from        String   // Spoofed email
   fromName    String
   body        String   @db.Text // HTML
-  
+
   // Red flags (for education)
   redFlags    String[]
-  
+
   // Landing page
   landingPageType String // 'EDUCATION' | 'DATA_COLLECTION'
   landingPageContent String @db.Text
   educationMessage String? @db.Text
-  
+
   // Usage
   campaigns   PhishingCampaign[]
   tests       PhishingTest[]
-  
+
   // Metadata
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
+
   @@index([category])
   @@index([difficulty])
 }
@@ -1230,30 +1264,30 @@ enum PhishingCategory {
 
 model PhishingTest {
   id          String   @id @default(cuid())
-  
+
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   campaignId  String
   campaign    PhishingCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  
+
   templateId  String
   template    PhishingTemplate @relation(fields: [templateId], references: [id])
-  
+
   // Tracking
   trackingToken String @unique
   status      PhishingTestStatus @default(SENT)
-  
+
   // Timestamps
   sentAt      DateTime
   openedAt    DateTime?
   clickedAt   DateTime?
   reportedAt  DateTime?
-  
+
   // IP tracking
   ipAddress   String?
   userAgent   String?
-  
+
   @@index([userId])
   @@index([campaignId])
   @@index([status])
@@ -1273,22 +1307,22 @@ enum PhishingTestStatus {
 
 model UserOnboarding {
   id          String   @id @default(cuid())
-  
+
   userId      String   @unique
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
+
   // Progress
   completed   Boolean  @default(false)
   currentStep String?  // Step ID
   progress    Int      @default(0) // Percentage
-  
+
   // Step completion
   completedSteps String[] // Step IDs
-  
+
   // Timestamps
   startedAt   DateTime @default(now())
   completedAt DateTime?
-  
+
   @@index([completed])
 }
 ```
@@ -1298,6 +1332,7 @@ model UserOnboarding {
 **(Continued in Part 2...)**
 
 **This is comprehensive enterprise training system with:**
+
 - ✅ 125+ lessons (23+ hours of content)
 - ✅ Security awareness training (like KnowBe4)
 - ✅ Phishing simulations (automated testing)

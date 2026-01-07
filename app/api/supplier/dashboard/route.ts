@@ -1,15 +1,15 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET || 'supplier-portal-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || "supplier-portal-secret-key";
 
 // Verify supplier token
 function verifyToken(request: Request): any {
-  const authHeader = request.headers.get('authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error('Unauthorized');
+  const authHeader = request.headers.get("authorization");
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    throw new Error("Unauthorized");
   }
 
   const token = authHeader.substring(7);
@@ -26,12 +26,12 @@ export async function GET(request: Request) {
     const decoded = verifyToken(request);
 
     const { searchParams } = new URL(request.url);
-    const supplierId = searchParams.get('supplierId');
+    const supplierId = searchParams.get("supplierId");
 
     if (!supplierId || decoded.supplierId !== supplierId) {
       return NextResponse.json(
-        { error: 'Unauthorized access' },
-        { status: 403 }
+        { error: "Unauthorized access" },
+        { status: 403 },
       );
     }
 
@@ -40,9 +40,9 @@ export async function GET(request: Request) {
       where: {
         supplierId,
         status: {
-          in: ['OPEN', 'INVESTIGATING', 'ACTION_PENDING']
-        }
-      }
+          in: ["OPEN", "INVESTIGATING", "ACTION_PENDING"],
+        },
+      },
     });
 
     // Get pending responses count
@@ -50,18 +50,18 @@ export async function GET(request: Request) {
       where: {
         supplierId,
         status: {
-          in: ['OPEN', 'INVESTIGATING']
+          in: ["OPEN", "INVESTIGATING"],
         },
         supplierResponses: {
-          none: {}
-        }
-      }
+          none: {},
+        },
+      },
     });
 
     // Get recent NCRs
     const recentNCRs = await prisma.nonConformanceReport.findMany({
       where: { supplierId },
-      orderBy: { reportDate: 'desc' },
+      orderBy: { reportDate: "desc" },
       take: 5,
       select: {
         id: true,
@@ -69,8 +69,8 @@ export async function GET(request: Request) {
         title: true,
         severity: true,
         reportDate: true,
-        status: true
-      }
+        status: true,
+      },
     });
 
     // Calculate quality score (simple version)
@@ -78,33 +78,33 @@ export async function GET(request: Request) {
       where: {
         supplierId,
         reportDate: {
-          gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) // Last 90 days
-        }
-      }
+          gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // Last 90 days
+        },
+      },
     });
 
     const closedNCRs = await prisma.nonConformanceReport.count({
       where: {
         supplierId,
-        status: 'CLOSED',
+        status: "CLOSED",
         reportDate: {
-          gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)
-        }
-      }
+          gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+        },
+      },
     });
 
     // Quality score: 100 - (10 * open NCRs) - (5 * critical NCRs)
     const criticalNCRs = await prisma.nonConformanceReport.count({
       where: {
         supplierId,
-        severity: 'CRITICAL',
+        severity: "CRITICAL",
         status: {
-          not: 'CLOSED'
-        }
-      }
+          not: "CLOSED",
+        },
+      },
     });
 
-    const qualityScore = Math.max(0, 100 - (openNCRs * 10) - (criticalNCRs * 15));
+    const qualityScore = Math.max(0, 100 - openNCRs * 10 - criticalNCRs * 15);
 
     return NextResponse.json({
       success: true,
@@ -112,15 +112,14 @@ export async function GET(request: Request) {
         openNCRs,
         pendingResponses,
         qualityScore: Math.round(qualityScore),
-        recentNCRs
-      }
+        recentNCRs,
+      },
     });
-
   } catch (error: any) {
-    console.error('Dashboard error:', error);
+    console.error("Dashboard error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to load dashboard' },
-      { status: error.message === 'Unauthorized' ? 401 : 500 }
+      { error: error.message || "Failed to load dashboard" },
+      { status: error.message === "Unauthorized" ? 401 : 500 },
     );
   }
 }

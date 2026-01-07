@@ -3,9 +3,9 @@
 // =============================================================================
 // Send transactional emails for notifications, alerts, and communications
 
-import sgMail from '@sendgrid/mail';
-import nodemailer from 'nodemailer';
-import { logger } from './logger';
+import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
+import { logger } from "./logger";
 
 // Configure SendGrid
 const sendGridApiKey = process.env.SENDGRID_API_KEY;
@@ -15,8 +15,8 @@ if (sendGridApiKey) {
 
 // Configure SMTP as fallback
 const smtpTransporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.sendgrid.net',
-  port: parseInt(process.env.SMTP_PORT || '587'),
+  host: process.env.SMTP_HOST || "smtp.sendgrid.net",
+  port: parseInt(process.env.SMTP_PORT || "587"),
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
@@ -24,8 +24,8 @@ const smtpTransporter = nodemailer.createTransport({
   },
 });
 
-const fromEmail = process.env.SMTP_FROM_EMAIL || 'noreply@logivox.ai';
-const fromName = process.env.SMTP_FROM_NAME || 'LogiVox WMS';
+const fromEmail = process.env.SMTP_FROM_EMAIL || "noreply@logivox.ai";
+const fromName = process.env.SMTP_FROM_NAME || "LogiVox WMS";
 
 export interface EmailOptions {
   to: string | string[];
@@ -51,7 +51,9 @@ export function isEmailConfigured(): boolean {
 /**
  * Send email using SendGrid or SMTP
  */
-export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; messageId?: string; error?: string }> {
+export async function sendEmail(
+  options: EmailOptions,
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
   try {
     const startTime = Date.now();
 
@@ -67,27 +69,27 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
         html: options.html,
         text: options.text,
         replyTo: options.replyTo,
-        attachments: options.attachments?.map(att => ({
+        attachments: options.attachments?.map((att) => ({
           filename: att.filename,
-          content: att.content.toString('base64'),
+          content: att.content.toString("base64"),
           type: att.contentType,
-          disposition: 'attachment',
+          disposition: "attachment",
         })),
       };
 
       const [response] = await sgMail.send(msg);
       const duration = Date.now() - startTime;
 
-      logger.info('Email sent via SendGrid', {
+      logger.info("Email sent via SendGrid", {
         to: options.to,
         subject: options.subject,
-        messageId: response.headers['x-message-id'],
+        messageId: response.headers["x-message-id"],
         duration,
       });
 
       return {
         success: true,
-        messageId: response.headers['x-message-id'] as string,
+        messageId: response.headers["x-message-id"] as string,
       };
     }
 
@@ -105,7 +107,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
 
       const duration = Date.now() - startTime;
 
-      logger.info('Email sent via SMTP', {
+      logger.info("Email sent via SMTP", {
         to: options.to,
         subject: options.subject,
         messageId: info.messageId,
@@ -118,10 +120,10 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
       };
     }
 
-    logger.error('Email service not configured');
-    return { success: false, error: 'Email service not configured' };
+    logger.error("Email service not configured");
+    return { success: false, error: "Email service not configured" };
   } catch (error: any) {
-    logger.error('Failed to send email', {
+    logger.error("Failed to send email", {
       error,
       to: options.to,
       subject: options.subject,
@@ -138,7 +140,10 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
 /**
  * Send welcome email to new user
  */
-export async function sendWelcomeEmail(email: string, name: string): Promise<{ success: boolean }> {
+export async function sendWelcomeEmail(
+  email: string,
+  name: string,
+): Promise<{ success: boolean }> {
   const html = `
     <!DOCTYPE html>
     <html>
@@ -181,7 +186,7 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<{ s
 
   const result = await sendEmail({
     to: email,
-    subject: 'Welcome to LogiVox WMS',
+    subject: "Welcome to LogiVox WMS",
     html,
     text: `Hi ${name}, welcome to LogiVox WMS!`,
   });
@@ -192,7 +197,10 @@ export async function sendWelcomeEmail(email: string, name: string): Promise<{ s
 /**
  * Send password reset email
  */
-export async function sendPasswordResetEmail(email: string, resetToken: string): Promise<{ success: boolean }> {
+export async function sendPasswordResetEmail(
+  email: string,
+  resetToken: string,
+): Promise<{ success: boolean }> {
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}`;
 
   const html = `
@@ -234,7 +242,7 @@ export async function sendPasswordResetEmail(email: string, resetToken: string):
 
   const result = await sendEmail({
     to: email,
-    subject: 'Reset Your Password - LogiVox WMS',
+    subject: "Reset Your Password - LogiVox WMS",
     html,
     text: `Reset your password: ${resetUrl}`,
   });
@@ -245,7 +253,10 @@ export async function sendPasswordResetEmail(email: string, resetToken: string):
 /**
  * Send MFA setup email with QR code
  */
-export async function sendMFASetupEmail(email: string, qrCodeUrl: string): Promise<{ success: boolean }> {
+export async function sendMFASetupEmail(
+  email: string,
+  qrCodeUrl: string,
+): Promise<{ success: boolean }> {
   const html = `
     <!DOCTYPE html>
     <html>
@@ -282,7 +293,7 @@ export async function sendMFASetupEmail(email: string, qrCodeUrl: string): Promi
 
   const result = await sendEmail({
     to: email,
-    subject: 'Two-Factor Authentication Setup - LogiVox WMS',
+    subject: "Two-Factor Authentication Setup - LogiVox WMS",
     html,
   });
 
@@ -299,11 +310,11 @@ export async function sendOrderConfirmationEmail(
     customerName: string;
     items: Array<{ name: string; quantity: number }>;
     total: number;
-  }
+  },
 ): Promise<{ success: boolean }> {
   const itemsHtml = orderDetails.items
-    .map(item => `<li>${item.name} - Qty: ${item.quantity}</li>`)
-    .join('');
+    .map((item) => `<li>${item.name} - Qty: ${item.quantity}</li>`)
+    .join("");
 
   const html = `
     <!DOCTYPE html>
@@ -355,20 +366,25 @@ export async function sendOrderConfirmationEmail(
  */
 export async function sendLowStockAlertEmail(
   email: string,
-  items: Array<{ name: string; currentQty: number; minQty: number; warehouse: string }>
+  items: Array<{
+    name: string;
+    currentQty: number;
+    minQty: number;
+    warehouse: string;
+  }>,
 ): Promise<{ success: boolean }> {
   const itemsHtml = items
     .map(
-      item => `
+      (item) => `
       <tr>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.name}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.currentQty}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.minQty}</td>
         <td style="padding: 8px; border: 1px solid #ddd;">${item.warehouse}</td>
       </tr>
-    `
+    `,
     )
-    .join('');
+    .join("");
 
   const html = `
     <!DOCTYPE html>
@@ -416,7 +432,7 @@ export async function sendLowStockAlertEmail(
 
   const result = await sendEmail({
     to: email,
-    subject: '⚠️ Low Stock Alert - LogiVox WMS',
+    subject: "⚠️ Low Stock Alert - LogiVox WMS",
     html,
   });
 

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Eye,
   Type,
@@ -13,19 +13,25 @@ import {
   RotateCcw,
   Check,
   Info,
-} from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Button } from '@/components/ui/button';
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import {
   useVisualAccessibility,
   accessibilityPresets,
@@ -33,7 +39,7 @@ import {
   type ContrastMode,
   type FocusIndicatorStyle,
   type LineSpacing,
-} from '@/lib/visual-accessibility';
+} from "@/lib/visual-accessibility";
 
 export function AccessibilitySettings() {
   const {
@@ -67,7 +73,10 @@ export function AccessibilitySettings() {
   } = useVisualAccessibility();
 
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState({ title: '', description: '' });
+  const [toastMessage, setToastMessage] = useState({
+    title: "",
+    description: "",
+  });
   const [activePreset, setActivePreset] = useState<string | null>(null);
 
   const toast = (message: { title: string; description: string }) => {
@@ -78,7 +87,7 @@ export function AccessibilitySettings() {
 
   const handleApplyPreset = (presetName: keyof typeof accessibilityPresets) => {
     const preset = accessibilityPresets[presetName];
-    
+
     // Apply all preset values
     setFontSize(preset.fontSize);
     setLineSpacing(preset.lineSpacing);
@@ -95,7 +104,7 @@ export function AccessibilitySettings() {
 
     setActivePreset(presetName);
     toast({
-      title: 'Preset applied',
+      title: "Preset applied",
       description: `${presetName.charAt(0).toUpperCase() + presetName.slice(1)} preset has been applied.`,
     });
   };
@@ -104,8 +113,8 @@ export function AccessibilitySettings() {
     resetToDefaults();
     setActivePreset(null);
     toast({
-      title: 'Settings reset',
-      description: 'All accessibility settings have been reset to defaults.',
+      title: "Settings reset",
+      description: "All accessibility settings have been reset to defaults.",
     });
   };
 
@@ -113,8 +122,8 @@ export function AccessibilitySettings() {
     applySystemPreferences();
     setActivePreset(null);
     toast({
-      title: 'System preferences applied',
-      description: 'Your system accessibility preferences have been applied.',
+      title: "System preferences applied",
+      description: "Your system accessibility preferences have been applied.",
     });
   };
 
@@ -122,7 +131,9 @@ export function AccessibilitySettings() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Accessibility Settings</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Accessibility Settings
+        </h1>
         <p className="text-muted-foreground mt-2">
           Customize your visual experience to match your needs and preferences.
         </p>
@@ -142,43 +153,45 @@ export function AccessibilitySettings() {
         <CardContent className="space-y-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <Button
-              variant={activePreset === 'default' ? 'default' : 'outline'}
-              onClick={() => handleApplyPreset('default')}
+              variant={activePreset === "default" ? "default" : "outline"}
+              onClick={() => handleApplyPreset("default")}
               className="justify-start"
             >
               Default Settings
             </Button>
             <Button
-              variant={activePreset === 'highContrast' ? 'default' : 'outline'}
-              onClick={() => handleApplyPreset('highContrast')}
+              variant={activePreset === "highContrast" ? "default" : "outline"}
+              onClick={() => handleApplyPreset("highContrast")}
               className="justify-start"
             >
               High Contrast
             </Button>
             <Button
-              variant={activePreset === 'largeText' ? 'default' : 'outline'}
-              onClick={() => handleApplyPreset('largeText')}
+              variant={activePreset === "largeText" ? "default" : "outline"}
+              onClick={() => handleApplyPreset("largeText")}
               className="justify-start"
             >
               Large Text
             </Button>
             <Button
-              variant={activePreset === 'reducedMotion' ? 'default' : 'outline'}
-              onClick={() => handleApplyPreset('reducedMotion')}
+              variant={activePreset === "reducedMotion" ? "default" : "outline"}
+              onClick={() => handleApplyPreset("reducedMotion")}
               className="justify-start"
             >
               Reduced Motion
             </Button>
             <Button
-              variant={activePreset === 'lowVision' ? 'default' : 'outline'}
-              onClick={() => handleApplyPreset('lowVision')}
+              variant={activePreset === "lowVision" ? "default" : "outline"}
+              onClick={() => handleApplyPreset("lowVision")}
               className="justify-start"
             >
               Low Vision
             </Button>
             <Button
-              variant={activePreset === 'motorImpairment' ? 'default' : 'outline'}
-              onClick={() => handleApplyPreset('motorImpairment')}
+              variant={
+                activePreset === "motorImpairment" ? "default" : "outline"
+              }
+              onClick={() => handleApplyPreset("motorImpairment")}
               className="justify-start"
             >
               Motor Impairment
@@ -188,7 +201,11 @@ export function AccessibilitySettings() {
           <div className="my-4 border-t" />
 
           <div className="flex gap-2">
-            <Button variant="outline" onClick={handleApplySystem} className="flex-1">
+            <Button
+              variant="outline"
+              onClick={handleApplySystem}
+              className="flex-1"
+            >
               <Info className="h-4 w-4 mr-2" />
               Use System Preferences
             </Button>
@@ -215,7 +232,10 @@ export function AccessibilitySettings() {
           {/* Font Size */}
           <div className="space-y-2">
             <Label htmlFor="font-size">Font Size</Label>
-            <Select value={fontSize} onValueChange={(value) => setFontSize(value as FontSize)}>
+            <Select
+              value={fontSize}
+              onValueChange={(value) => setFontSize(value as FontSize)}
+            >
               <SelectTrigger id="font-size">
                 <SelectValue />
               </SelectTrigger>
@@ -234,7 +254,10 @@ export function AccessibilitySettings() {
           {/* Line Spacing */}
           <div className="space-y-2">
             <Label htmlFor="line-spacing">Line Spacing</Label>
-            <Select value={lineSpacing} onValueChange={(value) => setLineSpacing(value as LineSpacing)}>
+            <Select
+              value={lineSpacing}
+              onValueChange={(value) => setLineSpacing(value as LineSpacing)}
+            >
               <SelectTrigger id="line-spacing">
                 <SelectValue />
               </SelectTrigger>
@@ -281,7 +304,10 @@ export function AccessibilitySettings() {
           {/* Contrast Mode */}
           <div className="space-y-2">
             <Label htmlFor="contrast-mode">Contrast Mode</Label>
-            <Select value={contrastMode} onValueChange={(value) => setContrastMode(value as ContrastMode)}>
+            <Select
+              value={contrastMode}
+              onValueChange={(value) => setContrastMode(value as ContrastMode)}
+            >
               <SelectTrigger id="contrast-mode">
                 <SelectValue />
               </SelectTrigger>
@@ -292,7 +318,8 @@ export function AccessibilitySettings() {
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
-              Increases contrast ratio between text and background. WCAG AA requires minimum 4.5:1.
+              Increases contrast ratio between text and background. WCAG AA
+              requires minimum 4.5:1.
             </p>
           </div>
 
@@ -308,7 +335,9 @@ export function AccessibilitySettings() {
               <Switch
                 id="colorblind-mode"
                 checked={useColorBlindMode}
-                onCheckedChange={(checked) => setColorBlindMode(checked, colorBlindType as any)}
+                onCheckedChange={(checked) =>
+                  setColorBlindMode(checked, colorBlindType as any)
+                }
               />
             </div>
 
@@ -317,15 +346,23 @@ export function AccessibilitySettings() {
                 <Label htmlFor="colorblind-type">Type</Label>
                 <Select
                   value={colorBlindType}
-                  onValueChange={(value) => setColorBlindMode(true, value as any)}
+                  onValueChange={(value) =>
+                    setColorBlindMode(true, value as any)
+                  }
                 >
                   <SelectTrigger id="colorblind-type">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="protanopia">Protanopia (Red-blind)</SelectItem>
-                    <SelectItem value="deuteranopia">Deuteranopia (Green-blind)</SelectItem>
-                    <SelectItem value="tritanopia">Tritanopia (Blue-blind)</SelectItem>
+                    <SelectItem value="protanopia">
+                      Protanopia (Red-blind)
+                    </SelectItem>
+                    <SelectItem value="deuteranopia">
+                      Deuteranopia (Green-blind)
+                    </SelectItem>
+                    <SelectItem value="tritanopia">
+                      Tritanopia (Blue-blind)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -385,9 +422,7 @@ export function AccessibilitySettings() {
             <Focus className="h-5 w-5" />
             Focus & Navigation
           </CardTitle>
-          <CardDescription>
-            Customize keyboard focus indicators
-          </CardDescription>
+          <CardDescription>Customize keyboard focus indicators</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Focus Indicator Style */}
@@ -395,7 +430,9 @@ export function AccessibilitySettings() {
             <Label htmlFor="focus-style">Focus Indicator Style</Label>
             <Select
               value={focusIndicatorStyle}
-              onValueChange={(value) => setFocusIndicatorStyle(value as FocusIndicatorStyle)}
+              onValueChange={(value) =>
+                setFocusIndicatorStyle(value as FocusIndicatorStyle)
+              }
             >
               <SelectTrigger id="focus-style">
                 <SelectValue />
@@ -407,7 +444,8 @@ export function AccessibilitySettings() {
               </SelectContent>
             </Select>
             <p className="text-sm text-muted-foreground">
-              Controls the thickness of focus outlines around interactive elements.
+              Controls the thickness of focus outlines around interactive
+              elements.
             </p>
           </div>
 
@@ -497,8 +535,9 @@ export function AccessibilitySettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            LogiVox is designed to meet WCAG 2.1 Level AA standards, ensuring our platform is accessible 
-            to users with diverse needs and abilities.
+            LogiVox is designed to meet WCAG 2.1 Level AA standards, ensuring
+            our platform is accessible to users with diverse needs and
+            abilities.
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="secondary">
@@ -517,8 +556,11 @@ export function AccessibilitySettings() {
           <div className="text-sm">
             <p className="font-semibold mb-1">Need help?</p>
             <p className="text-muted-foreground">
-              Contact our accessibility team at{' '}
-              <a href="mailto:accessibility@logivox.ai" className="text-primary hover:underline">
+              Contact our accessibility team at{" "}
+              <a
+                href="mailto:accessibility@logivox.ai"
+                className="text-primary hover:underline"
+              >
                 accessibility@logivox.ai
               </a>
             </p>

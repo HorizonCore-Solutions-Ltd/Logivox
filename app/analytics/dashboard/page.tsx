@@ -3,9 +3,9 @@
  * KPIs, performance metrics, and reporting
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import {
   TrendingUp,
   TrendingDown,
@@ -18,7 +18,7 @@ import {
   CheckCircle,
   BarChart3,
   Activity,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Analytics {
   loadSheets: {
@@ -58,7 +58,9 @@ interface Analytics {
 export default function AnalyticsDashboard() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<'today' | 'week' | 'month'>('today');
+  const [dateRange, setDateRange] = useState<"today" | "week" | "month">(
+    "today",
+  );
 
   useEffect(() => {
     fetchAnalytics();
@@ -69,12 +71,12 @@ export default function AnalyticsDashboard() {
     try {
       const response = await fetch(`/api/analytics?range=${dateRange}`);
       const data = await response.json();
-      
+
       if (data.analytics) {
         setAnalytics(data.analytics);
       }
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error("Fetch error:", error);
     } finally {
       setLoading(false);
     }
@@ -90,9 +92,9 @@ export default function AnalyticsDashboard() {
 
   const getTrend = (value: number, threshold: number = 80) => {
     if (value >= threshold) {
-      return { icon: TrendingUp, color: 'text-green-600' };
+      return { icon: TrendingUp, color: "text-green-600" };
     }
-    return { icon: TrendingDown, color: 'text-red-600' };
+    return { icon: TrendingDown, color: "text-red-600" };
   };
 
   return (
@@ -102,37 +104,41 @@ export default function AnalyticsDashboard() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Analytics Dashboard</h1>
-              <p className="text-sm text-gray-600 mt-1">Performance metrics and KPIs</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Analytics Dashboard
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Performance metrics and KPIs
+              </p>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <button
-                onClick={() => setDateRange('today')}
+                onClick={() => setDateRange("today")}
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
-                  dateRange === 'today'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  dateRange === "today"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 Today
               </button>
               <button
-                onClick={() => setDateRange('week')}
+                onClick={() => setDateRange("week")}
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
-                  dateRange === 'week'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  dateRange === "week"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 This Week
               </button>
               <button
-                onClick={() => setDateRange('month')}
+                onClick={() => setDateRange("month")}
                 className={`px-4 py-2 rounded-lg font-medium text-sm transition ${
-                  dateRange === 'month'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  dateRange === "month"
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
                 This Month
@@ -159,7 +165,9 @@ export default function AnalyticsDashboard() {
             <div className="text-3xl font-bold text-gray-900 mb-1">
               {analytics.loadSheets.departed}
             </div>
-            <div className="text-sm text-gray-600 mb-2">Load Sheets Departed</div>
+            <div className="text-sm text-gray-600 mb-2">
+              Load Sheets Departed
+            </div>
             <div className="flex items-center gap-2 text-xs">
               <span className="text-green-600 font-semibold">
                 {analytics.loadSheets.onTimePercentage.toFixed(0)}%
@@ -240,20 +248,28 @@ export default function AnalyticsDashboard() {
           {/* Load Sheet Performance */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-lg font-bold text-gray-900">Load Sheet Performance</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Load Sheet Performance
+              </h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Total Load Sheets</span>
-                <span className="font-bold text-gray-900">{analytics.loadSheets.total}</span>
+                <span className="font-bold text-gray-900">
+                  {analytics.loadSheets.total}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Approved</span>
-                <span className="font-bold text-green-600">{analytics.loadSheets.approved}</span>
+                <span className="font-bold text-green-600">
+                  {analytics.loadSheets.approved}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Departed</span>
-                <span className="font-bold text-blue-600">{analytics.loadSheets.departed}</span>
+                <span className="font-bold text-blue-600">
+                  {analytics.loadSheets.departed}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Avg Approval Time</span>
@@ -267,7 +283,9 @@ export default function AnalyticsDashboard() {
                   <div className="w-32 bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-green-500 h-2 rounded-full"
-                      style={{ width: `${analytics.loadSheets.onTimePercentage}%` }}
+                      style={{
+                        width: `${analytics.loadSheets.onTimePercentage}%`,
+                      }}
                     ></div>
                   </div>
                   <span className="font-bold text-green-600">
@@ -281,16 +299,22 @@ export default function AnalyticsDashboard() {
           {/* Worker Performance */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-lg font-bold text-gray-900">Worker Performance</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Worker Performance
+              </h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Total Workers</span>
-                <span className="font-bold text-gray-900">{analytics.workers.total}</span>
+                <span className="font-bold text-gray-900">
+                  {analytics.workers.total}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Active Now</span>
-                <span className="font-bold text-green-600">{analytics.workers.active}</span>
+                <span className="font-bold text-green-600">
+                  {analytics.workers.active}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Avg Productivity</span>
@@ -326,16 +350,22 @@ export default function AnalyticsDashboard() {
           {/* Interventions */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-lg font-bold text-gray-900">AI Interventions</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                AI Interventions
+              </h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Total Interventions</span>
-                <span className="font-bold text-gray-900">{analytics.interventions.total}</span>
+                <span className="font-bold text-gray-900">
+                  {analytics.interventions.total}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Resolved</span>
-                <span className="font-bold text-green-600">{analytics.interventions.resolved}</span>
+                <span className="font-bold text-green-600">
+                  {analytics.interventions.resolved}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Avg Resolution Time</span>
@@ -343,22 +373,32 @@ export default function AnalyticsDashboard() {
                   {analytics.interventions.avgResolutionTime.toFixed(1)} min
                 </span>
               </div>
-              
+
               {/* By Severity */}
               <div className="pt-4 border-t space-y-2">
-                {Object.entries(analytics.interventions.bySeverity).map(([severity, count]) => (
-                  <div key={severity} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{severity}</span>
-                    <span className={`font-bold ${
-                      severity === 'CRITICAL' ? 'text-red-600' :
-                      severity === 'HIGH' ? 'text-orange-600' :
-                      severity === 'MEDIUM' ? 'text-yellow-600' :
-                      'text-blue-600'
-                    }`}>
-                      {count}
-                    </span>
-                  </div>
-                ))}
+                {Object.entries(analytics.interventions.bySeverity).map(
+                  ([severity, count]) => (
+                    <div
+                      key={severity}
+                      className="flex items-center justify-between"
+                    >
+                      <span className="text-sm text-gray-600">{severity}</span>
+                      <span
+                        className={`font-bold ${
+                          severity === "CRITICAL"
+                            ? "text-red-600"
+                            : severity === "HIGH"
+                              ? "text-orange-600"
+                              : severity === "MEDIUM"
+                                ? "text-yellow-600"
+                                : "text-blue-600"
+                        }`}
+                      >
+                        {count}
+                      </span>
+                    </div>
+                  ),
+                )}
               </div>
             </div>
           </div>
@@ -366,12 +406,16 @@ export default function AnalyticsDashboard() {
           {/* Voice Commands */}
           <div className="bg-white rounded-lg shadow">
             <div className="p-6 border-b">
-              <h2 className="text-lg font-bold text-gray-900">Voice Command Analytics</h2>
+              <h2 className="text-lg font-bold text-gray-900">
+                Voice Command Analytics
+              </h2>
             </div>
             <div className="p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Total Commands</span>
-                <span className="font-bold text-gray-900">{analytics.voice.totalCommands}</span>
+                <span className="font-bold text-gray-900">
+                  {analytics.voice.totalCommands}
+                </span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Avg Accuracy</span>
@@ -385,14 +429,20 @@ export default function AnalyticsDashboard() {
                   {(analytics.voice.avgResponseTime / 1000).toFixed(2)}s
                 </span>
               </div>
-              
+
               {/* Top Intents */}
               <div className="pt-4 border-t space-y-2">
-                <div className="text-sm font-semibold text-gray-700 mb-2">Top Intents</div>
+                <div className="text-sm font-semibold text-gray-700 mb-2">
+                  Top Intents
+                </div>
                 {analytics.voice.topIntents.slice(0, 5).map((intent, idx) => (
                   <div key={idx} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">{intent.intent}</span>
-                    <span className="font-bold text-orange-600">{intent.count}</span>
+                    <span className="text-sm text-gray-600">
+                      {intent.intent}
+                    </span>
+                    <span className="font-bold text-orange-600">
+                      {intent.count}
+                    </span>
                   </div>
                 ))}
               </div>

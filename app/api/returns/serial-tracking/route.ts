@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { serialTrackingService } from '@/lib/services/returns/serial-tracking-service';
+import { NextRequest, NextResponse } from "next/server";
+import { serialTrackingService } from "@/lib/services/returns/serial-tracking-service";
 
 /**
  * POST /api/returns/serial-tracking/validate
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
 
     if (!rmaId || !serialNumber || !sku || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
@@ -29,10 +29,10 @@ export async function POST(request: NextRequest) {
       validation,
     });
   } catch (error: any) {
-    console.error('Serial validation error:', error);
+    console.error("Serial validation error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to validate serial number' },
-      { status: 500 }
+      { error: error.message || "Failed to validate serial number" },
+      { status: 500 },
     );
   }
 }
@@ -44,13 +44,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const serialNumber = searchParams.get('serialNumber');
-    const organizationId = searchParams.get('organizationId');
+    const serialNumber = searchParams.get("serialNumber");
+    const organizationId = searchParams.get("organizationId");
 
     if (!serialNumber || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required parameters' },
-        { status: 400 }
+        { error: "Missing required parameters" },
+        { status: 400 },
       );
     }
 
@@ -64,10 +64,10 @@ export async function GET(request: NextRequest) {
       lifecycle,
     });
   } catch (error: any) {
-    console.error('Get lifecycle error:', error);
+    console.error("Get lifecycle error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get serial lifecycle' },
-      { status: 500 }
+      { error: error.message || "Failed to get serial lifecycle" },
+      { status: 500 },
     );
   }
 }

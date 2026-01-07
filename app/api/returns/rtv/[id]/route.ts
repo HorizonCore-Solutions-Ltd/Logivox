@@ -7,13 +7,13 @@
  * POST /api/returns/rtv/[id]/credit - Record credit received
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { RTVService } from '@/lib/services/returns/rtv-management';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { RTVService } from "@/lib/services/returns/rtv-management";
 
 const authorizeSchema = z.object({
   authorizationNumber: z.string(),
@@ -30,19 +30,19 @@ const shipSchema = z.object({
 
 const creditSchema = z.object({
   creditAmount: z.number(),
-  creditType: z.enum(['REFUND', 'STORE_CREDIT', 'REPLACEMENT']),
+  creditType: z.enum(["REFUND", "STORE_CREDIT", "REPLACEMENT"]),
   referenceNumber: z.string().optional(),
   notes: z.string().optional(),
 });
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -50,19 +50,25 @@ export async function GET(
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
-    const rtvRequest = await prisma.$queryRaw`
+    const rtvRequest = (await prisma.$queryRaw`
       SELECT rtv.*, v.name as vendor_name, v.email as vendor_email
       FROM rtv_requests rtv
       LEFT JOIN "Vendor" v ON v.id = rtv.vendor_id
       WHERE rtv.id = ${params.id}
         AND rtv.organization_id = ${membership.organizationId}
-    ` as any[];
+    `) as any[];
 
     if (!rtvRequest || rtvRequest.length === 0) {
-      return NextResponse.json({ error: 'RTV request not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "RTV request not found" },
+        { status: 404 },
+      );
     }
 
     // Get associated RMA items
@@ -86,22 +92,22 @@ export async function GET(
       items,
     });
   } catch (error) {
-    console.error('Error fetching RTV request:', error);
+    console.error("Error fetching RTV request:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch RTV request' },
-      { status: 500 }
+      { error: "Failed to fetch RTV request" },
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -109,34 +115,40 @@ export async function PATCH(
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
     const { action } = body;
 
     // Get RTV request
-    const rtvRequest = await prisma.$queryRaw`
+    const rtvRequest = (await prisma.$queryRaw`
       SELECT * FROM rtv_requests
       WHERE id = ${params.id}
         AND organization_id = ${membership.organizationId}
-    ` as any[];
+    `) as any[];
 
     if (!rtvRequest || rtvRequest.length === 0) {
-      return NextResponse.json({ error: 'RTV request not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "RTV request not found" },
+        { status: 404 },
+      );
     }
 
     const rtv = rtvRequest[0];
     const rtvService = new RTVService();
 
-    if (action === 'authorize') {
+    if (action === "authorize") {
       const data = authorizeSchema.parse(body);
 
       await rtvService.recordAuthorization(
         params.id,
         data.authorizationNumber,
         data.expiresAt ? new Date(data.expiresAt) : undefined,
-        data.instructions
+        data.instructions,
       );
 
       await prisma.$executeRaw`
@@ -149,16 +161,18 @@ export async function PATCH(
           metadata = jsonb_set(
             COALESCE(metadata, '{}'::jsonb),
             '{authorizationInstructions}',
-            to_jsonb(${data.instructions || ''})
+            to_jsonb(${data.instructions || ""})
           ),
           updated_at = NOW()
         WHERE id = ${params.id}
       `;
 
-      return NextResponse.json({ message: 'Authorization recorded successfully' });
+      return NextResponse.json({
+        message: "Authorization recorded successfully",
+      });
     }
 
-    if (action === 'ship') {
+    if (action === "ship") {
       const data = shipSchema.parse(body);
 
       await rtvService.shipRTV(
@@ -166,7 +180,7 @@ export async function PATCH(
         data.carrier,
         data.trackingNumber,
         data.shippingCost,
-        data.packageCount
+        data.packageCount,
       );
 
       await prisma.$executeRaw`
@@ -186,10 +200,10 @@ export async function PATCH(
         WHERE id = ${params.id}
       `;
 
-      return NextResponse.json({ message: 'Shipment recorded successfully' });
+      return NextResponse.json({ message: "Shipment recorded successfully" });
     }
 
-    if (action === 'credit') {
+    if (action === "credit") {
       const data = creditSchema.parse(body);
 
       await rtvService.recordCredit(
@@ -197,7 +211,7 @@ export async function PATCH(
         data.creditAmount,
         data.creditType,
         data.referenceNumber,
-        data.notes
+        data.notes,
       );
 
       await prisma.$executeRaw`
@@ -211,13 +225,13 @@ export async function PATCH(
           metadata = jsonb_set(
             COALESCE(metadata, '{}'::jsonb),
             '{creditNotes}',
-            to_jsonb(${data.notes || ''})
+            to_jsonb(${data.notes || ""})
           ),
           updated_at = NOW()
         WHERE id = ${params.id}
       `;
 
-      return NextResponse.json({ message: 'Credit recorded successfully' });
+      return NextResponse.json({ message: "Credit recorded successfully" });
     }
 
     // General status update
@@ -228,22 +242,25 @@ export async function PATCH(
         WHERE id = ${params.id}
       `;
 
-      return NextResponse.json({ message: 'RTV request updated successfully' });
+      return NextResponse.json({ message: "RTV request updated successfully" });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error updating RTV request:', error);
+    console.error("Error updating RTV request:", error);
     return NextResponse.json(
-      { error: 'Failed to update RTV request', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to update RTV request",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

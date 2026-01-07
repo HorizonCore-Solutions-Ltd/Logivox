@@ -1,15 +1,15 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const paymentSchema = z.object({
   invoiceId: z.string(),
   amount: z.number().positive(),
-  paymentMethod: z.enum(['CARD', 'BANK_TRANSFER', 'CHECK', 'CASH', 'OTHER']),
-  paymentDate: z.string().transform(str => new Date(str)),
+  paymentMethod: z.enum(["CARD", "BANK_TRANSFER", "CHECK", "CASH", "OTHER"]),
+  paymentDate: z.string().transform((str) => new Date(str)),
   transactionId: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -22,21 +22,26 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { searchParams } = new URL(req.url);
-    const invoiceId = searchParams.get('invoiceId');
+    const invoiceId = searchParams.get("invoiceId");
 
     const payments = await prisma.payment.findMany({
       where: {
@@ -54,13 +59,16 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { paymentDate: 'desc' },
+      orderBy: { paymentDate: "desc" },
     });
 
     return NextResponse.json(payments);
   } catch (error: any) {
-    console.error('Error fetching payments:', error);
-    return NextResponse.json({ error: 'Failed to fetch payments' }, { status: 500 });
+    console.error("Error fetching payments:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch payments" },
+      { status: 500 },
+    );
   }
 }
 
@@ -72,16 +80,21 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -97,7 +110,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!invoice) {
-      return NextResponse.json({ error: 'Invoice not found' }, { status: 404 });
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
     // Create payment record
@@ -131,14 +144,14 @@ export async function POST(req: NextRequest) {
     // Update invoice status based on payment
     let newStatus = invoice.status;
     if (paidAmount >= invoice.totalAmount) {
-      newStatus = 'PAID';
+      newStatus = "PAID";
     } else if (paidAmount > 0) {
-      newStatus = 'PARTIALLY_PAID';
+      newStatus = "PARTIALLY_PAID";
     }
 
     await prisma.invoice.update({
       where: { id: validatedData.invoiceId },
-      data: { 
+      data: {
         status: newStatus,
         paidAmount,
       },
@@ -149,8 +162,8 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'PAYMENT_RECORDED',
-        entityType: 'Payment',
+        action: "PAYMENT_RECORDED",
+        entityType: "Payment",
         entityId: payment.id,
         metadata: {
           invoiceNumber: invoice.invoiceNumber,
@@ -163,9 +176,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(payment, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error creating payment:', error);
-    return NextResponse.json({ error: 'Failed to create payment' }, { status: 500 });
+    console.error("Error creating payment:", error);
+    return NextResponse.json(
+      { error: "Failed to create payment" },
+      { status: 500 },
+    );
   }
 }

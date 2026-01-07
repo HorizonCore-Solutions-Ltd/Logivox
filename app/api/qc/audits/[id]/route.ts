@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import AuditService from '@/lib/services/audit.service';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import AuditService from "@/lib/services/audit.service";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -10,7 +10,7 @@ const prisma = new PrismaClient();
  */
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const audit = await prisma.audit.findUnique({
@@ -18,29 +18,25 @@ export async function GET(
       include: {
         findings: {
           orderBy: {
-            severity: 'desc'
-          }
+            severity: "desc",
+          },
         },
-        supplier: true
-      }
+        supplier: true,
+      },
     });
 
     if (!audit) {
-      return NextResponse.json(
-        { error: 'Audit not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Audit not found" }, { status: 404 });
     }
 
     return NextResponse.json({
       success: true,
-      data: audit
+      data: audit,
     });
-
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || 'Failed to get audit' },
-      { status: 500 }
+      { error: error.message || "Failed to get audit" },
+      { status: 500 },
     );
   }
 }
@@ -51,7 +47,7 @@ export async function GET(
  */
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -60,18 +56,17 @@ export async function PUT(
       params.id,
       body.status,
       body.summary,
-      body.recommendations
+      body.recommendations,
     );
 
     return NextResponse.json({
       success: true,
-      data: audit
+      data: audit,
     });
-
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || 'Failed to update audit' },
-      { status: 500 }
+      { error: error.message || "Failed to update audit" },
+      { status: 500 },
     );
   }
 }
@@ -82,22 +77,21 @@ export async function PUT(
  */
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     await prisma.audit.delete({
-      where: { id: params.id }
+      where: { id: params.id },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Audit deleted'
+      message: "Audit deleted",
     });
-
   } catch (error: any) {
     return NextResponse.json(
-      { error: error.message || 'Failed to delete audit' },
-      { status: 500 }
+      { error: error.message || "Failed to delete audit" },
+      { status: 500 },
     );
   }
 }

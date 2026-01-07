@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -9,18 +9,46 @@ const createAlertRuleSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   code: z.string().min(1, "Code is required"),
-  category: z.enum(['INVENTORY', 'SALES', 'PURCHASING', 'WAREHOUSE', 'QUALITY', 'FINANCIAL', 'SYSTEM', 'SECURITY', 'PERFORMANCE', 'CUSTOM']),
-  alertType: z.enum(['THRESHOLD', 'ANOMALY', 'STATUS_CHANGE', 'SCHEDULE', 'EVENT']),
-  severity: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']).default('MEDIUM'),
+  category: z.enum([
+    "INVENTORY",
+    "SALES",
+    "PURCHASING",
+    "WAREHOUSE",
+    "QUALITY",
+    "FINANCIAL",
+    "SYSTEM",
+    "SECURITY",
+    "PERFORMANCE",
+    "CUSTOM",
+  ]),
+  alertType: z.enum([
+    "THRESHOLD",
+    "ANOMALY",
+    "STATUS_CHANGE",
+    "SCHEDULE",
+    "EVENT",
+  ]),
+  severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).default("MEDIUM"),
   triggerEntity: z.string().min(1, "Trigger entity is required"),
   triggerConditions: z.record(z.any()),
-  triggerFrequency: z.enum(['REALTIME', 'EVERY_MINUTE', 'EVERY_5_MINUTES', 'EVERY_15_MINUTES', 'HOURLY', 'DAILY']).default('REALTIME'),
+  triggerFrequency: z
+    .enum([
+      "REALTIME",
+      "EVERY_MINUTE",
+      "EVERY_5_MINUTES",
+      "EVERY_15_MINUTES",
+      "HOURLY",
+      "DAILY",
+    ])
+    .default("REALTIME"),
   metricCode: z.string().optional(),
   threshold: z.number().optional(),
-  thresholdOperator: z.enum(['GT', 'LT', 'GTE', 'LTE', 'EQ', 'NE']).optional(),
+  thresholdOperator: z.enum(["GT", "LT", "GTE", "LTE", "EQ", "NE"]).optional(),
   templateId: z.string().optional(),
-  notificationChannels: z.array(z.string()).min(1, "At least one channel required"),
-  recipientType: z.enum(['USER', 'ROLE', 'CUSTOM', 'DYNAMIC']),
+  notificationChannels: z
+    .array(z.string())
+    .min(1, "At least one channel required"),
+  recipientType: z.enum(["USER", "ROLE", "CUSTOM", "DYNAMIC"]),
   recipients: z.record(z.any()),
   activeHoursStart: z.string().optional(),
   activeHoursEnd: z.string().optional(),
@@ -54,7 +82,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -73,13 +101,13 @@ export async function GET(request: Request) {
     if (category) where.category = category;
     if (alertType) where.alertType = alertType;
     if (isActive !== null && isActive !== undefined) {
-      where.isActive = isActive === 'true';
+      where.isActive = isActive === "true";
     }
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { code: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { code: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -106,7 +134,7 @@ export async function GET(request: Request) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ rules });
@@ -114,7 +142,7 @@ export async function GET(request: Request) {
     console.error("Error fetching alert rules:", error);
     return NextResponse.json(
       { error: "Failed to fetch alert rules" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -140,7 +168,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -160,7 +188,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Alert rule code already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -188,13 +216,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating alert rule:", error);
     return NextResponse.json(
       { error: "Failed to create alert rule" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -232,7 +232,8 @@ export default function CycleCountsPage() {
           </div>
         ) : cycleCounts.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            No cycle counts found. Create a cycle count to start managing inventory accuracy.
+            No cycle counts found. Create a cycle count to start managing
+            inventory accuracy.
           </div>
         ) : (
           <>
@@ -325,9 +326,7 @@ export default function CycleCountsPage() {
                             </div>
                           </>
                         ) : (
-                          <div className="text-sm text-gray-500">
-                            All Items
-                          </div>
+                          <div className="text-sm text-gray-500">All Items</div>
                         )}
                       </td>
                       <td className="px-6 py-4">

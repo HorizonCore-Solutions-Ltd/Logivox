@@ -1,40 +1,40 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get("page") || "1")
-    const limit = parseInt(searchParams.get("limit") || "50")
-    const action = searchParams.get("action")
-    const entityType = searchParams.get("entityType")
-    const userId = searchParams.get("userId")
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
+    const action = searchParams.get("action");
+    const entityType = searchParams.get("entityType");
+    const userId = searchParams.get("userId");
 
-    const skip = (page - 1) * limit
+    const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: any = {}
+    const where: any = {};
 
     if (action) {
-      where.action = action
+      where.action = action;
     }
 
     if (entityType) {
-      where.entityType = entityType
+      where.entityType = entityType;
     }
 
     if (userId) {
-      where.userId = userId
+      where.userId = userId;
     }
 
     // Get activity logs
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
         take: limit,
       }),
       prisma.activityLog.count({ where }),
-    ])
+    ]);
 
     return NextResponse.json({
       logs,
@@ -66,12 +66,12 @@ export async function GET(request: NextRequest) {
         total,
         totalPages: Math.ceil(total / limit),
       },
-    })
+    });
   } catch (error) {
-    console.error("Activity logs fetch error:", error)
+    console.error("Activity logs fetch error:", error);
     return NextResponse.json(
       { message: "Failed to fetch activity logs" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

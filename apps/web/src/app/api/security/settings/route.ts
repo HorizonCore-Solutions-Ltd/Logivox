@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { SECURITY_PRESETS } from '@/lib/security-config';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { SECURITY_PRESETS } from "@/lib/security-config";
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const organization = await prisma.organization.findUnique({
@@ -17,11 +17,15 @@ export async function GET(request: NextRequest) {
     });
 
     if (!organization) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 404 },
+      );
     }
 
     // Return current settings or default to SMB_CASUAL
-    const settings = organization.securitySettings || SECURITY_PRESETS.SMB_CASUAL;
+    const settings =
+      organization.securitySettings || SECURITY_PRESETS.SMB_CASUAL;
 
     return NextResponse.json({
       currentSettings: settings,
@@ -29,10 +33,10 @@ export async function GET(request: NextRequest) {
       presets: SECURITY_PRESETS,
     });
   } catch (error) {
-    console.error('Error fetching security settings:', error);
+    console.error("Error fetching security settings:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch security settings' },
-      { status: 500 }
+      { error: "Failed to fetch security settings" },
+      { status: 500 },
     );
   }
 }
@@ -41,7 +45,7 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -57,8 +61,8 @@ export async function PUT(request: NextRequest) {
       newSettings = customSettings;
     } else {
       return NextResponse.json(
-        { error: 'Either preset or customSettings must be provided' },
-        { status: 400 }
+        { error: "Either preset or customSettings must be provided" },
+        { status: 400 },
       );
     }
 
@@ -73,28 +77,28 @@ export async function PUT(request: NextRequest) {
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'UPDATE',
-        entity: 'SECURITY_SETTINGS',
+        action: "UPDATE",
+        entity: "SECURITY_SETTINGS",
         entityId: organization.id,
-        description: preset 
+        description: preset
           ? `Applied ${preset} security preset`
-          : 'Updated custom security settings',
+          : "Updated custom security settings",
         metadata: { preset, appliedSettings: newSettings },
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: preset 
+      message: preset
         ? `Applied ${preset} security preset successfully`
-        : 'Security settings updated successfully',
+        : "Security settings updated successfully",
       settings: organization.securitySettings,
     });
   } catch (error) {
-    console.error('Error updating security settings:', error);
+    console.error("Error updating security settings:", error);
     return NextResponse.json(
-      { error: 'Failed to update security settings' },
-      { status: 500 }
+      { error: "Failed to update security settings" },
+      { status: 500 },
     );
   }
 }

@@ -4,18 +4,18 @@
  * PUT /api/returns/settings - Update return settings
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { DEFAULT_RETURN_SETTINGS } from '@/lib/services/returns/settings';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { DEFAULT_RETURN_SETTINGS } from "@/lib/services/returns/settings";
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -23,14 +23,17 @@ export async function GET(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     // Get settings or return defaults
-    const settings = await prisma.$queryRaw`
+    const settings = (await prisma.$queryRaw`
       SELECT * FROM return_settings
       WHERE organization_id = ${membership.organizationId}
-    ` as any[];
+    `) as any[];
 
     if (settings.length === 0) {
       return NextResponse.json({
@@ -47,10 +50,10 @@ export async function GET(request: NextRequest) {
       isDefault: false,
     });
   } catch (error) {
-    console.error('Error fetching settings:', error);
+    console.error("Error fetching settings:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch settings' },
-      { status: 500 }
+      { error: "Failed to fetch settings" },
+      { status: 500 },
     );
   }
 }
@@ -59,7 +62,7 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -67,7 +70,10 @@ export async function PUT(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -121,8 +127,8 @@ export async function PUT(request: NextRequest) {
       data: {
         organizationId: membership.organizationId,
         userId: session.user.id,
-        action: 'SETTINGS_UPDATED',
-        entityType: 'RETURN_SETTINGS',
+        action: "SETTINGS_UPDATED",
+        entityType: "RETURN_SETTINGS",
         entityId: membership.organizationId,
         metadata: {
           updatedBy: session.user.name || session.user.email,
@@ -132,13 +138,16 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       settings: newSettings,
-      message: 'Settings updated successfully',
+      message: "Settings updated successfully",
     });
   } catch (error) {
-    console.error('Error updating settings:', error);
+    console.error("Error updating settings:", error);
     return NextResponse.json(
-      { error: 'Failed to update settings', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to update settings",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

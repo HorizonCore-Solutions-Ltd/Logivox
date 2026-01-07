@@ -52,17 +52,18 @@ export function AIChatbot() {
       const response = await fetch("/api/chat/session", {
         method: "POST",
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         setSessionId(data.sessionId);
-        
+
         // Add welcome message
         setMessages([
           {
             id: "welcome",
             role: "assistant",
-            content: "Hello! I'm your AI assistant. I can help you with inventory management, stock checks, orders, and more. How can I help you today?",
+            content:
+              "Hello! I'm your AI assistant. I can help you with inventory management, stock checks, orders, and more. How can I help you today?",
             timestamp: new Date(),
           },
         ]);
@@ -102,7 +103,7 @@ export function AIChatbot() {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         const assistantMessage: ChatMessage = {
           id: data.id || Math.random().toString(36),
           role: "assistant",
@@ -115,7 +116,7 @@ export function AIChatbot() {
       }
     } catch (error) {
       console.error("Error sending message:", error);
-      
+
       // Add error message
       setMessages((prev) => [
         ...prev,
@@ -155,9 +156,11 @@ export function AIChatbot() {
   }
 
   return (
-    <Card className={`fixed bottom-6 right-6 shadow-2xl transition-all ${
-      isMinimized ? "h-14" : "h-[600px]"
-    } w-96 flex flex-col z-50`}>
+    <Card
+      className={`fixed bottom-6 right-6 shadow-2xl transition-all ${
+        isMinimized ? "h-14" : "h-[600px]"
+      } w-96 flex flex-col z-50`}
+    >
       {/* Header */}
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b">
         <div className="flex items-center gap-2">
@@ -207,7 +210,7 @@ export function AIChatbot() {
                     <Bot className="h-4 w-4 text-primary-foreground" />
                   </div>
                 )}
-                
+
                 <div
                   className={`max-w-[75%] rounded-lg p-3 ${
                     message.role === "user"
@@ -215,7 +218,9 @@ export function AIChatbot() {
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap">
+                    {message.content}
+                  </p>
                   <p className="text-xs opacity-70 mt-1">
                     {message.timestamp.toLocaleTimeString([], {
                       hour: "2-digit",
@@ -253,7 +258,9 @@ export function AIChatbot() {
           {/* Quick Replies */}
           {messages.length <= 1 && (
             <div className="px-4 pb-2">
-              <p className="text-xs text-muted-foreground mb-2">Quick actions:</p>
+              <p className="text-xs text-muted-foreground mb-2">
+                Quick actions:
+              </p>
               <div className="flex flex-wrap gap-2">
                 {QUICK_REPLIES.map((reply) => (
                   <Button
@@ -275,7 +282,9 @@ export function AIChatbot() {
             <div className="flex gap-2">
               <Input
                 value={input}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setInput(e.target.value)
+                }
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
                 disabled={loading}

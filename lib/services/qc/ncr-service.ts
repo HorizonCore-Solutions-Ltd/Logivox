@@ -3,43 +3,44 @@
  * Enterprise-grade NCR management with supplier claims and financial tracking
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export type NCRSourceType = 
-  | 'RECEIVING'
-  | 'PRODUCTION'
-  | 'PICKING'
-  | 'PACKING'
-  | 'CUSTOMER_COMPLAINT'
-  | 'AUDIT';
+export type NCRSourceType =
+  | "RECEIVING"
+  | "PRODUCTION"
+  | "PICKING"
+  | "PACKING"
+  | "CUSTOMER_COMPLAINT"
+  | "AUDIT";
 
-export type NCRDisposition = 
-  | 'REWORK'
-  | 'SCRAP'
-  | 'RETURN_TO_VENDOR'
-  | 'USE_AS_IS'
-  | 'CREDIT_CLAIM'
-  | 'QUARANTINE';
+export type NCRDisposition =
+  | "REWORK"
+  | "SCRAP"
+  | "RETURN_TO_VENDOR"
+  | "USE_AS_IS"
+  | "CREDIT_CLAIM"
+  | "QUARANTINE";
 
-export type ClaimStatus = 
-  | 'PENDING'
-  | 'SUBMITTED'
-  | 'APPROVED'
-  | 'REJECTED'
-  | 'PAID'
-  | 'PARTIALLY_PAID';
+export type ClaimStatus =
+  | "PENDING"
+  | "SUBMITTED"
+  | "APPROVED"
+  | "REJECTED"
+  | "PAID"
+  | "PARTIALLY_PAID";
 
 export class NCRService {
-  
   /**
    * Generate next NCR number
    */
-  private static async generateNCRNumber(organizationId: string): Promise<string> {
+  private static async generateNCRNumber(
+    organizationId: string,
+  ): Promise<string> {
     const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    
+    const month = String(new Date().getMonth() + 1).padStart(2, "0");
+
     const lastNCR = await prisma.nonConformanceReport.findFirst({
       where: {
         organizationId,
@@ -47,16 +48,16 @@ export class NCRService {
           startsWith: `NCR-${year}${month}`,
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     let sequence = 1;
     if (lastNCR) {
-      const lastSequence = parseInt(lastNCR.ncrNumber.split('-').pop() || '0');
+      const lastSequence = parseInt(lastNCR.ncrNumber.split("-").pop() || "0");
       sequence = lastSequence + 1;
     }
 
-    return `NCR-${year}${month}-${String(sequence).padStart(4, '0')}`;
+    return `NCR-${year}${month}-${String(sequence).padStart(4, "0")}`;
   }
 
   /**
@@ -93,9 +94,8 @@ export class NCRService {
     customerImpact?: boolean;
     createdBy: string;
   }) {
-    
     const ncrNumber = await this.generateNCRNumber(params.organizationId);
-    
+
     const ncr = await prisma.nonConformanceReport.create({
       data: {
         ncrNumber,
@@ -121,10 +121,10 @@ export class NCRService {
         disposition: params.disposition,
         estimatedCost: params.estimatedCost,
         claimAmount: params.claimAmount,
-        claimStatus: params.claimAmount ? 'PENDING' : null,
+        claimStatus: params.claimAmount ? "PENDING" : null,
         photos: params.photos || [],
         documents: params.documents || [],
-        priority: params.priority || 'MEDIUM',
+        priority: params.priority || "MEDIUM",
         assignedTo: params.assignedTo,
         dueDate: params.dueDate,
         customerImpact: params.customerImpact || false,
@@ -152,7 +152,7 @@ export class NCRService {
       assignedTo: string;
       dueDate: Date;
       notes: string;
-    }>
+    }>,
   ) {
     return await prisma.nonConformanceReport.update({
       where: { id: ncrId },
@@ -190,7 +190,7 @@ export class NCRService {
     return await prisma.nonConformanceReport.update({
       where: { id: ncrId },
       data: {
-        claimStatus: 'SUBMITTED',
+        claimStatus: "SUBMITTED",
         claimSubmittedDate: new Date(),
       },
     });
@@ -210,11 +210,14 @@ export class NCRService {
       claimNotes: params.claimNotes,
     };
 
-    if (params.claimStatus === 'APPROVED') {
+    if (params.claimStatus === "APPROVED") {
       data.claimApprovedDate = new Date();
     }
 
-    if (params.claimStatus === 'PAID' || params.claimStatus === 'PARTIALLY_PAID') {
+    if (
+      params.claimStatus === "PAID" ||
+      params.claimStatus === "PARTIALLY_PAID"
+    ) {
       data.claimPaidAmount = params.claimPaidAmount;
     }
 
@@ -235,7 +238,7 @@ export class NCRService {
     return await prisma.nonConformanceReport.update({
       where: { id: params.ncrId },
       data: {
-        status: 'CLOSED',
+        status: "CLOSED",
         closedDate: new Date(),
         closedBy: params.closedBy,
         closureNotes: params.closureNotes,
@@ -251,7 +254,7 @@ export class NCRService {
       where: { id: ncrId },
     });
 
-    if (!ncr) throw new Error('NCR not found');
+    if (!ncr) throw new Error("NCR not found");
 
     const updatedCapaIds = [...(ncr.capaIds || []), capaId];
 
@@ -290,7 +293,7 @@ export class NCRService {
       claimStatus?: string;
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ) {
     const where: any = { organizationId };
 
@@ -299,7 +302,7 @@ export class NCRService {
     if (filters.supplierId) where.supplierId = filters.supplierId;
     if (filters.category) where.category = filters.category;
     if (filters.claimStatus) where.claimStatus = filters.claimStatus;
-    
+
     if (filters.startDate || filters.endDate) {
       where.reportDate = {};
       if (filters.startDate) where.reportDate.gte = filters.startDate;
@@ -311,7 +314,7 @@ export class NCRService {
       include: {
         supplier: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return ncrs;
@@ -325,10 +328,10 @@ export class NCRService {
     filters: {
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ) {
     const where: any = { organizationId };
-    
+
     if (filters.startDate || filters.endDate) {
       where.reportDate = {};
       if (filters.startDate) where.reportDate.gte = filters.startDate;
@@ -340,23 +343,23 @@ export class NCRService {
     });
 
     const totalNCRs = ncrs.length;
-    const openNCRs = ncrs.filter(n => n.status === 'OPEN').length;
-    const closedNCRs = ncrs.filter(n => n.status === 'CLOSED').length;
-    
-    const criticalNCRs = ncrs.filter(n => n.severity === 'CRITICAL').length;
-    const majorNCRs = ncrs.filter(n => n.severity === 'MAJOR').length;
-    const minorNCRs = ncrs.filter(n => n.severity === 'MINOR').length;
+    const openNCRs = ncrs.filter((n) => n.status === "OPEN").length;
+    const closedNCRs = ncrs.filter((n) => n.status === "CLOSED").length;
+
+    const criticalNCRs = ncrs.filter((n) => n.severity === "CRITICAL").length;
+    const majorNCRs = ncrs.filter((n) => n.severity === "MAJOR").length;
+    const minorNCRs = ncrs.filter((n) => n.severity === "MINOR").length;
 
     const totalClaimAmount = ncrs
-      .filter(n => n.claimAmount)
+      .filter((n) => n.claimAmount)
       .reduce((sum, n) => sum + Number(n.claimAmount), 0);
 
     const paidClaimAmount = ncrs
-      .filter(n => n.claimPaidAmount)
+      .filter((n) => n.claimPaidAmount)
       .reduce((sum, n) => sum + Number(n.claimPaidAmount), 0);
 
     const totalCost = ncrs
-      .filter(n => n.actualCost || n.estimatedCost)
+      .filter((n) => n.actualCost || n.estimatedCost)
       .reduce((sum, n) => sum + Number(n.actualCost || n.estimatedCost), 0);
 
     const avgResolutionDays = this.calculateAvgResolutionDays(ncrs);
@@ -380,13 +383,16 @@ export class NCRService {
    * Calculate average resolution days
    */
   private static calculateAvgResolutionDays(ncrs: any[]): number {
-    const closedNCRs = ncrs.filter(n => n.status === 'CLOSED' && n.closedDate);
-    
+    const closedNCRs = ncrs.filter(
+      (n) => n.status === "CLOSED" && n.closedDate,
+    );
+
     if (closedNCRs.length === 0) return 0;
 
     const totalDays = closedNCRs.reduce((sum, ncr) => {
       const days = Math.floor(
-        (ncr.closedDate.getTime() - ncr.reportDate.getTime()) / (1000 * 60 * 60 * 24)
+        (ncr.closedDate.getTime() - ncr.reportDate.getTime()) /
+          (1000 * 60 * 60 * 24),
       );
       return sum + days;
     }, 0);

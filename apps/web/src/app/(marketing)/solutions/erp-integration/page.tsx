@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Workflow,
   Zap,
@@ -17,42 +23,48 @@ import {
   TrendingUp,
   Shield,
   Clock,
-  Network
-} from "lucide-react"
+  Network,
+} from "lucide-react";
 
 export default function ERPIntegrationPage() {
   const features = [
     {
       icon: ArrowLeftRight,
       title: "Bi-Directional Sync",
-      description: "Seamless two-way data flow between LogiVox and your ERP system in real-time."
+      description:
+        "Seamless two-way data flow between LogiVox and your ERP system in real-time.",
     },
     {
       icon: Zap,
       title: "Real-Time Updates",
-      description: "Instant synchronization ensures data accuracy across all systems."
+      description:
+        "Instant synchronization ensures data accuracy across all systems.",
     },
     {
       icon: Database,
       title: "Data Mapping",
-      description: "Intelligent field mapping automatically aligns data structures between systems."
+      description:
+        "Intelligent field mapping automatically aligns data structures between systems.",
     },
     {
       icon: Shield,
       title: "Secure Connections",
-      description: "Enterprise-grade encryption and authentication protect your business data."
+      description:
+        "Enterprise-grade encryption and authentication protect your business data.",
     },
     {
       icon: RefreshCw,
       title: "Automated Workflows",
-      description: "Trigger actions across systems with customizable business rules."
+      description:
+        "Trigger actions across systems with customizable business rules.",
     },
     {
       icon: Clock,
       title: "Conflict Resolution",
-      description: "Smart algorithms handle data conflicts and version control automatically."
-    }
-  ]
+      description:
+        "Smart algorithms handle data conflicts and version control automatically.",
+    },
+  ];
 
   const supportedERPs = [
     { name: "SAP", category: "Enterprise" },
@@ -63,31 +75,32 @@ export default function ERPIntegrationPage() {
     { name: "Sage", category: "SMB" },
     { name: "Acumatica", category: "Cloud ERP" },
     { name: "Odoo", category: "Open Source" },
-    { name: "Custom APIs", category: "Enterprise" }
-  ]
+    { name: "Custom APIs", category: "Enterprise" },
+  ];
 
   const integrationCapabilities = [
     {
       title: "Inventory Synchronization",
-      description: "Real-time stock levels, locations, and movements across all systems",
-      icon: Database
+      description:
+        "Real-time stock levels, locations, and movements across all systems",
+      icon: Database,
     },
     {
       title: "Order Management",
       description: "Seamless order processing from creation to fulfillment",
-      icon: FileText
+      icon: FileText,
     },
     {
       title: "Financial Reconciliation",
       description: "Automated accounting updates and transaction tracking",
-      icon: TrendingUp
+      icon: TrendingUp,
     },
     {
       title: "Master Data Management",
       description: "Centralized product, customer, and vendor information",
-      icon: Network
-    }
-  ]
+      icon: Network,
+    },
+  ];
 
   const benefits = [
     "Eliminate manual data entry and reduce errors by 95%",
@@ -97,8 +110,8 @@ export default function ERPIntegrationPage() {
     "Scale integrations without additional IT resources",
     "Pre-built connectors reduce implementation time by 70%",
     "Monitor integration health with real-time dashboards",
-    "Rollback capabilities for safe deployments"
-  ]
+    "Rollback capabilities for safe deployments",
+  ];
 
   return (
     <div className="min-h-screen">
@@ -111,7 +124,9 @@ export default function ERPIntegrationPage() {
               ERP Integration
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Connect LogiVox seamlessly with your existing ERP system. Eliminate data silos, automate workflows, and maintain a single source of truth across your enterprise.
+              Connect LogiVox seamlessly with your existing ERP system.
+              Eliminate data silos, automate workflows, and maintain a single
+              source of truth across your enterprise.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -134,13 +149,17 @@ export default function ERPIntegrationPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Works With Your ERP</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Pre-built connectors for leading ERP systems, plus custom API integration
+              Pre-built connectors for leading ERP systems, plus custom API
+              integration
             </p>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {supportedERPs.map((erp) => (
-              <Card key={erp.name} className="text-center hover:shadow-lg transition-shadow">
+              <Card
+                key={erp.name}
+                className="text-center hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center mx-auto mb-3">
                     <Workflow className="h-6 w-6 text-white" />
@@ -160,7 +179,9 @@ export default function ERPIntegrationPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Enterprise Integration Features</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Enterprise Integration Features
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Built for reliability, security, and scalability
             </p>
@@ -168,7 +189,7 @@ export default function ERPIntegrationPage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <Card key={feature.title}>
                   <CardHeader>
@@ -179,7 +200,7 @@ export default function ERPIntegrationPage() {
                     <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -197,7 +218,7 @@ export default function ERPIntegrationPage() {
 
           <div className="grid gap-8 md:grid-cols-2">
             {integrationCapabilities.map((capability) => {
-              const Icon = capability.icon
+              const Icon = capability.icon;
               return (
                 <Card key={capability.title}>
                   <CardHeader>
@@ -206,13 +227,17 @@ export default function ERPIntegrationPage() {
                         <Icon className="h-6 w-6 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="mb-2">{capability.title}</CardTitle>
-                        <CardDescription>{capability.description}</CardDescription>
+                        <CardTitle className="mb-2">
+                          {capability.title}
+                        </CardTitle>
+                        <CardDescription>
+                          {capability.description}
+                        </CardDescription>
                       </div>
                     </div>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -228,7 +253,8 @@ export default function ERPIntegrationPage() {
                 Accelerate Your Digital Transformation
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our ERP integration platform delivers immediate ROI and long-term scalability.
+                Our ERP integration platform delivers immediate ROI and
+                long-term scalability.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -244,7 +270,9 @@ export default function ERPIntegrationPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Integration Architecture</CardTitle>
-                  <CardDescription>Secure, scalable, and reliable</CardDescription>
+                  <CardDescription>
+                    Secure, scalable, and reliable
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-square bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg flex items-center justify-center border-2 border-dashed">
@@ -274,10 +302,27 @@ export default function ERPIntegrationPage() {
 
           <div className="grid gap-6 md:grid-cols-4">
             {[
-              { step: "1", title: "Discovery", description: "We analyze your ERP setup and business requirements" },
-              { step: "2", title: "Configuration", description: "Map data fields and configure sync rules" },
-              { step: "3", title: "Testing", description: "Validate integration in staging environment" },
-              { step: "4", title: "Go Live", description: "Deploy to production with full support" }
+              {
+                step: "1",
+                title: "Discovery",
+                description:
+                  "We analyze your ERP setup and business requirements",
+              },
+              {
+                step: "2",
+                title: "Configuration",
+                description: "Map data fields and configure sync rules",
+              },
+              {
+                step: "3",
+                title: "Testing",
+                description: "Validate integration in staging environment",
+              },
+              {
+                step: "4",
+                title: "Go Live",
+                description: "Deploy to production with full support",
+              },
             ].map((phase) => (
               <Card key={phase.step}>
                 <CardHeader>
@@ -309,12 +354,17 @@ export default function ERPIntegrationPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 border-white text-white hover:bg-white/20" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-white/10 border-white text-white hover:bg-white/20"
+              asChild
+            >
               <Link href="/contact">Book Integration Consultation</Link>
             </Button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

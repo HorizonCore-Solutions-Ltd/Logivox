@@ -3,13 +3,13 @@
  * Helpers for optimizing images and assets
  */
 
-import path from 'path';
-import fs from 'fs/promises';
+import path from "path";
+import fs from "fs/promises";
 
 /**
  * Image format types
  */
-export type ImageFormat = 'webp' | 'avif' | 'jpeg' | 'png';
+export type ImageFormat = "webp" | "avif" | "jpeg" | "png";
 
 /**
  * Image optimization configuration
@@ -19,7 +19,7 @@ export interface ImageOptimizationConfig {
   format?: ImageFormat;
   width?: number;
   height?: number;
-  fit?: 'contain' | 'cover' | 'fill' | 'inside' | 'outside';
+  fit?: "contain" | "cover" | "fill" | "inside" | "outside";
 }
 
 /**
@@ -27,10 +27,10 @@ export interface ImageOptimizationConfig {
  */
 export const DEFAULT_IMAGE_CONFIG: Required<ImageOptimizationConfig> = {
   quality: 80,
-  format: 'webp',
+  format: "webp",
   width: 1200,
   height: 1200,
-  fit: 'cover',
+  fit: "cover",
 };
 
 /**
@@ -49,9 +49,9 @@ export const ImageSizePresets = {
  * Responsive image sizes for Next.js Image component
  */
 export const responsiveImageSizes = {
-  mobile: '(max-width: 640px) 100vw',
-  tablet: '(max-width: 1024px) 50vw',
-  desktop: '33vw',
+  mobile: "(max-width: 640px) 100vw",
+  tablet: "(max-width: 1024px) 50vw",
+  desktop: "33vw",
 };
 
 /**
@@ -59,15 +59,15 @@ export const responsiveImageSizes = {
  */
 export function getOptimizedImageUrl(
   src: string,
-  config?: ImageOptimizationConfig
+  config?: ImageOptimizationConfig,
 ): string {
   const params = new URLSearchParams();
 
-  if (config?.width) params.set('w', config.width.toString());
-  if (config?.height) params.set('h', config.height.toString());
-  if (config?.quality) params.set('q', config.quality.toString());
-  if (config?.format) params.set('f', config.format);
-  if (config?.fit) params.set('fit', config.fit);
+  if (config?.width) params.set("w", config.width.toString());
+  if (config?.height) params.set("h", config.height.toString());
+  if (config?.quality) params.set("q", config.quality.toString());
+  if (config?.format) params.set("f", config.format);
+  if (config?.fit) params.set("fit", config.fit);
 
   const queryString = params.toString();
   return queryString ? `${src}?${queryString}` : src;
@@ -78,22 +78,22 @@ export function getOptimizedImageUrl(
  */
 export function generateSrcSet(
   src: string,
-  widths: number[] = [640, 750, 828, 1080, 1200, 1920]
+  widths: number[] = [640, 750, 828, 1080, 1200, 1920],
 ): string {
   return widths
     .map((width) => `${getOptimizedImageUrl(src, { width })} ${width}w`)
-    .join(', ');
+    .join(", ");
 }
 
 /**
  * Get image dimensions from file
  */
 export async function getImageDimensions(
-  filePath: string
+  filePath: string,
 ): Promise<{ width: number; height: number } | null> {
   try {
     const buffer = await fs.readFile(filePath);
-    
+
     // PNG
     if (buffer[0] === 0x89 && buffer[1] === 0x50) {
       return {
@@ -101,7 +101,7 @@ export async function getImageDimensions(
         height: buffer.readUInt32BE(20),
       };
     }
-    
+
     // JPEG
     if (buffer[0] === 0xff && buffer[1] === 0xd8) {
       let offset = 2;
@@ -116,10 +116,10 @@ export async function getImageDimensions(
         offset += 2 + buffer.readUInt16BE(offset + 2);
       }
     }
-    
+
     return null;
   } catch (error) {
-    console.error('Error getting image dimensions:', error);
+    console.error("Error getting image dimensions:", error);
     return null;
   }
 }
@@ -141,12 +141,12 @@ export async function validateImage(
     maxHeight?: number;
     maxSize?: number; // in bytes
     allowedFormats?: string[];
-  }
+  },
 ): Promise<ImageValidation> {
   try {
     const stats = await fs.stat(filePath);
     const ext = path.extname(filePath).toLowerCase();
-    
+
     // Check file size
     if (options?.maxSize && stats.size > options.maxSize) {
       return {
@@ -155,17 +155,23 @@ export async function validateImage(
         size: stats.size,
       };
     }
-    
+
     // Check format
-    const allowedFormats = options?.allowedFormats || ['.jpg', '.jpeg', '.png', '.webp', '.avif'];
+    const allowedFormats = options?.allowedFormats || [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".webp",
+      ".avif",
+    ];
     if (!allowedFormats.includes(ext)) {
       return {
         valid: false,
-        error: `Format ${ext} not allowed. Allowed formats: ${allowedFormats.join(', ')}`,
+        error: `Format ${ext} not allowed. Allowed formats: ${allowedFormats.join(", ")}`,
         size: stats.size,
       };
     }
-    
+
     // Check dimensions
     const dimensions = await getImageDimensions(filePath);
     if (dimensions) {
@@ -186,7 +192,7 @@ export async function validateImage(
         };
       }
     }
-    
+
     return {
       valid: true,
       dimensions: dimensions || undefined,
@@ -195,7 +201,7 @@ export async function validateImage(
   } catch (error) {
     return {
       valid: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -203,15 +209,18 @@ export async function validateImage(
 /**
  * Generate placeholder blur data URL
  */
-export function generateBlurDataURL(width: number = 10, height: number = 10): string {
+export function generateBlurDataURL(
+  width: number = 10,
+  height: number = 10,
+): string {
   // Generate a simple gray placeholder
   const svg = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <rect width="${width}" height="${height}" fill="#e5e7eb"/>
     </svg>
   `;
-  
-  const base64 = Buffer.from(svg).toString('base64');
+
+  const base64 = Buffer.from(svg).toString("base64");
   return `data:image/svg+xml;base64,${base64}`;
 }
 
@@ -219,7 +228,7 @@ export function generateBlurDataURL(width: number = 10, height: number = 10): st
  * Image CDN configuration
  */
 export interface CDNConfig {
-  provider: 'cloudinary' | 'imgix' | 'cloudflare' | 'custom';
+  provider: "cloudinary" | "imgix" | "cloudflare" | "custom";
   baseUrl: string;
   apiKey?: string;
 }
@@ -230,14 +239,14 @@ export interface CDNConfig {
 export function getCDNImageUrl(
   src: string,
   config: ImageOptimizationConfig,
-  cdn: CDNConfig
+  cdn: CDNConfig,
 ): string {
   switch (cdn.provider) {
-    case 'cloudinary':
+    case "cloudinary":
       return getCloudinaryUrl(src, config, cdn.baseUrl);
-    case 'imgix':
+    case "imgix":
       return getImgixUrl(src, config, cdn.baseUrl);
-    case 'cloudflare':
+    case "cloudflare":
       return getCloudflareUrl(src, config, cdn.baseUrl);
     default:
       return getOptimizedImageUrl(src, config);
@@ -250,17 +259,17 @@ export function getCDNImageUrl(
 function getCloudinaryUrl(
   src: string,
   config: ImageOptimizationConfig,
-  baseUrl: string
+  baseUrl: string,
 ): string {
   const transformations: string[] = [];
-  
+
   if (config.width) transformations.push(`w_${config.width}`);
   if (config.height) transformations.push(`h_${config.height}`);
   if (config.quality) transformations.push(`q_${config.quality}`);
   if (config.format) transformations.push(`f_${config.format}`);
   if (config.fit) transformations.push(`c_${config.fit}`);
-  
-  const transform = transformations.join(',');
+
+  const transform = transformations.join(",");
   return `${baseUrl}/image/upload/${transform}/${src}`;
 }
 
@@ -270,18 +279,18 @@ function getCloudinaryUrl(
 function getImgixUrl(
   src: string,
   config: ImageOptimizationConfig,
-  baseUrl: string
+  baseUrl: string,
 ): string {
   const params = new URLSearchParams();
-  
-  if (config.width) params.set('w', config.width.toString());
-  if (config.height) params.set('h', config.height.toString());
-  if (config.quality) params.set('q', config.quality.toString());
-  if (config.format) params.set('fm', config.format);
-  if (config.fit) params.set('fit', config.fit);
-  
-  params.set('auto', 'format,compress');
-  
+
+  if (config.width) params.set("w", config.width.toString());
+  if (config.height) params.set("h", config.height.toString());
+  if (config.quality) params.set("q", config.quality.toString());
+  if (config.format) params.set("fm", config.format);
+  if (config.fit) params.set("fit", config.fit);
+
+  params.set("auto", "format,compress");
+
   return `${baseUrl}/${src}?${params.toString()}`;
 }
 
@@ -291,17 +300,17 @@ function getImgixUrl(
 function getCloudflareUrl(
   src: string,
   config: ImageOptimizationConfig,
-  baseUrl: string
+  baseUrl: string,
 ): string {
   const options: string[] = [];
-  
+
   if (config.width) options.push(`width=${config.width}`);
   if (config.height) options.push(`height=${config.height}`);
   if (config.quality) options.push(`quality=${config.quality}`);
   if (config.format) options.push(`format=${config.format}`);
   if (config.fit) options.push(`fit=${config.fit}`);
-  
-  const optionsString = options.join(',');
+
+  const optionsString = options.join(",");
   return `${baseUrl}/cdn-cgi/image/${optionsString}/${src}`;
 }
 
@@ -313,18 +322,18 @@ export const AssetOptimization = {
    * Get optimal image format based on browser support
    */
   getOptimalFormat(userAgent?: string): ImageFormat {
-    if (!userAgent) return 'webp';
-    
+    if (!userAgent) return "webp";
+
     // Check for AVIF support (newer browsers)
     if (
-      userAgent.includes('Chrome/') &&
-      parseInt(userAgent.split('Chrome/')[1]) >= 85
+      userAgent.includes("Chrome/") &&
+      parseInt(userAgent.split("Chrome/")[1]) >= 85
     ) {
-      return 'avif';
+      return "avif";
     }
-    
+
     // WebP is widely supported
-    return 'webp';
+    return "webp";
   },
 
   /**
@@ -332,11 +341,11 @@ export const AssetOptimization = {
    */
   getResponsiveSizes(maxWidth?: number): string {
     if (maxWidth && maxWidth <= 640) {
-      return '100vw';
+      return "100vw";
     } else if (maxWidth && maxWidth <= 1024) {
-      return '(max-width: 640px) 100vw, 50vw';
+      return "(max-width: 640px) 100vw, 50vw";
     }
-    return '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw';
+    return "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw";
   },
 
   /**
@@ -364,29 +373,29 @@ export const AssetOptimization = {
 export const ImagePerformanceHints = {
   // Use appropriate image formats
   formats: {
-    photos: 'webp or avif',
-    graphics: 'webp or png',
-    icons: 'svg',
-    logos: 'svg or webp',
+    photos: "webp or avif",
+    graphics: "webp or png",
+    icons: "svg",
+    logos: "svg or webp",
   },
 
   // Recommended sizes
   recommendations: {
-    thumbnail: '150x150px, quality 70',
-    preview: '400x400px, quality 75',
-    detail: '800x800px, quality 80',
-    hero: '1920x1080px, quality 85',
+    thumbnail: "150x150px, quality 70",
+    preview: "400x400px, quality 75",
+    detail: "800x800px, quality 80",
+    hero: "1920x1080px, quality 85",
   },
 
   // Best practices
   tips: [
-    'Use WebP format for 25-35% smaller file sizes',
-    'Consider AVIF for even better compression',
-    'Implement lazy loading for images below the fold',
-    'Use responsive images with srcset',
-    'Add blur placeholders for better perceived performance',
-    'Serve images from CDN when possible',
-    'Use appropriate quality settings (70-85 for most cases)',
-    'Implement proper caching headers',
+    "Use WebP format for 25-35% smaller file sizes",
+    "Consider AVIF for even better compression",
+    "Implement lazy loading for images below the fold",
+    "Use responsive images with srcset",
+    "Add blur placeholders for better perceived performance",
+    "Serve images from CDN when possible",
+    "Use appropriate quality settings (70-85 for most cases)",
+    "Implement proper caching headers",
   ],
 };

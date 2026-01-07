@@ -1,43 +1,43 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { authenticateApiKey } from "@/lib/api-auth"
-import { prisma } from "@/lib/prisma"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { authenticateApiKey } from "@/lib/api-auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(request: NextRequest) {
   // Authenticate with API key
-  const auth = await authenticateApiKey(request)
+  const auth = await authenticateApiKey(request);
   if (!auth.authenticated) {
-    return auth.error
+    return auth.error;
   }
 
   try {
-    const { searchParams } = new URL(request.url)
-    const page = parseInt(searchParams.get("page") || "1")
-    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100)
-    const search = searchParams.get("search")
-    const category = searchParams.get("category")
-    const warehouse = searchParams.get("warehouse")
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = Math.min(parseInt(searchParams.get("limit") || "50"), 100);
+    const search = searchParams.get("search");
+    const category = searchParams.get("category");
+    const warehouse = searchParams.get("warehouse");
 
-    const skip = (page - 1) * limit
+    const skip = (page - 1) * limit;
 
     // Build where clause
     const where: any = {
       organizationId: auth.organizationId,
-    }
+    };
 
     if (search) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
         { sku: { contains: search, mode: "insensitive" } },
-      ]
+      ];
     }
 
     if (category) {
-      where.categoryId = category
+      where.categoryId = category;
     }
 
     if (warehouse) {
-      where.warehouseId = warehouse
+      where.warehouseId = warehouse;
     }
 
     // Get inventory items
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         take: limit,
       }),
       prisma.inventoryItem.count({ where }),
-    ])
+    ]);
 
     return NextResponse.json({
       data: items,
@@ -74,12 +74,12 @@ export async function GET(request: NextRequest) {
         total,
         totalPages: Math.ceil(total / limit),
       },
-    })
+    });
   } catch (error) {
-    console.error("API inventory fetch error:", error)
+    console.error("API inventory fetch error:", error);
     return NextResponse.json(
       { message: "Failed to fetch inventory items" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

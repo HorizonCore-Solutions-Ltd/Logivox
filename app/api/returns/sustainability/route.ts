@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { sustainabilityService } from '@/lib/services/returns/sustainability-service';
+import { NextRequest, NextResponse } from "next/server";
+import { sustainabilityService } from "@/lib/services/returns/sustainability-service";
 
 /**
  * POST /api/returns/sustainability/report
@@ -12,12 +12,12 @@ export async function POST(request: NextRequest) {
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Missing required field: organizationId' },
-        { status: 400 }
+        { error: "Missing required field: organizationId" },
+        { status: 400 },
       );
     }
 
-    if (reportType === 'RETURN' && rmaId) {
+    if (reportType === "RETURN" && rmaId) {
       // Generate return-level report
       const report = await sustainabilityService.calculateReturnSustainability({
         rmaId,
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         success: true,
         report,
       });
-    } else if (reportType === 'ORGANIZATION') {
+    } else if (reportType === "ORGANIZATION") {
       // Generate organization ESG report
       const report = await sustainabilityService.generateESGReport({
         organizationId,
@@ -45,14 +45,14 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Invalid report type or missing parameters' },
-      { status: 400 }
+      { error: "Invalid report type or missing parameters" },
+      { status: 400 },
     );
   } catch (error: any) {
-    console.error('Sustainability report error:', error);
+    console.error("Sustainability report error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate sustainability report' },
-      { status: 500 }
+      { error: error.message || "Failed to generate sustainability report" },
+      { status: 500 },
     );
   }
 }
@@ -64,27 +64,28 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const sku = searchParams.get('sku');
-    const organizationId = searchParams.get('organizationId');
+    const sku = searchParams.get("sku");
+    const organizationId = searchParams.get("organizationId");
 
     if (!sku || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required parameters' },
-        { status: 400 }
+        { error: "Missing required parameters" },
+        { status: 400 },
       );
     }
 
-    const profile = await sustainabilityService.getProductSustainabilityProfile(sku);
+    const profile =
+      await sustainabilityService.getProductSustainabilityProfile(sku);
 
     return NextResponse.json({
       success: true,
       profile,
     });
   } catch (error: any) {
-    console.error('Product sustainability error:', error);
+    console.error("Product sustainability error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get product sustainability' },
-      { status: 500 }
+      { error: error.message || "Failed to get product sustainability" },
+      { status: 500 },
     );
   }
 }

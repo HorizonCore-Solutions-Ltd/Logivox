@@ -4,32 +4,32 @@
  * PUT: Update system settings
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
-import { hasPermission } from '@/lib/rbac';
-import { logAuditEvent } from '@/lib/audit-logger';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/rbac";
+import { logAuditEvent } from "@/lib/audit-logger";
 
 // Default settings structure
 const defaultSettings = {
   general: {
-    appName: 'LogiVox',
-    appUrl: 'https://logivox.ai',
-    companyName: 'Your Company',
-    timezone: 'UTC',
-    dateFormat: 'MM/DD/YYYY',
-    currency: 'USD',
-    language: 'en',
+    appName: "LogiVox",
+    appUrl: "https://logivox.ai",
+    companyName: "Your Company",
+    timezone: "UTC",
+    dateFormat: "MM/DD/YYYY",
+    currency: "USD",
+    language: "en",
   },
   email: {
     enabled: false,
-    smtpHost: '',
+    smtpHost: "",
     smtpPort: 587,
-    smtpUser: '',
-    smtpPassword: '',
-    fromEmail: 'noreply@logivox.ai',
-    fromName: 'LogiVox',
+    smtpUser: "",
+    smtpPassword: "",
+    fromEmail: "noreply@logivox.ai",
+    fromName: "LogiVox",
   },
   notifications: {
     emailNotifications: true,
@@ -53,19 +53,19 @@ const defaultSettings = {
     autoReorder: false,
     reorderDays: 7,
     allowNegativeStock: false,
-    defaultWarehouse: '',
+    defaultWarehouse: "",
     trackSerialNumbers: true,
     trackBatchNumbers: true,
   },
   integrations: {
     stripeEnabled: false,
-    stripePublicKey: '',
-    stripeSecretKey: '',
+    stripePublicKey: "",
+    stripeSecretKey: "",
     twilioEnabled: false,
-    twilioAccountSid: '',
-    twilioAuthToken: '',
+    twilioAccountSid: "",
+    twilioAuthToken: "",
     slackEnabled: false,
-    slackWebhook: '',
+    slackWebhook: "",
   },
 };
 
@@ -75,12 +75,12 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check permission
-    if (!hasPermission(session.user.role, 'settings:read')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!hasPermission(session.user.role, "settings:read")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Fetch settings from database
@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
 
     // Convert to object structure
     const settingsObject = settings.reduce((acc, setting) => {
-      const [category, key] = setting.key.split('.');
+      const [category, key] = setting.key.split(".");
       if (!acc[category]) {
         acc[category] = {};
       }
@@ -97,20 +97,23 @@ export async function GET(request: NextRequest) {
     }, {} as any);
 
     // Merge with defaults
-    const mergedSettings = Object.keys(defaultSettings).reduce((acc, category) => {
-      acc[category] = {
-        ...defaultSettings[category as keyof typeof defaultSettings],
-        ...(settingsObject[category] || {}),
-      };
-      return acc;
-    }, {} as any);
+    const mergedSettings = Object.keys(defaultSettings).reduce(
+      (acc, category) => {
+        acc[category] = {
+          ...defaultSettings[category as keyof typeof defaultSettings],
+          ...(settingsObject[category] || {}),
+        };
+        return acc;
+      },
+      {} as any,
+    );
 
     return NextResponse.json(mergedSettings);
   } catch (error) {
-    console.error('Error fetching settings:', error);
+    console.error("Error fetching settings:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch settings' },
-      { status: 500 }
+      { error: "Failed to fetch settings" },
+      { status: 500 },
     );
   }
 }
@@ -121,28 +124,28 @@ export async function PUT(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check permission
-    if (!hasPermission(session.user.role, 'settings:write')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!hasPermission(session.user.role, "settings:write")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const body = await request.json();
 
     // Validate settings structure
-    if (!body || typeof body !== 'object') {
+    if (!body || typeof body !== "object") {
       return NextResponse.json(
-        { error: 'Invalid settings data' },
-        { status: 400 }
+        { error: "Invalid settings data" },
+        { status: 400 },
       );
     }
 
     // Flatten settings object
     const flattenedSettings: Array<{ key: string; value: any }> = [];
     Object.entries(body).forEach(([category, settings]) => {
-      if (typeof settings === 'object') {
+      if (typeof settings === "object") {
         Object.entries(settings as object).forEach(([key, value]) => {
           flattenedSettings.push({
             key: `${category}.${key}`,
@@ -165,32 +168,32 @@ export async function PUT(request: NextRequest) {
             key: setting.key,
             value: setting.value,
           },
-        })
-      )
+        }),
+      ),
     );
 
     // Log audit event
     await logAuditEvent({
       userId: session.user.id,
-      action: 'settings_updated',
-      resource: 'system_settings',
+      action: "settings_updated",
+      resource: "system_settings",
       details: {
         updatedSettings: flattenedSettings.map((s) => s.key),
         timestamp: new Date().toISOString(),
       },
-      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-      userAgent: request.headers.get('user-agent') || 'unknown',
+      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+      userAgent: request.headers.get("user-agent") || "unknown",
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Settings updated successfully',
+      message: "Settings updated successfully",
     });
   } catch (error) {
-    console.error('Error updating settings:', error);
+    console.error("Error updating settings:", error);
     return NextResponse.json(
-      { error: 'Failed to update settings' },
-      { status: 500 }
+      { error: "Failed to update settings" },
+      { status: 500 },
     );
   }
 }

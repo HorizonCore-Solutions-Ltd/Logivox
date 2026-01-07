@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { qrReturnService } from '@/lib/services/returns/qr-return-service';
+import { NextRequest, NextResponse } from "next/server";
+import { qrReturnService } from "@/lib/services/returns/qr-return-service";
 
 /**
  * POST /api/returns/qr-code
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
 
     if (!rmaId || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required fields: rmaId, organizationId' },
-        { status: 400 }
+        { error: "Missing required fields: rmaId, organizationId" },
+        { status: 400 },
       );
     }
 
@@ -27,10 +27,10 @@ export async function POST(request: NextRequest) {
       qrReturn,
     });
   } catch (error: any) {
-    console.error('QR generation error:', error);
+    console.error("QR generation error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate QR code' },
-      { status: 500 }
+      { error: error.message || "Failed to generate QR code" },
+      { status: 500 },
     );
   }
 }

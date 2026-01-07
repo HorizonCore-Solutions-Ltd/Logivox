@@ -109,9 +109,23 @@ export default function CAPADetailPage() {
   };
 
   const getRPNLevel = (rpn: number) => {
-    if (rpn >= 200) return { label: "High Risk", color: "text-red-600", bgColor: "bg-red-100" };
-    if (rpn >= 100) return { label: "Medium Risk", color: "text-orange-600", bgColor: "bg-orange-100" };
-    return { label: "Low Risk", color: "text-green-600", bgColor: "bg-green-100" };
+    if (rpn >= 200)
+      return {
+        label: "High Risk",
+        color: "text-red-600",
+        bgColor: "bg-red-100",
+      };
+    if (rpn >= 100)
+      return {
+        label: "Medium Risk",
+        color: "text-orange-600",
+        bgColor: "bg-orange-100",
+      };
+    return {
+      label: "Low Risk",
+      color: "text-green-600",
+      bgColor: "bg-green-100",
+    };
   };
 
   const getCompletionPercentage = () => {
@@ -129,7 +143,8 @@ export default function CAPADetailPage() {
   };
 
   const isOverdue = () => {
-    if (!capa || capa.status === "CLOSED" || capa.status === "VERIFIED") return false;
+    if (!capa || capa.status === "CLOSED" || capa.status === "VERIFIED")
+      return false;
     return new Date(capa.targetDate) < new Date();
   };
 
@@ -260,20 +275,28 @@ export default function CAPADetailPage() {
                   <p className="text-2xl font-bold">{capa.severity}</p>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Occurrence</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Occurrence
+                  </p>
                   <p className="text-2xl font-bold">{capa.occurrence}</p>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Detection</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Detection
+                  </p>
                   <p className="text-2xl font-bold">{capa.detection}</p>
                 </div>
               </div>
-              <div className={`text-center p-4 rounded-lg ${riskLevel.bgColor}`}>
+              <div
+                className={`text-center p-4 rounded-lg ${riskLevel.bgColor}`}
+              >
                 <p className="text-sm text-muted-foreground mb-1">Total RPN</p>
                 <p className={`text-3xl font-bold ${riskLevel.color}`}>
                   {capa.rpn}
                 </p>
-                <p className={`text-sm ${riskLevel.color}`}>{riskLevel.label}</p>
+                <p className={`text-sm ${riskLevel.color}`}>
+                  {riskLevel.label}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -293,7 +316,9 @@ export default function CAPADetailPage() {
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <p className="text-sm font-medium">Root Cause Analysis</p>
                   </div>
-                  <p className="text-sm text-muted-foreground pl-6">{capa.rootCause}</p>
+                  <p className="text-sm text-muted-foreground pl-6">
+                    {capa.rootCause}
+                  </p>
                 </div>
               )}
               {capa.immediateAction && (
@@ -302,7 +327,9 @@ export default function CAPADetailPage() {
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <p className="text-sm font-medium">Immediate Action</p>
                   </div>
-                  <p className="text-sm text-muted-foreground pl-6">{capa.immediateAction}</p>
+                  <p className="text-sm text-muted-foreground pl-6">
+                    {capa.immediateAction}
+                  </p>
                 </div>
               )}
               {capa.correctiveAction && (
@@ -311,7 +338,9 @@ export default function CAPADetailPage() {
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <p className="text-sm font-medium">Corrective Action</p>
                   </div>
-                  <p className="text-sm text-muted-foreground pl-6">{capa.correctiveAction}</p>
+                  <p className="text-sm text-muted-foreground pl-6">
+                    {capa.correctiveAction}
+                  </p>
                 </div>
               )}
               {capa.preventiveAction && (
@@ -320,19 +349,26 @@ export default function CAPADetailPage() {
                     <CheckCircle className="w-4 h-4 text-green-500" />
                     <p className="text-sm font-medium">Preventive Action</p>
                   </div>
-                  <p className="text-sm text-muted-foreground pl-6">{capa.preventiveAction}</p>
+                  <p className="text-sm text-muted-foreground pl-6">
+                    {capa.preventiveAction}
+                  </p>
                 </div>
               )}
-              {!capa.rootCause && !capa.immediateAction && !capa.correctiveAction && !capa.preventiveAction && (
-                <p className="text-sm text-muted-foreground text-center py-4">
-                  No actions documented yet
-                </p>
-              )}
+              {!capa.rootCause &&
+                !capa.immediateAction &&
+                !capa.correctiveAction &&
+                !capa.preventiveAction && (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No actions documented yet
+                  </p>
+                )}
             </CardContent>
           </Card>
 
           {/* Effectiveness Verification */}
-          {(capa.effectivenessVerification || capa.verificationMethod || capa.verificationResult) && (
+          {(capa.effectivenessVerification ||
+            capa.verificationMethod ||
+            capa.verificationResult) && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -343,20 +379,36 @@ export default function CAPADetailPage() {
               <CardContent className="space-y-4">
                 {capa.verificationMethod && (
                   <div>
-                    <p className="text-sm font-medium mb-1">Verification Method</p>
-                    <p className="text-sm text-muted-foreground">{capa.verificationMethod}</p>
+                    <p className="text-sm font-medium mb-1">
+                      Verification Method
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {capa.verificationMethod}
+                    </p>
                   </div>
                 )}
                 {capa.effectivenessVerification && (
                   <div>
-                    <p className="text-sm font-medium mb-1">Verification Plan</p>
-                    <p className="text-sm text-muted-foreground">{capa.effectivenessVerification}</p>
+                    <p className="text-sm font-medium mb-1">
+                      Verification Plan
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {capa.effectivenessVerification}
+                    </p>
                   </div>
                 )}
                 {capa.verificationResult && (
                   <div>
-                    <p className="text-sm font-medium mb-1">Verification Result</p>
-                    <Badge variant={capa.verificationResult === "EFFECTIVE" ? "default" : "destructive"}>
+                    <p className="text-sm font-medium mb-1">
+                      Verification Result
+                    </p>
+                    <Badge
+                      variant={
+                        capa.verificationResult === "EFFECTIVE"
+                          ? "default"
+                          : "destructive"
+                      }
+                    >
                       {capa.verificationResult}
                     </Badge>
                   </div>
@@ -385,23 +437,33 @@ export default function CAPADetailPage() {
               )}
               <div>
                 <p className="text-sm text-muted-foreground">Target Date</p>
-                <p className={`text-sm font-medium ${isOverdue() ? "text-red-600" : ""}`}>
+                <p
+                  className={`text-sm font-medium ${isOverdue() ? "text-red-600" : ""}`}
+                >
                   {new Date(capa.targetDate).toLocaleDateString()}
                   {isOverdue() && " (Overdue)"}
                 </p>
               </div>
               {capa.completedDate && (
                 <div>
-                  <p className="text-sm text-muted-foreground">Completed Date</p>
-                  <p className="text-sm">{new Date(capa.completedDate).toLocaleDateString()}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Completed Date
+                  </p>
+                  <p className="text-sm">
+                    {new Date(capa.completedDate).toLocaleDateString()}
+                  </p>
                 </div>
               )}
               {capa.verifiedDate && (
                 <div>
                   <p className="text-sm text-muted-foreground">Verified Date</p>
-                  <p className="text-sm">{new Date(capa.verifiedDate).toLocaleDateString()}</p>
+                  <p className="text-sm">
+                    {new Date(capa.verifiedDate).toLocaleDateString()}
+                  </p>
                   {capa.verifiedBy && (
-                    <p className="text-xs text-muted-foreground">By: {capa.verifiedBy}</p>
+                    <p className="text-xs text-muted-foreground">
+                      By: {capa.verifiedBy}
+                    </p>
                   )}
                 </div>
               )}
@@ -421,7 +483,9 @@ export default function CAPADetailPage() {
                 <Button
                   variant="link"
                   className="p-0 h-auto text-sm"
-                  onClick={() => router.push(`/dashboard/qc/ncr/${capa.ncr?.id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/qc/ncr/${capa.ncr?.id}`)
+                  }
                 >
                   {capa.ncr.ncrNumber}
                 </Button>
@@ -440,11 +504,15 @@ export default function CAPADetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Created</p>
-                <p className="text-sm">{new Date(capa.createdAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(capa.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{new Date(capa.updatedAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(capa.updatedAt).toLocaleString()}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -459,7 +527,9 @@ export default function CAPADetailPage() {
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => {/* Update status to IN_PROGRESS */}}
+                  onClick={() => {
+                    /* Update status to IN_PROGRESS */
+                  }}
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Start Working
@@ -469,7 +539,9 @@ export default function CAPADetailPage() {
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => {/* Update status to PENDING_VERIFICATION */}}
+                  onClick={() => {
+                    /* Update status to PENDING_VERIFICATION */
+                  }}
                 >
                   <Target className="w-4 h-4 mr-2" />
                   Submit for Verification

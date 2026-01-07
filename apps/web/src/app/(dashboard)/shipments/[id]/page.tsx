@@ -478,7 +478,9 @@ export default function ShipmentDetailPage() {
 
               {shipment.length && shipment.width && shipment.height && (
                 <div>
-                  <div className="text-sm text-gray-600">Dimensions (L×W×H)</div>
+                  <div className="text-sm text-gray-600">
+                    Dimensions (L×W×H)
+                  </div>
                   <div className="font-medium text-gray-900">
                     {shipment.length} × {shipment.width} × {shipment.height}{" "}
                     {shipment.dimensionUnit}
@@ -498,7 +500,8 @@ export default function ShipmentDetailPage() {
                     <ul className="ml-4 text-sm text-gray-600">
                       {pkg.items.map((item, idx) => (
                         <li key={idx}>
-                          {item.quantity}× {item.salesOrderItem.inventory.productName} (
+                          {item.quantity}×{" "}
+                          {item.salesOrderItem.inventory.productName} (
                           {item.salesOrderItem.inventory.sku})
                         </li>
                       ))}

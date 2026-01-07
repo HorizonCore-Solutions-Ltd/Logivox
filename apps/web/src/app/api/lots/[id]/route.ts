@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -17,7 +17,7 @@ const updateLotSchema = z.object({
 // GET /api/lots/[id] - Get lot details with traceability
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -35,7 +35,7 @@ export async function GET(
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization membership" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -141,17 +141,14 @@ export async function GET(
     return NextResponse.json(lot);
   } catch (error) {
     console.error("Error fetching lot:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch lot" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch lot" }, { status: 500 });
   }
 }
 
 // PATCH /api/lots/[id] - Update lot
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -170,7 +167,7 @@ export async function PATCH(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -199,7 +196,7 @@ export async function PATCH(
       if (!location) {
         return NextResponse.json(
           { error: "Location not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
     }
@@ -251,14 +248,14 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error updating lot:", error);
     return NextResponse.json(
       { error: "Failed to update lot" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

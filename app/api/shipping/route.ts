@@ -3,25 +3,25 @@
  * Handles shipment creation, carrier selection, rate shopping, and tracking
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { ShippingService } from '@/lib/services/shipping.service';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { ShippingService } from "@/lib/services/shipping.service";
+import { prisma } from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // GET - Get shipment details, rates, or tracking
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     switch (action) {
-      case 'shipment':
-        const shipmentId = searchParams.get('shipmentId');
+      case "shipment":
+        const shipmentId = searchParams.get("shipmentId");
         if (!shipmentId) {
           return NextResponse.json(
-            { error: 'Shipment ID is required' },
-            { status: 400 }
+            { error: "Shipment ID is required" },
+            { status: 400 },
           );
         }
 
@@ -31,27 +31,28 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(shipment);
 
-      case 'tracking':
-        const trackingNumber = searchParams.get('trackingNumber');
+      case "tracking":
+        const trackingNumber = searchParams.get("trackingNumber");
         if (!trackingNumber) {
           return NextResponse.json(
-            { error: 'Tracking number is required' },
-            { status: 400 }
+            { error: "Tracking number is required" },
+            { status: 400 },
           );
         }
 
-        const tracking = await ShippingService.getByTrackingNumber(trackingNumber);
+        const tracking =
+          await ShippingService.getByTrackingNumber(trackingNumber);
         return NextResponse.json(tracking);
 
-      case 'performance':
-        const organizationId = searchParams.get('organizationId');
-        const startDate = searchParams.get('startDate');
-        const endDate = searchParams.get('endDate');
+      case "performance":
+        const organizationId = searchParams.get("organizationId");
+        const startDate = searchParams.get("startDate");
+        const endDate = searchParams.get("endDate");
 
         if (!organizationId || !startDate || !endDate) {
           return NextResponse.json(
-            { error: 'Missing required parameters' },
-            { status: 400 }
+            { error: "Missing required parameters" },
+            { status: 400 },
           );
         }
 
@@ -65,15 +66,15 @@ export async function GET(req: NextRequest) {
 
       default:
         return NextResponse.json(
-          { error: 'Invalid action. Use: shipment, tracking, performance' },
-          { status: 400 }
+          { error: "Invalid action. Use: shipment, tracking, performance" },
+          { status: 400 },
         );
     }
   } catch (error: any) {
-    console.error('Shipping GET error:', error);
+    console.error("Shipping GET error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process request' },
-      { status: 500 }
+      { error: error.message || "Failed to process request" },
+      { status: 500 },
     );
   }
 }
@@ -85,13 +86,20 @@ export async function POST(req: NextRequest) {
     const { action } = body;
 
     switch (action) {
-      case 'create-shipment':
-        const { organizationId, salesOrderId, packId, carrierCode, carrierService, createdById } = body;
-        
+      case "create-shipment":
+        const {
+          organizationId,
+          salesOrderId,
+          packId,
+          carrierCode,
+          carrierService,
+          createdById,
+        } = body;
+
         if (!organizationId || !salesOrderId || !createdById) {
           return NextResponse.json(
-            { error: 'Missing required fields' },
-            { status: 400 }
+            { error: "Missing required fields" },
+            { status: 400 },
           );
         }
 
@@ -106,13 +114,23 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(shipment, { status: 201 });
 
-      case 'get-rates':
-        const { organizationId: rateOrgId, fromAddress, toAddress, weight, weightUnit, carriers } = body;
-        
+      case "get-rates":
+        const {
+          organizationId: rateOrgId,
+          fromAddress,
+          toAddress,
+          weight,
+          weightUnit,
+          carriers,
+        } = body;
+
         if (!rateOrgId || !fromAddress || !toAddress || !weight) {
           return NextResponse.json(
-            { error: 'Missing required fields (organizationId, fromAddress, toAddress, weight)' },
-            { status: 400 }
+            {
+              error:
+                "Missing required fields (organizationId, fromAddress, toAddress, weight)",
+            },
+            { status: 400 },
           );
         }
 
@@ -121,19 +139,23 @@ export async function POST(req: NextRequest) {
           fromAddress,
           toAddress,
           weight,
-          weightUnit: weightUnit || 'kg',
+          weightUnit: weightUnit || "kg",
           carriers,
         });
 
         return NextResponse.json(rates);
 
-      case 'select-carrier':
-        const { organizationId: selectOrgId, shipmentId: selectShipmentId, criteria } = body;
-        
+      case "select-carrier":
+        const {
+          organizationId: selectOrgId,
+          shipmentId: selectShipmentId,
+          criteria,
+        } = body;
+
         if (!selectOrgId || !selectShipmentId || !criteria) {
           return NextResponse.json(
-            { error: 'organizationId, shipmentId, and criteria are required' },
-            { status: 400 }
+            { error: "organizationId, shipmentId, and criteria are required" },
+            { status: 400 },
           );
         }
 
@@ -145,13 +167,13 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(selected);
 
-      case 'generate-label':
+      case "generate-label":
         const { shipmentId: labelShipmentId } = body;
-        
+
         if (!labelShipmentId) {
           return NextResponse.json(
-            { error: 'Shipment ID is required' },
-            { status: 400 }
+            { error: "Shipment ID is required" },
+            { status: 400 },
           );
         }
 
@@ -161,13 +183,25 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(label);
 
-      case 'bulk-ship':
-        const { organizationId: bulkOrgId, shipments, createdById: bulkCreatedById } = body;
-        
-        if (!bulkOrgId || !shipments || !Array.isArray(shipments) || !bulkCreatedById) {
+      case "bulk-ship":
+        const {
+          organizationId: bulkOrgId,
+          shipments,
+          createdById: bulkCreatedById,
+        } = body;
+
+        if (
+          !bulkOrgId ||
+          !shipments ||
+          !Array.isArray(shipments) ||
+          !bulkCreatedById
+        ) {
           return NextResponse.json(
-            { error: 'organizationId, shipments array, and createdById are required' },
-            { status: 400 }
+            {
+              error:
+                "organizationId, shipments array, and createdById are required",
+            },
+            { status: 400 },
           );
         }
 
@@ -180,16 +214,13 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(bulkResult);
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error: any) {
-    console.error('Shipping POST error:', error);
+    console.error("Shipping POST error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process request' },
-      { status: 500 }
+      { error: error.message || "Failed to process request" },
+      { status: 500 },
     );
   }
 }

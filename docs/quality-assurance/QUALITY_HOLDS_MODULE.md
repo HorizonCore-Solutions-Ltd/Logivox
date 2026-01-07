@@ -7,6 +7,7 @@ The Quality Holds module provides comprehensive quarantine and hold management f
 ## Key Features
 
 ### Multi-Level Hold Types
+
 - **PRODUCT**: Hold all inventory of specific SKU
 - **LOT**: Hold specific lot/batch number
 - **LOCATION**: Hold all inventory in warehouse location
@@ -14,18 +15,21 @@ The Quality Holds module provides comprehensive quarantine and hold management f
 - **ORDER**: Hold all inventory from specific PO
 
 ### Quantity Tracking
+
 - Quantity On Hold (initial quarantine)
 - Quantity Released (approved for use)
 - Quantity Rejected (scrapped/returned)
 - Remaining Quantity (still under hold)
 
 ### Financial Impact
+
 - Estimated Value (total value at risk)
 - Released Value (approved inventory value)
 - Rejected Value (loss from rejection)
 - Real-time financial reporting
 
 ### Disposition Workflow
+
 - Multiple disposition options
 - Approval requirements
 - Documentation tracking
@@ -36,12 +40,14 @@ The Quality Holds module provides comprehensive quarantine and hold management f
 ### Quality Holds Dashboard (`/dashboard/qc/quality-holds`)
 
 **Statistics Cards:**
+
 - Active Holds (current)
 - Quantity On Hold (units)
 - Total Value At Risk ($)
 - Release Rate (%)
 
 **Filters:**
+
 - Status: All, Active, Released, Rejected, Partial
 - Hold Type: All types
 - Severity: All, Critical, High, Medium, Low
@@ -49,6 +55,7 @@ The Quality Holds module provides comprehensive quarantine and hold management f
 - Search: Hold number, reason, product
 
 **Data Table:**
+
 - Hold Number
 - Hold Type badge
 - Status badge
@@ -61,17 +68,20 @@ The Quality Holds module provides comprehensive quarantine and hold management f
 ### Hold Detail Page (`/dashboard/qc/quality-holds/[id]`)
 
 **4-Metric Overview:**
+
 - On Hold (red)
 - Released (green)
 - Rejected (gray)
 - Remaining (orange)
 
 **Visual Progress:**
+
 - Quantity distribution chart
 - Financial impact breakdown
 - Disposition status
 
 **Release/Rejection Actions:**
+
 - Release Hold (approve for use)
 - Reject Items (scrap/return)
 - Partial Release (approve portion)
@@ -151,6 +161,7 @@ Steps:
 ### When to Create Holds
 
 **Immediate Holds Required:**
+
 - Failed receiving inspection
 - Customer complaint received
 - Safety issue discovered
@@ -158,6 +169,7 @@ Steps:
 - NCR issued
 
 **Proactive Holds:**
+
 - Pending investigation
 - Supplier under review
 - Process validation in progress
@@ -166,49 +178,56 @@ Steps:
 ### Severity Classification
 
 **CRITICAL:**
+
 - Safety hazard
 - Regulatory violation
 - Customer-facing issue
-- >$50,000 at risk
+- > $50,000 at risk
 
 **HIGH:**
+
 - Major quality defect
 - Specification violation
 - $10,000-$50,000 at risk
 
 **MEDIUM:**
+
 - Moderate defect
 - Process deviation
 - $1,000-$10,000 at risk
 
 **LOW:**
+
 - Minor cosmetic issue
 - Documentation concern
 - <$1,000 at risk
 
 ### Hold Type Selection Guide
 
-| Scenario | Hold Type | Reason |
-|----------|-----------|--------|
-| Single SKU defective | PRODUCT | Affects all units of that SKU |
-| Manufacturing defect in batch | LOT | Specific lot affected |
-| Contamination in location | LOCATION | All items in area affected |
-| Supplier quality issue | VENDOR | All items from supplier suspect |
-| Entire PO failed inspection | ORDER | Whole shipment affected |
+| Scenario                      | Hold Type | Reason                          |
+| ----------------------------- | --------- | ------------------------------- |
+| Single SKU defective          | PRODUCT   | Affects all units of that SKU   |
+| Manufacturing defect in batch | LOT       | Specific lot affected           |
+| Contamination in location     | LOCATION  | All items in area affected      |
+| Supplier quality issue        | VENDOR    | All items from supplier suspect |
+| Entire PO failed inspection   | ORDER     | Whole shipment affected         |
 
 ## Integration
 
 ### With NCR Module
+
 - NCRs automatically create holds
 - Hold quantity matches affected quantity
 - NCR disposition drives hold decision
 
 ### With Inventory System
+
 - Holds block inventory transactions
 - Released inventory becomes available
 - Rejected inventory written off
 
 ### With RTV Process
+
 - RETURN_TO_VENDOR creates RTV
 - Tracks return process
 - Links to supplier claims

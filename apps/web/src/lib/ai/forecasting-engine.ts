@@ -1,11 +1,11 @@
 /**
  * Forecasting Engine for LogiVox
- * 
+ *
  * Integrates AI forecasting models with database to provide
  * real-time inventory predictions and recommendations.
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 import {
   generateForecast,
   analyzeStockTurnover,
@@ -15,7 +15,7 @@ import {
   type StockOptimization,
   type TurnoverAnalysis,
   type ABCClassification,
-} from './inventory-forecasting';
+} from "./inventory-forecasting";
 
 // ============================================================================
 // Forecast Generation for Products
@@ -23,7 +23,7 @@ import {
 
 export async function generateProductForecast(
   productId: string,
-  tenantId: string
+  tenantId: string,
 ): Promise<ForecastData | null> {
   try {
     // Fetch product
@@ -52,7 +52,7 @@ export async function generateProductForecast(
           lte: endDate,
         },
         status: {
-          in: ['CONFIRMED', 'COMPLETED'],
+          in: ["CONFIRMED", "COMPLETED"],
         },
       },
       select: {
@@ -60,7 +60,7 @@ export async function generateProductForecast(
         createdAt: true,
       },
       orderBy: {
-        createdAt: 'asc',
+        createdAt: "asc",
       },
     });
 
@@ -69,16 +69,20 @@ export async function generateProductForecast(
     const salesByDate = new Map<string, number>();
 
     bookings.forEach((booking: { quantity: number; createdAt: Date }) => {
-      const dateKey = booking.createdAt.toISOString().split('T')[0];
+      const dateKey = booking.createdAt.toISOString().split("T")[0];
       if (!dateKey) return;
-      
+
       const current = salesByDate.get(dateKey) || 0;
       salesByDate.set(dateKey, current + booking.quantity);
     });
 
     // Fill in missing days with 0 sales
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const dateKey = d.toISOString().split('T')[0];
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dateKey = d.toISOString().split("T")[0];
       if (dateKey) {
         dailySales.push(salesByDate.get(dateKey) || 0);
       }
@@ -91,7 +95,7 @@ export async function generateProductForecast(
       product.quantity,
       7, // 7 days lead time
       50, // $50 order cost
-      product.unitCost * 0.2 // 20% of unit cost as holding cost
+      product.unitCost * 0.2, // 20% of unit cost as holding cost
     );
 
     // Add product name
@@ -99,7 +103,7 @@ export async function generateProductForecast(
 
     return forecast;
   } catch (error) {
-    console.error('Error generating forecast:', error);
+    console.error("Error generating forecast:", error);
     return null;
   }
 }
@@ -110,7 +114,7 @@ export async function generateProductForecast(
 
 export async function generateAllForecasts(
   tenantId: string,
-  limit: number = 50
+  limit: number = 50,
 ): Promise<ForecastData[]> {
   try {
     // Get products with recent activity
@@ -127,21 +131,21 @@ export async function generateAllForecasts(
       },
       take: limit,
       orderBy: {
-        updatedAt: 'desc',
+        updatedAt: "desc",
       },
     });
 
     // Generate forecasts in parallel
     const forecasts = await Promise.all(
-      products.map((product: { id: string; name: string }) => 
-        generateProductForecast(product.id, tenantId)
-      )
+      products.map((product: { id: string; name: string }) =>
+        generateProductForecast(product.id, tenantId),
+      ),
     );
 
     // Filter out null results
     return forecasts.filter((f): f is ForecastData => f !== null);
   } catch (error) {
-    console.error('Error generating bulk forecasts:', error);
+    console.error("Error generating bulk forecasts:", error);
     return [];
   }
 }
@@ -151,7 +155,7 @@ export async function generateAllForecasts(
 // ============================================================================
 
 export async function generateStockOptimization(
-  tenantId: string
+  tenantId: string,
 ): Promise<StockOptimization[]> {
   try {
     const forecasts = await generateAllForecasts(tenantId);
@@ -159,24 +163,25 @@ export async function generateStockOptimization(
 
     for (const forecast of forecasts) {
       const currentStock = forecast.currentStock;
-      const optimalStock = forecast.reorderPoint + forecast.suggestedOrderQuantity / 2;
+      const optimalStock =
+        forecast.reorderPoint + forecast.suggestedOrderQuantity / 2;
 
       const overstock = Math.max(0, currentStock - optimalStock);
       const understock = Math.max(0, optimalStock - currentStock);
 
-      let recommendation: StockOptimization['recommendation'];
+      let recommendation: StockOptimization["recommendation"];
       let suggestedAction: string;
       let estimatedCostSavings = 0;
 
       if (currentStock < forecast.reorderPoint) {
-        recommendation = 'order';
+        recommendation = "order";
         suggestedAction = `Order ${forecast.suggestedOrderQuantity} units immediately. Current stock (${currentStock}) is below reorder point (${forecast.reorderPoint}).`;
       } else if (overstock > forecast.suggestedOrderQuantity) {
-        recommendation = 'reduce';
+        recommendation = "reduce";
         suggestedAction = `Reduce stock by ${Math.round(overstock)} units through promotions or reduced ordering. Excess holding costs detected.`;
         estimatedCostSavings = overstock * 5; // $5 per unit holding cost
       } else {
-        recommendation = 'maintain';
+        recommendation = "maintain";
         suggestedAction = `Stock levels optimal. Current: ${currentStock}, Optimal range: ${Math.round(forecast.reorderPoint)}-${Math.round(optimalStock)}`;
       }
 
@@ -198,7 +203,7 @@ export async function generateStockOptimization(
       return priority[a.recommendation] - priority[b.recommendation];
     });
   } catch (error) {
-    console.error('Error generating stock optimization:', error);
+    console.error("Error generating stock optimization:", error);
     return [];
   }
 }
@@ -209,7 +214,7 @@ export async function generateStockOptimization(
 
 export async function analyzeTurnoverRates(
   tenantId: string,
-  periodDays: number = 90
+  periodDays: number = 90,
 ): Promise<TurnoverAnalysis[]> {
   try {
     const endDate = new Date();
@@ -239,7 +244,7 @@ export async function analyzeTurnoverRates(
             lte: endDate,
           },
           status: {
-            in: ['CONFIRMED', 'COMPLETED'],
+            in: ["CONFIRMED", "COMPLETED"],
           },
         },
         _sum: {
@@ -248,7 +253,11 @@ export async function analyzeTurnoverRates(
       });
 
       const soldQuantity = sales._sum.quantity || 0;
-      const analysis = analyzeStockTurnover(soldQuantity, product.quantity, periodDays);
+      const analysis = analyzeStockTurnover(
+        soldQuantity,
+        product.quantity,
+        periodDays,
+      );
       analysis.productId = product.id;
 
       analyses.push(analysis);
@@ -257,7 +266,7 @@ export async function analyzeTurnoverRates(
     // Sort by turnover rate (descending)
     return analyses.sort((a, b) => b.turnoverRate - a.turnoverRate);
   } catch (error) {
-    console.error('Error analyzing turnover:', error);
+    console.error("Error analyzing turnover:", error);
     return [];
   }
 }
@@ -268,7 +277,7 @@ export async function analyzeTurnoverRates(
 
 export async function classifyInventoryABC(
   tenantId: string,
-  periodDays: number = 365
+  periodDays: number = 365,
 ): Promise<ABCClassification[]> {
   try {
     const endDate = new Date();
@@ -287,37 +296,39 @@ export async function classifyInventoryABC(
 
     // Calculate annual value for each product
     const productValues = await Promise.all(
-      products.map(async (product: { id: string; name: string; unitPrice: number }) => {
-        const sales = await prisma.booking.aggregate({
-          where: {
-            productId: product.id,
-            tenantId,
-            createdAt: {
-              gte: startDate,
-              lte: endDate,
+      products.map(
+        async (product: { id: string; name: string; unitPrice: number }) => {
+          const sales = await prisma.booking.aggregate({
+            where: {
+              productId: product.id,
+              tenantId,
+              createdAt: {
+                gte: startDate,
+                lte: endDate,
+              },
+              status: {
+                in: ["CONFIRMED", "COMPLETED"],
+              },
             },
-            status: {
-              in: ['CONFIRMED', 'COMPLETED'],
+            _sum: {
+              quantity: true,
             },
-          },
-          _sum: {
-            quantity: true,
-          },
-        });
+          });
 
-        const soldQuantity = sales._sum.quantity || 0;
-        const annualValue = soldQuantity * product.unitPrice;
+          const soldQuantity = sales._sum.quantity || 0;
+          const annualValue = soldQuantity * product.unitPrice;
 
-        return {
-          id: product.id,
-          annualValue,
-        };
-      })
+          return {
+            id: product.id,
+            annualValue,
+          };
+        },
+      ),
     );
 
     return performABCAnalysis(productValues);
   } catch (error) {
-    console.error('Error performing ABC analysis:', error);
+    console.error("Error performing ABC analysis:", error);
     return [];
   }
 }
@@ -329,7 +340,7 @@ export async function classifyInventoryABC(
 export async function analyzeDemandVariability(
   productId: string,
   tenantId: string,
-  periodDays: number = 90
+  periodDays: number = 90,
 ) {
   try {
     const endDate = new Date();
@@ -346,7 +357,7 @@ export async function analyzeDemandVariability(
           lte: endDate,
         },
         status: {
-          in: ['CONFIRMED', 'COMPLETED'],
+          in: ["CONFIRMED", "COMPLETED"],
         },
       },
       select: {
@@ -358,17 +369,21 @@ export async function analyzeDemandVariability(
     // Aggregate by day
     const salesByDate = new Map<string, number>();
     bookings.forEach((booking: { quantity: number; createdAt: Date }) => {
-      const dateKey = booking.createdAt.toISOString().split('T')[0];
+      const dateKey = booking.createdAt.toISOString().split("T")[0];
       if (!dateKey) return;
-      
+
       const current = salesByDate.get(dateKey) || 0;
       salesByDate.set(dateKey, current + booking.quantity);
     });
 
     // Convert to array
     const dailySales: number[] = [];
-    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-      const dateKey = d.toISOString().split('T')[0];
+    for (
+      let d = new Date(startDate);
+      d <= endDate;
+      d.setDate(d.getDate() + 1)
+    ) {
+      const dateKey = d.toISOString().split("T")[0];
       if (dateKey) {
         dailySales.push(salesByDate.get(dateKey) || 0);
       }
@@ -376,7 +391,7 @@ export async function analyzeDemandVariability(
 
     return calculateDemandVariability(dailySales);
   } catch (error) {
-    console.error('Error analyzing demand variability:', error);
+    console.error("Error analyzing demand variability:", error);
     return null;
   }
 }
@@ -391,13 +406,15 @@ export interface ReorderAlert {
   currentStock: number;
   reorderPoint: number;
   suggestedQuantity: number;
-  urgency: 'critical' | 'high' | 'medium' | 'low';
+  urgency: "critical" | "high" | "medium" | "low";
   daysUntilStockout: number;
   estimatedStockoutDate: Date;
   message: string;
 }
 
-export async function generateReorderAlerts(tenantId: string): Promise<ReorderAlert[]> {
+export async function generateReorderAlerts(
+  tenantId: string,
+): Promise<ReorderAlert[]> {
   try {
     const forecasts = await generateAllForecasts(tenantId);
     const alerts: ReorderAlert[] = [];
@@ -409,20 +426,20 @@ export async function generateReorderAlerts(tenantId: string): Promise<ReorderAl
             ? forecast.currentStock / forecast.averageDailySales
             : Infinity;
 
-        let urgency: ReorderAlert['urgency'];
+        let urgency: ReorderAlert["urgency"];
         if (daysUntilStockout <= 3) {
-          urgency = 'critical';
+          urgency = "critical";
         } else if (daysUntilStockout <= 7) {
-          urgency = 'high';
+          urgency = "high";
         } else if (daysUntilStockout <= 14) {
-          urgency = 'medium';
+          urgency = "medium";
         } else {
-          urgency = 'low';
+          urgency = "low";
         }
 
         const estimatedStockoutDate = new Date();
         estimatedStockoutDate.setDate(
-          estimatedStockoutDate.getDate() + Math.floor(daysUntilStockout)
+          estimatedStockoutDate.getDate() + Math.floor(daysUntilStockout),
         );
 
         alerts.push({
@@ -441,9 +458,11 @@ export async function generateReorderAlerts(tenantId: string): Promise<ReorderAl
 
     // Sort by urgency
     const urgencyOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-    return alerts.sort((a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency]);
+    return alerts.sort(
+      (a, b) => urgencyOrder[a.urgency] - urgencyOrder[b.urgency],
+    );
   } catch (error) {
-    console.error('Error generating reorder alerts:', error);
+    console.error("Error generating reorder alerts:", error);
     return [];
   }
 }
@@ -456,7 +475,7 @@ export async function trackForecastAccuracy(
   productId: string,
   tenantId: string,
   forecastDate: Date,
-  predictedDemand: number
+  predictedDemand: number,
 ): Promise<number> {
   try {
     // Get actual sales for the forecast date
@@ -475,7 +494,7 @@ export async function trackForecastAccuracy(
           lte: endOfDay,
         },
         status: {
-          in: ['CONFIRMED', 'COMPLETED'],
+          in: ["CONFIRMED", "COMPLETED"],
         },
       },
       _sum: {
@@ -491,7 +510,7 @@ export async function trackForecastAccuracy(
 
     return Math.max(0, Math.min(1, accuracy));
   } catch (error) {
-    console.error('Error tracking forecast accuracy:', error);
+    console.error("Error tracking forecast accuracy:", error);
     return 0;
   }
 }

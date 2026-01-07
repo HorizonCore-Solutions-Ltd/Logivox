@@ -1,17 +1,17 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { getCurrentUser } from "@/lib/auth-helpers"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth-helpers";
 
 // GET /api/inventory/[id] - Get single inventory item
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const item = await prisma.inventoryItem.findUnique({
@@ -25,37 +25,37 @@ export async function GET(
           take: 10,
         },
       },
-    })
+    });
 
     if (!item) {
       return NextResponse.json(
         { error: "Inventory item not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json(item)
+    return NextResponse.json(item);
   } catch (error: any) {
-    console.error("Error fetching inventory item:", error)
+    console.error("Error fetching inventory item:", error);
     return NextResponse.json(
       { error: "Failed to fetch inventory item" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 // PUT /api/inventory/[id] - Update inventory item
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json()
+    const body = await request.json();
     const {
       name,
       description,
@@ -67,18 +67,18 @@ export async function PUT(
       unit,
       warehouseId,
       categoryId,
-    } = body
+    } = body;
 
     // Check if item exists
     const existingItem = await prisma.inventoryItem.findUnique({
       where: { id: params.id },
-    })
+    });
 
     if (!existingItem) {
       return NextResponse.json(
         { error: "Inventory item not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
     // Update item
@@ -101,7 +101,7 @@ export async function PUT(
         category: true,
         organization: true,
       },
-    })
+    });
 
     // Log activity
     await prisma.activityLog.create({
@@ -115,45 +115,45 @@ export async function PUT(
         organizationId: item.organizationId,
         userId: user.id,
       },
-    })
+    });
 
-    return NextResponse.json(item)
+    return NextResponse.json(item);
   } catch (error: any) {
-    console.error("Error updating inventory item:", error)
+    console.error("Error updating inventory item:", error);
     return NextResponse.json(
       { error: "Failed to update inventory item" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 // DELETE /api/inventory/[id] - Delete inventory item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if item exists
     const existingItem = await prisma.inventoryItem.findUnique({
       where: { id: params.id },
-    })
+    });
 
     if (!existingItem) {
       return NextResponse.json(
         { error: "Inventory item not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
     // Delete item (movements will be cascade deleted)
     await prisma.inventoryItem.delete({
       where: { id: params.id },
-    })
+    });
 
     // Log activity
     await prisma.activityLog.create({
@@ -167,14 +167,16 @@ export async function DELETE(
         organizationId: existingItem.organizationId,
         userId: user.id,
       },
-    })
+    });
 
-    return NextResponse.json({ message: "Inventory item deleted successfully" })
+    return NextResponse.json({
+      message: "Inventory item deleted successfully",
+    });
   } catch (error: any) {
-    console.error("Error deleting inventory item:", error)
+    console.error("Error deleting inventory item:", error);
     return NextResponse.json(
       { error: "Failed to delete inventory item" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

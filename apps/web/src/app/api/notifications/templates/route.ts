@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -9,16 +9,27 @@ const createTemplateSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   code: z.string().min(1, "Code is required"),
-  category: z.enum(['ORDER_UPDATES', 'INVENTORY_ALERTS', 'SHIPMENT_UPDATES', 'PAYMENT_UPDATES', 'QUALITY_ALERTS', 'SYSTEM_ALERTS', 'USER_ACTIONS', 'REPORTS', 'APPROVALS', 'CUSTOM']),
-  notificationType: z.enum(['EMAIL', 'SMS', 'WEBHOOK', 'PUSH', 'IN_APP']),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).default('MEDIUM'),
+  category: z.enum([
+    "ORDER_UPDATES",
+    "INVENTORY_ALERTS",
+    "SHIPMENT_UPDATES",
+    "PAYMENT_UPDATES",
+    "QUALITY_ALERTS",
+    "SYSTEM_ALERTS",
+    "USER_ACTIONS",
+    "REPORTS",
+    "APPROVALS",
+    "CUSTOM",
+  ]),
+  notificationType: z.enum(["EMAIL", "SMS", "WEBHOOK", "PUSH", "IN_APP"]),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).default("MEDIUM"),
   subject: z.string().optional(),
   body: z.string().min(1, "Body is required"),
   htmlBody: z.string().optional(),
   smsBody: z.string().optional(),
   channels: z.array(z.string()).min(1, "At least one channel required"),
   deliveryRules: z.record(z.any()).optional(),
-  recipientType: z.enum(['USER', 'ROLE', 'CUSTOM', 'DYNAMIC']),
+  recipientType: z.enum(["USER", "ROLE", "CUSTOM", "DYNAMIC"]),
   defaultRecipients: z.record(z.any()).optional(),
   triggerEvent: z.string().min(1, "Trigger event is required"),
   conditions: z.record(z.any()).optional(),
@@ -48,7 +59,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -67,13 +78,13 @@ export async function GET(request: Request) {
     if (category) where.category = category;
     if (notificationType) where.notificationType = notificationType;
     if (isActive !== null && isActive !== undefined) {
-      where.isActive = isActive === 'true';
+      where.isActive = isActive === "true";
     }
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { code: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { code: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -93,7 +104,7 @@ export async function GET(request: Request) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ templates });
@@ -101,7 +112,7 @@ export async function GET(request: Request) {
     console.error("Error fetching templates:", error);
     return NextResponse.json(
       { error: "Failed to fetch templates" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -127,7 +138,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -147,7 +158,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Template code already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -174,13 +185,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating template:", error);
     return NextResponse.json(
       { error: "Failed to create template" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

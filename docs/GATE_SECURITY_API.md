@@ -1,11 +1,13 @@
 # Gate Security API Quick Reference
 
 ## Authentication
+
 All endpoints require authentication via NextAuth session, except LPR webhook which uses API key.
 
 ## 🚗 Vehicle Check & Management
 
 ### Check Vehicle Status
+
 ```http
 POST /api/security/check-vehicle
 Content-Type: application/json
@@ -16,6 +18,7 @@ Content-Type: application/json
 ```
 
 **Response**:
+
 ```json
 {
   "status": "APPROVED" | "BLOCKED" | "PENDING",
@@ -27,6 +30,7 @@ Content-Type: application/json
 ```
 
 ### Add to Blacklist
+
 ```http
 POST /api/security/blacklist
 
@@ -39,6 +43,7 @@ POST /api/security/blacklist
 ```
 
 ### Add to Whitelist
+
 ```http
 POST /api/security/whitelist
 
@@ -55,6 +60,7 @@ POST /api/security/whitelist
 ## ⚖️ Weight Bridge
 
 ### Record Weight
+
 ```http
 POST /api/security/gate-entries/[id]/weigh
 
@@ -67,6 +73,7 @@ POST /api/security/gate-entries/[id]/weigh
 ```
 
 **Response**:
+
 ```json
 {
   "weighRecord": { ... },
@@ -87,6 +94,7 @@ POST /api/security/gate-entries/[id]/weigh
 ## 📸 Photo Capture
 
 ### Upload Photo
+
 ```http
 POST /api/security/gate-entries/[id]/photos
 Content-Type: multipart/form-data
@@ -97,6 +105,7 @@ description: "Driver's license photo"
 ```
 
 ### List Photos
+
 ```http
 GET /api/security/gate-entries/[id]/photos?photoType=TRUCK_FRONT
 ```
@@ -104,6 +113,7 @@ GET /api/security/gate-entries/[id]/photos?photoType=TRUCK_FRONT
 ## 📄 Document Management
 
 ### Upload Document
+
 ```http
 POST /api/security/gate-entries/[id]/documents
 Content-Type: multipart/form-data
@@ -115,6 +125,7 @@ expiryDate: "2026-12-31T23:59:59Z"
 ```
 
 ### Verify Document
+
 ```http
 PATCH /api/security/gate-entries/[id]/documents/[docId]/verify
 
@@ -127,6 +138,7 @@ PATCH /api/security/gate-entries/[id]/documents/[docId]/verify
 ## 🚦 Queue Management
 
 ### Add to Queue
+
 ```http
 POST /api/security/gate-queue
 
@@ -140,11 +152,13 @@ POST /api/security/gate-queue
 ```
 
 ### Call Next Vehicle
+
 ```http
 POST /api/security/gate-queue/call-next?gateId=gate-123
 ```
 
 ### Update Queue Status
+
 ```http
 PATCH /api/security/gate-queue/[id]
 
@@ -155,6 +169,7 @@ PATCH /api/security/gate-queue/[id]
 ```
 
 ### Get Queue
+
 ```http
 GET /api/security/gate-queue?gateId=gate-123&status=WAITING
 ```
@@ -162,6 +177,7 @@ GET /api/security/gate-queue?gateId=gate-123&status=WAITING
 ## 🚪 Gate Management
 
 ### Create Gate
+
 ```http
 POST /api/security/gates
 
@@ -181,6 +197,7 @@ POST /api/security/gates
 ```
 
 ### Update Gate Status
+
 ```http
 PATCH /api/security/gates/[id]
 
@@ -190,6 +207,7 @@ PATCH /api/security/gates/[id]
 ```
 
 ### List Gates
+
 ```http
 GET /api/security/gates?warehouseId=wh-123&status=OPEN
 ```
@@ -197,6 +215,7 @@ GET /api/security/gates?warehouseId=wh-123&status=OPEN
 ## 🅿️ Parking Management
 
 ### Create Parking Spot
+
 ```http
 POST /api/security/parking-spots
 
@@ -212,11 +231,13 @@ POST /api/security/parking-spots
 ```
 
 ### Find Available Spots
+
 ```http
 POST /api/security/parking-spots/find-available?warehouseId=wh-123&requiresRefrigeration=true&vehicleLength=14.5
 ```
 
 ### Assign Parking
+
 ```http
 POST /api/security/gate-entries/[id]/assign-parking
 
@@ -228,6 +249,7 @@ POST /api/security/gate-entries/[id]/assign-parking
 ## 🌡️ Temperature Monitoring
 
 ### Log Temperature
+
 ```http
 POST /api/security/gate-entries/[id]/temperature
 
@@ -242,6 +264,7 @@ POST /api/security/gate-entries/[id]/temperature
 ```
 
 **Response**:
+
 ```json
 {
   "tempLog": { ... },
@@ -253,6 +276,7 @@ POST /api/security/gate-entries/[id]/temperature
 ```
 
 ### Get Temperature History
+
 ```http
 GET /api/security/gate-entries/[id]/temperature
 ```
@@ -260,6 +284,7 @@ GET /api/security/gate-entries/[id]/temperature
 ## ☢️ Hazmat Management
 
 ### Record Hazmat Details
+
 ```http
 POST /api/security/gate-entries/[id]/hazmat
 
@@ -279,6 +304,7 @@ POST /api/security/gate-entries/[id]/hazmat
 ```
 
 **Response**:
+
 ```json
 {
   "hazmatRecord": { ... },
@@ -293,6 +319,7 @@ POST /api/security/gate-entries/[id]/hazmat
 ## 🤖 LPR Integration (Webhook)
 
 ### LPR Camera Capture
+
 ```http
 POST /api/security/lpr/capture
 x-api-key: your-api-key
@@ -312,6 +339,7 @@ Content-Type: application/json
 **Responses**:
 
 **Auto-Approved (Whitelisted)**:
+
 ```json
 {
   "status": "AUTO_APPROVED",
@@ -323,6 +351,7 @@ Content-Type: application/json
 ```
 
 **Blocked (Blacklisted)**:
+
 ```json
 {
   "status": "BLOCKED",
@@ -334,6 +363,7 @@ Content-Type: application/json
 ```
 
 **Pending Manual Review**:
+
 ```json
 {
   "status": "PENDING_MANUAL_REVIEW",
@@ -346,12 +376,14 @@ Content-Type: application/json
 ## 🔄 Automation
 
 ### Run Automation Checks
+
 ```http
 GET /api/security/automation/run
 Authorization: Bearer your-cron-secret
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -390,6 +422,7 @@ Authorization: Bearer your-cron-secret
 ## 📋 Enums Reference
 
 ### BlacklistSeverity
+
 - `LOW` - Minor violations
 - `MEDIUM` - Repeated issues
 - `HIGH` - Serious violations
@@ -397,6 +430,7 @@ Authorization: Bearer your-cron-secret
 - `PERMANENT` - Indefinite ban
 
 ### GatePhotoType
+
 - `DRIVER_ID`
 - `DRIVER_FACE`
 - `TRUCK_FRONT`
@@ -409,6 +443,7 @@ Authorization: Bearer your-cron-secret
 - `OTHER`
 
 ### GateDocumentType
+
 - `BILL_OF_LADING`
 - `MANIFEST`
 - `PERMIT`
@@ -418,6 +453,7 @@ Authorization: Bearer your-cron-secret
 - `OTHER`
 
 ### QueueStatus
+
 - `WAITING` - In queue
 - `CALLED` - Called to gate
 - `IN_PROGRESS` - Being processed
@@ -425,16 +461,19 @@ Authorization: Bearer your-cron-secret
 - `CANCELLED` - Removed from queue
 
 ### GateType
+
 - `INBOUND` - Entry only
 - `OUTBOUND` - Exit only
 - `BOTH` - Bidirectional
 
 ### GateStatus
+
 - `OPEN` - Operational
 - `CLOSED` - Not accepting vehicles
 - `MAINTENANCE` - Under repair
 
 ### ParkingSpotType
+
 - `STANDARD` - Regular vehicles
 - `OVERSIZED` - Large trucks
 - `REFRIGERATED` - Reefer-approved

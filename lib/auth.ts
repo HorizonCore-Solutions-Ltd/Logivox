@@ -3,14 +3,14 @@
  * Placeholder for authentication options
  */
 
-import { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [],
   session: {
-    strategy: 'jwt',
+    strategy: "jwt",
   },
   pages: {
-    signIn: '/auth/signin',
+    signIn: "/auth/signin",
   },
 };

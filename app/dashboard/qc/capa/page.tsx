@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   AlertTriangle,
   Plus,
@@ -28,8 +28,8 @@ import {
   Clock,
   TrendingUp,
   Shield,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface CAPAStats {
   total: number;
@@ -60,11 +60,11 @@ export default function CAPADashboardPage() {
   const [stats, setStats] = useState<CAPAStats | null>(null);
   const [capas, setCAPAs] = useState<CAPA[]>([]);
   const [overdueCAPAs, setOverdueCAPAs] = useState<CAPA[]>([]);
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showOverdue, setShowOverdue] = useState(false);
 
-  const organizationId = 'org_123'; // TODO: Get from auth context
+  const organizationId = "org_123"; // TODO: Get from auth context
 
   useEffect(() => {
     fetchData();
@@ -73,9 +73,9 @@ export default function CAPADashboardPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       const params = new URLSearchParams({ organizationId });
-      if (statusFilter) params.append('status', statusFilter);
+      if (statusFilter) params.append("status", statusFilter);
 
       const [statsRes, capasRes, overdueRes] = await Promise.all([
         fetch(`/api/qc/capa/stats?organizationId=${organizationId}`),
@@ -87,40 +87,47 @@ export default function CAPADashboardPage() {
       if (capasRes.ok) setCAPAs(await capasRes.json());
       if (overdueRes.ok) setOverdueCAPAs(await overdueRes.json());
     } catch (error) {
-      console.error('Error fetching CAPA data:', error);
+      console.error("Error fetching CAPA data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredCAPAs = (showOverdue ? overdueCAPAs : capas).filter(capa =>
-    capa.capaNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    capa.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCAPAs = (showOverdue ? overdueCAPAs : capas).filter(
+    (capa) =>
+      capa.capaNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      capa.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, string> = {
-      OPEN: 'bg-blue-500',
-      IN_PROGRESS: 'bg-yellow-500',
-      COMPLETED: 'bg-purple-500',
-      VERIFIED: 'bg-green-600',
-      CLOSED: 'bg-gray-600',
+      OPEN: "bg-blue-500",
+      IN_PROGRESS: "bg-yellow-500",
+      COMPLETED: "bg-purple-500",
+      VERIFIED: "bg-green-600",
+      CLOSED: "bg-gray-600",
     };
-    return <Badge className={`${config[status]} text-white`}>{status.replace(/_/g, ' ')}</Badge>;
+    return (
+      <Badge className={`${config[status]} text-white`}>
+        {status.replace(/_/g, " ")}
+      </Badge>
+    );
   };
 
   const getTypeBadge = (type: string) => {
     const config: Record<string, string> = {
-      CORRECTIVE: 'bg-orange-500',
-      PREVENTIVE: 'bg-blue-500',
-      BOTH: 'bg-purple-500',
+      CORRECTIVE: "bg-orange-500",
+      PREVENTIVE: "bg-blue-500",
+      BOTH: "bg-purple-500",
     };
     return <Badge className={`${config[type]} text-white`}>{type}</Badge>;
   };
 
   const getRPNBadge = (rpn: number) => {
-    if (rpn >= 200) return <Badge className="bg-red-600 text-white">High ({rpn})</Badge>;
-    if (rpn >= 100) return <Badge className="bg-orange-500 text-white">Medium ({rpn})</Badge>;
+    if (rpn >= 200)
+      return <Badge className="bg-red-600 text-white">High ({rpn})</Badge>;
+    if (rpn >= 100)
+      return <Badge className="bg-orange-500 text-white">Medium ({rpn})</Badge>;
     return <Badge className="bg-green-600 text-white">Low ({rpn})</Badge>;
   };
 
@@ -142,8 +149,12 @@ export default function CAPADashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Corrective & Preventive Actions</h1>
-          <p className="text-muted-foreground">Manage CAPA workflow and risk assessment</p>
+          <h1 className="text-3xl font-bold">
+            Corrective & Preventive Actions
+          </h1>
+          <p className="text-muted-foreground">
+            Manage CAPA workflow and risk assessment
+          </p>
         </div>
         <Link href="/dashboard/qc/capa/create">
           <Button>
@@ -175,7 +186,9 @@ export default function CAPADashboardPage() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.avgRPN.toFixed(0)}</div>
+              <div className="text-2xl font-bold">
+                {stats.avgRPN.toFixed(0)}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {stats.highRisk} high risk (RPN &gt; 100)
               </p>
@@ -188,7 +201,9 @@ export default function CAPADashboardPage() {
               <AlertTriangle className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.overdue}</div>
+              <div className="text-2xl font-bold text-red-600">
+                {stats.overdue}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Past target completion date
               </p>
@@ -197,11 +212,15 @@ export default function CAPADashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Completion</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Completion
+              </CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.avgCompletionDays.toFixed(1)} days</div>
+              <div className="text-2xl font-bold">
+                {stats.avgCompletionDays.toFixed(1)} days
+              </div>
               <p className="text-xs text-muted-foreground">
                 {stats.verified} verified
               </p>
@@ -237,7 +256,7 @@ export default function CAPADashboardPage() {
               </SelectContent>
             </Select>
             <Button
-              variant={showOverdue ? 'default' : 'outline'}
+              variant={showOverdue ? "default" : "outline"}
               onClick={() => setShowOverdue(!showOverdue)}
             >
               <AlertTriangle className="h-4 w-4 mr-2" />
@@ -267,32 +286,54 @@ export default function CAPADashboardPage() {
               <TableBody>
                 {filteredCAPAs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground"
+                    >
                       No CAPAs found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredCAPAs.map((capa) => (
                     <TableRow key={capa.id}>
-                      <TableCell className="font-medium">{capa.capaNumber}</TableCell>
-                      <TableCell className="max-w-xs truncate">{capa.title}</TableCell>
+                      <TableCell className="font-medium">
+                        {capa.capaNumber}
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {capa.title}
+                      </TableCell>
                       <TableCell>{getTypeBadge(capa.capaType)}</TableCell>
-                      <TableCell>{getRPNBadge(capa.riskPriorityNumber)}</TableCell>
+                      <TableCell>
+                        {getRPNBadge(capa.riskPriorityNumber)}
+                      </TableCell>
                       <TableCell>{getStatusBadge(capa.status)}</TableCell>
                       <TableCell>
                         {capa.targetCompletionDate ? (
-                          <span className={isOverdue(capa.targetCompletionDate) ? 'text-red-600 font-semibold' : ''}>
-                            {new Date(capa.targetCompletionDate).toLocaleDateString()}
-                            {isOverdue(capa.targetCompletionDate) && ' (Overdue)'}
+                          <span
+                            className={
+                              isOverdue(capa.targetCompletionDate)
+                                ? "text-red-600 font-semibold"
+                                : ""
+                            }
+                          >
+                            {new Date(
+                              capa.targetCompletionDate,
+                            ).toLocaleDateString()}
+                            {isOverdue(capa.targetCompletionDate) &&
+                              " (Overdue)"}
                           </span>
                         ) : (
-                          '-'
+                          "-"
                         )}
                       </TableCell>
-                      <TableCell>{new Date(capa.createdAt).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {new Date(capa.createdAt).toLocaleDateString()}
+                      </TableCell>
                       <TableCell>
                         <Link href={`/dashboard/qc/capa/${capa.id}`}>
-                          <Button variant="ghost" size="sm">View</Button>
+                          <Button variant="ghost" size="sm">
+                            View
+                          </Button>
                         </Link>
                       </TableCell>
                     </TableRow>

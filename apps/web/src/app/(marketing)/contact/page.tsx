@@ -1,10 +1,23 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, Phone, MapPin, Send, MessageSquare, HelpCircle } from "lucide-react"
+import * as React from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Send,
+  MessageSquare,
+  HelpCircle,
+} from "lucide-react";
 
 export default function ContactPage() {
   const [formData, setFormData] = React.useState({
@@ -13,37 +26,43 @@ export default function ContactPage() {
     company: "",
     phone: "",
     subject: "",
-    message: ""
-  })
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
+    message: "",
+  });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    
+    e.preventDefault();
+    setIsSubmitting(true);
+
     // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    console.log("Form submitted:", formData)
-    alert("Thank you for contacting us! We'll get back to you within 24 hours.")
-    
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    console.log("Form submitted:", formData);
+    alert(
+      "Thank you for contacting us! We'll get back to you within 24 hours.",
+    );
+
     setFormData({
       name: "",
       email: "",
       company: "",
       phone: "",
       subject: "",
-      message: ""
-    })
-    setIsSubmitting(false)
-  }
+      message: "",
+    });
+    setIsSubmitting(false);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const contactMethods = [
     {
@@ -51,41 +70,41 @@ export default function ContactPage() {
       title: "Email Us",
       description: "Our team typically responds within 24 hours",
       value: "hello@logivox.ai",
-      action: "mailto:hello@logivox.ai"
+      action: "mailto:hello@logivox.ai",
     },
     {
       icon: Phone,
       title: "Call Us",
       description: "Mon-Fri from 8am to 6pm PST",
       value: "+1 (555) 123-4567",
-      action: "tel:+15551234567"
+      action: "tel:+15551234567",
     },
     {
       icon: MapPin,
       title: "Visit Us",
       description: "Our headquarters in San Francisco",
       value: "123 Market Street, San Francisco, CA 94103",
-      action: null
-    }
-  ]
+      action: null,
+    },
+  ];
 
   const supportOptions = [
     {
       icon: MessageSquare,
       title: "Sales Inquiry",
-      description: "Learn about pricing and plans"
+      description: "Learn about pricing and plans",
     },
     {
       icon: HelpCircle,
       title: "Technical Support",
-      description: "Get help with your account"
+      description: "Get help with your account",
     },
     {
       icon: Send,
       title: "General Question",
-      description: "Any other questions"
-    }
-  ]
+      description: "Any other questions",
+    },
+  ];
 
   return (
     <div className="flex flex-col">
@@ -98,7 +117,7 @@ export default function ContactPage() {
               Get in Touch
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Have questions? We're here to help. Reach out to our team and 
+              Have questions? We're here to help. Reach out to our team and
               we'll get back to you as soon as possible.
             </p>
           </div>
@@ -122,14 +141,16 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent>
                   {method.action ? (
-                    <a 
+                    <a
                       href={method.action}
                       className="text-primary hover:underline font-medium"
                     >
                       {method.value}
                     </a>
                   ) : (
-                    <p className="text-sm text-muted-foreground">{method.value}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {method.value}
+                    </p>
                   )}
                 </CardContent>
               </Card>
@@ -147,7 +168,8 @@ export default function ContactPage() {
               <div className="mb-8">
                 <h2 className="text-3xl font-bold mb-4">Send us a Message</h2>
                 <p className="text-muted-foreground">
-                  Fill out the form below and we'll get back to you within 24 hours.
+                  Fill out the form below and we'll get back to you within 24
+                  hours.
                 </p>
               </div>
 
@@ -254,9 +276,9 @@ export default function ContactPage() {
                   />
                 </div>
 
-                <Button 
-                  type="submit" 
-                  size="lg" 
+                <Button
+                  type="submit"
+                  size="lg"
                   className="w-full"
                   disabled={isSubmitting}
                 >
@@ -280,7 +302,8 @@ export default function ContactPage() {
               <div className="mb-8">
                 <h2 className="text-3xl font-bold mb-4">How Can We Help?</h2>
                 <p className="text-muted-foreground">
-                  Choose the option that best describes your inquiry for faster assistance.
+                  Choose the option that best describes your inquiry for faster
+                  assistance.
                 </p>
               </div>
 
@@ -293,8 +316,12 @@ export default function ContactPage() {
                           <option.icon className="h-5 w-5 text-primary" />
                         </div>
                         <div>
-                          <CardTitle className="text-lg">{option.title}</CardTitle>
-                          <CardDescription>{option.description}</CardDescription>
+                          <CardTitle className="text-lg">
+                            {option.title}
+                          </CardTitle>
+                          <CardDescription>
+                            {option.description}
+                          </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
@@ -306,7 +333,8 @@ export default function ContactPage() {
                 <CardHeader>
                   <CardTitle>Need Immediate Assistance?</CardTitle>
                   <CardDescription>
-                    For urgent technical issues, our support team is available 24/7.
+                    For urgent technical issues, our support team is available
+                    24/7.
                   </CardDescription>
                   <div className="pt-4">
                     <Button variant="outline" className="w-full" asChild>
@@ -342,5 +370,5 @@ export default function ContactPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

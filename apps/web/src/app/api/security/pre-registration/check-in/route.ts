@@ -1,20 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { SecurityNotificationService } from '@/lib/services/security-notifications';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { SecurityNotificationService } from "@/lib/services/security-notifications";
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { qrCode, securityPersonnelId } = await request.json();
 
     if (!qrCode) {
-      return NextResponse.json({ error: 'QR code is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "QR code is required" },
+        { status: 400 },
+      );
     }
 
     // Find pre-registration by QR code
@@ -26,21 +29,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!preRegistration) {
-      return NextResponse.json({ error: 'Invalid QR code' }, { status: 404 });
+      return NextResponse.json({ error: "Invalid QR code" }, { status: 404 });
     }
 
     // Validate registration status
-    if (preRegistration.status !== 'APPROVED') {
+    if (preRegistration.status !== "APPROVED") {
       return NextResponse.json(
-        { error: `Registration is ${preRegistration.status}. Only approved registrations can check in.` },
-        { status: 400 }
+        {
+          error: `Registration is ${preRegistration.status}. Only approved registrations can check in.`,
+        },
+        { status: 400 },
       );
     }
 
     if (preRegistration.checkedIn) {
       return NextResponse.json(
-        { error: 'Visitor already checked in' },
-        { status: 400 }
+        { error: "Visitor already checked in" },
+        { status: 400 },
       );
     }
 
@@ -48,25 +53,25 @@ export async function POST(request: NextRequest) {
     if (new Date() > preRegistration.expiresAt) {
       await prisma.visitorPreRegistration.update({
         where: { id: preRegistration.id },
-        data: { status: 'EXPIRED' },
+        data: { status: "EXPIRED" },
       });
       return NextResponse.json(
-        { error: 'Registration has expired' },
-        { status: 400 }
+        { error: "Registration has expired" },
+        { status: 400 },
       );
     }
 
     // Generate visitor badge number
     const lastVisitor = await prisma.visitor.findFirst({
       where: { organizationId: session.user.organizationId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: { badgeNumber: true },
     });
 
-    const lastNumber = lastVisitor?.badgeNumber 
-      ? parseInt(lastVisitor.badgeNumber.replace(/\D/g, '')) 
+    const lastNumber = lastVisitor?.badgeNumber
+      ? parseInt(lastVisitor.badgeNumber.replace(/\D/g, ""))
       : 0;
-    const badgeNumber = `VIS${String(lastNumber + 1).padStart(6, '0')}`;
+    const badgeNumber = `VIS${String(lastNumber + 1).padStart(6, "0")}`;
 
     // Create visitor record
     const visitor = await prisma.visitor.create({
@@ -74,7 +79,7 @@ export async function POST(request: NextRequest) {
         organizationId: session.user.organizationId,
         badgeNumber,
         badgeIssued: true,
-        
+
         // From pre-registration
         firstName: preRegistration.firstName,
         lastName: preRegistration.lastName,
@@ -87,11 +92,11 @@ export async function POST(request: NextRequest) {
         hostDepartment: preRegistration.hostDepartment,
         escortRequired: preRegistration.escortRequired,
         allowedAreas: preRegistration.allowedAreas,
-        
+
         // Check-in details
         checkInTime: new Date(),
         visitDate: preRegistration.visitDate,
-        status: 'CHECKED_IN',
+        status: "CHECKED_IN",
         securityPersonnelId,
       },
     });
@@ -103,7 +108,7 @@ export async function POST(request: NextRequest) {
         checkedIn: true,
         checkedInAt: new Date(),
         visitorId: visitor.id,
-        status: 'CHECKED_IN',
+        status: "CHECKED_IN",
       },
     });
 
@@ -113,7 +118,7 @@ export async function POST(request: NextRequest) {
         session.user.organizationId,
         visitor,
         preRegistration.hostEmail,
-        preRegistration.hostName
+        preRegistration.hostName,
       );
     }
 
@@ -122,8 +127,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'CREATE',
-        entity: 'VISITOR',
+        action: "CREATE",
+        entity: "VISITOR",
         entityId: visitor.id,
         description: `Checked in pre-registered visitor ${visitor.firstName} ${visitor.lastName} via QR code`,
         metadata: {
@@ -134,17 +139,20 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      visitor,
-      badgeNumber,
-      message: 'Visitor checked in successfully',
-    }, { status: 201 });
-  } catch (error) {
-    console.error('Error checking in visitor:', error);
     return NextResponse.json(
-      { error: 'Failed to check in visitor' },
-      { status: 500 }
+      {
+        success: true,
+        visitor,
+        badgeNumber,
+        message: "Visitor checked in successfully",
+      },
+      { status: 201 },
+    );
+  } catch (error) {
+    console.error("Error checking in visitor:", error);
+    return NextResponse.json(
+      { error: "Failed to check in visitor" },
+      { status: 500 },
     );
   }
 }

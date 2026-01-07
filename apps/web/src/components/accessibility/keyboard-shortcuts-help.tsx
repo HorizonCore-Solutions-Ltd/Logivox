@@ -4,24 +4,19 @@
  * Accessible via Ctrl+Shift+K
  */
 
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { useKeyboardShortcut } from "@/lib/accessibility"
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useKeyboardShortcut } from "@/lib/accessibility";
 import {
   Command,
   Keyboard,
@@ -30,15 +25,15 @@ import {
   FileText,
   Mic,
   Settings,
-} from "lucide-react"
+} from "lucide-react";
 
 /**
  * Keyboard shortcut definition
  */
 interface Shortcut {
-  key: string
-  description: string
-  category: string
+  key: string;
+  description: string;
+  category: string;
 }
 
 /**
@@ -46,25 +41,53 @@ interface Shortcut {
  */
 const SHORTCUTS: Shortcut[] = [
   // Global shortcuts
-  { key: "Ctrl+Shift+K", description: "Show keyboard shortcuts", category: "Global" },
-  { key: "Ctrl+Shift+V", description: "Toggle voice control", category: "Global" },
-  { key: "Ctrl+Shift+H", description: "Show voice control help", category: "Global" },
+  {
+    key: "Ctrl+Shift+K",
+    description: "Show keyboard shortcuts",
+    category: "Global",
+  },
+  {
+    key: "Ctrl+Shift+V",
+    description: "Toggle voice control",
+    category: "Global",
+  },
+  {
+    key: "Ctrl+Shift+H",
+    description: "Show voice control help",
+    category: "Global",
+  },
   { key: "Ctrl+K", description: "Focus search", category: "Global" },
   { key: "Ctrl+B", description: "Toggle sidebar", category: "Global" },
-  { key: "Ctrl+Shift+T", description: "Toggle theme (dark/light)", category: "Global" },
+  {
+    key: "Ctrl+Shift+T",
+    description: "Toggle theme (dark/light)",
+    category: "Global",
+  },
   { key: "?", description: "Show help", category: "Global" },
-  
+
   // Navigation shortcuts
-  { key: "Ctrl+Shift+D", description: "Go to dashboard", category: "Navigation" },
-  { key: "Ctrl+Shift+I", description: "Go to inventory", category: "Navigation" },
-  { key: "Ctrl+Shift+B", description: "Go to bookings", category: "Navigation" },
+  {
+    key: "Ctrl+Shift+D",
+    description: "Go to dashboard",
+    category: "Navigation",
+  },
+  {
+    key: "Ctrl+Shift+I",
+    description: "Go to inventory",
+    category: "Navigation",
+  },
+  {
+    key: "Ctrl+Shift+B",
+    description: "Go to bookings",
+    category: "Navigation",
+  },
   { key: "Ctrl+Shift+A", description: "Go to alerts", category: "Navigation" },
   { key: "Ctrl+Shift+R", description: "Go to reports", category: "Navigation" },
-  
+
   // Modal/Dialog shortcuts
   { key: "Escape", description: "Close modal or dialog", category: "Modals" },
   { key: "Enter", description: "Confirm action", category: "Modals" },
-  
+
   // Table navigation
   { key: "↓", description: "Next row", category: "Tables" },
   { key: "↑", description: "Previous row", category: "Tables" },
@@ -72,25 +95,28 @@ const SHORTCUTS: Shortcut[] = [
   { key: "End", description: "Last row", category: "Tables" },
   { key: "Space", description: "Select row", category: "Tables" },
   { key: "Enter", description: "Open row details", category: "Tables" },
-  
+
   // Form shortcuts
   { key: "Tab", description: "Next field", category: "Forms" },
   { key: "Shift+Tab", description: "Previous field", category: "Forms" },
   { key: "Ctrl+Enter", description: "Submit form", category: "Forms" },
   { key: "Escape", description: "Cancel editing", category: "Forms" },
-]
+];
 
 /**
  * Group shortcuts by category
  */
 function groupShortcutsByCategory(shortcuts: Shortcut[]) {
-  return shortcuts.reduce((acc, shortcut) => {
-    if (!acc[shortcut.category]) {
-      acc[shortcut.category] = []
-    }
-    acc[shortcut.category]!.push(shortcut)
-    return acc
-  }, {} as Record<string, Shortcut[]>)
+  return shortcuts.reduce(
+    (acc, shortcut) => {
+      if (!acc[shortcut.category]) {
+        acc[shortcut.category] = [];
+      }
+      acc[shortcut.category]!.push(shortcut);
+      return acc;
+    },
+    {} as Record<string, Shortcut[]>,
+  );
 }
 
 /**
@@ -99,17 +125,17 @@ function groupShortcutsByCategory(shortcuts: Shortcut[]) {
 function getCategoryIcon(category: string) {
   switch (category) {
     case "Global":
-      return <Command className="h-4 w-4" />
+      return <Command className="h-4 w-4" />;
     case "Navigation":
-      return <Navigation className="h-4 w-4" />
+      return <Navigation className="h-4 w-4" />;
     case "Tables":
-      return <Table2 className="h-4 w-4" />
+      return <Table2 className="h-4 w-4" />;
     case "Forms":
-      return <FileText className="h-4 w-4" />
+      return <FileText className="h-4 w-4" />;
     case "Modals":
-      return <Settings className="h-4 w-4" />
+      return <Settings className="h-4 w-4" />;
     default:
-      return <Keyboard className="h-4 w-4" />
+      return <Keyboard className="h-4 w-4" />;
   }
 }
 
@@ -117,8 +143,8 @@ function getCategoryIcon(category: string) {
  * Format keyboard shortcut for display
  */
 function formatShortcut(shortcut: string): React.ReactNode {
-  const parts = shortcut.split('+')
-  
+  const parts = shortcut.split("+");
+
   return (
     <div className="flex items-center gap-1">
       {parts.map((part, index) => (
@@ -132,27 +158,31 @@ function formatShortcut(shortcut: string): React.ReactNode {
         </React.Fragment>
       ))}
     </div>
-  )
+  );
 }
 
 export function KeyboardShortcutsHelp() {
-  const [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false);
   const groupedShortcuts = React.useMemo(
     () => groupShortcutsByCategory(SHORTCUTS),
-    []
-  )
+    [],
+  );
 
   // Register Ctrl+Shift+K to open shortcuts help
   useKeyboardShortcut("Ctrl+Shift+K", () => {
-    setOpen(true)
-  })
+    setOpen(true);
+  });
 
   // Also support ? key
-  useKeyboardShortcut("?", () => {
-    setOpen(true)
-  }, { enabled: !open })
+  useKeyboardShortcut(
+    "?",
+    () => {
+      setOpen(true);
+    },
+    { enabled: !open },
+  );
 
-  const categories = Object.keys(groupedShortcuts)
+  const categories = Object.keys(groupedShortcuts);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -168,9 +198,16 @@ export function KeyboardShortcutsHelp() {
         </DialogHeader>
 
         <Tabs defaultValue={categories[0]} className="w-full">
-          <TabsList className="grid w-full" style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}>
+          <TabsList
+            className="grid w-full"
+            style={{ gridTemplateColumns: `repeat(${categories.length}, 1fr)` }}
+          >
             {categories.map((category) => (
-              <TabsTrigger key={category} value={category} className="flex items-center gap-2">
+              <TabsTrigger
+                key={category}
+                value={category}
+                className="flex items-center gap-2"
+              >
                 {getCategoryIcon(category)}
                 <span className="hidden sm:inline">{category}</span>
               </TabsTrigger>
@@ -186,7 +223,9 @@ export function KeyboardShortcutsHelp() {
                       key={index}
                       className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
                     >
-                      <span className="text-sm font-medium">{shortcut.description}</span>
+                      <span className="text-sm font-medium">
+                        {shortcut.description}
+                      </span>
                       {formatShortcut(shortcut.key)}
                     </div>
                   ))}
@@ -199,15 +238,16 @@ export function KeyboardShortcutsHelp() {
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Keyboard className="h-4 w-4" />
-            <span>Press {formatShortcut("Ctrl+Shift+K")} or {formatShortcut("?")} to show this dialog</span>
+            <span>
+              Press {formatShortcut("Ctrl+Shift+K")} or {formatShortcut("?")} to
+              show this dialog
+            </span>
           </div>
-          <Badge variant="outline">
-            {SHORTCUTS.length} shortcuts
-          </Badge>
+          <Badge variant="outline">{SHORTCUTS.length} shortcuts</Badge>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 /**
@@ -222,5 +262,5 @@ export function KeyboardShortcutAnnouncer() {
       aria-live="polite"
       aria-atomic="true"
     />
-  )
+  );
 }

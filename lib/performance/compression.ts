@@ -3,9 +3,9 @@
  * Compress API responses to reduce bandwidth
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { gzip, deflate } from 'zlib';
-import { promisify } from 'util';
+import { NextRequest, NextResponse } from "next/server";
+import { gzip, deflate } from "zlib";
+import { promisify } from "util";
 
 const gzipAsync = promisify(gzip);
 const deflateAsync = promisify(deflate);
@@ -25,12 +25,12 @@ const DEFAULT_CONFIG: Required<CompressionConfig> = {
   level: 6,
   excludePaths: [/^\/api\/stream/, /^\/api\/upload/],
   excludeTypes: [
-    'image/',
-    'video/',
-    'audio/',
-    'application/zip',
-    'application/gzip',
-    'application/pdf',
+    "image/",
+    "video/",
+    "audio/",
+    "application/zip",
+    "application/gzip",
+    "application/pdf",
   ],
 };
 
@@ -39,7 +39,7 @@ const DEFAULT_CONFIG: Required<CompressionConfig> = {
  */
 function shouldCompress(
   contentType: string | null,
-  config: Required<CompressionConfig>
+  config: Required<CompressionConfig>,
 ): boolean {
   if (!contentType) return false;
 
@@ -52,10 +52,10 @@ function shouldCompress(
 
   // Compress text-based content
   return (
-    contentType.includes('text/') ||
-    contentType.includes('application/json') ||
-    contentType.includes('application/javascript') ||
-    contentType.includes('application/xml')
+    contentType.includes("text/") ||
+    contentType.includes("application/json") ||
+    contentType.includes("application/javascript") ||
+    contentType.includes("application/xml")
   );
 }
 
@@ -64,7 +64,7 @@ function shouldCompress(
  */
 function shouldCompressPath(
   pathname: string,
-  config: Required<CompressionConfig>
+  config: Required<CompressionConfig>,
 ): boolean {
   for (const excludePath of config.excludePaths) {
     if (excludePath.test(pathname)) {
@@ -77,12 +77,12 @@ function shouldCompressPath(
 /**
  * Get accepted encoding from request
  */
-function getAcceptedEncoding(req: NextRequest): 'gzip' | 'deflate' | null {
-  const acceptEncoding = req.headers.get('accept-encoding');
+function getAcceptedEncoding(req: NextRequest): "gzip" | "deflate" | null {
+  const acceptEncoding = req.headers.get("accept-encoding");
   if (!acceptEncoding) return null;
 
-  if (acceptEncoding.includes('gzip')) return 'gzip';
-  if (acceptEncoding.includes('deflate')) return 'deflate';
+  if (acceptEncoding.includes("gzip")) return "gzip";
+  if (acceptEncoding.includes("deflate")) return "deflate";
   return null;
 }
 
@@ -94,7 +94,7 @@ export function compressionMiddleware(config: CompressionConfig = {}) {
 
   return async function (
     req: NextRequest,
-    response: NextResponse
+    response: NextResponse,
   ): Promise<NextResponse> {
     try {
       // Check if path should be compressed
@@ -109,14 +109,14 @@ export function compressionMiddleware(config: CompressionConfig = {}) {
       }
 
       // Check content type
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get("content-type");
       if (!shouldCompress(contentType, finalConfig)) {
         return response;
       }
 
       // Get response body
       const body = await response.text();
-      const bodySize = Buffer.byteLength(body, 'utf-8');
+      const bodySize = Buffer.byteLength(body, "utf-8");
 
       // Check minimum size threshold
       if (bodySize < finalConfig.threshold) {
@@ -124,10 +124,10 @@ export function compressionMiddleware(config: CompressionConfig = {}) {
       }
 
       // Compress body
-      const buffer = Buffer.from(body, 'utf-8');
+      const buffer = Buffer.from(body, "utf-8");
       let compressed: Buffer;
 
-      if (encoding === 'gzip') {
+      if (encoding === "gzip") {
         compressed = await gzipAsync(buffer, { level: finalConfig.level });
       } else {
         compressed = await deflateAsync(buffer, { level: finalConfig.level });
@@ -141,24 +141,30 @@ export function compressionMiddleware(config: CompressionConfig = {}) {
       });
 
       // Set compression headers
-      compressedResponse.headers.set('Content-Encoding', encoding);
-      compressedResponse.headers.set('Content-Length', compressed.length.toString());
-      compressedResponse.headers.delete('Content-Type');
-      compressedResponse.headers.set('Content-Type', contentType || 'application/json');
+      compressedResponse.headers.set("Content-Encoding", encoding);
+      compressedResponse.headers.set(
+        "Content-Length",
+        compressed.length.toString(),
+      );
+      compressedResponse.headers.delete("Content-Type");
+      compressedResponse.headers.set(
+        "Content-Type",
+        contentType || "application/json",
+      );
 
       // Add vary header for caching
-      const vary = response.headers.get('vary');
+      const vary = response.headers.get("vary");
       if (vary) {
-        if (!vary.includes('Accept-Encoding')) {
-          compressedResponse.headers.set('Vary', `${vary}, Accept-Encoding`);
+        if (!vary.includes("Accept-Encoding")) {
+          compressedResponse.headers.set("Vary", `${vary}, Accept-Encoding`);
         }
       } else {
-        compressedResponse.headers.set('Vary', 'Accept-Encoding');
+        compressedResponse.headers.set("Vary", "Accept-Encoding");
       }
 
       return compressedResponse;
     } catch (error) {
-      console.error('Compression error:', error);
+      console.error("Compression error:", error);
       return response; // Return original response on error
     }
   };
@@ -173,7 +179,7 @@ export async function compressedJson(
   options?: {
     status?: number;
     headers?: Record<string, string>;
-  }
+  },
 ): Promise<NextResponse> {
   const json = JSON.stringify(data);
   const encoding = getAcceptedEncoding(req);
@@ -183,7 +189,7 @@ export async function compressedJson(
     return NextResponse.json(data, options);
   }
 
-  const buffer = Buffer.from(json, 'utf-8');
+  const buffer = Buffer.from(json, "utf-8");
   const bodySize = buffer.length;
 
   // Don't compress small responses
@@ -194,7 +200,7 @@ export async function compressedJson(
   try {
     // Compress
     const compressed =
-      encoding === 'gzip'
+      encoding === "gzip"
         ? await gzipAsync(buffer, { level: 6 })
         : await deflateAsync(buffer, { level: 6 });
 
@@ -202,17 +208,17 @@ export async function compressedJson(
     const response = new NextResponse(compressed, {
       status: options?.status || 200,
       headers: {
-        'Content-Type': 'application/json',
-        'Content-Encoding': encoding,
-        'Content-Length': compressed.length.toString(),
-        'Vary': 'Accept-Encoding',
+        "Content-Type": "application/json",
+        "Content-Encoding": encoding,
+        "Content-Length": compressed.length.toString(),
+        Vary: "Accept-Encoding",
         ...options?.headers,
       },
     });
 
     return response;
   } catch (error) {
-    console.error('JSON compression error:', error);
+    console.error("JSON compression error:", error);
     return NextResponse.json(data, options);
   }
 }
@@ -230,7 +236,7 @@ export interface CompressionStats {
 export function getCompressionStats(
   originalSize: number,
   compressedSize: number,
-  encoding: string
+  encoding: string,
 ): CompressionStats {
   return {
     originalSize,
@@ -245,7 +251,7 @@ export function getCompressionStats(
  */
 export async function withCompression(
   req: NextRequest,
-  handler: () => Promise<NextResponse>
+  handler: () => Promise<NextResponse>,
 ): Promise<NextResponse> {
   const response = await handler();
   const compression = compressionMiddleware();

@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { sendEmail } from '@/lib/services/email-service';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { sendEmail } from "@/lib/services/email-service";
+import crypto from "crypto";
 
 const preRegistrationSchema = z.object({
   firstName: z.string().min(1),
@@ -12,7 +12,17 @@ const preRegistrationSchema = z.object({
   email: z.string().email(),
   phone: z.string().optional(),
   company: z.string().optional(),
-  visitorType: z.enum(['CONTRACTOR', 'VENDOR', 'CUSTOMER', 'AUDITOR', 'CANDIDATE', 'GUEST', 'OTHER']).default('GUEST'),
+  visitorType: z
+    .enum([
+      "CONTRACTOR",
+      "VENDOR",
+      "CUSTOMER",
+      "AUDITOR",
+      "CANDIDATE",
+      "GUEST",
+      "OTHER",
+    ])
+    .default("GUEST"),
   visitDate: z.string().datetime(),
   visitPurpose: z.string().min(1),
   expectedDuration: z.number().optional(),
@@ -29,17 +39,17 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
     const skip = (page - 1) * limit;
 
-    const status = searchParams.get('status');
-    const date = searchParams.get('date');
-    const search = searchParams.get('search');
+    const status = searchParams.get("status");
+    const date = searchParams.get("date");
+    const search = searchParams.get("search");
 
     const where: any = {
       organizationId: session.user.organizationId,
@@ -58,11 +68,11 @@ export async function GET(request: NextRequest) {
     }
     if (search) {
       where.OR = [
-        { firstName: { contains: search, mode: 'insensitive' } },
-        { lastName: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
-        { company: { contains: search, mode: 'insensitive' } },
-        { registrationNumber: { contains: search, mode: 'insensitive' } },
+        { firstName: { contains: search, mode: "insensitive" } },
+        { lastName: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
+        { company: { contains: search, mode: "insensitive" } },
+        { registrationNumber: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -71,7 +81,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { visitDate: 'desc' },
+        orderBy: { visitDate: "desc" },
         include: {
           visitor: {
             select: {
@@ -96,10 +106,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching pre-registrations:', error);
+    console.error("Error fetching pre-registrations:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch pre-registrations' },
-      { status: 500 }
+      { error: "Failed to fetch pre-registrations" },
+      { status: 500 },
     );
   }
 }
@@ -108,7 +118,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -117,20 +127,20 @@ export async function POST(request: NextRequest) {
     // Generate unique registration number
     const lastReg = await prisma.visitorPreRegistration.findFirst({
       where: { organizationId: session.user.organizationId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: { registrationNumber: true },
     });
 
-    const lastNumber = lastReg?.registrationNumber 
-      ? parseInt(lastReg.registrationNumber.replace(/\D/g, '')) 
+    const lastNumber = lastReg?.registrationNumber
+      ? parseInt(lastReg.registrationNumber.replace(/\D/g, ""))
       : 0;
-    const registrationNumber = `REG${String(lastNumber + 1).padStart(6, '0')}`;
+    const registrationNumber = `REG${String(lastNumber + 1).padStart(6, "0")}`;
 
     // Generate QR code data (unique hash)
     const qrCodeData = crypto
-      .createHash('sha256')
+      .createHash("sha256")
       .update(`${registrationNumber}-${validatedData.email}-${Date.now()}`)
-      .digest('hex')
+      .digest("hex")
       .substring(0, 16);
 
     // Calculate expiry (visit date + 1 day)
@@ -146,7 +156,7 @@ export async function POST(request: NextRequest) {
         qrCode: qrCodeData,
         visitDate: new Date(validatedData.visitDate),
         expiresAt,
-        status: 'PENDING',
+        status: "PENDING",
       },
     });
 
@@ -158,8 +168,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'CREATE',
-        entity: 'VISITOR_PRE_REGISTRATION',
+        action: "CREATE",
+        entity: "VISITOR_PRE_REGISTRATION",
         entityId: registration.id,
         description: `Pre-registered visitor ${validatedData.firstName} ${validatedData.lastName}`,
         metadata: {
@@ -173,14 +183,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
-    console.error('Error creating pre-registration:', error);
+    console.error("Error creating pre-registration:", error);
     return NextResponse.json(
-      { error: 'Failed to create pre-registration' },
-      { status: 500 }
+      { error: "Failed to create pre-registration" },
+      { status: 500 },
     );
   }
 
@@ -188,7 +198,7 @@ export async function POST(request: NextRequest) {
     if (registration.email) {
       await sendEmail({
         to: registration.email,
-        subject: 'Visitor Pre-Registration Confirmation',
+        subject: "Visitor Pre-Registration Confirmation",
         html: `
           <h2>Pre-Registration Confirmed</h2>
           <p>Dear ${registration.visitorName},</p>

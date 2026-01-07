@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,7 +25,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DollarSign, FileText, Clock, Check, Plus, RefreshCw, Download, Send, TrendingUp } from 'lucide-react';
+import {
+  DollarSign,
+  FileText,
+  Clock,
+  Check,
+  Plus,
+  RefreshCw,
+  Download,
+  Send,
+  TrendingUp,
+} from "lucide-react";
 import Link from "next/link";
 
 interface Invoice {
@@ -29,7 +45,7 @@ interface Invoice {
   billingPeriodStart: string;
   billingPeriodEnd: string;
   dueDate: string;
-  status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE' | 'CANCELLED';
+  status: "DRAFT" | "SENT" | "PAID" | "OVERDUE" | "CANCELLED";
   totalAmount: number;
   paidAmount?: number;
   lineItems: any[];
@@ -39,7 +55,7 @@ interface Invoice {
 export default function BillingPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     fetchInvoices();
@@ -48,7 +64,7 @@ export default function BillingPage() {
   const fetchInvoices = async () => {
     try {
       const params = new URLSearchParams();
-      if (statusFilter) params.append('status', statusFilter);
+      if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(`/api/billing/invoices?${params.toString()}`);
       if (res.ok) {
@@ -56,7 +72,7 @@ export default function BillingPage() {
         setInvoices(data);
       }
     } catch (error) {
-      console.error('Error fetching invoices:', error);
+      console.error("Error fetching invoices:", error);
     } finally {
       setLoading(false);
     }
@@ -64,32 +80,36 @@ export default function BillingPage() {
 
   const getStatusBadge = (status: string) => {
     const colors = {
-      DRAFT: 'bg-gray-100 text-gray-800',
-      SENT: 'bg-blue-100 text-blue-800',
-      PAID: 'bg-green-100 text-green-800',
-      OVERDUE: 'bg-red-100 text-red-800',
-      CANCELLED: 'bg-gray-100 text-gray-600',
+      DRAFT: "bg-gray-100 text-gray-800",
+      SENT: "bg-blue-100 text-blue-800",
+      PAID: "bg-green-100 text-green-800",
+      OVERDUE: "bg-red-100 text-red-800",
+      CANCELLED: "bg-gray-100 text-gray-600",
     };
     return colors[status as keyof typeof colors] || colors.DRAFT;
   };
 
   const totalRevenue = invoices
-    .filter(inv => inv.status === 'PAID')
+    .filter((inv) => inv.status === "PAID")
     .reduce((sum, inv) => sum + inv.totalAmount, 0);
 
   const pendingRevenue = invoices
-    .filter(inv => inv.status === 'SENT' || inv.status === 'OVERDUE')
+    .filter((inv) => inv.status === "SENT" || inv.status === "OVERDUE")
     .reduce((sum, inv) => sum + inv.totalAmount, 0);
 
-  const overdueInvoices = invoices.filter(inv => inv.status === 'OVERDUE').length;
-  const draftInvoices = invoices.filter(inv => inv.status === 'DRAFT').length;
+  const overdueInvoices = invoices.filter(
+    (inv) => inv.status === "OVERDUE",
+  ).length;
+  const draftInvoices = invoices.filter((inv) => inv.status === "DRAFT").length;
 
   return (
     <div className="container mx-auto py-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">3PL Billing & Invoicing</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            3PL Billing & Invoicing
+          </h1>
           <p className="text-gray-600 mt-1">
             Manage client billing, rate cards, and automated invoicing
           </p>
@@ -124,7 +144,9 @@ export default function BillingPage() {
             <FileText className="h-4 w-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-gray-900">{invoices.length}</div>
+            <div className="text-3xl font-bold text-gray-900">
+              {invoices.length}
+            </div>
           </CardContent>
         </Card>
 
@@ -139,7 +161,9 @@ export default function BillingPage() {
             <div className="text-3xl font-bold text-green-600">
               ${totalRevenue.toLocaleString()}
             </div>
-            <p className="text-xs text-gray-500 mt-1">From {invoices.filter(i => i.status === 'PAID').length} invoices</p>
+            <p className="text-xs text-gray-500 mt-1">
+              From {invoices.filter((i) => i.status === "PAID").length} invoices
+            </p>
           </CardContent>
         </Card>
 
@@ -167,7 +191,7 @@ export default function BillingPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-red-600">
-              {invoices.filter(inv => inv.status === 'OVERDUE').length}
+              {invoices.filter((inv) => inv.status === "OVERDUE").length}
             </div>
             <p className="text-xs text-gray-500 mt-1">Requires attention</p>
           </CardContent>
@@ -240,8 +264,8 @@ export default function BillingPage() {
                     {invoice.customer.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(invoice.billingPeriodStart).toLocaleDateString()} -
-                    {new Date(invoice.billingPeriodEnd).toLocaleDateString()}
+                    {new Date(invoice.billingPeriodStart).toLocaleDateString()}{" "}
+                    -{new Date(invoice.billingPeriodEnd).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(invoice.dueDate).toLocaleDateString()}
@@ -252,17 +276,20 @@ export default function BillingPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(
-                        invoice.status
+                        invoice.status,
                       )}`}
                     >
                       {invoice.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <a href={`/billing/${invoice.id}`} className="text-blue-600 hover:text-blue-900 mr-4">
+                    <a
+                      href={`/billing/${invoice.id}`}
+                      className="text-blue-600 hover:text-blue-900 mr-4"
+                    >
                       View
                     </a>
-                    {invoice.status === 'DRAFT' && (
+                    {invoice.status === "DRAFT" && (
                       <button className="text-green-600 hover:text-green-900">
                         Send
                       </button>

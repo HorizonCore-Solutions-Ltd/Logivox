@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,7 +12,7 @@ const quarantineSchema = z.object({
 // POST /api/lots/[id]/quarantine - Quarantine a lot
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -31,7 +31,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -49,7 +49,7 @@ export async function POST(
     if (lot.isQuarantined) {
       return NextResponse.json(
         { error: "Lot is already quarantined" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,14 +86,14 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error quarantining lot:", error);
     return NextResponse.json(
       { error: "Failed to quarantine lot" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -101,7 +101,7 @@ export async function POST(
 // DELETE /api/lots/[id]/quarantine - Release from quarantine
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -120,7 +120,7 @@ export async function DELETE(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -138,7 +138,7 @@ export async function DELETE(
     if (!lot.isQuarantined) {
       return NextResponse.json(
         { error: "Lot is not quarantined" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -169,7 +169,7 @@ export async function DELETE(
     console.error("Error releasing lot from quarantine:", error);
     return NextResponse.json(
       { error: "Failed to release lot from quarantine" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

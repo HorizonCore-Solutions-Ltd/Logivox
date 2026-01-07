@@ -5,44 +5,44 @@ export interface VisitorPolicyConfig {
   preRegistrationRequired: boolean; // TRUE for enterprise, FALSE for SMB
   preRegistrationApprovalRequired: boolean; // TRUE for high-security, FALSE for casual
   walkInsAllowed: boolean; // FALSE for enterprise, TRUE for SMB
-  
+
   // Identification Requirements
   photoIdRequired: boolean; // TRUE for enterprise, FALSE for casual
   photoCapture: boolean; // TRUE for high-security
   backgroundCheckRequired: boolean; // TRUE for sensitive facilities
-  
+
   // Badge Requirements
   physicalBadgeRequired: boolean; // TRUE for enterprise, FALSE for digital-only
   digitalBadgeAllowed: boolean; // TRUE for modern operations
   badgeReturnRequired: boolean; // TRUE for physical badges
-  
+
   // Access Control
   escortRequired: boolean; // TRUE for restricted areas
   allowedAreasEnforced: boolean; // TRUE for zoned facilities
   timeRestrictions: boolean; // TRUE for business hours only
-  
+
   // Host Requirements
   hostRequired: boolean; // TRUE for enterprise, FALSE for public areas
   hostApprovalRequired: boolean; // TRUE for high-security
   hostMustEscort: boolean; // TRUE for maximum security
-  
+
   // Duration & Limits
   maximumVisitDuration: number | null; // Hours, or null for unlimited
   overdueAlertThreshold: number | null; // Hours before alert
   dailyVisitorLimit: number | null; // Max visitors per day, or null
-  
+
   // Compliance & Documentation
   purposeRequired: boolean; // TRUE for audit trails
   companyRequired: boolean; // TRUE for B2B facilities
   emergencyContactRequired: boolean; // TRUE for high-risk areas
   ndaRequired: boolean; // TRUE for confidential areas
   safetyBriefingRequired: boolean; // TRUE for manufacturing
-  
+
   // Regional Compliance (GDPR, etc.)
   dataRetentionDays: number; // 30, 90, 365, etc.
   consentRequired: boolean; // TRUE for GDPR compliance
   rightToErasure: boolean; // TRUE for GDPR
-  
+
   // Notification Settings
   notifyHostOnArrival: boolean;
   notifySecurityOnEntry: boolean;
@@ -54,12 +54,12 @@ export interface GateControlConfig {
   automatedGates: boolean; // LPR, RFID, etc.
   manualCheckIn: boolean;
   appointmentRequired: boolean;
-  
+
   // Vehicle Inspection
   vehicleInspectionRequired: boolean;
   sealVerificationRequired: boolean;
   weightCheckRequired: boolean;
-  
+
   // After Hours
   afterHoursAccessAllowed: boolean;
   afterHoursApprovalRequired: boolean;
@@ -70,12 +70,12 @@ export interface SecurityComplianceConfig {
   dailyReportsEnabled: boolean;
   weeklyReportsEnabled: boolean;
   monthlyReportsEnabled: boolean;
-  
+
   // Alert Thresholds
   alertOnOverdueVisitors: boolean;
   alertOnAfterHoursAccess: boolean;
   alertOnFailedAccess: boolean;
-  
+
   // Compliance Standards
   oshaCompliance: boolean;
   isoCompliance: boolean;

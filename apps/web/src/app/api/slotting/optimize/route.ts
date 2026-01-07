@@ -1,8 +1,8 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 /**
  * POST /api/slotting/optimize
@@ -12,23 +12,31 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { warehouseId } = await req.json();
 
     if (!warehouseId) {
-      return NextResponse.json({ error: 'warehouseId is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "warehouseId is required" },
+        { status: 400 },
+      );
     }
 
     // Get all active slotting rules for the warehouse
@@ -38,7 +46,7 @@ export async function POST(req: NextRequest) {
         warehouseId,
         isActive: true,
       },
-      orderBy: { priority: 'desc' },
+      orderBy: { priority: "desc" },
     });
 
     // Get all inventory items in the warehouse
@@ -82,42 +90,76 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      let velocity: 'FAST' | 'MEDIUM' | 'SLOW' = 'SLOW';
-      if (orderCount > 20) velocity = 'FAST';
-      else if (orderCount > 5) velocity = 'MEDIUM';
+      let velocity: "FAST" | "MEDIUM" | "SLOW" = "SLOW";
+      if (orderCount > 20) velocity = "FAST";
+      else if (orderCount > 5) velocity = "MEDIUM";
 
       // Find best matching rule
       for (const rule of rules) {
         const criteria = rule.criteria as any;
 
         // Check velocity match
-        if (criteria.velocityThreshold && criteria.velocityThreshold !== velocity) {
+        if (
+          criteria.velocityThreshold &&
+          criteria.velocityThreshold !== velocity
+        ) {
           continue;
         }
 
         // Check weight range
         if (criteria.weightRange) {
-          if (criteria.weightRange.min && item.weight && item.weight < criteria.weightRange.min) continue;
-          if (criteria.weightRange.max && item.weight && item.weight > criteria.weightRange.max) continue;
+          if (
+            criteria.weightRange.min &&
+            item.weight &&
+            item.weight < criteria.weightRange.min
+          )
+            continue;
+          if (
+            criteria.weightRange.max &&
+            item.weight &&
+            item.weight > criteria.weightRange.max
+          )
+            continue;
         }
 
         // Check dimension constraints
         if (criteria.dimensionConstraints) {
-          if (criteria.dimensionConstraints.maxLength && item.length && item.length > criteria.dimensionConstraints.maxLength) continue;
-          if (criteria.dimensionConstraints.maxWidth && item.width && item.width > criteria.dimensionConstraints.maxWidth) continue;
-          if (criteria.dimensionConstraints.maxHeight && item.height && item.height > criteria.dimensionConstraints.maxHeight) continue;
+          if (
+            criteria.dimensionConstraints.maxLength &&
+            item.length &&
+            item.length > criteria.dimensionConstraints.maxLength
+          )
+            continue;
+          if (
+            criteria.dimensionConstraints.maxWidth &&
+            item.width &&
+            item.width > criteria.dimensionConstraints.maxWidth
+          )
+            continue;
+          if (
+            criteria.dimensionConstraints.maxHeight &&
+            item.height &&
+            item.height > criteria.dimensionConstraints.maxHeight
+          )
+            continue;
         }
 
         // Check category match
         if (criteria.categoryIds && criteria.categoryIds.length > 0) {
-          if (!item.categoryId || !criteria.categoryIds.includes(item.categoryId)) continue;
+          if (
+            !item.categoryId ||
+            !criteria.categoryIds.includes(item.categoryId)
+          )
+            continue;
         }
 
         // Find best location in target zone
-        const targetLocation = locations.find(loc => {
+        const targetLocation = locations.find((loc) => {
           // Match location type to target zone
-          if (rule.targetZoneType === 'FAST_PICK' && loc.type !== 'BIN') return false;
-          if (rule.targetZoneType === 'BULK' && loc.type !== 'RACK') return false;
+          if (rule.targetZoneType === "FAST_PICK" && loc.type !== "BIN")
+            return false;
+          if (rule.targetZoneType === "BULK" && loc.type !== "RACK")
+            return false;
 
           // Check capacity
           if (loc.capacity && item.quantity > loc.capacity) return false;
@@ -143,7 +185,8 @@ export async function POST(req: NextRequest) {
             priority: rule.priority,
             velocity,
             orderCount,
-            estimatedTimeSavings: velocity === 'FAST' ? 30 : velocity === 'MEDIUM' ? 15 : 0, // seconds per pick
+            estimatedTimeSavings:
+              velocity === "FAST" ? 30 : velocity === "MEDIUM" ? 15 : 0, // seconds per pick
           });
           break; // Use first matching rule
         }
@@ -152,7 +195,7 @@ export async function POST(req: NextRequest) {
 
     // Save recommendations to database
     const savedRecommendations = await Promise.all(
-      recommendations.map(rec =>
+      recommendations.map((rec) =>
         prisma.slottingRecommendation.create({
           data: {
             organizationId,
@@ -163,7 +206,7 @@ export async function POST(req: NextRequest) {
             reason: rec.reason,
             ruleId: rec.ruleId,
             priority: rec.priority,
-            status: 'PENDING',
+            status: "PENDING",
             metadata: {
               velocity: rec.velocity,
               orderCount: rec.orderCount,
@@ -171,8 +214,8 @@ export async function POST(req: NextRequest) {
             },
             createdById: session.user.id,
           },
-        })
-      )
+        }),
+      ),
     );
 
     // Log activity
@@ -180,8 +223,8 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'SLOTTING_OPTIMIZATION_RUN',
-        entityType: 'SlottingRecommendation',
+        action: "SLOTTING_OPTIMIZATION_RUN",
+        entityType: "SlottingRecommendation",
         metadata: {
           warehouseId,
           recommendationCount: savedRecommendations.length,
@@ -198,7 +241,10 @@ export async function POST(req: NextRequest) {
       itemsAnalyzed: inventory.length,
     });
   } catch (error: any) {
-    console.error('Error running slotting optimization:', error);
-    return NextResponse.json({ error: 'Failed to run optimization' }, { status: 500 });
+    console.error("Error running slotting optimization:", error);
+    return NextResponse.json(
+      { error: "Failed to run optimization" },
+      { status: 500 },
+    );
   }
 }

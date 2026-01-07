@@ -11,7 +11,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/mobile/inventory/{id} - Get inventory item details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -21,7 +21,7 @@ export async function GET(
           success: false,
           error: { code: "UNAUTHORIZED", message: "Authentication required" },
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -73,7 +73,7 @@ export async function GET(
           success: false,
           error: { code: "NOT_FOUND", message: "Item not found" },
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -93,7 +93,7 @@ export async function GET(
           message: "Failed to fetch inventory item",
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

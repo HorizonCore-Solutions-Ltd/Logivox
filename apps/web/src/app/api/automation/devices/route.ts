@@ -1,25 +1,25 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 
 export async function GET(request: Request) {
   try {
     const session = await getServerSession();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const devices = await (prisma as any).automationDevice.findMany({
       include: {
         assignedTasks: {
           where: {
-            status: 'IN_PROGRESS',
+            status: "IN_PROGRESS",
           },
           take: 1,
         },
       },
       orderBy: {
-        name: 'asc',
+        name: "asc",
       },
     });
 
@@ -39,7 +39,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(formattedDevices);
   } catch (error) {
-    console.error('Error fetching automation devices:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching automation devices:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

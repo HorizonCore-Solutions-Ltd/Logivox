@@ -11,7 +11,7 @@ import { prisma } from "@/lib/prisma";
 // POST /api/mobile/tasks/[id]/start - Start task
 export async function POST(
   request: Request,
-  { params }: { params: { id: string; action: string } }
+  { params }: { params: { id: string; action: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -21,7 +21,7 @@ export async function POST(
           success: false,
           error: { code: "UNAUTHORIZED", message: "Authentication required" },
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -36,7 +36,7 @@ export async function POST(
           success: false,
           error: { code: "NOT_FOUND", message: "Task not found" },
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -46,7 +46,7 @@ export async function POST(
           success: false,
           error: { code: "FORBIDDEN", message: "Task not assigned to you" },
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -104,7 +104,7 @@ export async function POST(
           message: "Failed to start task",
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

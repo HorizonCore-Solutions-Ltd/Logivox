@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -17,7 +17,10 @@ export async function POST(request: NextRequest) {
     // Get tenant ID from first organization
     const tenantId = session.user.organizations[0]?.id;
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     // Create or get chatbot instance
@@ -39,7 +42,7 @@ export async function POST(request: NextRequest) {
     console.error("Error starting chat session:", error);
     return NextResponse.json(
       { error: "Failed to start chat session" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

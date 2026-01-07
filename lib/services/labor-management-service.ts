@@ -5,7 +5,7 @@
  * scheduling, time tracking, and labor optimization
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -56,8 +56,8 @@ export interface ProductivityReport {
   efficiency: number;
   performanceScore: number; // 0-100
   trends: {
-    productivityTrend: 'INCREASING' | 'STABLE' | 'DECREASING';
-    efficiencyTrend: 'INCREASING' | 'STABLE' | 'DECREASING';
+    productivityTrend: "INCREASING" | "STABLE" | "DECREASING";
+    efficiencyTrend: "INCREASING" | "STABLE" | "DECREASING";
   };
   taskBreakdown: Array<{
     taskType: string;
@@ -78,7 +78,7 @@ export interface TaskAssignment {
     assignedAt: Date;
   }>;
   workload: number; // 0-100
-  availability: 'AVAILABLE' | 'BUSY' | 'OVERLOADED' | 'OFFLINE';
+  availability: "AVAILABLE" | "BUSY" | "OVERLOADED" | "OFFLINE";
   efficiency: number;
   suggestedTasks: Array<{
     taskId: string;
@@ -126,7 +126,7 @@ export class LaborManagementService {
       department?: string;
       station?: string;
       notes?: string;
-    }
+    },
   ): Promise<any> {
     // Check if already clocked in
     const existingEntry = await prisma.timeEntry.findFirst({
@@ -138,7 +138,7 @@ export class LaborManagementService {
     });
 
     if (existingEntry) {
-      throw new Error('Worker already clocked in');
+      throw new Error("Worker already clocked in");
     }
 
     // Create time entry
@@ -160,7 +160,7 @@ export class LaborManagementService {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        currentStatus: 'AVAILABLE',
+        currentStatus: "AVAILABLE",
         lastActivityAt: new Date(),
       },
     });
@@ -177,7 +177,7 @@ export class LaborManagementService {
     data?: {
       breakMinutes?: number;
       notes?: string;
-    }
+    },
   ): Promise<any> {
     const entry = await prisma.timeEntry.findFirst({
       where: {
@@ -188,7 +188,7 @@ export class LaborManagementService {
     });
 
     if (!entry) {
-      throw new Error('No active clock-in found');
+      throw new Error("No active clock-in found");
     }
 
     const clockOutTime = new Date();
@@ -215,7 +215,7 @@ export class LaborManagementService {
     await prisma.user.update({
       where: { id: userId },
       data: {
-        currentStatus: 'OFFLINE',
+        currentStatus: "OFFLINE",
       },
     });
 
@@ -228,9 +228,16 @@ export class LaborManagementService {
   async assignTask(
     organizationId: string,
     taskId: string,
-    taskType: 'PICK' | 'PACK' | 'RECEIVE' | 'PUTAWAY' | 'COUNT' | 'QC' | 'OTHER',
+    taskType:
+      | "PICK"
+      | "PACK"
+      | "RECEIVE"
+      | "PUTAWAY"
+      | "COUNT"
+      | "QC"
+      | "OTHER",
     userId: string,
-    priority?: number
+    priority?: number,
   ): Promise<any> {
     // Get worker
     const worker = await prisma.user.findFirst({
@@ -241,7 +248,7 @@ export class LaborManagementService {
     });
 
     if (!worker) {
-      throw new Error('Worker not found');
+      throw new Error("Worker not found");
     }
 
     // Create task assignment
@@ -253,7 +260,7 @@ export class LaborManagementService {
         userId,
         priority: priority || 5,
         assignedAt: new Date(),
-        status: 'ASSIGNED',
+        status: "ASSIGNED",
       },
       include: {
         user: true,
@@ -273,7 +280,7 @@ export class LaborManagementService {
       unitsProcessed?: number;
       accuracy?: number;
       notes?: string;
-    }
+    },
   ): Promise<any> {
     const assignment = await prisma.taskAssignment.findFirst({
       where: {
@@ -283,16 +290,17 @@ export class LaborManagementService {
     });
 
     if (!assignment) {
-      throw new Error('Task assignment not found');
+      throw new Error("Task assignment not found");
     }
 
     const completedAt = new Date();
-    const duration = (completedAt.getTime() - assignment.assignedAt.getTime()) / (1000 * 60);
+    const duration =
+      (completedAt.getTime() - assignment.assignedAt.getTime()) / (1000 * 60);
 
     return await prisma.taskAssignment.update({
       where: { id: taskAssignmentId },
       data: {
-        status: 'COMPLETED',
+        status: "COMPLETED",
         completedAt,
         duration,
         unitsProcessed: data.unitsProcessed,
@@ -312,7 +320,7 @@ export class LaborManagementService {
     organizationId: string,
     userId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<ProductivityReport> {
     const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const end = endDate || new Date();
@@ -326,7 +334,7 @@ export class LaborManagementService {
     });
 
     if (!worker) {
-      throw new Error('Worker not found');
+      throw new Error("Worker not found");
     }
 
     // Get time entries
@@ -341,7 +349,10 @@ export class LaborManagementService {
       },
     });
 
-    const totalHours = timeEntries.reduce((sum, entry) => sum + (entry.totalHours || 0), 0);
+    const totalHours = timeEntries.reduce(
+      (sum, entry) => sum + (entry.totalHours || 0),
+      0,
+    );
 
     // Get task assignments
     const tasks = await prisma.taskAssignment.findMany({
@@ -356,21 +367,28 @@ export class LaborManagementService {
     });
 
     const totalTasks = tasks.length;
-    const tasksCompleted = tasks.filter((t) => t.status === 'COMPLETED').length;
-    const tasksCancelled = tasks.filter((t) => t.status === 'CANCELLED').length;
+    const tasksCompleted = tasks.filter((t) => t.status === "COMPLETED").length;
+    const tasksCancelled = tasks.filter((t) => t.status === "CANCELLED").length;
 
-    const completedTasks = tasks.filter((t) => t.status === 'COMPLETED' && t.duration);
+    const completedTasks = tasks.filter(
+      (t) => t.status === "COMPLETED" && t.duration,
+    );
     const averageTaskTime =
       completedTasks.length > 0
-        ? completedTasks.reduce((sum, t) => sum + (t.duration || 0), 0) / completedTasks.length
+        ? completedTasks.reduce((sum, t) => sum + (t.duration || 0), 0) /
+          completedTasks.length
         : 0;
 
-    const totalUnits = completedTasks.reduce((sum, t) => sum + (t.unitsProcessed || 0), 0);
+    const totalUnits = completedTasks.reduce(
+      (sum, t) => sum + (t.unitsProcessed || 0),
+      0,
+    );
     const productivity = totalHours > 0 ? totalUnits / totalHours : 0;
 
     const averageAccuracy =
       completedTasks.length > 0
-        ? completedTasks.reduce((sum, t) => sum + (t.accuracy || 100), 0) / completedTasks.length
+        ? completedTasks.reduce((sum, t) => sum + (t.accuracy || 100), 0) /
+          completedTasks.length
         : 100;
 
     const efficiency = totalTasks > 0 ? (tasksCompleted / totalTasks) * 100 : 0;
@@ -379,11 +397,12 @@ export class LaborManagementService {
     const productivityScore = Math.min((productivity / 50) * 40, 40); // Max 40 points
     const accuracyScore = (averageAccuracy / 100) * 30; // Max 30 points
     const efficiencyScore = (efficiency / 100) * 30; // Max 30 points
-    const performanceScore = productivityScore + accuracyScore + efficiencyScore;
+    const performanceScore =
+      productivityScore + accuracyScore + efficiencyScore;
 
     // Task breakdown
     const taskTypeGroups = tasks.reduce((acc: any, task) => {
-      const type = task.taskType || 'OTHER';
+      const type = task.taskType || "OTHER";
       if (!acc[type]) {
         acc[type] = { count: 0, totalTime: 0 };
       }
@@ -392,12 +411,14 @@ export class LaborManagementService {
       return acc;
     }, {});
 
-    const taskBreakdown = Object.entries(taskTypeGroups).map(([type, data]: [string, any]) => ({
-      taskType: type,
-      count: data.count,
-      totalTime: data.totalTime,
-      avgTime: data.count > 0 ? data.totalTime / data.count : 0,
-    }));
+    const taskBreakdown = Object.entries(taskTypeGroups).map(
+      ([type, data]: [string, any]) => ({
+        taskType: type,
+        count: data.count,
+        totalTime: data.totalTime,
+        avgTime: data.count > 0 ? data.totalTime / data.count : 0,
+      }),
+    );
 
     return {
       userId,
@@ -413,8 +434,8 @@ export class LaborManagementService {
       efficiency,
       performanceScore,
       trends: {
-        productivityTrend: 'STABLE', // Would calculate actual trend
-        efficiencyTrend: 'STABLE',
+        productivityTrend: "STABLE", // Would calculate actual trend
+        efficiencyTrend: "STABLE",
       },
       taskBreakdown,
     };
@@ -426,7 +447,7 @@ export class LaborManagementService {
   async getLaborMetrics(
     organizationId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<LaborMetrics> {
     const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const end = endDate || new Date();
@@ -435,7 +456,7 @@ export class LaborManagementService {
     const totalWorkers = await prisma.user.count({
       where: {
         organizationId,
-        role: { in: ['PICKER', 'PACKER', 'RECEIVER', 'QC', 'WAREHOUSE'] },
+        role: { in: ["PICKER", "PACKER", "RECEIVER", "QC", "WAREHOUSE"] },
       },
     });
 
@@ -463,7 +484,7 @@ export class LaborManagementService {
 
     const totalHoursWorked = timeEntries.reduce(
       (sum, entry) => sum + (entry.totalHours || 0),
-      0
+      0,
     );
 
     // Total tasks
@@ -474,7 +495,7 @@ export class LaborManagementService {
           gte: start,
           lte: end,
         },
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
       include: {
         user: true,
@@ -482,8 +503,12 @@ export class LaborManagementService {
     });
 
     const totalTasksCompleted = tasks.length;
-    const totalUnits = tasks.reduce((sum, t) => sum + (t.unitsProcessed || 0), 0);
-    const averageProductivity = totalHoursWorked > 0 ? totalUnits / totalHoursWorked : 0;
+    const totalUnits = tasks.reduce(
+      (sum, t) => sum + (t.unitsProcessed || 0),
+      0,
+    );
+    const averageProductivity =
+      totalHoursWorked > 0 ? totalUnits / totalHoursWorked : 0;
     const averageCostPerHour = 25; // Placeholder
 
     // Top performers
@@ -503,8 +528,14 @@ export class LaborManagementService {
     const topPerformers = Object.entries(workerGroups)
       .map(([userId, data]: [string, any]) => {
         const userEntries = timeEntries.filter((e) => e.userId === userId);
-        const hours = userEntries.reduce((sum, e) => sum + (e.totalHours || 0), 0);
-        const units = data.tasks.reduce((sum: number, t: any) => sum + (t.unitsProcessed || 0), 0);
+        const hours = userEntries.reduce(
+          (sum, e) => sum + (e.totalHours || 0),
+          0,
+        );
+        const units = data.tasks.reduce(
+          (sum: number, t: any) => sum + (t.unitsProcessed || 0),
+          0,
+        );
         const productivity = hours > 0 ? units / hours : 0;
 
         const accuracies = data.tasks
@@ -512,7 +543,8 @@ export class LaborManagementService {
           .map((t: any) => t.accuracy);
         const accuracy =
           accuracies.length > 0
-            ? accuracies.reduce((sum: number, a: number) => sum + a, 0) / accuracies.length
+            ? accuracies.reduce((sum: number, a: number) => sum + a, 0) /
+              accuracies.length
             : 100;
 
         return {
@@ -530,7 +562,7 @@ export class LaborManagementService {
 
     // Department breakdown
     const departmentGroups = timeEntries.reduce((acc: any, entry) => {
-      const dept = entry.department || 'GENERAL';
+      const dept = entry.department || "GENERAL";
       if (!acc[dept]) {
         acc[dept] = { entries: [], tasks: [] };
       }
@@ -540,7 +572,7 @@ export class LaborManagementService {
 
     tasks.forEach((task) => {
       const entry = timeEntries.find((e) => e.userId === task.userId);
-      const dept = entry?.department || 'GENERAL';
+      const dept = entry?.department || "GENERAL";
       if (departmentGroups[dept]) {
         departmentGroups[dept].tasks.push(task);
       }
@@ -549,9 +581,15 @@ export class LaborManagementService {
     const departmentBreakdown = Object.entries(departmentGroups).map(
       ([dept, data]: [string, any]) => {
         const workers = new Set(data.entries.map((e: any) => e.userId)).size;
-        const hours = data.entries.reduce((sum: number, e: any) => sum + (e.totalHours || 0), 0);
+        const hours = data.entries.reduce(
+          (sum: number, e: any) => sum + (e.totalHours || 0),
+          0,
+        );
         const taskCount = data.tasks.length;
-        const units = data.tasks.reduce((sum: number, t: any) => sum + (t.unitsProcessed || 0), 0);
+        const units = data.tasks.reduce(
+          (sum: number, t: any) => sum + (t.unitsProcessed || 0),
+          0,
+        );
         const avgProductivity = hours > 0 ? units / hours : 0;
 
         return {
@@ -561,7 +599,7 @@ export class LaborManagementService {
           totalTasks: taskCount,
           avgProductivity,
         };
-      }
+      },
     );
 
     // Recent activity
@@ -571,12 +609,13 @@ export class LaborManagementService {
       .map((task) => ({
         userId: task.userId,
         userName: task.user.name,
-        taskType: task.taskType || 'OTHER',
+        taskType: task.taskType || "OTHER",
         completedAt: task.completedAt!,
         duration: task.duration || 0,
-        productivity: task.duration && task.unitsProcessed
-          ? task.unitsProcessed / (task.duration / 60)
-          : 0,
+        productivity:
+          task.duration && task.unitsProcessed
+            ? task.unitsProcessed / (task.duration / 60)
+            : 0,
       }));
 
     return {
@@ -596,14 +635,14 @@ export class LaborManagementService {
    * Get worker assignment suggestions
    */
   async getWorkerAssignments(
-    organizationId: string
+    organizationId: string,
   ): Promise<TaskAssignment[]> {
     // Get all active workers
     const workers = await prisma.user.findMany({
       where: {
         organizationId,
         isActive: true,
-        role: { in: ['PICKER', 'PACKER', 'RECEIVER', 'QC', 'WAREHOUSE'] },
+        role: { in: ["PICKER", "PACKER", "RECEIVER", "QC", "WAREHOUSE"] },
       },
     });
 
@@ -614,18 +653,18 @@ export class LaborManagementService {
       const currentTasks = await prisma.taskAssignment.findMany({
         where: {
           userId: worker.id,
-          status: { in: ['ASSIGNED', 'IN_PROGRESS'] },
+          status: { in: ["ASSIGNED", "IN_PROGRESS"] },
         },
-        orderBy: { priority: 'desc' },
+        orderBy: { priority: "desc" },
       });
 
       // Calculate workload
       const workload = Math.min(currentTasks.length * 20, 100);
 
       // Determine availability
-      let availability: TaskAssignment['availability'] = 'AVAILABLE';
-      if (workload >= 80) availability = 'OVERLOADED';
-      else if (workload >= 40) availability = 'BUSY';
+      let availability: TaskAssignment["availability"] = "AVAILABLE";
+      if (workload >= 80) availability = "OVERLOADED";
+      else if (workload >= 40) availability = "BUSY";
 
       // Check if clocked in
       const clockedIn = await prisma.timeEntry.findFirst({
@@ -636,7 +675,7 @@ export class LaborManagementService {
       });
 
       if (!clockedIn) {
-        availability = 'OFFLINE';
+        availability = "OFFLINE";
       }
 
       assignments.push({
@@ -644,7 +683,7 @@ export class LaborManagementService {
         userName: worker.name,
         currentTasks: currentTasks.map((t) => ({
           taskId: t.taskId,
-          taskType: t.taskType || 'OTHER',
+          taskType: t.taskType || "OTHER",
           priority: t.priority,
           estimatedTime: 30, // Placeholder
           assignedAt: t.assignedAt,
@@ -664,7 +703,7 @@ export class LaborManagementService {
    */
   async createSchedule(
     organizationId: string,
-    request: ScheduleRequest
+    request: ScheduleRequest,
   ): Promise<any> {
     const schedules = [];
 
@@ -697,7 +736,7 @@ export class LaborManagementService {
     organizationId: string,
     userId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<any[]> {
     return await prisma.schedule.findMany({
       where: {
@@ -708,7 +747,7 @@ export class LaborManagementService {
           lte: endDate,
         },
       },
-      orderBy: { date: 'asc' },
+      orderBy: { date: "asc" },
       include: {
         user: true,
       },
@@ -721,7 +760,7 @@ export class LaborManagementService {
   async getAllSchedules(
     organizationId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<any[]> {
     return await prisma.schedule.findMany({
       where: {
@@ -731,7 +770,7 @@ export class LaborManagementService {
           lte: endDate,
         },
       },
-      orderBy: [{ date: 'asc' }, { startTime: 'asc' }],
+      orderBy: [{ date: "asc" }, { startTime: "asc" }],
       include: {
         user: true,
       },
@@ -744,7 +783,7 @@ export class LaborManagementService {
   async calculateLaborCost(
     organizationId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<{
     totalHours: number;
     totalCost: number;
@@ -782,22 +821,30 @@ export class LaborManagementService {
     }, {});
 
     let totalCost = 0;
-    const breakdown = Object.entries(userGroups).map(([userId, data]: [string, any]) => {
-      const hours = data.entries.reduce((sum: number, e: any) => sum + (e.totalHours || 0), 0);
-      const hourlyRate = 25; // Would get from user profile
-      const cost = hours * hourlyRate;
-      totalCost += cost;
+    const breakdown = Object.entries(userGroups).map(
+      ([userId, data]: [string, any]) => {
+        const hours = data.entries.reduce(
+          (sum: number, e: any) => sum + (e.totalHours || 0),
+          0,
+        );
+        const hourlyRate = 25; // Would get from user profile
+        const cost = hours * hourlyRate;
+        totalCost += cost;
 
-      return {
-        userId,
-        userName: data.userName,
-        hours,
-        hourlyRate,
-        totalCost: cost,
-      };
-    });
+        return {
+          userId,
+          userName: data.userName,
+          hours,
+          hourlyRate,
+          totalCost: cost,
+        };
+      },
+    );
 
-    const totalHours = timeEntries.reduce((sum, e) => sum + (e.totalHours || 0), 0);
+    const totalHours = timeEntries.reduce(
+      (sum, e) => sum + (e.totalHours || 0),
+      0,
+    );
 
     return {
       totalHours,
@@ -816,25 +863,26 @@ export class LaborManagementService {
       taskType: string;
       priority: number;
       estimatedTime: number;
-    }>
+    }>,
   ): Promise<Array<{ userId: string; taskIds: string[] }>> {
     // Get available workers
     const assignments = await this.getWorkerAssignments(organizationId);
     const availableWorkers = assignments
-      .filter((a) => a.availability === 'AVAILABLE' || a.availability === 'BUSY')
+      .filter(
+        (a) => a.availability === "AVAILABLE" || a.availability === "BUSY",
+      )
       .sort((a, b) => a.workload - b.workload);
 
     if (availableWorkers.length === 0) {
-      throw new Error('No available workers');
+      throw new Error("No available workers");
     }
 
     // Distribute tasks evenly
-    const distribution: Array<{ userId: string; taskIds: string[] }> = availableWorkers.map(
-      (worker) => ({
+    const distribution: Array<{ userId: string; taskIds: string[] }> =
+      availableWorkers.map((worker) => ({
         userId: worker.userId,
         taskIds: [],
-      })
-    );
+      }));
 
     const sortedTasks = [...tasks].sort((a, b) => b.priority - a.priority);
 

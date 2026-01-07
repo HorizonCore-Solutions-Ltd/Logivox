@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useQuery } from "@tanstack/react-query"
+import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
   User,
@@ -9,9 +9,15 @@ import {
   Filter,
   Download,
   Shield,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -19,49 +25,49 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 interface ActivityLog {
-  id: string
-  action: string
-  entityType: string
-  entityId: string
-  details: string
-  ipAddress: string
-  userAgent: string
-  createdAt: string
+  id: string;
+  action: string;
+  entityType: string;
+  entityId: string;
+  details: string;
+  ipAddress: string;
+  userAgent: string;
+  createdAt: string;
   user: {
-    id: string
-    name: string | null
-    email: string
-    image: string | null
-  }
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+  };
 }
 
 interface ActivityLogsResponse {
-  logs: ActivityLog[]
+  logs: ActivityLog[];
   pagination: {
-    page: number
-    limit: number
-    total: number
-    totalPages: number
-  }
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export default function ActivityLogsPage() {
-  const [page, setPage] = React.useState(1)
-  const [actionFilter, setActionFilter] = React.useState<string>("all")
-  const [entityTypeFilter, setEntityTypeFilter] = React.useState<string>("all")
+  const [page, setPage] = React.useState(1);
+  const [actionFilter, setActionFilter] = React.useState<string>("all");
+  const [entityTypeFilter, setEntityTypeFilter] = React.useState<string>("all");
 
   const { data, isLoading } = useQuery<ActivityLogsResponse>({
     queryKey: ["activity-logs", page, actionFilter, entityTypeFilter],
@@ -69,51 +75,59 @@ export default function ActivityLogsPage() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "50",
-      })
+      });
 
       if (actionFilter !== "all") {
-        params.set("action", actionFilter)
+        params.set("action", actionFilter);
       }
 
       if (entityTypeFilter !== "all") {
-        params.set("entityType", entityTypeFilter)
+        params.set("entityType", entityTypeFilter);
       }
 
-      const response = await fetch(`/api/activity-logs?${params}`)
-      if (!response.ok) throw new Error("Failed to fetch activity logs")
-      return response.json()
+      const response = await fetch(`/api/activity-logs?${params}`);
+      if (!response.ok) throw new Error("Failed to fetch activity logs");
+      return response.json();
     },
-  })
+  });
 
   const getActionBadge = (action: string) => {
     switch (action) {
       case "CREATE":
-        return <Badge variant="default" className="bg-green-500">Create</Badge>
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Create
+          </Badge>
+        );
       case "UPDATE":
-        return <Badge variant="default" className="bg-blue-500">Update</Badge>
+        return (
+          <Badge variant="default" className="bg-blue-500">
+            Update
+          </Badge>
+        );
       case "DELETE":
-        return <Badge variant="destructive">Delete</Badge>
+        return <Badge variant="destructive">Delete</Badge>;
       case "LOGIN":
-        return <Badge variant="outline">Login</Badge>
+        return <Badge variant="outline">Login</Badge>;
       case "LOGOUT":
-        return <Badge variant="outline">Logout</Badge>
+        return <Badge variant="outline">Logout</Badge>;
       default:
-        return <Badge variant="secondary">{action}</Badge>
+        return <Badge variant="secondary">{action}</Badge>;
     }
-  }
+  };
 
   const getEntityTypeIcon = (entityType: string) => {
-    return <Shield className="h-4 w-4 text-muted-foreground" />
-  }
+    return <Shield className="h-4 w-4 text-muted-foreground" />;
+  };
 
   const formatDetails = (details: string) => {
     try {
-      const parsed = JSON.parse(details)
-      return JSON.stringify(parsed, null, 2)
+      const parsed = JSON.parse(details);
+      return JSON.stringify(parsed, null, 2);
     } catch {
-      return details
+      return details;
     }
-  }
+  };
 
   return (
     <DashboardSidebar>
@@ -138,18 +152,24 @@ export default function ActivityLogsPage() {
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Activities</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Activities
+              </CardTitle>
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{data?.pagination.total || 0}</div>
+              <div className="text-2xl font-bold">
+                {data?.pagination.total || 0}
+              </div>
               <p className="text-xs text-muted-foreground">All time</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Current Page</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Current Page
+              </CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -162,12 +182,15 @@ export default function ActivityLogsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Filters Active</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Filters Active
+              </CardTitle>
               <Filter className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {(actionFilter !== "all" ? 1 : 0) + (entityTypeFilter !== "all" ? 1 : 0)}
+                {(actionFilter !== "all" ? 1 : 0) +
+                  (entityTypeFilter !== "all" ? 1 : 0)}
               </div>
               <p className="text-xs text-muted-foreground">Applied filters</p>
             </CardContent>
@@ -201,14 +224,21 @@ export default function ActivityLogsPage() {
                 </Select>
               </div>
               <div className="flex-1">
-                <label className="text-sm font-medium mb-2 block">Entity Type</label>
-                <Select value={entityTypeFilter} onValueChange={setEntityTypeFilter}>
+                <label className="text-sm font-medium mb-2 block">
+                  Entity Type
+                </label>
+                <Select
+                  value={entityTypeFilter}
+                  onValueChange={setEntityTypeFilter}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Types</SelectItem>
-                    <SelectItem value="inventoryItem">Inventory Item</SelectItem>
+                    <SelectItem value="inventoryItem">
+                      Inventory Item
+                    </SelectItem>
                     <SelectItem value="warehouse">Warehouse</SelectItem>
                     <SelectItem value="category">Category</SelectItem>
                     <SelectItem value="customer">Customer</SelectItem>
@@ -269,8 +299,12 @@ export default function ActivityLogsPage() {
                               </div>
                             )}
                             <div>
-                              <p className="font-medium text-sm">{log.user.name || "Unknown"}</p>
-                              <p className="text-xs text-muted-foreground">{log.user.email}</p>
+                              <p className="font-medium text-sm">
+                                {log.user.name || "Unknown"}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {log.user.email}
+                              </p>
                             </div>
                           </div>
                         </TableCell>
@@ -278,7 +312,9 @@ export default function ActivityLogsPage() {
                         <TableCell>
                           <div className="flex items-center gap-2">
                             {getEntityTypeIcon(log.entityType)}
-                            <span className="text-sm font-medium">{log.entityType}</span>
+                            <span className="text-sm font-medium">
+                              {log.entityType}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -291,7 +327,9 @@ export default function ActivityLogsPage() {
                             </pre>
                           </details>
                         </TableCell>
-                        <TableCell className="text-sm font-mono">{log.ipAddress}</TableCell>
+                        <TableCell className="text-sm font-mono">
+                          {log.ipAddress}
+                        </TableCell>
                         <TableCell className="text-sm">
                           {new Date(log.createdAt).toLocaleString()}
                         </TableCell>
@@ -303,7 +341,9 @@ export default function ActivityLogsPage() {
                 {/* Pagination */}
                 <div className="flex items-center justify-between mt-4">
                   <p className="text-sm text-muted-foreground">
-                    Showing {((page - 1) * 50) + 1} to {Math.min(page * 50, data.pagination.total)} of {data.pagination.total} activities
+                    Showing {(page - 1) * 50 + 1} to{" "}
+                    {Math.min(page * 50, data.pagination.total)} of{" "}
+                    {data.pagination.total} activities
                   </p>
                   <div className="flex gap-2">
                     <Button
@@ -334,5 +374,5 @@ export default function ActivityLogsPage() {
         </Card>
       </div>
     </DashboardSidebar>
-  )
+  );
 }

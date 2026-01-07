@@ -1,26 +1,26 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 // GET /api/qc/fmea/[id]/failure-modes - List all failure modes for an FMEA
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const failureModes = await prisma.fMEAFailureMode.findMany({
       where: { fmeaId: params.id },
       orderBy: {
-        rpn: 'desc'
-      }
+        rpn: "desc",
+      },
     });
 
     return NextResponse.json({ success: true, data: failureModes });
   } catch (error: any) {
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -28,7 +28,7 @@ export async function GET(
 // POST /api/qc/fmea/[id]/failure-modes - Add failure mode to FMEA
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await req.json();
@@ -44,7 +44,7 @@ export async function POST(
       detection,
       recommendedActions,
       responsiblePerson,
-      targetDate
+      targetDate,
     } = body;
 
     // Calculate RPN
@@ -54,7 +54,7 @@ export async function POST(
       data: {
         fmeaId: params.id,
         processStep,
-        processFunction: processFunction || '',
+        processFunction: processFunction || "",
         failureMode,
         effectsOfFailure,
         potentialCauses,
@@ -66,16 +66,16 @@ export async function POST(
         recommendedActions,
         responsiblePerson,
         targetDate: targetDate ? new Date(targetDate) : undefined,
-        status: 'OPEN'
-      }
+        status: "OPEN",
+      },
     });
 
     return NextResponse.json({ success: true, data: failureModeRecord });
   } catch (error: any) {
-    console.error('Error creating failure mode:', error);
+    console.error("Error creating failure mode:", error);
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

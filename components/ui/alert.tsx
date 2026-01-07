@@ -1,7 +1,7 @@
-import * as React from "react"
+import * as React from "react";
 
 export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
-  variant?: 'default' | 'destructive'
+  variant?: "default" | "destructive";
 }
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
@@ -10,11 +10,13 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
       ref={ref}
       role="alert"
       className={`relative w-full rounded-lg border p-4 ${
-        variant === "destructive" ? "border-red-500 bg-red-50 text-red-900" : "border-gray-300 bg-gray-50"
+        variant === "destructive"
+          ? "border-red-500 bg-red-50 text-red-900"
+          : "border-gray-300 bg-gray-50"
       } ${className}`}
       {...props}
     />
-  )
+  ),
 );
 Alert.displayName = "Alert";
 

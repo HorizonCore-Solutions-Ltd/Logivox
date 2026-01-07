@@ -3,13 +3,19 @@
  * Comprehensive audit trail with filtering and search
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -17,23 +23,27 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   FileText,
   Search,
@@ -47,8 +57,8 @@ import {
   Settings,
   Package,
   ShoppingCart,
-} from 'lucide-react';
-import { format } from 'date-fns';
+} from "lucide-react";
+import { format } from "date-fns";
 
 interface AuditLog {
   id: string;
@@ -78,20 +88,20 @@ const ACTION_ICONS: Record<string, any> = {
 };
 
 const ACTION_COLORS: Record<string, string> = {
-  created: 'green',
-  updated: 'blue',
-  deleted: 'red',
-  success: 'green',
-  failed: 'red',
+  created: "green",
+  updated: "blue",
+  deleted: "red",
+  success: "green",
+  failed: "red",
 };
 
 export default function AuditLogPage() {
   const [logs, setLogs] = useState<AuditLog[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [actionFilter, setActionFilter] = useState<string>('all');
-  const [resourceFilter, setResourceFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [actionFilter, setActionFilter] = useState<string>("all");
+  const [resourceFilter, setResourceFilter] = useState<string>("all");
   const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
@@ -111,13 +121,13 @@ export default function AuditLogPage() {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '50',
+        limit: "50",
       });
 
-      if (actionFilter !== 'all') params.append('action', actionFilter);
-      if (resourceFilter !== 'all') params.append('resource', resourceFilter);
-      if (dateRange.from) params.append('from', dateRange.from.toISOString());
-      if (dateRange.to) params.append('to', dateRange.to.toISOString());
+      if (actionFilter !== "all") params.append("action", actionFilter);
+      if (resourceFilter !== "all") params.append("resource", resourceFilter);
+      if (dateRange.from) params.append("from", dateRange.from.toISOString());
+      if (dateRange.to) params.append("to", dateRange.to.toISOString());
 
       const response = await fetch(`/api/admin/audit-logs?${params}`);
       if (response.ok) {
@@ -126,7 +136,7 @@ export default function AuditLogPage() {
         setTotalPages(data.pagination.totalPages);
       }
     } catch (error) {
-      console.error('Failed to fetch audit logs:', error);
+      console.error("Failed to fetch audit logs:", error);
     } finally {
       setLoading(false);
     }
@@ -143,7 +153,7 @@ export default function AuditLogPage() {
         log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
         log.resource.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        log.ipAddress.includes(searchQuery)
+        log.ipAddress.includes(searchQuery),
     );
 
     setFilteredLogs(filtered);
@@ -152,19 +162,19 @@ export default function AuditLogPage() {
   const exportLogs = async () => {
     try {
       const params = new URLSearchParams({
-        format: 'csv',
+        format: "csv",
       });
 
-      if (actionFilter !== 'all') params.append('action', actionFilter);
-      if (resourceFilter !== 'all') params.append('resource', resourceFilter);
-      if (dateRange.from) params.append('from', dateRange.from.toISOString());
-      if (dateRange.to) params.append('to', dateRange.to.toISOString());
+      if (actionFilter !== "all") params.append("action", actionFilter);
+      if (resourceFilter !== "all") params.append("resource", resourceFilter);
+      if (dateRange.from) params.append("from", dateRange.from.toISOString());
+      if (dateRange.to) params.append("to", dateRange.to.toISOString());
 
       const response = await fetch(`/api/admin/audit-logs/export?${params}`);
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = `audit-logs-${Date.now()}.csv`;
         document.body.appendChild(a);
@@ -173,16 +183,16 @@ export default function AuditLogPage() {
         document.body.removeChild(a);
       }
     } catch (error) {
-      console.error('Failed to export logs:', error);
+      console.error("Failed to export logs:", error);
     }
   };
 
   const getActionBadge = (action: string) => {
-    const type = action.split('_').pop() || '';
-    const color = ACTION_COLORS[type] || 'gray';
+    const type = action.split("_").pop() || "";
+    const color = ACTION_COLORS[type] || "gray";
     return (
       <Badge variant="outline" className={`bg-${color}-50 border-${color}-200`}>
-        {action.replace(/_/g, ' ')}
+        {action.replace(/_/g, " ")}
       </Badge>
     );
   };
@@ -232,7 +242,9 @@ export default function AuditLogPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Resources Modified</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Resources Modified
+            </CardTitle>
             <Database className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -243,12 +255,19 @@ export default function AuditLogPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Security Events</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Security Events
+            </CardTitle>
             <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {logs.filter((l) => l.action.includes('login') || l.action.includes('auth')).length}
+              {
+                logs.filter(
+                  (l) =>
+                    l.action.includes("login") || l.action.includes("auth"),
+                ).length
+              }
             </div>
           </CardContent>
         </Card>
@@ -282,7 +301,9 @@ export default function AuditLogPage() {
                 <SelectItem value="user_created">User Created</SelectItem>
                 <SelectItem value="user_updated">User Updated</SelectItem>
                 <SelectItem value="user_deleted">User Deleted</SelectItem>
-                <SelectItem value="settings_updated">Settings Updated</SelectItem>
+                <SelectItem value="settings_updated">
+                  Settings Updated
+                </SelectItem>
                 <SelectItem value="login_success">Login Success</SelectItem>
                 <SelectItem value="login_failed">Login Failed</SelectItem>
               </SelectContent>
@@ -306,14 +327,14 @@ export default function AuditLogPage() {
                   {dateRange.from ? (
                     dateRange.to ? (
                       <>
-                        {format(dateRange.from, 'LLL dd')} -{' '}
-                        {format(dateRange.to, 'LLL dd')}
+                        {format(dateRange.from, "LLL dd")} -{" "}
+                        {format(dateRange.to, "LLL dd")}
                       </>
                     ) : (
-                      format(dateRange.from, 'LLL dd, y')
+                      format(dateRange.from, "LLL dd, y")
                     )
                   ) : (
-                    'Pick a date'
+                    "Pick a date"
                   )}
                 </Button>
               </PopoverTrigger>
@@ -432,38 +453,58 @@ export default function AuditLogPage() {
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">User</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    User
+                  </p>
                   <p className="text-sm">{selectedLog.userName}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Action</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Action
+                  </p>
                   <p className="text-sm">{selectedLog.action}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Resource</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Resource
+                  </p>
                   <p className="text-sm">{selectedLog.resource}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Resource ID</p>
-                  <p className="text-sm font-mono">{selectedLog.resourceId || 'N/A'}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Resource ID
+                  </p>
+                  <p className="text-sm font-mono">
+                    {selectedLog.resourceId || "N/A"}
+                  </p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">IP Address</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    IP Address
+                  </p>
                   <p className="text-sm font-mono">{selectedLog.ipAddress}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-muted-foreground">Timestamp</p>
-                  <p className="text-sm">{new Date(selectedLog.timestamp).toLocaleString()}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Timestamp
+                  </p>
+                  <p className="text-sm">
+                    {new Date(selectedLog.timestamp).toLocaleString()}
+                  </p>
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-2">User Agent</p>
+                <p className="text-sm font-medium text-muted-foreground mb-2">
+                  User Agent
+                </p>
                 <p className="text-xs font-mono bg-muted p-2 rounded">
                   {selectedLog.userAgent}
                 </p>
               </div>
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-2">Details</p>
+                <p className="text-sm font-medium text-muted-foreground mb-2">
+                  Details
+                </p>
                 <pre className="text-xs font-mono bg-muted p-4 rounded overflow-auto max-h-64">
                   {JSON.stringify(selectedLog.details, null, 2)}
                 </pre>

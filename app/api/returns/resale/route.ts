@@ -7,23 +7,31 @@
  * GET /api/returns/resale/pricing - Get pricing recommendation
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { ResaleAutomationService } from '@/lib/services/returns/resale-automation';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { ResaleAutomationService } from "@/lib/services/returns/resale-automation";
 
 const createCandidateSchema = z.object({
   rmaItemId: z.string(),
-  condition: z.enum(['NEW', 'LIKE_NEW', 'GOOD', 'FAIR', 'POOR']),
+  condition: z.enum(["NEW", "LIKE_NEW", "GOOD", "FAIR", "POOR"]),
   notes: z.string().optional(),
 });
 
 const createListingSchema = z.object({
   candidateId: z.string(),
-  channel: z.enum(['EBAY', 'AMAZON', 'SHOPIFY', 'WALMART', 'MERCARI', 'POSHMARK', 'INTERNAL']),
+  channel: z.enum([
+    "EBAY",
+    "AMAZON",
+    "SHOPIFY",
+    "WALMART",
+    "MERCARI",
+    "POSHMARK",
+    "INTERNAL",
+  ]),
   price: z.number(),
   quantity: z.number().default(1),
   title: z.string().optional(),
@@ -35,7 +43,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -43,15 +51,18 @@ export async function GET(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type'); // candidates or listings
-    const status = searchParams.get('status');
-    const channel = searchParams.get('channel');
+    const type = searchParams.get("type"); // candidates or listings
+    const status = searchParams.get("status");
+    const channel = searchParams.get("channel");
 
-    if (type === 'listings') {
+    if (type === "listings") {
       let query = `
         SELECT rl.*, rc.sku, rc.condition, p.name as product_name
         FROM resale_listings rl
@@ -105,10 +116,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ candidates });
   } catch (error) {
-    console.error('Error fetching resale data:', error);
+    console.error("Error fetching resale data:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch resale data' },
-      { status: 500 }
+      { error: "Failed to fetch resale data" },
+      { status: 500 },
     );
   }
 }
@@ -117,7 +128,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -125,18 +136,21 @@ export async function POST(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
+    const type = searchParams.get("type");
 
-    if (type === 'listing') {
+    if (type === "listing") {
       const data = createListingSchema.parse(body);
 
       // Get candidate
-      const candidate = await prisma.$queryRaw`
+      const candidate = (await prisma.$queryRaw`
         SELECT rc.*, ri.product_id, p.sku, p.name, r.organization_id
         FROM resale_candidates rc
         JOIN "RMAItem" ri ON ri.id = rc.rma_item_id
@@ -144,10 +158,13 @@ export async function POST(request: NextRequest) {
         LEFT JOIN "Product" p ON p.id = ri.product_id
         WHERE rc.id = ${data.candidateId}
           AND r.organization_id = ${membership.organizationId}
-      ` as any[];
+      `) as any[];
 
       if (!candidate || candidate.length === 0) {
-        return NextResponse.json({ error: 'Candidate not found' }, { status: 404 });
+        return NextResponse.json(
+          { error: "Candidate not found" },
+          { status: 404 },
+        );
       }
 
       const cand = candidate[0];
@@ -179,8 +196,11 @@ export async function POST(request: NextRequest) {
       // Sync to channel if auto-sync enabled
       if (data.autoSync) {
         try {
-          const syncResult = await resaleService.syncToChannel(listing.id, data.channel);
-          
+          const syncResult = await resaleService.syncToChannel(
+            listing.id,
+            data.channel,
+          );
+
           await prisma.$executeRaw`
             UPDATE resale_listings
             SET 
@@ -191,7 +211,7 @@ export async function POST(request: NextRequest) {
             WHERE id = ${listing.id}
           `;
         } catch (syncError) {
-          console.error('Sync error:', syncError);
+          console.error("Sync error:", syncError);
           // Continue even if sync fails
         }
       }
@@ -205,7 +225,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         listing,
-        message: 'Listing created successfully',
+        message: "Listing created successfully",
       });
     }
 
@@ -222,13 +242,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rmaItem || rmaItem.rma.organizationId !== membership.organizationId) {
-      return NextResponse.json({ error: 'RMA item not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "RMA item not found" },
+        { status: 404 },
+      );
     }
 
     const resaleService = new ResaleAutomationService();
     const candidate = await resaleService.evaluateForResale({
-      productId: rmaItem.productId || '',
-      sku: rmaItem.sku || '',
+      productId: rmaItem.productId || "",
+      sku: rmaItem.sku || "",
       condition: data.condition,
       originalPrice: rmaItem.unitPrice?.toNumber() || 0,
       returnReason: rmaItem.rma.returnReason as any,
@@ -252,25 +275,28 @@ export async function POST(request: NextRequest) {
     // Update RMA item
     await prisma.rMAItem.update({
       where: { id: data.rmaItemId },
-      data: { disposition: 'RESELL' },
+      data: { disposition: "RESELL" },
     });
 
     return NextResponse.json({
       candidate,
-      message: 'Resale candidate created successfully',
+      message: "Resale candidate created successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating resale data:', error);
+    console.error("Error creating resale data:", error);
     return NextResponse.json(
-      { error: 'Failed to create resale data', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to create resale data",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

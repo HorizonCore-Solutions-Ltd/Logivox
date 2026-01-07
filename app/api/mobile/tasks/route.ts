@@ -18,7 +18,7 @@ export async function GET(request: Request) {
           success: false,
           error: { code: "UNAUTHORIZED", message: "Authentication required" },
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -68,10 +68,7 @@ export async function GET(request: Request) {
           },
         },
       },
-      orderBy: [
-        { priority: "desc" },
-        { scheduledFor: "asc" },
-      ],
+      orderBy: [{ priority: "desc" }, { scheduledFor: "asc" }],
       take: 50,
     });
 
@@ -92,7 +89,7 @@ export async function GET(request: Request) {
           message: "Failed to fetch tasks",
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

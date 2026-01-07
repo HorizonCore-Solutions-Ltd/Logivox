@@ -1,11 +1,11 @@
 /**
  * Report Engine for LogiVox
- * 
+ *
  * Executes report configurations and generates data results.
  * Handles filtering, sorting, grouping, and aggregations.
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 import {
   ReportConfig,
   ReportFilter,
@@ -14,7 +14,7 @@ import {
   AggregationType,
   FieldType,
   getFieldById,
-} from './report-types';
+} from "./report-types";
 
 // ============================================================================
 // Report Execution
@@ -32,7 +32,7 @@ export interface ReportResult {
  */
 export async function executeReport(
   config: ReportConfig,
-  tenantId: string
+  tenantId: string,
 ): Promise<ReportResult> {
   const startTime = Date.now();
 
@@ -40,19 +40,19 @@ export async function executeReport(
   let data: any[] = [];
 
   switch (config.category) {
-    case 'inventory':
+    case "inventory":
       data = await executeInventoryReport(config, tenantId);
       break;
-    case 'sales':
+    case "sales":
       data = await executeSalesReport(config, tenantId);
       break;
-    case 'customers':
+    case "customers":
       data = await executeCustomerReport(config, tenantId);
       break;
-    case 'financial':
+    case "financial":
       data = await executeFinancialReport(config, tenantId);
       break;
-    case 'operations':
+    case "operations":
       data = await executeOperationsReport(config, tenantId);
       break;
     default:
@@ -75,7 +75,7 @@ export async function executeReport(
 
 async function executeInventoryReport(
   config: ReportConfig,
-  tenantId: string
+  tenantId: string,
 ): Promise<any[]> {
   const where: any = { tenantId };
 
@@ -92,8 +92,8 @@ async function executeInventoryReport(
     config.grouping.aggregations.forEach((agg) => {
       const aggKey = agg.alias || `${agg.type}_${agg.field}`;
       aggregations[aggKey] = {
-        [agg.type === AggregationType.COUNT ? '_count' : `_${agg.type}`]:
-          agg.field === '*' ? true : { [agg.field]: true },
+        [agg.type === AggregationType.COUNT ? "_count" : `_${agg.type}`]:
+          agg.field === "*" ? true : { [agg.field]: true },
       };
     });
 
@@ -127,7 +127,7 @@ async function executeInventoryReport(
 
 async function executeSalesReport(
   config: ReportConfig,
-  tenantId: string
+  tenantId: string,
 ): Promise<any[]> {
   const where: any = { tenantId };
 
@@ -144,8 +144,8 @@ async function executeSalesReport(
     config.grouping.aggregations.forEach((agg) => {
       const aggKey = agg.alias || `${agg.type}_${agg.field}`;
       aggregations[aggKey] = {
-        [agg.type === AggregationType.COUNT ? '_count' : `_${agg.type}`]:
-          agg.field === '*' ? true : { [agg.field]: true },
+        [agg.type === AggregationType.COUNT ? "_count" : `_${agg.type}`]:
+          agg.field === "*" ? true : { [agg.field]: true },
       };
     });
 
@@ -162,11 +162,11 @@ async function executeSalesReport(
     // Standard report with joins
     const include: any = {};
 
-    if (config.fields.includes('customer_name')) {
+    if (config.fields.includes("customer_name")) {
       include.customer = { select: { name: true } };
     }
 
-    if (config.fields.includes('product_name')) {
+    if (config.fields.includes("product_name")) {
       include.product = { select: { name: true } };
     }
 
@@ -198,7 +198,7 @@ async function executeSalesReport(
 
 async function executeCustomerReport(
   config: ReportConfig,
-  tenantId: string
+  tenantId: string,
 ): Promise<any[]> {
   const where: any = { tenantId };
 
@@ -223,7 +223,7 @@ async function executeCustomerReport(
           totalAmount: true,
           createdAt: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 1,
       },
     },
@@ -239,7 +239,7 @@ async function executeCustomerReport(
     total_bookings: customer._count.bookings,
     total_spent: customer.bookings.reduce(
       (sum: number, b: any) => sum + (b.totalAmount || 0),
-      0
+      0,
     ),
     last_booking_date: customer.bookings[0]?.createdAt,
     created_at: customer.createdAt,
@@ -252,11 +252,13 @@ async function executeCustomerReport(
 
 async function executeFinancialReport(
   config: ReportConfig,
-  tenantId: string
+  tenantId: string,
 ): Promise<any[]> {
   // Financial reports combine inventory and sales data
   // Use the appropriate execution based on fields
-  if (config.fields.some((f) => f.includes('booking') || f.includes('revenue'))) {
+  if (
+    config.fields.some((f) => f.includes("booking") || f.includes("revenue"))
+  ) {
     return executeSalesReport(config, tenantId);
   } else {
     return executeInventoryReport(config, tenantId);
@@ -269,7 +271,7 @@ async function executeFinancialReport(
 
 async function executeOperationsReport(
   config: ReportConfig,
-  tenantId: string
+  tenantId: string,
 ): Promise<any[]> {
   // Operations reports are primarily booking-based
   return executeSalesReport(config, tenantId);
@@ -308,19 +310,19 @@ function applyFilter(where: any, filter: ReportFilter): void {
       break;
 
     case FilterOperator.CONTAINS:
-      where[field] = { contains: filter.value, mode: 'insensitive' };
+      where[field] = { contains: filter.value, mode: "insensitive" };
       break;
 
     case FilterOperator.NOT_CONTAINS:
-      where[field] = { not: { contains: filter.value, mode: 'insensitive' } };
+      where[field] = { not: { contains: filter.value, mode: "insensitive" } };
       break;
 
     case FilterOperator.STARTS_WITH:
-      where[field] = { startsWith: filter.value, mode: 'insensitive' };
+      where[field] = { startsWith: filter.value, mode: "insensitive" };
       break;
 
     case FilterOperator.ENDS_WITH:
-      where[field] = { endsWith: filter.value, mode: 'insensitive' };
+      where[field] = { endsWith: filter.value, mode: "insensitive" };
       break;
 
     case FilterOperator.IN:
@@ -373,10 +375,7 @@ function buildOrderBy(sorts: ReportSort[]): any {
 // Data Transformation
 // ============================================================================
 
-export function formatReportData(
-  data: any[],
-  config: ReportConfig
-): any[] {
+export function formatReportData(data: any[], config: ReportConfig): any[] {
   return data.map((row) => {
     const formatted: any = {};
 
@@ -400,19 +399,19 @@ function formatValue(value: any, type: FieldType): any {
 
   switch (type) {
     case FieldType.CURRENCY:
-      return typeof value === 'number' ? value.toFixed(2) : value;
+      return typeof value === "number" ? value.toFixed(2) : value;
 
     case FieldType.PERCENTAGE:
-      return typeof value === 'number' ? `${(value * 100).toFixed(2)}%` : value;
+      return typeof value === "number" ? `${(value * 100).toFixed(2)}%` : value;
 
     case FieldType.DATE:
-      return value instanceof Date ? value.toISOString().split('T')[0] : value;
+      return value instanceof Date ? value.toISOString().split("T")[0] : value;
 
     case FieldType.DATETIME:
       return value instanceof Date ? value.toISOString() : value;
 
     case FieldType.NUMBER:
-      return typeof value === 'number' ? value : parseFloat(value);
+      return typeof value === "number" ? value : parseFloat(value);
 
     default:
       return value;
@@ -430,16 +429,16 @@ export function validateReportConfig(config: ReportConfig): {
   const errors: string[] = [];
 
   // Check required fields
-  if (!config.name || config.name.trim() === '') {
-    errors.push('Report name is required');
+  if (!config.name || config.name.trim() === "") {
+    errors.push("Report name is required");
   }
 
   if (!config.category) {
-    errors.push('Report category is required');
+    errors.push("Report category is required");
   }
 
   if (!config.fields || config.fields.length === 0) {
-    errors.push('At least one field must be selected');
+    errors.push("At least one field must be selected");
   }
 
   // Validate filters

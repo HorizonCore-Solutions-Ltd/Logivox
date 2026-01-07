@@ -13,6 +13,7 @@ Part 1 establishes LogiVox's core IoT and sensor infrastructure: device provisio
 This foundation enables real-time operational visibility, predictive maintenance, compliance monitoring, and data-driven optimization across the warehouse.
 
 ### Core Capabilities
+
 - **Device Management**: Provision, configure, and monitor IoT devices at scale
 - **Telemetry Collection**: Real-time data ingestion from sensors, RFID, beacons, equipment
 - **Event Stream Processing**: Process, filter, aggregate, and route sensor events
@@ -25,59 +26,82 @@ This foundation enables real-time operational visibility, predictive maintenance
 ## 🏗️ 1. IoT Device Management
 
 ### Goal
+
 Centralized lifecycle management for all IoT devices: sensors, beacons, RFID readers, gateways, edge devices.
 
 ```typescript
 type DeviceType =
-  | 'TEMPERATURE_SENSOR'
-  | 'HUMIDITY_SENSOR'
-  | 'AIR_QUALITY_SENSOR'
-  | 'MOTION_SENSOR'
-  | 'RFID_READER'
-  | 'BLE_BEACON'
-  | 'GPS_TRACKER'
-  | 'UWB_ANCHOR'
-  | 'GATEWAY'
-  | 'EDGE_DEVICE'
-  | 'SCALE'
-  | 'LIGHT_SENSOR'
-  | 'NOISE_SENSOR'
-  | 'VIBRATION_SENSOR';
+  | "TEMPERATURE_SENSOR"
+  | "HUMIDITY_SENSOR"
+  | "AIR_QUALITY_SENSOR"
+  | "MOTION_SENSOR"
+  | "RFID_READER"
+  | "BLE_BEACON"
+  | "GPS_TRACKER"
+  | "UWB_ANCHOR"
+  | "GATEWAY"
+  | "EDGE_DEVICE"
+  | "SCALE"
+  | "LIGHT_SENSOR"
+  | "NOISE_SENSOR"
+  | "VIBRATION_SENSOR";
 
-type DeviceStatus = 'ONLINE' | 'OFFLINE' | 'MAINTENANCE' | 'ERROR' | 'DECOMMISSIONED';
+type DeviceStatus =
+  | "ONLINE"
+  | "OFFLINE"
+  | "MAINTENANCE"
+  | "ERROR"
+  | "DECOMMISSIONED";
 
-type ConnectivityProtocol = 'MQTT' | 'HTTP' | 'COAP' | 'LORAWAN' | 'ZIGBEE' | 'BLUETOOTH' | 'WIFI' | 'ETHERNET';
+type ConnectivityProtocol =
+  | "MQTT"
+  | "HTTP"
+  | "COAP"
+  | "LORAWAN"
+  | "ZIGBEE"
+  | "BLUETOOTH"
+  | "WIFI"
+  | "ETHERNET";
 
 interface IoTDeviceManagement {
   // Device lifecycle
   registerDevice: (device: DeviceRegistration) => Promise<string>; // device ID
-  updateDevice: (deviceId: string, updates: Partial<IoTDevice>) => Promise<void>;
+  updateDevice: (
+    deviceId: string,
+    updates: Partial<IoTDevice>,
+  ) => Promise<void>;
   decommissionDevice: (deviceId: string, reason?: string) => Promise<void>;
-  
+
   // Configuration
   configureDevice: (deviceId: string, config: DeviceConfig) => Promise<void>;
   getDeviceConfig: (deviceId: string) => Promise<DeviceConfig>;
-  
+
   // Monitoring
   getDevice: (deviceId: string) => Promise<IoTDevice>;
   listDevices: (filters?: DeviceFilters) => Promise<IoTDevice[]>;
   getDeviceHealth: (deviceId: string) => Promise<DeviceHealth>;
-  
+
   // Bulk operations
-  bulkUpdateDevices: (deviceIds: string[], updates: Partial<IoTDevice>) => Promise<void>;
-  
+  bulkUpdateDevices: (
+    deviceIds: string[],
+    updates: Partial<IoTDevice>,
+  ) => Promise<void>;
+
   // Firmware
-  updateFirmware: (deviceId: string, firmwareVersion: string) => Promise<string>; // job ID
+  updateFirmware: (
+    deviceId: string,
+    firmwareVersion: string,
+  ) => Promise<string>; // job ID
 }
 
 interface DeviceRegistration {
   name: string;
   type: DeviceType;
-  
+
   // Connectivity
   protocol: ConnectivityProtocol;
   connectionString?: string;
-  
+
   // Location
   warehouseId: string;
   zone?: string;
@@ -86,15 +110,15 @@ interface DeviceRegistration {
     y: number;
     z?: number;
   };
-  
+
   // Hardware
   manufacturer?: string;
   model?: string;
   serialNumber?: string;
-  
+
   // Configuration
   config?: DeviceConfig;
-  
+
   // Metadata
   metadata?: Record<string, unknown>;
 }
@@ -103,14 +127,14 @@ interface IoTDevice {
   id: string;
   name: string;
   type: DeviceType;
-  
+
   status: DeviceStatus;
-  
+
   // Connectivity
   protocol: ConnectivityProtocol;
   connectionString?: string;
   lastSeen?: Date;
-  
+
   // Location
   warehouseId: string;
   zone?: string;
@@ -119,21 +143,21 @@ interface IoTDevice {
     y: number;
     z?: number;
   };
-  
+
   // Hardware
   manufacturer?: string;
   model?: string;
   serialNumber?: string;
   firmwareVersion?: string;
-  
+
   // Configuration
   config: DeviceConfig;
-  
+
   // Lifecycle
   registeredAt: Date;
   lastMaintenanceAt?: Date;
   nextMaintenanceDue?: Date;
-  
+
   // Metadata
   metadata?: Record<string, unknown>;
 }
@@ -141,7 +165,7 @@ interface IoTDevice {
 interface DeviceConfig {
   // Sampling
   samplingIntervalSeconds?: number;
-  
+
   // Thresholds
   thresholds?: {
     metric: string;
@@ -149,18 +173,18 @@ interface DeviceConfig {
     max?: number;
     alertOnViolation: boolean;
   }[];
-  
+
   // Data retention
   localBufferSize?: number;
   localRetentionHours?: number;
-  
+
   // Power management
-  powerMode?: 'ALWAYS_ON' | 'LOW_POWER' | 'SCHEDULED';
+  powerMode?: "ALWAYS_ON" | "LOW_POWER" | "SCHEDULED";
   scheduleActive?: {
     start: string; // HH:MM
     end: string;
   }[];
-  
+
   // Advanced
   customSettings?: Record<string, unknown>;
 }
@@ -175,24 +199,24 @@ interface DeviceFilters {
 
 interface DeviceHealth {
   deviceId: string;
-  
-  overall: 'HEALTHY' | 'DEGRADED' | 'CRITICAL';
-  
+
+  overall: "HEALTHY" | "DEGRADED" | "CRITICAL";
+
   metrics: {
     batteryLevel?: number; // %
     signalStrength?: number; // dBm
     uptime?: number; // seconds
-    
+
     messagesSent: number;
     messagesLost: number;
     errorRate: number; // %
-    
+
     lastSuccessfulMessage?: Date;
     consecutiveFailures: number;
   };
-  
+
   issues: {
-    severity: 'LOW' | 'MEDIUM' | 'HIGH';
+    severity: "LOW" | "MEDIUM" | "HIGH";
     description: string;
     detectedAt: Date;
   }[];
@@ -212,23 +236,27 @@ const DEVICE_MANAGEMENT_VOICE_COMMANDS = [
 ## 📊 2. Real-Time Telemetry Collection
 
 ### Goal
+
 Ingest, validate, and store sensor data at scale with low latency.
 
 ```typescript
-type TelemetryDataType = 'NUMERIC' | 'BOOLEAN' | 'STRING' | 'JSON' | 'BINARY';
+type TelemetryDataType = "NUMERIC" | "BOOLEAN" | "STRING" | "JSON" | "BINARY";
 
 interface TelemetryService {
   // Publish telemetry
   publishTelemetry: (data: TelemetryMessage) => Promise<void>;
   publishBatch: (messages: TelemetryMessage[]) => Promise<void>;
-  
+
   // Query telemetry
   queryTelemetry: (query: TelemetryQuery) => Promise<TelemetryResult>;
-  
+
   // Real-time streaming
-  subscribeTelemetry: (subscription: TelemetrySubscription, callback: (data: TelemetryMessage) => void) => Promise<string>; // subscription ID
+  subscribeTelemetry: (
+    subscription: TelemetrySubscription,
+    callback: (data: TelemetryMessage) => void,
+  ) => Promise<string>; // subscription ID
   unsubscribe: (subscriptionId: string) => Promise<void>;
-  
+
   // Aggregations
   getAggregatedData: (query: AggregationQuery) => Promise<AggregatedData>;
 }
@@ -236,10 +264,10 @@ interface TelemetryService {
 interface TelemetryMessage {
   // Source
   deviceId: string;
-  
+
   // Timestamp
   timestamp: Date;
-  
+
   // Data
   measurements: {
     metric: string;
@@ -247,17 +275,17 @@ interface TelemetryMessage {
     unit?: string;
     dataType: TelemetryDataType;
   }[];
-  
+
   // Context
   location?: {
     warehouseId: string;
     zone?: string;
     coordinates?: { x: number; y: number; z?: number };
   };
-  
+
   // Quality
-  quality?: 'GOOD' | 'UNCERTAIN' | 'BAD';
-  
+  quality?: "GOOD" | "UNCERTAIN" | "BAD";
+
   // Metadata
   metadata?: Record<string, unknown>;
 }
@@ -266,32 +294,32 @@ interface TelemetryQuery {
   // Devices
   deviceIds?: string[];
   deviceTypes?: DeviceType[];
-  
+
   // Time range
   startTime: Date;
   endTime: Date;
-  
+
   // Metrics
   metrics?: string[];
-  
+
   // Location
   warehouseId?: string;
   zone?: string;
-  
+
   // Pagination
   limit?: number;
   offset?: number;
-  
+
   // Sorting
-  orderBy?: 'timestamp' | 'deviceId' | 'metric';
-  orderDirection?: 'ASC' | 'DESC';
+  orderBy?: "timestamp" | "deviceId" | "metric";
+  orderDirection?: "ASC" | "DESC";
 }
 
 interface TelemetryResult {
   data: TelemetryMessage[];
-  
+
   totalCount: number;
-  
+
   // Pagination
   hasMore: boolean;
   nextOffset?: number;
@@ -302,14 +330,14 @@ interface TelemetrySubscription {
   deviceIds?: string[];
   deviceTypes?: DeviceType[];
   metrics?: string[];
-  
+
   warehouseId?: string;
   zone?: string;
-  
+
   // Conditions
   conditions?: {
     metric: string;
-    operator: '>' | '<' | '=' | '>=' | '<=' | '!=';
+    operator: ">" | "<" | "=" | ">=" | "<=" | "!=";
     value: number | boolean | string;
   }[];
 }
@@ -317,14 +345,14 @@ interface TelemetrySubscription {
 interface AggregationQuery {
   deviceIds?: string[];
   metrics: string[];
-  
+
   startTime: Date;
   endTime: Date;
-  
+
   // Aggregation
-  aggregation: 'AVG' | 'MIN' | 'MAX' | 'SUM' | 'COUNT' | 'STDDEV';
-  groupBy: 'DEVICE' | 'METRIC' | 'HOUR' | 'DAY' | 'ZONE';
-  
+  aggregation: "AVG" | "MIN" | "MAX" | "SUM" | "COUNT" | "STDDEV";
+  groupBy: "DEVICE" | "METRIC" | "HOUR" | "DAY" | "ZONE";
+
   // Interval
   intervalMinutes?: number;
 }
@@ -332,7 +360,7 @@ interface AggregationQuery {
 interface AggregatedData {
   groups: {
     groupKey: string; // deviceId, metric, hour, day, or zone
-    
+
     aggregates: {
       metric: string;
       value: number;
@@ -354,30 +382,34 @@ const TELEMETRY_VOICE_COMMANDS = [
 ## ⚡ 3. Event Stream Processing
 
 ### Goal
+
 Process, filter, aggregate, and route sensor events in real-time for alerts, analytics, and integrations.
 
 ```typescript
 type EventType =
-  | 'THRESHOLD_VIOLATION'
-  | 'DEVICE_OFFLINE'
-  | 'BATTERY_LOW'
-  | 'ENVIRONMENTAL_ALERT'
-  | 'ASSET_MOVED'
-  | 'GEOFENCE_BREACH'
-  | 'ANOMALY_DETECTED'
-  | 'MAINTENANCE_DUE';
+  | "THRESHOLD_VIOLATION"
+  | "DEVICE_OFFLINE"
+  | "BATTERY_LOW"
+  | "ENVIRONMENTAL_ALERT"
+  | "ASSET_MOVED"
+  | "GEOFENCE_BREACH"
+  | "ANOMALY_DETECTED"
+  | "MAINTENANCE_DUE";
 
 interface EventStreamProcessing {
   // Stream management
   createStream: (config: StreamConfig) => Promise<string>; // stream ID
-  updateStream: (streamId: string, config: Partial<StreamConfig>) => Promise<void>;
+  updateStream: (
+    streamId: string,
+    config: Partial<StreamConfig>,
+  ) => Promise<void>;
   deleteStream: (streamId: string) => Promise<void>;
-  
+
   // Processing rules
   createRule: (streamId: string, rule: ProcessingRule) => Promise<string>; // rule ID
   updateRule: (ruleId: string, rule: Partial<ProcessingRule>) => Promise<void>;
   deleteRule: (ruleId: string) => Promise<void>;
-  
+
   // Monitoring
   getStreamStatus: (streamId: string) => Promise<StreamStatus>;
   listStreams: () => Promise<EventStream[]>;
@@ -386,24 +418,24 @@ interface EventStreamProcessing {
 interface StreamConfig {
   name: string;
   description?: string;
-  
+
   // Input sources
   sources: {
     deviceIds?: string[];
     deviceTypes?: DeviceType[];
     metrics?: string[];
   };
-  
+
   // Processing
   bufferSizeMessages?: number;
   processingIntervalSeconds?: number;
-  
+
   // Output
   outputs: {
-    type: 'WEBHOOK' | 'MQTT' | 'DATABASE' | 'EMAIL' | 'SMS' | 'INTERNAL_EVENT';
+    type: "WEBHOOK" | "MQTT" | "DATABASE" | "EMAIL" | "SMS" | "INTERNAL_EVENT";
     config: Record<string, unknown>;
   }[];
-  
+
   // Retention
   retentionDays?: number;
 }
@@ -411,31 +443,31 @@ interface StreamConfig {
 interface ProcessingRule {
   name: string;
   enabled: boolean;
-  
+
   // Trigger
   trigger: {
     eventType?: EventType;
-    
+
     // Conditions
     conditions: {
       field: string; // e.g., 'measurements.temperature.value'
-      operator: '>' | '<' | '=' | '>=' | '<=' | '!=' | 'IN' | 'NOT_IN';
+      operator: ">" | "<" | "=" | ">=" | "<=" | "!=" | "IN" | "NOT_IN";
       value: unknown;
     }[];
-    
+
     // All conditions must match (AND) or any (OR)?
     matchAll: boolean;
   };
-  
+
   // Actions
   actions: {
-    type: 'ALERT' | 'AGGREGATE' | 'TRANSFORM' | 'ROUTE' | 'SUPPRESS';
+    type: "ALERT" | "AGGREGATE" | "TRANSFORM" | "ROUTE" | "SUPPRESS";
     config: Record<string, unknown>;
   }[];
-  
+
   // Rate limiting
   rateLimitPerMinute?: number;
-  
+
   // Priority
   priority: number; // 1-10, higher = first
 }
@@ -444,35 +476,35 @@ interface EventStream {
   id: string;
   name: string;
   config: StreamConfig;
-  
-  status: 'ACTIVE' | 'PAUSED' | 'ERROR';
-  
+
+  status: "ACTIVE" | "PAUSED" | "ERROR";
+
   // Statistics
   stats: {
     messagesProcessed: number;
     messagesFiltered: number;
     rulesTriggered: number;
-    
+
     avgProcessingTimeMs: number;
     lastProcessedAt?: Date;
   };
-  
+
   createdAt: Date;
   updatedAt: Date;
 }
 
 interface StreamStatus {
   streamId: string;
-  status: 'ACTIVE' | 'PAUSED' | 'ERROR';
-  
+  status: "ACTIVE" | "PAUSED" | "ERROR";
+
   // Real-time metrics
   currentThroughput: number; // messages/sec
   avgLatencyMs: number;
   errorRate: number; // %
-  
+
   // Buffer
   bufferUsage: number; // %
-  
+
   // Recent errors
   recentErrors: {
     timestamp: Date;
@@ -493,62 +525,68 @@ const EVENT_STREAM_VOICE_COMMANDS = [
 ## 🌡️ 4. Environmental Monitoring
 
 ### Goal
+
 Monitor warehouse environmental conditions for compliance, worker comfort, and inventory preservation.
 
 ```typescript
 interface EnvironmentalMonitoring {
   // Zone configuration
   configureZone: (config: ZoneEnvironmentalConfig) => Promise<string>; // zone config ID
-  
+
   // Current conditions
-  getCurrentConditions: (warehouseId: string, zone?: string) => Promise<EnvironmentalConditions>;
-  
+  getCurrentConditions: (
+    warehouseId: string,
+    zone?: string,
+  ) => Promise<EnvironmentalConditions>;
+
   // Historical data
   getConditionsHistory: (query: ConditionsQuery) => Promise<ConditionsHistory>;
-  
+
   // Alerts
-  getEnvironmentalAlerts: (filters: AlertFilters) => Promise<EnvironmentalAlert[]>;
+  getEnvironmentalAlerts: (
+    filters: AlertFilters,
+  ) => Promise<EnvironmentalAlert[]>;
   acknowledgeAlert: (alertId: string) => Promise<void>;
 }
 
 interface ZoneEnvironmentalConfig {
   warehouseId: string;
   zone: string;
-  
+
   // Requirements
   requirements: {
     temperature?: {
       min: number;
       max: number;
-      unit: 'C' | 'F';
+      unit: "C" | "F";
       critical: boolean; // trigger critical alert?
     };
-    
+
     humidity?: {
       min: number;
       max: number;
       critical: boolean;
     };
-    
+
     airQuality?: {
       maxCO2ppm?: number;
       maxVOCppb?: number;
       minAirQualityIndex?: number;
     };
-    
+
     light?: {
       minLux: number;
       maxLux: number;
     };
-    
+
     noise?: {
       maxDecibels: number;
     };
   };
-  
+
   // Monitoring
   checkIntervalSeconds: number;
-  
+
   // Alerts
   alertContacts: string[];
   escalationDelayMinutes?: number;
@@ -558,51 +596,51 @@ interface EnvironmentalConditions {
   warehouseId: string;
   zone?: string;
   timestamp: Date;
-  
+
   // Measurements
   temperature?: {
     value: number;
-    unit: 'C' | 'F';
-    status: 'NORMAL' | 'WARNING' | 'CRITICAL';
+    unit: "C" | "F";
+    status: "NORMAL" | "WARNING" | "CRITICAL";
   };
-  
+
   humidity?: {
     value: number;
-    status: 'NORMAL' | 'WARNING' | 'CRITICAL';
+    status: "NORMAL" | "WARNING" | "CRITICAL";
   };
-  
+
   airQuality?: {
     co2ppm?: number;
     vocppb?: number;
     pm25?: number;
     pm10?: number;
     airQualityIndex?: number;
-    status: 'GOOD' | 'MODERATE' | 'UNHEALTHY' | 'HAZARDOUS';
+    status: "GOOD" | "MODERATE" | "UNHEALTHY" | "HAZARDOUS";
   };
-  
+
   light?: {
     lux: number;
-    status: 'NORMAL' | 'TOO_DARK' | 'TOO_BRIGHT';
+    status: "NORMAL" | "TOO_DARK" | "TOO_BRIGHT";
   };
-  
+
   noise?: {
     decibels: number;
-    status: 'NORMAL' | 'LOUD';
+    status: "NORMAL" | "LOUD";
   };
-  
+
   // Overall
-  overallStatus: 'NORMAL' | 'WARNING' | 'CRITICAL';
+  overallStatus: "NORMAL" | "WARNING" | "CRITICAL";
 }
 
 interface ConditionsQuery {
   warehouseId: string;
   zone?: string;
-  
+
   startTime: Date;
   endTime: Date;
-  
-  metrics?: ('temperature' | 'humidity' | 'airQuality' | 'light' | 'noise')[];
-  
+
+  metrics?: ("temperature" | "humidity" | "airQuality" | "light" | "noise")[];
+
   // Aggregation
   intervalMinutes?: number;
 }
@@ -612,7 +650,7 @@ interface ConditionsHistory {
     timestamp: Date;
     conditions: EnvironmentalConditions;
   }[];
-  
+
   // Summary
   summary: {
     metric: string;
@@ -626,25 +664,25 @@ interface ConditionsHistory {
 interface EnvironmentalAlert {
   id: string;
   timestamp: Date;
-  
+
   warehouseId: string;
   zone: string;
-  
-  alertType: 'TEMPERATURE' | 'HUMIDITY' | 'AIR_QUALITY' | 'LIGHT' | 'NOISE';
-  severity: 'WARNING' | 'CRITICAL';
-  
+
+  alertType: "TEMPERATURE" | "HUMIDITY" | "AIR_QUALITY" | "LIGHT" | "NOISE";
+  severity: "WARNING" | "CRITICAL";
+
   description: string;
-  
+
   // Measured value
   metric: string;
   value: number;
   threshold: number;
-  
+
   // Status
   acknowledged: boolean;
   acknowledgedBy?: string;
   acknowledgedAt?: Date;
-  
+
   resolved: boolean;
   resolvedAt?: Date;
 }
@@ -654,10 +692,10 @@ interface AlertFilters {
   zone?: string;
   alertType?: string;
   severity?: string;
-  
+
   startTime?: Date;
   endTime?: Date;
-  
+
   acknowledged?: boolean;
   resolved?: boolean;
 }
@@ -676,41 +714,61 @@ const ENVIRONMENTAL_VOICE_COMMANDS = [
 ## 📍 5. Real-Time Asset Tracking
 
 ### Goal
+
 Track location and movement of assets, equipment, and inventory using RFID, BLE, GPS, and UWB.
 
 ```typescript
-type TrackingTechnology = 'RFID' | 'BLE' | 'GPS' | 'UWB' | 'WIFI' | 'BARCODE';
+type TrackingTechnology = "RFID" | "BLE" | "GPS" | "UWB" | "WIFI" | "BARCODE";
 
 interface AssetTracking {
   // Asset registration
   registerAsset: (asset: AssetRegistration) => Promise<string>; // asset ID
-  updateAsset: (assetId: string, updates: Partial<TrackedAsset>) => Promise<void>;
-  
+  updateAsset: (
+    assetId: string,
+    updates: Partial<TrackedAsset>,
+  ) => Promise<void>;
+
   // Location
   getCurrentLocation: (assetId: string) => Promise<AssetLocation>;
-  getLocationHistory: (assetId: string, query: LocationHistoryQuery) => Promise<LocationHistory>;
-  
+  getLocationHistory: (
+    assetId: string,
+    query: LocationHistoryQuery,
+  ) => Promise<LocationHistory>;
+
   // Geofencing
   createGeofence: (geofence: Geofence) => Promise<string>; // geofence ID
-  getGeofenceEvents: (geofenceId: string, filters?: GeofenceEventFilters) => Promise<GeofenceEvent[]>;
-  
+  getGeofenceEvents: (
+    geofenceId: string,
+    filters?: GeofenceEventFilters,
+  ) => Promise<GeofenceEvent[]>;
+
   // Search
   findAssets: (filters: AssetSearchFilters) => Promise<TrackedAsset[]>;
-  findAssetsInZone: (warehouseId: string, zone: string) => Promise<TrackedAsset[]>;
+  findAssetsInZone: (
+    warehouseId: string,
+    zone: string,
+  ) => Promise<TrackedAsset[]>;
 }
 
 interface AssetRegistration {
   name: string;
-  type: 'PALLET' | 'CARTON' | 'EQUIPMENT' | 'TOOL' | 'CONTAINER' | 'VEHICLE' | 'OTHER';
-  
+  type:
+    | "PALLET"
+    | "CARTON"
+    | "EQUIPMENT"
+    | "TOOL"
+    | "CONTAINER"
+    | "VEHICLE"
+    | "OTHER";
+
   // Tracking
   trackingTechnology: TrackingTechnology;
   trackingId: string; // RFID tag ID, BLE MAC, GPS device ID, etc.
-  
+
   // Location
   warehouseId: string;
   initialZone?: string;
-  
+
   // Attributes
   attributes?: {
     sku?: string;
@@ -719,7 +777,7 @@ interface AssetRegistration {
     owner?: string;
     value?: number;
   };
-  
+
   // Metadata
   metadata?: Record<string, unknown>;
 }
@@ -728,44 +786,44 @@ interface TrackedAsset {
   id: string;
   name: string;
   type: string;
-  
+
   trackingTechnology: TrackingTechnology;
   trackingId: string;
-  
+
   // Current state
   currentLocation: AssetLocation;
-  
-  status: 'ACTIVE' | 'INACTIVE' | 'LOST' | 'DECOMMISSIONED';
-  
+
+  status: "ACTIVE" | "INACTIVE" | "LOST" | "DECOMMISSIONED";
+
   // Attributes
   attributes?: Record<string, unknown>;
-  
+
   // Lifecycle
   registeredAt: Date;
   lastSeenAt?: Date;
-  
+
   metadata?: Record<string, unknown>;
 }
 
 interface AssetLocation {
   assetId: string;
   timestamp: Date;
-  
+
   // Location
   warehouseId: string;
   zone?: string;
-  
+
   coordinates?: {
     x: number;
     y: number;
     z?: number;
     accuracy: number; // meters
   };
-  
+
   // Additional context
   nearbyAssets?: string[];
   nearbyBeacons?: string[];
-  
+
   // Movement
   velocity?: {
     speedMps: number;
@@ -776,7 +834,7 @@ interface AssetLocation {
 interface LocationHistoryQuery {
   startTime: Date;
   endTime: Date;
-  
+
   // Sampling
   maxPoints?: number;
   intervalSeconds?: number;
@@ -784,12 +842,12 @@ interface LocationHistoryQuery {
 
 interface LocationHistory {
   assetId: string;
-  
+
   points: {
     timestamp: Date;
     location: AssetLocation;
   }[];
-  
+
   // Summary
   summary: {
     totalDistanceM: number;
@@ -801,45 +859,45 @@ interface LocationHistory {
 
 interface Geofence {
   name: string;
-  
+
   warehouseId: string;
   zone?: string;
-  
+
   // Shape
-  shape: 'CIRCLE' | 'RECTANGLE' | 'POLYGON';
+  shape: "CIRCLE" | "RECTANGLE" | "POLYGON";
   coordinates: {
     x: number;
     y: number;
   }[];
   radius?: number; // for circle
-  
+
   // Rules
   rules: {
     assetTypes?: string[];
     assetIds?: string[];
-    
-    triggerOn: 'ENTER' | 'EXIT' | 'DWELL';
+
+    triggerOn: "ENTER" | "EXIT" | "DWELL";
     dwellTimeSeconds?: number; // for DWELL trigger
-    
-    action: 'ALERT' | 'LOG' | 'WEBHOOK';
+
+    action: "ALERT" | "LOG" | "WEBHOOK";
     actionConfig: Record<string, unknown>;
   }[];
-  
+
   enabled: boolean;
 }
 
 interface GeofenceEvent {
   id: string;
   timestamp: Date;
-  
+
   geofenceId: string;
   geofenceName: string;
-  
+
   assetId: string;
   assetName: string;
-  
-  eventType: 'ENTER' | 'EXIT' | 'DWELL';
-  
+
+  eventType: "ENTER" | "EXIT" | "DWELL";
+
   location: {
     x: number;
     y: number;
@@ -850,7 +908,7 @@ interface GeofenceEventFilters {
   startTime?: Date;
   endTime?: Date;
   assetId?: string;
-  eventType?: 'ENTER' | 'EXIT' | 'DWELL';
+  eventType?: "ENTER" | "EXIT" | "DWELL";
 }
 
 interface AssetSearchFilters {
@@ -859,7 +917,7 @@ interface AssetSearchFilters {
   type?: string;
   status?: string;
   trackingTechnology?: TrackingTechnology;
-  
+
   // Attributes
   attributes?: Record<string, unknown>;
 }
@@ -879,22 +937,30 @@ const ASSET_TRACKING_VOICE_COMMANDS = [
 ## 🚜 6. Fleet Sensor Integration
 
 ### Goal
+
 Monitor equipment health, utilization, and location for forklifts, AGVs, conveyors, and dock equipment.
 
 ```typescript
-type EquipmentType = 'FORKLIFT' | 'AGV' | 'CONVEYOR' | 'DOCK_DOOR' | 'PALLET_JACK' | 'TUGGER' | 'CRANE';
+type EquipmentType =
+  | "FORKLIFT"
+  | "AGV"
+  | "CONVEYOR"
+  | "DOCK_DOOR"
+  | "PALLET_JACK"
+  | "TUGGER"
+  | "CRANE";
 
 interface FleetSensorIntegration {
   // Equipment registration
   registerEquipment: (equipment: EquipmentRegistration) => Promise<string>; // equipment ID
-  
+
   // Telemetry
   publishEquipmentTelemetry: (data: EquipmentTelemetry) => Promise<void>;
   getEquipmentStatus: (equipmentId: string) => Promise<EquipmentStatus>;
-  
+
   // Fleet monitoring
   getFleetOverview: (warehouseId: string) => Promise<FleetOverview>;
-  
+
   // Maintenance
   predictMaintenance: (equipmentId: string) => Promise<MaintenancePrediction>;
 }
@@ -902,60 +968,60 @@ interface FleetSensorIntegration {
 interface EquipmentRegistration {
   name: string;
   type: EquipmentType;
-  
+
   warehouseId: string;
-  
+
   // Hardware
   manufacturer?: string;
   model?: string;
   serialNumber?: string;
   yearOfManufacture?: number;
-  
+
   // Sensors
   sensors: {
     sensorType: string; // 'engine_hours', 'battery_level', 'speed', 'vibration', etc.
     deviceId: string;
   }[];
-  
+
   // Specifications
   specs?: {
     capacity?: number;
     maxSpeed?: number;
     batteryCapacity?: number;
   };
-  
+
   metadata?: Record<string, unknown>;
 }
 
 interface EquipmentTelemetry {
   equipmentId: string;
   timestamp: Date;
-  
+
   // Operational metrics
   metrics: {
     engineHours?: number;
     batteryLevel?: number; // %
     fuelLevel?: number; // %
-    
+
     speed?: number; // km/h
     load?: number; // kg
-    
+
     vibration?: number;
     temperature?: number;
     oilPressure?: number;
-    
+
     // Status indicators
     errorCodes?: string[];
     warningLights?: string[];
   };
-  
+
   // Location
   location?: {
     x: number;
     y: number;
     zone?: string;
   };
-  
+
   // Operator
   operatorId?: string;
 }
@@ -964,66 +1030,72 @@ interface EquipmentStatus {
   equipmentId: string;
   name: string;
   type: EquipmentType;
-  
-  currentStatus: 'OPERATING' | 'IDLE' | 'CHARGING' | 'MAINTENANCE' | 'ERROR' | 'OFFLINE';
-  
+
+  currentStatus:
+    | "OPERATING"
+    | "IDLE"
+    | "CHARGING"
+    | "MAINTENANCE"
+    | "ERROR"
+    | "OFFLINE";
+
   // Latest metrics
   latestMetrics: {
     timestamp: Date;
-    
+
     batteryLevel?: number;
     fuelLevel?: number;
     speed?: number;
     load?: number;
   };
-  
+
   // Location
   currentLocation?: {
     x: number;
     y: number;
     zone?: string;
   };
-  
+
   // Health
-  health: 'GOOD' | 'FAIR' | 'POOR' | 'CRITICAL';
-  
+  health: "GOOD" | "FAIR" | "POOR" | "CRITICAL";
+
   activeAlerts: {
-    severity: 'LOW' | 'MEDIUM' | 'HIGH';
+    severity: "LOW" | "MEDIUM" | "HIGH";
     description: string;
   }[];
-  
+
   // Utilization (today)
   utilizationToday: {
     operatingHours: number;
     idleHours: number;
     utilizationPercent: number;
   };
-  
+
   // Operator
   currentOperator?: string;
-  
+
   lastSeenAt: Date;
 }
 
 interface FleetOverview {
   warehouseId: string;
   timestamp: Date;
-  
+
   totalEquipment: number;
-  
+
   // By status
   byStatus: {
     status: string;
     count: number;
   }[];
-  
+
   // By type
   byType: {
     type: EquipmentType;
     count: number;
     avgUtilization: number;
   }[];
-  
+
   // Fleet health
   fleetHealth: {
     good: number;
@@ -1031,40 +1103,40 @@ interface FleetOverview {
     poor: number;
     critical: number;
   };
-  
+
   // Alerts
   activeAlerts: number;
   criticalAlerts: number;
-  
+
   // Utilization
   avgUtilization: number;
-  
+
   // Maintenance
   maintenanceDueCount: number;
 }
 
 interface MaintenancePrediction {
   equipmentId: string;
-  
+
   predictedMaintenanceDate: Date;
   confidence: number; // 0-1
-  
+
   // Reasoning
   factors: {
     factor: string; // 'engine_hours', 'vibration_trend', etc.
     contribution: number; // %
     description: string;
   }[];
-  
+
   // Recommendations
   recommendations: {
     action: string;
-    priority: 'LOW' | 'MEDIUM' | 'HIGH';
+    priority: "LOW" | "MEDIUM" | "HIGH";
     estimatedCost?: number;
   }[];
-  
+
   // Risk
-  failureRisk: 'LOW' | 'MEDIUM' | 'HIGH';
+  failureRisk: "LOW" | "MEDIUM" | "HIGH";
   impactIfNotAddressed: string;
 }
 
@@ -1082,6 +1154,7 @@ const FLEET_SENSOR_VOICE_COMMANDS = [
 ## 📊 Part 1 Summary
 
 ### Core IoT Infrastructure Covered
+
 ✅ Comprehensive IoT device lifecycle management (register, configure, monitor, firmware)  
 ✅ Real-time telemetry collection with streaming and aggregations  
 ✅ Event stream processing with rules, filtering, and routing  

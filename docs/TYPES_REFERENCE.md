@@ -11,7 +11,7 @@ This document provides comprehensive TypeScript type definitions for LogiVox. Th
 ```
 packages/shared/
 ├── src/
-│   ├── types.ts          # Core type definitions and interfaces  
+│   ├── types.ts          # Core type definitions and interfaces
 │   ├── constants.ts      # Application constants and configuration
 │   ├── validators.ts     # Validation functions and rules
 │   ├── utils.ts          # Utility functions and helpers
@@ -23,18 +23,19 @@ packages/shared/
 ## Installation & Usage
 
 ### Import Shared Types
+
 ```typescript
 // Import specific types
-import { User, Organization, InventoryItem } from '@logivox/shared';
+import { User, Organization, InventoryItem } from "@logivox/shared";
 
-// Import constants  
-import { API_VERSION, VALIDATION_LIMITS } from '@logivox/shared';
+// Import constants
+import { API_VERSION, VALIDATION_LIMITS } from "@logivox/shared";
 
 // Import validators
-import { userValidators, validateInventoryItem } from '@logivox/shared';
+import { userValidators, validateInventoryItem } from "@logivox/shared";
 
 // Import utilities
-import { stringUtils, dateUtils, numberUtils } from '@logivox/shared';
+import { stringUtils, dateUtils, numberUtils } from "@logivox/shared";
 ```
 
 ## Core Entity Types
@@ -85,7 +86,7 @@ export interface User {
   mfaSecret?: string;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   organization?: Organization;
   createdInventoryItems?: InventoryItem[];
@@ -93,43 +94,43 @@ export interface User {
 }
 
 export enum UserRole {
-  SUPER_ADMIN = 'SUPER_ADMIN',
-  ADMIN = 'ADMIN',
-  MANAGER = 'MANAGER',
-  OPERATOR = 'OPERATOR',
-  VIEWER = 'VIEWER'
+  SUPER_ADMIN = "SUPER_ADMIN",
+  ADMIN = "ADMIN",
+  MANAGER = "MANAGER",
+  OPERATOR = "OPERATOR",
+  VIEWER = "VIEWER",
 }
 
 export enum Permission {
   // Inventory permissions
-  INVENTORY_READ = 'inventory:read',
-  INVENTORY_WRITE = 'inventory:write',
-  INVENTORY_DELETE = 'inventory:delete',
-  INVENTORY_ADJUST = 'inventory:adjust',
-  
+  INVENTORY_READ = "inventory:read",
+  INVENTORY_WRITE = "inventory:write",
+  INVENTORY_DELETE = "inventory:delete",
+  INVENTORY_ADJUST = "inventory:adjust",
+
   // Warehouse permissions
-  WAREHOUSE_READ = 'warehouse:read',
-  WAREHOUSE_WRITE = 'warehouse:write',
-  WAREHOUSE_DELETE = 'warehouse:delete',
-  WAREHOUSE_MANAGE = 'warehouse:manage',
-  
+  WAREHOUSE_READ = "warehouse:read",
+  WAREHOUSE_WRITE = "warehouse:write",
+  WAREHOUSE_DELETE = "warehouse:delete",
+  WAREHOUSE_MANAGE = "warehouse:manage",
+
   // Purchase Order permissions
-  PO_READ = 'po:read',
-  PO_WRITE = 'po:write',
-  PO_APPROVE = 'po:approve',
-  PO_DELETE = 'po:delete',
-  
+  PO_READ = "po:read",
+  PO_WRITE = "po:write",
+  PO_APPROVE = "po:approve",
+  PO_DELETE = "po:delete",
+
   // User management permissions
-  USER_READ = 'user:read',
-  USER_WRITE = 'user:write',
-  USER_DELETE = 'user:delete',
-  USER_INVITE = 'user:invite',
-  
+  USER_READ = "user:read",
+  USER_WRITE = "user:write",
+  USER_DELETE = "user:delete",
+  USER_INVITE = "user:invite",
+
   // Administrative permissions
-  ADMIN_READ = 'admin:read',
-  ADMIN_WRITE = 'admin:write',
-  ADMIN_BILLING = 'admin:billing',
-  ADMIN_AUDIT = 'admin:audit'
+  ADMIN_READ = "admin:read",
+  ADMIN_WRITE = "admin:write",
+  ADMIN_BILLING = "admin:billing",
+  ADMIN_AUDIT = "admin:audit",
 }
 ```
 
@@ -151,7 +152,7 @@ export interface Warehouse {
   settings: WarehouseSettings;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   organization?: Organization;
   inventoryItems?: InventoryItem[];
@@ -169,11 +170,11 @@ export interface WarehouseSettings {
 }
 
 export enum StockCountFrequency {
-  DAILY = 'DAILY',
-  WEEKLY = 'WEEKLY',
-  MONTHLY = 'MONTHLY',
-  QUARTERLY = 'QUARTERLY',
-  ANNUALLY = 'ANNUALLY'
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  QUARTERLY = "QUARTERLY",
+  ANNUALLY = "ANNUALLY",
 }
 
 // Location within warehouse
@@ -188,7 +189,7 @@ export interface Location {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   warehouse?: Warehouse;
   parentLocation?: Location;
@@ -197,11 +198,11 @@ export interface Location {
 }
 
 export enum LocationType {
-  ZONE = 'ZONE',
-  AISLE = 'AISLE',
-  RACK = 'RACK',
-  SHELF = 'SHELF',
-  BIN = 'BIN'
+  ZONE = "ZONE",
+  AISLE = "AISLE",
+  RACK = "RACK",
+  SHELF = "SHELF",
+  BIN = "BIN",
 }
 ```
 
@@ -234,7 +235,7 @@ export interface InventoryItem {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   organization?: Organization;
   warehouse?: Warehouse;
@@ -253,10 +254,10 @@ export interface ProductDimensions {
 }
 
 export enum DimensionUnit {
-  CM = 'CM',
-  INCH = 'INCH',
-  M = 'M',
-  FT = 'FT'
+  CM = "CM",
+  INCH = "INCH",
+  M = "M",
+  FT = "FT",
 }
 
 // Product category
@@ -269,7 +270,7 @@ export interface Category {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   organization?: Organization;
   parentCategory?: Category;
@@ -296,7 +297,7 @@ export interface StockMovement {
   userId?: string;
   notes?: string;
   timestamp: Date;
-  
+
   // Relations
   inventoryItem?: InventoryItem;
   warehouse?: Warehouse;
@@ -304,22 +305,22 @@ export interface StockMovement {
 }
 
 export enum MovementType {
-  IN = 'IN',           // Stock increase
-  OUT = 'OUT',         // Stock decrease
-  TRANSFER = 'TRANSFER', // Inter-warehouse transfer
-  ADJUSTMENT = 'ADJUSTMENT', // Manual adjustment
-  RETURN = 'RETURN',   // Return from customer
-  DAMAGE = 'DAMAGE',   // Damaged goods
-  COUNT = 'COUNT'      // Cycle count adjustment
+  IN = "IN", // Stock increase
+  OUT = "OUT", // Stock decrease
+  TRANSFER = "TRANSFER", // Inter-warehouse transfer
+  ADJUSTMENT = "ADJUSTMENT", // Manual adjustment
+  RETURN = "RETURN", // Return from customer
+  DAMAGE = "DAMAGE", // Damaged goods
+  COUNT = "COUNT", // Cycle count adjustment
 }
 
 export enum ReferenceType {
-  PURCHASE_ORDER = 'PURCHASE_ORDER',
-  TRANSFER_ORDER = 'TRANSFER_ORDER',
-  SALE_ORDER = 'SALE_ORDER',
-  MANUAL_ADJUSTMENT = 'MANUAL_ADJUSTMENT',
-  CYCLE_COUNT = 'CYCLE_COUNT',
-  RETURN = 'RETURN'
+  PURCHASE_ORDER = "PURCHASE_ORDER",
+  TRANSFER_ORDER = "TRANSFER_ORDER",
+  SALE_ORDER = "SALE_ORDER",
+  MANUAL_ADJUSTMENT = "MANUAL_ADJUSTMENT",
+  CYCLE_COUNT = "CYCLE_COUNT",
+  RETURN = "RETURN",
 }
 
 // Stock adjustment
@@ -334,7 +335,7 @@ export interface StockAdjustment {
   approvedAt?: Date;
   status: AdjustmentStatus;
   createdAt: Date;
-  
+
   // Relations
   inventoryItem?: InventoryItem;
   user?: User;
@@ -342,19 +343,19 @@ export interface StockAdjustment {
 }
 
 export enum AdjustmentReason {
-  DAMAGED = 'DAMAGED',
-  EXPIRED = 'EXPIRED',
-  LOST = 'LOST',
-  FOUND = 'FOUND',
-  CORRECTION = 'CORRECTION',
-  THEFT = 'THEFT',
-  OTHER = 'OTHER'
+  DAMAGED = "DAMAGED",
+  EXPIRED = "EXPIRED",
+  LOST = "LOST",
+  FOUND = "FOUND",
+  CORRECTION = "CORRECTION",
+  THEFT = "THEFT",
+  OTHER = "OTHER",
 }
 
 export enum AdjustmentStatus {
-  PENDING = 'PENDING',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED'
+  PENDING = "PENDING",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
 }
 ```
 
@@ -378,7 +379,7 @@ export interface Supplier {
   settings: SupplierSettings;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   organization?: Organization;
   inventoryItems?: InventoryItem[];
@@ -408,11 +409,11 @@ export interface SupplierSettings {
 }
 
 export enum PaymentMethod {
-  CREDIT_CARD = 'CREDIT_CARD',
-  BANK_TRANSFER = 'BANK_TRANSFER',
-  CHECK = 'CHECK',
-  CASH = 'CASH',
-  NET_TERMS = 'NET_TERMS'
+  CREDIT_CARD = "CREDIT_CARD",
+  BANK_TRANSFER = "BANK_TRANSFER",
+  CHECK = "CHECK",
+  CASH = "CASH",
+  NET_TERMS = "NET_TERMS",
 }
 
 // Purchase Order entity
@@ -437,7 +438,7 @@ export interface PurchaseOrder {
   approvedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   supplier?: Supplier;
   organization?: Organization;
@@ -448,15 +449,15 @@ export interface PurchaseOrder {
 }
 
 export enum PurchaseOrderStatus {
-  DRAFT = 'DRAFT',
-  PENDING_APPROVAL = 'PENDING_APPROVAL',
-  APPROVED = 'APPROVED',
-  SENT_TO_SUPPLIER = 'SENT_TO_SUPPLIER',
-  ACKNOWLEDGED = 'ACKNOWLEDGED',
-  PARTIALLY_RECEIVED = 'PARTIALLY_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  CANCELLED = 'CANCELLED',
-  CLOSED = 'CLOSED'
+  DRAFT = "DRAFT",
+  PENDING_APPROVAL = "PENDING_APPROVAL",
+  APPROVED = "APPROVED",
+  SENT_TO_SUPPLIER = "SENT_TO_SUPPLIER",
+  ACKNOWLEDGED = "ACKNOWLEDGED",
+  PARTIALLY_RECEIVED = "PARTIALLY_RECEIVED",
+  RECEIVED = "RECEIVED",
+  CANCELLED = "CANCELLED",
+  CLOSED = "CLOSED",
 }
 
 // Purchase Order Item
@@ -469,7 +470,7 @@ export interface PurchaseOrderItem {
   unitCost: number;
   totalCost: number;
   notes?: string;
-  
+
   // Relations
   purchaseOrder?: PurchaseOrder;
   inventoryItem?: InventoryItem;
@@ -498,7 +499,7 @@ export interface Transfer {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   fromWarehouse?: Warehouse;
   toWarehouse?: Warehouse;
@@ -511,13 +512,13 @@ export interface Transfer {
 }
 
 export enum TransferStatus {
-  REQUESTED = 'REQUESTED',
-  APPROVED = 'APPROVED',
-  REJECTED = 'REJECTED',
-  IN_TRANSIT = 'IN_TRANSIT',
-  RECEIVED = 'RECEIVED',
-  COMPLETED = 'COMPLETED',
-  CANCELLED = 'CANCELLED'
+  REQUESTED = "REQUESTED",
+  APPROVED = "APPROVED",
+  REJECTED = "REJECTED",
+  IN_TRANSIT = "IN_TRANSIT",
+  RECEIVED = "RECEIVED",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
 }
 
 export interface TransferItem {
@@ -528,7 +529,7 @@ export interface TransferItem {
   shippedQuantity: number;
   receivedQuantity: number;
   notes?: string;
-  
+
   // Relations
   transfer?: Transfer;
   inventoryItem?: InventoryItem;
@@ -547,18 +548,18 @@ export interface ERPIntegration {
   syncStatus: SyncStatus;
   createdAt: Date;
   updatedAt: Date;
-  
+
   // Relations
   organization?: Organization;
   syncLogs?: ERPSyncLog[];
 }
 
 export enum ERPType {
-  SAP = 'SAP',
-  ORACLE_NETSUITE = 'ORACLE_NETSUITE',
-  MICROSOFT_DYNAMICS = 'MICROSOFT_DYNAMICS',
-  QUICKBOOKS = 'QUICKBOOKS',
-  CUSTOM = 'CUSTOM'
+  SAP = "SAP",
+  ORACLE_NETSUITE = "ORACLE_NETSUITE",
+  MICROSOFT_DYNAMICS = "MICROSOFT_DYNAMICS",
+  QUICKBOOKS = "QUICKBOOKS",
+  CUSTOM = "CUSTOM",
 }
 
 export interface ERPConfiguration {
@@ -572,21 +573,21 @@ export interface ERPConfiguration {
 }
 
 export enum SyncFrequency {
-  REAL_TIME = 'REAL_TIME',
-  EVERY_5_MINUTES = 'EVERY_5_MINUTES',
-  EVERY_15_MINUTES = 'EVERY_15_MINUTES',
-  HOURLY = 'HOURLY',
-  DAILY = 'DAILY',
-  WEEKLY = 'WEEKLY'
+  REAL_TIME = "REAL_TIME",
+  EVERY_5_MINUTES = "EVERY_5_MINUTES",
+  EVERY_15_MINUTES = "EVERY_15_MINUTES",
+  HOURLY = "HOURLY",
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
 }
 
 export enum ERPEntity {
-  PRODUCTS = 'PRODUCTS',
-  INVENTORY = 'INVENTORY',
-  SUPPLIERS = 'SUPPLIERS',
-  PURCHASE_ORDERS = 'PURCHASE_ORDERS',
-  CUSTOMERS = 'CUSTOMERS',
-  SALES_ORDERS = 'SALES_ORDERS'
+  PRODUCTS = "PRODUCTS",
+  INVENTORY = "INVENTORY",
+  SUPPLIERS = "SUPPLIERS",
+  PURCHASE_ORDERS = "PURCHASE_ORDERS",
+  CUSTOMERS = "CUSTOMERS",
+  SALES_ORDERS = "SALES_ORDERS",
 }
 
 export interface FieldMapping {
@@ -597,10 +598,10 @@ export interface FieldMapping {
 }
 
 export enum SyncStatus {
-  CONNECTED = 'CONNECTED',
-  SYNCING = 'SYNCING',
-  ERROR = 'ERROR',
-  DISCONNECTED = 'DISCONNECTED'
+  CONNECTED = "CONNECTED",
+  SYNCING = "SYNCING",
+  ERROR = "ERROR",
+  DISCONNECTED = "DISCONNECTED",
 }
 ```
 
@@ -680,7 +681,8 @@ export interface CreateInventoryItemRequest {
   locationId?: string;
 }
 
-export interface UpdateInventoryItemRequest extends Partial<CreateInventoryItemRequest> {}
+export interface UpdateInventoryItemRequest
+  extends Partial<CreateInventoryItemRequest> {}
 
 export interface InventorySearchFilters {
   warehouseId?: string;
@@ -694,16 +696,16 @@ export interface InventorySearchFilters {
 }
 
 export enum InventorySortField {
-  NAME = 'name',
-  SKU = 'sku',
-  CURRENT_STOCK = 'currentStock',
-  CREATED_AT = 'createdAt',
-  UPDATED_AT = 'updatedAt'
+  NAME = "name",
+  SKU = "sku",
+  CURRENT_STOCK = "currentStock",
+  CREATED_AT = "createdAt",
+  UPDATED_AT = "updatedAt",
 }
 
 export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc'
+  ASC = "asc",
+  DESC = "desc",
 }
 
 // Stock adjustment API types
@@ -735,7 +737,7 @@ export interface WebSocketEvent<T = any> {
 
 // Inventory real-time events
 export interface InventoryUpdatedEvent {
-  type: 'inventory:updated';
+  type: "inventory:updated";
   data: {
     inventoryItem: InventoryItem;
     changes: Partial<InventoryItem>;
@@ -744,7 +746,7 @@ export interface InventoryUpdatedEvent {
 }
 
 export interface StockMovementEvent {
-  type: 'stock:movement';
+  type: "stock:movement";
   data: {
     stockMovement: StockMovement;
     inventoryItem: InventoryItem;
@@ -752,7 +754,7 @@ export interface StockMovementEvent {
 }
 
 export interface LowStockAlertEvent {
-  type: 'alert:low-stock';
+  type: "alert:low-stock";
   data: {
     inventoryItem: InventoryItem;
     currentStock: number;
@@ -762,7 +764,7 @@ export interface LowStockAlertEvent {
 
 // Purchase Order events
 export interface PurchaseOrderStatusEvent {
-  type: 'po:status-changed';
+  type: "po:status-changed";
   data: {
     purchaseOrder: PurchaseOrder;
     previousStatus: PurchaseOrderStatus;
@@ -773,7 +775,7 @@ export interface PurchaseOrderStatusEvent {
 
 // Transfer events
 export interface TransferStatusEvent {
-  type: 'transfer:status-changed';
+  type: "transfer:status-changed";
   data: {
     transfer: Transfer;
     previousStatus: TransferStatus;
@@ -789,9 +791,13 @@ export interface TransferStatusEvent {
 
 ```typescript
 // Common utility types
-export type Currency = 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD' | 'JPY';
+export type Currency = "USD" | "EUR" | "GBP" | "CAD" | "AUD" | "JPY";
 
-export type SubscriptionPlan = 'FREE' | 'STARTER' | 'PROFESSIONAL' | 'ENTERPRISE';
+export type SubscriptionPlan =
+  | "FREE"
+  | "STARTER"
+  | "PROFESSIONAL"
+  | "ENTERPRISE";
 
 // Audit and logging types
 export interface AuditLog {
@@ -805,7 +811,7 @@ export interface AuditLog {
   ipAddress?: string;
   userAgent?: string;
   timestamp: Date;
-  
+
   // Relations
   user?: User;
   organization?: Organization;
@@ -824,17 +830,17 @@ export interface SecurityLog {
   resolved: boolean;
   resolvedAt?: Date;
   resolvedBy?: string;
-  
+
   // Relations
   user?: User;
   organization?: Organization;
 }
 
 export enum SecuritySeverity {
-  LOW = 'LOW',
-  MEDIUM = 'MEDIUM',
-  HIGH = 'HIGH',
-  CRITICAL = 'CRITICAL'
+  LOW = "LOW",
+  MEDIUM = "MEDIUM",
+  HIGH = "HIGH",
+  CRITICAL = "CRITICAL",
 }
 
 // File upload types
@@ -848,7 +854,7 @@ export interface FileUpload {
   organizationId: string;
   uploadedBy: string;
   createdAt: Date;
-  
+
   // Relations
   organization?: Organization;
   uploader?: User;
@@ -866,20 +872,20 @@ export interface Notification {
   readAt?: Date;
   data?: Record<string, any>;
   createdAt: Date;
-  
+
   // Relations
   user?: User;
   organization?: Organization;
 }
 
 export enum NotificationType {
-  INFO = 'INFO',
-  WARNING = 'WARNING',
-  ERROR = 'ERROR',
-  SUCCESS = 'SUCCESS',
-  LOW_STOCK = 'LOW_STOCK',
-  ORDER_UPDATE = 'ORDER_UPDATE',
-  SYSTEM_ALERT = 'SYSTEM_ALERT'
+  INFO = "INFO",
+  WARNING = "WARNING",
+  ERROR = "ERROR",
+  SUCCESS = "SUCCESS",
+  LOW_STOCK = "LOW_STOCK",
+  ORDER_UPDATE = "ORDER_UPDATE",
+  SYSTEM_ALERT = "SYSTEM_ALERT",
 }
 ```
 
@@ -896,28 +902,28 @@ export interface LogiVoxError {
 
 export enum ErrorCode {
   // Authentication errors
-  UNAUTHORIZED = 'UNAUTHORIZED',
-  FORBIDDEN = 'FORBIDDEN',
-  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
-  TOKEN_EXPIRED = 'TOKEN_EXPIRED',
-  MFA_REQUIRED = 'MFA_REQUIRED',
-  
+  UNAUTHORIZED = "UNAUTHORIZED",
+  FORBIDDEN = "FORBIDDEN",
+  INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
+  TOKEN_EXPIRED = "TOKEN_EXPIRED",
+  MFA_REQUIRED = "MFA_REQUIRED",
+
   // Validation errors
-  VALIDATION_ERROR = 'VALIDATION_ERROR',
-  INVALID_INPUT = 'INVALID_INPUT',
-  DUPLICATE_ENTRY = 'DUPLICATE_ENTRY',
-  FOREIGN_KEY_CONSTRAINT = 'FOREIGN_KEY_CONSTRAINT',
-  
+  VALIDATION_ERROR = "VALIDATION_ERROR",
+  INVALID_INPUT = "INVALID_INPUT",
+  DUPLICATE_ENTRY = "DUPLICATE_ENTRY",
+  FOREIGN_KEY_CONSTRAINT = "FOREIGN_KEY_CONSTRAINT",
+
   // Business logic errors
-  INSUFFICIENT_STOCK = 'INSUFFICIENT_STOCK',
-  INVALID_OPERATION = 'INVALID_OPERATION',
-  ORGANIZATION_LIMIT_EXCEEDED = 'ORGANIZATION_LIMIT_EXCEEDED',
-  
+  INSUFFICIENT_STOCK = "INSUFFICIENT_STOCK",
+  INVALID_OPERATION = "INVALID_OPERATION",
+  ORGANIZATION_LIMIT_EXCEEDED = "ORGANIZATION_LIMIT_EXCEEDED",
+
   // System errors
-  INTERNAL_SERVER_ERROR = 'INTERNAL_SERVER_ERROR',
-  DATABASE_ERROR = 'DATABASE_ERROR',
-  EXTERNAL_SERVICE_ERROR = 'EXTERNAL_SERVICE_ERROR',
-  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED'
+  INTERNAL_SERVER_ERROR = "INTERNAL_SERVER_ERROR",
+  DATABASE_ERROR = "DATABASE_ERROR",
+  EXTERNAL_SERVICE_ERROR = "EXTERNAL_SERVICE_ERROR",
+  RATE_LIMIT_EXCEEDED = "RATE_LIMIT_EXCEEDED",
 }
 
 // Validation result types
@@ -981,7 +987,8 @@ export interface InventoryListProps extends BaseComponentProps {
   onItemDelete?: (item: InventoryItem) => void;
 }
 
-export interface InventoryFormProps extends FormProps<CreateInventoryItemRequest> {
+export interface InventoryFormProps
+  extends FormProps<CreateInventoryItemRequest> {
   warehouses: Warehouse[];
   categories: Category[];
   suppliers: Supplier[];
@@ -1015,7 +1022,10 @@ export interface UseInventoryReturn {
   pagination: PaginationInfo | null;
   refetch: () => void;
   createItem: (item: CreateInventoryItemRequest) => Promise<void>;
-  updateItem: (id: string, updates: UpdateInventoryItemRequest) => Promise<void>;
+  updateItem: (
+    id: string,
+    updates: UpdateInventoryItemRequest,
+  ) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
 }
 
@@ -1053,48 +1063,52 @@ export interface UseFormReturn<T> {
 ```typescript
 // Type guard functions
 export function isUser(obj: any): obj is User {
-  return obj && typeof obj.id === 'string' && typeof obj.email === 'string';
+  return obj && typeof obj.id === "string" && typeof obj.email === "string";
 }
 
 export function isInventoryItem(obj: any): obj is InventoryItem {
-  return obj && typeof obj.id === 'string' && typeof obj.sku === 'string';
+  return obj && typeof obj.id === "string" && typeof obj.sku === "string";
 }
 
 export function isPurchaseOrder(obj: any): obj is PurchaseOrder {
-  return obj && typeof obj.id === 'string' && typeof obj.orderNumber === 'string';
+  return (
+    obj && typeof obj.id === "string" && typeof obj.orderNumber === "string"
+  );
 }
 
 // Utility type functions
 export function createApiResponse<T>(
   data: T,
   success: boolean = true,
-  message?: string
+  message?: string,
 ): ApiResponse<T> {
   return {
     success,
     data,
-    message
+    message,
   };
 }
 
 export function createErrorResponse(
   error: string,
-  statusCode: number = 400
+  statusCode: number = 400,
 ): ApiResponse<never> {
   return {
     success: false,
-    error
+    error,
   };
 }
 
 // Enum utility functions
-export function getEnumValues<T extends Record<string, string>>(enumObject: T): string[] {
+export function getEnumValues<T extends Record<string, string>>(
+  enumObject: T,
+): string[] {
   return Object.values(enumObject);
 }
 
 export function isValidEnum<T extends Record<string, string>>(
   enumObject: T,
-  value: string
+  value: string,
 ): value is T[keyof T] {
   return Object.values(enumObject).includes(value);
 }
@@ -1106,7 +1120,7 @@ export function isValidEnum<T extends Record<string, string>>(
 
 1. **Core Types (`types.ts`)**
    - User Management (User, Organization, UserRole, Permission)
-   - Inventory Management (InventoryItem, Category, Location, StockMovement)  
+   - Inventory Management (InventoryItem, Category, Location, StockMovement)
    - Warehouse Management (Warehouse, Address)
    - Supplier & Purchase Orders (Supplier, PurchaseOrder, PurchaseOrderItem)
    - API & Response Types (ApiResponse, PaginatedResponse, WebSocketMessage)
@@ -1148,6 +1162,7 @@ export function isValidEnum<T extends Record<string, string>>(
    - Performance utilities (debounce, throttle)
 
 ### ✅ Build Success
+
 - Package compiles without errors
 - All TypeScript types are properly exported
 - No naming conflicts or circular dependencies
@@ -1163,7 +1178,7 @@ interface InventoryPageProps {
 
 const InventoryPage: React.FC<InventoryPageProps> = ({ warehouseId }) => {
   const { items, loading, createItem } = useInventory({ warehouseId });
-  
+
   const handleCreateItem = async (data: CreateInventoryItemRequest) => {
     try {
       await createItem(data);
@@ -1172,10 +1187,10 @@ const InventoryPage: React.FC<InventoryPageProps> = ({ warehouseId }) => {
       // Handle error
     }
   };
-  
+
   return (
     <div>
-      <InventoryList 
+      <InventoryList
         items={items}
         loading={loading}
         onItemCreate={handleCreateItem}
@@ -1188,16 +1203,16 @@ const InventoryPage: React.FC<InventoryPageProps> = ({ warehouseId }) => {
 export async function POST(request: Request): Promise<ApiResponse<InventoryItem>> {
   try {
     const body: CreateInventoryItemRequest = await request.json();
-    
+
     // Validate request
     const validation = validateInventoryItem(body);
     if (!validation.isValid) {
       return createErrorResponse('Validation failed', 400);
     }
-    
+
     // Create item
     const item = await inventoryService.createItem(body);
-    
+
     return createApiResponse(item, true, 'Item created successfully');
   } catch (error) {
     return createErrorResponse('Failed to create item', 500);

@@ -5,7 +5,7 @@
  * discrepancy management, and inventory updates
  */
 
-import { PrismaClient, GRNStatus, POStatus, Prisma } from '@prisma/client';
+import { PrismaClient, GRNStatus, POStatus, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -62,14 +62,19 @@ export interface DiscrepancyReport {
   purchaseOrderNumber: string;
   supplierName: string;
   discrepancies: Array<{
-    type: 'QUANTITY_SHORT' | 'QUANTITY_OVER' | 'QUALITY_ISSUE' | 'WRONG_ITEM' | 'DAMAGED';
+    type:
+      | "QUANTITY_SHORT"
+      | "QUANTITY_OVER"
+      | "QUALITY_ISSUE"
+      | "WRONG_ITEM"
+      | "DAMAGED";
     itemSku: string;
     itemName: string;
     expected: number;
     received: number;
     variance: number;
     description: string;
-    severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   }>;
   totalImpact: number;
   recommendations: string[];
@@ -83,10 +88,10 @@ export interface PutAwayTask {
   quantity: number;
   fromLocation: string; // Receiving dock
   toLocation: string; // Target bin
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   estimatedTime: number; // minutes
   assignedTo?: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
 }
 
 /**
@@ -98,8 +103,8 @@ export class ReceivingService {
    */
   private async generateGRNNumber(organizationId: string): Promise<string> {
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
-    
+    const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
+
     const lastGRN = await prisma.goodsReceiptNote.findFirst({
       where: {
         organizationId,
@@ -108,17 +113,17 @@ export class ReceivingService {
         },
       },
       orderBy: {
-        grnNumber: 'desc',
+        grnNumber: "desc",
       },
     });
 
     let sequence = 1;
     if (lastGRN) {
-      const lastSequence = parseInt(lastGRN.grnNumber.split('-')[2]);
+      const lastSequence = parseInt(lastGRN.grnNumber.split("-")[2]);
       sequence = lastSequence + 1;
     }
 
-    return `GRN-${dateStr}-${sequence.toString().padStart(3, '0')}`;
+    return `GRN-${dateStr}-${sequence.toString().padStart(3, "0")}`;
   }
 
   /**
@@ -127,7 +132,7 @@ export class ReceivingService {
   async createGRN(
     organizationId: string,
     userId: string,
-    request: CreateGRNRequest
+    request: CreateGRNRequest,
   ): Promise<any> {
     // Validate purchase order exists
     const purchaseOrder = await prisma.purchaseOrder.findFirst({
@@ -142,11 +147,16 @@ export class ReceivingService {
     });
 
     if (!purchaseOrder) {
-      throw new Error('Purchase order not found');
+      throw new Error("Purchase order not found");
     }
 
-    if (purchaseOrder.status === 'CANCELLED' || purchaseOrder.status === 'CLOSED') {
-      throw new Error(`Cannot receive against ${purchaseOrder.status} purchase order`);
+    if (
+      purchaseOrder.status === "CANCELLED" ||
+      purchaseOrder.status === "CLOSED"
+    ) {
+      throw new Error(
+        `Cannot receive against ${purchaseOrder.status} purchase order`,
+      );
     }
 
     // Generate GRN number
@@ -164,7 +174,7 @@ export class ReceivingService {
       if (item.receivedQuantity !== item.orderedQuantity) {
         hasDiscrepancy = true;
         discrepancyNotes.push(
-          `${item.inventoryItemId}: Expected ${item.orderedQuantity}, received ${item.receivedQuantity}`
+          `${item.inventoryItemId}: Expected ${item.orderedQuantity}, received ${item.receivedQuantity}`,
         );
       }
 
@@ -172,7 +182,7 @@ export class ReceivingService {
       if (item.rejectedQuantity && item.rejectedQuantity > 0) {
         hasDiscrepancy = true;
         discrepancyNotes.push(
-          `${item.inventoryItemId}: ${item.rejectedQuantity} units rejected`
+          `${item.inventoryItemId}: ${item.rejectedQuantity} units rejected`,
         );
       }
     }
@@ -184,11 +194,11 @@ export class ReceivingService {
         purchaseOrderId: request.purchaseOrderId,
         warehouseId: request.warehouseId,
         grnNumber,
-        status: 'PENDING',
+        status: "PENDING",
         receivedById: userId,
         receivingDock: request.receivingDock,
         hasDiscrepancy,
-        discrepancyNotes: hasDiscrepancy ? discrepancyNotes.join('; ') : null,
+        discrepancyNotes: hasDiscrepancy ? discrepancyNotes.join("; ") : null,
         totalReceived,
         notes: request.notes,
         internalNotes: request.internalNotes,
@@ -204,7 +214,9 @@ export class ReceivingService {
             binLocation: item.binLocation,
             batchNumber: item.batchNumber,
             expiryDate: item.expiryDate,
-            serialNumbers: item.serialNumbers ? JSON.stringify(item.serialNumbers) : null,
+            serialNumbers: item.serialNumbers
+              ? JSON.stringify(item.serialNumbers)
+              : null,
             notes: item.notes,
           })),
         },
@@ -239,7 +251,9 @@ export class ReceivingService {
   /**
    * Update purchase order status based on received quantities
    */
-  private async updatePurchaseOrderStatus(purchaseOrderId: string): Promise<void> {
+  private async updatePurchaseOrderStatus(
+    purchaseOrderId: string,
+  ): Promise<void> {
     const po = await prisma.purchaseOrder.findUnique({
       where: { id: purchaseOrderId },
       include: {
@@ -264,9 +278,9 @@ export class ReceivingService {
     let newStatus: POStatus = po.status;
 
     if (allFullyReceived) {
-      newStatus = 'RECEIVED';
+      newStatus = "RECEIVED";
     } else if (anyPartiallyReceived) {
-      newStatus = 'PARTIALLY_RECEIVED';
+      newStatus = "PARTIALLY_RECEIVED";
     }
 
     if (newStatus !== po.status) {
@@ -280,7 +294,10 @@ export class ReceivingService {
   /**
    * Trigger quality control inspection
    */
-  private async triggerQualityControl(grnId: string, organizationId: string): Promise<void> {
+  private async triggerQualityControl(
+    grnId: string,
+    organizationId: string,
+  ): Promise<void> {
     const grn = await prisma.goodsReceiptNote.findUnique({
       where: { id: grnId },
       include: {
@@ -293,7 +310,7 @@ export class ReceivingService {
     // Update GRN status
     await prisma.goodsReceiptNote.update({
       where: { id: grnId },
-      data: { status: 'QUALITY_CHECK' },
+      data: { status: "QUALITY_CHECK" },
     });
 
     // Create QC inspection record
@@ -307,7 +324,7 @@ export class ReceivingService {
   async completeGRN(
     grnId: string,
     organizationId: string,
-    userId: string
+    userId: string,
   ): Promise<any> {
     const grn = await prisma.goodsReceiptNote.findFirst({
       where: {
@@ -326,11 +343,11 @@ export class ReceivingService {
     });
 
     if (!grn) {
-      throw new Error('GRN not found');
+      throw new Error("GRN not found");
     }
 
-    if (grn.status === 'COMPLETED') {
-      throw new Error('GRN already completed');
+    if (grn.status === "COMPLETED") {
+      throw new Error("GRN already completed");
     }
 
     // Update inventory for each item
@@ -385,7 +402,7 @@ export class ReceivingService {
               organizationId,
               serialNumber: serial,
               inventoryItemId: item.inventoryItemId,
-              status: 'AVAILABLE',
+              status: "AVAILABLE",
               receivedDate: grn.receivedDate,
               goodsReceiptNoteId: grn.id,
               purchaseOrderId: grn.purchaseOrderId,
@@ -407,7 +424,7 @@ export class ReceivingService {
     const updatedGRN = await prisma.goodsReceiptNote.update({
       where: { id: grnId },
       data: {
-        status: 'COMPLETED',
+        status: "COMPLETED",
         putAwayCompleted: true,
         putAwayDate: new Date(),
       },
@@ -435,17 +452,17 @@ export class ReceivingService {
     organizationId: string,
     userId: string,
     results: {
-      qcStatus: 'PASS' | 'FAIL';
+      qcStatus: "PASS" | "FAIL";
       qcNotes?: string;
       items: Array<{
         grnItemId: string;
-        qcStatus: 'PASS' | 'FAIL';
+        qcStatus: "PASS" | "FAIL";
         acceptedQuantity: number;
         rejectedQuantity: number;
         hasDefects: boolean;
         defectDescription?: string;
       }>;
-    }
+    },
   ): Promise<any> {
     // Update GRN
     await prisma.goodsReceiptNote.update({
@@ -455,7 +472,7 @@ export class ReceivingService {
         qcNotes: results.qcNotes,
         qcById: userId,
         qcDate: new Date(),
-        status: results.qcStatus === 'PASS' ? 'APPROVED' : 'REJECTED',
+        status: results.qcStatus === "PASS" ? "APPROVED" : "REJECTED",
       },
     });
 
@@ -474,7 +491,7 @@ export class ReceivingService {
     }
 
     // If approved, complete the GRN
-    if (results.qcStatus === 'PASS') {
+    if (results.qcStatus === "PASS") {
       return await this.completeGRN(grnId, organizationId, userId);
     }
 
@@ -492,7 +509,7 @@ export class ReceivingService {
   async getReceivingMetrics(
     organizationId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<ReceivingMetrics> {
     const dateFilter: any = {
       organizationId,
@@ -519,7 +536,7 @@ export class ReceivingService {
 
     const totalValue = grns.reduce(
       (sum, grn) => sum + (grn.totalReceived?.toNumber() || 0),
-      0
+      0,
     );
 
     // Discrepancy rate
@@ -530,7 +547,8 @@ export class ReceivingService {
       },
     });
 
-    const discrepancyRate = totalGRNs > 0 ? (grnsWithDiscrepancy / totalGRNs) * 100 : 0;
+    const discrepancyRate =
+      totalGRNs > 0 ? (grnsWithDiscrepancy / totalGRNs) * 100 : 0;
 
     // Accuracy rate
     const accuracyRate = 100 - discrepancyRate;
@@ -546,14 +564,14 @@ export class ReceivingService {
         totalReceived: true,
       },
       orderBy: {
-        receivedDate: 'desc',
+        receivedDate: "desc",
       },
       take: 10,
     });
 
     // Top suppliers
     const supplierStats = await prisma.goodsReceiptNote.groupBy({
-      by: ['purchaseOrderId'],
+      by: ["purchaseOrderId"],
       where: dateFilter,
       _count: true,
       _sum: {
@@ -570,13 +588,13 @@ export class ReceivingService {
         });
 
         return {
-          supplierId: po?.supplier?.id || '',
-          supplierName: po?.supplier?.name || '',
+          supplierId: po?.supplier?.id || "",
+          supplierName: po?.supplier?.name || "",
           totalOrders: stat._count,
           totalValue: stat._sum.totalReceived?.toNumber() || 0,
           accuracyRate: 95, // Placeholder - would calculate from actual data
         };
-      })
+      }),
     );
 
     return {
@@ -599,7 +617,7 @@ export class ReceivingService {
    */
   async generateDiscrepancyReport(
     grnId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<DiscrepancyReport> {
     const grn = await prisma.goodsReceiptNote.findFirst({
       where: {
@@ -621,10 +639,10 @@ export class ReceivingService {
     });
 
     if (!grn) {
-      throw new Error('GRN not found');
+      throw new Error("GRN not found");
     }
 
-    const discrepancies: DiscrepancyReport['discrepancies'] = [];
+    const discrepancies: DiscrepancyReport["discrepancies"] = [];
     let totalImpact = 0;
 
     for (const item of grn.items) {
@@ -635,16 +653,16 @@ export class ReceivingService {
         totalImpact += impact;
 
         discrepancies.push({
-          type: variance < 0 ? 'QUANTITY_SHORT' : 'QUANTITY_OVER',
+          type: variance < 0 ? "QUANTITY_SHORT" : "QUANTITY_OVER",
           itemSku: item.inventoryItem.sku,
           itemName: item.inventoryItem.name,
           expected: item.orderedQuantity,
           received: item.receivedQuantity,
           variance,
-          description: `${variance < 0 ? 'Short' : 'Over'} shipment of ${Math.abs(
-            variance
+          description: `${variance < 0 ? "Short" : "Over"} shipment of ${Math.abs(
+            variance,
           )} units`,
-          severity: Math.abs(variance) > 10 ? 'HIGH' : 'MEDIUM',
+          severity: Math.abs(variance) > 10 ? "HIGH" : "MEDIUM",
         });
       }
 
@@ -654,14 +672,14 @@ export class ReceivingService {
         totalImpact += impact;
 
         discrepancies.push({
-          type: 'QUALITY_ISSUE',
+          type: "QUALITY_ISSUE",
           itemSku: item.inventoryItem.sku,
           itemName: item.inventoryItem.name,
           expected: item.receivedQuantity,
           received: item.acceptedQuantity,
           variance: item.rejectedQuantity,
-          description: item.defectDescription || 'Quality issues detected',
-          severity: item.rejectedQuantity > 5 ? 'HIGH' : 'MEDIUM',
+          description: item.defectDescription || "Quality issues detected",
+          severity: item.rejectedQuantity > 5 ? "HIGH" : "MEDIUM",
         });
       }
     }
@@ -669,20 +687,26 @@ export class ReceivingService {
     // Generate recommendations
     const recommendations: string[] = [];
     if (totalImpact > 1000) {
-      recommendations.push('High value discrepancy - initiate supplier discussion');
+      recommendations.push(
+        "High value discrepancy - initiate supplier discussion",
+      );
     }
-    if (discrepancies.some((d) => d.type === 'QUALITY_ISSUE')) {
-      recommendations.push('Quality issues detected - review supplier quality standards');
+    if (discrepancies.some((d) => d.type === "QUALITY_ISSUE")) {
+      recommendations.push(
+        "Quality issues detected - review supplier quality standards",
+      );
     }
-    if (discrepancies.some((d) => d.type === 'QUANTITY_SHORT')) {
-      recommendations.push('Short shipment - request credit or additional delivery');
+    if (discrepancies.some((d) => d.type === "QUANTITY_SHORT")) {
+      recommendations.push(
+        "Short shipment - request credit or additional delivery",
+      );
     }
 
     return {
       grnId: grn.id,
       grnNumber: grn.grnNumber,
       purchaseOrderNumber: grn.purchaseOrder.poNumber,
-      supplierName: grn.purchaseOrder.supplier?.name || 'Unknown',
+      supplierName: grn.purchaseOrder.supplier?.name || "Unknown",
       discrepancies,
       totalImpact,
       recommendations,
@@ -694,7 +718,7 @@ export class ReceivingService {
    */
   async generatePutAwayTasks(
     grnId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<PutAwayTask[]> {
     const grn = await prisma.goodsReceiptNote.findFirst({
       where: {
@@ -711,7 +735,7 @@ export class ReceivingService {
     });
 
     if (!grn) {
-      throw new Error('GRN not found');
+      throw new Error("GRN not found");
     }
 
     const tasks: PutAwayTask[] = [];
@@ -727,11 +751,11 @@ export class ReceivingService {
         inventoryItemId: item.inventoryItemId,
         sku: item.inventoryItem.sku,
         quantity: item.acceptedQuantity,
-        fromLocation: grn.receivingDock || 'RECEIVING',
+        fromLocation: grn.receivingDock || "RECEIVING",
         toLocation: item.binLocation,
         priority: this.calculatePutAwayPriority(item),
         estimatedTime: this.estimatePutAwayTime(item.acceptedQuantity),
-        status: 'PENDING',
+        status: "PENDING",
       });
     }
 
@@ -742,27 +766,28 @@ export class ReceivingService {
    * Calculate put-away priority
    */
   private calculatePutAwayPriority(
-    item: any
-  ): 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' {
+    item: any,
+  ): "LOW" | "MEDIUM" | "HIGH" | "URGENT" {
     // Perishable items = URGENT
     if (item.expiryDate) {
       const daysToExpiry = Math.floor(
-        (new Date(item.expiryDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        (new Date(item.expiryDate).getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24),
       );
-      if (daysToExpiry < 30) return 'URGENT';
+      if (daysToExpiry < 30) return "URGENT";
     }
 
     // High value items = HIGH
     if (item.unitCost.toNumber() > 100) {
-      return 'HIGH';
+      return "HIGH";
     }
 
     // Large quantities = MEDIUM
     if (item.acceptedQuantity > 100) {
-      return 'MEDIUM';
+      return "MEDIUM";
     }
 
-    return 'LOW';
+    return "LOW";
   }
 
   /**
@@ -816,7 +841,7 @@ export class ReceivingService {
       search?: string;
       page?: number;
       limit?: number;
-    }
+    },
   ): Promise<{ grns: any[]; total: number; page: number; pages: number }> {
     const page = filters.page || 1;
     const limit = filters.limit || 20;
@@ -825,7 +850,8 @@ export class ReceivingService {
     const where: any = { organizationId };
 
     if (filters.status) where.status = filters.status;
-    if (filters.purchaseOrderId) where.purchaseOrderId = filters.purchaseOrderId;
+    if (filters.purchaseOrderId)
+      where.purchaseOrderId = filters.purchaseOrderId;
     if (filters.warehouseId) where.warehouseId = filters.warehouseId;
 
     if (filters.startDate || filters.endDate) {
@@ -836,10 +862,10 @@ export class ReceivingService {
 
     if (filters.search) {
       where.OR = [
-        { grnNumber: { contains: filters.search, mode: 'insensitive' } },
+        { grnNumber: { contains: filters.search, mode: "insensitive" } },
         {
           purchaseOrder: {
-            poNumber: { contains: filters.search, mode: 'insensitive' },
+            poNumber: { contains: filters.search, mode: "insensitive" },
           },
         },
       ];
@@ -859,7 +885,7 @@ export class ReceivingService {
           receivedBy: true,
           items: true,
         },
-        orderBy: { receivedDate: 'desc' },
+        orderBy: { receivedDate: "desc" },
         skip,
         take: limit,
       }),

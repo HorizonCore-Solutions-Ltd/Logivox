@@ -3,28 +3,28 @@
  * Manages cross-docking appointments and scheduling
  */
 
-import { prisma } from '@/lib/prisma';
-import { CrossDockType, CrossDockStatus, SortingMethod } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { CrossDockType, CrossDockStatus, SortingMethod } from "@prisma/client";
 
 interface CreateAppointmentInput {
   organizationId: string;
   warehouseId: string;
   type: CrossDockType;
   priority?: string;
-  
+
   // Inbound details
   inboundCarrier?: string;
   inboundVehicleId?: string;
   expectedArrival: Date;
-  
+
   // Outbound details
   targetShipDate: Date;
-  
+
   // Operational
   sortingMethod?: SortingMethod;
   sortingAreaId?: string;
   maxDwellTime?: number;
-  
+
   notes?: string;
   specialInstructions?: string;
 }
@@ -40,9 +40,11 @@ interface UpdateStatusInput {
  * Generate unique appointment number
  * Format: XD-YYYYMMDD-NNN
  */
-export async function generateAppointmentNumber(organizationId: string): Promise<string> {
+export async function generateAppointmentNumber(
+  organizationId: string,
+): Promise<string> {
   const today = new Date();
-  const dateStr = today.toISOString().split('T')[0]?.replace(/-/g, '') || '';
+  const dateStr = today.toISOString().split("T")[0]?.replace(/-/g, "") || "";
   const prefix = `XD-${dateStr}`;
 
   const lastAppointment = await prisma.crossDockingAppointment.findFirst({
@@ -50,23 +52,25 @@ export async function generateAppointmentNumber(organizationId: string): Promise
       organizationId,
       appointmentNumber: { startsWith: prefix },
     },
-    orderBy: { appointmentNumber: 'desc' },
+    orderBy: { appointmentNumber: "desc" },
   });
 
   let sequence = 1;
   if (lastAppointment) {
-    const lastNumber = lastAppointment.appointmentNumber.split('-')[2];
-    sequence = parseInt(lastNumber || '0') + 1;
+    const lastNumber = lastAppointment.appointmentNumber.split("-")[2];
+    sequence = parseInt(lastNumber || "0") + 1;
   }
 
-  return `${prefix}-${sequence.toString().padStart(3, '0')}`;
+  return `${prefix}-${sequence.toString().padStart(3, "0")}`;
 }
 
 /**
  * Create new cross-docking appointment
  */
 export async function createAppointment(input: CreateAppointmentInput) {
-  const appointmentNumber = await generateAppointmentNumber(input.organizationId);
+  const appointmentNumber = await generateAppointmentNumber(
+    input.organizationId,
+  );
 
   const appointment = await prisma.crossDockingAppointment.create({
     data: {
@@ -74,7 +78,7 @@ export async function createAppointment(input: CreateAppointmentInput) {
       organizationId: input.organizationId,
       warehouseId: input.warehouseId,
       type: input.type,
-      priority: input.priority || 'MEDIUM',
+      priority: input.priority || "MEDIUM",
       inboundCarrier: input.inboundCarrier,
       inboundVehicleId: input.inboundVehicleId,
       expectedArrival: input.expectedArrival,
@@ -96,7 +100,7 @@ export async function createAppointment(input: CreateAppointmentInput) {
   await logActivity({
     appointmentId: appointment.id,
     organizationId: input.organizationId,
-    action: 'CREATED',
+    action: "CREATED",
     description: `Cross-dock appointment ${appointmentNumber} created`,
   });
 
@@ -114,7 +118,7 @@ export async function updateAppointmentStatus(input: UpdateStatusInput) {
   });
 
   if (!appointment) {
-    throw new Error('Appointment not found');
+    throw new Error("Appointment not found");
   }
 
   const updateData: any = {
@@ -129,11 +133,12 @@ export async function updateAppointmentStatus(input: UpdateStatusInput) {
 
   if (status === CrossDockStatus.COMPLETED) {
     updateData.completedAt = new Date();
-    
+
     // Calculate dwell time
     if (appointment.actualArrival) {
       const dwellMinutes = Math.floor(
-        (new Date().getTime() - appointment.actualArrival.getTime()) / (1000 * 60)
+        (new Date().getTime() - appointment.actualArrival.getTime()) /
+          (1000 * 60),
       );
       updateData.dwellTimeMinutes = dwellMinutes;
     }
@@ -155,7 +160,7 @@ export async function updateAppointmentStatus(input: UpdateStatusInput) {
   await logActivity({
     appointmentId,
     organizationId: appointment.organizationId,
-    action: 'STATUS_CHANGED',
+    action: "STATUS_CHANGED",
     description: `Status changed from ${appointment.status} to ${status}`,
     performedBy: userId,
     metadata: { previousStatus: appointment.status, newStatus: status, notes },
@@ -170,19 +175,19 @@ export async function updateAppointmentStatus(input: UpdateStatusInput) {
 export async function assignDoor(
   appointmentId: string,
   doorId: string,
-  doorType: 'INBOUND' | 'OUTBOUND'
+  doorType: "INBOUND" | "OUTBOUND",
 ) {
   const appointment = await prisma.crossDockingAppointment.findUnique({
     where: { id: appointmentId },
   });
 
   if (!appointment) {
-    throw new Error('Appointment not found');
+    throw new Error("Appointment not found");
   }
 
   const updateData: any = {};
 
-  if (doorType === 'INBOUND') {
+  if (doorType === "INBOUND") {
     updateData.inboundDoorId = doorId;
   } else {
     // Add to outbound doors array
@@ -200,7 +205,7 @@ export async function assignDoor(
   await logActivity({
     appointmentId,
     organizationId: appointment.organizationId,
-    action: 'DOOR_ASSIGNED',
+    action: "DOOR_ASSIGNED",
     description: `${doorType} door assigned`,
     metadata: { doorId, doorType },
   });
@@ -241,7 +246,7 @@ export async function getAppointment(appointmentId: string) {
       },
       sortingTasks: true,
       activities: {
-        orderBy: { performedAt: 'desc' },
+        orderBy: { performedAt: "desc" },
         take: 50,
       },
     },
@@ -268,7 +273,7 @@ export async function listAppointments(filters: {
   if (filters.warehouseId) where.warehouseId = filters.warehouseId;
   if (filters.status) where.status = filters.status;
   if (filters.type) where.type = filters.type;
-  
+
   if (filters.startDate || filters.endDate) {
     where.expectedArrival = {};
     if (filters.startDate) where.expectedArrival.gte = filters.startDate;
@@ -283,7 +288,7 @@ export async function listAppointments(filters: {
         receipts: { select: { id: true } },
         shipments: { select: { id: true, status: true } },
       },
-      orderBy: { expectedArrival: 'asc' },
+      orderBy: { expectedArrival: "asc" },
       take: filters.limit || 50,
       skip: filters.offset || 0,
     }),
@@ -334,7 +339,7 @@ export async function getAppointmentCalendar(filters: {
         },
       },
     },
-    orderBy: { expectedArrival: 'asc' },
+    orderBy: { expectedArrival: "asc" },
   });
 }
 
@@ -352,7 +357,7 @@ export async function getAppointmentStats(filters: {
   };
 
   if (filters.warehouseId) where.warehouseId = filters.warehouseId;
-  
+
   if (filters.startDate || filters.endDate) {
     where.expectedArrival = {};
     if (filters.startDate) where.expectedArrival.gte = filters.startDate;
@@ -395,21 +400,21 @@ export async function getAppointmentStats(filters: {
   appointments.forEach((apt) => {
     // Count by status
     stats.byStatus[apt.status] = (stats.byStatus[apt.status] || 0) + 1;
-    
+
     // Count by type
     stats.byType[apt.type] = (stats.byType[apt.type] || 0) + 1;
-    
+
     // Unit totals
     stats.totalUnits += apt.totalUnits;
     stats.receivedUnits += apt.receivedUnits;
     stats.shippedUnits += apt.shippedUnits;
-    
+
     // Dwell time
     if (apt.dwellTimeMinutes) {
       totalDwellTime += apt.dwellTimeMinutes;
       dwellTimeCount++;
     }
-    
+
     // On-time performance
     if (apt.actualShipDate && apt.targetShipDate) {
       if (apt.actualShipDate <= apt.targetShipDate) {
@@ -423,8 +428,12 @@ export async function getAppointmentStats(filters: {
   }
 
   if (appointments.length > 0) {
-    stats.utilizationRate = Math.round((stats.shippedUnits / stats.totalUnits) * 100);
-    stats.onTimePercentage = Math.round((onTimeCount / appointments.length) * 100);
+    stats.utilizationRate = Math.round(
+      (stats.shippedUnits / stats.totalUnits) * 100,
+    );
+    stats.onTimePercentage = Math.round(
+      (onTimeCount / appointments.length) * 100,
+    );
   }
 
   return stats;
@@ -466,15 +475,17 @@ export async function deleteAppointment(appointmentId: string) {
   });
 
   if (!appointment) {
-    throw new Error('Appointment not found');
+    throw new Error("Appointment not found");
   }
 
   if (appointment.status !== CrossDockStatus.SCHEDULED) {
-    throw new Error('Can only delete scheduled appointments');
+    throw new Error("Can only delete scheduled appointments");
   }
 
   if (appointment.receipts.length > 0 || appointment.shipments.length > 0) {
-    throw new Error('Cannot delete appointment with existing receipts or shipments');
+    throw new Error(
+      "Cannot delete appointment with existing receipts or shipments",
+    );
   }
 
   await prisma.crossDockingAppointment.update({
@@ -485,8 +496,8 @@ export async function deleteAppointment(appointmentId: string) {
   await logActivity({
     appointmentId,
     organizationId: appointment.organizationId,
-    action: 'CANCELLED',
-    description: 'Appointment cancelled',
+    action: "CANCELLED",
+    description: "Appointment cancelled",
   });
 
   return { success: true };

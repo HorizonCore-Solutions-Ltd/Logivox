@@ -3,10 +3,10 @@
  * Test inventory CRUD operations and business logic
  */
 
-import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
-import { prisma } from '@/lib/prisma';
+import { describe, expect, test, beforeAll, afterAll } from "@jest/globals";
+import { prisma } from "@/lib/prisma";
 
-describe('Inventory Management', () => {
+describe("Inventory Management", () => {
   let testOrg: any;
   let testWarehouse: any;
   let testCategory: any;
@@ -26,9 +26,9 @@ describe('Inventory Management', () => {
     testUser = await prisma.user.create({
       data: {
         email: `test-inv-${Date.now()}@example.com`,
-        name: 'Test Inventory User',
-        password: 'hashed',
-        role: 'USER',
+        name: "Test Inventory User",
+        password: "hashed",
+        role: "USER",
         organizationId: testOrg.id,
       },
     });
@@ -36,21 +36,21 @@ describe('Inventory Management', () => {
     // Create test warehouse
     testWarehouse = await prisma.warehouse.create({
       data: {
-        name: 'Test Warehouse',
+        name: "Test Warehouse",
         code: `TWH-${Date.now()}`,
         organizationId: testOrg.id,
-        address: '123 Test St',
-        city: 'Test City',
-        state: 'TS',
-        zipCode: '12345',
-        country: 'US',
+        address: "123 Test St",
+        city: "Test City",
+        state: "TS",
+        zipCode: "12345",
+        country: "US",
       },
     });
 
     // Create test category
     testCategory = await prisma.category.create({
       data: {
-        name: 'Test Category',
+        name: "Test Category",
         code: `TCAT-${Date.now()}`,
         organizationId: testOrg.id,
       },
@@ -77,13 +77,13 @@ describe('Inventory Management', () => {
     await prisma.$disconnect();
   });
 
-  describe('Inventory Item Creation', () => {
-    test('should create a new inventory item', async () => {
+  describe("Inventory Item Creation", () => {
+    test("should create a new inventory item", async () => {
       testItem = await prisma.inventoryItem.create({
         data: {
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
-          description: 'A test product',
+          name: "Test Product",
+          description: "A test product",
           organizationId: testOrg.id,
           categoryId: testCategory.id,
           unitPrice: 29.99,
@@ -95,30 +95,30 @@ describe('Inventory Management', () => {
       });
 
       expect(testItem).toBeDefined();
-      expect(testItem.sku).toContain('SKU-');
-      expect(testItem.name).toBe('Test Product');
+      expect(testItem.sku).toContain("SKU-");
+      expect(testItem.name).toBe("Test Product");
       expect(testItem.quantity).toBe(100);
     });
 
-    test('should not allow duplicate SKU in same organization', async () => {
+    test("should not allow duplicate SKU in same organization", async () => {
       await expect(
         prisma.inventoryItem.create({
           data: {
             sku: testItem.sku,
-            name: 'Duplicate Product',
+            name: "Duplicate Product",
             organizationId: testOrg.id,
             categoryId: testCategory.id,
             unitPrice: 19.99,
             quantity: 50,
             createdBy: testUser.id,
           },
-        })
+        }),
       ).rejects.toThrow();
     });
   });
 
-  describe('Inventory Updates', () => {
-    test('should update inventory quantity', async () => {
+  describe("Inventory Updates", () => {
+    test("should update inventory quantity", async () => {
       const updatedItem = await prisma.inventoryItem.update({
         where: { id: testItem.id },
         data: { quantity: 150 },
@@ -127,7 +127,7 @@ describe('Inventory Management', () => {
       expect(updatedItem.quantity).toBe(150);
     });
 
-    test('should update item price', async () => {
+    test("should update item price", async () => {
       const updatedItem = await prisma.inventoryItem.update({
         where: { id: testItem.id },
         data: { unitPrice: 34.99 },
@@ -137,8 +137,8 @@ describe('Inventory Management', () => {
     });
   });
 
-  describe('Inventory Queries', () => {
-    test('should find item by SKU', async () => {
+  describe("Inventory Queries", () => {
+    test("should find item by SKU", async () => {
       const foundItem = await prisma.inventoryItem.findFirst({
         where: {
           sku: testItem.sku,
@@ -150,7 +150,7 @@ describe('Inventory Management', () => {
       expect(foundItem?.id).toBe(testItem.id);
     });
 
-    test('should filter items by category', async () => {
+    test("should filter items by category", async () => {
       const items = await prisma.inventoryItem.findMany({
         where: {
           organizationId: testOrg.id,
@@ -162,7 +162,7 @@ describe('Inventory Management', () => {
       expect(items[0].categoryId).toBe(testCategory.id);
     });
 
-    test('should find low stock items', async () => {
+    test("should find low stock items", async () => {
       await prisma.inventoryItem.update({
         where: { id: testItem.id },
         data: { quantity: 10, reorderPoint: 20 },
@@ -179,17 +179,17 @@ describe('Inventory Management', () => {
     });
   });
 
-  describe('Inventory Movement Tracking', () => {
-    test('should create inventory movement record', async () => {
+  describe("Inventory Movement Tracking", () => {
+    test("should create inventory movement record", async () => {
       const movement = await prisma.inventoryMovement.create({
         data: {
           itemId: testItem.id,
           warehouseId: testWarehouse.id,
-          movementType: 'ADJUSTMENT',
+          movementType: "ADJUSTMENT",
           quantityChange: 50,
           quantityBefore: testItem.quantity,
           quantityAfter: testItem.quantity + 50,
-          reason: 'Stock count adjustment',
+          reason: "Stock count adjustment",
           performedBy: testUser.id,
           organizationId: testOrg.id,
         },
@@ -203,8 +203,8 @@ describe('Inventory Management', () => {
     });
   });
 
-  describe('Multi-Tenant Isolation', () => {
-    test('should not find items from different organization', async () => {
+  describe("Multi-Tenant Isolation", () => {
+    test("should not find items from different organization", async () => {
       const otherOrg = await prisma.organization.create({
         data: {
           name: `Other Org ${Date.now()}`,

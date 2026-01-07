@@ -1,33 +1,30 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { CAPAService } from '@/lib/services/qc/capa-service';
+import { NextRequest, NextResponse } from "next/server";
+import { CAPAService } from "@/lib/services/qc/capa-service";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const capa = await CAPAService.getCAPIById(params.id);
-    
+
     if (!capa) {
-      return NextResponse.json(
-        { error: 'CAPA not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "CAPA not found" }, { status: 404 });
     }
-    
+
     return NextResponse.json(capa);
   } catch (error: any) {
-    console.error('Error fetching CAPA:', error);
+    console.error("Error fetching CAPA:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch CAPA' },
-      { status: 500 }
+      { error: error.message || "Failed to fetch CAPA" },
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -36,23 +33,23 @@ export async function PATCH(
     let result;
 
     switch (action) {
-      case 'updateStatus':
+      case "updateStatus":
         result = await CAPAService.updateStatus(params.id, data.status);
         break;
 
-      case 'completeContainment':
+      case "completeContainment":
         result = await CAPAService.completeContainment(params.id);
         break;
 
-      case 'completeCorrectiveActions':
+      case "completeCorrectiveActions":
         result = await CAPAService.completeCorrectiveActions(params.id);
         break;
 
-      case 'completePreventiveActions':
+      case "completePreventiveActions":
         result = await CAPAService.completePreventiveActions(params.id);
         break;
 
-      case 'verify':
+      case "verify":
         result = await CAPAService.verifyCAPI({
           capaId: params.id,
           verificationPerformedBy: data.verifiedBy,
@@ -62,16 +59,16 @@ export async function PATCH(
         });
         break;
 
-      case 'managementReview':
+      case "managementReview":
         result = await CAPAService.managementReview({
           capaId: params.id,
           managementReviewedBy: data.reviewedBy,
-          managementApproval: data.approved ? 'APPROVED' : 'REJECTED',
+          managementApproval: data.approved ? "APPROVED" : "REJECTED",
           managementComments: data.reviewNotes,
         });
         break;
 
-      case 'close':
+      case "close":
         result = await CAPAService.closeCAPI({
           capaId: params.id,
           closedBy: data.closedBy,
@@ -79,23 +76,20 @@ export async function PATCH(
         });
         break;
 
-      case 'completeTraining':
+      case "completeTraining":
         result = await CAPAService.completeTraining(params.id);
         break;
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
     return NextResponse.json(result);
   } catch (error: any) {
-    console.error('Error updating CAPA:', error);
+    console.error("Error updating CAPA:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to update CAPA' },
-      { status: 500 }
+      { error: error.message || "Failed to update CAPA" },
+      { status: 500 },
     );
   }
 }

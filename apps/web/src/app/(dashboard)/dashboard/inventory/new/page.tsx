@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useRouter } from "next/navigation"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { ArrowLeft } from "lucide-react"
+import * as React from "react";
+import { useRouter } from "next/navigation";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { ArrowLeft } from "lucide-react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -24,17 +24,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 // Form schema
 const inventorySchema = z.object({
@@ -43,40 +43,45 @@ const inventorySchema = z.object({
   description: z.string().optional(),
   barcode: z.string().optional(),
   quantity: z.coerce.number().min(0, "Quantity must be 0 or greater"),
-  minStockLevel: z.coerce.number().min(0, "Min stock level must be 0 or greater"),
-  reorderPoint: z.coerce.number().min(0, "Reorder point must be 0 or greater").optional(),
+  minStockLevel: z.coerce
+    .number()
+    .min(0, "Min stock level must be 0 or greater"),
+  reorderPoint: z.coerce
+    .number()
+    .min(0, "Reorder point must be 0 or greater")
+    .optional(),
   costPrice: z.coerce.number().min(0, "Cost price must be 0 or greater"),
   sellingPrice: z.coerce.number().min(0, "Selling price must be 0 or greater"),
   unit: z.string().min(1, "Unit is required"),
   warehouseId: z.string().min(1, "Warehouse is required"),
   categoryId: z.string().optional(),
-})
+});
 
-type InventoryFormValues = z.infer<typeof inventorySchema>
+type InventoryFormValues = z.infer<typeof inventorySchema>;
 
 export default function NewInventoryPage() {
-  const router = useRouter()
-  const { toast } = useToast()
+  const router = useRouter();
+  const { toast } = useToast();
 
   // Fetch warehouses
   const { data: warehouses = [] } = useQuery({
     queryKey: ["warehouses"],
     queryFn: async () => {
-      const res = await fetch("/api/warehouses")
-      if (!res.ok) throw new Error("Failed to fetch warehouses")
-      return res.json()
+      const res = await fetch("/api/warehouses");
+      if (!res.ok) throw new Error("Failed to fetch warehouses");
+      return res.json();
     },
-  })
+  });
 
   // Fetch categories
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
-      const res = await fetch("/api/categories")
-      if (!res.ok) throw new Error("Failed to fetch categories")
-      return res.json()
+      const res = await fetch("/api/categories");
+      if (!res.ok) throw new Error("Failed to fetch categories");
+      return res.json();
     },
-  })
+  });
 
   // Form
   const form = useForm<InventoryFormValues>({
@@ -95,7 +100,7 @@ export default function NewInventoryPage() {
       warehouseId: "",
       categoryId: "",
     },
-  })
+  });
 
   // Create mutation
   const createMutation = useMutation({
@@ -104,48 +109,46 @@ export default function NewInventoryPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
-      })
+      });
 
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.message || "Failed to create inventory item")
+        const error = await res.json();
+        throw new Error(error.message || "Failed to create inventory item");
       }
 
-      return res.json()
+      return res.json();
     },
     onSuccess: () => {
       toast({
         title: "Success",
         description: "Inventory item created successfully",
-      })
-      router.push("/dashboard/inventory")
+      });
+      router.push("/dashboard/inventory");
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const onSubmit = (values: InventoryFormValues) => {
-    createMutation.mutate(values)
-  }
+    createMutation.mutate(values);
+  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center space-x-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.back()}
-        >
+        <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Add Inventory Item</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Add Inventory Item
+          </h1>
           <p className="text-muted-foreground">
             Create a new inventory item in your system
           </p>
@@ -306,9 +309,7 @@ export default function NewInventoryPage() {
                         <FormControl>
                           <Input type="number" min="0" {...field} />
                         </FormControl>
-                        <FormDescription>
-                          When to reorder stock
-                        </FormDescription>
+                        <FormDescription>When to reorder stock</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -335,9 +336,7 @@ export default function NewInventoryPage() {
                             {...field}
                           />
                         </FormControl>
-                        <FormDescription>
-                          How much it costs you
-                        </FormDescription>
+                        <FormDescription>How much it costs you</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -389,7 +388,10 @@ export default function NewInventoryPage() {
                           </FormControl>
                           <SelectContent>
                             {warehouses.map((warehouse: any) => (
-                              <SelectItem key={warehouse.id} value={warehouse.id}>
+                              <SelectItem
+                                key={warehouse.id}
+                                value={warehouse.id}
+                              >
                                 {warehouse.name}
                               </SelectItem>
                             ))}
@@ -449,5 +451,5 @@ export default function NewInventoryPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

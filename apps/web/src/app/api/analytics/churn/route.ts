@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -19,7 +19,10 @@ export async function GET(request: NextRequest) {
     // Get tenant ID from first organization
     const tenantId = session.user.organizations[0]?.id;
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     // Fetch customers (simplified - would include real purchase data)
@@ -56,17 +59,17 @@ export async function GET(request: NextRequest) {
           customerName: customer.customerName,
           ...prediction,
         };
-      })
+      }),
     );
 
     // Filter by risk level if specified
     const searchParams = request.nextUrl.searchParams;
     const riskLevel = searchParams.get("risk");
-    
+
     let filteredPredictions = churnPredictions;
     if (riskLevel) {
       filteredPredictions = churnPredictions.filter(
-        p => p.riskLevel === riskLevel
+        (p) => p.riskLevel === riskLevel,
       );
     }
 
@@ -77,17 +80,18 @@ export async function GET(request: NextRequest) {
       predictions: filteredPredictions,
       total: filteredPredictions.length,
       summary: {
-        critical: churnPredictions.filter(p => p.riskLevel === 'critical').length,
-        high: churnPredictions.filter(p => p.riskLevel === 'high').length,
-        medium: churnPredictions.filter(p => p.riskLevel === 'medium').length,
-        low: churnPredictions.filter(p => p.riskLevel === 'low').length,
+        critical: churnPredictions.filter((p) => p.riskLevel === "critical")
+          .length,
+        high: churnPredictions.filter((p) => p.riskLevel === "high").length,
+        medium: churnPredictions.filter((p) => p.riskLevel === "medium").length,
+        low: churnPredictions.filter((p) => p.riskLevel === "low").length,
       },
     });
   } catch (error) {
     console.error("Error predicting churn:", error);
     return NextResponse.json(
       { error: "Failed to predict churn" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

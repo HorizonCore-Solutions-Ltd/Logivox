@@ -3,17 +3,45 @@
  * Real-time IoT device monitoring and alerts
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Activity, AlertTriangle, Battery, Signal, Thermometer, Droplets, Radio, RefreshCw } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Activity,
+  AlertTriangle,
+  Battery,
+  Signal,
+  Thermometer,
+  Droplets,
+  Radio,
+  RefreshCw,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
-export default function IoTMonitoringDashboard({ organizationId }: { organizationId: string }) {
+export default function IoTMonitoringDashboard({
+  organizationId,
+}: {
+  organizationId: string;
+}) {
   const [loading, setLoading] = useState(false);
   const [devices, setDevices] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -24,13 +52,13 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
   const loadDevices = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/inventory/iot/devices');
+      const response = await fetch("/api/inventory/iot/devices");
       const data = await response.json();
       if (data.success) {
         setDevices(data.data.devices || []);
       }
     } catch (error) {
-      console.error('Failed to load devices:', error);
+      console.error("Failed to load devices:", error);
     }
     setLoading(false);
   };
@@ -38,39 +66,43 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
   // Load alerts
   const loadAlerts = async () => {
     try {
-      const response = await fetch('/api/inventory/iot/alerts?severity=HIGH&resolved=false');
+      const response = await fetch(
+        "/api/inventory/iot/alerts?severity=HIGH&resolved=false",
+      );
       const data = await response.json();
       if (data.success) {
         setAlerts(data.data.alerts || []);
       }
     } catch (error) {
-      console.error('Failed to load alerts:', error);
+      console.error("Failed to load alerts:", error);
     }
   };
 
   // Load environmental data
   const loadEnvironmental = async () => {
     try {
-      const response = await fetch('/api/inventory/iot/environmental/reading?hours=24');
+      const response = await fetch(
+        "/api/inventory/iot/environmental/reading?hours=24",
+      );
       const data = await response.json();
       if (data.success) {
         setEnvironmentalData(data.data);
       }
     } catch (error) {
-      console.error('Failed to load environmental data:', error);
+      console.error("Failed to load environmental data:", error);
     }
   };
 
   // Load digital twin status
   const loadDigitalTwin = async () => {
     try {
-      const response = await fetch('/api/inventory/iot/digital-twin/sync');
+      const response = await fetch("/api/inventory/iot/digital-twin/sync");
       const data = await response.json();
       if (data.success) {
         setDigitalTwinStatus(data.data);
       }
     } catch (error) {
-      console.error('Failed to load digital twin status:', error);
+      console.error("Failed to load digital twin status:", error);
     }
   };
 
@@ -100,10 +132,14 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">IoT Device Monitoring</h1>
-          <p className="text-muted-foreground">Real-time sensor data and device health</p>
+          <p className="text-muted-foreground">
+            Real-time sensor data and device health
+          </p>
         </div>
         <Button onClick={loadDevices} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
@@ -124,23 +160,30 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Online Devices</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Online Devices
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{deviceStats.ACTIVE || 0}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {deviceStats.ACTIVE || 0}
+            </div>
             <p className="text-xs text-muted-foreground mt-2">
-              {Math.round(((deviceStats.ACTIVE || 0) / devices.length) * 100)}% uptime
+              {Math.round(((deviceStats.ACTIVE || 0) / devices.length) * 100)}%
+              uptime
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Critical Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Critical Alerts
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              {alerts.filter(a => a.severity === 'CRITICAL').length}
+              {alerts.filter((a) => a.severity === "CRITICAL").length}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
               Require immediate attention
@@ -150,11 +193,13 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Needs Maintenance</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Needs Maintenance
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {devices.filter(d => d.health?.maintenance?.required).length}
+              {devices.filter((d) => d.health?.maintenance?.required).length}
             </div>
             <p className="text-xs text-muted-foreground mt-2">
               Scheduled maintenance
@@ -201,9 +246,18 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
                 <Thermometer className="h-8 w-8 text-red-500" />
                 <div>
                   <p className="text-sm text-muted-foreground">Temperature</p>
-                  <p className="text-2xl font-bold">{environmentalData.statistics?.temperature?.current?.toFixed(1)}°C</p>
+                  <p className="text-2xl font-bold">
+                    {environmentalData.statistics?.temperature?.current?.toFixed(
+                      1,
+                    )}
+                    °C
+                  </p>
                   <p className="text-xs text-muted-foreground">
-                    Range: {environmentalData.statistics?.temperature?.min?.toFixed(1)}°C - {environmentalData.statistics?.temperature?.max?.toFixed(1)}°C
+                    Range:{" "}
+                    {environmentalData.statistics?.temperature?.min?.toFixed(1)}
+                    °C -{" "}
+                    {environmentalData.statistics?.temperature?.max?.toFixed(1)}
+                    °C
                   </p>
                 </div>
               </div>
@@ -212,9 +266,16 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
                 <Droplets className="h-8 w-8 text-blue-500" />
                 <div>
                   <p className="text-sm text-muted-foreground">Humidity</p>
-                  <p className="text-2xl font-bold">{environmentalData.statistics?.humidity?.current?.toFixed(1)}%</p>
+                  <p className="text-2xl font-bold">
+                    {environmentalData.statistics?.humidity?.current?.toFixed(
+                      1,
+                    )}
+                    %
+                  </p>
                   <p className="text-xs text-muted-foreground">
-                    Range: {environmentalData.statistics?.humidity?.min?.toFixed(1)}% - {environmentalData.statistics?.humidity?.max?.toFixed(1)}%
+                    Range:{" "}
+                    {environmentalData.statistics?.humidity?.min?.toFixed(1)}% -{" "}
+                    {environmentalData.statistics?.humidity?.max?.toFixed(1)}%
                   </p>
                 </div>
               </div>
@@ -224,7 +285,8 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
               <Alert variant="destructive" className="mt-4">
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  {environmentalData.statistics.violations} environmental violations detected in the last 24 hours
+                  {environmentalData.statistics.violations} environmental
+                  violations detected in the last 24 hours
                 </AlertDescription>
               </Alert>
             )}
@@ -241,29 +303,47 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
         <CardContent>
           <div className="space-y-2">
             {devices.map((device) => (
-              <div key={device.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div
+                key={device.id}
+                className="flex items-center justify-between p-3 border rounded-lg"
+              >
                 <div className="flex items-center gap-4 flex-1">
                   <div>
-                    <Radio className={`h-5 w-5 ${device.status === 'ACTIVE' ? 'text-green-600' : 'text-gray-400'}`} />
+                    <Radio
+                      className={`h-5 w-5 ${device.status === "ACTIVE" ? "text-green-600" : "text-gray-400"}`}
+                    />
                   </div>
                   <div className="flex-1">
                     <p className="font-medium">{device.name}</p>
-                    <p className="text-sm text-muted-foreground">{device.deviceType} • {device.location?.name || 'Unknown location'}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {device.deviceType} •{" "}
+                      {device.location?.name || "Unknown location"}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4">
                     {device.batteryLevel !== null && (
                       <div className="flex items-center gap-2">
-                        <Battery className={`h-4 w-4 ${device.batteryLevel < 20 ? 'text-red-600' : 'text-green-600'}`} />
+                        <Battery
+                          className={`h-4 w-4 ${device.batteryLevel < 20 ? "text-red-600" : "text-green-600"}`}
+                        />
                         <span className="text-sm">{device.batteryLevel}%</span>
                       </div>
                     )}
                     {device.signalStrength !== null && (
                       <div className="flex items-center gap-2">
-                        <Signal className={`h-4 w-4 ${device.signalStrength < 30 ? 'text-red-600' : 'text-green-600'}`} />
-                        <span className="text-sm">{device.signalStrength}%</span>
+                        <Signal
+                          className={`h-4 w-4 ${device.signalStrength < 30 ? "text-red-600" : "text-green-600"}`}
+                        />
+                        <span className="text-sm">
+                          {device.signalStrength}%
+                        </span>
                       </div>
                     )}
-                    <Badge variant={device.status === 'ACTIVE' ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={
+                        device.status === "ACTIVE" ? "default" : "secondary"
+                      }
+                    >
                       {device.status}
                     </Badge>
                     {device.health?.maintenance?.required && (
@@ -282,21 +362,33 @@ export default function IoTMonitoringDashboard({ organizationId }: { organizatio
         <Card>
           <CardHeader>
             <CardTitle>Digital Twin Synchronization</CardTitle>
-            <CardDescription>Physical-digital inventory state comparison</CardDescription>
+            <CardDescription>
+              Physical-digital inventory state comparison
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-4 border rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">Average Confidence</p>
-                <p className="text-3xl font-bold">{digitalTwinStatus.statistics?.avgConfidence}%</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Average Confidence
+                </p>
+                <p className="text-3xl font-bold">
+                  {digitalTwinStatus.statistics?.avgConfidence}%
+                </p>
               </div>
               <div className="text-center p-4 border rounded-lg">
                 <p className="text-sm text-muted-foreground mb-2">Needs Sync</p>
-                <p className="text-3xl font-bold text-yellow-600">{digitalTwinStatus.statistics?.needsSync}</p>
+                <p className="text-3xl font-bold text-yellow-600">
+                  {digitalTwinStatus.statistics?.needsSync}
+                </p>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <p className="text-sm text-muted-foreground mb-2">High Confidence</p>
-                <p className="text-3xl font-bold text-green-600">{digitalTwinStatus.statistics?.highConfidence}</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  High Confidence
+                </p>
+                <p className="text-3xl font-bold text-green-600">
+                  {digitalTwinStatus.statistics?.highConfidence}
+                </p>
               </div>
             </div>
           </CardContent>

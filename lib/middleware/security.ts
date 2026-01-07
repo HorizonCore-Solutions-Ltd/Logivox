@@ -3,10 +3,10 @@
  * Orchestrates all security features
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { rateLimit, RateLimitPresets } from './rate-limiter';
-import { securityHeaders, developmentCSP } from './security-headers';
-import { csrfProtection } from './csrf-protection';
+import { NextRequest, NextResponse } from "next/server";
+import { rateLimit, RateLimitPresets } from "./rate-limiter";
+import { securityHeaders, developmentCSP } from "./security-headers";
+import { csrfProtection } from "./csrf-protection";
 
 /**
  * Security middleware configuration
@@ -43,13 +43,13 @@ export interface SecurityConfig {
  */
 export async function applySecurity(
   req: NextRequest,
-  config: SecurityConfig = {}
+  config: SecurityConfig = {},
 ): Promise<NextResponse> {
   let response = NextResponse.next();
 
   // Apply rate limiting
   if (config.rateLimit !== false) {
-    const preset = config.rateLimitPreset || 'API';
+    const preset = config.rateLimitPreset || "API";
     const rateLimitResult = await rateLimit(req, RateLimitPresets[preset]);
 
     if (rateLimitResult && rateLimitResult.status === 429) {
@@ -93,10 +93,10 @@ export function apiSecurity(config?: SecurityConfig) {
   return async (req: NextRequest) => {
     const apiConfig: SecurityConfig = {
       rateLimit: true,
-      rateLimitPreset: 'API',
+      rateLimitPreset: "API",
       securityHeaders: true,
       csrfProtection: false, // API routes typically use bearer tokens
-      developmentMode: process.env.NODE_ENV === 'development',
+      developmentMode: process.env.NODE_ENV === "development",
       ...config,
     };
 
@@ -111,10 +111,10 @@ export function authSecurity(config?: SecurityConfig) {
   return async (req: NextRequest) => {
     const authConfig: SecurityConfig = {
       rateLimit: true,
-      rateLimitPreset: 'AUTH',
+      rateLimitPreset: "AUTH",
       securityHeaders: true,
       csrfProtection: true,
-      developmentMode: process.env.NODE_ENV === 'development',
+      developmentMode: process.env.NODE_ENV === "development",
       ...config,
     };
 
@@ -129,10 +129,10 @@ export function writeSecurity(config?: SecurityConfig) {
   return async (req: NextRequest) => {
     const writeConfig: SecurityConfig = {
       rateLimit: true,
-      rateLimitPreset: 'WRITE',
+      rateLimitPreset: "WRITE",
       securityHeaders: true,
       csrfProtection: true,
-      developmentMode: process.env.NODE_ENV === 'development',
+      developmentMode: process.env.NODE_ENV === "development",
       ...config,
     };
 
@@ -147,10 +147,10 @@ export function readSecurity(config?: SecurityConfig) {
   return async (req: NextRequest) => {
     const readConfig: SecurityConfig = {
       rateLimit: true,
-      rateLimitPreset: 'READ',
+      rateLimitPreset: "READ",
       securityHeaders: true,
       csrfProtection: false,
-      developmentMode: process.env.NODE_ENV === 'development',
+      developmentMode: process.env.NODE_ENV === "development",
       ...config,
     };
 

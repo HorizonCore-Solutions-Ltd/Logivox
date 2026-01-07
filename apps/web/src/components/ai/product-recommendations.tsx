@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Users, Sparkles, ShoppingCart, Star } from "lucide-react";
@@ -20,7 +26,9 @@ interface ProductRecommendationsProps {
   productId?: string;
   customerId?: string;
   limit?: number;
-  showTypes?: Array<"user-based" | "item-based" | "trending" | "personalized" | "all">;
+  showTypes?: Array<
+    "user-based" | "item-based" | "trending" | "personalized" | "all"
+  >;
 }
 
 export function ProductRecommendations({
@@ -29,7 +37,9 @@ export function ProductRecommendations({
   limit = 10,
   showTypes = ["all"],
 }: ProductRecommendationsProps) {
-  const [recommendations, setRecommendations] = useState<Record<string, Recommendation[]>>({});
+  const [recommendations, setRecommendations] = useState<
+    Record<string, Recommendation[]>
+  >({});
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("all");
 
@@ -45,7 +55,7 @@ export function ProductRecommendations({
       // Fetch recommendations for each type
       for (const type of showTypes) {
         const response = await fetch(
-          `/api/recommendations/${productId || "default"}?type=${type}&limit=${limit}`
+          `/api/recommendations/${productId || "default"}?type=${type}&limit=${limit}`,
         );
 
         if (response.ok) {
@@ -105,7 +115,9 @@ export function ProductRecommendations({
         <div className="flex items-center justify-center py-12">
           <div className="flex flex-col items-center gap-2">
             <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-            <p className="text-sm text-muted-foreground">Loading recommendations...</p>
+            <p className="text-sm text-muted-foreground">
+              Loading recommendations...
+            </p>
           </div>
         </div>
       </div>
@@ -144,10 +156,12 @@ export function ProductRecommendations({
         <Card className="p-12">
           <div className="flex flex-col items-center justify-center text-center">
             <Sparkles className="h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Recommendations Yet</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              No Recommendations Yet
+            </h3>
             <p className="text-sm text-muted-foreground max-w-md">
-              We don't have enough data to generate recommendations yet. As you browse and
-              purchase products, we'll learn your preferences.
+              We don't have enough data to generate recommendations yet. As you
+              browse and purchase products, we'll learn your preferences.
             </p>
           </div>
         </Card>
@@ -156,9 +170,12 @@ export function ProductRecommendations({
           {/* Grid Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold">{getTabTitle(activeTab)}</h3>
+              <h3 className="text-lg font-semibold">
+                {getTabTitle(activeTab)}
+              </h3>
               <p className="text-sm text-muted-foreground">
-                {currentRecommendations.length} product{currentRecommendations.length !== 1 ? "s" : ""} recommended
+                {currentRecommendations.length} product
+                {currentRecommendations.length !== 1 ? "s" : ""} recommended
               </p>
             </div>
             <Button variant="outline" size="sm" onClick={fetchRecommendations}>
@@ -214,8 +231,13 @@ export function ProductRecommendations({
                     <div className="text-right">
                       <p className="text-xs text-muted-foreground">Match</p>
                       <div className="flex items-center gap-1">
-                        <Star className={`h-4 w-4 ${getScoreColor(rec.score)}`} fill="currentColor" />
-                        <p className={`text-sm font-semibold ${getScoreColor(rec.score)}`}>
+                        <Star
+                          className={`h-4 w-4 ${getScoreColor(rec.score)}`}
+                          fill="currentColor"
+                        />
+                        <p
+                          className={`text-sm font-semibold ${getScoreColor(rec.score)}`}
+                        >
                           {(rec.score * 100).toFixed(0)}%
                         </p>
                       </div>
@@ -245,24 +267,37 @@ export function ProductRecommendations({
         <Card className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Total Products</p>
-              <p className="text-2xl font-bold">{currentRecommendations.length}</p>
+              <p className="text-sm text-muted-foreground mb-1">
+                Total Products
+              </p>
+              <p className="text-2xl font-bold">
+                {currentRecommendations.length}
+              </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Avg Match Score</p>
+              <p className="text-sm text-muted-foreground mb-1">
+                Avg Match Score
+              </p>
               <p className="text-2xl font-bold">
                 {(
                   (currentRecommendations.reduce((sum, r) => sum + r.score, 0) /
                     currentRecommendations.length) *
                   100
-                ).toFixed(0)}%
+                ).toFixed(0)}
+                %
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground mb-1">Price Range</p>
               <p className="text-2xl font-bold">
-                ${Math.min(...currentRecommendations.map((r) => r.price)).toFixed(0)} -
-                ${Math.max(...currentRecommendations.map((r) => r.price)).toFixed(0)}
+                $
+                {Math.min(
+                  ...currentRecommendations.map((r) => r.price),
+                ).toFixed(0)}{" "}
+                - $
+                {Math.max(
+                  ...currentRecommendations.map((r) => r.price),
+                ).toFixed(0)}
               </p>
             </div>
             <div>

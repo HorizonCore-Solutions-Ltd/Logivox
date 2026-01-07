@@ -3,6 +3,7 @@
 ## What Changed
 
 ### **BEFORE** (Complex - Removed ❌)
+
 - 5,250+ lines of complex fleet management code
 - Database models for vehicles, assignments, tracking, maintenance
 - GPS tracking, insurance, MOT, compliance
@@ -10,6 +11,7 @@
 - 8+ files across service layer, API, UI, database
 
 ### **AFTER** (Simple - Current ✅)
+
 - 500 lines of focused code
 - NO database models (just code library)
 - ONLY dimensions, weight, capacity
@@ -53,7 +55,7 @@
 ❌ `components/vehicles/customer-vehicle-portal.tsx` (650 lines)  
 ❌ `components/vehicles/transport-daily-dashboard.tsx` (800 lines)  
 ❌ `docs/VEHICLE_FLEET_MODULE_COMPLETE.md`  
-❌ `docs/UNLIMITED_VEHICLE_FLEET_SUPPORT.md`  
+❌ `docs/UNLIMITED_VEHICLE_FLEET_SUPPORT.md`
 
 **Total removed:** ~5,250 lines
 
@@ -66,20 +68,22 @@
 The vehicle types library helps LoadOptimizationService:
 
 1. **Calculate if orders fit in a vehicle**
+
    ```typescript
    const vehicle = recommendVehicle({
      totalVolumeCubicFeet: 1200,
      totalWeightLbs: 8000,
      palletCount: 8,
-     region: 'UK',
+     region: "UK",
    });
    // Returns: UK_RIGID_7.5T (7.5 Tonne Box Truck)
    ```
 
 2. **Provide dimensions for 3D bin packing**
+
    ```typescript
    const loadPlan = await loadOptimizationService.optimizeLoad({
-     orderIds: ['ord_1', 'ord_2'],
+     orderIds: ["ord_1", "ord_2"],
      vehicleDimensions: {
        length: vehicle.dimensions.lengthInches,
        width: vehicle.dimensions.widthInches,
@@ -105,17 +109,18 @@ The vehicle types library helps LoadOptimizationService:
 **US:** 4 types (53ft trailer, 26ft box, 16ft box, cargo van)  
 **EU:** 3 types (13.6m trailer, 7.5T truck, 3.5T van)  
 **Asia:** 3 types (20ft container, 40ft container, light truck)  
-**Refrigerated:** 2 types (Reefer trailer, reefer van)  
+**Refrigerated:** 2 types (Reefer trailer, reefer van)
 
 ### **Custom Types:**
 
 Add unlimited custom vehicles:
+
 ```typescript
 addCustomVehicleType({
-  id: 'CUSTOM_MEGA_60',
-  name: '60ft Mega Trailer',
-  region: 'UK',
-  category: 'TRAILER',
+  id: "CUSTOM_MEGA_60",
+  name: "60ft Mega Trailer",
+  region: "UK",
+  category: "TRAILER",
   dimensions: { lengthInches: 720, widthInches: 102, heightInches: 162 },
   maxWeightLbs: 80000,
   volumeCubicFeet: 6500,
@@ -132,6 +137,7 @@ Orders → Calculate Totals → Recommend Vehicle → Use Dimensions → 3D Bin 
 ```
 
 **Example:**
+
 ```typescript
 // 1. Orders total 1,200 cu ft, 8,000 lbs, 8 pallets
 const orders = ['ord_1', 'ord_2', 'ord_3'];
@@ -160,7 +166,7 @@ const loadPlan = await optimizeLoad({
 ❌ Maintenance scheduling  
 ❌ Transport daily operations  
 ❌ Database models  
-❌ Complex workflows  
+❌ Complex workflows
 
 **Why?** These are separate concerns. This library does ONE thing well: helps with load planning.
 
@@ -169,11 +175,13 @@ const loadPlan = await optimizeLoad({
 ## API Usage
 
 ### Get Vehicle Types
+
 ```bash
 GET /api/vehicle-types?region=UK
 ```
 
 ### Get Recommendation
+
 ```bash
 POST /api/vehicle-types/recommend
 {
@@ -185,6 +193,7 @@ POST /api/vehicle-types/recommend
 ```
 
 ### Add Custom Type
+
 ```bash
 PUT /api/vehicle-types/custom
 {
@@ -216,7 +225,7 @@ PUT /api/vehicle-types/custom
 ✅ **Fast** - No complex queries  
 ✅ **Easy to extend** - Add custom vehicles easily  
 ✅ **Maintainable** - Small codebase  
-✅ **Global** - UK, EU, US, Asia vehicles included  
+✅ **Global** - UK, EU, US, Asia vehicles included
 
 ---
 
@@ -235,13 +244,14 @@ PUT /api/vehicle-types/custom
 ## Summary
 
 **Before:** Massive fleet management system trying to do everything  
-**After:** Focused vehicle dimension library for load optimization  
+**After:** Focused vehicle dimension library for load optimization
 
 **Result:** Clean, simple, purpose-built solution that does exactly what's needed - help LoadOptimizationService pick the right vehicle size! 🎯
 
 ---
 
 **Total Lines of Code:**
+
 - Before: ~5,250 lines (complex fleet management)
 - After: ~500 lines (simple vehicle types)
 - **Reduction: 90% simpler** ✅

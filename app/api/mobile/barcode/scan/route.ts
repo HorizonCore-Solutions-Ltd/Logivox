@@ -18,7 +18,7 @@ export async function POST(request: Request) {
           success: false,
           error: { code: "UNAUTHORIZED", message: "Authentication required" },
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
             message: "Barcode is required",
           },
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -44,10 +44,7 @@ export async function POST(request: Request) {
     // Try to find inventory item
     const item = await prisma.inventoryItem.findFirst({
       where: {
-        OR: [
-          { barcode: barcode },
-          { sku: barcode },
-        ],
+        OR: [{ barcode: barcode }, { sku: barcode }],
         organizationId: session.user.organizationId,
       },
       select: {
@@ -104,10 +101,7 @@ export async function POST(request: Request) {
         // Try to find sales order
         const order = await prisma.salesOrder.findFirst({
           where: {
-            OR: [
-              { soNumber: barcode },
-              { externalOrderNumber: barcode },
-            ],
+            OR: [{ soNumber: barcode }, { externalOrderNumber: barcode }],
             organizationId: session.user.organizationId,
           },
           select: {
@@ -147,7 +141,7 @@ export async function POST(request: Request) {
             message: "No matching item, location, or order found",
           },
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -170,7 +164,7 @@ export async function POST(request: Request) {
           message: "Failed to process barcode scan",
         },
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -9,77 +9,79 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
-import { X, Download, Smartphone } from "lucide-react"
+} from "@/components/ui/card";
+import { X, Download, Smartphone } from "lucide-react";
 
 interface BeforeInstallPromptEvent extends Event {
-  prompt(): Promise<void>
-  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
 export function PWAInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [showPrompt, setShowPrompt] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
     // Check if already installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true)
-      return
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstalled(true);
+      return;
     }
 
     const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Don't show immediately, wait for user interaction
-      setTimeout(() => setShowPrompt(true), 30000) // Show after 30 seconds
-    }
+      setTimeout(() => setShowPrompt(true), 30000); // Show after 30 seconds
+    };
 
-    window.addEventListener('beforeinstallprompt', handler)
+    window.addEventListener("beforeinstallprompt", handler);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler)
-    }
-  }, [])
+      window.removeEventListener("beforeinstallprompt", handler);
+    };
+  }, []);
 
   useEffect(() => {
-    window.addEventListener('appinstalled', () => {
-      setIsInstalled(true)
-      setShowPrompt(false)
-      setDeferredPrompt(null)
-    })
-  }, [])
+    window.addEventListener("appinstalled", () => {
+      setIsInstalled(true);
+      setShowPrompt(false);
+      setDeferredPrompt(null);
+    });
+  }, []);
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) return;
 
-    await deferredPrompt.prompt()
-    const { outcome } = await deferredPrompt.userChoice
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
 
-    if (outcome === 'accepted') {
-      setDeferredPrompt(null)
-      setShowPrompt(false)
+    if (outcome === "accepted") {
+      setDeferredPrompt(null);
+      setShowPrompt(false);
     }
-  }
+  };
 
   const handleDismiss = () => {
-    setShowPrompt(false)
+    setShowPrompt(false);
     // Don't show again for 7 days
-    localStorage.setItem('pwa-prompt-dismissed', Date.now().toString())
-  }
+    localStorage.setItem("pwa-prompt-dismissed", Date.now().toString());
+  };
 
   if (isInstalled || !showPrompt || !deferredPrompt) {
-    return null
+    return null;
   }
 
   // Check if dismissed recently
-  const dismissed = localStorage.getItem('pwa-prompt-dismissed')
+  const dismissed = localStorage.getItem("pwa-prompt-dismissed");
   if (dismissed) {
-    const dismissedTime = parseInt(dismissed)
-    const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24)
+    const dismissedTime = parseInt(dismissed);
+    const daysSinceDismissed =
+      (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24);
     if (daysSinceDismissed < 7) {
-      return null
+      return null;
     }
   }
 
@@ -124,5 +126,5 @@ export function PWAInstallPrompt() {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

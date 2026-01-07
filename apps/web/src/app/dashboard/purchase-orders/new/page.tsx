@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +53,7 @@ export default function CreatePurchaseOrderPage() {
   const [loading, setLoading] = useState(false);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-  
+
   // Form state
   const [supplierId, setSupplierId] = useState("");
   const [expectedDate, setExpectedDate] = useState("");
@@ -122,8 +128,13 @@ export default function CreatePurchaseOrderPage() {
     setItems(newItems);
   };
 
-  const handleInventoryItemSelect = (index: number, inventoryItemId: string) => {
-    const inventoryItem = inventoryItems.find(item => item.id === inventoryItemId);
+  const handleInventoryItemSelect = (
+    index: number,
+    inventoryItemId: string,
+  ) => {
+    const inventoryItem = inventoryItems.find(
+      (item) => item.id === inventoryItemId,
+    );
     if (inventoryItem) {
       handleItemChange(index, "inventoryItemId", inventoryItemId);
       handleItemChange(index, "sku", inventoryItem.sku);
@@ -133,7 +144,10 @@ export default function CreatePurchaseOrderPage() {
   };
 
   const calculateSubtotal = () => {
-    return items.reduce((sum, item) => sum + item.quantityOrdered * item.unitPrice, 0);
+    return items.reduce(
+      (sum, item) => sum + item.quantityOrdered * item.unitPrice,
+      0,
+    );
   };
 
   const calculateTax = () => {
@@ -155,7 +169,9 @@ export default function CreatePurchaseOrderPage() {
       return;
     }
 
-    const validItems = items.filter(item => item.sku && item.description && item.quantityOrdered > 0);
+    const validItems = items.filter(
+      (item) => item.sku && item.description && item.quantityOrdered > 0,
+    );
     if (validItems.length === 0) {
       toast({
         title: "Validation Error",
@@ -167,7 +183,7 @@ export default function CreatePurchaseOrderPage() {
 
     try {
       setLoading(true);
-      
+
       const response = await fetch("/api/purchase-orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -234,7 +250,9 @@ export default function CreatePurchaseOrderPage() {
             Back to Purchase Orders
           </Button>
           <h1 className="text-3xl font-bold mt-2">Create Purchase Order</h1>
-          <p className="text-muted-foreground">Create a new purchase order for your supplier</p>
+          <p className="text-muted-foreground">
+            Create a new purchase order for your supplier
+          </p>
         </div>
       </div>
 
@@ -245,7 +263,9 @@ export default function CreatePurchaseOrderPage() {
           <Card>
             <CardHeader>
               <CardTitle>Supplier & Basic Information</CardTitle>
-              <CardDescription>Select supplier and set basic purchase order details</CardDescription>
+              <CardDescription>
+                Select supplier and set basic purchase order details
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -299,7 +319,9 @@ export default function CreatePurchaseOrderPage() {
               <div className="flex justify-between items-center">
                 <div>
                   <CardTitle>Items</CardTitle>
-                  <CardDescription>Add items to this purchase order</CardDescription>
+                  <CardDescription>
+                    Add items to this purchase order
+                  </CardDescription>
                 </div>
                 <Button size="sm" onClick={handleAddItem}>
                   <Plus className="h-4 w-4 mr-2" />
@@ -329,7 +351,9 @@ export default function CreatePurchaseOrderPage() {
                         <Label>Select from Inventory (Optional)</Label>
                         <Select
                           value={item.inventoryItemId || ""}
-                          onValueChange={(value) => handleInventoryItemSelect(index, value)}
+                          onValueChange={(value) =>
+                            handleInventoryItemSelect(index, value)
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Select inventory item" />
@@ -348,7 +372,9 @@ export default function CreatePurchaseOrderPage() {
                         <Label>SKU *</Label>
                         <Input
                           value={item.sku}
-                          onChange={(e) => handleItemChange(index, "sku", e.target.value)}
+                          onChange={(e) =>
+                            handleItemChange(index, "sku", e.target.value)
+                          }
                           placeholder="Enter SKU"
                         />
                       </div>
@@ -357,7 +383,13 @@ export default function CreatePurchaseOrderPage() {
                         <Label>Description *</Label>
                         <Input
                           value={item.description}
-                          onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "description",
+                              e.target.value,
+                            )
+                          }
                           placeholder="Enter description"
                         />
                       </div>
@@ -368,7 +400,13 @@ export default function CreatePurchaseOrderPage() {
                           type="number"
                           min="1"
                           value={item.quantityOrdered}
-                          onChange={(e) => handleItemChange(index, "quantityOrdered", parseInt(e.target.value) || 1)}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "quantityOrdered",
+                              parseInt(e.target.value) || 1,
+                            )
+                          }
                         />
                       </div>
 
@@ -379,7 +417,13 @@ export default function CreatePurchaseOrderPage() {
                           step="0.01"
                           min="0"
                           value={item.unitPrice}
-                          onChange={(e) => handleItemChange(index, "unitPrice", parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "unitPrice",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
                         />
                       </div>
 
@@ -390,7 +434,13 @@ export default function CreatePurchaseOrderPage() {
                           step="0.01"
                           min="0"
                           value={item.tax}
-                          onChange={(e) => handleItemChange(index, "tax", parseFloat(e.target.value) || 0)}
+                          onChange={(e) =>
+                            handleItemChange(
+                              index,
+                              "tax",
+                              parseFloat(e.target.value) || 0,
+                            )
+                          }
                         />
                       </div>
 
@@ -502,11 +552,15 @@ export default function CreatePurchaseOrderPage() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal:</span>
-                  <span className="font-semibold">${calculateSubtotal().toFixed(2)}</span>
+                  <span className="font-semibold">
+                    ${calculateSubtotal().toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax:</span>
-                  <span className="font-semibold">${calculateTax().toFixed(2)}</span>
+                  <span className="font-semibold">
+                    ${calculateTax().toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-lg font-bold pt-2 border-t">
                   <span>Total:</span>
@@ -521,7 +575,9 @@ export default function CreatePurchaseOrderPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Total Quantity:</span>
-                  <span>{items.reduce((sum, item) => sum + item.quantityOrdered, 0)}</span>
+                  <span>
+                    {items.reduce((sum, item) => sum + item.quantityOrdered, 0)}
+                  </span>
                 </div>
               </div>
 

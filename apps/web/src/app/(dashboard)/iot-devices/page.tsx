@@ -1,14 +1,21 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Wifi, WifiOff, AlertTriangle, Activity } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Wifi, WifiOff, AlertTriangle, Activity } from "lucide-react";
 
 interface IoTDevice {
   id: string;
   deviceId: string;
   name: string;
-  deviceType: 'SCANNER' | 'PRINTER' | 'RFID_READER' | 'SCALE' | 'SENSOR' | 'GATEWAY' | 'OTHER';
-  status: 'ONLINE' | 'OFFLINE' | 'MAINTENANCE' | 'ERROR';
+  deviceType:
+    | "SCANNER"
+    | "PRINTER"
+    | "RFID_READER"
+    | "SCALE"
+    | "SENSOR"
+    | "GATEWAY"
+    | "OTHER";
+  status: "ONLINE" | "OFFLINE" | "MAINTENANCE" | "ERROR";
   warehouse: { name: string; code: string };
   location?: { name: string; code: string };
   lastSeen: string;
@@ -19,7 +26,7 @@ interface IoTDevice {
 export default function IoTDevicesPage() {
   const [devices, setDevices] = useState<IoTDevice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     fetchDevices();
@@ -30,7 +37,7 @@ export default function IoTDevicesPage() {
   const fetchDevices = async () => {
     try {
       const params = new URLSearchParams();
-      if (statusFilter) params.append('status', statusFilter);
+      if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(`/api/iot/devices?${params.toString()}`);
       if (res.ok) {
@@ -38,7 +45,7 @@ export default function IoTDevicesPage() {
         setDevices(data);
       }
     } catch (error) {
-      console.error('Error fetching IoT devices:', error);
+      console.error("Error fetching IoT devices:", error);
     } finally {
       setLoading(false);
     }
@@ -46,13 +53,13 @@ export default function IoTDevicesPage() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'ONLINE':
+      case "ONLINE":
         return <Wifi className="w-5 h-5 text-green-600" />;
-      case 'OFFLINE':
+      case "OFFLINE":
         return <WifiOff className="w-5 h-5 text-gray-400" />;
-      case 'ERROR':
+      case "ERROR":
         return <AlertTriangle className="w-5 h-5 text-red-600" />;
-      case 'MAINTENANCE':
+      case "MAINTENANCE":
         return <Activity className="w-5 h-5 text-yellow-600" />;
       default:
         return <WifiOff className="w-5 h-5 text-gray-400" />;
@@ -61,16 +68,18 @@ export default function IoTDevicesPage() {
 
   const getStatusBadge = (status: string) => {
     const colors = {
-      ONLINE: 'bg-green-100 text-green-800',
-      OFFLINE: 'bg-gray-100 text-gray-800',
-      MAINTENANCE: 'bg-yellow-100 text-yellow-800',
-      ERROR: 'bg-red-100 text-red-800',
+      ONLINE: "bg-green-100 text-green-800",
+      OFFLINE: "bg-gray-100 text-gray-800",
+      MAINTENANCE: "bg-yellow-100 text-yellow-800",
+      ERROR: "bg-red-100 text-red-800",
     };
     return colors[status as keyof typeof colors] || colors.OFFLINE;
   };
 
   const getTimeSince = (dateStr: string) => {
-    const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    const seconds = Math.floor(
+      (Date.now() - new Date(dateStr).getTime()) / 1000,
+    );
     if (seconds < 60) return `${seconds}s ago`;
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes}m ago`;
@@ -80,16 +89,18 @@ export default function IoTDevicesPage() {
     return `${days}d ago`;
   };
 
-  const onlineCount = devices.filter(d => d.status === 'ONLINE').length;
-  const offlineCount = devices.filter(d => d.status === 'OFFLINE').length;
-  const errorCount = devices.filter(d => d.status === 'ERROR').length;
+  const onlineCount = devices.filter((d) => d.status === "ONLINE").length;
+  const offlineCount = devices.filter((d) => d.status === "OFFLINE").length;
+  const errorCount = devices.filter((d) => d.status === "ERROR").length;
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">IoT Devices</h1>
-          <p className="text-gray-600 mt-1">Monitor warehouse hardware and sensors</p>
+          <p className="text-gray-600 mt-1">
+            Monitor warehouse hardware and sensors
+          </p>
         </div>
       </div>
 
@@ -151,9 +162,13 @@ export default function IoTDevicesPage() {
       {/* Device Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading ? (
-          <div className="col-span-3 text-center py-12 text-gray-500">Loading...</div>
+          <div className="col-span-3 text-center py-12 text-gray-500">
+            Loading...
+          </div>
         ) : devices.length === 0 ? (
-          <div className="col-span-3 text-center py-12 text-gray-500">No devices found</div>
+          <div className="col-span-3 text-center py-12 text-gray-500">
+            No devices found
+          </div>
         ) : (
           devices.map((device) => (
             <div
@@ -162,7 +177,9 @@ export default function IoTDevicesPage() {
             >
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{device.name}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {device.name}
+                  </h3>
                   <p className="text-sm text-gray-600">{device.deviceId}</p>
                   <p className="text-xs text-gray-500">{device.deviceType}</p>
                 </div>
@@ -182,12 +199,16 @@ export default function IoTDevicesPage() {
                 )}
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Last Seen:</span>
-                  <span className="font-medium">{getTimeSince(device.lastSeen)}</span>
+                  <span className="font-medium">
+                    {getTimeSince(device.lastSeen)}
+                  </span>
                 </div>
                 {device.firmwareVersion && (
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Firmware:</span>
-                    <span className="font-medium">{device.firmwareVersion}</span>
+                    <span className="font-medium">
+                      {device.firmwareVersion}
+                    </span>
                   </div>
                 )}
               </div>
@@ -195,7 +216,7 @@ export default function IoTDevicesPage() {
               <div className="flex justify-between items-center pt-3 border-t">
                 <span
                   className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(
-                    device.status
+                    device.status,
                   )}`}
                 >
                   {device.status}

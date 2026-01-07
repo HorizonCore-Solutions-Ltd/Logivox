@@ -1,119 +1,139 @@
-import { Metadata } from "next"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, BookOpen, Video, CheckCircle2, Search } from "lucide-react"
+import { Metadata } from "next";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
+  BookOpen,
+  Video,
+  CheckCircle2,
+  Search,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Getting Started with LogiVox WMS | Help Center",
-  description: "Quick start guides and tutorials to help you set up and configure your LogiVox warehouse management system.",
-}
+  description:
+    "Quick start guides and tutorials to help you set up and configure your LogiVox warehouse management system.",
+};
 
 export default function GettingStartedPage() {
   const articles = [
     {
       title: "Setting Up Your First Warehouse",
       slug: "setup-first-warehouse",
-      description: "Complete walkthrough of creating and configuring your first warehouse location",
+      description:
+        "Complete walkthrough of creating and configuring your first warehouse location",
       readTime: "5 min",
       difficulty: "Beginner",
-      popular: true
+      popular: true,
     },
     {
       title: "Adding Users and Assigning Roles",
       slug: "add-users-roles",
-      description: "Learn how to invite team members and configure role-based access control",
+      description:
+        "Learn how to invite team members and configure role-based access control",
       readTime: "3 min",
       difficulty: "Beginner",
-      popular: true
+      popular: true,
     },
     {
       title: "Configuring Warehouse Locations",
       slug: "configure-locations",
-      description: "Set up zones, aisles, racks, and bin locations for optimal warehouse organization",
+      description:
+        "Set up zones, aisles, racks, and bin locations for optimal warehouse organization",
       readTime: "8 min",
       difficulty: "Beginner",
-      popular: true
+      popular: true,
     },
     {
       title: "Importing Your Initial Inventory",
       slug: "import-inventory",
-      description: "Import existing inventory data from CSV or via API integration",
+      description:
+        "Import existing inventory data from CSV or via API integration",
       readTime: "6 min",
-      difficulty: "Beginner"
+      difficulty: "Beginner",
     },
     {
       title: "Setting Up Mobile Devices",
       slug: "setup-mobile-devices",
-      description: "Configure tablets, scanners, and mobile devices for warehouse operations",
+      description:
+        "Configure tablets, scanners, and mobile devices for warehouse operations",
       readTime: "4 min",
-      difficulty: "Beginner"
+      difficulty: "Beginner",
     },
     {
       title: "Creating Your First Receiving Order",
       slug: "first-receiving-order",
       description: "Step-by-step guide to receiving goods into your warehouse",
       readTime: "7 min",
-      difficulty: "Beginner"
+      difficulty: "Beginner",
     },
     {
       title: "Understanding the Dashboard",
       slug: "dashboard-overview",
       description: "Navigate the main dashboard and understand key metrics",
       readTime: "4 min",
-      difficulty: "Beginner"
+      difficulty: "Beginner",
     },
     {
       title: "Configuring Barcode Scanners",
       slug: "barcode-scanners",
-      description: "Set up and connect barcode scanners for efficient scanning operations",
+      description:
+        "Set up and connect barcode scanners for efficient scanning operations",
       readTime: "5 min",
-      difficulty: "Intermediate"
+      difficulty: "Intermediate",
     },
     {
       title: "Setting Up Shipping Carriers",
       slug: "shipping-carriers",
-      description: "Integrate with FedEx, UPS, USPS, and other shipping carriers",
+      description:
+        "Integrate with FedEx, UPS, USPS, and other shipping carriers",
       readTime: "10 min",
-      difficulty: "Intermediate"
+      difficulty: "Intermediate",
     },
     {
       title: "Customizing Your Workflow",
       slug: "customize-workflow",
       description: "Adapt LogiVox to match your specific warehouse processes",
       readTime: "12 min",
-      difficulty: "Advanced"
-    }
-  ]
+      difficulty: "Advanced",
+    },
+  ];
 
   const quickStartSteps = [
     {
       step: 1,
       title: "Create Your Account",
-      description: "Sign up and verify your email address"
+      description: "Sign up and verify your email address",
     },
     {
       step: 2,
       title: "Add Your Warehouse",
-      description: "Configure warehouse details and locations"
+      description: "Configure warehouse details and locations",
     },
     {
       step: 3,
       title: "Import Inventory",
-      description: "Upload your existing product catalog"
+      description: "Upload your existing product catalog",
     },
     {
       step: 4,
       title: "Invite Your Team",
-      description: "Add users and assign appropriate roles"
+      description: "Add users and assign appropriate roles",
     },
     {
       step: 5,
       title: "Start Receiving",
-      description: "Begin processing incoming shipments"
-    }
-  ]
+      description: "Begin processing incoming shipments",
+    },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -121,7 +141,9 @@ export default function GettingStartedPage() {
       <section className="bg-gradient-to-b from-primary-50 to-white border-b py-12">
         <div className="container-enterprise">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-            <Link href="/help" className="hover:text-primary">Help Center</Link>
+            <Link href="/help" className="hover:text-primary">
+              Help Center
+            </Link>
             <span>/</span>
             <span>Getting Started</span>
           </div>
@@ -132,7 +154,8 @@ export default function GettingStartedPage() {
             <h1 className="text-4xl font-bold">Getting Started</h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-3xl mb-6">
-            Everything you need to set up LogiVox and start managing your warehouse operations efficiently.
+            Everything you need to set up LogiVox and start managing your
+            warehouse operations efficiently.
           </p>
 
           {/* Search Bar */}
@@ -145,22 +168,37 @@ export default function GettingStartedPage() {
                 className="w-full rounded-lg border border-input bg-background px-10 py-3 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
-            
+
             {/* Category Quick Links */}
             <div className="flex flex-wrap gap-2 mt-4">
-              <Badge variant="secondary" className="cursor-pointer hover:bg-primary-100">
+              <Badge
+                variant="secondary"
+                className="cursor-pointer hover:bg-primary-100"
+              >
                 All Guides
               </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+              <Badge
+                variant="outline"
+                className="cursor-pointer hover:bg-muted"
+              >
                 Beginner
               </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+              <Badge
+                variant="outline"
+                className="cursor-pointer hover:bg-muted"
+              >
                 Intermediate
               </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+              <Badge
+                variant="outline"
+                className="cursor-pointer hover:bg-muted"
+              >
                 Advanced
               </Badge>
-              <Badge variant="outline" className="cursor-pointer hover:bg-muted">
+              <Badge
+                variant="outline"
+                className="cursor-pointer hover:bg-muted"
+              >
                 Popular
               </Badge>
             </div>
@@ -172,7 +210,9 @@ export default function GettingStartedPage() {
       <section className="py-12 bg-muted/30">
         <div className="container-enterprise">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6">Quick Start (30 minutes)</h2>
+            <h2 className="text-2xl font-bold mb-6">
+              Quick Start (30 minutes)
+            </h2>
             <div className="grid gap-4">
               {quickStartSteps.map((step) => (
                 <Card key={step.step}>
@@ -182,7 +222,9 @@ export default function GettingStartedPage() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-lg">{step.title}</h3>
-                      <p className="text-sm text-muted-foreground">{step.description}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {step.description}
+                      </p>
                     </div>
                   </CardContent>
                 </Card>
@@ -213,7 +255,15 @@ export default function GettingStartedPage() {
                 <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant={article.difficulty === "Beginner" ? "secondary" : article.difficulty === "Intermediate" ? "default" : "outline"}>
+                      <Badge
+                        variant={
+                          article.difficulty === "Beginner"
+                            ? "secondary"
+                            : article.difficulty === "Intermediate"
+                              ? "default"
+                              : "outline"
+                        }
+                      >
                         {article.difficulty}
                       </Badge>
                       {article.popular && (
@@ -245,7 +295,8 @@ export default function GettingStartedPage() {
             <CardContent className="p-8 text-center">
               <h2 className="text-2xl font-bold mb-4">Ready to Learn More?</h2>
               <p className="text-muted-foreground mb-6">
-                Once you've completed the getting started guides, explore advanced features and best practices.
+                Once you've completed the getting started guides, explore
+                advanced features and best practices.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild>
@@ -254,9 +305,7 @@ export default function GettingStartedPage() {
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link href="/docs">
-                    API Documentation
-                  </Link>
+                  <Link href="/docs">API Documentation</Link>
                 </Button>
               </div>
             </CardContent>
@@ -264,5 +313,5 @@ export default function GettingStartedPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

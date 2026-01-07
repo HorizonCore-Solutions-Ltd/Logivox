@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   TrendingUp,
   TrendingDown,
@@ -18,7 +24,7 @@ import {
   Shield,
   BarChart3,
   Users,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface ReturnsDashboardProps {
   organizationId: string;
@@ -27,7 +33,7 @@ interface ReturnsDashboardProps {
 export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     // TODO: Fetch real data from API
@@ -71,7 +77,9 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Returns Management</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Returns Management
+        </h1>
         <p className="text-muted-foreground mt-2">
           Comprehensive returns analytics and automation
         </p>
@@ -85,7 +93,9 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.overview.totalReturns.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              {stats.overview.totalReturns.toLocaleString()}
+            </div>
             <p className="text-xs text-muted-foreground flex items-center mt-1">
               <TrendingDown className="mr-1 h-3 w-3 text-green-500" />
               <span className="text-green-500">-2.3%</span> vs last period
@@ -99,7 +109,9 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.overview.returnRate}%</div>
+            <div className="text-2xl font-bold">
+              {stats.overview.returnRate}%
+            </div>
             <p className="text-xs text-muted-foreground">
               <Badge variant="secondary" className="text-xs">
                 Below industry avg (10%)
@@ -130,10 +142,13 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
             <Leaf className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.sustainability.co2Saved}kg</div>
+            <div className="text-2xl font-bold">
+              {stats.sustainability.co2Saved}kg
+            </div>
             <p className="text-xs text-muted-foreground">
               <Badge variant="outline" className="text-xs bg-green-50">
-                🌱 {Math.round(stats.sustainability.co2Saved / 21)} trees equivalent
+                🌱 {Math.round(stats.sustainability.co2Saved / 21)} trees
+                equivalent
               </Badge>
             </p>
           </CardContent>
@@ -141,7 +156,11 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="instant-refund">Instant Refunds</TabsTrigger>
@@ -159,19 +178,31 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
                   <Clock className="h-5 w-5" />
                   Processing Performance
                 </CardTitle>
-                <CardDescription>Average return processing metrics</CardDescription>
+                <CardDescription>
+                  Average return processing metrics
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Avg Processing Time</span>
-                    <span className="text-2xl font-bold">{stats.overview.avgProcessingTime} days</span>
+                    <span className="text-sm font-medium">
+                      Avg Processing Time
+                    </span>
+                    <span className="text-2xl font-bold">
+                      {stats.overview.avgProcessingTime} days
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Customer Satisfaction</span>
+                    <span className="text-sm font-medium">
+                      Customer Satisfaction
+                    </span>
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold">{stats.overview.customerSatisfaction}</span>
-                      <span className="text-sm text-muted-foreground">/ 5.0</span>
+                      <span className="text-2xl font-bold">
+                        {stats.overview.customerSatisfaction}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        / 5.0
+                      </span>
                     </div>
                   </div>
                   <div className="text-xs text-muted-foreground">
@@ -206,7 +237,12 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
                     </span>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    Recovery Rate: {((stats.financial.recovered / stats.financial.totalCost) * 100).toFixed(1)}%
+                    Recovery Rate:{" "}
+                    {(
+                      (stats.financial.recovered / stats.financial.totalCost) *
+                      100
+                    ).toFixed(1)}
+                    %
                   </div>
                 </div>
               </CardContent>
@@ -221,21 +257,33 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
                 <Shield className="h-5 w-5" />
                 Instant Refund Program
               </CardTitle>
-              <CardDescription>Trust-based refunds before item receipt</CardDescription>
+              <CardDescription>
+                Trust-based refunds before item receipt
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Total Issued</div>
-                    <div className="text-2xl font-bold">${(stats.financial.instantRefunds / 1000).toFixed(0)}K</div>
+                    <div className="text-sm text-muted-foreground">
+                      Total Issued
+                    </div>
+                    <div className="text-2xl font-bold">
+                      ${(stats.financial.instantRefunds / 1000).toFixed(0)}K
+                    </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Verification Rate</div>
-                    <div className="text-2xl font-bold text-green-600">97.8%</div>
+                    <div className="text-sm text-muted-foreground">
+                      Verification Rate
+                    </div>
+                    <div className="text-2xl font-bold text-green-600">
+                      97.8%
+                    </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Chargebacks</div>
+                    <div className="text-sm text-muted-foreground">
+                      Chargebacks
+                    </div>
                     <div className="text-2xl font-bold text-red-600">2.2%</div>
                   </div>
                 </div>
@@ -252,23 +300,33 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
                 <AlertTriangle className="h-5 w-5" />
                 Return Prevention Insights
               </CardTitle>
-              <CardDescription>Proactive prevention opportunities</CardDescription>
+              <CardDescription>
+                Proactive prevention opportunities
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Predicted Returns</div>
-                    <div className="text-2xl font-bold">{stats.prevention.predictedReturns}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Predicted Returns
+                    </div>
+                    <div className="text-2xl font-bold">
+                      {stats.prevention.predictedReturns}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Preventable</div>
+                    <div className="text-sm text-muted-foreground">
+                      Preventable
+                    </div>
                     <div className="text-2xl font-bold text-orange-600">
                       {stats.prevention.preventableReturns}
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Potential Savings</div>
+                    <div className="text-sm text-muted-foreground">
+                      Potential Savings
+                    </div>
                     <div className="text-2xl font-bold text-green-600">
                       ${(stats.prevention.potentialSavings / 1000).toFixed(1)}K
                     </div>
@@ -293,19 +351,31 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <div className="text-sm text-muted-foreground">Circularity Score</div>
+                    <div className="text-sm text-muted-foreground">
+                      Circularity Score
+                    </div>
                     <div className="text-2xl font-bold">
                       {stats.sustainability.circularityScore}
-                      <Badge variant="outline" className="ml-2">A</Badge>
+                      <Badge variant="outline" className="ml-2">
+                        A
+                      </Badge>
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">Items Reused</div>
-                    <div className="text-2xl font-bold">{stats.sustainability.itemsReused}</div>
+                    <div className="text-sm text-muted-foreground">
+                      Items Reused
+                    </div>
+                    <div className="text-2xl font-bold">
+                      {stats.sustainability.itemsReused}
+                    </div>
                   </div>
                   <div>
-                    <div className="text-sm text-muted-foreground">CO₂ Saved</div>
-                    <div className="text-2xl font-bold">{stats.sustainability.co2Saved}kg</div>
+                    <div className="text-sm text-muted-foreground">
+                      CO₂ Saved
+                    </div>
+                    <div className="text-2xl font-bold">
+                      {stats.sustainability.co2Saved}kg
+                    </div>
                   </div>
                 </div>
                 <Button>Generate ESG Report</Button>
@@ -326,7 +396,8 @@ export function ReturnsDashboard({ organizationId }: ReturnsDashboardProps) {
             <CardContent>
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground">
-                  Cross-border returns tracking, customs clearance, and duty refunds
+                  Cross-border returns tracking, customs clearance, and duty
+                  refunds
                 </div>
                 <Button>View International Returns</Button>
               </div>

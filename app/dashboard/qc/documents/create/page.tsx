@@ -1,28 +1,44 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, ArrowLeft, Save, Upload } from 'lucide-react';
-import { format } from 'date-fns';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, ArrowLeft, Save, Upload } from "lucide-react";
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 export default function CreateDocument() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState('');
-  const [description, setDescription] = useState('');
-  const [owner, setOwner] = useState('');
-  const [department, setDepartment] = useState('');
+  const [title, setTitle] = useState("");
+  const [type, setType] = useState("");
+  const [description, setDescription] = useState("");
+  const [owner, setOwner] = useState("");
+  const [department, setDepartment] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [trainingRequired, setTrainingRequired] = useState(false);
   const [effectiveDate, setEffectiveDate] = useState<Date>();
@@ -37,7 +53,7 @@ export default function CreateDocument() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
-      alert('Please select a file to upload');
+      alert("Please select a file to upload");
       return;
     }
 
@@ -46,21 +62,21 @@ export default function CreateDocument() {
     try {
       // Upload file first
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
-      const uploadResponse = await fetch('/api/upload/documents', {
-        method: 'POST',
-        body: formData
+      const uploadResponse = await fetch("/api/upload/documents", {
+        method: "POST",
+        body: formData,
       });
 
-      if (!uploadResponse.ok) throw new Error('File upload failed');
+      if (!uploadResponse.ok) throw new Error("File upload failed");
 
       const uploadResult = await uploadResponse.json();
 
       // Create document record
-      const response = await fetch('/api/qc/documents', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/documents", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           type,
@@ -73,12 +89,12 @@ export default function CreateDocument() {
           trainingRequired,
           effectiveDate,
           reviewDate,
-          organizationId: 'org-1',
-          createdBy: 'current-user'
-        })
+          organizationId: "org-1",
+          createdBy: "current-user",
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to create document');
+      if (!response.ok) throw new Error("Failed to create document");
 
       const result = await response.json();
       router.push(`/dashboard/qc/documents/${result.data.id}`);
@@ -126,10 +142,16 @@ export default function CreateDocument() {
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="SOP">Standard Operating Procedure (SOP)</SelectItem>
-                    <SelectItem value="WORK_INSTRUCTION">Work Instruction</SelectItem>
+                    <SelectItem value="SOP">
+                      Standard Operating Procedure (SOP)
+                    </SelectItem>
+                    <SelectItem value="WORK_INSTRUCTION">
+                      Work Instruction
+                    </SelectItem>
                     <SelectItem value="FORM">Form/Template</SelectItem>
-                    <SelectItem value="QUALITY_MANUAL">Quality Manual</SelectItem>
+                    <SelectItem value="QUALITY_MANUAL">
+                      Quality Manual
+                    </SelectItem>
                     <SelectItem value="SPECIFICATION">Specification</SelectItem>
                     <SelectItem value="PROCEDURE">Procedure</SelectItem>
                     <SelectItem value="POLICY">Policy</SelectItem>
@@ -195,9 +217,14 @@ export default function CreateDocument() {
                   <Label>Effective Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {effectiveDate ? format(effectiveDate, 'PPP') : 'Select date'}
+                        {effectiveDate
+                          ? format(effectiveDate, "PPP")
+                          : "Select date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent>
@@ -214,9 +241,12 @@ export default function CreateDocument() {
                   <Label>Next Review Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {reviewDate ? format(reviewDate, 'PPP') : 'Select date'}
+                        {reviewDate ? format(reviewDate, "PPP") : "Select date"}
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent>
@@ -236,7 +266,9 @@ export default function CreateDocument() {
                 <Checkbox
                   id="training"
                   checked={trainingRequired}
-                  onCheckedChange={(checked) => setTrainingRequired(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setTrainingRequired(checked as boolean)
+                  }
                 />
                 <Label htmlFor="training" className="cursor-pointer">
                   Requires Training & Acknowledgment
@@ -254,7 +286,9 @@ export default function CreateDocument() {
             Cancel
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? 'Uploading...' : (
+            {loading ? (
+              "Uploading..."
+            ) : (
               <>
                 <Upload className="w-4 h-4 mr-2" />
                 Upload Document

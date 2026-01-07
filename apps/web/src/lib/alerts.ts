@@ -1,9 +1,9 @@
 /**
  * Automated Reorder Alert Engine
- * 
+ *
  * This module handles intelligent inventory monitoring and multi-channel
  * alert notifications when items hit reorder thresholds.
- * 
+ *
  * Features:
  * - Lead-time aware alerts (warns X days before stockout)
  * - Multiple alert channels (email, SMS, Slack, push)
@@ -12,13 +12,17 @@
  * - Predictive stockout date calculation
  */
 
-import { PrismaClient } from '@prisma/client';
-import { addDays, differenceInDays, format } from 'date-fns';
+import { PrismaClient } from "@prisma/client";
+import { addDays, differenceInDays, format } from "date-fns";
 
 // Define alert enums if not in Prisma schema
-export type AlertType = 'LOW_STOCK' | 'REORDER_POINT' | 'STOCKOUT' | 'EXPIRING_SOON';
-export type AlertSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-export type AlertStatus = 'PENDING' | 'SENT' | 'ACKNOWLEDGED' | 'RESOLVED';
+export type AlertType =
+  | "LOW_STOCK"
+  | "REORDER_POINT"
+  | "STOCKOUT"
+  | "EXPIRING_SOON";
+export type AlertSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+export type AlertStatus = "PENDING" | "SENT" | "ACKNOWLEDGED" | "RESOLVED";
 
 const prisma = new PrismaClient();
 
@@ -28,12 +32,12 @@ const prisma = new PrismaClient();
 
 export interface ReorderAlertConfig {
   organizationId: string;
-  checkLeadTime?: boolean;          // Alert X days before stockout (default: true)
-  throttleHours?: number;           // Don't re-alert within X hours (default: 24)
-  enableEmail?: boolean;            // Send email alerts (default: true)
-  enableSMS?: boolean;              // Send SMS alerts (default: false)
-  enableSlack?: boolean;            // Send Slack alerts (default: false)
-  enablePush?: boolean;             // Send push notifications (default: true)
+  checkLeadTime?: boolean; // Alert X days before stockout (default: true)
+  throttleHours?: number; // Don't re-alert within X hours (default: 24)
+  enableEmail?: boolean; // Send email alerts (default: true)
+  enableSMS?: boolean; // Send SMS alerts (default: false)
+  enableSlack?: boolean; // Send Slack alerts (default: false)
+  enablePush?: boolean; // Send push notifications (default: true)
 }
 
 export interface AlertResult {
@@ -89,7 +93,9 @@ export class ReorderAlertEngine {
    * Main method: Check all inventory items and create alerts
    */
   async checkInventory(): Promise<AlertResult[]> {
-    console.log(`[ReorderAlertEngine] Checking inventory for organization: ${this.config.organizationId}`);
+    console.log(
+      `[ReorderAlertEngine] Checking inventory for organization: ${this.config.organizationId}`,
+    );
 
     // Get all active inventory items with auto-reorder enabled
     const items = await prisma.inventoryItem.findMany({
@@ -105,12 +111,14 @@ export class ReorderAlertEngine {
         supplier: true,
         movements: {
           take: 100,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
         },
       },
     });
 
-    console.log(`[ReorderAlertEngine] Found ${items.length} items with auto-reorder enabled`);
+    console.log(
+      `[ReorderAlertEngine] Found ${items.length} items with auto-reorder enabled`,
+    );
 
     const results: AlertResult[] = [];
 
@@ -126,7 +134,9 @@ export class ReorderAlertEngine {
         // Check if we already sent an alert recently (throttling)
         const shouldThrottle = await this.shouldThrottleAlert(item.id);
         if (shouldThrottle) {
-          console.log(`[ReorderAlertEngine] Throttling alert for item: ${item.name} (${item.sku})`);
+          console.log(
+            `[ReorderAlertEngine] Throttling alert for item: ${item.name} (${item.sku})`,
+          );
           continue;
         }
 
@@ -134,7 +144,11 @@ export class ReorderAlertEngine {
         const alert = await this.createAlert(item, analysis);
 
         // Send notifications
-        const notificationsSent = await this.sendNotifications(item, alert, analysis);
+        const notificationsSent = await this.sendNotifications(
+          item,
+          alert,
+          analysis,
+        );
 
         // Update alert with notification status
         await prisma.reorderAlert.update({
@@ -160,9 +174,14 @@ export class ReorderAlertEngine {
           notificationsSent,
         });
 
-        console.log(`[ReorderAlertEngine] Alert created for: ${item.name} (${item.sku}) - ${analysis.alertType}`);
+        console.log(
+          `[ReorderAlertEngine] Alert created for: ${item.name} (${item.sku}) - ${analysis.alertType}`,
+        );
       } catch (error) {
-        console.error(`[ReorderAlertEngine] Error processing item ${item.id}:`, error);
+        console.error(
+          `[ReorderAlertEngine] Error processing item ${item.id}:`,
+          error,
+        );
         // Continue with next item
       }
     }
@@ -189,7 +208,10 @@ export class ReorderAlertEngine {
 
     if (averageDailyUsage > 0) {
       daysUntilStockout = currentStock / averageDailyUsage;
-      estimatedStockoutDate = addDays(new Date(), Math.floor(daysUntilStockout));
+      estimatedStockoutDate = addDays(
+        new Date(),
+        Math.floor(daysUntilStockout),
+      );
     }
 
     // Determine alert type and severity
@@ -198,20 +220,20 @@ export class ReorderAlertEngine {
     let shouldAlert = false;
 
     if (currentStock <= 0) {
-      alertType = 'STOCKOUT';
-      severity = 'CRITICAL';
+      alertType = "STOCKOUT";
+      severity = "CRITICAL";
       shouldAlert = true;
     } else if (this.config.checkLeadTime && daysUntilStockout <= leadTimeDays) {
-      alertType = 'REORDER_POINT';
-      severity = 'HIGH';
+      alertType = "REORDER_POINT";
+      severity = "HIGH";
       shouldAlert = true;
     } else if (currentStock <= reorderPoint) {
-      alertType = 'LOW_STOCK';
-      severity = 'MEDIUM';
+      alertType = "LOW_STOCK";
+      severity = "MEDIUM";
       shouldAlert = true;
     } else {
-      alertType = 'LOW_STOCK';
-      severity = 'LOW';
+      alertType = "LOW_STOCK";
+      severity = "LOW";
       shouldAlert = false;
     }
 
@@ -239,15 +261,21 @@ export class ReorderAlertEngine {
     const thirtyDaysAgo = addDays(new Date(), -30);
     const outboundMovements = movements.filter(
       (m) =>
-        (m.type === 'SALE' || m.type === 'BOOKING') &&
-        new Date(m.createdAt) >= thirtyDaysAgo
+        (m.type === "SALE" || m.type === "BOOKING") &&
+        new Date(m.createdAt) >= thirtyDaysAgo,
     );
 
     if (outboundMovements.length === 0) return 0;
 
-    const totalQuantity = outboundMovements.reduce((sum, m) => sum + Math.abs(m.quantity), 0);
+    const totalQuantity = outboundMovements.reduce(
+      (sum, m) => sum + Math.abs(m.quantity),
+      0,
+    );
     const oldestMovement = outboundMovements[outboundMovements.length - 1];
-    const daysCovered = differenceInDays(new Date(), new Date(oldestMovement.createdAt));
+    const daysCovered = differenceInDays(
+      new Date(),
+      new Date(oldestMovement.createdAt),
+    );
 
     return daysCovered > 0 ? totalQuantity / daysCovered : 0;
   }
@@ -262,7 +290,7 @@ export class ReorderAlertEngine {
       where: {
         inventoryItemId,
         createdAt: { gte: throttleDate },
-        status: { in: ['PENDING', 'ACKNOWLEDGED'] },
+        status: { in: ["PENDING", "ACKNOWLEDGED"] },
       },
     });
 
@@ -279,7 +307,7 @@ export class ReorderAlertEngine {
         inventoryItemId: item.id,
         alertType: analysis.alertType,
         severity: analysis.severity,
-        status: 'PENDING',
+        status: "PENDING",
         currentStock: analysis.currentStock,
         reorderPoint: analysis.reorderPoint,
         reorderQuantity: analysis.reorderQuantity,
@@ -294,7 +322,7 @@ export class ReorderAlertEngine {
   private async sendNotifications(
     item: any,
     alert: any,
-    analysis: StockAnalysis
+    analysis: StockAnalysis,
   ): Promise<{ email: boolean; sms: boolean; slack: boolean; push: boolean }> {
     const results = {
       email: false,
@@ -312,7 +340,7 @@ export class ReorderAlertEngine {
         await this.sendEmailAlert(item, message, analysis);
         results.email = true;
       } catch (error) {
-        console.error('[ReorderAlertEngine] Email send failed:', error);
+        console.error("[ReorderAlertEngine] Email send failed:", error);
       }
     }
 
@@ -322,7 +350,7 @@ export class ReorderAlertEngine {
         await this.sendSMSAlert(item, message, analysis);
         results.sms = true;
       } catch (error) {
-        console.error('[ReorderAlertEngine] SMS send failed:', error);
+        console.error("[ReorderAlertEngine] SMS send failed:", error);
       }
     }
 
@@ -332,7 +360,7 @@ export class ReorderAlertEngine {
         await this.sendSlackAlert(item, message, analysis);
         results.slack = true;
       } catch (error) {
-        console.error('[ReorderAlertEngine] Slack send failed:', error);
+        console.error("[ReorderAlertEngine] Slack send failed:", error);
       }
     }
 
@@ -342,7 +370,7 @@ export class ReorderAlertEngine {
         await this.sendPushAlert(item, message, analysis);
         results.push = true;
       } catch (error) {
-        console.error('[ReorderAlertEngine] Push send failed:', error);
+        console.error("[ReorderAlertEngine] Push send failed:", error);
       }
     }
 
@@ -353,20 +381,26 @@ export class ReorderAlertEngine {
    * Build human-readable notification message
    */
   private buildNotificationMessage(item: any, analysis: StockAnalysis): string {
-    const { currentStock, reorderPoint, reorderQuantity, estimatedStockoutDate, alertType } = analysis;
+    const {
+      currentStock,
+      reorderPoint,
+      reorderQuantity,
+      estimatedStockoutDate,
+      alertType,
+    } = analysis;
 
     let message = `🚨 Reorder Alert: ${item.name} (${item.sku})\n\n`;
 
-    if (alertType === 'STOCKOUT') {
+    if (alertType === "STOCKOUT") {
       message += `❌ OUT OF STOCK!\n`;
       message += `Current Stock: ${currentStock}\n`;
       message += `Reorder Point: ${reorderPoint}\n`;
       message += `Suggested Reorder: ${reorderQuantity} units\n`;
-    } else if (alertType === 'REORDER_POINT') {
+    } else if (alertType === "REORDER_POINT") {
       message += `⚠️ CRITICAL - Stockout Imminent!\n`;
       message += `Current Stock: ${currentStock} units\n`;
       message += `Reorder Point: ${reorderPoint} units\n`;
-      message += `Estimated Stockout: ${estimatedStockoutDate ? format(estimatedStockoutDate, 'MMM dd, yyyy') : 'Unknown'}\n`;
+      message += `Estimated Stockout: ${estimatedStockoutDate ? format(estimatedStockoutDate, "MMM dd, yyyy") : "Unknown"}\n`;
       message += `Suggested Reorder: ${reorderQuantity} units\n`;
     } else {
       message += `📉 Low Stock Warning\n`;
@@ -375,8 +409,8 @@ export class ReorderAlertEngine {
       message += `Suggested Reorder: ${reorderQuantity} units\n`;
     }
 
-    message += `\nWarehouse: ${item.warehouse?.name || 'Unknown'}\n`;
-    message += `Supplier: ${item.supplier?.name || 'Not assigned'}\n`;
+    message += `\nWarehouse: ${item.warehouse?.name || "Unknown"}\n`;
+    message += `Supplier: ${item.supplier?.name || "Not assigned"}\n`;
 
     return message;
   }
@@ -384,11 +418,15 @@ export class ReorderAlertEngine {
   /**
    * Send email alert
    */
-  private async sendEmailAlert(item: any, message: string, analysis: StockAnalysis): Promise<void> {
+  private async sendEmailAlert(
+    item: any,
+    message: string,
+    analysis: StockAnalysis,
+  ): Promise<void> {
     // TODO: Integrate with SendGrid/Resend/etc.
     // For now, just log
     console.log(`[ReorderAlertEngine] EMAIL ALERT:\n${message}`);
-    
+
     // Example implementation:
     // await sendEmail({
     //   to: 'inventory@company.com',
@@ -400,10 +438,14 @@ export class ReorderAlertEngine {
   /**
    * Send SMS alert
    */
-  private async sendSMSAlert(item: any, message: string, analysis: StockAnalysis): Promise<void> {
+  private async sendSMSAlert(
+    item: any,
+    message: string,
+    analysis: StockAnalysis,
+  ): Promise<void> {
     // TODO: Integrate with Twilio
     console.log(`[ReorderAlertEngine] SMS ALERT:\n${message}`);
-    
+
     // Example implementation:
     // await twilioClient.messages.create({
     //   to: '+1234567890',
@@ -415,10 +457,14 @@ export class ReorderAlertEngine {
   /**
    * Send Slack alert
    */
-  private async sendSlackAlert(item: any, message: string, analysis: StockAnalysis): Promise<void> {
+  private async sendSlackAlert(
+    item: any,
+    message: string,
+    analysis: StockAnalysis,
+  ): Promise<void> {
     // TODO: Integrate with Slack webhook
     console.log(`[ReorderAlertEngine] SLACK ALERT:\n${message}`);
-    
+
     // Example implementation:
     // await fetch(process.env.SLACK_WEBHOOK_URL, {
     //   method: 'POST',
@@ -433,10 +479,14 @@ export class ReorderAlertEngine {
   /**
    * Send push notification
    */
-  private async sendPushAlert(item: any, message: string, analysis: StockAnalysis): Promise<void> {
+  private async sendPushAlert(
+    item: any,
+    message: string,
+    analysis: StockAnalysis,
+  ): Promise<void> {
     // TODO: Integrate with Web Push API (PWA already supports this)
     console.log(`[ReorderAlertEngine] PUSH ALERT:\n${message}`);
-    
+
     // Example implementation:
     // await webpush.sendNotification(subscription, JSON.stringify({
     //   title: `Reorder Alert: ${item.name}`,
@@ -453,7 +503,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.findMany({
       where: {
         organizationId,
-        status: 'PENDING',
+        status: "PENDING",
       },
       include: {
         inventoryItem: {
@@ -464,10 +514,7 @@ export class ReorderAlertEngine {
           },
         },
       },
-      orderBy: [
-        { severity: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ severity: "desc" }, { createdAt: "desc" }],
     });
   }
 
@@ -478,7 +525,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.update({
       where: { id: alertId },
       data: {
-        status: 'ACKNOWLEDGED',
+        status: "ACKNOWLEDGED",
         acknowledgedAt: new Date(),
       },
     });
@@ -491,7 +538,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.update({
       where: { id: alertId },
       data: {
-        status: 'RESOLVED',
+        status: "RESOLVED",
         resolvedAt: new Date(),
         notes,
       },
@@ -505,7 +552,7 @@ export class ReorderAlertEngine {
     return await prisma.reorderAlert.update({
       where: { id: alertId },
       data: {
-        status: 'DISMISSED',
+        status: "DISMISSED",
         dismissedAt: new Date(),
         notes,
       },
@@ -528,12 +575,12 @@ export class ReorderAlertEngine {
       await prisma.reorderAlert.updateMany({
         where: {
           inventoryItemId,
-          status: { in: ['PENDING', 'ACKNOWLEDGED'] },
+          status: { in: ["PENDING", "ACKNOWLEDGED"] },
         },
         data: {
-          status: 'RESOLVED',
+          status: "RESOLVED",
           resolvedAt: new Date(),
-          notes: 'Auto-resolved: Stock replenished',
+          notes: "Auto-resolved: Stock replenished",
         },
       });
     }
@@ -548,7 +595,9 @@ export class ReorderAlertEngine {
  * Schedule daily inventory check (use with cron job)
  */
 export async function runDailyInventoryCheck(organizationId: string) {
-  console.log(`[runDailyInventoryCheck] Starting daily check for org: ${organizationId}`);
+  console.log(
+    `[runDailyInventoryCheck] Starting daily check for org: ${organizationId}`,
+  );
 
   const engine = new ReorderAlertEngine({
     organizationId,
@@ -562,7 +611,9 @@ export async function runDailyInventoryCheck(organizationId: string) {
 
   const results = await engine.checkInventory();
 
-  console.log(`[runDailyInventoryCheck] Completed. ${results.length} alerts created.`);
+  console.log(
+    `[runDailyInventoryCheck] Completed. ${results.length} alerts created.`,
+  );
 
   return results;
 }
@@ -570,29 +621,46 @@ export async function runDailyInventoryCheck(organizationId: string) {
 /**
  * Get alert statistics for dashboard
  */
-export async function getAlertStatistics(organizationId: string, days: number = 30) {
+export async function getAlertStatistics(
+  organizationId: string,
+  days: number = 30,
+) {
   const since = addDays(new Date(), -days);
 
-  const [total, pending, acknowledged, resolved, dismissed] = await Promise.all([
-    prisma.reorderAlert.count({
-      where: { organizationId, createdAt: { gte: since } },
-    }),
-    prisma.reorderAlert.count({
-      where: { organizationId, status: 'PENDING', createdAt: { gte: since } },
-    }),
-    prisma.reorderAlert.count({
-      where: { organizationId, status: 'ACKNOWLEDGED', createdAt: { gte: since } },
-    }),
-    prisma.reorderAlert.count({
-      where: { organizationId, status: 'RESOLVED', createdAt: { gte: since } },
-    }),
-    prisma.reorderAlert.count({
-      where: { organizationId, status: 'DISMISSED', createdAt: { gte: since } },
-    }),
-  ]);
+  const [total, pending, acknowledged, resolved, dismissed] = await Promise.all(
+    [
+      prisma.reorderAlert.count({
+        where: { organizationId, createdAt: { gte: since } },
+      }),
+      prisma.reorderAlert.count({
+        where: { organizationId, status: "PENDING", createdAt: { gte: since } },
+      }),
+      prisma.reorderAlert.count({
+        where: {
+          organizationId,
+          status: "ACKNOWLEDGED",
+          createdAt: { gte: since },
+        },
+      }),
+      prisma.reorderAlert.count({
+        where: {
+          organizationId,
+          status: "RESOLVED",
+          createdAt: { gte: since },
+        },
+      }),
+      prisma.reorderAlert.count({
+        where: {
+          organizationId,
+          status: "DISMISSED",
+          createdAt: { gte: since },
+        },
+      }),
+    ],
+  );
 
   const bySeverity = await prisma.reorderAlert.groupBy({
-    by: ['severity'],
+    by: ["severity"],
     where: { organizationId, createdAt: { gte: since } },
     _count: true,
   });
@@ -603,9 +671,12 @@ export async function getAlertStatistics(organizationId: string, days: number = 
     acknowledged,
     resolved,
     dismissed,
-    bySeverity: bySeverity.reduce((acc: Record<string, number>, item: any) => {
-      acc[item.severity.toLowerCase()] = item._count;
-      return acc;
-    }, {} as Record<string, number>),
+    bySeverity: bySeverity.reduce(
+      (acc: Record<string, number>, item: any) => {
+        acc[item.severity.toLowerCase()] = item._count;
+        return acc;
+      },
+      {} as Record<string, number>,
+    ),
   };
 }

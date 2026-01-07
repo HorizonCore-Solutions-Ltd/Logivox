@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -26,7 +26,10 @@ export async function GET(request: NextRequest) {
     // Get tenant ID from first organization
     const tenantId = session.user.organizations[0]?.id;
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     // Fetch products for indexing
@@ -44,10 +47,12 @@ export async function GET(request: NextRequest) {
     });
 
     // Index products
-    searchEngine.index(products.map((p: Product) => ({
-      ...p,
-      type: "product" as const,
-    })));
+    searchEngine.index(
+      products.map((p: Product) => ({
+        ...p,
+        type: "product" as const,
+      })),
+    );
 
     // Get suggestions
     const suggestions = await searchEngine.suggest(query);
@@ -57,7 +62,7 @@ export async function GET(request: NextRequest) {
     console.error("Error generating suggestions:", error);
     return NextResponse.json(
       { error: "Failed to generate suggestions" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

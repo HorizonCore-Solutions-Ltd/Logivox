@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   ShoppingBag,
   TrendingUp,
@@ -30,8 +30,8 @@ import {
   ExternalLink,
   Check,
   X,
-} from 'lucide-react';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface ResaleCandidate {
   id: string;
@@ -77,15 +77,18 @@ export default function ResaleManagerPage() {
   const [candidates, setCandidates] = useState<ResaleCandidate[]>([]);
   const [listings, setListings] = useState<ResaleListing[]>([]);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [selectedCandidate, setSelectedCandidate] = useState<ResaleCandidate | null>(null);
+  const [selectedCandidate, setSelectedCandidate] =
+    useState<ResaleCandidate | null>(null);
   const [formData, setFormData] = useState<CreateListingForm>({
-    candidateId: '',
-    title: '',
-    description: '',
+    candidateId: "",
+    title: "",
+    description: "",
     price: 0,
-    marketplace: 'EBAY',
+    marketplace: "EBAY",
   });
-  const [activeTab, setActiveTab] = useState<'candidates' | 'listings'>('candidates');
+  const [activeTab, setActiveTab] = useState<"candidates" | "listings">(
+    "candidates",
+  );
 
   useEffect(() => {
     fetchResaleData();
@@ -96,17 +99,17 @@ export default function ResaleManagerPage() {
       setLoading(true);
 
       // Fetch candidates
-      const candidatesResponse = await fetch('/api/returns/resale/candidates');
+      const candidatesResponse = await fetch("/api/returns/resale/candidates");
       const candidatesData = await candidatesResponse.json();
       setCandidates(candidatesData.candidates || []);
 
       // Fetch listings
-      const listingsResponse = await fetch('/api/returns/resale/listings');
+      const listingsResponse = await fetch("/api/returns/resale/listings");
       const listingsData = await listingsResponse.json();
       setListings(listingsData.listings || []);
     } catch (error) {
-      console.error('Error fetching resale data:', error);
-      toast.error('Failed to load resale data');
+      console.error("Error fetching resale data:", error);
+      toast.error("Failed to load resale data");
     } finally {
       setLoading(false);
     }
@@ -119,16 +122,16 @@ export default function ResaleManagerPage() {
       title: candidate.item_name,
       description: `${candidate.item_name} in ${candidate.condition} condition`,
       price: candidate.recommended_price,
-      marketplace: 'EBAY',
+      marketplace: "EBAY",
     });
     setCreateDialogOpen(true);
   };
 
   const createListing = async () => {
     try {
-      const response = await fetch('/api/returns/resale/listings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/returns/resale/listings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           candidateId: formData.candidateId,
           title: formData.title,
@@ -139,85 +142,91 @@ export default function ResaleManagerPage() {
       });
 
       if (response.ok) {
-        toast.success('Listing created successfully');
+        toast.success("Listing created successfully");
         setCreateDialogOpen(false);
         fetchResaleData();
       } else {
-        throw new Error('Failed to create listing');
+        throw new Error("Failed to create listing");
       }
     } catch (error) {
-      console.error('Error creating listing:', error);
-      toast.error('Failed to create listing');
+      console.error("Error creating listing:", error);
+      toast.error("Failed to create listing");
     }
   };
 
   const syncListing = async (listingId: string, marketplace: string) => {
     try {
-      const response = await fetch(`/api/returns/resale/listings/${listingId}/sync`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ marketplace }),
-      });
+      const response = await fetch(
+        `/api/returns/resale/listings/${listingId}/sync`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ marketplace }),
+        },
+      );
 
       if (response.ok) {
-        toast.success('Listing synced to marketplace');
+        toast.success("Listing synced to marketplace");
         fetchResaleData();
       } else {
-        throw new Error('Failed to sync listing');
+        throw new Error("Failed to sync listing");
       }
     } catch (error) {
-      console.error('Error syncing listing:', error);
-      toast.error('Failed to sync listing');
+      console.error("Error syncing listing:", error);
+      toast.error("Failed to sync listing");
     }
   };
 
   const getConditionBadge = (condition: string) => {
     const config = {
-      LIKE_NEW: { color: 'bg-green-500', text: 'Like New' },
-      GOOD: { color: 'bg-blue-500', text: 'Good' },
-      FAIR: { color: 'bg-yellow-500', text: 'Fair' },
-      REFURBISHED: { color: 'bg-purple-500', text: 'Refurbished' },
+      LIKE_NEW: { color: "bg-green-500", text: "Like New" },
+      GOOD: { color: "bg-blue-500", text: "Good" },
+      FAIR: { color: "bg-yellow-500", text: "Fair" },
+      REFURBISHED: { color: "bg-purple-500", text: "Refurbished" },
     };
 
-    const { color, text } = config[condition as keyof typeof config] || config.GOOD;
+    const { color, text } =
+      config[condition as keyof typeof config] || config.GOOD;
     return <Badge className={`${color} text-white`}>{text}</Badge>;
   };
 
   const getDemandBadge = (demand: string) => {
     const config = {
-      HIGH: { color: 'bg-green-500', text: 'High Demand' },
-      MEDIUM: { color: 'bg-yellow-500', text: 'Medium' },
-      LOW: { color: 'bg-gray-500', text: 'Low' },
+      HIGH: { color: "bg-green-500", text: "High Demand" },
+      MEDIUM: { color: "bg-yellow-500", text: "Medium" },
+      LOW: { color: "bg-gray-500", text: "Low" },
     };
 
-    const { color, text } = config[demand as keyof typeof config] || config.MEDIUM;
+    const { color, text } =
+      config[demand as keyof typeof config] || config.MEDIUM;
     return <Badge className={`${color} text-white`}>{text}</Badge>;
   };
 
   const getListingStatusBadge = (status: string) => {
     const config = {
-      DRAFT: { color: 'bg-gray-500', text: 'Draft' },
-      LISTED: { color: 'bg-blue-500', text: 'Listed' },
-      SOLD: { color: 'bg-green-500', text: 'Sold' },
-      EXPIRED: { color: 'bg-red-500', text: 'Expired' },
+      DRAFT: { color: "bg-gray-500", text: "Draft" },
+      LISTED: { color: "bg-blue-500", text: "Listed" },
+      SOLD: { color: "bg-green-500", text: "Sold" },
+      EXPIRED: { color: "bg-red-500", text: "Expired" },
     };
 
-    const { color, text } = config[status as keyof typeof config] || config.DRAFT;
+    const { color, text } =
+      config[status as keyof typeof config] || config.DRAFT;
     return <Badge className={`${color} text-white`}>{text}</Badge>;
   };
 
   const candidatesStats = {
     total: candidates.length,
-    highDemand: candidates.filter((c) => c.market_demand === 'HIGH').length,
+    highDemand: candidates.filter((c) => c.market_demand === "HIGH").length,
     totalValue: candidates.reduce((sum, c) => sum + c.estimated_value, 0),
   };
 
   const listingsStats = {
     total: listings.length,
-    active: listings.filter((l) => l.status === 'LISTED').length,
-    sold: listings.filter((l) => l.status === 'SOLD').length,
+    active: listings.filter((l) => l.status === "LISTED").length,
+    sold: listings.filter((l) => l.status === "SOLD").length,
     revenue: listings
-      .filter((l) => l.status === 'SOLD')
+      .filter((l) => l.status === "SOLD")
       .reduce((sum, l) => sum + (l.sale_price || 0), 0),
   };
 
@@ -271,7 +280,9 @@ export default function ResaleManagerPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${candidatesStats.totalValue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">
+              ${candidatesStats.totalValue.toFixed(2)}
+            </div>
             <p className="text-xs text-muted-foreground">Total potential</p>
           </CardContent>
         </Card>
@@ -284,8 +295,12 @@ export default function ResaleManagerPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-500">{listingsStats.active}</div>
-            <p className="text-xs text-muted-foreground">of {listingsStats.total} total</p>
+            <div className="text-2xl font-bold text-blue-500">
+              {listingsStats.active}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              of {listingsStats.total} total
+            </p>
           </CardContent>
         </Card>
 
@@ -300,7 +315,9 @@ export default function ResaleManagerPage() {
             <div className="text-2xl font-bold text-green-500">
               ${listingsStats.revenue.toFixed(2)}
             </div>
-            <p className="text-xs text-muted-foreground">{listingsStats.sold} sold</p>
+            <p className="text-xs text-muted-foreground">
+              {listingsStats.sold} sold
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -308,21 +325,21 @@ export default function ResaleManagerPage() {
       {/* Tabs */}
       <div className="flex gap-2 border-b">
         <Button
-          variant={activeTab === 'candidates' ? 'default' : 'ghost'}
-          onClick={() => setActiveTab('candidates')}
+          variant={activeTab === "candidates" ? "default" : "ghost"}
+          onClick={() => setActiveTab("candidates")}
         >
           Candidates ({candidates.length})
         </Button>
         <Button
-          variant={activeTab === 'listings' ? 'default' : 'ghost'}
-          onClick={() => setActiveTab('listings')}
+          variant={activeTab === "listings" ? "default" : "ghost"}
+          onClick={() => setActiveTab("listings")}
         >
           Listings ({listings.length})
         </Button>
       </div>
 
       {/* Candidates Tab */}
-      {activeTab === 'candidates' && (
+      {activeTab === "candidates" && (
         <Card>
           <CardHeader>
             <CardTitle>Resale Candidates</CardTitle>
@@ -344,7 +361,9 @@ export default function ResaleManagerPage() {
                       <Package className="w-8 h-8 text-primary" />
                       <div>
                         <div className="font-bold">{candidate.item_name}</div>
-                        <div className="text-sm text-muted-foreground">{candidate.item_sku}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {candidate.item_sku}
+                        </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           RMA: {candidate.rma_number}
                         </div>
@@ -353,7 +372,9 @@ export default function ResaleManagerPage() {
 
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-sm text-muted-foreground">Estimated Value</div>
+                        <div className="text-sm text-muted-foreground">
+                          Estimated Value
+                        </div>
                         <div className="text-xl font-bold">
                           ${candidate.estimated_value.toFixed(2)}
                         </div>
@@ -365,7 +386,10 @@ export default function ResaleManagerPage() {
                         {getConditionBadge(candidate.condition)}
                         {getDemandBadge(candidate.market_demand)}
                       </div>
-                      <Button size="sm" onClick={() => openCreateDialog(candidate)}>
+                      <Button
+                        size="sm"
+                        onClick={() => openCreateDialog(candidate)}
+                      >
                         <Plus className="w-4 h-4 mr-2" />
                         Create Listing
                       </Button>
@@ -379,7 +403,7 @@ export default function ResaleManagerPage() {
       )}
 
       {/* Listings Tab */}
-      {activeTab === 'listings' && (
+      {activeTab === "listings" && (
         <Card>
           <CardHeader>
             <CardTitle>Resale Listings</CardTitle>
@@ -401,7 +425,9 @@ export default function ResaleManagerPage() {
                       <ShoppingBag className="w-8 h-8 text-primary" />
                       <div>
                         <div className="font-bold">{listing.title}</div>
-                        <div className="text-sm text-muted-foreground">{listing.item_sku}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {listing.item_sku}
+                        </div>
                         <div className="text-xs text-muted-foreground mt-1">
                           {listing.marketplace}
                           {listing.listed_at &&
@@ -412,8 +438,10 @@ export default function ResaleManagerPage() {
 
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-xl font-bold">${listing.price.toFixed(2)}</div>
-                        {listing.status === 'SOLD' && listing.sale_price && (
+                        <div className="text-xl font-bold">
+                          ${listing.price.toFixed(2)}
+                        </div>
+                        {listing.status === "SOLD" && listing.sale_price && (
                           <div className="text-sm text-green-600">
                             Sold for ${listing.sale_price.toFixed(2)}
                           </div>
@@ -423,10 +451,12 @@ export default function ResaleManagerPage() {
                         </div>
                       </div>
                       {getListingStatusBadge(listing.status)}
-                      {listing.status === 'DRAFT' && (
+                      {listing.status === "DRAFT" && (
                         <Button
                           size="sm"
-                          onClick={() => syncListing(listing.id, listing.marketplace)}
+                          onClick={() =>
+                            syncListing(listing.id, listing.marketplace)
+                          }
                         >
                           <ExternalLink className="w-4 h-4 mr-2" />
                           Sync
@@ -434,7 +464,11 @@ export default function ResaleManagerPage() {
                       )}
                       {listing.listing_url && (
                         <Button size="sm" variant="outline" asChild>
-                          <a href={listing.listing_url} target="_blank" rel="noopener noreferrer">
+                          <a
+                            href={listing.listing_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             <ExternalLink className="w-4 h-4 mr-2" />
                             View
                           </a>
@@ -463,7 +497,9 @@ export default function ResaleManagerPage() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-bold">{selectedCandidate.item_name}</div>
+                      <div className="font-bold">
+                        {selectedCandidate.item_name}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         {selectedCandidate.item_sku}
                       </div>
@@ -475,11 +511,17 @@ export default function ResaleManagerPage() {
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <div className="text-muted-foreground">Estimated Value</div>
-                      <div className="font-bold">${selectedCandidate.estimated_value.toFixed(2)}</div>
+                      <div className="text-muted-foreground">
+                        Estimated Value
+                      </div>
+                      <div className="font-bold">
+                        ${selectedCandidate.estimated_value.toFixed(2)}
+                      </div>
                     </div>
                     <div>
-                      <div className="text-muted-foreground">Recommended Price</div>
+                      <div className="text-muted-foreground">
+                        Recommended Price
+                      </div>
                       <div className="font-bold text-green-600">
                         ${selectedCandidate.recommended_price.toFixed(2)}
                       </div>
@@ -491,10 +533,14 @@ export default function ResaleManagerPage() {
               {/* Form */}
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Marketplace</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Marketplace
+                  </label>
                   <Select
                     value={formData.marketplace}
-                    onValueChange={(value) => setFormData({ ...formData, marketplace: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, marketplace: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -503,38 +549,53 @@ export default function ResaleManagerPage() {
                       <SelectItem value="EBAY">eBay</SelectItem>
                       <SelectItem value="AMAZON">Amazon</SelectItem>
                       <SelectItem value="SHOPIFY">Shopify</SelectItem>
-                      <SelectItem value="FACEBOOK">Facebook Marketplace</SelectItem>
+                      <SelectItem value="FACEBOOK">
+                        Facebook Marketplace
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Title</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Title
+                  </label>
                   <Input
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, title: e.target.value })
+                    }
                     placeholder="Listing title"
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Description</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Description
+                  </label>
                   <Textarea
                     value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, description: e.target.value })
+                    }
                     placeholder="Listing description"
                     rows={4}
                   />
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Price</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Price
+                  </label>
                   <Input
                     type="number"
                     step="0.01"
                     value={formData.price}
                     onChange={(e) =>
-                      setFormData({ ...formData, price: parseFloat(e.target.value) })
+                      setFormData({
+                        ...formData,
+                        price: parseFloat(e.target.value),
+                      })
                     }
                   />
                 </div>
@@ -543,7 +604,10 @@ export default function ResaleManagerPage() {
           )}
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setCreateDialogOpen(false)}
+            >
               Cancel
             </Button>
             <Button onClick={createListing}>

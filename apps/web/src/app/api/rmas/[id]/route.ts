@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/rmas/[id] - Get RMA details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -22,7 +22,7 @@ export async function GET(
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -108,17 +108,14 @@ export async function GET(
     return NextResponse.json(rma);
   } catch (error) {
     console.error("Error fetching RMA:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch RMA" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch RMA" }, { status: 500 });
   }
 }
 
 // DELETE /api/rmas/[id] - Cancel RMA
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -137,7 +134,7 @@ export async function DELETE(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -156,7 +153,7 @@ export async function DELETE(
     if (!["PENDING", "APPROVED"].includes(rma.status)) {
       return NextResponse.json(
         { error: "Can only cancel pending or approved RMAs" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -184,7 +181,7 @@ export async function DELETE(
     console.error("Error cancelling RMA:", error);
     return NextResponse.json(
       { error: "Failed to cancel RMA" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

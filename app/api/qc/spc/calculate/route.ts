@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import SPCService from '@/lib/services/spc.service';
+import { NextResponse } from "next/server";
+import SPCService from "@/lib/services/spc.service";
 
 /**
  * GET /api/qc/spc/calculate
@@ -8,20 +8,20 @@ import SPCService from '@/lib/services/spc.service';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    
-    const measurementType = searchParams.get('measurementType');
-    const productId = searchParams.get('productId') || undefined;
-    const startDate = searchParams.get('startDate') 
-      ? new Date(searchParams.get('startDate')!) 
+
+    const measurementType = searchParams.get("measurementType");
+    const productId = searchParams.get("productId") || undefined;
+    const startDate = searchParams.get("startDate")
+      ? new Date(searchParams.get("startDate")!)
       : undefined;
-    const endDate = searchParams.get('endDate')
-      ? new Date(searchParams.get('endDate')!)
+    const endDate = searchParams.get("endDate")
+      ? new Date(searchParams.get("endDate")!)
       : undefined;
 
     if (!measurementType) {
       return NextResponse.json(
-        { error: 'measurementType is required' },
-        { status: 400 }
+        { error: "measurementType is required" },
+        { status: 400 },
       );
     }
 
@@ -30,12 +30,15 @@ export async function GET(request: Request) {
       measurementType,
       productId,
       startDate,
-      endDate
+      endDate,
     );
 
     // Check if NCR should be created
     if (!spcData.inControl) {
-      const ncrId = await SPCService.checkAndCreateNCR(spcData, measurementType);
+      const ncrId = await SPCService.checkAndCreateNCR(
+        spcData,
+        measurementType,
+      );
       if (ncrId) {
         (spcData as any).ncrCreated = ncrId;
       }
@@ -43,14 +46,13 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       success: true,
-      data: spcData
+      data: spcData,
     });
-
   } catch (error: any) {
-    console.error('SPC calculation error:', error);
+    console.error("SPC calculation error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to calculate SPC' },
-      { status: 500 }
+      { error: error.message || "Failed to calculate SPC" },
+      { status: 500 },
     );
   }
 }
@@ -66,8 +68,8 @@ export async function POST(request: Request) {
 
     if (!values || !Array.isArray(values) || values.length < 2) {
       return NextResponse.json(
-        { error: 'values array with at least 2 points required' },
-        { status: 400 }
+        { error: "values array with at least 2 points required" },
+        { status: 400 },
       );
     }
 
@@ -87,22 +89,24 @@ export async function POST(request: Request) {
       id: `point-${idx}`,
       value,
       timestamp: new Date(),
-      sampleNumber: idx + 1
+      sampleNumber: idx + 1,
     }));
 
     // Apply Western Electric Rules
     const westernElectricViolations = SPCService.applyWesternElectricRules(
       dataPoints,
-      controlLimits
+      controlLimits,
     );
 
     // Find out-of-control points
     const outOfControlPoints = dataPoints
-      .filter(p => p.value > controlLimits.ucl || p.value < controlLimits.lcl)
-      .map(p => p.id);
+      .filter((p) => p.value > controlLimits.ucl || p.value < controlLimits.lcl)
+      .map((p) => p.id);
 
-    const inControl = outOfControlPoints.length === 0 && 
-                      westernElectricViolations.filter(v => v.severity === 'CRITICAL').length === 0;
+    const inControl =
+      outOfControlPoints.length === 0 &&
+      westernElectricViolations.filter((v) => v.severity === "CRITICAL")
+        .length === 0;
 
     return NextResponse.json({
       success: true,
@@ -113,15 +117,14 @@ export async function POST(request: Request) {
         ppk,
         outOfControlPoints,
         westernElectricViolations,
-        inControl
-      }
+        inControl,
+      },
     });
-
   } catch (error: any) {
-    console.error('SPC calculation error:', error);
+    console.error("SPC calculation error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to calculate SPC' },
-      { status: 500 }
+      { error: error.message || "Failed to calculate SPC" },
+      { status: 500 },
     );
   }
 }

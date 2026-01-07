@@ -1,4 +1,5 @@
 # Yard Management System
+
 ## Design Specification Document
 
 **Document Version:** 1.0  
@@ -85,6 +86,7 @@ The dock scheduling system provides comprehensive appointment lifecycle manageme
 The intelligent parking assignment system considers multiple factors:
 
 **Priority Factors:**
+
 1. Delivery urgency and appointment priority
 2. Vehicle type and size requirements
 3. Cargo type and special handling needs
@@ -92,6 +94,7 @@ The intelligent parking assignment system considers multiple factors:
 5. Historical patterns and carrier preferences
 
 **Business Rules:**
+
 - Temperature-controlled cargo gets priority dock assignment
 - Hazardous materials assigned to designated safety zones
 - Cross-dock shipments routed to expedited staging areas
@@ -125,6 +128,7 @@ Complete tracking through the yard lifecycle:
 ### Yard Location Entity
 
 **Primary Attributes:**
+
 - Location identifier (code and name)
 - Type classification (dock, staging, parking, etc.)
 - Physical capacity measurements
@@ -132,6 +136,7 @@ Complete tracking through the yard lifecycle:
 - Operational status and availability
 
 **Relationships:**
+
 - Parent organization for multi-tenant support
 - Active dock appointments for scheduled operations
 - Historical usage data for analytics
@@ -140,23 +145,27 @@ Complete tracking through the yard lifecycle:
 ### Dock Appointment Entity
 
 **Scheduling Information:**
+
 - Scheduled date and time windows (start/end)
 - Actual arrival and departure timestamps
 - Duration tracking for billing and analytics
 
 **Carrier and Vehicle Data:**
+
 - Carrier company name and contact information
 - Driver name and license verification
 - Vehicle registration and trailer numbers
 - Vehicle type classification
 
 **Operational Details:**
+
 - Assigned yard location and dock number
 - Appointment status and substatus codes
 - Notes and special instructions
 - Document attachments and photos
 
 **System Integration Points:**
+
 - Linked gate entry records for security correlation
 - Purchase orders and receiving documents
 - Warehouse management system synchronization
@@ -178,6 +187,7 @@ Complete tracking through the yard lifecycle:
 6. Gate barrier opens and vehicle proceeds to assigned spot
 
 **Data Exchange:**
+
 - Gate entry records automatically create or update appointments
 - Vehicle and driver information synchronized bidirectionally
 - Security clearance status affects parking zone assignment
@@ -207,12 +217,14 @@ Complete tracking through the yard lifecycle:
 ### Security Patrol Integration
 
 **Automated Patrol Routes:**
+
 - Patrol checkpoints positioned at critical yard locations
 - Guards scan QR codes at each yard zone during rounds
 - System correlates patrol data with vehicle locations
 - Anomaly detection for unauthorized vehicle movements
 
 **Incident Management:**
+
 - Security incidents tagged with yard location coordinates
 - Vehicle damage reports linked to appointment records
 - Panic alerts show nearest yard vehicles for context
@@ -225,6 +237,7 @@ Complete tracking through the yard lifecycle:
 ### Yard Manager Dashboard
 
 **Key Metrics Display:**
+
 - Current yard occupancy rate (occupied/total capacity)
 - Average vehicle dwell time by appointment type
 - Dock utilization percentage across all loading bays
@@ -232,6 +245,7 @@ Complete tracking through the yard lifecycle:
 - Upcoming appointments in next 4-hour window
 
 **Interactive Yard Map:**
+
 - Visual representation of all yard locations
 - Color-coded status indicators (occupied, available, reserved)
 - Click-through to vehicle and appointment details
@@ -241,6 +255,7 @@ Complete tracking through the yard lifecycle:
 ### Appointment Management Console
 
 **Quick Actions:**
+
 - Create new appointments with smart field population
 - Reschedule existing appointments with conflict checking
 - Check-in walk-in arrivals with rapid data entry
@@ -248,6 +263,7 @@ Complete tracking through the yard lifecycle:
 - Generate driver instructions and location maps
 
 **Filtering and Search:**
+
 - Filter by appointment status, carrier, date range
 - Search by vehicle number, driver name, PO number
 - Sort by scheduled time, actual arrival, priority
@@ -256,6 +272,7 @@ Complete tracking through the yard lifecycle:
 ### Mobile Driver Application
 
 **Self-Service Features:**
+
 - View appointment details and arrival instructions
 - Check-in notification upon yard entry
 - Real-time location directions to assigned spot
@@ -282,6 +299,7 @@ Complete tracking through the yard lifecycle:
 **Walk-In Handling:**
 
 When vehicles arrive without appointments:
+
 - Gate guard creates walk-in appointment record
 - System checks for matching purchase orders or shipping orders
 - Available dock or staging location assigned based on current capacity
@@ -291,12 +309,14 @@ When vehicles arrive without appointments:
 ### Capacity Management Rules
 
 **Overbooking Prevention:**
+
 - Maximum appointments per dock per time slot enforced
 - Buffer time between appointments for dock turnaround
 - Capacity reservations for known long-duration operations
 - Emergency override for executive-approved exceptions
 
 **Overflow Procedures:**
+
 - Overflow staging areas activated when primary lots full
 - Remote parking assignments with shuttle service coordination
 - Appointment delays communicated proactively to carriers
@@ -305,12 +325,14 @@ When vehicles arrive without appointments:
 ### Priority Handling
 
 **High-Priority Appointments:**
+
 - Just-in-time deliveries receive expedited dock assignment
 - Critical inventory marked for immediate receiving processing
 - Direct-to-dock routing bypasses staging areas
 - Dedicated fast-track lanes for premium carriers
 
 **Special Handling Requirements:**
+
 - Temperature-controlled cargo assigned to climate docks
 - Hazardous materials routed to certified handling zones
 - High-value shipments receive security escort in yard
@@ -348,6 +370,7 @@ When vehicles arrive without appointments:
 ### Access Control
 
 **Role-Based Permissions:**
+
 - **Yard Manager:** Full access to all appointments and locations
 - **Gate Guard:** Check-in/check-out operations, location view only
 - **Dock Supervisor:** Dock assignments and status updates
@@ -365,6 +388,7 @@ When vehicles arrive without appointments:
 ### Audit and Compliance
 
 **Audit Trail Requirements:**
+
 - All appointment modifications logged with user and timestamp
 - Location assignment changes tracked with reason codes
 - Gate entry/exit records retained for 7 years
@@ -378,6 +402,7 @@ When vehicles arrive without appointments:
 ### Operational Reports
 
 **Daily Operations Summary:**
+
 - Total appointments by status (completed, cancelled, no-show)
 - Average dwell time by carrier and appointment type
 - Dock utilization percentage by time of day
@@ -385,6 +410,7 @@ When vehicles arrive without appointments:
 - Exception incidents and resolutions
 
 **Weekly Performance Analysis:**
+
 - On-time appointment performance trending
 - Carrier performance scorecards with rankings
 - Yard capacity utilization heat maps
@@ -394,6 +420,7 @@ When vehicles arrive without appointments:
 ### Strategic Analytics
 
 **Monthly Executive Dashboard:**
+
 - Year-over-year appointment volume growth
 - Dock efficiency improvements and cost savings
 - Carrier relationship health indicators
@@ -455,17 +482,17 @@ When vehicles arrive without appointments:
 
 **Revision History:**
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | January 3, 2026 | Platform Engineering | Initial release |
+| Version | Date            | Author               | Changes         |
+| ------- | --------------- | -------------------- | --------------- |
+| 1.0     | January 3, 2026 | Platform Engineering | Initial release |
 
 **Approval:**
 
-| Role | Name | Signature | Date |
-|------|------|-----------|------|
-| Engineering Lead | _______________ | _______________ | _______________ |
-| Product Manager | _______________ | _______________ | _______________ |
-| Operations Director | _______________ | _______________ | _______________ |
+| Role                | Name                   | Signature              | Date                   |
+| ------------------- | ---------------------- | ---------------------- | ---------------------- |
+| Engineering Lead    | **\*\***\_\_\_**\*\*** | **\*\***\_\_\_**\*\*** | **\*\***\_\_\_**\*\*** |
+| Product Manager     | **\*\***\_\_\_**\*\*** | **\*\***\_\_\_**\*\*** | **\*\***\_\_\_**\*\*** |
+| Operations Director | **\*\***\_\_\_**\*\*** | **\*\***\_\_\_**\*\*** | **\*\***\_\_\_**\*\*** |
 
 ---
 

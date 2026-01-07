@@ -1,11 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, TrendingUp, TrendingDown, Package, DollarSign, Calendar, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+  Package,
+  DollarSign,
+  Calendar,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import { ForecastViewer } from "@/components/forecasting/forecast-viewer";
 import { ReorderAlerts } from "@/components/forecasting/reorder-alerts";
 import { ABCAnalysis } from "@/components/forecasting/abc-analysis";
@@ -16,7 +31,11 @@ interface ForecastData {
   productId: string;
   productName: string;
   currentStock: number;
-  predictions: Array<{ date: string; demand: number; confidence: { lower: number; upper: number } }>;
+  predictions: Array<{
+    date: string;
+    demand: number;
+    confidence: { lower: number; upper: number };
+  }>;
   trend: {
     direction: "increasing" | "decreasing" | "stable";
     slope: number;
@@ -98,7 +117,8 @@ interface TurnoverData {
 export default function ForecastingDashboard() {
   const [forecasts, setForecasts] = useState<ForecastData[]>([]);
   const [alerts, setAlerts] = useState<ReorderAlert[]>([]);
-  const [optimization, setOptimization] = useState<StockOptimizationData | null>(null);
+  const [optimization, setOptimization] =
+    useState<StockOptimizationData | null>(null);
   const [abcAnalysis, setAbcAnalysis] = useState<ABCCategory[]>([]);
   const [turnoverData, setTurnoverData] = useState<TurnoverData[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
@@ -113,13 +133,14 @@ export default function ForecastingDashboard() {
     setLoading(true);
     try {
       // Load all forecasting data in parallel
-      const [forecastsRes, alertsRes, optimizationRes, abcRes, turnoverRes] = await Promise.all([
-        fetch("/api/forecasting/bulk"),
-        fetch("/api/forecasting/alerts"),
-        fetch("/api/forecasting/optimization"),
-        fetch("/api/forecasting/abc"),
-        fetch("/api/forecasting/turnover"),
-      ]);
+      const [forecastsRes, alertsRes, optimizationRes, abcRes, turnoverRes] =
+        await Promise.all([
+          fetch("/api/forecasting/bulk"),
+          fetch("/api/forecasting/alerts"),
+          fetch("/api/forecasting/optimization"),
+          fetch("/api/forecasting/abc"),
+          fetch("/api/forecasting/turnover"),
+        ]);
 
       if (forecastsRes.ok) {
         const data = await forecastsRes.json();
@@ -181,7 +202,9 @@ export default function ForecastingDashboard() {
       <div className="flex h-[600px] items-center justify-center">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4" />
-          <p className="text-sm text-muted-foreground">Loading forecasting data...</p>
+          <p className="text-sm text-muted-foreground">
+            Loading forecasting data...
+          </p>
         </div>
       </div>
     );
@@ -192,7 +215,9 @@ export default function ForecastingDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">AI Inventory Forecasting</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            AI Inventory Forecasting
+          </h1>
           <p className="text-muted-foreground">
             Machine learning-powered demand prediction and stock optimization
           </p>
@@ -206,31 +231,41 @@ export default function ForecastingDashboard() {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Critical Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Critical Alerts
+            </CardTitle>
             <AlertTriangle className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {alerts.filter((a) => a.urgency === "critical").length}
             </div>
-            <p className="text-xs text-muted-foreground">Requires immediate action</p>
+            <p className="text-xs text-muted-foreground">
+              Requires immediate action
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Products Forecasted</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Products Forecasted
+            </CardTitle>
             <Package className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{forecasts.length}</div>
-            <p className="text-xs text-muted-foreground">AI predictions generated</p>
+            <p className="text-xs text-muted-foreground">
+              AI predictions generated
+            </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Potential Savings</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Potential Savings
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -243,14 +278,18 @@ export default function ForecastingDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Average Confidence</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Average Confidence
+            </CardTitle>
             <CheckCircle className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               {forecasts.length > 0
                 ? Math.round(
-                    (forecasts.reduce((sum, f) => sum + f.confidence, 0) / forecasts.length) * 100
+                    (forecasts.reduce((sum, f) => sum + f.confidence, 0) /
+                      forecasts.length) *
+                      100,
                   )
                 : 0}
               %
@@ -261,7 +300,11 @@ export default function ForecastingDashboard() {
       </div>
 
       {/* Main Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="forecasts">Forecasts</TabsTrigger>
@@ -281,7 +324,9 @@ export default function ForecastingDashboard() {
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-4">
           {/* Critical Alerts */}
-          {alerts.filter((a) => a.urgency === "critical" || a.urgency === "high").length > 0 && (
+          {alerts.filter(
+            (a) => a.urgency === "critical" || a.urgency === "high",
+          ).length > 0 && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -295,7 +340,9 @@ export default function ForecastingDashboard() {
               <CardContent>
                 <div className="space-y-3">
                   {alerts
-                    .filter((a) => a.urgency === "critical" || a.urgency === "high")
+                    .filter(
+                      (a) => a.urgency === "critical" || a.urgency === "high",
+                    )
                     .slice(0, 5)
                     .map((alert) => (
                       <div
@@ -324,8 +371,9 @@ export default function ForecastingDashboard() {
                       </div>
                     ))}
                 </div>
-                {alerts.filter((a) => a.urgency === "critical" || a.urgency === "high").length >
-                  5 && (
+                {alerts.filter(
+                  (a) => a.urgency === "critical" || a.urgency === "high",
+                ).length > 5 && (
                   <Button
                     variant="outline"
                     className="w-full mt-4"
@@ -433,7 +481,13 @@ export default function ForecastingDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {turnoverData.filter((t) => t.classification === "slow" || t.classification === "obsolete").length}
+                  {
+                    turnoverData.filter(
+                      (t) =>
+                        t.classification === "slow" ||
+                        t.classification === "obsolete",
+                    ).length
+                  }
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Consider liquidation or promotions
@@ -486,7 +540,8 @@ export default function ForecastingDashboard() {
                               </Badge>
                             )}
                             <Badge>
-                              {Math.round(forecast.confidence * 100)}% confidence
+                              {Math.round(forecast.confidence * 100)}%
+                              confidence
                             </Badge>
                           </div>
                         </div>

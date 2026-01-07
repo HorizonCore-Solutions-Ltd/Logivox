@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   ClipboardCheck,
   Package,
@@ -20,47 +26,54 @@ import {
   MapPin,
   PackageCheck,
   Boxes,
-  ShoppingCart
-} from "lucide-react"
+  ShoppingCart,
+} from "lucide-react";
 
 export default function FulfillmentPage() {
   const features = [
     {
       icon: ClipboardCheck,
       title: "Wave Planning",
-      description: "Intelligent batching and wave creation based on priority, destination, and item characteristics."
+      description:
+        "Intelligent batching and wave creation based on priority, destination, and item characteristics.",
     },
     {
       icon: Scan,
       title: "Multi-Modal Picking",
-      description: "Support for discrete, batch, zone, and wave picking strategies with RF-directed workflows."
+      description:
+        "Support for discrete, batch, zone, and wave picking strategies with RF-directed workflows.",
     },
     {
       icon: Package,
       title: "Smart Packing",
-      description: "Automated cartonization, packing instructions, and multi-package order handling."
+      description:
+        "Automated cartonization, packing instructions, and multi-package order handling.",
     },
     {
       icon: Truck,
       title: "Shipping Integration",
-      description: "Rate shopping, label generation, and carrier integration for all major shipping providers."
+      description:
+        "Rate shopping, label generation, and carrier integration for all major shipping providers.",
     },
     {
       icon: CheckCircle,
       title: "Quality Control",
-      description: "Built-in verification steps to ensure 99.9% order accuracy before shipment."
+      description:
+        "Built-in verification steps to ensure 99.9% order accuracy before shipment.",
     },
     {
       icon: BarChart3,
       title: "Performance Tracking",
-      description: "Real-time productivity metrics, KPIs, and performance dashboards for continuous improvement."
-    }
-  ]
+      description:
+        "Real-time productivity metrics, KPIs, and performance dashboards for continuous improvement.",
+    },
+  ];
 
   const pickingMethods = [
     {
       title: "Discrete Picking",
-      description: "One order at a time for high-priority or specialized fulfillment",
+      description:
+        "One order at a time for high-priority or specialized fulfillment",
       icon: ShoppingCart,
       benefits: [
         "Highest order accuracy (99.9%)",
@@ -68,8 +81,8 @@ export default function FulfillmentPage() {
         "Simple training requirements",
         "Best for low-volume operations",
         "Flexible for variable order sizes",
-        "Easy exception handling"
-      ]
+        "Easy exception handling",
+      ],
     },
     {
       title: "Batch Picking",
@@ -81,8 +94,8 @@ export default function FulfillmentPage() {
         "Optimized for similar items",
         "Ideal for e-commerce fulfillment",
         "Sorting and consolidation support",
-        "Put-to-light integration"
-      ]
+        "Put-to-light integration",
+      ],
     },
     {
       title: "Zone Picking",
@@ -94,8 +107,8 @@ export default function FulfillmentPage() {
         "Faster pick times per zone",
         "Conveyor integration support",
         "Scalable for high volume",
-        "Parallel processing capability"
-      ]
+        "Parallel processing capability",
+      ],
     },
     {
       title: "Wave Picking",
@@ -107,97 +120,101 @@ export default function FulfillmentPage() {
         "Load balancing across workforce",
         "Carrier cutoff optimization",
         "Priority-based wave creation",
-        "Resource optimization"
-      ]
-    }
-  ]
+        "Resource optimization",
+      ],
+    },
+  ];
 
   const packingFeatures = [
     {
       title: "Automated Cartonization",
-      description: "Intelligent box selection based on item dimensions and weight"
+      description:
+        "Intelligent box selection based on item dimensions and weight",
     },
     {
       title: "Packing Instructions",
-      description: "Visual guides for optimal item placement and protection"
+      description: "Visual guides for optimal item placement and protection",
     },
     {
       title: "Multi-Package Orders",
-      description: "Automatic order splitting across multiple boxes"
+      description: "Automatic order splitting across multiple boxes",
     },
     {
       title: "Gift Wrapping",
-      description: "Special handling instructions and gift message support"
+      description: "Special handling instructions and gift message support",
     },
     {
       title: "Fragile Item Handling",
-      description: "Special packaging requirements and cushioning alerts"
+      description: "Special packaging requirements and cushioning alerts",
     },
     {
       title: "Packing Verification",
-      description: "Scan verification to prevent shipping errors"
-    }
-  ]
+      description: "Scan verification to prevent shipping errors",
+    },
+  ];
 
   const workflow = [
     {
       step: "Order Import",
-      description: "Orders automatically imported from e-commerce, ERP, or marketplace",
-      icon: ShoppingCart
+      description:
+        "Orders automatically imported from e-commerce, ERP, or marketplace",
+      icon: ShoppingCart,
     },
     {
       step: "Wave Planning",
-      description: "System creates optimized pick waves based on priority and capacity",
-      icon: ClipboardCheck
+      description:
+        "System creates optimized pick waves based on priority and capacity",
+      icon: ClipboardCheck,
     },
     {
       step: "Pick Execution",
-      description: "RF-directed picking with barcode verification at each location",
-      icon: Scan
+      description:
+        "RF-directed picking with barcode verification at each location",
+      icon: Scan,
     },
     {
       step: "Quality Check",
       description: "Optional QC inspection for high-value or flagged orders",
-      icon: CheckCircle
+      icon: CheckCircle,
     },
     {
       step: "Packing Station",
       description: "Cartonization, packing, and shipping label generation",
-      icon: Package
+      icon: Package,
     },
     {
       step: "Shipment",
       description: "Carrier pickup with tracking information sent to customer",
-      icon: Truck
-    }
-  ]
+      icon: Truck,
+    },
+  ];
 
   const benefits = [
     {
       metric: "99.9%",
-      description: "Order accuracy with verification steps"
+      description: "Order accuracy with verification steps",
     },
     {
       metric: "60%",
-      description: "Faster order processing times"
+      description: "Faster order processing times",
     },
     {
       metric: "40%",
-      description: "Increase in picking productivity"
+      description: "Increase in picking productivity",
     },
     {
       metric: "50%",
-      description: "Reduction in shipping costs via rate shopping"
+      description: "Reduction in shipping costs via rate shopping",
     },
     {
       metric: "35%",
-      description: "Decrease in labor costs per order"
+      description: "Decrease in labor costs per order",
     },
     {
       metric: "Same-Day",
-      description: "Fulfillment capability for urgent orders"
-    }
-  ]
+      description: "Fulfillment capability for urgent orders",
+    },
+  ];
 
   const carriers = [
     "FedEx (Ground, Express, International)",
@@ -207,8 +224,8 @@ export default function FulfillmentPage() {
     "Amazon Shipping",
     "Regional carriers (OnTrac, Lasership)",
     "Freight carriers (LTL, FTL)",
-    "Custom carrier API integration"
-  ]
+    "Custom carrier API integration",
+  ];
 
   return (
     <div className="flex flex-col">
@@ -223,9 +240,10 @@ export default function FulfillmentPage() {
               Streamlined Picking, Packing, and Shipping Operations
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Optimize your entire fulfillment process with intelligent wave planning, 
-              multi-modal picking strategies, and automated shipping integration. 
-              Achieve 99.9% accuracy and 60% faster processing times.
+              Optimize your entire fulfillment process with intelligent wave
+              planning, multi-modal picking strategies, and automated shipping
+              integration. Achieve 99.9% accuracy and 60% faster processing
+              times.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -293,7 +311,9 @@ export default function FulfillmentPage() {
                     </div>
                     <div>
                       <CardTitle className="text-xl">{method.title}</CardTitle>
-                      <CardDescription className="mt-1">{method.description}</CardDescription>
+                      <CardDescription className="mt-1">
+                        {method.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -327,7 +347,10 @@ export default function FulfillmentPage() {
           <div className="mx-auto max-w-4xl">
             <div className="relative">
               {workflow.map((item, index) => (
-                <div key={index} className="relative mb-8 flex items-start space-x-4">
+                <div
+                  key={index}
+                  className="relative mb-8 flex items-start space-x-4"
+                >
                   <div className="flex flex-col items-center">
                     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
                       <item.icon className="h-6 w-6" />
@@ -339,7 +362,9 @@ export default function FulfillmentPage() {
                   <Card className="flex-1">
                     <CardContent className="pt-6">
                       <h3 className="font-semibold">{item.step}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{item.description}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
@@ -366,7 +391,9 @@ export default function FulfillmentPage() {
                 <CardContent className="pt-6">
                   <PackageCheck className="h-8 w-8 text-primary mb-3" />
                   <h3 className="font-semibold">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -389,8 +416,12 @@ export default function FulfillmentPage() {
             {benefits.map((benefit, index) => (
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">{benefit.metric}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{benefit.description}</p>
+                  <div className="text-4xl font-bold text-primary">
+                    {benefit.metric}
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {benefit.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -432,7 +463,8 @@ export default function FulfillmentPage() {
               Optimize Your Order Fulfillment
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join companies achieving 99.9% accuracy and same-day shipping with LogiVox
+              Join companies achieving 99.9% accuracy and same-day shipping with
+              LogiVox
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -448,5 +480,5 @@ export default function FulfillmentPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

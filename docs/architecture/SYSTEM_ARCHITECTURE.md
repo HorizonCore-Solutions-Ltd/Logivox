@@ -79,13 +79,14 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 6. **Security by Design**: Zero-trust architecture with end-to-end encryption
 7. **Global Scale Ready**: Multi-region deployment with edge caching and CDN
 8. **Observability First**: Comprehensive monitoring, logging, and distributed tracing
-6. **Security-First**: Zero-trust architecture with encryption everywhere
+9. **Security-First**: Zero-trust architecture with encryption everywhere
 
 ## 2. System Components
 
 ### 2.1 Frontend Applications
 
 #### 2.1.1 Web Application (React 18 + TypeScript)
+
 ```typescript
 // Technology Stack
 - Framework: React 18 with TypeScript
@@ -98,6 +99,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 **Key Features:**
+
 - Responsive design for desktop and tablet
 - Progressive Web App (PWA) capabilities
 - Real-time updates via WebSocket
@@ -105,6 +107,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 - Role-based UI rendering
 
 #### 2.1.2 Mobile Application (React Native)
+
 ```typescript
 // Technology Stack
 - Framework: React Native + TypeScript
@@ -116,6 +119,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 **Key Features:**
+
 - Native barcode scanning
 - Offline data synchronization
 - Push notifications for alerts
@@ -123,6 +127,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 - Voice-to-text input
 
 #### 2.1.3 Admin Panel (React + TypeScript)
+
 ```typescript
 // Technology Stack
 - Framework: React 18 with TypeScript
@@ -133,6 +138,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 **Key Features:**
+
 - System monitoring dashboards
 - User and organization management
 - ERP integration configuration
@@ -142,6 +148,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ### 2.2 Backend Services
 
 #### 2.2.1 Core API Service (Node.js + Express)
+
 ```typescript
 // Technology Stack
 - Runtime: Node.js 18 LTS
@@ -153,6 +160,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 **Responsibilities:**
+
 - User authentication and authorization
 - Inventory management operations
 - Warehouse and location management
@@ -160,6 +168,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 - Real-time WebSocket connections
 
 **API Endpoints Structure:**
+
 ```
 /api/v1/
 ├── /auth/               # Authentication endpoints
@@ -174,6 +183,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 #### 2.2.2 Integration Service (Node.js)
+
 ```typescript
 // Technology Stack
 - Runtime: Node.js 18 LTS
@@ -185,6 +195,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 **Responsibilities:**
+
 - ERP system integrations (SAP, Oracle, Dynamics, QuickBooks)
 - Data transformation and mapping
 - Sync job scheduling and monitoring
@@ -192,6 +203,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 - Webhook processing for real-time updates
 
 **Supported Integrations:**
+
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │ SAP Business    │    │ Oracle NetSuite │    │ Microsoft       │
@@ -217,6 +229,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 #### 2.2.3 Notification Service (Node.js)
+
 ```typescript
 // Technology Stack
 - Runtime: Node.js 18 LTS
@@ -228,6 +241,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ```
 
 **Responsibilities:**
+
 - Real-time WebSocket notifications
 - Email notification delivery
 - SMS alerts for critical events
@@ -237,6 +251,7 @@ LogiVox is built on a next-generation, cloud-native architecture designed to be 
 ### 2.3 Data Architecture
 
 #### 2.3.1 Primary Database (PostgreSQL)
+
 ```sql
 -- Multi-Tenant Schema Design
 CREATE SCHEMA IF NOT EXISTS public;      -- System tables
@@ -254,6 +269,7 @@ audit_logs/            -- Complete audit trail
 ```
 
 **Database Design Principles:**
+
 - Multi-tenant with schema-per-organization
 - Referential integrity with foreign keys
 - Audit trail for all data changes
@@ -261,6 +277,7 @@ audit_logs/            -- Complete audit trail
 - Row-level security (RLS) implementation
 
 #### 2.3.2 Caching Layer (Redis)
+
 ```redis
 # Cache Structure
 sessions:<session_id>          # User session data
@@ -271,6 +288,7 @@ queue:integration_jobs         # Background job queue
 ```
 
 **Cache Strategies:**
+
 - Session storage with automatic expiration
 - Permission caching for authorization
 - Inventory level caching with TTL
@@ -278,6 +296,7 @@ queue:integration_jobs         # Background job queue
 - Real-time notification storage
 
 #### 2.3.3 File Storage (AWS S3)
+
 ```
 logivox-storage/
 ├── organizations/
@@ -297,11 +316,12 @@ logivox-storage/
 ### 3.1 Authentication & Authorization
 
 #### 3.1.1 JWT-Based Authentication
+
 ```typescript
 // Token Structure
 interface JWTPayload {
   sub: string;           // User ID
-  org: string;           // Organization ID  
+  org: string;           // Organization ID
   role: UserRole;        // User role
   permissions: string[]; // Specific permissions
   exp: number;           // Expiration timestamp
@@ -317,55 +337,58 @@ interface JWTPayload {
 ```
 
 #### 3.1.2 Role-Based Access Control (RBAC)
+
 ```typescript
 // Permission Model
 enum Permission {
   // Inventory permissions
-  INVENTORY_READ = 'inventory:read',
-  INVENTORY_WRITE = 'inventory:write',
-  INVENTORY_DELETE = 'inventory:delete',
-  INVENTORY_ADJUST = 'inventory:adjust',
-  
+  INVENTORY_READ = "inventory:read",
+  INVENTORY_WRITE = "inventory:write",
+  INVENTORY_DELETE = "inventory:delete",
+  INVENTORY_ADJUST = "inventory:adjust",
+
   // Warehouse permissions
-  WAREHOUSE_READ = 'warehouse:read',
-  WAREHOUSE_WRITE = 'warehouse:write',
-  WAREHOUSE_MANAGE = 'warehouse:manage',
-  
+  WAREHOUSE_READ = "warehouse:read",
+  WAREHOUSE_WRITE = "warehouse:write",
+  WAREHOUSE_MANAGE = "warehouse:manage",
+
   // Purchase order permissions
-  PO_READ = 'po:read',
-  PO_WRITE = 'po:write',
-  PO_APPROVE = 'po:approve',
-  
+  PO_READ = "po:read",
+  PO_WRITE = "po:write",
+  PO_APPROVE = "po:approve",
+
   // User management permissions
-  USER_READ = 'user:read',
-  USER_WRITE = 'user:write',
-  USER_INVITE = 'user:invite',
-  
+  USER_READ = "user:read",
+  USER_WRITE = "user:write",
+  USER_INVITE = "user:invite",
+
   // Administration permissions
-  ADMIN_READ = 'admin:read',
-  ADMIN_WRITE = 'admin:write',
-  ADMIN_BILLING = 'admin:billing'
+  ADMIN_READ = "admin:read",
+  ADMIN_WRITE = "admin:write",
+  ADMIN_BILLING = "admin:billing",
 }
 
 // Role Definitions
 const ROLE_PERMISSIONS = {
   SUPER_ADMIN: [...ALL_PERMISSIONS],
   ADMIN: [...INVENTORY_PERMS, ...WAREHOUSE_PERMS, ...PO_PERMS, ...USER_PERMS],
-  MANAGER: [...INVENTORY_PERMS, 'warehouse:read', 'po:read', 'po:write'],
-  OPERATOR: ['inventory:read', 'inventory:write', 'warehouse:read'],
-  VIEWER: ['inventory:read', 'warehouse:read', 'po:read']
+  MANAGER: [...INVENTORY_PERMS, "warehouse:read", "po:read", "po:write"],
+  OPERATOR: ["inventory:read", "inventory:write", "warehouse:read"],
+  VIEWER: ["inventory:read", "warehouse:read", "po:read"],
 };
 ```
 
 ### 3.2 Data Security
 
 #### 3.2.1 Encryption
+
 - **Data at Rest**: AES-256 encryption for database and file storage
 - **Data in Transit**: TLS 1.3 for all API communications
 - **Sensitive Fields**: bcrypt for passwords, encryption for PII
 - **Key Management**: AWS KMS for encryption key rotation
 
 #### 3.2.2 Multi-Tenant Isolation
+
 ```typescript
 // Row-Level Security Implementation
 -- Enable RLS on all tenant tables
@@ -383,6 +406,7 @@ SET app.current_org_id = '{organization_id}';
 ### 3.3 Network Security
 
 #### 3.3.1 AWS Security Groups
+
 ```yaml
 # Web Tier Security Group
 WebTierSG:
@@ -392,7 +416,7 @@ WebTierSG:
     - Port: 80 (HTTP - redirects to HTTPS)
       Source: 0.0.0.0/0
 
-# Application Tier Security Group  
+# Application Tier Security Group
 AppTierSG:
   InboundRules:
     - Port: 3000-3010
@@ -414,6 +438,7 @@ DBTierSG:
 ### 4.1 AWS Infrastructure
 
 #### 4.1.1 EKS Cluster Configuration
+
 ```yaml
 # Kubernetes Cluster Specification
 apiVersion: eksctl.io/v1alpha5
@@ -440,7 +465,7 @@ nodeGroups:
     maxSize: 10
     desiredCapacity: 3
     privateNetworking: true
-    
+
 addons:
   - name: aws-load-balancer-controller
   - name: aws-ebs-csi-driver
@@ -448,6 +473,7 @@ addons:
 ```
 
 #### 4.1.2 Service Deployment
+
 ```yaml
 # Core API Service Deployment
 apiVersion: apps/v1
@@ -462,45 +488,46 @@ spec:
   template:
     spec:
       containers:
-      - name: api
-        image: flowstock/api:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: db-secret
-              key: url
-        - name: REDIS_URL
-          valueFrom:
-            secretKeyRef:
-              name: redis-secret
-              key: url
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 3000
-          initialDelaySeconds: 5
-          periodSeconds: 5
+        - name: api
+          image: flowstock/api:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-secret
+                  key: url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: redis-secret
+                  key: url
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 3000
+            initialDelaySeconds: 5
+            periodSeconds: 5
 ```
 
 ### 4.2 CI/CD Pipeline
 
 #### 4.2.1 GitHub Actions Workflow
+
 ```yaml
 name: Deploy to Production
 
@@ -550,64 +577,67 @@ jobs:
 ### 5.1 Application Monitoring
 
 #### 5.1.1 Metrics Collection
+
 ```typescript
 // Prometheus Metrics
-const promClient = require('prom-client');
+const promClient = require("prom-client");
 
 // Custom metrics
 const httpRequestDuration = new promClient.Histogram({
-  name: 'http_request_duration_seconds',
-  help: 'Duration of HTTP requests in seconds',
-  labelNames: ['method', 'route', 'status_code']
+  name: "http_request_duration_seconds",
+  help: "Duration of HTTP requests in seconds",
+  labelNames: ["method", "route", "status_code"],
 });
 
 const activeUsers = new promClient.Gauge({
-  name: 'active_users_total',
-  help: 'Total number of active users'
+  name: "active_users_total",
+  help: "Total number of active users",
 });
 
 const inventoryItems = new promClient.Gauge({
-  name: 'inventory_items_total',
-  help: 'Total number of inventory items',
-  labelNames: ['organization_id', 'warehouse_id']
+  name: "inventory_items_total",
+  help: "Total number of inventory items",
+  labelNames: ["organization_id", "warehouse_id"],
 });
 ```
 
 #### 5.1.2 Logging Strategy
+
 ```typescript
 // Structured Logging with Winston
-import winston from 'winston';
+import winston from "winston";
 
 const logger = winston.createLogger({
-  level: 'info',
+  level: "info",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
-    winston.format.json()
+    winston.format.json(),
   ),
-  defaultMeta: { 
-    service: 'logivox-api',
-    version: process.env.APP_VERSION 
+  defaultMeta: {
+    service: "logivox-api",
+    version: process.env.APP_VERSION,
   },
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' })
-  ]
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
+  ],
 });
 
 // Usage
-logger.info('User authenticated', {
+logger.info("User authenticated", {
   userId: user.id,
   organizationId: user.organizationId,
   ip: req.ip,
-  userAgent: req.get('User-Agent')
+  userAgent: req.get("User-Agent"),
 });
 ```
 
 ### 5.2 Infrastructure Monitoring
 
 #### 5.2.1 CloudWatch Dashboards
+
 ```json
 {
   "widgets": [
@@ -636,6 +666,7 @@ logger.info('User authenticated', {
 ### 6.1 Auto-Scaling Configuration
 
 #### 6.1.1 Horizontal Pod Autoscaler
+
 ```yaml
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -649,21 +680,22 @@ spec:
   minReplicas: 3
   maxReplicas: 20
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 #### 6.1.2 Database Scaling Strategy
+
 ```sql
 -- Read Replica Configuration
 -- Primary: Write operations
@@ -675,10 +707,10 @@ spec:
 -- Replica pools: 10 connections each
 
 -- Query optimization
-CREATE INDEX CONCURRENTLY idx_inventory_org_warehouse 
+CREATE INDEX CONCURRENTLY idx_inventory_org_warehouse
 ON inventory_items (organization_id, warehouse_id);
 
-CREATE INDEX CONCURRENTLY idx_stock_movements_item_date 
+CREATE INDEX CONCURRENTLY idx_stock_movements_item_date
 ON stock_movements (inventory_item_id, created_at DESC);
 ```
 
@@ -687,6 +719,7 @@ ON stock_movements (inventory_item_id, created_at DESC);
 ### 7.1 Backup Strategy
 
 #### 7.1.1 Database Backups
+
 ```bash
 #!/bin/bash
 # Automated PostgreSQL backup script
@@ -706,6 +739,7 @@ archive_command = 'aws s3 cp %p s3://logivox-backups/wal/%f'
 ```
 
 #### 7.1.2 Application State Backup
+
 ```yaml
 # Kubernetes backup using Velero
 apiVersion: v1
@@ -713,23 +747,25 @@ kind: Schedule
 metadata:
   name: daily-backup
 spec:
-  schedule: "0 2 * * *"  # Daily at 2 AM
+  schedule: "0 2 * * *" # Daily at 2 AM
   template:
     includedNamespaces:
-    - logivox-prod
+      - logivox-prod
     storageLocation: aws-s3
-    ttl: 720h0m0s  # 30 days retention
+    ttl: 720h0m0s # 30 days retention
 ```
 
 ### 7.2 Recovery Procedures
 
 #### 7.2.1 Recovery Time Objectives (RTO)
+
 - **Critical Services**: 4 hours maximum downtime
 - **Database Recovery**: 2 hours maximum
 - **File Storage Recovery**: 1 hour maximum
 - **Full System Recovery**: 6 hours maximum
 
 #### 7.2.2 Recovery Point Objectives (RPO)
+
 - **Database**: Maximum 15 minutes data loss
 - **File Storage**: Maximum 1 hour data loss
 - **Configuration**: Maximum 4 hours data loss

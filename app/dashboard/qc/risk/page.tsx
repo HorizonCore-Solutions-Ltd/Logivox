@@ -1,12 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ZAxis, Cell } from 'recharts';
-import { AlertTriangle, Plus, TrendingDown } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ZAxis,
+  Cell,
+} from "recharts";
+import { AlertTriangle, Plus, TrendingDown } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface Risk {
   id: string;
@@ -30,7 +46,7 @@ export default function RiskDashboard() {
     critical: 0,
     high: 0,
     medium: 0,
-    low: 0
+    low: 0,
   });
 
   useEffect(() => {
@@ -39,7 +55,7 @@ export default function RiskDashboard() {
 
   const loadRisks = async () => {
     try {
-      const response = await fetch('/api/qc/risk');
+      const response = await fetch("/api/qc/risk");
       const result = await response.json();
 
       if (result.success) {
@@ -47,7 +63,7 @@ export default function RiskDashboard() {
         calculateStats(result.data);
       }
     } catch (error) {
-      console.error('Load risks error:', error);
+      console.error("Load risks error:", error);
     } finally {
       setLoading(false);
     }
@@ -56,35 +72,38 @@ export default function RiskDashboard() {
   const calculateStats = (risks: Risk[]) => {
     setStats({
       total: risks.length,
-      critical: risks.filter(r => r.rpn >= 200).length,
-      high: risks.filter(r => r.rpn >= 125 && r.rpn < 200).length,
-      medium: risks.filter(r => r.rpn >= 50 && r.rpn < 125).length,
-      low: risks.filter(r => r.rpn < 50).length
+      critical: risks.filter((r) => r.rpn >= 200).length,
+      high: risks.filter((r) => r.rpn >= 125 && r.rpn < 200).length,
+      medium: risks.filter((r) => r.rpn >= 50 && r.rpn < 125).length,
+      low: risks.filter((r) => r.rpn < 50).length,
     });
   };
 
   const getRPNColor = (rpn: number) => {
-    if (rpn >= 200) return '#ef4444'; // red
-    if (rpn >= 125) return '#f97316'; // orange
-    if (rpn >= 50) return '#eab308'; // yellow
-    return '#22c55e'; // green
+    if (rpn >= 200) return "#ef4444"; // red
+    if (rpn >= 125) return "#f97316"; // orange
+    if (rpn >= 50) return "#eab308"; // yellow
+    return "#22c55e"; // green
   };
 
   const getRPNBadge = (rpn: number) => {
-    if (rpn >= 200) return <Badge className="bg-red-100 text-red-800">CRITICAL</Badge>;
-    if (rpn >= 125) return <Badge className="bg-orange-100 text-orange-800">HIGH</Badge>;
-    if (rpn >= 50) return <Badge className="bg-yellow-100 text-yellow-800">MEDIUM</Badge>;
+    if (rpn >= 200)
+      return <Badge className="bg-red-100 text-red-800">CRITICAL</Badge>;
+    if (rpn >= 125)
+      return <Badge className="bg-orange-100 text-orange-800">HIGH</Badge>;
+    if (rpn >= 50)
+      return <Badge className="bg-yellow-100 text-yellow-800">MEDIUM</Badge>;
     return <Badge className="bg-green-100 text-green-800">LOW</Badge>;
   };
 
   // Prepare heatmap data
-  const heatmapData = risks.map(risk => ({
+  const heatmapData = risks.map((risk) => ({
     x: risk.occurrence,
     y: risk.severity,
     z: risk.rpn,
     id: risk.id,
     title: risk.title,
-    color: getRPNColor(risk.rpn)
+    color: getRPNColor(risk.rpn),
   }));
 
   return (
@@ -95,7 +114,7 @@ export default function RiskDashboard() {
           <h1 className="text-3xl font-bold">Risk Management</h1>
           <p className="text-muted-foreground">ISO 9001:2015 Risk Register</p>
         </div>
-        <Button onClick={() => router.push('/dashboard/qc/risk/create')}>
+        <Button onClick={() => router.push("/dashboard/qc/risk/create")}>
           <Plus className="w-4 h-4 mr-2" />
           New Risk Assessment
         </Button>
@@ -117,7 +136,9 @@ export default function RiskDashboard() {
             <CardTitle className="text-sm font-medium">Critical</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-600">{stats.critical}</div>
+            <div className="text-3xl font-bold text-red-600">
+              {stats.critical}
+            </div>
             <p className="text-xs text-muted-foreground">RPN ≥ 200</p>
           </CardContent>
         </Card>
@@ -127,7 +148,9 @@ export default function RiskDashboard() {
             <CardTitle className="text-sm font-medium">High</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-orange-600">{stats.high}</div>
+            <div className="text-3xl font-bold text-orange-600">
+              {stats.high}
+            </div>
             <p className="text-xs text-muted-foreground">RPN 125-199</p>
           </CardContent>
         </Card>
@@ -137,7 +160,9 @@ export default function RiskDashboard() {
             <CardTitle className="text-sm font-medium">Medium</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-yellow-600">{stats.medium}</div>
+            <div className="text-3xl font-bold text-yellow-600">
+              {stats.medium}
+            </div>
             <p className="text-xs text-muted-foreground">RPN 50-124</p>
           </CardContent>
         </Card>
@@ -165,23 +190,31 @@ export default function RiskDashboard() {
           <ResponsiveContainer width="100%" height={400}>
             <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                type="number" 
-                dataKey="x" 
-                name="Occurrence" 
+              <XAxis
+                type="number"
+                dataKey="x"
+                name="Occurrence"
                 domain={[0, 11]}
-                label={{ value: 'Occurrence (Likelihood)', position: 'insideBottom', offset: -10 }}
+                label={{
+                  value: "Occurrence (Likelihood)",
+                  position: "insideBottom",
+                  offset: -10,
+                }}
               />
-              <YAxis 
-                type="number" 
-                dataKey="y" 
-                name="Severity" 
+              <YAxis
+                type="number"
+                dataKey="y"
+                name="Severity"
                 domain={[0, 11]}
-                label={{ value: 'Severity (Impact)', angle: -90, position: 'insideLeft' }}
+                label={{
+                  value: "Severity (Impact)",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
               />
               <ZAxis type="number" dataKey="z" range={[50, 1000]} />
-              <Tooltip 
-                cursor={{ strokeDasharray: '3 3' }}
+              <Tooltip
+                cursor={{ strokeDasharray: "3 3" }}
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
@@ -211,7 +244,9 @@ export default function RiskDashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Active Risks</CardTitle>
-          <CardDescription>Sorted by Risk Priority Number (RPN)</CardDescription>
+          <CardDescription>
+            Sorted by Risk Priority Number (RPN)
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -232,11 +267,15 @@ export default function RiskDashboard() {
                       </div>
                       <p className="text-sm">{risk.title}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Owner: {risk.owner} | S:{risk.severity} O:{risk.occurrence} D:{risk.detection}
+                        Owner: {risk.owner} | S:{risk.severity} O:
+                        {risk.occurrence} D:{risk.detection}
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold" style={{ color: getRPNColor(risk.rpn) }}>
+                      <div
+                        className="text-2xl font-bold"
+                        style={{ color: getRPNColor(risk.rpn) }}
+                      >
                         {risk.rpn}
                       </div>
                       <p className="text-xs text-muted-foreground">RPN</p>
@@ -247,10 +286,10 @@ export default function RiskDashboard() {
               <div className="text-center py-8 text-muted-foreground">
                 <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>No risks registered yet</p>
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="mt-4"
-                  onClick={() => router.push('/dashboard/qc/risk/create')}
+                  onClick={() => router.push("/dashboard/qc/risk/create")}
                 >
                   Create First Risk Assessment
                 </Button>

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import DocumentService from '@/lib/services/document.service';
+import { NextResponse } from "next/server";
+import DocumentService from "@/lib/services/document.service";
 
 /**
  * POST /api/qc/documents/[id]/approve
@@ -7,26 +7,25 @@ import DocumentService from '@/lib/services/document.service';
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
 
     const document = await DocumentService.approveDocument(
       params.id,
-      body.approvedBy || 'system'
+      body.approvedBy || "system",
     );
 
     return NextResponse.json({
       success: true,
-      data: document
+      data: document,
     });
-
   } catch (error: any) {
-    console.error('Approve document error:', error);
+    console.error("Approve document error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to approve document' },
-      { status: 500 }
+      { error: error.message || "Failed to approve document" },
+      { status: 500 },
     );
   }
 }

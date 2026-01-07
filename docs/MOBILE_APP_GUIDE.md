@@ -13,6 +13,7 @@ The LogiVox mobile application provides warehouse workers with a powerful, offli
 ### 1. **Barcode Scanning**
 
 Universal barcode scanner that recognizes:
+
 - Inventory items (by barcode or SKU)
 - Warehouse locations
 - Sales orders
@@ -20,12 +21,14 @@ Universal barcode scanner that recognizes:
 - Tasks
 
 **Supported Formats:**
+
 - EAN-13
 - CODE-128
 - CODE-39
 - QR Codes
 
 **Usage:**
+
 1. Tap the scan button (floating action button)
 2. Point camera at barcode
 3. App automatically detects and processes
@@ -33,12 +36,14 @@ Universal barcode scanner that recognizes:
 ### 2. **Offline-First Architecture**
 
 Work without internet connection:
+
 - All data cached locally
 - Changes queued for sync
 - Automatic sync when online
 - Conflict resolution
 
 **How It Works:**
+
 1. Data is cached when online
 2. Offline changes stored in queue
 3. Auto-sync every 30 seconds when online
@@ -47,12 +52,14 @@ Work without internet connection:
 ### 3. **Task Management**
 
 View and complete warehouse tasks:
+
 - Auto-filtered to assigned user
 - Priority-based ordering
 - Status tracking (Pending, In Progress, Completed)
 - Task actions (Start, Pause, Complete, Cancel)
 
 **Task Types:**
+
 - Putaway
 - Picking
 - Replenishment
@@ -63,6 +70,7 @@ View and complete warehouse tasks:
 ### 4. **Push Notifications**
 
 Real-time alerts for:
+
 - New task assignments
 - Task updates
 - Urgent priorities
@@ -170,23 +178,23 @@ mobile/
 ```typescript
 // Login
 const response = await fetch(`${API_URL}/api/mobile/auth/login`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    email: 'worker@example.com',
-    password: 'password',
+    email: "worker@example.com",
+    password: "password",
     deviceInfo: {
-      deviceId: 'unique-device-id',
-      deviceName: 'iPhone 14',
-      fcmToken: 'fcm-token',
+      deviceId: "unique-device-id",
+      deviceName: "iPhone 14",
+      fcmToken: "fcm-token",
     },
   }),
 });
 
 const { data } = await response.json();
 // Store tokens
-await AsyncStorage.setItem('auth_token', data.accessToken);
-await AsyncStorage.setItem('refresh_token', data.refreshToken);
+await AsyncStorage.setItem("auth_token", data.accessToken);
+await AsyncStorage.setItem("refresh_token", data.refreshToken);
 ```
 
 ### Barcode Scanning
@@ -194,14 +202,14 @@ await AsyncStorage.setItem('refresh_token', data.refreshToken);
 ```typescript
 // Scan barcode
 const response = await fetch(`${API_URL}/api/mobile/barcode/scan`, {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
-    barcode: '1234567890123',
-    context: 'PICKING',
+    barcode: "1234567890123",
+    context: "PICKING",
   }),
 });
 
@@ -214,20 +222,17 @@ console.log(data.entity); // Full entity details
 
 ```typescript
 // Get tasks
-const response = await fetch(
-  `${API_URL}/api/mobile/tasks?status=PENDING`,
-  {
-    headers: { 'Authorization': `Bearer ${token}` },
-  }
-);
+const response = await fetch(`${API_URL}/api/mobile/tasks?status=PENDING`, {
+  headers: { Authorization: `Bearer ${token}` },
+});
 
 const { data } = await response.json();
 console.log(data.tasks); // Array of tasks
 
 // Start task
 await fetch(`${API_URL}/api/mobile/tasks/${taskId}/start`, {
-  method: 'POST',
-  headers: { 'Authorization': `Bearer ${token}` },
+  method: "POST",
+  headers: { Authorization: `Bearer ${token}` },
 });
 ```
 
@@ -236,24 +241,24 @@ await fetch(`${API_URL}/api/mobile/tasks/${taskId}/start`, {
 ```typescript
 // Sync offline changes
 const response = await fetch(`${API_URL}/api/mobile/sync`, {
-  method: 'POST',
+  method: "POST",
   headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`,
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
   },
   body: JSON.stringify({
-    lastSyncAt: '2025-01-16T12:00:00Z',
+    lastSyncAt: "2025-01-16T12:00:00Z",
     pendingChanges: [
       {
-        entity: 'task',
-        action: 'task_completion',
+        entity: "task",
+        action: "task_completion",
         data: {
-          taskId: 'task-123',
-          status: 'COMPLETED',
-          completedAt: '2025-01-16T12:30:00Z',
+          taskId: "task-123",
+          status: "COMPLETED",
+          completedAt: "2025-01-16T12:30:00Z",
         },
-        localId: 'local_12345',
-        timestamp: '2025-01-16T12:30:00Z',
+        localId: "local_12345",
+        timestamp: "2025-01-16T12:30:00Z",
       },
     ],
   }),
@@ -274,12 +279,12 @@ console.log(data.conflicts); // Sync conflicts
 ```typescript
 // AsyncStorage keys
 const STORAGE_KEYS = {
-  AUTH_TOKEN: 'auth_token',
-  REFRESH_TOKEN: 'refresh_token',
-  OFFLINE_QUEUE: 'offline_queue',
-  CACHED_TASKS: 'cached_tasks',
-  CACHED_ITEMS: 'cached_items',
-  LAST_SYNC: 'last_sync_time',
+  AUTH_TOKEN: "auth_token",
+  REFRESH_TOKEN: "refresh_token",
+  OFFLINE_QUEUE: "offline_queue",
+  CACHED_TASKS: "cached_tasks",
+  CACHED_ITEMS: "cached_items",
+  LAST_SYNC: "last_sync_time",
 };
 ```
 
@@ -289,7 +294,7 @@ const STORAGE_KEYS = {
 interface SyncEntity {
   id: string;
   entity: string;
-  action: 'CREATE' | 'UPDATE' | 'DELETE';
+  action: "CREATE" | "UPDATE" | "DELETE";
   data: any;
   localId: string;
   timestamp: Date;
@@ -307,13 +312,13 @@ interface SyncEntity {
 
 ```typescript
 // Handle conflicts
-if (conflict.conflictType === 'VERSION_MISMATCH') {
+if (conflict.conflictType === "VERSION_MISMATCH") {
   // Show conflict resolution UI
   const resolution = await showConflictDialog(conflict);
-  
-  if (resolution === 'SERVER_WINS') {
+
+  if (resolution === "SERVER_WINS") {
     // Discard local changes
-  } else if (resolution === 'CLIENT_WINS') {
+  } else if (resolution === "CLIENT_WINS") {
     // Force push local changes
   }
 }
@@ -332,10 +337,10 @@ const permission = await messaging().requestPermission();
 if (permission === messaging.AuthorizationStatus.AUTHORIZED) {
   // Get FCM token
   const fcmToken = await messaging().getToken();
-  
+
   // Send to server during login
   await fetch(`${API_URL}/api/mobile/auth/login`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify({
       email,
       password,
@@ -354,29 +359,29 @@ if (permission === messaging.AuthorizationStatus.AUTHORIZED) {
 ```typescript
 // Foreground messages
 messaging().onMessage(async (remoteMessage) => {
-  console.log('Notification received:', remoteMessage);
-  
+  console.log("Notification received:", remoteMessage);
+
   // Show in-app notification
   showInAppNotification(remoteMessage.notification);
-  
+
   // Refresh tasks if task assignment
-  if (remoteMessage.data?.type === 'TASK_ASSIGNED') {
+  if (remoteMessage.data?.type === "TASK_ASSIGNED") {
     refreshTasks();
   }
 });
 
 // Background messages
 messaging().setBackgroundMessageHandler(async (remoteMessage) => {
-  console.log('Background notification:', remoteMessage);
+  console.log("Background notification:", remoteMessage);
 });
 
 // Notification opened app
 messaging().onNotificationOpenedApp((remoteMessage) => {
-  console.log('Notification opened app:', remoteMessage);
-  
+  console.log("Notification opened app:", remoteMessage);
+
   // Navigate to relevant screen
   if (remoteMessage.data?.taskId) {
-    navigation.navigate('TaskDetail', {
+    navigation.navigate("TaskDetail", {
       taskId: remoteMessage.data.taskId,
     });
   }
@@ -391,7 +396,7 @@ messaging().onNotificationOpenedApp((remoteMessage) => {
 
 ```typescript
 // Request camera permission
-import { Camera } from 'expo-camera';
+import { Camera } from "expo-camera";
 
 const [permission, requestPermission] = Camera.useCameraPermissions();
 
@@ -408,7 +413,7 @@ import { Camera, CameraView } from 'expo-camera';
 function BarcodeScanner({ onScan }) {
   const handleBarCodeScanned = ({ type, data }) => {
     console.log(`Scanned ${type}: ${data}`);
-    
+
     // Process barcode
     onScan({ data, format: type, timestamp: new Date() });
   };
@@ -434,14 +439,14 @@ function BarcodeScanner({ onScan }) {
 ```typescript
 try {
   const response = await fetch(url, options);
-  
+
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
-  
+
   return await response.json();
 } catch (error) {
-  if (error.message.includes('Network request failed')) {
+  if (error.message.includes("Network request failed")) {
     // Offline - queue for sync
     queueForOfflineSync(request);
   } else {
@@ -538,21 +543,25 @@ cd android
 ### Common Issues
 
 **1. Barcode scanner not working**
+
 - Check camera permissions
 - Verify supported formats
 - Test with known good barcodes
 
 **2. Offline sync not syncing**
+
 - Check network connectivity
 - Verify auth token validity
 - Inspect sync queue
 
 **3. Push notifications not received**
+
 - Verify FCM setup
 - Check device notification settings
 - Test with Firebase Console
 
 **4. App crashes on launch**
+
 - Clear app data
 - Reinstall app
 - Check native dependencies
@@ -562,6 +571,7 @@ cd android
 ## Support
 
 For issues or questions:
+
 - Email: support@logivox.ai
 - Slack: #mobile-support
 - Documentation: https://docs.logivox.ai/mobile

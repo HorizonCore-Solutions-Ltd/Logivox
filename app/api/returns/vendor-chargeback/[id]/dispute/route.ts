@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { vendorChargebackService } from '@/lib/services/returns/vendor-chargeback-service';
+import { NextRequest, NextResponse } from "next/server";
+import { vendorChargebackService } from "@/lib/services/returns/vendor-chargeback-service";
 
 /**
  * POST /api/returns/vendor-chargeback/[id]/dispute
@@ -7,7 +7,7 @@ import { vendorChargebackService } from '@/lib/services/returns/vendor-chargebac
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -15,8 +15,8 @@ export async function POST(
 
     if (!disputeReason || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
@@ -32,10 +32,10 @@ export async function POST(
       dispute: result,
     });
   } catch (error: any) {
-    console.error('Dispute error:', error);
+    console.error("Dispute error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process dispute' },
-      { status: 500 }
+      { error: error.message || "Failed to process dispute" },
+      { status: 500 },
     );
   }
 }

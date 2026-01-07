@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import * as React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Key,
   Plus,
@@ -13,9 +13,15 @@ import {
   Calendar,
   Shield,
   AlertTriangle,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -23,7 +29,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,9 +37,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -41,52 +47,52 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Switch } from "@/components/ui/switch"
-import { toast } from "sonner"
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 
 const createApiKeySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   expiresInDays: z.number().min(1).max(365).optional(),
-})
+});
 
-type CreateApiKeyFormData = z.infer<typeof createApiKeySchema>
+type CreateApiKeyFormData = z.infer<typeof createApiKeySchema>;
 
 interface ApiKey {
-  id: string
-  name: string
-  description: string | null
-  keyPrefix: string
-  expiresAt: string | null
-  lastUsedAt: string | null
-  isActive: boolean
-  scopes: string[]
-  createdAt: string
+  id: string;
+  name: string;
+  description: string | null;
+  keyPrefix: string;
+  expiresAt: string | null;
+  lastUsedAt: string | null;
+  isActive: boolean;
+  scopes: string[];
+  createdAt: string;
 }
 
 interface NewApiKey {
-  id: string
-  name: string
-  description: string | null
-  apiKey: string
-  keyPrefix: string
-  expiresAt: string | null
-  message: string
+  id: string;
+  name: string;
+  description: string | null;
+  apiKey: string;
+  keyPrefix: string;
+  expiresAt: string | null;
+  message: string;
 }
 
 export default function ApiKeysPage() {
-  const queryClient = useQueryClient()
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false)
-  const [newApiKey, setNewApiKey] = React.useState<NewApiKey | null>(null)
-  const [isKeyVisible, setIsKeyVisible] = React.useState(false)
+  const queryClient = useQueryClient();
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = React.useState(false);
+  const [newApiKey, setNewApiKey] = React.useState<NewApiKey | null>(null);
+  const [isKeyVisible, setIsKeyVisible] = React.useState(false);
 
   const {
     register,
@@ -100,22 +106,24 @@ export default function ApiKeysPage() {
       description: "",
       expiresInDays: 90,
     },
-  })
+  });
 
   const { data: apiKeys, isLoading } = useQuery<ApiKey[]>({
     queryKey: ["api-keys"],
     queryFn: async () => {
-      const response = await fetch("/api/api-keys")
-      if (!response.ok) throw new Error("Failed to fetch API keys")
-      return response.json()
+      const response = await fetch("/api/api-keys");
+      if (!response.ok) throw new Error("Failed to fetch API keys");
+      return response.json();
     },
-  })
+  });
 
   const createMutation = useMutation({
     mutationFn: async (data: CreateApiKeyFormData) => {
       const expiresAt = data.expiresInDays
-        ? new Date(Date.now() + data.expiresInDays * 24 * 60 * 60 * 1000).toISOString()
-        : undefined
+        ? new Date(
+            Date.now() + data.expiresInDays * 24 * 60 * 60 * 1000,
+          ).toISOString()
+        : undefined;
 
       const response = await fetch("/api/api-keys", {
         method: "POST",
@@ -125,43 +133,43 @@ export default function ApiKeysPage() {
           description: data.description,
           expiresAt,
         }),
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to create API key")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create API key");
       }
-      return response.json()
+      return response.json();
     },
     onSuccess: (data: NewApiKey) => {
-      queryClient.invalidateQueries({ queryKey: ["api-keys"] })
-      setNewApiKey(data)
-      setIsCreateDialogOpen(false)
-      reset()
+      queryClient.invalidateQueries({ queryKey: ["api-keys"] });
+      setNewApiKey(data);
+      setIsCreateDialogOpen(false);
+      reset();
     },
     onError: (error: Error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
-  })
+  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const response = await fetch(`/api/api-keys/${id}`, {
         method: "DELETE",
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to delete API key")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete API key");
       }
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["api-keys"] })
-      toast.success("API key deleted successfully")
+      queryClient.invalidateQueries({ queryKey: ["api-keys"] });
+      toast.success("API key deleted successfully");
     },
     onError: (error: Error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
-  })
+  });
 
   const toggleActiveMutation = useMutation({
     mutationFn: async ({ id, isActive }: { id: string; isActive: boolean }) => {
@@ -169,32 +177,36 @@ export default function ApiKeysPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive }),
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to update API key")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to update API key");
       }
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["api-keys"] })
-      toast.success("API key updated successfully")
+      queryClient.invalidateQueries({ queryKey: ["api-keys"] });
+      toast.success("API key updated successfully");
     },
     onError: (error: Error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
-  })
+  });
 
   const handleDelete = (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete "${name}"? This action cannot be undone.`)) {
-      deleteMutation.mutate(id)
+    if (
+      confirm(
+        `Are you sure you want to delete "${name}"? This action cannot be undone.`,
+      )
+    ) {
+      deleteMutation.mutate(id);
     }
-  }
+  };
 
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-    toast.success("Copied to clipboard")
-  }
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
 
   return (
     <DashboardSidebar>
@@ -243,7 +255,9 @@ export default function ApiKeysPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Expiring Soon
+              </CardTitle>
               <AlertTriangle className="h-4 w-4 text-orange-500" />
             </CardHeader>
             <CardContent>
@@ -251,7 +265,8 @@ export default function ApiKeysPage() {
                 {apiKeys?.filter(
                   (k) =>
                     k.expiresAt &&
-                    new Date(k.expiresAt) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    new Date(k.expiresAt) <
+                      new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 ).length || 0}
               </div>
               <p className="text-xs text-muted-foreground">Within 7 days</p>
@@ -293,7 +308,9 @@ export default function ApiKeysPage() {
                         <div>
                           <p className="font-medium">{key.name}</p>
                           {key.description && (
-                            <p className="text-sm text-muted-foreground">{key.description}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {key.description}
+                            </p>
                           )}
                         </div>
                       </TableCell>
@@ -304,7 +321,9 @@ export default function ApiKeysPage() {
                       </TableCell>
                       <TableCell>
                         {key.isActive ? (
-                          <Badge variant="default" className="bg-green-500">Active</Badge>
+                          <Badge variant="default" className="bg-green-500">
+                            Active
+                          </Badge>
                         ) : (
                           <Badge variant="secondary">Inactive</Badge>
                         )}
@@ -315,7 +334,9 @@ export default function ApiKeysPage() {
                             {new Date(key.lastUsedAt).toLocaleDateString()}
                           </span>
                         ) : (
-                          <span className="text-sm text-muted-foreground">Never</span>
+                          <span className="text-sm text-muted-foreground">
+                            Never
+                          </span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -327,7 +348,9 @@ export default function ApiKeysPage() {
                             </span>
                           </div>
                         ) : (
-                          <span className="text-sm text-muted-foreground">Never</span>
+                          <span className="text-sm text-muted-foreground">
+                            Never
+                          </span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -379,7 +402,8 @@ export default function ApiKeysPage() {
                 <Key className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-lg font-medium mb-2">No API keys yet</p>
                 <p className="text-muted-foreground mb-4">
-                  Create your first API key to start integrating with external systems
+                  Create your first API key to start integrating with external
+                  systems
                 </p>
                 <Button onClick={() => setIsCreateDialogOpen(true)}>
                   <Plus className="mr-2 h-4 w-4" />
@@ -412,12 +436,16 @@ export default function ApiKeysPage() {
                 <div className="flex items-center gap-2 text-sm">
                   <Badge variant="outline">GET</Badge>
                   <code className="font-mono">/api/v1/inventory</code>
-                  <span className="text-muted-foreground">- List inventory items</span>
+                  <span className="text-muted-foreground">
+                    - List inventory items
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 text-sm">
                   <Badge variant="outline">GET</Badge>
                   <code className="font-mono">/api/v1/inventory/:id</code>
-                  <span className="text-muted-foreground">- Get inventory item details</span>
+                  <span className="text-muted-foreground">
+                    - Get inventory item details
+                  </span>
                 </div>
               </div>
             </div>
@@ -434,7 +462,10 @@ export default function ApiKeysPage() {
               Generate a new API key for programmatic access to your data
             </DialogDescription>
           </DialogHeader>
-          <form onSubmit={handleSubmit((data) => createMutation.mutate(data))} className="space-y-4">
+          <form
+            onSubmit={handleSubmit((data) => createMutation.mutate(data))}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="name">Name *</Label>
               <Input
@@ -443,7 +474,9 @@ export default function ApiKeysPage() {
                 {...register("name")}
               />
               {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.name.message}
+                </p>
               )}
             </div>
 
@@ -525,7 +558,11 @@ export default function ApiKeysPage() {
                     size="icon"
                     onClick={() => setIsKeyVisible(!isKeyVisible)}
                   >
-                    {isKeyVisible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    {isKeyVisible ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
                   </Button>
                   <Button
                     variant="outline"
@@ -554,10 +591,12 @@ export default function ApiKeysPage() {
             </div>
           )}
           <DialogFooter>
-            <Button onClick={() => setNewApiKey(null)}>I've Saved My Key</Button>
+            <Button onClick={() => setNewApiKey(null)}>
+              I've Saved My Key
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </DashboardSidebar>
-  )
+  );
 }

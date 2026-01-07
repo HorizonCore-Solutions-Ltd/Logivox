@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
@@ -130,7 +136,9 @@ export default function GRNDetailPage() {
   const [grn, setGRN] = useState<GRN | null>(null);
   const [qcDialogOpen, setQcDialogOpen] = useState(false);
   const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
-  const [qcOverallStatus, setQcOverallStatus] = useState<"PASS" | "FAIL" | "PARTIAL">("PASS");
+  const [qcOverallStatus, setQcOverallStatus] = useState<
+    "PASS" | "FAIL" | "PARTIAL"
+  >("PASS");
   const [qcNotes, setQcNotes] = useState("");
   const [qcItems, setQcItems] = useState<QCItemData[]>([]);
 
@@ -147,7 +155,7 @@ export default function GRNDetailPage() {
       if (response.ok) {
         const data = await response.json();
         setGRN(data);
-        
+
         // Initialize QC items data
         setQcItems(
           data.items.map((item: GRNItem) => ({
@@ -156,7 +164,7 @@ export default function GRNDetailPage() {
             rejectedQuantity: item.rejectedQuantity ?? 0,
             hasDefects: item.hasDefects,
             defectDescription: item.defectDescription || "",
-          }))
+          })),
         );
       } else {
         toast({
@@ -250,11 +258,15 @@ export default function GRNDetailPage() {
     }
   };
 
-  const updateQCItem = (itemId: string, field: keyof QCItemData, value: any) => {
+  const updateQCItem = (
+    itemId: string,
+    field: keyof QCItemData,
+    value: any,
+  ) => {
     setQcItems((prev) =>
       prev.map((item) =>
-        item.itemId === itemId ? { ...item, [field]: value } : item
-      )
+        item.itemId === itemId ? { ...item, [field]: value } : item,
+      ),
     );
   };
 
@@ -278,7 +290,9 @@ export default function GRNDetailPage() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center h-64">Loading...</div>
+    );
   }
 
   if (!grn) {
@@ -294,10 +308,10 @@ export default function GRNDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{grn.grnNumber}</h1>
-            <p className="text-muted-foreground">
-              Goods Receipt Note Details
-            </p>
+            <h1 className="text-3xl font-bold tracking-tight">
+              {grn.grnNumber}
+            </h1>
+            <p className="text-muted-foreground">Goods Receipt Note Details</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -363,8 +377,8 @@ export default function GRNDetailPage() {
                   grn.qcStatus === "PASS"
                     ? "bg-green-100 text-green-800"
                     : grn.qcStatus === "FAIL"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-yellow-100 text-yellow-800"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-yellow-100 text-yellow-800"
                 }
               >
                 {grn.qcStatus}
@@ -393,7 +407,9 @@ export default function GRNDetailPage() {
             </div>
             <div>
               <Label className="text-muted-foreground">Supplier</Label>
-              <div className="font-medium">{grn.purchaseOrder.supplier.name}</div>
+              <div className="font-medium">
+                {grn.purchaseOrder.supplier.name}
+              </div>
               <div className="text-sm text-muted-foreground">
                 {grn.purchaseOrder.supplier.code}
               </div>
@@ -444,9 +460,7 @@ export default function GRNDetailPage() {
                 <Label className="text-muted-foreground">QC Performed By</Label>
                 <div className="font-medium">{grn.qcBy.name}</div>
                 <div className="text-sm text-muted-foreground">
-                  {grn.qcDate
-                    ? new Date(grn.qcDate).toLocaleDateString()
-                    : ""}
+                  {grn.qcDate ? new Date(grn.qcDate).toLocaleDateString() : ""}
                 </div>
               </div>
             )}
@@ -545,8 +559,8 @@ export default function GRNDetailPage() {
                           item.qcStatus === "PASS"
                             ? "bg-green-100 text-green-800"
                             : item.qcStatus === "FAIL"
-                            ? "bg-red-100 text-red-800"
-                            : "bg-yellow-100 text-yellow-800"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-yellow-100 text-yellow-800"
                         }
                       >
                         {item.qcStatus}
@@ -621,7 +635,7 @@ export default function GRNDetailPage() {
                             updateQCItem(
                               item.id,
                               "acceptedQuantity",
-                              parseInt(e.target.value) || 0
+                              parseInt(e.target.value) || 0,
                             )
                           }
                           max={item.receivedQuantity}
@@ -636,7 +650,7 @@ export default function GRNDetailPage() {
                             updateQCItem(
                               item.id,
                               "rejectedQuantity",
-                              parseInt(e.target.value) || 0
+                              parseInt(e.target.value) || 0,
                             )
                           }
                           max={item.receivedQuantity}
@@ -647,8 +661,16 @@ export default function GRNDetailPage() {
                         <Textarea
                           value={qcItem.defectDescription}
                           onChange={(e) => {
-                            updateQCItem(item.id, "defectDescription", e.target.value);
-                            updateQCItem(item.id, "hasDefects", e.target.value.length > 0);
+                            updateQCItem(
+                              item.id,
+                              "defectDescription",
+                              e.target.value,
+                            );
+                            updateQCItem(
+                              item.id,
+                              "hasDefects",
+                              e.target.value.length > 0,
+                            );
                           }}
                           placeholder="Describe any defects found..."
                           rows={2}
@@ -674,13 +696,16 @@ export default function GRNDetailPage() {
       </Dialog>
 
       {/* Complete Confirmation Dialog */}
-      <AlertDialog open={completeDialogOpen} onOpenChange={setCompleteDialogOpen}>
+      <AlertDialog
+        open={completeDialogOpen}
+        onOpenChange={setCompleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Complete GRN?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will update inventory quantities and mark the GRN as completed.
-              This action cannot be undone.
+              This will update inventory quantities and mark the GRN as
+              completed. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

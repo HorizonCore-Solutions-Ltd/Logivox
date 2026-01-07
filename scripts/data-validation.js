@@ -2,16 +2,16 @@
 
 /**
  * FlowStock WMS - Data Validation and Cleanup Tool
- * 
+ *
  * Validates data integrity and performs cleanup operations.
- * 
+ *
  * Usage:
  *   node scripts/data-validation.js --check all
  *   node scripts/data-validation.js --check inventory
  *   node scripts/data-validation.js --fix orphaned-records
  */
 
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const issues = {
@@ -26,7 +26,7 @@ const issues = {
 async function validate(options) {
   const { check, fix } = options;
 
-  console.log('\n🔍 FlowStock WMS Data Validation Tool\n');
+  console.log("\n🔍 FlowStock WMS Data Validation Tool\n");
 
   try {
     if (check) {
@@ -39,7 +39,6 @@ async function validate(options) {
 
     // Display summary
     displaySummary();
-
   } catch (error) {
     console.error(`\n❌ Validation failed: ${error.message}`);
     process.exit(1);
@@ -55,7 +54,7 @@ async function runChecks(checkType) {
   console.log(`Running checks: ${checkType}\n`);
 
   switch (checkType) {
-    case 'all':
+    case "all":
       await checkProducts();
       await checkInventory();
       await checkOrders();
@@ -64,25 +63,25 @@ async function runChecks(checkType) {
       await checkOrphanedRecords();
       await checkDataIntegrity();
       break;
-    case 'products':
+    case "products":
       await checkProducts();
       break;
-    case 'inventory':
+    case "inventory":
       await checkInventory();
       break;
-    case 'orders':
+    case "orders":
       await checkOrders();
       break;
-    case 'customers':
+    case "customers":
       await checkCustomers();
       break;
-    case 'locations':
+    case "locations":
       await checkLocations();
       break;
-    case 'orphaned':
+    case "orphaned":
       await checkOrphanedRecords();
       break;
-    case 'integrity':
+    case "integrity":
       await checkDataIntegrity();
       break;
     default:
@@ -95,7 +94,7 @@ async function runChecks(checkType) {
  * Check Products
  */
 async function checkProducts() {
-  console.log('📦 Checking Products...\n');
+  console.log("📦 Checking Products...\n");
 
   // Check for duplicate SKUs
   const duplicateSkus = await prisma.$queryRaw`
@@ -107,9 +106,9 @@ async function checkProducts() {
 
   if (duplicateSkus.length > 0) {
     issues.critical.push({
-      type: 'Duplicate SKUs',
+      type: "Duplicate SKUs",
       count: duplicateSkus.length,
-      details: duplicateSkus.map(d => `${d.sku} (${d.count} occurrences)`),
+      details: duplicateSkus.map((d) => `${d.sku} (${d.count} occurrences)`),
     });
   }
 
@@ -120,7 +119,7 @@ async function checkProducts() {
 
   if (noSku > 0) {
     issues.critical.push({
-      type: 'Products without SKU',
+      type: "Products without SKU",
       count: noSku,
     });
   }
@@ -128,16 +127,13 @@ async function checkProducts() {
   // Check for products with negative prices
   const negativePrices = await prisma.product.count({
     where: {
-      OR: [
-        { unitCost: { lt: 0 } },
-        { sellingPrice: { lt: 0 } },
-      ],
+      OR: [{ unitCost: { lt: 0 } }, { sellingPrice: { lt: 0 } }],
     },
   });
 
   if (negativePrices > 0) {
     issues.warnings.push({
-      type: 'Products with negative prices',
+      type: "Products with negative prices",
       count: negativePrices,
     });
   }
@@ -151,19 +147,19 @@ async function checkProducts() {
 
   if (belowCost > 0) {
     issues.warnings.push({
-      type: 'Products selling below cost',
+      type: "Products selling below cost",
       count: belowCost,
     });
   }
 
-  console.log('✅ Product checks complete\n');
+  console.log("✅ Product checks complete\n");
 }
 
 /**
  * Check Inventory
  */
 async function checkInventory() {
-  console.log('📊 Checking Inventory...\n');
+  console.log("📊 Checking Inventory...\n");
 
   // Check for negative stock levels
   const negativeStock = await prisma.inventoryLevel.count({
@@ -172,7 +168,7 @@ async function checkInventory() {
 
   if (negativeStock > 0) {
     issues.critical.push({
-      type: 'Negative stock levels',
+      type: "Negative stock levels",
       count: negativeStock,
     });
   }
@@ -186,7 +182,7 @@ async function checkInventory() {
 
   if (invalidReservations > 0) {
     issues.critical.push({
-      type: 'Reserved quantity exceeds available',
+      type: "Reserved quantity exceeds available",
       count: invalidReservations,
     });
   }
@@ -200,7 +196,7 @@ async function checkInventory() {
 
   if (orphanedTransactions > 0) {
     issues.warnings.push({
-      type: 'Orphaned inventory transactions',
+      type: "Orphaned inventory transactions",
       count: orphanedTransactions,
     });
   }
@@ -233,22 +229,23 @@ async function checkInventory() {
 
   if (mismatchedLevels.length > 0) {
     issues.warnings.push({
-      type: 'Inventory levels not matching transactions',
+      type: "Inventory levels not matching transactions",
       count: mismatchedLevels.length,
-      details: mismatchedLevels.map(m => 
-        `Product ${m.product_id}: Current=${m.current_quantity}, Calculated=${m.calculated_quantity}`
+      details: mismatchedLevels.map(
+        (m) =>
+          `Product ${m.product_id}: Current=${m.current_quantity}, Calculated=${m.calculated_quantity}`,
       ),
     });
   }
 
-  console.log('✅ Inventory checks complete\n');
+  console.log("✅ Inventory checks complete\n");
 }
 
 /**
  * Check Orders
  */
 async function checkOrders() {
-  console.log('📋 Checking Orders...\n');
+  console.log("📋 Checking Orders...\n");
 
   // Check for orders without customers
   const noCustomer = await prisma.salesOrder.count({
@@ -257,7 +254,7 @@ async function checkOrders() {
 
   if (noCustomer > 0) {
     issues.critical.push({
-      type: 'Orders without customer',
+      type: "Orders without customer",
       count: noCustomer,
     });
   }
@@ -266,14 +263,22 @@ async function checkOrders() {
   const invalidStatuses = await prisma.salesOrder.count({
     where: {
       status: {
-        notIn: ['PENDING', 'CONFIRMED', 'PICKED', 'PACKED', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
+        notIn: [
+          "PENDING",
+          "CONFIRMED",
+          "PICKED",
+          "PACKED",
+          "SHIPPED",
+          "DELIVERED",
+          "CANCELLED",
+        ],
       },
     },
   });
 
   if (invalidStatuses > 0) {
     issues.warnings.push({
-      type: 'Orders with invalid status',
+      type: "Orders with invalid status",
       count: invalidStatuses,
     });
   }
@@ -289,7 +294,7 @@ async function checkOrders() {
 
   if (noLineItems > 0) {
     issues.warnings.push({
-      type: 'Orders without line items',
+      type: "Orders without line items",
       count: noLineItems,
     });
   }
@@ -297,26 +302,26 @@ async function checkOrders() {
   // Check for shipped orders without tracking numbers
   const noTracking = await prisma.salesOrder.count({
     where: {
-      status: 'SHIPPED',
+      status: "SHIPPED",
       trackingNumber: null,
     },
   });
 
   if (noTracking > 0) {
     issues.warnings.push({
-      type: 'Shipped orders without tracking numbers',
+      type: "Shipped orders without tracking numbers",
       count: noTracking,
     });
   }
 
-  console.log('✅ Order checks complete\n');
+  console.log("✅ Order checks complete\n");
 }
 
 /**
  * Check Customers
  */
 async function checkCustomers() {
-  console.log('👥 Checking Customers...\n');
+  console.log("👥 Checking Customers...\n");
 
   // Check for duplicate emails
   const duplicateEmails = await prisma.$queryRaw`
@@ -328,9 +333,11 @@ async function checkCustomers() {
 
   if (duplicateEmails.length > 0) {
     issues.critical.push({
-      type: 'Duplicate customer emails',
+      type: "Duplicate customer emails",
       count: duplicateEmails.length,
-      details: duplicateEmails.map(d => `${d.email} (${d.count} occurrences)`),
+      details: duplicateEmails.map(
+        (d) => `${d.email} (${d.count} occurrences)`,
+      ),
     });
   }
 
@@ -341,7 +348,7 @@ async function checkCustomers() {
 
   if (noEmail > 0) {
     issues.critical.push({
-      type: 'Customers without email',
+      type: "Customers without email",
       count: noEmail,
     });
   }
@@ -351,7 +358,7 @@ async function checkCustomers() {
     where: {
       email: {
         not: {
-          contains: '@',
+          contains: "@",
         },
       },
     },
@@ -359,19 +366,19 @@ async function checkCustomers() {
 
   if (invalidEmails > 0) {
     issues.warnings.push({
-      type: 'Customers with invalid email format',
+      type: "Customers with invalid email format",
       count: invalidEmails,
     });
   }
 
-  console.log('✅ Customer checks complete\n');
+  console.log("✅ Customer checks complete\n");
 }
 
 /**
  * Check Locations
  */
 async function checkLocations() {
-  console.log('📍 Checking Locations...\n');
+  console.log("📍 Checking Locations...\n");
 
   // Check for duplicate location codes in same warehouse
   const duplicateLocations = await prisma.$queryRaw`
@@ -383,10 +390,11 @@ async function checkLocations() {
 
   if (duplicateLocations.length > 0) {
     issues.critical.push({
-      type: 'Duplicate location codes',
+      type: "Duplicate location codes",
       count: duplicateLocations.length,
-      details: duplicateLocations.map(d => 
-        `Warehouse ${d.warehouse_id}, Location ${d.location_code} (${d.count} occurrences)`
+      details: duplicateLocations.map(
+        (d) =>
+          `Warehouse ${d.warehouse_id}, Location ${d.location_code} (${d.count} occurrences)`,
       ),
     });
   }
@@ -398,19 +406,19 @@ async function checkLocations() {
 
   if (noWarehouse > 0) {
     issues.critical.push({
-      type: 'Locations without warehouse',
+      type: "Locations without warehouse",
       count: noWarehouse,
     });
   }
 
-  console.log('✅ Location checks complete\n');
+  console.log("✅ Location checks complete\n");
 }
 
 /**
  * Check for orphaned records
  */
 async function checkOrphanedRecords() {
-  console.log('🔗 Checking for orphaned records...\n');
+  console.log("🔗 Checking for orphaned records...\n");
 
   // Orphaned order line items
   const orphanedLineItems = await prisma.orderLineItem.count({
@@ -421,19 +429,19 @@ async function checkOrphanedRecords() {
 
   if (orphanedLineItems > 0) {
     issues.warnings.push({
-      type: 'Orphaned order line items',
+      type: "Orphaned order line items",
       count: orphanedLineItems,
     });
   }
 
-  console.log('✅ Orphaned record checks complete\n');
+  console.log("✅ Orphaned record checks complete\n");
 }
 
 /**
  * Check data integrity (foreign keys, constraints)
  */
 async function checkDataIntegrity() {
-  console.log('🔒 Checking data integrity...\n');
+  console.log("🔒 Checking data integrity...\n");
 
   // This would include checks for:
   // - Foreign key violations
@@ -441,7 +449,7 @@ async function checkDataIntegrity() {
   // - Check constraint violations
   // - Data type consistency
 
-  console.log('✅ Data integrity checks complete\n');
+  console.log("✅ Data integrity checks complete\n");
 }
 
 /**
@@ -451,13 +459,13 @@ async function runFixes(fixType) {
   console.log(`\n🔧 Running fixes: ${fixType}\n`);
 
   switch (fixType) {
-    case 'orphaned-records':
+    case "orphaned-records":
       await fixOrphanedRecords();
       break;
-    case 'negative-stock':
+    case "negative-stock":
       await fixNegativeStock();
       break;
-    case 'invalid-reservations':
+    case "invalid-reservations":
       await fixInvalidReservations();
       break;
     default:
@@ -470,7 +478,7 @@ async function runFixes(fixType) {
  * Fix orphaned records
  */
 async function fixOrphanedRecords() {
-  console.log('Removing orphaned records...\n');
+  console.log("Removing orphaned records...\n");
 
   // Delete orphaned order line items
   const deletedLineItems = await prisma.orderLineItem.deleteMany({
@@ -479,7 +487,9 @@ async function fixOrphanedRecords() {
     },
   });
 
-  console.log(`✅ Deleted ${deletedLineItems.count} orphaned order line items\n`);
+  console.log(
+    `✅ Deleted ${deletedLineItems.count} orphaned order line items\n`,
+  );
 
   // Delete orphaned inventory transactions
   const deletedTransactions = await prisma.inventoryTransaction.deleteMany({
@@ -488,14 +498,16 @@ async function fixOrphanedRecords() {
     },
   });
 
-  console.log(`✅ Deleted ${deletedTransactions.count} orphaned inventory transactions\n`);
+  console.log(
+    `✅ Deleted ${deletedTransactions.count} orphaned inventory transactions\n`,
+  );
 }
 
 /**
  * Fix negative stock levels
  */
 async function fixNegativeStock() {
-  console.log('Fixing negative stock levels...\n');
+  console.log("Fixing negative stock levels...\n");
 
   const negativeStock = await prisma.inventoryLevel.findMany({
     where: { quantity: { lt: 0 } },
@@ -512,9 +524,9 @@ async function fixNegativeStock() {
       data: {
         productId: level.productId,
         warehouseId: level.warehouseId,
-        type: 'ADJUSTMENT',
+        type: "ADJUSTMENT",
         quantity: Math.abs(level.quantity),
-        reason: 'AUTO_FIX',
+        reason: "AUTO_FIX",
         notes: `Fixed negative stock level: ${level.quantity} → 0`,
       },
     });
@@ -527,7 +539,7 @@ async function fixNegativeStock() {
  * Fix invalid reservations
  */
 async function fixInvalidReservations() {
-  console.log('Fixing invalid reservations...\n');
+  console.log("Fixing invalid reservations...\n");
 
   const invalidReservations = await prisma.inventoryLevel.findMany({
     where: {
@@ -549,21 +561,23 @@ async function fixInvalidReservations() {
  * Display summary
  */
 function displaySummary() {
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 Validation Summary');
-  console.log('='.repeat(60));
+  console.log("\n" + "=".repeat(60));
+  console.log("📊 Validation Summary");
+  console.log("=".repeat(60));
 
   if (issues.critical.length === 0 && issues.warnings.length === 0) {
-    console.log('✅ No issues found! Database is healthy.\n');
+    console.log("✅ No issues found! Database is healthy.\n");
     return;
   }
 
   if (issues.critical.length > 0) {
-    console.log('\n🚨 CRITICAL ISSUES:\n');
+    console.log("\n🚨 CRITICAL ISSUES:\n");
     issues.critical.forEach((issue, index) => {
       console.log(`${index + 1}. ${issue.type}: ${issue.count} records`);
       if (issue.details) {
-        issue.details.slice(0, 5).forEach(detail => console.log(`   - ${detail}`));
+        issue.details
+          .slice(0, 5)
+          .forEach((detail) => console.log(`   - ${detail}`));
         if (issue.details.length > 5) {
           console.log(`   ... and ${issue.details.length - 5} more`);
         }
@@ -572,11 +586,13 @@ function displaySummary() {
   }
 
   if (issues.warnings.length > 0) {
-    console.log('\n⚠️  WARNINGS:\n');
+    console.log("\n⚠️  WARNINGS:\n");
     issues.warnings.forEach((issue, index) => {
       console.log(`${index + 1}. ${issue.type}: ${issue.count} records`);
       if (issue.details) {
-        issue.details.slice(0, 5).forEach(detail => console.log(`   - ${detail}`));
+        issue.details
+          .slice(0, 5)
+          .forEach((detail) => console.log(`   - ${detail}`));
         if (issue.details.length > 5) {
           console.log(`   ... and ${issue.details.length - 5} more`);
         }
@@ -584,7 +600,7 @@ function displaySummary() {
     });
   }
 
-  console.log('\n' + '='.repeat(60) + '\n');
+  console.log("\n" + "=".repeat(60) + "\n");
 }
 
 /**
@@ -595,13 +611,13 @@ function parseArgs() {
   const options = {};
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--check' && args[i + 1]) {
+    if (args[i] === "--check" && args[i + 1]) {
       options.check = args[i + 1];
       i++;
-    } else if (args[i] === '--fix' && args[i + 1]) {
+    } else if (args[i] === "--fix" && args[i + 1]) {
       options.fix = args[i + 1];
       i++;
-    } else if (args[i] === '--help' || args[i] === '-h') {
+    } else if (args[i] === "--help" || args[i] === "-h") {
       displayHelp();
       process.exit(0);
     }
@@ -653,7 +669,7 @@ if (require.main === module) {
   const options = parseArgs();
 
   if (!options.check && !options.fix) {
-    console.error('❌ Error: --check or --fix argument is required.\n');
+    console.error("❌ Error: --check or --fix argument is required.\n");
     displayHelp();
     process.exit(1);
   }

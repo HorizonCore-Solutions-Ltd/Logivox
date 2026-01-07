@@ -1,16 +1,16 @@
-export const dynamic = 'force-dynamic';
-import { NextResponse } from "next/server"
-import { getCurrentUser } from "@/lib/auth-helpers"
-import { prisma } from "@/lib/prisma"
+export const dynamic = "force-dynamic";
+import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth-helpers";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const warehouse = await prisma.warehouse.findUnique({
@@ -24,43 +24,43 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
     if (!warehouse) {
       return NextResponse.json(
         { message: "Warehouse not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json(warehouse)
+    return NextResponse.json(warehouse);
   } catch (error) {
-    console.error("Error fetching warehouse:", error)
+    console.error("Error fetching warehouse:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json()
-    const { name, location, description } = body
+    const body = await request.json();
+    const { name, location, description } = body;
 
     if (!name) {
       return NextResponse.json(
         { message: "Name is required" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     const warehouse = await prisma.warehouse.update({
@@ -72,7 +72,7 @@ export async function PUT(
         location,
         description,
       },
-    })
+    });
 
     // Log activity
     await prisma.activityLog.create({
@@ -85,26 +85,26 @@ export async function PUT(
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
       },
-    })
+    });
 
-    return NextResponse.json(warehouse)
+    return NextResponse.json(warehouse);
   } catch (error) {
-    console.error("Error updating warehouse:", error)
+    console.error("Error updating warehouse:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Check if warehouse has inventory items
@@ -112,22 +112,22 @@ export async function DELETE(
       where: {
         warehouseId: params.id,
       },
-    })
+    });
 
     if (itemCount > 0) {
       return NextResponse.json(
         {
           message: `Cannot delete warehouse with ${itemCount} inventory items. Please move or delete the items first.`,
         },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     const warehouse = await prisma.warehouse.delete({
       where: {
         id: params.id,
       },
-    })
+    });
 
     // Log activity
     await prisma.activityLog.create({
@@ -140,14 +140,14 @@ export async function DELETE(
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
       },
-    })
+    });
 
-    return NextResponse.json({ message: "Warehouse deleted successfully" })
+    return NextResponse.json({ message: "Warehouse deleted successfully" });
   } catch (error) {
-    console.error("Error deleting warehouse:", error)
+    console.error("Error deleting warehouse:", error);
     return NextResponse.json(
       { message: "Internal server error" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -14,19 +14,40 @@ const updateIntegrationSchema = z.object({
   webhookSecret: z.string().optional(),
   features: z.record(z.any()).optional(),
   syncDirection: z.enum(["IMPORT", "EXPORT", "BIDIRECTIONAL"]).optional(),
-  syncFrequency: z.enum([
-    "REALTIME", "EVERY_5_MINUTES", "EVERY_15_MINUTES", "EVERY_30_MINUTES",
-    "HOURLY", "EVERY_6_HOURS", "DAILY", "WEEKLY", "MANUAL"
-  ]).optional(),
+  syncFrequency: z
+    .enum([
+      "REALTIME",
+      "EVERY_5_MINUTES",
+      "EVERY_15_MINUTES",
+      "EVERY_30_MINUTES",
+      "HOURLY",
+      "EVERY_6_HOURS",
+      "DAILY",
+      "WEEKLY",
+      "MANUAL",
+    ])
+    .optional(),
   autoSync: z.boolean().optional(),
   fieldMappings: z.record(z.any()).optional(),
   defaultMappings: z.record(z.any()).optional(),
   rateLimitPerMinute: z.number().optional(),
   rateLimitPerHour: z.number().optional(),
   rateLimitPerDay: z.number().optional(),
-  status: z.enum(["ACTIVE", "INACTIVE", "ERROR", "CONFIGURING", "TESTING", "PAUSED", "ARCHIVED"]).optional(),
+  status: z
+    .enum([
+      "ACTIVE",
+      "INACTIVE",
+      "ERROR",
+      "CONFIGURING",
+      "TESTING",
+      "PAUSED",
+      "ARCHIVED",
+    ])
+    .optional(),
   isActive: z.boolean().optional(),
-  healthStatus: z.enum(["HEALTHY", "DEGRADED", "UNHEALTHY", "UNKNOWN"]).optional(),
+  healthStatus: z
+    .enum(["HEALTHY", "DEGRADED", "UNHEALTHY", "UNKNOWN"])
+    .optional(),
   version: z.string().optional(),
   apiVersion: z.string().optional(),
   tags: z.array(z.string()).optional(),
@@ -36,7 +57,7 @@ const updateIntegrationSchema = z.object({
 // GET /api/integrations/[id] - Get integration details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -116,7 +137,7 @@ export async function GET(
     if (!integration) {
       return NextResponse.json(
         { error: "Integration not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -125,7 +146,7 @@ export async function GET(
     console.error("Error fetching integration:", error);
     return NextResponse.json(
       { error: "Failed to fetch integration" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -133,7 +154,7 @@ export async function GET(
 // PATCH /api/integrations/[id] - Update integration
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -166,13 +187,13 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating integration:", error);
     return NextResponse.json(
       { error: "Failed to update integration" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -180,7 +201,7 @@ export async function PATCH(
 // DELETE /api/integrations/[id] - Delete integration
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -198,8 +219,11 @@ export async function DELETE(
 
     if (activeSyncs > 0) {
       return NextResponse.json(
-        { error: "Cannot delete integration with active syncs. Please cancel or complete them first." },
-        { status: 400 }
+        {
+          error:
+            "Cannot delete integration with active syncs. Please cancel or complete them first.",
+        },
+        { status: 400 },
       );
     }
 
@@ -212,7 +236,7 @@ export async function DELETE(
     console.error("Error deleting integration:", error);
     return NextResponse.json(
       { error: "Failed to delete integration" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

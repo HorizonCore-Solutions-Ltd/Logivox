@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -16,7 +16,7 @@ const createPickListSchema = z.object({
 // POST /api/sales-orders/[id]/create-pick-list - Create a pick list for a sales order
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -28,7 +28,10 @@ export async function POST(
     const userId = session.user.id;
 
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const existingSO = await prisma.salesOrder.findFirst({
@@ -46,13 +49,16 @@ export async function POST(
     });
 
     if (!existingSO) {
-      return NextResponse.json({ error: "Sales order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Sales order not found" },
+        { status: 404 },
+      );
     }
 
     if (existingSO.status !== "APPROVED") {
       return NextResponse.json(
         { error: "Sales order must be APPROVED to create a pick list" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -79,76 +85,78 @@ export async function POST(
     }
     const pickListNumber = `${prefix}-${sequence.toString().padStart(3, "0")}`;
 
-    const pickList = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Create pick list with items
-      const pl = await tx.pickList.create({
-        data: {
-          organizationId,
-          pickListNumber,
-          salesOrderId: existingSO.id,
-          warehouseId: validatedData.warehouseId,
-          status: "PENDING",
-          priority: validatedData.priority || existingSO.priority || 0,
-          assignedToId: validatedData.assignedToId,
-          assignedDate: validatedData.assignedToId ? new Date() : null,
-          notes: validatedData.notes,
-          createdById: userId,
-          items: {
-            create: existingSO.items.map((soItem: any) => ({
-              salesOrderItemId: soItem.id,
-              inventoryItemId: soItem.inventoryItemId,
-              quantityToPick: soItem.quantity - soItem.quantityPicked,
-              quantityPicked: 0,
-              binLocation: soItem.binLocation,
-              batchNumber: soItem.batchNumber,
-            })),
-          },
-        },
-        include: {
-          items: {
-            include: {
-              inventoryItem: true,
-              salesOrderItem: true,
+    const pickList = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        // Create pick list with items
+        const pl = await tx.pickList.create({
+          data: {
+            organizationId,
+            pickListNumber,
+            salesOrderId: existingSO.id,
+            warehouseId: validatedData.warehouseId,
+            status: "PENDING",
+            priority: validatedData.priority || existingSO.priority || 0,
+            assignedToId: validatedData.assignedToId,
+            assignedDate: validatedData.assignedToId ? new Date() : null,
+            notes: validatedData.notes,
+            createdById: userId,
+            items: {
+              create: existingSO.items.map((soItem: any) => ({
+                salesOrderItemId: soItem.id,
+                inventoryItemId: soItem.inventoryItemId,
+                quantityToPick: soItem.quantity - soItem.quantityPicked,
+                quantityPicked: 0,
+                binLocation: soItem.binLocation,
+                batchNumber: soItem.batchNumber,
+              })),
             },
           },
-          assignedTo: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
+          include: {
+            items: {
+              include: {
+                inventoryItem: true,
+                salesOrderItem: true,
+              },
+            },
+            assignedTo: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+              },
+            },
+            warehouse: true,
+            salesOrder: true,
+          },
+        });
+
+        // Update sales order status to PICKING
+        await tx.salesOrder.update({
+          where: { id: existingSO.id },
+          data: {
+            status: "PICKING",
+          },
+        });
+
+        // Log activity
+        await tx.activityLog.create({
+          data: {
+            organizationId,
+            userId,
+            action: "PICK_LIST_CREATED",
+            entityType: "PickList",
+            entityId: pl.id,
+            metadata: {
+              pickListNumber: pl.pickListNumber,
+              soNumber: existingSO.soNumber,
+              itemCount: existingSO.items.length,
             },
           },
-          warehouse: true,
-          salesOrder: true,
-        },
-      });
+        });
 
-      // Update sales order status to PICKING
-      await tx.salesOrder.update({
-        where: { id: existingSO.id },
-        data: {
-          status: "PICKING",
-        },
-      });
-
-      // Log activity
-      await tx.activityLog.create({
-        data: {
-          organizationId,
-          userId,
-          action: "PICK_LIST_CREATED",
-          entityType: "PickList",
-          entityId: pl.id,
-          metadata: {
-            pickListNumber: pl.pickListNumber,
-            soNumber: existingSO.soNumber,
-            itemCount: existingSO.items.length,
-          },
-        },
-      });
-
-      return pl;
-    });
+        return pl;
+      },
+    );
 
     return NextResponse.json(pickList, { status: 201 });
   } catch (error) {
@@ -158,7 +166,7 @@ export async function POST(
     console.error("Error creating pick list:", error);
     return NextResponse.json(
       { error: "Failed to create pick list" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -3,14 +3,19 @@
  * Intelligently matches inbound receipts to outbound shipments
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 interface MatchingCriteria {
   appointmentId?: string;
   organizationId: string;
   warehouseId?: string;
   receiptId?: string;
-  strategy?: 'FIFO' | 'LIFO' | 'CLOSEST_DUE_DATE' | 'PRIORITY' | 'CUSTOMER_PRIORITY';
+  strategy?:
+    | "FIFO"
+    | "LIFO"
+    | "CLOSEST_DUE_DATE"
+    | "PRIORITY"
+    | "CUSTOMER_PRIORITY";
 }
 
 interface MatchResult {
@@ -28,9 +33,15 @@ interface MatchResult {
  * Auto-match inbound receipts to outbound shipments
  */
 export async function autoMatchReceiptsToShipments(
-  criteria: MatchingCriteria
+  criteria: MatchingCriteria,
 ): Promise<MatchResult> {
-  const { appointmentId, organizationId, warehouseId, receiptId, strategy = 'FIFO' } = criteria;
+  const {
+    appointmentId,
+    organizationId,
+    warehouseId,
+    receiptId,
+    strategy = "FIFO",
+  } = criteria;
 
   // Get available receipt items (not fully allocated)
   const receiptItemsQuery: any = {
@@ -56,7 +67,7 @@ export async function autoMatchReceiptsToShipments(
       },
       inventory: true,
     },
-    orderBy: { receivedAt: strategy === 'LIFO' ? 'desc' : 'asc' },
+    orderBy: { receivedAt: strategy === "LIFO" ? "desc" : "asc" },
   });
 
   if (receiptItems.length === 0) {
@@ -72,7 +83,7 @@ export async function autoMatchReceiptsToShipments(
   // Get pending outbound shipments
   const shipmentsQuery: any = {
     organizationId,
-    status: { in: ['PLANNED', 'PICKING'] },
+    status: { in: ["PLANNED", "PICKING"] },
   };
 
   if (appointmentId) {
@@ -119,14 +130,14 @@ export async function autoMatchReceiptsToShipments(
 
       // Check if sales order has this SKU
       const hasMatchingSKU = shipment.salesOrder.items.some(
-        (soItem) => soItem.inventoryItem.sku === receiptItem.sku
+        (soItem) => soItem.inventoryItem.sku === receiptItem.sku,
       );
 
       if (!hasMatchingSKU) return false;
 
       // Check if shipment needs more units
       const soItem = shipment.salesOrder.items.find(
-        (item) => item.inventoryItem.sku === receiptItem.sku
+        (item) => item.inventoryItem.sku === receiptItem.sku,
       );
 
       if (!soItem) return false;
@@ -152,7 +163,7 @@ export async function autoMatchReceiptsToShipments(
       if (remainingQty <= 0) break;
 
       const soItem = shipment.salesOrder!.items.find(
-        (item) => item.inventoryItem.sku === receiptItem.sku
+        (item) => item.inventoryItem.sku === receiptItem.sku,
       );
 
       if (!soItem) continue;
@@ -171,7 +182,7 @@ export async function autoMatchReceiptsToShipments(
             receiptItemId: receiptItem.id,
             shipmentId: shipment.id,
             quantityAllocated: allocateQty,
-            status: 'ALLOCATED',
+            status: "ALLOCATED",
           },
         });
 
@@ -264,11 +275,13 @@ export async function manualAllocate(input: {
   });
 
   if (!receiptItem) {
-    throw new Error('Receipt item not found');
+    throw new Error("Receipt item not found");
   }
 
   if (receiptItem.quantityRemaining < quantity) {
-    throw new Error(`Insufficient quantity. Available: ${receiptItem.quantityRemaining}`);
+    throw new Error(
+      `Insufficient quantity. Available: ${receiptItem.quantityRemaining}`,
+    );
   }
 
   // Validate shipment
@@ -277,7 +290,7 @@ export async function manualAllocate(input: {
   });
 
   if (!shipment) {
-    throw new Error('Shipment not found');
+    throw new Error("Shipment not found");
   }
 
   // Create allocation
@@ -288,7 +301,7 @@ export async function manualAllocate(input: {
       shipmentId,
       quantityAllocated: quantity,
       assignedTo: userId,
-      status: 'ALLOCATED',
+      status: "ALLOCATED",
     },
   });
 
@@ -325,11 +338,11 @@ export async function deallocate(allocationId: string) {
   });
 
   if (!allocation) {
-    throw new Error('Allocation not found');
+    throw new Error("Allocation not found");
   }
 
-  if (allocation.status === 'SHIPPED') {
-    throw new Error('Cannot deallocate shipped items');
+  if (allocation.status === "SHIPPED") {
+    throw new Error("Cannot deallocate shipped items");
   }
 
   // Restore receipt item quantities
@@ -398,7 +411,7 @@ export async function getAllocations(filters: {
         },
       },
     },
-    orderBy: { allocatedAt: 'desc' },
+    orderBy: { allocatedAt: "desc" },
   });
 }
 
@@ -407,33 +420,44 @@ export async function getAllocations(filters: {
  */
 function sortShipmentsByStrategy(shipments: any[], strategy: string) {
   switch (strategy) {
-    case 'FIFO':
-      return shipments.sort((a, b) => 
-        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    case "FIFO":
+      return shipments.sort(
+        (a, b) =>
+          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       );
-    
-    case 'LIFO':
-      return shipments.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+
+    case "LIFO":
+      return shipments.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
-    
-    case 'CLOSEST_DUE_DATE':
-      return shipments.sort((a, b) => 
-        new Date(a.targetShipDate).getTime() - new Date(b.targetShipDate).getTime()
+
+    case "CLOSEST_DUE_DATE":
+      return shipments.sort(
+        (a, b) =>
+          new Date(a.targetShipDate).getTime() -
+          new Date(b.targetShipDate).getTime(),
       );
-    
-    case 'PRIORITY':
-      const priorityOrder: Record<string, number> = { URGENT: 1, HIGH: 2, MEDIUM: 3, LOW: 4 };
+
+    case "PRIORITY":
+      const priorityOrder: Record<string, number> = {
+        URGENT: 1,
+        HIGH: 2,
+        MEDIUM: 3,
+        LOW: 4,
+      };
       return shipments.sort((a, b) => {
-        const aPriority = priorityOrder[a.appointment?.priority || 'MEDIUM'] || 3;
-        const bPriority = priorityOrder[b.appointment?.priority || 'MEDIUM'] || 3;
+        const aPriority =
+          priorityOrder[a.appointment?.priority || "MEDIUM"] || 3;
+        const bPriority =
+          priorityOrder[b.appointment?.priority || "MEDIUM"] || 3;
         return aPriority - bPriority;
       });
-    
-    case 'CUSTOMER_PRIORITY':
+
+    case "CUSTOMER_PRIORITY":
       // Could be enhanced with customer tiers/priority flags
       return shipments;
-    
+
     default:
       return shipments;
   }
@@ -443,9 +467,17 @@ function sortShipmentsByStrategy(shipments: any[], strategy: string) {
  * Get matching recommendations (preview without creating allocations)
  */
 export async function getMatchingRecommendations(criteria: MatchingCriteria) {
-  const { organizationId, appointmentId, receiptId, strategy = 'FIFO' } = criteria;
+  const {
+    organizationId,
+    appointmentId,
+    receiptId,
+    strategy = "FIFO",
+  } = criteria;
 
-  const receiptItemsQuery: any = { organizationId, quantityRemaining: { gt: 0 } };
+  const receiptItemsQuery: any = {
+    organizationId,
+    quantityRemaining: { gt: 0 },
+  };
   if (appointmentId) receiptItemsQuery.receipt = { appointmentId };
   if (receiptId) receiptItemsQuery.receiptId = receiptId;
 
@@ -459,7 +491,7 @@ export async function getMatchingRecommendations(criteria: MatchingCriteria) {
 
   const shipmentsQuery: any = {
     organizationId,
-    status: { in: ['PLANNED', 'PICKING'] },
+    status: { in: ["PLANNED", "PICKING"] },
   };
   if (appointmentId) shipmentsQuery.appointmentId = appointmentId;
 
@@ -486,13 +518,13 @@ export async function getMatchingRecommendations(criteria: MatchingCriteria) {
     const matchingShipments = shipments.filter((shipment) => {
       if (!shipment.salesOrder) return false;
       return shipment.salesOrder.items.some(
-        (soItem) => soItem.inventoryItem.sku === receiptItem.sku
+        (soItem) => soItem.inventoryItem.sku === receiptItem.sku,
       );
     });
 
     for (const shipment of matchingShipments) {
       const soItem = shipment.salesOrder!.items.find(
-        (item) => item.inventoryItem.sku === receiptItem.sku
+        (item) => item.inventoryItem.sku === receiptItem.sku,
       );
 
       if (!soItem) continue;

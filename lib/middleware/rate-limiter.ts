@@ -3,8 +3,8 @@
  * Protects against brute force attacks and API abuse
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { Redis } from '@upstash/redis';
+import { NextRequest, NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
 
 // Initialize Redis client for distributed rate limiting
 const redis = process.env.UPSTASH_REDIS_REST_URL
@@ -55,7 +55,7 @@ export const RateLimitPresets = {
   AUTH: {
     maxRequests: 5,
     windowSeconds: 900, // 15 minutes
-    message: 'Too many authentication attempts. Please try again later.',
+    message: "Too many authentication attempts. Please try again later.",
   },
 
   /**
@@ -65,7 +65,7 @@ export const RateLimitPresets = {
   API: {
     maxRequests: 100,
     windowSeconds: 60,
-    message: 'Too many requests. Please slow down.',
+    message: "Too many requests. Please slow down.",
   },
 
   /**
@@ -93,22 +93,25 @@ export const RateLimitPresets = {
   PASSWORD_RESET: {
     maxRequests: 3,
     windowSeconds: 3600, // 1 hour
-    message: 'Too many password reset attempts. Please try again later.',
+    message: "Too many password reset attempts. Please try again later.",
   },
 } as const;
 
 /**
  * Get client identifier from request
  */
-function getIdentifier(req: NextRequest, customIdentifier?: (req: NextRequest) => string): string {
+function getIdentifier(
+  req: NextRequest,
+  customIdentifier?: (req: NextRequest) => string,
+): string {
   if (customIdentifier) {
     return customIdentifier(req);
   }
 
   // Try to get IP from various headers (supporting proxies)
-  const forwarded = req.headers.get('x-forwarded-for');
-  const realIp = req.headers.get('x-real-ip');
-  const ip = forwarded?.split(',')[0] || realIp || 'unknown';
+  const forwarded = req.headers.get("x-forwarded-for");
+  const realIp = req.headers.get("x-real-ip");
+  const ip = forwarded?.split(",")[0] || realIp || "unknown";
 
   return ip;
 }
@@ -119,7 +122,7 @@ function getIdentifier(req: NextRequest, customIdentifier?: (req: NextRequest) =
 async function checkRateLimitRedis(
   key: string,
   maxRequests: number,
-  windowSeconds: number
+  windowSeconds: number,
 ): Promise<{ allowed: boolean; remaining: number; resetAt: number }> {
   const now = Date.now();
   const windowMs = windowSeconds * 1000;
@@ -128,13 +131,13 @@ async function checkRateLimitRedis(
   try {
     // Use Redis pipeline for atomic operations
     const pipeline = redis!.pipeline();
-    
+
     // Increment counter
     pipeline.incr(key);
-    
+
     // Set expiry on first request
     pipeline.expire(key, windowSeconds);
-    
+
     // Get current count
     pipeline.get(key);
 
@@ -146,7 +149,7 @@ async function checkRateLimitRedis(
 
     return { allowed, remaining, resetAt };
   } catch (error) {
-    console.error('Redis rate limit error:', error);
+    console.error("Redis rate limit error:", error);
     // Fail open - allow request if Redis is down
     return { allowed: true, remaining: maxRequests, resetAt };
   }
@@ -158,7 +161,7 @@ async function checkRateLimitRedis(
 function checkRateLimitMemory(
   key: string,
   maxRequests: number,
-  windowSeconds: number
+  windowSeconds: number,
 ): { allowed: boolean; remaining: number; resetAt: number } {
   const now = Date.now();
   const windowMs = windowSeconds * 1000;
@@ -185,7 +188,7 @@ function checkRateLimitMemory(
  */
 export async function rateLimit(
   req: NextRequest,
-  config: RateLimitConfig
+  config: RateLimitConfig,
 ): Promise<NextResponse | null> {
   const { maxRequests, windowSeconds, identifier, skip, message } = config;
 
@@ -205,9 +208,9 @@ export async function rateLimit(
 
   // Add rate limit headers
   const headers = {
-    'X-RateLimit-Limit': maxRequests.toString(),
-    'X-RateLimit-Remaining': result.remaining.toString(),
-    'X-RateLimit-Reset': new Date(result.resetAt).toISOString(),
+    "X-RateLimit-Limit": maxRequests.toString(),
+    "X-RateLimit-Remaining": result.remaining.toString(),
+    "X-RateLimit-Reset": new Date(result.resetAt).toISOString(),
   };
 
   // If limit exceeded, return 429
@@ -215,18 +218,18 @@ export async function rateLimit(
     return NextResponse.json(
       {
         success: false,
-        error: message || 'Too many requests. Please try again later.',
-        code: 'RATE_LIMIT_EXCEEDED',
+        error: message || "Too many requests. Please try again later.",
+        code: "RATE_LIMIT_EXCEEDED",
       },
       {
         status: 429,
         headers: {
           ...headers,
-          'Retry-After': Math.ceil(
-            (result.resetAt - Date.now()) / 1000
+          "Retry-After": Math.ceil(
+            (result.resetAt - Date.now()) / 1000,
           ).toString(),
         },
-      }
+      },
     );
   }
 
@@ -254,6 +257,6 @@ export function cleanupMemoryStore() {
 }
 
 // Auto-cleanup every 5 minutes in development
-if (!redis && process.env.NODE_ENV === 'development') {
+if (!redis && process.env.NODE_ENV === "development") {
   setInterval(cleanupMemoryStore, 5 * 60 * 1000);
 }

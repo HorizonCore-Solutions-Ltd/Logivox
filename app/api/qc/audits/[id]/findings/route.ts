@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import AuditService from '@/lib/services/audit.service';
+import { NextResponse } from "next/server";
+import AuditService from "@/lib/services/audit.service";
 
 /**
  * POST /api/qc/audits/[id]/findings
@@ -7,7 +7,7 @@ import AuditService from '@/lib/services/audit.service';
  */
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -21,19 +21,18 @@ export async function POST(
       evidence: body.evidence,
       requirement: body.requirement,
       responsiblePerson: body.responsiblePerson,
-      dueDate: body.dueDate ? new Date(body.dueDate) : undefined
+      dueDate: body.dueDate ? new Date(body.dueDate) : undefined,
     });
 
     return NextResponse.json({
       success: true,
-      data: finding
+      data: finding,
     });
-
   } catch (error: any) {
-    console.error('Add finding error:', error);
+    console.error("Add finding error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to add finding' },
-      { status: 500 }
+      { error: error.message || "Failed to add finding" },
+      { status: 500 },
     );
   }
 }

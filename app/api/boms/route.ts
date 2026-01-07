@@ -26,7 +26,9 @@ const createBOMSchema = z.object({
   version: z.string().default("1.0"),
   productId: z.string().min(1, "Product ID is required"),
   productQuantity: z.number().int().min(1).default(1),
-  bomType: z.enum(['ASSEMBLY', 'DISASSEMBLY', 'KIT', 'RECIPE', 'CONFIGURATION']).default('ASSEMBLY'),
+  bomType: z
+    .enum(["ASSEMBLY", "DISASSEMBLY", "KIT", "RECIPE", "CONFIGURATION"])
+    .default("ASSEMBLY"),
   isActive: z.boolean().default(true),
   isDefault: z.boolean().default(false),
   estimatedTime: z.number().int().optional(),
@@ -37,14 +39,16 @@ const createBOMSchema = z.object({
   effectiveFrom: z.string().optional(),
   effectiveTo: z.string().optional(),
   notes: z.string().optional(),
-  components: z.array(bomComponentSchema).min(1, "At least one component is required"),
+  components: z
+    .array(bomComponentSchema)
+    .min(1, "At least one component is required"),
 });
 
 // Helper function to generate BOM number
 async function generateBOMNumber(organizationId: string): Promise<string> {
   const today = new Date();
-  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-  
+  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
+
   const lastBOM = await prisma.billOfMaterials.findFirst({
     where: {
       organizationId,
@@ -52,16 +56,16 @@ async function generateBOMNumber(organizationId: string): Promise<string> {
         startsWith: `BOM-${dateStr}`,
       },
     },
-    orderBy: { bomNumber: 'desc' },
+    orderBy: { bomNumber: "desc" },
   });
 
   let sequence = 1;
   if (lastBOM) {
-    const lastSequence = parseInt(lastBOM.bomNumber.split('-')[2]);
+    const lastSequence = parseInt(lastBOM.bomNumber.split("-")[2]);
     sequence = lastSequence + 1;
   }
 
-  return `BOM-${dateStr}-${sequence.toString().padStart(3, '0')}`;
+  return `BOM-${dateStr}-${sequence.toString().padStart(3, "0")}`;
 }
 
 // GET /api/boms - List all BOMs
@@ -85,7 +89,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -130,7 +134,7 @@ export async function GET(request: Request) {
     console.error("Error fetching BOMs:", error);
     return NextResponse.json(
       { error: "Failed to fetch BOMs" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -159,7 +163,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -171,12 +175,13 @@ export async function POST(request: Request) {
     // Calculate total cost from components
     const totalComponentCost = validatedData.components.reduce(
       (sum, comp) => sum + (comp.unitCost || 0) * comp.quantity,
-      0
+      0,
     );
 
-    const totalCost = totalComponentCost + 
-                     (validatedData.laborCost || 0) + 
-                     (validatedData.overheadCost || 0);
+    const totalCost =
+      totalComponentCost +
+      (validatedData.laborCost || 0) +
+      (validatedData.overheadCost || 0);
 
     // Create BOM with components
     const bom = await prisma.billOfMaterials.create({
@@ -197,9 +202,13 @@ export async function POST(request: Request) {
         totalCost,
         standardYield: validatedData.standardYield,
         scrapRate: validatedData.scrapRate,
-        status: 'DRAFT',
-        effectiveFrom: validatedData.effectiveFrom ? new Date(validatedData.effectiveFrom) : new Date(),
-        effectiveTo: validatedData.effectiveTo ? new Date(validatedData.effectiveTo) : null,
+        status: "DRAFT",
+        effectiveFrom: validatedData.effectiveFrom
+          ? new Date(validatedData.effectiveFrom)
+          : new Date(),
+        effectiveTo: validatedData.effectiveTo
+          ? new Date(validatedData.effectiveTo)
+          : null,
         notes: validatedData.notes,
         components: {
           create: validatedData.components.map((comp) => ({
@@ -232,7 +241,7 @@ export async function POST(request: Request) {
               },
             },
           },
-          orderBy: { sequence: 'asc' },
+          orderBy: { sequence: "asc" },
         },
       },
     });
@@ -242,14 +251,14 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating BOM:", error);
     return NextResponse.json(
       { error: "Failed to create BOM" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

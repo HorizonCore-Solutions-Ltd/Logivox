@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -24,7 +24,7 @@ const processRMASchema = z.object({
 // POST /api/rmas/[id]/process - Process RMA (restock + refunds)
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -43,7 +43,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -69,7 +69,7 @@ export async function POST(
     if (rma.status !== "RECEIVED" && rma.status !== "INSPECTING") {
       return NextResponse.json(
         { error: "RMA must be received or inspecting to process" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -82,7 +82,7 @@ export async function POST(
       if (!rmaItem) {
         return NextResponse.json(
           { error: `Item ${item.itemId} not found in RMA` },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -92,7 +92,7 @@ export async function POST(
           {
             error: `Accepted + rejected quantities must equal received quantity for item ${item.itemId}`,
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -113,7 +113,7 @@ export async function POST(
           if (!location) {
             return NextResponse.json(
               { error: `Restock location ${item.restockLocationId} not found` },
-              { status: 404 }
+              { status: 404 },
             );
           }
         }
@@ -241,14 +241,14 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error processing RMA:", error);
     return NextResponse.json(
       { error: "Failed to process RMA" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

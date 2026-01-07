@@ -2,10 +2,19 @@
  * Integration Dashboard - Manage ERP, TMS, Carrier connections
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { RefreshCw, Plus, Trash2, CheckCircle, XCircle, Play, Settings, Link as LinkIcon } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  RefreshCw,
+  Plus,
+  Trash2,
+  CheckCircle,
+  XCircle,
+  Play,
+  Settings,
+  Link as LinkIcon,
+} from "lucide-react";
 
 interface Webhook {
   id: string;
@@ -20,17 +29,20 @@ export default function IntegrationDashboard() {
   const [webhooks, setWebhooks] = useState<Webhook[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newWebhook, setNewWebhook] = useState({ url: '', events: [] as string[] });
+  const [newWebhook, setNewWebhook] = useState({
+    url: "",
+    events: [] as string[],
+  });
 
   const availableEvents = [
-    'loadsheet.created',
-    'loadsheet.approved',
-    'loadsheet.departed',
-    'container.created',
-    'container.assigned',
-    'order.created',
-    'wave.created',
-    'wave.released',
+    "loadsheet.created",
+    "loadsheet.approved",
+    "loadsheet.departed",
+    "container.created",
+    "container.assigned",
+    "order.created",
+    "wave.created",
+    "wave.released",
   ];
 
   useEffect(() => {
@@ -40,11 +52,11 @@ export default function IntegrationDashboard() {
   const fetchWebhooks = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/integrations');
+      const response = await fetch("/api/integrations");
       const data = await response.json();
       setWebhooks(data.webhooks || []);
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error("Fetch error:", error);
     } finally {
       setLoading(false);
     }
@@ -52,32 +64,32 @@ export default function IntegrationDashboard() {
 
   const createWebhook = async () => {
     try {
-      const response = await fetch('/api/integrations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/integrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'createWebhook',
+          action: "createWebhook",
           ...newWebhook,
         }),
       });
 
       if (response.ok) {
         setShowCreateModal(false);
-        setNewWebhook({ url: '', events: [] });
+        setNewWebhook({ url: "", events: [] });
         fetchWebhooks();
       }
     } catch (error) {
-      console.error('Create error:', error);
+      console.error("Create error:", error);
     }
   };
 
   const testWebhook = async (webhookId: string) => {
     try {
-      const response = await fetch('/api/integrations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/integrations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'testWebhook',
+          action: "testWebhook",
           webhookId,
         }),
       });
@@ -85,31 +97,34 @@ export default function IntegrationDashboard() {
       const data = await response.json();
       alert(data.message);
     } catch (error) {
-      console.error('Test error:', error);
-      alert('Test failed');
+      console.error("Test error:", error);
+      alert("Test failed");
     }
   };
 
   const deleteWebhook = async (webhookId: string) => {
-    if (!confirm('Delete this webhook?')) return;
+    if (!confirm("Delete this webhook?")) return;
 
     try {
       await fetch(`/api/integrations?webhookId=${webhookId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
       fetchWebhooks();
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error("Delete error:", error);
     }
   };
 
-  const toggleWebhookStatus = async (webhookId: string, currentStatus: string) => {
-    const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+  const toggleWebhookStatus = async (
+    webhookId: string,
+    currentStatus: string,
+  ) => {
+    const newStatus = currentStatus === "ACTIVE" ? "INACTIVE" : "ACTIVE";
 
     try {
-      await fetch('/api/integrations', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/integrations", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           webhookId,
           status: newStatus,
@@ -117,7 +132,7 @@ export default function IntegrationDashboard() {
       });
       fetchWebhooks();
     } catch (error) {
-      console.error('Update error:', error);
+      console.error("Update error:", error);
     }
   };
 
@@ -136,8 +151,12 @@ export default function IntegrationDashboard() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Integration Manager</h1>
-            <p className="text-gray-600 mt-2">Connect to ERP, TMS, and carrier systems</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Integration Manager
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Connect to ERP, TMS, and carrier systems
+            </p>
           </div>
           <div className="flex gap-3">
             <button
@@ -214,12 +233,16 @@ export default function IntegrationDashboard() {
 
         <div className="p-6">
           {loading ? (
-            <div className="text-center py-12 text-gray-500">Loading webhooks...</div>
+            <div className="text-center py-12 text-gray-500">
+              Loading webhooks...
+            </div>
           ) : webhooks.length === 0 ? (
             <div className="text-center py-12">
               <LinkIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500">No webhooks configured</p>
-              <p className="text-sm text-gray-400 mt-2">Create a webhook to receive real-time events</p>
+              <p className="text-sm text-gray-400 mt-2">
+                Create a webhook to receive real-time events
+              </p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -236,9 +259,9 @@ export default function IntegrationDashboard() {
                         </code>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                            webhook.status === 'ACTIVE'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                            webhook.status === "ACTIVE"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
                           }`}
                         >
                           {webhook.status}
@@ -259,7 +282,11 @@ export default function IntegrationDashboard() {
                       <div className="text-xs text-gray-500">
                         Created: {new Date(webhook.createdAt).toLocaleString()}
                         {webhook.lastTriggered && (
-                          <> • Last triggered: {new Date(webhook.lastTriggered).toLocaleString()}</>
+                          <>
+                            {" "}
+                            • Last triggered:{" "}
+                            {new Date(webhook.lastTriggered).toLocaleString()}
+                          </>
                         )}
                       </div>
                     </div>
@@ -273,11 +300,17 @@ export default function IntegrationDashboard() {
                         <Play className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => toggleWebhookStatus(webhook.id, webhook.status)}
+                        onClick={() =>
+                          toggleWebhookStatus(webhook.id, webhook.status)
+                        }
                         className="p-2 text-gray-600 hover:bg-gray-50 rounded transition"
-                        title={webhook.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
+                        title={
+                          webhook.status === "ACTIVE"
+                            ? "Deactivate"
+                            : "Activate"
+                        }
                       >
-                        {webhook.status === 'ACTIVE' ? (
+                        {webhook.status === "ACTIVE" ? (
                           <XCircle className="w-4 h-4" />
                         ) : (
                           <CheckCircle className="w-4 h-4" />
@@ -304,7 +337,9 @@ export default function IntegrationDashboard() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Create Webhook</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                Create Webhook
+              </h2>
             </div>
 
             <div className="p-6 space-y-6">
@@ -316,7 +351,9 @@ export default function IntegrationDashboard() {
                   type="url"
                   placeholder="https://your-server.com/webhook"
                   value={newWebhook.url}
-                  onChange={(e) => setNewWebhook({ ...newWebhook, url: e.target.value })}
+                  onChange={(e) =>
+                    setNewWebhook({ ...newWebhook, url: e.target.value })
+                  }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>

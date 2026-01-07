@@ -1,9 +1,9 @@
 /**
  * Load Plan Visualization Component
- * 
+ *
  * 3D visualization of trailer load plan with drag-and-drop
  * item placement, real-time capacity indicators, and multi-stop view.
- * 
+ *
  * Features:
  * - 3D trailer view (Canvas/Three.js or SVG)
  * - Color-coded items by delivery stop
@@ -13,15 +13,15 @@
  * - Voice control integration
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useState, useEffect, useRef } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Truck,
   Package,
@@ -32,9 +32,13 @@ import {
   PlayCircle,
   Download,
   Mic,
-} from 'lucide-react';
-import { useVoiceControl } from '@/hooks/use-voice-control';
-import type { LoadPlan, LoadedItem, TrailerConfig } from '@/types/load-optimization';
+} from "lucide-react";
+import { useVoiceControl } from "@/hooks/use-voice-control";
+import type {
+  LoadPlan,
+  LoadedItem,
+  TrailerConfig,
+} from "@/types/load-optimization";
 
 interface LoadPlanVisualizationProps {
   loadPlanId: string;
@@ -44,14 +48,14 @@ interface LoadPlanVisualizationProps {
 }
 
 const STOP_COLORS = [
-  '#3b82f6', // blue
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#ef4444', // red
-  '#8b5cf6', // purple
-  '#ec4899', // pink
-  '#14b8a6', // teal
-  '#f97316', // orange
+  "#3b82f6", // blue
+  "#10b981", // green
+  "#f59e0b", // amber
+  "#ef4444", // red
+  "#8b5cf6", // purple
+  "#ec4899", // pink
+  "#14b8a6", // teal
+  "#f97316", // orange
 ];
 
 export function LoadPlanVisualization({
@@ -64,10 +68,10 @@ export function LoadPlanVisualization({
   const [trailer, setTrailer] = useState<TrailerConfig | null>(null);
   const [items, setItems] = useState<LoadedItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [view, setView] = useState<'3d' | '2d-side' | '2d-top'>('2d-side');
+  const [view, setView] = useState<"3d" | "2d-side" | "2d-top">("2d-side");
   const [selectedItem, setSelectedItem] = useState<string | null>(null);
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Load data
@@ -77,14 +81,16 @@ export function LoadPlanVisualization({
 
   const loadLoadPlan = async () => {
     try {
-      const response = await fetch(`/api/load-optimization/plans/${loadPlanId}`);
+      const response = await fetch(
+        `/api/load-optimization/plans/${loadPlanId}`,
+      );
       const data = await response.json();
-      
+
       setLoadPlan(data.loadPlan);
       setTrailer(data.visualization.trailer);
       setItems(data.visualization.items);
     } catch (error) {
-      console.error('Failed to load plan:', error);
+      console.error("Failed to load plan:", error);
     } finally {
       setLoading(false);
     }
@@ -94,9 +100,9 @@ export function LoadPlanVisualization({
   const { listening, transcript } = useVoiceControl({
     enabled: enableVoice,
     onCommand: (command) => {
-      if (command.action === 'START_LOADING' && onStartLoading) {
+      if (command.action === "START_LOADING" && onStartLoading) {
         onStartLoading();
-      } else if (command.action === 'COMPLETE_LOADING' && onComplete) {
+      } else if (command.action === "COMPLETE_LOADING" && onComplete) {
         onComplete();
       }
     },
@@ -156,14 +162,14 @@ export function LoadPlanVisualization({
                 height={h}
                 fill={color}
                 fillOpacity={hoveredItem === item.id ? 0.8 : 0.6}
-                stroke={selectedItem === item.id ? 'black' : color}
+                stroke={selectedItem === item.id ? "black" : color}
                 strokeWidth={selectedItem === item.id ? 3 : 1}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}
                 onClick={() => setSelectedItem(item.id)}
                 className="cursor-pointer transition-all"
               />
-              
+
               {/* Item label (if space allows) */}
               {w > 40 && h > 20 && (
                 <text
@@ -183,16 +189,18 @@ export function LoadPlanVisualization({
         })}
 
         {/* Access lanes (between stops) */}
-        {Array.from(new Set(items.map(i => i.stop)))
+        {Array.from(new Set(items.map((i) => i.stop)))
           .sort()
           .slice(0, -1)
           .map((stop) => {
-            const stopItems = items.filter(i => i.stop === stop);
+            const stopItems = items.filter((i) => i.stop === stop);
             if (stopItems.length === 0) return null;
-            
-            const maxZ = Math.max(...stopItems.map(i => i.position.z + i.dimensions.length));
+
+            const maxZ = Math.max(
+              ...stopItems.map((i) => i.position.z + i.dimensions.length),
+            );
             const laneX = maxZ * scale;
-            
+
             return (
               <line
                 key={`lane-${stop}`}
@@ -238,7 +246,7 @@ export function LoadPlanVisualization({
 
         {/* Items (top view - floor level only) */}
         {items
-          .filter(item => item.position.y === 0) // Only floor items
+          .filter((item) => item.position.y === 0) // Only floor items
           .map((item) => {
             const x = item.position.z * scale;
             const y = item.position.x * scale;
@@ -255,7 +263,7 @@ export function LoadPlanVisualization({
                 height={h}
                 fill={color}
                 fillOpacity={hoveredItem === item.id ? 0.8 : 0.6}
-                stroke={selectedItem === item.id ? 'black' : color}
+                stroke={selectedItem === item.id ? "black" : color}
                 strokeWidth={selectedItem === item.id ? 3 : 1}
                 onMouseEnter={() => setHoveredItem(item.id)}
                 onMouseLeave={() => setHoveredItem(null)}
@@ -276,8 +284,12 @@ export function LoadPlanVisualization({
     return <div>Load plan not found</div>;
   }
 
-  const utilization = loadPlan.utilization || { volumePercent: 0, weightPercent: 0, floorPercent: 0 };
-  const totalStops = Array.from(new Set(items.map(i => i.stop))).length;
+  const utilization = loadPlan.utilization || {
+    volumePercent: 0,
+    weightPercent: 0,
+    floorPercent: 0,
+  };
+  const totalStops = Array.from(new Set(items.map((i) => i.stop))).length;
 
   return (
     <div className="space-y-6">
@@ -290,33 +302,38 @@ export function LoadPlanVisualization({
               <div>
                 <CardTitle>Load Plan: {loadPlan.id}</CardTitle>
                 <p className="text-sm text-gray-500">
-                  {trailer.name} • {totalStops} {totalStops === 1 ? 'Stop' : 'Stops'}
+                  {trailer.name} • {totalStops}{" "}
+                  {totalStops === 1 ? "Stop" : "Stops"}
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <Badge variant={loadPlan.status === 'COMPLETED' ? 'default' : 'secondary'}>
+              <Badge
+                variant={
+                  loadPlan.status === "COMPLETED" ? "default" : "secondary"
+                }
+              >
                 {loadPlan.status}
               </Badge>
-              
+
               {enableVoice && (
                 <Button
-                  variant={listening ? 'destructive' : 'outline'}
+                  variant={listening ? "destructive" : "outline"}
                   size="sm"
                   className="gap-2"
                 >
                   <Mic className="h-4 w-4" />
-                  {listening ? 'Listening...' : 'Voice'}
+                  {listening ? "Listening..." : "Voice"}
                 </Button>
               )}
-              
+
               <Button variant="outline" size="sm" className="gap-2">
                 <Download className="h-4 w-4" />
                 Export PDF
               </Button>
-              
-              {loadPlan.status === 'OPTIMIZED' && onStartLoading && (
+
+              {loadPlan.status === "OPTIMIZED" && onStartLoading && (
                 <Button onClick={onStartLoading} className="gap-2">
                   <PlayCircle className="h-4 w-4" />
                   Start Loading
@@ -338,26 +355,31 @@ export function LoadPlanVisualization({
                   <TabsList>
                     <TabsTrigger value="2d-side">Side View</TabsTrigger>
                     <TabsTrigger value="2d-top">Top View</TabsTrigger>
-                    <TabsTrigger value="3d" disabled>3D View</TabsTrigger>
+                    <TabsTrigger value="3d" disabled>
+                      3D View
+                    </TabsTrigger>
                   </TabsList>
                 </Tabs>
               </div>
             </CardHeader>
             <CardContent>
               <div className="flex justify-center items-center p-4 bg-gray-50 rounded-lg overflow-auto">
-                {view === '2d-side' && render2DSideView()}
-                {view === '2d-top' && render2DTopView()}
+                {view === "2d-side" && render2DSideView()}
+                {view === "2d-top" && render2DTopView()}
               </div>
 
               {/* Legend */}
               <div className="mt-4 flex flex-wrap gap-3">
-                {Array.from(new Set(items.map(i => i.stop)))
+                {Array.from(new Set(items.map((i) => i.stop)))
                   .sort()
                   .map((stop, index) => (
                     <div key={stop} className="flex items-center gap-2">
                       <div
                         className="w-4 h-4 rounded"
-                        style={{ backgroundColor: STOP_COLORS[index % STOP_COLORS.length] }}
+                        style={{
+                          backgroundColor:
+                            STOP_COLORS[index % STOP_COLORS.length],
+                        }}
                       />
                       <span className="text-sm">Stop {stop}</span>
                     </div>
@@ -374,7 +396,7 @@ export function LoadPlanVisualization({
               </CardHeader>
               <CardContent>
                 {(() => {
-                  const item = items.find(i => i.id === selectedItem);
+                  const item = items.find((i) => i.id === selectedItem);
                   if (!item) return null;
 
                   return (
@@ -386,19 +408,22 @@ export function LoadPlanVisualization({
                         <span className="font-semibold">Stop:</span> {item.stop}
                       </div>
                       <div>
-                        <span className="font-semibold">Dimensions:</span>{' '}
-                        {item.dimensions.length}" × {item.dimensions.width}" × {item.dimensions.height}"
+                        <span className="font-semibold">Dimensions:</span>{" "}
+                        {item.dimensions.length}" × {item.dimensions.width}" ×{" "}
+                        {item.dimensions.height}"
                       </div>
                       <div>
-                        <span className="font-semibold">Weight:</span> {item.weight} lbs
+                        <span className="font-semibold">Weight:</span>{" "}
+                        {item.weight} lbs
                       </div>
                       <div>
-                        <span className="font-semibold">Position:</span>{' '}
-                        X: {item.position.x}", Y: {item.position.y}", Z: {item.position.z}"
+                        <span className="font-semibold">Position:</span> X:{" "}
+                        {item.position.x}", Y: {item.position.y}", Z:{" "}
+                        {item.position.z}"
                       </div>
                       <div>
-                        <span className="font-semibold">Stackable:</span>{' '}
-                        {item.stackable ? 'Yes' : 'No'}
+                        <span className="font-semibold">Stackable:</span>{" "}
+                        {item.stackable ? "Yes" : "No"}
                       </div>
                     </div>
                   );
@@ -422,23 +447,29 @@ export function LoadPlanVisualization({
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Volume</span>
-                  <span className="font-semibold">{utilization.volumePercent}%</span>
+                  <span className="font-semibold">
+                    {utilization.volumePercent}%
+                  </span>
                 </div>
                 <Progress value={utilization.volumePercent} />
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Weight</span>
-                  <span className="font-semibold">{utilization.weightPercent}%</span>
+                  <span className="font-semibold">
+                    {utilization.weightPercent}%
+                  </span>
                 </div>
                 <Progress value={utilization.weightPercent} />
               </div>
-              
+
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span>Floor Space</span>
-                  <span className="font-semibold">{utilization.floorPercent}%</span>
+                  <span className="font-semibold">
+                    {utilization.floorPercent}%
+                  </span>
                 </div>
                 <Progress value={utilization.floorPercent} />
               </div>
@@ -458,17 +489,21 @@ export function LoadPlanVisualization({
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span>Front Axle:</span>
-                    <span className="font-semibold">{loadPlan.frontAxleWeight.toLocaleString()} lbs</span>
+                    <span className="font-semibold">
+                      {loadPlan.frontAxleWeight.toLocaleString()} lbs
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Rear Axle:</span>
-                    <span className="font-semibold">{loadPlan.rearAxleWeight.toLocaleString()} lbs</span>
+                    <span className="font-semibold">
+                      {loadPlan.rearAxleWeight.toLocaleString()} lbs
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm font-bold">
                     <span>Total:</span>
                     <span>{loadPlan.totalWeight.toLocaleString()} lbs</span>
                   </div>
-                  
+
                   {loadPlan.weightBalanced ? (
                     <Alert>
                       <CheckCircle className="h-4 w-4" />
@@ -477,12 +512,16 @@ export function LoadPlanVisualization({
                   ) : (
                     <Alert variant="destructive">
                       <AlertTriangle className="h-4 w-4" />
-                      <AlertDescription>Weight imbalance detected</AlertDescription>
+                      <AlertDescription>
+                        Weight imbalance detected
+                      </AlertDescription>
                     </Alert>
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No weight data available</p>
+                <p className="text-sm text-gray-500">
+                  No weight data available
+                </p>
               )}
             </CardContent>
           </Card>
@@ -503,7 +542,9 @@ export function LoadPlanVisualization({
                 </div>
                 <div className="flex justify-between">
                   <span>Orders:</span>
-                  <span className="font-semibold">{loadPlan.orderIds?.length || 0}</span>
+                  <span className="font-semibold">
+                    {loadPlan.orderIds?.length || 0}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery Stops:</span>
@@ -514,7 +555,8 @@ export function LoadPlanVisualization({
           </Card>
 
           {/* Issues & Recommendations */}
-          {(loadPlan.issues?.length > 0 || loadPlan.recommendations?.length > 0) && (
+          {(loadPlan.issues?.length > 0 ||
+            loadPlan.recommendations?.length > 0) && (
             <Card>
               <CardHeader>
                 <CardTitle>Alerts</CardTitle>
@@ -523,13 +565,17 @@ export function LoadPlanVisualization({
                 {loadPlan.issues?.map((issue: string, index: number) => (
                   <Alert key={`issue-${index}`} variant="destructive">
                     <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription className="text-sm">{issue}</AlertDescription>
+                    <AlertDescription className="text-sm">
+                      {issue}
+                    </AlertDescription>
                   </Alert>
                 ))}
-                
+
                 {loadPlan.recommendations?.map((rec: string, index: number) => (
                   <Alert key={`rec-${index}`}>
-                    <AlertDescription className="text-sm">{rec}</AlertDescription>
+                    <AlertDescription className="text-sm">
+                      {rec}
+                    </AlertDescription>
                   </Alert>
                 ))}
               </CardContent>

@@ -1,10 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, Calendar, AlertCircle, Download } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  Calendar,
+  AlertCircle,
+  Download,
+} from "lucide-react";
 import { ForecastCharts } from "./forecast-charts";
 
 interface ForecastData {
@@ -12,10 +24,10 @@ interface ForecastData {
   productName: string;
   currentStock: number;
   historicalSales: Array<{ date: string; quantity: number }>;
-  predictions: Array<{ 
-    date: string; 
-    demand: number; 
-    confidence: { lower: number; upper: number } 
+  predictions: Array<{
+    date: string;
+    demand: number;
+    confidence: { lower: number; upper: number };
   }>;
   trend: {
     direction: "increasing" | "decreasing" | "stable";
@@ -133,7 +145,10 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
   };
 
   const nextPrediction = forecast.predictions[0];
-  const totalPredictedDemand = forecast.predictions.reduce((sum, p) => sum + p.demand, 0);
+  const totalPredictedDemand = forecast.predictions.reduce(
+    (sum, p) => sum + p.demand,
+    0,
+  );
 
   return (
     <div className="space-y-6">
@@ -174,8 +189,12 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Order Quantity</p>
-              <p className="text-2xl font-bold">{forecast.optimalOrderQuantity}</p>
-              <p className="text-xs text-muted-foreground">EOQ recommendation</p>
+              <p className="text-2xl font-bold">
+                {forecast.optimalOrderQuantity}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                EOQ recommendation
+              </p>
             </div>
           </div>
         </CardContent>
@@ -194,7 +213,9 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Trend Direction</p>
-                <p className="font-medium capitalize">{forecast.trend.direction}</p>
+                <p className="font-medium capitalize">
+                  {forecast.trend.direction}
+                </p>
                 <p className="text-xs text-muted-foreground">
                   {Math.abs(forecast.trend.slope).toFixed(2)} units/day
                 </p>
@@ -202,7 +223,9 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
             </div>
 
             <div>
-              <p className="text-sm text-muted-foreground">Forecast Confidence</p>
+              <p className="text-sm text-muted-foreground">
+                Forecast Confidence
+              </p>
               <div className="flex items-center gap-2 mt-1">
                 <div className="flex-1 bg-muted rounded-full h-2">
                   <div
@@ -210,7 +233,9 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
                     style={{ width: `${forecast.confidence * 100}%` }}
                   />
                 </div>
-                <span className="font-medium">{Math.round(forecast.confidence * 100)}%</span>
+                <span className="font-medium">
+                  {Math.round(forecast.confidence * 100)}%
+                </span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
                 {forecast.confidence >= 0.8
@@ -246,20 +271,42 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
                   <p className="text-xs text-muted-foreground">Peak Periods</p>
                   <p className="text-sm">
                     {forecast.seasonality.pattern === "weekly"
-                      ? forecast.seasonality.peaks.map((p) => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][p]).join(", ")
+                      ? forecast.seasonality.peaks
+                          .map(
+                            (p) =>
+                              ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+                                p
+                              ],
+                          )
+                          .join(", ")
                       : forecast.seasonality.pattern === "monthly"
-                        ? forecast.seasonality.peaks.map((p) => `Week ${p + 1}`).join(", ")
-                        : forecast.seasonality.peaks.map((p) => `Month ${p + 1}`).join(", ")}
+                        ? forecast.seasonality.peaks
+                            .map((p) => `Week ${p + 1}`)
+                            .join(", ")
+                        : forecast.seasonality.peaks
+                            .map((p) => `Month ${p + 1}`)
+                            .join(", ")}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-muted-foreground">Low Periods</p>
                   <p className="text-sm">
                     {forecast.seasonality.pattern === "weekly"
-                      ? forecast.seasonality.troughs.map((p) => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][p]).join(", ")
+                      ? forecast.seasonality.troughs
+                          .map(
+                            (p) =>
+                              ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
+                                p
+                              ],
+                          )
+                          .join(", ")
                       : forecast.seasonality.pattern === "monthly"
-                        ? forecast.seasonality.troughs.map((p) => `Week ${p + 1}`).join(", ")
-                        : forecast.seasonality.troughs.map((p) => `Month ${p + 1}`).join(", ")}
+                        ? forecast.seasonality.troughs
+                            .map((p) => `Week ${p + 1}`)
+                            .join(", ")
+                        : forecast.seasonality.troughs
+                            .map((p) => `Month ${p + 1}`)
+                            .join(", ")}
                   </p>
                 </div>
               </div>
@@ -302,7 +349,9 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">{Math.round(prediction.demand)} units</p>
+                  <p className="font-medium">
+                    {Math.round(prediction.demand)} units
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Range: {Math.round(prediction.confidence.lower)} -{" "}
                     {Math.round(prediction.confidence.upper)}
@@ -328,9 +377,10 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
                   Immediate Reorder Required
                 </p>
                 <p className="text-sm text-red-700 dark:text-red-300 mt-1">
-                  Current stock ({forecast.currentStock} units) is below the reorder point (
-                  {forecast.reorderPoint} units). Order {forecast.optimalOrderQuantity} units
-                  immediately to prevent stockout.
+                  Current stock ({forecast.currentStock} units) is below the
+                  reorder point ({forecast.reorderPoint} units). Order{" "}
+                  {forecast.optimalOrderQuantity} units immediately to prevent
+                  stockout.
                 </p>
               </div>
             </div>
@@ -344,8 +394,10 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
                   Increasing Demand Detected
                 </p>
                 <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
-                  Demand is trending upward at {Math.abs(forecast.trend.slope).toFixed(2)}{" "}
-                  units/day. Consider increasing safety stock levels or ordering more frequently.
+                  Demand is trending upward at{" "}
+                  {Math.abs(forecast.trend.slope).toFixed(2)} units/day.
+                  Consider increasing safety stock levels or ordering more
+                  frequently.
                 </p>
               </div>
             </div>
@@ -359,9 +411,10 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
                   Decreasing Demand Detected
                 </p>
                 <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                  Demand is trending downward at {Math.abs(forecast.trend.slope).toFixed(2)}{" "}
-                  units/day. Consider reducing order quantities or extending order intervals to
-                  avoid excess inventory.
+                  Demand is trending downward at{" "}
+                  {Math.abs(forecast.trend.slope).toFixed(2)} units/day.
+                  Consider reducing order quantities or extending order
+                  intervals to avoid excess inventory.
                 </p>
               </div>
             </div>
@@ -373,8 +426,8 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
                 <span>
-                  Maintain safety stock of {forecast.safetyStock} units to cover demand
-                  variability
+                  Maintain safety stock of {forecast.safetyStock} units to cover
+                  demand variability
                 </span>
               </li>
               <li className="flex items-start gap-2">
@@ -386,14 +439,15 @@ export function ForecastViewer({ productId }: ForecastViewerProps) {
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
                 <span>
-                  Order {forecast.optimalOrderQuantity} units per order for optimal cost efficiency
-                  (EOQ)
+                  Order {forecast.optimalOrderQuantity} units per order for
+                  optimal cost efficiency (EOQ)
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-primary">•</span>
                 <span>
-                  Expected total demand over next 30 days: {Math.round(totalPredictedDemand)} units
+                  Expected total demand over next 30 days:{" "}
+                  {Math.round(totalPredictedDemand)} units
                 </span>
               </li>
             </ul>

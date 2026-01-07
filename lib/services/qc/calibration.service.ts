@@ -6,7 +6,7 @@
  * ISO 13485:2016 Clause 7.6 - Control of monitoring and measuring equipment
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 export class CalibrationService {
   /**
@@ -42,8 +42,10 @@ export class CalibrationService {
         criticalEquipment: params.criticalEquipment,
         location: params.location,
         responsiblePerson: params.responsiblePerson,
-        status: 'ACTIVE',
-        nextCalibrationDue: new Date(Date.now() + params.calibrationFrequency * 24 * 60 * 60 * 1000),
+        status: "ACTIVE",
+        nextCalibrationDue: new Date(
+          Date.now() + params.calibrationFrequency * 24 * 60 * 60 * 1000,
+        ),
       },
     });
   }
@@ -92,7 +94,7 @@ export class CalibrationService {
         nextCalibrationDate: params.nextCalibrationDate,
         notes: params.notes,
         attachments: params.attachments,
-        passed: params.asLeftCondition === 'IN_TOLERANCE',
+        passed: params.asLeftCondition === "IN_TOLERANCE",
       },
     });
 
@@ -102,13 +104,22 @@ export class CalibrationService {
       data: {
         lastCalibrationDate: params.calibrationDate,
         nextCalibrationDue: params.nextCalibrationDate,
-        calibrationStatus: params.asLeftCondition === 'IN_TOLERANCE' ? 'CURRENT' : 'NEEDS_ATTENTION',
-        status: params.asLeftCondition === 'IN_TOLERANCE' ? 'ACTIVE' : 'OUT_OF_SERVICE',
+        calibrationStatus:
+          params.asLeftCondition === "IN_TOLERANCE"
+            ? "CURRENT"
+            : "NEEDS_ATTENTION",
+        status:
+          params.asLeftCondition === "IN_TOLERANCE"
+            ? "ACTIVE"
+            : "OUT_OF_SERVICE",
       },
     });
 
     // If out of tolerance, create notification
-    if (params.asFoundCondition === 'OUT_OF_TOLERANCE' || params.asFoundCondition === 'FAILED') {
+    if (
+      params.asFoundCondition === "OUT_OF_TOLERANCE" ||
+      params.asFoundCondition === "FAILED"
+    ) {
       await this.createOutOfToleranceAlert({
         equipmentId: params.equipmentId,
         recordId: record.id,
@@ -132,7 +143,7 @@ export class CalibrationService {
 
     const whereClause: any = {
       organizationId: params.organizationId,
-      status: { not: 'RETIRED' },
+      status: { not: "RETIRED" },
       nextCalibrationDue: { lte: dueDate },
     };
 
@@ -144,17 +155,17 @@ export class CalibrationService {
       where: whereClause,
       include: {
         calibrationRecords: {
-          orderBy: { calibrationDate: 'desc' },
+          orderBy: { calibrationDate: "desc" },
           take: 1,
         },
       },
-      orderBy: { nextCalibrationDue: 'asc' },
+      orderBy: { nextCalibrationDue: "asc" },
     });
 
-    return equipment.map(eq => {
+    return equipment.map((eq) => {
       const daysUntilDue = Math.floor(
-        (new Date(eq.nextCalibrationDue).getTime() - Date.now()) / 
-        (1000 * 60 * 60 * 24)
+        (new Date(eq.nextCalibrationDue).getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24),
       );
 
       return {
@@ -175,7 +186,7 @@ export class CalibrationService {
   }) {
     return await prisma.calibrationRecord.findMany({
       where: { equipmentId: params.equipmentId },
-      orderBy: { calibrationDate: 'desc' },
+      orderBy: { calibrationDate: "desc" },
       take: params.limit || 50,
     });
   }
@@ -183,35 +194,33 @@ export class CalibrationService {
   /**
    * Get compliance report
    */
-  static async getComplianceReport(params: {
-    organizationId: string;
-  }) {
+  static async getComplianceReport(params: { organizationId: string }) {
     const allEquipment = await prisma.calibrationEquipment.findMany({
       where: {
         organizationId: params.organizationId,
-        status: { not: 'RETIRED' },
+        status: { not: "RETIRED" },
       },
       include: {
         calibrationRecords: {
-          orderBy: { calibrationDate: 'desc' },
+          orderBy: { calibrationDate: "desc" },
           take: 1,
         },
       },
     });
 
     const now = Date.now();
-    const current = allEquipment.filter(eq => 
-      new Date(eq.nextCalibrationDue).getTime() > now
+    const current = allEquipment.filter(
+      (eq) => new Date(eq.nextCalibrationDue).getTime() > now,
     );
-    const overdue = allEquipment.filter(eq => 
-      new Date(eq.nextCalibrationDue).getTime() <= now
+    const overdue = allEquipment.filter(
+      (eq) => new Date(eq.nextCalibrationDue).getTime() <= now,
     );
-    const critical = allEquipment.filter(eq => eq.criticalEquipment);
+    const critical = allEquipment.filter((eq) => eq.criticalEquipment);
 
     const outOfTolerance = await prisma.calibrationRecord.count({
       where: {
         equipment: { organizationId: params.organizationId },
-        asFoundCondition: { in: ['OUT_OF_TOLERANCE', 'FAILED'] },
+        asFoundCondition: { in: ["OUT_OF_TOLERANCE", "FAILED"] },
         calibrationDate: {
           gte: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000), // Last year
         },
@@ -233,8 +242,8 @@ export class CalibrationService {
         currentCalibration: current.length,
         overdueCalibration: overdue.length,
         criticalEquipment: critical.length,
-        criticalOverdue: critical.filter(eq => 
-          new Date(eq.nextCalibrationDue).getTime() <= now
+        criticalOverdue: critical.filter(
+          (eq) => new Date(eq.nextCalibrationDue).getTime() <= now,
         ).length,
         complianceRate: (current.length / allEquipment.length) * 100 || 0,
       },
@@ -268,24 +277,28 @@ export class CalibrationService {
     // This would integrate with your notification system
     // For now, we'll create a placeholder alert
     return {
-      type: 'OUT_OF_TOLERANCE_ALERT',
+      type: "OUT_OF_TOLERANCE_ALERT",
       equipmentId: params.equipmentId,
       equipmentName: equipment.equipmentName,
       condition: params.asFoundCondition,
-      severity: equipment.criticalEquipment ? 'CRITICAL' : 'HIGH',
+      severity: equipment.criticalEquipment ? "CRITICAL" : "HIGH",
       message: `Equipment ${equipment.equipmentName} found ${params.asFoundCondition}. Immediate investigation required.`,
-      actionRequired: 'Investigate impact on products manufactured since last calibration',
+      actionRequired:
+        "Investigate impact on products manufactured since last calibration",
     };
   }
 
   /**
    * Helper: Calculate urgency
    */
-  private static calculateUrgency(daysUntilDue: number, isCritical: boolean): string {
-    if (daysUntilDue < 0) return 'OVERDUE';
-    if (daysUntilDue <= 7) return isCritical ? 'CRITICAL' : 'HIGH';
-    if (daysUntilDue <= 14) return 'MEDIUM';
-    return 'LOW';
+  private static calculateUrgency(
+    daysUntilDue: number,
+    isCritical: boolean,
+  ): string {
+    if (daysUntilDue < 0) return "OVERDUE";
+    if (daysUntilDue <= 7) return isCritical ? "CRITICAL" : "HIGH";
+    if (daysUntilDue <= 14) return "MEDIUM";
+    return "LOW";
   }
 
   /**
@@ -293,7 +306,7 @@ export class CalibrationService {
    */
   private static groupByType(equipment: any[]): any {
     const grouped: any = {};
-    equipment.forEach(eq => {
+    equipment.forEach((eq) => {
       if (!grouped[eq.equipmentType]) {
         grouped[eq.equipmentType] = {
           total: 0,

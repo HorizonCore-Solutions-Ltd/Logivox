@@ -3,6 +3,7 @@
 ## Option 1: Using Docker (Recommended for Local Development)
 
 ### Prerequisites
+
 - Docker Desktop installed
 - No local PostgreSQL running on port 5432
 
@@ -11,21 +12,25 @@
 1. **Create docker-compose.yml** (already exists in project root)
 
 2. **Start PostgreSQL**
+
    ```powershell
    docker-compose up -d
    ```
 
 3. **Update .env**
+
    ```env
    DATABASE_URL="postgresql://flowstock:flowstock_dev@localhost:5432/flowstock?schema=public"
    ```
 
 4. **Run Migration**
+
    ```powershell
    npx prisma migrate dev --name init
    ```
 
 5. **Seed Database**
+
    ```powershell
    npx prisma db seed
    ```
@@ -56,11 +61,13 @@
    - It looks like: `postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres`
 
 4. **Update .env**
+
    ```env
    DATABASE_URL="postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres"
    ```
 
 5. **Run Migration**
+
    ```powershell
    npx prisma migrate dev --name init
    ```
@@ -85,6 +92,7 @@
    - Complete installation
 
 3. **Create Database**
+
    ```powershell
    # Open Command Prompt as Administrator
    psql -U postgres
@@ -98,11 +106,13 @@
    ```
 
 4. **Update .env**
+
    ```env
    DATABASE_URL="postgresql://flowstock:your_password@localhost:5432/flowstock?schema=public"
    ```
 
 5. **Run Migration**
+
    ```powershell
    npx prisma migrate dev --name init
    ```
@@ -117,12 +127,14 @@
 Once you've run the seed, you can log in with:
 
 ### Super Admin
+
 - **Email:** admin@logivox.ai
 - **Password:** Admin@123
 - **Role:** SUPER_ADMIN
 - **Organization:** Demo Company Ltd (OWNER)
 
 ### Manager
+
 - **Email:** manager@demo-company.com
 - **Password:** Manager@123
 - **Role:** MANAGER
@@ -131,9 +143,11 @@ Once you've run the seed, you can log in with:
 ## Verify Setup
 
 1. **Check Prisma Studio**
+
    ```powershell
    npx prisma studio
    ```
+
    Opens at http://localhost:5555
 
 2. **Check Tables Created**
@@ -152,6 +166,7 @@ Once you've run the seed, you can log in with:
 ## Common Issues
 
 ### Port 5432 Already in Use
+
 ```powershell
 # Check what's using the port
 netstat -ano | findstr :5432
@@ -161,11 +176,13 @@ taskkill /PID <PID> /F
 ```
 
 ### Connection Refused
+
 - Ensure PostgreSQL is running
 - Check DATABASE_URL in .env is correct
 - Verify firewall settings
 
 ### Migration Errors
+
 ```powershell
 # Reset database (⚠️ deletes all data)
 npx prisma migrate reset
@@ -177,6 +194,7 @@ npx prisma migrate dev --name init
 ## Next Steps
 
 After database setup:
+
 1. ✅ Database running
 2. ✅ Tables created
 3. ✅ Demo data seeded

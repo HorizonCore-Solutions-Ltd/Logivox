@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, UserCheck, UserX, Clock } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { Plus, Search, Filter, UserCheck, UserX, Clock } from "lucide-react";
 
 interface Employee {
   id: string;
@@ -10,7 +10,7 @@ interface Employee {
   lastName: string;
   email: string;
   phone?: string;
-  status: 'ACTIVE' | 'INACTIVE' | 'ON_LEAVE' | 'TERMINATED';
+  status: "ACTIVE" | "INACTIVE" | "ON_LEAVE" | "TERMINATED";
   position?: string;
   department?: string;
   hireDate: string;
@@ -24,8 +24,8 @@ interface Employee {
 export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
@@ -35,8 +35,8 @@ export default function EmployeesPage() {
   const fetchEmployees = async () => {
     try {
       const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (statusFilter) params.append('status', statusFilter);
+      if (search) params.append("search", search);
+      if (statusFilter) params.append("status", statusFilter);
 
       const res = await fetch(`/api/employees?${params.toString()}`);
       if (res.ok) {
@@ -44,7 +44,7 @@ export default function EmployeesPage() {
         setEmployees(data);
       }
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error("Error fetching employees:", error);
     } finally {
       setLoading(false);
     }
@@ -52,10 +52,10 @@ export default function EmployeesPage() {
 
   const getStatusBadge = (status: string) => {
     const colors = {
-      ACTIVE: 'bg-green-100 text-green-800',
-      INACTIVE: 'bg-gray-100 text-gray-800',
-      ON_LEAVE: 'bg-yellow-100 text-yellow-800',
-      TERMINATED: 'bg-red-100 text-red-800',
+      ACTIVE: "bg-green-100 text-green-800",
+      INACTIVE: "bg-gray-100 text-gray-800",
+      ON_LEAVE: "bg-yellow-100 text-yellow-800",
+      TERMINATED: "bg-red-100 text-red-800",
     };
     return colors[status as keyof typeof colors] || colors.INACTIVE;
   };
@@ -117,7 +117,7 @@ export default function EmployeesPage() {
             <div>
               <p className="text-sm text-gray-600">Active</p>
               <p className="text-2xl font-bold text-green-600">
-                {employees.filter(e => e.status === 'ACTIVE').length}
+                {employees.filter((e) => e.status === "ACTIVE").length}
               </p>
             </div>
             <UserCheck className="w-8 h-8 text-green-600" />
@@ -128,7 +128,7 @@ export default function EmployeesPage() {
             <div>
               <p className="text-sm text-gray-600">On Leave</p>
               <p className="text-2xl font-bold text-yellow-600">
-                {employees.filter(e => e.status === 'ON_LEAVE').length}
+                {employees.filter((e) => e.status === "ON_LEAVE").length}
               </p>
             </div>
             <Clock className="w-8 h-8 text-yellow-600" />
@@ -139,7 +139,11 @@ export default function EmployeesPage() {
             <div>
               <p className="text-sm text-gray-600">Inactive</p>
               <p className="text-2xl font-bold text-gray-600">
-                {employees.filter(e => e.status === 'INACTIVE' || e.status === 'TERMINATED').length}
+                {
+                  employees.filter(
+                    (e) => e.status === "INACTIVE" || e.status === "TERMINATED",
+                  ).length
+                }
               </p>
             </div>
             <UserX className="w-8 h-8 text-gray-600" />
@@ -193,19 +197,29 @@ export default function EmployeesPage() {
                       <div className="text-sm font-medium text-gray-900">
                         {employee.firstName} {employee.lastName}
                       </div>
-                      <div className="text-sm text-gray-500">{employee.employeeNumber}</div>
-                      <div className="text-sm text-gray-500">{employee.email}</div>
+                      <div className="text-sm text-gray-500">
+                        {employee.employeeNumber}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {employee.email}
+                      </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{employee.position || '-'}</div>
-                    <div className="text-sm text-gray-500">{employee.department || '-'}</div>
+                    <div className="text-sm text-gray-900">
+                      {employee.position || "-"}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {employee.department || "-"}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {employee.warehouse.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(employee.status)}`}>
+                    <span
+                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(employee.status)}`}
+                    >
                       {employee.status}
                     </span>
                   </td>
@@ -213,7 +227,10 @@ export default function EmployeesPage() {
                     {employee._count?.shifts || 0} shifts
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <a href={`/employees/${employee.id}`} className="text-blue-600 hover:text-blue-900">
+                    <a
+                      href={`/employees/${employee.id}`}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
                       View
                     </a>
                   </td>

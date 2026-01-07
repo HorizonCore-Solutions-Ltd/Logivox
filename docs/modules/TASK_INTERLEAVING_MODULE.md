@@ -11,6 +11,7 @@
 The Task Interleaving module enables warehouse workers to seamlessly switch between different task types (picking, putaway, replenishment, cycle counting, moves, returns) to maximize productivity, minimize travel time, and optimize resource utilization. LogiVox Task Interleaving combines **enterprise-grade multi-task orchestration** with **AI-powered dynamic optimization, predictive task assignment, real-time route optimization, and voice-guided task switching**.
 
 ### Business Value
+
 - **Productivity**: 25-40% increase in worker productivity through optimized task sequences
 - **Travel Reduction**: 30-50% reduction in warehouse travel distance
 - **Flexibility**: Workers automatically assigned optimal task mix based on skills, location, equipment
@@ -18,22 +19,24 @@ The Task Interleaving module enables warehouse workers to seamlessly switch betw
 - **Responsiveness**: Real-time task re-optimization as priorities change
 
 ### Market Impact
+
 **Without Task Interleaving**: Workers finish one task, travel to base, get next task → 20-30% wasted time  
 **With Task Interleaving**: Seamless task-to-task transitions → maximum efficiency
 
 ### Competitive Position
-| Feature | Oracle | SAP | Manhattan | Blue Yonder | **LogiVox** |
-|---------|--------|-----|-----------|-------------|-------------|
-| Multi-Task Assignment | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ **Yes** |
-| Basic Interleaving | ✅ Yes | ✅ Yes | ✅ Yes | ⚠️ Limited | ✅ **Yes** |
-| AI Task Optimization | ❌ No | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited | ✅ **Advanced** |
-| Real-Time Re-Optimization | ⚠️ Limited | ⚠️ Limited | ✅ Yes | ⚠️ Limited | ✅ **Yes** |
-| Predictive Assignment | ❌ No | ❌ No | ❌ No | ❌ No | ✅ **Yes** |
-| Voice Task Switching | ❌ No | ❌ No | ❌ No | ❌ No | ✅ **Yes** |
-| Equipment-Aware | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ **Advanced** |
-| Skill-Based Routing | ⚠️ Limited | ⚠️ Limited | ✅ Yes | ⚠️ Limited | ✅ **Advanced** |
-| Dynamic Priorities | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes | ✅ **AI-Powered** |
-| ML Learning | ❌ No | ❌ No | ❌ No | ❌ No | ✅ **Yes** |
+
+| Feature                   | Oracle     | SAP        | Manhattan  | Blue Yonder | **LogiVox**       |
+| ------------------------- | ---------- | ---------- | ---------- | ----------- | ----------------- |
+| Multi-Task Assignment     | ✅ Yes     | ✅ Yes     | ✅ Yes     | ✅ Yes      | ✅ **Yes**        |
+| Basic Interleaving        | ✅ Yes     | ✅ Yes     | ✅ Yes     | ⚠️ Limited  | ✅ **Yes**        |
+| AI Task Optimization      | ❌ No      | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited  | ✅ **Advanced**   |
+| Real-Time Re-Optimization | ⚠️ Limited | ⚠️ Limited | ✅ Yes     | ⚠️ Limited  | ✅ **Yes**        |
+| Predictive Assignment     | ❌ No      | ❌ No      | ❌ No      | ❌ No       | ✅ **Yes**        |
+| Voice Task Switching      | ❌ No      | ❌ No      | ❌ No      | ❌ No       | ✅ **Yes**        |
+| Equipment-Aware           | ✅ Yes     | ✅ Yes     | ✅ Yes     | ✅ Yes      | ✅ **Advanced**   |
+| Skill-Based Routing       | ⚠️ Limited | ⚠️ Limited | ✅ Yes     | ⚠️ Limited  | ✅ **Advanced**   |
+| Dynamic Priorities        | ✅ Yes     | ✅ Yes     | ✅ Yes     | ✅ Yes      | ✅ **AI-Powered** |
+| ML Learning               | ❌ No      | ❌ No      | ❌ No      | ❌ No       | ✅ **Yes**        |
 
 ---
 
@@ -42,109 +45,123 @@ The Task Interleaving module enables warehouse workers to seamlessly switch betw
 ### 1. Task Pool Management
 
 #### Task Types & Priorities
+
 ```typescript
 interface Task {
   id: string;
   taskNumber: string;
   type: TaskType;
-  
+
   // Priority
-  priority: 'CRITICAL' | 'HIGH' | 'NORMAL' | 'LOW';
-  priorityScore: number;  // 0-100
-  urgency: 'IMMEDIATE' | 'URGENT' | 'STANDARD' | 'DEFERRED';
-  
+  priority: "CRITICAL" | "HIGH" | "NORMAL" | "LOW";
+  priorityScore: number; // 0-100
+  urgency: "IMMEDIATE" | "URGENT" | "STANDARD" | "DEFERRED";
+
   // Source
-  sourceType: 'SALES_ORDER' | 'PURCHASE_ORDER' | 'TRANSFER' | 'REPLENISHMENT' | 'CYCLE_COUNT' | 'SYSTEM' | 'MANUAL';
+  sourceType:
+    | "SALES_ORDER"
+    | "PURCHASE_ORDER"
+    | "TRANSFER"
+    | "REPLENISHMENT"
+    | "CYCLE_COUNT"
+    | "SYSTEM"
+    | "MANUAL";
   sourceId?: string;
-  
+
   // Details
   details: TaskDetails;
-  
+
   // Location
   fromLocation?: string;
   toLocation?: string;
   zone?: string;
-  
+
   // Quantity
   quantity: number;
   uom: string;
-  
+
   // Requirements
   equipmentRequired?: EquipmentType[];
   skillsRequired?: Skill[];
   certificationsRequired?: string[];
-  
+
   // Timing
   createdAt: Date;
   dueDate?: Date;
-  estimatedDuration: number;  // minutes
-  
+  estimatedDuration: number; // minutes
+
   // Assignment
-  status: 'AVAILABLE' | 'ASSIGNED' | 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'CANCELLED';
+  status:
+    | "AVAILABLE"
+    | "ASSIGNED"
+    | "IN_PROGRESS"
+    | "PAUSED"
+    | "COMPLETED"
+    | "CANCELLED";
   assignedTo?: string;
   assignedAt?: Date;
-  
+
   // Constraints
   mustCompleteBefore?: Date;
   cannotStartBefore?: Date;
-  blockedBy?: string[];  // other task IDs
+  blockedBy?: string[]; // other task IDs
   blocking?: string[];
-  
+
   // Scoring (for assignment)
   distanceScore?: number;
   skillMatchScore?: number;
   equipmentMatchScore?: number;
   urgencyScore?: number;
   totalScore?: number;
-  
+
   // Performance
   actualDuration?: number;
   completedAt?: Date;
   completedBy?: string;
 }
 
-type TaskType = 
-  | 'PICK'           // Order picking
-  | 'PUTAWAY'        // Inbound putaway
-  | 'REPLENISHMENT'  // Location replenishment
-  | 'CYCLE_COUNT'    // Inventory counting
-  | 'MOVE'           // Inventory relocation
-  | 'RETURN'         // Customer returns
-  | 'TRANSFER'       // Warehouse transfers
-  | 'CONSOLIDATION'  // Consolidate partial pallets
-  | 'QUALITY_CHECK'  // QC inspection
-  | 'KITTING'        // Assembly tasks
-  | 'PACKING'        // Order packing
-  | 'LOADING'        // Truck loading
-  | 'UNLOADING'      // Truck unloading
-  | 'MAINTENANCE'    // Equipment maintenance
-  | 'CLEANUP';       // Zone cleanup
+type TaskType =
+  | "PICK" // Order picking
+  | "PUTAWAY" // Inbound putaway
+  | "REPLENISHMENT" // Location replenishment
+  | "CYCLE_COUNT" // Inventory counting
+  | "MOVE" // Inventory relocation
+  | "RETURN" // Customer returns
+  | "TRANSFER" // Warehouse transfers
+  | "CONSOLIDATION" // Consolidate partial pallets
+  | "QUALITY_CHECK" // QC inspection
+  | "KITTING" // Assembly tasks
+  | "PACKING" // Order packing
+  | "LOADING" // Truck loading
+  | "UNLOADING" // Truck unloading
+  | "MAINTENANCE" // Equipment maintenance
+  | "CLEANUP"; // Zone cleanup
 
 interface TaskPool {
   id: string;
   name: string;
-  type: 'GLOBAL' | 'ZONE' | 'DEPARTMENT' | 'SHIFT';
-  
+  type: "GLOBAL" | "ZONE" | "DEPARTMENT" | "SHIFT";
+
   // Tasks
   availableTasks: Task[];
   assignedTasks: Task[];
   inProgressTasks: Task[];
   totalTasks: number;
-  
+
   // Filtering
   taskTypes: TaskType[];
   zones?: string[];
   equipmentTypes?: EquipmentType[];
-  
+
   // Metrics
   avgTaskDuration: number;
-  avgWaitTime: number;  // time tasks wait before assignment
-  utilizationRate: number;  // %
-  
+  avgWaitTime: number; // time tasks wait before assignment
+  utilizationRate: number; // %
+
   // Thresholds
-  criticalThreshold: number;  // alert if tasks exceed this
-  maxWaitTime: number;  // minutes
-  
+  criticalThreshold: number; // alert if tasks exceed this
+  maxWaitTime: number; // minutes
+
   updatedAt: Date;
 }
 
@@ -163,6 +180,7 @@ const TASK_MANAGEMENT_VOICE_COMMANDS = [
 ```
 
 #### Task Eligibility & Constraints
+
 ```typescript
 interface TaskEligibility {
   // Worker Requirements
@@ -170,16 +188,16 @@ interface TaskEligibility {
   checkWorkerCertifications: (workerId: string, task: Task) => boolean;
   checkWorkerEquipment: (workerId: string, task: Task) => boolean;
   checkWorkerZoneAccess: (workerId: string, task: Task) => boolean;
-  
+
   // Task Constraints
   checkTimeConstraints: (task: Task) => boolean;
   checkBlockingTasks: (task: Task) => boolean;
   checkLocationAccess: (task: Task) => boolean;
-  
+
   // System Constraints
   checkCapacity: (zone: string) => boolean;
   checkEquipmentAvailability: (equipment: EquipmentType) => boolean;
-  
+
   // Overall Eligibility
   isEligible: (workerId: string, task: Task) => EligibilityResult;
 }
@@ -187,15 +205,15 @@ interface TaskEligibility {
 interface EligibilityResult {
   eligible: boolean;
   reasons: string[];
-  score: number;  // 0-100
-  
+  score: number; // 0-100
+
   // Details
   skillMatch: boolean;
   equipmentMatch: boolean;
   zoneAccess: boolean;
   timeAllowed: boolean;
   notBlocked: boolean;
-  
+
   // Recommendations
   canBeDeferred: boolean;
   alternativeWorkers?: string[];
@@ -203,62 +221,66 @@ interface EligibilityResult {
 }
 
 interface TaskConstraint {
-  type: 'TIME' | 'LOCATION' | 'EQUIPMENT' | 'SKILL' | 'SEQUENCE' | 'DEPENDENCY';
+  type: "TIME" | "LOCATION" | "EQUIPMENT" | "SKILL" | "SEQUENCE" | "DEPENDENCY";
   description: string;
-  hard: boolean;  // must satisfy vs. nice to satisfy
-  weight: number;  // importance (1-10)
+  hard: boolean; // must satisfy vs. nice to satisfy
+  weight: number; // importance (1-10)
 }
 ```
 
 ### 2. Intelligent Task Assignment
 
 #### Assignment Algorithm
+
 ```typescript
 interface TaskAssignmentEngine {
   // Assignment Methods
   assignNextTask: (workerId: string) => Promise<Task | null>;
   assignTaskBatch: (workerId: string, batchSize: number) => Promise<Task[]>;
   assignOptimalSequence: (workerId: string) => Promise<TaskSequence>;
-  
+
   // Assignment Strategies
   strategy: AssignmentStrategy;
-  
+
   // Scoring
   scoreTask: (workerId: string, task: Task) => TaskScore;
   scoreAllTasks: (workerId: string, tasks: Task[]) => ScoredTask[];
-  
+
   // Optimization
-  optimizeAssignments: (workers: Worker[], tasks: Task[]) => Promise<AssignmentPlan>;
+  optimizeAssignments: (
+    workers: Worker[],
+    tasks: Task[],
+  ) => Promise<AssignmentPlan>;
   reoptimize: (trigger: ReoptimizeTrigger) => Promise<AssignmentPlan>;
-  
+
   // Balancing
   balanceWorkload: (workers: Worker[]) => Promise<void>;
   preventCherryPicking: boolean;
 }
 
-type AssignmentStrategy = 
-  | 'NEAREST_TASK'        // Closest task to worker
-  | 'HIGHEST_PRIORITY'    // Most urgent task
-  | 'BALANCED_MIX'        // Mix of task types
-  | 'SKILL_MATCH'         // Best skill match
-  | 'EQUIPMENT_MATCH'     // Best equipment match
-  | 'FIFO'                // First in, first out
-  | 'HYBRID'              // Combination of factors
-  | 'AI_OPTIMIZED';       // ML-powered optimization
+type AssignmentStrategy =
+  | "NEAREST_TASK" // Closest task to worker
+  | "HIGHEST_PRIORITY" // Most urgent task
+  | "BALANCED_MIX" // Mix of task types
+  | "SKILL_MATCH" // Best skill match
+  | "EQUIPMENT_MATCH" // Best equipment match
+  | "FIFO" // First in, first out
+  | "HYBRID" // Combination of factors
+  | "AI_OPTIMIZED"; // ML-powered optimization
 
 interface TaskScore {
   taskId: string;
-  totalScore: number;  // 0-100
-  
+  totalScore: number; // 0-100
+
   // Component Scores
-  distanceScore: number;      // closer = higher
-  priorityScore: number;      // higher priority = higher
-  skillMatchScore: number;    // better match = higher
+  distanceScore: number; // closer = higher
+  priorityScore: number; // higher priority = higher
+  skillMatchScore: number; // better match = higher
   equipmentMatchScore: number;
-  urgencyScore: number;       // more urgent = higher
-  durationScore: number;      // matches remaining shift time
-  zoneScore: number;          // currently in zone
-  
+  urgencyScore: number; // more urgent = higher
+  durationScore: number; // matches remaining shift time
+  zoneScore: number; // currently in zone
+
   // Weights (configurable)
   weights: {
     distance: number;
@@ -269,31 +291,31 @@ interface TaskScore {
     duration: number;
     zone: number;
   };
-  
+
   // Metadata
-  estimatedTravelTime: number;  // minutes
+  estimatedTravelTime: number; // minutes
   estimatedTaskTime: number;
   estimatedCompletionTime: Date;
 }
 
 interface AssignmentPlan {
   timestamp: Date;
-  
+
   // Assignments
   assignments: WorkerAssignment[];
   unassignedTasks: Task[];
-  
+
   // Metrics
   totalTravelDistance: number;
   totalTravelTime: number;
   avgTasksPerWorker: number;
-  avgUtilization: number;  // %
-  
+  avgUtilization: number; // %
+
   // Optimization
   optimizationMethod: string;
-  computeTime: number;  // milliseconds
-  improvementVsBaseline: number;  // %
-  
+  computeTime: number; // milliseconds
+  improvementVsBaseline: number; // %
+
   // Validity
   validUntil: Date;
   reoptimizationTriggers: ReoptimizeTrigger[];
@@ -302,70 +324,75 @@ interface AssignmentPlan {
 interface WorkerAssignment {
   workerId: string;
   workerName: string;
-  
+
   // Tasks
   assignedTasks: Task[];
   taskCount: number;
-  
+
   // Sequence
   recommendedSequence: TaskSequence;
-  
+
   // Estimates
-  totalDistance: number;  // feet
-  totalTime: number;  // minutes
+  totalDistance: number; // feet
+  totalTime: number; // minutes
   estimatedCompletion: Date;
-  
+
   // Utilization
   utilizationPercent: number;
-  idleTime: number;  // minutes
+  idleTime: number; // minutes
 }
 
-type ReoptimizeTrigger = 
-  | 'NEW_URGENT_TASK'
-  | 'WORKER_AVAILABILITY_CHANGE'
-  | 'EQUIPMENT_FAILURE'
-  | 'TASK_COMPLETION'
-  | 'PRIORITY_CHANGE'
-  | 'TIME_THRESHOLD'
-  | 'MANUAL_REQUEST';
+type ReoptimizeTrigger =
+  | "NEW_URGENT_TASK"
+  | "WORKER_AVAILABILITY_CHANGE"
+  | "EQUIPMENT_FAILURE"
+  | "TASK_COMPLETION"
+  | "PRIORITY_CHANGE"
+  | "TIME_THRESHOLD"
+  | "MANUAL_REQUEST";
 ```
 
 #### Task Sequencing
+
 ```typescript
 interface TaskSequence {
   workerId: string;
   tasks: SequencedTask[];
   totalTasks: number;
-  
+
   // Route
   route: Location[];
-  totalDistance: number;  // feet
-  totalTime: number;  // minutes
-  
+  totalDistance: number; // feet
+  totalTime: number; // minutes
+
   // Optimization
-  optimizationGoal: 'MINIMIZE_DISTANCE' | 'MINIMIZE_TIME' | 'MAXIMIZE_PRIORITY' | 'BALANCED';
-  savingsVsNaive: number;  // % improvement
-  
+  optimizationGoal:
+    | "MINIMIZE_DISTANCE"
+    | "MINIMIZE_TIME"
+    | "MAXIMIZE_PRIORITY"
+    | "BALANCED";
+  savingsVsNaive: number; // % improvement
+
   // Validity
   validUntil: Date;
-  flexible: boolean;  // can reorder tasks
+  flexible: boolean; // can reorder tasks
 }
 
 interface SequencedTask {
   sequence: number;
   task: Task;
-  
+
   // Timing
   estimatedStartTime: Date;
   estimatedEndTime: Date;
-  duration: number;  // minutes
-  
+  duration: number; // minutes
+
   // Travel
-  travelFromPrevious: number;  // feet
-  travelTime: number;  // minutes
-  
+  travelFromPrevious: number; // feet
+  travelTime: number; // minutes
+
   // Flexibility
-  canSwapWith?: number[];  // other sequence numbers
+  canSwapWith?: number[]; // other sequence numbers
   mustFollow?: number;
   mustPrecede?: number;
 }
@@ -373,43 +400,59 @@ interface SequencedTask {
 interface RouteOptimization {
   // Algorithms
   optimizeRoute: (tasks: Task[]) => Route;
-  tspSolver: (locations: Location[]) => Route;  // Traveling Salesman Problem
+  tspSolver: (locations: Location[]) => Route; // Traveling Salesman Problem
   clusterTasks: (tasks: Task[]) => TaskCluster[];
-  
+
   // Methods
-  method: 'NEAREST_NEIGHBOR' | 'GENETIC_ALGORITHM' | 'SIMULATED_ANNEALING' | 'BRANCH_AND_BOUND' | 'ML_OPTIMIZED';
-  
+  method:
+    | "NEAREST_NEIGHBOR"
+    | "GENETIC_ALGORITHM"
+    | "SIMULATED_ANNEALING"
+    | "BRANCH_AND_BOUND"
+    | "ML_OPTIMIZED";
+
   // Constraints
   respectPriorities: boolean;
   respectTimeWindows: boolean;
   respectTaskDependencies: boolean;
-  
+
   // Performance
-  maxComputeTime: number;  // milliseconds
-  acceptableSuboptimal: number;  // % (e.g., 95% = accept 95% optimal)
+  maxComputeTime: number; // milliseconds
+  acceptableSuboptimal: number; // % (e.g., 95% = accept 95% optimal)
 }
 ```
 
 ### 3. Dynamic Task Interleaving
 
 #### Real-Time Interleaving
+
 ```typescript
 interface TaskInterleavingEngine {
   // Core Interleaving
-  findNextBestTask: (workerId: string, currentLocation: Location) => Promise<Task | null>;
-  interleaveTasks: (currentTask: Task, location: Location) => Promise<Task | null>;
-  
+  findNextBestTask: (
+    workerId: string,
+    currentLocation: Location,
+  ) => Promise<Task | null>;
+  interleaveTasks: (
+    currentTask: Task,
+    location: Location,
+  ) => Promise<Task | null>;
+
   // Interleaving Rules
   rules: InterleavingRule[];
-  
+
   // Decision Logic
-  shouldInterleave: (worker: Worker, currentTask: Task, candidateTask: Task) => InterleaveDecision;
-  
+  shouldInterleave: (
+    worker: Worker,
+    currentTask: Task,
+    candidateTask: Task,
+  ) => InterleaveDecision;
+
   // Optimization
   optimizeForTravel: boolean;
   optimizeForPriority: boolean;
   optimizeForBalance: boolean;
-  
+
   // Limits
   maxInterleavesPerShift: number;
   maxConsecutiveSameType: number;
@@ -421,45 +464,45 @@ interface InterleavingRule {
   name: string;
   enabled: boolean;
   priority: number;
-  
+
   // Conditions (WHEN to interleave)
   trigger: InterleaveTrigger;
-  
+
   // Criteria (WHAT task to interleave)
   taskCriteria: TaskCriteria;
-  
+
   // Constraints
-  maxDetourDistance: number;  // feet
-  maxDetourTime: number;  // minutes
+  maxDetourDistance: number; // feet
+  maxDetourTime: number; // minutes
   allowedTaskTypes: TaskType[];
   excludedTaskTypes: TaskType[];
-  
+
   // Business Logic
   requiresSameZone: boolean;
   requiresSameEquipment: boolean;
   requiresHigherPriority: boolean;
-  
+
   // Performance
   timesTriggered: number;
   timesSuccessful: number;
-  avgTimeSavings: number;  // minutes
+  avgTimeSavings: number; // minutes
 }
 
-type InterleaveTrigger = 
-  | 'TASK_COMPLETION'           // After completing a task
-  | 'PASSING_LOCATION'          // Passing near another task
-  | 'URGENT_TASK_AVAILABLE'     // High priority task appears
-  | 'EQUIPMENT_CHANGE'          // Equipment becomes available
-  | 'ZONE_CHANGE'               // Entering new zone
-  | 'LOW_PRIORITY_CURRENT'      // Current task is low priority
-  | 'SHIFT_TIME_REMAINING'      // Limited time left in shift
-  | 'WORKER_REQUEST';           // Worker asks for different task
+type InterleaveTrigger =
+  | "TASK_COMPLETION" // After completing a task
+  | "PASSING_LOCATION" // Passing near another task
+  | "URGENT_TASK_AVAILABLE" // High priority task appears
+  | "EQUIPMENT_CHANGE" // Equipment becomes available
+  | "ZONE_CHANGE" // Entering new zone
+  | "LOW_PRIORITY_CURRENT" // Current task is low priority
+  | "SHIFT_TIME_REMAINING" // Limited time left in shift
+  | "WORKER_REQUEST"; // Worker asks for different task
 
 interface TaskCriteria {
   taskTypes: TaskType[];
   minPriority?: number;
-  maxDistance?: number;  // from current location
-  maxDuration?: number;  // minutes
+  maxDistance?: number; // from current location
+  maxDuration?: number; // minutes
   requireSkillMatch: boolean;
   requireEquipmentMatch: boolean;
   requireZoneMatch: boolean;
@@ -467,32 +510,40 @@ interface TaskCriteria {
 
 interface InterleaveDecision {
   shouldInterleave: boolean;
-  confidence: number;  // 0-1
-  
+  confidence: number; // 0-1
+
   // Reasoning
   reasons: string[];
   benefits: InterleaveBenefit[];
   costs: InterleaveCost[];
-  
+
   // Recommendation
   recommendedTask?: Task;
   alternativeTasks?: Task[];
-  
+
   // Impact
-  timeSavings: number;  // minutes
-  distanceSavings: number;  // feet
+  timeSavings: number; // minutes
+  distanceSavings: number; // feet
   priorityImprovement: number;
 }
 
 interface InterleaveBenefit {
-  type: 'TIME_SAVINGS' | 'DISTANCE_SAVINGS' | 'PRIORITY_IMPROVEMENT' | 'UTILIZATION_IMPROVEMENT';
+  type:
+    | "TIME_SAVINGS"
+    | "DISTANCE_SAVINGS"
+    | "PRIORITY_IMPROVEMENT"
+    | "UTILIZATION_IMPROVEMENT";
   value: number;
   unit: string;
   description: string;
 }
 
 interface InterleaveCost {
-  type: 'CONTEXT_SWITCH' | 'EQUIPMENT_CHANGE' | 'ZONE_CHANGE' | 'DELAY_CURRENT_TASK';
+  type:
+    | "CONTEXT_SWITCH"
+    | "EQUIPMENT_CHANGE"
+    | "ZONE_CHANGE"
+    | "DELAY_CURRENT_TASK";
   value: number;
   unit: string;
   description: string;
@@ -513,89 +564,96 @@ const INTERLEAVING_VOICE_COMMANDS = [
 ### 4. Multi-Task Work Sessions
 
 #### Work Session Management
+
 ```typescript
 interface WorkSession {
   id: string;
   workerId: string;
   workerName: string;
-  
+
   // Timing
   startTime: Date;
   endTime?: Date;
-  duration: number;  // minutes
+  duration: number; // minutes
   shiftHours: number;
-  
+
   // Tasks
   tasks: SessionTask[];
   totalTasks: number;
   tasksByType: Record<TaskType, number>;
-  
+
   // Current State
   currentTask?: Task;
   currentLocation?: Location;
   currentEquipment?: Equipment;
-  
+
   // Performance
   tasksCompleted: number;
   tasksInProgress: number;
   tasksCancelled: number;
-  
+
   // Travel
-  totalDistance: number;  // feet
-  totalTravelTime: number;  // minutes
+  totalDistance: number; // feet
+  totalTravelTime: number; // minutes
   avgDistancePerTask: number;
-  
+
   // Productivity
   tasksPerHour: number;
   utilizationPercent: number;
-  activeTime: number;  // minutes (excluding breaks, idle)
+  activeTime: number; // minutes (excluding breaks, idle)
   idleTime: number;
   breakTime: number;
-  
+
   // Interleaving
   interleaveCount: number;
   taskSwitches: number;
   avgTasksBeforeSwitch: number;
-  
+
   // Quality
-  accuracy: number;  // %
+  accuracy: number; // %
   errors: SessionError[];
-  
-  status: 'ACTIVE' | 'BREAK' | 'LUNCH' | 'ENDED';
+
+  status: "ACTIVE" | "BREAK" | "LUNCH" | "ENDED";
 }
 
 interface SessionTask {
   taskId: string;
   taskType: TaskType;
   sequence: number;
-  
+
   // Timing
   startTime: Date;
   endTime?: Date;
-  duration: number;  // minutes
+  duration: number; // minutes
   estimatedDuration: number;
-  variance: number;  // actual vs. estimated
-  
+  variance: number; // actual vs. estimated
+
   // Travel
   travelDistance: number;
   travelTime: number;
-  
+
   // Status
-  status: 'COMPLETED' | 'IN_PROGRESS' | 'CANCELLED' | 'DEFERRED';
-  
+  status: "COMPLETED" | "IN_PROGRESS" | "CANCELLED" | "DEFERRED";
+
   // Performance
   accuracy: boolean;
   errors?: string[];
-  
+
   // Interleaving
   wasInterleaved: boolean;
-  interleavedFrom?: string;  // previous task ID
+  interleavedFrom?: string; // previous task ID
 }
 
 interface SessionError {
   timestamp: Date;
   taskId: string;
-  errorType: 'WRONG_ITEM' | 'WRONG_QUANTITY' | 'WRONG_LOCATION' | 'DAMAGED' | 'SYSTEM_ERROR' | 'OTHER';
+  errorType:
+    | "WRONG_ITEM"
+    | "WRONG_QUANTITY"
+    | "WRONG_LOCATION"
+    | "DAMAGED"
+    | "SYSTEM_ERROR"
+    | "OTHER";
   description: string;
   corrected: boolean;
 }
@@ -616,82 +674,83 @@ const WORK_SESSION_VOICE_COMMANDS = [
 ### 5. Equipment-Aware Task Assignment
 
 #### Equipment Tracking
+
 ```typescript
 interface Equipment {
   id: string;
   type: EquipmentType;
-  identifier: string;  // license plate, serial number
-  
+  identifier: string; // license plate, serial number
+
   // Current State
-  status: 'AVAILABLE' | 'IN_USE' | 'CHARGING' | 'MAINTENANCE' | 'OFFLINE';
+  status: "AVAILABLE" | "IN_USE" | "CHARGING" | "MAINTENANCE" | "OFFLINE";
   currentUser?: string;
   currentLocation?: Location;
-  
+
   // Capabilities
-  maxLoad: number;  // lbs
-  maxHeight: number;  // feet
+  maxLoad: number; // lbs
+  maxHeight: number; // feet
   canAccessZones: string[];
-  
+
   // Battery (for powered equipment)
-  batteryLevel?: number;  // %
-  estimatedRuntime?: number;  // minutes
-  
+  batteryLevel?: number; // %
+  estimatedRuntime?: number; // minutes
+
   // Certification
   certificationRequired: boolean;
   certifiedUsers: string[];
-  
+
   // Performance
   hoursUsed: number;
   utilizationPercent: number;
   lastMaintenance?: Date;
   nextMaintenance?: Date;
-  
+
   updatedAt: Date;
 }
 
-type EquipmentType = 
-  | 'FORKLIFT'
-  | 'REACH_TRUCK'
-  | 'PALLET_JACK'
-  | 'ORDER_PICKER'
-  | 'CHERRY_PICKER'
-  | 'HAND_CART'
-  | 'RF_SCANNER'
-  | 'VOICE_HEADSET'
-  | 'PRINTER'
-  | 'SCALE'
-  | 'NONE';
+type EquipmentType =
+  | "FORKLIFT"
+  | "REACH_TRUCK"
+  | "PALLET_JACK"
+  | "ORDER_PICKER"
+  | "CHERRY_PICKER"
+  | "HAND_CART"
+  | "RF_SCANNER"
+  | "VOICE_HEADSET"
+  | "PRINTER"
+  | "SCALE"
+  | "NONE";
 
 interface EquipmentAssignment {
   equipmentId: string;
   workerId: string;
-  
+
   // Assignment
   assignedAt: Date;
   releasedAt?: Date;
-  duration: number;  // minutes
-  
+  duration: number; // minutes
+
   // Usage
   tasksCompleted: number;
   distanceTraveled: number;
-  
+
   // Battery
   startBatteryLevel?: number;
   endBatteryLevel?: number;
-  batterUsage?: number;  // %
-  
-  status: 'ACTIVE' | 'ENDED';
+  batterUsage?: number; // %
+
+  status: "ACTIVE" | "ENDED";
 }
 
 interface EquipmentBasedTasking {
   // Task Filtering
   filterTasksByEquipment: (equipment: Equipment) => Task[];
   requiresEquipmentChange: (currentTask: Task, nextTask: Task) => boolean;
-  
+
   // Optimization
   minimizeEquipmentChanges: boolean;
   groupTasksByEquipment: (tasks: Task[]) => EquipmentTaskGroup[];
-  
+
   // Battery Management
   monitorBatteryLevels: () => void;
   scheduleChargingBreaks: (equipment: Equipment) => ChargingSchedule;
@@ -703,7 +762,7 @@ interface EquipmentTaskGroup {
   tasks: Task[];
   totalTasks: number;
   estimatedDuration: number;
-  
+
   // Sequencing
   optimalSequence: Task[];
   totalDistance: number;
@@ -723,86 +782,87 @@ const EQUIPMENT_VOICE_COMMANDS = [
 ### 6. Skill-Based Task Routing
 
 #### Worker Skills & Proficiency
+
 ```typescript
 interface Worker {
   id: string;
   employeeId: string;
   name: string;
-  
+
   // Skills
   skills: WorkerSkill[];
   certifications: Certification[];
-  
+
   // Equipment
   certifiedEquipment: EquipmentType[];
   preferredEquipment?: EquipmentType;
   currentEquipment?: Equipment;
-  
+
   // Access
   zoneAccess: string[];
   securityClearance: string;
-  
+
   // Performance
   performanceMetrics: WorkerPerformance;
-  
+
   // Status
-  status: 'AVAILABLE' | 'WORKING' | 'BREAK' | 'LUNCH' | 'OFFLINE' | 'TRAINING';
+  status: "AVAILABLE" | "WORKING" | "BREAK" | "LUNCH" | "OFFLINE" | "TRAINING";
   currentLocation?: Location;
   currentTask?: Task;
-  
+
   // Preferences
   preferredTaskTypes?: TaskType[];
   maxConsecutiveHours: number;
-  
+
   // Schedule
-  shiftStart: string;  // "08:00"
-  shiftEnd: string;    // "17:00"
+  shiftStart: string; // "08:00"
+  shiftEnd: string; // "17:00"
   hoursWorkedToday: number;
   hoursRemainingInShift: number;
 }
 
 interface WorkerSkill {
   skillType: TaskType;
-  proficiencyLevel: 'NOVICE' | 'INTERMEDIATE' | 'ADVANCED' | 'EXPERT';
-  proficiencyScore: number;  // 0-100
-  
+  proficiencyLevel: "NOVICE" | "INTERMEDIATE" | "ADVANCED" | "EXPERT";
+  proficiencyScore: number; // 0-100
+
   // Experience
   tasksCompleted: number;
   hoursExperience: number;
-  
+
   // Performance
-  avgTaskTime: number;  // minutes
-  accuracy: number;  // %
-  productivity: number;  // vs. standard
-  
+  avgTaskTime: number; // minutes
+  accuracy: number; // %
+  productivity: number; // vs. standard
+
   // Training
   trainedDate?: Date;
   certifiedDate?: Date;
   recertificationDue?: Date;
-  
+
   lastUsed?: Date;
 }
 
 interface WorkerPerformance {
   // Overall
-  overallRating: number;  // 0-100
-  
+  overallRating: number; // 0-100
+
   // Productivity
   tasksPerHour: number;
   avgTaskDuration: number;
-  efficiencyVsStandard: number;  // %
-  
+  efficiencyVsStandard: number; // %
+
   // Quality
-  accuracy: number;  // %
-  errorRate: number;  // %
-  
+  accuracy: number; // %
+  errorRate: number; // %
+
   // Speed
-  pickingSpeed: number;  // lines per hour
+  pickingSpeed: number; // lines per hour
   putawaySpeed: number;
-  
+
   // Consistency
-  consistency: number;  // % (low variance = high consistency)
-  
+  consistency: number; // % (low variance = high consistency)
+
   // Period
   periodStart: Date;
   periodEnd: Date;
@@ -813,11 +873,11 @@ interface SkillBasedRouting {
   // Assignment
   matchSkillToTask: (worker: Worker, task: Task) => SkillMatch;
   assignByExpertise: (task: Task) => Worker[];
-  
+
   // Development
   identifyTrainingNeeds: (worker: Worker) => TrainingRecommendation[];
-  balanceSkillDevelopment: boolean;  // give tasks to build skills
-  
+  balanceSkillDevelopment: boolean; // give tasks to build skills
+
   // Optimization
   maximizeSkillUtilization: boolean;
   avoidSkillMismatch: boolean;
@@ -826,13 +886,13 @@ interface SkillBasedRouting {
 interface SkillMatch {
   workerId: string;
   taskId: string;
-  matchScore: number;  // 0-100
-  
+  matchScore: number; // 0-100
+
   // Details
   hasRequiredSkills: boolean;
   proficiencyLevel: string;
   experienceLevel: string;
-  
+
   // Prediction
   estimatedDuration: number;
   estimatedAccuracy: number;
@@ -861,52 +921,52 @@ interface PredictiveTaskAssignment {
   predictTaskVolume: (timeframe: number) => Promise<TaskVolumePrediction>;
   predictBottlenecks: () => Promise<Bottleneck[]>;
   predictOptimalStartTime: (task: Task) => Promise<Date>;
-  
+
   // Proactive Assignment
   preAssignTasks: (lookAhead: number) => Promise<PreAssignment[]>;
   anticipateUrgentTasks: () => Promise<Task[]>;
-  
+
   // Machine Learning
-  mlModel: 'GPT-4' | 'CUSTOM_TRANSFORMER' | 'GRADIENT_BOOSTING';
+  mlModel: "GPT-4" | "CUSTOM_TRANSFORMER" | "GRADIENT_BOOSTING";
   trainOnHistoricalData: () => Promise<ModelMetrics>;
   improveAccuracy: () => Promise<void>;
-  
+
   // Confidence
-  predictionConfidence: number;  // 0-1
+  predictionConfidence: number; // 0-1
   acceptableConfidenceThreshold: number;
 }
 
 interface WorkerPrediction {
   workerId: string;
-  
+
   // Availability
   availableAt: Date;
   confidenceLevel: number;
-  
+
   // Capacity
-  estimatedCapacity: number;  // tasks
-  estimatedDuration: number;  // minutes
-  
+  estimatedCapacity: number; // tasks
+  estimatedDuration: number; // minutes
+
   // Context
   predictedLocation: Location;
   predictedEquipment?: EquipmentType;
-  predictedSkillState: string;  // "warmed up", "peak", "fatigued"
-  
+  predictedSkillState: string; // "warmed up", "peak", "fatigued"
+
   // Factors
   basedOn: PredictionFactor[];
 }
 
 interface TaskVolumePrediction {
   timeframe: DateRange;
-  
+
   // Volumes
   predictedTasksByType: Record<TaskType, number>;
   totalTasks: number;
-  
+
   // Capacity
   workersAvailable: number;
-  capacityGap: number;  // tasks
-  
+  capacityGap: number; // tasks
+
   // Recommendations
   recommendedActions: string[];
   shouldCallInWorkers: boolean;
@@ -914,20 +974,20 @@ interface TaskVolumePrediction {
 }
 
 interface Bottleneck {
-  type: 'ZONE' | 'EQUIPMENT' | 'SKILL' | 'TASK_TYPE';
+  type: "ZONE" | "EQUIPMENT" | "SKILL" | "TASK_TYPE";
   location?: string;
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+
   // Impact
   delayMinutes: number;
   tasksAffected: number;
   workersAffected: number;
-  
+
   // Prediction
   occurAt: Date;
-  duration: number;  // minutes
-  probability: number;  // 0-1
-  
+  duration: number; // minutes
+  probability: number; // 0-1
+
   // Resolution
   recommendedActions: string[];
 }
@@ -935,15 +995,15 @@ interface Bottleneck {
 interface PreAssignment {
   taskId: string;
   workerId: string;
-  
+
   // Timing
   assignAt: Date;
   startAt: Date;
-  
+
   // Reasoning
   reason: string;
   confidence: number;
-  
+
   // Conditions
   conditionalOn?: string[];
 }
@@ -964,46 +1024,49 @@ const PREDICTIVE_ASSIGNMENT_VOICE_COMMANDS = [
 interface RealtimeRouteOptimizer {
   // Optimization
   optimizeRoute: (workerId: string, tasks: Task[]) => Promise<OptimizedRoute>;
-  reoptimizeOnTheFly: (workerId: string, newTask: Task) => Promise<OptimizedRoute>;
-  
+  reoptimizeOnTheFly: (
+    workerId: string,
+    newTask: Task,
+  ) => Promise<OptimizedRoute>;
+
   // Dynamic Factors
-  considerTraffic: boolean;  // warehouse congestion
-  considerEquipment: boolean;  // equipment location
-  considerPriorities: boolean;  // changing priorities
-  considerBlockages: boolean;  // aisles blocked
-  
+  considerTraffic: boolean; // warehouse congestion
+  considerEquipment: boolean; // equipment location
+  considerPriorities: boolean; // changing priorities
+  considerBlockages: boolean; // aisles blocked
+
   // Algorithms
-  algorithm: 'DIJKSTRA' | 'A_STAR' | 'GENETIC' | 'ANT_COLONY' | 'ML_OPTIMIZED';
-  
+  algorithm: "DIJKSTRA" | "A_STAR" | "GENETIC" | "ANT_COLONY" | "ML_OPTIMIZED";
+
   // Real-Time Updates
-  updateInterval: number;  // seconds
+  updateInterval: number; // seconds
   autoReoptimize: boolean;
   reoptimizeTriggers: ReoptimizeTrigger[];
-  
+
   // Performance
-  maxComputeTime: number;  // milliseconds
-  achieveNearOptimal: number;  // % (e.g., 98%)
+  maxComputeTime: number; // milliseconds
+  achieveNearOptimal: number; // % (e.g., 98%)
 }
 
 interface OptimizedRoute {
   workerId: string;
   tasks: Task[];
-  
+
   // Route
   waypoints: Waypoint[];
-  totalDistance: number;  // feet
-  totalTime: number;  // minutes
-  
+  totalDistance: number; // feet
+  totalTime: number; // minutes
+
   // Optimization
   method: string;
-  improvement: number;  // % vs. baseline
-  computeTime: number;  // milliseconds
-  
+  improvement: number; // % vs. baseline
+  computeTime: number; // milliseconds
+
   // Flexibility
   alternativeRoutes: Route[];
-  criticalTasks: string[];  // must do in order
-  flexibleTasks: string[];  // can reorder
-  
+  criticalTasks: string[]; // must do in order
+  flexibleTasks: string[]; // can reorder
+
   // Conditions
   validUntil: Date;
   assumedConditions: Assumption[];
@@ -1014,25 +1077,25 @@ interface Waypoint {
   location: Location;
   taskId?: string;
   taskType?: TaskType;
-  
+
   // Timing
   arrivalTime: Date;
-  duration: number;  // minutes at location
+  duration: number; // minutes at location
   departureTime: Date;
-  
+
   // Travel
   distanceFromPrevious: number;
   travelTimeFromPrevious: number;
-  
+
   // Context
-  congestionLevel?: 'LOW' | 'MEDIUM' | 'HIGH';
+  congestionLevel?: "LOW" | "MEDIUM" | "HIGH";
   equipmentRequired?: EquipmentType;
 }
 
 interface Assumption {
-  type: 'TRAFFIC' | 'AVAILABILITY' | 'PRIORITY' | 'EQUIPMENT';
+  type: "TRAFFIC" | "AVAILABILITY" | "PRIORITY" | "EQUIPMENT";
   description: string;
-  confidence: number;  // 0-1
+  confidence: number; // 0-1
 }
 
 // Voice Commands for Route Optimization
@@ -1054,39 +1117,41 @@ interface MultiWorkerOptimization {
   optimizeTeam: (workers: Worker[], tasks: Task[]) => Promise<TeamPlan>;
   balanceWorkload: (workers: Worker[]) => Promise<BalancedPlan>;
   coordinateHandoffs: (task: Task) => Promise<Handoff[]>;
-  
+
   // Collaboration
   enableTaskSharing: boolean;
   enableTaskHandoff: boolean;
-  enableTeamTasks: boolean;  // multi-worker tasks
-  
+  enableTeamTasks: boolean; // multi-worker tasks
+
   // Coordination
   preventCollisions: boolean;
   syncMeetingPoints: (workers: Worker[]) => Promise<MeetingPoint[]>;
-  coordinateEquipmentSharing: (equipment: Equipment) => Promise<SharingSchedule>;
+  coordinateEquipmentSharing: (
+    equipment: Equipment,
+  ) => Promise<SharingSchedule>;
 }
 
 interface TeamPlan {
   timestamp: Date;
   workers: Worker[];
   tasks: Task[];
-  
+
   // Assignments
   workerAssignments: WorkerAssignment[];
-  
+
   // Coordination
   handoffs: Handoff[];
   meetingPoints: MeetingPoint[];
-  
+
   // Metrics
   totalDistance: number;
   totalTime: number;
   avgUtilization: number;
   taskCompletionTime: number;
-  
+
   // Optimization
   method: string;
-  improvement: number;  // % vs. independent
+  improvement: number; // % vs. independent
   computeTime: number;
 }
 
@@ -1094,23 +1159,28 @@ interface Handoff {
   taskId: string;
   fromWorker: string;
   toWorker: string;
-  
+
   // Location
   handoffLocation: Location;
   handoffTime: Date;
-  
+
   // Reason
-  reason: 'SHIFT_CHANGE' | 'EQUIPMENT_CHANGE' | 'ZONE_BOUNDARY' | 'SKILL_MATCH' | 'OPTIMIZATION';
-  
+  reason:
+    | "SHIFT_CHANGE"
+    | "EQUIPMENT_CHANGE"
+    | "ZONE_BOUNDARY"
+    | "SKILL_MATCH"
+    | "OPTIMIZATION";
+
   // Status
-  status: 'PLANNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: "PLANNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 }
 
 interface MeetingPoint {
   location: Location;
   workers: string[];
   time: Date;
-  purpose: 'HANDOFF' | 'TEAM_TASK' | 'EQUIPMENT_TRANSFER' | 'COORDINATION';
+  purpose: "HANDOFF" | "TEAM_TASK" | "EQUIPMENT_TRANSFER" | "COORDINATION";
 }
 
 // Voice Commands for Multi-Worker
@@ -1130,20 +1200,20 @@ interface GamificationSystem {
   // Points & Rewards
   calculatePoints: (session: WorkSession) => Points;
   awardBadges: (worker: Worker, achievement: Achievement) => Badge;
-  
+
   // Leaderboards
   leaderboards: Leaderboard[];
   updateLeaderboard: (workerId: string, metrics: WorkerPerformance) => void;
-  
+
   // Challenges
   dailyChallenges: Challenge[];
   weeklyGoals: Goal[];
-  
+
   // Social
   enableTeamCompetition: boolean;
   enableIndividualComparisons: boolean;
   shareAchievements: boolean;
-  
+
   // Privacy
   anonymousMode: boolean;
   optOut: boolean;
@@ -1151,14 +1221,14 @@ interface GamificationSystem {
 
 interface Points {
   total: number;
-  
+
   // Breakdown
   productivityPoints: number;
   accuracyPoints: number;
   speedPoints: number;
-  interleavingPoints: number;  // bonus for smart interleaving
-  helpingPoints: number;  // assisting others
-  
+  interleavingPoints: number; // bonus for smart interleaving
+  helpingPoints: number; // assisting others
+
   // Bonuses
   bonuses: PointBonus[];
   multiplier: number;
@@ -1169,11 +1239,11 @@ interface Badge {
   name: string;
   description: string;
   iconUrl: string;
-  rarity: 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
-  
+  rarity: "COMMON" | "RARE" | "EPIC" | "LEGENDARY";
+
   // Requirements
   requirements: Requirement[];
-  
+
   // Status
   earnedAt?: Date;
   earnedBy?: string;
@@ -1183,13 +1253,18 @@ interface Badge {
 interface Leaderboard {
   id: string;
   name: string;
-  metric: 'TASKS_PER_HOUR' | 'ACCURACY' | 'DISTANCE_SAVED' | 'INTERLEAVES' | 'POINTS';
-  period: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ALL_TIME';
-  
+  metric:
+    | "TASKS_PER_HOUR"
+    | "ACCURACY"
+    | "DISTANCE_SAVED"
+    | "INTERLEAVES"
+    | "POINTS";
+  period: "DAILY" | "WEEKLY" | "MONTHLY" | "ALL_TIME";
+
   // Rankings
   rankings: LeaderboardEntry[];
   myRank?: number;
-  
+
   updatedAt: Date;
 }
 
@@ -1198,27 +1273,27 @@ interface LeaderboardEntry {
   workerId: string;
   workerName: string;
   score: number;
-  trend: 'UP' | 'DOWN' | 'SAME';
+  trend: "UP" | "DOWN" | "SAME";
 }
 
 interface Challenge {
   id: string;
   name: string;
   description: string;
-  type: 'SPEED' | 'ACCURACY' | 'VOLUME' | 'INTERLEAVING' | 'TEAMWORK';
-  
+  type: "SPEED" | "ACCURACY" | "VOLUME" | "INTERLEAVING" | "TEAMWORK";
+
   // Target
   target: number;
   unit: string;
-  
+
   // Reward
   pointReward: number;
   badgeReward?: string;
-  
+
   // Timing
   startDate: Date;
   endDate: Date;
-  
+
   // Status
   progress: number;
   completed: boolean;
@@ -1242,47 +1317,47 @@ interface FatigueManagement {
   // Detection
   detectFatigue: (workerId: string) => Promise<FatigueLevel>;
   monitorPerformanceDecline: (workerId: string) => Promise<PerformanceTrend>;
-  
+
   // Factors
   factors: {
     hoursWorked: boolean;
     taskComplexity: boolean;
     errorRate: boolean;
     speedDecline: boolean;
-    voiceStress: boolean;  // analyze voice for stress
+    voiceStress: boolean; // analyze voice for stress
   };
-  
+
   // Actions
   suggestBreak: (workerId: string) => Promise<void>;
   reduceTaskComplexity: (workerId: string) => Promise<void>;
   redistributeTasks: (workerId: string) => Promise<void>;
-  
+
   // Prevention
   preventiveBreaks: boolean;
   maxConsecutiveHours: number;
-  mandatoryBreakInterval: number;  // minutes
-  
+  mandatoryBreakInterval: number; // minutes
+
   // Monitoring
   realTimeMonitoring: boolean;
   alertThreshold: FatigueLevel;
 }
 
 interface FatigueLevel {
-  level: 'FRESH' | 'NORMAL' | 'TIRED' | 'FATIGUED' | 'EXHAUSTED';
-  score: number;  // 0-100 (0 = exhausted, 100 = fresh)
-  
+  level: "FRESH" | "NORMAL" | "TIRED" | "FATIGUED" | "EXHAUSTED";
+  score: number; // 0-100 (0 = exhausted, 100 = fresh)
+
   // Indicators
   indicators: {
     hoursWorked: number;
     tasksCompleted: number;
     recentErrorRate: number;
-    speedDecline: number;  // %
+    speedDecline: number; // %
     breaksSinceLastTask: number;
   };
-  
+
   // Recommendations
   recommendBreak: boolean;
-  breakDuration: number;  // minutes
+  breakDuration: number; // minutes
   recommendLighterTasks: boolean;
   recommendShiftEnd: boolean;
 }
@@ -1291,14 +1366,14 @@ interface WorkloadBalancing {
   // Balance Methods
   balanceAcrossWorkers: (workers: Worker[]) => Promise<BalancedAssignment>;
   redistributeOverload: (overloadedWorker: Worker) => Promise<void>;
-  
+
   // Fairness
   ensureFairDistribution: boolean;
   preventCherryPicking: boolean;
   rotateDifficultTasks: boolean;
-  
+
   // Metrics
-  workloadBalance: number;  // 0-1 (1 = perfectly balanced)
+  workloadBalance: number; // 0-1 (1 = perfectly balanced)
   utilizationVariance: number;
   satisfactionScore: number;
 }
@@ -1322,21 +1397,21 @@ interface VoiceGuidedSwitching {
   suggestNextTask: (worker: Worker, location: Location) => Promise<void>;
   provideRouteGuidance: (from: Location, to: Location) => Promise<void>;
   alertUrgentTask: (task: Task) => Promise<void>;
-  
+
   // Confirmations
   requestSwitchConfirmation: (newTask: Task) => Promise<boolean>;
   confirmTaskStart: () => Promise<boolean>;
   confirmTaskComplete: () => Promise<boolean>;
-  
+
   // Hands-Free
   fullyHandsFree: boolean;
   noScreenRequired: boolean;
   conversationalInterface: boolean;
-  
+
   // Languages
   supportedLanguages: string[];
   autoDetectLanguage: boolean;
-  
+
   // Personalization
   adaptToWorkerPace: boolean;
   adjustVerbosity: boolean;
@@ -1346,20 +1421,20 @@ interface VoiceGuidedSwitching {
 interface VoiceSwitchingSession {
   sessionId: string;
   workerId: string;
-  
+
   // Voice Usage
   voiceCommandsUsed: number;
   voicePromptsGiven: number;
   voiceGuidanceMinutes: number;
-  
+
   // Effectiveness
   switchesViaVoice: number;
   switchesViaScreen: number;
-  voiceRecognitionAccuracy: number;  // %
-  
+  voiceRecognitionAccuracy: number; // %
+
   // Satisfaction
-  workerSatisfaction?: number;  // 1-5
-  preferredInterface: 'VOICE' | 'SCREEN' | 'MIXED';
+  workerSatisfaction?: number; // 1-5
+  preferredInterface: "VOICE" | "SCREEN" | "MIXED";
 }
 
 // Voice Commands for Task Switching (Comprehensive)
@@ -1368,39 +1443,39 @@ const VOICE_SWITCHING_COMMANDS = [
   "Complete task",
   "Task done",
   "Finished",
-  
+
   // Get Next Task
   "Next task",
   "Get next task",
   "What's next",
   "Show me my next task",
-  
+
   // Task Selection
   "Accept task",
   "Skip task",
   "Defer task",
   "Show me different task",
-  
+
   // Interleaving
   "Any tasks nearby",
   "Show nearby tasks",
   "Find replenishment on my way",
   "Interleave cycle count",
   "Switch to urgent task",
-  
+
   // Navigation
   "Where is {location}",
   "Guide me to {location}",
   "Show me the way",
   "Optimize my route",
-  
+
   // Information
   "What task am I on",
   "How many tasks left",
   "Show my progress",
   "What time is it",
   "When is my break",
-  
+
   // Help
   "Help",
   "Repeat instructions",
@@ -1414,43 +1489,44 @@ const VOICE_SWITCHING_COMMANDS = [
 ## 📊 Task Interleaving Metrics & Dashboards
 
 ### Performance Metrics
+
 ```typescript
 interface InterleavingMetrics {
   // Productivity
   tasksPerHour: number;
   tasksPerHourWithInterleaving: number;
-  productivityImprovement: number;  // %
-  
+  productivityImprovement: number; // %
+
   // Travel
-  avgTravelDistancePerTask: number;  // feet
+  avgTravelDistancePerTask: number; // feet
   totalTravelDistance: number;
-  travelReduction: number;  // % vs. without interleaving
-  
+  travelReduction: number; // % vs. without interleaving
+
   // Utilization
-  avgWorkerUtilization: number;  // %
-  idleTimeReduction: number;  // minutes
-  utilizationImprovement: number;  // %
-  
+  avgWorkerUtilization: number; // %
+  idleTimeReduction: number; // minutes
+  utilizationImprovement: number; // %
+
   // Interleaving
   interleavesPerShift: number;
-  interleavingSuccessRate: number;  // %
-  avgTimeSavingsPerInterleave: number;  // minutes
-  
+  interleavingSuccessRate: number; // %
+  avgTimeSavingsPerInterleave: number; // minutes
+
   // Task Mix
-  taskMixBalance: number;  // 0-1 (1 = perfect mix)
+  taskMixBalance: number; // 0-1 (1 = perfect mix)
   avgTaskTypesPershiftPerWorker: number;
-  
+
   // Response Time
-  avgTaskWaitTime: number;  // minutes from creation to assignment
+  avgTaskWaitTime: number; // minutes from creation to assignment
   urgentTaskResponseTime: number;
-  
+
   // Quality
-  accuracyWithInterleaving: number;  // %
-  errorRateChange: number;  // % (positive = more errors)
-  
+  accuracyWithInterleaving: number; // %
+  errorRateChange: number; // % (positive = more errors)
+
   // Worker Satisfaction
-  workerSatisfaction: number;  // 1-5
-  preferredByWorkers: number;  // %
+  workerSatisfaction: number; // 1-5
+  preferredByWorkers: number; // %
 }
 
 interface InterleavingDashboard {
@@ -1458,27 +1534,31 @@ interface InterleavingDashboard {
   activeWorkers: Worker[];
   activeTasks: Task[];
   availableTasks: Task[];
-  
+
   // Performance
   currentMetrics: InterleavingMetrics;
   trendsHourly: MetricTrend[];
   trendsDaily: MetricTrend[];
-  
+
   // Optimization
   optimizationOpportunities: Opportunity[];
   bottlenecks: Bottleneck[];
   recommendations: Recommendation[];
-  
+
   // Alerts
   criticalAlerts: Alert[];
   performanceAlerts: Alert[];
 }
 
 interface Opportunity {
-  type: 'INTERLEAVING' | 'ROUTE_OPTIMIZATION' | 'TASK_REBALANCING' | 'EQUIPMENT_CHANGE';
+  type:
+    | "INTERLEAVING"
+    | "ROUTE_OPTIMIZATION"
+    | "TASK_REBALANCING"
+    | "EQUIPMENT_CHANGE";
   description: string;
-  potentialSavings: number;  // minutes or $
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  potentialSavings: number; // minutes or $
+  difficulty: "EASY" | "MEDIUM" | "HARD";
   priority: number;
 }
 ```
@@ -1501,7 +1581,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Resume task",
     "Request different task",
   ],
-  
+
   // Interleaving (7)
   INTERLEAVING: [
     "Show nearby tasks",
@@ -1512,7 +1592,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Continue with current task",
     "Optimize my route",
   ],
-  
+
   // Work Sessions (8)
   SESSIONS: [
     "Start work session",
@@ -1524,7 +1604,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "How many tasks completed",
     "What is my tasks per hour",
   ],
-  
+
   // Equipment (6)
   EQUIPMENT: [
     "Assign equipment {type}",
@@ -1534,7 +1614,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Report equipment issue",
     "Show equipment status",
   ],
-  
+
   // Skills (4)
   SKILLS: [
     "Show my skill profile",
@@ -1542,7 +1622,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Show tasks matching my skills",
     "Mark me as expert in {skill}",
   ],
-  
+
   // Predictive (5)
   PREDICTIVE: [
     "Predict my next task",
@@ -1551,7 +1631,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Show predicted bottlenecks",
     "Optimize my schedule",
   ],
-  
+
   // Route Optimization (6)
   ROUTES: [
     "Optimize my route",
@@ -1561,7 +1641,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Shortest route",
     "Skip traffic",
   ],
-  
+
   // Multi-Worker (5)
   MULTI_WORKER: [
     "Request team assistance",
@@ -1570,7 +1650,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Accept task handoff",
     "Show team status",
   ],
-  
+
   // Gamification (6)
   GAMIFICATION: [
     "Show my points",
@@ -1580,7 +1660,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Show today's challenge",
     "Show my progress",
   ],
-  
+
   // Fatigue Management (5)
   FATIGUE: [
     "I need a break",
@@ -1589,7 +1669,7 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
     "Report fatigue",
     "Check my workload",
   ],
-  
+
   // Voice Switching (24 - comprehensive set)
   VOICE_SWITCHING: [
     "Complete task",
@@ -1646,24 +1726,28 @@ const ALL_INTERLEAVING_VOICE_COMMANDS = {
 ## 📁 Implementation Phases
 
 ### Phase 1: Core Interleaving (4-6 weeks)
+
 - Task pool management
 - Basic task assignment
 - Simple interleaving rules
 - Work session tracking
 
 ### Phase 2: Optimization (3-4 weeks)
+
 - Route optimization
 - Equipment-aware assignment
 - Skill-based routing
 - Multi-task sequencing
 
 ### Phase 3: Intelligence (4-6 weeks)
+
 - AI-powered predictive assignment
 - Real-time re-optimization
 - Bottleneck prediction
 - Performance analytics
 
 ### Phase 4: Advanced Features (4-6 weeks)
+
 - Voice-guided task switching (130+ commands)
 - Multi-worker coordination
 - Fatigue detection

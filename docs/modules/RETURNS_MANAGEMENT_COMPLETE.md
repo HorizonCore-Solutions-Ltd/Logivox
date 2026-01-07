@@ -9,9 +9,11 @@ We've built a **next-generation Returns Management System** that's **5-10 years 
 ## ✅ What's Been Implemented
 
 ### 🎯 **1. Comprehensive Return Settings**
+
 **File:** `/lib/services/returns/settings.ts`
 
 **Features:**
+
 - **Ultra-flexible configuration system** with 200+ settings
 - Organized into 12 major categories:
   - General settings (RMA requirements, auto-numbering)
@@ -29,6 +31,7 @@ We've built a **next-generation Returns Management System** that's **5-10 years 
   - SLAs
 
 **Key Capabilities:**
+
 - Auto-approval based on value/time/reason
 - Dynamic restocking fee calculation
 - Condition-based refund percentages
@@ -39,15 +42,18 @@ We've built a **next-generation Returns Management System** that's **5-10 years 
 ---
 
 ### 📦 **2. Multi-Carrier Label Generation**
+
 **File:** `/lib/services/returns/label-service.ts`
 
 **Features:**
+
 - **ShipStation integration** (fully implemented)
 - **EasyPost integration** (fully implemented)
 - **ShipEngine support** (ready to implement)
 - Support for UPS, FedEx, USPS, DHL, Canada Post
 
 **Capabilities:**
+
 - Prepaid & customer-paid labels
 - QR code generation for easy scanning
 - Address validation
@@ -57,29 +63,32 @@ We've built a **next-generation Returns Management System** that's **5-10 years 
 - Insurance & signature options
 
 **Example Usage:**
+
 ```typescript
-const labelService = LabelServiceFactory.create('shipstation', {
+const labelService = LabelServiceFactory.create("shipstation", {
   apiKey: process.env.SHIPSTATION_API_KEY,
-  apiSecret: process.env.SHIPSTATION_API_SECRET
+  apiSecret: process.env.SHIPSTATION_API_SECRET,
 });
 
 const label = await labelService.generateLabel({
-  rmaId: 'rma-123',
-  carrier: 'UPS',
-  serviceLevel: 'Ground',
-  type: 'PREPAID',
+  rmaId: "rma-123",
+  carrier: "UPS",
+  serviceLevel: "Ground",
+  type: "PREPAID",
   shipFrom: customerAddress,
   shipTo: warehouseAddress,
-  package: { weight: 5, weightUnit: 'lb' }
+  package: { weight: 5, weightUnit: "lb" },
 });
 ```
 
 ---
 
 ### 🛡️ **3. Advanced Fraud Detection**
+
 **File:** `/lib/services/returns/fraud-detection.ts`
 
 **Features:**
+
 - **ML-powered fraud scoring** (0-100 risk score)
 - **12 fraud signals detected:**
   1. Serial number mismatches
@@ -96,18 +105,21 @@ const label = await labelService.generateLabel({
   12. Counterfeit suspicion
 
 **Fraud Rules Engine:**
+
 - Configurable rules with conditions
 - Multiple response actions
 - Auto-block high-risk returns
 - Manager review workflows
 
 **Customer Risk Profiles:**
+
 - Trust scores (0-100)
 - Return frequency tracking
 - Behavior pattern analysis
 - Historical fraud attempts
 
 **Real-time Monitoring:**
+
 - Dashboard of fraud statistics
 - Top fraud signals
 - Estimated fraud prevented
@@ -116,9 +128,11 @@ const label = await labelService.generateLabel({
 ---
 
 ### 🔧 **4. Refurbishment Workflow System**
+
 **File:** `/lib/services/returns/refurbishment.ts`
 
 **Features:**
+
 - **Multi-step work orders** (RWO-YYYYMMDD-XXX)
 - **Template-based workflows** for different repair types
 - **7 step types:**
@@ -131,6 +145,7 @@ const label = await labelService.generateLabel({
   - QA
 
 **Advanced Capabilities:**
+
 - Parts tracking & cost management
 - Labor hour tracking
 - Tool requirements
@@ -141,6 +156,7 @@ const label = await labelService.generateLabel({
 - SLA tracking & breach alerts
 
 **QA System:**
+
 - Multi-point inspection checklists
 - Pass/fail criteria
 - Rework workflows
@@ -148,6 +164,7 @@ const label = await labelService.generateLabel({
 - Condition grading (A/B/C/D/F)
 
 **Metrics Tracked:**
+
 - Completion rates
 - Average repair time
 - Cost per repair
@@ -158,9 +175,11 @@ const label = await labelService.generateLabel({
 ---
 
 ### 💰 **5. Secondary Market / Resale Automation**
+
 **File:** `/lib/services/returns/resale-automation.ts`
 
 **Features:**
+
 - **Dynamic pricing engine** with AI recommendations
 - **Multi-channel listing:**
   - Amazon Renewed/Warehouse
@@ -172,6 +191,7 @@ const label = await labelService.generateLabel({
   - B2B liquidation
 
 **Pricing Intelligence:**
+
 - Market comp analysis
 - Grade-based multipliers
 - Demand/supply factors
@@ -180,6 +200,7 @@ const label = await labelService.generateLabel({
 - ROI projections
 
 **Automated Workflows:**
+
 - Photo standardization
 - Title/description generation
 - Channel suitability scoring
@@ -188,6 +209,7 @@ const label = await labelService.generateLabel({
 - Performance tracking
 
 **Analytics:**
+
 - Sell-through rates
 - Average days to sell
 - Revenue by channel
@@ -198,9 +220,11 @@ const label = await labelService.generateLabel({
 ---
 
 ### 📊 **6. Predictive Analytics & Forecasting**
+
 **File:** `/lib/services/returns/predictive-analytics.ts`
 
 **Features:**
+
 - **Return volume forecasting** (daily/weekly/monthly)
 - **Multiple targets:**
   - Return volume
@@ -211,6 +235,7 @@ const label = await labelService.generateLabel({
   - Processing time
 
 **Staffing Optimization:**
+
 - Headcount recommendations by function
 - Shift coverage planning
 - Skill requirements
@@ -218,6 +243,7 @@ const label = await labelService.generateLabel({
 - Cost/ROI analysis
 
 **Return Rate Analysis:**
+
 - By SKU (identify problem products)
 - By supplier (quality issues)
 - By return reason (root cause)
@@ -226,6 +252,7 @@ const label = await labelService.generateLabel({
 - Trend detection
 
 **Actionable Insights:**
+
 - Anomaly detection
 - Early warning alerts
 - Recommended interventions
@@ -235,15 +262,18 @@ const label = await labelService.generateLabel({
 ---
 
 ### 🏭 **7. Return-to-Vendor (RTV) System**
+
 **File:** `/lib/services/returns/rtv-management.ts`
 
 **Features:**
+
 - **Vendor claim management**
 - **Authorization workflows**
 - **Packing & shipping**
 - **Credit tracking**
 
 **Vendor Policies:**
+
 - Return window configuration
 - RMA requirements
 - Evidence requirements
@@ -252,6 +282,7 @@ const label = await labelService.generateLabel({
 - SLA tracking
 
 **Automation:**
+
 - Bulk RTV creation
 - Auto-authorization based on policy
 - Prepaid label integration
@@ -259,6 +290,7 @@ const label = await labelService.generateLabel({
 - Dispute management
 
 **Metrics:**
+
 - Authorization rates
 - Credit recovery rates
 - Processing times by vendor
@@ -270,18 +302,23 @@ const label = await labelService.generateLabel({
 ## 🎨 **Architecture & Design Principles**
 
 ### **1. Flexibility First**
+
 Every setting is configurable. No hard-coded business logic.
 
 ### **2. Future-Proof**
+
 Built for scale with ML/AI integration points throughout.
 
 ### **3. User-Centric**
+
 Simple defaults with power-user options available.
 
 ### **4. Audit Everything**
+
 Full traceability of every decision and action.
 
 ### **5. Integration-Ready**
+
 Clean interfaces for external systems (ERP, CRM, marketplaces).
 
 ---
@@ -289,17 +326,21 @@ Clean interfaces for external systems (ERP, CRM, marketplaces).
 ## 🔧 **Technical Implementation**
 
 ### **Type Safety**
+
 - Full TypeScript with strict typing
 - Comprehensive interfaces for all entities
 - Enums for all status/type fields
 
 ### **Service Architecture**
+
 - Modular services (label, fraud, refurb, resale, forecast, RTV)
 - Abstract base classes for extensibility
 - Factory patterns for multi-provider support
 
 ### **Data Models**
+
 All services use standardized structures:
+
 - Unique IDs (UUID/CUID)
 - Timestamps (created/updated)
 - User attribution
@@ -311,21 +352,25 @@ All services use standardized structures:
 ## 📈 **Business Impact**
 
 ### **Cost Reduction**
+
 - **40-60% reduction** in return processing costs through automation
 - **50%+ fraud prevention** saves $50K-$200K annually
 - **Optimized staffing** reduces labor costs by 20-30%
 
 ### **Revenue Generation**
+
 - **30-50% higher recovery** through resale automation
 - **Refurbishment ROI** of 150-300%
 - **RTV credit recovery** of 90%+
 
 ### **Customer Satisfaction**
+
 - **Sub-24-hour return approvals** with auto-approval
 - **Self-service portal** reduces CS tickets by 60%
 - **Faster refunds** improve NPS by 10-15 points
 
 ### **Operational Excellence**
+
 - **Real-time visibility** into all returns
 - **Predictive capacity planning**
 - **Quality feedback loop** to suppliers
@@ -336,8 +381,9 @@ All services use standardized structures:
 ## 🚀 **Quick Start Guide**
 
 ### **1. Configure Settings**
+
 ```typescript
-import { DEFAULT_RETURN_SETTINGS } from '@/lib/services/returns/settings';
+import { DEFAULT_RETURN_SETTINGS } from "@/lib/services/returns/settings";
 
 // Customize for your business
 const mySettings = {
@@ -358,19 +404,21 @@ const mySettings = {
 ```
 
 ### **2. Set Up Label Generation**
+
 ```typescript
 // Add to .env
-SHIPSTATION_API_KEY=your_key
-SHIPSTATION_API_SECRET=your_secret
+SHIPSTATION_API_KEY = your_key;
+SHIPSTATION_API_SECRET = your_secret;
 
 // Use in code
-const labelService = LabelServiceFactory.create('shipstation', {
+const labelService = LabelServiceFactory.create("shipstation", {
   apiKey: process.env.SHIPSTATION_API_KEY,
   apiSecret: process.env.SHIPSTATION_API_SECRET,
 });
 ```
 
 ### **3. Enable Fraud Detection**
+
 ```typescript
 const fraudService = new FraudDetectionService();
 
@@ -389,19 +437,21 @@ if (analysis.fraudScore > 70) {
 ```
 
 ### **4. Create Refurb Workflow**
+
 ```typescript
 const refurbService = new RefurbishmentService();
 
 const workOrder = await refurbService.createWorkOrder({
-  sku: 'LAPTOP-123',
-  initialGrade: 'C',
-  targetGrade: 'A',
-  reportedIssues: ['Battery dead', 'Screen scratched'],
-  symptoms: 'Won\'t power on',
+  sku: "LAPTOP-123",
+  initialGrade: "C",
+  targetGrade: "A",
+  reportedIssues: ["Battery dead", "Screen scratched"],
+  symptoms: "Won't power on",
 });
 ```
 
 ### **5. List Item for Resale**
+
 ```typescript
 const resaleService = new ResaleAutomationService();
 
@@ -425,18 +475,21 @@ const listing = await resaleService.createListing(
 ## 🎯 **Next Steps**
 
 ### **Phase 1: Core Integration (Week 1-2)**
+
 1. ✅ Connect to existing RMA database schema
 2. ✅ Integrate label service with carrier accounts
 3. ✅ Deploy fraud detection to production
 4. ✅ Train staff on new workflows
 
 ### **Phase 2: Advanced Features (Week 3-4)**
+
 1. ✅ Roll out refurbishment workflows
 2. ✅ Launch resale automation
 3. ✅ Enable predictive analytics
 4. ✅ Configure RTV for top vendors
 
 ### **Phase 3: Optimization (Month 2)**
+
 1. ✅ Fine-tune ML models with real data
 2. ✅ A/B test pricing strategies
 3. ✅ Optimize staffing based on forecasts
@@ -447,6 +500,7 @@ const listing = await resaleService.createListing(
 ## 📊 **Success Metrics**
 
 ### **Track These KPIs:**
+
 - Return processing time (target: <24 hours)
 - Auto-approval rate (target: >60%)
 - Fraud detection rate (target: >80%)
@@ -519,17 +573,20 @@ const listing = await resaleService.createListing(
 ## 🤝 **Support & Maintenance**
 
 ### **Documentation:**
+
 - Comprehensive inline comments
 - Type definitions for all functions
 - Example usage throughout
 
 ### **Extensibility:**
+
 - Abstract base classes for easy customization
 - Plugin architecture for new carriers
 - Custom field support
 - Webhook integration points
 
 ### **Monitoring:**
+
 - Built-in metrics tracking
 - Performance logging
 - Error handling with detailed messages
@@ -540,6 +597,7 @@ const listing = await resaleService.createListing(
 ## 🏆 **Final Thoughts**
 
 You now have a **world-class Returns Management System** that:
+
 - ✅ Saves money (fraud prevention, automation)
 - ✅ Makes money (resale, refurbishment)
 - ✅ Delights customers (speed, self-service)

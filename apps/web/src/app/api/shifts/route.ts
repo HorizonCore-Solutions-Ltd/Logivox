@@ -1,17 +1,19 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const shiftSchema = z.object({
-  name: z.string().min(1, 'Shift name is required'),
+  name: z.string().min(1, "Shift name is required"),
   warehouseId: z.string(),
-  startTime: z.string().transform(str => new Date(str)),
-  endTime: z.string().transform(str => new Date(str)),
+  startTime: z.string().transform((str) => new Date(str)),
+  endTime: z.string().transform((str) => new Date(str)),
   assignedEmployeeIds: z.array(z.string()).optional(),
-  shiftType: z.enum(['MORNING', 'AFTERNOON', 'NIGHT', 'WEEKEND']).default('MORNING'),
+  shiftType: z
+    .enum(["MORNING", "AFTERNOON", "NIGHT", "WEEKEND"])
+    .default("MORNING"),
   capacity: z.number().int().positive().optional(),
   notes: z.string().optional(),
 });
@@ -24,23 +26,28 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { searchParams } = new URL(req.url);
-    const warehouseId = searchParams.get('warehouseId');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const warehouseId = searchParams.get("warehouseId");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     const shifts = await prisma.shift.findMany({
       where: {
@@ -63,13 +70,16 @@ export async function GET(req: NextRequest) {
           select: { employees: true },
         },
       },
-      orderBy: { startTime: 'desc' },
+      orderBy: { startTime: "desc" },
     });
 
     return NextResponse.json(shifts);
   } catch (error: any) {
-    console.error('Error fetching shifts:', error);
-    return NextResponse.json({ error: 'Failed to fetch shifts' }, { status: 500 });
+    console.error("Error fetching shifts:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch shifts" },
+      { status: 500 },
+    );
   }
 }
 
@@ -81,16 +91,21 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -101,11 +116,12 @@ export async function POST(req: NextRequest) {
       data: {
         ...shiftData,
         organizationId,
-        ...(assignedEmployeeIds && assignedEmployeeIds.length > 0 && {
-          employees: {
-            connect: assignedEmployeeIds.map(id => ({ id })),
-          },
-        }),
+        ...(assignedEmployeeIds &&
+          assignedEmployeeIds.length > 0 && {
+            employees: {
+              connect: assignedEmployeeIds.map((id) => ({ id })),
+            },
+          }),
       },
       include: {
         warehouse: { select: { name: true, code: true } },
@@ -125,8 +141,8 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'SHIFT_CREATED',
-        entityType: 'Shift',
+        action: "SHIFT_CREATED",
+        entityType: "Shift",
         entityId: shift.id,
         metadata: {
           shiftName: shift.name,
@@ -140,9 +156,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(shift, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error creating shift:', error);
-    return NextResponse.json({ error: 'Failed to create shift' }, { status: 500 });
+    console.error("Error creating shift:", error);
+    return NextResponse.json(
+      { error: "Failed to create shift" },
+      { status: 500 },
+    );
   }
 }

@@ -137,7 +137,9 @@ export default function QualityHoldDetailPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <Clock className="w-12 h-12 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading quality hold details...</p>
+          <p className="text-muted-foreground">
+            Loading quality hold details...
+          </p>
         </div>
       </div>
     );
@@ -174,7 +176,9 @@ export default function QualityHoldDetailPage() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/qc/quality-holds/${params.id}/edit`)}
+            onClick={() =>
+              router.push(`/dashboard/qc/quality-holds/${params.id}/edit`)
+            }
           >
             <Edit className="w-4 h-4 mr-2" />
             Edit
@@ -277,24 +281,38 @@ export default function QualityHoldDetailPage() {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-muted-foreground">Total Estimated Value</span>
+                  <span className="text-sm text-muted-foreground">
+                    Total Estimated Value
+                  </span>
                   <span className="text-2xl font-bold text-red-600">
                     ${hold.estimatedValue.toFixed(2)}
                   </span>
                 </div>
                 {hold.quantityReleased > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Released Value</span>
+                    <span className="text-sm text-muted-foreground">
+                      Released Value
+                    </span>
                     <span className="text-lg font-semibold text-green-600">
-                      ${((hold.quantityReleased / hold.quantityOnHold) * hold.estimatedValue).toFixed(2)}
+                      $
+                      {(
+                        (hold.quantityReleased / hold.quantityOnHold) *
+                        hold.estimatedValue
+                      ).toFixed(2)}
                     </span>
                   </div>
                 )}
                 {hold.quantityRejected > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Rejected Value</span>
+                    <span className="text-sm text-muted-foreground">
+                      Rejected Value
+                    </span>
                     <span className="text-lg font-semibold text-gray-600">
-                      ${((hold.quantityRejected / hold.quantityOnHold) * hold.estimatedValue).toFixed(2)}
+                      $
+                      {(
+                        (hold.quantityRejected / hold.quantityOnHold) *
+                        hold.estimatedValue
+                      ).toFixed(2)}
                     </span>
                   </div>
                 )}
@@ -323,7 +341,9 @@ export default function QualityHoldDetailPage() {
                 {hold.dispositionNotes && (
                   <div>
                     <p className="text-sm font-medium mb-1">Notes</p>
-                    <p className="text-sm text-muted-foreground">{hold.dispositionNotes}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {hold.dispositionNotes}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -344,12 +364,16 @@ export default function QualityHoldDetailPage() {
                   <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
                     <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-green-900">Released</p>
+                      <p className="text-sm font-medium text-green-900">
+                        Released
+                      </p>
                       <p className="text-xs text-green-700">
                         {new Date(hold.releasedAt).toLocaleString()}
                       </p>
                       {hold.releasedBy && (
-                        <p className="text-xs text-green-600 mt-1">By: {hold.releasedBy}</p>
+                        <p className="text-xs text-green-600 mt-1">
+                          By: {hold.releasedBy}
+                        </p>
                       )}
                     </div>
                     <Badge className="bg-green-600 text-white">
@@ -361,12 +385,16 @@ export default function QualityHoldDetailPage() {
                   <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                     <XCircle className="w-5 h-5 text-gray-600 mt-0.5" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">Rejected</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        Rejected
+                      </p>
                       <p className="text-xs text-gray-700">
                         {new Date(hold.rejectedAt).toLocaleString()}
                       </p>
                       {hold.rejectedBy && (
-                        <p className="text-xs text-gray-600 mt-1">By: {hold.rejectedBy}</p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          By: {hold.rejectedBy}
+                        </p>
                       )}
                     </div>
                     <Badge className="bg-gray-600 text-white">
@@ -394,7 +422,9 @@ export default function QualityHoldDetailPage() {
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Product</p>
                   <p className="text-sm font-medium">{hold.product.name}</p>
-                  <p className="text-xs text-muted-foreground">{hold.product.sku}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {hold.product.sku}
+                  </p>
                 </div>
               )}
               {hold.lot && (
@@ -410,14 +440,18 @@ export default function QualityHoldDetailPage() {
                     <MapPin className="w-3 h-3" />
                     {hold.location.name}
                   </p>
-                  <p className="text-xs text-muted-foreground">{hold.location.zone}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {hold.location.zone}
+                  </p>
                 </div>
               )}
               {hold.supplier && (
                 <div>
                   <p className="text-sm text-muted-foreground mb-1">Supplier</p>
                   <p className="text-sm font-medium">{hold.supplier.name}</p>
-                  <p className="text-xs text-muted-foreground">{hold.supplier.code}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {hold.supplier.code}
+                  </p>
                 </div>
               )}
               {hold.order && (
@@ -426,7 +460,9 @@ export default function QualityHoldDetailPage() {
                   <Button
                     variant="link"
                     className="p-0 h-auto text-sm"
-                    onClick={() => router.push(`/dashboard/orders/${hold.order?.id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/orders/${hold.order?.id}`)
+                    }
                   >
                     {hold.order.orderNumber}
                   </Button>
@@ -434,11 +470,17 @@ export default function QualityHoldDetailPage() {
               )}
               {hold.inspection && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Inspection</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Inspection
+                  </p>
                   <Button
                     variant="link"
                     className="p-0 h-auto text-sm"
-                    onClick={() => router.push(`/dashboard/qc/inspections/${hold.inspection?.id}`)}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/qc/inspections/${hold.inspection?.id}`,
+                      )
+                    }
                   >
                     {hold.inspection.inspectionNumber}
                   </Button>
@@ -446,11 +488,15 @@ export default function QualityHoldDetailPage() {
               )}
               {hold.ncr && (
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">Related NCR</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Related NCR
+                  </p>
                   <Button
                     variant="link"
                     className="p-0 h-auto text-sm"
-                    onClick={() => router.push(`/dashboard/qc/ncr/${hold.ncr?.id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/qc/ncr/${hold.ncr?.id}`)
+                    }
                   >
                     {hold.ncr.ncrNumber}
                   </Button>
@@ -470,11 +516,15 @@ export default function QualityHoldDetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Created</p>
-                <p className="text-sm">{new Date(hold.createdAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(hold.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{new Date(hold.updatedAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(hold.updatedAt).toLocaleString()}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -489,7 +539,9 @@ export default function QualityHoldDetailPage() {
                 <Button
                   variant="outline"
                   className="w-full justify-start text-green-600 border-green-600 hover:bg-green-50"
-                  onClick={() => {/* Release hold */}}
+                  onClick={() => {
+                    /* Release hold */
+                  }}
                 >
                   <CheckCircle className="w-4 h-4 mr-2" />
                   Release Hold
@@ -497,7 +549,9 @@ export default function QualityHoldDetailPage() {
                 <Button
                   variant="outline"
                   className="w-full justify-start text-red-600 border-red-600 hover:bg-red-50"
-                  onClick={() => {/* Reject hold */}}
+                  onClick={() => {
+                    /* Reject hold */
+                  }}
                 >
                   <XCircle className="w-4 h-4 mr-2" />
                   Reject Items
@@ -505,7 +559,9 @@ export default function QualityHoldDetailPage() {
                 <Button
                   variant="outline"
                   className="w-full justify-start"
-                  onClick={() => router.push(`/dashboard/qc/ncr/create?holdId=${hold.id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/qc/ncr/create?holdId=${hold.id}`)
+                  }
                 >
                   <AlertTriangle className="w-4 h-4 mr-2" />
                   Create NCR

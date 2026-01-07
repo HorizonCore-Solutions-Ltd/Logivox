@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useRef, useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Pen, Trash2 } from 'lucide-react';
+import { useRef, useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Pen, Trash2 } from "lucide-react";
 
 interface SignatureCaptureProps {
   value: string;
@@ -15,7 +15,7 @@ interface SignatureCaptureProps {
 export function SignatureCapture({
   value,
   onChange,
-  label = 'Signature',
+  label = "Signature",
   required = false,
 }: SignatureCaptureProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -25,7 +25,7 @@ export function SignatureCapture({
   useEffect(() => {
     if (value && canvasRef.current) {
       const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (ctx) {
         const img = new Image();
         img.onload = () => {
@@ -37,15 +37,21 @@ export function SignatureCapture({
     }
   }, [value]);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+  const startDrawing = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const x =
+      "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+    const y =
+      "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.beginPath();
       ctx.moveTo(x, y);
@@ -54,22 +60,28 @@ export function SignatureCapture({
     }
   };
 
-  const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+  const draw = (
+    e:
+      | React.MouseEvent<HTMLCanvasElement>
+      | React.TouchEvent<HTMLCanvasElement>,
+  ) => {
     if (!isDrawing) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    const x =
+      "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
+    const y =
+      "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.lineTo(x, y);
-      ctx.strokeStyle = '#000';
+      ctx.strokeStyle = "#000";
       ctx.lineWidth = 2;
-      ctx.lineCap = 'round';
+      ctx.lineCap = "round";
       ctx.stroke();
     }
   };
@@ -79,7 +91,7 @@ export function SignatureCapture({
       setIsDrawing(false);
       const canvas = canvasRef.current;
       if (canvas) {
-        const dataUrl = canvas.toDataURL('image/png');
+        const dataUrl = canvas.toDataURL("image/png");
         onChange(dataUrl);
       }
     }
@@ -88,11 +100,11 @@ export function SignatureCapture({
   const clear = () => {
     const canvas = canvasRef.current;
     if (canvas) {
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         setIsEmpty(true);
-        onChange('');
+        onChange("");
       }
     }
   };
@@ -104,12 +116,7 @@ export function SignatureCapture({
           {label} {required && <span className="text-red-500">*</span>}
         </label>
         {!isEmpty && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={clear}
-          >
+          <Button type="button" variant="ghost" size="sm" onClick={clear}>
             <Trash2 className="mr-1 h-4 w-4" />
             Clear
           </Button>

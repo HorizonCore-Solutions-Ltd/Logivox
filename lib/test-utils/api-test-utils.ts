@@ -3,7 +3,7 @@
  * Helper functions for testing API routes
  */
 
-import { NextRequest } from 'next/server';
+import { NextRequest } from "next/server";
 
 /**
  * Create mock NextRequest for testing
@@ -16,8 +16,8 @@ export function createMockRequest(options: {
   searchParams?: Record<string, string>;
 }): NextRequest {
   const {
-    method = 'GET',
-    url = 'http://localhost:3000/api/test',
+    method = "GET",
+    url = "http://localhost:3000/api/test",
     body,
     headers = {},
     searchParams = {},
@@ -33,7 +33,7 @@ export function createMockRequest(options: {
   const request = new NextRequest(fullUrl, {
     method,
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...headers,
     },
     body: body ? JSON.stringify(body) : undefined,
@@ -54,16 +54,21 @@ export function createAuthenticatedRequest(options: {
   userId?: string;
   userRole?: string;
 }): NextRequest {
-  const { userId = 'test-user-id', userRole = 'ADMIN', headers, ...requestOptions } = options;
+  const {
+    userId = "test-user-id",
+    userRole = "ADMIN",
+    headers,
+    ...requestOptions
+  } = options;
 
   // Create mock JWT token
   const mockToken = Buffer.from(
     JSON.stringify({
       sub: userId,
       role: userRole,
-      email: 'test@example.com',
-    })
-  ).toString('base64');
+      email: "test@example.com",
+    }),
+  ).toString("base64");
 
   return createMockRequest({
     ...requestOptions,
@@ -79,7 +84,7 @@ export function createAuthenticatedRequest(options: {
  */
 export async function parseResponse(response: Response) {
   const text = await response.text();
-  
+
   try {
     return JSON.parse(text);
   } catch {
@@ -164,10 +169,10 @@ export function createMockPrisma() {
 export function createMockSession(overrides?: any) {
   return {
     user: {
-      id: 'test-user-id',
-      email: 'test@example.com',
-      name: 'Test User',
-      role: 'ADMIN',
+      id: "test-user-id",
+      email: "test@example.com",
+      name: "Test User",
+      role: "ADMIN",
       ...overrides?.user,
     },
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
@@ -180,13 +185,13 @@ export function createMockSession(overrides?: any) {
  */
 export const factories = {
   inventoryItem: (overrides?: any) => ({
-    id: 'test-item-id',
-    sku: 'TEST-SKU-001',
-    name: 'Test Product',
-    description: 'Test description',
-    barcode: '1234567890123',
-    categoryId: 'cat-1',
-    supplierId: 'sup-1',
+    id: "test-item-id",
+    sku: "TEST-SKU-001",
+    name: "Test Product",
+    description: "Test description",
+    barcode: "1234567890123",
+    categoryId: "cat-1",
+    supplierId: "sup-1",
     unitPrice: 99.99,
     unitCost: 49.99,
     reorderPoint: 10,
@@ -198,46 +203,46 @@ export const factories = {
   }),
 
   salesOrder: (overrides?: any) => ({
-    id: 'test-order-id',
-    soNumber: 'SO-20251016-0001',
-    status: 'CONFIRMED',
-    customerId: 'cust-1',
-    warehouseId: 'wh-1',
+    id: "test-order-id",
+    soNumber: "SO-20251016-0001",
+    status: "CONFIRMED",
+    customerId: "cust-1",
+    warehouseId: "wh-1",
     orderDate: new Date(),
     requiredDate: new Date(),
     shippedDate: null,
     totalAmount: 199.98,
-    notes: '',
+    notes: "",
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
   }),
 
   purchaseOrder: (overrides?: any) => ({
-    id: 'test-po-id',
-    poNumber: 'PO-20251016-0001',
-    status: 'CONFIRMED',
-    supplierId: 'sup-1',
-    warehouseId: 'wh-1',
+    id: "test-po-id",
+    poNumber: "PO-20251016-0001",
+    status: "CONFIRMED",
+    supplierId: "sup-1",
+    warehouseId: "wh-1",
     orderDate: new Date(),
     expectedDate: new Date(),
     receivedDate: null,
     totalAmount: 499.95,
-    notes: '',
+    notes: "",
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
   }),
 
   warehouse: (overrides?: any) => ({
-    id: 'test-wh-id',
-    name: 'Test Warehouse',
-    code: 'WH-TEST',
-    address: '123 Test St',
-    city: 'Test City',
-    state: 'TS',
-    postalCode: '12345',
-    country: 'US',
+    id: "test-wh-id",
+    name: "Test Warehouse",
+    code: "WH-TEST",
+    address: "123 Test St",
+    city: "Test City",
+    state: "TS",
+    postalCode: "12345",
+    country: "US",
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -245,15 +250,15 @@ export const factories = {
   }),
 
   location: (overrides?: any) => ({
-    id: 'test-loc-id',
-    name: 'A-01-01-01',
-    barcode: 'LOC-A-01-01-01',
-    warehouseId: 'wh-1',
-    zone: 'A',
-    aisle: '01',
-    rack: '01',
-    bin: '01',
-    locationType: 'STORAGE',
+    id: "test-loc-id",
+    name: "A-01-01-01",
+    barcode: "LOC-A-01-01-01",
+    warehouseId: "wh-1",
+    zone: "A",
+    aisle: "01",
+    rack: "01",
+    bin: "01",
+    locationType: "STORAGE",
     isActive: true,
     capacity: 100,
     currentUtilization: 0,
@@ -263,10 +268,10 @@ export const factories = {
   }),
 
   stockLevel: (overrides?: any) => ({
-    id: 'test-stock-id',
-    inventoryItemId: 'item-1',
-    warehouseId: 'wh-1',
-    locationId: 'loc-1',
+    id: "test-stock-id",
+    inventoryItemId: "item-1",
+    warehouseId: "wh-1",
+    locationId: "loc-1",
     quantity: 100,
     allocatedQuantity: 20,
     availableQuantity: 80,
@@ -279,33 +284,33 @@ export const factories = {
   }),
 
   pickingTask: (overrides?: any) => ({
-    id: 'test-task-id',
-    taskNumber: 'TASK-20251016-0001',
-    taskType: 'PICKING',
-    status: 'PENDING',
+    id: "test-task-id",
+    taskNumber: "TASK-20251016-0001",
+    taskType: "PICKING",
+    status: "PENDING",
     priority: 5,
-    warehouseId: 'wh-1',
-    assignedToId: 'user-1',
-    fromLocationId: 'loc-1',
-    toLocationId: 'loc-2',
-    inventoryItemId: 'item-1',
+    warehouseId: "wh-1",
+    assignedToId: "user-1",
+    fromLocationId: "loc-1",
+    toLocationId: "loc-2",
+    inventoryItemId: "item-1",
     quantity: 10,
     scheduledFor: new Date(),
     startedAt: null,
     completedAt: null,
     duration: null,
-    notes: '',
+    notes: "",
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
   }),
 
   user: (overrides?: any) => ({
-    id: 'test-user-id',
-    email: 'test@example.com',
-    name: 'Test User',
-    password: 'hashed-password',
-    role: 'ADMIN',
+    id: "test-user-id",
+    email: "test@example.com",
+    name: "Test User",
+    password: "hashed-password",
+    role: "ADMIN",
     isActive: true,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -317,16 +322,16 @@ export const factories = {
  * Assert response structure
  */
 export function assertSuccessResponse(data: any) {
-  expect(data).toHaveProperty('success', true);
-  expect(data).toHaveProperty('data');
+  expect(data).toHaveProperty("success", true);
+  expect(data).toHaveProperty("data");
 }
 
 export function assertErrorResponse(data: any, errorCode?: string) {
-  expect(data).toHaveProperty('success', false);
-  expect(data).toHaveProperty('error');
-  
+  expect(data).toHaveProperty("success", false);
+  expect(data).toHaveProperty("error");
+
   if (errorCode) {
-    expect(data.error).toHaveProperty('code', errorCode);
+    expect(data.error).toHaveProperty("code", errorCode);
   }
 }
 
@@ -335,9 +340,9 @@ export function assertErrorResponse(data: any, errorCode?: string) {
  */
 export function assertPaginationResponse(data: any) {
   assertSuccessResponse(data);
-  expect(data.data).toHaveProperty('items');
-  expect(data.data).toHaveProperty('total');
-  expect(data.data).toHaveProperty('page');
-  expect(data.data).toHaveProperty('limit');
+  expect(data.data).toHaveProperty("items");
+  expect(data.data).toHaveProperty("total");
+  expect(data.data).toHaveProperty("page");
+  expect(data.data).toHaveProperty("limit");
   expect(Array.isArray(data.data.items)).toBe(true);
 }

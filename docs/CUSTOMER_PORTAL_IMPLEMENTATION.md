@@ -1,6 +1,7 @@
 # Customer Self-Service Portal - Implementation Summary
 
 ## Overview
+
 The Customer Self-Service Portal is a complete, integrated web interface that allows customers to place orders, track shipments, and manage their accounts without needing to contact warehouse staff directly. Built as part of the existing LogiVox WMS Next.js application.
 
 **Implementation Date:** January 3, 2026  
@@ -12,6 +13,7 @@ The Customer Self-Service Portal is a complete, integrated web interface that al
 ## Key Features
 
 ### ✅ Order Placement
+
 - **Product Selection**: Browse available inventory items
 - **Quantity Entry**: Specify quantities with validation
 - **Shipping Details**: Enter or use default shipping address
@@ -20,6 +22,7 @@ The Customer Self-Service Portal is a complete, integrated web interface that al
 - **Instant Submission**: Orders created with PENDING_APPROVAL status
 
 ### ✅ Order Management
+
 - **Order History**: View all past and current orders
 - **Search & Filter**: Find orders by number, tracking, or status
 - **Order Details**: View complete order information including items, quantities, pricing
@@ -27,6 +30,7 @@ The Customer Self-Service Portal is a complete, integrated web interface that al
 - **Pagination**: Efficient browsing of large order histories
 
 ### ✅ Shipment Tracking
+
 - **Tracking Numbers**: View tracking information for all shipments
 - **Carrier Links**: Direct links to carrier tracking pages
 - **Status Updates**: Real-time shipment status (picked, packed, shipped, delivered)
@@ -34,6 +38,7 @@ The Customer Self-Service Portal is a complete, integrated web interface that al
 - **Multi-Shipment**: Support for orders with multiple shipments
 
 ### ✅ Account Management
+
 - **Profile Information**: View user and company details
 - **Contact Details**: Access to company email and phone
 - **Shipping Address**: Default shipping address on file
@@ -45,6 +50,7 @@ The Customer Self-Service Portal is a complete, integrated web interface that al
 ## Architecture
 
 ### Integration Pattern
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │         LogiVox WMS (Single Next.js Application)        │
@@ -72,6 +78,7 @@ The Customer Self-Service Portal is a complete, integrated web interface that al
 ```
 
 ### Benefits of Integrated Approach
+
 1. **Single Codebase**: Easier maintenance and updates
 2. **Shared Authentication**: One login system for all users
 3. **Unified Database**: Real-time data consistency
@@ -87,6 +94,7 @@ The Customer Self-Service Portal is a complete, integrated web interface that al
 ### Files Created (12 Files, ~2,800 Lines)
 
 #### Frontend Pages (6 files)
+
 ```
 apps/web/src/app/portal/
 ├── layout.tsx (142 lines)           # Portal wrapper with navigation
@@ -104,6 +112,7 @@ apps/web/src/app/portal/
 ```
 
 #### API Endpoints (6 files)
+
 ```
 apps/web/src/app/api/portal/
 ├── dashboard/
@@ -123,6 +132,7 @@ apps/web/src/app/api/portal/
 ### Database Schema Changes
 
 #### User Role Extension
+
 ```prisma
 enum UserRole {
   SUPER_ADMIN  // Full system access
@@ -135,17 +145,18 @@ enum UserRole {
 ```
 
 #### User-Customer Linking
+
 ```prisma
 model User {
   // ... existing fields ...
-  
+
   customerId  String?    @map("customer_id")  // ⭐ NEW
   customer    Customer?  @relation("CustomerUsers", fields: [customerId], references: [id])  // ⭐ NEW
 }
 
 model Customer {
   // ... existing fields ...
-  
+
   portalUsers User[]     @relation("CustomerUsers")  // ⭐ NEW - bidirectional
 }
 ```
@@ -159,6 +170,7 @@ model Customer {
 ### Role-Based Access Control (RBAC)
 
 #### Portal Access Rules
+
 ```typescript
 // Only CUSTOMER role can access /portal/* routes
 if (session.user.role !== "CUSTOMER") {
@@ -167,23 +179,26 @@ if (session.user.role !== "CUSTOMER") {
 ```
 
 #### API Permission Checks
+
 ```typescript
 // All portal APIs verify CUSTOMER role
 if (session.user.role !== "CUSTOMER") {
   return NextResponse.json(
     { error: "Forbidden - Customer access only" },
-    { status: 403 }
+    { status: 403 },
   );
 }
 ```
 
 #### Data Isolation
+
 - **Customer Scoping**: All queries filtered by `customerId`
 - **Organization Scoping**: Respects `organizationId` boundaries
 - **User Linking**: Each portal user must be linked to a customer
 - **Read-Only by Default**: Customers can only modify their own orders
 
 ### Authentication Flow
+
 1. Customer user logs in via NextAuth.js
 2. Session includes role (CUSTOMER) and customerId
 3. Portal layout checks role, redirects if unauthorized
@@ -195,6 +210,7 @@ if (session.user.role !== "CUSTOMER") {
 ## User Workflows
 
 ### 1. Place New Order
+
 ```
 Customer Portal → Place Order Button
   ↓
@@ -216,6 +232,7 @@ Customer receives tracking information
 ```
 
 ### 2. Track Orders
+
 ```
 Customer Portal → Orders Tab
   ↓
@@ -235,6 +252,7 @@ Click tracking link → External carrier tracking
 ```
 
 ### 3. Monitor Shipments
+
 ```
 Customer Portal → Tracking Tab
   ↓
@@ -256,6 +274,7 @@ View delivery address and dates
 ## API Endpoints
 
 ### Dashboard Statistics
+
 ```http
 GET /api/portal/dashboard
 Authorization: Required (NextAuth session)
@@ -274,6 +293,7 @@ Response:
 ```
 
 ### List Orders
+
 ```http
 GET /api/portal/orders?page=1&limit=20&search=ORD&status=SHIPPED
 Authorization: Required
@@ -292,6 +312,7 @@ Response:
 ```
 
 ### Create Order
+
 ```http
 POST /api/portal/orders
 Authorization: Required
@@ -318,6 +339,7 @@ Response:
 ```
 
 ### Order Detail
+
 ```http
 GET /api/portal/orders/:id
 Authorization: Required
@@ -334,6 +356,7 @@ Response:
 ```
 
 ### Available Products
+
 ```http
 GET /api/portal/products
 Authorization: Required
@@ -355,6 +378,7 @@ Response:
 ```
 
 ### Customer Info
+
 ```http
 GET /api/portal/customer
 Authorization: Required
@@ -381,6 +405,7 @@ Response:
 ```
 
 ### List Shipments
+
 ```http
 GET /api/portal/shipments?search=TRACK123&page=1
 Authorization: Required
@@ -409,14 +434,16 @@ Response:
 ## Setup Instructions
 
 ### 1. Database Migration (✅ COMPLETED)
+
 ```bash
 npx prisma migrate dev --name add_customer_portal_role
 ```
 
 ### 2. Create Customer Portal User
+
 ```sql
 -- Example: Link existing user to customer
-UPDATE "User" 
+UPDATE "User"
 SET role = 'CUSTOMER', customer_id = 'customer-uuid-here'
 WHERE email = 'customer@example.com';
 
@@ -433,7 +460,9 @@ VALUES (
 ```
 
 ### 3. Configure Customer Access
+
 Customers can be invited by:
+
 1. **Admin Creates User**: Staff admin creates user with CUSTOMER role
 2. **Assigns Customer**: Links user to specific customer record
 3. **Send Credentials**: Email login credentials to customer
@@ -444,6 +473,7 @@ Customers can be invited by:
 ## Testing Checklist
 
 ### ✅ Authentication & Authorization
+
 - [x] Customer role can access portal routes
 - [x] Non-customer roles redirected to dashboard
 - [x] Unauthenticated users redirected to login
@@ -451,6 +481,7 @@ Customers can be invited by:
 - [x] Data scoped to customer's organization
 
 ### ✅ Order Placement
+
 - [x] Products load from available inventory
 - [x] Quantity validation (> 0)
 - [x] Customer info loads correctly
@@ -459,6 +490,7 @@ Customers can be invited by:
 - [x] Success message and redirect to orders
 
 ### ✅ Order History
+
 - [x] Orders list displays correctly
 - [x] Search by order/tracking number works
 - [x] Status filter works
@@ -466,6 +498,7 @@ Customers can be invited by:
 - [x] Only customer's orders visible
 
 ### ✅ Order Details
+
 - [x] Full order information displayed
 - [x] Items, quantities, prices shown
 - [x] Shipment information included
@@ -473,6 +506,7 @@ Customers can be invited by:
 - [x] Tracking links work
 
 ### ✅ Shipment Tracking
+
 - [x] Shipments list loads
 - [x] Search functionality works
 - [x] Status colors correct
@@ -480,6 +514,7 @@ Customers can be invited by:
 - [x] Delivery dates display
 
 ### ✅ Account Management
+
 - [x] User information displays
 - [x] Company information displays
 - [x] Shipping address shows
@@ -490,18 +525,21 @@ Customers can be invited by:
 ## Performance Considerations
 
 ### Database Queries
+
 - **Indexed Fields**: `customerId`, `orderNumber`, `trackingNumber`, `status`
 - **Pagination**: All lists paginated (default 20 items)
 - **Eager Loading**: Related data included in single query
 - **Caching**: NextAuth session cached
 
 ### API Response Times
+
 - Dashboard stats: < 200ms
 - Order list: < 300ms
 - Order detail: < 200ms
 - Product list: < 150ms
 
 ### Frontend Performance
+
 - **Server Components**: Most pages server-rendered
 - **Client Components**: Only interactive parts
 - **Loading States**: Spinner for async operations
@@ -512,6 +550,7 @@ Customers can be invited by:
 ## Future Enhancements
 
 ### Phase 2 (Planned)
+
 - [ ] Email notifications for order status changes
 - [ ] Customer-specific pricing rules
 - [ ] Bulk order upload (CSV)
@@ -522,6 +561,7 @@ Customers can be invited by:
 - [ ] Order approval workflow customization
 
 ### Phase 3 (Future)
+
 - [ ] Mobile app (React Native)
 - [ ] API keys for programmatic access
 - [ ] Webhook notifications
@@ -534,18 +574,21 @@ Customers can be invited by:
 ## Support & Documentation
 
 ### For Customers
+
 - **Portal URL**: `https://yourdomain.com/portal`
 - **Login**: Use credentials provided by your warehouse
 - **Support**: Contact support@logivox.com
 - **Hours**: Customer service available 24/7
 
 ### For Administrators
+
 - **Create Users**: Dashboard → Users → Add User (set role to CUSTOMER)
 - **Link Customer**: Set `customerId` to existing customer record
 - **Monitor Orders**: Dashboard → Orders → Filter by customer
 - **User Guide**: `/docs/CUSTOMER_PORTAL_USER_GUIDE.md` (to be created)
 
 ### Technical Support
+
 - **Code Location**: `/apps/web/src/app/portal/*`
 - **API Routes**: `/apps/web/src/app/api/portal/*`
 - **Schema**: `/prisma/schema.prisma` (User.role, User.customerId)
@@ -556,6 +599,7 @@ Customers can be invited by:
 ## Success Metrics
 
 ### Expected Benefits
+
 1. **Reduced Manual Work**: 70% reduction in phone/email orders
 2. **Faster Order Processing**: Orders entered directly by customers
 3. **24/7 Availability**: Customers can order anytime
@@ -565,6 +609,7 @@ Customers can be invited by:
 7. **Cost Savings**: Less staff time on order entry and status calls
 
 ### KPIs to Track
+
 - Number of portal users registered
 - Orders placed through portal vs. traditional methods
 - Average order processing time
@@ -582,11 +627,12 @@ The Customer Self-Service Portal is a **production-ready, fully functional** web
 ✅ **Secure Access**: Role-based authentication and data isolation  
 ✅ **Modern UX**: Responsive design with mobile support  
 ✅ **Real-time Data**: Live order and shipment status updates  
-✅ **Easy Maintenance**: Single codebase, shared infrastructure  
+✅ **Easy Maintenance**: Single codebase, shared infrastructure
 
 **Status**: Ready for customer onboarding and production use.
 
 **Next Steps**:
+
 1. Create customer portal users
 2. Send credentials to selected customers
 3. Provide training/documentation

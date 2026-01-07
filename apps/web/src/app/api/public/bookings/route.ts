@@ -1,20 +1,20 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { authenticateApiKey } from "@/lib/api-auth"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { authenticateApiKey } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
   // Authenticate API key
-  const auth = await authenticateApiKey(request)
-  if (!auth.authenticated) return auth.error!
+  const auth = await authenticateApiKey(request);
+  if (!auth.authenticated) return auth.error!;
 
-  const { searchParams } = new URL(request.url)
-  const status = searchParams.get("status")
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get("status");
 
   // Build where clause
-  const where: any = { organizationId: auth.organizationId }
+  const where: any = { organizationId: auth.organizationId };
   if (status) {
-    where.status = status
+    where.status = status;
   }
 
   // Fetch bookings for the organization
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
       updatedAt: true,
     },
     orderBy: { createdAt: "desc" },
-  })
+  });
 
-  return NextResponse.json(bookings)
+  return NextResponse.json(bookings);
 }

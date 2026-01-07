@@ -11,12 +11,14 @@ Before you begin, ensure you have the following installed:
 ## Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/flowstock/flowstock.git
    cd flowstock
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
@@ -24,44 +26,50 @@ Before you begin, ensure you have the following installed:
 3. **Set up environment variables**
 
    **Backend (.env)**
+
    ```bash
    cp apps/api/.env.example apps/api/.env
    ```
-   
+
    Edit `apps/api/.env` with your configuration:
+
    ```
    DATABASE_URL="postgresql://username:password@localhost:5432/flowstock"
    JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
    ```
 
    **Frontend (.env)**
+
    ```bash
    cp apps/web/.env.example apps/web/.env
    ```
 
 4. **Set up the database**
+
    ```bash
    # Generate Prisma client
    npm run db:generate
-   
+
    # Run migrations
    npm run db:migrate
-   
+
    # Seed with demo data (optional)
    cd packages/database && npm run seed
    ```
 
 5. **Start development servers**
+
    ```bash
    # Start both frontend and backend
    npm run dev
    ```
-   
+
    Or run them separately:
+
    ```bash
    # Backend (API server)
    npm run dev:api
-   
+
    # Frontend (React app)
    npm run dev:web
    ```
@@ -76,6 +84,7 @@ Before you begin, ensure you have the following installed:
 ## Demo Credentials
 
 After seeding the database, you can use:
+
 - **Email**: admin@demo.com
 - **Password**: (set up authentication system)
 
@@ -101,6 +110,7 @@ flowstock/
 ## Available Scripts
 
 ### Root Level
+
 - `npm run dev` - Start both frontend and backend
 - `npm run build` - Build all applications
 - `npm run test` - Run all tests
@@ -108,6 +118,7 @@ flowstock/
 - `npm run db:studio` - Open Prisma Studio
 
 ### Backend (apps/api)
+
 - `npm run dev` - Start development server with hot reload
 - `npm run build` - Build for production
 - `npm run start` - Start production server
@@ -115,6 +126,7 @@ flowstock/
 - `npm run lint` - Lint TypeScript code
 
 ### Frontend (apps/web)
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run preview` - Preview production build

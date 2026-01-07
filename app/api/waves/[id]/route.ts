@@ -7,7 +7,7 @@ import { z } from "zod";
 // GET /api/waves/[id] - Get wave details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -117,7 +117,7 @@ export async function GET(
     console.error("Error fetching wave:", error);
     return NextResponse.json(
       { error: "Failed to fetch wave" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -125,7 +125,7 @@ export async function GET(
 // PATCH /api/waves/[id] - Update wave
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -148,11 +148,15 @@ export async function PATCH(
         case "cancel":
           return handleCancelWave(params.id, session.user.id);
         case "assign":
-          return handleAssignWave(params.id, updateData.assignedToId, session.user.id);
+          return handleAssignWave(
+            params.id,
+            updateData.assignedToId,
+            session.user.id,
+          );
         default:
           return NextResponse.json(
             { error: "Invalid action" },
-            { status: 400 }
+            { status: 400 },
           );
       }
     }
@@ -187,7 +191,7 @@ export async function PATCH(
     console.error("Error updating wave:", error);
     return NextResponse.json(
       { error: "Failed to update wave" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -195,7 +199,7 @@ export async function PATCH(
 // DELETE /api/waves/[id] - Delete wave
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -216,7 +220,7 @@ export async function DELETE(
     if (!["PLANNED", "CANCELLED"].includes(wave.status)) {
       return NextResponse.json(
         { error: "Cannot delete wave in current status" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -229,7 +233,7 @@ export async function DELETE(
     console.error("Error deleting wave:", error);
     return NextResponse.json(
       { error: "Failed to delete wave" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -248,7 +252,7 @@ async function handleReleaseWave(waveId: string, userId: string) {
   if (wave.status !== "PLANNED") {
     return NextResponse.json(
       { error: "Wave can only be released from PLANNED status" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -281,7 +285,7 @@ async function handleStartWave(waveId: string, userId: string) {
   if (wave.status !== "RELEASED") {
     return NextResponse.json(
       { error: "Wave must be released before starting" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -315,13 +319,13 @@ async function handleCompleteWave(waveId: string, userId: string) {
 
   // Check if all lines are picked
   const allPicked = wave.lines.every((line) =>
-    ["PICKED", "VERIFIED", "CANCELLED"].includes(line.status)
+    ["PICKED", "VERIFIED", "CANCELLED"].includes(line.status),
   );
 
   if (!allPicked) {
     return NextResponse.json(
       { error: "Not all lines have been picked" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -357,7 +361,7 @@ async function handleCancelWave(waveId: string, userId: string) {
   if (["COMPLETED", "CANCELLED"].includes(wave.status)) {
     return NextResponse.json(
       { error: "Cannot cancel wave in current status" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -375,7 +379,7 @@ async function handleCancelWave(waveId: string, userId: string) {
 async function handleAssignWave(
   waveId: string,
   assignedToId: string,
-  userId: string
+  userId: string,
 ) {
   const updated = await prisma.wavePick.update({
     where: { id: waveId },

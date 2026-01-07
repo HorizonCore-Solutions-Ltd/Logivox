@@ -143,7 +143,7 @@ export async function GET(request: Request) {
     console.error("Error fetching automations:", error);
     return NextResponse.json(
       { error: "Failed to fetch automations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -170,7 +170,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Automation with this code already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -226,13 +226,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating automation:", error);
     return NextResponse.json(
       { error: "Failed to create automation" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

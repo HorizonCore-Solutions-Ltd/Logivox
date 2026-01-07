@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -14,7 +14,7 @@ import {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { productId: string } }
+  { params }: { params: { productId: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -30,7 +30,10 @@ export async function GET(
     // Get tenant ID from first organization
     const tenantId = session.user.organizations[0]?.id;
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     // Fetch products
@@ -48,13 +51,13 @@ export async function GET(
     });
 
     // Transform to expected format
-    const productList = products.map((p: typeof products[number]) => ({
+    const productList = products.map((p: (typeof products)[number]) => ({
       id: p.id,
       name: p.name,
-      category: p.category || 'Uncategorized',
+      category: p.category || "Uncategorized",
       price: Number(p.unitPrice),
       tags: p.tags || [],
-      description: p.description || '',
+      description: p.description || "",
     }));
 
     // Create dummy data for demo (in production, fetch real data)
@@ -67,8 +70,11 @@ export async function GET(
     };
 
     const allUsers: UserProfile[] = [userProfile];
-    const purchaseHistory: Array<{ productId: string; relatedProductId: string }> = [];
-    
+    const purchaseHistory: Array<{
+      productId: string;
+      relatedProductId: string;
+    }> = [];
+
     let recommendations: RecommendationResult[] = [];
 
     switch (type) {
@@ -77,7 +83,7 @@ export async function GET(
           session.user.id,
           allUsers,
           productList,
-          limit
+          limit,
         );
         break;
 
@@ -86,20 +92,25 @@ export async function GET(
           productId,
           productList,
           purchaseHistory,
-          limit
+          limit,
         );
         break;
 
       case "trending":
         const recentPurchases: Array<{ productId: string; date: Date }> = [];
-        recommendations = await getTrendingProducts(recentPurchases, productList, 7, limit);
+        recommendations = await getTrendingProducts(
+          recentPurchases,
+          productList,
+          7,
+          limit,
+        );
         break;
 
       case "personalized":
         recommendations = await getPersonalizedRecommendations(
           userProfile,
           productList,
-          limit
+          limit,
         );
         break;
 
@@ -108,11 +119,11 @@ export async function GET(
         // For demo, just return trending products (most popular)
         recommendations = productList
           .slice(0, limit)
-          .map((p: typeof productList[number]) => ({
+          .map((p: (typeof productList)[number]) => ({
             productId: p.id,
             productName: p.name,
             score: Math.random(),
-            reason: 'Recommended for you',
+            reason: "Recommended for you",
             category: p.category,
             price: p.price,
           }));
@@ -127,7 +138,7 @@ export async function GET(
     console.error("Error getting recommendations:", error);
     return NextResponse.json(
       { error: "Failed to get recommendations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

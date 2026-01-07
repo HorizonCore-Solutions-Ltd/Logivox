@@ -1,36 +1,38 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const createGateSchema = z.object({
   name: z.string().min(1),
   gateNumber: z.string().min(1),
-  type: z.enum(['INBOUND', 'OUTBOUND', 'BOTH']),
+  type: z.enum(["INBOUND", "OUTBOUND", "BOTH"]),
   warehouseId: z.string(),
   hasLPRCamera: z.boolean().default(false),
   hasWeighBridge: z.boolean().default(false),
   maxVehicleHeight: z.number().optional(),
   maxVehicleWidth: z.number().optional(),
-  operatingHours: z.object({
-    start: z.string(), // HH:MM format
-    end: z.string(),
-  }).optional(),
+  operatingHours: z
+    .object({
+      start: z.string(), // HH:MM format
+      end: z.string(),
+    })
+    .optional(),
   notes: z.string().optional(),
 });
 
 const listSchema = z.object({
   warehouseId: z.string().optional(),
-  type: z.enum(['INBOUND', 'OUTBOUND', 'BOTH']).optional(),
-  status: z.enum(['OPEN', 'CLOSED', 'MAINTENANCE']).optional(),
+  type: z.enum(["INBOUND", "OUTBOUND", "BOTH"]).optional(),
+  status: z.enum(["OPEN", "CLOSED", "MAINTENANCE"]).optional(),
 });
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -47,8 +49,8 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Gate number already exists for this warehouse' },
-        { status: 400 }
+        { error: "Gate number already exists for this warehouse" },
+        { status: 400 },
       );
     }
 
@@ -65,7 +67,7 @@ export async function POST(req: NextRequest) {
         maxVehicleWidth: data.maxVehicleWidth,
         operatingHours: data.operatingHours || undefined,
         notes: data.notes,
-        status: 'OPEN',
+        status: "OPEN",
       },
     });
 
@@ -73,15 +75,15 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating gate:', error);
+    console.error("Error creating gate:", error);
     return NextResponse.json(
-      { error: 'Failed to create gate' },
-      { status: 500 }
+      { error: "Failed to create gate" },
+      { status: 500 },
     );
   }
 }
@@ -90,14 +92,14 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const params = listSchema.parse({
-      warehouseId: searchParams.get('warehouseId') || undefined,
-      type: searchParams.get('type') || undefined,
-      status: searchParams.get('status') || undefined,
+      warehouseId: searchParams.get("warehouseId") || undefined,
+      type: searchParams.get("type") || undefined,
+      status: searchParams.get("status") || undefined,
     });
 
     const where: any = {
@@ -130,28 +132,28 @@ export async function GET(req: NextRequest) {
           select: {
             queue: {
               where: {
-                status: { in: ['WAITING', 'CALLED', 'IN_PROGRESS'] },
+                status: { in: ["WAITING", "CALLED", "IN_PROGRESS"] },
               },
             },
           },
         },
       },
-      orderBy: { gateNumber: 'asc' },
+      orderBy: { gateNumber: "asc" },
     });
 
     // Add real-time queue count and status
     const gatesWithStatus = gates.map((gate) => ({
       ...gate,
       currentQueueCount: gate._count.queue,
-      isOperational: gate.status === 'OPEN',
+      isOperational: gate.status === "OPEN",
     }));
 
     return NextResponse.json({ gates: gatesWithStatus });
   } catch (error) {
-    console.error('Error fetching gates:', error);
+    console.error("Error fetching gates:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch gates' },
-      { status: 500 }
+      { error: "Failed to fetch gates" },
+      { status: 500 },
     );
   }
 }

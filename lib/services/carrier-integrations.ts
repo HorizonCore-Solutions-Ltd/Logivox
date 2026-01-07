@@ -1,6 +1,6 @@
 /**
  * Carrier Integration Service
- * 
+ *
  * Provides unified interface for major shipping carriers:
  * - FedEx
  * - UPS
@@ -41,7 +41,7 @@ export interface ShippingRate {
 export interface ShipmentLabel {
   trackingNumber: string;
   labelUrl: string;
-  labelFormat: 'PDF' | 'PNG' | 'ZPL';
+  labelFormat: "PDF" | "PNG" | "ZPL";
   carrier: string;
   service: string;
   cost: number;
@@ -57,7 +57,13 @@ export interface TrackingEvent {
 export interface TrackingInfo {
   trackingNumber: string;
   carrier: string;
-  status: 'pre_transit' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'exception' | 'returned';
+  status:
+    | "pre_transit"
+    | "in_transit"
+    | "out_for_delivery"
+    | "delivered"
+    | "exception"
+    | "returned";
   estimatedDelivery?: Date;
   actualDelivery?: Date;
   events: TrackingEvent[];
@@ -74,23 +80,24 @@ export class FedExService {
   private baseUrl: string;
 
   constructor() {
-    this.apiKey = process.env.FEDEX_API_KEY || '';
-    this.apiSecret = process.env.FEDEX_API_SECRET || '';
-    this.accountNumber = process.env.FEDEX_ACCOUNT_NUMBER || '';
-    this.meterNumber = process.env.FEDEX_METER_NUMBER || '';
-    this.baseUrl = process.env.FEDEX_ENV === 'production' 
-      ? 'https://apis.fedex.com' 
-      : 'https://apis-sandbox.fedex.com';
+    this.apiKey = process.env.FEDEX_API_KEY || "";
+    this.apiSecret = process.env.FEDEX_API_SECRET || "";
+    this.accountNumber = process.env.FEDEX_ACCOUNT_NUMBER || "";
+    this.meterNumber = process.env.FEDEX_METER_NUMBER || "";
+    this.baseUrl =
+      process.env.FEDEX_ENV === "production"
+        ? "https://apis.fedex.com"
+        : "https://apis-sandbox.fedex.com";
   }
 
   private async getAccessToken(): Promise<string> {
     const response = await fetch(`${this.baseUrl}/oauth/token`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        grant_type: 'client_credentials',
+        grant_type: "client_credentials",
         client_id: this.apiKey,
         client_secret: this.apiSecret,
       }),
@@ -104,14 +111,18 @@ export class FedExService {
     return data.access_token;
   }
 
-  async getRates(origin: Address, destination: Address, packages: Package[]): Promise<ShippingRate[]> {
+  async getRates(
+    origin: Address,
+    destination: Address,
+    packages: Package[],
+  ): Promise<ShippingRate[]> {
     const token = await this.getAccessToken();
 
     const response = await fetch(`${this.baseUrl}/rate/v1/rates/quotes`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         accountNumber: { value: this.accountNumber },
@@ -127,25 +138,27 @@ export class FedExService {
           },
           recipient: {
             address: {
-              streetLines: [destination.street1, destination.street2].filter(Boolean),
+              streetLines: [destination.street1, destination.street2].filter(
+                Boolean,
+              ),
               city: destination.city,
               stateOrProvinceCode: destination.state,
               postalCode: destination.postalCode,
               countryCode: destination.country,
             },
           },
-          pickupType: 'DROPOFF_AT_FEDEX_LOCATION',
-          rateRequestType: ['LIST', 'ACCOUNT'],
-          requestedPackageLineItems: packages.map(pkg => ({
+          pickupType: "DROPOFF_AT_FEDEX_LOCATION",
+          rateRequestType: ["LIST", "ACCOUNT"],
+          requestedPackageLineItems: packages.map((pkg) => ({
             weight: {
-              units: 'LB',
+              units: "LB",
               value: pkg.weight,
             },
             dimensions: {
               length: pkg.length,
               width: pkg.width,
               height: pkg.height,
-              units: 'IN',
+              units: "IN",
             },
           })),
         },
@@ -158,11 +171,13 @@ export class FedExService {
 
     const data = await response.json();
     return data.output.rateReplyDetails.map((rate: any) => ({
-      carrier: 'FedEx',
+      carrier: "FedEx",
       service: rate.serviceName,
       rate: parseFloat(rate.ratedShipmentDetails[0].totalNetCharge),
       currency: rate.ratedShipmentDetails[0].currency,
-      deliveryDate: rate.commit?.dateDetail?.dayFormat ? new Date(rate.commit.dateDetail.dayFormat) : undefined,
+      deliveryDate: rate.commit?.dateDetail?.dayFormat
+        ? new Date(rate.commit.dateDetail.dayFormat)
+        : undefined,
     }));
   }
 
@@ -170,15 +185,15 @@ export class FedExService {
     origin: Address,
     destination: Address,
     packages: Package[],
-    service: string
+    service: string,
   ): Promise<ShipmentLabel> {
     const token = await this.getAccessToken();
 
     const response = await fetch(`${this.baseUrl}/ship/v1/shipments`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         accountNumber: { value: this.accountNumber },
@@ -197,41 +212,45 @@ export class FedExService {
               countryCode: origin.country,
             },
           },
-          recipients: [{
-            contact: {
-              personName: destination.name,
-              phoneNumber: destination.phone,
-              companyName: destination.company,
+          recipients: [
+            {
+              contact: {
+                personName: destination.name,
+                phoneNumber: destination.phone,
+                companyName: destination.company,
+              },
+              address: {
+                streetLines: [destination.street1, destination.street2].filter(
+                  Boolean,
+                ),
+                city: destination.city,
+                stateOrProvinceCode: destination.state,
+                postalCode: destination.postalCode,
+                countryCode: destination.country,
+              },
             },
-            address: {
-              streetLines: [destination.street1, destination.street2].filter(Boolean),
-              city: destination.city,
-              stateOrProvinceCode: destination.state,
-              postalCode: destination.postalCode,
-              countryCode: destination.country,
-            },
-          }],
+          ],
           serviceType: service,
-          packagingType: 'YOUR_PACKAGING',
-          pickupType: 'DROPOFF_AT_FEDEX_LOCATION',
+          packagingType: "YOUR_PACKAGING",
+          pickupType: "DROPOFF_AT_FEDEX_LOCATION",
           shippingChargesPayment: {
-            paymentType: 'SENDER',
+            paymentType: "SENDER",
           },
           labelSpecification: {
-            labelFormatType: 'COMMON2D',
-            imageType: 'PDF',
-            labelStockType: 'PAPER_4X6',
+            labelFormatType: "COMMON2D",
+            imageType: "PDF",
+            labelStockType: "PAPER_4X6",
           },
-          requestedPackageLineItems: packages.map(pkg => ({
+          requestedPackageLineItems: packages.map((pkg) => ({
             weight: {
-              units: 'LB',
+              units: "LB",
               value: pkg.weight,
             },
             dimensions: {
               length: pkg.length,
               width: pkg.width,
               height: pkg.height,
-              units: 'IN',
+              units: "IN",
             },
           })),
         },
@@ -244,12 +263,12 @@ export class FedExService {
 
     const data = await response.json();
     const shipmentDetails = data.output.transactionShipments[0];
-    
+
     return {
       trackingNumber: shipmentDetails.masterTrackingNumber,
       labelUrl: shipmentDetails.pieceResponses[0].packageDocuments[0].url,
-      labelFormat: 'PDF',
-      carrier: 'FedEx',
+      labelFormat: "PDF",
+      carrier: "FedEx",
       service: service,
       cost: parseFloat(shipmentDetails.shipmentDocuments[0].totalCharge),
     };
@@ -259,10 +278,10 @@ export class FedExService {
     const token = await this.getAccessToken();
 
     const response = await fetch(`${this.baseUrl}/track/v1/trackingnumbers`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         trackingInfo: [
@@ -285,33 +304,46 @@ export class FedExService {
 
     return {
       trackingNumber,
-      carrier: 'FedEx',
+      carrier: "FedEx",
       status: this.mapFedExStatus(trackingData.latestStatusDetail.code),
-      estimatedDelivery: trackingData.dateAndTimes?.find((d: any) => d.type === 'ESTIMATED_DELIVERY')?.dateTime 
-        ? new Date(trackingData.dateAndTimes.find((d: any) => d.type === 'ESTIMATED_DELIVERY').dateTime)
+      estimatedDelivery: trackingData.dateAndTimes?.find(
+        (d: any) => d.type === "ESTIMATED_DELIVERY",
+      )?.dateTime
+        ? new Date(
+            trackingData.dateAndTimes.find(
+              (d: any) => d.type === "ESTIMATED_DELIVERY",
+            ).dateTime,
+          )
         : undefined,
-      actualDelivery: trackingData.dateAndTimes?.find((d: any) => d.type === 'ACTUAL_DELIVERY')?.dateTime
-        ? new Date(trackingData.dateAndTimes.find((d: any) => d.type === 'ACTUAL_DELIVERY').dateTime)
+      actualDelivery: trackingData.dateAndTimes?.find(
+        (d: any) => d.type === "ACTUAL_DELIVERY",
+      )?.dateTime
+        ? new Date(
+            trackingData.dateAndTimes.find(
+              (d: any) => d.type === "ACTUAL_DELIVERY",
+            ).dateTime,
+          )
         : undefined,
-      events: trackingData.scanEvents?.map((event: any) => ({
-        timestamp: new Date(event.date),
-        status: event.eventDescription,
-        location: event.scanLocation?.city,
-        description: event.eventDescription,
-      })) || [],
+      events:
+        trackingData.scanEvents?.map((event: any) => ({
+          timestamp: new Date(event.date),
+          status: event.eventDescription,
+          location: event.scanLocation?.city,
+          description: event.eventDescription,
+        })) || [],
     };
   }
 
-  private mapFedExStatus(code: string): TrackingInfo['status'] {
-    const statusMap: Record<string, TrackingInfo['status']> = {
-      'PU': 'pre_transit',
-      'IT': 'in_transit',
-      'OD': 'out_for_delivery',
-      'DL': 'delivered',
-      'DE': 'exception',
-      'RS': 'returned',
+  private mapFedExStatus(code: string): TrackingInfo["status"] {
+    const statusMap: Record<string, TrackingInfo["status"]> = {
+      PU: "pre_transit",
+      IT: "in_transit",
+      OD: "out_for_delivery",
+      DL: "delivered",
+      DE: "exception",
+      RS: "returned",
     };
-    return statusMap[code] || 'in_transit';
+    return statusMap[code] || "in_transit";
   }
 }
 
@@ -325,25 +357,28 @@ export class UPSService {
   private baseUrl: string;
 
   constructor() {
-    this.clientId = process.env.UPS_CLIENT_ID || '';
-    this.clientSecret = process.env.UPS_CLIENT_SECRET || '';
-    this.accountNumber = process.env.UPS_ACCOUNT_NUMBER || '';
-    this.baseUrl = process.env.UPS_ENV === 'production'
-      ? 'https://onlinetools.ups.com/api'
-      : 'https://wwwcie.ups.com/api';
+    this.clientId = process.env.UPS_CLIENT_ID || "";
+    this.clientSecret = process.env.UPS_CLIENT_SECRET || "";
+    this.accountNumber = process.env.UPS_ACCOUNT_NUMBER || "";
+    this.baseUrl =
+      process.env.UPS_ENV === "production"
+        ? "https://onlinetools.ups.com/api"
+        : "https://wwwcie.ups.com/api";
   }
 
   private async getAccessToken(): Promise<string> {
-    const credentials = Buffer.from(`${this.clientId}:${this.clientSecret}`).toString('base64');
+    const credentials = Buffer.from(
+      `${this.clientId}:${this.clientSecret}`,
+    ).toString("base64");
 
     const response = await fetch(`${this.baseUrl}/security/v1/oauth/token`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${credentials}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${credentials}`,
       },
       body: new URLSearchParams({
-        grant_type: 'client_credentials',
+        grant_type: "client_credentials",
       }),
     });
 
@@ -355,19 +390,23 @@ export class UPSService {
     return data.access_token;
   }
 
-  async getRates(origin: Address, destination: Address, packages: Package[]): Promise<ShippingRate[]> {
+  async getRates(
+    origin: Address,
+    destination: Address,
+    packages: Package[],
+  ): Promise<ShippingRate[]> {
     const token = await this.getAccessToken();
 
     const response = await fetch(`${this.baseUrl}/rating/v1/Rate`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         RateRequest: {
           Request: {
-            RequestOption: 'Shop',
+            RequestOption: "Shop",
           },
           Shipment: {
             Shipper: {
@@ -397,18 +436,18 @@ export class UPSService {
                 CountryCode: origin.country,
               },
             },
-            Package: packages.map(pkg => ({
+            Package: packages.map((pkg) => ({
               PackagingType: {
-                Code: '02', // Customer Supplied Package
+                Code: "02", // Customer Supplied Package
               },
               Dimensions: {
-                UnitOfMeasurement: { Code: 'IN' },
+                UnitOfMeasurement: { Code: "IN" },
                 Length: pkg.length.toString(),
                 Width: pkg.width.toString(),
                 Height: pkg.height.toString(),
               },
               PackageWeight: {
-                UnitOfMeasurement: { Code: 'LBS' },
+                UnitOfMeasurement: { Code: "LBS" },
                 Weight: pkg.weight.toString(),
               },
             })),
@@ -423,11 +462,11 @@ export class UPSService {
 
     const data = await response.json();
     return data.RateResponse.RatedShipment.map((rate: any) => ({
-      carrier: 'UPS',
+      carrier: "UPS",
       service: rate.Service.Code,
       rate: parseFloat(rate.TotalCharges.MonetaryValue),
       currency: rate.TotalCharges.CurrencyCode,
-      deliveryDays: rate.GuaranteedDelivery?.BusinessDaysInTransit 
+      deliveryDays: rate.GuaranteedDelivery?.BusinessDaysInTransit
         ? parseInt(rate.GuaranteedDelivery.BusinessDaysInTransit)
         : undefined,
     }));
@@ -436,12 +475,15 @@ export class UPSService {
   async trackShipment(trackingNumber: string): Promise<TrackingInfo> {
     const token = await this.getAccessToken();
 
-    const response = await fetch(`${this.baseUrl}/track/v1/details/${trackingNumber}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${token}`,
+    const response = await fetch(
+      `${this.baseUrl}/track/v1/details/${trackingNumber}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`UPS tracking request failed: ${response.statusText}`);
@@ -452,30 +494,31 @@ export class UPSService {
 
     return {
       trackingNumber,
-      carrier: 'UPS',
+      carrier: "UPS",
       status: this.mapUPSStatus(shipment.package[0].currentStatus.code),
-      estimatedDelivery: shipment.deliveryDate?.date 
+      estimatedDelivery: shipment.deliveryDate?.date
         ? new Date(shipment.deliveryDate.date)
         : undefined,
-      events: shipment.package[0].activity?.map((event: any) => ({
-        timestamp: new Date(`${event.date} ${event.time}`),
-        status: event.status.description,
-        location: event.location?.address?.city,
-        description: event.status.description,
-      })) || [],
+      events:
+        shipment.package[0].activity?.map((event: any) => ({
+          timestamp: new Date(`${event.date} ${event.time}`),
+          status: event.status.description,
+          location: event.location?.address?.city,
+          description: event.status.description,
+        })) || [],
     };
   }
 
-  private mapUPSStatus(code: string): TrackingInfo['status'] {
-    const statusMap: Record<string, TrackingInfo['status']> = {
-      'M': 'pre_transit',
-      'I': 'in_transit',
-      'OT': 'out_for_delivery',
-      'D': 'delivered',
-      'X': 'exception',
-      'RS': 'returned',
+  private mapUPSStatus(code: string): TrackingInfo["status"] {
+    const statusMap: Record<string, TrackingInfo["status"]> = {
+      M: "pre_transit",
+      I: "in_transit",
+      OT: "out_for_delivery",
+      D: "delivered",
+      X: "exception",
+      RS: "returned",
     };
-    return statusMap[code] || 'in_transit';
+    return statusMap[code] || "in_transit";
   }
 }
 
@@ -488,18 +531,25 @@ export class USPSService {
   private baseUrl: string;
 
   constructor() {
-    this.userId = process.env.USPS_USER_ID || '';
-    this.password = process.env.USPS_PASSWORD || '';
-    this.baseUrl = process.env.USPS_ENV === 'production'
-      ? 'https://secure.shippingapis.com/ShippingAPI.dll'
-      : 'https://secure.shippingapis.com/ShippingAPITest.dll';
+    this.userId = process.env.USPS_USER_ID || "";
+    this.password = process.env.USPS_PASSWORD || "";
+    this.baseUrl =
+      process.env.USPS_ENV === "production"
+        ? "https://secure.shippingapis.com/ShippingAPI.dll"
+        : "https://secure.shippingapis.com/ShippingAPITest.dll";
   }
 
-  async getRates(origin: Address, destination: Address, packages: Package[]): Promise<ShippingRate[]> {
+  async getRates(
+    origin: Address,
+    destination: Address,
+    packages: Package[],
+  ): Promise<ShippingRate[]> {
     // USPS uses XML API
     const xml = `
       <RateV4Request USERID="${this.userId}">
-        ${packages.map((pkg, i) => `
+        ${packages
+          .map(
+            (pkg, i) => `
           <Package ID="${i}">
             <Service>ALL</Service>
             <ZipOrigination>${origin.postalCode}</ZipOrigination>
@@ -511,12 +561,16 @@ export class USPSService {
             <Length>${pkg.length}</Length>
             <Height>${pkg.height}</Height>
           </Package>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </RateV4Request>
     `;
 
-    const response = await fetch(`${this.baseUrl}?API=RateV4&XML=${encodeURIComponent(xml)}`);
-    
+    const response = await fetch(
+      `${this.baseUrl}?API=RateV4&XML=${encodeURIComponent(xml)}`,
+    );
+
     if (!response.ok) {
       throw new Error(`USPS rate request failed: ${response.statusText}`);
     }
@@ -524,7 +578,7 @@ export class USPSService {
     const xmlText = await response.text();
     // Parse XML response (simplified - would use xml2js in production)
     return [
-      { carrier: 'USPS', service: 'Priority Mail', rate: 0, currency: 'USD' },
+      { carrier: "USPS", service: "Priority Mail", rate: 0, currency: "USD" },
     ];
   }
 
@@ -535,18 +589,20 @@ export class USPSService {
       </TrackFieldRequest>
     `;
 
-    const response = await fetch(`${this.baseUrl}?API=TrackV2&XML=${encodeURIComponent(xml)}`);
-    
+    const response = await fetch(
+      `${this.baseUrl}?API=TrackV2&XML=${encodeURIComponent(xml)}`,
+    );
+
     if (!response.ok) {
       throw new Error(`USPS tracking request failed: ${response.statusText}`);
     }
 
     const xmlText = await response.text();
-    
+
     return {
       trackingNumber,
-      carrier: 'USPS',
-      status: 'in_transit',
+      carrier: "USPS",
+      status: "in_transit",
       events: [],
     };
   }
@@ -566,7 +622,11 @@ export class CarrierService {
     this.usps = new USPSService();
   }
 
-  async getAllRates(origin: Address, destination: Address, packages: Package[]): Promise<ShippingRate[]> {
+  async getAllRates(
+    origin: Address,
+    destination: Address,
+    packages: Package[],
+  ): Promise<ShippingRate[]> {
     const rates = await Promise.allSettled([
       this.fedex.getRates(origin, destination, packages),
       this.ups.getRates(origin, destination, packages),
@@ -574,8 +634,11 @@ export class CarrierService {
     ]);
 
     return rates
-      .filter((result): result is PromiseFulfilledResult<ShippingRate[]> => result.status === 'fulfilled')
-      .flatMap(result => result.value)
+      .filter(
+        (result): result is PromiseFulfilledResult<ShippingRate[]> =>
+          result.status === "fulfilled",
+      )
+      .flatMap((result) => result.value)
       .sort((a, b) => a.rate - b.rate);
   }
 
@@ -584,27 +647,35 @@ export class CarrierService {
     origin: Address,
     destination: Address,
     packages: Package[],
-    service: string
+    service: string,
   ): Promise<ShipmentLabel> {
     switch (carrier.toLowerCase()) {
-      case 'fedex':
-        return this.fedex.createShipment(origin, destination, packages, service);
-      case 'ups':
-        throw new Error('UPS shipment creation not yet implemented');
-      case 'usps':
-        throw new Error('USPS shipment creation not yet implemented');
+      case "fedex":
+        return this.fedex.createShipment(
+          origin,
+          destination,
+          packages,
+          service,
+        );
+      case "ups":
+        throw new Error("UPS shipment creation not yet implemented");
+      case "usps":
+        throw new Error("USPS shipment creation not yet implemented");
       default:
         throw new Error(`Unknown carrier: ${carrier}`);
     }
   }
 
-  async trackShipment(carrier: string, trackingNumber: string): Promise<TrackingInfo> {
+  async trackShipment(
+    carrier: string,
+    trackingNumber: string,
+  ): Promise<TrackingInfo> {
     switch (carrier.toLowerCase()) {
-      case 'fedex':
+      case "fedex":
         return this.fedex.trackShipment(trackingNumber);
-      case 'ups':
+      case "ups":
         return this.ups.trackShipment(trackingNumber);
-      case 'usps':
+      case "usps":
         return this.usps.trackShipment(trackingNumber);
       default:
         throw new Error(`Unknown carrier: ${carrier}`);

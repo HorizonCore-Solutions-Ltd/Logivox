@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import debitMemoService from '@/lib/services/qc/debit-memo-service';
+import { NextRequest, NextResponse } from "next/server";
+import debitMemoService from "@/lib/services/qc/debit-memo-service";
 
 /**
  * POST /api/qc/debit-memos/[id]/approve
@@ -7,7 +7,7 @@ import debitMemoService from '@/lib/services/qc/debit-memo-service';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -19,10 +19,10 @@ export async function POST(
 
     return NextResponse.json(debitMemo);
   } catch (error: any) {
-    console.error('Error approving debit memo:', error);
+    console.error("Error approving debit memo:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }

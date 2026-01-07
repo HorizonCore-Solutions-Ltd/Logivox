@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { crossBorderService } from '@/lib/services/returns/cross-border-service';
+import { NextRequest, NextResponse } from "next/server";
+import { crossBorderService } from "@/lib/services/returns/cross-border-service";
 
 /**
  * POST /api/returns/cross-border/routing
@@ -8,12 +8,19 @@ import { crossBorderService } from '@/lib/services/returns/cross-border-service'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { rmaId, customerCountry, originCountry, productValue, productWeight, urgency } = body;
+    const {
+      rmaId,
+      customerCountry,
+      originCountry,
+      productValue,
+      productWeight,
+      urgency,
+    } = body;
 
     if (!rmaId || !customerCountry || !originCountry) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
@@ -23,7 +30,7 @@ export async function POST(request: NextRequest) {
       originCountry,
       productValue: productValue || 100,
       productWeight: productWeight || 5,
-      urgency: urgency || 'STANDARD',
+      urgency: urgency || "STANDARD",
     });
 
     return NextResponse.json({
@@ -31,10 +38,10 @@ export async function POST(request: NextRequest) {
       routing,
     });
   } catch (error: any) {
-    console.error('Cross-border routing error:', error);
+    console.error("Cross-border routing error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to determine routing' },
-      { status: 500 }
+      { error: error.message || "Failed to determine routing" },
+      { status: 500 },
     );
   }
 }
@@ -46,12 +53,12 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const countryCode = searchParams.get('countryCode');
+    const countryCode = searchParams.get("countryCode");
 
     if (!countryCode) {
       return NextResponse.json(
-        { error: 'Missing countryCode parameter' },
-        { status: 400 }
+        { error: "Missing countryCode parameter" },
+        { status: 400 },
       );
     }
 
@@ -62,10 +69,10 @@ export async function GET(request: NextRequest) {
       profile,
     });
   } catch (error: any) {
-    console.error('Country profile error:', error);
+    console.error("Country profile error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get country profile' },
-      { status: 500 }
+      { error: error.message || "Failed to get country profile" },
+      { status: 500 },
     );
   }
 }

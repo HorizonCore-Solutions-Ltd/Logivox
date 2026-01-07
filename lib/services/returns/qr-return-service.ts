@@ -4,21 +4,26 @@
  * Dramatically improves mobile experience and reduces friction
  */
 
-import { z } from 'zod';
-import QRCode from 'qrcode';
+import { z } from "zod";
+import QRCode from "qrcode";
 
-export type QRCodeStatus = 'GENERATED' | 'SCANNED' | 'LABEL_PRINTED' | 'SHIPMENT_CREATED' | 'EXPIRED';
+export type QRCodeStatus =
+  | "GENERATED"
+  | "SCANNED"
+  | "LABEL_PRINTED"
+  | "SHIPMENT_CREATED"
+  | "EXPIRED";
 
 export interface QRCodeReturn {
   id: string;
   rmaId: string;
   rmaNumber: string;
-  
+
   // QR Code
   qrCodeImageUrl: string;
   qrCodeData: string; // Encrypted/encoded payload
-  qrCodeFormat: 'PNG' | 'SVG';
-  
+  qrCodeFormat: "PNG" | "SVG";
+
   // Embedded Data (encrypted in QR)
   embeddedData: {
     rmaNumber: string;
@@ -34,23 +39,23 @@ export interface QRCodeReturn {
       postalCode: string;
       country: string;
     };
-    carrier: 'UPS' | 'FedEx' | 'USPS' | 'DHL';
+    carrier: "UPS" | "FedEx" | "USPS" | "DHL";
     serviceLevel: string; // 'Ground', 'Priority', etc.
     packageInfo?: {
       dimensions?: { length: number; width: number; height: number };
       weight?: number;
-      weightUnit: 'lb' | 'kg';
+      weightUnit: "lb" | "kg";
     };
     insuranceValue?: number;
     referenceNumbers: string[];
   };
-  
+
   // Drop-off Locations
   nearbyLocations: DropOffLocation[];
-  
+
   // Status
   status: QRCodeStatus;
-  
+
   // Tracking
   tracking: {
     scannedAt?: Date;
@@ -63,11 +68,11 @@ export interface QRCodeReturn {
     shipmentCreatedAt?: Date;
     carrierReference?: string;
   };
-  
+
   // Expiration
   expirationDate: Date;
   expired: boolean;
-  
+
   // Security
   security: {
     encrypted: boolean;
@@ -75,7 +80,7 @@ export interface QRCodeReturn {
     validationCode: string; // Short code for manual verification
     securityChecksum: string;
   };
-  
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
@@ -86,8 +91,8 @@ export interface DropOffLocation {
   id: string;
   name: string; // "UPS Store #1234"
   carrier: string;
-  type: 'STORE' | 'LOCKER' | 'DROP_BOX' | 'POST_OFFICE';
-  
+  type: "STORE" | "LOCKER" | "DROP_BOX" | "POST_OFFICE";
+
   // Address
   address: {
     address1: string;
@@ -97,14 +102,14 @@ export interface DropOffLocation {
     postalCode: string;
     country: string;
   };
-  
+
   // Location
   coordinates?: {
     latitude: number;
     longitude: number;
   };
   distance?: number; // miles from customer
-  
+
   // Hours
   hours: {
     monday?: string;
@@ -115,7 +120,7 @@ export interface DropOffLocation {
     saturday?: string;
     sunday?: string;
   };
-  
+
   // Capabilities
   capabilities: {
     acceptsQRReturns: boolean;
@@ -125,20 +130,20 @@ export interface DropOffLocation {
     offersPhotos: boolean;
     acceptsCash: boolean;
   };
-  
+
   // Contact
   phone?: string;
   website?: string;
-  
+
   // Real-time info
-  currentStatus?: 'OPEN' | 'CLOSED' | 'BUSY';
+  currentStatus?: "OPEN" | "CLOSED" | "BUSY";
   estimatedWaitTime?: number; // minutes
 }
 
 export interface QRCodeGenerationRequest {
   rmaId: string;
   customerId: string;
-  
+
   // Customer Location (for finding nearby drop-offs)
   customerLocation?: {
     zip?: string;
@@ -147,20 +152,20 @@ export interface QRCodeGenerationRequest {
     latitude?: number;
     longitude?: number;
   };
-  
+
   // Carrier preference
-  preferredCarrier?: 'UPS' | 'FedEx' | 'USPS' | 'DHL';
-  
+  preferredCarrier?: "UPS" | "FedEx" | "USPS" | "DHL";
+
   // Package info (optional, for better label generation)
   packageInfo?: {
     weight?: number;
-    weightUnit?: 'lb' | 'kg';
+    weightUnit?: "lb" | "kg";
     dimensions?: { length: number; width: number; height: number };
   };
-  
+
   // Options
   options?: {
-    format?: 'PNG' | 'SVG';
+    format?: "PNG" | "SVG";
     size?: number; // pixels (default 300)
     includeText?: boolean; // Include RMA number below QR
     expirationDays?: number; // default 30
@@ -170,7 +175,7 @@ export interface QRCodeGenerationRequest {
 export interface QRCodeScanResult {
   success: boolean;
   rmaNumber: string;
-  
+
   // Decoded data
   decodedData: {
     rmaId: string;
@@ -179,7 +184,7 @@ export interface QRCodeScanResult {
     carrier: string;
     serviceLevel: string;
   };
-  
+
   // Validation
   validation: {
     valid: boolean;
@@ -187,7 +192,7 @@ export interface QRCodeScanResult {
     alreadyUsed: boolean;
     checksumValid: boolean;
   };
-  
+
   // Actions
   nextSteps: {
     printLabel: boolean;
@@ -196,7 +201,7 @@ export interface QRCodeScanResult {
     requiresPayment: boolean;
     estimatedCost?: number;
   };
-  
+
   // Metadata
   scannedAt: Date;
   scannedBy?: string;
@@ -207,29 +212,31 @@ export interface QRCodeScanResult {
  * QR Code Return Service
  */
 export class QRCodeReturnService {
-  
   /**
    * Generate QR code for label-less return
    */
-  async generateQRCodeReturn(request: QRCodeGenerationRequest): Promise<QRCodeReturn> {
-    
+  async generateQRCodeReturn(
+    request: QRCodeGenerationRequest,
+  ): Promise<QRCodeReturn> {
     // Get RMA details
     const rma = await this.getRMA(request.rmaId);
-    
+
     if (!rma) {
       throw new Error(`RMA ${request.rmaId} not found`);
     }
-    
+
     // Get return address (warehouse address)
     const returnAddress = await this.getWarehouseAddress(rma.warehouseId);
-    
+
     // Determine carrier
-    const carrier = request.preferredCarrier || this.selectOptimalCarrier({
-      origin: request.customerLocation,
-      destination: returnAddress,
-      weight: request.packageInfo?.weight,
-    });
-    
+    const carrier =
+      request.preferredCarrier ||
+      this.selectOptimalCarrier({
+        origin: request.customerLocation,
+        destination: returnAddress,
+        weight: request.packageInfo?.weight,
+      });
+
     // Create embedded data
     const embeddedData = {
       rmaNumber: rma.rmaNumber,
@@ -237,49 +244,49 @@ export class QRCodeReturnService {
       customerPhone: rma.customerPhone,
       returnAddress: {
         name: returnAddress.name,
-        company: returnAddress.company || 'Warehouse',
+        company: returnAddress.company || "Warehouse",
         address1: returnAddress.address1,
         address2: returnAddress.address2,
         city: returnAddress.city,
         state: returnAddress.state,
         postalCode: returnAddress.postalCode,
-        country: returnAddress.country || 'US',
+        country: returnAddress.country || "US",
       },
       carrier,
-      serviceLevel: 'Ground',
+      serviceLevel: "Ground",
       packageInfo: request.packageInfo,
       insuranceValue: rma.totalValue > 100 ? rma.totalValue : undefined,
-      referenceNumbers: [rma.rmaNumber, rma.orderId || ''],
+      referenceNumbers: [rma.rmaNumber, rma.orderId || ""],
     };
-    
+
     // Encrypt data
     const encryptedData = await this.encryptData(embeddedData);
-    
+
     // Generate validation code (6-digit for manual entry)
     const validationCode = this.generateValidationCode();
-    
+
     // Generate checksum
     const checksum = this.generateChecksum(encryptedData + validationCode);
-    
+
     // Create QR payload
     const qrPayload = JSON.stringify({
-      v: '1', // version
-      t: 'RMA', // type
+      v: "1", // version
+      t: "RMA", // type
       d: encryptedData, // data
       c: validationCode, // code
       s: checksum, // security
       exp: Date.now() + (request.options?.expirationDays || 30) * 86400000, // expiration
     });
-    
+
     // Generate QR code image
     const qrCodeImageUrl = await this.generateQRCodeImage({
       data: qrPayload,
-      format: request.options?.format || 'PNG',
+      format: request.options?.format || "PNG",
       size: request.options?.size || 300,
       includeText: request.options?.includeText !== false,
       text: rma.rmaNumber,
     });
-    
+
     // Find nearby drop-off locations
     const nearbyLocations = await this.findNearbyDropOffLocations({
       location: request.customerLocation,
@@ -287,11 +294,13 @@ export class QRCodeReturnService {
       maxDistance: 25, // miles
       maxResults: 10,
     });
-    
+
     // Calculate expiration
     const expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + (request.options?.expirationDays || 30));
-    
+    expirationDate.setDate(
+      expirationDate.getDate() + (request.options?.expirationDays || 30),
+    );
+
     // Create QR code return record
     const qrCodeReturn: QRCodeReturn = {
       id: `QR-${Date.now()}`,
@@ -299,10 +308,10 @@ export class QRCodeReturnService {
       rmaNumber: rma.rmaNumber,
       qrCodeImageUrl,
       qrCodeData: qrPayload,
-      qrCodeFormat: request.options?.format || 'PNG',
+      qrCodeFormat: request.options?.format || "PNG",
       embeddedData,
       nearbyLocations,
-      status: 'GENERATED',
+      status: "GENERATED",
       tracking: {
         labelPrinted: false,
         shipmentCreated: false,
@@ -311,24 +320,24 @@ export class QRCodeReturnService {
       expired: false,
       security: {
         encrypted: true,
-        encryptionMethod: 'AES-256',
+        encryptionMethod: "AES-256",
         validationCode,
         securityChecksum: checksum,
       },
       createdAt: new Date(),
       updatedAt: new Date(),
-      generatedBy: 'SYSTEM',
+      generatedBy: "SYSTEM",
     };
-    
+
     // Save QR code return
     await this.saveQRCodeReturn(qrCodeReturn);
-    
+
     // Update RMA with QR code reference
     await this.updateRMAWithQRCode(request.rmaId, qrCodeReturn.id);
-    
+
     return qrCodeReturn;
   }
-  
+
   /**
    * Scan and validate QR code
    */
@@ -337,16 +346,15 @@ export class QRCodeReturnService {
     scannedBy?: string;
     location?: string;
   }): Promise<QRCodeScanResult> {
-    
     try {
       // Parse QR payload
       const payload = JSON.parse(params.qrData);
-      
+
       // Validate structure
       if (!payload.v || !payload.t || !payload.d) {
         return {
           success: false,
-          rmaNumber: 'UNKNOWN',
+          rmaNumber: "UNKNOWN",
           decodedData: {} as any,
           validation: {
             valid: false,
@@ -362,25 +370,28 @@ export class QRCodeReturnService {
           scannedAt: new Date(),
         };
       }
-      
+
       // Check expiration
       const expired = Date.now() > payload.exp;
-      
+
       // Validate checksum
-      const checksumValid = this.validateChecksum(payload.d + payload.c, payload.s);
-      
+      const checksumValid = this.validateChecksum(
+        payload.d + payload.c,
+        payload.s,
+      );
+
       // Decrypt data
       const decryptedData = await this.decryptData(payload.d);
-      
+
       // Get QR code record
       const qrCodeReturn = await this.getQRCodeByRMA(decryptedData.rmaNumber);
-      
+
       // Check if already used
       const alreadyUsed = qrCodeReturn?.tracking.labelPrinted || false;
-      
+
       // Determine if valid
       const valid = !expired && checksumValid && !alreadyUsed;
-      
+
       // Generate return label
       let labelUrl: string | undefined;
       if (valid) {
@@ -389,19 +400,19 @@ export class QRCodeReturnService {
           carrier: decryptedData.carrier,
           shipFrom: {
             // Customer address would be obtained from RMA
-            name: 'Customer',
-            address1: '123 Main St',
-            city: 'Anytown',
-            state: 'CA',
-            postalCode: '90210',
-            country: 'US',
+            name: "Customer",
+            address1: "123 Main St",
+            city: "Anytown",
+            state: "CA",
+            postalCode: "90210",
+            country: "US",
           },
           shipTo: decryptedData.returnAddress,
           packageInfo: decryptedData.packageInfo,
         });
-        
+
         labelUrl = label.labelUrl;
-        
+
         // Update QR code tracking
         if (qrCodeReturn) {
           qrCodeReturn.tracking.scannedAt = new Date();
@@ -410,18 +421,18 @@ export class QRCodeReturnService {
           qrCodeReturn.tracking.labelPrinted = true;
           qrCodeReturn.tracking.labelPrintedAt = new Date();
           qrCodeReturn.tracking.trackingNumber = label.trackingNumber;
-          qrCodeReturn.status = 'LABEL_PRINTED';
+          qrCodeReturn.status = "LABEL_PRINTED";
           qrCodeReturn.updatedAt = new Date();
-          
+
           await this.saveQRCodeReturn(qrCodeReturn);
         }
       }
-      
+
       return {
         success: valid,
         rmaNumber: decryptedData.rmaNumber,
         decodedData: {
-          rmaId: qrCodeReturn?.rmaId || '',
+          rmaId: qrCodeReturn?.rmaId || "",
           customerEmail: decryptedData.customerEmail,
           returnAddress: decryptedData.returnAddress,
           carrier: decryptedData.carrier,
@@ -443,12 +454,11 @@ export class QRCodeReturnService {
         scannedBy: params.scannedBy,
         location: params.location,
       };
-      
     } catch (error) {
-      console.error('QR scan error:', error);
+      console.error("QR scan error:", error);
       return {
         success: false,
-        rmaNumber: 'ERROR',
+        rmaNumber: "ERROR",
         decodedData: {} as any,
         validation: {
           valid: false,
@@ -465,7 +475,7 @@ export class QRCodeReturnService {
       };
     }
   }
-  
+
   /**
    * Find nearby drop-off locations
    */
@@ -481,32 +491,31 @@ export class QRCodeReturnService {
     maxDistance?: number;
     maxResults?: number;
   }): Promise<DropOffLocation[]> {
-    
     // TODO: Integrate with carrier APIs (UPS, FedEx, USPS)
     // For now, return mock data
-    
+
     const mockLocations: DropOffLocation[] = [
       {
-        id: 'UPS-1234',
-        name: 'UPS Store #1234',
-        carrier: 'UPS',
-        type: 'STORE',
+        id: "UPS-1234",
+        name: "UPS Store #1234",
+        carrier: "UPS",
+        type: "STORE",
         address: {
-          address1: '123 Main St',
-          city: 'San Francisco',
-          state: 'CA',
-          postalCode: '94102',
-          country: 'US',
+          address1: "123 Main St",
+          city: "San Francisco",
+          state: "CA",
+          postalCode: "94102",
+          country: "US",
         },
         distance: 0.5,
         hours: {
-          monday: '9:00 AM - 7:00 PM',
-          tuesday: '9:00 AM - 7:00 PM',
-          wednesday: '9:00 AM - 7:00 PM',
-          thursday: '9:00 AM - 7:00 PM',
-          friday: '9:00 AM - 7:00 PM',
-          saturday: '10:00 AM - 5:00 PM',
-          sunday: 'Closed',
+          monday: "9:00 AM - 7:00 PM",
+          tuesday: "9:00 AM - 7:00 PM",
+          wednesday: "9:00 AM - 7:00 PM",
+          thursday: "9:00 AM - 7:00 PM",
+          friday: "9:00 AM - 7:00 PM",
+          saturday: "10:00 AM - 5:00 PM",
+          sunday: "Closed",
         },
         capabilities: {
           acceptsQRReturns: true,
@@ -516,30 +525,30 @@ export class QRCodeReturnService {
           offersPhotos: false,
           acceptsCash: false,
         },
-        phone: '(415) 555-1234',
-        currentStatus: 'OPEN',
+        phone: "(415) 555-1234",
+        currentStatus: "OPEN",
       },
       {
-        id: 'FEDEX-5678',
-        name: 'FedEx Office #5678',
-        carrier: 'FedEx',
-        type: 'STORE',
+        id: "FEDEX-5678",
+        name: "FedEx Office #5678",
+        carrier: "FedEx",
+        type: "STORE",
         address: {
-          address1: '456 Market St',
-          city: 'San Francisco',
-          state: 'CA',
-          postalCode: '94103',
-          country: 'US',
+          address1: "456 Market St",
+          city: "San Francisco",
+          state: "CA",
+          postalCode: "94103",
+          country: "US",
         },
         distance: 1.2,
         hours: {
-          monday: '8:00 AM - 8:00 PM',
-          tuesday: '8:00 AM - 8:00 PM',
-          wednesday: '8:00 AM - 8:00 PM',
-          thursday: '8:00 AM - 8:00 PM',
-          friday: '8:00 AM - 8:00 PM',
-          saturday: '9:00 AM - 6:00 PM',
-          sunday: '10:00 AM - 4:00 PM',
+          monday: "8:00 AM - 8:00 PM",
+          tuesday: "8:00 AM - 8:00 PM",
+          wednesday: "8:00 AM - 8:00 PM",
+          thursday: "8:00 AM - 8:00 PM",
+          friday: "8:00 AM - 8:00 PM",
+          saturday: "9:00 AM - 6:00 PM",
+          sunday: "10:00 AM - 4:00 PM",
         },
         capabilities: {
           acceptsQRReturns: true,
@@ -549,30 +558,30 @@ export class QRCodeReturnService {
           offersPhotos: true,
           acceptsCash: true,
         },
-        phone: '(415) 555-5678',
-        currentStatus: 'OPEN',
+        phone: "(415) 555-5678",
+        currentStatus: "OPEN",
       },
     ];
-    
+
     // Filter by carrier if specified
     let filtered = params.carrier
-      ? mockLocations.filter(loc => loc.carrier === params.carrier)
+      ? mockLocations.filter((loc) => loc.carrier === params.carrier)
       : mockLocations;
-    
+
     // Filter by QR capability
-    filtered = filtered.filter(loc => loc.capabilities.acceptsQRReturns);
-    
+    filtered = filtered.filter((loc) => loc.capabilities.acceptsQRReturns);
+
     // Sort by distance
     filtered.sort((a, b) => (a.distance || 999) - (b.distance || 999));
-    
+
     // Limit results
     if (params.maxResults) {
       filtered = filtered.slice(0, params.maxResults);
     }
-    
+
     return filtered;
   }
-  
+
   /**
    * Track QR code usage
    */
@@ -583,9 +592,8 @@ export class QRCodeReturnService {
     shipmentCreated: boolean;
     timeline: Array<{ event: string; timestamp: Date; location?: string }>;
   }> {
-    
     const qrCode = await this.getQRCodeByRMAId(rmaId);
-    
+
     if (!qrCode) {
       return {
         generated: false,
@@ -595,37 +603,37 @@ export class QRCodeReturnService {
         timeline: [],
       };
     }
-    
+
     const timeline = [
       {
-        event: 'QR Code Generated',
+        event: "QR Code Generated",
         timestamp: qrCode.createdAt,
       },
     ];
-    
+
     if (qrCode.tracking.scannedAt) {
       timeline.push({
-        event: 'QR Code Scanned',
+        event: "QR Code Scanned",
         timestamp: qrCode.tracking.scannedAt,
         location: qrCode.tracking.scannedLocation,
       });
     }
-    
+
     if (qrCode.tracking.labelPrintedAt) {
       timeline.push({
-        event: 'Label Printed',
+        event: "Label Printed",
         timestamp: qrCode.tracking.labelPrintedAt,
         location: qrCode.tracking.scannedLocation,
       });
     }
-    
+
     if (qrCode.tracking.shipmentCreatedAt) {
       timeline.push({
-        event: 'Shipment Created',
+        event: "Shipment Created",
         timestamp: qrCode.tracking.shipmentCreatedAt,
       });
     }
-    
+
     return {
       generated: true,
       scanned: !!qrCode.tracking.scannedAt,
@@ -634,7 +642,7 @@ export class QRCodeReturnService {
       timeline,
     };
   }
-  
+
   /**
    * Get QR code statistics
    */
@@ -659,123 +667,126 @@ export class QRCodeReturnService {
       byCarrier: [],
     };
   }
-  
+
   // ===== PRIVATE HELPER METHODS =====
-  
+
   private async getRMA(rmaId: string): Promise<any> {
     // TODO: Implement actual RMA retrieval
     return {
       rmaId,
       rmaNumber: `RMA-${Date.now()}`,
       orderId: `ORD-${Date.now()}`,
-      customerId: 'customer-1',
-      customerEmail: 'customer@example.com',
-      customerPhone: '(555) 123-4567',
-      warehouseId: 'warehouse-1',
+      customerId: "customer-1",
+      customerEmail: "customer@example.com",
+      customerPhone: "(555) 123-4567",
+      warehouseId: "warehouse-1",
       totalValue: 150,
     };
   }
-  
+
   private async getWarehouseAddress(warehouseId: string): Promise<any> {
     // TODO: Implement actual warehouse address retrieval
     return {
-      name: 'Returns Center',
-      company: 'LogiVox Warehouse',
-      address1: '789 Warehouse Blvd',
-      city: 'Los Angeles',
-      state: 'CA',
-      postalCode: '90001',
-      country: 'US',
+      name: "Returns Center",
+      company: "LogiVox Warehouse",
+      address1: "789 Warehouse Blvd",
+      city: "Los Angeles",
+      state: "CA",
+      postalCode: "90001",
+      country: "US",
     };
   }
-  
-  private selectOptimalCarrier(params: any): 'UPS' | 'FedEx' | 'USPS' | 'DHL' {
+
+  private selectOptimalCarrier(params: any): "UPS" | "FedEx" | "USPS" | "DHL" {
     // Simple selection logic
     // TODO: Implement cost-based optimization
-    return 'UPS';
+    return "UPS";
   }
-  
+
   private async encryptData(data: any): Promise<string> {
     // TODO: Implement actual encryption (AES-256)
-    return Buffer.from(JSON.stringify(data)).toString('base64');
+    return Buffer.from(JSON.stringify(data)).toString("base64");
   }
-  
+
   private async decryptData(encryptedData: string): Promise<any> {
     // TODO: Implement actual decryption
-    return JSON.parse(Buffer.from(encryptedData, 'base64').toString());
+    return JSON.parse(Buffer.from(encryptedData, "base64").toString());
   }
-  
+
   private generateValidationCode(): string {
     return Math.floor(100000 + Math.random() * 900000).toString();
   }
-  
+
   private generateChecksum(data: string): string {
     // Simple checksum for demo
     // TODO: Implement proper HMAC-SHA256
     let hash = 0;
     for (let i = 0; i < data.length; i++) {
       const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return Math.abs(hash).toString(36).substring(0, 8);
   }
-  
+
   private validateChecksum(data: string, checksum: string): boolean {
     return this.generateChecksum(data) === checksum;
   }
-  
+
   private async generateQRCodeImage(params: {
     data: string;
-    format: 'PNG' | 'SVG';
+    format: "PNG" | "SVG";
     size: number;
     includeText: boolean;
     text?: string;
   }): Promise<string> {
-    
     try {
       // Generate QR code as data URL
       const qrCodeDataUrl = await QRCode.toDataURL(params.data, {
         width: params.size,
         margin: 2,
-        errorCorrectionLevel: 'H',
+        errorCorrectionLevel: "H",
       });
-      
+
       // TODO: If includeText, add text below QR code using canvas
       // For now, return just the QR code
-      
+
       return qrCodeDataUrl;
-      
     } catch (error) {
-      console.error('QR code generation error:', error);
-      throw new Error('Failed to generate QR code');
+      console.error("QR code generation error:", error);
+      throw new Error("Failed to generate QR code");
     }
   }
-  
+
   private async generateReturnLabel(params: any): Promise<any> {
     // TODO: Integrate with carrier API to generate label
     return {
-      labelUrl: 'https://example.com/label.pdf',
+      labelUrl: "https://example.com/label.pdf",
       trackingNumber: `1Z${Math.random().toString(36).substring(7).toUpperCase()}`,
     };
   }
-  
+
   private async saveQRCodeReturn(qrCodeReturn: QRCodeReturn): Promise<void> {
     // TODO: Save to database
     console.log(`Saved QR code return: ${qrCodeReturn.id}`);
   }
-  
-  private async getQRCodeByRMA(rmaNumber: string): Promise<QRCodeReturn | null> {
+
+  private async getQRCodeByRMA(
+    rmaNumber: string,
+  ): Promise<QRCodeReturn | null> {
     // TODO: Retrieve from database
     return null;
   }
-  
+
   private async getQRCodeByRMAId(rmaId: string): Promise<QRCodeReturn | null> {
     // TODO: Retrieve from database
     return null;
   }
-  
-  private async updateRMAWithQRCode(rmaId: string, qrCodeId: string): Promise<void> {
+
+  private async updateRMAWithQRCode(
+    rmaId: string,
+    qrCodeId: string,
+  ): Promise<void> {
     // TODO: Update RMA record
     console.log(`Updated RMA ${rmaId} with QR code ${qrCodeId}`);
   }

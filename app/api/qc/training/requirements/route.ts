@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { TrainingService } from '@/lib/services/qc/training.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { TrainingService } from "@/lib/services/qc/training.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
       prerequisiteTrainings: body.prerequisiteTrainings,
       assessmentRequired: body.assessmentRequired,
       passingScore: body.passingScore,
-      createdBy: session.user.email || '',
+      createdBy: session.user.email || "",
     });
 
     return NextResponse.json(requirement);
@@ -39,15 +39,18 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const organizationId = searchParams.get('organizationId');
-    const category = searchParams.get('category');
+    const organizationId = searchParams.get("organizationId");
+    const category = searchParams.get("category");
 
     if (!organizationId) {
-      return NextResponse.json({ error: 'organizationId required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "organizationId required" },
+        { status: 400 },
+      );
     }
 
     // This would be implemented with a new method in TrainingService

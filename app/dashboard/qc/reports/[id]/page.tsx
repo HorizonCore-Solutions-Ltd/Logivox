@@ -138,7 +138,9 @@ export default function QualityReportDetailPage() {
   };
 
   const handleEmailReport = async () => {
-    const recipients = prompt("Enter recipient email addresses (comma-separated):");
+    const recipients = prompt(
+      "Enter recipient email addresses (comma-separated):",
+    );
     if (!recipients) return;
 
     setEmailing(true);
@@ -224,7 +226,9 @@ export default function QualityReportDetailPage() {
           </Button>
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/qc/reports/${params.id}/edit`)}
+            onClick={() =>
+              router.push(`/dashboard/qc/reports/${params.id}/edit`)
+            }
           >
             <Edit className="w-4 h-4 mr-2" />
             Edit
@@ -326,7 +330,9 @@ export default function QualityReportDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm whitespace-pre-wrap">{report.keyFindings}</p>
+                <p className="text-sm whitespace-pre-wrap">
+                  {report.keyFindings}
+                </p>
               </CardContent>
             </Card>
           )}
@@ -341,7 +347,9 @@ export default function QualityReportDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm whitespace-pre-wrap">{report.recommendations}</p>
+                <p className="text-sm whitespace-pre-wrap">
+                  {report.recommendations}
+                </p>
               </CardContent>
             </Card>
           )}
@@ -360,7 +368,9 @@ export default function QualityReportDetailPage() {
                   {Object.entries(report.metricsData).map(([key, value]) => (
                     <div key={key} className="p-4 bg-muted rounded-lg">
                       <p className="text-xs text-muted-foreground mb-1">
-                        {key.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {key
+                          .replace(/_/g, " ")
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                       </p>
                       <p className="text-2xl font-bold">
                         {typeof value === "number" ? value.toFixed(2) : value}
@@ -391,10 +401,14 @@ export default function QualityReportDetailPage() {
                       <div className="flex items-center gap-3">
                         <FileText className="w-5 h-5 text-blue-600" />
                         <div>
-                          <p className="text-sm font-medium">{attachment.fileName}</p>
+                          <p className="text-sm font-medium">
+                            {attachment.fileName}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {formatFileSize(attachment.fileSize)} •{" "}
-                            {new Date(attachment.uploadedAt).toLocaleDateString()}
+                            {new Date(
+                              attachment.uploadedAt,
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
@@ -428,8 +442,12 @@ export default function QualityReportDetailPage() {
                 </div>
                 {report.approvedAt && (
                   <div>
-                    <p className="text-sm text-muted-foreground">Approved Date</p>
-                    <p className="text-sm">{new Date(report.approvedAt).toLocaleString()}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Approved Date
+                    </p>
+                    <p className="text-sm">
+                      {new Date(report.approvedAt).toLocaleString()}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -473,11 +491,15 @@ export default function QualityReportDetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Created</p>
-                <p className="text-sm">{new Date(report.createdAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(report.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{new Date(report.updatedAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(report.updatedAt).toLocaleString()}
+                </p>
               </div>
             </CardContent>
           </Card>

@@ -7,6 +7,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 ## 🎯 Features Implemented
 
 ### 1. **License Plate Recognition (LPR)**
+
 - **Automatic License Plate Capture**: Integration with LPR cameras via webhook
 - **Confidence Scoring**: Only processes reads >80% confidence
 - **Auto-Entry Creation**: Automatically creates gate entries for whitelisted vehicles
@@ -14,6 +15,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 - **API Endpoint**: `/api/security/lpr/capture`
 
 ### 2. **Blacklist/Whitelist Management**
+
 - **Vehicle Blacklist**: Ban vehicles with severity levels (LOW → PERMANENT)
 - **Whitelist Types**: CARRIER, VEHICLE, DRIVER
 - **Auto-Approval**: Skip manual checks for trusted vehicles
@@ -25,6 +27,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `POST /api/security/check-vehicle` - Check vehicle status
 
 ### 3. **Weight Bridge Integration**
+
 - **In/Out Weighing**: Record weights on entry and exit
 - **Variance Detection**: Automatic alerts for >5% weight discrepancy
 - **Theft Prevention**: Flags suspicious weight loss (>10%)
@@ -34,6 +37,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `GET /api/security/gate-entries/[id]/weigh` - Get weight history
 
 ### 4. **Photo/Video Capture**
+
 - **10 Photo Types**:
   - Driver ID
   - Driver Face
@@ -50,6 +54,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `GET /api/security/gate-entries/[id]/photos` - List photos
 
 ### 5. **Document Verification**
+
 - **Document Types**:
   - Bill of Lading (BOL)
   - Manifest
@@ -64,6 +69,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `PATCH /api/security/gate-entries/[id]/documents/[docId]/verify` - Verify document
 
 ### 6. **Queue Management**
+
 - **FIFO + Priority**: First-in-first-out with priority override
 - **Wait Time Estimation**: Real-time wait time calculations (5 min/vehicle)
 - **Status Tracking**: WAITING → CALLED → IN_PROGRESS → COMPLETED
@@ -75,6 +81,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `PATCH /api/security/gate-queue/[id]` - Update status
 
 ### 7. **Multi-Gate Management**
+
 - **Gate Types**: INBOUND, OUTBOUND, BOTH
 - **Gate Status**: OPEN, CLOSED, MAINTENANCE
 - **Capabilities**: LPR camera, weight bridge, size restrictions
@@ -86,6 +93,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `PATCH /api/security/gates/[id]` - Update gate status
 
 ### 8. **Smart Parking Assignment**
+
 - **4 Parking Types**: STANDARD, OVERSIZED, REFRIGERATED, HAZMAT
 - **Size Constraints**: Max length/width/height/weight
 - **Special Features**: Electricity, water hookup, refrigeration
@@ -97,6 +105,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `POST /api/security/gate-entries/[id]/assign-parking` - Assign parking
 
 ### 9. **Temperature Monitoring**
+
 - **Reefer Truck Monitoring**: Track refrigerated cargo temperatures
 - **Multi-Sensor Support**: Front, rear, middle temperature zones
 - **Threshold Alerts**: Automatic alerts for out-of-range temps
@@ -107,6 +116,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `GET /api/security/gate-entries/[id]/temperature` - Get temperature history
 
 ### 10. **Hazmat Handling**
+
 - **UN Number Tracking**: Proper identification of dangerous goods
 - **Hazmat Classification**: Class tracking (1-9)
 - **Permit Management**: Permit numbers and expiry dates
@@ -118,17 +128,20 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
   - `GET /api/security/gate-entries/[id]/hazmat` - Get hazmat records
 
 ### 11. **Dwell Time Alerts**
+
 - **Automated Monitoring**: Check every 15 minutes
 - **Configurable Thresholds**: Default 24 hours
 - **Escalating Alerts**: MEDIUM (>24h) → HIGH (>48h)
 - **Parking Spot Tracking**: Shows where vehicle is parked
 
 ### 12. **After-Hours Management**
+
 - **24/7 Operations**: All features work around the clock
 - **Gate Operating Hours**: Configurable per gate
 - **Security Personnel Shifts**: Track guard assignments
 
 ### 13. **Automation Services**
+
 - **Dwell Time Monitoring**: Automatic overdue vehicle detection
 - **Temperature Monitoring**: Continuous reefer temp checks
 - **Permit Expiry Checking**: Daily permit validation
@@ -137,12 +150,14 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 - **Auto-Run**: Cron job every 15 minutes
 
 ### 14. **Real-Time Dashboards**
+
 - **Gate Status Board**: Live view of all gates
 - **Queue Dashboard**: Current wait times per gate
 - **Vehicle Tracking**: All vehicles currently on-site
 - **Alert Center**: Real-time security alerts
 
 ### 15. **Comprehensive Reporting**
+
 - **Weight Variance Reports**: Theft detection analysis
 - **Dwell Time Reports**: Average on-site duration
 - **Temperature Compliance**: Reefer violation tracking
@@ -152,16 +167,19 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 ## 📊 Database Models
 
 ### Core Models
+
 - **GateEntry** - Main vehicle entry/exit record
 - **Gate** - Physical gate definitions
 - **GateQueue** - Queue management
 - **ParkingSpot** - Parking space inventory
 
 ### Security Models
+
 - **VehicleBlacklist** - Banned vehicles
 - **VehicleWhitelist** - Pre-approved vehicles
 
 ### Operations Models
+
 - **GateWeighBridge** - Weight records
 - **GatePhoto** - Photo documentation
 - **GateDocument** - Document management
@@ -171,6 +189,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 ## 🔄 Typical Workflows
 
 ### Workflow 1: Standard Delivery Truck Arrival
+
 1. **LPR Camera** captures license plate → `/api/security/lpr/capture`
 2. **System checks** blacklist/whitelist → Auto-approved if whitelisted
 3. **Guard** verifies driver ID → Takes photo `/api/security/gate-entries/[id]/photos`
@@ -181,6 +200,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 8. **Exit recorded** → Gate entry updated
 
 ### Workflow 2: Hazmat Vehicle Arrival
+
 1. LPR capture → Flagged as hazmat carrier
 2. Guard checks hazmat permits
 3. Record hazmat details → `/api/security/gate-entries/[id]/hazmat`
@@ -190,6 +210,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 7. Special exit procedures enforced
 
 ### Workflow 3: Refrigerated Cargo
+
 1. Truck arrives with reefer unit
 2. Guard logs initial temperature → `/api/security/gate-entries/[id]/temperature`
 3. Temperature monitored every 30 min (automation service)
@@ -197,6 +218,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 5. Temperature history available for compliance
 
 ### Workflow 4: Queue Management
+
 1. Multiple trucks arrive simultaneously
 2. Each added to queue → `/api/security/gate-queue`
 3. Guards call forward from queue → `/api/security/gate-queue/call-next`
@@ -221,12 +243,14 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 ## 🚀 Integration Points
 
 ### Hardware Integrations
+
 - **LPR Cameras**: Webhook API for automatic plate reading
 - **Weight Bridges**: IoT device integration
 - **Temperature Sensors**: Real-time monitoring
 - **CCTV Systems**: Photo/video capture
 
 ### Software Integrations
+
 - **SMS Gateway**: Driver notifications
 - **Email Service**: Alert notifications
 - **Cloud Storage**: Vercel Blob for photos/documents
@@ -235,6 +259,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 ## 📱 Mobile App Features (APIs Built)
 
 ### Guard Tablet App
+
 - View queue in real-time
 - Capture photos on mobile
 - Process vehicles quickly
@@ -242,6 +267,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 - Call forward from queue
 
 ### Driver Self-Service Kiosk
+
 - Check queue position
 - View wait time
 - Upload documents in advance
@@ -261,6 +287,7 @@ The Advanced Gate Security System provides comprehensive truck/lorry management 
 ## 🧪 Testing
 
 ### Test LPR Integration
+
 ```bash
 curl -X POST https://your-domain.com/api/security/lpr/capture \
   -H "x-api-key: your-api-key" \
@@ -275,6 +302,7 @@ curl -X POST https://your-domain.com/api/security/lpr/capture \
 ```
 
 ### Test Automation Service
+
 ```bash
 curl -X POST https://your-domain.com/api/security/automation/run \
   -H "Authorization: Bearer your-cron-secret"
@@ -283,6 +311,7 @@ curl -X POST https://your-domain.com/api/security/automation/run \
 ## 📝 Configuration
 
 ### Environment Variables
+
 ```env
 # Required
 DATABASE_URL=postgresql://...
@@ -308,16 +337,19 @@ SMS_API_KEY=...              # For driver notifications
 ## 🆘 Troubleshooting
 
 ### LPR not creating entries
+
 - Check API key is valid
 - Verify confidence score >80%
 - Ensure gate exists in system
 
 ### Weight variance false positives
+
 - Calibrate weight bridges monthly
 - Check for trailer additions/removals
 - Verify driver didn't add cargo on-site
 
 ### Temperature alerts flooding
+
 - Adjust target min/max thresholds
 - Check sensor calibration
 - Verify reefer unit is functioning

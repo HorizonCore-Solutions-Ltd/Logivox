@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -7,20 +7,21 @@ const prisma = new PrismaClient();
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const period = parseInt(searchParams.get('period') || '30');
+    const period = parseInt(searchParams.get("period") || "30");
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - period);
 
     // Generate date ranges based on period
-    const intervals = period <= 7 ? period : period <= 30 ? 7 : period <= 90 ? 10 : 12;
+    const intervals =
+      period <= 7 ? period : period <= 30 ? 7 : period <= 90 ? 10 : 12;
     const intervalDays = Math.floor(period / intervals);
 
     const trends = [];
     for (let i = 0; i < intervals; i++) {
       const intervalStart = new Date(startDate);
-      intervalStart.setDate(intervalStart.getDate() + (i * intervalDays));
-      
+      intervalStart.setDate(intervalStart.getDate() + i * intervalDays);
+
       const intervalEnd = new Date(intervalStart);
       intervalEnd.setDate(intervalEnd.getDate() + intervalDays);
 
@@ -29,75 +30,86 @@ export async function GET(req: NextRequest) {
           where: {
             createdAt: {
               gte: intervalStart,
-              lt: intervalEnd
-            }
-          }
+              lt: intervalEnd,
+            },
+          },
         }),
         prisma.correctivePreventiveAction.count({
           where: {
             createdAt: {
               gte: intervalStart,
-              lt: intervalEnd
-            }
-          }
+              lt: intervalEnd,
+            },
+          },
         }),
         prisma.riskRegister.count({
           where: {
             createdAt: {
               gte: intervalStart,
-              lt: intervalEnd
-            }
-          }
-        })
+              lt: intervalEnd,
+            },
+          },
+        }),
       ]);
 
       trends.push({
-        period: intervalStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        period: intervalStart.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+        }),
         ncrs,
         capas,
-        risks
+        risks,
       });
     }
 
     // Top 5 suppliers by quality score
     const suppliers = await prisma.supplier.findMany({
       take: 5,
-      orderBy: { name: 'asc' },
+      orderBy: { name: "asc" },
       include: {
         // nonConformanceReports removed - not a direct relation
-      }
+      },
     });
 
     // Get NCRs separately for each supplier
-    const supplierNCRs = await Promise.all(suppliers.map(async (supplier) => {
-      const ncrs = await prisma.nonConformanceReport.findMany({
-        where: {
-          supplierId: supplier.id
-        }
-      });
-      return { supplierId: supplier.id, ncrs };
-    }));
+    const supplierNCRs = await Promise.all(
+      suppliers.map(async (supplier) => {
+        const ncrs = await prisma.nonConformanceReport.findMany({
+          where: {
+            supplierId: supplier.id,
+          },
+        });
+        return { supplierId: supplier.id, ncrs };
+      }),
+    );
 
-    const ncrMap = new Map(supplierNCRs.map(s => [s.supplierId, s.ncrs]));
+    const ncrMap = new Map(supplierNCRs.map((s) => [s.supplierId, s.ncrs]));
 
-    const topSuppliers = suppliers.map((supplier: any) => {
-      const supplierNcrs = ncrMap.get(supplier.id) || [];
-      const ncrs = supplierNcrs.length;
-      const criticalNCRs = supplierNcrs.filter((n: any) => n.severity === 'CRITICAL').length;
-      const majorNCRs = supplierNcrs.filter((n: any) => n.severity === 'MAJOR').length;
-      
-      // Simple quality score calculation
-      let score = 100;
-      score -= criticalNCRs * 15;
-      score -= majorNCRs * 10;
-      score -= (ncrs - criticalNCRs - majorNCRs) * 5;
-      
-      return {
-        name: supplier.name,
-        score: Math.max(0, score),
-        ncrs
-      };
-    }).sort((a, b) => b.score - a.score);
+    const topSuppliers = suppliers
+      .map((supplier: any) => {
+        const supplierNcrs = ncrMap.get(supplier.id) || [];
+        const ncrs = supplierNcrs.length;
+        const criticalNCRs = supplierNcrs.filter(
+          (n: any) => n.severity === "CRITICAL",
+        ).length;
+        const majorNCRs = supplierNcrs.filter(
+          (n: any) => n.severity === "MAJOR",
+        ).length;
+
+        // Simple quality score calculation
+        let score = 100;
+        score -= criticalNCRs * 15;
+        score -= majorNCRs * 10;
+        score -= (ncrs - criticalNCRs - majorNCRs) * 5;
+
+        return {
+          name: supplier.name,
+          score: Math.max(0, score),
+          ncrs,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
 
     // SPC Alerts (mock data - in production would come from SPC service)
     const spcAlerts: any[] = [];
@@ -112,45 +124,53 @@ export async function GET(req: NextRequest) {
       totalDocs,
       approvedDocs,
       totalRisks,
-      mitigatedRisks
+      mitigatedRisks,
     ] = await Promise.all([
       prisma.nonConformanceReport.count(),
       prisma.nonConformanceReport.count({
-        where: { capas: { some: {} } }
+        where: { capas: { some: {} } },
       }),
       prisma.audit.count(),
-      prisma.audit.count({ where: { status: 'COMPLETED' } }),
+      prisma.audit.count({ where: { status: "COMPLETED" } }),
       prisma.document.count(),
-      prisma.document.count({ where: { status: 'APPROVED' } }),
+      prisma.document.count({ where: { status: "APPROVED" } }),
       prisma.riskRegister.count(),
-      prisma.riskRegister.count({ where: { status: 'MITIGATED' } })
+      prisma.riskRegister.count({ where: { status: "MITIGATED" } }),
     ]);
 
     const compliance = [
       {
-        name: 'NCR CAPA Linkage',
+        name: "NCR CAPA Linkage",
         value: ncrWithCAPA,
         total: totalNCRs > 0 ? totalNCRs : 1,
-        percentage: totalNCRs > 0 ? Math.round((ncrWithCAPA / totalNCRs) * 100) : 100
+        percentage:
+          totalNCRs > 0 ? Math.round((ncrWithCAPA / totalNCRs) * 100) : 100,
       },
       {
-        name: 'Audit Completion',
+        name: "Audit Completion",
         value: completedAudits,
         total: totalAudits > 0 ? totalAudits : 1,
-        percentage: totalAudits > 0 ? Math.round((completedAudits / totalAudits) * 100) : 100
+        percentage:
+          totalAudits > 0
+            ? Math.round((completedAudits / totalAudits) * 100)
+            : 100,
       },
       {
-        name: 'Document Control',
+        name: "Document Control",
         value: approvedDocs,
         total: totalDocs > 0 ? totalDocs : 1,
-        percentage: totalDocs > 0 ? Math.round((approvedDocs / totalDocs) * 100) : 100
+        percentage:
+          totalDocs > 0 ? Math.round((approvedDocs / totalDocs) * 100) : 100,
       },
       {
-        name: 'Risk Management',
+        name: "Risk Management",
         value: mitigatedRisks,
         total: totalRisks > 0 ? totalRisks : 1,
-        percentage: totalRisks > 0 ? Math.round((mitigatedRisks / totalRisks) * 100) : 100
-      }
+        percentage:
+          totalRisks > 0
+            ? Math.round((mitigatedRisks / totalRisks) * 100)
+            : 100,
+      },
     ];
 
     return NextResponse.json({
@@ -159,14 +179,14 @@ export async function GET(req: NextRequest) {
         trends,
         suppliers: topSuppliers,
         spcAlerts,
-        compliance
-      }
+        compliance,
+      },
     });
   } catch (error: any) {
-    console.error('Error fetching trends:', error);
+    console.error("Error fetching trends:", error);
     return NextResponse.json(
       { success: false, error: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   ClipboardList,
   Plus,
@@ -27,8 +27,8 @@ import {
   Calculator,
   Target,
   TrendingUp,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface SamplingPlan {
   id: string;
@@ -51,17 +51,17 @@ interface SamplingPlan {
 export default function SamplingPlansPage() {
   const [loading, setLoading] = useState(true);
   const [plans, setPlans] = useState<SamplingPlan[]>([]);
-  const [statusFilter, setStatusFilter] = useState<string>('ACTIVE');
-  const [targetTypeFilter, setTargetTypeFilter] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>("ACTIVE");
+  const [targetTypeFilter, setTargetTypeFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [showCalculator, setShowCalculator] = useState(false);
 
   // Calculator state
   const [lotSize, setLotSize] = useState<number>(1000);
-  const [inspectionLevel, setInspectionLevel] = useState<string>('II');
+  const [inspectionLevel, setInspectionLevel] = useState<string>("II");
   const [calculatedSize, setCalculatedSize] = useState<any>(null);
 
-  const organizationId = 'org_123'; // TODO: Get from auth context
+  const organizationId = "org_123"; // TODO: Get from auth context
 
   useEffect(() => {
     fetchData();
@@ -70,15 +70,15 @@ export default function SamplingPlansPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       const params = new URLSearchParams({ organizationId });
-      if (statusFilter) params.append('status', statusFilter);
-      if (targetTypeFilter) params.append('targetType', targetTypeFilter);
+      if (statusFilter) params.append("status", statusFilter);
+      if (targetTypeFilter) params.append("targetType", targetTypeFilter);
 
       const res = await fetch(`/api/qc/sampling-plans?${params.toString()}`);
       if (res.ok) setPlans(await res.json());
     } catch (error) {
-      console.error('Error fetching sampling plans:', error);
+      console.error("Error fetching sampling plans:", error);
     } finally {
       setLoading(false);
     }
@@ -86,9 +86,9 @@ export default function SamplingPlansPage() {
 
   const calculateSampleSize = async () => {
     try {
-      const res = await fetch('/api/qc/sampling-plans/calculate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/qc/sampling-plans/calculate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ lotSize, inspectionLevel }),
       });
       if (res.ok) {
@@ -96,33 +96,38 @@ export default function SamplingPlansPage() {
         setCalculatedSize(data);
       }
     } catch (error) {
-      console.error('Error calculating sample size:', error);
+      console.error("Error calculating sample size:", error);
     }
   };
 
-  const filteredPlans = plans.filter(plan =>
-    plan.planNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    plan.planName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredPlans = plans.filter(
+    (plan) =>
+      plan.planNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      plan.planName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, string> = {
-      DRAFT: 'bg-gray-500',
-      ACTIVE: 'bg-green-600',
-      INACTIVE: 'bg-yellow-500',
-      SUPERSEDED: 'bg-orange-500',
+      DRAFT: "bg-gray-500",
+      ACTIVE: "bg-green-600",
+      INACTIVE: "bg-yellow-500",
+      SUPERSEDED: "bg-orange-500",
     };
     return <Badge className={`${config[status]} text-white`}>{status}</Badge>;
   };
 
   const getTargetTypeBadge = (type: string) => {
     const config: Record<string, string> = {
-      UNIVERSAL: 'bg-purple-500',
-      SUPPLIER: 'bg-blue-500',
-      PRODUCT: 'bg-green-600',
-      PRODUCT_CATEGORY: 'bg-teal-500',
+      UNIVERSAL: "bg-purple-500",
+      SUPPLIER: "bg-blue-500",
+      PRODUCT: "bg-green-600",
+      PRODUCT_CATEGORY: "bg-teal-500",
     };
-    return <Badge className={`${config[type]} text-white`}>{type.replace(/_/g, ' ')}</Badge>;
+    return (
+      <Badge className={`${config[type]} text-white`}>
+        {type.replace(/_/g, " ")}
+      </Badge>
+    );
   };
 
   const isExpired = (expirationDate: string | undefined) => {
@@ -144,12 +149,17 @@ export default function SamplingPlansPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Sampling Plans</h1>
-          <p className="text-muted-foreground">AQL-based sampling per ANSI/ASQ Z1.4</p>
+          <p className="text-muted-foreground">
+            AQL-based sampling per ANSI/ASQ Z1.4
+          </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setShowCalculator(!showCalculator)}>
+          <Button
+            variant="outline"
+            onClick={() => setShowCalculator(!showCalculator)}
+          >
             <Calculator className="h-4 w-4 mr-2" />
-            {showCalculator ? 'Hide' : 'Show'} Calculator
+            {showCalculator ? "Hide" : "Show"} Calculator
           </Button>
           <Link href="/dashboard/qc/sampling-plans/create">
             <Button>
@@ -179,7 +189,10 @@ export default function SamplingPlansPage() {
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Inspection Level</label>
-                <Select value={inspectionLevel} onValueChange={setInspectionLevel}>
+                <Select
+                  value={inspectionLevel}
+                  onValueChange={setInspectionLevel}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -206,17 +219,29 @@ export default function SamplingPlansPage() {
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                 <div className="grid gap-2 md:grid-cols-3">
                   <div>
-                    <p className="text-sm text-muted-foreground">Sample Size Code</p>
-                    <p className="text-2xl font-bold">{calculatedSize.sampleSizeCode}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Sample Size Code
+                    </p>
+                    <p className="text-2xl font-bold">
+                      {calculatedSize.sampleSizeCode}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Sample Size</p>
-                    <p className="text-2xl font-bold text-green-600">{calculatedSize.sampleSize}</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {calculatedSize.sampleSize}
+                    </p>
                   </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Inspection %</p>
+                    <p className="text-sm text-muted-foreground">
+                      Inspection %
+                    </p>
                     <p className="text-2xl font-bold">
-                      {((calculatedSize.sampleSize / calculatedSize.lotSize) * 100).toFixed(2)}%
+                      {(
+                        (calculatedSize.sampleSize / calculatedSize.lotSize) *
+                        100
+                      ).toFixed(2)}
+                      %
                     </p>
                   </div>
                 </div>
@@ -236,19 +261,21 @@ export default function SamplingPlansPage() {
           <CardContent>
             <div className="text-2xl font-bold">{plans.length}</div>
             <p className="text-xs text-muted-foreground">
-              {plans.filter(p => p.status === 'ACTIVE').length} active
+              {plans.filter((p) => p.status === "ACTIVE").length} active
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Universal Plans</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Universal Plans
+            </CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {plans.filter(p => p.targetType === 'UNIVERSAL').length}
+              {plans.filter((p) => p.targetType === "UNIVERSAL").length}
             </div>
             <p className="text-xs text-muted-foreground">
               Apply to all inspections
@@ -263,11 +290,9 @@ export default function SamplingPlansPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Math.max(...plans.map(p => p.timesUsed), 0)}
+              {Math.max(...plans.map((p) => p.timesUsed), 0)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              times used
-            </p>
+            <p className="text-xs text-muted-foreground">times used</p>
           </CardContent>
         </Card>
 
@@ -278,7 +303,7 @@ export default function SamplingPlansPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {plans.filter(p => p.status === 'SUPERSEDED').length}
+              {plans.filter((p) => p.status === "SUPERSEDED").length}
             </div>
             <p className="text-xs text-muted-foreground">
               replaced by newer plans
@@ -312,7 +337,10 @@ export default function SamplingPlansPage() {
                 <SelectItem value="SUPERSEDED">Superseded</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={targetTypeFilter} onValueChange={setTargetTypeFilter}>
+            <Select
+              value={targetTypeFilter}
+              onValueChange={setTargetTypeFilter}
+            >
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="All Target Types" />
               </SelectTrigger>
@@ -321,7 +349,9 @@ export default function SamplingPlansPage() {
                 <SelectItem value="UNIVERSAL">Universal</SelectItem>
                 <SelectItem value="SUPPLIER">Supplier</SelectItem>
                 <SelectItem value="PRODUCT">Product</SelectItem>
-                <SelectItem value="PRODUCT_CATEGORY">Product Category</SelectItem>
+                <SelectItem value="PRODUCT_CATEGORY">
+                  Product Category
+                </SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline" onClick={fetchData}>
@@ -351,33 +381,48 @@ export default function SamplingPlansPage() {
               <TableBody>
                 {filteredPlans.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center text-muted-foreground">
+                    <TableCell
+                      colSpan={11}
+                      className="text-center text-muted-foreground"
+                    >
                       No sampling plans found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredPlans.map((plan) => (
                     <TableRow key={plan.id}>
-                      <TableCell className="font-medium">{plan.planNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {plan.planNumber}
+                      </TableCell>
                       <TableCell>{plan.planName}</TableCell>
-                      <TableCell>{getTargetTypeBadge(plan.targetType)}</TableCell>
+                      <TableCell>
+                        {getTargetTypeBadge(plan.targetType)}
+                      </TableCell>
                       <TableCell>{plan.inspectionType}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{plan.inspectionLevel}</Badge>
                       </TableCell>
-                      <TableCell>{plan.aqlMajor ? `${plan.aqlMajor}%` : '-'}</TableCell>
-                      <TableCell>{plan.sampleSize || '-'}</TableCell>
+                      <TableCell>
+                        {plan.aqlMajor ? `${plan.aqlMajor}%` : "-"}
+                      </TableCell>
+                      <TableCell>{plan.sampleSize || "-"}</TableCell>
                       <TableCell>{plan.timesUsed}</TableCell>
                       <TableCell>{getStatusBadge(plan.status)}</TableCell>
                       <TableCell>
-                        <span className={isExpired(plan.expirationDate) ? 'text-red-600' : ''}>
+                        <span
+                          className={
+                            isExpired(plan.expirationDate) ? "text-red-600" : ""
+                          }
+                        >
                           {new Date(plan.effectiveDate).toLocaleDateString()}
-                          {isExpired(plan.expirationDate) && ' (Expired)'}
+                          {isExpired(plan.expirationDate) && " (Expired)"}
                         </span>
                       </TableCell>
                       <TableCell>
                         <Link href={`/dashboard/qc/sampling-plans/${plan.id}`}>
-                          <Button variant="ghost" size="sm">View</Button>
+                          <Button variant="ghost" size="sm">
+                            View
+                          </Button>
                         </Link>
                       </TableCell>
                     </TableRow>

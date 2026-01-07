@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -8,8 +8,17 @@ import { z } from "zod";
 const updateDashboardSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().optional(),
-  dashboardType: z.enum(['OVERVIEW', 'INVENTORY', 'SALES', 'WAREHOUSE', 'ANALYTICS', 'CUSTOM']).optional(),
-  category: z.enum(['OPERATIONS', 'SALES', 'FINANCE', 'INVENTORY']).optional(),
+  dashboardType: z
+    .enum([
+      "OVERVIEW",
+      "INVENTORY",
+      "SALES",
+      "WAREHOUSE",
+      "ANALYTICS",
+      "CUSTOM",
+    ])
+    .optional(),
+  category: z.enum(["OPERATIONS", "SALES", "FINANCE", "INVENTORY"]).optional(),
   layout: z.record(z.any()).optional(),
   widgets: z.array(z.record(z.any())).optional(),
   isPublic: z.boolean().optional(),
@@ -26,7 +35,7 @@ const updateDashboardSchema = z.object({
 // GET /api/dashboards/[id] - Get dashboard by ID
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -47,7 +56,7 @@ export async function GET(
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -70,7 +79,10 @@ export async function GET(
     });
 
     if (!dashboard) {
-      return NextResponse.json({ error: "Dashboard not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Dashboard not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(dashboard);
@@ -78,7 +90,7 @@ export async function GET(
     console.error("Error fetching dashboard:", error);
     return NextResponse.json(
       { error: "Failed to fetch dashboard" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -86,7 +98,7 @@ export async function GET(
 // PATCH /api/dashboards/[id] - Update dashboard
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -107,7 +119,7 @@ export async function PATCH(
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -122,7 +134,10 @@ export async function PATCH(
     });
 
     if (!existing) {
-      return NextResponse.json({ error: "Dashboard not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Dashboard not found" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -148,13 +163,13 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating dashboard:", error);
     return NextResponse.json(
       { error: "Failed to update dashboard" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -162,7 +177,7 @@ export async function PATCH(
 // DELETE /api/dashboards/[id] - Delete dashboard
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -183,7 +198,7 @@ export async function DELETE(
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -198,7 +213,10 @@ export async function DELETE(
     });
 
     if (!existing) {
-      return NextResponse.json({ error: "Dashboard not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Dashboard not found" },
+        { status: 404 },
+      );
     }
 
     // Delete dashboard
@@ -211,7 +229,7 @@ export async function DELETE(
     console.error("Error deleting dashboard:", error);
     return NextResponse.json(
       { error: "Failed to delete dashboard" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

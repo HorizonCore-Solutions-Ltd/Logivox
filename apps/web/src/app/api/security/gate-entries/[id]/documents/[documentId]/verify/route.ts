@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const verifySchema = z.object({
   verified: z.boolean(),
@@ -11,12 +11,12 @@ const verifySchema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string; documentId: string } }
+  { params }: { params: { id: string; documentId: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { id: gateEntryId, documentId } = params;
@@ -30,7 +30,10 @@ export async function PATCH(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     // Verify document exists
@@ -42,7 +45,10 @@ export async function PATCH(
     });
 
     if (!document) {
-      return NextResponse.json({ error: 'Document not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Document not found" },
+        { status: 404 },
+      );
     }
 
     const body = await req.json();
@@ -63,15 +69,15 @@ export async function PATCH(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error verifying document:', error);
+    console.error("Error verifying document:", error);
     return NextResponse.json(
-      { error: 'Failed to verify document' },
-      { status: 500 }
+      { error: "Failed to verify document" },
+      { status: 500 },
     );
   }
 }

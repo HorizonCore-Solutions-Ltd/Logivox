@@ -115,7 +115,7 @@ export interface ReturnSettings {
       autoGrade: boolean;
       damageDetection: boolean;
       authenticityCheck: boolean;
-      confidence Threshold: number; // 0-100
+      confidenceThreshold: number; // 0-100
     };
 
     // Condition Grading

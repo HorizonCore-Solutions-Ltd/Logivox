@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import FMEAService from '@/lib/services/fmea.service';
+import { NextResponse } from "next/server";
+import FMEAService from "@/lib/services/fmea.service";
 
 /**
  * GET /api/qc/fmea/overdue
@@ -13,15 +13,14 @@ export async function GET(request: Request) {
       success: true,
       data: overdueActions,
       meta: {
-        total: overdueActions.length
-      }
+        total: overdueActions.length,
+      },
     });
-
   } catch (error: any) {
-    console.error('Overdue actions error:', error);
+    console.error("Overdue actions error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch overdue actions' },
-      { status: 500 }
+      { error: error.message || "Failed to fetch overdue actions" },
+      { status: 500 },
     );
   }
 }

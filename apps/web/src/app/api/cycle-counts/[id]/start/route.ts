@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 // POST /api/cycle-counts/[id]/start - Start cycle count
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -22,7 +22,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -36,14 +36,14 @@ export async function POST(
     if (!cycleCount) {
       return NextResponse.json(
         { error: "Cycle count not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (cycleCount.status !== "PLANNED") {
       return NextResponse.json(
         { error: "Only planned cycle counts can be started" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -91,7 +91,7 @@ export async function POST(
     console.error("Error starting cycle count:", error);
     return NextResponse.json(
       { error: "Failed to start cycle count" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

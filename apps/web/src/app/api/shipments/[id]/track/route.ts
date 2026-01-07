@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -10,7 +10,7 @@ const trackingEventSchema = z.object({
   status: z.string(),
   description: z.string(),
   location: z.string().optional(),
-  timestamp: z.string().optional()
+  timestamp: z.string().optional(),
 });
 
 /**
@@ -20,16 +20,13 @@ const trackingEventSchema = z.object({
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const shipmentId = params.id;
@@ -42,15 +39,15 @@ export async function POST(
       include: {
         organizationMemberships: {
           where: { isActive: true },
-          include: { organization: true }
-        }
-      }
+          include: { organization: true },
+        },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -60,29 +57,29 @@ export async function POST(
     const shipment = await prisma.shipment.findFirst({
       where: {
         id: shipmentId,
-        organizationId
+        organizationId,
       },
       include: {
-        salesOrder: true
-      }
+        salesOrder: true,
+      },
     });
 
     if (!shipment) {
       return NextResponse.json(
         { error: "Shipment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // Get existing tracking events
     const existingEvents = (shipment.trackingEvents as any[]) || [];
-    
+
     // Add new event
     const newEvent = {
       status: validatedEvent.status,
       description: validatedEvent.description,
       location: validatedEvent.location,
-      timestamp: validatedEvent.timestamp || new Date().toISOString()
+      timestamp: validatedEvent.timestamp || new Date().toISOString(),
     };
 
     // Determine shipment status from event
@@ -105,13 +102,13 @@ export async function POST(
         trackingEvents: [...existingEvents, newEvent] as any,
         lastTrackingUpdate: new Date(),
         ...(newStatus === "DELIVERED" && {
-          actualDelivery: new Date()
+          actualDelivery: new Date(),
         }),
         ...(newStatus === "EXCEPTION" && {
           exceptionReason: validatedEvent.description,
-          exceptionDate: new Date()
-        })
-      }
+          exceptionDate: new Date(),
+        }),
+      },
     });
 
     // Update sales order if delivered
@@ -120,8 +117,8 @@ export async function POST(
         where: { id: shipment.salesOrderId },
         data: {
           status: "DELIVERED",
-          deliveredDate: new Date()
-        }
+          deliveredDate: new Date(),
+        },
       });
 
       // Create activity log
@@ -137,30 +134,29 @@ export async function POST(
             salesOrderNumber: shipment.salesOrder.soNumber,
             trackingNumber: shipment.trackingNumber,
             deliveredDate: new Date().toISOString(),
-            location: validatedEvent.location
-          }
-        }
+            location: validatedEvent.location,
+          },
+        },
       });
     }
 
     return NextResponse.json({
       shipment: updatedShipment,
-      event: newEvent
+      event: newEvent,
     });
-
   } catch (error: any) {
     console.error("Error updating tracking:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Failed to update tracking" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -172,16 +168,13 @@ export async function POST(
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const shipmentId = params.id;
@@ -192,15 +185,15 @@ export async function GET(
       include: {
         organizationMemberships: {
           where: { isActive: true },
-          include: { organization: true }
-        }
-      }
+          include: { organization: true },
+        },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -210,7 +203,7 @@ export async function GET(
     const shipment = await prisma.shipment.findFirst({
       where: {
         id: shipmentId,
-        organizationId
+        organizationId,
       },
       select: {
         id: true,
@@ -225,27 +218,26 @@ export async function GET(
         estimatedDelivery: true,
         actualDelivery: true,
         trackingEvents: true,
-        lastTrackingUpdate: true
-      }
+        lastTrackingUpdate: true,
+      },
     });
 
     if (!shipment) {
       return NextResponse.json(
         { error: "Shipment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     return NextResponse.json({
       ...shipment,
-      events: shipment.trackingEvents || []
+      events: shipment.trackingEvents || [],
     });
-
   } catch (error: any) {
     console.error("Error fetching tracking:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch tracking" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

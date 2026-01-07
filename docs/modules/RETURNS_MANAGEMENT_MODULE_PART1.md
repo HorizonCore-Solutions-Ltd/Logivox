@@ -11,6 +11,7 @@
 Part 1 delivers enterprise-grade returns operations: RMA creation, return authorization, receiving, inspection/triage, disposition, restocking, and return-to-vendor workflows. It integrates tightly with inventory, QC/quarantine, customer service, and finance.
 
 ### Core Capabilities
+
 - **RMA Lifecycle**: Create/approve RMAs, labels, tracking, expected contents
 - **Returns Receiving**: Scan inbound returns, match against RMA/order/serial/lot
 - **Triage & Inspection**: Condition grading, reason codes, photo evidence
@@ -24,37 +25,43 @@ Part 1 delivers enterprise-grade returns operations: RMA creation, return author
 ## 🧾 1. RMA Lifecycle Management
 
 ### End-to-end return authorization and tracking
+
 ```typescript
-type ReturnChannel = 'CUSTOMER' | '3PL_CLIENT' | 'RETAIL' | 'MARKETPLACE' | 'INTERNAL';
+type ReturnChannel =
+  | "CUSTOMER"
+  | "3PL_CLIENT"
+  | "RETAIL"
+  | "MARKETPLACE"
+  | "INTERNAL";
 
 type ReturnType =
-  | 'UNWANTED'
-  | 'DAMAGED'
-  | 'DEFECTIVE'
-  | 'WRONG_ITEM'
-  | 'MISSING_PARTS'
-  | 'EXPIRED'
-  | 'RECALL'
-  | 'WARRANTY'
-  | 'CARRIER_DAMAGE'
-  | 'OTHER';
+  | "UNWANTED"
+  | "DAMAGED"
+  | "DEFECTIVE"
+  | "WRONG_ITEM"
+  | "MISSING_PARTS"
+  | "EXPIRED"
+  | "RECALL"
+  | "WARRANTY"
+  | "CARRIER_DAMAGE"
+  | "OTHER";
 
 type RMAStatus =
-  | 'DRAFT'
-  | 'REQUESTED'
-  | 'APPROVED'
-  | 'REJECTED'
-  | 'LABEL_ISSUED'
-  | 'IN_TRANSIT'
-  | 'RECEIVED'
-  | 'UNDER_INSPECTION'
-  | 'DISPOSITIONED'
-  | 'CLOSED'
-  | 'CANCELLED';
+  | "DRAFT"
+  | "REQUESTED"
+  | "APPROVED"
+  | "REJECTED"
+  | "LABEL_ISSUED"
+  | "IN_TRANSIT"
+  | "RECEIVED"
+  | "UNDER_INSPECTION"
+  | "DISPOSITIONED"
+  | "CLOSED"
+  | "CANCELLED";
 
-type ReturnEligibilityDecision = 'ELIGIBLE' | 'NOT_ELIGIBLE' | 'NEEDS_REVIEW';
+type ReturnEligibilityDecision = "ELIGIBLE" | "NOT_ELIGIBLE" | "NEEDS_REVIEW";
 
-type ReturnLabelType = 'PREPAID' | 'CUSTOMER_PAID' | 'CARRIER_COLLECT' | 'NONE';
+type ReturnLabelType = "PREPAID" | "CUSTOMER_PAID" | "CARRIER_COLLECT" | "NONE";
 
 interface ReturnsManagementSystem {
   // RMA
@@ -64,12 +71,23 @@ interface ReturnsManagementSystem {
   rejectRMA: (rmaId: string, rejection: RMARejection) => Promise<void>;
 
   // Labels / tracking
-  generateReturnLabel: (rmaId: string, config: ReturnLabelConfig) => Promise<ReturnLabel>;
-  recordTrackingUpdate: (rmaId: string, update: ReturnTrackingUpdate) => Promise<void>;
+  generateReturnLabel: (
+    rmaId: string,
+    config: ReturnLabelConfig,
+  ) => Promise<ReturnLabel>;
+  recordTrackingUpdate: (
+    rmaId: string,
+    update: ReturnTrackingUpdate,
+  ) => Promise<void>;
 
   // Policy
-  evaluateEligibility: (request: EligibilityRequest) => Promise<EligibilityResult>;
-  getReturnPolicy: (customerId?: string, clientId?: string) => Promise<ReturnPolicy>;
+  evaluateEligibility: (
+    request: EligibilityRequest,
+  ) => Promise<EligibilityResult>;
+  getReturnPolicy: (
+    customerId?: string,
+    clientId?: string,
+  ) => Promise<ReturnPolicy>;
 
   // Visibility
   getRMA: (rmaId: string) => Promise<RMA>;
@@ -116,7 +134,7 @@ interface CreateRMARequest {
   }[];
 
   // Logistics
-  returnMethod?: 'MAIL' | 'PICKUP' | 'DROP_OFF' | 'IN_STORE';
+  returnMethod?: "MAIL" | "PICKUP" | "DROP_OFF" | "IN_STORE";
   returnLabelRequested: boolean;
 
   // Photos/documents
@@ -143,7 +161,7 @@ interface RMA {
     decision: ReturnEligibilityDecision;
     reason: string;
     evaluatedAt: Date;
-    evaluatedBy: 'SYSTEM' | 'AGENT' | 'MANAGER';
+    evaluatedBy: "SYSTEM" | "AGENT" | "MANAGER";
   };
 
   // Lines
@@ -175,7 +193,7 @@ interface RMA {
     estimatedCredit?: number;
     actualCredit?: number;
     currency: string;
-    creditStatus: 'NONE' | 'PENDING' | 'ISSUED' | 'DENIED';
+    creditStatus: "NONE" | "PENDING" | "ISSUED" | "DENIED";
   };
 
   // Audit
@@ -238,11 +256,11 @@ interface EligibilityResult {
 
   // Suggested path
   recommendedAction:
-    | 'APPROVE'
-    | 'REJECT'
-    | 'MANAGER_REVIEW'
-    | 'ROUTE_TO_QC'
-    | 'ROUTE_TO_VENDOR_CLAIM';
+    | "APPROVE"
+    | "REJECT"
+    | "MANAGER_REVIEW"
+    | "ROUTE_TO_QC"
+    | "ROUTE_TO_VENDOR_CLAIM";
 }
 
 interface ReturnPolicy {
@@ -376,7 +394,7 @@ interface RMAEvent {
   at: Date;
   actor: {
     actorId: string;
-    actorType: 'USER' | 'SYSTEM' | 'DEVICE';
+    actorType: "USER" | "SYSTEM" | "DEVICE";
     role?: string;
   };
   type: string;
@@ -400,14 +418,30 @@ const RMA_VOICE_COMMANDS = [
 ## 📦 2. Returns Receiving & Verification
 
 ### Scan, match, validate: stop fraud and misroutes
-```typescript
-type ReturnReceiveStatus = 'PENDING' | 'RECEIVED' | 'PARTIAL' | 'MISMATCH' | 'UNKNOWN' | 'CLOSED';
 
-type VerificationOutcome = 'MATCH' | 'MISMATCH' | 'UNKNOWN_ITEM' | 'EXCESS_QUANTITY' | 'MISSING_SERIAL' | 'INVALID_LOT';
+```typescript
+type ReturnReceiveStatus =
+  | "PENDING"
+  | "RECEIVED"
+  | "PARTIAL"
+  | "MISMATCH"
+  | "UNKNOWN"
+  | "CLOSED";
+
+type VerificationOutcome =
+  | "MATCH"
+  | "MISMATCH"
+  | "UNKNOWN_ITEM"
+  | "EXCESS_QUANTITY"
+  | "MISSING_SERIAL"
+  | "INVALID_LOT";
 
 interface ReturnsReceiving {
   startReturnReceipt: (rmaNumber: string) => Promise<ReturnReceipt>;
-  receiveLine: (receiptId: string, input: ReceiveReturnLineInput) => Promise<ReturnReceipt>;
+  receiveLine: (
+    receiptId: string,
+    input: ReceiveReturnLineInput,
+  ) => Promise<ReturnReceipt>;
   closeReturnReceipt: (receiptId: string) => Promise<void>;
 
   // Verification
@@ -495,7 +529,13 @@ interface ReturnReceiptLine {
   verificationNotes?: string;
 
   // Routing
-  routedTo: 'RETURNS_STAGING' | 'QC_INSPECTION' | 'QUARANTINE' | 'REFURB' | 'SCRAP' | 'RTV_STAGING';
+  routedTo:
+    | "RETURNS_STAGING"
+    | "QC_INSPECTION"
+    | "QUARANTINE"
+    | "REFURB"
+    | "SCRAP"
+    | "RTV_STAGING";
 
   // Evidence
   photos?: string[];
@@ -506,18 +546,22 @@ interface FraudSignal {
   id: string;
   at: Date;
 
-  severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  severity: "LOW" | "MEDIUM" | "HIGH";
   signal:
-    | 'SERIAL_NOT_FOUND'
-    | 'LOT_NOT_FOUND'
-    | 'SKU_NOT_ON_ORDER'
-    | 'EXCESS_QUANTITY'
-    | 'RETURN_WINDOW_EXCEEDED'
-    | 'MULTIPLE_RETURNS_SAME_SERIAL'
-    | 'SUSPICIOUS_DAMAGE_PATTERN';
+    | "SERIAL_NOT_FOUND"
+    | "LOT_NOT_FOUND"
+    | "SKU_NOT_ON_ORDER"
+    | "EXCESS_QUANTITY"
+    | "RETURN_WINDOW_EXCEEDED"
+    | "MULTIPLE_RETURNS_SAME_SERIAL"
+    | "SUSPICIOUS_DAMAGE_PATTERN";
 
   description: string;
-  recommendedAction: 'HOLD_FOR_REVIEW' | 'REJECT_RETURN' | 'ROUTE_TO_SECURITY' | 'ROUTE_TO_QC';
+  recommendedAction:
+    | "HOLD_FOR_REVIEW"
+    | "REJECT_RETURN"
+    | "ROUTE_TO_SECURITY"
+    | "ROUTE_TO_QC";
 }
 
 const RETURNS_RECEIVING_VOICE_COMMANDS = [
@@ -535,14 +579,24 @@ const RETURNS_RECEIVING_VOICE_COMMANDS = [
 ## 🧪 3. Triage, Condition Grading & Inspection
 
 ### Standardized return condition grading
-```typescript
-type ConditionGrade = 'A' | 'B' | 'C' | 'D' | 'F';
 
-type InspectionTrigger = 'ALL_RETURNS' | 'RISK_BASED' | 'VALUE_BASED' | 'RANDOM' | 'CATEGORY_BASED' | 'MANUAL';
+```typescript
+type ConditionGrade = "A" | "B" | "C" | "D" | "F";
+
+type InspectionTrigger =
+  | "ALL_RETURNS"
+  | "RISK_BASED"
+  | "VALUE_BASED"
+  | "RANDOM"
+  | "CATEGORY_BASED"
+  | "MANUAL";
 
 interface ReturnsTriage {
   triageItem: (input: TriageInput) => Promise<TriageResult>;
-  createReturnInspection: (receiptLineId: string, templateId?: string) => Promise<string>;
+  createReturnInspection: (
+    receiptLineId: string,
+    templateId?: string,
+  ) => Promise<string>;
 
   // Rules
   getTriageRules: (clientId?: string) => Promise<TriageRules>;
@@ -588,13 +642,13 @@ interface TriageResult {
   // Flags
   flags: {
     type:
-      | 'POSSIBLE_FRAUD'
-      | 'SAFETY_RISK'
-      | 'RECALL_RELATED'
-      | 'MISSING_SERIAL'
-      | 'MISSING_PARTS'
-      | 'COUNTERFEIT_RISK'
-      | 'QUARANTINE_REQUIRED';
+      | "POSSIBLE_FRAUD"
+      | "SAFETY_RISK"
+      | "RECALL_RELATED"
+      | "MISSING_SERIAL"
+      | "MISSING_PARTS"
+      | "COUNTERFEIT_RISK"
+      | "QUARANTINE_REQUIRED";
     message: string;
   }[];
 }
@@ -649,22 +703,28 @@ const RETURNS_TRIAGE_VOICE_COMMANDS = [
 ## 🧭 4. Disposition Engine
 
 ### Policy-driven disposition with full traceability
+
 ```typescript
 type DispositionDecision =
-  | 'RESTOCK'
-  | 'REFURBISH'
-  | 'REWORK'
-  | 'SCRAP'
-  | 'QUARANTINE'
-  | 'RETURN_TO_VENDOR'
-  | 'DONATE'
-  | 'RESALE_SECONDARY'
-  | 'CUSTOMER_RETURN_BACK'
-  | 'HOLD_FOR_REVIEW';
+  | "RESTOCK"
+  | "REFURBISH"
+  | "REWORK"
+  | "SCRAP"
+  | "QUARANTINE"
+  | "RETURN_TO_VENDOR"
+  | "DONATE"
+  | "RESALE_SECONDARY"
+  | "CUSTOMER_RETURN_BACK"
+  | "HOLD_FOR_REVIEW";
 
 interface DispositionEngine {
-  decideDisposition: (input: DispositionInput) => Promise<DispositionRecommendation>;
-  applyDisposition: (receiptLineId: string, decision: ApplyDispositionInput) => Promise<void>;
+  decideDisposition: (
+    input: DispositionInput,
+  ) => Promise<DispositionRecommendation>;
+  applyDisposition: (
+    receiptLineId: string,
+    decision: ApplyDispositionInput,
+  ) => Promise<void>;
 
   // Work queues
   getWorkQueue: (queue: DispositionDecision) => Promise<ReturnWorkItem[]>;
@@ -745,7 +805,7 @@ interface ReturnWorkItem {
   sku: string;
 
   decision: DispositionDecision;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
   assignedTo?: string;
   createdAt: Date;
@@ -767,6 +827,7 @@ const DISPOSITION_VOICE_COMMANDS = [
 ## 🏭 5. Restock & Inventory Reintegration
 
 ### Controlled restock with QC gates
+
 ```typescript
 interface RestockSystem {
   // Restock
@@ -789,7 +850,11 @@ interface InventoryAdjustment {
   quantity: number;
   unit: string;
 
-  reasonCode: 'RETURN_RESTOCK' | 'RETURN_SCRAP' | 'RETURN_REFURB' | 'RETURN_RTV';
+  reasonCode:
+    | "RETURN_RESTOCK"
+    | "RETURN_SCRAP"
+    | "RETURN_REFURB"
+    | "RETURN_RTV";
   referenceId: string; // receiptLineId or workOrderId
 
   performedBy: string;
@@ -808,8 +873,16 @@ const RESTOCK_VOICE_COMMANDS = [
 ## 🚚 6. Return-To-Vendor (RTV)
 
 ### Vendor claims + authorization + shipping
+
 ```typescript
-type RTVStatus = 'DRAFT' | 'REQUESTED' | 'APPROVED' | 'REJECTED' | 'PACKING' | 'SHIPPED' | 'CLOSED';
+type RTVStatus =
+  | "DRAFT"
+  | "REQUESTED"
+  | "APPROVED"
+  | "REJECTED"
+  | "PACKING"
+  | "SHIPPED"
+  | "CLOSED";
 
 interface RTVSystem {
   createRTV: (input: CreateRTVRequest) => Promise<RTV>;
@@ -909,6 +982,7 @@ const RTV_VOICE_COMMANDS = [
 ## 📊 Part 1 Summary
 
 ### Core Features Covered
+
 ✅ RMA lifecycle + eligibility policy  
 ✅ Returns receiving + serial/lot verification + fraud signals  
 ✅ Triage + condition grading + inspection triggers  
@@ -919,6 +993,7 @@ const RTV_VOICE_COMMANDS = [
 **Voice Commands in Part 1**: 30+ commands
 
 **Coming in Part 2 (Advanced)**:
+
 - Predictive returns forecasting + staffing
 - Automated credit decisioning + dispute workflows
 - Advanced refurbishment work orders + QA gates
@@ -937,4 +1012,7 @@ const RTV_VOICE_COMMANDS = [
 - Full disposition traceability for audits and customer disputes
 
 **Module 13 Part 1: Returns Management - Production Ready** ✅
+
+```
+
 ```

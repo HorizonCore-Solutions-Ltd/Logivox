@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,13 +12,15 @@ const createMappingSchema = z.object({
   description: z.string().optional(),
   entityType: z.string().min(1, "Entity type is required"),
   direction: z.enum(["IMPORT", "EXPORT", "BIDIRECTIONAL"]),
-  mappings: z.array(z.object({
-    wmsField: z.string(),
-    externalField: z.string(),
-    transform: z.string().optional(),
-    defaultValue: z.any().optional(),
-    isRequired: z.boolean().default(false),
-  })),
+  mappings: z.array(
+    z.object({
+      wmsField: z.string(),
+      externalField: z.string(),
+      transform: z.string().optional(),
+      defaultValue: z.any().optional(),
+      isRequired: z.boolean().default(false),
+    }),
+  ),
   transformations: z.record(z.any()).optional(),
   defaultValues: z.record(z.any()).optional(),
   validationRules: z.record(z.any()).optional(),
@@ -47,7 +49,10 @@ export async function GET(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -98,7 +103,7 @@ export async function GET(request: Request) {
     console.error("Error fetching mappings:", error);
     return NextResponse.json(
       { error: "Failed to fetch mappings" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -123,7 +128,10 @@ export async function POST(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -139,7 +147,7 @@ export async function POST(request: Request) {
     if (!integration) {
       return NextResponse.json(
         { error: "Integration not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -157,8 +165,10 @@ export async function POST(request: Request) {
 
     if (existing) {
       return NextResponse.json(
-        { error: "A mapping already exists for this entity type and direction" },
-        { status: 400 }
+        {
+          error: "A mapping already exists for this entity type and direction",
+        },
+        { status: 400 },
       );
     }
 
@@ -192,13 +202,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating mapping:", error);
     return NextResponse.json(
       { error: "Failed to create mapping" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,7 +83,9 @@ export default function AccountPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">My Account</h1>
-        <p className="text-gray-600 mt-1">View your account and company information</p>
+        <p className="text-gray-600 mt-1">
+          View your account and company information
+        </p>
       </div>
 
       {/* User Information */}
@@ -115,7 +123,8 @@ export default function AccountPage() {
           </div>
           <div className="pt-4 border-t">
             <p className="text-sm text-gray-500">
-              To update your login information, please contact your account manager or warehouse team.
+              To update your login information, please contact your account
+              manager or warehouse team.
             </p>
           </div>
         </CardContent>
@@ -128,7 +137,9 @@ export default function AccountPage() {
             <Building2 className="h-5 w-5 text-gray-600" />
             <CardTitle>Company Information</CardTitle>
           </div>
-          <CardDescription>Your company details and default shipping address</CardDescription>
+          <CardDescription>
+            Your company details and default shipping address
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
@@ -189,7 +200,8 @@ export default function AccountPage() {
               {customerInfo.customer.city && (
                 <p>
                   {customerInfo.customer.city}
-                  {customerInfo.customer.country && `, ${customerInfo.customer.country}`}
+                  {customerInfo.customer.country &&
+                    `, ${customerInfo.customer.country}`}
                 </p>
               )}
             </div>
@@ -197,7 +209,8 @@ export default function AccountPage() {
 
           <div className="pt-4 border-t">
             <p className="text-sm text-gray-500">
-              To update your company information or shipping address, please contact your account manager.
+              To update your company information or shipping address, please
+              contact your account manager.
             </p>
           </div>
         </CardContent>

@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -40,7 +40,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!customerUser?.customer) {
-      return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Customer not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json({
@@ -53,6 +56,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error("Portal customer error:", error);
-    return NextResponse.json({ error: "Failed to fetch customer details" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch customer details" },
+      { status: 500 },
+    );
   }
 }

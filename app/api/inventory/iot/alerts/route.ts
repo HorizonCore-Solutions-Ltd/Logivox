@@ -3,12 +3,12 @@
  * Manage IoT-generated alerts and notifications
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/inventory/iot/alerts
@@ -18,19 +18,16 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const severity = searchParams.get('severity'); // LOW, MEDIUM, HIGH, CRITICAL
-    const resolved = searchParams.get('resolved') === 'true';
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const severity = searchParams.get("severity"); // LOW, MEDIUM, HIGH, CRITICAL
+    const resolved = searchParams.get("resolved") === "true";
+    const limit = parseInt(searchParams.get("limit") || "50");
 
     const where: any = {
-      organizationId: session.user.organizationId
+      organizationId: session.user.organizationId,
     };
 
     if (severity) {
@@ -47,12 +44,12 @@ export async function GET(request: NextRequest) {
         device: true,
         product: {
           include: {
-            product: true
-          }
-        }
+            product: true,
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' },
-      take: limit
+      orderBy: { createdAt: "desc" },
+      take: limit,
     });
 
     // Statistics
@@ -61,8 +58,10 @@ export async function GET(request: NextRequest) {
       return acc;
     }, {});
 
-    const unresolved = alerts.filter(a => !a.resolved).length;
-    const critical = alerts.filter(a => a.severity === 'CRITICAL' && !a.resolved).length;
+    const unresolved = alerts.filter((a) => !a.resolved).length;
+    const critical = alerts.filter(
+      (a) => a.severity === "CRITICAL" && !a.resolved,
+    ).length;
 
     return NextResponse.json({
       success: true,
@@ -72,16 +71,15 @@ export async function GET(request: NextRequest) {
           total: alerts.length,
           unresolved,
           critical,
-          bySeverity
-        }
-      }
+          bySeverity,
+        },
+      },
     });
-
   } catch (error: any) {
-    console.error('Alerts retrieval error:', error);
+    console.error("Alerts retrieval error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve alerts', message: error.message },
-      { status: 500 }
+      { error: "Failed to retrieve alerts", message: error.message },
+      { status: 500 },
     );
   }
 }
@@ -92,15 +90,12 @@ export async function GET(request: NextRequest) {
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { alertId: string } }
+  { params }: { params: { alertId: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { alertId } = params;
@@ -110,27 +105,26 @@ export async function PATCH(
     const alert = await prisma.ioTAlert.update({
       where: {
         id: alertId,
-        organizationId: session.user.organizationId
+        organizationId: session.user.organizationId,
       },
       data: {
         resolved: resolved ?? undefined,
         resolvedAt: resolved ? new Date() : undefined,
         resolvedBy: resolved ? session.user.id : undefined,
-        notes: notes || undefined
-      }
+        notes: notes || undefined,
+      },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Alert updated successfully',
-      data: { alert }
+      message: "Alert updated successfully",
+      data: { alert },
     });
-
   } catch (error: any) {
-    console.error('Alert update error:', error);
+    console.error("Alert update error:", error);
     return NextResponse.json(
-      { error: 'Failed to update alert', message: error.message },
-      { status: 500 }
+      { error: "Failed to update alert", message: error.message },
+      { status: 500 },
     );
   }
 }

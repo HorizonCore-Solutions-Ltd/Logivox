@@ -91,8 +91,8 @@ Instead, please report security vulnerabilities to:
 
 We operate a private bug bounty program:
 
-| Severity | Reward Range |
-|----------|-------------|
+| Severity | Reward Range  |
+| -------- | ------------- |
 | Critical | $500 - $2,000 |
 | High     | $250 - $500   |
 | Medium   | $100 - $250   |
@@ -139,6 +139,7 @@ All security-relevant events are logged:
 - API rate limit hits
 
 Logs are:
+
 - Encrypted at rest
 - Retained for 90 days
 - Available for audit

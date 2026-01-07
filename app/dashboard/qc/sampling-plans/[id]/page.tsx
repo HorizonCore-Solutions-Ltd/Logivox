@@ -167,7 +167,9 @@ export default function SamplingPlanDetailPage() {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            onClick={() => router.push(`/dashboard/qc/sampling-plans/${params.id}/edit`)}
+            onClick={() =>
+              router.push(`/dashboard/qc/sampling-plans/${params.id}/edit`)
+            }
           >
             <Edit className="w-4 h-4 mr-2" />
             Edit
@@ -184,7 +186,9 @@ export default function SamplingPlanDetailPage() {
         <Badge className={statusColors[plan.status] || "bg-gray-100"}>
           {plan.status}
         </Badge>
-        <Badge className={inspectionTypeColors[plan.inspectionType] || "bg-gray-100"}>
+        <Badge
+          className={inspectionTypeColors[plan.inspectionType] || "bg-gray-100"}
+        >
           {plan.inspectionType} Inspection
         </Badge>
         <Badge variant="outline">AQL: {plan.aql}</Badge>
@@ -230,16 +234,24 @@ export default function SamplingPlanDetailPage() {
                   <p className="text-2xl font-bold text-blue-600">{plan.aql}</p>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Sample Size</p>
-                  <p className="text-2xl font-bold text-green-600">{plan.sampleSize}</p>
+                  <p className="text-sm text-muted-foreground mb-1">
+                    Sample Size
+                  </p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {plan.sampleSize}
+                  </p>
                 </div>
                 <div className="text-center p-4 bg-green-50 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Accept</p>
-                  <p className="text-2xl font-bold text-green-600">{plan.acceptanceNumber}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {plan.acceptanceNumber}
+                  </p>
                 </div>
                 <div className="text-center p-4 bg-red-50 rounded-lg">
                   <p className="text-sm text-muted-foreground mb-1">Reject</p>
-                  <p className="text-2xl font-bold text-red-600">{plan.rejectionNumber}</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {plan.rejectionNumber}
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -324,12 +336,16 @@ export default function SamplingPlanDetailPage() {
                     >
                       <div>
                         <p className="text-sm font-medium">{product.name}</p>
-                        <p className="text-xs text-muted-foreground">{product.sku}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {product.sku}
+                        </p>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => router.push(`/dashboard/products/${product.id}`)}
+                        onClick={() =>
+                          router.push(`/dashboard/products/${product.id}`)
+                        }
                       >
                         View
                       </Button>
@@ -359,12 +375,18 @@ export default function SamplingPlanDetailPage() {
               {plan.lastUsed && (
                 <div>
                   <p className="text-sm text-muted-foreground">Last Used</p>
-                  <p className="text-sm">{new Date(plan.lastUsed).toLocaleDateString()}</p>
+                  <p className="text-sm">
+                    {new Date(plan.lastUsed).toLocaleDateString()}
+                  </p>
                 </div>
               )}
               <div>
-                <p className="text-sm text-muted-foreground">Product Category</p>
-                <Badge variant="outline">{plan.productCategory.replace("_", " ")}</Badge>
+                <p className="text-sm text-muted-foreground">
+                  Product Category
+                </p>
+                <Badge variant="outline">
+                  {plan.productCategory.replace("_", " ")}
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -385,8 +407,12 @@ export default function SamplingPlanDetailPage() {
                 </div>
                 {plan.approvedAt && (
                   <div>
-                    <p className="text-sm text-muted-foreground">Approved Date</p>
-                    <p className="text-sm">{new Date(plan.approvedAt).toLocaleDateString()}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Approved Date
+                    </p>
+                    <p className="text-sm">
+                      {new Date(plan.approvedAt).toLocaleDateString()}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -404,12 +430,16 @@ export default function SamplingPlanDetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-muted-foreground">Effective Date</p>
-                <p className="text-sm">{new Date(plan.effectiveDate).toLocaleDateString()}</p>
+                <p className="text-sm">
+                  {new Date(plan.effectiveDate).toLocaleDateString()}
+                </p>
               </div>
               {plan.expiryDate && (
                 <div>
                   <p className="text-sm text-muted-foreground">Expiry Date</p>
-                  <p className={`text-sm ${isExpired() ? "text-red-600 font-bold" : ""}`}>
+                  <p
+                    className={`text-sm ${isExpired() ? "text-red-600 font-bold" : ""}`}
+                  >
                     {new Date(plan.expiryDate).toLocaleDateString()}
                     {isExpired() && " (Expired)"}
                   </p>
@@ -435,11 +465,15 @@ export default function SamplingPlanDetailPage() {
               )}
               <div>
                 <p className="text-sm text-muted-foreground">Created</p>
-                <p className="text-sm">{new Date(plan.createdAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(plan.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Last Updated</p>
-                <p className="text-sm">{new Date(plan.updatedAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(plan.updatedAt).toLocaleString()}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -453,7 +487,11 @@ export default function SamplingPlanDetailPage() {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => router.push(`/dashboard/qc/inspections/create?planId=${plan.id}`)}
+                onClick={() =>
+                  router.push(
+                    `/dashboard/qc/inspections/create?planId=${plan.id}`,
+                  )
+                }
               >
                 <ClipboardCheck className="w-4 h-4 mr-2" />
                 Use in Inspection
@@ -461,7 +499,9 @@ export default function SamplingPlanDetailPage() {
               <Button
                 variant="outline"
                 className="w-full justify-start"
-                onClick={() => {/* Duplicate plan */}}
+                onClick={() => {
+                  /* Duplicate plan */
+                }}
               >
                 <FileText className="w-4 h-4 mr-2" />
                 Duplicate Plan

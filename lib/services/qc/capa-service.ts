@@ -3,23 +3,36 @@
  * Enterprise-grade CAPA management with formal workflow and verification
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export type CAPAType = 'CORRECTIVE' | 'PREVENTIVE' | 'BOTH';
-export type CAPAStatus = 'OPEN' | 'IN_PROGRESS' | 'ACTIONS_IMPLEMENTED' | 'VERIFICATION_PENDING' | 'VERIFIED' | 'CLOSED' | 'CANCELLED';
-export type RootCauseMethod = '5_WHYS' | 'FISHBONE' | 'FAULT_TREE' | 'PARETO' | 'FMEA';
+export type CAPAType = "CORRECTIVE" | "PREVENTIVE" | "BOTH";
+export type CAPAStatus =
+  | "OPEN"
+  | "IN_PROGRESS"
+  | "ACTIONS_IMPLEMENTED"
+  | "VERIFICATION_PENDING"
+  | "VERIFIED"
+  | "CLOSED"
+  | "CANCELLED";
+export type RootCauseMethod =
+  | "5_WHYS"
+  | "FISHBONE"
+  | "FAULT_TREE"
+  | "PARETO"
+  | "FMEA";
 
 export class CAPAService {
-  
   /**
    * Generate next CAPA number
    */
-  private static async generateCAPANumber(organizationId: string): Promise<string> {
+  private static async generateCAPANumber(
+    organizationId: string,
+  ): Promise<string> {
     const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    
+    const month = String(new Date().getMonth() + 1).padStart(2, "0");
+
     const lastCAPA = await prisma.correctivePreventiveAction.findFirst({
       where: {
         organizationId,
@@ -27,22 +40,28 @@ export class CAPAService {
           startsWith: `CAPA-${year}${month}`,
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     let sequence = 1;
     if (lastCAPA) {
-      const lastSequence = parseInt(lastCAPA.capaNumber.split('-').pop() || '0');
+      const lastSequence = parseInt(
+        lastCAPA.capaNumber.split("-").pop() || "0",
+      );
       sequence = lastSequence + 1;
     }
 
-    return `CAPA-${year}${month}-${String(sequence).padStart(4, '0')}`;
+    return `CAPA-${year}${month}-${String(sequence).padStart(4, "0")}`;
   }
 
   /**
    * Calculate Risk Priority Number (RPN)
    */
-  private static calculateRPN(severity: number, occurrence: number, detection: number): number {
+  private static calculateRPN(
+    severity: number,
+    occurrence: number,
+    detection: number,
+  ): number {
     return severity * occurrence * detection;
   }
 
@@ -81,16 +100,15 @@ export class CAPAService {
     priority?: string;
     createdBy: string;
   }) {
-    
     const capaNumber = await this.generateCAPANumber(params.organizationId);
-    
+
     // Calculate RPN if risk values provided
     let riskPriority: number | undefined;
     if (params.riskSeverity && params.riskOccurrence && params.riskDetection) {
       riskPriority = this.calculateRPN(
         params.riskSeverity,
         params.riskOccurrence,
-        params.riskDetection
+        params.riskDetection,
       );
     }
 
@@ -126,7 +144,7 @@ export class CAPAService {
         verificationMethod: params.verificationMethod,
         verificationCriteria: params.verificationCriteria,
         managementReviewRequired: params.managementReviewRequired || false,
-        priority: params.priority || 'MEDIUM',
+        priority: params.priority || "MEDIUM",
         createdBy: params.createdBy,
       },
       include: {
@@ -168,7 +186,7 @@ export class CAPAService {
       where: { id: capaId },
       data: {
         correctiveCompletedDate: new Date(),
-        status: 'ACTIONS_IMPLEMENTED',
+        status: "ACTIONS_IMPLEMENTED",
       },
     });
   }
@@ -204,10 +222,10 @@ export class CAPAService {
     };
 
     if (params.verificationPassed) {
-      data.status = 'VERIFIED';
+      data.status = "VERIFIED";
       data.effectivenessCheckDate = new Date();
     } else {
-      data.status = 'IN_PROGRESS'; // Back to in progress if failed
+      data.status = "IN_PROGRESS"; // Back to in progress if failed
     }
 
     return await prisma.correctivePreventiveAction.update({
@@ -247,7 +265,7 @@ export class CAPAService {
     return await prisma.correctivePreventiveAction.update({
       where: { id: params.capaId },
       data: {
-        status: 'CLOSED',
+        status: "CLOSED",
         closedDate: new Date(),
         closedBy: params.closedBy,
         closureApproved: true,
@@ -293,18 +311,19 @@ export class CAPAService {
       priority?: string;
       responsiblePerson?: string;
       overdue?: boolean;
-    } = {}
+    } = {},
   ) {
     const where: any = { organizationId };
 
     if (filters.status) where.status = filters.status;
     if (filters.capaType) where.capaType = filters.capaType;
     if (filters.priority) where.priority = filters.priority;
-    if (filters.responsiblePerson) where.responsiblePerson = filters.responsiblePerson;
-    
+    if (filters.responsiblePerson)
+      where.responsiblePerson = filters.responsiblePerson;
+
     if (filters.overdue) {
       where.targetCompletionDate = { lt: new Date() };
-      where.status = { not: 'CLOSED' };
+      where.status = { not: "CLOSED" };
     }
 
     return await prisma.correctivePreventiveAction.findMany({
@@ -312,7 +331,7 @@ export class CAPAService {
       include: {
         ncr: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -331,19 +350,25 @@ export class CAPAService {
     });
 
     const totalCAPAs = capas.length;
-    const openCAPAs = capas.filter(c => c.status === 'OPEN').length;
-    const inProgressCAPAs = capas.filter(c => c.status === 'IN_PROGRESS').length;
-    const completedCAPAs = capas.filter(c => c.status === 'CLOSED').length;
-    
+    const openCAPAs = capas.filter((c) => c.status === "OPEN").length;
+    const inProgressCAPAs = capas.filter(
+      (c) => c.status === "IN_PROGRESS",
+    ).length;
+    const completedCAPAs = capas.filter((c) => c.status === "CLOSED").length;
+
     const now = new Date();
     const overdueCAPAs = capas.filter(
-      c => c.targetCompletionDate < now && c.status !== 'CLOSED'
+      (c) => c.targetCompletionDate < now && c.status !== "CLOSED",
     ).length;
 
-    const verifiedCAPAs = capas.filter(c => c.verificationPassed === true);
-    const avgEffectiveness = verifiedCAPAs.length > 0
-      ? verifiedCAPAs.reduce((sum, c) => sum + (c.effectivenessScore || 0), 0) / verifiedCAPAs.length
-      : 0;
+    const verifiedCAPAs = capas.filter((c) => c.verificationPassed === true);
+    const avgEffectiveness =
+      verifiedCAPAs.length > 0
+        ? verifiedCAPAs.reduce(
+            (sum, c) => sum + (c.effectivenessScore || 0),
+            0,
+          ) / verifiedCAPAs.length
+        : 0;
 
     const avgCompletionDays = this.calculateAvgCompletionDays(capas);
 
@@ -363,13 +388,16 @@ export class CAPAService {
    * Calculate average completion days
    */
   private static calculateAvgCompletionDays(capas: any[]): number {
-    const completed = capas.filter(c => c.status === 'CLOSED' && c.closedDate);
-    
+    const completed = capas.filter(
+      (c) => c.status === "CLOSED" && c.closedDate,
+    );
+
     if (completed.length === 0) return 0;
 
     const totalDays = completed.reduce((sum, capa) => {
       const days = Math.floor(
-        (capa.closedDate.getTime() - capa.createdAt.getTime()) / (1000 * 60 * 60 * 24)
+        (capa.closedDate.getTime() - capa.createdAt.getTime()) /
+          (1000 * 60 * 60 * 24),
       );
       return sum + days;
     }, 0);
@@ -385,12 +413,12 @@ export class CAPAService {
       where: {
         organizationId,
         targetCompletionDate: { lt: new Date() },
-        status: { notIn: ['CLOSED', 'CANCELLED'] },
+        status: { notIn: ["CLOSED", "CANCELLED"] },
       },
       include: {
         ncr: true,
       },
-      orderBy: { targetCompletionDate: 'asc' },
+      orderBy: { targetCompletionDate: "asc" },
     });
   }
 }

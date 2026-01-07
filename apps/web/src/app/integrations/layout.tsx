@@ -1,19 +1,17 @@
-import { ReactNode } from "react"
-import { Navigation } from "@/components/landing"
-import { Footer } from "@/components/layout/footer"
+import { ReactNode } from "react";
+import { Navigation } from "@/components/landing";
+import { Footer } from "@/components/layout/footer";
 
 export default function IntegrationsLayout({
   children,
 }: {
-  children: ReactNode
+  children: ReactNode;
 }) {
   return (
     <>
       <Navigation />
-      <main className="min-h-screen">
-        {children}
-      </main>
+      <main className="min-h-screen">{children}</main>
       <Footer />
     </>
-  )
+  );
 }

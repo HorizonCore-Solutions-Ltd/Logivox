@@ -1,16 +1,28 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Download, AlertTriangle, GitBranch } from 'lucide-react';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Trash2, Download, AlertTriangle, GitBranch } from "lucide-react";
 
-type GateType = 'AND' | 'OR' | 'XOR' | 'BASIC_EVENT';
+type GateType = "AND" | "OR" | "XOR" | "BASIC_EVENT";
 
 interface FaultTreeNode {
   id: string;
@@ -22,34 +34,58 @@ interface FaultTreeNode {
 }
 
 export default function FaultTreeAnalysisPage() {
-  const [topEvent, setTopEvent] = useState('System Failure');
+  const [topEvent, setTopEvent] = useState("System Failure");
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [newNodeLabel, setNewNodeLabel] = useState('');
-  const [newNodeType, setNewNodeType] = useState<GateType>('BASIC_EVENT');
-  const [newNodeProbability, setNewNodeProbability] = useState('');
-  const [newNodeDescription, setNewNodeDescription] = useState('');
+  const [newNodeLabel, setNewNodeLabel] = useState("");
+  const [newNodeType, setNewNodeType] = useState<GateType>("BASIC_EVENT");
+  const [newNodeProbability, setNewNodeProbability] = useState("");
+  const [newNodeDescription, setNewNodeDescription] = useState("");
 
   const [tree, setTree] = useState<FaultTreeNode>({
-    id: 'root',
-    label: 'System Failure',
-    type: 'OR',
+    id: "root",
+    label: "System Failure",
+    type: "OR",
     children: [
       {
-        id: '1',
-        label: 'Hardware Failure',
-        type: 'AND',
+        id: "1",
+        label: "Hardware Failure",
+        type: "AND",
         children: [
-          { id: '1.1', label: 'Power Supply Fails', type: 'BASIC_EVENT', probability: 0.05, children: [] },
-          { id: '1.2', label: 'Component Overheats', type: 'BASIC_EVENT', probability: 0.03, children: [] },
+          {
+            id: "1.1",
+            label: "Power Supply Fails",
+            type: "BASIC_EVENT",
+            probability: 0.05,
+            children: [],
+          },
+          {
+            id: "1.2",
+            label: "Component Overheats",
+            type: "BASIC_EVENT",
+            probability: 0.03,
+            children: [],
+          },
         ],
       },
       {
-        id: '2',
-        label: 'Software Failure',
-        type: 'OR',
+        id: "2",
+        label: "Software Failure",
+        type: "OR",
         children: [
-          { id: '2.1', label: 'Bug in Code', type: 'BASIC_EVENT', probability: 0.10, children: [] },
-          { id: '2.2', label: 'Memory Leak', type: 'BASIC_EVENT', probability: 0.07, children: [] },
+          {
+            id: "2.1",
+            label: "Bug in Code",
+            type: "BASIC_EVENT",
+            probability: 0.1,
+            children: [],
+          },
+          {
+            id: "2.2",
+            label: "Memory Leak",
+            type: "BASIC_EVENT",
+            probability: 0.07,
+            children: [],
+          },
         ],
       },
     ],
@@ -65,20 +101,22 @@ export default function FaultTreeAnalysisPage() {
   };
 
   const calculateProbability = (node: FaultTreeNode): number => {
-    if (node.type === 'BASIC_EVENT') {
+    if (node.type === "BASIC_EVENT") {
       return node.probability || 0;
     }
 
     if (node.children.length === 0) return 0;
 
-    const childProbs = node.children.map(child => calculateProbability(child));
+    const childProbs = node.children.map((child) =>
+      calculateProbability(child),
+    );
 
     switch (node.type) {
-      case 'AND':
+      case "AND":
         return childProbs.reduce((acc, prob) => acc * prob, 1);
-      case 'OR':
+      case "OR":
         return 1 - childProbs.reduce((acc, prob) => acc * (1 - prob), 1);
-      case 'XOR':
+      case "XOR":
         // Simplified XOR: exactly one event occurs
         const allFail = childProbs.reduce((acc, prob) => acc * (1 - prob), 1);
         const anySucceed = 1 - allFail;
@@ -95,7 +133,9 @@ export default function FaultTreeAnalysisPage() {
       id: `${selectedNode}.${Date.now()}`,
       label: newNodeLabel,
       type: newNodeType,
-      probability: newNodeProbability ? parseFloat(newNodeProbability) : undefined,
+      probability: newNodeProbability
+        ? parseFloat(newNodeProbability)
+        : undefined,
       description: newNodeDescription || undefined,
       children: [],
     };
@@ -108,9 +148,9 @@ export default function FaultTreeAnalysisPage() {
     };
 
     setTree(addToNode(tree));
-    setNewNodeLabel('');
-    setNewNodeProbability('');
-    setNewNodeDescription('');
+    setNewNodeLabel("");
+    setNewNodeProbability("");
+    setNewNodeDescription("");
   };
 
   const removeNode = (nodeId: string) => {
@@ -118,7 +158,7 @@ export default function FaultTreeAnalysisPage() {
       return {
         ...node,
         children: node.children
-          .filter(child => child.id !== nodeId)
+          .filter((child) => child.id !== nodeId)
           .map(removeFromNode),
       };
     };
@@ -137,21 +177,29 @@ export default function FaultTreeAnalysisPage() {
       <div key={node.id} className="space-y-2">
         <div
           className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors ${
-            isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-primary/50'
+            isSelected
+              ? "border-primary bg-primary/5"
+              : "border-gray-200 hover:border-primary/50"
           }`}
           style={{ marginLeft: `${level * 24}px` }}
           onClick={() => setSelectedNode(node.id)}
         >
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              {node.type !== 'BASIC_EVENT' && <GitBranch className="h-4 w-4 text-gray-400" />}
+              {node.type !== "BASIC_EVENT" && (
+                <GitBranch className="h-4 w-4 text-gray-400" />
+              )}
               <span className="font-semibold">{node.label}</span>
-              <Badge variant={node.type === 'BASIC_EVENT' ? 'secondary' : 'default'}>
+              <Badge
+                variant={node.type === "BASIC_EVENT" ? "secondary" : "default"}
+              >
                 {node.type}
               </Badge>
             </div>
             {node.description && (
-              <p className="text-xs text-muted-foreground mt-1">{node.description}</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {node.description}
+              </p>
             )}
           </div>
           <div className="flex items-center gap-3">
@@ -161,7 +209,7 @@ export default function FaultTreeAnalysisPage() {
               </div>
               <div className="text-xs text-muted-foreground">Probability</div>
             </div>
-            {node.id !== 'root' && (
+            {node.id !== "root" && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -175,18 +223,18 @@ export default function FaultTreeAnalysisPage() {
             )}
           </div>
         </div>
-        {node.children.map(child => renderNode(child, level + 1))}
+        {node.children.map((child) => renderNode(child, level + 1))}
       </div>
     );
   };
 
   const exportToJson = () => {
     const json = JSON.stringify(tree, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `fault-tree-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `fault-tree-${new Date().toISOString().split("T")[0]}.json`;
     a.click();
   };
 
@@ -198,7 +246,8 @@ export default function FaultTreeAnalysisPage() {
         <div>
           <h1 className="text-3xl font-bold">Fault Tree Analysis</h1>
           <p className="text-muted-foreground">
-            Build and analyze logical fault trees to identify system failure modes
+            Build and analyze logical fault trees to identify system failure
+            modes
           </p>
         </div>
         <Button onClick={exportToJson}>
@@ -217,13 +266,17 @@ export default function FaultTreeAnalysisPage() {
                 <AlertTriangle className="h-6 w-6 text-orange-600" />
                 <div className="flex-1">
                   <CardTitle>Top Event: {tree.label}</CardTitle>
-                  <CardDescription>Total system failure probability</CardDescription>
+                  <CardDescription>
+                    Total system failure probability
+                  </CardDescription>
                 </div>
                 <div className="text-right">
                   <div className="text-3xl font-bold text-orange-600">
                     {(topEventProbability * 100).toFixed(3)}%
                   </div>
-                  <div className="text-sm text-muted-foreground">Failure Probability</div>
+                  <div className="text-sm text-muted-foreground">
+                    Failure Probability
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -233,11 +286,11 @@ export default function FaultTreeAnalysisPage() {
           <Card>
             <CardHeader>
               <CardTitle>Fault Tree Structure</CardTitle>
-              <CardDescription>Click a node to select it, then add children</CardDescription>
+              <CardDescription>
+                Click a node to select it, then add children
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-2">
-              {renderNode(tree)}
-            </CardContent>
+            <CardContent className="space-y-2">{renderNode(tree)}</CardContent>
           </Card>
 
           {/* Legend */}
@@ -285,7 +338,7 @@ export default function FaultTreeAnalysisPage() {
               <CardDescription>
                 {selectedNode
                   ? `Adding to: ${findNode(tree, selectedNode)?.label}`
-                  : 'Select a node to add children'}
+                  : "Select a node to add children"}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -301,7 +354,11 @@ export default function FaultTreeAnalysisPage() {
 
               <div>
                 <Label>Gate Type</Label>
-                <Select value={newNodeType} onValueChange={(v) => setNewNodeType(v as GateType)} disabled={!selectedNode}>
+                <Select
+                  value={newNodeType}
+                  onValueChange={(v) => setNewNodeType(v as GateType)}
+                  disabled={!selectedNode}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -314,7 +371,7 @@ export default function FaultTreeAnalysisPage() {
                 </Select>
               </div>
 
-              {newNodeType === 'BASIC_EVENT' && (
+              {newNodeType === "BASIC_EVENT" && (
                 <div>
                   <Label>Probability (0-1)</Label>
                   <Input
@@ -377,7 +434,9 @@ export default function FaultTreeAnalysisPage() {
                 </li>
                 <li className="flex gap-2">
                   <span className="text-primary">•</span>
-                  <span>Analyze minimal cut sets (combinations leading to failure)</span>
+                  <span>
+                    Analyze minimal cut sets (combinations leading to failure)
+                  </span>
                 </li>
               </ul>
             </CardContent>

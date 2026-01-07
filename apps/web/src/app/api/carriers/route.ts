@@ -1,14 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const carrierSchema = z.object({
-  name: z.string().min(1, 'Carrier name is required'),
-  code: z.string().min(1, 'Carrier code is required'),
-  type: z.enum(['PARCEL', 'LTL', 'FTL', 'COURIER', 'POSTAL', 'OTHER']),
-  apiProvider: z.enum(['FEDEX', 'UPS', 'USPS', 'DHL', 'CUSTOM', 'NONE']).optional(),
+  name: z.string().min(1, "Carrier name is required"),
+  code: z.string().min(1, "Carrier code is required"),
+  type: z.enum(["PARCEL", "LTL", "FTL", "COURIER", "POSTAL", "OTHER"]),
+  apiProvider: z
+    .enum(["FEDEX", "UPS", "USPS", "DHL", "CUSTOM", "NONE"])
+    .optional(),
   apiKey: z.string().optional(),
   apiSecret: z.string().optional(),
   accountNumber: z.string().optional(),
@@ -32,25 +34,22 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const type = searchParams.get('type');
-    const isActive = searchParams.get('isActive');
-    const apiProvider = searchParams.get('apiProvider');
+    const type = searchParams.get("type");
+    const isActive = searchParams.get("isActive");
+    const apiProvider = searchParams.get("apiProvider");
 
     const carriers = await prisma.carrier.findMany({
       where: {
         organizationId: session.user.organizationId,
         ...(type && { type: type as any }),
-        ...(isActive !== null && { isActive: isActive === 'true' }),
+        ...(isActive !== null && { isActive: isActive === "true" }),
         ...(apiProvider && { apiProvider: apiProvider as any }),
       },
-      orderBy: [
-        { isDefault: 'desc' },
-        { name: 'asc' },
-      ],
+      orderBy: [{ isDefault: "desc" }, { name: "asc" }],
       include: {
         _count: {
           select: {
@@ -62,10 +61,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(carriers);
   } catch (error: any) {
-    console.error('Error fetching carriers:', error);
+    console.error("Error fetching carriers:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch carriers' },
-      { status: 500 }
+      { error: "Failed to fetch carriers" },
+      { status: 500 },
     );
   }
 }
@@ -78,7 +77,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -94,8 +93,8 @@ export async function POST(req: NextRequest) {
 
     if (existingCarrier) {
       return NextResponse.json(
-        { error: 'Carrier code already exists in your organization' },
-        { status: 400 }
+        { error: "Carrier code already exists in your organization" },
+        { status: 400 },
       );
     }
 
@@ -124,15 +123,15 @@ export async function POST(req: NextRequest) {
     await prisma.activityLog.create({
       data: {
         userId: session.user.id,
-        action: 'CARRIER_CREATED',
-        entityType: 'Carrier',
+        action: "CARRIER_CREATED",
+        entityType: "Carrier",
         entityId: carrier.id,
         details: {
           carrierName: carrier.name,
           carrierCode: carrier.code,
         },
-        ipAddress: req.headers.get('x-forwarded-for') || 'unknown',
-        userAgent: req.headers.get('user-agent') || 'unknown',
+        ipAddress: req.headers.get("x-forwarded-for") || "unknown",
+        userAgent: req.headers.get("user-agent") || "unknown",
       },
     });
 
@@ -140,15 +139,15 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating carrier:', error);
+    console.error("Error creating carrier:", error);
     return NextResponse.json(
-      { error: 'Failed to create carrier' },
-      { status: 500 }
+      { error: "Failed to create carrier" },
+      { status: 500 },
     );
   }
 }

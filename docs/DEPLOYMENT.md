@@ -1,11 +1,13 @@
 # Deployment Guide
 
 ## Overview
+
 This guide provides comprehensive instructions for deploying LogiVox WMS to production environments using Docker, Kubernetes, and CI/CD pipelines.
 
 ---
 
 ## Table of Contents
+
 1. [Prerequisites](#prerequisites)
 2. [Docker Deployment](#docker-deployment)
 3. [Kubernetes Deployment](#kubernetes-deployment)
@@ -21,6 +23,7 @@ This guide provides comprehensive instructions for deploying LogiVox WMS to prod
 ## Prerequisites
 
 ### Required Tools
+
 ```bash
 # Docker
 docker --version  # >= 24.0
@@ -36,6 +39,7 @@ node --version  # >= 20.0
 ```
 
 ### Required Accounts
+
 - GitHub account (for CI/CD)
 - Container registry access (GitHub Container Registry, Docker Hub, or AWS ECR)
 - Cloud provider account (AWS, GCP, Azure, or DigitalOcean)
@@ -107,12 +111,14 @@ docker push ghcr.io/pndlovu/flowstock:latest
 ### Cluster Setup
 
 #### 1. Create Namespace
+
 ```bash
 kubectl create namespace production
 kubectl config set-context --current --namespace=production
 ```
 
 #### 2. Create Secrets
+
 ```bash
 # Generate secrets
 kubectl create secret generic logivox-secrets \
@@ -127,11 +133,13 @@ kubectl apply -f k8s/secrets.yaml
 ```
 
 #### 3. Create ConfigMap
+
 ```bash
 kubectl apply -f k8s/configmap.yaml
 ```
 
 #### 4. Create Storage
+
 ```bash
 kubectl apply -f k8s/storage.yaml
 
@@ -140,6 +148,7 @@ kubectl get pvc -n production
 ```
 
 #### 5. Deploy Application
+
 ```bash
 # Apply deployment
 kubectl apply -f k8s/deployment.yaml
@@ -152,6 +161,7 @@ kubectl get pods -n production
 ```
 
 #### 6. Configure Ingress
+
 ```bash
 # Install ingress controller (if not installed)
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/cloud/deploy.yaml
@@ -166,6 +176,7 @@ kubectl get ingress -n production
 ### Deployment Management
 
 #### Update Application
+
 ```bash
 # Update image
 kubectl set image deployment/logivox-app \
@@ -180,6 +191,7 @@ kubectl rollout undo deployment/logivox-app -n production
 ```
 
 #### Scale Application
+
 ```bash
 # Manual scaling
 kubectl scale deployment/logivox-app --replicas=5 -n production
@@ -189,6 +201,7 @@ kubectl get hpa -n production
 ```
 
 #### View Logs
+
 ```bash
 # All pods
 kubectl logs -f -l app=flowstock -n production
@@ -201,6 +214,7 @@ kubectl logs --previous <pod-name> -n production
 ```
 
 #### Execute Commands
+
 ```bash
 # Shell into pod
 kubectl exec -it <pod-name> -n production -- /bin/sh
@@ -216,6 +230,7 @@ kubectl exec -it <pod-name> -n production -- npx prisma migrate deploy
 ### GitHub Actions Setup
 
 #### 1. Configure Secrets
+
 Go to GitHub repository → Settings → Secrets and add:
 
 ```
@@ -234,12 +249,15 @@ SENTRY_DSN (Sentry DSN)
 ```
 
 #### 2. Workflow Triggers
+
 The CI/CD pipeline triggers on:
+
 - Push to `main` → Production deployment
 - Push to `develop` → Staging deployment
 - Pull requests → Tests only
 
 #### 3. Pipeline Stages
+
 1. **Lint** - Code quality checks
 2. **Test** - Unit and integration tests
 3. **Build** - Docker image build
@@ -335,6 +353,7 @@ kubectl port-forward svc/grafana 3001:3000 -n production
 Backups run automatically via cron job (see docker-compose.prod.yml).
 
 **Configuration:**
+
 ```env
 BACKUP_SCHEDULE=0 2 * * *  # Daily at 2 AM
 RETENTION_DAYS=30
@@ -414,6 +433,7 @@ kubectl apply -f k8s/ingress.yaml
 ### Common Issues
 
 #### 1. Pods Not Starting
+
 ```bash
 # Check pod status
 kubectl describe pod <pod-name> -n production
@@ -426,6 +446,7 @@ kubectl logs <pod-name> -n production
 ```
 
 #### 2. Database Connection Issues
+
 ```bash
 # Test database connectivity
 kubectl exec -it <pod-name> -n production -- psql ${DATABASE_URL} -c "SELECT 1"
@@ -438,6 +459,7 @@ kubectl logs <postgres-pod> -n production
 ```
 
 #### 3. Redis Connection Issues
+
 ```bash
 # Test Redis connectivity
 kubectl exec -it <pod-name> -n production -- redis-cli -u ${REDIS_URL} ping
@@ -447,6 +469,7 @@ kubectl get svc redis-service -n production
 ```
 
 #### 4. Image Pull Errors
+
 ```bash
 # Check image pull secrets
 kubectl get secrets -n production
@@ -460,6 +483,7 @@ kubectl create secret docker-registry ghcr-secret \
 ```
 
 #### 5. Ingress Not Working
+
 ```bash
 # Check ingress controller
 kubectl get pods -n ingress-nginx

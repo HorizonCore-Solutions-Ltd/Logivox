@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useParams, useRouter } from "next/navigation"
-import { useQuery, useMutation } from "@tanstack/react-query"
-import { useSession } from "next-auth/react"
+import * as React from "react";
+import { useParams, useRouter } from "next/navigation";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import {
   Building2,
   Users,
@@ -14,71 +14,81 @@ import {
   Loader2,
   Crown,
   Eye,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { toast } from "sonner"
-import Link from "next/link"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import Link from "next/link";
 
 interface Invitation {
-  id: string
-  email: string
-  role: "ADMIN" | "MEMBER" | "VIEWER"
-  status: string
-  expiresAt: string
+  id: string;
+  email: string;
+  role: "ADMIN" | "MEMBER" | "VIEWER";
+  status: string;
+  expiresAt: string;
   organization: {
-    id: string
-    name: string
-    description: string | null
-  }
+    id: string;
+    name: string;
+    description: string | null;
+  };
   inviter: {
-    name: string | null
-    email: string
-  }
+    name: string | null;
+    email: string;
+  };
 }
 
 export default function InvitationAcceptPage() {
-  const params = useParams()
-  const router = useRouter()
-  const { data: session } = useSession()
-  const token = params.token as string
+  const params = useParams();
+  const router = useRouter();
+  const { data: session } = useSession();
+  const token = params.token as string;
 
-  const { data: invitation, isLoading, error } = useQuery<Invitation>({
+  const {
+    data: invitation,
+    isLoading,
+    error,
+  } = useQuery<Invitation>({
     queryKey: ["invitation", token],
     queryFn: async () => {
-      const response = await fetch(`/api/invitations/${token}`)
+      const response = await fetch(`/api/invitations/${token}`);
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to fetch invitation")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to fetch invitation");
       }
-      return response.json()
+      return response.json();
     },
     enabled: !!token && !!session,
-  })
+  });
 
   const acceptMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/invitations/${token}`, {
         method: "POST",
-      })
+      });
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to accept invitation")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to accept invitation");
       }
-      return response.json()
+      return response.json();
     },
     onSuccess: (data) => {
-      toast.success(data.message || "Successfully joined organization")
+      toast.success(data.message || "Successfully joined organization");
       setTimeout(() => {
-        router.push("/dashboard")
-      }, 2000)
+        router.push("/dashboard");
+      }, 2000);
     },
     onError: (error: Error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
-  })
+  });
 
   const getRoleBadge = (role: string) => {
     switch (role) {
@@ -88,25 +98,25 @@ export default function InvitationAcceptPage() {
             <Crown className="h-3 w-3" />
             Admin
           </Badge>
-        )
+        );
       case "MEMBER":
         return (
           <Badge variant="secondary" className="gap-1">
             <Users className="h-3 w-3" />
             Member
           </Badge>
-        )
+        );
       case "VIEWER":
         return (
           <Badge variant="outline" className="gap-1">
             <Eye className="h-3 w-3" />
             Viewer
           </Badge>
-        )
+        );
       default:
-        return <Badge variant="secondary">{role}</Badge>
+        return <Badge variant="secondary">{role}</Badge>;
     }
-  }
+  };
 
   if (!session) {
     return (
@@ -128,7 +138,7 @@ export default function InvitationAcceptPage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   if (isLoading) {
@@ -147,7 +157,7 @@ export default function InvitationAcceptPage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   if (error || !invitation) {
@@ -160,7 +170,9 @@ export default function InvitationAcceptPage() {
             </div>
             <CardTitle>Invitation Not Found</CardTitle>
             <CardDescription>
-              {error instanceof Error ? error.message : "This invitation may have expired or been revoked"}
+              {error instanceof Error
+                ? error.message
+                : "This invitation may have expired or been revoked"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -172,7 +184,7 @@ export default function InvitationAcceptPage() {
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -191,7 +203,9 @@ export default function InvitationAcceptPage() {
           {/* Organization Details */}
           <div className="space-y-4">
             <div className="p-4 rounded-lg border bg-card">
-              <h3 className="font-semibold text-lg mb-2">{invitation.organization.name}</h3>
+              <h3 className="font-semibold text-lg mb-2">
+                {invitation.organization.name}
+              </h3>
               {invitation.organization.description && (
                 <p className="text-sm text-muted-foreground mb-3">
                   {invitation.organization.description}
@@ -231,7 +245,9 @@ export default function InvitationAcceptPage() {
 
           {/* Role Description */}
           <div className="p-3 rounded-lg bg-muted/50">
-            <p className="text-sm font-medium mb-2">What you'll be able to do:</p>
+            <p className="text-sm font-medium mb-2">
+              What you'll be able to do:
+            </p>
             <ul className="text-sm text-muted-foreground space-y-1">
               {invitation.role === "ADMIN" && (
                 <>
@@ -290,5 +306,5 @@ export default function InvitationAcceptPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

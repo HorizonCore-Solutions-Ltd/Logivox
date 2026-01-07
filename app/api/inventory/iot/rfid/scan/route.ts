@@ -1,22 +1,22 @@
 /**
  * IoT RFID Scan Processing API
  * Real-time RFID tag processing with auto-counting
- * 
+ *
  * Features:
  * - Real-time tag processing
  * - 95%+ accuracy auto-adjustment
  * - Movement tracking
  * - Discrepancy alerts
- * 
+ *
  * Performance: < 10ms edge processing
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { iotMonitoringService } from '@/lib/services/inventory/iot-monitoring-service';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { iotMonitoringService } from "@/lib/services/inventory/iot-monitoring-service";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/inventory/iot/rfid/scan
@@ -24,14 +24,11 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
-  
+
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -39,17 +36,17 @@ export async function POST(request: NextRequest) {
       deviceId,
       tags,
       location,
-      scanType = 'COUNT' // COUNT, ARRIVAL, DEPARTURE
+      scanType = "COUNT", // COUNT, ARRIVAL, DEPARTURE
     } = body;
 
     // Validation
     if (!deviceId || !tags || !Array.isArray(tags)) {
       return NextResponse.json(
         {
-          error: 'Missing required fields: deviceId, tags',
-          code: 'VALIDATION_ERROR'
+          error: "Missing required fields: deviceId, tags",
+          code: "VALIDATION_ERROR",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -61,8 +58,8 @@ export async function POST(request: NextRequest) {
           tag,
           signalStrength: Math.random() * 100, // From RFID reader
           timestamp: new Date(),
-          location: location || 'UNKNOWN',
-          scanType
+          location: location || "UNKNOWN",
+          scanType,
         };
 
         try {
@@ -70,20 +67,20 @@ export async function POST(request: NextRequest) {
           return {
             tag,
             success: true,
-            result
+            result,
           };
         } catch (error: any) {
           return {
             tag,
             success: false,
-            error: error.message
+            error: error.message,
           };
         }
-      })
+      }),
     );
 
-    const successful = results.filter(r => r.success);
-    const failed = results.filter(r => !r.success);
+    const successful = results.filter((r) => r.success);
+    const failed = results.filter((r) => !r.success);
 
     const responseTime = Date.now() - startTime;
 
@@ -95,21 +92,20 @@ export async function POST(request: NextRequest) {
           successful: successful.length,
           failed: failed.length,
           processingTime: `${responseTime}ms`,
-          avgTimePerTag: `${Math.round(responseTime / tags.length)}ms`
+          avgTimePerTag: `${Math.round(responseTime / tags.length)}ms`,
         },
-        results: successful.map(r => r.result),
-        errors: failed.length > 0 ? failed : undefined
-      }
+        results: successful.map((r) => r.result),
+        errors: failed.length > 0 ? failed : undefined,
+      },
     });
-
   } catch (error: any) {
-    console.error('RFID scan processing error:', error);
+    console.error("RFID scan processing error:", error);
     return NextResponse.json(
       {
-        error: 'Failed to process RFID scan',
-        message: error.message
+        error: "Failed to process RFID scan",
+        message: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

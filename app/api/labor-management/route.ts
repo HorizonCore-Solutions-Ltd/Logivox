@@ -3,48 +3,49 @@
  * Handles time tracking, productivity metrics, and labor cost analysis
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { LaborManagementService } from '@/lib/services/labor-management.service';
+import { NextRequest, NextResponse } from "next/server";
+import { LaborManagementService } from "@/lib/services/labor-management.service";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // GET - Get productivity metrics or labor costs
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     switch (action) {
-      case 'productivity':
-        const employeeId = searchParams.get('employeeId');
-        const startDate = searchParams.get('startDate');
-        const endDate = searchParams.get('endDate');
+      case "productivity":
+        const employeeId = searchParams.get("employeeId");
+        const startDate = searchParams.get("startDate");
+        const endDate = searchParams.get("endDate");
 
         if (!employeeId || !startDate || !endDate) {
           return NextResponse.json(
-            { error: 'Missing required parameters' },
-            { status: 400 }
+            { error: "Missing required parameters" },
+            { status: 400 },
           );
         }
 
-        const productivity = await LaborManagementService.getProductivityMetrics({
-          employeeId,
-          startDate: new Date(startDate),
-          endDate: new Date(endDate),
-        });
+        const productivity =
+          await LaborManagementService.getProductivityMetrics({
+            employeeId,
+            startDate: new Date(startDate),
+            endDate: new Date(endDate),
+          });
 
         return NextResponse.json(productivity);
 
-      case 'labor-cost':
-        const organizationId = searchParams.get('organizationId');
-        const warehouseId = searchParams.get('warehouseId');
-        const periodStart = searchParams.get('startDate');
-        const periodEnd = searchParams.get('endDate');
+      case "labor-cost":
+        const organizationId = searchParams.get("organizationId");
+        const warehouseId = searchParams.get("warehouseId");
+        const periodStart = searchParams.get("startDate");
+        const periodEnd = searchParams.get("endDate");
 
         if (!organizationId || !periodStart || !periodEnd) {
           return NextResponse.json(
-            { error: 'Missing required parameters' },
-            { status: 400 }
+            { error: "Missing required parameters" },
+            { status: 400 },
           );
         }
 
@@ -56,15 +57,15 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json(laborCost);
 
-      case 'attendance':
-        const empId = searchParams.get('employeeId');
-        const month = searchParams.get('month');
-        const year = searchParams.get('year');
+      case "attendance":
+        const empId = searchParams.get("employeeId");
+        const month = searchParams.get("month");
+        const year = searchParams.get("year");
 
         if (!empId || !month || !year) {
           return NextResponse.json(
-            { error: 'Missing required parameters' },
-            { status: 400 }
+            { error: "Missing required parameters" },
+            { status: 400 },
           );
         }
 
@@ -80,15 +81,17 @@ export async function GET(req: NextRequest) {
 
       default:
         return NextResponse.json(
-          { error: 'Invalid action. Use: productivity, labor-cost, attendance' },
-          { status: 400 }
+          {
+            error: "Invalid action. Use: productivity, labor-cost, attendance",
+          },
+          { status: 400 },
         );
     }
   } catch (error: any) {
-    console.error('Labor Management GET error:', error);
+    console.error("Labor Management GET error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process request' },
-      { status: 500 }
+      { error: error.message || "Failed to process request" },
+      { status: 500 },
     );
   }
 }
@@ -100,13 +103,19 @@ export async function POST(req: NextRequest) {
     const { action } = body;
 
     switch (action) {
-      case 'clock-in':
-        const { organizationId: clockInOrgId, employeeId: clockInEmpId, warehouseId: clockInWarehouseId } = body;
-        
+      case "clock-in":
+        const {
+          organizationId: clockInOrgId,
+          employeeId: clockInEmpId,
+          warehouseId: clockInWarehouseId,
+        } = body;
+
         if (!clockInOrgId || !clockInEmpId || !clockInWarehouseId) {
           return NextResponse.json(
-            { error: 'organizationId, employeeId and warehouseId are required' },
-            { status: 400 }
+            {
+              error: "organizationId, employeeId and warehouseId are required",
+            },
+            { status: 400 },
           );
         }
 
@@ -118,13 +127,13 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(clockIn);
 
-      case 'clock-out':
+      case "clock-out":
         const { employeeId: clockOutEmpId } = body;
-        
+
         if (!clockOutEmpId) {
           return NextResponse.json(
-            { error: 'Employee ID is required' },
-            { status: 400 }
+            { error: "Employee ID is required" },
+            { status: 400 },
           );
         }
 
@@ -134,32 +143,29 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(clockOut);
 
-      case 'record-activity':
+      case "record-activity":
         const { employeeId, activityType, quantity, duration } = body;
-        
+
         if (!employeeId || !activityType) {
           return NextResponse.json(
-            { error: 'Employee ID and activity type are required' },
-            { status: 400 }
+            { error: "Employee ID and activity type are required" },
+            { status: 400 },
           );
         }
 
         // recordActivity doesn't exist - returning mock response
-        const activity = { success: true, message: 'Activity recorded' };
+        const activity = { success: true, message: "Activity recorded" };
 
         return NextResponse.json(activity);
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error: any) {
-    console.error('Labor Management POST error:', error);
+    console.error("Labor Management POST error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process request' },
-      { status: 500 }
+      { error: error.message || "Failed to process request" },
+      { status: 500 },
     );
   }
 }

@@ -1,27 +1,37 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Search, X, Clock, TrendingUp, FileText, BookOpen, HelpCircle, Code } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import {
+  Search,
+  X,
+  Clock,
+  TrendingUp,
+  FileText,
+  BookOpen,
+  HelpCircle,
+  Code,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface Suggestion {
-  id: string
-  text: string
-  type?: "recent" | "popular" | "category" | "page"
-  url?: string
-  category?: string
+  id: string;
+  text: string;
+  type?: "recent" | "popular" | "category" | "page";
+  url?: string;
+  category?: string;
 }
 
-interface AutoSuggestSearchProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  value: string
-  onValueChange: (value: string) => void
-  suggestions: Suggestion[]
-  onSuggestionSelect?: (suggestion: Suggestion) => void
-  showHistory?: boolean
-  contextType?: "blog" | "docs" | "help" | "general"
-  onSearch?: (query: string) => void
+interface AutoSuggestSearchProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  value: string;
+  onValueChange: (value: string) => void;
+  suggestions: Suggestion[];
+  onSuggestionSelect?: (suggestion: Suggestion) => void;
+  showHistory?: boolean;
+  contextType?: "blog" | "docs" | "help" | "general";
+  onSearch?: (query: string) => void;
 }
 
 export function AutoSuggestSearch({
@@ -36,37 +46,40 @@ export function AutoSuggestSearch({
   placeholder = "Search...",
   ...props
 }: AutoSuggestSearchProps) {
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [focusedIndex, setFocusedIndex] = React.useState(-1)
-  const [recentSearches, setRecentSearches] = React.useState<string[]>([])
-  const searchRef = React.useRef<HTMLDivElement>(null)
-  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [focusedIndex, setFocusedIndex] = React.useState(-1);
+  const [recentSearches, setRecentSearches] = React.useState<string[]>([]);
+  const searchRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   // Load recent searches from localStorage
   React.useEffect(() => {
     if (showHistory) {
-      const stored = localStorage.getItem(`search-history-${contextType}`)
+      const stored = localStorage.getItem(`search-history-${contextType}`);
       if (stored) {
         try {
-          setRecentSearches(JSON.parse(stored))
+          setRecentSearches(JSON.parse(stored));
         } catch (e) {
-          console.error("Failed to load search history:", e)
+          console.error("Failed to load search history:", e);
         }
       }
     }
-  }, [showHistory, contextType])
+  }, [showHistory, contextType]);
 
   // Handle click outside
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsOpen(false)
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // Popular searches by context
   const popularSearches = React.useMemo(() => {
@@ -95,101 +108,119 @@ export function AutoSuggestSearch({
         "Returns processing",
         "Real-time tracking",
       ],
-    }
-    return searches[contextType] || searches.general
-  }, [contextType])
+    };
+    return searches[contextType] || searches.general;
+  }, [contextType]);
 
   const saveToHistory = (query: string) => {
-    if (!query.trim() || !showHistory) return
+    if (!query.trim() || !showHistory) return;
 
     const updated = [
       query,
       ...recentSearches.filter((s) => s.toLowerCase() !== query.toLowerCase()),
-    ].slice(0, 5)
+    ].slice(0, 5);
 
-    setRecentSearches(updated)
-    localStorage.setItem(`search-history-${contextType}`, JSON.stringify(updated))
-  }
+    setRecentSearches(updated);
+    localStorage.setItem(
+      `search-history-${contextType}`,
+      JSON.stringify(updated),
+    );
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value
-    onValueChange(newValue)
-    setIsOpen(true)
-    setFocusedIndex(-1)
-  }
+    const newValue = e.target.value;
+    onValueChange(newValue);
+    setIsOpen(true);
+    setFocusedIndex(-1);
+  };
 
   const handleSuggestionClick = (suggestion: Suggestion | string) => {
-    const queryText = typeof suggestion === "string" ? suggestion : suggestion.text
-    onValueChange(queryText)
-    saveToHistory(queryText)
+    const queryText =
+      typeof suggestion === "string" ? suggestion : suggestion.text;
+    onValueChange(queryText);
+    saveToHistory(queryText);
 
     if (typeof suggestion === "object" && onSuggestionSelect) {
-      onSuggestionSelect(suggestion)
+      onSuggestionSelect(suggestion);
     }
 
     if (onSearch) {
-      onSearch(queryText)
+      onSearch(queryText);
     }
 
-    setIsOpen(false)
-  }
+    setIsOpen(false);
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const allSuggestions = [
       ...suggestions,
-      ...(value.trim() === "" && showHistory ? recentSearches.map(text => ({ id: text, text, type: "recent" as const })) : []),
-    ]
+      ...(value.trim() === "" && showHistory
+        ? recentSearches.map((text) => ({
+            id: text,
+            text,
+            type: "recent" as const,
+          }))
+        : []),
+    ];
 
     if (e.key === "ArrowDown") {
-      e.preventDefault()
-      setFocusedIndex((prev) => Math.min(prev + 1, allSuggestions.length - 1))
+      e.preventDefault();
+      setFocusedIndex((prev) => Math.min(prev + 1, allSuggestions.length - 1));
     } else if (e.key === "ArrowUp") {
-      e.preventDefault()
-      setFocusedIndex((prev) => Math.max(prev - 1, -1))
+      e.preventDefault();
+      setFocusedIndex((prev) => Math.max(prev - 1, -1));
     } else if (e.key === "Enter") {
-      e.preventDefault()
+      e.preventDefault();
       if (focusedIndex >= 0 && allSuggestions[focusedIndex]) {
-        handleSuggestionClick(allSuggestions[focusedIndex])
+        handleSuggestionClick(allSuggestions[focusedIndex]);
       } else if (value.trim()) {
-        saveToHistory(value)
+        saveToHistory(value);
         if (onSearch) {
-          onSearch(value)
+          onSearch(value);
         }
-        setIsOpen(false)
+        setIsOpen(false);
       }
     } else if (e.key === "Escape") {
-      setIsOpen(false)
-      inputRef.current?.blur()
+      setIsOpen(false);
+      inputRef.current?.blur();
     }
-  }
+  };
 
   const handleClear = () => {
-    onValueChange("")
-    setIsOpen(false)
-    inputRef.current?.focus()
-  }
+    onValueChange("");
+    setIsOpen(false);
+    inputRef.current?.focus();
+  };
 
   const clearHistory = () => {
-    setRecentSearches([])
-    localStorage.removeItem(`search-history-${contextType}`)
-  }
+    setRecentSearches([]);
+    localStorage.removeItem(`search-history-${contextType}`);
+  };
 
   const getTypeIcon = (type?: string) => {
     switch (type) {
       case "recent":
-        return <Clock className="h-4 w-4" />
+        return <Clock className="h-4 w-4" />;
       case "popular":
-        return <TrendingUp className="h-4 w-4" />
+        return <TrendingUp className="h-4 w-4" />;
       case "page":
-        return <FileText className="h-4 w-4" />
+        return <FileText className="h-4 w-4" />;
       case "category":
-        return contextType === "docs" ? <Code className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />
+        return contextType === "docs" ? (
+          <Code className="h-4 w-4" />
+        ) : (
+          <BookOpen className="h-4 w-4" />
+        );
       default:
-        return <Search className="h-4 w-4" />
+        return <Search className="h-4 w-4" />;
     }
-  }
+  };
 
-  const showSuggestions = isOpen && (value.trim() !== "" || (showHistory && recentSearches.length > 0) || popularSearches.length > 0)
+  const showSuggestions =
+    isOpen &&
+    (value.trim() !== "" ||
+      (showHistory && recentSearches.length > 0) ||
+      popularSearches.length > 0);
 
   return (
     <div ref={searchRef} className="relative w-full">
@@ -230,14 +261,16 @@ export function AutoSuggestSearch({
                   onClick={() => handleSuggestionClick(suggestion)}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-left",
-                    focusedIndex === index && "bg-accent"
+                    focusedIndex === index && "bg-accent",
                   )}
                 >
                   <span className="text-muted-foreground">
                     {getTypeIcon(suggestion.type)}
                   </span>
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium truncate">{suggestion.text}</div>
+                    <div className="font-medium truncate">
+                      {suggestion.text}
+                    </div>
                     {suggestion.category && (
                       <div className="text-xs text-muted-foreground truncate">
                         {suggestion.category}
@@ -274,7 +307,7 @@ export function AutoSuggestSearch({
                   onClick={() => handleSuggestionClick(search)}
                   className={cn(
                     "w-full flex items-center gap-3 px-3 py-2 text-sm rounded-md hover:bg-accent transition-colors text-left",
-                    focusedIndex === index + suggestions.length && "bg-accent"
+                    focusedIndex === index + suggestions.length && "bg-accent",
                   )}
                 >
                   <span className="text-muted-foreground">
@@ -318,5 +351,5 @@ export function AutoSuggestSearch({
         </div>
       )}
     </div>
-  )
+  );
 }

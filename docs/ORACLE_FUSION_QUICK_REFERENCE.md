@@ -1,9 +1,11 @@
 # Oracle Fusion Build - Quick Reference Guide
+
 ## LogiVox WMS Feature Catalog
 
 ## 🎯 What Was Built
 
 ### Complete Dashboard URLs:
+
 ```
 # IoT & Sensor Integration
 /dashboard/iot                    - Device management dashboard
@@ -27,6 +29,7 @@
 ## 📊 Complete API Endpoints:
 
 ### IoT APIs (Already Existed):
+
 ```
 GET  /api/iot/devices
 GET  /api/iot/alerts
@@ -34,6 +37,7 @@ GET  /api/iot/devices/{id}/readings
 ```
 
 ### AI/ML APIs (Newly Created):
+
 ```
 GET  /api/ml/forecasts?horizon=30
 GET  /api/ml/slotting-recommendations
@@ -41,6 +45,7 @@ GET  /api/ml/models/metrics
 ```
 
 ### 3PL Billing APIs:
+
 ```
 GET    /api/billing/invoices
 GET    /api/billing/rate-cards
@@ -50,6 +55,7 @@ DELETE /api/billing/rate-cards/{id}
 ```
 
 ### Automation APIs (Newly Created):
+
 ```
 GET  /api/automation/devices
 GET  /api/automation/tasks
@@ -57,6 +63,7 @@ POST /api/automation/devices/{id}/control
 ```
 
 ### Blockchain APIs (Newly Created):
+
 ```
 GET  /api/blockchain/transactions
 GET  /api/blockchain/trace/{shipmentId}
@@ -65,33 +72,39 @@ GET  /api/blockchain/trace/{shipmentId}
 ## 🗄️ Database Models Used:
 
 ### IoT Phase:
+
 - IoTDevice
 - IoTReading
 - IoTAlert
 - RFIDTag
 
 ### AI/ML Phase:
+
 - MLModel
 - DemandForecast
 - SlottingRecommendation
 
 ### 3PL Billing Phase:
+
 - BillingClient
 - BillingRateCard
 - Invoice
 - InvoiceLineItem
 
 ### Automation Phase:
+
 - AutomationDevice
 - AutomationTask
 
 ### Blockchain Phase:
+
 - BlockchainTransaction
 - Shipment (for tracing)
 
 ## 🎨 UI Components Used:
 
 From `@/components/ui`:
+
 - Card, CardContent, CardHeader, CardTitle, CardDescription
 - Button
 - Badge
@@ -105,6 +118,7 @@ From `@/components/ui`:
 - useToast
 
 From `recharts`:
+
 - LineChart, Line
 - AreaChart, Area
 - BarChart, Bar
@@ -115,6 +129,7 @@ From `recharts`:
 - ResponsiveContainer
 
 From `lucide-react`:
+
 - Bot, Brain, Target, TrendingUp, Activity
 - Package, Shield, Lock, CheckCircle2
 - Clock, AlertCircle, AlertTriangle
@@ -126,6 +141,7 @@ From `lucide-react`:
 ## 📈 Key Features by Dashboard:
 
 ### 1. IoT Device Dashboard
+
 - Real-time device status monitoring
 - Battery level indicators
 - Reading and alert counts
@@ -133,6 +149,7 @@ From `lucide-react`:
 - Stats cards (total, online, offline, error)
 
 ### 2. IoT Alert Management
+
 - Alert severity filtering (CRITICAL/HIGH/MEDIUM/LOW)
 - Status filtering (ACTIVE/RESOLVED)
 - Search functionality
@@ -140,6 +157,7 @@ From `lucide-react`:
 - Alert statistics
 
 ### 3. IoT Monitoring
+
 - Live sensor readings
 - 50-reading history chart
 - Auto-refresh (5 seconds)
@@ -147,6 +165,7 @@ From `lucide-react`:
 - Current/avg/min/max statistics
 
 ### 4. AI Forecasting
+
 - Demand forecast vs actuals (area chart)
 - Slotting recommendations with approve/reject
 - Model performance comparison (bar chart)
@@ -154,6 +173,7 @@ From `lucide-react`:
 - Time horizon selector (7/14/30/90 days)
 
 ### 5. Rate Cards Management
+
 - Complete CRUD interface
 - Activity type selection (8 types)
 - Rate type options (4 types)
@@ -162,6 +182,7 @@ From `lucide-react`:
 - Active/inactive status
 
 ### 6. Automation Dashboard
+
 - Fleet overview (5 metrics)
 - Device status monitoring
 - Battery and utilization tracking
@@ -171,6 +192,7 @@ From `lucide-react`:
 - Auto-refresh mode
 
 ### 7. Blockchain Dashboard
+
 - Transaction history with block numbers
 - Transaction type badges
 - Shipment tracing interface
@@ -181,6 +203,7 @@ From `lucide-react`:
 ## 🚀 Testing Checklist:
 
 ### Before Production:
+
 - [ ] Test all API endpoints with authentication
 - [ ] Verify real-time updates work correctly
 - [ ] Check responsive design on mobile devices
@@ -193,6 +216,7 @@ From `lucide-react`:
 - [ ] Verify all filters and search functionality
 
 ### Performance Checks:
+
 - [ ] API response times < 200ms
 - [ ] Chart rendering smooth with 100+ data points
 - [ ] Table pagination for large datasets
@@ -209,14 +233,14 @@ From `lucide-react`:
 
 ## 🎉 Completion Status:
 
-| Phase | Status | UI Components | API Endpoints |
-|-------|--------|---------------|---------------|
-| Phase 1: IoT | ✅ 100% | 3 dashboards | 3 endpoints |
-| Phase 2: AI/ML | ✅ 100% | 1 dashboard (3 tabs) | 3 endpoints |
-| Phase 3: 3PL Billing | ✅ 100% | 2 dashboards | 5 endpoints |
-| Phase 4: Automation | ✅ 100% | 1 dashboard | 3 endpoints |
-| Phase 5: Blockchain | ✅ 100% | 1 dashboard (2 tabs) | 2 endpoints |
-| Phase 6: Analytics | ✅ 100% | Previously complete | Complete |
+| Phase                | Status  | UI Components        | API Endpoints |
+| -------------------- | ------- | -------------------- | ------------- |
+| Phase 1: IoT         | ✅ 100% | 3 dashboards         | 3 endpoints   |
+| Phase 2: AI/ML       | ✅ 100% | 1 dashboard (3 tabs) | 3 endpoints   |
+| Phase 3: 3PL Billing | ✅ 100% | 2 dashboards         | 5 endpoints   |
+| Phase 4: Automation  | ✅ 100% | 1 dashboard          | 3 endpoints   |
+| Phase 5: Blockchain  | ✅ 100% | 1 dashboard (2 tabs) | 2 endpoints   |
+| Phase 6: Analytics   | ✅ 100% | Previously complete  | Complete      |
 
 **Total: 10 major dashboards, 20+ API endpoints, 100% feature coverage**
 
@@ -230,4 +254,4 @@ From `lucide-react`:
 
 ---
 
-*All Oracle Fusion competitive features are production-ready! 🚀*
+_All Oracle Fusion competitive features are production-ready! 🚀_

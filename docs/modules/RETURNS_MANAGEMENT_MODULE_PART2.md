@@ -12,6 +12,7 @@
 Part 2 turns returns into a **profit center** by automating decisions, predicting volumes, optimizing staffing, routing items to refurbishment/resale, and reducing fraud. It adds a self-service returns experience, intelligent credit decisioning, advanced refurbishment workflows, and ML-driven fraud and anomaly detection.
 
 ### Advanced Capabilities
+
 - **Predictive Returns Forecasting**: volume, reasons, and recovery value predictions
 - **Autonomous Credit/Replacement Decisioning**: policy + evidence + risk controls
 - **Refurbishment & Repair Work Orders**: multi-step workflows + QA gates
@@ -24,28 +25,37 @@ Part 2 turns returns into a **profit center** by automating decisions, predictin
 ## 🧠 1. Predictive Returns Forecasting & Staffing
 
 ### Forecast returns volume, reasons, and recovery value
+
 ```typescript
-type ForecastGranularity = 'DAY' | 'WEEK' | 'MONTH';
+type ForecastGranularity = "DAY" | "WEEK" | "MONTH";
 
 type ForecastTarget =
-  | 'RETURN_VOLUME'
-  | 'RETURN_RATE'
-  | 'DAMAGE_RATE'
-  | 'DEFECT_RATE'
-  | 'FRAUD_RATE'
-  | 'RECOVERY_VALUE'
-  | 'REFURB_LOAD'
-  | 'QC_LOAD'
-  | 'RTV_LOAD';
+  | "RETURN_VOLUME"
+  | "RETURN_RATE"
+  | "DAMAGE_RATE"
+  | "DEFECT_RATE"
+  | "FRAUD_RATE"
+  | "RECOVERY_VALUE"
+  | "REFURB_LOAD"
+  | "QC_LOAD"
+  | "RTV_LOAD";
 
 interface ReturnsForecastingSystem {
   forecast: (request: ReturnsForecastRequest) => Promise<ReturnsForecastResult>;
-  forecastBySKU: (request: ReturnsForecastRequest) => Promise<SKUForecastResult[]>;
-  forecastByCustomer: (request: ReturnsForecastRequest) => Promise<CustomerForecastResult[]>;
+  forecastBySKU: (
+    request: ReturnsForecastRequest,
+  ) => Promise<SKUForecastResult[]>;
+  forecastByCustomer: (
+    request: ReturnsForecastRequest,
+  ) => Promise<CustomerForecastResult[]>;
 
   // Operations planning
-  recommendStaffing: (forecast: ReturnsForecastResult) => Promise<StaffingRecommendation>;
-  recommendSpace: (forecast: ReturnsForecastResult) => Promise<ReturnsSpaceRecommendation>;
+  recommendStaffing: (
+    forecast: ReturnsForecastResult,
+  ) => Promise<StaffingRecommendation>;
+  recommendSpace: (
+    forecast: ReturnsForecastResult,
+  ) => Promise<ReturnsSpaceRecommendation>;
 
   // Learning
   trainForecastModel: (period: DateRange) => Promise<ModelTrainingResult>;
@@ -95,7 +105,7 @@ interface ReturnsForecastResult {
   // Insights
   insights: {
     insight: string;
-    impact: 'HIGH' | 'MEDIUM' | 'LOW';
+    impact: "HIGH" | "MEDIUM" | "LOW";
     recommendedAction: string;
   }[];
 
@@ -109,14 +119,14 @@ interface ReturnsForecastResult {
 
 interface SKUForecastResult {
   sku: string;
-  series: ReturnsForecastResult['series'];
+  series: ReturnsForecastResult["series"];
   expectedRecoveryValue: number;
   drivers: string[];
 }
 
 interface CustomerForecastResult {
   customerId: string;
-  series: ReturnsForecastResult['series'];
+  series: ReturnsForecastResult["series"];
   likelyReturnReasons: {
     reasonCode: string;
     percent: number;
@@ -128,7 +138,13 @@ interface StaffingRecommendation {
 
   // By function
   staffing: {
-    function: 'RETURNS_RECEIVING' | 'TRIAGE' | 'QC' | 'REFURB' | 'PACKOUT' | 'RTV';
+    function:
+      | "RETURNS_RECEIVING"
+      | "TRIAGE"
+      | "QC"
+      | "REFURB"
+      | "PACKOUT"
+      | "RTV";
     recommendedHeadcount: number;
     shiftCoverage: {
       shiftName: string;
@@ -153,7 +169,14 @@ interface ReturnsSpaceRecommendation {
 
   // Space allocations
   allocations: {
-    area: 'RETURNS_STAGING' | 'QC' | 'QUARANTINE' | 'REFURB' | 'RESALE' | 'SCRAP' | 'RTV_STAGING';
+    area:
+      | "RETURNS_STAGING"
+      | "QC"
+      | "QUARANTINE"
+      | "REFURB"
+      | "RESALE"
+      | "SCRAP"
+      | "RTV_STAGING";
     requiredSqFt: number;
     peakSqFt: number;
     rationale: string;
@@ -178,19 +201,25 @@ const RETURNS_FORECAST_VOICE_COMMANDS = [
 ## 💳 2. Autonomous Credit & Replacement Decisioning
 
 ### Policy + evidence + risk controls
+
 ```typescript
-type CreditDecision = 'APPROVE_CREDIT' | 'APPROVE_REPLACEMENT' | 'DENY' | 'PARTIAL_CREDIT' | 'NEEDS_REVIEW';
+type CreditDecision =
+  | "APPROVE_CREDIT"
+  | "APPROVE_REPLACEMENT"
+  | "DENY"
+  | "PARTIAL_CREDIT"
+  | "NEEDS_REVIEW";
 
 type CreditDriver =
-  | 'POLICY_ELIGIBLE'
-  | 'WINDOW_VALID'
-  | 'ITEM_VERIFIED'
-  | 'VISION_MATCH'
-  | 'SENSOR_COMPLIANT'
-  | 'FRAUD_RISK'
-  | 'CUSTOMER_HISTORY'
-  | 'DISPUTE_OPEN'
-  | 'HIGH_VALUE_REVIEW';
+  | "POLICY_ELIGIBLE"
+  | "WINDOW_VALID"
+  | "ITEM_VERIFIED"
+  | "VISION_MATCH"
+  | "SENSOR_COMPLIANT"
+  | "FRAUD_RISK"
+  | "CUSTOMER_HISTORY"
+  | "DISPUTE_OPEN"
+  | "HIGH_VALUE_REVIEW";
 
 interface CreditDecisioningSystem {
   decide: (request: CreditDecisionRequest) => Promise<CreditDecisionResult>;
@@ -199,7 +228,10 @@ interface CreditDecisioningSystem {
 
   // Disputes
   openDispute: (request: DisputeRequest) => Promise<string>;
-  resolveDispute: (disputeId: string, resolution: DisputeResolution) => Promise<void>;
+  resolveDispute: (
+    disputeId: string,
+    resolution: DisputeResolution,
+  ) => Promise<void>;
 }
 
 interface CreditDecisionRequest {
@@ -266,7 +298,7 @@ interface DisputeRequest {
 interface DisputeResolution {
   resolvedAt: Date;
   resolvedBy: string;
-  outcome: 'CUSTOMER_WON' | 'MERCHANT_WON' | 'PARTIAL';
+  outcome: "CUSTOMER_WON" | "MERCHANT_WON" | "PARTIAL";
   creditAmount?: number;
   notes?: string;
 }
@@ -286,15 +318,34 @@ const CREDIT_VOICE_COMMANDS = [
 ## 🛠️ 3. Refurbishment & Repair Work Orders (RWO)
 
 ### Multi-step refurb workflows with QA gates
-```typescript
-type RWOStatus = 'CREATED' | 'QUEUED' | 'IN_PROGRESS' | 'WAITING_PARTS' | 'QA' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
 
-type RefurbOutcome = 'RESTOCK_A' | 'RESTOCK_B' | 'RESALE' | 'SCRAP' | 'RTV' | 'QUARANTINE';
+```typescript
+type RWOStatus =
+  | "CREATED"
+  | "QUEUED"
+  | "IN_PROGRESS"
+  | "WAITING_PARTS"
+  | "QA"
+  | "COMPLETED"
+  | "FAILED"
+  | "CANCELLED";
+
+type RefurbOutcome =
+  | "RESTOCK_A"
+  | "RESTOCK_B"
+  | "RESALE"
+  | "SCRAP"
+  | "RTV"
+  | "QUARANTINE";
 
 interface RefurbishmentSystem {
   createWorkOrder: (request: CreateRWORequest) => Promise<RefurbWorkOrder>;
   startStep: (rwoId: string, stepId: string, userId: string) => Promise<void>;
-  completeStep: (rwoId: string, stepId: string, result: StepResult) => Promise<void>;
+  completeStep: (
+    rwoId: string,
+    stepId: string,
+    result: StepResult,
+  ) => Promise<void>;
   routeToQA: (rwoId: string) => Promise<void>;
   completeQA: (rwoId: string, qa: QAResult) => Promise<void>;
   closeWorkOrder: (rwoId: string, outcome: RefurbOutcome) => Promise<void>;
@@ -332,7 +383,7 @@ interface RefurbWorkOrder {
   serial?: string;
 
   status: RWOStatus;
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
   steps: RefurbStep[];
 
@@ -401,15 +452,32 @@ const REFURB_VOICE_COMMANDS = [
 ## 🏷️ 4. Secondary Market Resale Automation
 
 ### Grade, price, list, and fulfill resale items
-```typescript
-type ResaleChannel = 'AMAZON_RESALE' | 'EBAY' | 'SHOPIFY' | 'B2B_LIQUIDATION' | 'INTERNAL_OUTLET';
 
-type ListingStatus = 'DRAFT' | 'LISTED' | 'SOLD' | 'CANCELLED' | 'RETURNED' | 'CLOSED';
+```typescript
+type ResaleChannel =
+  | "AMAZON_RESALE"
+  | "EBAY"
+  | "SHOPIFY"
+  | "B2B_LIQUIDATION"
+  | "INTERNAL_OUTLET";
+
+type ListingStatus =
+  | "DRAFT"
+  | "LISTED"
+  | "SOLD"
+  | "CANCELLED"
+  | "RETURNED"
+  | "CLOSED";
 
 interface ResaleAutomation {
-  createResaleCandidate: (input: ResaleCandidateInput) => Promise<ResaleCandidate>;
+  createResaleCandidate: (
+    input: ResaleCandidateInput,
+  ) => Promise<ResaleCandidate>;
   priceCandidate: (candidateId: string) => Promise<PricingRecommendation>;
-  createListing: (candidateId: string, channel: ResaleChannel) => Promise<ResaleListing>;
+  createListing: (
+    candidateId: string,
+    channel: ResaleChannel,
+  ) => Promise<ResaleListing>;
   syncListings: () => Promise<void>;
 
   // Fulfillment
@@ -457,7 +525,7 @@ interface ResaleCandidate {
     net: number;
   };
 
-  status: 'READY' | 'LISTED' | 'SOLD' | 'HOLD' | 'CLOSED';
+  status: "READY" | "LISTED" | "SOLD" | "HOLD" | "CLOSED";
 }
 
 interface PricingRecommendation {
@@ -469,7 +537,14 @@ interface PricingRecommendation {
 
   // Rationale
   drivers: {
-    driver: 'MARKET_PRICE' | 'GRADE' | 'DEMAND' | 'AGE' | 'SEASONALITY' | 'COMPETITION' | 'FEES';
+    driver:
+      | "MARKET_PRICE"
+      | "GRADE"
+      | "DEMAND"
+      | "AGE"
+      | "SEASONALITY"
+      | "COMPETITION"
+      | "FEES";
     impact: number; // 0-1
     evidence: string;
   }[];
@@ -524,21 +599,22 @@ const RESALE_VOICE_COMMANDS = [
 ## 🕵️ 5. Fraud & Abuse Intelligence
 
 ### Detect anomalous returns patterns and serial reuse
+
 ```typescript
-type FraudOutcome = 'CLEAR' | 'REVIEW' | 'BLOCK' | 'AUTO_DENY';
+type FraudOutcome = "CLEAR" | "REVIEW" | "BLOCK" | "AUTO_DENY";
 
 type FraudSignalType =
-  | 'SERIAL_REUSE'
-  | 'LOT_MISMATCH'
-  | 'ORDER_MISMATCH'
-  | 'WINDOW_ABUSE'
-  | 'EXCESS_RETURNS_RATE'
-  | 'HIGH_VALUE_PATTERN'
-  | 'ADDRESS_CLUSTER'
-  | 'ACCOUNT_TAKEOVER'
-  | 'SUSPICIOUS_DAMAGE_PATTERN'
-  | 'CARRIER_ROUTE_ANOMALY'
-  | 'VISION_MISMATCH';
+  | "SERIAL_REUSE"
+  | "LOT_MISMATCH"
+  | "ORDER_MISMATCH"
+  | "WINDOW_ABUSE"
+  | "EXCESS_RETURNS_RATE"
+  | "HIGH_VALUE_PATTERN"
+  | "ADDRESS_CLUSTER"
+  | "ACCOUNT_TAKEOVER"
+  | "SUSPICIOUS_DAMAGE_PATTERN"
+  | "CARRIER_ROUTE_ANOMALY"
+  | "VISION_MISMATCH";
 
 interface ReturnsFraudSystem {
   scoreFraud: (request: FraudScoreRequest) => Promise<FraudScoreResult>;
@@ -549,7 +625,10 @@ interface ReturnsFraudSystem {
   requireIdentityVerification: (customerId: string) => Promise<void>;
 
   // Learning
-  provideFeedback: (rmaId: string, label: 'FRAUD' | 'NOT_FRAUD') => Promise<void>;
+  provideFeedback: (
+    rmaId: string,
+    label: "FRAUD" | "NOT_FRAUD",
+  ) => Promise<void>;
 }
 
 interface FraudScoreRequest {
@@ -587,13 +666,18 @@ interface FraudScoreResult {
 
   signals: {
     type: FraudSignalType;
-    severity: 'LOW' | 'MEDIUM' | 'HIGH';
+    severity: "LOW" | "MEDIUM" | "HIGH";
     evidence: string;
     weight: number; // 0-1
   }[];
 
   recommendedActions: {
-    action: 'HOLD_FOR_REVIEW' | 'REQUEST_ID' | 'DENY_RETURN' | 'DENY_CREDIT' | 'SECURITY_REVIEW';
+    action:
+      | "HOLD_FOR_REVIEW"
+      | "REQUEST_ID"
+      | "DENY_RETURN"
+      | "DENY_CREDIT"
+      | "SECURITY_REVIEW";
     reason: string;
   }[];
 
@@ -605,10 +689,10 @@ interface FraudAlert {
   id: string;
   createdAt: Date;
   rmaId: string;
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   message: string;
   recommendedAction: string;
-  status: 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED';
+  status: "OPEN" | "ACKNOWLEDGED" | "RESOLVED";
 }
 
 const FRAUD_VOICE_COMMANDS = [
@@ -625,36 +709,54 @@ const FRAUD_VOICE_COMMANDS = [
 ## 🤝 6. Customer Self-Service + AI Returns Agent
 
 ### Guided returns, label generation, and status updates
+
 ```typescript
 type PortalStep =
-  | 'SELECT_ORDER'
-  | 'SELECT_ITEMS'
-  | 'SELECT_REASON'
-  | 'UPLOAD_PHOTOS'
-  | 'CHOOSE_METHOD'
-  | 'CONFIRM'
-  | 'LABEL'
-  | 'STATUS';
+  | "SELECT_ORDER"
+  | "SELECT_ITEMS"
+  | "SELECT_REASON"
+  | "UPLOAD_PHOTOS"
+  | "CHOOSE_METHOD"
+  | "CONFIRM"
+  | "LABEL"
+  | "STATUS";
 
 interface ReturnsPortal {
   // Customer flow
   startReturn: (customerId: string) => Promise<string>; // sessionId
-  submitStep: (sessionId: string, step: PortalStep, payload: any) => Promise<void>;
+  submitStep: (
+    sessionId: string,
+    step: PortalStep,
+    payload: any,
+  ) => Promise<void>;
   generateRMAFromSession: (sessionId: string) => Promise<RMA>;
-  getReturnStatus: (rmaNumber: string) => Promise<{ status: RMAStatus; updates: string[] }>;
+  getReturnStatus: (
+    rmaNumber: string,
+  ) => Promise<{ status: RMAStatus; updates: string[] }>;
 }
 
 interface AIReturnsAgent {
   // Conversational assistance
-  answerPolicyQuestion: (question: string, context: AgentContext) => Promise<string>;
-  guideReturnCreation: (message: string, context: AgentContext) => Promise<AgentNextStep>;
+  answerPolicyQuestion: (
+    question: string,
+    context: AgentContext,
+  ) => Promise<string>;
+  guideReturnCreation: (
+    message: string,
+    context: AgentContext,
+  ) => Promise<AgentNextStep>;
 
   // Dispute handling
   summarizeDispute: (disputeId: string) => Promise<string>;
   proposeResolution: (disputeId: string) => Promise<string>;
 
   // Safety rails
-  allowedActions: ('CREATE_RMA' | 'GENERATE_LABEL' | 'CHECK_STATUS' | 'ESCALATE')[];
+  allowedActions: (
+    | "CREATE_RMA"
+    | "GENERATE_LABEL"
+    | "CHECK_STATUS"
+    | "ESCALATE"
+  )[];
 }
 
 interface AgentContext {

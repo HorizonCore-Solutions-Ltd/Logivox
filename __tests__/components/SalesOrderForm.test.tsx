@@ -2,52 +2,58 @@
  * Component Tests - Sales Order Form
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SalesOrderForm from '@/components/orders/SalesOrderForm';
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import SalesOrderForm from "@/components/orders/SalesOrderForm";
 
 // Mock fetch for customer and inventory lookups
 global.fetch = jest.fn((url) => {
-  if (url.includes('/api/customers')) {
+  if (url.includes("/api/customers")) {
     return Promise.resolve({
       ok: true,
-      json: () => Promise.resolve({
-        success: true,
-        data: {
-          customers: [
-            { id: 'cust-1', name: 'Test Customer', email: 'test@example.com' },
-          ],
-        },
-      }),
+      json: () =>
+        Promise.resolve({
+          success: true,
+          data: {
+            customers: [
+              {
+                id: "cust-1",
+                name: "Test Customer",
+                email: "test@example.com",
+              },
+            ],
+          },
+        }),
     });
   }
-  
-  if (url.includes('/api/inventory')) {
+
+  if (url.includes("/api/inventory")) {
     return Promise.resolve({
       ok: true,
-      json: () => Promise.resolve({
-        success: true,
-        data: {
-          items: [
-            { 
-              id: 'item-1',
-              sku: 'SKU-001',
-              name: 'Product 1',
-              unitPrice: 9.99,
-              stockLevel: { totalAvailable: 100 },
-            },
-          ],
-        },
-      }),
+      json: () =>
+        Promise.resolve({
+          success: true,
+          data: {
+            items: [
+              {
+                id: "item-1",
+                sku: "SKU-001",
+                name: "Product 1",
+                unitPrice: 9.99,
+                stockLevel: { totalAvailable: 100 },
+              },
+            ],
+          },
+        }),
     });
   }
-  
+
   return Promise.resolve({
     ok: true,
     json: () => Promise.resolve({ success: true }),
   });
 }) as jest.Mock;
 
-describe('SalesOrderForm Component', () => {
+describe("SalesOrderForm Component", () => {
   const mockOnSubmit = jest.fn();
   const mockOnCancel = jest.fn();
 
@@ -55,44 +61,29 @@ describe('SalesOrderForm Component', () => {
     jest.clearAllMocks();
   });
 
-  it('should render form fields', () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should render form fields", () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     expect(screen.getByLabelText(/customer/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/order date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/required by/i)).toBeInTheDocument();
   });
 
-  it('should load customers on mount', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should load customers on mount", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringContaining('/api/customers'),
-        expect.any(Object)
+        expect.stringContaining("/api/customers"),
+        expect.any(Object),
       );
     });
   });
 
-  it('should add line item', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should add line item", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
-    const addButton = screen.getByRole('button', { name: /add item/i });
+    const addButton = screen.getByRole("button", { name: /add item/i });
     fireEvent.click(addButton);
 
     await waitFor(() => {
@@ -102,20 +93,15 @@ describe('SalesOrderForm Component', () => {
     });
   });
 
-  it('should remove line item', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should remove line item", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     // Add an item first
-    const addButton = screen.getByRole('button', { name: /add item/i });
+    const addButton = screen.getByRole("button", { name: /add item/i });
     fireEvent.click(addButton);
 
     await waitFor(() => {
-      const removeButton = screen.getByRole('button', { name: /remove/i });
+      const removeButton = screen.getByRole("button", { name: /remove/i });
       fireEvent.click(removeButton);
     });
 
@@ -124,48 +110,38 @@ describe('SalesOrderForm Component', () => {
     });
   });
 
-  it('should calculate line total', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should calculate line total", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
-    const addButton = screen.getByRole('button', { name: /add item/i });
+    const addButton = screen.getByRole("button", { name: /add item/i });
     fireEvent.click(addButton);
 
     await waitFor(() => {
       const quantityInput = screen.getByLabelText(/quantity/i);
       const priceInput = screen.getByLabelText(/unit price/i);
 
-      fireEvent.change(quantityInput, { target: { value: '10' } });
-      fireEvent.change(priceInput, { target: { value: '9.99' } });
+      fireEvent.change(quantityInput, { target: { value: "10" } });
+      fireEvent.change(priceInput, { target: { value: "9.99" } });
     });
 
     await waitFor(() => {
-      expect(screen.getByText('£99.90')).toBeInTheDocument();
+      expect(screen.getByText("£99.90")).toBeInTheDocument();
     });
   });
 
-  it('should calculate order total', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should calculate order total", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     // Add first item
-    const addButton = screen.getByRole('button', { name: /add item/i });
+    const addButton = screen.getByRole("button", { name: /add item/i });
     fireEvent.click(addButton);
 
     await waitFor(() => {
       const quantityInputs = screen.getAllByLabelText(/quantity/i);
       const priceInputs = screen.getAllByLabelText(/unit price/i);
 
-      fireEvent.change(quantityInputs[0], { target: { value: '10' } });
-      fireEvent.change(priceInputs[0], { target: { value: '9.99' } });
+      fireEvent.change(quantityInputs[0], { target: { value: "10" } });
+      fireEvent.change(priceInputs[0], { target: { value: "9.99" } });
     });
 
     // Add second item
@@ -175,8 +151,8 @@ describe('SalesOrderForm Component', () => {
       const quantityInputs = screen.getAllByLabelText(/quantity/i);
       const priceInputs = screen.getAllByLabelText(/unit price/i);
 
-      fireEvent.change(quantityInputs[1], { target: { value: '5' } });
-      fireEvent.change(priceInputs[1], { target: { value: '19.99' } });
+      fireEvent.change(quantityInputs[1], { target: { value: "5" } });
+      fireEvent.change(priceInputs[1], { target: { value: "19.99" } });
     });
 
     await waitFor(() => {
@@ -185,15 +161,10 @@ describe('SalesOrderForm Component', () => {
     });
   });
 
-  it('should validate required fields', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should validate required fields", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
-    const submitButton = screen.getByRole('button', { name: /create order/i });
+    const submitButton = screen.getByRole("button", { name: /create order/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -203,118 +174,101 @@ describe('SalesOrderForm Component', () => {
     expect(mockOnSubmit).not.toHaveBeenCalled();
   });
 
-  it('should validate at least one line item', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should validate at least one line item", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     // Select customer
     const customerSelect = screen.getByLabelText(/customer/i);
-    fireEvent.change(customerSelect, { target: { value: 'cust-1' } });
+    fireEvent.change(customerSelect, { target: { value: "cust-1" } });
 
-    const submitButton = screen.getByRole('button', { name: /create order/i });
+    const submitButton = screen.getByRole("button", { name: /create order/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText(/at least one item is required/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/at least one item is required/i),
+      ).toBeInTheDocument();
     });
   });
 
-  it('should submit valid form', async () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should submit valid form", async () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
     // Select customer
     const customerSelect = screen.getByLabelText(/customer/i);
-    fireEvent.change(customerSelect, { target: { value: 'cust-1' } });
+    fireEvent.change(customerSelect, { target: { value: "cust-1" } });
 
     // Add line item
-    const addButton = screen.getByRole('button', { name: /add item/i });
+    const addButton = screen.getByRole("button", { name: /add item/i });
     fireEvent.click(addButton);
 
     await waitFor(() => {
       const itemSelect = screen.getByLabelText(/item/i);
       const quantityInput = screen.getByLabelText(/quantity/i);
 
-      fireEvent.change(itemSelect, { target: { value: 'item-1' } });
-      fireEvent.change(quantityInput, { target: { value: '10' } });
+      fireEvent.change(itemSelect, { target: { value: "item-1" } });
+      fireEvent.change(quantityInput, { target: { value: "10" } });
     });
 
-    const submitButton = screen.getByRole('button', { name: /create order/i });
+    const submitButton = screen.getByRole("button", { name: /create order/i });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockOnSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
-          customerId: 'cust-1',
+          customerId: "cust-1",
           lineItems: expect.arrayContaining([
             expect.objectContaining({
-              inventoryItemId: 'item-1',
+              inventoryItemId: "item-1",
               quantity: 10,
             }),
           ]),
-        })
+        }),
       );
     });
   });
 
-  it('should call onCancel when cancel clicked', () => {
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+  it("should call onCancel when cancel clicked", () => {
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
-    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    const cancelButton = screen.getByRole("button", { name: /cancel/i });
     fireEvent.click(cancelButton);
 
     expect(mockOnCancel).toHaveBeenCalled();
   });
 
-  it('should warn about low stock', async () => {
+  it("should warn about low stock", async () => {
     (global.fetch as jest.Mock).mockImplementationOnce(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({
-          success: true,
-          data: {
-            items: [
-              {
-                id: 'item-1',
-                sku: 'SKU-001',
-                name: 'Low Stock Product',
-                stockLevel: { totalAvailable: 5 },
-              },
-            ],
-          },
-        }),
-      })
+        json: () =>
+          Promise.resolve({
+            success: true,
+            data: {
+              items: [
+                {
+                  id: "item-1",
+                  sku: "SKU-001",
+                  name: "Low Stock Product",
+                  stockLevel: { totalAvailable: 5 },
+                },
+              ],
+            },
+          }),
+      }),
     );
 
-    render(
-      <SalesOrderForm
-        onSubmit={mockOnSubmit}
-        onCancel={mockOnCancel}
-      />
-    );
+    render(<SalesOrderForm onSubmit={mockOnSubmit} onCancel={mockOnCancel} />);
 
-    const addButton = screen.getByRole('button', { name: /add item/i });
+    const addButton = screen.getByRole("button", { name: /add item/i });
     fireEvent.click(addButton);
 
     await waitFor(() => {
       const itemSelect = screen.getByLabelText(/item/i);
       const quantityInput = screen.getByLabelText(/quantity/i);
 
-      fireEvent.change(itemSelect, { target: { value: 'item-1' } });
-      fireEvent.change(quantityInput, { target: { value: '10' } });
+      fireEvent.change(itemSelect, { target: { value: "item-1" } });
+      fireEvent.change(quantityInput, { target: { value: "10" } });
     });
 
     await waitFor(() => {

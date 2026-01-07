@@ -1,7 +1,12 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Thermometer, AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Thermometer,
+  AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 
 interface TempLog {
   id: string;
@@ -18,7 +23,9 @@ interface TempLog {
 export default function TemperatureLogsPage() {
   const [logs, setLogs] = useState<TempLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
 
   useEffect(() => {
     fetchLogs();
@@ -27,8 +34,8 @@ export default function TemperatureLogsPage() {
   const fetchLogs = async () => {
     try {
       const params = new URLSearchParams();
-      params.append('startDate', selectedDate);
-      params.append('endDate', selectedDate);
+      params.append("startDate", selectedDate);
+      params.append("endDate", selectedDate);
 
       const res = await fetch(`/api/temperature-logs?${params.toString()}`);
       if (res.ok) {
@@ -36,22 +43,27 @@ export default function TemperatureLogsPage() {
         setLogs(data);
       }
     } catch (error) {
-      console.error('Error fetching temperature logs:', error);
+      console.error("Error fetching temperature logs:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const violations = logs.filter(log => log.isViolation);
-  const avgTemp = logs.length > 0 
-    ? (logs.reduce((sum, log) => sum + log.temperature, 0) / logs.length).toFixed(1)
-    : '0';
+  const violations = logs.filter((log) => log.isViolation);
+  const avgTemp =
+    logs.length > 0
+      ? (
+          logs.reduce((sum, log) => sum + log.temperature, 0) / logs.length
+        ).toFixed(1)
+      : "0";
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Temperature Monitoring</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Temperature Monitoring
+          </h1>
           <p className="text-gray-600 mt-1">Cold chain compliance tracking</p>
         </div>
         <input
@@ -86,7 +98,9 @@ export default function TemperatureLogsPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Violations</p>
-              <p className="text-2xl font-bold text-red-600">{violations.length}</p>
+              <p className="text-2xl font-bold text-red-600">
+                {violations.length}
+              </p>
             </div>
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
@@ -96,7 +110,10 @@ export default function TemperatureLogsPage() {
             <div>
               <p className="text-sm text-gray-600">Compliance Rate</p>
               <p className="text-2xl font-bold text-green-600">
-                {logs.length > 0 ? ((1 - violations.length / logs.length) * 100).toFixed(1) : '100'}%
+                {logs.length > 0
+                  ? ((1 - violations.length / logs.length) * 100).toFixed(1)
+                  : "100"}
+                %
               </p>
             </div>
             <TrendingDown className="w-8 h-8 text-green-600" />
@@ -147,7 +164,10 @@ export default function TemperatureLogsPage() {
               </tr>
             ) : (
               logs.map((log) => (
-                <tr key={log.id} className={log.isViolation ? 'bg-red-50' : 'hover:bg-gray-50'}>
+                <tr
+                  key={log.id}
+                  className={log.isViolation ? "bg-red-50" : "hover:bg-gray-50"}
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {new Date(log.timestamp).toLocaleString()}
                   </td>
@@ -155,15 +175,17 @@ export default function TemperatureLogsPage() {
                     {log.warehouse.name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {log.location?.name || '-'}
+                    {log.location?.name || "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`text-sm font-medium ${log.isViolation ? 'text-red-600' : 'text-gray-900'}`}>
+                    <span
+                      className={`text-sm font-medium ${log.isViolation ? "text-red-600" : "text-gray-900"}`}
+                    >
                       {log.temperature}°C
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {log.humidity ? `${log.humidity}%` : '-'}
+                    {log.humidity ? `${log.humidity}%` : "-"}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {log.recordedBy.name}

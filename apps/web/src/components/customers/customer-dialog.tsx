@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useMutation } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -21,17 +21,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 const customerSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -41,15 +41,15 @@ const customerSchema = z.object({
   type: z.enum(["CUSTOMER", "SUPPLIER", "BOTH"]),
   taxId: z.string().optional(),
   notes: z.string().optional(),
-})
+});
 
-type CustomerFormData = z.infer<typeof customerSchema>
+type CustomerFormData = z.infer<typeof customerSchema>;
 
 interface CustomerDialogProps {
-  customer?: any
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess?: () => void
+  customer?: any;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function CustomerDialog({
@@ -58,8 +58,8 @@ export function CustomerDialog({
   onOpenChange,
   onSuccess,
 }: CustomerDialogProps) {
-  const { toast } = useToast()
-  const isEditing = !!customer
+  const { toast } = useToast();
+  const isEditing = !!customer;
 
   const form = useForm<CustomerFormData>({
     resolver: zodResolver(customerSchema),
@@ -72,7 +72,7 @@ export function CustomerDialog({
       taxId: "",
       notes: "",
     },
-  })
+  });
 
   // Reset form when customer changes
   React.useEffect(() => {
@@ -85,7 +85,7 @@ export function CustomerDialog({
         type: customer.type || "CUSTOMER",
         taxId: customer.taxId || "",
         notes: customer.notes || "",
-      })
+      });
     } else {
       form.reset({
         name: "",
@@ -95,52 +95,52 @@ export function CustomerDialog({
         type: "CUSTOMER",
         taxId: "",
         notes: "",
-      })
+      });
     }
-  }, [customer, form])
+  }, [customer, form]);
 
   // Mutation
   const mutation = useMutation({
     mutationFn: async (data: CustomerFormData) => {
       const url = isEditing
         ? `/api/customers/${customer.id}`
-        : "/api/customers"
-      const method = isEditing ? "PUT" : "POST"
+        : "/api/customers";
+      const method = isEditing ? "PUT" : "POST";
 
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      })
+      });
 
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.message || "Failed to save customer")
+        const error = await res.json();
+        throw new Error(error.message || "Failed to save customer");
       }
 
-      return res.json()
+      return res.json();
     },
     onSuccess: () => {
       toast({
         title: "Success",
         description: `Customer ${isEditing ? "updated" : "created"} successfully`,
-      })
-      onOpenChange(false)
-      form.reset()
-      onSuccess?.()
+      });
+      onOpenChange(false);
+      form.reset();
+      onSuccess?.();
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const onSubmit = (data: CustomerFormData) => {
-    mutation.mutate(data)
-  }
+    mutation.mutate(data);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -297,13 +297,13 @@ export function CustomerDialog({
                 {mutation.isPending
                   ? "Saving..."
                   : isEditing
-                  ? "Update"
-                  : "Create"}
+                    ? "Update"
+                    : "Create"}
               </Button>
             </DialogFooter>
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

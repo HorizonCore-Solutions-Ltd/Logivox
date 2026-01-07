@@ -3,26 +3,32 @@
  * Comprehensive UI for inbound inventory management, GRN creation, QC, and put-away
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Package, 
-  ClipboardCheck, 
-  ArrowDownToLine, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Package,
+  ClipboardCheck,
+  ArrowDownToLine,
   FileText,
   TrendingUp,
   AlertCircle,
   CheckCircle,
   Clock,
-  Truck
-} from 'lucide-react';
+  Truck,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -30,7 +36,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 
 interface GRNItem {
   id: string;
@@ -39,7 +45,7 @@ interface GRNItem {
   supplierName: string;
   expectedQuantity: number;
   receivedQuantity: number;
-  status: 'PENDING' | 'IN_PROGRESS' | 'QC_PENDING' | 'COMPLETED' | 'REJECTED';
+  status: "PENDING" | "IN_PROGRESS" | "QC_PENDING" | "COMPLETED" | "REJECTED";
   createdAt: string;
 }
 
@@ -48,7 +54,7 @@ interface QCInspection {
   grnNumber: string;
   productName: string;
   inspectionType: string;
-  status: 'PENDING' | 'PASSED' | 'FAILED';
+  status: "PENDING" | "PASSED" | "FAILED";
   assignedTo: string;
   createdAt: string;
 }
@@ -60,7 +66,7 @@ interface PutAwayTask {
   quantity: number;
   fromLocation: string;
   toLocation: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
   assignedTo: string;
 }
 
@@ -80,11 +86,11 @@ export default function ReceivingDashboard() {
   const [putAwayTasks, setPutAwayTasks] = useState<PutAwayTask[]>([]);
   const [stats, setStats] = useState<ReceivingStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Form states
-  const [newGrnPO, setNewGrnPO] = useState('');
-  const [newGrnSupplier, setNewGrnSupplier] = useState('');
+  const [newGrnPO, setNewGrnPO] = useState("");
+  const [newGrnSupplier, setNewGrnSupplier] = useState("");
 
   useEffect(() => {
     loadDashboardData();
@@ -93,29 +99,30 @@ export default function ReceivingDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load GRNs
-      const grnsResponse = await fetch('/api/receiving?action=list-grns');
+      const grnsResponse = await fetch("/api/receiving?action=list-grns");
       const grnsData = await grnsResponse.json();
       setGrns(grnsData.grns || []);
 
       // Load statistics
-      const statsResponse = await fetch('/api/receiving?action=statistics');
+      const statsResponse = await fetch("/api/receiving?action=statistics");
       const statsData = await statsResponse.json();
       setStats(statsData);
 
       // Load QC inspections
-      const qcResponse = await fetch('/api/receiving?action=qc-inspections');
+      const qcResponse = await fetch("/api/receiving?action=qc-inspections");
       const qcData = await qcResponse.json();
       setQcInspections(qcData.inspections || []);
 
       // Load put-away tasks
-      const putAwayResponse = await fetch('/api/receiving?action=putaway-tasks');
+      const putAwayResponse = await fetch(
+        "/api/receiving?action=putaway-tasks",
+      );
       const putAwayData = await putAwayResponse.json();
       setPutAwayTasks(putAwayData.tasks || []);
-
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -123,107 +130,108 @@ export default function ReceivingDashboard() {
 
   const createGRN = async () => {
     try {
-      const response = await fetch('/api/receiving', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'create-grn',
+          action: "create-grn",
           poNumber: newGrnPO,
           supplierId: newGrnSupplier,
           items: [], // Would be populated from PO
-          warehouseId: 'default-warehouse'
-        })
+          warehouseId: "default-warehouse",
+        }),
       });
 
       if (response.ok) {
-        setNewGrnPO('');
-        setNewGrnSupplier('');
+        setNewGrnPO("");
+        setNewGrnSupplier("");
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to create GRN:', error);
+      console.error("Failed to create GRN:", error);
     }
   };
 
   const processAsn = async (asnId: string) => {
     try {
-      const response = await fetch('/api/receiving', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'process-asn',
-          asnId
-        })
+          action: "process-asn",
+          asnId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to process ASN:', error);
+      console.error("Failed to process ASN:", error);
     }
   };
 
   const startQC = async (grnId: string) => {
     try {
-      const response = await fetch('/api/receiving', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'quality-control',
+          action: "quality-control",
           grnId,
           inspectionResults: {
             passed: true,
-            notes: 'Initial QC'
-          }
-        })
+            notes: "Initial QC",
+          },
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to start QC:', error);
+      console.error("Failed to start QC:", error);
     }
   };
 
   const completePutAway = async (taskId: string) => {
     try {
-      const response = await fetch('/api/receiving', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'complete-putaway',
-          taskId
-        })
+          action: "complete-putaway",
+          taskId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to complete put-away:', error);
+      console.error("Failed to complete put-away:", error);
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      PENDING: { variant: 'secondary' as const, icon: Clock },
-      IN_PROGRESS: { variant: 'default' as const, icon: TrendingUp },
-      QC_PENDING: { variant: 'warning' as const, icon: AlertCircle },
-      COMPLETED: { variant: 'success' as const, icon: CheckCircle },
-      REJECTED: { variant: 'destructive' as const, icon: AlertCircle },
-      PASSED: { variant: 'success' as const, icon: CheckCircle },
-      FAILED: { variant: 'destructive' as const, icon: AlertCircle },
+      PENDING: { variant: "secondary" as const, icon: Clock },
+      IN_PROGRESS: { variant: "default" as const, icon: TrendingUp },
+      QC_PENDING: { variant: "warning" as const, icon: AlertCircle },
+      COMPLETED: { variant: "success" as const, icon: CheckCircle },
+      REJECTED: { variant: "destructive" as const, icon: AlertCircle },
+      PASSED: { variant: "success" as const, icon: CheckCircle },
+      FAILED: { variant: "destructive" as const, icon: AlertCircle },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     const Icon = config.icon;
 
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
-        {status.replace('_', ' ')}
+        {status.replace("_", " ")}
       </Badge>
     );
   };
@@ -249,10 +257,11 @@ export default function ReceivingDashboard() {
             Receiving Operations
           </h1>
           <p className="text-muted-foreground">
-            Manage inbound inventory, GRN creation, quality control, and put-away
+            Manage inbound inventory, GRN creation, quality control, and
+            put-away
           </p>
         </div>
-        <Button onClick={() => setActiveTab('create-grn')}>
+        <Button onClick={() => setActiveTab("create-grn")}>
           <Package className="mr-2 h-4 w-4" />
           Create GRN
         </Button>
@@ -289,7 +298,9 @@ export default function ReceivingDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Put-Away Pending</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Put-Away Pending
+              </CardTitle>
               <ArrowDownToLine className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -302,7 +313,9 @@ export default function ReceivingDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Today Received</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Today Received
+              </CardTitle>
               <Truck className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -347,7 +360,9 @@ export default function ReceivingDashboard() {
                 <TableBody>
                   {grns.slice(0, 5).map((grn) => (
                     <TableRow key={grn.id}>
-                      <TableCell className="font-medium">{grn.grnNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {grn.grnNumber}
+                      </TableCell>
                       <TableCell>{grn.poNumber}</TableCell>
                       <TableCell>{grn.supplierName}</TableCell>
                       <TableCell>
@@ -358,7 +373,7 @@ export default function ReceivingDashboard() {
                         {new Date(grn.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        {grn.status === 'PENDING' && (
+                        {grn.status === "PENDING" && (
                           <Button size="sm" onClick={() => startQC(grn.id)}>
                             Start QC
                           </Button>
@@ -395,7 +410,9 @@ export default function ReceivingDashboard() {
                 <TableBody>
                   {grns.map((grn) => (
                     <TableRow key={grn.id}>
-                      <TableCell className="font-medium">{grn.grnNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {grn.grnNumber}
+                      </TableCell>
                       <TableCell>{grn.poNumber}</TableCell>
                       <TableCell>{grn.supplierName}</TableCell>
                       <TableCell>{grn.expectedQuantity}</TableCell>
@@ -439,7 +456,9 @@ export default function ReceivingDashboard() {
                 <TableBody>
                   {qcInspections.map((inspection) => (
                     <TableRow key={inspection.id}>
-                      <TableCell className="font-medium">{inspection.grnNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {inspection.grnNumber}
+                      </TableCell>
                       <TableCell>{inspection.productName}</TableCell>
                       <TableCell>{inspection.inspectionType}</TableCell>
                       <TableCell>{inspection.assignedTo}</TableCell>
@@ -448,7 +467,7 @@ export default function ReceivingDashboard() {
                         {new Date(inspection.createdAt).toLocaleDateString()}
                       </TableCell>
                       <TableCell>
-                        {inspection.status === 'PENDING' && (
+                        {inspection.status === "PENDING" && (
                           <Button size="sm">Inspect</Button>
                         )}
                       </TableCell>
@@ -464,7 +483,9 @@ export default function ReceivingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Put-Away Tasks</CardTitle>
-              <CardDescription>Manage inventory put-away operations</CardDescription>
+              <CardDescription>
+                Manage inventory put-away operations
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -483,7 +504,9 @@ export default function ReceivingDashboard() {
                 <TableBody>
                   {putAwayTasks.map((task) => (
                     <TableRow key={task.id}>
-                      <TableCell className="font-medium">{task.grnNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {task.grnNumber}
+                      </TableCell>
                       <TableCell>{task.productName}</TableCell>
                       <TableCell>{task.quantity}</TableCell>
                       <TableCell>{task.fromLocation}</TableCell>
@@ -491,8 +514,11 @@ export default function ReceivingDashboard() {
                       <TableCell>{task.assignedTo}</TableCell>
                       <TableCell>{getStatusBadge(task.status)}</TableCell>
                       <TableCell>
-                        {task.status === 'PENDING' && (
-                          <Button size="sm" onClick={() => completePutAway(task.id)}>
+                        {task.status === "PENDING" && (
+                          <Button
+                            size="sm"
+                            onClick={() => completePutAway(task.id)}
+                          >
                             Complete
                           </Button>
                         )}
@@ -532,7 +558,10 @@ export default function ReceivingDashboard() {
                   />
                 </div>
               </div>
-              <Button onClick={createGRN} disabled={!newGrnPO || !newGrnSupplier}>
+              <Button
+                onClick={createGRN}
+                disabled={!newGrnPO || !newGrnSupplier}
+              >
                 Create GRN
               </Button>
             </CardContent>

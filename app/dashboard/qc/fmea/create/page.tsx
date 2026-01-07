@@ -1,15 +1,27 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Save, ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Plus, Trash2, Save, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface FailureMode {
   id: string;
@@ -30,17 +42,17 @@ export default function CreateFMEA() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState('');
-  const [scope, setScope] = useState('');
-  const [teamLead, setTeamLead] = useState('');
-  const [teamMembers, setTeamMembers] = useState('');
-  
+  const [title, setTitle] = useState("");
+  const [type, setType] = useState("");
+  const [scope, setScope] = useState("");
+  const [teamLead, setTeamLead] = useState("");
+  const [teamMembers, setTeamMembers] = useState("");
+
   const [failureModes, setFailureModes] = useState<FailureMode[]>([]);
   const [currentMode, setCurrentMode] = useState<Partial<FailureMode>>({
     severity: 5,
     occurrence: 5,
-    detection: 5
+    detection: 5,
   });
 
   const calculateRPN = (s: number, o: number, d: number) => s * o * d;
@@ -51,22 +63,22 @@ export default function CreateFMEA() {
     const rpn = calculateRPN(
       currentMode.severity || 5,
       currentMode.occurrence || 5,
-      currentMode.detection || 5
+      currentMode.detection || 5,
     );
 
     const newMode: FailureMode = {
       id: Date.now().toString(),
-      processStep: currentMode.processStep || '',
-      failureMode: currentMode.failureMode || '',
-      effects: currentMode.effects || '',
-      causes: currentMode.causes || '',
-      controls: currentMode.controls || '',
+      processStep: currentMode.processStep || "",
+      failureMode: currentMode.failureMode || "",
+      effects: currentMode.effects || "",
+      causes: currentMode.causes || "",
+      controls: currentMode.controls || "",
       severity: currentMode.severity || 5,
       occurrence: currentMode.occurrence || 5,
       detection: currentMode.detection || 5,
       rpn,
-      actions: currentMode.actions || '',
-      responsible: currentMode.responsible || ''
+      actions: currentMode.actions || "",
+      responsible: currentMode.responsible || "",
     };
 
     setFailureModes([...failureModes, newMode]);
@@ -74,14 +86,14 @@ export default function CreateFMEA() {
   };
 
   const removeFailureMode = (id: string) => {
-    setFailureModes(failureModes.filter(m => m.id !== id));
+    setFailureModes(failureModes.filter((m) => m.id !== id));
   };
 
   const getRPNColor = (rpn: number) => {
-    if (rpn >= 200) return 'bg-red-100 text-red-800';
-    if (rpn >= 125) return 'bg-orange-100 text-orange-800';
-    if (rpn >= 50) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-green-100 text-green-800';
+    if (rpn >= 200) return "bg-red-100 text-red-800";
+    if (rpn >= 125) return "bg-orange-100 text-orange-800";
+    if (rpn >= 50) return "bg-yellow-100 text-yellow-800";
+    return "bg-green-100 text-green-800";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,22 +101,22 @@ export default function CreateFMEA() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/qc/fmea', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/fmea", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title,
           type,
           scope,
           teamLead,
-          teamMembers: teamMembers.split(',').map(m => m.trim()),
+          teamMembers: teamMembers.split(",").map((m) => m.trim()),
           failureModes,
-          organizationId: 'org-1',
-          createdBy: 'current-user'
-        })
+          organizationId: "org-1",
+          createdBy: "current-user",
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to create FMEA');
+      if (!response.ok) throw new Error("Failed to create FMEA");
 
       const result = await response.json();
       router.push(`/dashboard/qc/fmea/${result.data.id}`);
@@ -120,7 +132,9 @@ export default function CreateFMEA() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">New FMEA</h1>
-          <p className="text-muted-foreground">Failure Mode and Effects Analysis</p>
+          <p className="text-muted-foreground">
+            Failure Mode and Effects Analysis
+          </p>
         </div>
         <Button variant="outline" onClick={() => router.back()}>
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -197,7 +211,9 @@ export default function CreateFMEA() {
         <Card className="mt-6">
           <CardHeader>
             <CardTitle>Add Failure Mode</CardTitle>
-            <CardDescription>Identify potential failure modes and assess risks</CardDescription>
+            <CardDescription>
+              Identify potential failure modes and assess risks
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -205,8 +221,13 @@ export default function CreateFMEA() {
                 <Label>Process Step</Label>
                 <Input
                   placeholder="e.g., Visual inspection"
-                  value={currentMode.processStep || ''}
-                  onChange={(e) => setCurrentMode({ ...currentMode, processStep: e.target.value })}
+                  value={currentMode.processStep || ""}
+                  onChange={(e) =>
+                    setCurrentMode({
+                      ...currentMode,
+                      processStep: e.target.value,
+                    })
+                  }
                 />
               </div>
 
@@ -214,8 +235,13 @@ export default function CreateFMEA() {
                 <Label>Failure Mode</Label>
                 <Input
                   placeholder="How could it fail?"
-                  value={currentMode.failureMode || ''}
-                  onChange={(e) => setCurrentMode({ ...currentMode, failureMode: e.target.value })}
+                  value={currentMode.failureMode || ""}
+                  onChange={(e) =>
+                    setCurrentMode({
+                      ...currentMode,
+                      failureMode: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -224,8 +250,10 @@ export default function CreateFMEA() {
               <Label>Effects of Failure</Label>
               <Textarea
                 placeholder="What happens if it fails?"
-                value={currentMode.effects || ''}
-                onChange={(e) => setCurrentMode({ ...currentMode, effects: e.target.value })}
+                value={currentMode.effects || ""}
+                onChange={(e) =>
+                  setCurrentMode({ ...currentMode, effects: e.target.value })
+                }
                 rows={2}
               />
             </div>
@@ -234,8 +262,10 @@ export default function CreateFMEA() {
               <Label>Potential Causes</Label>
               <Textarea
                 placeholder="What could cause this failure?"
-                value={currentMode.causes || ''}
-                onChange={(e) => setCurrentMode({ ...currentMode, causes: e.target.value })}
+                value={currentMode.causes || ""}
+                onChange={(e) =>
+                  setCurrentMode({ ...currentMode, causes: e.target.value })
+                }
                 rows={2}
               />
             </div>
@@ -244,16 +274,20 @@ export default function CreateFMEA() {
               <Label>Current Controls</Label>
               <Textarea
                 placeholder="What controls are currently in place?"
-                value={currentMode.controls || ''}
-                onChange={(e) => setCurrentMode({ ...currentMode, controls: e.target.value })}
+                value={currentMode.controls || ""}
+                onChange={(e) =>
+                  setCurrentMode({ ...currentMode, controls: e.target.value })
+                }
                 rows={2}
               />
             </div>
 
             {/* RPN Calculator */}
             <div className="border p-4 rounded-lg bg-gray-50">
-              <h4 className="font-semibold mb-4">Risk Assessment (RPN Calculator)</h4>
-              
+              <h4 className="font-semibold mb-4">
+                Risk Assessment (RPN Calculator)
+              </h4>
+
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -265,7 +299,12 @@ export default function CreateFMEA() {
                     min="1"
                     max="10"
                     value={currentMode.severity || 5}
-                    onChange={(e) => setCurrentMode({ ...currentMode, severity: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setCurrentMode({
+                        ...currentMode,
+                        severity: parseInt(e.target.value),
+                      })
+                    }
                     className="w-full"
                   />
                 </div>
@@ -280,7 +319,12 @@ export default function CreateFMEA() {
                     min="1"
                     max="10"
                     value={currentMode.occurrence || 5}
-                    onChange={(e) => setCurrentMode({ ...currentMode, occurrence: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setCurrentMode({
+                        ...currentMode,
+                        occurrence: parseInt(e.target.value),
+                      })
+                    }
                     className="w-full"
                   />
                 </div>
@@ -295,23 +339,31 @@ export default function CreateFMEA() {
                     min="1"
                     max="10"
                     value={currentMode.detection || 5}
-                    onChange={(e) => setCurrentMode({ ...currentMode, detection: parseInt(e.target.value) })}
+                    onChange={(e) =>
+                      setCurrentMode({
+                        ...currentMode,
+                        detection: parseInt(e.target.value),
+                      })
+                    }
                     className="w-full"
                   />
                 </div>
 
                 <div className="pt-4 border-t">
                   <div className="text-center">
-                    <p className="text-sm text-muted-foreground">Risk Priority Number (RPN)</p>
+                    <p className="text-sm text-muted-foreground">
+                      Risk Priority Number (RPN)
+                    </p>
                     <div className="text-4xl font-bold my-2">
                       {calculateRPN(
                         currentMode.severity || 5,
                         currentMode.occurrence || 5,
-                        currentMode.detection || 5
+                        currentMode.detection || 5,
                       )}
                     </div>
                     <p className="text-xs">
-                      {currentMode.severity} × {currentMode.occurrence} × {currentMode.detection}
+                      {currentMode.severity} × {currentMode.occurrence} ×{" "}
+                      {currentMode.detection}
                     </p>
                   </div>
                 </div>
@@ -323,8 +375,10 @@ export default function CreateFMEA() {
                 <Label>Recommended Actions</Label>
                 <Textarea
                   placeholder="What should be done?"
-                  value={currentMode.actions || ''}
-                  onChange={(e) => setCurrentMode({ ...currentMode, actions: e.target.value })}
+                  value={currentMode.actions || ""}
+                  onChange={(e) =>
+                    setCurrentMode({ ...currentMode, actions: e.target.value })
+                  }
                   rows={2}
                 />
               </div>
@@ -333,8 +387,13 @@ export default function CreateFMEA() {
                 <Label>Responsible Person</Label>
                 <Input
                   placeholder="Who is responsible?"
-                  value={currentMode.responsible || ''}
-                  onChange={(e) => setCurrentMode({ ...currentMode, responsible: e.target.value })}
+                  value={currentMode.responsible || ""}
+                  onChange={(e) =>
+                    setCurrentMode({
+                      ...currentMode,
+                      responsible: e.target.value,
+                    })
+                  }
                 />
               </div>
             </div>
@@ -358,15 +417,23 @@ export default function CreateFMEA() {
                 {failureModes
                   .sort((a, b) => b.rpn - a.rpn)
                   .map((mode) => (
-                    <div key={mode.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={mode.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
-                          <Badge className={getRPNColor(mode.rpn)}>RPN: {mode.rpn}</Badge>
-                          <span className="font-medium">{mode.processStep}</span>
+                          <Badge className={getRPNColor(mode.rpn)}>
+                            RPN: {mode.rpn}
+                          </Badge>
+                          <span className="font-medium">
+                            {mode.processStep}
+                          </span>
                         </div>
                         <p className="text-sm">{mode.failureMode}</p>
                         <p className="text-xs text-muted-foreground mt-1">
-                          S:{mode.severity} O:{mode.occurrence} D:{mode.detection}
+                          S:{mode.severity} O:{mode.occurrence} D:
+                          {mode.detection}
                         </p>
                       </div>
                       <Button
@@ -390,7 +457,9 @@ export default function CreateFMEA() {
             Cancel
           </Button>
           <Button type="submit" disabled={loading || failureModes.length === 0}>
-            {loading ? 'Saving...' : (
+            {loading ? (
+              "Saving..."
+            ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
                 Create FMEA

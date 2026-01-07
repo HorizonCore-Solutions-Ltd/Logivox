@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization membership" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching serial numbers:", error);
     return NextResponse.json(
       { error: "Failed to fetch serial numbers" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -169,7 +169,7 @@ export async function POST(request: NextRequest) {
       if (!inventoryItem) {
         return NextResponse.json(
           { error: "Inventory item not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
             error: "Duplicate serial numbers found",
             duplicates: existingSerials.map((s: any) => s.serialNumber),
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -235,7 +235,7 @@ export async function POST(request: NextRequest) {
       if (!inventoryItem) {
         return NextResponse.json(
           { error: "Inventory item not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -250,7 +250,7 @@ export async function POST(request: NextRequest) {
       if (existing) {
         return NextResponse.json(
           { error: "Serial number already exists" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -258,7 +258,7 @@ export async function POST(request: NextRequest) {
       const warrantyEndDate = data.warrantyPeriodDays
         ? new Date(
             warrantyStartDate.getTime() +
-              data.warrantyPeriodDays * 24 * 60 * 60 * 1000
+              data.warrantyPeriodDays * 24 * 60 * 60 * 1000,
           )
         : undefined;
 
@@ -308,14 +308,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating serial number:", error);
     return NextResponse.json(
       { error: "Failed to create serial number" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

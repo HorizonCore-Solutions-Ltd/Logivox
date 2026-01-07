@@ -22,12 +22,18 @@ interface SmartSearchProps {
   showHistory?: boolean;
 }
 
-export function SmartSearch({ onSelect, placeholder = "Search products, orders, customers...", showHistory = true }: SmartSearchProps) {
+export function SmartSearch({
+  onSelect,
+  placeholder = "Search products, orders, customers...",
+  showHistory = true,
+}: SmartSearchProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
-  const [popularSearches, setPopularSearches] = useState<Array<{ query: string; count: number }>>([]);
+  const [popularSearches, setPopularSearches] = useState<
+    Array<{ query: string; count: number }>
+  >([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -43,7 +49,10 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
 
     // Click outside to close
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -74,14 +83,18 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
     setLoading(true);
     try {
       // Get autocomplete suggestions
-      const suggestResponse = await fetch(`/api/search/suggest?q=${encodeURIComponent(searchQuery)}`);
+      const suggestResponse = await fetch(
+        `/api/search/suggest?q=${encodeURIComponent(searchQuery)}`,
+      );
       if (suggestResponse.ok) {
         const suggestData = await suggestResponse.json();
         setSuggestions(suggestData.suggestions || []);
       }
 
       // Perform search
-      const searchResponse = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
+      const searchResponse = await fetch(
+        `/api/search?q=${encodeURIComponent(searchQuery)}`,
+      );
       if (searchResponse.ok) {
         const searchData = await searchResponse.json();
         setResults(searchData.results || []);
@@ -109,7 +122,10 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
 
   const selectResult = (result: SearchResult) => {
     // Add to search history
-    const newHistory = [query, ...searchHistory.filter(h => h !== query)].slice(0, 10);
+    const newHistory = [
+      query,
+      ...searchHistory.filter((h) => h !== query),
+    ].slice(0, 10);
     setSearchHistory(newHistory);
     localStorage.setItem("searchHistory", JSON.stringify(newHistory));
 
@@ -162,7 +178,9 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
           type="text"
           placeholder={placeholder}
           value={query}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleQueryChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            handleQueryChange(e.target.value)
+          }
           onFocus={() => setIsOpen(true)}
           className="pl-10 pr-10"
         />
@@ -194,7 +212,9 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
             {/* Autocomplete Suggestions */}
             {!loading && suggestions.length > 0 && (
               <div className="border-b">
-                <div className="p-2 text-xs text-muted-foreground font-medium">Suggestions</div>
+                <div className="p-2 text-xs text-muted-foreground font-medium">
+                  Suggestions
+                </div>
                 {suggestions.map((suggestion, index) => (
                   <button
                     key={index}
@@ -223,7 +243,9 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium truncate">{result.title}</span>
+                          <span className="font-medium truncate">
+                            {result.title}
+                          </span>
                           <Badge className={getTypeBadge(result.type)}>
                             {result.type}
                           </Badge>
@@ -244,7 +266,9 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
             {/* No Results */}
             {!loading && query && results.length === 0 && (
               <div className="p-8 text-center">
-                <p className="text-muted-foreground">No results found for "{query}"</p>
+                <p className="text-muted-foreground">
+                  No results found for "{query}"
+                </p>
                 <p className="text-sm text-muted-foreground mt-2">
                   Try different keywords or check your spelling
                 </p>
@@ -255,7 +279,9 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
             {!loading && !query && showHistory && searchHistory.length > 0 && (
               <div className="border-b">
                 <div className="p-2 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground font-medium">Recent Searches</span>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    Recent Searches
+                  </span>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -281,7 +307,9 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
             {/* Popular Searches */}
             {!loading && !query && popularSearches.length > 0 && (
               <div>
-                <div className="p-2 text-xs text-muted-foreground font-medium">Trending Searches</div>
+                <div className="p-2 text-xs text-muted-foreground font-medium">
+                  Trending Searches
+                </div>
                 {popularSearches.slice(0, 5).map((search, index) => (
                   <button
                     key={index}
@@ -292,7 +320,9 @@ export function SmartSearch({ onSelect, placeholder = "Search products, orders, 
                       <TrendingUp className="h-4 w-4 text-muted-foreground" />
                       <span>{search.query}</span>
                     </div>
-                    <span className="text-xs text-muted-foreground">{search.count} searches</span>
+                    <span className="text-xs text-muted-foreground">
+                      {search.count} searches
+                    </span>
                   </button>
                 ))}
               </div>

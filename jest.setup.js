@@ -4,23 +4,23 @@
  */
 
 // Add custom jest matchers from jest-dom
-import '@testing-library/jest-dom';
+import "@testing-library/jest-dom";
 
 // Mock Next.js router
-jest.mock('next/navigation', () => ({
+jest.mock("next/navigation", () => ({
   useRouter() {
     return {
       push: jest.fn(),
       replace: jest.fn(),
       prefetch: jest.fn(),
       back: jest.fn(),
-      pathname: '/',
+      pathname: "/",
       query: {},
-      asPath: '/',
+      asPath: "/",
     };
   },
   usePathname() {
-    return '/';
+    return "/";
   },
   useSearchParams() {
     return new URLSearchParams();
@@ -28,19 +28,19 @@ jest.mock('next/navigation', () => ({
 }));
 
 // Mock next-auth
-jest.mock('next-auth/react', () => ({
+jest.mock("next-auth/react", () => ({
   useSession() {
     return {
       data: {
         user: {
-          id: 'test-user-id',
-          email: 'test@example.com',
-          name: 'Test User',
-          role: 'ADMIN',
+          id: "test-user-id",
+          email: "test@example.com",
+          name: "Test User",
+          role: "ADMIN",
         },
-        expires: '2025-12-31',
+        expires: "2025-12-31",
       },
-      status: 'authenticated',
+      status: "authenticated",
     };
   },
   signIn: jest.fn(),
@@ -49,7 +49,7 @@ jest.mock('next-auth/react', () => ({
 }));
 
 // Mock Prisma Client
-jest.mock('@/lib/prisma', () => ({
+jest.mock("@/lib/prisma", () => ({
   __esModule: true,
   default: {
     inventoryItem: {
@@ -115,15 +115,15 @@ global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
     json: () => Promise.resolve({}),
-    text: () => Promise.resolve(''),
+    text: () => Promise.resolve(""),
     headers: new Headers(),
     status: 200,
-    statusText: 'OK',
-  })
+    statusText: "OK",
+  }),
 );
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: jest.fn().mockImplementation((query) => ({
     matches: false,
@@ -179,9 +179,9 @@ const originalError = console.error;
 beforeAll(() => {
   console.error = (...args) => {
     if (
-      typeof args[0] === 'string' &&
-      (args[0].includes('Warning: ReactDOM.render') ||
-        args[0].includes('Not implemented: HTMLFormElement.prototype.submit'))
+      typeof args[0] === "string" &&
+      (args[0].includes("Warning: ReactDOM.render") ||
+        args[0].includes("Not implemented: HTMLFormElement.prototype.submit"))
     ) {
       return;
     }

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Activity,
   Plus,
@@ -29,8 +29,8 @@ import {
   XCircle,
   LineChart,
   TrendingUp,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface MeasurementStats {
   total: number;
@@ -60,11 +60,12 @@ export default function MeasurementsPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<MeasurementStats | null>(null);
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
-  const [measurementTypeFilter, setMeasurementTypeFilter] = useState<string>('');
-  const [conformingFilter, setConformingFilter] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [measurementTypeFilter, setMeasurementTypeFilter] =
+    useState<string>("");
+  const [conformingFilter, setConformingFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const organizationId = 'org_123'; // TODO: Get from auth context
+  const organizationId = "org_123"; // TODO: Get from auth context
 
   useEffect(() => {
     fetchData();
@@ -73,10 +74,11 @@ export default function MeasurementsPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       const params = new URLSearchParams({ organizationId });
-      if (measurementTypeFilter) params.append('measurementType', measurementTypeFilter);
-      if (conformingFilter) params.append('isConforming', conformingFilter);
+      if (measurementTypeFilter)
+        params.append("measurementType", measurementTypeFilter);
+      if (conformingFilter) params.append("isConforming", conformingFilter);
 
       const [statsRes, measurementsRes] = await Promise.all([
         fetch(`/api/qc/measurements/stats?organizationId=${organizationId}`),
@@ -86,27 +88,28 @@ export default function MeasurementsPage() {
       if (statsRes.ok) setStats(await statsRes.json());
       if (measurementsRes.ok) setMeasurements(await measurementsRes.json());
     } catch (error) {
-      console.error('Error fetching measurement data:', error);
+      console.error("Error fetching measurement data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredMeasurements = measurements.filter(m =>
-    m.measurementNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.measurementName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMeasurements = measurements.filter(
+    (m) =>
+      m.measurementNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      m.measurementName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getMeasurementTypeBadge = (type: string) => {
     const config: Record<string, string> = {
-      DIMENSIONAL: 'bg-blue-500',
-      WEIGHT: 'bg-purple-500',
-      TEMPERATURE: 'bg-red-500',
-      PRESSURE: 'bg-orange-500',
-      PH: 'bg-green-600',
-      HARDNESS: 'bg-gray-600',
-      THICKNESS: 'bg-teal-500',
-      VISCOSITY: 'bg-pink-500',
+      DIMENSIONAL: "bg-blue-500",
+      WEIGHT: "bg-purple-500",
+      TEMPERATURE: "bg-red-500",
+      PRESSURE: "bg-orange-500",
+      PH: "bg-green-600",
+      HARDNESS: "bg-gray-600",
+      THICKNESS: "bg-teal-500",
+      VISCOSITY: "bg-pink-500",
     };
     return <Badge className={`${config[type]} text-white`}>{type}</Badge>;
   };
@@ -127,11 +130,28 @@ export default function MeasurementsPage() {
 
   const getCPKBadge = (cpk: number | undefined) => {
     if (!cpk) return <Badge variant="outline">N/A</Badge>;
-    
-    if (cpk >= 1.67) return <Badge className="bg-green-600 text-white">Excellent ({cpk.toFixed(2)})</Badge>;
-    if (cpk >= 1.33) return <Badge className="bg-blue-500 text-white">Good ({cpk.toFixed(2)})</Badge>;
-    if (cpk >= 1.00) return <Badge className="bg-yellow-500 text-white">Adequate ({cpk.toFixed(2)})</Badge>;
-    return <Badge className="bg-red-600 text-white">Poor ({cpk.toFixed(2)})</Badge>;
+
+    if (cpk >= 1.67)
+      return (
+        <Badge className="bg-green-600 text-white">
+          Excellent ({cpk.toFixed(2)})
+        </Badge>
+      );
+    if (cpk >= 1.33)
+      return (
+        <Badge className="bg-blue-500 text-white">
+          Good ({cpk.toFixed(2)})
+        </Badge>
+      );
+    if (cpk >= 1.0)
+      return (
+        <Badge className="bg-yellow-500 text-white">
+          Adequate ({cpk.toFixed(2)})
+        </Badge>
+      );
+    return (
+      <Badge className="bg-red-600 text-white">Poor ({cpk.toFixed(2)})</Badge>
+    );
   };
 
   if (loading) {
@@ -148,7 +168,9 @@ export default function MeasurementsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Quality Measurements</h1>
-          <p className="text-muted-foreground">Parametric data tracking with SPC</p>
+          <p className="text-muted-foreground">
+            Parametric data tracking with SPC
+          </p>
         </div>
         <div className="flex gap-2">
           <Link href="/dashboard/qc/measurements/spc">
@@ -171,7 +193,9 @@ export default function MeasurementsPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Measurements</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Measurements
+              </CardTitle>
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -188,7 +212,9 @@ export default function MeasurementsPage() {
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.conforming}</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.conforming}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Within spec limits
               </p>
@@ -197,27 +223,31 @@ export default function MeasurementsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Non-Conforming</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Non-Conforming
+              </CardTitle>
               <XCircle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.nonConforming}</div>
-              <p className="text-xs text-muted-foreground">
-                Out of spec
-              </p>
+              <div className="text-2xl font-bold text-red-600">
+                {stats.nonConforming}
+              </div>
+              <p className="text-xs text-muted-foreground">Out of spec</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Conformance Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Conformance Rate
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.conformanceRate.toFixed(1)}%</div>
-              <p className="text-xs text-muted-foreground">
-                Overall quality
-              </p>
+              <div className="text-2xl font-bold">
+                {stats.conformanceRate.toFixed(1)}%
+              </div>
+              <p className="text-xs text-muted-foreground">Overall quality</p>
             </CardContent>
           </Card>
         </div>
@@ -239,7 +269,8 @@ export default function MeasurementsPage() {
                   </div>
                   <div className="text-2xl font-bold">{data.count}</div>
                   <p className="text-xs text-muted-foreground">
-                    {data.conforming} conforming ({((data.conforming / data.count) * 100).toFixed(0)}%)
+                    {data.conforming} conforming (
+                    {((data.conforming / data.count) * 100).toFixed(0)}%)
                   </p>
                 </div>
               ))}
@@ -261,7 +292,10 @@ export default function MeasurementsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
             />
-            <Select value={measurementTypeFilter} onValueChange={setMeasurementTypeFilter}>
+            <Select
+              value={measurementTypeFilter}
+              onValueChange={setMeasurementTypeFilter}
+            >
               <SelectTrigger className="w-[200px]">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
@@ -277,7 +311,10 @@ export default function MeasurementsPage() {
                 <SelectItem value="VISCOSITY">Viscosity</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={conformingFilter} onValueChange={setConformingFilter}>
+            <Select
+              value={conformingFilter}
+              onValueChange={setConformingFilter}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="All Results" />
               </SelectTrigger>
@@ -314,17 +351,26 @@ export default function MeasurementsPage() {
               <TableBody>
                 {filteredMeasurements.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={11} className="text-center text-muted-foreground">
+                    <TableCell
+                      colSpan={11}
+                      className="text-center text-muted-foreground"
+                    >
                       No measurements found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredMeasurements.map((m) => (
                     <TableRow key={m.id}>
-                      <TableCell className="font-medium">{m.measurementNumber}</TableCell>
-                      <TableCell>{getMeasurementTypeBadge(m.measurementType)}</TableCell>
+                      <TableCell className="font-medium">
+                        {m.measurementNumber}
+                      </TableCell>
+                      <TableCell>
+                        {getMeasurementTypeBadge(m.measurementType)}
+                      </TableCell>
                       <TableCell>{m.measurementName}</TableCell>
-                      <TableCell className="font-semibold">{m.measurementValue}</TableCell>
+                      <TableCell className="font-semibold">
+                        {m.measurementValue}
+                      </TableCell>
                       <TableCell>{m.unitOfMeasure}</TableCell>
                       <TableCell>
                         {m.lowerSpecLimit && m.upperSpecLimit ? (
@@ -332,24 +378,37 @@ export default function MeasurementsPage() {
                             {m.lowerSpecLimit} - {m.upperSpecLimit}
                           </span>
                         ) : (
-                          '-'
+                          "-"
                         )}
                       </TableCell>
                       <TableCell>
                         {m.deviation ? (
-                          <span className={m.deviation !== 0 ? 'text-red-600 font-semibold' : ''}>
-                            {m.deviation > 0 ? '+' : ''}{m.deviation.toFixed(3)}
+                          <span
+                            className={
+                              m.deviation !== 0
+                                ? "text-red-600 font-semibold"
+                                : ""
+                            }
+                          >
+                            {m.deviation > 0 ? "+" : ""}
+                            {m.deviation.toFixed(3)}
                           </span>
                         ) : (
-                          '-'
+                          "-"
                         )}
                       </TableCell>
                       <TableCell>{getCPKBadge(m.cpk)}</TableCell>
-                      <TableCell>{getConformanceBadge(m.isConforming)}</TableCell>
-                      <TableCell>{new Date(m.measurementDate).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {getConformanceBadge(m.isConforming)}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(m.measurementDate).toLocaleDateString()}
+                      </TableCell>
                       <TableCell>
                         <Link href={`/dashboard/qc/measurements/${m.id}`}>
-                          <Button variant="ghost" size="sm">View</Button>
+                          <Button variant="ghost" size="sm">
+                            View
+                          </Button>
                         </Link>
                       </TableCell>
                     </TableRow>

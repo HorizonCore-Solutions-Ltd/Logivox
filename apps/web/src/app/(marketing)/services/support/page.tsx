@@ -1,13 +1,31 @@
-import { Metadata } from "next"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, ArrowRight, Phone, MessageSquare, Mail, Clock, Shield, Headphones, Zap, AlertTriangle } from "lucide-react"
-import Link from "next/link"
+import { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Phone,
+  MessageSquare,
+  Mail,
+  Clock,
+  Shield,
+  Headphones,
+  Zap,
+  AlertTriangle,
+} from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "24/7 Support Center | LogiVox WMS",
-  description: "Enterprise-grade support with guaranteed SLA. Get help when you need it with 24/7/365 support from WMS experts.",
-}
+  description:
+    "Enterprise-grade support with guaranteed SLA. Get help when you need it with 24/7/365 support from WMS experts.",
+};
 
 export default function SupportPage() {
   return (
@@ -23,7 +41,8 @@ export default function SupportPage() {
               24/7 Enterprise Support
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Get help when you need it. Our WMS experts are available around the clock to keep your operations running smoothly.
+              Get help when you need it. Our WMS experts are available around
+              the clock to keep your operations running smoothly.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -43,7 +62,9 @@ export default function SupportPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Choose Your Support Level</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Choose Your Support Level
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               From essential email support to dedicated 24/7 priority assistance
             </p>
@@ -107,7 +128,12 @@ export default function SupportPage() {
                 icon: Shield,
               },
             ].map((tier) => (
-              <Card key={tier.name} className={tier.featured ? "border-2 border-primary-600 shadow-lg" : ""}>
+              <Card
+                key={tier.name}
+                className={
+                  tier.featured ? "border-2 border-primary-600 shadow-lg" : ""
+                }
+              >
                 {tier.featured && (
                   <div className="bg-primary-600 text-white text-center py-2 text-sm font-semibold">
                     MOST POPULAR
@@ -120,13 +146,19 @@ export default function SupportPage() {
                     </div>
                     {tier.name}
                   </CardTitle>
-                  <div className="text-3xl font-bold text-primary-600">{tier.price}</div>
+                  <div className="text-3xl font-bold text-primary-600">
+                    {tier.price}
+                  </div>
                   <CardDescription>{tier.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <p className="text-sm font-semibold mb-1">SLA: {tier.sla}</p>
-                    <p className="text-sm text-muted-foreground">{tier.availability}</p>
+                    <p className="text-sm font-semibold mb-1">
+                      SLA: {tier.sla}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {tier.availability}
+                    </p>
                   </div>
                   <ul className="space-y-3">
                     {tier.features.map((feature, idx) => (
@@ -136,8 +168,14 @@ export default function SupportPage() {
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full" variant={tier.featured ? "default" : "outline"} asChild>
-                    <Link href={`/contact?service=support&tier=${tier.name.toLowerCase().replace(' ', '-')}`}>
+                  <Button
+                    className="w-full"
+                    variant={tier.featured ? "default" : "outline"}
+                    asChild
+                  >
+                    <Link
+                      href={`/contact?service=support&tier=${tier.name.toLowerCase().replace(" ", "-")}`}
+                    >
                       Get Started
                     </Link>
                   </Button>
@@ -152,7 +190,9 @@ export default function SupportPage() {
       <section className="py-20 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Multiple Ways to Get Help</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Multiple Ways to Get Help
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Choose the channel that works best for you
             </p>
@@ -200,8 +240,12 @@ export default function SupportPage() {
                   <CardDescription>{channel.description}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="font-semibold text-primary-600 mb-2">{channel.action}</p>
-                  <p className="text-sm text-muted-foreground">{channel.available}</p>
+                  <p className="font-semibold text-primary-600 mb-2">
+                    {channel.action}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {channel.available}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -213,7 +257,9 @@ export default function SupportPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Service Level Agreements</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Service Level Agreements
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Clear response times based on issue severity
             </p>
@@ -261,12 +307,16 @@ export default function SupportPage() {
               <Card key={level.priority}>
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-3">
-                    <div className={`inline-flex p-2 rounded-lg bg-${level.color}-100 text-${level.color}-700 flex-shrink-0`}>
+                    <div
+                      className={`inline-flex p-2 rounded-lg bg-${level.color}-100 text-${level.color}-700 flex-shrink-0`}
+                    >
                       <level.icon className="h-5 w-5" />
                     </div>
                     {level.priority}
                   </CardTitle>
-                  <CardDescription className="text-sm">{level.description}</CardDescription>
+                  <CardDescription className="text-sm">
+                    {level.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 text-sm">
@@ -280,7 +330,9 @@ export default function SupportPage() {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Enterprise:</span>
-                      <span className="font-semibold text-primary-600">{level.enterprise}</span>
+                      <span className="font-semibold text-primary-600">
+                        {level.enterprise}
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -354,7 +406,8 @@ export default function SupportPage() {
               <Phone className="h-16 w-16 mx-auto mb-6 opacity-90" />
               <h2 className="text-3xl font-bold mb-4">Need Help Now?</h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Our support team is standing by to help you resolve any issues and keep your warehouse running smoothly.
+                Our support team is standing by to help you resolve any issues
+                and keep your warehouse running smoothly.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="secondary" asChild>
@@ -362,7 +415,12 @@ export default function SupportPage() {
                     Contact Support <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-transparent border-white text-white hover:bg-white/10"
+                  asChild
+                >
                   <Link href="/help">Browse Knowledge Base</Link>
                 </Button>
               </div>
@@ -371,5 +429,5 @@ export default function SupportPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

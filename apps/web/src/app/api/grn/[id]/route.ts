@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,7 +7,16 @@ import { z } from "zod";
 
 // Validation schema for updating GRN
 const updateGRNSchema = z.object({
-  status: z.enum(["DRAFT", "PENDING", "QUALITY_CHECK", "APPROVED", "REJECTED", "COMPLETED"]).optional(),
+  status: z
+    .enum([
+      "DRAFT",
+      "PENDING",
+      "QUALITY_CHECK",
+      "APPROVED",
+      "REJECTED",
+      "COMPLETED",
+    ])
+    .optional(),
   warehouseId: z.string().optional(),
   receivingDock: z.string().optional(),
   notes: z.string().optional(),
@@ -19,7 +28,7 @@ const updateGRNSchema = z.object({
 // GET /api/grn/[id] - Get GRN details
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -29,7 +38,10 @@ export async function GET(
 
     const organizationId = session.user.organizations[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const grn = await prisma.goodsReceiptNote.findFirst({
@@ -95,7 +107,7 @@ export async function GET(
 // PUT /api/grn/[id] - Update GRN
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -105,7 +117,10 @@ export async function PUT(
 
     const organizationId = session.user.organizations[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const body = await request.json();
@@ -127,7 +142,7 @@ export async function PUT(
     if (existingGRN.status === "COMPLETED") {
       return NextResponse.json(
         { error: "Cannot update completed GRN" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -182,18 +197,21 @@ export async function PUT(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating GRN:", error);
-    return NextResponse.json({ error: "Failed to update GRN" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update GRN" },
+      { status: 500 },
+    );
   }
 }
 
 // DELETE /api/grn/[id] - Delete GRN (only DRAFT status)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -203,7 +221,10 @@ export async function DELETE(
 
     const organizationId = session.user.organizations[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     // Check if GRN exists and is in DRAFT status
@@ -221,7 +242,7 @@ export async function DELETE(
     if (grn.status !== "DRAFT") {
       return NextResponse.json(
         { error: "Only draft GRNs can be deleted" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -249,6 +270,9 @@ export async function DELETE(
     return NextResponse.json({ message: "GRN deleted successfully" });
   } catch (error) {
     console.error("Error deleting GRN:", error);
-    return NextResponse.json({ error: "Failed to delete GRN" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to delete GRN" },
+      { status: 500 },
+    );
   }
 }

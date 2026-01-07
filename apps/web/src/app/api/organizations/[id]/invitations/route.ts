@@ -1,23 +1,23 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { z } from "zod"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const inviteSchema = z.object({
   email: z.string().email("Invalid email"),
   role: z.enum(["ADMIN", "MEMBER", "VIEWER"]),
-})
+});
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Verify user is member of this organization
@@ -26,10 +26,10 @@ export async function GET(
         userId: session.user.id,
         organizationId: params.id,
       },
-    })
+    });
 
     if (!membership) {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 })
+      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
 
     // Get all invitations for this organization
@@ -45,26 +45,26 @@ export async function GET(
         },
       },
       orderBy: { createdAt: "desc" },
-    })
+    });
 
-    return NextResponse.json(invitations)
+    return NextResponse.json(invitations);
   } catch (error) {
-    console.error("Invitations fetch error:", error)
+    console.error("Invitations fetch error:", error);
     return NextResponse.json(
       { message: "Failed to fetch invitations" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Verify user is admin of this organization
@@ -74,18 +74,18 @@ export async function POST(
         organizationId: params.id,
         role: "ADMIN",
       },
-    })
+    });
 
     if (!membership) {
       return NextResponse.json(
         { message: "Only admins can send invitations" },
-        { status: 403 }
-      )
+        { status: 403 },
+      );
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const { email, role } = inviteSchema.parse(body)
+    const body = await request.json();
+    const { email, role } = inviteSchema.parse(body);
 
     // Check if user is already a member
     const existingUser = await prisma.user.findUnique({
@@ -95,13 +95,13 @@ export async function POST(
           where: { id: params.id },
         },
       },
-    })
+    });
 
     if (existingUser?.organizations?.length > 0) {
       return NextResponse.json(
         { message: "User is already a member of this organization" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Check if invitation already exists
@@ -111,17 +111,17 @@ export async function POST(
         organizationId: params.id,
         status: "PENDING",
       },
-    })
+    });
 
     if (existingInvitation) {
       return NextResponse.json(
         { message: "Invitation already sent to this email" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Generate invitation token
-    const token = `inv_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`
+    const token = `inv_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`;
 
     // Create invitation
     const invitation = await prisma.invitation.create({
@@ -142,7 +142,7 @@ export async function POST(
           },
         },
       },
-    })
+    });
 
     // Send invitation email
     const inviteUrl = `${process.env.NEXTAUTH_URL}/invite/${token}`;
@@ -158,7 +158,7 @@ export async function POST(
         <p>Or copy this link: ${inviteUrl}</p>
         <p>This invitation will expire in 7 days.</p>
       `,
-    })
+    });
 
     // Create activity log
     await prisma.activityLog.create({
@@ -175,21 +175,21 @@ export async function POST(
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
       },
-    })
+    });
 
-    return NextResponse.json(invitation, { status: 201 })
+    return NextResponse.json(invitation, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { message: "Validation error", errors: error.errors },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
-    console.error("Invitation creation error:", error)
+    console.error("Invitation creation error:", error);
     return NextResponse.json(
       { message: "Failed to create invitation" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching cycle counts:", error);
     return NextResponse.json(
       { error: "Failed to fetch cycle counts" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
       if (!location) {
         return NextResponse.json(
           { error: "Location not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
     }
@@ -175,7 +175,7 @@ export async function POST(request: NextRequest) {
       if (!category) {
         return NextResponse.json(
           { error: "Category not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
     }
@@ -196,7 +196,7 @@ export async function POST(request: NextRequest) {
     let sequence = 1;
     if (lastCount) {
       const lastSeq = parseInt(
-        (lastCount.countNumber.split("-")[2] || "0") || "0"
+        lastCount.countNumber.split("-")[2] || "0" || "0",
       );
       sequence = lastSeq + 1;
     }
@@ -295,14 +295,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating cycle count:", error);
     return NextResponse.json(
       { error: "Failed to create cycle count" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

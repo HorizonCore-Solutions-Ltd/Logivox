@@ -6,7 +6,7 @@
  * AS9100 Section 8.7 - Control of nonconforming process outputs and products
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 export class MRBService {
   /**
@@ -54,7 +54,7 @@ export class MRBService {
         urgency: params.urgency,
         customerImpact: params.customerImpact,
         estimatedValue: params.estimatedValue,
-        status: 'PENDING_REVIEW',
+        status: "PENDING_REVIEW",
       },
     });
   }
@@ -72,7 +72,7 @@ export class MRBService {
     return await prisma.materialReviewBoard.update({
       where: { id: params.mrbId },
       data: {
-        status: 'SCHEDULED',
+        status: "SCHEDULED",
         meetingDate: params.meetingDate,
         chairperson: params.chairperson,
         attendees: params.attendees,
@@ -110,20 +110,22 @@ export class MRBService {
     });
 
     if (!mrb) {
-      throw new Error('MRB record not found');
+      throw new Error("MRB record not found");
     }
 
     // Check if all required approvals obtained
-    const allApproved = params.approvers.every(a => a.approved);
-    
+    const allApproved = params.approvers.every((a) => a.approved);
+
     if (!allApproved) {
-      throw new Error('All required approvals must be obtained before recording disposition');
+      throw new Error(
+        "All required approvals must be obtained before recording disposition",
+      );
     }
 
     return await prisma.materialReviewBoard.update({
       where: { id: params.mrbId },
       data: {
-        status: 'DISPOSITION_APPROVED',
+        status: "DISPOSITION_APPROVED",
         disposition: params.disposition,
         dispositionJustification: params.dispositionJustification,
         conditions: params.conditions || [],
@@ -160,14 +162,14 @@ export class MRBService {
       where: { id: params.mrbId },
     });
 
-    if (mrb?.status !== 'DISPOSITION_APPROVED') {
-      throw new Error('Disposition must be approved before execution');
+    if (mrb?.status !== "DISPOSITION_APPROVED") {
+      throw new Error("Disposition must be approved before execution");
     }
 
     return await prisma.materialReviewBoard.update({
       where: { id: params.mrbId },
       data: {
-        status: params.dispositionComplete ? 'COMPLETED' : 'IN_PROGRESS',
+        status: params.dispositionComplete ? "COMPLETED" : "IN_PROGRESS",
         executedBy: params.executedBy,
         executionDate: params.executionDate,
         actualQuantityProcessed: params.actualQuantityProcessed,
@@ -193,7 +195,7 @@ export class MRBService {
     return await prisma.materialReviewBoard.update({
       where: { id: params.mrbId },
       data: {
-        status: 'CLOSED',
+        status: "CLOSED",
         closedDate: new Date(),
         closedBy: params.closedBy,
         closureNotes: params.closureNotes,
@@ -231,9 +233,10 @@ export class MRBService {
     const bySeverity: any = {};
     const byStatus: any = {};
 
-    reviews.forEach(review => {
+    reviews.forEach((review) => {
       if (review.disposition) {
-        byDisposition[review.disposition] = (byDisposition[review.disposition] || 0) + 1;
+        byDisposition[review.disposition] =
+          (byDisposition[review.disposition] || 0) + 1;
       }
       bySeverity[review.severity] = (bySeverity[review.severity] || 0) + 1;
       byStatus[review.status] = (byStatus[review.status] || 0) + 1;
@@ -241,43 +244,49 @@ export class MRBService {
 
     // Calculate cycle times
     const cycleTimes = reviews
-      .filter(r => r.dispositionDate)
-      .map(r => {
+      .filter((r) => r.dispositionDate)
+      .map((r) => {
         const hours = Math.floor(
-          (new Date(r.dispositionDate!).getTime() - new Date(r.submittedDate).getTime()) / 
-          (1000 * 60 * 60)
+          (new Date(r.dispositionDate!).getTime() -
+            new Date(r.submittedDate).getTime()) /
+            (1000 * 60 * 60),
         );
         return hours;
       });
 
-    const avgCycleTime = cycleTimes.length > 0
-      ? cycleTimes.reduce((sum, t) => sum + t, 0) / cycleTimes.length
-      : 0;
+    const avgCycleTime =
+      cycleTimes.length > 0
+        ? cycleTimes.reduce((sum, t) => sum + t, 0) / cycleTimes.length
+        : 0;
 
     // Calculate costs
     const totalEstimatedCost = reviews
-      .filter(r => r.estimatedValue)
+      .filter((r) => r.estimatedValue)
       .reduce((sum, r) => sum + (r.estimatedValue || 0), 0);
 
     const totalActualCost = reviews
-      .filter(r => r.actualCost)
+      .filter((r) => r.actualCost)
       .reduce((sum, r) => sum + (r.actualCost || 0), 0);
 
     // Calculate quantities
-    const totalQuantityReviewed = reviews.reduce((sum, r) => sum + r.quantity, 0);
+    const totalQuantityReviewed = reviews.reduce(
+      (sum, r) => sum + r.quantity,
+      0,
+    );
     const totalQuantityProcessed = reviews
-      .filter(r => r.actualQuantityProcessed)
+      .filter((r) => r.actualQuantityProcessed)
       .reduce((sum, r) => sum + (r.actualQuantityProcessed || 0), 0);
 
     return {
       summary: {
         total: reviews.length,
-        pending: reviews.filter(r => r.status === 'PENDING_REVIEW').length,
-        scheduled: reviews.filter(r => r.status === 'SCHEDULED').length,
-        approved: reviews.filter(r => r.status === 'DISPOSITION_APPROVED').length,
-        inProgress: reviews.filter(r => r.status === 'IN_PROGRESS').length,
-        completed: reviews.filter(r => r.status === 'COMPLETED').length,
-        closed: reviews.filter(r => r.status === 'CLOSED').length,
+        pending: reviews.filter((r) => r.status === "PENDING_REVIEW").length,
+        scheduled: reviews.filter((r) => r.status === "SCHEDULED").length,
+        approved: reviews.filter((r) => r.status === "DISPOSITION_APPROVED")
+          .length,
+        inProgress: reviews.filter((r) => r.status === "IN_PROGRESS").length,
+        completed: reviews.filter((r) => r.status === "COMPLETED").length,
+        closed: reviews.filter((r) => r.status === "CLOSED").length,
       },
       byDisposition,
       bySeverity,
@@ -295,9 +304,11 @@ export class MRBService {
         totalProcessed: totalQuantityProcessed,
       },
       quality: {
-        customerImpact: reviews.filter(r => r.customerImpact).length,
+        customerImpact: reviews.filter((r) => r.customerImpact).length,
         finalInspectionPassRate: this.calculatePassRate(reviews),
-        preventiveActionsGenerated: reviews.filter(r => r.preventiveActionsRequired).length,
+        preventiveActionsGenerated: reviews.filter(
+          (r) => r.preventiveActionsRequired,
+        ).length,
       },
     };
   }
@@ -311,19 +322,16 @@ export class MRBService {
   }) {
     const whereClause: any = {
       organizationId: params.organizationId,
-      status: { in: ['PENDING_REVIEW', 'SCHEDULED'] },
+      status: { in: ["PENDING_REVIEW", "SCHEDULED"] },
     };
 
     if (params.urgentOnly) {
-      whereClause.urgency = { in: ['HIGH', 'CRITICAL'] };
+      whereClause.urgency = { in: ["HIGH", "CRITICAL"] };
     }
 
     return await prisma.materialReviewBoard.findMany({
       where: whereClause,
-      orderBy: [
-        { urgency: 'desc' },
-        { submittedDate: 'asc' },
-      ],
+      orderBy: [{ urgency: "desc" }, { submittedDate: "asc" }],
     });
   }
 
@@ -332,12 +340,17 @@ export class MRBService {
    */
   private static calculateSavings(reviews: any[]): number {
     const scrappedValue = reviews
-      .filter(r => r.disposition === 'SCRAP')
+      .filter((r) => r.disposition === "SCRAP")
       .reduce((sum, r) => sum + (r.estimatedValue || 0), 0);
 
     const savedValue = reviews
-      .filter(r => ['USE_AS_IS', 'REWORK', 'REPAIR', 'SORT'].includes(r.disposition || ''))
-      .reduce((sum, r) => sum + ((r.estimatedValue || 0) - (r.actualCost || 0)), 0);
+      .filter((r) =>
+        ["USE_AS_IS", "REWORK", "REPAIR", "SORT"].includes(r.disposition || ""),
+      )
+      .reduce(
+        (sum, r) => sum + ((r.estimatedValue || 0) - (r.actualCost || 0)),
+        0,
+      );
 
     return savedValue;
   }
@@ -346,13 +359,13 @@ export class MRBService {
    * Helper: Calculate final inspection pass rate
    */
   private static calculatePassRate(reviews: any[]): number {
-    const completed = reviews.filter(r => 
-      r.status === 'COMPLETED' && r.finalInspectionPassed !== null
+    const completed = reviews.filter(
+      (r) => r.status === "COMPLETED" && r.finalInspectionPassed !== null,
     );
 
     if (completed.length === 0) return 0;
 
-    const passed = completed.filter(r => r.finalInspectionPassed).length;
+    const passed = completed.filter((r) => r.finalInspectionPassed).length;
     return (passed / completed.length) * 100;
   }
 }

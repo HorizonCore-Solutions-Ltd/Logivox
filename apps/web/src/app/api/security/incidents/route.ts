@@ -1,23 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const incidentSchema = z.object({
   incidentType: z.enum([
-    'THEFT',
-    'VANDALISM',
-    'TRESPASSING',
-    'FIRE',
-    'MEDICAL_EMERGENCY',
-    'SAFETY_VIOLATION',
-    'UNAUTHORIZED_ACCESS',
-    'EQUIPMENT_DAMAGE',
-    'VEHICLE_ACCIDENT',
-    'OTHER'
+    "THEFT",
+    "VANDALISM",
+    "TRESPASSING",
+    "FIRE",
+    "MEDICAL_EMERGENCY",
+    "SAFETY_VIOLATION",
+    "UNAUTHORIZED_ACCESS",
+    "EQUIPMENT_DAMAGE",
+    "VEHICLE_ACCIDENT",
+    "OTHER",
   ]),
-  severity: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
+  severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]),
   title: z.string().min(1),
   description: z.string(),
   location: z.string(),
@@ -43,21 +43,21 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '50');
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "50");
     const skip = (page - 1) * limit;
 
     // Filters
-    const incidentType = searchParams.get('incidentType');
-    const severity = searchParams.get('severity');
-    const status = searchParams.get('status');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    const search = searchParams.get('search');
+    const incidentType = searchParams.get("incidentType");
+    const severity = searchParams.get("severity");
+    const status = searchParams.get("status");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
+    const search = searchParams.get("search");
 
     const where: any = {
       organizationId: session.user.organizationId,
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     if (incidentType) where.incidentType = incidentType;
     if (severity) where.severity = severity;
     if (status) where.status = status;
-    
+
     if (startDate || endDate) {
       where.incidentTime = {};
       if (startDate) where.incidentTime.gte = new Date(startDate);
@@ -75,10 +75,10 @@ export async function GET(request: NextRequest) {
 
     if (search) {
       where.OR = [
-        { title: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { incidentNumber: { contains: search, mode: 'insensitive' } },
-        { location: { contains: search, mode: 'insensitive' } },
+        { title: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { incidentNumber: { contains: search, mode: "insensitive" } },
+        { location: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { incidentTime: 'desc' },
+        orderBy: { incidentTime: "desc" },
         include: {
           reportedBy: {
             select: {
@@ -120,10 +120,10 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching security incidents:', error);
+    console.error("Error fetching security incidents:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch security incidents' },
-      { status: 500 }
+      { error: "Failed to fetch security incidents" },
+      { status: 500 },
     );
   }
 }
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -141,14 +141,14 @@ export async function POST(request: NextRequest) {
     // Generate incident number
     const lastIncident = await prisma.securityIncident.findFirst({
       where: { organizationId: session.user.organizationId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       select: { incidentNumber: true },
     });
 
-    const lastNumber = lastIncident?.incidentNumber 
-      ? parseInt(lastIncident.incidentNumber.replace(/\D/g, '')) 
+    const lastNumber = lastIncident?.incidentNumber
+      ? parseInt(lastIncident.incidentNumber.replace(/\D/g, ""))
       : 0;
-    const incidentNumber = `INC${String(lastNumber + 1).padStart(6, '0')}`;
+    const incidentNumber = `INC${String(lastNumber + 1).padStart(6, "0")}`;
 
     const incident = await prisma.securityIncident.create({
       data: {
@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
         organizationId: session.user.organizationId,
         incidentNumber,
         incidentTime: new Date(validatedData.incidentTime),
-        status: 'REPORTED',
+        status: "REPORTED",
       },
       include: {
         reportedBy: {
@@ -183,8 +183,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'CREATE',
-        entity: 'SECURITY_INCIDENT',
+        action: "CREATE",
+        entity: "SECURITY_INCIDENT",
         entityId: incident.id,
         description: `Reported ${validatedData.incidentType} incident: ${validatedData.title}`,
         metadata: {
@@ -199,14 +199,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
-    console.error('Error creating security incident:', error);
+    console.error("Error creating security incident:", error);
     return NextResponse.json(
-      { error: 'Failed to create security incident' },
-      { status: 500 }
+      { error: "Failed to create security incident" },
+      { status: 500 },
     );
   }
 }

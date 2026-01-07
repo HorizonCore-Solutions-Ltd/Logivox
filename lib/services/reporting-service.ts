@@ -5,7 +5,7 @@
  * custom reports, scheduled reports, and executive analytics
  */
 
-import { PrismaClient, Prisma } from '@prisma/client';
+import { PrismaClient, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -16,21 +16,21 @@ export interface ReportRequest {
   filters?: Record<string, any>;
   groupBy?: string[];
   sortBy?: string;
-  format?: 'JSON' | 'CSV' | 'PDF' | 'EXCEL';
+  format?: "JSON" | "CSV" | "PDF" | "EXCEL";
 }
 
 export type ReportType =
-  | 'INVENTORY_SUMMARY'
-  | 'SALES_SUMMARY'
-  | 'FULFILLMENT_SUMMARY'
-  | 'LABOR_PRODUCTIVITY'
-  | 'CARRIER_PERFORMANCE'
-  | 'CUSTOMER_ANALYTICS'
-  | 'WAREHOUSE_UTILIZATION'
-  | 'FINANCIAL_SUMMARY'
-  | 'KPI_DASHBOARD'
-  | 'EXECUTIVE_SUMMARY'
-  | 'CUSTOM';
+  | "INVENTORY_SUMMARY"
+  | "SALES_SUMMARY"
+  | "FULFILLMENT_SUMMARY"
+  | "LABOR_PRODUCTIVITY"
+  | "CARRIER_PERFORMANCE"
+  | "CUSTOMER_ANALYTICS"
+  | "WAREHOUSE_UTILIZATION"
+  | "FINANCIAL_SUMMARY"
+  | "KPI_DASHBOARD"
+  | "EXECUTIVE_SUMMARY"
+  | "CUSTOM";
 
 export interface KPIDashboard {
   period: { startDate: Date; endDate: Date };
@@ -89,15 +89,15 @@ export interface ExecutiveSummary {
   };
   trends: Array<{
     metric: string;
-    trend: 'UP' | 'DOWN' | 'STABLE';
+    trend: "UP" | "DOWN" | "STABLE";
     change: number;
     analysis: string;
   }>;
   performanceByCategory: {
-    operations: { score: number; status: 'GOOD' | 'WARNING' | 'CRITICAL' };
-    inventory: { score: number; status: 'GOOD' | 'WARNING' | 'CRITICAL' };
-    financial: { score: number; status: 'GOOD' | 'WARNING' | 'CRITICAL' };
-    customer: { score: number; status: 'GOOD' | 'WARNING' | 'CRITICAL' };
+    operations: { score: number; status: "GOOD" | "WARNING" | "CRITICAL" };
+    inventory: { score: number; status: "GOOD" | "WARNING" | "CRITICAL" };
+    financial: { score: number; status: "GOOD" | "WARNING" | "CRITICAL" };
+    customer: { score: number; status: "GOOD" | "WARNING" | "CRITICAL" };
   };
   recommendations: string[];
 }
@@ -109,11 +109,11 @@ export interface CustomReport {
   columns: Array<{
     key: string;
     label: string;
-    type: 'string' | 'number' | 'date' | 'currency' | 'percentage';
+    type: "string" | "number" | "date" | "currency" | "percentage";
   }>;
   summary?: Record<string, number>;
   charts?: Array<{
-    type: 'line' | 'bar' | 'pie' | 'area';
+    type: "line" | "bar" | "pie" | "area";
     data: any[];
     config: Record<string, any>;
   }>;
@@ -129,11 +129,11 @@ export class ReportingService {
   async generateKPIDashboard(
     organizationId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<KPIDashboard> {
     // Calculate previous period for growth comparison
     const periodDays = Math.ceil(
-      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
     );
     const prevStartDate = new Date(startDate);
     prevStartDate.setDate(prevStartDate.getDate() - periodDays);
@@ -144,7 +144,7 @@ export class ReportingService {
       where: {
         organizationId,
         createdAt: { gte: startDate, lte: endDate },
-        status: { in: ['SHIPPED', 'DELIVERED'] },
+        status: { in: ["SHIPPED", "DELIVERED"] },
       },
     });
 
@@ -152,7 +152,7 @@ export class ReportingService {
       where: {
         organizationId,
         createdAt: { gte: prevStartDate, lte: prevEndDate },
-        status: { in: ['SHIPPED', 'DELIVERED'] },
+        status: { in: ["SHIPPED", "DELIVERED"] },
       },
     });
 
@@ -176,7 +176,7 @@ export class ReportingService {
       where: {
         organizationId,
         createdAt: { gte: startDate, lte: endDate },
-        status: { in: ['SHIPPED', 'DELIVERED'] },
+        status: { in: ["SHIPPED", "DELIVERED"] },
       },
       select: {
         totalAmount: true,
@@ -185,14 +185,14 @@ export class ReportingService {
 
     const totalRevenue = salesData.reduce(
       (sum, order) => sum + (order.totalAmount?.toNumber() || 0),
-      0
+      0,
     );
 
     const prevSalesData = await prisma.salesOrder.findMany({
       where: {
         organizationId,
         createdAt: { gte: prevStartDate, lte: prevEndDate },
-        status: { in: ['SHIPPED', 'DELIVERED'] },
+        status: { in: ["SHIPPED", "DELIVERED"] },
       },
       select: {
         totalAmount: true,
@@ -201,10 +201,11 @@ export class ReportingService {
 
     const prevRevenue = prevSalesData.reduce(
       (sum, order) => sum + (order.totalAmount?.toNumber() || 0),
-      0
+      0,
     );
 
-    const revenueGrowth = prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue) * 100 : 0;
+    const revenueGrowth =
+      prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue) * 100 : 0;
 
     const avgOrderValue = orders > 0 ? totalRevenue / orders : 0;
 
@@ -246,7 +247,7 @@ export class ReportingService {
 
     const totalHoursWorked = timeEntries.reduce(
       (sum, entry) => sum + (entry.totalHours || 0),
-      0
+      0,
     );
 
     const totalWorkers = new Set(timeEntries.map((e) => e.userId)).size;
@@ -281,7 +282,8 @@ export class ReportingService {
         totalOrders: orders,
         activeCustomers,
         customerGrowth,
-        avgOrdersPerCustomer: activeCustomers > 0 ? orders / activeCustomers : 0,
+        avgOrdersPerCustomer:
+          activeCustomers > 0 ? orders / activeCustomers : 0,
         customerSatisfaction: 4.5,
         repeatCustomerRate: 65,
       },
@@ -301,32 +303,38 @@ export class ReportingService {
   async generateExecutiveSummary(
     organizationId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<ExecutiveSummary> {
-    const kpiDashboard = await this.generateKPIDashboard(organizationId, startDate, endDate);
+    const kpiDashboard = await this.generateKPIDashboard(
+      organizationId,
+      startDate,
+      endDate,
+    );
 
     // Determine highlights and concerns
     const highlights: string[] = [];
     const concerns: string[] = [];
 
     if (kpiDashboard.operational.fulfillmentAccuracy >= 98) {
-      highlights.push('Excellent fulfillment accuracy at 98.5%');
+      highlights.push("Excellent fulfillment accuracy at 98.5%");
     }
 
     if (kpiDashboard.financial.revenueGrowth > 10) {
-      highlights.push(`Strong revenue growth of ${kpiDashboard.financial.revenueGrowth.toFixed(1)}%`);
+      highlights.push(
+        `Strong revenue growth of ${kpiDashboard.financial.revenueGrowth.toFixed(1)}%`,
+      );
     }
 
     if (kpiDashboard.customer.customerSatisfaction >= 4.5) {
-      highlights.push('Outstanding customer satisfaction rating');
+      highlights.push("Outstanding customer satisfaction rating");
     }
 
     if (kpiDashboard.inventory.stockoutRate > 5) {
-      concerns.push('High stockout rate affecting sales');
+      concerns.push("High stockout rate affecting sales");
     }
 
     if (kpiDashboard.operational.onTimeDelivery < 90) {
-      concerns.push('On-time delivery below target');
+      concerns.push("On-time delivery below target");
     }
 
     // Performance scores
@@ -336,10 +344,11 @@ export class ReportingService {
       2;
     const inventoryScore = 100 - kpiDashboard.inventory.stockoutRate * 10;
     const financialScore = kpiDashboard.financial.grossMargin * 2;
-    const customerScore = (kpiDashboard.customer.customerSatisfaction / 5) * 100;
+    const customerScore =
+      (kpiDashboard.customer.customerSatisfaction / 5) * 100;
 
     return {
-      organization: 'Logivox WMS',
+      organization: "Logivox WMS",
       period: { startDate, endDate },
       highlights,
       concerns,
@@ -352,40 +361,60 @@ export class ReportingService {
       },
       trends: [
         {
-          metric: 'Revenue',
-          trend: kpiDashboard.financial.revenueGrowth > 0 ? 'UP' : 'DOWN',
+          metric: "Revenue",
+          trend: kpiDashboard.financial.revenueGrowth > 0 ? "UP" : "DOWN",
           change: kpiDashboard.financial.revenueGrowth,
-          analysis: 'Revenue growth driven by increased order volume',
+          analysis: "Revenue growth driven by increased order volume",
         },
         {
-          metric: 'Customer Base',
-          trend: kpiDashboard.customer.customerGrowth > 0 ? 'UP' : 'DOWN',
+          metric: "Customer Base",
+          trend: kpiDashboard.customer.customerGrowth > 0 ? "UP" : "DOWN",
           change: kpiDashboard.customer.customerGrowth,
-          analysis: 'Customer acquisition pace is healthy',
+          analysis: "Customer acquisition pace is healthy",
         },
       ],
       performanceByCategory: {
         operations: {
           score: operationsScore,
-          status: operationsScore >= 95 ? 'GOOD' : operationsScore >= 85 ? 'WARNING' : 'CRITICAL',
+          status:
+            operationsScore >= 95
+              ? "GOOD"
+              : operationsScore >= 85
+                ? "WARNING"
+                : "CRITICAL",
         },
         inventory: {
           score: inventoryScore,
-          status: inventoryScore >= 95 ? 'GOOD' : inventoryScore >= 85 ? 'WARNING' : 'CRITICAL',
+          status:
+            inventoryScore >= 95
+              ? "GOOD"
+              : inventoryScore >= 85
+                ? "WARNING"
+                : "CRITICAL",
         },
         financial: {
           score: financialScore,
-          status: financialScore >= 50 ? 'GOOD' : financialScore >= 40 ? 'WARNING' : 'CRITICAL',
+          status:
+            financialScore >= 50
+              ? "GOOD"
+              : financialScore >= 40
+                ? "WARNING"
+                : "CRITICAL",
         },
         customer: {
           score: customerScore,
-          status: customerScore >= 80 ? 'GOOD' : customerScore >= 70 ? 'WARNING' : 'CRITICAL',
+          status:
+            customerScore >= 80
+              ? "GOOD"
+              : customerScore >= 70
+                ? "WARNING"
+                : "CRITICAL",
         },
       },
       recommendations: [
-        'Increase safety stock levels to reduce stockout rate',
-        'Implement carrier diversification to improve on-time delivery',
-        'Focus on high-margin product lines to boost profitability',
+        "Increase safety stock levels to reduce stockout rate",
+        "Implement carrier diversification to improve on-time delivery",
+        "Focus on high-margin product lines to boost profitability",
       ],
     };
   }
@@ -396,7 +425,7 @@ export class ReportingService {
   async generateInventorySummary(
     organizationId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<CustomReport> {
     const products = await prisma.product.findMany({
       where: { organizationId },
@@ -408,27 +437,27 @@ export class ReportingService {
     const data = products.map((product) => ({
       sku: product.sku,
       name: product.name,
-      category: product.category?.name || 'Uncategorized',
+      category: product.category?.name || "Uncategorized",
       onHand: product.onHandQuantity,
       available: product.availableQuantity,
       reserved: product.reservedQuantity,
       value: product.totalValue?.toNumber() || 0,
       turnoverRate: 4.5, // Placeholder
-      status: product.onHandQuantity <= product.reorderPoint ? 'LOW' : 'NORMAL',
+      status: product.onHandQuantity <= product.reorderPoint ? "LOW" : "NORMAL",
     }));
 
     return {
-      title: 'Inventory Summary Report',
+      title: "Inventory Summary Report",
       description: `Comprehensive inventory overview for period ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
       data,
       columns: [
-        { key: 'sku', label: 'SKU', type: 'string' },
-        { key: 'name', label: 'Product Name', type: 'string' },
-        { key: 'category', label: 'Category', type: 'string' },
-        { key: 'onHand', label: 'On Hand', type: 'number' },
-        { key: 'available', label: 'Available', type: 'number' },
-        { key: 'value', label: 'Total Value', type: 'currency' },
-        { key: 'status', label: 'Status', type: 'string' },
+        { key: "sku", label: "SKU", type: "string" },
+        { key: "name", label: "Product Name", type: "string" },
+        { key: "category", label: "Category", type: "string" },
+        { key: "onHand", label: "On Hand", type: "number" },
+        { key: "available", label: "Available", type: "number" },
+        { key: "value", label: "Total Value", type: "currency" },
+        { key: "status", label: "Status", type: "string" },
       ],
       summary: {
         totalSKUs: products.length,
@@ -444,7 +473,7 @@ export class ReportingService {
   async generateSalesSummary(
     organizationId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<CustomReport> {
     const orders = await prisma.salesOrder.findMany({
       where: {
@@ -466,27 +495,31 @@ export class ReportingService {
       status: order.status,
       fulfillmentTime: order.shippedDate
         ? Math.ceil(
-            (order.shippedDate.getTime() - order.createdAt.getTime()) / (1000 * 60 * 60)
+            (order.shippedDate.getTime() - order.createdAt.getTime()) /
+              (1000 * 60 * 60),
           )
         : null,
     }));
 
     return {
-      title: 'Sales Summary Report',
+      title: "Sales Summary Report",
       description: `Sales performance for period ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
       data,
       columns: [
-        { key: 'orderNumber', label: 'Order #', type: 'string' },
-        { key: 'date', label: 'Date', type: 'date' },
-        { key: 'customer', label: 'Customer', type: 'string' },
-        { key: 'items', label: 'Items', type: 'number' },
-        { key: 'totalAmount', label: 'Total', type: 'currency' },
-        { key: 'status', label: 'Status', type: 'string' },
+        { key: "orderNumber", label: "Order #", type: "string" },
+        { key: "date", label: "Date", type: "date" },
+        { key: "customer", label: "Customer", type: "string" },
+        { key: "items", label: "Items", type: "number" },
+        { key: "totalAmount", label: "Total", type: "currency" },
+        { key: "status", label: "Status", type: "string" },
       ],
       summary: {
         totalOrders: orders.length,
         totalRevenue: data.reduce((sum, o) => sum + o.totalAmount, 0),
-        avgOrderValue: orders.length > 0 ? data.reduce((sum, o) => sum + o.totalAmount, 0) / orders.length : 0,
+        avgOrderValue:
+          orders.length > 0
+            ? data.reduce((sum, o) => sum + o.totalAmount, 0) / orders.length
+            : 0,
       },
     };
   }
@@ -497,7 +530,7 @@ export class ReportingService {
   async generateLaborProductivityReport(
     organizationId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<CustomReport> {
     const timeEntries = await prisma.timeEntry.findMany({
       where: {
@@ -513,7 +546,7 @@ export class ReportingService {
       where: {
         organizationId,
         assignedAt: { gte: startDate, lte: endDate },
-        status: 'COMPLETED',
+        status: "COMPLETED",
       },
       include: {
         user: true,
@@ -553,15 +586,15 @@ export class ReportingService {
     }));
 
     return {
-      title: 'Labor Productivity Report',
+      title: "Labor Productivity Report",
       description: `Worker performance analysis for period ${startDate.toLocaleDateString()} to ${endDate.toLocaleDateString()}`,
       data,
       columns: [
-        { key: 'worker', label: 'Worker', type: 'string' },
-        { key: 'hoursWorked', label: 'Hours', type: 'number' },
-        { key: 'tasksCompleted', label: 'Tasks', type: 'number' },
-        { key: 'unitsProcessed', label: 'Units', type: 'number' },
-        { key: 'productivity', label: 'Units/Hour', type: 'number' },
+        { key: "worker", label: "Worker", type: "string" },
+        { key: "hoursWorked", label: "Hours", type: "number" },
+        { key: "tasksCompleted", label: "Tasks", type: "number" },
+        { key: "unitsProcessed", label: "Units", type: "number" },
+        { key: "productivity", label: "Units/Hour", type: "number" },
       ],
       summary: {
         totalHours: data.reduce((sum, w) => sum + w.hoursWorked, 0),
@@ -576,58 +609,58 @@ export class ReportingService {
    */
   async generateReport(
     organizationId: string,
-    request: ReportRequest
+    request: ReportRequest,
   ): Promise<CustomReport> {
     switch (request.reportType) {
-      case 'INVENTORY_SUMMARY':
+      case "INVENTORY_SUMMARY":
         return await this.generateInventorySummary(
           organizationId,
           request.startDate,
-          request.endDate
+          request.endDate,
         );
 
-      case 'SALES_SUMMARY':
+      case "SALES_SUMMARY":
         return await this.generateSalesSummary(
           organizationId,
           request.startDate,
-          request.endDate
+          request.endDate,
         );
 
-      case 'LABOR_PRODUCTIVITY':
+      case "LABOR_PRODUCTIVITY":
         return await this.generateLaborProductivityReport(
           organizationId,
           request.startDate,
-          request.endDate
+          request.endDate,
         );
 
-      case 'KPI_DASHBOARD':
+      case "KPI_DASHBOARD":
         const kpis = await this.generateKPIDashboard(
           organizationId,
           request.startDate,
-          request.endDate
+          request.endDate,
         );
         return {
-          title: 'KPI Dashboard',
-          description: 'Key performance indicators overview',
+          title: "KPI Dashboard",
+          description: "Key performance indicators overview",
           data: [kpis],
           columns: [],
         };
 
-      case 'EXECUTIVE_SUMMARY':
+      case "EXECUTIVE_SUMMARY":
         const summary = await this.generateExecutiveSummary(
           organizationId,
           request.startDate,
-          request.endDate
+          request.endDate,
         );
         return {
-          title: 'Executive Summary',
-          description: 'High-level performance summary',
+          title: "Executive Summary",
+          description: "High-level performance summary",
           data: [summary],
           columns: [],
         };
 
       default:
-        throw new Error('Unsupported report type');
+        throw new Error("Unsupported report type");
     }
   }
 
@@ -636,7 +669,7 @@ export class ReportingService {
    */
   async exportReport(
     report: CustomReport,
-    format: 'JSON' | 'CSV' | 'PDF' | 'EXCEL'
+    format: "JSON" | "CSV" | "PDF" | "EXCEL",
   ): Promise<string> {
     // Would implement actual export logic
     // For now, return URL to exported file
@@ -653,14 +686,14 @@ export class ReportingService {
     userId: string,
     schedule: {
       reportType: ReportType;
-      frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY';
+      frequency: "DAILY" | "WEEKLY" | "MONTHLY";
       dayOfWeek?: number;
       dayOfMonth?: number;
       time: string;
       recipients: string[];
-      format: 'JSON' | 'CSV' | 'PDF' | 'EXCEL';
+      format: "JSON" | "CSV" | "PDF" | "EXCEL";
       filters?: Record<string, any>;
-    }
+    },
   ): Promise<any> {
     return await prisma.scheduledReport.create({
       data: {
@@ -684,11 +717,11 @@ export class ReportingService {
    */
   async getReportHistory(
     organizationId: string,
-    limit: number = 50
+    limit: number = 50,
   ): Promise<any[]> {
     return await prisma.reportHistory.findMany({
       where: { organizationId },
-      orderBy: { generatedAt: 'desc' },
+      orderBy: { generatedAt: "desc" },
       take: limit,
       include: {
         generatedBy: true,
@@ -703,13 +736,13 @@ export class ReportingService {
     organizationId: string,
     userId: string,
     report: CustomReport,
-    format: string
+    format: string,
   ): Promise<any> {
     return await prisma.reportHistory.create({
       data: {
         organizationId,
         reportTitle: report.title,
-        reportType: 'CUSTOM',
+        reportType: "CUSTOM",
         generatedAt: new Date(),
         generatedById: userId,
         format,

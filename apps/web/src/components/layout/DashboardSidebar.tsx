@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useSession } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Building2,
   LayoutDashboard,
@@ -31,49 +31,49 @@ import {
   Key,
   Book,
   FileBarChart,
-  Smartphone
-} from "lucide-react"
-import { useTheme } from "next-themes"
-import { OrganizationSwitcher } from "@/components/organizations/organization-switcher"
+  Smartphone,
+} from "lucide-react";
+import { useTheme } from "next-themes";
+import { OrganizationSwitcher } from "@/components/organizations/organization-switcher";
 
 interface DashboardSidebarProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function DashboardSidebar({ children }: DashboardSidebarProps) {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-  const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false)
-  const [isInventoryExpanded, setIsInventoryExpanded] = React.useState(true)
-  const [currentOrgId, setCurrentOrgId] = React.useState<string>("")
-  const pathname = usePathname()
-  const { theme, setTheme } = useTheme()
-  const { data: session } = useSession()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
+  const [isInventoryExpanded, setIsInventoryExpanded] = React.useState(true);
+  const [currentOrgId, setCurrentOrgId] = React.useState<string>("");
+  const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const { data: session } = useSession();
 
   // Initialize current org ID from session
   React.useEffect(() => {
     if (session?.user?.organizations?.[0]?.id) {
-      setCurrentOrgId(session.user.organizations[0].id)
+      setCurrentOrgId(session.user.organizations[0].id);
     }
-  }, [session])
+  }, [session]);
 
   const handleOrgSwitch = (orgId: string) => {
-    setCurrentOrgId(orgId)
+    setCurrentOrgId(orgId);
     // TODO: Update session context with new org ID
     // For now, we'll just update local state
-    console.log("Switched to organization:", orgId)
-  }
+    console.log("Switched to organization:", orgId);
+  };
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { 
-      name: "Inventory", 
-      href: "/dashboard/inventory", 
+    {
+      name: "Inventory",
+      href: "/dashboard/inventory",
       icon: Package,
       subItems: [
         { name: "All Items", href: "/dashboard/inventory", icon: Package },
         { name: "Warehouses", href: "/dashboard/warehouses", icon: Warehouse },
         { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
-      ]
+      ],
     },
     { name: "Customers", href: "/dashboard/customers", icon: Users },
     { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
@@ -85,12 +85,13 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     { name: "Activity Logs", href: "/dashboard/activity", icon: Activity },
     { name: "PWA Settings", href: "/dashboard/pwa-settings", icon: Smartphone },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  ]
+  ];
 
-  const isActive = (href: string) => pathname === href
-  const isInventoryActive = pathname.startsWith("/dashboard/inventory") || 
-                           pathname.startsWith("/dashboard/warehouses") || 
-                           pathname.startsWith("/dashboard/categories")
+  const isActive = (href: string) => pathname === href;
+  const isInventoryActive =
+    pathname.startsWith("/dashboard/inventory") ||
+    pathname.startsWith("/dashboard/warehouses") ||
+    pathname.startsWith("/dashboard/categories");
 
   return (
     <div className="min-h-screen flex">
@@ -109,9 +110,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           {navigation.map((item) => {
-            const Icon = item.icon
-            const hasSubItems = 'subItems' in item && item.subItems
-            
+            const Icon = item.icon;
+            const hasSubItems = "subItems" in item && item.subItems;
+
             if (hasSubItems) {
               return (
                 <div key={item.name}>
@@ -127,12 +128,14 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                       <Icon className="mr-3 h-5 w-5" />
                       {item.name}
                     </div>
-                    <ChevronRight className={`h-4 w-4 transition-transform ${isInventoryExpanded ? 'rotate-90' : ''}`} />
+                    <ChevronRight
+                      className={`h-4 w-4 transition-transform ${isInventoryExpanded ? "rotate-90" : ""}`}
+                    />
                   </button>
                   {isInventoryExpanded && (
                     <div className="ml-4 mt-1 space-y-1">
                       {item.subItems.map((subItem) => {
-                        const SubIcon = subItem.icon
+                        const SubIcon = subItem.icon;
                         return (
                           <Link
                             key={subItem.name}
@@ -146,14 +149,14 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                             <SubIcon className="mr-3 h-4 w-4" />
                             {subItem.name}
                           </Link>
-                        )
+                        );
                       })}
                     </div>
                   )}
                 </div>
-              )
+              );
             }
-            
+
             return (
               <Link
                 key={item.name}
@@ -167,7 +170,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                 <Icon className="mr-3 h-5 w-5" />
                 {item.name}
               </Link>
-            )
+            );
           })}
         </nav>
 
@@ -180,7 +183,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">John Doe</p>
-                <p className="text-xs text-muted-foreground truncate">john@acme.com</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  john@acme.com
+                </p>
               </div>
             </div>
             <Button
@@ -189,7 +194,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
               className="h-8 w-8 p-0"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              {theme === "dark" ? (
+                <Sun className="h-4 w-4" />
+              ) : (
+                <Moon className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
@@ -206,7 +215,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
             className="lg:hidden"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {isMobileMenuOpen ? (
+              <X className="h-5 w-5" />
+            ) : (
+              <Menu className="h-5 w-5" />
+            )}
           </Button>
 
           {/* Search Bar */}
@@ -258,7 +271,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                 <div className="absolute right-0 mt-2 w-56 bg-card border rounded-lg shadow-lg py-2">
                   <div className="px-4 py-2 border-b">
                     <p className="text-sm font-medium">John Doe</p>
-                    <p className="text-xs text-muted-foreground">john@acme.com</p>
+                    <p className="text-xs text-muted-foreground">
+                      john@acme.com
+                    </p>
                   </div>
                   <Link
                     href="/dashboard/profile"
@@ -310,14 +325,16 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
               {/* Navigation */}
               <nav className="px-4 py-6 space-y-1">
                 {navigation.map((item) => {
-                  const Icon = item.icon
-                  const hasSubItems = 'subItems' in item && item.subItems
-                  
+                  const Icon = item.icon;
+                  const hasSubItems = "subItems" in item && item.subItems;
+
                   if (hasSubItems) {
                     return (
                       <div key={item.name}>
                         <button
-                          onClick={() => setIsInventoryExpanded(!isInventoryExpanded)}
+                          onClick={() =>
+                            setIsInventoryExpanded(!isInventoryExpanded)
+                          }
                           className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                             isInventoryActive
                               ? "bg-primary/10 text-primary"
@@ -328,12 +345,14 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                             <Icon className="mr-3 h-5 w-5" />
                             {item.name}
                           </div>
-                          <ChevronRight className={`h-4 w-4 transition-transform ${isInventoryExpanded ? 'rotate-90' : ''}`} />
+                          <ChevronRight
+                            className={`h-4 w-4 transition-transform ${isInventoryExpanded ? "rotate-90" : ""}`}
+                          />
                         </button>
                         {isInventoryExpanded && (
                           <div className="ml-4 mt-1 space-y-1">
                             {item.subItems.map((subItem) => {
-                              const SubIcon = subItem.icon
+                              const SubIcon = subItem.icon;
                               return (
                                 <Link
                                   key={subItem.name}
@@ -348,14 +367,14 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                                   <SubIcon className="mr-3 h-4 w-4" />
                                   {subItem.name}
                                 </Link>
-                              )
+                              );
                             })}
                           </div>
                         )}
                       </div>
-                    )
+                    );
                   }
-                  
+
                   return (
                     <Link
                       key={item.name}
@@ -370,7 +389,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                       <Icon className="mr-3 h-5 w-5" />
                       {item.name}
                     </Link>
-                  )
+                  );
                 })}
               </nav>
             </aside>
@@ -378,10 +397,8 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         )}
 
         {/* Page Content */}
-        <main className="flex-1">
-          {children}
-        </main>
+        <main className="flex-1">{children}</main>
       </div>
     </div>
-  )
+  );
 }

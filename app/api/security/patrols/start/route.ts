@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const StartPatrolSchema = z.object({
   routeId: z.string(),
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const json = await req.json();
@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     // Get route and checkpoints
@@ -40,7 +43,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!route) {
-      return NextResponse.json({ error: 'Patrol route not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Patrol route not found" },
+        { status: 404 },
+      );
     }
 
     // Check if guard already has an active patrol
@@ -48,14 +54,14 @@ export async function POST(req: NextRequest) {
       where: {
         organizationId,
         guardId: body.guardId,
-        status: 'IN_PROGRESS',
+        status: "IN_PROGRESS",
       },
     });
 
     if (activePatrol) {
       return NextResponse.json(
-        { error: 'Guard already has an active patrol' },
-        { status: 400 }
+        { error: "Guard already has an active patrol" },
+        { status: 400 },
       );
     }
 
@@ -66,7 +72,7 @@ export async function POST(req: NextRequest) {
         routeId: body.routeId,
         guardId: body.guardId,
         startTime: new Date(),
-        status: 'IN_PROGRESS',
+        status: "IN_PROGRESS",
         totalCheckpoints: route.checkpoints.length,
         scannedCheckpoints: 0,
         missedCheckpoints: 0,
@@ -77,7 +83,7 @@ export async function POST(req: NextRequest) {
           include: {
             checkpoints: {
               where: { isActive: true },
-              orderBy: { checkpointNumber: 'asc' },
+              orderBy: { checkpointNumber: "asc" },
             },
           },
         },
@@ -86,10 +92,16 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(execution);
   } catch (error: any) {
-    console.error('Error starting patrol:', error);
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 });
+    console.error("Error starting patrol:", error);
+    if (error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

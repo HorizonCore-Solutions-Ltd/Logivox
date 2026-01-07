@@ -2,7 +2,7 @@
 
 **Status**: ✅ Production Ready  
 **Code**: 12,339 lines  
-**Migration**: Applied ✅  
+**Migration**: Applied ✅
 
 ---
 
@@ -56,11 +56,13 @@ Environment:   .env.returns.example
 ## Environment Setup
 
 1. Copy template:
+
 ```bash
 cp .env.returns.example .env
 ```
 
 2. Add Stripe keys:
+
 ```env
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_PUBLISHABLE_KEY=pk_live_...
@@ -68,6 +70,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 3. Set app URL:
+
 ```env
 NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
@@ -80,7 +83,7 @@ Each route follows this pattern:
 
 ```typescript
 // app/api/returns/[feature]/route.ts
-import { featureService } from '@/lib/services/returns/[feature]-service';
+import { featureService } from "@/lib/services/returns/[feature]-service";
 
 export async function POST(req: Request) {
   try {
@@ -122,7 +125,7 @@ npx prisma studio
 All 10 models migrated and ready:
 
 1. `InstantRefund` - Stripe refunds
-2. `QRReturn` - QR-based returns  
+2. `QRReturn` - QR-based returns
 3. `AggregatedReturn` - Multi-RMA consolidation
 4. `SerialTracking` - Serial validation
 5. `VendorChargeback` - Auto chargebacks
@@ -173,4 +176,4 @@ All 10 models migrated and ready:
 
 **Status**: 🚀 **READY FOR DEPLOYMENT**
 
-*See RETURNS_DEPLOYMENT_READY.md for complete details*
+_See RETURNS_DEPLOYMENT_READY.md for complete details_

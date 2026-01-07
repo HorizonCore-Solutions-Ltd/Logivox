@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   LineChart,
   Line,
@@ -25,7 +31,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts"
+} from "recharts";
 import {
   TrendingUp,
   Package,
@@ -35,84 +41,86 @@ import {
   Download,
   Calendar,
   Activity,
-} from "lucide-react"
-import { format } from "date-fns"
+} from "lucide-react";
+import { format } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { exportToCSV, exportToPDF, exportToExcel } from "@/lib/export-utils"
+} from "@/components/ui/dropdown-menu";
+import { exportToCSV, exportToPDF, exportToExcel } from "@/lib/export-utils";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"]
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
 interface AnalyticsData {
   overview: {
-    totalInventoryItems: number
-    totalInventoryUnits: number
-    lowStockItems: number
-    totalBookings: number
-    totalRevenue: number
-  }
+    totalInventoryItems: number;
+    totalInventoryUnits: number;
+    lowStockItems: number;
+    totalBookings: number;
+    totalRevenue: number;
+  };
   charts: {
-    dailyRevenue: Array<{ date: string; revenue: number }>
-    inventoryByCategory: Array<{ name: string; value: number }>
-    bookingsByStatus: Array<{ status: string; count: number }>
-  }
+    dailyRevenue: Array<{ date: string; revenue: number }>;
+    inventoryByCategory: Array<{ name: string; value: number }>;
+    bookingsByStatus: Array<{ status: string; count: number }>;
+  };
   topCustomers: Array<{
-    id: string
-    name: string
-    email: string
-    totalRevenue: number
-    bookingsCount: number
-  }>
+    id: string;
+    name: string;
+    email: string;
+    totalRevenue: number;
+    bookingsCount: number;
+  }>;
   recentActivity: Array<{
-    id: string
-    action: string
-    entityType: string
-    userName: string
-    createdAt: string
-  }>
+    id: string;
+    action: string;
+    entityType: string;
+    userName: string;
+    createdAt: string;
+  }>;
 }
 
 export default function AnalyticsPage() {
-  const [dateRange, setDateRange] = useState("30")
+  const [dateRange, setDateRange] = useState("30");
 
   const { data, isLoading } = useQuery<AnalyticsData>({
     queryKey: ["analytics", dateRange],
     queryFn: async () => {
-      const res = await fetch(`/api/analytics?days=${dateRange}`)
-      if (!res.ok) throw new Error("Failed to fetch analytics")
-      return res.json()
+      const res = await fetch(`/api/analytics?days=${dateRange}`);
+      if (!res.ok) throw new Error("Failed to fetch analytics");
+      return res.json();
     },
-  })
+  });
 
   const handleExport = (format: string) => {
-    if (!data) return
+    if (!data) return;
 
     switch (format) {
       case "csv":
-        exportToCSV(data, dateRange)
-        break
+        exportToCSV(data, dateRange);
+        break;
       case "pdf":
-        exportToPDF(data, dateRange)
-        break
+        exportToPDF(data, dateRange);
+        break;
       case "excel":
-        exportToExcel(data, dateRange)
-        break
+        exportToExcel(data, dateRange);
+        break;
     }
-  }
+  };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-lg text-muted-foreground">Loading analytics...</div>
+        <div className="text-lg text-muted-foreground">
+          Loading analytics...
+        </div>
       </div>
-    )
+    );
   }
 
-  if (!data) return null
+  if (!data) return null;
 
   return (
     <div className="space-y-6">
@@ -166,7 +174,9 @@ export default function AnalyticsPage() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.overview.totalInventoryItems}</div>
+            <div className="text-2xl font-bold">
+              {data.overview.totalInventoryItems}
+            </div>
             <p className="text-xs text-muted-foreground">
               {data.overview.totalInventoryUnits} total units
             </p>
@@ -175,24 +185,30 @@ export default function AnalyticsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Low Stock Items
+            </CardTitle>
             <AlertTriangle className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.overview.lowStockItems}</div>
-            <p className="text-xs text-muted-foreground">
-              Require attention
-            </p>
+            <div className="text-2xl font-bold">
+              {data.overview.lowStockItems}
+            </div>
+            <p className="text-xs text-muted-foreground">Require attention</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Bookings
+            </CardTitle>
             <ShoppingCart className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data.overview.totalBookings}</div>
+            <div className="text-2xl font-bold">
+              {data.overview.totalBookings}
+            </div>
             <p className="text-xs text-muted-foreground">
               Last {dateRange} days
             </p>
@@ -216,19 +232,21 @@ export default function AnalyticsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg. Booking Value</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg. Booking Value
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
               $
               {data.overview.totalBookings > 0
-                ? (data.overview.totalRevenue / data.overview.totalBookings).toFixed(2)
+                ? (
+                    data.overview.totalRevenue / data.overview.totalBookings
+                  ).toFixed(2)
                 : "0.00"}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Per booking
-            </p>
+            <p className="text-xs text-muted-foreground">Per booking</p>
           </CardContent>
         </Card>
       </div>
@@ -239,7 +257,9 @@ export default function AnalyticsPage() {
         <Card className="col-span-2">
           <CardHeader>
             <CardTitle>Revenue Trend</CardTitle>
-            <CardDescription>Daily revenue from fulfilled bookings</CardDescription>
+            <CardDescription>
+              Daily revenue from fulfilled bookings
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -285,7 +305,10 @@ export default function AnalyticsPage() {
                   dataKey="value"
                 >
                   {data.charts.inventoryByCategory.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -326,18 +349,25 @@ export default function AnalyticsPage() {
           <CardContent>
             <div className="space-y-4">
               {data.topCustomers.map((customer, index) => (
-                <div key={customer.id} className="flex items-center justify-between">
+                <div
+                  key={customer.id}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold">
                       {index + 1}
                     </div>
                     <div>
                       <p className="font-medium">{customer.name}</p>
-                      <p className="text-xs text-muted-foreground">{customer.email}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {customer.email}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-bold">${customer.totalRevenue.toLocaleString()}</p>
+                    <p className="font-bold">
+                      ${customer.totalRevenue.toLocaleString()}
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {customer.bookingsCount} bookings
                     </p>
@@ -368,10 +398,15 @@ export default function AnalyticsPage() {
                     <p className="text-sm">
                       <span className="font-medium">{activity.userName}</span>{" "}
                       {activity.action.toLowerCase()}{" "}
-                      <span className="text-muted-foreground">{activity.entityType}</span>
+                      <span className="text-muted-foreground">
+                        {activity.entityType}
+                      </span>
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {format(new Date(activity.createdAt), "MMM dd, yyyy 'at' HH:mm")}
+                      {format(
+                        new Date(activity.createdAt),
+                        "MMM dd, yyyy 'at' HH:mm",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -386,5 +421,5 @@ export default function AnalyticsPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

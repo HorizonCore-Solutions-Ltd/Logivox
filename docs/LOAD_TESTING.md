@@ -1,4 +1,5 @@
 # 🔥 LOAD TESTING GUIDE
+
 ## LogiVox WMS - Performance & Load Testing
 
 ### Overview
@@ -11,21 +12,21 @@ This guide covers load testing strategies, tools, and benchmarks for ensuring Lo
 
 ### Response Time Targets
 
-| Metric | Target | Acceptable | Unacceptable |
-|--------|--------|------------|--------------|
-| **Page Load** | < 1s | < 2s | > 3s |
-| **API Response** | < 200ms | < 500ms | > 1s |
-| **Search Query** | < 300ms | < 600ms | > 1s |
-| **Database Query** | < 100ms | < 300ms | > 500ms |
+| Metric             | Target  | Acceptable | Unacceptable |
+| ------------------ | ------- | ---------- | ------------ |
+| **Page Load**      | < 1s    | < 2s       | > 3s         |
+| **API Response**   | < 200ms | < 500ms    | > 1s         |
+| **Search Query**   | < 300ms | < 600ms    | > 1s         |
+| **Database Query** | < 100ms | < 300ms    | > 500ms      |
 
 ### Throughput Targets
 
-| Metric | Target |
-|--------|--------|
-| **Concurrent Users** | 1000+ |
-| **API Requests/Second** | 500+ |
-| **Database Connections** | 100+ |
-| **WebSocket Connections** | 500+ |
+| Metric                    | Target |
+| ------------------------- | ------ |
+| **Concurrent Users**      | 1000+  |
+| **API Requests/Second**   | 500+   |
+| **Database Connections**  | 100+   |
+| **WebSocket Connections** | 500+   |
 
 ---
 
@@ -88,43 +89,44 @@ For GUI-based load testing:
 **k6 Script:**
 
 ```javascript
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: '5m', target: 100 }, // Ramp up
-    { duration: '30m', target: 100 }, // Stay at 100
-    { duration: '5m', target: 0 }, // Ramp down
+    { duration: "5m", target: 100 }, // Ramp up
+    { duration: "30m", target: 100 }, // Stay at 100
+    { duration: "5m", target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<500'], // 95% under 500ms
-    http_req_failed: ['rate<0.01'], // Error rate <1%
+    http_req_duration: ["p(95)<500"], // 95% under 500ms
+    http_req_failed: ["rate<0.01"], // Error rate <1%
   },
 };
 
 export default function () {
   // Read operations (60%)
   if (Math.random() < 0.6) {
-    const res = http.get('http://localhost:3000/api/inventory');
-    check(res, { 'status is 200': (r) => r.status === 200 });
+    const res = http.get("http://localhost:3000/api/inventory");
+    check(res, { "status is 200": (r) => r.status === 200 });
   } else {
     // Write operations (40%)
     const payload = JSON.stringify({
       sku: `ITEM-${Date.now()}`,
       quantity: 100,
     });
-    const res = http.post('http://localhost:3000/api/inventory', payload, {
-      headers: { 'Content-Type': 'application/json' },
+    const res = http.post("http://localhost:3000/api/inventory", payload, {
+      headers: { "Content-Type": "application/json" },
     });
-    check(res, { 'status is 201': (r) => r.status === 201 });
+    check(res, { "status is 201": (r) => r.status === 201 });
   }
-  
+
   sleep(1); // Think time
 }
 ```
 
 **Run:**
+
 ```bash
 k6 run scripts/load-tests/normal-load.js
 ```
@@ -142,33 +144,34 @@ k6 run scripts/load-tests/normal-load.js
 ```javascript
 export const options = {
   stages: [
-    { duration: '2m', target: 500 },
-    { duration: '15m', target: 500 },
-    { duration: '2m', target: 0 },
+    { duration: "2m", target: 500 },
+    { duration: "15m", target: 500 },
+    { duration: "2m", target: 0 },
   ],
   thresholds: {
-    http_req_duration: ['p(95)<1000'],
-    http_req_failed: ['rate<0.05'], // 5% error rate acceptable
+    http_req_duration: ["p(95)<1000"],
+    http_req_failed: ["rate<0.05"], // 5% error rate acceptable
   },
 };
 
 export default function () {
   const endpoints = [
-    '/api/inventory',
-    '/api/orders',
-    '/api/shipments',
-    '/api/products',
-    '/api/customers',
+    "/api/inventory",
+    "/api/orders",
+    "/api/shipments",
+    "/api/products",
+    "/api/customers",
   ];
-  
+
   const endpoint = endpoints[Math.floor(Math.random() * endpoints.length)];
   http.get(`http://localhost:3000${endpoint}`);
-  
+
   sleep(0.5);
 }
 ```
 
 **Run:**
+
 ```bash
 k6 run scripts/load-tests/peak-load.js
 ```
@@ -185,16 +188,16 @@ k6 run scripts/load-tests/peak-load.js
 ```javascript
 export const options = {
   stages: [
-    { duration: '5m', target: 500 },
-    { duration: '5m', target: 1000 },
-    { duration: '5m', target: 1500 },
-    { duration: '5m', target: 2000 },
-    { duration: '10m', target: 2000 },
+    { duration: "5m", target: 500 },
+    { duration: "5m", target: 1000 },
+    { duration: "5m", target: 1500 },
+    { duration: "5m", target: 2000 },
+    { duration: "10m", target: 2000 },
   ],
 };
 
 export default function () {
-  http.get('http://localhost:3000/api/inventory');
+  http.get("http://localhost:3000/api/inventory");
   sleep(Math.random() * 2);
 }
 ```
@@ -211,11 +214,11 @@ export default function () {
 ```javascript
 export const options = {
   stages: [
-    { duration: '1m', target: 100 },
-    { duration: '10s', target: 1000 }, // Spike
-    { duration: '3m', target: 1000 },
-    { duration: '10s', target: 100 },
-    { duration: '1m', target: 100 },
+    { duration: "1m", target: 100 },
+    { duration: "10s", target: 1000 }, // Spike
+    { duration: "3m", target: 1000 },
+    { duration: "10s", target: 100 },
+    { duration: "1m", target: 100 },
   ],
 };
 ```
@@ -232,9 +235,9 @@ export const options = {
 ```javascript
 export const options = {
   stages: [
-    { duration: '5m', target: 200 },
-    { duration: '4h', target: 200 },
-    { duration: '5m', target: 0 },
+    { duration: "5m", target: 200 },
+    { duration: "4h", target: 200 },
+    { duration: "5m", target: 0 },
   ],
 };
 ```
@@ -274,6 +277,7 @@ export const options = {
 **1. Prometheus + Grafana**
 
 Access metrics endpoint:
+
 ```
 http://localhost:3000/api/metrics
 ```
@@ -285,9 +289,9 @@ http://localhost:3000/api/metrics
 SELECT count(*) FROM pg_stat_activity;
 
 -- Slow queries
-SELECT query, mean_exec_time 
-FROM pg_stat_statements 
-ORDER BY mean_exec_time DESC 
+SELECT query, mean_exec_time
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
 LIMIT 10;
 
 -- Lock waits
@@ -311,6 +315,7 @@ grep ERROR logs/application.log | awk '{print $1}' | uniq -c
 ### 1. Database Optimization
 
 **Connection Pooling:**
+
 ```env
 DATABASE_POOL_MIN=10
 DATABASE_POOL_MAX=100
@@ -318,6 +323,7 @@ DATABASE_POOL_TIMEOUT=30000
 ```
 
 **Query Optimization:**
+
 ```sql
 -- Add indexes for frequently queried fields
 CREATE INDEX idx_inventory_sku ON inventory(sku);
@@ -330,8 +336,9 @@ EXPLAIN ANALYZE SELECT * FROM inventory WHERE sku = 'ITEM-001';
 ### 2. Caching
 
 **Redis Caching:**
+
 ```typescript
-import Redis from 'ioredis';
+import Redis from "ioredis";
 
 const redis = new Redis(process.env.REDIS_URL);
 
@@ -351,19 +358,20 @@ return data;
 ### 3. API Rate Limiting
 
 ```typescript
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 const limiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 100, // 100 requests per minute
 });
 
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 ```
 
 ### 4. Load Balancing
 
 **Nginx Configuration:**
+
 ```nginx
 upstream logivox {
     least_conn;
@@ -412,6 +420,7 @@ server {
 **Environment:** Staging
 
 ## Test Configuration
+
 - Scenario: Peak Load
 - Users: 500 concurrent
 - Duration: 15 minutes
@@ -420,26 +429,31 @@ server {
 ## Results
 
 ### Response Times
+
 - Average: 234ms ✅
 - 95th percentile: 456ms ✅
 - 99th percentile: 892ms ✅
 - Max: 1.2s ⚠️
 
 ### Throughput
+
 - Requests/second: 532 ✅
 - Total requests: 479,280
 - Success rate: 99.2% ✅
 
 ### System Resources
+
 - CPU: Peak 72% ✅
 - Memory: Peak 6.2GB ✅
 - Database connections: Peak 87/100 ✅
 
 ## Issues Found
+
 1. Occasional 1s+ response on /api/reports endpoint
 2. Memory usage trending upward (potential leak?)
 
 ## Recommendations
+
 1. Optimize /api/reports query
 2. Investigate memory usage pattern
 3. Add more caching for product catalog

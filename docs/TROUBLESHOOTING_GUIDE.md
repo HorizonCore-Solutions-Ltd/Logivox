@@ -101,11 +101,13 @@ top
 ### Issue 1: Cannot Log In
 
 **Symptoms:**
+
 - "Invalid credentials" error despite correct password
 - Login page redirects back without error
 - Login succeeds but immediately logs out
 
 **Possible Causes:**
+
 1. Incorrect username/password
 2. Account locked due to failed attempts
 3. Session configuration issues
@@ -177,6 +179,7 @@ docker compose restart app
 ### Issue 2: Two-Factor Authentication (2FA) Not Working
 
 **Symptoms:**
+
 - QR code won't scan
 - Verification code always invalid
 - "Invalid token" error
@@ -229,6 +232,7 @@ docker compose exec app npm run generate-backup-codes -- --email=user@example.co
 ### Issue 3: Session Expires Too Quickly
 
 **Symptoms:**
+
 - Users logged out after a few minutes
 - "Session expired" errors
 
@@ -260,6 +264,7 @@ docker compose restart app
 ### Issue 1: Database Connection Failed
 
 **Symptoms:**
+
 - "Cannot connect to database" error
 - Application won't start
 - Timeout errors
@@ -338,6 +343,7 @@ sudo ufw allow 5432/tcp
 ### Issue 2: Slow Database Queries
 
 **Symptoms:**
+
 - Pages loading slowly
 - API timeouts
 - High database CPU usage
@@ -415,10 +421,10 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '4'
+          cpus: "4"
           memory: 8G
         reservations:
-          cpus: '2'
+          cpus: "2"
           memory: 4G
 ```
 
@@ -443,6 +449,7 @@ docker compose restart db
 ### Issue 3: Database Out of Space
 
 **Symptoms:**
+
 - "disk full" errors
 - Cannot insert/update records
 - Application crashes
@@ -516,6 +523,7 @@ docker compose exec db psql -U flowstock -d flowstock_prod -c "DELETE FROM audit
 ### Issue 1: Slow Page Load Times
 
 **Symptoms:**
+
 - Pages take >5 seconds to load
 - Timeouts on dashboard
 - Slow API responses
@@ -579,7 +587,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '4'
+          cpus: "4"
           memory: 8G
 ```
 
@@ -596,6 +604,7 @@ gzip_types text/plain text/css application/json application/javascript text/xml 
 ### Issue 2: High Memory Usage
 
 **Symptoms:**
+
 - Out of memory errors
 - Application crashes
 - Swap usage increasing
@@ -654,6 +663,7 @@ const pool = new Pool({
 ### Issue 3: High CPU Usage
 
 **Symptoms:**
+
 - CPU consistently >80%
 - Server becomes unresponsive
 - Slow API responses
@@ -697,14 +707,14 @@ services:
 
 ```javascript
 // src/middleware/rateLimiter.ts
-import rateLimit from 'express-rate-limit';
+import rateLimit from "express-rate-limit";
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 100, // limit each IP to 100 requests per windowMs
 });
 
-app.use('/api/', limiter);
+app.use("/api/", limiter);
 ```
 
 ---
@@ -714,6 +724,7 @@ app.use('/api/', limiter);
 ### Issue 1: 500 Internal Server Error
 
 **Symptoms:**
+
 - API returns 500 status code
 - Generic error message
 - Application logs show errors
@@ -755,6 +766,7 @@ docker compose exec app npm run health-check
 ### Issue 2: 401 Unauthorized
 
 **Symptoms:**
+
 - API returns 401 status
 - "Authentication required" message
 - Valid credentials rejected
@@ -793,6 +805,7 @@ docker compose exec app printenv JWT_SECRET
 ### Issue 3: 429 Too Many Requests
 
 **Symptoms:**
+
 - API returns 429 status
 - "Rate limit exceeded" message
 - Requests blocked temporarily
@@ -832,7 +845,7 @@ docker compose restart app
 // Premium users get higher limits
 const premiumLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 500 // 5x normal limit
+  max: 500, // 5x normal limit
 });
 ```
 
@@ -843,6 +856,7 @@ const premiumLimiter = rateLimit({
 ### Issue 1: Stripe Integration Not Working
 
 **Symptoms:**
+
 - Payment processing fails
 - "Invalid API key" error
 - Webhook events not received
@@ -898,6 +912,7 @@ stripe trigger payment_intent.succeeded
 ### Issue 2: Email Not Sending
 
 **Symptoms:**
+
 - Users not receiving emails
 - Password reset emails not delivered
 - "SMTP error" in logs
@@ -959,6 +974,7 @@ docker compose exec redis redis-cli DEL "queue:email"
 ### Issue 1: Docker Build Fails
 
 **Symptoms:**
+
 - `docker compose build` fails
 - Dependency installation errors
 - Image build timeouts
@@ -998,6 +1014,7 @@ docker compose build
 ### Issue 2: Kubernetes Pods CrashLoopBackOff
 
 **Symptoms:**
+
 - Pods continuously restarting
 - "CrashLoopBackOff" status
 - Application won't start
@@ -1051,7 +1068,7 @@ livenessProbe:
   httpGet:
     path: /health
     port: 3000
-  initialDelaySeconds: 60  # Increase from 30
+  initialDelaySeconds: 60 # Increase from 30
   periodSeconds: 30
 ```
 
@@ -1062,6 +1079,7 @@ livenessProbe:
 ### Issue 1: Users Not Receiving Notifications
 
 **Symptoms:**
+
 - Notification settings enabled but not receiving
 - Email queue growing
 - No errors in logs
@@ -1112,6 +1130,7 @@ docker compose exec redis redis-cli LLEN "queue:email"
 ### Issue 1: Barcode Won't Scan
 
 **Symptoms:**
+
 - Scanner not reading barcode
 - Incorrect values scanned
 - Scanner not connecting
@@ -1119,16 +1138,19 @@ docker compose exec redis redis-cli LLEN "queue:email"
 **Solutions:**
 
 **1. Check Barcode Quality:**
+
 - Print barcodes at higher resolution (300 DPI minimum)
 - Ensure adequate contrast (black bars on white background)
 - Avoid damaged or wrinkled labels
 
 **2. Configure Scanner:**
+
 - Check scanner is in correct mode (Code 39, Code 128, QR, etc.)
 - Verify USB connection
 - Test scanner with known-good barcode
 
 **3. Adjust Scan Distance:**
+
 - Optimal distance: 4-12 inches
 - Ensure adequate lighting
 - Hold scanner perpendicular to barcode
@@ -1140,6 +1162,7 @@ docker compose exec redis redis-cli LLEN "queue:email"
 ### Issue 1: Mobile App Won't Sync
 
 **Symptoms:**
+
 - "Sync failed" message
 - Data not updating
 - Offline mode stuck
@@ -1158,13 +1181,16 @@ curl https://flowstock.yourcompany.com/api/health
 **Solutions:**
 
 **1. Clear App Cache:**
+
 - iOS: Settings → LogiVox → Clear Cache
 - Android: Settings → Apps → LogiVox → Storage → Clear Cache
 
 **2. Force Sync:**
+
 - Open app → Settings → Force Sync
 
 **3. Reinstall App:**
+
 - Uninstall and reinstall from app store
 
 ---
@@ -1174,6 +1200,7 @@ curl https://flowstock.yourcompany.com/api/health
 ### Issue 1: Stock Levels Incorrect
 
 **Symptoms:**
+
 - Physical count doesn't match system
 - Negative stock levels
 - Discrepancies after transfers
@@ -1199,6 +1226,7 @@ SELECT * FROM inventory_levels WHERE quantity < 0;
 **Solutions:**
 
 **1. Perform Cycle Count:**
+
 - Navigate to: Warehouse → Cycle Counting
 - Select items with discrepancies
 - Perform physical count
@@ -1321,11 +1349,13 @@ docker compose start app
 ### Emergency Contact
 
 **Critical Issues (24/7):**
+
 - 📞 Phone: 1-800-LOGIVOX
 - 📧 Email: urgent@logivox.ai
 - 💬 Slack: #emergency-support
 
 **On-Call Engineer:**
+
 - PagerDuty: Automatic escalation
 - Response Time: <15 minutes
 
@@ -1342,4 +1372,4 @@ docker compose start app
 ---
 
 **LogiVox WMS Troubleshooting Guide - Version 1.0**  
-*Last updated: October 16, 2025*
+_Last updated: October 16, 2025_

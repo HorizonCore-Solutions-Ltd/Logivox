@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -27,7 +27,7 @@ const inspectRMASchema = z.object({
 // POST /api/rmas/[id]/inspect - QC inspection workflow
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -46,7 +46,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -67,7 +67,7 @@ export async function POST(
     if (rma.status !== "INSPECTING") {
       return NextResponse.json(
         { error: "RMA must be in INSPECTING status" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -80,7 +80,7 @@ export async function POST(
       if (!rmaItem) {
         return NextResponse.json(
           { error: `Item ${item.itemId} not found in RMA` },
-          { status: 404 }
+          { status: 404 },
         );
       }
     }
@@ -153,14 +153,14 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error inspecting RMA:", error);
     return NextResponse.json(
       { error: "Failed to inspect RMA" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

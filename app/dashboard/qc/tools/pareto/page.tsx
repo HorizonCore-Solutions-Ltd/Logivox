@@ -1,12 +1,29 @@
-'use client';
+"use client";
 
-import { useState, useMemo } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart } from 'recharts';
-import { Plus, Trash2, Download, TrendingUp } from 'lucide-react';
+import { useState, useMemo } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  BarChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ComposedChart,
+} from "recharts";
+import { Plus, Trash2, Download, TrendingUp } from "lucide-react";
 
 interface DataItem {
   category: string;
@@ -15,30 +32,30 @@ interface DataItem {
 
 export default function ParetoChartPage() {
   const [data, setData] = useState<DataItem[]>([
-    { category: 'Defect Type A', value: 45 },
-    { category: 'Defect Type B', value: 30 },
-    { category: 'Defect Type C', value: 15 },
-    { category: 'Defect Type D', value: 7 },
-    { category: 'Defect Type E', value: 3 },
+    { category: "Defect Type A", value: 45 },
+    { category: "Defect Type B", value: 30 },
+    { category: "Defect Type C", value: 15 },
+    { category: "Defect Type D", value: 7 },
+    { category: "Defect Type E", value: 3 },
   ]);
 
-  const [newCategory, setNewCategory] = useState('');
-  const [newValue, setNewValue] = useState('');
+  const [newCategory, setNewCategory] = useState("");
+  const [newValue, setNewValue] = useState("");
 
   // Calculate Pareto data
   const paretoData = useMemo(() => {
     // Sort by value descending
     const sorted = [...data].sort((a, b) => b.value - a.value);
-    
+
     // Calculate cumulative percentage
     const total = sorted.reduce((sum, item) => sum + item.value, 0);
     let cumulative = 0;
-    
-    return sorted.map(item => {
+
+    return sorted.map((item) => {
       cumulative += item.value;
       const cumulativePercent = (cumulative / total) * 100;
       const percentage = (item.value / total) * 100;
-      
+
       return {
         category: item.category,
         value: item.value,
@@ -49,33 +66,38 @@ export default function ParetoChartPage() {
   }, [data]);
 
   // Find 80% threshold
-  const eightyPercentIndex = paretoData.findIndex(item => item.cumulative >= 80);
+  const eightyPercentIndex = paretoData.findIndex(
+    (item) => item.cumulative >= 80,
+  );
 
   const handleAdd = () => {
     if (newCategory && newValue && !isNaN(parseFloat(newValue))) {
-      setData([...data, { category: newCategory, value: parseFloat(newValue) }]);
-      setNewCategory('');
-      setNewValue('');
+      setData([
+        ...data,
+        { category: newCategory, value: parseFloat(newValue) },
+      ]);
+      setNewCategory("");
+      setNewValue("");
     }
   };
 
   const handleRemove = (category: string) => {
-    setData(data.filter(item => item.category !== category));
+    setData(data.filter((item) => item.category !== category));
   };
 
   const handleExport = () => {
     const csv = [
-      ['Category', 'Value', 'Percentage', 'Cumulative %'].join(','),
-      ...paretoData.map(item =>
-        [item.category, item.value, item.percentage, item.cumulative].join(',')
+      ["Category", "Value", "Percentage", "Cumulative %"].join(","),
+      ...paretoData.map((item) =>
+        [item.category, item.value, item.percentage, item.cumulative].join(","),
       ),
-    ].join('\n');
+    ].join("\n");
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `pareto-analysis-${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `pareto-analysis-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
   };
 
@@ -88,7 +110,8 @@ export default function ParetoChartPage() {
         <div>
           <h1 className="text-3xl font-bold">Pareto Chart Analysis</h1>
           <p className="text-muted-foreground">
-            Identify the vital few causes that contribute to most problems (80/20 rule)
+            Identify the vital few causes that contribute to most problems
+            (80/20 rule)
           </p>
         </div>
         <Button onClick={handleExport}>
@@ -118,11 +141,32 @@ export default function ParetoChartPage() {
                     height={100}
                     interval={0}
                   />
-                  <YAxis yAxisId="left" label={{ value: 'Frequency', angle: -90, position: 'insideLeft' }} />
-                  <YAxis yAxisId="right" orientation="right" domain={[0, 100]} label={{ value: 'Cumulative %', angle: 90, position: 'insideRight' }} />
+                  <YAxis
+                    yAxisId="left"
+                    label={{
+                      value: "Frequency",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    domain={[0, 100]}
+                    label={{
+                      value: "Cumulative %",
+                      angle: 90,
+                      position: "insideRight",
+                    }}
+                  />
                   <Tooltip />
                   <Legend />
-                  <Bar yAxisId="left" dataKey="value" fill="#3b82f6" name="Frequency" />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="value"
+                    fill="#3b82f6"
+                    name="Frequency"
+                  />
                   <Line
                     yAxisId="right"
                     type="monotone"
@@ -136,7 +180,7 @@ export default function ParetoChartPage() {
                   <Line
                     yAxisId="right"
                     type="monotone"
-                    data={paretoData.map(d => ({ ...d, eightyPercent: 80 }))}
+                    data={paretoData.map((d) => ({ ...d, eightyPercent: 80 }))}
                     dataKey="eightyPercent"
                     stroke="#16a34a"
                     strokeWidth={2}
@@ -162,7 +206,9 @@ export default function ParetoChartPage() {
                       <th className="p-3 text-left font-semibold">Category</th>
                       <th className="p-3 text-right font-semibold">Count</th>
                       <th className="p-3 text-right font-semibold">%</th>
-                      <th className="p-3 text-right font-semibold">Cumulative %</th>
+                      <th className="p-3 text-right font-semibold">
+                        Cumulative %
+                      </th>
                       <th className="p-3 text-right font-semibold">Actions</th>
                     </tr>
                   </thead>
@@ -171,7 +217,7 @@ export default function ParetoChartPage() {
                       <tr
                         key={item.category}
                         className={`border-b ${
-                          index <= eightyPercentIndex ? 'bg-green-50' : ''
+                          index <= eightyPercentIndex ? "bg-green-50" : ""
                         }`}
                       >
                         <td className="p-3">
@@ -184,7 +230,9 @@ export default function ParetoChartPage() {
                         </td>
                         <td className="p-3 text-right">{item.value}</td>
                         <td className="p-3 text-right">{item.percentage}%</td>
-                        <td className="p-3 text-right font-semibold">{item.cumulative}%</td>
+                        <td className="p-3 text-right font-semibold">
+                          {item.cumulative}%
+                        </td>
                         <td className="p-3 text-right">
                           <Button
                             variant="ghost"
@@ -228,7 +276,11 @@ export default function ParetoChartPage() {
                   onChange={(e) => setNewValue(e.target.value)}
                 />
               </div>
-              <Button onClick={handleAdd} className="w-full" disabled={!newCategory || !newValue}>
+              <Button
+                onClick={handleAdd}
+                className="w-full"
+                disabled={!newCategory || !newValue}
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Data Point
               </Button>
@@ -245,9 +297,11 @@ export default function ParetoChartPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-semibold text-green-600 mb-2">Vital Few (80% Impact)</h4>
+                <h4 className="font-semibold text-green-600 mb-2">
+                  Vital Few (80% Impact)
+                </h4>
                 <div className="space-y-1 text-sm">
-                  {vitalFew.map(item => (
+                  {vitalFew.map((item) => (
                     <div key={item.category} className="flex justify-between">
                       <span>{item.category}</span>
                       <span className="font-semibold">{item.percentage}%</span>
@@ -261,11 +315,16 @@ export default function ParetoChartPage() {
 
               {trivialMany.length > 0 && (
                 <div className="border-t pt-4">
-                  <h4 className="font-semibold text-gray-600 mb-2">Trivial Many</h4>
+                  <h4 className="font-semibold text-gray-600 mb-2">
+                    Trivial Many
+                  </h4>
                   <p className="text-xs text-muted-foreground">
-                    {trivialMany.length} categories contribute only{' '}
-                    {Math.round((100 - (vitalFew[vitalFew.length - 1]?.cumulative || 0)) * 10) / 10}%
-                    of the total impact
+                    {trivialMany.length} categories contribute only{" "}
+                    {Math.round(
+                      (100 - (vitalFew[vitalFew.length - 1]?.cumulative || 0)) *
+                        10,
+                    ) / 10}
+                    % of the total impact
                   </p>
                 </div>
               )}
@@ -275,7 +334,9 @@ export default function ParetoChartPage() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex gap-2">
                     <span className="text-primary">•</span>
-                    <span>Prioritize improvement efforts on the vital few categories</span>
+                    <span>
+                      Prioritize improvement efforts on the vital few categories
+                    </span>
                   </li>
                   <li className="flex gap-2">
                     <span className="text-primary">•</span>

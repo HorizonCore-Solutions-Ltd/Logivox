@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import rootCauseAnalysisService from '@/lib/services/qc/root-cause-analysis-service';
+import { NextRequest, NextResponse } from "next/server";
+import rootCauseAnalysisService from "@/lib/services/qc/root-cause-analysis-service";
 
 /**
  * GET /api/qc/root-cause-analysis
@@ -8,15 +8,15 @@ import rootCauseAnalysisService from '@/lib/services/qc/root-cause-analysis-serv
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get('organizationId');
-    const vendorId = searchParams.get('vendorId');
-    const status = searchParams.get('status');
-    const severity = searchParams.get('severity');
+    const organizationId = searchParams.get("organizationId");
+    const vendorId = searchParams.get("vendorId");
+    const status = searchParams.get("status");
+    const severity = searchParams.get("severity");
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Organization ID required' },
-        { status: 400 }
+        { error: "Organization ID required" },
+        { status: 400 },
       );
     }
 
@@ -29,10 +29,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error: any) {
-    console.error('Error listing RCAs:', error);
+    console.error("Error listing RCAs:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -60,15 +60,15 @@ export async function POST(request: NextRequest) {
       customerImpact: body.customerImpact,
       responsibleParty: body.responsibleParty,
       targetCompletionDate: new Date(body.targetCompletionDate),
-      createdBy: body.createdBy || 'system',
+      createdBy: body.createdBy || "system",
     });
 
     return NextResponse.json(rca, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating RCA:', error);
+    console.error("Error creating RCA:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }

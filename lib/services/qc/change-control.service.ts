@@ -5,7 +5,7 @@
  * ISO 13485:2016 Clause 7.3.9 - Design and Development Changes
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 export class ChangeControlService {
   /**
@@ -50,8 +50,8 @@ export class ChangeControlService {
         customerImpact: params.customerImpact,
         regulatoryImpact: params.regulatoryImpact,
         validationRequired: params.validationRequired,
-        status: 'DRAFT',
-        approvalStatus: 'PENDING',
+        status: "DRAFT",
+        approvalStatus: "PENDING",
         attachments: params.attachments,
         createdBy: params.requestedBy,
       },
@@ -76,7 +76,7 @@ export class ChangeControlService {
     const change = await prisma.changeControl.update({
       where: { id: params.changeId },
       data: {
-        status: 'SUBMITTED',
+        status: "SUBMITTED",
         submittedDate: new Date(),
         impactAssessment: params.impactAssessment,
         proposedImplementationPlan: params.proposedImplementationPlan,
@@ -91,7 +91,7 @@ export class ChangeControlService {
           changeControlId: params.changeId,
           approverRole: approver,
           approvalLevel: this.getApprovalLevel(approver),
-          status: 'PENDING',
+          status: "PENDING",
           requestedDate: new Date(),
         },
       });
@@ -113,7 +113,7 @@ export class ChangeControlService {
     const approval = await prisma.changeApproval.update({
       where: { id: params.approvalId },
       data: {
-        status: params.approved ? 'APPROVED' : 'REJECTED',
+        status: params.approved ? "APPROVED" : "REJECTED",
         approvedBy: params.approvedBy,
         approvalDate: new Date(),
         comments: params.comments,
@@ -130,23 +130,23 @@ export class ChangeControlService {
 
     // Check if all approvals are complete
     const allApprovals = approval.changeControl.approvals;
-    const allApproved = allApprovals.every(a => a.status === 'APPROVED');
-    const anyRejected = allApprovals.some(a => a.status === 'REJECTED');
+    const allApproved = allApprovals.every((a) => a.status === "APPROVED");
+    const anyRejected = allApprovals.some((a) => a.status === "REJECTED");
 
     if (anyRejected) {
       await prisma.changeControl.update({
         where: { id: approval.changeControlId },
         data: {
-          status: 'REJECTED',
-          approvalStatus: 'REJECTED',
+          status: "REJECTED",
+          approvalStatus: "REJECTED",
         },
       });
     } else if (allApproved) {
       await prisma.changeControl.update({
         where: { id: approval.changeControlId },
         data: {
-          status: 'APPROVED',
-          approvalStatus: 'APPROVED',
+          status: "APPROVED",
+          approvalStatus: "APPROVED",
           approvedDate: new Date(),
         },
       });
@@ -172,14 +172,14 @@ export class ChangeControlService {
       where: { id: params.changeId },
     });
 
-    if (change?.status !== 'APPROVED') {
-      throw new Error('Change must be approved before implementation');
+    if (change?.status !== "APPROVED") {
+      throw new Error("Change must be approved before implementation");
     }
 
     return await prisma.changeControl.update({
       where: { id: params.changeId },
       data: {
-        status: 'IMPLEMENTED',
+        status: "IMPLEMENTED",
         implementationDate: params.implementationDate,
         implementedBy: params.implementedBy,
         actualCost: params.actualCost,
@@ -204,7 +204,7 @@ export class ChangeControlService {
     return await prisma.changeControl.update({
       where: { id: params.changeId },
       data: {
-        status: 'CLOSED',
+        status: "CLOSED",
         closedDate: new Date(),
         effectivenessReview: params.effectivenessReview,
         objectivesMet: params.objectivesMet,
@@ -242,53 +242,65 @@ export class ChangeControlService {
 
     const byType: any = {};
     const byStatus: any = {};
-    
-    changes.forEach(change => {
+
+    changes.forEach((change) => {
       byType[change.changeType] = (byType[change.changeType] || 0) + 1;
       byStatus[change.status] = (byStatus[change.status] || 0) + 1;
     });
 
-    const approved = changes.filter(c => c.status === 'APPROVED' || c.status === 'IMPLEMENTED' || c.status === 'CLOSED');
-    const rejected = changes.filter(c => c.status === 'REJECTED');
+    const approved = changes.filter(
+      (c) =>
+        c.status === "APPROVED" ||
+        c.status === "IMPLEMENTED" ||
+        c.status === "CLOSED",
+    );
+    const rejected = changes.filter((c) => c.status === "REJECTED");
 
     // Calculate approval cycle time
     const approvalTimes = approved
-      .filter(c => c.approvedDate && c.submittedDate)
-      .map(c => {
+      .filter((c) => c.approvedDate && c.submittedDate)
+      .map((c) => {
         const days = Math.floor(
-          (new Date(c.approvedDate!).getTime() - new Date(c.submittedDate!).getTime()) / 
-          (1000 * 60 * 60 * 24)
+          (new Date(c.approvedDate!).getTime() -
+            new Date(c.submittedDate!).getTime()) /
+            (1000 * 60 * 60 * 24),
         );
         return days;
       });
 
-    const avgApprovalTime = approvalTimes.length > 0
-      ? approvalTimes.reduce((sum, t) => sum + t, 0) / approvalTimes.length
-      : 0;
+    const avgApprovalTime =
+      approvalTimes.length > 0
+        ? approvalTimes.reduce((sum, t) => sum + t, 0) / approvalTimes.length
+        : 0;
 
     // Calculate implementation time
     const implementationTimes = changes
-      .filter(c => c.implementationDate && c.approvedDate)
-      .map(c => {
+      .filter((c) => c.implementationDate && c.approvedDate)
+      .map((c) => {
         const days = Math.floor(
-          (new Date(c.implementationDate!).getTime() - new Date(c.approvedDate!).getTime()) / 
-          (1000 * 60 * 60 * 24)
+          (new Date(c.implementationDate!).getTime() -
+            new Date(c.approvedDate!).getTime()) /
+            (1000 * 60 * 60 * 24),
         );
         return days;
       });
 
-    const avgImplementationTime = implementationTimes.length > 0
-      ? implementationTimes.reduce((sum, t) => sum + t, 0) / implementationTimes.length
-      : 0;
+    const avgImplementationTime =
+      implementationTimes.length > 0
+        ? implementationTimes.reduce((sum, t) => sum + t, 0) /
+          implementationTimes.length
+        : 0;
 
     return {
       summary: {
         total: changes.length,
         approved: approved.length,
         rejected: rejected.length,
-        pending: changes.filter(c => c.status === 'SUBMITTED' || c.status === 'DRAFT').length,
-        implemented: changes.filter(c => c.status === 'IMPLEMENTED').length,
-        closed: changes.filter(c => c.status === 'CLOSED').length,
+        pending: changes.filter(
+          (c) => c.status === "SUBMITTED" || c.status === "DRAFT",
+        ).length,
+        implemented: changes.filter((c) => c.status === "IMPLEMENTED").length,
+        closed: changes.filter((c) => c.status === "CLOSED").length,
         approvalRate: (approved.length / changes.length) * 100 || 0,
       },
       byType,
@@ -298,13 +310,14 @@ export class ChangeControlService {
         averageImplementationTime: Math.round(avgImplementationTime),
       },
       impact: {
-        withCustomerImpact: changes.filter(c => c.customerImpact).length,
-        withRegulatoryImpact: changes.filter(c => c.regulatoryImpact).length,
-        requiresValidation: changes.filter(c => c.validationRequired).length,
+        withCustomerImpact: changes.filter((c) => c.customerImpact).length,
+        withRegulatoryImpact: changes.filter((c) => c.regulatoryImpact).length,
+        requiresValidation: changes.filter((c) => c.validationRequired).length,
       },
       effectiveness: {
-        objectivesMet: changes.filter(c => c.objectivesMet).length,
-        objectivesNotMet: changes.filter(c => c.objectivesMet === false).length,
+        objectivesMet: changes.filter((c) => c.objectivesMet).length,
+        objectivesNotMet: changes.filter((c) => c.objectivesMet === false)
+          .length,
       },
     };
   }
@@ -314,11 +327,11 @@ export class ChangeControlService {
    */
   private static getApprovalLevel(role: string): number {
     const levels: any = {
-      'QUALITY_MANAGER': 1,
-      'ENGINEERING_MANAGER': 1,
-      'OPERATIONS_MANAGER': 2,
-      'REGULATORY_AFFAIRS': 2,
-      'GENERAL_MANAGER': 3,
+      QUALITY_MANAGER: 1,
+      ENGINEERING_MANAGER: 1,
+      OPERATIONS_MANAGER: 2,
+      REGULATORY_AFFAIRS: 2,
+      GENERAL_MANAGER: 3,
     };
     return levels[role] || 1;
   }

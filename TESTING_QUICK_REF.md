@@ -37,6 +37,7 @@ npm run audit:fix               # Auto-fix
 ## 🛠️ Development Workflow
 
 ### Before Committing
+
 ```bash
 npm run test:coverage           # Check tests
 npm run security:scan           # Security check
@@ -45,6 +46,7 @@ git commit -m "message"         # Hooks run automatically
 ```
 
 ### Coverage Targets
+
 - Unit Tests: 100%
 - Integration: 100%
 - E2E Tests: 90%+
@@ -52,6 +54,7 @@ git commit -m "message"         # Hooks run automatically
 ## 📝 Test Templates
 
 ### Unit Test
+
 ```typescript
 import { render, screen } from '@testing-library/react';
 
@@ -64,12 +67,13 @@ describe('Component', () => {
 ```
 
 ### E2E Test
-```typescript
-import { test, expect } from '@playwright/test';
 
-test('flow', async ({ page }) => {
-  await page.goto('/');
-  await expect(page).toHaveURL('/dashboard');
+```typescript
+import { test, expect } from "@playwright/test";
+
+test("flow", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL("/dashboard");
 });
 ```
 

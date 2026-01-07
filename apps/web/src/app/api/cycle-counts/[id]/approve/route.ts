@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -14,7 +14,7 @@ const approveCycleCountSchema = z.object({
 // POST /api/cycle-counts/[id]/approve - Approve or reject cycle count
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -33,7 +33,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "Insufficient permissions" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -58,14 +58,14 @@ export async function POST(
     if (!cycleCount) {
       return NextResponse.json(
         { error: "Cycle count not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (cycleCount.status !== "COMPLETED") {
       return NextResponse.json(
         { error: "Only completed cycle counts can be approved" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -76,7 +76,7 @@ export async function POST(
       if (!data.rejectionReason) {
         return NextResponse.json(
           { error: "Rejection reason is required" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -134,7 +134,7 @@ export async function POST(
           let sequence = 1;
           if (lastAdjustment) {
             const lastSeq = parseInt(
-              (lastAdjustment.adjustmentNumber.split("-")[2] || "0") || "0"
+              lastAdjustment.adjustmentNumber.split("-")[2] || "0" || "0",
             );
             sequence = lastSeq + 1;
           }
@@ -162,7 +162,9 @@ export async function POST(
               completedById: session.user.id,
               approvedDate: new Date(),
               completedDate: new Date(),
-              unitCost: item.unitCost ? parseFloat(item.unitCost.toString()) : null,
+              unitCost: item.unitCost
+                ? parseFloat(item.unitCost.toString())
+                : null,
               totalCost: item.varianceValue
                 ? parseFloat(item.varianceValue.toString())
                 : null,
@@ -180,8 +182,8 @@ export async function POST(
                 newQty === 0
                   ? "OUT_OF_STOCK"
                   : newQty <= (item.inventoryItem.minStockLevel || 0)
-                  ? "LOW_STOCK"
-                  : "ACTIVE",
+                    ? "LOW_STOCK"
+                    : "ACTIVE",
             },
           });
 
@@ -268,14 +270,14 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error approving cycle count:", error);
     return NextResponse.json(
       { error: "Failed to approve cycle count" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -23,11 +23,11 @@ export const SecurityConfig = {
   session: {
     maxAge: 86400, // 24 hours
     updateAge: 3600, // Update session every hour
-    cookieName: 'session_token',
+    cookieName: "session_token",
     cookieOptions: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax' as const,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
     },
   },
 
@@ -78,14 +78,22 @@ export const SecurityConfig = {
   fileUpload: {
     maxFileSize: 10 * 1024 * 1024, // 10MB
     allowedMimeTypes: [
-      'image/jpeg',
-      'image/png',
-      'image/gif',
-      'application/pdf',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "application/pdf",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ],
-    allowedExtensions: ['.jpg', '.jpeg', '.png', '.gif', '.pdf', '.xls', '.xlsx'],
+    allowedExtensions: [
+      ".jpg",
+      ".jpeg",
+      ".png",
+      ".gif",
+      ".pdf",
+      ".xls",
+      ".xlsx",
+    ],
   },
 
   /**
@@ -93,17 +101,21 @@ export const SecurityConfig = {
    */
   cors: {
     allowedOrigins:
-      process.env.NODE_ENV === 'production'
-        ? [process.env.APP_URL || 'https://yourcompany.com']
-        : ['http://localhost:3000', 'http://localhost:3001'],
-    allowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      process.env.NODE_ENV === "production"
+        ? [process.env.APP_URL || "https://yourcompany.com"]
+        : ["http://localhost:3000", "http://localhost:3001"],
+    allowedMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-CSRF-Token',
-      'X-Requested-With',
+      "Content-Type",
+      "Authorization",
+      "X-CSRF-Token",
+      "X-Requested-With",
     ],
-    exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
+    exposedHeaders: [
+      "X-RateLimit-Limit",
+      "X-RateLimit-Remaining",
+      "X-RateLimit-Reset",
+    ],
     credentials: true,
     maxAge: 86400, // 24 hours
   },
@@ -113,27 +125,32 @@ export const SecurityConfig = {
    */
   csp: {
     production: {
-      'default-src': ["'self'"],
-      'script-src': ["'self'", "'sha256-...'"],
-      'style-src': ["'self'"],
-      'img-src': ["'self'", 'data:', 'https://cdn.yourcompany.com'],
-      'font-src': ["'self'", 'https://fonts.gstatic.com'],
-      'connect-src': ["'self'", 'https://api.yourcompany.com'],
-      'frame-src': ["'none'"],
-      'object-src': ["'none'"],
-      'base-uri': ["'self'"],
-      'form-action': ["'self'"],
-      'frame-ancestors': ["'none'"],
-      'upgrade-insecure-requests': true,
-      'block-all-mixed-content': true,
+      "default-src": ["'self'"],
+      "script-src": ["'self'", "'sha256-...'"],
+      "style-src": ["'self'"],
+      "img-src": ["'self'", "data:", "https://cdn.yourcompany.com"],
+      "font-src": ["'self'", "https://fonts.gstatic.com"],
+      "connect-src": ["'self'", "https://api.yourcompany.com"],
+      "frame-src": ["'none'"],
+      "object-src": ["'none'"],
+      "base-uri": ["'self'"],
+      "form-action": ["'self'"],
+      "frame-ancestors": ["'none'"],
+      "upgrade-insecure-requests": true,
+      "block-all-mixed-content": true,
     },
     development: {
-      'default-src': ["'self'"],
-      'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'localhost:*'],
-      'style-src': ["'self'", "'unsafe-inline'"],
-      'img-src': ["'self'", 'data:', 'https:', 'http://localhost:*'],
-      'font-src': ["'self'", 'data:'],
-      'connect-src': ["'self'", 'ws://localhost:*', 'http://localhost:*'],
+      "default-src": ["'self'"],
+      "script-src": [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        "localhost:*",
+      ],
+      "style-src": ["'self'", "'unsafe-inline'"],
+      "img-src": ["'self'", "data:", "https:", "http://localhost:*"],
+      "font-src": ["'self'", "data:"],
+      "connect-src": ["'self'", "ws://localhost:*", "http://localhost:*"],
     },
   },
 
@@ -141,18 +158,18 @@ export const SecurityConfig = {
    * Audit Logging Configuration
    */
   audit: {
-    enabled: process.env.ENABLE_AUDIT_LOGS !== 'false',
+    enabled: process.env.ENABLE_AUDIT_LOGS !== "false",
     retentionDays: 90,
-    logLevel: process.env.LOG_LEVEL || 'info',
-    sensitiveFields: ['password', 'passwordHash', 'token', 'secret', 'apiKey'],
+    logLevel: process.env.LOG_LEVEL || "info",
+    sensitiveFields: ["password", "passwordHash", "token", "secret", "apiKey"],
   },
 
   /**
    * Two-Factor Authentication
    */
   twoFactor: {
-    enabled: process.env.ENABLE_2FA === 'true',
-    issuer: process.env.APP_NAME || 'LogiVox WMS',
+    enabled: process.env.ENABLE_2FA === "true",
+    issuer: process.env.APP_NAME || "LogiVox WMS",
     window: 1, // Allow 1 time step before/after
     backupCodesCount: 10,
   },
@@ -180,19 +197,19 @@ export const SecurityConfig = {
    * Security Headers
    */
   headers: {
-    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-    'X-Frame-Options': 'DENY',
-    'X-Content-Type-Options': 'nosniff',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
   },
 
   /**
    * API Key Configuration
    */
   apiKeys: {
-    enabled: process.env.ENABLE_API_KEYS === 'true',
-    prefix: 'wms_',
+    enabled: process.env.ENABLE_API_KEYS === "true",
+    prefix: "wms_",
     length: 32,
     expiryDays: 365,
   },

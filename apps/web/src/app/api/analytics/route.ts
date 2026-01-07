@@ -1,36 +1,36 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
-import { subDays, startOfDay, endOfDay, format } from "date-fns"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { subDays, startOfDay, endOfDay, format } from "date-fns";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: { organizations: { take: 1 } },
-    })
+    });
 
     if (!user || user.organizations.length === 0) {
       return NextResponse.json(
         { message: "No organization found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
-    const organizationId = user.organizations[0].id
-    const { searchParams } = new URL(request.url)
-    const days = parseInt(searchParams.get("days") || "30")
+    const organizationId = user.organizations[0].id;
+    const { searchParams } = new URL(request.url);
+    const days = parseInt(searchParams.get("days") || "30");
 
     // Calculate date range
-    const endDate = endOfDay(new Date())
-    const startDate = startOfDay(subDays(endDate, days))
+    const endDate = endOfDay(new Date());
+    const startDate = startOfDay(subDays(endDate, days));
 
     // Parallel queries for performance
     const [
@@ -166,7 +166,7 @@ export async function GET(request: NextRequest) {
         GROUP BY DATE(b."createdAt")
         ORDER BY date ASC
       `,
-    ])
+    ]);
 
     // Process top customers
     const topCustomersWithRevenue = topCustomers
@@ -176,18 +176,18 @@ export async function GET(request: NextRequest) {
         email: customer.email,
         totalRevenue: customer.bookings.reduce(
           (sum: number, booking: any) => sum + Number(booking.totalAmount),
-          0
+          0,
         ),
         bookingsCount: customer.bookings.length,
       }))
       .sort((a: any, b: any) => b.totalRevenue - a.totalRevenue)
-      .slice(0, 5)
+      .slice(0, 5);
 
     // Format daily revenue for chart
     const formattedDailyRevenue = dailyRevenue.map((item: any) => ({
       date: format(new Date(item.date), "MMM dd"),
       revenue: Number(item.revenue),
-    }))
+    }));
 
     // Build response
     const analytics = {
@@ -219,14 +219,14 @@ export async function GET(request: NextRequest) {
         userName: log.user.name || log.user.email,
         createdAt: log.createdAt,
       })),
-    }
+    };
 
-    return NextResponse.json(analytics)
+    return NextResponse.json(analytics);
   } catch (error) {
-    console.error("Analytics fetch error:", error)
+    console.error("Analytics fetch error:", error);
     return NextResponse.json(
       { message: "Failed to fetch analytics" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useTheme } from "next-themes"
-import { signOut } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { useAuth } from "@/hooks/use-auth"
-import { useQuery } from "@tanstack/react-query"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
+import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { Badge } from "@/components/ui/badge";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { 
-  Building2, 
-  Moon, 
-  Sun, 
-  Menu, 
-  X, 
+} from "@/components/ui/popover";
+import {
+  Building2,
+  Moon,
+  Sun,
+  Menu,
+  X,
   ChevronDown,
   Zap,
   Shield,
@@ -31,39 +31,39 @@ import {
   Bell,
   Package,
   AlertTriangle,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function Header() {
-  const [isOpen, setIsOpen] = React.useState(false)
-  const [showUserMenu, setShowUserMenu] = React.useState(false)
-  const { theme, setTheme } = useTheme()
-  const { user, isAuthenticated, isLoading } = useAuth()
-  const router = useRouter()
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [showUserMenu, setShowUserMenu] = React.useState(false);
+  const { theme, setTheme } = useTheme();
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const router = useRouter();
 
   // Fetch low stock alerts (only when authenticated)
   const { data: lowStockItems = [] } = useQuery({
     queryKey: ["inventory", "low-stock"],
     queryFn: async () => {
-      const res = await fetch("/api/inventory?status=LOW_STOCK")
-      if (!res.ok) return []
-      const lowStock = await res.json()
-      
-      const outRes = await fetch("/api/inventory?status=OUT_OF_STOCK")
+      const res = await fetch("/api/inventory?status=LOW_STOCK");
+      if (!res.ok) return [];
+      const lowStock = await res.json();
+
+      const outRes = await fetch("/api/inventory?status=OUT_OF_STOCK");
       if (outRes.ok) {
-        const outOfStock = await outRes.json()
-        return [...lowStock, ...outOfStock]
+        const outOfStock = await outRes.json();
+        return [...lowStock, ...outOfStock];
       }
-      
-      return lowStock
+
+      return lowStock;
     },
     enabled: isAuthenticated,
     refetchInterval: 60000, // Refetch every minute
-  })
+  });
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" })
-  }
+    await signOut({ callbackUrl: "/" });
+  };
 
   const navigation = [
     {
@@ -78,7 +78,7 @@ export function Header() {
         },
         {
           name: "ERP Integration",
-          href: "/solutions/erp-integration", 
+          href: "/solutions/erp-integration",
           description: "Connect with Oracle, SAP, NetSuite",
           icon: Zap,
         },
@@ -112,12 +112,12 @@ export function Header() {
     { name: "About", href: "/about" },
     { name: "Blog", href: "/blog" },
     { name: "Contact", href: "/contact" },
-  ]
+  ];
 
   const ctaButtons = [
     { name: "Sign In", href: "/sign-in", variant: "ghost" as const },
     { name: "Get Started", href: "/sign-up", variant: "default" as const },
-  ]
+  ];
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -142,7 +142,7 @@ export function Header() {
                     {item.name}
                     <ChevronDown className="ml-1 h-4 w-4 transition-transform group-hover:rotate-180" />
                   </button>
-                  
+
                   {/* Dropdown Menu */}
                   <div className="absolute left-0 top-full mt-2 w-80 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                     <div className="rounded-lg bg-popover border shadow-lg ring-1 ring-black ring-opacity-5">
@@ -199,10 +199,14 @@ export function Header() {
           {isAuthenticated && lowStockItems.length > 0 && (
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative h-9 w-9">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="relative h-9 w-9"
+                >
                   <Bell className="h-4 w-4" />
                   {lowStockItems.length > 0 && (
-                    <Badge 
+                    <Badge
                       className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
                       variant="destructive"
                     >
@@ -226,12 +230,14 @@ export function Header() {
                         key={item.id}
                         className="flex items-start space-x-2 p-2 hover:bg-muted rounded-lg cursor-pointer"
                         onClick={() => {
-                          router.push(`/dashboard/inventory/${item.id}`)
+                          router.push(`/dashboard/inventory/${item.id}`);
                         }}
                       >
                         <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate">{item.name}</p>
+                          <p className="text-sm font-medium truncate">
+                            {item.name}
+                          </p>
                           <p className="text-xs text-muted-foreground">
                             {item.quantity} {item.unit} remaining
                           </p>
@@ -244,7 +250,9 @@ export function Header() {
                       variant="link"
                       size="sm"
                       className="w-full"
-                      onClick={() => router.push("/dashboard/inventory?filter=alerts")}
+                      onClick={() =>
+                        router.push("/dashboard/inventory?filter=alerts")
+                      }
                     >
                       View all {lowStockItems.length} alerts →
                     </Button>
@@ -266,13 +274,18 @@ export function Header() {
                   onClick={() => setShowUserMenu(!showUserMenu)}
                 >
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                    {user.name?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}
+                    {user.name?.charAt(0).toUpperCase() ||
+                      user.email?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-sm font-medium">{user.name || user.email}</span>
-                  <ChevronDown className={cn(
-                    "h-4 w-4 transition-transform",
-                    showUserMenu && "rotate-180"
-                  )} />
+                  <span className="text-sm font-medium">
+                    {user.name || user.email}
+                  </span>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 transition-transform",
+                      showUserMenu && "rotate-180",
+                    )}
+                  />
                 </Button>
 
                 {/* User dropdown menu */}
@@ -281,7 +294,9 @@ export function Header() {
                     <div className="py-1">
                       <div className="px-4 py-2 border-b border-border">
                         <p className="text-sm font-medium">{user.name}</p>
-                        <p className="text-xs text-muted-foreground">{user.email}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {user.email}
+                        </p>
                         {user.role && (
                           <p className="text-xs text-muted-foreground mt-1">
                             Role: {user.role}
@@ -334,11 +349,7 @@ export function Header() {
             className="md:hidden"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? (
-              <X className="h-5 w-5" />
-            ) : (
-              <Menu className="h-5 w-5" />
-            )}
+            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             <span className="sr-only">Toggle menu</span>
           </Button>
         </div>
@@ -389,5 +400,5 @@ export function Header() {
         </div>
       )}
     </header>
-  )
+  );
 }

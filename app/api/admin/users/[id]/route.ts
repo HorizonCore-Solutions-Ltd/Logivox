@@ -4,28 +4,28 @@
  * DELETE: Delete user
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
-import { hasPermission } from '@/lib/rbac';
-import { logAuditEvent } from '@/lib/audit-logger';
-import bcrypt from 'bcryptjs';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { prisma } from "@/lib/prisma";
+import { hasPermission } from "@/lib/rbac";
+import { logAuditEvent } from "@/lib/audit-logger";
+import bcrypt from "bcryptjs";
 
 // PATCH /api/admin/users/[id] - Update user
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasPermission(session.user.role, 'users:update')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!hasPermission(session.user.role, "users:update")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { id } = params;
@@ -37,21 +37,21 @@ export async function PATCH(
     });
 
     if (!existingUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Prevent self-demotion or deactivation
     if (id === session.user.id) {
       if (body.role && body.role !== existingUser.role) {
         return NextResponse.json(
-          { error: 'Cannot change your own role' },
-          { status: 400 }
+          { error: "Cannot change your own role" },
+          { status: 400 },
         );
       }
-      if (body.status && body.status !== 'active') {
+      if (body.status && body.status !== "active") {
         return NextResponse.json(
-          { error: 'Cannot deactivate your own account' },
-          { status: 400 }
+          { error: "Cannot deactivate your own account" },
+          { status: 400 },
         );
       }
     }
@@ -88,23 +88,23 @@ export async function PATCH(
     // Log audit event
     await logAuditEvent({
       userId: session.user.id,
-      action: 'user_updated',
-      resource: 'user',
+      action: "user_updated",
+      resource: "user",
       resourceId: id,
       details: {
         updatedFields: Object.keys(updateData),
         userName: user.name,
       },
-      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-      userAgent: request.headers.get('user-agent') || 'unknown',
+      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+      userAgent: request.headers.get("user-agent") || "unknown",
     });
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error('Error updating user:', error);
+    console.error("Error updating user:", error);
     return NextResponse.json(
-      { error: 'Failed to update user' },
-      { status: 500 }
+      { error: "Failed to update user" },
+      { status: 500 },
     );
   }
 }
@@ -112,17 +112,17 @@ export async function PATCH(
 // DELETE /api/admin/users/[id] - Delete user
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (!hasPermission(session.user.role, 'users:delete')) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!hasPermission(session.user.role, "users:delete")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     const { id } = params;
@@ -130,8 +130,8 @@ export async function DELETE(
     // Prevent self-deletion
     if (id === session.user.id) {
       return NextResponse.json(
-        { error: 'Cannot delete your own account' },
-        { status: 400 }
+        { error: "Cannot delete your own account" },
+        { status: 400 },
       );
     }
 
@@ -142,7 +142,7 @@ export async function DELETE(
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Delete user
@@ -153,27 +153,27 @@ export async function DELETE(
     // Log audit event
     await logAuditEvent({
       userId: session.user.id,
-      action: 'user_deleted',
-      resource: 'user',
+      action: "user_deleted",
+      resource: "user",
       resourceId: id,
       details: {
         userName: user.name,
         userEmail: user.email,
         userRole: user.role,
       },
-      ipAddress: request.headers.get('x-forwarded-for') || 'unknown',
-      userAgent: request.headers.get('user-agent') || 'unknown',
+      ipAddress: request.headers.get("x-forwarded-for") || "unknown",
+      userAgent: request.headers.get("user-agent") || "unknown",
     });
 
     return NextResponse.json({
       success: true,
-      message: 'User deleted successfully',
+      message: "User deleted successfully",
     });
   } catch (error) {
-    console.error('Error deleting user:', error);
+    console.error("Error deleting user:", error);
     return NextResponse.json(
-      { error: 'Failed to delete user' },
-      { status: 500 }
+      { error: "Failed to delete user" },
+      { status: 500 },
     );
   }
 }

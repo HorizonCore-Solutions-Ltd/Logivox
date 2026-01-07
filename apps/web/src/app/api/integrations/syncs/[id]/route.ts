@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/integrations/syncs/[id] - Get sync details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -51,10 +51,7 @@ export async function GET(
     });
 
     if (!sync) {
-      return NextResponse.json(
-        { error: "Sync not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Sync not found" }, { status: 404 });
     }
 
     return NextResponse.json(sync);
@@ -62,7 +59,7 @@ export async function GET(
     console.error("Error fetching sync:", error);
     return NextResponse.json(
       { error: "Failed to fetch sync" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -70,7 +67,7 @@ export async function GET(
 // PATCH /api/integrations/syncs/[id] - Update sync status
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -84,7 +81,7 @@ export async function PATCH(
     if (!action || !["cancel", "retry", "complete"].includes(action)) {
       return NextResponse.json(
         { error: "Invalid action. Must be 'cancel', 'retry', or 'complete'" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -93,10 +90,7 @@ export async function PATCH(
     });
 
     if (!sync) {
-      return NextResponse.json(
-        { error: "Sync not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Sync not found" }, { status: 404 });
     }
 
     let updateData: any = {};
@@ -106,7 +100,7 @@ export async function PATCH(
         if (!["PENDING", "RUNNING"].includes(sync.status)) {
           return NextResponse.json(
             { error: "Can only cancel pending or running syncs" },
-            { status: 400 }
+            { status: 400 },
           );
         }
         updateData = {
@@ -119,7 +113,7 @@ export async function PATCH(
         if (sync.status !== "FAILED") {
           return NextResponse.json(
             { error: "Can only retry failed syncs" },
-            { status: 400 }
+            { status: 400 },
           );
         }
         updateData = {
@@ -135,7 +129,7 @@ export async function PATCH(
         if (sync.status !== "RUNNING") {
           return NextResponse.json(
             { error: "Can only complete running syncs" },
-            { status: 400 }
+            { status: 400 },
           );
         }
         updateData = {
@@ -143,7 +137,9 @@ export async function PATCH(
           completedAt: new Date(),
           progress: 100,
           duration: sync.startedAt
-            ? Math.floor((new Date().getTime() - sync.startedAt.getTime()) / 1000)
+            ? Math.floor(
+                (new Date().getTime() - sync.startedAt.getTime()) / 1000,
+              )
             : null,
         };
         break;
@@ -188,7 +184,7 @@ export async function PATCH(
     console.error("Error updating sync:", error);
     return NextResponse.json(
       { error: "Failed to update sync" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -196,7 +192,7 @@ export async function PATCH(
 // DELETE /api/integrations/syncs/[id] - Delete sync
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -209,16 +205,13 @@ export async function DELETE(
     });
 
     if (!sync) {
-      return NextResponse.json(
-        { error: "Sync not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Sync not found" }, { status: 404 });
     }
 
     if (["PENDING", "RUNNING"].includes(sync.status)) {
       return NextResponse.json(
         { error: "Cannot delete pending or running syncs. Cancel them first." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -231,7 +224,7 @@ export async function DELETE(
     console.error("Error deleting sync:", error);
     return NextResponse.json(
       { error: "Failed to delete sync" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

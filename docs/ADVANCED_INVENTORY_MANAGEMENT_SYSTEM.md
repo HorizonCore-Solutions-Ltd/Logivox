@@ -1,10 +1,11 @@
 # Advanced Inventory Management System
+
 ## Enterprise-Grade AI-Powered Inventory Optimization
 
 **Version:** 2.0  
 **Last Updated:** January 4, 2026  
 **Status:** Production Ready  
-**License:** Proprietary  
+**License:** Proprietary
 
 ---
 
@@ -90,18 +91,21 @@ The Advanced Inventory Management System addresses these challenges through:
 ### Business Value Proposition
 
 **For Operations Teams:**
+
 - 77% faster inventory decisions
 - 83% reduction in manual reordering tasks
 - 95% accuracy in stock level predictions
 - 24/7 autonomous monitoring and optimization
 
 **For Finance Teams:**
+
 - $1.8M+ annual cost savings per distribution center
 - 35% reduction in carrying costs
 - 42% decrease in stockout incidents
 - 200%+ ROI within first year
 
 **For Executive Leadership:**
+
 - Real-time visibility across all inventory operations
 - Data-driven decision making with predictive intelligence
 - Competitive advantage: 5-10 years ahead of market standards
@@ -123,15 +127,16 @@ The Advanced Inventory Management System addresses these challenges through:
 
 ### Financial Impact Summary
 
-| Category | Annual Savings | Percentage |
-|----------|----------------|------------|
-| **Carrying Cost Reduction** | $630,000 | 35% |
-| **Prevented Stockouts** | $880,000 | 49% |
-| **Labor Efficiency** | $180,000 | 10% |
-| **Waste Reduction** | $110,000 | 6% |
-| **TOTAL ANNUAL SAVINGS** | **$1,800,000** | **100%** |
+| Category                    | Annual Savings | Percentage |
+| --------------------------- | -------------- | ---------- |
+| **Carrying Cost Reduction** | $630,000       | 35%        |
+| **Prevented Stockouts**     | $880,000       | 49%        |
+| **Labor Efficiency**        | $180,000       | 10%        |
+| **Waste Reduction**         | $110,000       | 6%         |
+| **TOTAL ANNUAL SAVINGS**    | **$1,800,000** | **100%**   |
 
 **ROI Calculation:**
+
 - Implementation Cost: $450,000 (one-time)
 - Annual Operational Cost: $120,000
 - Annual Savings: $1,800,000
@@ -142,6 +147,7 @@ The Advanced Inventory Management System addresses these challenges through:
 ### Operational Improvements
 
 **Before Advanced Inventory System:**
+
 - Manual reorder decisions: 6-8 hours/day
 - Stockout incidents: 120/month
 - Overstock capital: $4.2M tied up
@@ -151,6 +157,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Emergency orders: 45/month
 
 **After Advanced Inventory System:**
+
 - Manual reorder decisions: 1 hour/day (83% reduction)
 - Stockout incidents: 12/month (90% reduction)
 - Overstock capital: $2.7M (36% reduction)
@@ -162,30 +169,35 @@ The Advanced Inventory Management System addresses these challenges through:
 ### Key Performance Indicators (KPIs)
 
 **Forecast Accuracy:**
+
 - Target: 95%+
 - Current: 96.3% (30-day average)
 - Industry Standard: 70-75%
 - Competitive Advantage: +26% vs industry
 
 **Automation Rate:**
+
 - Target: 80%+
 - Current: 83.7%
 - Manual Review Required: 16.3%
 - Zero-Touch Execution: 83.7%
 
 **Stockout Prevention:**
+
 - Target: <5 incidents/month
 - Current: 3.2 incidents/month
 - Previous: 120 incidents/month
 - Improvement: 97.3% reduction
 
 **Overstock Reduction:**
+
 - Target: <$3M capital tied
 - Current: $2.7M
 - Previous: $4.2M
 - Capital Released: $1.5M
 
 **System Performance:**
+
 - API Response Time: <200ms (p95)
 - IoT Edge Processing: <10ms
 - Digital Twin Sync: <5 minutes
@@ -195,6 +207,7 @@ The Advanced Inventory Management System addresses these challenges through:
 ### Customer Success Metrics
 
 **Enterprise Client A (3PL - 5 Warehouses):**
+
 - Annual Savings: $8.4M across 5 facilities
 - Stockout Reduction: 94%
 - Inventory Accuracy: 97.8%
@@ -202,6 +215,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - ROI: 340% (first year)
 
 **Enterprise Client B (E-Commerce Retailer):**
+
 - Annual Savings: $2.1M
 - Forecast Accuracy: 96.1%
 - Overstock Reduction: 42%
@@ -209,6 +223,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - ROI: 275% (first year)
 
 **Enterprise Client C (Manufacturing):**
+
 - Annual Savings: $1.6M
 - Production Downtime: Reduced 88%
 - Raw Material Waste: Down 35%
@@ -222,6 +237,7 @@ The Advanced Inventory Management System addresses these challenges through:
 ### 1. AI-Powered Demand Forecasting
 
 **Capabilities:**
+
 - Ensemble forecasting (4 algorithms: SMA, EMA, Linear Regression, Seasonal)
 - 90-day horizon prediction with confidence intervals
 - Seasonal pattern recognition and trend analysis
@@ -231,6 +247,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Accuracy validation and performance tracking
 
 **Business Benefits:**
+
 - 95%+ forecast accuracy (vs 67% traditional methods)
 - Predict demand spikes 30-90 days in advance
 - Reduce safety stock by 25-40% while maintaining service levels
@@ -238,6 +255,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Optimize purchasing decisions with confidence scores
 
 **Technical Features:**
+
 - Weighted ensemble combining multiple algorithms
 - Confidence intervals (lower/upper bounds) for risk assessment
 - Seasonal decomposition for pattern recognition
@@ -247,12 +265,14 @@ The Advanced Inventory Management System addresses these challenges through:
 - Model performance metrics (MAPE, RMSE, MAE)
 
 **API Endpoints:**
+
 - `POST /api/inventory/forecast/generate` - Generate AI forecast
 - `GET /api/inventory/forecast/[productId]` - Historical forecasts
 - `POST /api/inventory/forecast/batch` - Parallel forecasting
 - `GET /api/inventory/forecast/accuracy` - Accuracy validation
 
 **Dashboard Features:**
+
 - 30-day demand prediction charts with confidence intervals
 - Seasonal pattern visualization
 - Forecast accuracy metrics and trends
@@ -264,6 +284,7 @@ The Advanced Inventory Management System addresses these challenges through:
 ### 2. Autonomous Operations
 
 **Capabilities:**
+
 - Zero-touch reordering (auto-executes when confidence >80%)
 - Intelligent inter-warehouse transfers for inventory balancing
 - IoT-triggered automatic adjustments (RFID discrepancies)
@@ -273,6 +294,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Decision audit trail with reasoning transparency
 
 **Business Benefits:**
+
 - 83% reduction in manual ordering tasks
 - 24/7 autonomous monitoring and optimization
 - Instant response to inventory imbalances
@@ -282,6 +304,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Free up staff for strategic planning
 
 **Technical Features:**
+
 - Confidence-based auto-execution (configurable threshold)
 - Multi-source data aggregation (forecast, IoT, historical)
 - Risk assessment scoring (0-100 for stockout and overstock)
@@ -317,6 +340,7 @@ The Advanced Inventory Management System addresses these challenges through:
    - Escalation: Large discrepancies flagged for investigation
 
 **API Endpoints:**
+
 - `POST /api/inventory/autonomous/reorder/execute` - Execute reorders
 - `GET /api/inventory/autonomous/reorder/decisions` - Decision log
 - `POST /api/inventory/autonomous/reorder/[id]/approve` - Manual approval
@@ -325,6 +349,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - `GET/PUT /api/inventory/autonomous/config` - Settings management
 
 **Dashboard Features:**
+
 - Real-time decision feed with status tracking
 - Approval queue with one-click approve/reject
 - Performance metrics (success rate, automation rate, ROI)
@@ -336,6 +361,7 @@ The Advanced Inventory Management System addresses these challenges through:
 ### 3. IoT Integration & Digital Twin
 
 **Capabilities:**
+
 - **RFID Automatic Counting**: 95%+ accuracy, 1,000+ tags/second throughput
 - **Weight Sensor Integration**: Real-time validation and discrepancy detection
 - **Environmental Monitoring**: Temperature, humidity, pressure compliance
@@ -345,6 +371,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - **Real-Time Alerts**: Immediate notification of anomalies
 
 **Business Benefits:**
+
 - 98%+ inventory accuracy (vs 82% manual counts)
 - Eliminate manual cycle counting (save 30 hours/week)
 - Prevent spoilage with environmental monitoring ($110K annual savings)
@@ -354,6 +381,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Reduce shrinkage and theft through continuous monitoring
 
 **Technical Features:**
+
 - MQTT protocol for lightweight, real-time communication
 - Edge computing for sub-10ms processing
 - Time-series data storage for historical analysis
@@ -392,6 +420,7 @@ The Advanced Inventory Management System addresses these challenges through:
    - Alerts: Real-time threshold violations
 
 **Digital Twin Features:**
+
 - Physical-digital state synchronization every 5 minutes
 - Confidence scoring (based on data freshness, sensor accuracy)
 - Discrepancy detection and auto-reconciliation
@@ -401,6 +430,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - 3D warehouse visualization with real-time updates
 
 **API Endpoints:**
+
 - `POST /api/inventory/iot/rfid/scan` - RFID processing
 - `POST /api/inventory/iot/weight/reading` - Weight sensors
 - `POST /api/inventory/iot/environmental/reading` - Temp/humidity
@@ -410,6 +440,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - `GET /api/inventory/iot/device/[id]/maintenance` - Predictive maintenance
 
 **Dashboard Features:**
+
 - Live device status map with health indicators
 - Real-time sensor readings (RFID, weight, environmental)
 - Alert feed with severity filtering and acknowledgment
@@ -421,6 +452,7 @@ The Advanced Inventory Management System addresses these challenges through:
 ### 4. ABC Velocity Classification
 
 **Capabilities:**
+
 - Dynamic product segmentation (A/B/C/D classes)
 - Velocity scoring (0-100 based on turnover, revenue, days-on-hand)
 - Class-specific optimization policies
@@ -430,6 +462,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Automated classification updates (weekly/monthly)
 
 **Business Benefits:**
+
 - Optimize resource allocation (focus 80% effort on 20% products)
 - Reduce carrying costs by 35% through targeted optimization
 - Identify slow movers for liquidation ($630K capital release)
@@ -438,6 +471,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Strategic purchasing decisions based on turnover data
 
 **Technical Features:**
+
 - Multi-factor velocity scoring algorithm
 - Pareto principle implementation (80/20 rule)
 - Historical trend analysis for classification stability
@@ -449,6 +483,7 @@ The Advanced Inventory Management System addresses these challenges through:
 **Classification Criteria:**
 
 **A Items (High Velocity - Top 20% Revenue):**
+
 - Velocity Score: 80-100
 - Turnover Rate: >12x annually (monthly or faster)
 - Revenue Contribution: 70-80% of total
@@ -460,6 +495,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Service Level: 99.5% target
 
 **B Items (Medium Velocity - Next 30% Revenue):**
+
 - Velocity Score: 60-79
 - Turnover Rate: 6-12x annually (bi-monthly)
 - Revenue Contribution: 15-20% of total
@@ -471,6 +507,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Service Level: 98% target
 
 **C Items (Low Velocity - Next 40% Revenue):**
+
 - Velocity Score: 30-59
 - Turnover Rate: 2-6x annually (quarterly)
 - Revenue Contribution: 5-10% of total
@@ -482,6 +519,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Service Level: 95% target
 
 **D Items (Very Low Velocity - Bottom 10% Revenue):**
+
 - Velocity Score: 0-29
 - Turnover Rate: <2x annually (semi-annually or slower)
 - Revenue Contribution: <5% of total
@@ -493,6 +531,7 @@ The Advanced Inventory Management System addresses these challenges through:
 - Service Level: 90% target
 
 **Velocity Scoring Algorithm:**
+
 ```
 Velocity Score = (
   (Turnover Rate / 12) * 0.40 +          // 40% weight on turnover
@@ -503,11 +542,13 @@ Velocity Score = (
 ```
 
 **API Endpoints:**
+
 - `POST /api/inventory/abc-analysis/run` - Execute ABC analysis
 - `GET /api/inventory/abc-analysis/results` - Retrieve results with filtering
 - `GET /api/inventory/velocity-classification/[productId]` - Single product insights
 
 **Dashboard Features:**
+
 - Velocity distribution pie chart (A/B/C/D breakdown)
 - Top performers table (A items with highest scores)
 - Slow movers table (D items for liquidation consideration)
@@ -520,6 +561,7 @@ Velocity Score = (
 ### 5. Risk Scoring & Alerts
 
 **Capabilities:**
+
 - Real-time stockout risk assessment (0-100 score)
 - Overstock risk detection and alerts
 - Financial impact calculation
@@ -544,6 +586,7 @@ Velocity Score = (
 **Risk Scoring Algorithm:**
 
 **Stockout Risk (0-100):**
+
 ```
 Stockout Risk = (
   (1 - Forecast Confidence) * 0.30 +
@@ -555,6 +598,7 @@ Stockout Risk = (
 ```
 
 **Overstock Risk (0-100):**
+
 ```
 Overstock Risk = (
   (Days Supply / Target Days - 1) * 0.40 +
@@ -591,6 +635,7 @@ Overstock Risk = (
   - SLA: Review during regular optimization cycles
 
 **Business Impact:**
+
 - Prevent 97% of potential stockouts ($880K annual savings)
 - Early warning system (30-90 days ahead)
 - Prioritized action lists for operations teams
@@ -631,6 +676,7 @@ Overstock Risk = (
    - Financial Impact: Optimization potential from policy adjustments
 
 **Dashboard Features:**
+
 - Risk heatmap showing all products by risk level
 - Critical alerts feed with one-click remediation
 - Financial impact summary ($1.8M+ optimization potential)
@@ -642,6 +688,7 @@ Overstock Risk = (
 ### 6. Inventory Intelligence & Optimization
 
 **Capabilities:**
+
 - Comprehensive optimization insights across all subsystems
 - Financial impact aggregation ($1.8M+ annual savings)
 - Real-time system health monitoring
@@ -714,15 +761,16 @@ Overstock Risk = (
 
 **Financial Impact Summary:**
 
-| Insight Area | Annual Impact | Status |
-|--------------|---------------|--------|
-| Carrying Cost Reduction | $630,000 | On Track |
-| Prevented Stockouts | $880,000 | Exceeding Target |
-| Labor Efficiency | $180,000 | Achieved |
-| Waste Reduction | $110,000 | Achieved |
-| **Total** | **$1,800,000** | **106% of Target** |
+| Insight Area            | Annual Impact  | Status             |
+| ----------------------- | -------------- | ------------------ |
+| Carrying Cost Reduction | $630,000       | On Track           |
+| Prevented Stockouts     | $880,000       | Exceeding Target   |
+| Labor Efficiency        | $180,000       | Achieved           |
+| Waste Reduction         | $110,000       | Achieved           |
+| **Total**               | **$1,800,000** | **106% of Target** |
 
 **Dashboard Features:**
+
 - Executive summary with key financial metrics
 - Stockout risk heatmap (products by risk level)
 - Overstock items with reduction opportunities
@@ -977,17 +1025,20 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 ### Scalability & Performance
 
 **Horizontal Scaling:**
+
 - Stateless API design enables horizontal pod autoscaling
 - Database connection pooling (50 connections per instance)
 - Redis caching for hot data (forecast results, device status)
 - CDN for static assets
 
 **Vertical Scaling:**
+
 - Database: PostgreSQL with read replicas
 - Cache: Redis Cluster for high availability
 - Compute: Auto-scaling based on CPU/Memory metrics
 
 **Performance Targets:**
+
 - API Response Time: <200ms (p95), <500ms (p99)
 - Forecast Generation: <30 seconds (single product), <5 minutes (batch 100 products)
 - IoT Edge Processing: <10ms (sensor to validation)
@@ -995,6 +1046,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 - Database Query: <100ms (indexed queries)
 
 **Load Capacity:**
+
 - Concurrent Users: 1,000+ simultaneous
 - API Requests: 10,000 req/min sustained, 50,000 req/min peak
 - IoT Data Ingestion: 100,000 readings/second
@@ -1008,6 +1060,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 ### Technology Stack Details
 
 **Frontend:**
+
 - Framework: Next.js 14 (App Router)
 - Language: TypeScript 5.0+
 - UI Library: React 18+
@@ -1018,6 +1071,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 - Tables: TanStack Table (React Table v8)
 
 **Backend:**
+
 - Runtime: Node.js 20+ LTS
 - Framework: Next.js 14 API Routes
 - Language: TypeScript 5.0+
@@ -1027,6 +1081,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 - Validation: Zod schemas
 
 **Database:**
+
 - Primary: PostgreSQL 15+
 - Time-Series: TimescaleDB (PostgreSQL extension)
 - Cache: Redis 7+
@@ -1035,6 +1090,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 - Backup: Automated daily snapshots
 
 **IoT & Messaging:**
+
 - Protocol: MQTT 5.0
 - Broker: Eclipse Mosquitto 2.0+
 - QoS Level: 1 (At least once)
@@ -1043,6 +1099,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 - Edge Computing: Node.js lightweight agents
 
 **AI/ML:**
+
 - Library: TensorFlow.js
 - Algorithms: Ensemble (SMA, EMA, Linear Regression, Seasonal Decomposition)
 - Training: Online learning with historical data
@@ -1050,6 +1107,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 - Inference: Real-time in Node.js runtime
 
 **Infrastructure:**
+
 - Container: Docker 24+
 - Orchestration: Kubernetes 1.28+
 - Cloud: AWS/Azure/GCP (cloud-agnostic)
@@ -1058,6 +1116,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 - CI/CD: GitHub Actions
 
 **Monitoring & Logging:**
+
 - APM: New Relic
 - Logs: ELK Stack (Elasticsearch, Logstash, Kibana)
 - Metrics: Prometheus + Grafana
@@ -1070,6 +1129,7 @@ IoT Device → MQTT Broker → Edge Processing (<10ms)
 **New Models (7):**
 
 1. **DemandForecast**
+
 ```prisma
 model DemandForecast {
   id                String   @id @default(cuid())
@@ -1084,15 +1144,16 @@ model DemandForecast {
   optimalStockLevel Int
   intelligence      Json     // Recommendations, insights
   createdAt         DateTime @default(now())
-  
+
   product           InventoryItem @relation(fields: [productId], references: [id])
-  
+
   @@index([productId])
   @@index([createdAt])
 }
 ```
 
 2. **AutonomousDecision**
+
 ```prisma
 model AutonomousDecision {
   id                String   @id @default(cuid())
@@ -1106,13 +1167,13 @@ model AutonomousDecision {
   result            String   // PENDING, SUCCESS, FAILED, REJECTED
   executedAt        DateTime?
   createdAt         DateTime @default(now())
-  
+
   organization      Organization @relation(fields: [organizationId], references: [id])
   product           InventoryItem @relation(fields: [productId], references: [id])
   purchaseOrder     PurchaseOrder?
   warehouseTransfer WarehouseTransfer?
   stockAdjustment   StockAdjustment?
-  
+
   @@index([organizationId])
   @@index([result])
   @@index([createdAt])
@@ -1120,6 +1181,7 @@ model AutonomousDecision {
 ```
 
 3. **IoTReading**
+
 ```prisma
 model IoTReading {
   id             String   @id @default(cuid())
@@ -1130,15 +1192,16 @@ model IoTReading {
   metadata       Json?    // Additional context
   timestamp      DateTime @default(now())
   processed      Boolean  @default(false)
-  
+
   device         IoTDevice @relation(fields: [deviceId], references: [id])
-  
+
   @@index([deviceId, timestamp])
   @@index([readingType])
 }
 ```
 
 4. **VelocityClassification**
+
 ```prisma
 model VelocityClassification {
   id                String   @id @default(cuid())
@@ -1149,15 +1212,16 @@ model VelocityClassification {
   annualRevenue     Float
   daysOnHand        Float
   lastUpdated       DateTime @default(now())
-  
+
   product           InventoryItem @relation(fields: [productId], references: [id])
-  
+
   @@index([velocityClass])
   @@index([velocityScore])
 }
 ```
 
 5. **DigitalTwinState**
+
 ```prisma
 model DigitalTwinState {
   id                String   @id @default(cuid())
@@ -1168,15 +1232,16 @@ model DigitalTwinState {
   discrepancy       Int
   confidenceScore   Float    // 0-100
   lastSyncedAt      DateTime @default(now())
-  
+
   product           InventoryItem @relation(fields: [productId], references: [id])
-  
+
   @@unique([productId, warehouseId])
   @@index([discrepancy])
 }
 ```
 
 6. **EnvironmentalReading**
+
 ```prisma
 model EnvironmentalReading {
   id            String   @id @default(cuid())
@@ -1188,15 +1253,16 @@ model EnvironmentalReading {
   vocLevel      Float?
   compliance    Boolean  @default(true)
   timestamp     DateTime @default(now())
-  
+
   device        IoTDevice @relation(fields: [deviceId], references: [id])
-  
+
   @@index([deviceId, timestamp])
   @@index([compliance])
 }
 ```
 
 7. **AutonomousConfig**
+
 ```prisma
 model AutonomousConfig {
   id                    String   @id @default(cuid())
@@ -1206,7 +1272,7 @@ model AutonomousConfig {
   enabled               Boolean  @default(true)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
-  
+
   organization          Organization @relation(fields: [organizationId], references: [id])
 }
 ```
@@ -1434,6 +1500,7 @@ model StockAdjustment {
 ### Error Handling
 
 **Standard Error Response Format:**
+
 ```json
 {
   "success": false,
@@ -1451,6 +1518,7 @@ model StockAdjustment {
 ```
 
 **Error Codes:**
+
 - `INSUFFICIENT_DATA` (400): Not enough historical data
 - `INVALID_CONFIDENCE` (400): Confidence score below threshold
 - `DEVICE_OFFLINE` (503): IoT device not responding
@@ -1462,6 +1530,7 @@ model StockAdjustment {
 - `INTERNAL_ERROR` (500): Server error
 
 **Retry Strategy:**
+
 - Transient errors (503, 429): Exponential backoff (1s, 2s, 4s, 8s)
 - Client errors (400, 401, 403, 404): Do not retry
 - Server errors (500): Retry up to 3 times with 5s delay
@@ -1469,6 +1538,7 @@ model StockAdjustment {
 ### Performance Optimization
 
 **Database Indexes:**
+
 ```sql
 -- Forecast lookups
 CREATE INDEX idx_forecast_product_created ON "DemandForecast"("productId", "createdAt" DESC);
@@ -1487,6 +1557,7 @@ CREATE INDEX idx_velocity_class_score ON "VelocityClassification"("velocityClass
 ```
 
 **Caching Strategy:**
+
 - Forecast Results: 1 hour TTL
 - Device Status: 5 minutes TTL
 - ABC Classifications: 24 hours TTL
@@ -1494,6 +1565,7 @@ CREATE INDEX idx_velocity_class_score ON "VelocityClassification"("velocityClass
 - User Session: 24 hours TTL
 
 **Query Optimization:**
+
 - Use `select` to limit returned fields
 - Implement pagination (default 50, max 100)
 - Use cursor-based pagination for large datasets
@@ -1541,21 +1613,21 @@ CREATE INDEX idx_velocity_class_score ON "VelocityClassification"("velocityClass
 ```typescript
 // Role hierarchy
 enum Role {
-  ADMIN       = 'ADMIN',       // Full system access
-  MANAGER     = 'MANAGER',     // Approve decisions, configure
-  OPERATOR    = 'OPERATOR',    // View, execute operations
-  VIEWER      = 'VIEWER'       // Read-only access
+  ADMIN = "ADMIN", // Full system access
+  MANAGER = "MANAGER", // Approve decisions, configure
+  OPERATOR = "OPERATOR", // View, execute operations
+  VIEWER = "VIEWER", // Read-only access
 }
 
 // Permission matrix
 const permissions = {
-  'forecast:generate': [ADMIN, MANAGER, OPERATOR],
-  'autonomous:execute': [ADMIN, MANAGER],
-  'autonomous:approve': [ADMIN, MANAGER],
-  'autonomous:config': [ADMIN],
-  'iot:manage': [ADMIN, MANAGER],
-  'abc:analyze': [ADMIN, MANAGER],
-  'reports:view': [ADMIN, MANAGER, OPERATOR, VIEWER]
+  "forecast:generate": [ADMIN, MANAGER, OPERATOR],
+  "autonomous:execute": [ADMIN, MANAGER],
+  "autonomous:approve": [ADMIN, MANAGER],
+  "autonomous:config": [ADMIN],
+  "iot:manage": [ADMIN, MANAGER],
+  "abc:analyze": [ADMIN, MANAGER],
+  "reports:view": [ADMIN, MANAGER, OPERATOR, VIEWER],
 };
 ```
 
@@ -1575,11 +1647,11 @@ interface AuditLog {
   id: string;
   userId: string;
   organizationId: string;
-  action: string;          // FORECAST_GENERATED, DECISION_EXECUTED
-  resource: string;        // Resource ID affected
+  action: string; // FORECAST_GENERATED, DECISION_EXECUTED
+  resource: string; // Resource ID affected
   ipAddress: string;
   userAgent: string;
-  metadata: Json;         // Additional context
+  metadata: Json; // Additional context
   timestamp: DateTime;
 }
 
@@ -1591,6 +1663,7 @@ interface AuditLog {
 ### Compliance Certifications
 
 **SOC 2 Type II:**
+
 - Annual audit by independent CPA firm
 - Security, Availability, Processing Integrity
 - Confidentiality, Privacy controls
@@ -1598,6 +1671,7 @@ interface AuditLog {
 - Report available to enterprise customers
 
 **ISO 27001:2022:**
+
 - Information Security Management System (ISMS)
 - Risk assessment and treatment
 - Incident management procedures
@@ -1605,6 +1679,7 @@ interface AuditLog {
 - Annual certification renewal
 
 **GDPR Compliance:**
+
 - Legal basis: Legitimate interest, Contract
 - Data Protection Officer (DPO) appointed
 - Privacy by Design principles
@@ -1613,6 +1688,7 @@ interface AuditLog {
 - Right to access, rectify, erase, port
 
 **PCI DSS Level 1:**
+
 - Handled via Stripe (PCI certified)
 - No card data stored in system
 - Tokenized payment processing
@@ -1620,6 +1696,7 @@ interface AuditLog {
 - Quarterly network scans
 
 **FDA 21 CFR Part 11:**
+
 - Electronic records and signatures
 - Audit trail for temperature-sensitive goods
 - System validation documentation
@@ -1627,6 +1704,7 @@ interface AuditLog {
 - Compliance for pharmaceutical/food warehouses
 
 **USDA/FSIS Compliance:**
+
 - Environmental monitoring for food safety
 - Temperature/humidity control validation
 - Hazard Analysis Critical Control Points (HACCP)
@@ -1635,6 +1713,7 @@ interface AuditLog {
 ### Security Testing
 
 **Vulnerability Scanning:**
+
 - Weekly automated scans (OWASP ZAP)
 - Monthly penetration testing
 - Dependency vulnerability scanning (Snyk)
@@ -1655,6 +1734,7 @@ interface AuditLog {
 - [ ] Output encoding verification
 
 **Bug Bounty Program:**
+
 - Platform: HackerOne
 - Scope: All production systems
 - Rewards: $100 - $10,000 (severity-based)
@@ -1668,6 +1748,7 @@ interface AuditLog {
 ### Load Testing Results (December 2025)
 
 **Test Environment:**
+
 - Infrastructure: AWS (us-east-1)
 - Instances: 10x t3.xlarge (4 vCPU, 16GB RAM)
 - Database: RDS PostgreSQL (db.r6g.2xlarge)
@@ -1676,10 +1757,10 @@ interface AuditLog {
 
 **Concurrent Users Test:**
 
-| Users | Avg Response | p95 Response | p99 Response | Error Rate | Throughput |
-|-------|--------------|--------------|--------------|------------|------------|
-| 100   | 85ms         | 150ms        | 210ms        | 0.01%      | 1,200 req/s |
-| 500   | 120ms        | 220ms        | 340ms        | 0.05%      | 5,800 req/s |
+| Users | Avg Response | p95 Response | p99 Response | Error Rate | Throughput   |
+| ----- | ------------ | ------------ | ------------ | ---------- | ------------ |
+| 100   | 85ms         | 150ms        | 210ms        | 0.01%      | 1,200 req/s  |
+| 500   | 120ms        | 220ms        | 340ms        | 0.05%      | 5,800 req/s  |
 | 1,000 | 180ms        | 310ms        | 480ms        | 0.12%      | 11,200 req/s |
 | 2,000 | 290ms        | 520ms        | 780ms        | 0.45%      | 19,800 req/s |
 | 5,000 | 680ms        | 1,200ms      | 1,850ms      | 2.30%      | 38,000 req/s |
@@ -1688,19 +1769,19 @@ interface AuditLog {
 
 **Forecast Generation Performance:**
 
-| Products | Sequential | Parallel (10 workers) | Improvement |
-|----------|------------|----------------------|-------------|
-| 1        | 2.8s       | 2.8s                 | -           |
-| 10       | 28s        | 5.2s                 | 82% faster  |
-| 100      | 280s (4.7min) | 32s               | 89% faster  |
-| 1,000    | 2,800s (46min) | 310s (5.2min)    | 89% faster  |
+| Products | Sequential     | Parallel (10 workers) | Improvement |
+| -------- | -------------- | --------------------- | ----------- |
+| 1        | 2.8s           | 2.8s                  | -           |
+| 10       | 28s            | 5.2s                  | 82% faster  |
+| 100      | 280s (4.7min)  | 32s                   | 89% faster  |
+| 1,000    | 2,800s (46min) | 310s (5.2min)         | 89% faster  |
 
 **Target Met:** ✅ <30s single product, <5min batch 100 products
 
 **IoT Data Ingestion:**
 
 | Readings/sec | Avg Latency | p95 Latency | Success Rate | CPU Usage | Memory Usage |
-|--------------|-------------|-------------|--------------|-----------|--------------|
+| ------------ | ----------- | ----------- | ------------ | --------- | ------------ |
 | 10,000       | 4ms         | 8ms         | 99.99%       | 35%       | 45%          |
 | 50,000       | 6ms         | 12ms        | 99.98%       | 62%       | 68%          |
 | 100,000      | 9ms         | 18ms        | 99.95%       | 88%       | 82%          |
@@ -1711,6 +1792,7 @@ interface AuditLog {
 ### Business Metrics (6-Month Post-Launch)
 
 **Adoption Rate:**
+
 - Organizations Using Forecasting: 94%
 - Organizations Using Autonomous Ops: 87%
 - Organizations Using IoT Integration: 76%
@@ -1718,6 +1800,7 @@ interface AuditLog {
 - Overall Feature Adoption: 87%
 
 **User Satisfaction:**
+
 - Net Promoter Score (NPS): 72 (Industry avg: 45)
 - Customer Satisfaction (CSAT): 4.6/5.0
 - Feature Usefulness: 4.7/5.0
@@ -1725,6 +1808,7 @@ interface AuditLog {
 - Support Response: 4.8/5.0
 
 **Operational Impact:**
+
 - Average Time Saved: 6.2 hours/day per warehouse
 - Stockout Reduction: 90% average
 - Overstock Reduction: 36% average
@@ -1732,6 +1816,7 @@ interface AuditLog {
 - Forecast Accuracy: 95.7% average
 
 **Financial Impact:**
+
 - Average Savings: $1.6M per warehouse annually
 - ROI Range: 200% - 450% (first year)
 - Payback Period: 2.8 - 4.5 months
@@ -1745,6 +1830,7 @@ interface AuditLog {
 ### Monitoring Stack
 
 **Application Performance Monitoring (New Relic):**
+
 - Transaction tracing (all API endpoints)
 - Error tracking and analysis
 - Apdex score monitoring (target: >0.95)
@@ -1753,6 +1839,7 @@ interface AuditLog {
 - CPU/Memory usage trends
 
 **Logging (ELK Stack):**
+
 - Centralized log aggregation
 - Structured JSON logging
 - Log retention: 90 days (hot), 1 year (warm), 7 years (cold)
@@ -1760,6 +1847,7 @@ interface AuditLog {
 - Log-based alerts and anomaly detection
 
 **Metrics (Prometheus + Grafana):**
+
 - System metrics (CPU, memory, disk, network)
 - Application metrics (request rate, latency, errors)
 - Business metrics (forecasts generated, decisions executed)
@@ -1767,6 +1855,7 @@ interface AuditLog {
 - Historical trend analysis
 
 **Uptime Monitoring (Pingdom):**
+
 - HTTP/HTTPS endpoint checks every 1 minute
 - SSL certificate expiration monitoring
 - DNS resolution monitoring
@@ -1776,6 +1865,7 @@ interface AuditLog {
 ### Key Metrics Tracked
 
 **System Health:**
+
 - API Availability: Target 99.9% (measured: 99.94%)
 - Database Availability: Target 99.95% (measured: 99.98%)
 - IoT Broker Availability: Target 99.9% (measured: 99.92%)
@@ -1783,6 +1873,7 @@ interface AuditLog {
 - Error Rate: Target <0.1% (measured: 0.04%)
 
 **Performance:**
+
 - API Response Time (p95): Target <200ms (measured: 162ms)
 - API Response Time (p99): Target <500ms (measured: 418ms)
 - Database Query Time (p95): Target <100ms (measured: 73ms)
@@ -1790,6 +1881,7 @@ interface AuditLog {
 - IoT Processing Latency: Target <10ms (measured: 6.2ms avg)
 
 **Business:**
+
 - Forecasts Generated: 12,500/day average
 - Autonomous Decisions: 3,800/day average
 - Auto-Execution Rate: 83.7%
@@ -1800,6 +1892,7 @@ interface AuditLog {
 ### Alert Configuration
 
 **Critical Alerts (PagerDuty + SMS + Email):**
+
 - API availability <99% for 5 minutes
 - Database connection failures
 - Forecast accuracy drops below 90%
@@ -1808,6 +1901,7 @@ interface AuditLog {
 - Environmental compliance violations
 
 **High Priority Alerts (Email + Slack):**
+
 - API response time >500ms (p95) for 10 minutes
 - Error rate >0.5% for 5 minutes
 - Forecast generation failures >10/hour
@@ -1816,6 +1910,7 @@ interface AuditLog {
 - Memory usage >85%
 
 **Medium Priority Alerts (Slack + Email):**
+
 - API response time >300ms (p95) for 15 minutes
 - Cache hit rate <70% for 30 minutes
 - Forecast accuracy 90-93% for 24 hours
@@ -1850,6 +1945,7 @@ MEDIUM Priority Alert Triggered
 **Incident Severity Levels:**
 
 **SEV1 (Critical):**
+
 - System completely down
 - Data loss or corruption
 - Security breach
@@ -1858,6 +1954,7 @@ MEDIUM Priority Alert Triggered
 - Stakeholders: CEO, CTO, Engineering, Support
 
 **SEV2 (High):**
+
 - Major feature unavailable
 - Significant performance degradation
 - Compliance violation
@@ -1866,6 +1963,7 @@ MEDIUM Priority Alert Triggered
 - Stakeholders: CTO, Engineering Manager, Support
 
 **SEV3 (Medium):**
+
 - Minor feature degraded
 - Non-critical performance issue
 - Response Time: <2 hours
@@ -1873,6 +1971,7 @@ MEDIUM Priority Alert Triggered
 - Stakeholders: Engineering Team, Support
 
 **SEV4 (Low):**
+
 - Cosmetic issues
 - Non-urgent improvements
 - Response Time: <1 business day
@@ -1934,6 +2033,7 @@ MEDIUM Priority Alert Triggered
 ### Unit Testing (Jest)
 
 **Coverage Targets:**
+
 - Services: 90%+ coverage
 - API Routes: 85%+ coverage
 - Utilities: 95%+ coverage
@@ -1941,33 +2041,34 @@ MEDIUM Priority Alert Triggered
 - Overall: 85%+ coverage
 
 **Test Structure:**
+
 ```typescript
-describe('AdvancedInventoryService', () => {
-  describe('performABCAnalysis', () => {
-    it('should classify products into A/B/C/D categories', async () => {
+describe("AdvancedInventoryService", () => {
+  describe("performABCAnalysis", () => {
+    it("should classify products into A/B/C/D categories", async () => {
       // Arrange
       const mockProducts = createMockProducts(100);
-      
+
       // Act
-      const results = await service.performABCAnalysis('org_123');
-      
+      const results = await service.performABCAnalysis("org_123");
+
       // Assert
       expect(results).toHaveLength(100);
-      expect(results.filter(r => r.velocityClass === 'A')).toHaveLength(20);
-      expect(results.filter(r => r.velocityClass === 'B')).toHaveLength(30);
-      expect(results.filter(r => r.velocityClass === 'C')).toHaveLength(40);
-      expect(results.filter(r => r.velocityClass === 'D')).toHaveLength(10);
+      expect(results.filter((r) => r.velocityClass === "A")).toHaveLength(20);
+      expect(results.filter((r) => r.velocityClass === "B")).toHaveLength(30);
+      expect(results.filter((r) => r.velocityClass === "C")).toHaveLength(40);
+      expect(results.filter((r) => r.velocityClass === "D")).toHaveLength(10);
     });
 
-    it('should calculate velocity scores correctly', async () => {
+    it("should calculate velocity scores correctly", async () => {
       const mockProduct = {
         turnoverRate: 10,
         annualRevenue: 100000,
-        daysOnHand: 30
+        daysOnHand: 30,
       };
-      
+
       const result = await service.calculateVelocityScore(mockProduct);
-      
+
       expect(result.velocityScore).toBeGreaterThan(70);
       expect(result.velocityScore).toBeLessThan(100);
     });
@@ -1976,6 +2077,7 @@ describe('AdvancedInventoryService', () => {
 ```
 
 **Mock Strategy:**
+
 - Database: Mocked with Prisma mock client
 - External APIs: Mocked with MSW (Mock Service Worker)
 - IoT Devices: Simulated with test fixtures
@@ -1984,24 +2086,25 @@ describe('AdvancedInventoryService', () => {
 ### Integration Testing
 
 **API Integration Tests:**
+
 ```typescript
-describe('POST /api/inventory/forecast/generate', () => {
-  it('should generate forecast successfully', async () => {
+describe("POST /api/inventory/forecast/generate", () => {
+  it("should generate forecast successfully", async () => {
     // Setup test data
     await prisma.inventoryItem.create({
-      data: testProduct
+      data: testProduct,
     });
     await prisma.orderItem.createMany({
-      data: testOrderHistory
+      data: testOrderHistory,
     });
 
     // Make API request
-    const response = await fetch('/api/inventory/forecast/generate', {
-      method: 'POST',
+    const response = await fetch("/api/inventory/forecast/generate", {
+      method: "POST",
       body: JSON.stringify({
-        productId: 'test_product_123',
-        horizonDays: 90
-      })
+        productId: "test_product_123",
+        horizonDays: 90,
+      }),
     });
 
     // Assertions
@@ -2012,23 +2115,24 @@ describe('POST /api/inventory/forecast/generate', () => {
     expect(data.data.confidence).toBeGreaterThan(0.8);
   });
 
-  it('should return error for insufficient data', async () => {
-    const response = await fetch('/api/inventory/forecast/generate', {
-      method: 'POST',
+  it("should return error for insufficient data", async () => {
+    const response = await fetch("/api/inventory/forecast/generate", {
+      method: "POST",
       body: JSON.stringify({
-        productId: 'new_product_no_history',
-        horizonDays: 90
-      })
+        productId: "new_product_no_history",
+        horizonDays: 90,
+      }),
     });
 
     expect(response.status).toBe(400);
     const data = await response.json();
-    expect(data.error.code).toBe('INSUFFICIENT_DATA');
+    expect(data.error.code).toBe("INSUFFICIENT_DATA");
   });
 });
 ```
 
 **Database Integration:**
+
 - Test against PostgreSQL (Docker container)
 - Migrations run before each test suite
 - Data seeded with realistic test fixtures
@@ -2040,31 +2144,34 @@ describe('POST /api/inventory/forecast/generate', () => {
 **Critical User Flows:**
 
 1. **Forecast Generation Flow:**
+
 ```typescript
-test('User can generate forecast and view results', async ({ page }) => {
+test("User can generate forecast and view results", async ({ page }) => {
   // Login
-  await page.goto('/login');
-  await page.fill('[name="email"]', 'test@example.com');
-  await page.fill('[name="password"]', 'password');
+  await page.goto("/login");
+  await page.fill('[name="email"]', "test@example.com");
+  await page.fill('[name="password"]', "password");
   await page.click('button[type="submit"]');
 
   // Navigate to forecasting dashboard
-  await page.goto('/inventory/forecasting');
-  
+  await page.goto("/inventory/forecasting");
+
   // Select product
   await page.click('[data-testid="product-selector"]');
-  await page.fill('[data-testid="product-search"]', 'Widget Pro');
+  await page.fill('[data-testid="product-search"]', "Widget Pro");
   await page.click('[data-testid="product-widget-pro"]');
-  
+
   // Generate forecast
   await page.click('[data-testid="generate-forecast"]');
-  
+
   // Wait for generation
   await page.waitForSelector('[data-testid="forecast-results"]');
-  
+
   // Verify results
   await expect(page.locator('[data-testid="forecast-chart"]')).toBeVisible();
-  await expect(page.locator('[data-testid="confidence-score"]')).toContainText('%');
+  await expect(page.locator('[data-testid="confidence-score"]')).toContainText(
+    "%",
+  );
   await expect(page.locator('[data-testid="recommendations"]')).toBeVisible();
 });
 ```
@@ -2074,6 +2181,7 @@ test('User can generate forecast and view results', async ({ page }) => {
 4. **ABC Analysis Execution Flow:**
 
 **E2E Test Environment:**
+
 - Dedicated test environment
 - Production-like configuration
 - Real database with test data
@@ -2083,37 +2191,41 @@ test('User can generate forecast and view results', async ({ page }) => {
 ### Performance Testing (k6)
 
 **Load Test Script:**
+
 ```javascript
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: '2m', target: 100 },  // Ramp-up
-    { duration: '5m', target: 100 },  // Steady state
-    { duration: '2m', target: 500 },  // Spike
-    { duration: '5m', target: 500 },  // Sustained spike
-    { duration: '2m', target: 0 },    // Ramp-down
+    { duration: "2m", target: 100 }, // Ramp-up
+    { duration: "5m", target: 100 }, // Steady state
+    { duration: "2m", target: 500 }, // Spike
+    { duration: "5m", target: 500 }, // Sustained spike
+    { duration: "2m", target: 0 }, // Ramp-down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<200'],  // 95% <200ms
-    http_req_failed: ['rate<0.01'],    // <1% errors
+    http_req_duration: ["p(95)<200"], // 95% <200ms
+    http_req_failed: ["rate<0.01"], // <1% errors
   },
 };
 
 export default function () {
-  const res = http.get('https://api.flowstock.com/api/inventory/forecast/accuracy');
-  
+  const res = http.get(
+    "https://api.flowstock.com/api/inventory/forecast/accuracy",
+  );
+
   check(res, {
-    'status is 200': (r) => r.status === 200,
-    'response time OK': (r) => r.timings.duration < 200,
+    "status is 200": (r) => r.status === 200,
+    "response time OK": (r) => r.timings.duration < 200,
   });
-  
+
   sleep(1);
 }
 ```
 
 **Stress Test Scenarios:**
+
 - Gradual ramp-up to 2,000 users
 - Spike test (100 → 1,000 users in 30s)
 - Soak test (500 users for 6 hours)
@@ -2122,6 +2234,7 @@ export default function () {
 ### Test Data Management
 
 **Test Data Strategy:**
+
 - Seed scripts for consistent test data
 - Factories for generating test objects
 - Realistic data distributions
@@ -2129,6 +2242,7 @@ export default function () {
 - Automated data cleanup
 
 **Test Data Seeding:**
+
 ```typescript
 // seed-test-data.ts
 async function seedTestData() {
@@ -2164,6 +2278,7 @@ async function seedTestData() {
 ### Prerequisites
 
 **Infrastructure Requirements:**
+
 - Kubernetes cluster (1.28+) or Docker Compose
 - PostgreSQL 15+ database
 - Redis 7+ cache
@@ -2172,6 +2287,7 @@ async function seedTestData() {
 - Network: Public IP for API, Private network for services
 
 **Development Tools:**
+
 - Node.js 20+ LTS
 - npm or yarn
 - Git
@@ -2181,6 +2297,7 @@ async function seedTestData() {
 ### Environment Configuration
 
 **Environment Variables (.env.production):**
+
 ```bash
 # Database
 DATABASE_URL="postgresql://user:pass@host:5432/flowstock"
@@ -2214,6 +2331,7 @@ MAX_ORDER_VALUE=10000
 ### Deployment Steps
 
 **1. Database Migration**
+
 ```bash
 # Run Prisma migrations
 npx prisma migrate deploy
@@ -2223,6 +2341,7 @@ npx prisma db seed
 ```
 
 **2. Build Application**
+
 ```bash
 # Install dependencies
 npm install --production
@@ -2235,6 +2354,7 @@ npm run start # Test locally
 ```
 
 **3. Docker Deployment**
+
 ```bash
 # Build Docker image
 docker build -t flowstock:v2.0 .
@@ -2252,6 +2372,7 @@ curl http://localhost:3000/api/health
 ```
 
 **4. Kubernetes Deployment**
+
 ```yaml
 # k8s/deployment.yaml
 apiVersion: apps/v1
@@ -2269,35 +2390,35 @@ spec:
         app: flowstock
     spec:
       containers:
-      - name: flowstock
-        image: flowstock:v2.0
-        ports:
-        - containerPort: 3000
-        env:
-        - name: DATABASE_URL
-          valueFrom:
-            secretKeyRef:
-              name: flowstock-secrets
-              key: database-url
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "500m"
-          limits:
-            memory: "2Gi"
-            cpu: "2000m"
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /api/ready
-            port: 3000
-          initialDelaySeconds: 10
-          periodSeconds: 5
+        - name: flowstock
+          image: flowstock:v2.0
+          ports:
+            - containerPort: 3000
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: flowstock-secrets
+                  key: database-url
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/ready
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
 ```
 
 ```bash
@@ -2313,6 +2434,7 @@ kubectl logs -f deployment/flowstock
 ```
 
 **5. IoT Device Setup**
+
 ```bash
 # Generate device certificates
 ./scripts/generate-device-cert.sh RFID-001
@@ -2387,6 +2509,7 @@ mosquitto_pub \
 The Advanced Inventory Management System delivers:
 
 **Technical Excellence:**
+
 - 5,500+ lines of production-ready code
 - 20 REST API endpoints with <200ms response times
 - 7 new database models with optimized indexing
@@ -2395,6 +2518,7 @@ The Advanced Inventory Management System delivers:
 - 99.9% system uptime
 
 **Business Impact:**
+
 - $1.8M+ annual savings per warehouse
 - 83% reduction in manual work
 - 90% fewer stockout incidents
@@ -2403,6 +2527,7 @@ The Advanced Inventory Management System delivers:
 - 3.2-month payback period
 
 **Competitive Advantage:**
+
 - 5-10 years ahead of market standards
 - Autonomous operations (zero-touch reordering)
 - Real-time IoT digital twin technology
@@ -2412,6 +2537,7 @@ The Advanced Inventory Management System delivers:
 ### Next Steps
 
 **For Development Teams:**
+
 1. Review API documentation
 2. Set up development environment
 3. Run test suite to validate implementation
@@ -2419,6 +2545,7 @@ The Advanced Inventory Management System delivers:
 5. Conduct user acceptance testing
 
 **For Operations Teams:**
+
 1. Configure IoT devices
 2. Set up monitoring dashboards
 3. Define alert notification preferences
@@ -2426,6 +2553,7 @@ The Advanced Inventory Management System delivers:
 5. Establish support procedures
 
 **For Executive Leadership:**
+
 1. Review ROI projections
 2. Plan rollout timeline
 3. Communicate value to stakeholders
@@ -2435,18 +2563,21 @@ The Advanced Inventory Management System delivers:
 ### Support & Resources
 
 **Documentation:**
+
 - API Documentation: `/docs/api.md`
 - Database Schema: `/docs/database.md`
 - Deployment Guide: This document
 - Troubleshooting FAQ: Section 15
 
 **Support Channels:**
+
 - Email: support@flowstock.com
 - Slack: #flowstock-support
 - Emergency: +1-XXX-XXX-XXXX (24/7)
 - Status Page: status.flowstock.com
 
 **Training Resources:**
+
 - Video tutorials: learn.flowstock.com
 - Webinars: Monthly feature deep-dives
 - Documentation: docs.flowstock.com
@@ -2470,7 +2601,7 @@ This system represents the culmination of extensive research, development, and t
 **Total Lines:** 2,200+  
 **Sections:** 17  
 **Code Examples:** 45+  
-**Diagrams:** 10+  
+**Diagrams:** 10+
 
 **Completion Status:** ✅ **100% COMPLETE**
 
@@ -2517,18 +2648,19 @@ The forecasting engine combines four proven algorithms to deliver industry-leadi
 
 ```typescript
 interface ForecastConfidence {
-  score: number;          // 0-100 confidence level
+  score: number; // 0-100 confidence level
   factors: {
-    dataQuality: number;  // Historical data completeness
-    consistency: number;  // Pattern stability
-    variance: number;     // Prediction variance across models
-    recency: number;      // Recent data availability
+    dataQuality: number; // Historical data completeness
+    consistency: number; // Pattern stability
+    variance: number; // Prediction variance across models
+    recency: number; // Recent data availability
   };
-  interpretation: 'very-high' | 'high' | 'moderate' | 'low';
+  interpretation: "very-high" | "high" | "moderate" | "low";
 }
 ```
 
 **Confidence Thresholds:**
+
 - Very High (90-100): Minimal human review, auto-execute
 - High (75-89): Standard confidence, recommend action
 - Moderate (60-74): Suggest human validation
@@ -2537,6 +2669,7 @@ interface ForecastConfidence {
 **Real-Time Adaptation:**
 
 The system continuously learns from actual outcomes:
+
 - Daily forecast accuracy measurement
 - Model weight adjustment based on performance
 - Anomaly detection and exclusion (e.g., COVID spike)
@@ -2577,16 +2710,17 @@ The autonomous system uses a multi-factor scoring algorithm:
 
 ```typescript
 interface DecisionScore {
-  confidence: number;        // AI forecast confidence (0-100)
-  riskLevel: number;         // Stockout/overstock risk (0-100)
-  businessImpact: number;    // Revenue impact score (0-100)
+  confidence: number; // AI forecast confidence (0-100)
+  riskLevel: number; // Stockout/overstock risk (0-100)
+  businessImpact: number; // Revenue impact score (0-100)
   historicalSuccess: number; // Past decision success rate (0-100)
-  finalScore: number;        // Weighted combination
-  recommendation: 'auto-execute' | 'suggest' | 'flag-review';
+  finalScore: number; // Weighted combination
+  recommendation: "auto-execute" | "suggest" | "flag-review";
 }
 ```
 
 **Scoring Weights:**
+
 - Forecast Confidence: 40%
 - Risk Level: 30%
 - Business Impact: 20%
@@ -2596,16 +2730,16 @@ interface DecisionScore {
 
 ```typescript
 const AUTO_EXECUTE_THRESHOLDS = {
-  minConfidence: 80,           // Forecast must be >80% confident
-  maxOrderValue: 10000,        // Orders <$10K auto-execute
-  minHistoricalSuccess: 85,    // Past success rate >85%
-  maxRiskScore: 30,            // Low risk only
+  minConfidence: 80, // Forecast must be >80% confident
+  maxOrderValue: 10000, // Orders <$10K auto-execute
+  minHistoricalSuccess: 85, // Past success rate >85%
+  maxRiskScore: 30, // Low risk only
   requireApprovalWhen: {
     newSupplier: true,
     firstTimeProduct: true,
-    unusualQuantity: true,      // >200% of typical order
-    criticalItem: true          // A-class items
-  }
+    unusualQuantity: true, // >200% of typical order
+    criticalItem: true, // A-class items
+  },
 };
 ```
 
@@ -2638,6 +2772,7 @@ const AUTO_EXECUTE_THRESHOLDS = {
 **Approval Workflow:**
 
 For decisions requiring human approval:
+
 - Notification sent to appropriate role (Manager/Director)
 - One-click approve/reject in dashboard
 - SLA: 4-hour response for standard, 1-hour for critical
@@ -2684,17 +2819,17 @@ interface DigitalTwinState {
   physicalInventory: {
     lastRFIDScan: Date;
     tagCount: number;
-    confidence: number;         // 0-100 based on read quality
+    confidence: number; // 0-100 based on read quality
   };
   systemInventory: {
     quantity: number;
     lastUpdated: Date;
-    source: 'manual' | 'transaction' | 'iot';
+    source: "manual" | "transaction" | "iot";
   };
   syncStatus: {
-    variance: number;           // Difference between physical & system
-    variancePercent: number;    // As percentage
-    syncConfidence: number;     // 0-100 confidence in accuracy
+    variance: number; // Difference between physical & system
+    variancePercent: number; // As percentage
+    syncConfidence: number; // 0-100 confidence in accuracy
     requiresReconciliation: boolean;
     lastSync: Date;
   };
@@ -2717,6 +2852,7 @@ interface DigitalTwinState {
 **Edge Processing:**
 
 Critical IoT data is processed at the edge for <10ms latency:
+
 - Tag deduplication (prevent double-counting)
 - Read quality filtering (signal strength, read count)
 - Anomaly detection (unexpected tags, missing expected tags)
@@ -2739,11 +2875,13 @@ IoT Device → Edge Gateway → MQTT Broker → Cloud Processor → Digital Twin
 Products are scored on three dimensions:
 
 1. **Revenue Contribution** (40% weight)
+
    ```
    Score = (Product Annual Revenue / Total Warehouse Revenue) × 100
    ```
 
 2. **Turnover Velocity** (40% weight)
+
    ```
    Velocity = (Units Sold per Month / Average On-Hand Inventory)
    Score = Normalized to 0-100 scale
@@ -2797,38 +2935,38 @@ Products are scored on three dimensions:
 ```typescript
 const CLASS_POLICIES = {
   A: {
-    countFrequency: 'daily',
+    countFrequency: "daily",
     safetyStockDays: 21,
     serviceLevel: 0.999,
     forecastHorizon: 90,
-    reviewCycle: 'daily',
-    expediteThreshold: 0.7  // Expedite if <70% of safety stock
+    reviewCycle: "daily",
+    expediteThreshold: 0.7, // Expedite if <70% of safety stock
   },
   B: {
-    countFrequency: 'weekly',
+    countFrequency: "weekly",
     safetyStockDays: 14,
     serviceLevel: 0.98,
     forecastHorizon: 60,
-    reviewCycle: 'weekly',
-    expediteThreshold: 0.5
+    reviewCycle: "weekly",
+    expediteThreshold: 0.5,
   },
   C: {
-    countFrequency: 'monthly',
+    countFrequency: "monthly",
     safetyStockDays: 7,
     serviceLevel: 0.95,
     forecastHorizon: 30,
-    reviewCycle: 'biweekly',
-    expediteThreshold: 0.3
+    reviewCycle: "biweekly",
+    expediteThreshold: 0.3,
   },
   D: {
-    countFrequency: 'quarterly',
+    countFrequency: "quarterly",
     safetyStockDays: 3,
-    serviceLevel: 0.90,
+    serviceLevel: 0.9,
     forecastHorizon: 30,
-    reviewCycle: 'monthly',
-    expediteThreshold: 0,      // Never expedite
-    liquidationCandidate: true  // Flag for clearance
-  }
+    reviewCycle: "monthly",
+    expediteThreshold: 0, // Never expedite
+    liquidationCandidate: true, // Flag for clearance
+  },
 };
 ```
 
@@ -2843,11 +2981,13 @@ const CLASS_POLICIES = {
 All API requests require authentication via one of:
 
 1. **JWT Bearer Token** (Recommended for web/mobile apps)
+
    ```http
    Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    ```
 
 2. **API Key** (For server-to-server integration)
+
    ```http
    X-API-Key: fs_live_abc123def456ghi789
    ```
@@ -2859,12 +2999,12 @@ All API requests require authentication via one of:
 
 **Role-Based Access Control (RBAC):**
 
-| Role | Forecasting | Autonomous Ops | IoT Management | Analytics | Admin |
-|------|-------------|----------------|----------------|-----------|-------|
-| Admin | ✅ Full | ✅ Full | ✅ Full | ✅ Full | ✅ Full |
-| Manager | ✅ Full | ✅ Approve/Reject | ✅ View | ✅ Full | ❌ None |
-| Operator | ✅ View | ✅ View | ✅ Monitor | ✅ View | ❌ None |
-| Viewer | ✅ View | ✅ View | ✅ View | ✅ View | ❌ None |
+| Role     | Forecasting | Autonomous Ops    | IoT Management | Analytics | Admin   |
+| -------- | ----------- | ----------------- | -------------- | --------- | ------- |
+| Admin    | ✅ Full     | ✅ Full           | ✅ Full        | ✅ Full   | ✅ Full |
+| Manager  | ✅ Full     | ✅ Approve/Reject | ✅ View        | ✅ Full   | ❌ None |
+| Operator | ✅ View     | ✅ View           | ✅ Monitor     | ✅ View   | ❌ None |
+| Viewer   | ✅ View     | ✅ View           | ✅ View        | ✅ View   | ❌ None |
 
 ### API Endpoints Reference
 
@@ -2886,6 +3026,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -2946,6 +3087,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -2970,6 +3112,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3013,6 +3156,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3022,7 +3166,7 @@ Authorization: Bearer {token}
     "confidence": 87,
     "orderNumber": "PO-2026-001234",
     "estimatedDelivery": "2026-01-18T00:00:00Z",
-    "cost": 4500.00,
+    "cost": 4500.0,
     "autoExecuted": true
   }
 }
@@ -3040,6 +3184,7 @@ Authorization: Bearer {token}
 ```
 
 **Query Parameters:**
+
 - `status`: `executed` | `pending` | `rejected` | `all`
 - `type`: `reorder` | `transfer` | `adjustment` | `all`
 - `days`: Number of days to look back (1-90)
@@ -3047,6 +3192,7 @@ Authorization: Bearer {token}
 - `page`: Page number (default: 1)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3060,7 +3206,7 @@ Authorization: Bearer {token}
         "confidence": 87,
         "createdAt": "2026-01-04T09:00:00Z",
         "executedAt": "2026-01-04T09:00:12Z",
-        "value": 4500.00
+        "value": 4500.0
       }
     ],
     "pagination": {
@@ -3088,6 +3234,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3154,6 +3301,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3190,6 +3338,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3222,6 +3371,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3245,6 +3395,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3298,6 +3449,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3342,6 +3494,7 @@ Authorization: Bearer {token}
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -3388,17 +3541,17 @@ Authorization: Bearer {token}
 
 **Common Error Codes:**
 
-| Code | HTTP Status | Description |
-|------|-------------|-------------|
-| `UNAUTHORIZED` | 401 | Invalid or missing authentication |
-| `FORBIDDEN` | 403 | Insufficient permissions |
-| `NOT_FOUND` | 404 | Resource not found |
-| `VALIDATION_ERROR` | 400 | Invalid request parameters |
-| `RATE_LIMIT_EXCEEDED` | 429 | Too many requests |
-| `FORECAST_GENERATION_FAILED` | 500 | Forecasting engine error |
-| `INSUFFICIENT_DATA` | 400 | Not enough historical data |
-| `DEVICE_OFFLINE` | 503 | IoT device not responding |
-| `CONCURRENT_MODIFICATION` | 409 | Resource modified by another request |
+| Code                         | HTTP Status | Description                          |
+| ---------------------------- | ----------- | ------------------------------------ |
+| `UNAUTHORIZED`               | 401         | Invalid or missing authentication    |
+| `FORBIDDEN`                  | 403         | Insufficient permissions             |
+| `NOT_FOUND`                  | 404         | Resource not found                   |
+| `VALIDATION_ERROR`           | 400         | Invalid request parameters           |
+| `RATE_LIMIT_EXCEEDED`        | 429         | Too many requests                    |
+| `FORECAST_GENERATION_FAILED` | 500         | Forecasting engine error             |
+| `INSUFFICIENT_DATA`          | 400         | Not enough historical data           |
+| `DEVICE_OFFLINE`             | 503         | IoT device not responding            |
+| `CONCURRENT_MODIFICATION`    | 409         | Resource modified by another request |
 
 ### Rate Limiting
 
@@ -3413,14 +3566,15 @@ Retry-After: 60
 
 **Rate Limit Tiers:**
 
-| Tier | Requests/Minute | Burst | Price |
-|------|----------------|-------|-------|
-| Free | 60 | 100 | $0 |
-| Pro | 300 | 500 | $299/mo |
-| Enterprise | 1,000 | 2,000 | $999/mo |
-| Unlimited | ∞ | ∞ | Custom |
+| Tier       | Requests/Minute | Burst | Price   |
+| ---------- | --------------- | ----- | ------- |
+| Free       | 60              | 100   | $0      |
+| Pro        | 300             | 500   | $299/mo |
+| Enterprise | 1,000           | 2,000 | $999/mo |
+| Unlimited  | ∞               | ∞     | Custom  |
 
 **Best Practices:**
+
 - Implement exponential backoff on 429 responses
 - Cache forecast results for at least 1 hour
 - Use batch endpoints when processing multiple items
@@ -3432,14 +3586,14 @@ Retry-After: 60
 
 ```typescript
 type WebhookEvent =
-  | 'forecast.generated'
-  | 'forecast.accuracy_degraded'
-  | 'decision.executed'
-  | 'decision.requires_approval'
-  | 'iot.alert_triggered'
-  | 'iot.device_offline'
-  | 'abc.classification_changed'
-  | 'inventory.discrepancy_detected';
+  | "forecast.generated"
+  | "forecast.accuracy_degraded"
+  | "decision.executed"
+  | "decision.requires_approval"
+  | "iot.alert_triggered"
+  | "iot.device_offline"
+  | "abc.classification_changed"
+  | "inventory.discrepancy_detected";
 ```
 
 **Webhook Payload Example:**
@@ -3453,7 +3607,7 @@ type WebhookEvent =
     "type": "reorder",
     "productId": "SKU-12345",
     "confidence": 72,
-    "value": 15000.00,
+    "value": 15000.0,
     "reason": "high-value-requires-approval"
   },
   "signature": "sha256=abc123def456..."
@@ -3496,10 +3650,10 @@ model DemandForecast {
   accuracy        Float?   // Validated accuracy once actual data available
   modelVersion    String   @default("v2.1.0")
   metadata        Json?    // Trend, seasonality, insights
-  
+
   organization    Organization @relation(fields: [organizationId], references: [id])
   product         InventoryItem @relation(fields: [productId], references: [id])
-  
+
   @@index([organizationId, productId, generatedAt])
   @@index([generatedAt])
 }
@@ -3522,10 +3676,10 @@ model AutonomousDecision {
   orderValue        Float?
   metadata          Json     // Decision context and details
   createdAt         DateTime @default(now())
-  
+
   organization      Organization @relation(fields: [organizationId], references: [id])
   product           InventoryItem? @relation(fields: [productId], references: [id])
-  
+
   @@index([organizationId, status, createdAt])
   @@index([productId, status])
   @@index([executedAt])
@@ -3542,11 +3696,11 @@ model IoTReading {
   timestamp       DateTime
   processed       Boolean  @default(false)
   anomaly         Boolean  @default(false)
-  
+
   device          IoTDevice @relation(fields: [deviceId], references: [id])
   organization    Organization @relation(fields: [organizationId], references: [id])
   warehouse       Warehouse? @relation(fields: [warehouseId], references: [id])
-  
+
   @@index([deviceId, timestamp])
   @@index([organizationId, readingType, timestamp])
   @@index([processed, timestamp])
@@ -3564,10 +3718,10 @@ model VelocityClassification {
   strategicScore  Float
   calculatedAt    DateTime @default(now())
   validUntil      DateTime // Typically 30 days
-  
+
   organization    Organization @relation(fields: [organizationId], references: [id])
   product         InventoryItem @relation(fields: [productId], references: [id])
-  
+
   @@unique([organizationId, productId, calculatedAt])
   @@index([organizationId, class])
   @@index([productId, calculatedAt])
@@ -3588,11 +3742,11 @@ model DigitalTwinState {
   lastWeightCheck       DateTime?
   requiresReconciliation Boolean  @default(false)
   updatedAt             DateTime @updatedAt
-  
+
   organization          Organization @relation(fields: [organizationId], references: [id])
   product               InventoryItem @relation(fields: [productId], references: [id])
   warehouse             Warehouse? @relation(fields: [warehouseId], references: [id])
-  
+
   @@unique([organizationId, productId, warehouseId])
   @@index([requiresReconciliation, organizationId])
 }
@@ -3610,10 +3764,10 @@ model EnvironmentalReading {
   compliant     Boolean  @default(true)
   alerts        Json?    // Array of alert objects
   timestamp     DateTime @default(now())
-  
+
   organization  Organization @relation(fields: [organizationId], references: [id])
   warehouse     Warehouse @relation(fields: [warehouseId], references: [id])
-  
+
   @@index([warehouseId, zone, timestamp])
   @@index([compliant, timestamp])
 }
@@ -3628,7 +3782,7 @@ model AutonomousConfig {
   requireApprovalFor    Json     // newSupplier, firstTimeProduct, etc.
   notificationRules     Json     // Alert configuration
   updatedAt             DateTime @updatedAt
-  
+
   organization          Organization @relation(fields: [organizationId], references: [id])
 }
 ```
@@ -3638,7 +3792,7 @@ model AutonomousConfig {
 ```prisma
 model Organization {
   // ... existing fields ...
-  
+
   // New relations
   demandForecasts       DemandForecast[]
   autonomousDecisions   AutonomousDecision[]
@@ -3651,14 +3805,14 @@ model Organization {
 
 model InventoryItem {
   // ... existing fields ...
-  
+
   // New fields
   lastForecastAt      DateTime?
   forecastAccuracy    Float?    // Running accuracy metric
   velocityClass       String?   // A, B, C, D
   velocityScore       Float?
   safetyStockDays     Int       @default(14)
-  
+
   // New relations
   demandForecasts     DemandForecast[]
   autonomousDecisions AutonomousDecision[]
@@ -3668,19 +3822,19 @@ model InventoryItem {
 
 model IoTDevice {
   // ... existing fields ...
-  
+
   // New fields
   lastMaintenanceDate DateTime?
   nextMaintenanceDate DateTime?
   predictiveMaintenanceScore Float? // 0-100 failure probability
-  
+
   // New relations
   iotReadings         IoTReading[]
 }
 
 model PurchaseOrder {
   // ... existing fields ...
-  
+
   // New fields
   autonomousDecisionId String?  // Link to autonomous decision
   confidence          Float?    // AI confidence if auto-generated
@@ -3689,7 +3843,7 @@ model PurchaseOrder {
 
 model WarehouseTransfer {
   // ... existing fields ...
-  
+
   // New fields
   autonomousDecisionId String?
   transferReason      String?   // inventory-balancing, etc.
@@ -3698,7 +3852,7 @@ model WarehouseTransfer {
 
 model StockAdjustment {
   // ... existing fields ...
-  
+
   // New fields
   iotReadingId   String?     // Link to IoT reading that triggered adjustment
   variance       Float?      // Physical vs system difference
@@ -3712,32 +3866,32 @@ model StockAdjustment {
 
 ```sql
 -- Forecasting lookups
-CREATE INDEX idx_demand_forecast_recent 
+CREATE INDEX idx_demand_forecast_recent
 ON DemandForecast(organizationId, productId, generatedAt DESC);
 
 -- Autonomous decision filtering
-CREATE INDEX idx_autonomous_pending 
-ON AutonomousDecision(organizationId, status, createdAt DESC) 
+CREATE INDEX idx_autonomous_pending
+ON AutonomousDecision(organizationId, status, createdAt DESC)
 WHERE status = 'pending';
 
 -- IoT data ingestion
-CREATE INDEX idx_iot_reading_unprocessed 
-ON IoTReading(processed, timestamp DESC) 
+CREATE INDEX idx_iot_reading_unprocessed
+ON IoTReading(processed, timestamp DESC)
 WHERE processed = false;
 
 -- ABC classification queries
-CREATE INDEX idx_velocity_class_current 
-ON VelocityClassification(organizationId, class, validUntil DESC) 
+CREATE INDEX idx_velocity_class_current
+ON VelocityClassification(organizationId, class, validUntil DESC)
 WHERE validUntil > NOW();
 
 -- Digital twin reconciliation
-CREATE INDEX idx_digital_twin_reconciliation 
-ON DigitalTwinState(organizationId, requiresReconciliation, updatedAt) 
+CREATE INDEX idx_digital_twin_reconciliation
+ON DigitalTwinState(organizationId, requiresReconciliation, updatedAt)
 WHERE requiresReconciliation = true;
 
 -- Environmental compliance alerts
-CREATE INDEX idx_environmental_non_compliant 
-ON EnvironmentalReading(warehouseId, compliant, timestamp DESC) 
+CREATE INDEX idx_environmental_non_compliant
+ON EnvironmentalReading(warehouseId, compliant, timestamp DESC)
 WHERE compliant = false;
 ```
 
@@ -3748,6 +3902,7 @@ WHERE compliant = false;
 ### ERP Integration
 
 **Supported ERP Systems:**
+
 - SAP S/4HANA
 - Oracle NetSuite
 - Microsoft Dynamics 365
@@ -3770,6 +3925,7 @@ Flowstock ← Bi-directional Sync → ERP System
 ```
 
 **Data Sync Frequency:**
+
 - Purchase Orders: Real-time (webhook-driven)
 - Inventory Levels: Every 5 minutes
 - Product Master Data: Every 15 minutes
@@ -3785,34 +3941,36 @@ async function createSAPPurchaseOrder(decision: AutonomousDecision) {
     host: process.env.SAP_HOST,
     client: process.env.SAP_CLIENT,
     user: process.env.SAP_USER,
-    password: process.env.SAP_PASSWORD
+    password: process.env.SAP_PASSWORD,
   });
-  
-  const result = await sapClient.call('BAPI_PO_CREATE1', {
+
+  const result = await sapClient.call("BAPI_PO_CREATE1", {
     PO_HEADER: {
-      DOC_TYPE: 'NB',
+      DOC_TYPE: "NB",
       VENDOR: decision.metadata.supplierId,
       PURCH_ORG: decision.metadata.purchasingOrg,
       PUR_GROUP: decision.metadata.purchasingGroup,
-      DOC_DATE: new Date().toISOString().split('T')[0]
+      DOC_DATE: new Date().toISOString().split("T")[0],
     },
-    PO_ITEMS: [{
-      PO_ITEM: '00010',
-      MATERIAL: decision.productId,
-      PLANT: decision.metadata.plant,
-      QUANTITY: decision.metadata.quantity.toString(),
-      UNIT: decision.metadata.unit,
-      NET_PRICE: decision.metadata.price.toString()
-    }]
+    PO_ITEMS: [
+      {
+        PO_ITEM: "00010",
+        MATERIAL: decision.productId,
+        PLANT: decision.metadata.plant,
+        QUANTITY: decision.metadata.quantity.toString(),
+        UNIT: decision.metadata.unit,
+        NET_PRICE: decision.metadata.price.toString(),
+      },
+    ],
   });
-  
-  if (result.RETURN[0].TYPE === 'E') {
+
+  if (result.RETURN[0].TYPE === "E") {
     throw new Error(`SAP PO creation failed: ${result.RETURN[0].MESSAGE}`);
   }
-  
+
   return {
     sapPONumber: result.PONUMBER,
-    success: true
+    success: true,
   };
 }
 ```
@@ -3822,32 +3980,37 @@ async function createSAPPurchaseOrder(decision: AutonomousDecision) {
 ```typescript
 // NetSuite RESTlet integration
 async function createNetSuitePO(decision: AutonomousDecision) {
-  const response = await fetch(`${process.env.NETSUITE_URL}/app/site/hosting/restlet.nl`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${await getNetSuiteToken()}`,
+  const response = await fetch(
+    `${process.env.NETSUITE_URL}/app/site/hosting/restlet.nl`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await getNetSuiteToken()}`,
+      },
+      body: JSON.stringify({
+        operation: "createPurchaseOrder",
+        data: {
+          entity: decision.metadata.vendorId,
+          tranDate: new Date().toISOString().split("T")[0],
+          items: [
+            {
+              item: decision.productId,
+              quantity: decision.metadata.quantity,
+              rate: decision.metadata.price,
+              amount: decision.metadata.quantity * decision.metadata.price,
+            },
+          ],
+          memo: `Auto-generated by Flowstock (Confidence: ${decision.confidence}%)`,
+        },
+      }),
     },
-    body: JSON.stringify({
-      operation: 'createPurchaseOrder',
-      data: {
-        entity: decision.metadata.vendorId,
-        tranDate: new Date().toISOString().split('T')[0],
-        items: [{
-          item: decision.productId,
-          quantity: decision.metadata.quantity,
-          rate: decision.metadata.price,
-          amount: decision.metadata.quantity * decision.metadata.price
-        }],
-        memo: `Auto-generated by Flowstock (Confidence: ${decision.confidence}%)`
-      }
-    })
-  });
-  
+  );
+
   const result = await response.json();
   return {
     netsuiteId: result.id,
-    success: true
+    success: true,
   };
 }
 ```
@@ -3857,6 +4020,7 @@ async function createNetSuitePO(decision: AutonomousDecision) {
 **Electronic Data Interchange (EDI):**
 
 Support for EDI standards:
+
 - **850**: Purchase Order
 - **855**: Purchase Order Acknowledgment
 - **856**: Advance Ship Notice (ASN)
@@ -3888,27 +4052,27 @@ interface SupplierAPIClient {
 
 class GraningerAPIClient implements SupplierAPIClient {
   async createOrder(order: SupplierOrder) {
-    const response = await fetch('https://api.grainger.com/v2/orders', {
-      method: 'POST',
+    const response = await fetch("https://api.grainger.com/v2/orders", {
+      method: "POST",
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${this.apiKey}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         accountNumber: this.accountNumber,
-        items: order.items.map(item => ({
+        items: order.items.map((item) => ({
           partNumber: item.supplierSKU,
           quantity: item.quantity,
-          unitPrice: item.unitPrice
+          unitPrice: item.unitPrice,
         })),
         shipTo: order.shipToAddress,
-        requestedDeliveryDate: order.requestedDate
-      })
+        requestedDeliveryDate: order.requestedDate,
+      }),
     });
-    
+
     return await response.json();
   }
-  
+
   // ... other methods
 }
 ```
@@ -3916,6 +4080,7 @@ class GraningerAPIClient implements SupplierAPIClient {
 **Supplier Portal Integration:**
 
 For suppliers without API/EDI:
+
 - Automated email with PO PDF attachment
 - Supplier portal login for PO viewing
 - One-click order acceptance
@@ -3925,6 +4090,7 @@ For suppliers without API/EDI:
 ### Carrier Integration
 
 **Supported Carriers:**
+
 - FedEx, UPS, USPS, DHL
 - Regional carriers (via EasyPost, ShipStation)
 - LTL/FTL freight carriers
@@ -3933,17 +4099,17 @@ For suppliers without API/EDI:
 
 ```typescript
 async function getRates(shipment: Shipment): Promise<CarrierRate[]> {
-  const carriers = ['fedex', 'ups', 'usps'];
-  
-  const ratePromises = carriers.map(carrier => 
-    getCarrierRate(carrier, shipment)
+  const carriers = ["fedex", "ups", "usps"];
+
+  const ratePromises = carriers.map((carrier) =>
+    getCarrierRate(carrier, shipment),
   );
-  
+
   const rates = await Promise.allSettled(ratePromises);
-  
+
   return rates
-    .filter(r => r.status === 'fulfilled')
-    .map(r => r.value)
+    .filter((r) => r.status === "fulfilled")
+    .map((r) => r.value)
     .sort((a, b) => {
       // Smart sorting: balance cost vs speed
       const aScore = a.cost * 0.7 + a.transitDays * 10 * 0.3;
@@ -3957,30 +4123,30 @@ async function getRates(shipment: Shipment): Promise<CarrierRate[]> {
 
 ```typescript
 // Real-time tracking via webhooks
-app.post('/webhooks/fedex/tracking', async (req, res) => {
+app.post("/webhooks/fedex/tracking", async (req, res) => {
   const event = req.body;
-  
-  if (event.type === 'delivery') {
+
+  if (event.type === "delivery") {
     // Update PO status to delivered
     await prisma.purchaseOrder.update({
       where: { trackingNumber: event.trackingNumber },
       data: {
-        status: 'DELIVERED',
+        status: "DELIVERED",
         deliveredAt: new Date(event.timestamp),
-        deliverySignature: event.signature
-      }
+        deliverySignature: event.signature,
+      },
     });
-    
+
     // Trigger auto-receiving if configured
     if (config.autoReceiveOnDelivery) {
       await createReceivingTask({
         poId: po.id,
         expectedItems: po.items,
-        priority: 'high'
+        priority: "high",
       });
     }
   }
-  
+
   res.json({ success: true });
 });
 ```
@@ -3990,6 +4156,7 @@ app.post('/webhooks/fedex/tracking', async (req, res) => {
 **Warehouse Management System Sync:**
 
 Key integrations:
+
 - **Inventory Adjustments**: Bi-directional sync
 - **Receiving Tasks**: Created from PO delivery
 - **Picking Tasks**: Location-based optimization
@@ -4000,29 +4167,32 @@ Key integrations:
 
 ```typescript
 // Optimal put-away location suggestion
-async function suggestPutawayLocation(product: InventoryItem, quantity: number) {
+async function suggestPutawayLocation(
+  product: InventoryItem,
+  quantity: number,
+) {
   const classification = await getABCClassification(product.id);
-  
-  if (classification === 'A') {
+
+  if (classification === "A") {
     // High-velocity items go to golden zone (closest to packing)
     return findAvailableLocation({
-      zone: 'golden-zone',
+      zone: "golden-zone",
       aisle: [1, 2, 3],
-      minCapacity: quantity
+      minCapacity: quantity,
     });
-  } else if (classification === 'B') {
+  } else if (classification === "B") {
     // Medium-velocity in standard picking area
     return findAvailableLocation({
-      zone: 'picking-area',
+      zone: "picking-area",
       aisle: [4, 5, 6, 7, 8],
-      minCapacity: quantity
+      minCapacity: quantity,
     });
   } else {
     // Low-velocity in bulk storage
     return findAvailableLocation({
-      zone: 'bulk-storage',
+      zone: "bulk-storage",
       preferPallet: true,
-      minCapacity: quantity
+      minCapacity: quantity,
     });
   }
 }
@@ -4031,6 +4201,7 @@ async function suggestPutawayLocation(product: InventoryItem, quantity: number) 
 ### E-Commerce Integration
 
 **Supported Platforms:**
+
 - Shopify, WooCommerce, Magento, BigCommerce
 - Amazon Seller Central, eBay
 - Custom API integration
@@ -4042,25 +4213,27 @@ async function suggestPutawayLocation(product: InventoryItem, quantity: number) 
 async function syncShopifyInventory(products: InventoryItem[]) {
   const shopify = new Shopify({
     shopName: process.env.SHOPIFY_SHOP,
-    accessToken: process.env.SHOPIFY_ACCESS_TOKEN
+    accessToken: process.env.SHOPIFY_ACCESS_TOKEN,
   });
-  
+
   for (const product of products) {
     // Get current Shopify inventory
     const variant = await shopify.productVariant.get(product.shopifyVariantId);
-    
+
     // Calculate available to sell (ATP)
     const atp = product.quantity - product.allocated - product.safetyStock;
-    
+
     // Only sync if difference > 5 units (avoid constant updates)
     if (Math.abs(variant.inventory_quantity - atp) > 5) {
       await shopify.inventoryLevel.set({
         location_id: product.shopifyLocationId,
         inventory_item_id: variant.inventory_item_id,
-        available: Math.max(0, atp) // Never show negative
+        available: Math.max(0, atp), // Never show negative
       });
-      
-      console.log(`Synced ${product.sku}: ${variant.inventory_quantity} → ${atp}`);
+
+      console.log(
+        `Synced ${product.sku}: ${variant.inventory_quantity} → ${atp}`,
+      );
     }
   }
 }
@@ -4073,37 +4246,37 @@ setInterval(syncShopifyInventory, 5 * 60 * 1000);
 
 ```typescript
 // Shopify webhook for new orders
-app.post('/webhooks/shopify/orders/create', async (req, res) => {
+app.post("/webhooks/shopify/orders/create", async (req, res) => {
   const order = req.body;
-  
+
   // Create sales order in Flowstock
   const salesOrder = await prisma.salesOrder.create({
     data: {
       organizationId: config.organizationId,
       externalId: order.id.toString(),
-      source: 'shopify',
+      source: "shopify",
       customerEmail: order.email,
       items: {
-        create: order.line_items.map(item => ({
+        create: order.line_items.map((item) => ({
           sku: item.sku,
           quantity: item.quantity,
-          price: parseFloat(item.price)
-        }))
+          price: parseFloat(item.price),
+        })),
       },
       shippingAddress: {
-        create: parseShopifyAddress(order.shipping_address)
-      }
-    }
+        create: parseShopifyAddress(order.shipping_address),
+      },
+    },
   });
-  
+
   // Auto-allocate inventory
   await allocateInventory(salesOrder.id);
-  
+
   // Create picking task if in stock
-  if (salesOrder.allocationStatus === 'COMPLETE') {
+  if (salesOrder.allocationStatus === "COMPLETE") {
     await createPickingTask(salesOrder.id);
   }
-  
+
   res.json({ success: true });
 });
 ```
@@ -4143,42 +4316,47 @@ app.post('/webhooks/shopify/orders/create', async (req, res) => {
 
 ### Feature Comparison Matrix
 
-| Feature | Flowstock | Amazon WMS | SAP EWM | Oracle WMS | Manhattan | Blue Yonder |
-|---------|-----------|------------|---------|------------|-----------|-------------|
-| **AI Forecasting** | ✅ 95%+ accuracy | ❌ No | ⚠️ Basic | ⚠️ Basic | ❌ No | ⚠️ Basic |
-| **Autonomous Operations** | ✅ 83% auto | ❌ No | ❌ No | ❌ No | ❌ No | ⚠️ Limited |
-| **IoT Integration** | ✅ RFID+Sensors | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited |
-| **Digital Twin** | ✅ 98%+ sync | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No |
-| **ABC Classification** | ✅ Dynamic | ⚠️ Manual | ✅ Yes | ⚠️ Manual | ✅ Yes | ✅ Yes |
-| **Real-Time Analytics** | ✅ <200ms | ⚠️ Delayed | ⚠️ Delayed | ⚠️ Delayed | ⚠️ Delayed | ✅ Yes |
-| **Cloud-Native** | ✅ Yes | ✅ Yes | ❌ Hybrid | ✅ Yes | ❌ On-prem | ⚠️ Hybrid |
-| **Implementation Time** | 2-4 weeks | 12-16 weeks | 24-52 weeks | 16-24 weeks | 20-40 weeks | 16-32 weeks |
-| **Starting Price** | $299/mo | $2K+/mo | $500K+ | $300K+ | $300K+ | $400K+ |
-| **ROI Payback** | 3.2 months | 12-18 months | 24-36 months | 18-24 months | 18-30 months | 24-36 months |
+| Feature                   | Flowstock        | Amazon WMS   | SAP EWM      | Oracle WMS   | Manhattan    | Blue Yonder  |
+| ------------------------- | ---------------- | ------------ | ------------ | ------------ | ------------ | ------------ |
+| **AI Forecasting**        | ✅ 95%+ accuracy | ❌ No        | ⚠️ Basic     | ⚠️ Basic     | ❌ No        | ⚠️ Basic     |
+| **Autonomous Operations** | ✅ 83% auto      | ❌ No        | ❌ No        | ❌ No        | ❌ No        | ⚠️ Limited   |
+| **IoT Integration**       | ✅ RFID+Sensors  | ⚠️ Limited   | ⚠️ Limited   | ⚠️ Limited   | ⚠️ Limited   | ⚠️ Limited   |
+| **Digital Twin**          | ✅ 98%+ sync     | ❌ No        | ❌ No        | ❌ No        | ❌ No        | ❌ No        |
+| **ABC Classification**    | ✅ Dynamic       | ⚠️ Manual    | ✅ Yes       | ⚠️ Manual    | ✅ Yes       | ✅ Yes       |
+| **Real-Time Analytics**   | ✅ <200ms        | ⚠️ Delayed   | ⚠️ Delayed   | ⚠️ Delayed   | ⚠️ Delayed   | ✅ Yes       |
+| **Cloud-Native**          | ✅ Yes           | ✅ Yes       | ❌ Hybrid    | ✅ Yes       | ❌ On-prem   | ⚠️ Hybrid    |
+| **Implementation Time**   | 2-4 weeks        | 12-16 weeks  | 24-52 weeks  | 16-24 weeks  | 20-40 weeks  | 16-32 weeks  |
+| **Starting Price**        | $299/mo          | $2K+/mo      | $500K+       | $300K+       | $300K+       | $400K+       |
+| **ROI Payback**           | 3.2 months       | 12-18 months | 24-36 months | 18-24 months | 18-30 months | 24-36 months |
 
 ### Unique Differentiators
 
 **1. Autonomous Operations (Our Exclusive Feature)**
+
 - 83.7% of decisions executed without human intervention
 - Competitors: All require manual approval for reordering
 - Business Impact: 77% faster decisions, $880K annual savings
 
 **2. Ensemble AI Forecasting**
+
 - 95%+ accuracy vs industry standard 67%
 - Competitors: SAP/Oracle have basic forecasting (75-80% accuracy)
 - Business Impact: 90% stockout reduction, 36% overstock reduction
 
 **3. Real-Time Digital Twin**
+
 - 98%+ physical-digital synchronization
 - Competitors: None offer true digital twin technology
 - Business Impact: 97.8% inventory accuracy vs industry 82%
 
 **4. IoT Edge Processing**
+
 - <10ms latency for critical decisions
 - Competitors: Cloud-only processing (200-500ms latency)
 - Business Impact: Instant alerts, real-time adjustments
 
 **5. Deployment Speed**
+
 - 2-4 weeks to full production
 - Competitors: 12-52 weeks average
 - Business Impact: Faster ROI, less disruption
@@ -4186,18 +4364,21 @@ app.post('/webhooks/shopify/orders/create', async (req, res) => {
 ### Market Opportunity
 
 **Total Addressable Market (TAM):**
+
 - Global warehouse management market: $4.8B (2026)
 - Growing at 15.2% CAGR
 - Target segment: Mid-market to enterprise (500+ SKUs)
 - Addressable: $2.1B (excluding small operations)
 
 **Target Customers:**
+
 - 3PL providers (25,000+ in North America)
 - E-commerce retailers (50,000+ with warehouses)
 - Manufacturers with distribution (30,000+)
 - Food & beverage distributors (15,000+)
 
 **Win Rate:**
+
 - Head-to-head vs legacy systems: 67%
 - Key factors: Cost (40%), Technology (35%), Speed (25%)
 
@@ -4208,6 +4389,7 @@ app.post('/webhooks/shopify/orders/create', async (req, res) => {
 ### Q1 2026 (Current Release - v2.0)
 
 **Completed Features:**
+
 - ✅ Ensemble AI forecasting (95%+ accuracy)
 - ✅ Autonomous operations (83% automation)
 - ✅ IoT integration (RFID, weight, environmental)
@@ -4349,11 +4531,11 @@ app.post('/webhooks/shopify/orders/create', async (req, res) => {
 
 ### Recovery Time Objectives (RTO) & Recovery Point Objectives (RPO)
 
-| Service Tier | RTO | RPO | Annual Downtime | SLA |
-|--------------|-----|-----|-----------------|-----|
-| Enterprise | <15 minutes | <5 minutes | <26 minutes | 99.995% |
-| Pro | <1 hour | <15 minutes | <4.4 hours | 99.95% |
-| Standard | <4 hours | <1 hour | <43 hours | 99.5% |
+| Service Tier | RTO         | RPO         | Annual Downtime | SLA     |
+| ------------ | ----------- | ----------- | --------------- | ------- |
+| Enterprise   | <15 minutes | <5 minutes  | <26 minutes     | 99.995% |
+| Pro          | <1 hour     | <15 minutes | <4.4 hours      | 99.95%  |
+| Standard     | <4 hours    | <1 hour     | <43 hours       | 99.5%   |
 
 ### Backup Strategy
 
@@ -4481,6 +4663,7 @@ Failover Time: <2 minutes (automatic)
 **Phase 3: Recovery (15 minutes - 4 hours)**
 
 **Scenario A: Database Failure**
+
 ```bash
 # 1. Promote replica to primary
 patroni switchover --master postgres-primary --candidate postgres-replica-1
@@ -4493,6 +4676,7 @@ curl https://api.flowstock.com/health
 ```
 
 **Scenario B: Region Failure**
+
 ```bash
 # 1. Update DNS to secondary region
 aws route53 change-resource-record-sets \
@@ -4510,6 +4694,7 @@ curl -I https://api.flowstock.com
 ```
 
 **Scenario C: Total Failure (Restore from Backup)**
+
 ```bash
 # 1. Provision new infrastructure
 terraform apply -var="environment=dr-recovery"
@@ -4606,29 +4791,31 @@ When full system is unavailable, customers can use:
 **Phase 2: Data Preparation (Week 3-4)**
 
 1. **Data Cleansing**
+
    ```sql
    -- Example: Clean invalid product data
-   DELETE FROM products 
-   WHERE sku IS NULL 
-   OR sku = '' 
+   DELETE FROM products
+   WHERE sku IS NULL
+   OR sku = ''
    OR quantity < 0;
-   
+
    -- Standardize units of measure
-   UPDATE products 
-   SET unit = 'EA' 
+   UPDATE products
+   SET unit = 'EA'
    WHERE unit IN ('EACH', 'Each', 'ea', 'PC', 'PCS');
    ```
 
 2. **Data Mapping**
+
    ```typescript
    // Legacy → Flowstock field mapping
    const fieldMapping = {
-     'ITEM_NO': 'sku',
-     'ITEM_DESC': 'name',
-     'QTY_ON_HAND': 'quantity',
-     'QTY_ALLOCATED': 'allocated',
-     'LAST_COST': 'costPrice',
-     'ABC_CODE': 'velocityClass'
+     ITEM_NO: "sku",
+     ITEM_DESC: "name",
+     QTY_ON_HAND: "quantity",
+     QTY_ALLOCATED: "allocated",
+     LAST_COST: "costPrice",
+     ABC_CODE: "velocityClass",
    };
    ```
 
@@ -4647,32 +4834,33 @@ When full system is unavailable, customers can use:
    - Train users on new system
 
 2. **Reconciliation**
+
    ```typescript
    async function reconcileInventory() {
      const legacyData = await fetchFromLegacySystem();
      const flowstockData = await fetchFromFlowstock();
-     
+
      const discrepancies = [];
-     
+
      for (const sku of Object.keys(legacyData)) {
        const legacy = legacyData[sku];
        const flowstock = flowstockData[sku];
-       
+
        if (Math.abs(legacy.quantity - flowstock.quantity) > 5) {
          discrepancies.push({
            sku,
            legacyQty: legacy.quantity,
            flowstockQty: flowstock.quantity,
-           variance: Math.abs(legacy.quantity - flowstock.quantity)
+           variance: Math.abs(legacy.quantity - flowstock.quantity),
          });
        }
      }
-     
+
      // Alert if > 10 discrepancies
      if (discrepancies.length > 10) {
-       sendAlert('High discrepancy count in reconciliation', discrepancies);
+       sendAlert("High discrepancy count in reconciliation", discrepancies);
      }
-     
+
      return discrepancies;
    }
    ```
@@ -4680,33 +4868,39 @@ When full system is unavailable, customers can use:
 **Phase 4: Cutover (Weekend)**
 
 **Friday Evening (6 PM):**
+
 - [ ] Freeze transactions in legacy system
 - [ ] Export final data snapshot
 - [ ] Backup legacy database
 
 **Saturday Morning (8 AM):**
+
 - [ ] Import data to Flowstock
 - [ ] Run validation scripts
 - [ ] Configure integrations (ERP, carrier, supplier)
 - [ ] Test critical workflows
 
 **Saturday Afternoon (2 PM):**
+
 - [ ] User acceptance testing
 - [ ] Fix any issues found
 - [ ] Final data sync
 
 **Saturday Evening (6 PM):**
+
 - [ ] Go/No-Go decision
 - [ ] If Go: Switch DNS to Flowstock
 - [ ] If No-Go: Rollback to legacy
 
 **Sunday:**
+
 - [ ] Monitor system closely
 - [ ] Support team on standby
 - [ ] Fix minor issues
 - [ ] User training sessions
 
 **Monday:**
+
 - [ ] Business as usual
 - [ ] Collect user feedback
 - [ ] Address quick wins
@@ -4734,24 +4928,24 @@ When full system is unavailable, customers can use:
 
 ```typescript
 // migration/import-inventory.ts
-import { PrismaClient } from '@prisma/client';
-import { parse } from 'csv-parse/sync';
-import fs from 'fs';
+import { PrismaClient } from "@prisma/client";
+import { parse } from "csv-parse/sync";
+import fs from "fs";
 
 const prisma = new PrismaClient();
 
 async function importInventory(csvFilePath: string) {
-  const fileContent = fs.readFileSync(csvFilePath, 'utf-8');
+  const fileContent = fs.readFileSync(csvFilePath, "utf-8");
   const records = parse(fileContent, {
     columns: true,
-    skip_empty_lines: true
+    skip_empty_lines: true,
   });
-  
+
   console.log(`Importing ${records.length} products...`);
-  
+
   let imported = 0;
   let failed = 0;
-  
+
   for (const record of records) {
     try {
       await prisma.inventoryItem.upsert({
@@ -4759,31 +4953,31 @@ async function importInventory(csvFilePath: string) {
         update: {
           name: record.NAME,
           quantity: parseInt(record.QUANTITY),
-          allocated: parseInt(record.ALLOCATED || '0'),
+          allocated: parseInt(record.ALLOCATED || "0"),
           costPrice: parseFloat(record.COST),
           sellingPrice: parseFloat(record.PRICE),
-          weight: parseFloat(record.WEIGHT || '0'),
-          weightUnit: record.WEIGHT_UNIT || 'lbs',
+          weight: parseFloat(record.WEIGHT || "0"),
+          weightUnit: record.WEIGHT_UNIT || "lbs",
           location: record.LOCATION,
-          velocityClass: mapABCCode(record.ABC_CODE)
+          velocityClass: mapABCCode(record.ABC_CODE),
         },
         create: {
           organizationId: process.env.ORGANIZATION_ID!,
           sku: record.SKU,
           name: record.NAME,
           quantity: parseInt(record.QUANTITY),
-          allocated: parseInt(record.ALLOCATED || '0'),
+          allocated: parseInt(record.ALLOCATED || "0"),
           costPrice: parseFloat(record.COST),
           sellingPrice: parseFloat(record.PRICE),
-          weight: parseFloat(record.WEIGHT || '0'),
-          weightUnit: record.WEIGHT_UNIT || 'lbs',
+          weight: parseFloat(record.WEIGHT || "0"),
+          weightUnit: record.WEIGHT_UNIT || "lbs",
           location: record.LOCATION,
-          velocityClass: mapABCCode(record.ABC_CODE)
-        }
+          velocityClass: mapABCCode(record.ABC_CODE),
+        },
       });
-      
+
       imported++;
-      
+
       if (imported % 100 === 0) {
         console.log(`Progress: ${imported}/${records.length}`);
       }
@@ -4792,7 +4986,7 @@ async function importInventory(csvFilePath: string) {
       failed++;
     }
   }
-  
+
   console.log(`\nImport complete!`);
   console.log(`Imported: ${imported}`);
   console.log(`Failed: ${failed}`);
@@ -4800,18 +4994,18 @@ async function importInventory(csvFilePath: string) {
 
 function mapABCCode(code: string): string {
   const mapping: Record<string, string> = {
-    'A': 'A',
-    'B': 'B',
-    'C': 'C',
-    'D': 'D',
-    'F': 'D', // Map F to D (slow movers)
-    '': 'C'   // Default to C if missing
+    A: "A",
+    B: "B",
+    C: "C",
+    D: "D",
+    F: "D", // Map F to D (slow movers)
+    "": "C", // Default to C if missing
   };
-  return mapping[code] || 'C';
+  return mapping[code] || "C";
 }
 
 // Run migration
-importInventory('./data/legacy_inventory.csv');
+importInventory("./data/legacy_inventory.csv");
 ```
 
 ---
@@ -4820,12 +5014,12 @@ importInventory('./data/legacy_inventory.csv');
 
 ### Uptime Guarantees
 
-| Tier | Monthly Uptime | Max Downtime/Month | Downtime/Year | Credit |
-|------|----------------|-------------------|---------------|--------|
-| Enterprise | 99.995% | 21.6 minutes | 4.3 hours | 100% |
-| Pro | 99.95% | 21.9 minutes | 4.4 hours | 50% |
-| Standard | 99.5% | 3.6 hours | 43.8 hours | 25% |
-| Free | 99.0% | 7.2 hours | 87.6 hours | None |
+| Tier       | Monthly Uptime | Max Downtime/Month | Downtime/Year | Credit |
+| ---------- | -------------- | ------------------ | ------------- | ------ |
+| Enterprise | 99.995%        | 21.6 minutes       | 4.3 hours     | 100%   |
+| Pro        | 99.95%         | 21.9 minutes       | 4.4 hours     | 50%    |
+| Standard   | 99.5%          | 3.6 hours          | 43.8 hours    | 25%    |
+| Free       | 99.0%          | 7.2 hours          | 87.6 hours    | None   |
 
 **SLA Credit Calculation:**
 
@@ -4836,6 +5030,7 @@ If Uptime < Guaranteed:
 ```
 
 **Excluded from SLA:**
+
 - Scheduled maintenance (with 7-day notice)
 - Customer configuration errors
 - Force majeure events (natural disasters, war, etc.)
@@ -4844,38 +5039,39 @@ If Uptime < Guaranteed:
 
 ### Performance Guarantees
 
-| Metric | Enterprise | Pro | Standard | Measurement |
-|--------|-----------|-----|----------|-------------|
-| API Response Time (p95) | <200ms | <300ms | <500ms | 5-minute intervals |
-| Forecast Generation | <3s | <5s | <10s | Per request |
-| IoT Data Ingestion | <50ms | <100ms | <200ms | Per batch |
-| Dashboard Load Time | <2s | <3s | <5s | Full page load |
-| Search Results | <100ms | <200ms | <500ms | Per query |
+| Metric                  | Enterprise | Pro    | Standard | Measurement        |
+| ----------------------- | ---------- | ------ | -------- | ------------------ |
+| API Response Time (p95) | <200ms     | <300ms | <500ms   | 5-minute intervals |
+| Forecast Generation     | <3s        | <5s    | <10s     | Per request        |
+| IoT Data Ingestion      | <50ms      | <100ms | <200ms   | Per batch          |
+| Dashboard Load Time     | <2s        | <3s    | <5s      | Full page load     |
+| Search Results          | <100ms     | <200ms | <500ms   | Per query          |
 
 **Performance Credits:**
 
 If performance degrades below guaranteed level for >1 hour in a month:
+
 - Enterprise: 10% credit
 - Pro: 5% credit
 - Standard: No credit
 
 ### Support SLA
 
-| Severity | Description | First Response | Resolution Target |
-|----------|-------------|----------------|-------------------|
-| SEV1 - Critical | System down, data loss, security breach | <15 min (24/7) | <4 hours |
-| SEV2 - High | Major feature unavailable, significant performance degradation | <1 hour (24/7) | <24 hours |
-| SEV3 - Medium | Minor feature broken, workaround available | <4 hours (business) | <72 hours |
-| SEV4 - Low | Cosmetic issue, question, feature request | <24 hours (business) | Best effort |
+| Severity        | Description                                                    | First Response       | Resolution Target |
+| --------------- | -------------------------------------------------------------- | -------------------- | ----------------- |
+| SEV1 - Critical | System down, data loss, security breach                        | <15 min (24/7)       | <4 hours          |
+| SEV2 - High     | Major feature unavailable, significant performance degradation | <1 hour (24/7)       | <24 hours         |
+| SEV3 - Medium   | Minor feature broken, workaround available                     | <4 hours (business)  | <72 hours         |
+| SEV4 - Low      | Cosmetic issue, question, feature request                      | <24 hours (business) | Best effort       |
 
 **Support Channels:**
 
-| Tier | Phone | Email | Chat | Slack Connect | Dedicated CSM |
-|------|-------|-------|------|---------------|---------------|
-| Enterprise | 24/7 | 24/7 | 24/7 | ✅ Yes | ✅ Yes |
-| Pro | Business hours | 24/7 | Business hours | ❌ No | ❌ No |
-| Standard | ❌ No | Business hours | ❌ No | ❌ No | ❌ No |
-| Free | ❌ No | Best effort | ❌ No | ❌ No | ❌ No |
+| Tier       | Phone          | Email          | Chat           | Slack Connect | Dedicated CSM |
+| ---------- | -------------- | -------------- | -------------- | ------------- | ------------- |
+| Enterprise | 24/7           | 24/7           | 24/7           | ✅ Yes        | ✅ Yes        |
+| Pro        | Business hours | 24/7           | Business hours | ❌ No         | ❌ No         |
+| Standard   | ❌ No          | Business hours | ❌ No          | ❌ No         | ❌ No         |
+| Free       | ❌ No          | Best effort    | ❌ No          | ❌ No         | ❌ No         |
 
 **Escalation Path:**
 
@@ -4885,6 +5081,7 @@ Customer Support → Tier 2 Engineer → Senior Engineer → Engineering Manager
 ```
 
 For SEV1 incidents:
+
 - Immediate PagerDuty alert to on-call engineer
 - Incident commander assigned within 15 minutes
 - Status updates every 30 minutes
@@ -4936,7 +5133,7 @@ CREATE POLICY tenant_isolation ON inventory_items
 ```typescript
 // Prisma middleware for tenant filtering
 prisma.$use(async (params, next) => {
-  if (params.model && params.action.startsWith('find')) {
+  if (params.model && params.action.startsWith("find")) {
     // Inject organizationId filter
     params.args.where = params.args.where || {};
     params.args.where.organizationId = getCurrentOrgId();
@@ -4949,12 +5146,12 @@ prisma.$use(async (params, next) => {
 
 **Compute Resources per Tier:**
 
-| Tier | vCPU | RAM | Storage | IOPS | Forecasts/Day | IoT Devices |
-|------|------|-----|---------|------|---------------|-------------|
-| Enterprise | Dedicated 16 | 64GB | 2TB | 20,000 | Unlimited | 1,000+ |
-| Pro | Shared 4 | 16GB | 500GB | 5,000 | 10,000 | 100 |
-| Standard | Shared 2 | 8GB | 100GB | 1,000 | 1,000 | 25 |
-| Free | Shared 0.5 | 2GB | 10GB | 100 | 100 | 5 |
+| Tier       | vCPU         | RAM  | Storage | IOPS   | Forecasts/Day | IoT Devices |
+| ---------- | ------------ | ---- | ------- | ------ | ------------- | ----------- |
+| Enterprise | Dedicated 16 | 64GB | 2TB     | 20,000 | Unlimited     | 1,000+      |
+| Pro        | Shared 4     | 16GB | 500GB   | 5,000  | 10,000        | 100         |
+| Standard   | Shared 2     | 8GB  | 100GB   | 1,000  | 1,000         | 25          |
+| Free       | Shared 0.5   | 2GB  | 10GB    | 100    | 100           | 5           |
 
 **Resource Quotas & Rate Limiting:**
 
@@ -4965,26 +5162,26 @@ const RATE_LIMITS = {
     requestsPerMinute: 60,
     forecastsPerDay: 100,
     iotDevices: 5,
-    storageGB: 10
+    storageGB: 10,
   },
   standard: {
     requestsPerMinute: 300,
     forecastsPerDay: 1000,
     iotDevices: 25,
-    storageGB: 100
+    storageGB: 100,
   },
   pro: {
     requestsPerMinute: 1000,
     forecastsPerDay: 10000,
     iotDevices: 100,
-    storageGB: 500
+    storageGB: 500,
   },
   enterprise: {
     requestsPerMinute: Infinity,
     forecastsPerDay: Infinity,
     iotDevices: 1000,
-    storageGB: 2000
-  }
+    storageGB: 2000,
+  },
 };
 ```
 
@@ -5000,42 +5197,42 @@ async function provisionNewTenant(orgData: OrganizationData) {
       name: orgData.name,
       slug: orgData.slug,
       tier: orgData.tier,
-      status: 'provisioning'
-    }
+      status: "provisioning",
+    },
   });
-  
+
   // 2. Create database schema (if Enterprise)
-  if (orgData.tier === 'enterprise') {
+  if (orgData.tier === "enterprise") {
     await createTenantSchema(org.id);
   }
-  
+
   // 3. Generate API keys
   const apiKey = generateAPIKey(org.id);
   await storeAPIKey(org.id, apiKey);
-  
+
   // 4. Configure integrations
   await setupDefaultIntegrations(org.id);
-  
+
   // 5. Create default admin user
   const admin = await createAdminUser({
     email: orgData.adminEmail,
     organizationId: org.id,
-    role: 'admin'
+    role: "admin",
   });
-  
+
   // 6. Send welcome email
   await sendWelcomeEmail(admin.email, {
     apiKey,
     loginUrl: `https://app.flowstock.com/login`,
-    documentationUrl: 'https://docs.flowstock.com'
+    documentationUrl: "https://docs.flowstock.com",
   });
-  
+
   // 7. Update status
   await prisma.organization.update({
     where: { id: org.id },
-    data: { status: 'active' }
+    data: { status: "active" },
   });
-  
+
   console.log(`Tenant ${org.name} provisioned successfully`);
   return org;
 }
@@ -5049,16 +5246,17 @@ async function provisionNewTenant(orgData: OrganizationData) {
 
 **Monthly Subscription Costs:**
 
-| Tier | Base Price | Per User | Per Warehouse | Per 1K Forecasts | Per IoT Device |
-|------|------------|----------|---------------|------------------|----------------|
-| Free | $0 | $0 | 1 included | 100 included | 5 included |
-| Standard | $299 | $15 | $99 | $10 | $5 |
-| Pro | $999 | $10 | $79 | $5 | $3 |
-| Enterprise | $2,999+ | $5 | $49 | Unlimited | $1 |
+| Tier       | Base Price | Per User | Per Warehouse | Per 1K Forecasts | Per IoT Device |
+| ---------- | ---------- | -------- | ------------- | ---------------- | -------------- |
+| Free       | $0         | $0       | 1 included    | 100 included     | 5 included     |
+| Standard   | $299       | $15      | $99           | $10              | $5             |
+| Pro        | $999       | $10      | $79           | $5               | $3             |
+| Enterprise | $2,999+    | $5       | $49           | Unlimited        | $1             |
 
 **Example Calculations:**
 
 **Small Operation (Standard Tier):**
+
 - Base: $299/month
 - 5 users: 5 × $15 = $75
 - 1 warehouse: Included
@@ -5067,6 +5265,7 @@ async function provisionNewTenant(orgData: OrganizationData) {
 - **Total: $424/month** or **$5,088/year**
 
 **Mid-Size Operation (Pro Tier):**
+
 - Base: $999/month
 - 20 users: 20 × $10 = $200
 - 3 warehouses: 2 × $79 = $158
@@ -5075,6 +5274,7 @@ async function provisionNewTenant(orgData: OrganizationData) {
 - **Total: $1,507/month** or **$18,084/year**
 
 **Enterprise Operation (Enterprise Tier):**
+
 - Base: $2,999/month
 - 100 users: 100 × $5 = $500
 - 10 warehouses: 9 × $49 = $441
@@ -5088,31 +5288,32 @@ async function provisionNewTenant(orgData: OrganizationData) {
 
 **Flowstock (Pro Tier - Mid-Size Operation):**
 
-| Year | Subscription | Implementation | Training | Support | Hardware | Total/Year |
-|------|-------------|----------------|----------|---------|----------|------------|
-| 1 | $18,084 | $15,000 | $5,000 | Included | $10,000 | $48,084 |
-| 2 | $18,084 | $0 | $1,000 | Included | $2,000 | $21,084 |
-| 3 | $18,084 | $0 | $500 | Included | $2,000 | $20,584 |
-| 4 | $18,084 | $0 | $500 | Included | $2,000 | $20,584 |
-| 5 | $18,084 | $0 | $500 | Included | $2,000 | $20,584 |
-| **5-Year Total** | | | | | | **$130,920** |
+| Year             | Subscription | Implementation | Training | Support  | Hardware | Total/Year   |
+| ---------------- | ------------ | -------------- | -------- | -------- | -------- | ------------ |
+| 1                | $18,084      | $15,000        | $5,000   | Included | $10,000  | $48,084      |
+| 2                | $18,084      | $0             | $1,000   | Included | $2,000   | $21,084      |
+| 3                | $18,084      | $0             | $500     | Included | $2,000   | $20,584      |
+| 4                | $18,084      | $0             | $500     | Included | $2,000   | $20,584      |
+| 5                | $18,084      | $0             | $500     | Included | $2,000   | $20,584      |
+| **5-Year Total** |              |                |          |          |          | **$130,920** |
 
 **Legacy WMS (e.g., SAP EWM):**
 
-| Year | License | Implementation | Customization | Support | Hardware | Hosting | Total/Year |
-|------|---------|----------------|---------------|---------|----------|---------|------------|
-| 1 | $120,000 | $400,000 | $80,000 | $24,000 | $50,000 | $36,000 | $710,000 |
-| 2 | $24,000 | $0 | $20,000 | $28,000 | $10,000 | $36,000 | $118,000 |
-| 3 | $24,000 | $0 | $20,000 | $30,000 | $10,000 | $36,000 | $120,000 |
-| 4 | $24,000 | $0 | $20,000 | $32,000 | $10,000 | $36,000 | $122,000 |
-| 5 | $24,000 | $0 | $20,000 | $34,000 | $10,000 | $36,000 | $124,000 |
-| **5-Year Total** | | | | | | | **$1,194,000** |
+| Year             | License  | Implementation | Customization | Support | Hardware | Hosting | Total/Year     |
+| ---------------- | -------- | -------------- | ------------- | ------- | -------- | ------- | -------------- |
+| 1                | $120,000 | $400,000       | $80,000       | $24,000 | $50,000  | $36,000 | $710,000       |
+| 2                | $24,000  | $0             | $20,000       | $28,000 | $10,000  | $36,000 | $118,000       |
+| 3                | $24,000  | $0             | $20,000       | $30,000 | $10,000  | $36,000 | $120,000       |
+| 4                | $24,000  | $0             | $20,000       | $32,000 | $10,000  | $36,000 | $122,000       |
+| 5                | $24,000  | $0             | $20,000       | $34,000 | $10,000  | $36,000 | $124,000       |
+| **5-Year Total** |          |                |               |         |          |         | **$1,194,000** |
 
 **Savings with Flowstock: $1,063,080 over 5 years (89% reduction)**
 
 ### ROI Calculation
 
 **Flowstock Investment:**
+
 - Year 1 Cost: $48,084
 - Yearly Savings: $1.8M (from earlier analysis)
   - Carrying cost reduction: $630K
@@ -5121,6 +5322,7 @@ async function provisionNewTenant(orgData: OrganizationData) {
   - Waste reduction: $110K
 
 **ROI Metrics:**
+
 - Net Benefit Year 1: $1,800,000 - $48,084 = $1,751,916
 - ROI Year 1: ($1,751,916 / $48,084) × 100 = **3,643%**
 - Payback Period: $48,084 / ($1,800,000 / 12) = **0.32 months** or **10 days**
@@ -5141,4 +5343,3 @@ IRR = 3,548%
 **Conclusion:** Flowstock delivers extraordinary ROI with minimal risk.
 
 ---
-

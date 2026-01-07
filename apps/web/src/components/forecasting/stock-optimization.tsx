@@ -1,9 +1,21 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { TrendingUp, TrendingDown, DollarSign, Package, AlertCircle } from "lucide-react";
+import {
+  TrendingUp,
+  TrendingDown,
+  DollarSign,
+  Package,
+  AlertCircle,
+} from "lucide-react";
 
 interface StockOptimizationData {
   overstock: Array<{
@@ -74,7 +86,9 @@ export function StockOptimization({ data }: StockOptimizationProps) {
     }
   };
 
-  const sortedRecommendations = [...data.recommendations].sort((a, b) => a.priority - b.priority);
+  const sortedRecommendations = [...data.recommendations].sort(
+    (a, b) => a.priority - b.priority,
+  );
 
   return (
     <div className="space-y-6">
@@ -95,34 +109,47 @@ export function StockOptimization({ data }: StockOptimizationProps) {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Overstock Items</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Overstock Items
+            </CardTitle>
             <TrendingDown className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{data.overstock.length}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {data.overstock.length}
+            </div>
             <p className="text-xs text-muted-foreground">Excess inventory</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Understock Items</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Understock Items
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-red-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{data.understock.length}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {data.understock.length}
+            </div>
             <p className="text-xs text-muted-foreground">Below optimal</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Actions Needed</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Actions Needed
+            </CardTitle>
             <AlertCircle className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {data.recommendations.filter((r) => r.action !== "maintain").length}
+              {
+                data.recommendations.filter((r) => r.action !== "maintain")
+                  .length
+              }
             </div>
             <p className="text-xs text-muted-foreground">Recommendations</p>
           </CardContent>
@@ -163,7 +190,11 @@ export function StockOptimization({ data }: StockOptimizationProps) {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {rec.action === "order" ? "+" : rec.action === "reduce" ? "-" : ""}
+                      {rec.action === "order"
+                        ? "+"
+                        : rec.action === "reduce"
+                          ? "-"
+                          : ""}
                       {Math.abs(rec.suggestedQuantity)} units
                     </p>
                     <Button size="sm" className="mt-2">
@@ -201,11 +232,15 @@ export function StockOptimization({ data }: StockOptimizationProps) {
                     <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                       <span>Current: {item.currentStock} units</span>
                       <span>Optimal: {item.optimalStock} units</span>
-                      <span className="text-yellow-600">Excess: {item.excessUnits} units</span>
+                      <span className="text-yellow-600">
+                        Excess: {item.excessUnits} units
+                      </span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">Holding Cost</p>
+                    <p className="text-sm text-muted-foreground">
+                      Holding Cost
+                    </p>
                     <p className="text-lg font-bold text-yellow-600">
                       ${item.estimatedCost.toLocaleString()}
                     </p>
@@ -216,10 +251,13 @@ export function StockOptimization({ data }: StockOptimizationProps) {
             <div className="mt-4 p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg">
               <p className="font-medium text-yellow-900 dark:text-yellow-100 mb-2">
                 Total Excess Holding Cost: $
-                {data.overstock.reduce((sum, item) => sum + item.estimatedCost, 0).toLocaleString()}
+                {data.overstock
+                  .reduce((sum, item) => sum + item.estimatedCost, 0)
+                  .toLocaleString()}
               </p>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Reduce inventory to optimal levels to free up capital and reduce storage costs.
+                Reduce inventory to optimal levels to free up capital and reduce
+                storage costs.
               </p>
             </div>
           </CardContent>
@@ -233,7 +271,9 @@ export function StockOptimization({ data }: StockOptimizationProps) {
             <CardTitle className="flex items-center gap-2">
               <AlertCircle className="h-5 w-5 text-red-500" />
               Understock Analysis
-              <Badge variant="destructive">{data.understock.length} items</Badge>
+              <Badge variant="destructive">
+                {data.understock.length} items
+              </Badge>
             </CardTitle>
             <CardDescription>
               Products below optimal levels - risk of stockouts
@@ -251,7 +291,9 @@ export function StockOptimization({ data }: StockOptimizationProps) {
                     <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
                       <span>Current: {item.currentStock} units</span>
                       <span>Optimal: {item.optimalStock} units</span>
-                      <span className="text-red-600">Shortage: {item.shortageUnits} units</span>
+                      <span className="text-red-600">
+                        Shortage: {item.shortageUnits} units
+                      </span>
                     </div>
                   </div>
                   <Button size="sm">Order Now</Button>
@@ -260,11 +302,16 @@ export function StockOptimization({ data }: StockOptimizationProps) {
             </div>
             <div className="mt-4 p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
               <p className="font-medium text-red-900 dark:text-red-100 mb-2">
-                Total Shortage: {data.understock.reduce((sum, item) => sum + item.shortageUnits, 0)}{" "}
+                Total Shortage:{" "}
+                {data.understock.reduce(
+                  (sum, item) => sum + item.shortageUnits,
+                  0,
+                )}{" "}
                 units across {data.understock.length} products
               </p>
               <p className="text-sm text-red-700 dark:text-red-300">
-                Increase inventory to prevent stockouts and lost sales opportunities.
+                Increase inventory to prevent stockouts and lost sales
+                opportunities.
               </p>
             </div>
           </CardContent>
@@ -279,12 +326,17 @@ export function StockOptimization({ data }: StockOptimizationProps) {
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground mb-2">Current State</p>
+              <p className="text-sm text-muted-foreground mb-2">
+                Current State
+              </p>
               <ul className="space-y-1 text-sm">
                 <li>• {data.overstock.length} overstocked products</li>
                 <li>• {data.understock.length} understocked products</li>
                 <li>
-                  • ${data.overstock.reduce((sum, item) => sum + item.estimatedCost, 0).toLocaleString()}{" "}
+                  • $
+                  {data.overstock
+                    .reduce((sum, item) => sum + item.estimatedCost, 0)
+                    .toLocaleString()}{" "}
                   in excess holding costs
                 </li>
               </ul>
@@ -296,7 +348,10 @@ export function StockOptimization({ data }: StockOptimizationProps) {
               </p>
               <ul className="space-y-1 text-sm text-green-700 dark:text-green-300">
                 <li>• Optimal stock levels for all products</li>
-                <li>• Reduced holding costs by ${data.totalSavings.toLocaleString()}</li>
+                <li>
+                  • Reduced holding costs by $
+                  {data.totalSavings.toLocaleString()}
+                </li>
                 <li>• Minimized stockout risk</li>
                 <li>• Improved cash flow and working capital</li>
               </ul>

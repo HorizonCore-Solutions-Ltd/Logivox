@@ -2,7 +2,13 @@
 
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -113,7 +119,9 @@ export default function RMAsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Returns Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Returns Management
+          </h1>
           <p className="text-muted-foreground">
             Manage customer returns and RMA requests
           </p>
@@ -177,7 +185,9 @@ export default function RMAsPage() {
             <div className="flex items-center justify-center p-8">
               <div className="text-center">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-                <p className="mt-2 text-sm text-muted-foreground">Loading RMAs...</p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Loading RMAs...
+                </p>
               </div>
             </div>
           ) : rmas.length === 0 ? (
@@ -201,7 +211,9 @@ export default function RMAsPage() {
               <TableBody>
                 {rmas.map((rma) => (
                   <TableRow key={rma.id}>
-                    <TableCell className="font-medium">{rma.rmaNumber}</TableCell>
+                    <TableCell className="font-medium">
+                      {rma.rmaNumber}
+                    </TableCell>
                     <TableCell>
                       <div>
                         <div className="font-medium">{rma.customer.name}</div>

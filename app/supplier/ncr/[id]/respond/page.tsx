@@ -1,17 +1,29 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Send, Upload, AlertTriangle, CheckCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { PhotoUpload } from '@/components/qc/PhotoUpload';
-import { SignatureCapture } from '@/components/qc/SignatureCapture';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowLeft,
+  Send,
+  Upload,
+  AlertTriangle,
+  CheckCircle,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { PhotoUpload } from "@/components/qc/PhotoUpload";
+import { SignatureCapture } from "@/components/qc/SignatureCapture";
 
 interface NCRDetails {
   id: string;
@@ -28,7 +40,11 @@ interface NCRDetails {
   disposition: string;
 }
 
-export default function SupplierNCRResponse({ params }: { params: { id: string } }) {
+export default function SupplierNCRResponse({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
   const [ncr, setNcr] = useState<NCRDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -36,17 +52,17 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
   const [success, setSuccess] = useState(false);
 
   // 8D Form Fields
-  const [d1Team, setD1Team] = useState('');
-  const [d2Problem, setD2Problem] = useState('');
-  const [d3Containment, setD3Containment] = useState('');
-  const [d4RootCause, setD4RootCause] = useState('');
-  const [d5Corrective, setD5Corrective] = useState('');
-  const [d6Implementation, setD6Implementation] = useState('');
-  const [d7Prevention, setD7Prevention] = useState('');
-  const [d8Congratulate, setD8Congratulate] = useState('');
-  
+  const [d1Team, setD1Team] = useState("");
+  const [d2Problem, setD2Problem] = useState("");
+  const [d3Containment, setD3Containment] = useState("");
+  const [d4RootCause, setD4RootCause] = useState("");
+  const [d5Corrective, setD5Corrective] = useState("");
+  const [d6Implementation, setD6Implementation] = useState("");
+  const [d7Prevention, setD7Prevention] = useState("");
+  const [d8Congratulate, setD8Congratulate] = useState("");
+
   const [photos, setPhotos] = useState<string[]>([]);
-  const [signature, setSignature] = useState('');
+  const [signature, setSignature] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
 
   useEffect(() => {
@@ -55,19 +71,19 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
 
   const loadNCR = async () => {
     try {
-      const token = localStorage.getItem('supplier_token');
+      const token = localStorage.getItem("supplier_token");
       const response = await fetch(`/api/supplier/ncr/${params.id}`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (!response.ok) throw new Error('Failed to load NCR');
+      if (!response.ok) throw new Error("Failed to load NCR");
 
       const result = await response.json();
       setNcr(result.data);
     } catch (error) {
-      console.error('Load NCR error:', error);
+      console.error("Load NCR error:", error);
     } finally {
       setLoading(false);
     }
@@ -78,8 +94,8 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
     setSubmitting(true);
 
     try {
-      const token = localStorage.getItem('supplier_token');
-      
+      const token = localStorage.getItem("supplier_token");
+
       // Prepare 8D response
       const eightD = {
         d1_team: d1Team,
@@ -89,14 +105,14 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
         d5_corrective: d5Corrective,
         d6_implementation: d6Implementation,
         d7_prevention: d7Prevention,
-        d8_congratulate: d8Congratulate
+        d8_congratulate: d8Congratulate,
       };
 
-      const response = await fetch('/api/supplier/response', {
-        method: 'POST',
+      const response = await fetch("/api/supplier/response", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           ncrId: params.id,
@@ -105,15 +121,14 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
           correctiveAction: d5Corrective,
           preventiveAction: d7Prevention,
           photos,
-          signature
-        })
+          signature,
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to submit response');
+      if (!response.ok) throw new Error("Failed to submit response");
 
       setSuccess(true);
-      setTimeout(() => router.push('/supplier/ncr'), 2000);
-
+      setTimeout(() => router.push("/supplier/ncr"), 2000);
     } catch (error: any) {
       alert(error.message);
     } finally {
@@ -167,11 +182,15 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back
           </Button>
-          <Badge className={
-            ncr.severity === 'CRITICAL' ? 'bg-red-100 text-red-800' :
-            ncr.severity === 'MAJOR' ? 'bg-orange-100 text-orange-800' :
-            'bg-yellow-100 text-yellow-800'
-          }>
+          <Badge
+            className={
+              ncr.severity === "CRITICAL"
+                ? "bg-red-100 text-red-800"
+                : ncr.severity === "MAJOR"
+                  ? "bg-orange-100 text-orange-800"
+                  : "bg-yellow-100 text-yellow-800"
+            }
+          >
             {ncr.severity}
           </Badge>
         </div>
@@ -179,9 +198,11 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
         {/* NCR Details */}
         <Card>
           <CardHeader>
-            <CardTitle>{ncr.ncrNumber} - {ncr.title}</CardTitle>
+            <CardTitle>
+              {ncr.ncrNumber} - {ncr.title}
+            </CardTitle>
             <CardDescription>
-              Reported: {new Date(ncr.reportDate).toLocaleDateString()} | 
+              Reported: {new Date(ncr.reportDate).toLocaleDateString()} |
               Status: {ncr.status}
             </CardDescription>
           </CardHeader>
@@ -189,11 +210,11 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Product SKU</Label>
-                <p className="font-medium">{ncr.productSku || 'N/A'}</p>
+                <p className="font-medium">{ncr.productSku || "N/A"}</p>
               </div>
               <div>
                 <Label>Lot Number</Label>
-                <p className="font-medium">{ncr.lotNumber || 'N/A'}</p>
+                <p className="font-medium">{ncr.lotNumber || "N/A"}</p>
               </div>
               <div>
                 <Label>Quantity Affected</Label>
@@ -247,7 +268,8 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
                   D2: Describe the Problem
                 </Label>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Detailed description of the problem using 5W2H (What, Where, When, Why, Who, How, How Many)
+                  Detailed description of the problem using 5W2H (What, Where,
+                  When, Why, Who, How, How Many)
                 </p>
                 <Textarea
                   placeholder="Provide detailed problem description..."
@@ -264,7 +286,8 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
                   D3: Develop Interim Containment Actions
                 </Label>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Immediate actions taken to contain the problem and protect customers
+                  Immediate actions taken to contain the problem and protect
+                  customers
                 </p>
                 <Textarea
                   placeholder="What actions have been taken to prevent further defects reaching customers?"
@@ -281,7 +304,8 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
                   D4: Determine Root Cause
                 </Label>
                 <p className="text-sm text-muted-foreground mb-2">
-                  Identify and verify the root cause using appropriate analysis methods
+                  Identify and verify the root cause using appropriate analysis
+                  methods
                 </p>
                 <Textarea
                   placeholder="What is the verified root cause? (Use 5-Why, Fishbone, etc.)"
@@ -362,7 +386,9 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
 
               {/* Evidence Upload */}
               <div>
-                <Label className="text-lg font-semibold">Supporting Evidence</Label>
+                <Label className="text-lg font-semibold">
+                  Supporting Evidence
+                </Label>
                 <div className="mt-2">
                   <PhotoUpload
                     value={photos}
@@ -374,24 +400,27 @@ export default function SupplierNCRResponse({ params }: { params: { id: string }
 
               {/* Digital Signature */}
               <div>
-                <Label className="text-lg font-semibold">Digital Signature</Label>
+                <Label className="text-lg font-semibold">
+                  Digital Signature
+                </Label>
                 <p className="text-sm text-muted-foreground mb-2">
                   Sign to certify the accuracy of this response
                 </p>
-                <SignatureCapture
-                  value={signature}
-                  onChange={setSignature}
-                />
+                <SignatureCapture value={signature} onChange={setSignature} />
               </div>
 
               {/* Submit Button */}
               <div className="flex justify-end space-x-3">
-                <Button type="button" variant="outline" onClick={() => router.back()}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={submitting}>
                   {submitting ? (
-                    'Submitting...'
+                    "Submitting..."
                   ) : (
                     <>
                       <Send className="w-4 h-4 mr-2" />

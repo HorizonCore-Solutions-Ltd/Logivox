@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { SamplingPlanService } from '@/lib/services/qc/sampling-plan-service';
+import { NextRequest, NextResponse } from "next/server";
+import { SamplingPlanService } from "@/lib/services/qc/sampling-plan-service";
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,8 +15,8 @@ export async function POST(request: NextRequest) {
 
     if (!lotSize || !inspectionLevel) {
       return NextResponse.json(
-        { error: 'lotSize and inspectionLevel are required' },
-        { status: 400 }
+        { error: "lotSize and inspectionLevel are required" },
+        { status: 400 },
       );
     }
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
 
     const sampleSizeCode = SamplingPlanService.determineSampleSizeCode(
       lotSize,
-      inspectionLevel
+      inspectionLevel,
     );
 
     return NextResponse.json({
@@ -41,10 +41,10 @@ export async function POST(request: NextRequest) {
       inspectionLevel,
     });
   } catch (error: any) {
-    console.error('Error calculating sample size:', error);
+    console.error("Error calculating sample size:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to calculate sample size' },
-      { status: 500 }
+      { error: error.message || "Failed to calculate sample size" },
+      { status: 500 },
     );
   }
 }

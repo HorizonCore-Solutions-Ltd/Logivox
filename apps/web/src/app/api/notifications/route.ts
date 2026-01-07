@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,14 +7,25 @@ import { z } from "zod";
 
 const sendNotificationSchema = z.object({
   templateId: z.string().optional(),
-  category: z.enum(['ORDER_UPDATES', 'INVENTORY_ALERTS', 'SHIPMENT_UPDATES', 'PAYMENT_UPDATES', 'QUALITY_ALERTS', 'SYSTEM_ALERTS', 'USER_ACTIONS', 'REPORTS', 'APPROVALS', 'CUSTOM']),
-  notificationType: z.enum(['EMAIL', 'SMS', 'WEBHOOK', 'PUSH', 'IN_APP']),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).default('MEDIUM'),
+  category: z.enum([
+    "ORDER_UPDATES",
+    "INVENTORY_ALERTS",
+    "SHIPMENT_UPDATES",
+    "PAYMENT_UPDATES",
+    "QUALITY_ALERTS",
+    "SYSTEM_ALERTS",
+    "USER_ACTIONS",
+    "REPORTS",
+    "APPROVALS",
+    "CUSTOM",
+  ]),
+  notificationType: z.enum(["EMAIL", "SMS", "WEBHOOK", "PUSH", "IN_APP"]),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).default("MEDIUM"),
   subject: z.string().optional(),
   body: z.string().min(1, "Body is required"),
   htmlBody: z.string().optional(),
   data: z.record(z.any()).optional(),
-  recipientType: z.enum(['USER', 'ROLE', 'CUSTOM', 'DYNAMIC']),
+  recipientType: z.enum(["USER", "ROLE", "CUSTOM", "DYNAMIC"]),
   recipientId: z.string().optional(),
   recipientEmail: z.string().email().optional(),
   recipientPhone: z.string().optional(),
@@ -30,10 +41,12 @@ const sendNotificationSchema = z.object({
 });
 
 // Helper function to generate notification number
-async function generateNotificationNumber(organizationId: string): Promise<string> {
+async function generateNotificationNumber(
+  organizationId: string,
+): Promise<string> {
   const today = new Date();
-  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-  
+  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
+
   const lastNotification = await prisma.notification.findFirst({
     where: {
       organizationId,
@@ -41,16 +54,18 @@ async function generateNotificationNumber(organizationId: string): Promise<strin
         startsWith: `NOTIF-${dateStr}-`,
       },
     },
-    orderBy: { notificationNumber: 'desc' },
+    orderBy: { notificationNumber: "desc" },
   });
 
   let sequence = 1;
   if (lastNotification?.notificationNumber) {
-    const lastSequence = parseInt(lastNotification.notificationNumber.split('-')[2]);
+    const lastSequence = parseInt(
+      lastNotification.notificationNumber.split("-")[2],
+    );
     sequence = lastSequence + 1;
   }
 
-  return `NOTIF-${dateStr}-${sequence.toString().padStart(4, '0')}`;
+  return `NOTIF-${dateStr}-${sequence.toString().padStart(4, "0")}`;
 }
 
 // GET /api/notifications - List notifications
@@ -74,7 +89,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -116,7 +131,7 @@ export async function GET(request: Request) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip: offset,
         take: limit,
       }),
@@ -144,7 +159,7 @@ export async function GET(request: Request) {
     console.error("Error fetching notifications:", error);
     return NextResponse.json(
       { error: "Failed to fetch notifications" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -170,7 +185,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -189,9 +204,13 @@ export async function POST(request: Request) {
         notificationNumber,
         createdById: user.id,
         ...validated,
-        scheduledFor: validated.scheduledFor ? new Date(validated.scheduledFor) : undefined,
-        expiresAt: validated.expiresAt ? new Date(validated.expiresAt) : undefined,
-        status: validated.scheduledFor ? 'SCHEDULED' : 'PENDING',
+        scheduledFor: validated.scheduledFor
+          ? new Date(validated.scheduledFor)
+          : undefined,
+        expiresAt: validated.expiresAt
+          ? new Date(validated.expiresAt)
+          : undefined,
+        status: validated.scheduledFor ? "SCHEDULED" : "PENDING",
       },
       include: {
         template: true,
@@ -212,10 +231,10 @@ export async function POST(request: Request) {
           data: {
             notificationId: notification.id,
             channel: channel as any,
-            status: 'PENDING',
+            status: "PENDING",
           },
-        })
-      )
+        }),
+      ),
     );
 
     // TODO: Actually send the notification via the appropriate channels
@@ -223,7 +242,7 @@ export async function POST(request: Request) {
     await prisma.notification.update({
       where: { id: notification.id },
       data: {
-        status: 'SENT',
+        status: "SENT",
         sentAt: new Date(),
       },
     });
@@ -233,13 +252,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error sending notification:", error);
     return NextResponse.json(
       { error: "Failed to send notification" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

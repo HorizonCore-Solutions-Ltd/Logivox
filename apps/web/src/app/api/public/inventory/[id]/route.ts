@@ -1,15 +1,15 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { authenticateApiKey } from "@/lib/api-auth"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { authenticateApiKey } from "@/lib/api-auth";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   // Authenticate API key
-  const auth = await authenticateApiKey(request)
-  if (!auth.authenticated) return auth.error!
+  const auth = await authenticateApiKey(request);
+  if (!auth.authenticated) return auth.error!;
 
   // Fetch single inventory item
   const item = await prisma.inventoryItem.findFirst({
@@ -43,14 +43,14 @@ export async function GET(
         },
       },
     },
-  })
+  });
 
   if (!item) {
     return NextResponse.json(
       { message: "Inventory item not found" },
-      { status: 404 }
-    )
+      { status: 404 },
+    );
   }
 
-  return NextResponse.json(item)
+  return NextResponse.json(item);
 }

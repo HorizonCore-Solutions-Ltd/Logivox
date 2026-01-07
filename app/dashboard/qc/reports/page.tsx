@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   FileText,
   Plus,
@@ -28,8 +28,8 @@ import {
   Calendar,
   TrendingUp,
   BarChart3,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface QualityReport {
   id: string;
@@ -46,11 +46,11 @@ interface QualityReport {
 export default function QualityReportsPage() {
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState<QualityReport[]>([]);
-  const [reportTypeFilter, setReportTypeFilter] = useState<string>('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [reportTypeFilter, setReportTypeFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const organizationId = 'org_123'; // TODO: Get from auth context
+  const organizationId = "org_123"; // TODO: Get from auth context
 
   useEffect(() => {
     fetchData();
@@ -59,15 +59,15 @@ export default function QualityReportsPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       const params = new URLSearchParams({ organizationId });
-      if (reportTypeFilter) params.append('reportType', reportTypeFilter);
-      if (categoryFilter) params.append('reportCategory', categoryFilter);
+      if (reportTypeFilter) params.append("reportType", reportTypeFilter);
+      if (categoryFilter) params.append("reportCategory", categoryFilter);
 
       const res = await fetch(`/api/qc/reports?${params.toString()}`);
       if (res.ok) setReports(await res.json());
     } catch (error) {
-      console.error('Error fetching reports:', error);
+      console.error("Error fetching reports:", error);
     } finally {
       setLoading(false);
     }
@@ -77,10 +77,10 @@ export default function QualityReportsPage() {
     try {
       const now = new Date();
       const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-      
-      await fetch('/api/qc/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+
+      await fetch("/api/qc/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           organizationId,
           reportType: type,
@@ -88,44 +88,47 @@ export default function QualityReportsPage() {
           reportName: `${category} ${type} Report - ${now.toLocaleDateString()}`,
           periodStart: startOfMonth.toISOString(),
           periodEnd: now.toISOString(),
-          generatedBy: 'user-123', // TODO: Get from auth
+          generatedBy: "user-123", // TODO: Get from auth
         }),
       });
-      
+
       fetchData();
     } catch (error) {
-      console.error('Error generating report:', error);
+      console.error("Error generating report:", error);
     }
   };
 
-  const filteredReports = reports.filter(report =>
-    report.reportNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.reportName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredReports = reports.filter(
+    (report) =>
+      report.reportNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.reportName.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getReportTypeBadge = (type: string) => {
     const config: Record<string, string> = {
-      DAILY: 'bg-blue-500',
-      WEEKLY: 'bg-green-600',
-      MONTHLY: 'bg-purple-500',
-      QUARTERLY: 'bg-orange-500',
-      ANNUAL: 'bg-red-600',
-      CUSTOM: 'bg-gray-600',
+      DAILY: "bg-blue-500",
+      WEEKLY: "bg-green-600",
+      MONTHLY: "bg-purple-500",
+      QUARTERLY: "bg-orange-500",
+      ANNUAL: "bg-red-600",
+      CUSTOM: "bg-gray-600",
     };
     return <Badge className={`${config[type]} text-white`}>{type}</Badge>;
   };
 
   const getCategoryBadge = (category: string) => {
     const config: Record<string, string> = {
-      INSPECTION: 'bg-blue-500',
-      DEFECTS: 'bg-red-500',
-      NCR: 'bg-orange-500',
-      CAPA: 'bg-purple-500',
-      SUPPLIER: 'bg-green-600',
-      COMPLIANCE: 'bg-teal-500',
-      EXECUTIVE: 'bg-gray-700',
+      INSPECTION: "bg-blue-500",
+      DEFECTS: "bg-red-500",
+      NCR: "bg-orange-500",
+      CAPA: "bg-purple-500",
+      SUPPLIER: "bg-green-600",
+      COMPLIANCE: "bg-teal-500",
+      EXECUTIVE: "bg-gray-700",
     };
-    return <Badge className={`${config[category]} text-white`}>{category}</Badge>;
+    return (
+      <Badge className={`${config[category]} text-white`}>{category}</Badge>
+    );
   };
 
   if (loading) {
@@ -142,7 +145,9 @@ export default function QualityReportsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Quality Reports</h1>
-          <p className="text-muted-foreground">Generate and view quality metrics reports</p>
+          <p className="text-muted-foreground">
+            Generate and view quality metrics reports
+          </p>
         </div>
         <Link href="/dashboard/qc/reports/generate">
           <Button>
@@ -161,7 +166,7 @@ export default function QualityReportsPage() {
           <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-7">
             <Button
               variant="outline"
-              onClick={() => generateReport('DAILY', 'INSPECTION')}
+              onClick={() => generateReport("DAILY", "INSPECTION")}
               className="flex flex-col h-auto py-3"
             >
               <FileText className="h-5 w-5 mb-2" />
@@ -169,7 +174,7 @@ export default function QualityReportsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => generateReport('WEEKLY', 'DEFECTS')}
+              onClick={() => generateReport("WEEKLY", "DEFECTS")}
               className="flex flex-col h-auto py-3"
             >
               <BarChart3 className="h-5 w-5 mb-2" />
@@ -177,7 +182,7 @@ export default function QualityReportsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => generateReport('MONTHLY', 'NCR')}
+              onClick={() => generateReport("MONTHLY", "NCR")}
               className="flex flex-col h-auto py-3"
             >
               <TrendingUp className="h-5 w-5 mb-2" />
@@ -185,7 +190,7 @@ export default function QualityReportsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => generateReport('MONTHLY', 'CAPA')}
+              onClick={() => generateReport("MONTHLY", "CAPA")}
               className="flex flex-col h-auto py-3"
             >
               <Calendar className="h-5 w-5 mb-2" />
@@ -193,7 +198,7 @@ export default function QualityReportsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => generateReport('MONTHLY', 'SUPPLIER')}
+              onClick={() => generateReport("MONTHLY", "SUPPLIER")}
               className="flex flex-col h-auto py-3"
             >
               <FileText className="h-5 w-5 mb-2" />
@@ -201,7 +206,7 @@ export default function QualityReportsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => generateReport('QUARTERLY', 'COMPLIANCE')}
+              onClick={() => generateReport("QUARTERLY", "COMPLIANCE")}
               className="flex flex-col h-auto py-3"
             >
               <BarChart3 className="h-5 w-5 mb-2" />
@@ -209,7 +214,7 @@ export default function QualityReportsPage() {
             </Button>
             <Button
               variant="outline"
-              onClick={() => generateReport('MONTHLY', 'EXECUTIVE')}
+              onClick={() => generateReport("MONTHLY", "EXECUTIVE")}
               className="flex flex-col h-auto py-3 border-2 border-primary"
             >
               <TrendingUp className="h-5 w-5 mb-2 text-primary" />
@@ -228,9 +233,7 @@ export default function QualityReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{reports.length}</div>
-            <p className="text-xs text-muted-foreground">
-              All time generated
-            </p>
+            <p className="text-xs text-muted-foreground">All time generated</p>
           </CardContent>
         </Card>
 
@@ -241,12 +244,16 @@ export default function QualityReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {reports.filter(r => {
-                const generated = new Date(r.generatedDate);
-                const now = new Date();
-                return generated.getMonth() === now.getMonth() &&
-                       generated.getFullYear() === now.getFullYear();
-              }).length}
+              {
+                reports.filter((r) => {
+                  const generated = new Date(r.generatedDate);
+                  const now = new Date();
+                  return (
+                    generated.getMonth() === now.getMonth() &&
+                    generated.getFullYear() === now.getFullYear()
+                  );
+                }).length
+              }
             </div>
             <p className="text-xs text-muted-foreground">
               Generated this month
@@ -256,12 +263,14 @@ export default function QualityReportsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Executive Reports</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Executive Reports
+            </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {reports.filter(r => r.reportCategory === 'EXECUTIVE').length}
+              {reports.filter((r) => r.reportCategory === "EXECUTIVE").length}
             </div>
             <p className="text-xs text-muted-foreground">
               Management summaries
@@ -276,9 +285,7 @@ export default function QualityReportsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">
-              Scheduled reports
-            </p>
+            <p className="text-xs text-muted-foreground">Scheduled reports</p>
           </CardContent>
         </Card>
       </div>
@@ -296,7 +303,10 @@ export default function QualityReportsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="max-w-sm"
             />
-            <Select value={reportTypeFilter} onValueChange={setReportTypeFilter}>
+            <Select
+              value={reportTypeFilter}
+              onValueChange={setReportTypeFilter}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="All Types" />
               </SelectTrigger>
@@ -349,24 +359,44 @@ export default function QualityReportsPage() {
               <TableBody>
                 {filteredReports.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
-                      No reports found. Generate your first report using the buttons above.
+                    <TableCell
+                      colSpan={8}
+                      className="text-center text-muted-foreground"
+                    >
+                      No reports found. Generate your first report using the
+                      buttons above.
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredReports.map((report) => (
                     <TableRow key={report.id}>
-                      <TableCell className="font-medium">{report.reportNumber}</TableCell>
-                      <TableCell className="max-w-xs truncate">{report.reportName}</TableCell>
-                      <TableCell>{getReportTypeBadge(report.reportType)}</TableCell>
-                      <TableCell>{getCategoryBadge(report.reportCategory)}</TableCell>
-                      <TableCell>{new Date(report.periodStart).toLocaleDateString()}</TableCell>
-                      <TableCell>{new Date(report.periodEnd).toLocaleDateString()}</TableCell>
-                      <TableCell>{new Date(report.generatedDate).toLocaleDateString()}</TableCell>
+                      <TableCell className="font-medium">
+                        {report.reportNumber}
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {report.reportName}
+                      </TableCell>
+                      <TableCell>
+                        {getReportTypeBadge(report.reportType)}
+                      </TableCell>
+                      <TableCell>
+                        {getCategoryBadge(report.reportCategory)}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(report.periodStart).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(report.periodEnd).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(report.generatedDate).toLocaleDateString()}
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
                           <Link href={`/dashboard/qc/reports/${report.id}`}>
-                            <Button variant="ghost" size="sm">View</Button>
+                            <Button variant="ghost" size="sm">
+                              View
+                            </Button>
                           </Link>
                           <Button variant="ghost" size="sm">
                             <Download className="h-4 w-4" />

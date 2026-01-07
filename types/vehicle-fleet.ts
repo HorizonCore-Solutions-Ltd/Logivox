@@ -1,6 +1,6 @@
 /**
  * Vehicle Fleet Types
- * 
+ *
  * Type definitions for vehicle fleet management, transport operations,
  * and customer vehicle visibility.
  */
@@ -10,43 +10,43 @@
 // ============================================================================
 
 export type VehicleCategory =
-  | 'ARTIC_TRAILER'    // Articulated lorry
-  | 'RIGID_TRUCK'      // Rigid box truck
-  | 'BOX_TRUCK'        // 7.5T and similar
-  | 'LUTON_VAN'        // Large box van
-  | 'VAN'              // Panel vans
-  | 'SPRINTER'         // Mercedes Sprinter type
-  | 'TRANSIT'          // Ford Transit type
-  | 'REEFER'           // Refrigerated
-  | 'FLATBED'          // Open flatbed
-  | 'CURTAIN_SIDE'     // Curtain sider
-  | 'PICKUP'           // Pick-up truck
-  | 'ELECTRIC'         // Electric vehicles
-  | 'SPECIALITY';      // Special purpose
+  | "ARTIC_TRAILER" // Articulated lorry
+  | "RIGID_TRUCK" // Rigid box truck
+  | "BOX_TRUCK" // 7.5T and similar
+  | "LUTON_VAN" // Large box van
+  | "VAN" // Panel vans
+  | "SPRINTER" // Mercedes Sprinter type
+  | "TRANSIT" // Ford Transit type
+  | "REEFER" // Refrigerated
+  | "FLATBED" // Open flatbed
+  | "CURTAIN_SIDE" // Curtain sider
+  | "PICKUP" // Pick-up truck
+  | "ELECTRIC" // Electric vehicles
+  | "SPECIALITY"; // Special purpose
 
 export type VehicleStatus =
-  | 'AVAILABLE'
-  | 'ASSIGNED'
-  | 'IN_TRANSIT'
-  | 'LOADING'
-  | 'UNLOADING'
-  | 'MAINTENANCE'
-  | 'OUT_OF_SERVICE'
-  | 'RETIRED';
+  | "AVAILABLE"
+  | "ASSIGNED"
+  | "IN_TRANSIT"
+  | "LOADING"
+  | "UNLOADING"
+  | "MAINTENANCE"
+  | "OUT_OF_SERVICE"
+  | "RETIRED";
 
 export type FuelType =
-  | 'DIESEL'
-  | 'PETROL'
-  | 'ELECTRIC'
-  | 'HYBRID'
-  | 'LPG'
-  | 'CNG';
+  | "DIESEL"
+  | "PETROL"
+  | "ELECTRIC"
+  | "HYBRID"
+  | "LPG"
+  | "CNG";
 
 export type LicenseClass =
-  | 'CAR_LICENSE'      // UK: Category B (can drive 7.5T with old license)
-  | 'CLASS_2'          // UK: Category C (Rigid trucks up to 32T)
-  | 'CLASS_1'          // UK: Category C+E (Articulated)
-  | 'CLASS_1_HAZMAT';  // Class 1 + Hazmat certification
+  | "CAR_LICENSE" // UK: Category B (can drive 7.5T with old license)
+  | "CLASS_2" // UK: Category C (Rigid trucks up to 32T)
+  | "CLASS_1" // UK: Category C+E (Articulated)
+  | "CLASS_1_HAZMAT"; // Class 1 + Hazmat certification
 
 // ============================================================================
 // VEHICLE INTERFACE
@@ -59,10 +59,10 @@ export interface Vehicle {
 
   // Basic info
   name: string;
-  registrationNumber: string;  // UK: Registration plate
-  vehicleType: string;          // ARTIC_53, RIGID_7.5T, LWB_VAN, etc.
+  registrationNumber: string; // UK: Registration plate
+  vehicleType: string; // ARTIC_53, RIGID_7.5T, LWB_VAN, etc.
   category: VehicleCategory;
-  
+
   // Specifications
   lengthInches: number;
   widthInches: number;
@@ -70,37 +70,37 @@ export interface Vehicle {
   maxWeightLbs: number;
   volumeCubicFeet: number;
   palletCapacity: number;
-  
+
   // Features
   hasLiftGate: boolean;
   hasTemperatureControl: boolean;
-  tempRangeMin?: number;         // Fahrenheit
+  tempRangeMin?: number; // Fahrenheit
   tempRangeMax?: number;
   hasSideLoading: boolean;
   hasRearLoading: boolean;
-  
+
   // Licensing & Compliance
   requiresLicense: LicenseClass;
-  tollClass: string;             // Toll road classification
-  emissionClass?: string;        // EURO 6, etc.
+  tollClass: string; // Toll road classification
+  emissionClass?: string; // EURO 6, etc.
   congestionChargeExempt: boolean;
-  
+
   // Fuel & Operating
   fuelType: FuelType;
   tankCapacityLiters?: number;
   typicalMPG?: number;
-  typicalRange?: number;         // Miles (for electric)
+  typicalRange?: number; // Miles (for electric)
   costPerMile: number;
-  
+
   // Status
   status: VehicleStatus;
   isActive: boolean;
-  customerVisible: boolean;      // Show to customers?
-  
+  customerVisible: boolean; // Show to customers?
+
   // Ownership
-  ownedOrLeased: 'OWNED' | 'LEASED' | 'CONTRACTED';
+  ownedOrLeased: "OWNED" | "LEASED" | "CONTRACTED";
   leaseExpiry?: Date;
-  
+
   // Assignment
   assignedWarehouseId?: string;
   assignedWarehouse?: any;
@@ -108,34 +108,34 @@ export interface Vehicle {
   currentDriver?: any;
   currentLocationId?: string;
   currentLocation?: VehicleLocation;
-  
+
   // Insurance & Compliance
   insuranceExpiry: Date;
-  motExpiry: Date;                // MOT test (UK)
+  motExpiry: Date; // MOT test (UK)
   roadTaxExpiry: Date;
-  tachoCalibration?: Date;        // Tachograph calibration
-  
+  tachoCalibration?: Date; // Tachograph calibration
+
   // Maintenance
   lastServiceDate?: Date;
   nextServiceDue?: Date;
   serviceMileageInterval?: number;
   currentMileage: number;
-  
+
   // Tracking
   hasGPSTracker: boolean;
   trackerIMEI?: string;
   lastSeenAt?: Date;
-  
+
   // Assignments
   assignments?: VehicleAssignment[];
   maintenanceSchedule?: MaintenanceSchedule[];
-  
+
   // Documents
   documents?: VehicleDocument[];
-  
+
   // Notes
   notes?: string;
-  
+
   // Metadata
   tenantId: string;
 }
@@ -152,63 +152,63 @@ export interface VehicleAssignment {
   // Vehicle
   vehicleId: string;
   vehicle?: Vehicle;
-  
+
   // Driver
   driverId?: string;
   driver?: any;
-  
+
   // Orders
   orderIds: string[];
   orders?: any[];
-  
+
   // Route
   routeId?: string;
   route?: any;
-  
+
   // Schedule
   scheduledDate: Date;
   scheduledStartTime?: Date;
   scheduledEndTime?: Date;
-  
+
   // Actual times
   actualStartTime?: Date;
   actualEndTime?: Date;
-  
+
   // Status
   status: AssignmentStatus;
-  
+
   // Metrics
-  estimatedDistance?: number;    // miles
+  estimatedDistance?: number; // miles
   actualDistance?: number;
-  estimatedDuration?: number;    // minutes
+  estimatedDuration?: number; // minutes
   actualDuration?: number;
   estimatedCost?: number;
   actualCost?: number;
-  
+
   // Stops
   totalStops: number;
   completedStops: number;
-  
+
   // Load
   loadPlanId?: string;
-  loadedWeight?: number;         // lbs
-  loadedVolume?: number;         // cubic feet
-  
+  loadedWeight?: number; // lbs
+  loadedVolume?: number; // cubic feet
+
   // Notes
   notes?: string;
-  
+
   // Metadata
   tenantId: string;
 }
 
 export type AssignmentStatus =
-  | 'SCHEDULED'
-  | 'CONFIRMED'
-  | 'IN_PROGRESS'
-  | 'PAUSED'
-  | 'COMPLETED'
-  | 'CANCELLED'
-  | 'FAILED';
+  | "SCHEDULED"
+  | "CONFIRMED"
+  | "IN_PROGRESS"
+  | "PAUSED"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "FAILED";
 
 // ============================================================================
 // VEHICLE LOCATION
@@ -221,25 +221,25 @@ export interface VehicleLocation {
   // Vehicle
   vehicleId: string;
   vehicle?: Vehicle;
-  
+
   // Location
   latitude: number;
   longitude: number;
   address?: string;
-  
+
   // Motion
-  speed?: number;                // mph
-  heading?: number;              // degrees (0-360)
-  
+  speed?: number; // mph
+  heading?: number; // degrees (0-360)
+
   // Status
   engineOn?: boolean;
   moving?: boolean;
-  
+
   // Timestamp
   timestamp: Date;
-  
+
   // Source
-  source: 'GPS' | 'MANUAL' | 'CHECKIN' | 'CHECKOUT';
+  source: "GPS" | "MANUAL" | "CHECKIN" | "CHECKOUT";
 }
 
 // ============================================================================
@@ -254,64 +254,64 @@ export interface MaintenanceSchedule {
   // Vehicle
   vehicleId: string;
   vehicle?: Vehicle;
-  
+
   // Type
   type: MaintenanceType;
-  
+
   // Schedule
   scheduledDate: Date;
   completedDate?: Date;
-  
+
   // Details
   description: string;
   workRequired?: string[];
-  
+
   // Cost
   estimatedCost?: number;
   actualCost?: number;
-  
+
   // Time
-  estimatedDuration?: number;    // hours
+  estimatedDuration?: number; // hours
   actualDuration?: number;
-  
+
   // Service provider
   serviceProvider?: string;
   location?: string;
-  
+
   // Status
   status: MaintenanceStatus;
-  
+
   // Results
   passed?: boolean;
   certificateNumber?: string;
   expiryDate?: Date;
   issues?: string[];
-  
+
   // Notes
   notes?: string;
-  
+
   // Metadata
   tenantId: string;
 }
 
 export type MaintenanceType =
-  | 'SERVICE'         // Regular service
-  | 'MOT'            // MOT test (UK)
-  | 'REPAIR'         // Repair work
-  | 'INSPECTION'     // Safety inspection
-  | 'TACHO'          // Tachograph calibration
-  | 'TYRES'          // Tyre replacement
-  | 'BRAKES'         // Brake service
-  | 'OIL_CHANGE'     // Oil change
-  | 'BODYWORK'       // Body repairs
-  | 'OTHER';
+  | "SERVICE" // Regular service
+  | "MOT" // MOT test (UK)
+  | "REPAIR" // Repair work
+  | "INSPECTION" // Safety inspection
+  | "TACHO" // Tachograph calibration
+  | "TYRES" // Tyre replacement
+  | "BRAKES" // Brake service
+  | "OIL_CHANGE" // Oil change
+  | "BODYWORK" // Body repairs
+  | "OTHER";
 
 export type MaintenanceStatus =
-  | 'SCHEDULED'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'CANCELLED'
-  | 'OVERDUE';
+  | "SCHEDULED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "OVERDUE";
 
 // ============================================================================
 // DOCUMENTS
@@ -325,42 +325,42 @@ export interface VehicleDocument {
   // Vehicle
   vehicleId: string;
   vehicle?: Vehicle;
-  
+
   // Document
   type: DocumentType;
   name: string;
   description?: string;
-  
+
   // File
   fileUrl: string;
   fileName: string;
   fileSize: number;
   mimeType: string;
-  
+
   // Dates
   issueDate?: Date;
   expiryDate?: Date;
-  
+
   // Status
   verified: boolean;
   verifiedBy?: string;
   verifiedAt?: Date;
-  
+
   // Metadata
   tenantId: string;
 }
 
 export type DocumentType =
-  | 'V5C'               // Vehicle registration (UK)
-  | 'INSURANCE'
-  | 'MOT_CERTIFICATE'
-  | 'ROAD_TAX'
-  | 'OPERATORS_LICENSE'
-  | 'TACHO_CALIBRATION'
-  | 'SERVICE_RECORD'
-  | 'INSPECTION_REPORT'
-  | 'PHOTO'
-  | 'OTHER';
+  | "V5C" // Vehicle registration (UK)
+  | "INSURANCE"
+  | "MOT_CERTIFICATE"
+  | "ROAD_TAX"
+  | "OPERATORS_LICENSE"
+  | "TACHO_CALIBRATION"
+  | "SERVICE_RECORD"
+  | "INSPECTION_REPORT"
+  | "PHOTO"
+  | "OTHER";
 
 // ============================================================================
 // AVAILABILITY
@@ -381,40 +381,40 @@ export interface VehicleAvailability {
 
 export interface VehicleStatistics {
   vehicleId: string;
-  
+
   // Usage
   totalAssignments: number;
   completedAssignments: number;
   cancelledAssignments: number;
-  
+
   // Distance
   totalMileage: number;
   averageMileagePerDay: number;
-  
+
   // Utilization
-  utilizationRate: number;       // percent
-  averageLoadWeight: number;     // lbs
-  averageLoadVolume: number;     // cubic feet
-  
+  utilizationRate: number; // percent
+  averageLoadWeight: number; // lbs
+  averageLoadVolume: number; // cubic feet
+
   // Time
   totalDrivingHours: number;
   totalIdleHours: number;
   averageHoursPerDay: number;
-  
+
   // Cost
   totalFuelCost: number;
   totalMaintenanceCost: number;
   averageCostPerMile: number;
-  
+
   // Efficiency
   averageMPG: number;
-  onTimeDeliveryRate: number;    // percent
-  
+  onTimeDeliveryRate: number; // percent
+
   // Maintenance
   maintenanceCount: number;
   averageDaysBetweenService: number;
   breakdownCount: number;
-  
+
   // Period
   periodStart: Date;
   periodEnd: Date;
@@ -513,27 +513,27 @@ export interface CustomerVehicleView {
   vehicleType: string;
   category: VehicleCategory;
   name: string;
-  
+
   // Current status
-  status: 'On Route' | 'Loading' | 'Arriving Soon' | 'Delivered';
+  status: "On Route" | "Loading" | "Arriving Soon" | "Delivered";
   eta?: Date;
-  
+
   // Location (if allowed)
   currentLocation?: {
     address: string;
     city: string;
     lastUpdate: Date;
   };
-  
+
   // Driver (limited info)
   driverName?: string;
   driverPhoto?: string;
   driverPhone?: string;
-  
+
   // Orders
-  yourOrders: string[];        // Order numbers
+  yourOrders: string[]; // Order numbers
   estimatedDeliveryTime?: Date;
-  
+
   // Tracking
   trackingUrl?: string;
   canTrackRealTime: boolean;

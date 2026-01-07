@@ -1,7 +1,7 @@
 /**
  * Receiving Service
  * Comprehensive Inbound Operations Management
- * 
+ *
  * Handles:
  * - Purchase Order receiving
  * - Goods Receipt Note (GRN) creation & management
@@ -11,8 +11,8 @@
  * - ASN (Advanced Shipment Notice) processing
  */
 
-import { prisma } from '@/lib/prisma';
-import { POStatus, GRNStatus, Prisma } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { POStatus, GRNStatus, Prisma } from "@prisma/client";
 
 export class ReceivingService {
   /**
@@ -53,7 +53,7 @@ export class ReceivingService {
     });
 
     if (!po) {
-      throw new Error('Purchase Order not found');
+      throw new Error("Purchase Order not found");
     }
 
     if (po.status === POStatus.CANCELLED || po.status === POStatus.CLOSED) {
@@ -64,21 +64,19 @@ export class ReceivingService {
     const grnCount = await prisma.goodsReceiptNote.count({
       where: { organizationId: params.organizationId },
     });
-    const grnNumber = `GRN-${new Date().getFullYear()}-${String(grnCount + 1).padStart(6, '0')}`;
+    const grnNumber = `GRN-${new Date().getFullYear()}-${String(grnCount + 1).padStart(6, "0")}`;
 
     // Calculate totals
     const totalReceived = params.items.reduce(
       (sum, item) => sum + item.receivedQuantity * item.unitCost,
-      0
+      0,
     );
 
     // Check for discrepancies
-    const hasDiscrepancy = params.items.some(
-      (item) => {
-        const poItem = po.items.find(i => i.id === item.purchaseOrderItemId);
-        return poItem && item.receivedQuantity !== poItem.quantityOrdered;
-      }
-    );
+    const hasDiscrepancy = params.items.some((item) => {
+      const poItem = po.items.find((i) => i.id === item.purchaseOrderItemId);
+      return poItem && item.receivedQuantity !== poItem.quantityOrdered;
+    });
 
     // Create GRN with items
     const grn = await prisma.goodsReceiptNote.create({
@@ -97,13 +95,15 @@ export class ReceivingService {
         notes: params.notes,
         internalNotes: params.internalNotes,
         items: {
-          create: params.items.map(item => ({
+          create: params.items.map((item) => ({
             purchaseOrderItemId: item.purchaseOrderItemId,
             inventoryItemId: item.inventoryItemId,
             orderedQuantity: item.orderedQuantity,
             receivedQuantity: item.receivedQuantity,
-            acceptedQuantity: item.qcStatus === 'PASS' ? item.receivedQuantity : 0,
-            rejectedQuantity: item.qcStatus === 'FAIL' ? item.receivedQuantity : 0,
+            acceptedQuantity:
+              item.qcStatus === "PASS" ? item.receivedQuantity : 0,
+            rejectedQuantity:
+              item.qcStatus === "FAIL" ? item.receivedQuantity : 0,
             unitCost: item.unitCost,
             batchNumber: item.batchNumber,
             serialNumbers: item.serialNumbers,
@@ -157,11 +157,11 @@ export class ReceivingService {
   static async performQualityControl(params: {
     grnId: string;
     qcById: string;
-    qcStatus: 'PASS' | 'FAIL' | 'PARTIAL';
+    qcStatus: "PASS" | "FAIL" | "PARTIAL";
     qcNotes?: string;
     items: Array<{
       grnItemId: string;
-      qcStatus: 'PASS' | 'FAIL';
+      qcStatus: "PASS" | "FAIL";
       acceptedQuantity: number;
       rejectedQuantity: number;
       qcNotes?: string;
@@ -177,7 +177,8 @@ export class ReceivingService {
         qcById: params.qcById,
         qcDate: new Date(),
         qcNotes: params.qcNotes,
-        status: params.qcStatus === 'PASS' ? GRNStatus.APPROVED : GRNStatus.REJECTED,
+        status:
+          params.qcStatus === "PASS" ? GRNStatus.APPROVED : GRNStatus.REJECTED,
       },
       include: {
         items: true,
@@ -200,10 +201,10 @@ export class ReceivingService {
     }
 
     // If QC passed, update inventory levels
-    if (params.qcStatus === 'PASS' || params.qcStatus === 'PARTIAL') {
+    if (params.qcStatus === "PASS" || params.qcStatus === "PARTIAL") {
       for (const item of params.items) {
-        if (item.qcStatus === 'PASS' && item.acceptedQuantity > 0) {
-          const grnItem = grn.items.find(i => i.id === item.grnItemId);
+        if (item.qcStatus === "PASS" && item.acceptedQuantity > 0) {
+          const grnItem = grn.items.find((i) => i.id === item.grnItemId);
           if (grnItem) {
             await prisma.inventoryItem.update({
               where: { id: grnItem.inventoryItemId },
@@ -221,9 +222,9 @@ export class ReceivingService {
             await prisma.inventoryMovement.create({
               data: {
                 inventoryItemId: grnItem.inventoryItemId,
-                type: 'PURCHASE',
+                type: "PURCHASE",
                 quantity: item.acceptedQuantity,
-                reason: 'GRN',
+                reason: "GRN",
                 notes: `Received via GRN ${grn.grnNumber}`,
               },
             });
@@ -263,7 +264,7 @@ export class ReceivingService {
       include: { items: true },
     });
 
-    const allPutAway = grn?.items.every(item => item.putAwayCompleted);
+    const allPutAway = grn?.items.every((item) => item.putAwayCompleted);
 
     if (allPutAway) {
       await prisma.goodsReceiptNote.update({
@@ -296,36 +297,38 @@ export class ReceivingService {
     });
 
     if (!item) {
-      throw new Error('Inventory item not found');
+      throw new Error("Inventory item not found");
     }
 
     // Find existing inventory movements for this item
     const existingLocations = await prisma.inventoryMovement.findMany({
       where: {
         inventoryItemId: params.inventoryItemId,
-        type: 'PURCHASE',
+        type: "PURCHASE",
       },
       select: {
         notes: true,
       },
       take: 5,
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     // Find available bin with capacity
     // This is simplified - in production you'd have a Bin/Location model
-    const suggestedZone = item.category?.name.substring(0, 2).toUpperCase() || 'GN';
+    const suggestedZone =
+      item.category?.name.substring(0, 2).toUpperCase() || "GN";
     const suggestedAisle = Math.floor(Math.random() * 10) + 1;
     const suggestedRack = Math.floor(Math.random() * 20) + 1;
     const suggestedLevel = Math.floor(Math.random() * 5) + 1;
 
     return {
       suggestedLocation: `${suggestedZone}-A${suggestedAisle}-R${suggestedRack}-L${suggestedLevel}`,
-      reason: existingLocations.length > 0 
-        ? 'Same location as previous receipts' 
-        : 'Optimized for product category',
+      reason:
+        existingLocations.length > 0
+          ? "Same location as previous receipts"
+          : "Optimized for product category",
       alternateLocations: [
         `${suggestedZone}-A${suggestedAisle + 1}-R${suggestedRack}-L${suggestedLevel}`,
         `${suggestedZone}-A${suggestedAisle}-R${suggestedRack + 1}-L${suggestedLevel}`,
@@ -338,7 +341,7 @@ export class ReceivingService {
    */
   static async recordDiscrepancy(params: {
     grnId: string;
-    discrepancyType: 'SHORTAGE' | 'OVERAGE' | 'DAMAGE' | 'WRONG_ITEM';
+    discrepancyType: "SHORTAGE" | "OVERAGE" | "DAMAGE" | "WRONG_ITEM";
     items: Array<{
       grnItemId: string;
       expectedQuantity: number;
@@ -363,10 +366,10 @@ export class ReceivingService {
 
     // Create a note or task for follow-up
     // In production, this would integrate with a task management system
-    
+
     return {
       discrepancyRecorded: true,
-      requiresApproval: params.discrepancyType === 'OVERAGE',
+      requiresApproval: params.discrepancyType === "OVERAGE",
       supplierNotified: params.notifySupplier || false,
     };
   }
@@ -380,7 +383,8 @@ export class ReceivingService {
     endDate?: Date;
     warehouseId?: string;
   }) {
-    const startDate = params.startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const startDate =
+      params.startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const endDate = params.endDate || new Date();
 
     const where: Prisma.GoodsReceiptNoteWhereInput = {
@@ -400,7 +404,7 @@ export class ReceivingService {
 
     // GRNs by status
     const byStatus = await prisma.goodsReceiptNote.groupBy({
-      by: ['status'],
+      by: ["status"],
       where,
       _count: true,
     });
@@ -412,7 +416,7 @@ export class ReceivingService {
 
     // QC pass rate
     const qcPassed = await prisma.goodsReceiptNote.count({
-      where: { ...where, qcStatus: 'PASS' },
+      where: { ...where, qcStatus: "PASS" },
     });
     const qcTotal = await prisma.goodsReceiptNote.count({
       where: { ...where, qcStatus: { not: null } },
@@ -452,7 +456,7 @@ export class ReceivingService {
     return {
       period: { startDate, endDate },
       totalGRNs,
-      byStatus: byStatus.map(s => ({
+      byStatus: byStatus.map((s) => ({
         status: s.status,
         count: s._count,
         percentage: (s._count / totalGRNs) * 100,
@@ -464,8 +468,10 @@ export class ReceivingService {
         total: itemsReceived._sum.receivedQuantity || 0,
         accepted: itemsReceived._sum.acceptedQuantity || 0,
         rejected: itemsReceived._sum.rejectedQuantity || 0,
-        rejectionRate: itemsReceived._sum.receivedQuantity 
-          ? ((itemsReceived._sum.rejectedQuantity || 0) / itemsReceived._sum.receivedQuantity) * 100
+        rejectionRate: itemsReceived._sum.receivedQuantity
+          ? ((itemsReceived._sum.rejectedQuantity || 0) /
+              itemsReceived._sum.receivedQuantity) *
+            100
           : 0,
       },
       pendingPutAways,
@@ -528,7 +534,7 @@ export class ReceivingService {
     page?: number;
     limit?: number;
     sortBy?: string;
-    sortOrder?: 'asc' | 'desc';
+    sortOrder?: "asc" | "desc";
   }) {
     const page = params.page || 1;
     const limit = params.limit || 20;
@@ -540,9 +546,10 @@ export class ReceivingService {
 
     if (params.status) where.status = params.status;
     if (params.warehouseId) where.warehouseId = params.warehouseId;
-    if (params.hasDiscrepancy !== undefined) where.hasDiscrepancy = params.hasDiscrepancy;
+    if (params.hasDiscrepancy !== undefined)
+      where.hasDiscrepancy = params.hasDiscrepancy;
     if (params.qcStatus) where.qcStatus = params.qcStatus;
-    
+
     if (params.startDate || params.endDate) {
       where.receivedDate = {};
       if (params.startDate) where.receivedDate.gte = params.startDate;
@@ -575,7 +582,7 @@ export class ReceivingService {
         skip,
         take: limit,
         orderBy: {
-          [params.sortBy || 'receivedDate']: params.sortOrder || 'desc',
+          [params.sortBy || "receivedDate"]: params.sortOrder || "desc",
         },
       }),
       prisma.goodsReceiptNote.count({ where }),
@@ -618,7 +625,7 @@ export class ReceivingService {
     });
 
     if (!po) {
-      throw new Error('Purchase Order not found');
+      throw new Error("Purchase Order not found");
     }
 
     // Store ASN data (you might want a separate ASN model)
@@ -642,12 +649,12 @@ export class ReceivingService {
     };
 
     for (const asnItem of params.asnData.items) {
-      const poItem = po.items.find(i => i.sku === asnItem.sku);
+      const poItem = po.items.find((i) => i.sku === asnItem.sku);
       if (!poItem) {
         validationResults.warnings.push(`SKU ${asnItem.sku} not found in PO`);
       } else if (poItem.quantityOrdered !== asnItem.quantity) {
         validationResults.warnings.push(
-          `Quantity mismatch for ${asnItem.sku}: PO=${poItem.quantityOrdered}, ASN=${asnItem.quantity}`
+          `Quantity mismatch for ${asnItem.sku}: PO=${poItem.quantityOrdered}, ASN=${asnItem.quantity}`,
         );
       }
     }
@@ -670,7 +677,12 @@ export class ReceivingService {
     const where: Prisma.PurchaseOrderWhereInput = {
       organizationId: params.organizationId,
       status: {
-        in: [POStatus.APPROVED, POStatus.SENT, POStatus.CONFIRMED, POStatus.PARTIALLY_RECEIVED],
+        in: [
+          POStatus.APPROVED,
+          POStatus.SENT,
+          POStatus.CONFIRMED,
+          POStatus.PARTIALLY_RECEIVED,
+        ],
       },
     };
 
@@ -686,16 +698,22 @@ export class ReceivingService {
         receipts: true,
       },
       orderBy: {
-        expectedDate: 'asc',
+        expectedDate: "asc",
       },
     });
 
-    return pendingPOs.map(po => ({
+    return pendingPOs.map((po) => ({
       ...po,
-      totalOrdered: po.items.reduce((sum, item) => sum + item.quantityOrdered, 0),
-      totalReceived: po.items.reduce((sum, item) => sum + item.quantityReceived, 0),
+      totalOrdered: po.items.reduce(
+        (sum, item) => sum + item.quantityOrdered,
+        0,
+      ),
+      totalReceived: po.items.reduce(
+        (sum, item) => sum + item.quantityReceived,
+        0,
+      ),
       itemsRemaining: po.items.filter(
-        item => item.quantityOrdered > item.quantityReceived
+        (item) => item.quantityOrdered > item.quantityReceived,
       ).length,
       isOverdue: po.expectedDate && po.expectedDate < new Date(),
     }));
@@ -713,9 +731,9 @@ export class ReceivingService {
     if (!po) return;
 
     const allReceived = po.items.every(
-      item => item.quantityReceived >= item.quantityOrdered
+      (item) => item.quantityReceived >= item.quantityOrdered,
     );
-    const someReceived = po.items.some(item => item.quantityReceived > 0);
+    const someReceived = po.items.some((item) => item.quantityReceived > 0);
 
     let newStatus = po.status;
     if (allReceived) {
@@ -740,7 +758,7 @@ export class ReceivingService {
    */
   static async generateReceivingLabels(params: {
     grnId: string;
-    labelType: 'MASTER' | 'CASE' | 'PALLET' | 'ITEM';
+    labelType: "MASTER" | "CASE" | "PALLET" | "ITEM";
   }) {
     const grn = await prisma.goodsReceiptNote.findUnique({
       where: { id: params.grnId },
@@ -754,11 +772,11 @@ export class ReceivingService {
     });
 
     if (!grn) {
-      throw new Error('GRN not found');
+      throw new Error("GRN not found");
     }
 
     // Generate label data (in production, integrate with label printer)
-    const labels = grn.items.map(item => ({
+    const labels = grn.items.map((item) => ({
       grnNumber: grn.grnNumber,
       sku: item.inventoryItem.sku,
       description: item.inventoryItem.description,
@@ -773,7 +791,7 @@ export class ReceivingService {
     return {
       labels,
       totalLabels: labels.length,
-      format: 'ZPL', // Zebra Programming Language for thermal printers
+      format: "ZPL", // Zebra Programming Language for thermal printers
     };
   }
 
@@ -796,13 +814,13 @@ export class ReceivingService {
   }) {
     // Create a dummy PO for blind receiving
     const poNumber = `BLIND-${Date.now()}`;
-    
+
     // This is a simplified version - in production you'd want more robust handling
     return {
       blindReceiptCreated: true,
       poNumber,
       requiresMatching: true,
-      message: 'Blind receipt created. Requires PO matching for completion.',
+      message: "Blind receipt created. Requires PO matching for completion.",
     };
   }
 }

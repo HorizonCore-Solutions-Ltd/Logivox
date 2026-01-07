@@ -3,15 +3,21 @@
  * Comprehensive user management with RBAC controls
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
   TableBody,
@@ -19,7 +25,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -27,14 +33,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,8 +48,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+} from "@/components/ui/dropdown-menu";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Users,
   Plus,
@@ -58,40 +64,43 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface User {
   id: string;
   name: string;
   email: string;
   role: string;
-  status: 'active' | 'inactive' | 'locked';
+  status: "active" | "inactive" | "locked";
   lastLogin: string | null;
   createdAt: string;
   avatar?: string;
 }
 
 const ROLES = [
-  { value: 'SUPER_ADMIN', label: 'Super Admin', color: 'red' },
-  { value: 'ADMIN', label: 'Admin', color: 'orange' },
-  { value: 'MANAGER', label: 'Manager', color: 'blue' },
-  { value: 'WAREHOUSE_STAFF', label: 'Warehouse Staff', color: 'green' },
-  { value: 'SALES', label: 'Sales', color: 'purple' },
-  { value: 'ACCOUNTANT', label: 'Accountant', color: 'yellow' },
-  { value: 'USER', label: 'User', color: 'gray' },
+  { value: "SUPER_ADMIN", label: "Super Admin", color: "red" },
+  { value: "ADMIN", label: "Admin", color: "orange" },
+  { value: "MANAGER", label: "Manager", color: "blue" },
+  { value: "WAREHOUSE_STAFF", label: "Warehouse Staff", color: "green" },
+  { value: "SALES", label: "Sales", color: "purple" },
+  { value: "ACCOUNTANT", label: "Accountant", color: "yellow" },
+  { value: "USER", label: "User", color: "gray" },
 ];
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchUsers();
@@ -103,13 +112,13 @@ export default function UserManagementPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users');
+      const response = await fetch("/api/admin/users");
       if (response.ok) {
         const data = await response.json();
         setUsers(data.users);
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load users' });
+      setMessage({ type: "error", text: "Failed to load users" });
     } finally {
       setLoading(false);
     }
@@ -123,17 +132,17 @@ export default function UserManagementPage() {
       filtered = filtered.filter(
         (user) =>
           user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          user.email.toLowerCase().includes(searchQuery.toLowerCase())
+          user.email.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
     // Role filter
-    if (roleFilter !== 'all') {
+    if (roleFilter !== "all") {
       filtered = filtered.filter((user) => user.role === roleFilter);
     }
 
     // Status filter
-    if (statusFilter !== 'all') {
+    if (statusFilter !== "all") {
       filtered = filtered.filter((user) => user.status === statusFilter);
     }
 
@@ -143,52 +152,52 @@ export default function UserManagementPage() {
   const updateUser = async (userId: string, updates: Partial<User>) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
       });
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'User updated successfully' });
+        setMessage({ type: "success", text: "User updated successfully" });
         fetchUsers();
       } else {
-        throw new Error('Failed to update user');
+        throw new Error("Failed to update user");
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to update user' });
+      setMessage({ type: "error", text: "Failed to update user" });
     }
   };
 
   const deleteUser = async (userId: string) => {
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'User deleted successfully' });
+        setMessage({ type: "success", text: "User deleted successfully" });
         fetchUsers();
         setIsDeleteDialogOpen(false);
       } else {
-        throw new Error('Failed to delete user');
+        throw new Error("Failed to delete user");
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to delete user' });
+      setMessage({ type: "error", text: "Failed to delete user" });
     }
   };
 
   const toggleUserStatus = async (user: User) => {
-    const newStatus = user.status === 'active' ? 'inactive' : 'active';
+    const newStatus = user.status === "active" ? "inactive" : "active";
     await updateUser(user.id, { status: newStatus });
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'active':
+      case "active":
         return <Badge className="bg-green-500">Active</Badge>;
-      case 'inactive':
+      case "inactive":
         return <Badge variant="secondary">Inactive</Badge>;
-      case 'locked':
+      case "locked":
         return <Badge variant="destructive">Locked</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
@@ -222,8 +231,8 @@ export default function UserManagementPage() {
 
       {/* Status Message */}
       {message && (
-        <Alert variant={message.type === 'success' ? 'default' : 'destructive'}>
-          {message.type === 'success' ? (
+        <Alert variant={message.type === "success" ? "default" : "destructive"}>
+          {message.type === "success" ? (
             <CheckCircle2 className="h-4 w-4" />
           ) : (
             <AlertTriangle className="h-4 w-4" />
@@ -250,18 +259,20 @@ export default function UserManagementPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter((u) => u.status === 'active').length}
+              {users.filter((u) => u.status === "active").length}
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inactive Users</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Inactive Users
+            </CardTitle>
             <XCircle className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter((u) => u.status === 'inactive').length}
+              {users.filter((u) => u.status === "inactive").length}
             </div>
           </CardContent>
         </Card>
@@ -272,7 +283,7 @@ export default function UserManagementPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {users.filter((u) => u.status === 'locked').length}
+              {users.filter((u) => u.status === "locked").length}
             </div>
           </CardContent>
         </Card>
@@ -354,9 +365,9 @@ export default function UserManagementPage() {
                         <AvatarImage src={user.avatar} />
                         <AvatarFallback>
                           {user.name
-                            .split(' ')
+                            .split(" ")
                             .map((n) => n[0])
-                            .join('')
+                            .join("")
                             .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
@@ -371,7 +382,7 @@ export default function UserManagementPage() {
                   <TableCell>
                     {user.lastLogin
                       ? new Date(user.lastLogin).toLocaleDateString()
-                      : 'Never'}
+                      : "Never"}
                   </TableCell>
                   <TableCell>
                     {new Date(user.createdAt).toLocaleDateString()}
@@ -395,8 +406,10 @@ export default function UserManagementPage() {
                           <Edit className="h-4 w-4 mr-2" />
                           Edit User
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleUserStatus(user)}>
-                          {user.status === 'active' ? (
+                        <DropdownMenuItem
+                          onClick={() => toggleUserStatus(user)}
+                        >
+                          {user.status === "active" ? (
                             <>
                               <Lock className="h-4 w-4 mr-2" />
                               Deactivate

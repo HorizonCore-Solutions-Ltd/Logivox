@@ -1,9 +1,16 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useVisualAccessibility, applyVisualAccessibilityPreferences } from '@/lib/visual-accessibility';
+import { useEffect } from "react";
+import {
+  useVisualAccessibility,
+  applyVisualAccessibilityPreferences,
+} from "@/lib/visual-accessibility";
 
-export function VisualAccessibilityProvider({ children }: { children: React.ReactNode }) {
+export function VisualAccessibilityProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const prefs = useVisualAccessibility();
 
   useEffect(() => {

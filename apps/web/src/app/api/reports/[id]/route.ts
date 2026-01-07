@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -8,25 +8,61 @@ import { z } from "zod";
 const updateReportSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().optional(),
-  reportType: z.enum(['TABULAR', 'SUMMARY', 'CHART', 'COMBINED', 'PIVOT', 'MATRIX']).optional(),
-  category: z.enum(['INVENTORY', 'SALES', 'PURCHASING', 'WAREHOUSE', 'FINANCIAL', 'QUALITY', 'PRODUCTION', 'CUSTOM']).optional(),
+  reportType: z
+    .enum(["TABULAR", "SUMMARY", "CHART", "COMBINED", "PIVOT", "MATRIX"])
+    .optional(),
+  category: z
+    .enum([
+      "INVENTORY",
+      "SALES",
+      "PURCHASING",
+      "WAREHOUSE",
+      "FINANCIAL",
+      "QUALITY",
+      "PRODUCTION",
+      "CUSTOM",
+    ])
+    .optional(),
   dataSource: z.string().min(1).optional(),
   filters: z.record(z.any()).optional(),
   groupBy: z.array(z.string()).optional(),
-  sortBy: z.array(z.object({
-    field: z.string(),
-    direction: z.enum(['asc', 'desc']),
-  })).optional(),
-  columns: z.array(z.object({
-    field: z.string(),
-    label: z.string(),
-    type: z.string().optional(),
-    aggregation: z.string().optional(),
-  })).optional(),
-  chartType: z.enum(['BAR', 'LINE', 'PIE', 'DONUT', 'AREA', 'SCATTER', 'GAUGE', 'FUNNEL', 'HEATMAP', 'TABLE']).optional(),
+  sortBy: z
+    .array(
+      z.object({
+        field: z.string(),
+        direction: z.enum(["asc", "desc"]),
+      }),
+    )
+    .optional(),
+  columns: z
+    .array(
+      z.object({
+        field: z.string(),
+        label: z.string(),
+        type: z.string().optional(),
+        aggregation: z.string().optional(),
+      }),
+    )
+    .optional(),
+  chartType: z
+    .enum([
+      "BAR",
+      "LINE",
+      "PIE",
+      "DONUT",
+      "AREA",
+      "SCATTER",
+      "GAUGE",
+      "FUNNEL",
+      "HEATMAP",
+      "TABLE",
+    ])
+    .optional(),
   chartConfig: z.record(z.any()).optional(),
   isScheduled: z.boolean().optional(),
-  scheduleType: z.enum(['HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', 'CUSTOM']).optional(),
+  scheduleType: z
+    .enum(["HOURLY", "DAILY", "WEEKLY", "MONTHLY", "CUSTOM"])
+    .optional(),
   scheduleConfig: z.record(z.any()).optional(),
   emailRecipients: z.array(z.string()).optional(),
   webhookUrl: z.string().optional(),
@@ -39,7 +75,7 @@ const updateReportSchema = z.object({
 // GET /api/reports/[id] - Get report by ID
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -60,7 +96,7 @@ export async function GET(
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -81,7 +117,7 @@ export async function GET(
         },
         executions: {
           take: 10,
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
           include: {
             executedBy: {
               select: {
@@ -104,7 +140,7 @@ export async function GET(
     console.error("Error fetching report:", error);
     return NextResponse.json(
       { error: "Failed to fetch report" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -112,7 +148,7 @@ export async function GET(
 // PATCH /api/reports/[id] - Update report
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -133,7 +169,7 @@ export async function PATCH(
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -174,13 +210,13 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error updating report:", error);
     return NextResponse.json(
       { error: "Failed to update report" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -188,7 +224,7 @@ export async function PATCH(
 // DELETE /api/reports/[id] - Delete report
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -209,7 +245,7 @@ export async function DELETE(
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -242,7 +278,7 @@ export async function DELETE(
     console.error("Error deleting report:", error);
     return NextResponse.json(
       { error: "Failed to delete report" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

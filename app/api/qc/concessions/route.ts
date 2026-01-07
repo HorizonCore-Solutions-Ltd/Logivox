@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import vendorConcessionService from '@/lib/services/qc/vendor-concession-service';
+import { NextRequest, NextResponse } from "next/server";
+import vendorConcessionService from "@/lib/services/qc/vendor-concession-service";
 
 /**
  * GET /api/qc/concessions
@@ -8,15 +8,15 @@ import vendorConcessionService from '@/lib/services/qc/vendor-concession-service
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get('organizationId');
-    const vendorId = searchParams.get('vendorId');
-    const status = searchParams.get('status');
-    const concessionType = searchParams.get('concessionType');
+    const organizationId = searchParams.get("organizationId");
+    const vendorId = searchParams.get("vendorId");
+    const status = searchParams.get("status");
+    const concessionType = searchParams.get("concessionType");
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Organization ID required' },
-        { status: 400 }
+        { error: "Organization ID required" },
+        { status: 400 },
       );
     }
 
@@ -29,10 +29,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error: any) {
-    console.error('Error listing concessions:', error);
+    console.error("Error listing concessions:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -60,15 +60,15 @@ export async function POST(request: NextRequest) {
       expiresAt: body.expiresAt ? new Date(body.expiresAt) : undefined,
       minimumOrderValue: body.minimumOrderValue,
       termsAndConditions: body.termsAndConditions,
-      createdBy: body.createdBy || 'system',
+      createdBy: body.createdBy || "system",
     });
 
     return NextResponse.json(concession, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating concession:', error);
+    console.error("Error creating concession:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }

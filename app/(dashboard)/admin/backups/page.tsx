@@ -3,13 +3,19 @@
  * Manage database backups, restore, and scheduling
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Table,
   TableBody,
@@ -17,7 +23,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +31,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +39,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Database,
   Download,
@@ -46,16 +52,16 @@ import {
   CheckCircle2,
   AlertTriangle,
   RefreshCw,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface Backup {
   id: string;
   filename: string;
   size: number;
-  type: 'manual' | 'scheduled' | 'automatic';
-  status: 'completed' | 'in_progress' | 'failed';
+  type: "manual" | "scheduled" | "automatic";
+  status: "completed" | "in_progress" | "failed";
   createdAt: string;
-  location: 'local' | 's3';
+  location: "local" | "s3";
 }
 
 export default function BackupManagementPage() {
@@ -65,7 +71,10 @@ export default function BackupManagementPage() {
   const [selectedBackup, setSelectedBackup] = useState<Backup | null>(null);
   const [isRestoreDialogOpen, setIsRestoreDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   useEffect(() => {
     fetchBackups();
@@ -73,13 +82,13 @@ export default function BackupManagementPage() {
 
   const fetchBackups = async () => {
     try {
-      const response = await fetch('/api/admin/backups');
+      const response = await fetch("/api/admin/backups");
       if (response.ok) {
         const data = await response.json();
         setBackups(data.backups);
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load backups' });
+      setMessage({ type: "error", text: "Failed to load backups" });
     } finally {
       setLoading(false);
     }
@@ -90,20 +99,20 @@ export default function BackupManagementPage() {
     setMessage(null);
 
     try {
-      const response = await fetch('/api/admin/backups', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'manual' }),
+      const response = await fetch("/api/admin/backups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "manual" }),
       });
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Backup created successfully' });
+        setMessage({ type: "success", text: "Backup created successfully" });
         fetchBackups();
       } else {
-        throw new Error('Failed to create backup');
+        throw new Error("Failed to create backup");
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to create backup' });
+      setMessage({ type: "error", text: "Failed to create backup" });
     } finally {
       setCreating(false);
     }
@@ -111,38 +120,38 @@ export default function BackupManagementPage() {
 
   const restoreBackup = async (backup: Backup) => {
     try {
-      const response = await fetch('/api/admin/backups/restore', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/admin/backups/restore", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ backupId: backup.id }),
       });
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Backup restored successfully' });
+        setMessage({ type: "success", text: "Backup restored successfully" });
         setIsRestoreDialogOpen(false);
       } else {
-        throw new Error('Failed to restore backup');
+        throw new Error("Failed to restore backup");
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to restore backup' });
+      setMessage({ type: "error", text: "Failed to restore backup" });
     }
   };
 
   const deleteBackup = async (backup: Backup) => {
     try {
       const response = await fetch(`/api/admin/backups/${backup.id}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Backup deleted successfully' });
+        setMessage({ type: "success", text: "Backup deleted successfully" });
         fetchBackups();
         setIsDeleteDialogOpen(false);
       } else {
-        throw new Error('Failed to delete backup');
+        throw new Error("Failed to delete backup");
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to delete backup' });
+      setMessage({ type: "error", text: "Failed to delete backup" });
     }
   };
 
@@ -152,7 +161,7 @@ export default function BackupManagementPage() {
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = backup.filename;
         document.body.appendChild(a);
@@ -161,25 +170,25 @@ export default function BackupManagementPage() {
         document.body.removeChild(a);
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to download backup' });
+      setMessage({ type: "error", text: "Failed to download backup" });
     }
   };
 
   const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case 'completed':
+      case "completed":
         return <Badge className="bg-green-500">Completed</Badge>;
-      case 'in_progress':
+      case "in_progress":
         return <Badge className="bg-blue-500">In Progress</Badge>;
-      case 'failed':
+      case "failed":
         return <Badge variant="destructive">Failed</Badge>;
       default:
         return <Badge variant="outline">{status}</Badge>;
@@ -188,11 +197,11 @@ export default function BackupManagementPage() {
 
   const getTypeBadge = (type: string) => {
     switch (type) {
-      case 'manual':
+      case "manual":
         return <Badge variant="outline">Manual</Badge>;
-      case 'scheduled':
+      case "scheduled":
         return <Badge className="bg-blue-500">Scheduled</Badge>;
-      case 'automatic':
+      case "automatic":
         return <Badge className="bg-purple-500">Automatic</Badge>;
       default:
         return <Badge variant="outline">{type}</Badge>;
@@ -212,7 +221,9 @@ export default function BackupManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Backup Management</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Backup Management
+          </h1>
           <p className="text-muted-foreground">
             Manage database backups and restoration
           </p>
@@ -223,14 +234,14 @@ export default function BackupManagementPage() {
           ) : (
             <Database className="h-4 w-4 mr-2" />
           )}
-          {creating ? 'Creating...' : 'Create Backup'}
+          {creating ? "Creating..." : "Create Backup"}
         </Button>
       </div>
 
       {/* Status Message */}
       {message && (
-        <Alert variant={message.type === 'success' ? 'default' : 'destructive'}>
-          {message.type === 'success' ? (
+        <Alert variant={message.type === "success" ? "default" : "destructive"}>
+          {message.type === "success" ? (
             <CheckCircle2 className="h-4 w-4" />
           ) : (
             <AlertTriangle className="h-4 w-4" />
@@ -265,12 +276,14 @@ export default function BackupManagementPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Scheduled Backups</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Scheduled Backups
+            </CardTitle>
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {backups.filter((b) => b.type === 'scheduled').length}
+              {backups.filter((b) => b.type === "scheduled").length}
             </div>
           </CardContent>
         </Card>
@@ -284,7 +297,7 @@ export default function BackupManagementPage() {
             <div className="text-sm">
               {backups.length > 0
                 ? new Date(backups[0].createdAt).toLocaleDateString()
-                : 'No backups'}
+                : "No backups"}
             </div>
           </CardContent>
         </Card>
@@ -315,9 +328,7 @@ export default function BackupManagementPage() {
       <Card>
         <CardHeader>
           <CardTitle>Backup History</CardTitle>
-          <CardDescription>
-            List of all database backups
-          </CardDescription>
+          <CardDescription>List of all database backups</CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -357,7 +368,9 @@ export default function BackupManagementPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => downloadBackup(backup)}>
+                        <DropdownMenuItem
+                          onClick={() => downloadBackup(backup)}
+                        >
                           <Download className="h-4 w-4 mr-2" />
                           Download
                         </DropdownMenuItem>
@@ -397,8 +410,9 @@ export default function BackupManagementPage() {
           <DialogHeader>
             <DialogTitle>Restore Backup</DialogTitle>
             <DialogDescription>
-              Are you sure you want to restore {selectedBackup?.filename}? This will
-              overwrite the current database. A safety backup will be created first.
+              Are you sure you want to restore {selectedBackup?.filename}? This
+              will overwrite the current database. A safety backup will be
+              created first.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -423,8 +437,8 @@ export default function BackupManagementPage() {
           <DialogHeader>
             <DialogTitle>Delete Backup</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete {selectedBackup?.filename}? This action
-              cannot be undone.
+              Are you sure you want to delete {selectedBackup?.filename}? This
+              action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

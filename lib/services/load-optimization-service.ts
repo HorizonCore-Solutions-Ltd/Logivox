@@ -1,9 +1,9 @@
 /**
  * Load Optimization Service
- * 
+ *
  * Handles 3D load planning, trailer optimization, weight distribution,
  * and multi-stop consolidation for warehouse shipping operations.
- * 
+ *
  * Features:
  * - 3D bin packing algorithm (tetris-style)
  * - Weight distribution and axle balance
@@ -13,12 +13,16 @@
  * - Visual load planning
  * - Automatic order-to-trailer assignment
  * - Vehicle type recommendations (integrated with vehicle-types library)
- * 
+ *
  * @module LoadOptimizationService
  */
 
-import { prisma } from '@/lib/prisma';
-import { recommendVehicle, findSuitableVehicles, type VehicleType } from '@/lib/vehicle-types';
+import { prisma } from "@/lib/prisma";
+import {
+  recommendVehicle,
+  findSuitableVehicles,
+  type VehicleType,
+} from "@/lib/vehicle-types";
 import type {
   LoadPlan,
   Trailer,
@@ -29,7 +33,7 @@ import type {
   LoadSequence,
   TrailerType,
   LoadConstraints,
-} from '@/types/load-optimization';
+} from "@/types/load-optimization";
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -37,13 +41,13 @@ import type {
 
 interface Dimensions {
   length: number; // inches
-  width: number;  // inches
+  width: number; // inches
   height: number; // inches
 }
 
 interface Weight {
-  weight: number;      // lbs
-  maxWeight?: number;  // capacity
+  weight: number; // lbs
+  maxWeight?: number; // capacity
 }
 
 interface Position {
@@ -55,11 +59,11 @@ interface Position {
 interface LoadedItem extends LoadItem {
   position: Position;
   rotated: boolean; // if item was rotated for better fit
-  stop: number;     // delivery stop number
+  stop: number; // delivery stop number
 }
 
 interface TrailerConfig extends Trailer {
-  usableLength: number;  // actual loadable space (minus cab)
+  usableLength: number; // actual loadable space (minus cab)
   usableWidth: number;
   usableHeight: number;
 }
@@ -81,28 +85,28 @@ interface LoadPlanResult {
 // ============================================================================
 
 const TRAILER_TYPES: Record<string, TrailerConfig> = {
-  'DRY_VAN_53': {
-    id: 'DRY_VAN_53',
-    name: '53\' Dry Van',
-    type: 'DRY_VAN',
-    length: 636,      // 53 feet = 636 inches
-    width: 102,       // 8.5 feet = 102 inches
-    height: 110,      // 9.17 feet = 110 inches
+  DRY_VAN_53: {
+    id: "DRY_VAN_53",
+    name: "53' Dry Van",
+    type: "DRY_VAN",
+    length: 636, // 53 feet = 636 inches
+    width: 102, // 8.5 feet = 102 inches
+    height: 110, // 9.17 feet = 110 inches
     usableLength: 630, // minus 6" for bulkhead
-    usableWidth: 100,  // minus 2" for side walls
+    usableWidth: 100, // minus 2" for side walls
     usableHeight: 108, // minus 2" for floor/ceiling
-    maxWeight: 45000,  // 45,000 lbs typical
+    maxWeight: 45000, // 45,000 lbs typical
     axleWeights: {
       front: 12000,
       rear: 34000,
     },
-    doorType: 'REAR',
-    features: ['STANDARD'],
+    doorType: "REAR",
+    features: ["STANDARD"],
   },
-  'DRY_VAN_48': {
-    id: 'DRY_VAN_48',
-    name: '48\' Dry Van',
-    type: 'DRY_VAN',
+  DRY_VAN_48: {
+    id: "DRY_VAN_48",
+    name: "48' Dry Van",
+    type: "DRY_VAN",
     length: 576,
     width: 102,
     height: 110,
@@ -114,35 +118,35 @@ const TRAILER_TYPES: Record<string, TrailerConfig> = {
       front: 12000,
       rear: 30000,
     },
-    doorType: 'REAR',
-    features: ['STANDARD'],
+    doorType: "REAR",
+    features: ["STANDARD"],
   },
-  'REEFER_53': {
-    id: 'REEFER_53',
-    name: '53\' Refrigerated',
-    type: 'REEFER',
+  REEFER_53: {
+    id: "REEFER_53",
+    name: "53' Refrigerated",
+    type: "REEFER",
     length: 636,
     width: 102,
     height: 110,
     usableLength: 620, // minus 16" for refrigeration unit
-    usableWidth: 98,   // insulation reduces width
+    usableWidth: 98, // insulation reduces width
     usableHeight: 106, // insulation reduces height
-    maxWeight: 43000,  // slightly less due to reefer unit
+    maxWeight: 43000, // slightly less due to reefer unit
     axleWeights: {
       front: 12000,
       rear: 31000,
     },
-    doorType: 'REAR',
-    features: ['TEMPERATURE_CONTROLLED', 'MULTI_ZONE'],
+    doorType: "REAR",
+    features: ["TEMPERATURE_CONTROLLED", "MULTI_ZONE"],
     temperatureRange: { min: -20, max: 70 }, // Fahrenheit
   },
-  'BOX_TRUCK_26': {
-    id: 'BOX_TRUCK_26',
-    name: '26\' Box Truck',
-    type: 'BOX_TRUCK',
-    length: 312,      // 26 feet
+  BOX_TRUCK_26: {
+    id: "BOX_TRUCK_26",
+    name: "26' Box Truck",
+    type: "BOX_TRUCK",
+    length: 312, // 26 feet
     width: 102,
-    height: 102,      // 8.5 feet
+    height: 102, // 8.5 feet
     usableLength: 310,
     usableWidth: 100,
     usableHeight: 100,
@@ -151,17 +155,17 @@ const TRAILER_TYPES: Record<string, TrailerConfig> = {
       front: 10000,
       rear: 16000,
     },
-    doorType: 'REAR_ROLLUP',
-    features: ['LIFT_GATE'],
+    doorType: "REAR_ROLLUP",
+    features: ["LIFT_GATE"],
     liftGateCapacity: 3000, // lbs
   },
-  'CONTAINER_40_HC': {
-    id: 'CONTAINER_40_HC',
-    name: '40\' High Cube Container',
-    type: 'CONTAINER',
-    length: 480,      // 40 feet
-    width: 96,        // 8 feet
-    height: 107,      // 8.92 feet (high cube)
+  CONTAINER_40_HC: {
+    id: "CONTAINER_40_HC",
+    name: "40' High Cube Container",
+    type: "CONTAINER",
+    length: 480, // 40 feet
+    width: 96, // 8 feet
+    height: 107, // 8.92 feet (high cube)
     usableLength: 476,
     usableWidth: 94,
     usableHeight: 105,
@@ -170,16 +174,16 @@ const TRAILER_TYPES: Record<string, TrailerConfig> = {
       front: 0,
       rear: 62000,
     },
-    doorType: 'REAR',
-    features: ['STACKABLE', 'WEATHERPROOF'],
+    doorType: "REAR",
+    features: ["STACKABLE", "WEATHERPROOF"],
   },
-  'CONTAINER_20': {
-    id: 'CONTAINER_20',
-    name: '20\' Standard Container',
-    type: 'CONTAINER',
-    length: 240,      // 20 feet
+  CONTAINER_20: {
+    id: "CONTAINER_20",
+    name: "20' Standard Container",
+    type: "CONTAINER",
+    length: 240, // 20 feet
     width: 96,
-    height: 102,      // 8.5 feet
+    height: 102, // 8.5 feet
     usableLength: 236,
     usableWidth: 94,
     usableHeight: 100,
@@ -188,16 +192,16 @@ const TRAILER_TYPES: Record<string, TrailerConfig> = {
       front: 0,
       rear: 48000,
     },
-    doorType: 'REAR',
-    features: ['STACKABLE', 'WEATHERPROOF'],
+    doorType: "REAR",
+    features: ["STACKABLE", "WEATHERPROOF"],
   },
-  'FLATBED_48': {
-    id: 'FLATBED_48',
-    name: '48\' Flatbed',
-    type: 'FLATBED',
+  FLATBED_48: {
+    id: "FLATBED_48",
+    name: "48' Flatbed",
+    type: "FLATBED",
     length: 576,
     width: 102,
-    height: 60,       // max recommended height for stability
+    height: 60, // max recommended height for stability
     usableLength: 576, // full length available
     usableWidth: 102,
     usableHeight: 60,
@@ -206,8 +210,8 @@ const TRAILER_TYPES: Record<string, TrailerConfig> = {
       front: 12000,
       rear: 36000,
     },
-    doorType: 'OPEN',
-    features: ['TARPING', 'OVERSIZED'],
+    doorType: "OPEN",
+    features: ["TARPING", "OVERSIZED"],
   },
 };
 
@@ -220,13 +224,15 @@ class BinPacking3D {
   private items: LoadItem[];
   private loadedItems: LoadedItem[] = [];
   private occupiedSpaces: Set<string> = new Set();
-  
+
   constructor(trailer: TrailerConfig, items: LoadItem[]) {
     this.trailer = trailer;
     // Sort items by volume (largest first) for better packing
     this.items = [...items].sort((a, b) => {
-      const volA = a.dimensions.length * a.dimensions.width * a.dimensions.height;
-      const volB = b.dimensions.length * b.dimensions.width * b.dimensions.height;
+      const volA =
+        a.dimensions.length * a.dimensions.width * a.dimensions.height;
+      const volB =
+        b.dimensions.length * b.dimensions.width * b.dimensions.height;
       return volB - volA;
     });
   }
@@ -240,7 +246,9 @@ class BinPacking3D {
 
     // Group items by delivery stop (for multi-stop optimization)
     const itemsByStop = this.groupByStop(this.items);
-    const stops = Object.keys(itemsByStop).sort((a, b) => Number(b) - Number(a)); // Reverse order (LIFO)
+    const stops = Object.keys(itemsByStop).sort(
+      (a, b) => Number(b) - Number(a),
+    ); // Reverse order (LIFO)
 
     // Pack each stop separately, starting from rear
     let currentZ = 0; // Start at front of trailer
@@ -248,14 +256,16 @@ class BinPacking3D {
     for (const stop of stops) {
       const stopItems = itemsByStop[stop];
       const stopLoadedItems = this.packStop(stopItems, Number(stop), currentZ);
-      
+
       this.loadedItems.push(...stopLoadedItems);
-      
+
       // Update Z position for next stop (add access lane)
       if (stopLoadedItems.length > 0) {
-        const maxZ = Math.max(...stopLoadedItems.map(item => 
-          item.position.z + item.dimensions.length
-        ));
+        const maxZ = Math.max(
+          ...stopLoadedItems.map(
+            (item) => item.position.z + item.dimensions.length,
+          ),
+        );
         currentZ = maxZ + 12; // 12" access lane between stops
       }
     }
@@ -266,13 +276,17 @@ class BinPacking3D {
   /**
    * Pack items for a single delivery stop
    */
-  private packStop(items: LoadItem[], stop: number, startZ: number): LoadedItem[] {
+  private packStop(
+    items: LoadItem[],
+    stop: number,
+    startZ: number,
+  ): LoadedItem[] {
     const loaded: LoadedItem[] = [];
-    
+
     // Try to pack each item
     for (const item of items) {
       const position = this.findBestPosition(item, startZ);
-      
+
       if (position) {
         loaded.push({
           ...item,
@@ -280,7 +294,7 @@ class BinPacking3D {
           rotated: false, // TODO: Add rotation logic
           stop,
         });
-        
+
         // Mark space as occupied
         this.markSpaceOccupied(item, position);
       }
@@ -297,11 +311,12 @@ class BinPacking3D {
     const { length, width, height } = item.dimensions;
 
     // Try positions from bottom-left-front corner, moving right then back then up
-    for (let z = minZ; z <= usableLength - length; z += 6) { // 6" increments
+    for (let z = minZ; z <= usableLength - length; z += 6) {
+      // 6" increments
       for (let x = 0; x <= usableWidth - width; x += 6) {
         for (let y = 0; y <= usableHeight - height; y += 6) {
           const position: Position = { x, y, z };
-          
+
           if (this.canFitAt(item, position)) {
             // Validate weight distribution
             if (this.isWeightDistributionValid(item, position)) {
@@ -359,7 +374,7 @@ class BinPacking3D {
   private hasSupport(item: LoadItem, position: Position): boolean {
     const { x, z } = position;
     const { width, length } = item.dimensions;
-    
+
     // Check if at least 70% of bottom surface is supported
     let supportedArea = 0;
     const totalArea = width * length;
@@ -368,8 +383,16 @@ class BinPacking3D {
       // Check if loaded item is below this position
       if (loaded.position.y + loaded.dimensions.height === position.y) {
         // Calculate overlap area
-        const overlapX = Math.max(0, Math.min(x + width, loaded.position.x + loaded.dimensions.width) - Math.max(x, loaded.position.x));
-        const overlapZ = Math.max(0, Math.min(z + length, loaded.position.z + loaded.dimensions.length) - Math.max(z, loaded.position.z));
+        const overlapX = Math.max(
+          0,
+          Math.min(x + width, loaded.position.x + loaded.dimensions.width) -
+            Math.max(x, loaded.position.x),
+        );
+        const overlapZ = Math.max(
+          0,
+          Math.min(z + length, loaded.position.z + loaded.dimensions.length) -
+            Math.max(z, loaded.position.z),
+        );
         supportedArea += overlapX * overlapZ;
       }
     }
@@ -382,37 +405,51 @@ class BinPacking3D {
    */
   private hasItemAbove(position: Position, dimensions: Dimensions): boolean {
     const { x, y, z } = position;
-    
+
     for (const loaded of this.loadedItems) {
       // Check if item is above
       if (loaded.position.y > y) {
         // Check for overlap in X and Z
-        const overlapX = Math.max(x, loaded.position.x) < Math.min(x + dimensions.width, loaded.position.x + loaded.dimensions.width);
-        const overlapZ = Math.max(z, loaded.position.z) < Math.min(z + dimensions.length, loaded.position.z + loaded.dimensions.length);
-        
+        const overlapX =
+          Math.max(x, loaded.position.x) <
+          Math.min(
+            x + dimensions.width,
+            loaded.position.x + loaded.dimensions.width,
+          );
+        const overlapZ =
+          Math.max(z, loaded.position.z) <
+          Math.min(
+            z + dimensions.length,
+            loaded.position.z + loaded.dimensions.length,
+          );
+
         if (overlapX && overlapZ) {
           return true;
         }
       }
     }
-    
+
     return false;
   }
 
   /**
    * Validate weight distribution doesn't exceed axle limits
    */
-  private isWeightDistributionValid(item: LoadItem, position: Position): boolean {
+  private isWeightDistributionValid(
+    item: LoadItem,
+    position: Position,
+  ): boolean {
     // Calculate center of gravity
     const trailerCenter = this.trailer.usableLength / 2;
-    const itemCenter = position.z + (item.dimensions.length / 2);
-    
+    const itemCenter = position.z + item.dimensions.length / 2;
+
     // Calculate weight on each axle
     const distanceFromCenter = Math.abs(itemCenter - trailerCenter);
     const totalWeight = this.getTotalWeight() + item.weight;
-    
+
     // Simplified weight distribution (actual would be more complex)
-    const rearWeight = totalWeight * (0.6 + (itemCenter / this.trailer.usableLength) * 0.2);
+    const rearWeight =
+      totalWeight * (0.6 + (itemCenter / this.trailer.usableLength) * 0.2);
     const frontWeight = totalWeight - rearWeight;
 
     // Check against axle limits
@@ -445,12 +482,15 @@ class BinPacking3D {
    * Group items by delivery stop
    */
   private groupByStop(items: LoadItem[]): Record<string, LoadItem[]> {
-    return items.reduce((acc, item) => {
-      const stop = item.deliveryStop || 1;
-      if (!acc[stop]) acc[stop] = [];
-      acc[stop].push(item);
-      return acc;
-    }, {} as Record<string, LoadItem[]>);
+    return items.reduce(
+      (acc, item) => {
+        const stop = item.deliveryStop || 1;
+        if (!acc[stop]) acc[stop] = [];
+        acc[stop].push(item);
+        return acc;
+      },
+      {} as Record<string, LoadItem[]>,
+    );
   }
 
   /**
@@ -466,7 +506,6 @@ class BinPacking3D {
 // ============================================================================
 
 export class LoadOptimizationService {
-  
   /**
    * Create optimized load plan for orders
    */
@@ -478,7 +517,8 @@ export class LoadOptimizationService {
     dockDoorId?: string;
     constraints?: LoadConstraints;
   }): Promise<LoadPlanResult> {
-    const { orderIds, trailerId, trailerType, warehouseId, constraints } = params;
+    const { orderIds, trailerId, trailerType, warehouseId, constraints } =
+      params;
 
     try {
       // 1. Get orders with items
@@ -502,7 +542,7 @@ export class LoadOptimizationService {
           success: false,
           loadPlan: null,
           utilization: { volumePercent: 0, weightPercent: 0, floorPercent: 0 },
-          issues: ['No orders found'],
+          issues: ["No orders found"],
           recommendations: [],
         };
       }
@@ -517,8 +557,12 @@ export class LoadOptimizationService {
           return {
             success: false,
             loadPlan: null,
-            utilization: { volumePercent: 0, weightPercent: 0, floorPercent: 0 },
-            issues: ['Trailer not found'],
+            utilization: {
+              volumePercent: 0,
+              weightPercent: 0,
+              floorPercent: 0,
+            },
+            issues: ["Trailer not found"],
             recommendations: [],
           };
         }
@@ -529,8 +573,12 @@ export class LoadOptimizationService {
           return {
             success: false,
             loadPlan: null,
-            utilization: { volumePercent: 0, weightPercent: 0, floorPercent: 0 },
-            issues: ['Invalid trailer type'],
+            utilization: {
+              volumePercent: 0,
+              weightPercent: 0,
+              floorPercent: 0,
+            },
+            issues: ["Invalid trailer type"],
             recommendations: [],
           };
         }
@@ -543,7 +591,11 @@ export class LoadOptimizationService {
       const loadItems = this.convertOrdersToLoadItems(orders);
 
       // 4. Validate constraints
-      const validation = this.validateConstraints(loadItems, trailer, constraints);
+      const validation = this.validateConstraints(
+        loadItems,
+        trailer,
+        constraints,
+      );
       if (!validation.valid) {
         return {
           success: false,
@@ -562,8 +614,8 @@ export class LoadOptimizationService {
       const utilization = this.calculateUtilization(loadedItems, trailer);
 
       // 7. Check if all items loaded
-      const unloadedItems = loadItems.filter(item => 
-        !loadedItems.find(loaded => loaded.id === item.id)
+      const unloadedItems = loadItems.filter(
+        (item) => !loadedItems.find((loaded) => loaded.id === item.id),
       );
 
       // 8. Generate recommendations
@@ -571,7 +623,7 @@ export class LoadOptimizationService {
         loadedItems,
         unloadedItems,
         utilization,
-        trailer
+        trailer,
       );
 
       // 9. Create load plan in database
@@ -588,19 +640,19 @@ export class LoadOptimizationService {
         success: unloadedItems.length === 0,
         loadPlan,
         utilization,
-        issues: unloadedItems.length > 0 
-          ? [`Could not fit ${unloadedItems.length} items`]
-          : [],
+        issues:
+          unloadedItems.length > 0
+            ? [`Could not fit ${unloadedItems.length} items`]
+            : [],
         recommendations,
       };
-
     } catch (error) {
-      console.error('Load optimization error:', error);
+      console.error("Load optimization error:", error);
       return {
         success: false,
         loadPlan: null,
         utilization: { volumePercent: 0, weightPercent: 0, floorPercent: 0 },
-        issues: ['Failed to create load plan'],
+        issues: ["Failed to create load plan"],
         recommendations: [],
       };
     }
@@ -628,7 +680,7 @@ export class LoadOptimizationService {
     const availableTrailers = await prisma.trailer.findMany({
       where: {
         warehouseId,
-        status: 'AT_DOCK',
+        status: "AT_DOCK",
         ...(dockDoorIds && {
           currentDockDoorId: { in: dockDoorIds },
         }),
@@ -658,7 +710,7 @@ export class LoadOptimizationService {
 
         // Remove assigned orders
         remainingOrderIds = remainingOrderIds.filter(
-          id => !result.loadPlan!.orderIds.includes(id)
+          (id) => !result.loadPlan!.orderIds.includes(id),
         );
       }
     }
@@ -692,7 +744,7 @@ export class LoadOptimizationService {
     if (!loadPlan) return null;
 
     const trailer = this.mapTrailerToConfig(loadPlan.trailer);
-    
+
     return {
       loadPlan: loadPlan as any,
       visualization: {
@@ -700,7 +752,10 @@ export class LoadOptimizationService {
         items: loadPlan.items as any,
         stats: {
           totalItems: loadPlan.items.length,
-          totalWeight: loadPlan.items.reduce((sum: number, item: any) => sum + item.weight, 0),
+          totalWeight: loadPlan.items.reduce(
+            (sum: number, item: any) => sum + item.weight,
+            0,
+          ),
           utilization: loadPlan.utilization,
         },
       },
@@ -710,16 +765,19 @@ export class LoadOptimizationService {
   /**
    * Calculate weight distribution across axles
    */
-  calculateWeightDistribution(loadedItems: LoadedItem[], trailer: TrailerConfig): WeightDistribution {
+  calculateWeightDistribution(
+    loadedItems: LoadedItem[],
+    trailer: TrailerConfig,
+  ): WeightDistribution {
     const trailerCenter = trailer.usableLength / 2;
     let frontWeight = 0;
     let rearWeight = 0;
     let totalWeight = 0;
 
     for (const item of loadedItems) {
-      const itemCenter = item.position.z + (item.dimensions.length / 2);
+      const itemCenter = item.position.z + item.dimensions.length / 2;
       const distanceFromCenter = itemCenter - trailerCenter;
-      
+
       // Weight distribution formula (simplified)
       const rearRatio = 0.6 + (distanceFromCenter / trailer.usableLength) * 0.2;
       const itemRearWeight = item.weight * rearRatio;
@@ -746,12 +804,15 @@ export class LoadOptimizationService {
    */
   optimizeLoadSequence(items: LoadItem[]): LoadSequence {
     // Group by delivery stop
-    const stopGroups = items.reduce((acc, item) => {
-      const stop = item.deliveryStop || 1;
-      if (!acc[stop]) acc[stop] = [];
-      acc[stop].push(item);
-      return acc;
-    }, {} as Record<number, LoadItem[]>);
+    const stopGroups = items.reduce(
+      (acc, item) => {
+        const stop = item.deliveryStop || 1;
+        if (!acc[stop]) acc[stop] = [];
+        acc[stop].push(item);
+        return acc;
+      },
+      {} as Record<number, LoadItem[]>,
+    );
 
     // Sort stops (last stop first - LIFO loading)
     const stops = Object.keys(stopGroups)
@@ -797,7 +858,11 @@ export class LoadOptimizationService {
     for (const order of orders) {
       for (const item of order.orderItems) {
         const product = item.product;
-        totalVolume += (product.length || 12) * (product.width || 12) * (product.height || 12) * item.quantity;
+        totalVolume +=
+          (product.length || 12) *
+          (product.width || 12) *
+          (product.height || 12) *
+          item.quantity;
         totalWeight += (product.weight || 1) * item.quantity;
         if (product.requiresTemperatureControl) requiresTemp = true;
       }
@@ -817,11 +882,11 @@ export class LoadOptimizationService {
 
   private convertOrdersToLoadItems(orders: any[]): LoadItem[] {
     const items: LoadItem[] = [];
-    
+
     for (const order of orders) {
       for (const orderItem of order.orderItems) {
         const product = orderItem.product;
-        
+
         // Create load item for each quantity
         for (let i = 0; i < orderItem.quantity; i++) {
           items.push({
@@ -852,7 +917,7 @@ export class LoadOptimizationService {
   private validateConstraints(
     items: LoadItem[],
     trailer: TrailerConfig,
-    constraints?: LoadConstraints
+    constraints?: LoadConstraints,
   ): { valid: boolean; issues: string[]; recommendations: string[] } {
     const issues: string[] = [];
     const recommendations: string[] = [];
@@ -860,26 +925,30 @@ export class LoadOptimizationService {
     // Check total weight
     const totalWeight = items.reduce((sum, item) => sum + item.weight, 0);
     if (totalWeight > trailer.maxWeight) {
-      issues.push(`Total weight (${totalWeight} lbs) exceeds trailer capacity (${trailer.maxWeight} lbs)`);
-      recommendations.push('Split shipment into multiple trailers');
+      issues.push(
+        `Total weight (${totalWeight} lbs) exceeds trailer capacity (${trailer.maxWeight} lbs)`,
+      );
+      recommendations.push("Split shipment into multiple trailers");
     }
 
     // Check temperature requirements
-    const needsTemp = items.some(item => item.requiresTemp);
-    if (needsTemp && trailer.type !== 'REEFER') {
-      issues.push('Temperature-controlled items require refrigerated trailer');
+    const needsTemp = items.some((item) => item.requiresTemp);
+    if (needsTemp && trailer.type !== "REEFER") {
+      issues.push("Temperature-controlled items require refrigerated trailer");
     }
 
     // Check hazmat
-    const hasHazmat = items.some(item => item.hazmat);
-    if (hasHazmat && !trailer.features?.includes('HAZMAT_CERTIFIED')) {
-      recommendations.push('Hazmat items require certified trailer and placards');
+    const hasHazmat = items.some((item) => item.hazmat);
+    if (hasHazmat && !trailer.features?.includes("HAZMAT_CERTIFIED")) {
+      recommendations.push(
+        "Hazmat items require certified trailer and placards",
+      );
     }
 
     // Check fragile items
-    const fragileCount = items.filter(item => item.fragile).length;
+    const fragileCount = items.filter((item) => item.fragile).length;
     if (fragileCount > items.length * 0.3) {
-      recommendations.push('High number of fragile items - load carefully');
+      recommendations.push("High number of fragile items - load carefully");
     }
 
     return {
@@ -889,18 +958,23 @@ export class LoadOptimizationService {
     };
   }
 
-  private calculateUtilization(loadedItems: LoadedItem[], trailer: TrailerConfig) {
-    const trailerVolume = trailer.usableLength * trailer.usableWidth * trailer.usableHeight;
+  private calculateUtilization(
+    loadedItems: LoadedItem[],
+    trailer: TrailerConfig,
+  ) {
+    const trailerVolume =
+      trailer.usableLength * trailer.usableWidth * trailer.usableHeight;
     const trailerFloor = trailer.usableLength * trailer.usableWidth;
-    
+
     let usedVolume = 0;
     let usedWeight = 0;
     let usedFloor = 0;
 
     for (const item of loadedItems) {
-      usedVolume += item.dimensions.length * item.dimensions.width * item.dimensions.height;
+      usedVolume +=
+        item.dimensions.length * item.dimensions.width * item.dimensions.height;
       usedWeight += item.weight;
-      
+
       // Calculate floor space (footprint at y=0)
       if (item.position.y === 0) {
         usedFloor += item.dimensions.width * item.dimensions.length;
@@ -918,20 +992,26 @@ export class LoadOptimizationService {
     loadedItems: LoadedItem[],
     unloadedItems: LoadItem[],
     utilization: any,
-    trailer: TrailerConfig
+    trailer: TrailerConfig,
   ): string[] {
     const recommendations: string[] = [];
 
     if (unloadedItems.length > 0) {
-      recommendations.push(`${unloadedItems.length} items could not fit - consider larger trailer or multiple shipments`);
+      recommendations.push(
+        `${unloadedItems.length} items could not fit - consider larger trailer or multiple shipments`,
+      );
     }
 
     if (utilization.volumePercent < 60) {
-      recommendations.push('Low volume utilization - consider consolidating with other orders');
+      recommendations.push(
+        "Low volume utilization - consider consolidating with other orders",
+      );
     }
 
     if (utilization.floorPercent > 90 && utilization.volumePercent < 70) {
-      recommendations.push('Good floor utilization but low cube - consider stacking more items');
+      recommendations.push(
+        "Good floor utilization but low cube - consider stacking more items",
+      );
     }
 
     const weightDist = this.calculateWeightDistribution(loadedItems, trailer);
@@ -944,19 +1024,22 @@ export class LoadOptimizationService {
 
   private async saveLoadPlan(data: any): Promise<LoadPlan> {
     // Save to database
-    return await prisma.loadPlan.create({
+    return (await prisma.loadPlan.create({
       data: {
         trailerId: data.trailerId,
         warehouseId: data.warehouseId,
-        status: 'DRAFT',
+        status: "DRAFT",
         totalItems: data.loadedItems.length,
-        totalWeight: data.loadedItems.reduce((sum: number, item: LoadedItem) => sum + item.weight, 0),
+        totalWeight: data.loadedItems.reduce(
+          (sum: number, item: LoadedItem) => sum + item.weight,
+          0,
+        ),
         utilization: data.utilization,
         orderIds: data.orderIds,
         // Items would be saved as JSON or separate table
         items: data.loadedItems,
       },
-    }) as any;
+    })) as any;
   }
 
   private mapTrailerToConfig(dbTrailer: any): TrailerConfig {
@@ -968,30 +1051,44 @@ export class LoadOptimizationService {
     };
   }
 
-  private isBalanced(front: number, rear: number, trailer: TrailerConfig): boolean {
+  private isBalanced(
+    front: number,
+    rear: number,
+    trailer: TrailerConfig,
+  ): boolean {
     if (!trailer.axleWeights) return true;
-    
-    return front <= trailer.axleWeights.front && rear <= trailer.axleWeights.rear;
+
+    return (
+      front <= trailer.axleWeights.front && rear <= trailer.axleWeights.rear
+    );
   }
 
-  private getWeightWarnings(front: number, rear: number, trailer: TrailerConfig): string[] {
+  private getWeightWarnings(
+    front: number,
+    rear: number,
+    trailer: TrailerConfig,
+  ): string[] {
     const warnings: string[] = [];
-    
+
     if (!trailer.axleWeights) return warnings;
 
     if (front > trailer.axleWeights.front) {
-      warnings.push(`Front axle overweight: ${front} lbs exceeds ${trailer.axleWeights.front} lbs limit`);
+      warnings.push(
+        `Front axle overweight: ${front} lbs exceeds ${trailer.axleWeights.front} lbs limit`,
+      );
     }
 
     if (rear > trailer.axleWeights.rear) {
-      warnings.push(`Rear axle overweight: ${rear} lbs exceeds ${trailer.axleWeights.rear} lbs limit`);
+      warnings.push(
+        `Rear axle overweight: ${rear} lbs exceeds ${trailer.axleWeights.rear} lbs limit`,
+      );
     }
 
     // Check balance
     const total = front + rear;
     const frontRatio = front / total;
     if (frontRatio < 0.25 || frontRatio > 0.35) {
-      warnings.push('Unbalanced load - redistribute weight');
+      warnings.push("Unbalanced load - redistribute weight");
     }
 
     return warnings;
@@ -1007,8 +1104,8 @@ export class LoadOptimizationService {
   async recommendVehicleForOrders(params: {
     orderIds: string[];
     warehouseId: string;
-    region?: VehicleType['region'];
-    prioritize?: 'cost' | 'utilization' | 'capacity';
+    region?: VehicleType["region"];
+    prioritize?: "cost" | "utilization" | "capacity";
   }): Promise<{
     vehicle: VehicleType | null;
     totalVolume: number;
@@ -1036,7 +1133,8 @@ export class LoadOptimizationService {
 
     for (const order of orders) {
       for (const item of order.items) {
-        const itemVolume = (item.lengthInches * item.widthInches * item.heightInches) / 1728; // Convert to cu ft
+        const itemVolume =
+          (item.lengthInches * item.widthInches * item.heightInches) / 1728; // Convert to cu ft
         totalVolume += itemVolume * item.quantity;
         totalWeight += item.weightLbs * item.quantity;
       }
@@ -1044,7 +1142,9 @@ export class LoadOptimizationService {
     }
 
     // Check if refrigeration needed
-    const requiresTemperatureControl = orders.some(o => o.requiresRefrigeration);
+    const requiresTemperatureControl = orders.some(
+      (o) => o.requiresRefrigeration,
+    );
 
     // Get warehouse region if not specified
     let region = params.region;
@@ -1052,7 +1152,7 @@ export class LoadOptimizationService {
       const warehouse = await prisma.warehouse.findUnique({
         where: { id: params.warehouseId },
       });
-      region = (warehouse?.region as VehicleType['region']) || 'UK';
+      region = (warehouse?.region as VehicleType["region"]) || "UK";
     }
 
     // Recommend vehicle
@@ -1062,7 +1162,7 @@ export class LoadOptimizationService {
       palletCount,
       requiresTemperatureControl,
       region,
-      prioritize: params.prioritize || 'utilization',
+      prioritize: params.prioritize || "utilization",
     });
 
     // Get alternatives
@@ -1079,10 +1179,12 @@ export class LoadOptimizationService {
       totalVolume,
       totalWeight,
       palletCount,
-      utilization: vehicle ? {
-        volumePercent: (totalVolume / vehicle.volumeCubicFeet) * 100,
-        weightPercent: (totalWeight / vehicle.maxWeightLbs) * 100,
-      } : { volumePercent: 0, weightPercent: 0 },
+      utilization: vehicle
+        ? {
+            volumePercent: (totalVolume / vehicle.volumeCubicFeet) * 100,
+            weightPercent: (totalWeight / vehicle.maxWeightLbs) * 100,
+          }
+        : { volumePercent: 0, weightPercent: 0 },
       alternatives,
     };
   }
@@ -1093,7 +1195,7 @@ export class LoadOptimizationService {
   async optimizeLoadWithVehicle(params: {
     orderIds: string[];
     warehouseId: string;
-    region?: VehicleType['region'];
+    region?: VehicleType["region"];
   }): Promise<{
     success: boolean;
     vehicle: VehicleType | null;
@@ -1105,7 +1207,7 @@ export class LoadOptimizationService {
       orderIds: params.orderIds,
       warehouseId: params.warehouseId,
       region: params.region,
-      prioritize: 'utilization',
+      prioritize: "utilization",
     });
 
     if (!vehicleRec.vehicle) {
@@ -1113,7 +1215,7 @@ export class LoadOptimizationService {
         success: false,
         vehicle: null,
         loadPlan: null,
-        recommendation: 'No suitable vehicle found for this load',
+        recommendation: "No suitable vehicle found for this load",
       };
     }
 
@@ -1125,11 +1227,17 @@ export class LoadOptimizationService {
       length: vehicleRec.vehicle.dimensions.lengthInches,
       width: vehicleRec.vehicle.dimensions.widthInches,
       height: vehicleRec.vehicle.dimensions.heightInches,
-      usableLength: vehicleRec.vehicle.dimensions.usableLengthInches || vehicleRec.vehicle.dimensions.lengthInches * 0.98,
-      usableWidth: vehicleRec.vehicle.dimensions.usableWidthInches || vehicleRec.vehicle.dimensions.widthInches * 0.98,
-      usableHeight: vehicleRec.vehicle.dimensions.usableHeightInches || vehicleRec.vehicle.dimensions.heightInches * 0.98,
+      usableLength:
+        vehicleRec.vehicle.dimensions.usableLengthInches ||
+        vehicleRec.vehicle.dimensions.lengthInches * 0.98,
+      usableWidth:
+        vehicleRec.vehicle.dimensions.usableWidthInches ||
+        vehicleRec.vehicle.dimensions.widthInches * 0.98,
+      usableHeight:
+        vehicleRec.vehicle.dimensions.usableHeightInches ||
+        vehicleRec.vehicle.dimensions.heightInches * 0.98,
       maxWeight: vehicleRec.vehicle.maxWeightLbs,
-      doorType: vehicleRec.vehicle.features?.hasSideLoading ? 'SIDE' : 'REAR',
+      doorType: vehicleRec.vehicle.features?.hasSideLoading ? "SIDE" : "REAR",
       features: [],
     };
 
@@ -1171,9 +1279,19 @@ export class LoadOptimizationService {
 
     // Calculate utilization
     const totalVolume = loadedItems.reduce((sum, item) => {
-      return sum + (item.dimensions.length * item.dimensions.width * item.dimensions.height / 1728);
+      return (
+        sum +
+        (item.dimensions.length *
+          item.dimensions.width *
+          item.dimensions.height) /
+          1728
+      );
     }, 0);
-    const trailerVolume = (trailerConfig.usableLength * trailerConfig.usableWidth * trailerConfig.usableHeight) / 1728;
+    const trailerVolume =
+      (trailerConfig.usableLength *
+        trailerConfig.usableWidth *
+        trailerConfig.usableHeight) /
+      1728;
 
     const loadPlan: LoadPlanResult = {
       success: loadedItems.length === loadItems.length,
@@ -1189,13 +1307,17 @@ export class LoadOptimizationService {
         weightPercent: vehicleRec.utilization.weightPercent,
         floorPercent: 0,
       },
-      issues: loadedItems.length < loadItems.length ? ['Not all items fit'] : [],
+      issues:
+        loadedItems.length < loadItems.length ? ["Not all items fit"] : [],
       recommendations: [],
     };
 
     // Generate recommendation
     let recommendation = `Recommended: ${vehicleRec.vehicle.name}. `;
-    if (loadPlan.utilization.volumePercent >= 75 && loadPlan.utilization.volumePercent <= 95) {
+    if (
+      loadPlan.utilization.volumePercent >= 75 &&
+      loadPlan.utilization.volumePercent <= 95
+    ) {
       recommendation += `Optimal utilization: ${Math.round(loadPlan.utilization.volumePercent)}%`;
     } else if (loadPlan.utilization.volumePercent < 75) {
       recommendation += `Low utilization (${Math.round(loadPlan.utilization.volumePercent)}%). Consider smaller vehicle.`;
@@ -1218,13 +1340,6 @@ export class LoadOptimizationService {
 
 export const loadOptimizationService = new LoadOptimizationService();
 
-export {
-  TRAILER_TYPES,
-  BinPacking3D,
-};
+export { TRAILER_TYPES, BinPacking3D };
 
-export type {
-  LoadedItem,
-  TrailerConfig,
-  LoadPlanResult,
-};
+export type { LoadedItem, TrailerConfig, LoadPlanResult };

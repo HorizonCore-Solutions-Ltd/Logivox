@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -52,7 +58,7 @@ export default function OrdersPage() {
         page: page.toString(),
         limit: "20",
       });
-      
+
       if (statusFilter !== "ALL") params.append("status", statusFilter);
       if (search) params.append("search", search);
 
@@ -91,7 +97,9 @@ export default function OrdersPage() {
     const Icon = config.icon;
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}
+      >
         <Icon className="h-3 w-3 mr-1" />
         {status.replace(/_/g, " ")}
       </span>
@@ -104,7 +112,9 @@ export default function OrdersPage() {
       <div className="flex justify-between items-start">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">My Orders</h1>
-          <p className="text-gray-600 mt-1">View and manage your order history</p>
+          <p className="text-gray-600 mt-1">
+            View and manage your order history
+          </p>
         </div>
         <Link href="/portal/orders/new">
           <Button>
@@ -117,7 +127,10 @@ export default function OrdersPage() {
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
-          <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+          <form
+            onSubmit={handleSearch}
+            className="flex flex-col md:flex-row gap-4"
+          >
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -209,7 +222,9 @@ export default function OrdersPage() {
                           <div>
                             <span className="text-gray-500">Requested:</span>
                             <p className="font-medium">
-                              {new Date(order.requestedDate).toLocaleDateString()}
+                              {new Date(
+                                order.requestedDate,
+                              ).toLocaleDateString()}
                             </p>
                           </div>
                         )}

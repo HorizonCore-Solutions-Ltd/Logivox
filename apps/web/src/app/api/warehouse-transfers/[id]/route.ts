@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -6,7 +6,9 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const updateTransferSchema = z.object({
-  status: z.enum(["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"]).optional(),
+  status: z
+    .enum(["PENDING", "IN_PROGRESS", "COMPLETED", "CANCELLED"])
+    .optional(),
   reason: z.string().optional(),
   notes: z.string().optional(),
   priority: z.enum(["HIGH", "MEDIUM", "LOW"]).optional(),
@@ -16,7 +18,7 @@ const updateTransferSchema = z.object({
 // GET /api/warehouse-transfers/[id]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -32,7 +34,7 @@ export async function GET(
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -72,7 +74,7 @@ export async function GET(
     if (!transfer) {
       return NextResponse.json(
         { error: "Transfer not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -81,7 +83,7 @@ export async function GET(
     console.error("Error fetching transfer:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch transfer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -89,7 +91,7 @@ export async function GET(
 // PUT /api/warehouse-transfers/[id] - Update transfer
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -105,7 +107,7 @@ export async function PUT(
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -119,7 +121,7 @@ export async function PUT(
     if (!existingTransfer) {
       return NextResponse.json(
         { error: "Transfer not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -127,7 +129,7 @@ export async function PUT(
     if (["COMPLETED", "CANCELLED"].includes(existingTransfer.status)) {
       return NextResponse.json(
         { error: "Cannot update completed or cancelled transfer" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -178,13 +180,13 @@ export async function PUT(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Failed to update transfer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

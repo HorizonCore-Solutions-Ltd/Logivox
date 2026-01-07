@@ -16,7 +16,7 @@ LogiVox uses **PostgreSQL** with **Prisma ORM** for database management. This gu
 Create `docker-compose.yml` in the project root:
 
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   postgres:
     image: postgres:16-alpine
@@ -51,16 +51,19 @@ DATABASE_URL="postgresql://flowstock:flowstock_dev_password@localhost:5432/flows
 ### 1. Install PostgreSQL
 
 **Windows:**
+
 - Download from https://www.postgresql.org/download/windows/
 - Run installer and set a password for postgres user
 
 **macOS:**
+
 ```bash
 brew install postgresql@16
 brew services start postgresql@16
 ```
 
 **Linux:**
+
 ```bash
 sudo apt update
 sudo apt install postgresql postgresql-contrib
@@ -126,6 +129,7 @@ npx prisma migrate dev --name init
 ```
 
 This will:
+
 - Create all database tables
 - Generate type-safe Prisma Client
 - Apply the migration to your database
@@ -141,34 +145,41 @@ This opens a GUI to view and edit your database.
 ## Database Schema Overview
 
 ### Authentication
+
 - `users` - User accounts
 - `accounts` - OAuth provider accounts
 - `sessions` - Active user sessions
 - `verification_tokens` - Email verification tokens
 
 ### Multi-Tenancy
+
 - `organizations` - Tenant organizations
 - `organization_members` - User-organization relationships
 
 ### Inventory
+
 - `warehouses` - Storage locations
 - `categories` - Product categories
 - `inventory_items` - Stock items
 - `inventory_movements` - Stock movement history
 
 ### Booking
+
 - `bookings` - Stock reservations
 - `booking_items` - Line items for bookings
 
 ### Business Entities
+
 - `suppliers` - Vendor information
 - `customers` - Customer information
 
 ### Integrations
+
 - `integrations` - External system connections
 - `api_keys` - API access keys
 
 ### Audit
+
 - `activity_logs` - Complete audit trail
 
 ## Common Commands
@@ -208,54 +219,54 @@ npx prisma format
 Create `prisma/seed.ts`:
 
 ```typescript
-import { PrismaClient } from '@prisma/client'
-import bcrypt from 'bcryptjs'
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 async function main() {
   // Create admin user
-  const hashedPassword = await bcrypt.hash('admin123', 12)
-  
+  const hashedPassword = await bcrypt.hash("admin123", 12);
+
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@logivox.ai' },
+    where: { email: "admin@logivox.ai" },
     update: {},
     create: {
-      email: 'admin@logivox.ai',
-      name: 'Admin User',
+      email: "admin@logivox.ai",
+      name: "Admin User",
       password: hashedPassword,
-      role: 'SUPER_ADMIN',
+      role: "SUPER_ADMIN",
       emailVerified: new Date(),
     },
-  })
+  });
 
   // Create demo organization
   const org = await prisma.organization.create({
     data: {
-      name: 'Demo Company',
-      slug: 'demo-company',
-      subscriptionTier: 'PROFESSIONAL',
+      name: "Demo Company",
+      slug: "demo-company",
+      subscriptionTier: "PROFESSIONAL",
       createdById: admin.id,
       members: {
         create: {
           userId: admin.id,
-          role: 'OWNER',
+          role: "OWNER",
         },
       },
     },
-  })
+  });
 
-  console.log({ admin, org })
+  console.log({ admin, org });
 }
 
 main()
   .catch((e) => {
-    console.error(e)
-    process.exit(1)
+    console.error(e);
+    process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect()
-  })
+    await prisma.$disconnect();
+  });
 ```
 
 Add to `package.json`:

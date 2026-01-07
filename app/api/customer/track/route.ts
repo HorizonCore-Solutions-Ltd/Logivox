@@ -3,19 +3,19 @@
  * Public tracking and photo upload
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 // GET - Track load sheet by number (public)
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const number = searchParams.get('number');
+    const number = searchParams.get("number");
 
     if (!number) {
       return NextResponse.json(
-        { error: 'Tracking number is required' },
-        { status: 400 }
+        { error: "Tracking number is required" },
+        { status: 400 },
       );
     }
 
@@ -48,27 +48,27 @@ export async function GET(req: NextRequest) {
           },
         },
         events: {
-          orderBy: { timestamp: 'desc' },
+          orderBy: { timestamp: "desc" },
         },
       },
     });
 
     if (!loadSheet) {
       return NextResponse.json(
-        { error: 'Load sheet not found' },
-        { status: 404 }
+        { error: "Load sheet not found" },
+        { status: 404 },
       );
     }
 
     return NextResponse.json({
       loadSheet,
-      message: 'Load sheet found',
+      message: "Load sheet found",
     });
   } catch (error) {
-    console.error('Customer track error:', error);
+    console.error("Customer track error:", error);
     return NextResponse.json(
-      { error: 'Failed to track shipment' },
-      { status: 500 }
+      { error: "Failed to track shipment" },
+      { status: 500 },
     );
   }
 }

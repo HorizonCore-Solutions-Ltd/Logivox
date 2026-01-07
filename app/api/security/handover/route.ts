@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const CreateHandoverSchema = z.object({
   warehouseId: z.string().optional(),
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const json = await req.json();
@@ -31,7 +31,10 @@ export async function POST(req: NextRequest) {
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     // Generate handover number
@@ -46,24 +49,30 @@ export async function POST(req: NextRequest) {
         },
       },
     });
-    const handoverNumber = `HO-${year}-${String(count + 1).padStart(4, '0')}`;
+    const handoverNumber = `HO-${year}-${String(count + 1).padStart(4, "0")}`;
 
     // Calculate activity counts (last 8 hours as typical shift)
     const shiftStart = new Date(Date.now() - 8 * 60 * 60 * 1000);
     const shiftEnd = now;
 
-    const [gateEntriesCount, gateExitsCount, visitorsCount, incidentsCount, patrolsCount] = await Promise.all([
+    const [
+      gateEntriesCount,
+      gateExitsCount,
+      visitorsCount,
+      incidentsCount,
+      patrolsCount,
+    ] = await Promise.all([
       prisma.gateEntry.count({
         where: {
           organizationId,
-          direction: 'INBOUND',
+          direction: "INBOUND",
           entryTime: { gte: shiftStart, lte: shiftEnd },
         },
       }),
       prisma.gateEntry.count({
         where: {
           organizationId,
-          direction: 'OUTBOUND',
+          direction: "OUTBOUND",
           exitTime: { gte: shiftStart, lte: shiftEnd },
         },
       }),
@@ -84,7 +93,7 @@ export async function POST(req: NextRequest) {
           organizationId,
           guardId: body.outgoingGuardId,
           startTime: { gte: shiftStart, lte: shiftEnd },
-          status: 'COMPLETED',
+          status: "COMPLETED",
         },
       }),
     ]);
@@ -93,7 +102,7 @@ export async function POST(req: NextRequest) {
     const currentVehiclesOnSite = await prisma.gateEntry.count({
       where: {
         organizationId,
-        status: { in: ['CHECKED_IN', 'PROCESSING', 'APPROVED'] },
+        status: { in: ["CHECKED_IN", "PROCESSING", "APPROVED"] },
         exitTime: null,
       },
     });
@@ -119,17 +128,23 @@ export async function POST(req: NextRequest) {
         ongoingIssues: body.ongoingIssues,
         equipmentStatus: body.equipmentStatus,
         notesForNextShift: body.notesForNextShift,
-        status: 'PENDING',
+        status: "PENDING",
       },
     });
 
     return NextResponse.json(handover);
   } catch (error: any) {
-    console.error('Error creating handover:', error);
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 });
+    console.error("Error creating handover:", error);
+    if (error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -138,36 +153,39 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
-    const guardId = searchParams.get('guardId');
+    const status = searchParams.get("status");
+    const guardId = searchParams.get("guardId");
 
     const handovers = await prisma.shiftHandover.findMany({
       where: {
         organizationId,
         ...(status && { status: status as any }),
         ...(guardId && {
-          OR: [
-            { outgoingGuardId: guardId },
-            { incomingGuardId: guardId },
-          ],
+          OR: [{ outgoingGuardId: guardId }, { incomingGuardId: guardId }],
         }),
       },
-      orderBy: { handoverDate: 'desc' },
+      orderBy: { handoverDate: "desc" },
       take: 50,
     });
 
     return NextResponse.json(handovers);
   } catch (error: any) {
-    console.error('Error listing handovers:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error listing handovers:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

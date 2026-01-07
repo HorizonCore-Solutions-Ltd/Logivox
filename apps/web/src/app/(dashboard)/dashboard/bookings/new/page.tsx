@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useForm, useFieldArray } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { useMutation, useQuery } from "@tanstack/react-query"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import * as React from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -14,61 +20,65 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { ArrowLeft, Plus, Trash2, Save } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { useToast } from "@/hooks/use-toast";
 
 const bookingSchema = z.object({
   customerId: z.string().min(1, "Customer is required"),
   bookingDate: z.string().min(1, "Booking date is required"),
   deliveryDate: z.string().optional(),
-  status: z.enum(["PENDING", "CONFIRMED", "FULFILLED", "CANCELLED"]).default("PENDING"),
+  status: z
+    .enum(["PENDING", "CONFIRMED", "FULFILLED", "CANCELLED"])
+    .default("PENDING"),
   notes: z.string().optional(),
-  items: z.array(
-    z.object({
-      inventoryItemId: z.string().min(1, "Item is required"),
-      quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
-      unitPrice: z.coerce.number().min(0, "Price must be positive"),
-    })
-  ).min(1, "At least one item is required"),
-})
+  items: z
+    .array(
+      z.object({
+        inventoryItemId: z.string().min(1, "Item is required"),
+        quantity: z.coerce.number().min(1, "Quantity must be at least 1"),
+        unitPrice: z.coerce.number().min(0, "Price must be positive"),
+      }),
+    )
+    .min(1, "At least one item is required"),
+});
 
-type BookingFormData = z.infer<typeof bookingSchema>
+type BookingFormData = z.infer<typeof bookingSchema>;
 
 export default function NewBookingPage() {
-  const router = useRouter()
-  const { toast } = useToast()
+  const router = useRouter();
+  const { toast } = useToast();
 
   // Fetch customers
   const { data: customers = [] } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
-      const res = await fetch("/api/customers")
-      if (!res.ok) throw new Error("Failed to fetch customers")
-      return res.json()
+      const res = await fetch("/api/customers");
+      if (!res.ok) throw new Error("Failed to fetch customers");
+      return res.json();
     },
-  })
+  });
 
   // Fetch inventory items
   const { data: inventoryItems = [] } = useQuery({
     queryKey: ["inventory"],
     queryFn: async () => {
-      const res = await fetch("/api/inventory")
-      if (!res.ok) throw new Error("Failed to fetch inventory")
-      return res.json()
+      const res = await fetch("/api/inventory");
+      if (!res.ok) throw new Error("Failed to fetch inventory");
+      return res.json();
     },
-  })
+  });
 
   const form = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
@@ -80,12 +90,12 @@ export default function NewBookingPage() {
       notes: "",
       items: [{ inventoryItemId: "", quantity: 1, unitPrice: 0 }],
     },
-  })
+  });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "items",
-  })
+  });
 
   // Create booking mutation
   const createMutation = useMutation({
@@ -94,52 +104,52 @@ export default function NewBookingPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      })
+      });
 
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.message || "Failed to create booking")
+        const error = await res.json();
+        throw new Error(error.message || "Failed to create booking");
       }
 
-      return res.json()
+      return res.json();
     },
     onSuccess: (data) => {
       toast({
         title: "Success",
         description: "Booking created successfully",
-      })
-      router.push(`/dashboard/bookings/${data.id}`)
+      });
+      router.push(`/dashboard/bookings/${data.id}`);
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   const onSubmit = (data: BookingFormData) => {
-    createMutation.mutate(data)
-  }
+    createMutation.mutate(data);
+  };
 
   // Auto-fill unit price when item is selected
   const handleItemChange = (index: number, itemId: string) => {
-    const item = inventoryItems.find((i: any) => i.id === itemId)
+    const item = inventoryItems.find((i: any) => i.id === itemId);
     if (item) {
-      form.setValue(`items.${index}.unitPrice`, item.sellingPrice)
+      form.setValue(`items.${index}.unitPrice`, item.sellingPrice);
     }
-  }
+  };
 
   // Calculate total
-  const watchedItems = form.watch("items")
+  const watchedItems = form.watch("items");
   const totalAmount = React.useMemo(() => {
     return watchedItems.reduce((sum, item) => {
-      const quantity = Number(item.quantity) || 0
-      const price = Number(item.unitPrice) || 0
-      return sum + quantity * price
-    }, 0)
-  }, [watchedItems])
+      const quantity = Number(item.quantity) || 0;
+      const price = Number(item.unitPrice) || 0;
+      return sum + quantity * price;
+    }, 0);
+  }, [watchedItems]);
 
   return (
     <DashboardSidebar>
@@ -155,7 +165,9 @@ export default function NewBookingPage() {
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Create New Booking</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Create New Booking
+            </h1>
             <p className="text-muted-foreground">
               Add a new stock booking or reservation
             </p>
@@ -289,9 +301,14 @@ export default function NewBookingPage() {
                       <span className="font-medium">{fields.length}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-muted-foreground">Total Quantity:</span>
+                      <span className="text-muted-foreground">
+                        Total Quantity:
+                      </span>
                       <span className="font-medium">
-                        {watchedItems.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0)}
+                        {watchedItems.reduce(
+                          (sum, item) => sum + (Number(item.quantity) || 0),
+                          0,
+                        )}
                       </span>
                     </div>
                     <div className="flex justify-between pt-4 border-t">
@@ -351,8 +368,8 @@ export default function NewBookingPage() {
                           <FormLabel>Item *</FormLabel>
                           <Select
                             onValueChange={(value) => {
-                              field.onChange(value)
-                              handleItemChange(index, value)
+                              field.onChange(value);
+                              handleItemChange(index, value);
                             }}
                             defaultValue={field.value}
                           >
@@ -364,7 +381,8 @@ export default function NewBookingPage() {
                             <SelectContent>
                               {inventoryItems.map((item: any) => (
                                 <SelectItem key={item.id} value={item.id}>
-                                  {item.name} ({item.sku}) - Available: {item.availableQuantity}
+                                  {item.name} ({item.sku}) - Available:{" "}
+                                  {item.availableQuantity}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -454,5 +472,5 @@ export default function NewBookingPage() {
         </Form>
       </div>
     </DashboardSidebar>
-  )
+  );
 }

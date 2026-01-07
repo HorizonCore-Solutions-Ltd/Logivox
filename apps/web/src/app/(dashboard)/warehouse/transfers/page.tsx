@@ -222,7 +222,8 @@ export default function WarehouseTransfersPage() {
           </div>
         ) : transfers.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            No transfers found. Create a transfer to move inventory between locations.
+            No transfers found. Create a transfer to move inventory between
+            locations.
           </div>
         ) : (
           <>
@@ -323,7 +324,8 @@ export default function WarehouseTransfersPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
-                          {transfer.requestedBy.name || transfer.requestedBy.email}
+                          {transfer.requestedBy.name ||
+                            transfer.requestedBy.email}
                         </div>
                         <div className="text-xs text-gray-500">
                           {formatDate(transfer.requestedDate)}

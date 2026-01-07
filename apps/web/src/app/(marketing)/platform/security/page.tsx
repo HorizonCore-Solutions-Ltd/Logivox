@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Shield,
   Lock,
@@ -17,52 +23,60 @@ import {
   Server,
   AlertTriangle,
   Fingerprint,
-  Database
-} from "lucide-react"
+  Database,
+} from "lucide-react";
 
 export default function SecurityPage() {
   const securityFeatures = [
     {
       icon: ShieldCheck,
       title: "Military-Grade Security",
-      description: "AES-256 encryption (same as used by military/government), zero-trust architecture, and continuous threat monitoring."
+      description:
+        "AES-256 encryption (same as used by military/government), zero-trust architecture, and continuous threat monitoring.",
     },
     {
       icon: Lock,
       title: "End-to-End Encryption",
-      description: "AES-256 encryption for data at rest and TLS 1.3 for data in transit."
+      description:
+        "AES-256 encryption for data at rest and TLS 1.3 for data in transit.",
     },
     {
       icon: Key,
       title: "Multi-Factor Authentication",
-      description: "Require MFA with TOTP, SMS, hardware keys, or biometric authentication."
+      description:
+        "Require MFA with TOTP, SMS, hardware keys, or biometric authentication.",
     },
     {
       icon: Shield,
       title: "Zero Trust Architecture",
-      description: "Never trust, always verify with continuous authentication and authorization."
+      description:
+        "Never trust, always verify with continuous authentication and authorization.",
     },
     {
       icon: Eye,
       title: "Complete Audit Logging",
-      description: "Immutable audit trails for all activities with forensic-level detail for compliance."
+      description:
+        "Immutable audit trails for all activities with forensic-level detail for compliance.",
     },
     {
       icon: Fingerprint,
       title: "Biometric Authentication",
-      description: "Support for fingerprint and facial recognition on compatible devices."
+      description:
+        "Support for fingerprint and facial recognition on compatible devices.",
     },
     {
       icon: Server,
       title: "DDoS Protection",
-      description: "Enterprise-grade protection against distributed denial of service attacks."
+      description:
+        "Enterprise-grade protection against distributed denial of service attacks.",
     },
     {
       icon: Database,
       title: "Business Continuity",
-      description: "99.99% uptime SLA with automated failover, disaster recovery, real-time backups, and multi-region redundancy."
-    }
-  ]
+      description:
+        "99.99% uptime SLA with automated failover, disaster recovery, real-time backups, and multi-region redundancy.",
+    },
+  ];
 
   const complianceStandards = [
     { name: "SOC 2 Type II", description: "Audited security controls" },
@@ -70,35 +84,59 @@ export default function SecurityPage() {
     { name: "GDPR", description: "European data protection" },
     { name: "HIPAA", description: "Healthcare data security" },
     { name: "PCI DSS", description: "Payment card security" },
-    { name: "CCPA", description: "California privacy rights" }
-  ]
+    { name: "CCPA", description: "California privacy rights" },
+  ];
 
   const securityLayers = [
     {
       title: "Application Security",
-      description: "Secure coding practices, regular security audits, and penetration testing",
+      description:
+        "Secure coding practices, regular security audits, and penetration testing",
       icon: ShieldCheck,
-      features: ["Input validation", "SQL injection prevention", "XSS protection", "CSRF tokens"]
+      features: [
+        "Input validation",
+        "SQL injection prevention",
+        "XSS protection",
+        "CSRF tokens",
+      ],
     },
     {
       title: "Infrastructure Security",
-      description: "Hardened servers, network segmentation, and intrusion detection systems",
+      description:
+        "Hardened servers, network segmentation, and intrusion detection systems",
       icon: Server,
-      features: ["Firewall rules", "Network isolation", "IDS/IPS", "Regular patching"]
+      features: [
+        "Firewall rules",
+        "Network isolation",
+        "IDS/IPS",
+        "Regular patching",
+      ],
     },
     {
       title: "Data Security",
-      description: "Encryption, access controls, and secure backup and recovery procedures",
+      description:
+        "Encryption, access controls, and secure backup and recovery procedures",
       icon: Database,
-      features: ["At-rest encryption", "In-transit encryption", "Key management", "Secure backups"]
+      features: [
+        "At-rest encryption",
+        "In-transit encryption",
+        "Key management",
+        "Secure backups",
+      ],
     },
     {
       title: "Access Control",
-      description: "Role-based permissions, least privilege principle, and session management",
+      description:
+        "Role-based permissions, least privilege principle, and session management",
       icon: Key,
-      features: ["RBAC", "Least privilege", "Session timeout", "IP whitelisting"]
-    }
-  ]
+      features: [
+        "RBAC",
+        "Least privilege",
+        "Session timeout",
+        "IP whitelisting",
+      ],
+    },
+  ];
 
   const benefits = [
     "AI Assistant: Public (no internet) & tenant-aware for logged-in users",
@@ -113,8 +151,8 @@ export default function SecurityPage() {
     "Real-time backups with disaster recovery",
     "Multi-region redundancy and automated failover",
     "Regular security updates and patches",
-    "Dedicated security team and incident response"
-  ]
+    "Dedicated security team and incident response",
+  ];
 
   return (
     <div className="min-h-screen">
@@ -127,7 +165,9 @@ export default function SecurityPage() {
               Enterprise Security
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Bank-level security architecture protecting your inventory data and operations. Built with zero-trust principles, advanced encryption, and continuous monitoring.
+              Bank-level security architecture protecting your inventory data
+              and operations. Built with zero-trust principles, advanced
+              encryption, and continuous monitoring.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -156,7 +196,7 @@ export default function SecurityPage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {securityFeatures.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <Card key={feature.title}>
                   <CardHeader>
@@ -167,7 +207,7 @@ export default function SecurityPage() {
                     <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -177,7 +217,9 @@ export default function SecurityPage() {
       <section className="py-20 lg:py-28 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Compliance & Certifications</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Compliance & Certifications
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Meeting the highest industry standards and regulations
             </p>
@@ -211,7 +253,7 @@ export default function SecurityPage() {
 
           <div className="grid gap-8 lg:grid-cols-2">
             {securityLayers.map((layer) => {
-              const Icon = layer.icon
+              const Icon = layer.icon;
               return (
                 <Card key={layer.title}>
                   <CardHeader>
@@ -221,10 +263,15 @@ export default function SecurityPage() {
                       </div>
                       <div className="flex-1">
                         <CardTitle className="mb-2">{layer.title}</CardTitle>
-                        <CardDescription className="mb-4">{layer.description}</CardDescription>
+                        <CardDescription className="mb-4">
+                          {layer.description}
+                        </CardDescription>
                         <div className="grid grid-cols-2 gap-2">
                           {layer.features.map((feature) => (
-                            <div key={feature} className="flex items-center gap-2 text-sm">
+                            <div
+                              key={feature}
+                              className="flex items-center gap-2 text-sm"
+                            >
                               <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0" />
                               <span>{feature}</span>
                             </div>
@@ -234,7 +281,7 @@ export default function SecurityPage() {
                     </div>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -250,7 +297,8 @@ export default function SecurityPage() {
                 Peace of Mind for Your Business
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our security-first approach protects your operations while enabling growth.
+                Our security-first approach protects your operations while
+                enabling growth.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -266,7 +314,9 @@ export default function SecurityPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Security Dashboard</CardTitle>
-                  <CardDescription>Monitor security events in real-time</CardDescription>
+                  <CardDescription>
+                    Monitor security events in real-time
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-square bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg flex items-center justify-center border-2 border-dashed">
@@ -288,7 +338,9 @@ export default function SecurityPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">24/7 Security Operations</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              24/7 Security Operations
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Our security team is always watching
             </p>
@@ -296,12 +348,28 @@ export default function SecurityPage() {
 
           <div className="grid gap-6 md:grid-cols-4">
             {[
-              { icon: Eye, title: "Continuous Monitoring", description: "Real-time threat detection across all systems" },
-              { icon: AlertTriangle, title: "Instant Alerts", description: "Immediate notification of security events" },
-              { icon: ShieldCheck, title: "Rapid Response", description: "Expert team responds within minutes" },
-              { icon: FileText, title: "Detailed Reports", description: "Complete incident analysis and remediation" }
+              {
+                icon: Eye,
+                title: "Continuous Monitoring",
+                description: "Real-time threat detection across all systems",
+              },
+              {
+                icon: AlertTriangle,
+                title: "Instant Alerts",
+                description: "Immediate notification of security events",
+              },
+              {
+                icon: ShieldCheck,
+                title: "Rapid Response",
+                description: "Expert team responds within minutes",
+              },
+              {
+                icon: FileText,
+                title: "Detailed Reports",
+                description: "Complete incident analysis and remediation",
+              },
             ].map((item) => {
-              const Icon = item.icon
+              const Icon = item.icon;
               return (
                 <Card key={item.title} className="text-center">
                   <CardHeader>
@@ -312,7 +380,7 @@ export default function SecurityPage() {
                     <CardDescription>{item.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -321,9 +389,7 @@ export default function SecurityPage() {
       {/* CTA Section */}
       <section className="py-20 lg:py-28 bg-gradient-to-br from-primary-600 to-primary-500">
         <div className="container-enterprise text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">
-            Security You Can Trust
-          </h2>
+          <h2 className="text-3xl font-bold mb-4">Security You Can Trust</h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
             Join thousands of companies relying on LogiVox's enterprise security
           </p>
@@ -334,12 +400,17 @@ export default function SecurityPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 border-white text-white hover:bg-white/20" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-white/10 border-white text-white hover:bg-white/20"
+              asChild
+            >
               <Link href="/contact">Request Security Assessment</Link>
             </Button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

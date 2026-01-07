@@ -62,6 +62,7 @@ flowstock/
 ### 1.2 Enterprise Application Architecture
 
 #### 1.2.1 Web Application (`apps/web/`)
+
 ```
 apps/web/
 ├── 📁 public/                        # Static assets & PWA files
@@ -115,6 +116,7 @@ apps/web/
 ```
 
 #### 1.2.2 Mobile Application (`apps/mobile/`)
+
 ```
 apps/mobile/
 ├── 📁 src/                           # React Native source code
@@ -150,6 +152,7 @@ apps/mobile/
 ```
 
 #### 1.2.3 API Service (`apps/api/`)
+
 ```
 apps/api/
 ├── 📁 src/                           # API source code
@@ -196,122 +199,130 @@ apps/api/
 
 #### 1.2.4 AI/ML Service (`apps/ai-service/`)
 ```
+
 apps/ai-service/
-├── 📁 src/                           # Python AI service source
-│   ├── 📁 models/                    # ML models & training
-│   │   ├── demand_forecasting.py     # Demand prediction models
-│   │   ├── optimization.py           # Route & storage optimization
-│   │   ├── anomaly_detection.py      # Quality control ML
-│   │   └── recommendation.py         # Intelligent recommendations
-│   ├── 📁 api/                       # FastAPI endpoints
-│   │   ├── main.py                   # FastAPI app configuration
-│   │   ├── routes/                   # API route handlers
-│   │   └── dependencies.py           # Dependency injection
-│   ├── 📁 services/                  # AI business logic
-│   │   ├── prediction_service.py     # Prediction orchestration
-│   │   ├── optimization_service.py   # Optimization algorithms
-│   │   └── training_service.py       # Model training pipelines
-│   ├── 📁 data/                      # Data processing
-│   │   ├── preprocessing.py          # Data cleaning & transformation
-│   │   ├── feature_engineering.py    # Feature extraction
-│   │   └── validation.py             # Data validation
-│   └── 📁 utils/                     # AI utilities
-│       ├── model_utils.py            # Model management utilities
-│       ├── data_utils.py             # Data processing utilities
-│       └── monitoring.py             # Model performance monitoring
-├── 📁 notebooks/                     # Jupyter notebooks for research
-├── 📁 data/                          # Training & test datasets
-├── 📁 models/                        # Trained model artifacts
-├── 📄 requirements.txt               # Python dependencies
-├── 📄 Dockerfile                     # Container configuration
-└── 📄 pyproject.toml                 # Python project configuration
+├── 📁 src/ # Python AI service source
+│ ├── 📁 models/ # ML models & training
+│ │ ├── demand_forecasting.py # Demand prediction models
+│ │ ├── optimization.py # Route & storage optimization
+│ │ ├── anomaly_detection.py # Quality control ML
+│ │ └── recommendation.py # Intelligent recommendations
+│ ├── 📁 api/ # FastAPI endpoints
+│ │ ├── main.py # FastAPI app configuration
+│ │ ├── routes/ # API route handlers
+│ │ └── dependencies.py # Dependency injection
+│ ├── 📁 services/ # AI business logic
+│ │ ├── prediction_service.py # Prediction orchestration
+│ │ ├── optimization_service.py # Optimization algorithms
+│ │ └── training_service.py # Model training pipelines
+│ ├── 📁 data/ # Data processing
+│ │ ├── preprocessing.py # Data cleaning & transformation
+│ │ ├── feature_engineering.py # Feature extraction
+│ │ └── validation.py # Data validation
+│ └── 📁 utils/ # AI utilities
+│ ├── model_utils.py # Model management utilities
+│ ├── data_utils.py # Data processing utilities
+│ └── monitoring.py # Model performance monitoring
+├── 📁 notebooks/ # Jupyter notebooks for research
+├── 📁 data/ # Training & test datasets
+├── 📁 models/ # Trained model artifacts
+├── 📄 requirements.txt # Python dependencies
+├── 📄 Dockerfile # Container configuration
+└── 📄 pyproject.toml # Python project configuration
+
 ```
 
 ### 1.3 Shared Packages Architecture
 
 #### 1.3.1 UI Component Library (`packages/ui/`)
 ```
+
 packages/ui/
-├── 📁 src/                           # Component source code
-│   ├── 📁 components/                # Reusable UI components
-│   │   ├── Button/                   # Smart button component
-│   │   ├── Input/                    # Enhanced input fields
-│   │   ├── Modal/                    # Responsive modal system
-│   │   ├── DataTable/                # Advanced data tables
-│   │   ├── Charts/                   # Data visualization
-│   │   ├── Scanner/                  # Barcode scanner component
-│   │   └── AIInsights/               # AI-powered insights widget
-│   ├── 📁 layouts/                   # Layout components
-│   │   ├── AppLayout/                # Main application layout
-│   │   ├── AuthLayout/               # Authentication layout
-│   │   └── DashboardLayout/          # Dashboard layout
-│   ├── 📁 themes/                    # Multi-tenant theming
-│   │   ├── base.theme.ts             # Base theme configuration
-│   │   ├── corporate.theme.ts        # Corporate theme variants
-│   │   └── tenant.theme.ts           # Tenant-specific themes
-│   ├── 📁 hooks/                     # UI-specific hooks
-│   │   ├── useTheme.ts               # Theme management
-│   │   ├── useBreakpoint.ts          # Responsive breakpoints
-│   │   └── useAnimation.ts           # Animation utilities
-│   └── 📁 utils/                     # UI utilities
-│       ├── styles.ts                 # Style utilities
-│       ├── animations.ts             # Animation configurations
-│       └── accessibility.ts          # A11y utilities
-├── 📁 stories/                       # Storybook stories
-├── 📄 package.json                   # UI package dependencies
-├── 📄 tsconfig.json                  # TypeScript configuration
-└── 📄 .storybook/                    # Storybook configuration
+├── 📁 src/ # Component source code
+│ ├── 📁 components/ # Reusable UI components
+│ │ ├── Button/ # Smart button component
+│ │ ├── Input/ # Enhanced input fields
+│ │ ├── Modal/ # Responsive modal system
+│ │ ├── DataTable/ # Advanced data tables
+│ │ ├── Charts/ # Data visualization
+│ │ ├── Scanner/ # Barcode scanner component
+│ │ └── AIInsights/ # AI-powered insights widget
+│ ├── 📁 layouts/ # Layout components
+│ │ ├── AppLayout/ # Main application layout
+│ │ ├── AuthLayout/ # Authentication layout
+│ │ └── DashboardLayout/ # Dashboard layout
+│ ├── 📁 themes/ # Multi-tenant theming
+│ │ ├── base.theme.ts # Base theme configuration
+│ │ ├── corporate.theme.ts # Corporate theme variants
+│ │ └── tenant.theme.ts # Tenant-specific themes
+│ ├── 📁 hooks/ # UI-specific hooks
+│ │ ├── useTheme.ts # Theme management
+│ │ ├── useBreakpoint.ts # Responsive breakpoints
+│ │ └── useAnimation.ts # Animation utilities
+│ └── 📁 utils/ # UI utilities
+│ ├── styles.ts # Style utilities
+│ ├── animations.ts # Animation configurations
+│ └── accessibility.ts # A11y utilities
+├── 📁 stories/ # Storybook stories
+├── 📄 package.json # UI package dependencies
+├── 📄 tsconfig.json # TypeScript configuration
+└── 📄 .storybook/ # Storybook configuration
+
 ```
 
 #### 1.3.2 Database Package (`packages/database/`)
 ```
+
 packages/database/
-├── 📁 prisma/                        # Prisma ORM configuration
-│   ├── 📁 migrations/                # Database migrations
-│   ├── 📄 schema.prisma              # Database schema definition
-│   └── 📄 seed.ts                    # Database seeding script
-├── 📁 src/                           # Database utilities
-│   ├── 📁 models/                    # Prisma model exports
-│   ├── 📁 queries/                   # Complex query builders
-│   ├── 📁 transactions/              # Transaction helpers
-│   ├── 📁 migrations/                # Migration utilities
-│   └── 📁 seeders/                   # Data seeding utilities
-├── 📁 scripts/                       # Database scripts
-│   ├── backup.ts                     # Database backup utilities
-│   ├── restore.ts                    # Database restore utilities
-│   └── analytics.ts                  # Database analytics
-├── 📄 package.json                   # Database package dependencies
-└── 📄 tsconfig.json                  # TypeScript configuration
+├── 📁 prisma/ # Prisma ORM configuration
+│ ├── 📁 migrations/ # Database migrations
+│ ├── 📄 schema.prisma # Database schema definition
+│ └── 📄 seed.ts # Database seeding script
+├── 📁 src/ # Database utilities
+│ ├── 📁 models/ # Prisma model exports
+│ ├── 📁 queries/ # Complex query builders
+│ ├── 📁 transactions/ # Transaction helpers
+│ ├── 📁 migrations/ # Migration utilities
+│ └── 📁 seeders/ # Data seeding utilities
+├── 📁 scripts/ # Database scripts
+│ ├── backup.ts # Database backup utilities
+│ ├── restore.ts # Database restore utilities
+│ └── analytics.ts # Database analytics
+├── 📄 package.json # Database package dependencies
+└── 📄 tsconfig.json # TypeScript configuration
+
 ```
 
 #### 1.3.3 Integration Package (`packages/integrations/`)
 ```
+
 packages/integrations/
-├── 📁 src/                           # Integration source code
-│   ├── 📁 erp/                       # ERP system integrations
-│   │   ├── oracle/                   # Oracle ERP integration
-│   │   ├── sap/                      # SAP integration
-│   │   ├── netsuite/                 # NetSuite integration
-│   │   └── dynamics/                 # Microsoft Dynamics integration
-│   ├── 📁 shipping/                  # Shipping & logistics
-│   │   ├── dhl/                      # DHL API integration
-│   │   ├── fedex/                    # FedEx integration
-│   │   ├── ups/                      # UPS integration
-│   │   └── royal-mail/               # Royal Mail integration
-│   ├── 📁 payment/                   # Payment processing
-│   │   ├── stripe/                   # Stripe integration
-│   │   ├── paypal/                   # PayPal integration
-│   │   └── billing/                  # Subscription billing
-│   ├── 📁 ai/                        # AI/ML integrations
-│   │   ├── openai/                   # OpenAI GPT integration
-│   │   ├── aws-ml/                   # AWS ML services
-│   │   └── azure-ai/                 # Azure AI services
-│   └── 📁 printing/                  # Label printing integrations
-│       ├── printnode/                # PrintNode API
-│       ├── zebra/                    # Zebra printer integration
-│       └── templates/                # Label template engine
-├── 📄 package.json                   # Integration dependencies
-└── 📄 tsconfig.json                  # TypeScript configuration
+├── 📁 src/ # Integration source code
+│ ├── 📁 erp/ # ERP system integrations
+│ │ ├── oracle/ # Oracle ERP integration
+│ │ ├── sap/ # SAP integration
+│ │ ├── netsuite/ # NetSuite integration
+│ │ └── dynamics/ # Microsoft Dynamics integration
+│ ├── 📁 shipping/ # Shipping & logistics
+│ │ ├── dhl/ # DHL API integration
+│ │ ├── fedex/ # FedEx integration
+│ │ ├── ups/ # UPS integration
+│ │ └── royal-mail/ # Royal Mail integration
+│ ├── 📁 payment/ # Payment processing
+│ │ ├── stripe/ # Stripe integration
+│ │ ├── paypal/ # PayPal integration
+│ │ └── billing/ # Subscription billing
+│ ├── 📁 ai/ # AI/ML integrations
+│ │ ├── openai/ # OpenAI GPT integration
+│ │ ├── aws-ml/ # AWS ML services
+│ │ └── azure-ai/ # Azure AI services
+│ └── 📁 printing/ # Label printing integrations
+│ ├── printnode/ # PrintNode API
+│ ├── zebra/ # Zebra printer integration
+│ └── templates/ # Label template engine
+├── 📄 package.json # Integration dependencies
+└── 📄 tsconfig.json # TypeScript configuration
+
 ```
 
 ## 2. Enterprise Development Roadmap
@@ -321,6 +332,7 @@ packages/integrations/
 #### 2.1.1 Core Infrastructure Setup
 **Timeline: Month 1**
 ```
+
 Infrastructure Tasks:
 ├── 🏗️ Monorepo setup with Nx/Lerna
 ├── 🐳 Docker containerization
@@ -329,11 +341,13 @@ Infrastructure Tasks:
 ├── 📊 Monitoring & logging setup
 ├── 🔐 Security & authentication framework
 └── 📚 Development documentation
+
 ```
 
 #### 2.1.2 Core Platform Development
 **Timeline: Months 2-3**
 ```
+
 Core Features:
 ├── 👤 Multi-tenant authentication system
 ├── 🏭 Warehouse management foundation
@@ -342,11 +356,13 @@ Core Features:
 ├── 📱 Mobile app foundation
 ├── 🖨️ Basic label printing
 └── 📈 Real-time dashboard MVP
+
 ```
 
 #### 2.1.3 ERP Integration MVP
 **Timeline: Month 4**
 ```
+
 Integration MVP:
 ├── 🔌 Oracle ERP connector
 ├── 📊 Data synchronization engine
@@ -354,6 +370,7 @@ Integration MVP:
 ├── 📋 Order management basics
 ├── 🚨 Error handling & monitoring
 └── 📝 Integration documentation
+
 ```
 
 ### 2.2 Phase 2: AI Enhancement & Automation (Months 5-8)
@@ -361,6 +378,7 @@ Integration MVP:
 #### 2.2.1 AI/ML Infrastructure
 **Timeline: Month 5**
 ```
+
 AI Foundation:
 ├── 🤖 AI service architecture
 ├── 🧠 OpenAI GPT-4 integration
@@ -368,11 +386,13 @@ AI Foundation:
 ├── 🔍 Anomaly detection system
 ├── 📊 Data pipeline for ML
 └── 🎯 Recommendation engine
+
 ```
 
 #### 2.2.2 Intelligent Automation
 **Timeline: Months 6-7**
 ```
+
 Smart Features:
 ├── 🤖 Automated stock suggestions
 ├── 📈 Demand forecasting
@@ -380,11 +400,13 @@ Smart Features:
 ├── ⚡ Smart workflow automation
 ├── 🔍 Quality control automation
 └── 📊 Predictive maintenance
+
 ```
 
 #### 2.2.3 Advanced Analytics
 **Timeline: Month 8**
 ```
+
 Analytics Platform:
 ├── 📊 Real-time analytics dashboard
 ├── 📈 Performance optimization insights
@@ -392,6 +414,7 @@ Analytics Platform:
 ├── 📋 Custom report builder
 ├── 🔍 Data exploration tools
 └── 📱 Mobile analytics app
+
 ```
 
 ### 2.3 Phase 3: Advanced Features & Scale (Months 9-12)
@@ -399,6 +422,7 @@ Analytics Platform:
 #### 2.3.1 Advanced Label Printing System
 **Timeline: Month 9**
 ```
+
 Printing Excellence:
 ├── 🖨️ Advanced template designer
 ├── 🎨 Drag-and-drop label builder
@@ -406,11 +430,13 @@ Printing Excellence:
 ├── 🔄 Print queue management
 ├── 📊 Printing analytics
 └── 🌍 Multi-language support
+
 ```
 
 #### 2.3.2 Enterprise Integrations
 **Timeline: Month 10**
 ```
+
 Integration Expansion:
 ├── 🔌 SAP integration
 ├── 💼 Microsoft Dynamics connector
@@ -418,11 +444,13 @@ Integration Expansion:
 ├── 📦 Shipping carrier APIs
 ├── 💳 Payment gateway integration
 └── 📧 Advanced notification system
+
 ```
 
 #### 2.3.3 Platform Optimization & Launch
 **Timeline: Months 11-12**
 ```
+
 Launch Preparation:
 ├── ⚡ Performance optimization
 ├── 🔒 Security hardening
@@ -431,6 +459,7 @@ Launch Preparation:
 ├── 🎓 User training materials
 ├── 🚀 Go-to-market strategy
 └── 🌍 International deployment
+
 ```
 
 ## 3. Technical Task Breakdown
@@ -439,6 +468,7 @@ Launch Preparation:
 
 #### 3.1.1 API Development
 ```
+
 API Tasks (Priority: High):
 ├── 📡 GraphQL schema design & implementation
 ├── 🔐 JWT authentication & authorization
@@ -450,10 +480,12 @@ API Tasks (Priority: High):
 ├── 🔄 Real-time WebSocket implementation
 ├── 📋 Webhook system for integrations
 └── 📈 Rate limiting & API security
+
 ```
 
 #### 3.1.2 Database Design
 ```
+
 Database Tasks (Priority: High):
 ├── 📊 Multi-tenant schema design
 ├── 🔄 Migration system setup
@@ -463,10 +495,12 @@ Database Tasks (Priority: High):
 ├── 💾 Backup & recovery system
 ├── 📊 Database monitoring
 └── 🧪 Test data management
+
 ```
 
 #### 3.1.3 Integration Development
 ```
+
 Integration Tasks (Priority: Medium):
 ├── 🔌 Oracle ERP API integration
 ├── 📊 Data transformation pipelines
@@ -476,12 +510,14 @@ Integration Tasks (Priority: Medium):
 ├── 🧪 Integration testing framework
 ├── 📚 Integration documentation
 └── 🔐 Secure credential management
+
 ```
 
 ### 3.2 Frontend Development Tasks
 
 #### 3.2.1 Web Application
 ```
+
 Web App Tasks (Priority: High):
 ├── 🎨 Design system implementation
 ├── 📱 Responsive layout system
@@ -493,10 +529,12 @@ Web App Tasks (Priority: High):
 ├── 🌐 Internationalization (i18n)
 ├── ♿ Accessibility compliance
 └── 🧪 Component testing suite
+
 ```
 
 #### 3.2.2 Mobile Application
 ```
+
 Mobile Tasks (Priority: Medium):
 ├── 📱 React Native app structure
 ├── 📷 Barcode scanning integration
@@ -507,12 +545,14 @@ Mobile Tasks (Priority: Medium):
 ├── 🔔 Push notifications
 ├── 🎨 Native UI components
 └── 🧪 Mobile testing framework
+
 ```
 
 ### 3.3 AI/ML Development Tasks
 
 #### 3.3.1 Machine Learning Pipeline
 ```
+
 ML Tasks (Priority: Medium):
 ├── 🤖 ML model architecture design
 ├── 📊 Data preprocessing pipelines
@@ -523,10 +563,12 @@ ML Tasks (Priority: Medium):
 ├── 📊 Model performance monitoring
 ├── 🔄 Continuous model improvement
 └── 🧪 ML testing & validation
+
 ```
 
 #### 3.3.2 AI Service Integration
 ```
+
 AI Integration Tasks (Priority: Low):
 ├── 🤖 OpenAI GPT-4 integration
 ├── 💬 Conversational AI interface
@@ -536,37 +578,41 @@ AI Integration Tasks (Priority: Low):
 ├── 🔍 Smart search capabilities
 ├── 📋 Automated report generation
 └── 🧠 Decision support system
+
 ```
 
 ## 4. Quality Assurance & Testing Strategy
 
 ### 4.1 Testing Pyramid
 ```
+
 Testing Strategy:
 ├── 🧪 Unit Tests (80% coverage target)
-│   ├── Component testing (React Testing Library)
-│   ├── Service layer testing (Jest)
-│   ├── Utility function testing
-│   └── Database query testing
+│ ├── Component testing (React Testing Library)
+│ ├── Service layer testing (Jest)
+│ ├── Utility function testing
+│ └── Database query testing
 ├── � Integration Tests (60% coverage target)
-│   ├── API endpoint testing
-│   ├── Database integration testing
-│   ├── ERP integration testing
-│   └── Third-party service testing
+│ ├── API endpoint testing
+│ ├── Database integration testing
+│ ├── ERP integration testing
+│ └── Third-party service testing
 ├── 🎭 End-to-End Tests (Critical paths)
-│   ├── User journey testing (Playwright)
-│   ├── Cross-browser testing
-│   ├── Mobile app testing (Detox)
-│   └── Performance testing
+│ ├── User journey testing (Playwright)
+│ ├── Cross-browser testing
+│ ├── Mobile app testing (Detox)
+│ └── Performance testing
 └── 📊 Performance Testing
-    ├── Load testing (Artillery/K6)
-    ├── Stress testing
-    ├── Database performance testing
-    └── API performance testing
+├── Load testing (Artillery/K6)
+├── Stress testing
+├── Database performance testing
+└── API performance testing
+
 ```
 
 ### 4.2 Quality Gates
 ```
+
 Quality Requirements:
 ├── ✅ Code coverage >80% for critical paths
 ├── ✅ Zero critical security vulnerabilities
@@ -576,12 +622,14 @@ Quality Requirements:
 ├── ✅ Mobile responsiveness
 ├── ✅ API documentation up-to-date
 └── ✅ Security testing passed
+
 ```
 
 ## 5. DevOps & Infrastructure Tasks
 
 ### 5.1 CI/CD Pipeline
 ```
+
 DevOps Tasks (Priority: High):
 ├── 🔄 GitHub Actions workflow setup
 ├── 🐳 Docker containerization
@@ -593,10 +641,12 @@ DevOps Tasks (Priority: High):
 ├── 💾 Backup & disaster recovery
 ├── 📋 Infrastructure documentation
 └── 🔐 Secrets management
+
 ```
 
 ### 5.2 Monitoring & Observability
 ```
+
 Monitoring Stack:
 ├── 📊 Application monitoring (Datadog/New Relic)
 ├── 📈 Infrastructure monitoring (CloudWatch)
@@ -606,42 +656,46 @@ Monitoring Stack:
 ├── 🔒 Security monitoring
 ├── 💰 Cost monitoring & optimization
 └── 📋 SLA monitoring
+
 ```
 
 ## 6. Team Organization & Responsibilities
 
 ### 6.1 Development Teams
 ```
+
 Team Structure:
 ├── 👥 Backend Team (3-4 developers)
-│   ├── API development
-│   ├── Database design
-│   ├── Integration development
-│   └── Performance optimization
+│ ├── API development
+│ ├── Database design
+│ ├── Integration development
+│ └── Performance optimization
 ├── 🎨 Frontend Team (3-4 developers)
-│   ├── Web application development
-│   ├── Mobile app development
-│   ├── UI/UX implementation
-│   └── Component library maintenance
+│ ├── Web application development
+│ ├── Mobile app development
+│ ├── UI/UX implementation
+│ └── Component library maintenance
 ├── 🤖 AI/ML Team (2-3 specialists)
-│   ├── Machine learning model development
-│   ├── Data science & analytics
-│   ├── AI service integration
-│   └── Model optimization
+│ ├── Machine learning model development
+│ ├── Data science & analytics
+│ ├── AI service integration
+│ └── Model optimization
 ├── ⚙️ DevOps Team (2 engineers)
-│   ├── Infrastructure management
-│   ├── CI/CD pipeline maintenance
-│   ├── Monitoring & alerting
-│   └── Security implementation
+│ ├── Infrastructure management
+│ ├── CI/CD pipeline maintenance
+│ ├── Monitoring & alerting
+│ └── Security implementation
 └── 🧪 QA Team (2-3 testers)
-    ├── Test automation development
-    ├── Manual testing & validation
-    ├── Performance testing
-    └── Security testing
+├── Test automation development
+├── Manual testing & validation
+├── Performance testing
+└── Security testing
+
 ```
 
 ### 6.2 Project Management
 ```
+
 Management Framework:
 ├── 📋 Agile/Scrum methodology
 ├── 📅 2-week sprint cycles
@@ -651,12 +705,14 @@ Management Framework:
 ├── 🔄 Sprint retrospectives
 ├── 📋 Quarterly planning sessions
 └── 📊 Performance metrics & KPIs
+
 ```
 
 ## 7. Documentation & Knowledge Management
 
 ### 7.1 Documentation Strategy
 ```
+
 Documentation Requirements:
 ├── 📚 Technical documentation (GitBook)
 ├── 📖 API documentation (GraphQL Playground)
@@ -667,10 +723,12 @@ Documentation Requirements:
 ├── 🔒 Security policies & procedures
 ├── 📊 Performance benchmarks
 └── 🧪 Testing documentation
+
 ```
 
 ### 7.2 Knowledge Sharing
 ```
+
 Knowledge Management:
 ├── 📝 Weekly tech talks & demos
 ├── 📚 Internal documentation wiki
@@ -679,6 +737,7 @@ Knowledge Management:
 ├── 🔄 Continuous learning programs
 ├── 📊 Best practices documentation
 └── 🤝 Cross-team collaboration sessions
+
 ```
 
 This comprehensive project structure and development roadmap provides a clear path for building LogiVox into a next-generation enterprise platform. The modular architecture, detailed task breakdown, and structured development phases ensure scalable growth while maintaining code quality and team productivity.
@@ -694,6 +753,7 @@ This comprehensive project structure and development roadmap provides a clear pa
 ```
 
 #### 1.2.2 API Server (`apps/api/`)
+
 ```
 apps/api/
 ├── 📁 src/                           # Source code
@@ -735,6 +795,7 @@ apps/api/
 ```
 
 #### 1.2.3 Mobile Application (`apps/mobile/`)
+
 ```
 apps/mobile/
 ├── 📁 src/                           # Source code
@@ -762,6 +823,7 @@ apps/mobile/
 ```
 
 #### 1.2.4 Shared Package (`packages/shared/`)
+
 ```
 packages/shared/
 ├── 📁 src/                           # Source code
@@ -775,6 +837,7 @@ packages/shared/
 ```
 
 #### 1.2.5 Database Package (`packages/database/`)
+
 ```
 packages/database/
 ├── 📁 prisma/                        # Prisma configuration
@@ -804,6 +867,7 @@ main                                  # Production-ready code
 ### 2.2 Development Environment Setup
 
 #### 2.2.1 Prerequisites
+
 ```bash
 # Required software
 Node.js >= 18.0.0
@@ -820,6 +884,7 @@ Xcode (for iOS)
 ```
 
 #### 2.2.2 Local Development Setup
+
 ```bash
 # 1. Clone repository
 git clone https://github.com/flowstock/flowstock.git
@@ -848,6 +913,7 @@ npm run dev
 ### 2.3 Testing Strategy Structure
 
 #### 2.3.1 Test Organization
+
 ```
 tests/
 ├── 📁 unit/                          # Unit tests
@@ -867,6 +933,7 @@ tests/
 ```
 
 #### 2.3.2 Test Commands
+
 ```bash
 # Run all tests
 npm test
@@ -892,6 +959,7 @@ npm run test:watch
 ### 3.1 Phase 1: Foundation & Core Infrastructure (Weeks 1-4)
 
 #### 3.1.1 Infrastructure Setup
+
 - [x] **Project Structure Creation**
   - [x] Monorepo setup with workspace configuration
   - [x] Package structure and dependencies
@@ -914,6 +982,7 @@ npm run test:watch
   - [x] Package build and distribution setup
 
 #### 3.1.2 Database Design & Setup
+
 - [ ] **Database Schema Implementation**
   - [ ] PostgreSQL database setup
   - [ ] Prisma schema definition
@@ -929,6 +998,7 @@ npm run test:watch
   - [ ] Audit logs and system tables
 
 #### 3.1.3 Authentication & Authorization
+
 - [ ] **JWT Authentication System**
   - [ ] User registration and login
   - [ ] Token generation and validation
@@ -946,6 +1016,7 @@ npm run test:watch
 ### 3.2 Phase 2: Core Inventory Management (Weeks 5-8)
 
 #### 3.2.1 Inventory Items Management
+
 - [ ] **Item Master Data**
   - [ ] Create/read/update/delete operations
   - [ ] SKU generation and validation
@@ -961,6 +1032,7 @@ npm run test:watch
   - [ ] Reorder point calculations
 
 #### 3.2.2 Stock Movement System
+
 - [ ] **Movement Types Implementation**
   - [ ] Inbound receipts processing
   - [ ] Outbound shipments tracking
@@ -976,6 +1048,7 @@ npm run test:watch
   - [ ] Movement audit trail
 
 #### 3.2.3 Web Interface Development
+
 - [ ] **React Web Application**
   - [ ] Dashboard with KPI widgets
   - [ ] Inventory item management screens
@@ -993,6 +1066,7 @@ npm run test:watch
 ### 3.3 Phase 3: Warehouse Operations (Weeks 9-12)
 
 #### 3.3.1 Warehouse Management
+
 - [ ] **Warehouse Setup**
   - [ ] Warehouse creation and configuration
   - [ ] Location hierarchy management
@@ -1008,6 +1082,7 @@ npm run test:watch
   - [ ] Location performance metrics
 
 #### 3.3.2 Transfer Operations
+
 - [ ] **Inter-Warehouse Transfers**
   - [ ] Transfer order creation
   - [ ] Approval workflow system
@@ -1023,6 +1098,7 @@ npm run test:watch
   - [ ] Movement performance tracking
 
 #### 3.3.3 Mobile Application Foundation
+
 - [ ] **React Native App Setup**
   - [ ] Navigation structure
   - [ ] Authentication screens
@@ -1033,6 +1109,7 @@ npm run test:watch
 ### 3.4 Phase 4: Mobile & Barcode Scanning (Weeks 13-16)
 
 #### 3.4.1 Barcode Scanning Implementation
+
 - [ ] **Scanner Integration**
   - [ ] Camera permission handling
   - [ ] 1D and 2D barcode support
@@ -1048,6 +1125,7 @@ npm run test:watch
   - [ ] Quick stock adjustments
 
 #### 3.4.2 Offline Capabilities
+
 - [ ] **Offline Data Management**
   - [ ] Local SQLite database
   - [ ] Data synchronization queue
@@ -1065,6 +1143,7 @@ npm run test:watch
 ### 3.5 Phase 5: Supplier & Purchase Orders (Weeks 17-20)
 
 #### 3.5.1 Supplier Management
+
 - [ ] **Supplier Portal**
   - [ ] Supplier registration system
   - [ ] Contact management
@@ -1080,6 +1159,7 @@ npm run test:watch
   - [ ] Delivery reliability
 
 #### 3.5.2 Purchase Order System
+
 - [ ] **PO Creation & Management**
   - [ ] Manual PO creation
   - [ ] Automated PO generation
@@ -1097,6 +1177,7 @@ npm run test:watch
 ### 3.6 Phase 6: ERP Integration Framework (Weeks 21-24)
 
 #### 3.6.1 Integration Architecture
+
 - [ ] **Integration Service**
   - [ ] Microservice architecture
   - [ ] Data transformation engine
@@ -1112,6 +1193,7 @@ npm run test:watch
   - [ ] Error log management
 
 #### 3.6.2 ERP Connectors
+
 - [ ] **SAP Integration**
   - [ ] RFC/BAPI connection setup
   - [ ] Master data synchronization
@@ -1143,6 +1225,7 @@ npm run test:watch
 ### 3.7 Phase 7: Analytics & Reporting (Weeks 25-28)
 
 #### 3.7.1 Dashboard & KPIs
+
 - [ ] **Executive Dashboard**
   - [ ] Key performance indicators
   - [ ] Real-time metrics
@@ -1158,6 +1241,7 @@ npm run test:watch
   - [ ] User activity monitoring
 
 #### 3.7.2 Reporting Engine
+
 - [ ] **Standard Reports**
   - [ ] Inventory valuation
   - [ ] Stock movement history
@@ -1175,6 +1259,7 @@ npm run test:watch
 ### 3.8 Phase 8: Advanced Features (Weeks 29-32)
 
 #### 3.8.1 Advanced Analytics
+
 - [ ] **Predictive Analytics**
   - [ ] Demand forecasting
   - [ ] Reorder optimization
@@ -1190,6 +1275,7 @@ npm run test:watch
   - [ ] Space optimization
 
 #### 3.8.2 Enterprise Features
+
 - [ ] **Multi-Currency Support**
   - [ ] Currency conversion
   - [ ] Exchange rate management
@@ -1207,6 +1293,7 @@ npm run test:watch
 ### 3.9 Phase 9: Performance & Scalability (Weeks 33-36)
 
 #### 3.9.1 Performance Optimization
+
 - [ ] **Database Optimization**
   - [ ] Query optimization
   - [ ] Index tuning
@@ -1222,6 +1309,7 @@ npm run test:watch
   - [ ] Service worker setup
 
 #### 3.9.2 Scalability Improvements
+
 - [ ] **Auto-scaling Setup**
   - [ ] Kubernetes cluster
   - [ ] Horizontal pod autoscaling
@@ -1239,6 +1327,7 @@ npm run test:watch
 ### 3.10 Phase 10: Production Deployment (Weeks 37-40)
 
 #### 3.10.1 Production Infrastructure
+
 - [ ] **AWS Infrastructure Setup**
   - [ ] EKS cluster configuration
   - [ ] RDS database setup
@@ -1254,6 +1343,7 @@ npm run test:watch
   - [ ] Disaster recovery plan
 
 #### 3.10.2 Launch Preparation
+
 - [ ] **Testing & QA**
   - [ ] Load testing
   - [ ] Security testing
@@ -1273,6 +1363,7 @@ npm run test:watch
 ### 4.1 Team Structure
 
 #### 4.1.1 Development Team
+
 ```
 Frontend Team (2 developers)
 ├── React Web Application
@@ -1296,6 +1387,7 @@ QA Team (1 tester)
 ```
 
 #### 4.1.2 Milestone Schedule
+
 ```
 Phase 1: Foundation          (Weeks 1-4)   [COMPLETED]
 Phase 2: Core Inventory      (Weeks 5-8)   [IN PROGRESS]
@@ -1312,12 +1404,14 @@ Phase 10: Production Launch  (Weeks 37-40) [PLANNED]
 ### 4.2 Risk Management
 
 #### 4.2.1 Technical Risks
+
 - **ERP Integration Complexity**: Phased approach with extensive testing
 - **Mobile Performance**: Early prototyping and optimization
 - **Database Scalability**: Design for scale from the beginning
 - **Real-time Synchronization**: Robust conflict resolution strategies
 
 #### 4.2.2 Mitigation Strategies
+
 - Regular code reviews and pair programming
 - Comprehensive testing at every phase
 - Continuous integration and deployment

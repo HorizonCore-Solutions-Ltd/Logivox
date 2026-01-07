@@ -1,9 +1,9 @@
 /**
  * Vehicle Types Library for Load Optimization
- * 
+ *
  * Simple library of vehicle dimensions and capacities used by LoadOptimizationService
  * to determine which vehicle size best fits a set of orders.
- * 
+ *
  * NO fleet management, tracking, insurance, or compliance features.
  * JUST dimensions and capacity for load planning.
  */
@@ -11,33 +11,33 @@
 export interface VehicleType {
   id: string;
   name: string;
-  region: 'UK' | 'EU' | 'US' | 'ASIA' | 'GLOBAL';
-  category: 'VAN' | 'TRUCK' | 'TRAILER' | 'CONTAINER';
-  
+  region: "UK" | "EU" | "US" | "ASIA" | "GLOBAL";
+  category: "VAN" | "TRUCK" | "TRAILER" | "CONTAINER";
+
   // Dimensions (inches)
   dimensions: {
     lengthInches: number;
     widthInches: number;
     heightInches: number;
-    usableLengthInches?: number;  // Accounts for wheel wells, cab, etc.
+    usableLengthInches?: number; // Accounts for wheel wells, cab, etc.
     usableWidthInches?: number;
     usableHeightInches?: number;
   };
-  
+
   // Capacity
   maxWeightLbs: number;
   volumeCubicFeet: number;
   palletCapacity: number;
-  
+
   // Features that affect loading
   features?: {
     hasLiftGate?: boolean;
     hasSideLoading?: boolean;
     hasTemperatureControl?: boolean;
-    tempRangeMin?: number;  // Fahrenheit
+    tempRangeMin?: number; // Fahrenheit
     tempRangeMax?: number;
   };
-  
+
   // Cost estimate for recommendations
   estimatedCostPerMile?: number;
 }
@@ -47,14 +47,13 @@ export interface VehicleType {
 // ============================================================================
 
 export const VEHICLE_TYPES: Record<string, VehicleType> = {
-  
   // ===== UK VEHICLES =====
-  
-  'UK_ARTIC_53': {
-    id: 'UK_ARTIC_53',
-    name: '53ft Articulated Lorry (UK)',
-    region: 'UK',
-    category: 'TRAILER',
+
+  UK_ARTIC_53: {
+    id: "UK_ARTIC_53",
+    name: "53ft Articulated Lorry (UK)",
+    region: "UK",
+    category: "TRAILER",
     dimensions: {
       lengthInches: 636,
       widthInches: 102,
@@ -68,12 +67,12 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     palletCapacity: 26,
     estimatedCostPerMile: 1.85,
   },
-  
-  'UK_RIGID_7.5T': {
-    id: 'UK_RIGID_7.5T',
-    name: '7.5 Tonne Box Truck (UK)',
-    region: 'UK',
-    category: 'TRUCK',
+
+  "UK_RIGID_7.5T": {
+    id: "UK_RIGID_7.5T",
+    name: "7.5 Tonne Box Truck (UK)",
+    region: "UK",
+    category: "TRUCK",
     dimensions: {
       lengthInches: 240,
       widthInches: 96,
@@ -90,12 +89,12 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     },
     estimatedCostPerMile: 1.25,
   },
-  
-  'UK_LUTON_VAN': {
-    id: 'UK_LUTON_VAN',
-    name: 'Luton Van 3.5T (UK)',
-    region: 'UK',
-    category: 'VAN',
+
+  UK_LUTON_VAN: {
+    id: "UK_LUTON_VAN",
+    name: "Luton Van 3.5T (UK)",
+    region: "UK",
+    category: "VAN",
     dimensions: {
       lengthInches: 168,
       widthInches: 84,
@@ -112,12 +111,12 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     },
     estimatedCostPerMile: 0.95,
   },
-  
-  'UK_TRANSIT_LWB': {
-    id: 'UK_TRANSIT_LWB',
-    name: 'Ford Transit LWB (UK)',
-    region: 'UK',
-    category: 'VAN',
+
+  UK_TRANSIT_LWB: {
+    id: "UK_TRANSIT_LWB",
+    name: "Ford Transit LWB (UK)",
+    region: "UK",
+    category: "VAN",
     dimensions: {
       lengthInches: 157,
       widthInches: 70,
@@ -131,12 +130,12 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     palletCapacity: 4,
     estimatedCostPerMile: 0.89,
   },
-  
-  'UK_SPRINTER_LWB': {
-    id: 'UK_SPRINTER_LWB',
-    name: 'Mercedes Sprinter LWB (UK)',
-    region: 'UK',
-    category: 'VAN',
+
+  UK_SPRINTER_LWB: {
+    id: "UK_SPRINTER_LWB",
+    name: "Mercedes Sprinter LWB (UK)",
+    region: "UK",
+    category: "VAN",
     dimensions: {
       lengthInches: 170,
       widthInches: 70,
@@ -150,14 +149,14 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     palletCapacity: 4,
     estimatedCostPerMile: 0.92,
   },
-  
+
   // ===== US VEHICLES =====
-  
-  'US_53FT_TRAILER': {
-    id: 'US_53FT_TRAILER',
-    name: '53ft Dry Van Trailer (US)',
-    region: 'US',
-    category: 'TRAILER',
+
+  US_53FT_TRAILER: {
+    id: "US_53FT_TRAILER",
+    name: "53ft Dry Van Trailer (US)",
+    region: "US",
+    category: "TRAILER",
     dimensions: {
       lengthInches: 636,
       widthInches: 102,
@@ -171,12 +170,12 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     palletCapacity: 26,
     estimatedCostPerMile: 1.75,
   },
-  
-  'US_26FT_BOX': {
-    id: 'US_26FT_BOX',
-    name: '26ft Box Truck (US)',
-    region: 'US',
-    category: 'TRUCK',
+
+  US_26FT_BOX: {
+    id: "US_26FT_BOX",
+    name: "26ft Box Truck (US)",
+    region: "US",
+    category: "TRUCK",
     dimensions: {
       lengthInches: 312,
       widthInches: 102,
@@ -191,14 +190,14 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     features: {
       hasLiftGate: true,
     },
-    estimatedCostPerMile: 1.50,
+    estimatedCostPerMile: 1.5,
   },
-  
-  'US_16FT_BOX': {
-    id: 'US_16FT_BOX',
-    name: '16ft Box Truck (US)',
-    region: 'US',
-    category: 'TRUCK',
+
+  US_16FT_BOX: {
+    id: "US_16FT_BOX",
+    name: "16ft Box Truck (US)",
+    region: "US",
+    category: "TRUCK",
     dimensions: {
       lengthInches: 192,
       widthInches: 96,
@@ -210,14 +209,14 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     maxWeightLbs: 12500,
     volumeCubicFeet: 800,
     palletCapacity: 6,
-    estimatedCostPerMile: 1.10,
+    estimatedCostPerMile: 1.1,
   },
-  
-  'US_CARGO_VAN': {
-    id: 'US_CARGO_VAN',
-    name: 'Cargo Van (US)',
-    region: 'US',
-    category: 'VAN',
+
+  US_CARGO_VAN: {
+    id: "US_CARGO_VAN",
+    name: "Cargo Van (US)",
+    region: "US",
+    category: "VAN",
     dimensions: {
       lengthInches: 144,
       widthInches: 56,
@@ -231,33 +230,33 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     palletCapacity: 2,
     estimatedCostPerMile: 0.75,
   },
-  
+
   // ===== EU VEHICLES =====
-  
-  'EU_13.6M_TRAILER': {
-    id: 'EU_13.6M_TRAILER',
-    name: '13.6m Mega Trailer (EU)',
-    region: 'EU',
-    category: 'TRAILER',
+
+  "EU_13.6M_TRAILER": {
+    id: "EU_13.6M_TRAILER",
+    name: "13.6m Mega Trailer (EU)",
+    region: "EU",
+    category: "TRAILER",
     dimensions: {
-      lengthInches: 535,  // 13.6 meters
+      lengthInches: 535, // 13.6 meters
       widthInches: 96,
-      heightInches: 118,  // Mega trailer height
+      heightInches: 118, // Mega trailer height
       usableLengthInches: 525,
       usableWidthInches: 93,
       usableHeightInches: 115,
     },
-    maxWeightLbs: 55116,  // 25 tonnes
+    maxWeightLbs: 55116, // 25 tonnes
     volumeCubicFeet: 3400,
     palletCapacity: 33,
-    estimatedCostPerMile: 1.80,
+    estimatedCostPerMile: 1.8,
   },
-  
-  'EU_7.5T_TRUCK': {
-    id: 'EU_7.5T_TRUCK',
-    name: '7.5 Tonne Truck (EU)',
-    region: 'EU',
-    category: 'TRUCK',
+
+  "EU_7.5T_TRUCK": {
+    id: "EU_7.5T_TRUCK",
+    name: "7.5 Tonne Truck (EU)",
+    region: "EU",
+    category: "TRUCK",
     dimensions: {
       lengthInches: 240,
       widthInches: 96,
@@ -269,14 +268,14 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     maxWeightLbs: 16535,
     volumeCubicFeet: 1400,
     palletCapacity: 9,
-    estimatedCostPerMile: 1.20,
+    estimatedCostPerMile: 1.2,
   },
-  
-  'EU_3.5T_VAN': {
-    id: 'EU_3.5T_VAN',
-    name: '3.5 Tonne Panel Van (EU)',
-    region: 'EU',
-    category: 'VAN',
+
+  "EU_3.5T_VAN": {
+    id: "EU_3.5T_VAN",
+    name: "3.5 Tonne Panel Van (EU)",
+    region: "EU",
+    category: "VAN",
     dimensions: {
       lengthInches: 165,
       widthInches: 70,
@@ -290,52 +289,52 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     palletCapacity: 4,
     estimatedCostPerMile: 0.85,
   },
-  
+
   // ===== ASIA VEHICLES =====
-  
-  'ASIA_20FT_CONTAINER': {
-    id: 'ASIA_20FT_CONTAINER',
-    name: '20ft Container (Asia)',
-    region: 'ASIA',
-    category: 'CONTAINER',
+
+  ASIA_20FT_CONTAINER: {
+    id: "ASIA_20FT_CONTAINER",
+    name: "20ft Container (Asia)",
+    region: "ASIA",
+    category: "CONTAINER",
     dimensions: {
-      lengthInches: 234,  // 19'10" internal
+      lengthInches: 234, // 19'10" internal
       widthInches: 92,
       heightInches: 94,
       usableLengthInches: 230,
       usableWidthInches: 90,
       usableHeightInches: 92,
     },
-    maxWeightLbs: 55126,  // 25 tonnes max
+    maxWeightLbs: 55126, // 25 tonnes max
     volumeCubicFeet: 1165,
     palletCapacity: 10,
-    estimatedCostPerMile: 1.40,
+    estimatedCostPerMile: 1.4,
   },
-  
-  'ASIA_40FT_CONTAINER': {
-    id: 'ASIA_40FT_CONTAINER',
-    name: '40ft Container (Asia)',
-    region: 'ASIA',
-    category: 'CONTAINER',
+
+  ASIA_40FT_CONTAINER: {
+    id: "ASIA_40FT_CONTAINER",
+    name: "40ft Container (Asia)",
+    region: "ASIA",
+    category: "CONTAINER",
     dimensions: {
-      lengthInches: 472,  // 39'5" internal
+      lengthInches: 472, // 39'5" internal
       widthInches: 92,
       heightInches: 94,
       usableLengthInches: 468,
       usableWidthInches: 90,
       usableHeightInches: 92,
     },
-    maxWeightLbs: 67200,  // 30 tonnes max
+    maxWeightLbs: 67200, // 30 tonnes max
     volumeCubicFeet: 2350,
     palletCapacity: 20,
-    estimatedCostPerMile: 1.60,
+    estimatedCostPerMile: 1.6,
   },
-  
-  'ASIA_LIGHT_TRUCK': {
-    id: 'ASIA_LIGHT_TRUCK',
-    name: 'Light Truck 3T (Asia)',
-    region: 'ASIA',
-    category: 'TRUCK',
+
+  ASIA_LIGHT_TRUCK: {
+    id: "ASIA_LIGHT_TRUCK",
+    name: "Light Truck 3T (Asia)",
+    region: "ASIA",
+    category: "TRUCK",
     dimensions: {
       lengthInches: 180,
       widthInches: 72,
@@ -347,20 +346,20 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     maxWeightLbs: 6614,
     volumeCubicFeet: 480,
     palletCapacity: 4,
-    estimatedCostPerMile: 0.70,
+    estimatedCostPerMile: 0.7,
   },
-  
+
   // ===== REFRIGERATED VEHICLES =====
-  
-  'REEFER_TRAILER_53': {
-    id: 'REEFER_TRAILER_53',
-    name: '53ft Refrigerated Trailer',
-    region: 'GLOBAL',
-    category: 'TRAILER',
+
+  REEFER_TRAILER_53: {
+    id: "REEFER_TRAILER_53",
+    name: "53ft Refrigerated Trailer",
+    region: "GLOBAL",
+    category: "TRAILER",
     dimensions: {
       lengthInches: 620,
       widthInches: 98,
-      heightInches: 104,  // Slightly less due to insulation
+      heightInches: 104, // Slightly less due to insulation
       usableLengthInches: 610,
       usableWidthInches: 94,
       usableHeightInches: 100,
@@ -375,12 +374,12 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
     },
     estimatedCostPerMile: 2.25,
   },
-  
-  'REEFER_VAN': {
-    id: 'REEFER_VAN',
-    name: 'Refrigerated Van',
-    region: 'GLOBAL',
-    category: 'VAN',
+
+  REEFER_VAN: {
+    id: "REEFER_VAN",
+    name: "Refrigerated Van",
+    region: "GLOBAL",
+    category: "VAN",
     dimensions: {
       lengthInches: 150,
       widthInches: 64,
@@ -408,15 +407,21 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
 /**
  * Get all vehicle types for a specific region
  */
-export function getVehicleTypesByRegion(region: VehicleType['region']): VehicleType[] {
-  return Object.values(VEHICLE_TYPES).filter(v => v.region === region || v.region === 'GLOBAL');
+export function getVehicleTypesByRegion(
+  region: VehicleType["region"],
+): VehicleType[] {
+  return Object.values(VEHICLE_TYPES).filter(
+    (v) => v.region === region || v.region === "GLOBAL",
+  );
 }
 
 /**
  * Get all vehicle types by category
  */
-export function getVehicleTypesByCategory(category: VehicleType['category']): VehicleType[] {
-  return Object.values(VEHICLE_TYPES).filter(v => v.category === category);
+export function getVehicleTypesByCategory(
+  category: VehicleType["category"],
+): VehicleType[] {
+  return Object.values(VEHICLE_TYPES).filter((v) => v.category === category);
 }
 
 /**
@@ -434,27 +439,30 @@ export function findSuitableVehicles(params: {
   totalWeightLbs: number;
   palletCount?: number;
   requiresTemperatureControl?: boolean;
-  region?: VehicleType['region'];
+  region?: VehicleType["region"];
 }): VehicleType[] {
   let vehicles = Object.values(VEHICLE_TYPES);
-  
+
   // Filter by region if specified
   if (params.region) {
-    vehicles = vehicles.filter(v => v.region === params.region || v.region === 'GLOBAL');
+    vehicles = vehicles.filter(
+      (v) => v.region === params.region || v.region === "GLOBAL",
+    );
   }
-  
+
   // Filter by temperature control if required
   if (params.requiresTemperatureControl) {
-    vehicles = vehicles.filter(v => v.features?.hasTemperatureControl);
+    vehicles = vehicles.filter((v) => v.features?.hasTemperatureControl);
   }
-  
+
   // Filter by capacity
-  vehicles = vehicles.filter(v => 
-    v.volumeCubicFeet >= params.totalVolumeCubicFeet &&
-    v.maxWeightLbs >= params.totalWeightLbs &&
-    (!params.palletCount || v.palletCapacity >= params.palletCount)
+  vehicles = vehicles.filter(
+    (v) =>
+      v.volumeCubicFeet >= params.totalVolumeCubicFeet &&
+      v.maxWeightLbs >= params.totalWeightLbs &&
+      (!params.palletCount || v.palletCapacity >= params.palletCount),
   );
-  
+
   // Sort by volume (smallest suitable vehicle first for cost efficiency)
   return vehicles.sort((a, b) => a.volumeCubicFeet - b.volumeCubicFeet);
 }
@@ -468,21 +476,22 @@ export function recommendVehicle(params: {
   totalWeightLbs: number;
   palletCount?: number;
   requiresTemperatureControl?: boolean;
-  region?: VehicleType['region'];
-  prioritize?: 'cost' | 'utilization' | 'capacity';
+  region?: VehicleType["region"];
+  prioritize?: "cost" | "utilization" | "capacity";
 }): VehicleType | null {
   const suitable = findSuitableVehicles(params);
-  
+
   if (suitable.length === 0) return null;
-  
-  if (params.prioritize === 'cost') {
+
+  if (params.prioritize === "cost") {
     // Cheapest suitable vehicle
-    return suitable.sort((a, b) => 
-      (a.estimatedCostPerMile || 999) - (b.estimatedCostPerMile || 999)
+    return suitable.sort(
+      (a, b) =>
+        (a.estimatedCostPerMile || 999) - (b.estimatedCostPerMile || 999),
     )[0];
   }
-  
-  if (params.prioritize === 'utilization') {
+
+  if (params.prioritize === "utilization") {
     // Best utilization (closest fit)
     return suitable.sort((a, b) => {
       const aUtil = params.totalVolumeCubicFeet / a.volumeCubicFeet;
@@ -490,7 +499,7 @@ export function recommendVehicle(params: {
       return Math.abs(bUtil - 0.85) - Math.abs(aUtil - 0.85); // Target 85% utilization
     })[0];
   }
-  
+
   // Default: smallest suitable vehicle (cost efficiency)
   return suitable[0];
 }

@@ -3,23 +3,23 @@
  * Create and manage worker interventions
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 // GET - List interventions
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const sessionId = searchParams.get('sessionId');
-    const workerId = searchParams.get('workerId');
-    const interventionType = searchParams.get('interventionType');
-    const severity = searchParams.get('severity');
+    const sessionId = searchParams.get("sessionId");
+    const workerId = searchParams.get("workerId");
+    const interventionType = searchParams.get("interventionType");
+    const severity = searchParams.get("severity");
 
     const where: any = {};
 
@@ -56,7 +56,7 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
       take: 100,
     });
 
@@ -65,10 +65,10 @@ export async function GET(req: NextRequest) {
       total: interventions.length,
     });
   } catch (error) {
-    console.error('AI Intervention GET error:', error);
+    console.error("AI Intervention GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch interventions' },
-      { status: 500 }
+      { error: "Failed to fetch interventions" },
+      { status: 500 },
     );
   }
 }
@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -93,8 +93,8 @@ export async function POST(req: NextRequest) {
 
     if (!sessionId || !interventionType || !severity) {
       return NextResponse.json(
-        { error: 'Session ID, intervention type, and severity are required' },
-        { status: 400 }
+        { error: "Session ID, intervention type, and severity are required" },
+        { status: 400 },
       );
     }
 
@@ -107,7 +107,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!aiSession) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
     // Create intervention
@@ -140,7 +140,7 @@ export async function POST(req: NextRequest) {
       where: { id: sessionId },
       data: {
         warningsIssued: {
-          increment: severity === 'HIGH' || severity === 'CRITICAL' ? 1 : 0,
+          increment: severity === "HIGH" || severity === "CRITICAL" ? 1 : 0,
         },
       },
     });
@@ -151,13 +151,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       intervention,
-      message: 'Intervention created successfully',
+      message: "Intervention created successfully",
     });
   } catch (error) {
-    console.error('AI Intervention POST error:', error);
+    console.error("AI Intervention POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to create intervention' },
-      { status: 500 }
+      { error: "Failed to create intervention" },
+      { status: 500 },
     );
   }
 }
@@ -167,7 +167,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -175,8 +175,8 @@ export async function PATCH(req: NextRequest) {
 
     if (!interventionId) {
       return NextResponse.json(
-        { error: 'Intervention ID is required' },
-        { status: 400 }
+        { error: "Intervention ID is required" },
+        { status: 400 },
       );
     }
 
@@ -186,14 +186,14 @@ export async function PATCH(req: NextRequest) {
 
     if (!intervention) {
       return NextResponse.json(
-        { error: 'Intervention not found' },
-        { status: 404 }
+        { error: "Intervention not found" },
+        { status: 404 },
       );
     }
 
     let updatedIntervention;
 
-    if (action === 'acknowledge') {
+    if (action === "acknowledge") {
       updatedIntervention = await prisma.aIIntervention.update({
         where: { id: interventionId },
         data: {
@@ -201,7 +201,7 @@ export async function PATCH(req: NextRequest) {
           acknowledgedAt: new Date(),
         },
       });
-    } else if (action === 'resolve') {
+    } else if (action === "resolve") {
       updatedIntervention = await prisma.aIIntervention.update({
         where: { id: interventionId },
         data: {
@@ -211,7 +211,7 @@ export async function PATCH(req: NextRequest) {
         },
       });
     } else {
-      return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
     return NextResponse.json({
@@ -219,10 +219,10 @@ export async function PATCH(req: NextRequest) {
       intervention: updatedIntervention,
     });
   } catch (error) {
-    console.error('AI Intervention PATCH error:', error);
+    console.error("AI Intervention PATCH error:", error);
     return NextResponse.json(
-      { error: 'Failed to update intervention' },
-      { status: 500 }
+      { error: "Failed to update intervention" },
+      { status: 500 },
     );
   }
 }

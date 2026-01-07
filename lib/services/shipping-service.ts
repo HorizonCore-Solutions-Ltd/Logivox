@@ -5,7 +5,12 @@
  * multi-carrier integration, and shipping analytics
  */
 
-import { PrismaClient, ShipmentStatus, CarrierType, Prisma } from '@prisma/client';
+import {
+  PrismaClient,
+  ShipmentStatus,
+  CarrierType,
+  Prisma,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -162,9 +167,11 @@ export class ShippingService {
   /**
    * Generate unique shipment number
    */
-  private async generateShipmentNumber(organizationId: string): Promise<string> {
+  private async generateShipmentNumber(
+    organizationId: string,
+  ): Promise<string> {
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+    const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
 
     const lastShipment = await prisma.shipment.findFirst({
       where: {
@@ -174,17 +181,17 @@ export class ShippingService {
         },
       },
       orderBy: {
-        shipmentNumber: 'desc',
+        shipmentNumber: "desc",
       },
     });
 
     let sequence = 1;
     if (lastShipment) {
-      const lastSequence = parseInt(lastShipment.shipmentNumber.split('-')[2]);
+      const lastSequence = parseInt(lastShipment.shipmentNumber.split("-")[2]);
       sequence = lastSequence + 1;
     }
 
-    return `SHIP-${dateStr}-${sequence.toString().padStart(3, '0')}`;
+    return `SHIP-${dateStr}-${sequence.toString().padStart(3, "0")}`;
   }
 
   /**
@@ -192,7 +199,7 @@ export class ShippingService {
    */
   async getRates(
     organizationId: string,
-    request: RateShoppingRequest
+    request: RateShoppingRequest,
   ): Promise<ShippingRate[]> {
     // Get active carrier configs
     const carriers = await prisma.carrierConfig.findMany({
@@ -209,7 +216,10 @@ export class ShippingService {
         const carrierRates = await this.fetchCarrierRates(carrier, request);
         rates.push(...carrierRates);
       } catch (error) {
-        console.error(`Error fetching rates from ${carrier.carrierName}:`, error);
+        console.error(
+          `Error fetching rates from ${carrier.carrierName}:`,
+          error,
+        );
         // Continue with other carriers
       }
     }
@@ -225,31 +235,34 @@ export class ShippingService {
    */
   private async fetchCarrierRates(
     carrier: any,
-    request: RateShoppingRequest
+    request: RateShoppingRequest,
   ): Promise<ShippingRate[]> {
     // This would integrate with actual carrier APIs
     // For now, return mock data based on carrier type
 
-    const baseRates: Record<string, Array<{ service: string; rate: number; days: number }>> = {
+    const baseRates: Record<
+      string,
+      Array<{ service: string; rate: number; days: number }>
+    > = {
       UPS: [
-        { service: 'UPS Ground', rate: 15.99, days: 5 },
-        { service: 'UPS 3 Day Select', rate: 25.99, days: 3 },
-        { service: 'UPS 2nd Day Air', rate: 35.99, days: 2 },
-        { service: 'UPS Next Day Air', rate: 55.99, days: 1 },
+        { service: "UPS Ground", rate: 15.99, days: 5 },
+        { service: "UPS 3 Day Select", rate: 25.99, days: 3 },
+        { service: "UPS 2nd Day Air", rate: 35.99, days: 2 },
+        { service: "UPS Next Day Air", rate: 55.99, days: 1 },
       ],
       FEDEX: [
-        { service: 'FedEx Ground', rate: 14.99, days: 5 },
-        { service: 'FedEx Express Saver', rate: 24.99, days: 3 },
-        { service: 'FedEx 2Day', rate: 34.99, days: 2 },
-        { service: 'FedEx Priority Overnight', rate: 54.99, days: 1 },
+        { service: "FedEx Ground", rate: 14.99, days: 5 },
+        { service: "FedEx Express Saver", rate: 24.99, days: 3 },
+        { service: "FedEx 2Day", rate: 34.99, days: 2 },
+        { service: "FedEx Priority Overnight", rate: 54.99, days: 1 },
       ],
       USPS: [
-        { service: 'USPS Priority Mail', rate: 12.99, days: 3 },
-        { service: 'USPS Priority Mail Express', rate: 32.99, days: 1 },
+        { service: "USPS Priority Mail", rate: 12.99, days: 3 },
+        { service: "USPS Priority Mail Express", rate: 32.99, days: 1 },
       ],
       DHL: [
-        { service: 'DHL Ground', rate: 16.99, days: 5 },
-        { service: 'DHL Express', rate: 45.99, days: 2 },
+        { service: "DHL Ground", rate: 16.99, days: 5 },
+        { service: "DHL Express", rate: 45.99, days: 2 },
       ],
     };
 
@@ -264,15 +277,15 @@ export class ShippingService {
         carrier: carrier.carrierName,
         carrierCode: carrier.carrierType,
         service: rate.service,
-        serviceCode: rate.service.replace(/\s+/g, '_').toUpperCase(),
+        serviceCode: rate.service.replace(/\s+/g, "_").toUpperCase(),
         rate: rate.rate,
-        currency: 'USD',
+        currency: "USD",
         estimatedDays: rate.days,
         estimatedDelivery,
         guaranteedDelivery: rate.days <= 2,
         includesInsurance: false,
         tracking: true,
-        features: ['Tracking', 'Proof of Delivery'],
+        features: ["Tracking", "Proof of Delivery"],
       };
     });
   }
@@ -284,15 +297,15 @@ export class ShippingService {
     organizationId: string,
     request: RateShoppingRequest,
     criteria: {
-      priority: 'COST' | 'SPEED' | 'RELIABILITY';
+      priority: "COST" | "SPEED" | "RELIABILITY";
       maxCost?: number;
       maxDays?: number;
-    }
+    },
   ): Promise<ShippingRate> {
     const rates = await this.getRates(organizationId, request);
 
     if (rates.length === 0) {
-      throw new Error('No carrier rates available');
+      throw new Error("No carrier rates available");
     }
 
     // Filter by constraints
@@ -303,29 +316,31 @@ export class ShippingService {
     }
 
     if (criteria.maxDays) {
-      filteredRates = filteredRates.filter((r) => r.estimatedDays <= criteria.maxDays!);
+      filteredRates = filteredRates.filter(
+        (r) => r.estimatedDays <= criteria.maxDays!,
+      );
     }
 
     if (filteredRates.length === 0) {
-      throw new Error('No rates match the specified criteria');
+      throw new Error("No rates match the specified criteria");
     }
 
     // Select based on priority
     switch (criteria.priority) {
-      case 'COST':
+      case "COST":
         // Already sorted by cost
         return filteredRates[0];
 
-      case 'SPEED':
+      case "SPEED":
         filteredRates.sort((a, b) => a.estimatedDays - b.estimatedDays);
         return filteredRates[0];
 
-      case 'RELIABILITY':
+      case "RELIABILITY":
         // Would factor in carrier performance metrics
         // For now, prefer known reliable carriers
-        const reliableCarriers = ['FedEx', 'UPS'];
+        const reliableCarriers = ["FedEx", "UPS"];
         const reliableRate = filteredRates.find((r) =>
-          reliableCarriers.includes(r.carrier)
+          reliableCarriers.includes(r.carrier),
         );
         return reliableRate || filteredRates[0];
 
@@ -340,7 +355,7 @@ export class ShippingService {
   async createShipment(
     organizationId: string,
     userId: string,
-    request: CreateShipmentRequest
+    request: CreateShipmentRequest,
   ): Promise<any> {
     // Validate sales order
     const salesOrder = await prisma.salesOrder.findFirst({
@@ -354,11 +369,11 @@ export class ShippingService {
     });
 
     if (!salesOrder) {
-      throw new Error('Sales order not found');
+      throw new Error("Sales order not found");
     }
 
-    if (salesOrder.status !== 'PACKED' && salesOrder.status !== 'PICKED') {
-      throw new Error('Sales order must be picked/packed before shipping');
+    if (salesOrder.status !== "PACKED" && salesOrder.status !== "PICKED") {
+      throw new Error("Sales order must be picked/packed before shipping");
     }
 
     // Generate shipment number
@@ -371,7 +386,7 @@ export class ShippingService {
         shipmentNumber,
         salesOrderId: request.salesOrderId,
         packId: request.packId,
-        status: 'PENDING',
+        status: "PENDING",
         carrierCode: request.carrierCode,
         carrierName: request.carrierCode, // Would map from code to name
         carrierService: request.carrierService,
@@ -385,8 +400,10 @@ export class ShippingService {
         postalCode: request.postalCode,
         country: request.country,
         weight: request.weight,
-        weightUnit: request.weightUnit || 'kg',
-        dimensions: request.dimensions ? JSON.stringify(request.dimensions) : null,
+        weightUnit: request.weightUnit || "kg",
+        dimensions: request.dimensions
+          ? JSON.stringify(request.dimensions)
+          : null,
         insuranceAmount: request.insuranceAmount,
         signatureRequired: request.signatureRequired || false,
         saturdayDelivery: request.saturdayDelivery || false,
@@ -408,9 +425,9 @@ export class ShippingService {
     shipmentId: string,
     organizationId: string,
     options?: {
-      format?: 'PDF' | 'PNG' | 'ZPL';
+      format?: "PDF" | "PNG" | "ZPL";
       includeQRCode?: boolean;
-    }
+    },
   ): Promise<ShipmentLabel> {
     const shipment = await prisma.shipment.findFirst({
       where: {
@@ -420,7 +437,7 @@ export class ShippingService {
     });
 
     if (!shipment) {
-      throw new Error('Shipment not found');
+      throw new Error("Shipment not found");
     }
 
     // Generate tracking number
@@ -437,8 +454,8 @@ export class ShippingService {
         trackingNumber,
         trackingUrl,
         labelUrl,
-        labelFormat: options?.format || 'PDF',
-        status: 'LABEL_CREATED',
+        labelFormat: options?.format || "PDF",
+        status: "LABEL_CREATED",
       },
     });
 
@@ -446,7 +463,7 @@ export class ShippingService {
       shipmentId: shipment.id,
       trackingNumber,
       labelUrl,
-      labelFormat: options?.format || 'PDF',
+      labelFormat: options?.format || "PDF",
       trackingUrl,
       carrier: shipment.carrierCode!,
       service: shipment.carrierService!,
@@ -471,12 +488,12 @@ export class ShippingService {
   async markAsShipped(
     shipmentId: string,
     organizationId: string,
-    userId: string
+    userId: string,
   ): Promise<any> {
     const shipment = await prisma.shipment.update({
       where: { id: shipmentId },
       data: {
-        status: 'SHIPPED',
+        status: "SHIPPED",
         shippedDate: new Date(),
       },
       include: {
@@ -488,7 +505,7 @@ export class ShippingService {
     await prisma.salesOrder.update({
       where: { id: shipment.salesOrderId },
       data: {
-        status: 'SHIPPED',
+        status: "SHIPPED",
         trackingNumber: shipment.trackingNumber,
       },
     });
@@ -501,7 +518,7 @@ export class ShippingService {
    */
   async trackShipment(
     shipmentId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<TrackingInfo> {
     const shipment = await prisma.shipment.findFirst({
       where: {
@@ -511,18 +528,18 @@ export class ShippingService {
     });
 
     if (!shipment) {
-      throw new Error('Shipment not found');
+      throw new Error("Shipment not found");
     }
 
     if (!shipment.trackingNumber) {
-      throw new Error('No tracking number available');
+      throw new Error("No tracking number available");
     }
 
     // Would integrate with carrier tracking API
     // For now, return mock tracking data
     const events = this.generateMockTrackingEvents(shipment);
 
-    const delivered = shipment.status === 'DELIVERED';
+    const delivered = shipment.status === "DELIVERED";
 
     return {
       shipmentId: shipment.id,
@@ -537,7 +554,7 @@ export class ShippingService {
       delivered,
       deliveryProof: delivered
         ? {
-            signedBy: 'John Doe',
+            signedBy: "John Doe",
             timestamp: shipment.actualDelivery || new Date(),
           }
         : undefined,
@@ -547,37 +564,37 @@ export class ShippingService {
   /**
    * Generate mock tracking events
    */
-  private generateMockTrackingEvents(shipment: any): TrackingInfo['events'] {
-    const events: TrackingInfo['events'] = [];
+  private generateMockTrackingEvents(shipment: any): TrackingInfo["events"] {
+    const events: TrackingInfo["events"] = [];
     const now = new Date();
 
     if (shipment.shippedDate) {
       events.push({
         timestamp: shipment.shippedDate,
-        status: 'SHIPPED',
+        status: "SHIPPED",
         location: `${shipment.city}, ${shipment.state}`,
-        description: 'Package picked up by carrier',
+        description: "Package picked up by carrier",
       });
     }
 
-    if (shipment.status === 'IN_TRANSIT' || shipment.status === 'DELIVERED') {
+    if (shipment.status === "IN_TRANSIT" || shipment.status === "DELIVERED") {
       const transitDate = new Date(shipment.shippedDate || now);
       transitDate.setHours(transitDate.getHours() + 12);
 
       events.push({
         timestamp: transitDate,
-        status: 'IN_TRANSIT',
-        location: 'Distribution Center',
-        description: 'Package in transit',
+        status: "IN_TRANSIT",
+        location: "Distribution Center",
+        description: "Package in transit",
       });
     }
 
-    if (shipment.status === 'DELIVERED') {
+    if (shipment.status === "DELIVERED") {
       events.push({
         timestamp: shipment.actualDelivery || now,
-        status: 'DELIVERED',
+        status: "DELIVERED",
         location: `${shipment.city}, ${shipment.state}`,
-        description: 'Package delivered',
+        description: "Package delivered",
       });
     }
 
@@ -589,19 +606,19 @@ export class ShippingService {
    */
   private getStatusDescription(status: ShipmentStatus): string {
     const descriptions: Record<ShipmentStatus, string> = {
-      PENDING: 'Shipment created, awaiting label',
-      LABEL_CREATED: 'Label generated, ready to ship',
-      PICKED_UP: 'Package picked up by carrier',
-      IN_TRANSIT: 'Package in transit',
-      OUT_FOR_DELIVERY: 'Package out for delivery',
-      DELIVERED: 'Package delivered',
-      RETURNED: 'Package returned to sender',
-      EXCEPTION: 'Delivery exception',
-      CANCELLED: 'Shipment cancelled',
-      SHIPPED: 'Package shipped',
+      PENDING: "Shipment created, awaiting label",
+      LABEL_CREATED: "Label generated, ready to ship",
+      PICKED_UP: "Package picked up by carrier",
+      IN_TRANSIT: "Package in transit",
+      OUT_FOR_DELIVERY: "Package out for delivery",
+      DELIVERED: "Package delivered",
+      RETURNED: "Package returned to sender",
+      EXCEPTION: "Delivery exception",
+      CANCELLED: "Shipment cancelled",
+      SHIPPED: "Package shipped",
     };
 
-    return descriptions[status] || 'Unknown status';
+    return descriptions[status] || "Unknown status";
   }
 
   /**
@@ -609,7 +626,7 @@ export class ShippingService {
    */
   async updateTrackingFromCarrier(
     shipmentId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<void> {
     const shipment = await prisma.shipment.findFirst({
       where: {
@@ -645,12 +662,12 @@ export class ShippingService {
       reason: string;
       description: string;
       resolutionAction?: string;
-    }
+    },
   ): Promise<any> {
     const shipment = await prisma.shipment.update({
       where: { id: shipmentId },
       data: {
-        status: 'EXCEPTION',
+        status: "EXCEPTION",
         exceptionReason: exceptionDetails.reason,
         exceptionDate: new Date(),
         notes: exceptionDetails.description,
@@ -676,7 +693,7 @@ export class ShippingService {
   async cancelShipment(
     shipmentId: string,
     organizationId: string,
-    reason: string
+    reason: string,
   ): Promise<any> {
     const shipment = await prisma.shipment.findFirst({
       where: {
@@ -686,11 +703,11 @@ export class ShippingService {
     });
 
     if (!shipment) {
-      throw new Error('Shipment not found');
+      throw new Error("Shipment not found");
     }
 
-    if (shipment.status === 'DELIVERED') {
-      throw new Error('Cannot cancel delivered shipment');
+    if (shipment.status === "DELIVERED") {
+      throw new Error("Cannot cancel delivered shipment");
     }
 
     // Would void label with carrier if already created
@@ -701,7 +718,7 @@ export class ShippingService {
     return await prisma.shipment.update({
       where: { id: shipmentId },
       data: {
-        status: 'CANCELLED',
+        status: "CANCELLED",
         notes: `Cancelled: ${reason}`,
       },
     });
@@ -713,7 +730,7 @@ export class ShippingService {
   async getShippingMetrics(
     organizationId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<ShippingMetrics> {
     const dateFilter: any = { organizationId };
 
@@ -743,12 +760,14 @@ export class ShippingService {
 
     const totalCost = shipments.reduce(
       (sum, s) => sum + (s.shippingCost?.toNumber() || 0),
-      0
+      0,
     );
     const averageCost = totalShipments > 0 ? totalCost / totalShipments : 0;
 
     // On-time delivery rate
-    const deliveredShipments = shipments.filter((s) => s.status === 'DELIVERED');
+    const deliveredShipments = shipments.filter(
+      (s) => s.status === "DELIVERED",
+    );
     const onTimeDeliveries = deliveredShipments.filter((s) => {
       if (!s.actualDelivery || !s.estimatedDelivery) return false;
       return s.actualDelivery <= s.estimatedDelivery;
@@ -759,12 +778,13 @@ export class ShippingService {
         : 0;
 
     // Exception rate
-    const exceptions = shipments.filter((s) => s.status === 'EXCEPTION');
-    const exceptionRate = totalShipments > 0 ? (exceptions.length / totalShipments) * 100 : 0;
+    const exceptions = shipments.filter((s) => s.status === "EXCEPTION");
+    const exceptionRate =
+      totalShipments > 0 ? (exceptions.length / totalShipments) * 100 : 0;
 
     // Carrier performance
     const carrierGroups = shipments.reduce((acc: any, s) => {
-      const carrier = s.carrierCode || 'UNKNOWN';
+      const carrier = s.carrierCode || "UNKNOWN";
       if (!acc[carrier]) {
         acc[carrier] = [];
       }
@@ -772,25 +792,40 @@ export class ShippingService {
       return acc;
     }, {});
 
-    const carrierPerformance = Object.entries(carrierGroups).map(([carrier, ships]: [string, any]) => {
-      const carrierTotal = ships.reduce((sum: number, s: any) => sum + (s.shippingCost?.toNumber() || 0), 0);
-      const carrierDelivered = ships.filter((s: any) => s.status === 'DELIVERED');
-      const carrierOnTime = carrierDelivered.filter((s: any) => {
-        if (!s.actualDelivery || !s.estimatedDelivery) return false;
-        return s.actualDelivery <= s.estimatedDelivery;
-      });
-      const carrierExceptions = ships.filter((s: any) => s.status === 'EXCEPTION');
+    const carrierPerformance = Object.entries(carrierGroups).map(
+      ([carrier, ships]: [string, any]) => {
+        const carrierTotal = ships.reduce(
+          (sum: number, s: any) => sum + (s.shippingCost?.toNumber() || 0),
+          0,
+        );
+        const carrierDelivered = ships.filter(
+          (s: any) => s.status === "DELIVERED",
+        );
+        const carrierOnTime = carrierDelivered.filter((s: any) => {
+          if (!s.actualDelivery || !s.estimatedDelivery) return false;
+          return s.actualDelivery <= s.estimatedDelivery;
+        });
+        const carrierExceptions = ships.filter(
+          (s: any) => s.status === "EXCEPTION",
+        );
 
-      return {
-        carrier,
-        totalShipments: ships.length,
-        totalCost: carrierTotal,
-        averageCost: ships.length > 0 ? carrierTotal / ships.length : 0,
-        onTimeRate: carrierDelivered.length > 0 ? (carrierOnTime.length / carrierDelivered.length) * 100 : 0,
-        exceptionRate: ships.length > 0 ? (carrierExceptions.length / ships.length) * 100 : 0,
-        avgDeliveryDays: 3, // Placeholder
-      };
-    });
+        return {
+          carrier,
+          totalShipments: ships.length,
+          totalCost: carrierTotal,
+          averageCost: ships.length > 0 ? carrierTotal / ships.length : 0,
+          onTimeRate:
+            carrierDelivered.length > 0
+              ? (carrierOnTime.length / carrierDelivered.length) * 100
+              : 0,
+          exceptionRate:
+            ships.length > 0
+              ? (carrierExceptions.length / ships.length) * 100
+              : 0,
+          avgDeliveryDays: 3, // Placeholder
+        };
+      },
+    );
 
     // Recent shipments
     const recentShipments = await prisma.shipment.findMany({
@@ -804,7 +839,7 @@ export class ShippingService {
         shippedDate: true,
         estimatedDelivery: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 10,
     });
 
@@ -819,7 +854,7 @@ export class ShippingService {
       popularServices: [], // Would aggregate from data
       recentShipments: recentShipments.map((s) => ({
         ...s,
-        carrier: s.carrierCode || '',
+        carrier: s.carrierCode || "",
       })),
     };
   }
@@ -827,7 +862,10 @@ export class ShippingService {
   /**
    * Get shipment by ID
    */
-  async getShipmentById(shipmentId: string, organizationId: string): Promise<any> {
+  async getShipmentById(
+    shipmentId: string,
+    organizationId: string,
+  ): Promise<any> {
     return await prisma.shipment.findFirst({
       where: {
         id: shipmentId,
@@ -859,7 +897,7 @@ export class ShippingService {
       search?: string;
       page?: number;
       limit?: number;
-    }
+    },
   ): Promise<{ shipments: any[]; total: number; page: number; pages: number }> {
     const page = filters.page || 1;
     const limit = filters.limit || 20;
@@ -878,11 +916,11 @@ export class ShippingService {
 
     if (filters.search) {
       where.OR = [
-        { shipmentNumber: { contains: filters.search, mode: 'insensitive' } },
-        { trackingNumber: { contains: filters.search, mode: 'insensitive' } },
+        { shipmentNumber: { contains: filters.search, mode: "insensitive" } },
+        { trackingNumber: { contains: filters.search, mode: "insensitive" } },
         {
           salesOrder: {
-            soNumber: { contains: filters.search, mode: 'insensitive' },
+            soNumber: { contains: filters.search, mode: "insensitive" },
           },
         },
       ];
@@ -899,7 +937,7 @@ export class ShippingService {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),

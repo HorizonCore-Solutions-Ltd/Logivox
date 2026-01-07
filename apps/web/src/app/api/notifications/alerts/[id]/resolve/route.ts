@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -13,7 +13,7 @@ const resolveSchema = z.object({
 // POST /api/notifications/alerts/[id]/resolve - Resolve alert
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -35,7 +35,7 @@ export async function POST(
     const updated = await prisma.alert.update({
       where: { id: params.id },
       data: {
-        status: 'RESOLVED',
+        status: "RESOLVED",
         resolvedAt: new Date(),
         resolvedById: session.user.id,
         resolution: validated.resolution,
@@ -57,13 +57,13 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error resolving alert:", error);
     return NextResponse.json(
       { error: "Failed to resolve alert" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

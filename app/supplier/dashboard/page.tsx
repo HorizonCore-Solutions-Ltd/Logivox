@@ -1,12 +1,27 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Package, AlertTriangle, CheckCircle, TrendingUp, FileText, BarChart3, LogOut, Clock } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import {
+  Package,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
+  FileText,
+  BarChart3,
+  LogOut,
+  Clock,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface SupplierUser {
   id: string;
@@ -42,9 +57,9 @@ export default function SupplierDashboard() {
 
   useEffect(() => {
     // Load user from localStorage
-    const storedUser = localStorage.getItem('supplier_user');
+    const storedUser = localStorage.getItem("supplier_user");
     if (!storedUser) {
-      router.push('/supplier/login');
+      router.push("/supplier/login");
       return;
     }
 
@@ -55,36 +70,43 @@ export default function SupplierDashboard() {
 
   const loadDashboardStats = async (supplierId: string) => {
     try {
-      const token = localStorage.getItem('supplier_token');
-      const response = await fetch(`/api/supplier/dashboard?supplierId=${supplierId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const token = localStorage.getItem("supplier_token");
+      const response = await fetch(
+        `/api/supplier/dashboard?supplierId=${supplierId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-      if (!response.ok) throw new Error('Failed to load dashboard');
+      if (!response.ok) throw new Error("Failed to load dashboard");
 
       const result = await response.json();
       setStats(result.data);
     } catch (error) {
-      console.error('Load stats error:', error);
+      console.error("Load stats error:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('supplier_token');
-    localStorage.removeItem('supplier_user');
-    router.push('/supplier/login');
+    localStorage.removeItem("supplier_token");
+    localStorage.removeItem("supplier_user");
+    router.push("/supplier/login");
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'CRITICAL': return 'bg-red-100 text-red-800';
-      case 'MAJOR': return 'bg-orange-100 text-orange-800';
-      case 'MINOR': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "CRITICAL":
+        return "bg-red-100 text-red-800";
+      case "MAJOR":
+        return "bg-orange-100 text-orange-800";
+      case "MINOR":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -111,7 +133,9 @@ export default function SupplierDashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-bold">Supplier Portal</h1>
-                <p className="text-sm text-muted-foreground">{user.supplier.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {user.supplier.name}
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -131,8 +155,12 @@ export default function SupplierDashboard() {
       <div className="container mx-auto px-6 py-8 space-y-6">
         {/* Welcome Message */}
         <div>
-          <h2 className="text-2xl font-bold">Welcome back, {user.name.split(' ')[0]}!</h2>
-          <p className="text-muted-foreground">Manage your quality communications and view performance</p>
+          <h2 className="text-2xl font-bold">
+            Welcome back, {user.name.split(" ")[0]}!
+          </h2>
+          <p className="text-muted-foreground">
+            Manage your quality communications and view performance
+          </p>
         </div>
 
         {/* Stats Cards */}
@@ -158,8 +186,12 @@ export default function SupplierDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.pendingResponses || 0}</div>
-              <p className="text-xs text-muted-foreground">Awaiting your input</p>
+              <div className="text-3xl font-bold">
+                {stats?.pendingResponses || 0}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Awaiting your input
+              </p>
             </CardContent>
           </Card>
 
@@ -171,7 +203,9 @@ export default function SupplierDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.qualityScore || 0}%</div>
+              <div className="text-3xl font-bold">
+                {stats?.qualityScore || 0}%
+              </div>
               <p className="text-xs text-muted-foreground">Current rating</p>
             </CardContent>
           </Card>
@@ -184,7 +218,9 @@ export default function SupplierDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{stats?.recentNCRs?.length || 0}</div>
+              <div className="text-3xl font-bold">
+                {stats?.recentNCRs?.length || 0}
+              </div>
               <p className="text-xs text-muted-foreground">Total NCRs</p>
             </CardContent>
           </Card>
@@ -192,39 +228,45 @@ export default function SupplierDashboard() {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Button 
-            className="h-24" 
+          <Button
+            className="h-24"
             variant="outline"
-            onClick={() => router.push('/supplier/ncr')}
+            onClick={() => router.push("/supplier/ncr")}
           >
             <div className="text-center">
               <FileText className="w-8 h-8 mx-auto mb-2" />
               <div className="font-semibold">View NCRs</div>
-              <div className="text-xs text-muted-foreground">Review quality issues</div>
+              <div className="text-xs text-muted-foreground">
+                Review quality issues
+              </div>
             </div>
           </Button>
 
-          <Button 
-            className="h-24" 
+          <Button
+            className="h-24"
             variant="outline"
-            onClick={() => router.push('/supplier/scorecard')}
+            onClick={() => router.push("/supplier/scorecard")}
           >
             <div className="text-center">
               <BarChart3 className="w-8 h-8 mx-auto mb-2" />
               <div className="font-semibold">Quality Scorecard</div>
-              <div className="text-xs text-muted-foreground">View performance metrics</div>
+              <div className="text-xs text-muted-foreground">
+                View performance metrics
+              </div>
             </div>
           </Button>
 
-          <Button 
-            className="h-24" 
+          <Button
+            className="h-24"
             variant="outline"
-            onClick={() => router.push('/supplier/documents')}
+            onClick={() => router.push("/supplier/documents")}
           >
             <div className="text-center">
               <Package className="w-8 h-8 mx-auto mb-2" />
               <div className="font-semibold">Documents</div>
-              <div className="text-xs text-muted-foreground">Quality agreements</div>
+              <div className="text-xs text-muted-foreground">
+                Quality agreements
+              </div>
             </div>
           </Button>
         </div>
@@ -233,14 +275,16 @@ export default function SupplierDashboard() {
         <Card>
           <CardHeader>
             <CardTitle>Recent Non-Conformance Reports</CardTitle>
-            <CardDescription>Latest quality issues requiring attention</CardDescription>
+            <CardDescription>
+              Latest quality issues requiring attention
+            </CardDescription>
           </CardHeader>
           <CardContent>
             {stats && stats.recentNCRs && stats.recentNCRs.length > 0 ? (
               <div className="space-y-3">
                 {stats.recentNCRs.map((ncr) => (
-                  <div 
-                    key={ncr.id} 
+                  <div
+                    key={ncr.id}
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
                     onClick={() => router.push(`/supplier/ncr/${ncr.id}`)}
                   >

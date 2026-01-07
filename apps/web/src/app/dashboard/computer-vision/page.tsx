@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useRef } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -13,10 +19,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { 
-  Camera, 
-  Eye, 
-  CheckCircle2, 
+import {
+  Camera,
+  Eye,
+  CheckCircle2,
   AlertTriangle,
   Package,
   Scan,
@@ -28,20 +34,25 @@ import {
   Download,
   Play,
   Square,
-  Maximize2
-} from 'lucide-react';
+  Maximize2,
+} from "lucide-react";
 
 interface CVScanResult {
   id: string;
   timestamp: string;
-  scanType: 'CYCLE_COUNT' | 'DAMAGE_DETECTION' | 'PACKAGE_VERIFY' | 'DIMENSION' | 'LABEL_READ';
+  scanType:
+    | "CYCLE_COUNT"
+    | "DAMAGE_DETECTION"
+    | "PACKAGE_VERIFY"
+    | "DIMENSION"
+    | "LABEL_READ";
   location: string;
-  status: 'SUCCESS' | 'WARNING' | 'ERROR';
+  status: "SUCCESS" | "WARNING" | "ERROR";
   confidence: number;
   detectedItems: {
     sku: string;
     quantity: number;
-    condition: 'GOOD' | 'DAMAGED' | 'UNKNOWN';
+    condition: "GOOD" | "DAMAGED" | "UNKNOWN";
     confidence: number;
     boundingBox?: { x: number; y: number; w: number; h: number };
   }[];
@@ -72,7 +83,8 @@ export default function ComputerVisionDashboard() {
   });
   const [loading, setLoading] = useState(false);
   const [activeCamera, setActiveCamera] = useState(false);
-  const [selectedScanType, setSelectedScanType] = useState<string>('CYCLE_COUNT');
+  const [selectedScanType, setSelectedScanType] =
+    useState<string>("CYCLE_COUNT");
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -84,13 +96,13 @@ export default function ComputerVisionDashboard() {
   const fetchScans = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/computer-vision/scans');
+      const res = await fetch("/api/computer-vision/scans");
       if (res.ok) {
         const data = await res.json();
         setScans(data);
       }
     } catch (error) {
-      console.error('Error fetching CV scans:', error);
+      console.error("Error fetching CV scans:", error);
     } finally {
       setLoading(false);
     }
@@ -98,35 +110,35 @@ export default function ComputerVisionDashboard() {
 
   const fetchStats = async () => {
     try {
-      const res = await fetch('/api/computer-vision/stats');
+      const res = await fetch("/api/computer-vision/stats");
       if (res.ok) {
         const data = await res.json();
         setStats(data);
       }
     } catch (error) {
-      console.error('Error fetching CV stats:', error);
+      console.error("Error fetching CV stats:", error);
     }
   };
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: 'environment' } 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setActiveCamera(true);
       }
     } catch (error) {
-      console.error('Error accessing camera:', error);
-      alert('Camera access denied. Please enable camera permissions.');
+      console.error("Error accessing camera:", error);
+      alert("Camera access denied. Please enable camera permissions.");
     }
   };
 
   const stopCamera = () => {
     if (videoRef.current && videoRef.current.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       videoRef.current.srcObject = null;
       setActiveCamera(false);
     }
@@ -139,19 +151,19 @@ export default function ComputerVisionDashboard() {
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
-    const ctx = canvas.getContext('2d');
+
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     ctx.drawImage(video, 0, 0);
-    const imageData = canvas.toDataURL('image/jpeg');
+    const imageData = canvas.toDataURL("image/jpeg");
 
     // Send to CV API for analysis
     try {
       setLoading(true);
-      const res = await fetch('/api/computer-vision/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/computer-vision/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           image: imageData,
           scanType: selectedScanType,
@@ -164,7 +176,7 @@ export default function ComputerVisionDashboard() {
         fetchStats();
       }
     } catch (error) {
-      console.error('Error analyzing image:', error);
+      console.error("Error analyzing image:", error);
     } finally {
       setLoading(false);
     }
@@ -172,20 +184,24 @@ export default function ComputerVisionDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'SUCCESS': return 'bg-green-100 text-green-800';
-      case 'WARNING': return 'bg-yellow-100 text-yellow-800';
-      case 'ERROR': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "SUCCESS":
+        return "bg-green-100 text-green-800";
+      case "WARNING":
+        return "bg-yellow-100 text-yellow-800";
+      case "ERROR":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getScanTypeLabel = (type: string) => {
     const labels = {
-      CYCLE_COUNT: 'Cycle Count',
-      DAMAGE_DETECTION: 'Damage Detection',
-      PACKAGE_VERIFY: 'Package Verification',
-      DIMENSION: 'Dimensioning',
-      LABEL_READ: 'Label Reading',
+      CYCLE_COUNT: "Cycle Count",
+      DAMAGE_DETECTION: "Damage Detection",
+      PACKAGE_VERIFY: "Package Verification",
+      DIMENSION: "Dimensioning",
+      LABEL_READ: "Label Reading",
     };
     return labels[type as keyof typeof labels] || type;
   };
@@ -195,7 +211,9 @@ export default function ComputerVisionDashboard() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Computer Vision Intelligence</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Computer Vision Intelligence
+          </h1>
           <p className="text-gray-600 mt-1">
             AI-powered visual verification and automated inventory scanning
           </p>
@@ -329,7 +347,9 @@ export default function ComputerVisionDashboard() {
             <Card>
               <CardHeader>
                 <CardTitle>Camera Feed</CardTitle>
-                <CardDescription>Point camera at inventory to scan</CardDescription>
+                <CardDescription>
+                  Point camera at inventory to scan
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="relative aspect-video bg-gray-900 rounded-lg overflow-hidden">
@@ -353,14 +373,21 @@ export default function ComputerVisionDashboard() {
                 </div>
 
                 <div className="space-y-3">
-                  <Select value={selectedScanType} onValueChange={setSelectedScanType}>
+                  <Select
+                    value={selectedScanType}
+                    onValueChange={setSelectedScanType}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="CYCLE_COUNT">Cycle Count</SelectItem>
-                      <SelectItem value="DAMAGE_DETECTION">Damage Detection</SelectItem>
-                      <SelectItem value="PACKAGE_VERIFY">Package Verification</SelectItem>
+                      <SelectItem value="DAMAGE_DETECTION">
+                        Damage Detection
+                      </SelectItem>
+                      <SelectItem value="PACKAGE_VERIFY">
+                        Package Verification
+                      </SelectItem>
                       <SelectItem value="DIMENSION">Dimensioning</SelectItem>
                       <SelectItem value="LABEL_READ">Label Reading</SelectItem>
                     </SelectContent>
@@ -374,13 +401,13 @@ export default function ComputerVisionDashboard() {
                       </Button>
                     ) : (
                       <>
-                        <Button 
-                          onClick={captureAndAnalyze} 
+                        <Button
+                          onClick={captureAndAnalyze}
                           className="flex-1"
                           disabled={loading}
                         >
                           <Scan className="h-4 w-4 mr-2" />
-                          {loading ? 'Analyzing...' : 'Capture & Analyze'}
+                          {loading ? "Analyzing..." : "Capture & Analyze"}
                         </Button>
                         <Button onClick={stopCamera} variant="destructive">
                           <Square className="h-4 w-4" />
@@ -407,12 +434,15 @@ export default function ComputerVisionDashboard() {
                 ) : (
                   <div className="space-y-4">
                     {scans.slice(0, 5).map((scan) => (
-                      <div 
+                      <div
                         key={scan.id}
                         className="border rounded-lg p-4 space-y-3"
                       >
                         <div className="flex items-center justify-between">
-                          <Badge variant="outline" className={getStatusColor(scan.status)}>
+                          <Badge
+                            variant="outline"
+                            className={getStatusColor(scan.status)}
+                          >
                             {scan.status}
                           </Badge>
                           <span className="text-xs text-gray-500">
@@ -437,18 +467,20 @@ export default function ComputerVisionDashboard() {
                         {scan.detectedItems.length > 0 && (
                           <div className="space-y-2">
                             {scan.detectedItems.map((item, idx) => (
-                              <div 
+                              <div
                                 key={idx}
                                 className="flex items-center justify-between bg-gray-50 p-2 rounded"
                               >
                                 <div>
-                                  <div className="text-sm font-medium">{item.sku}</div>
+                                  <div className="text-sm font-medium">
+                                    {item.sku}
+                                  </div>
                                   <div className="text-xs text-gray-600">
                                     Qty: {item.quantity} • {item.condition}
                                   </div>
                                 </div>
-                                <Progress 
-                                  value={item.confidence * 100} 
+                                <Progress
+                                  value={item.confidence * 100}
                                   className="w-20"
                                 />
                               </div>
@@ -461,7 +493,8 @@ export default function ComputerVisionDashboard() {
                             <div className="flex items-center gap-2 text-sm text-yellow-800">
                               <AlertTriangle className="h-4 w-4" />
                               <span>
-                                Variance: {scan.variance > 0 ? '+' : ''}{scan.variance} units
+                                Variance: {scan.variance > 0 ? "+" : ""}
+                                {scan.variance} units
                               </span>
                             </div>
                           </div>
@@ -480,20 +513,22 @@ export default function ComputerVisionDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>All Scans</CardTitle>
-              <CardDescription>Complete history of computer vision scans</CardDescription>
+              <CardDescription>
+                Complete history of computer vision scans
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {scans.map((scan) => (
-                  <div 
+                  <div
                     key={scan.id}
                     className="flex items-center gap-4 border-b pb-3 last:border-0"
                   >
                     <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                       {scan.imageUrl ? (
-                        <img 
-                          src={scan.imageUrl} 
-                          alt="Scan" 
+                        <img
+                          src={scan.imageUrl}
+                          alt="Scan"
                           className="w-full h-full object-cover"
                         />
                       ) : (
@@ -508,15 +543,20 @@ export default function ComputerVisionDashboard() {
                         <span className="font-medium text-gray-900">
                           {getScanTypeLabel(scan.scanType)}
                         </span>
-                        <Badge variant="outline" className={getStatusColor(scan.status)}>
+                        <Badge
+                          variant="outline"
+                          className={getStatusColor(scan.status)}
+                        >
                           {scan.status}
                         </Badge>
                       </div>
                       <div className="text-sm text-gray-600">
-                        {scan.location} • {scan.detectedItems.length} items • {(scan.confidence * 100).toFixed(0)}% confidence
+                        {scan.location} • {scan.detectedItems.length} items •{" "}
+                        {(scan.confidence * 100).toFixed(0)}% confidence
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
-                        {new Date(scan.timestamp).toLocaleString()} • {scan.processingTime}ms
+                        {new Date(scan.timestamp).toLocaleString()} •{" "}
+                        {scan.processingTime}ms
                       </div>
                     </div>
 
@@ -539,14 +579,25 @@ export default function ComputerVisionDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {['CYCLE_COUNT', 'DAMAGE_DETECTION', 'PACKAGE_VERIFY', 'DIMENSION', 'LABEL_READ'].map(type => {
-                    const count = scans.filter(s => s.scanType === type).length;
-                    const percentage = scans.length > 0 ? (count / scans.length) * 100 : 0;
+                  {[
+                    "CYCLE_COUNT",
+                    "DAMAGE_DETECTION",
+                    "PACKAGE_VERIFY",
+                    "DIMENSION",
+                    "LABEL_READ",
+                  ].map((type) => {
+                    const count = scans.filter(
+                      (s) => s.scanType === type,
+                    ).length;
+                    const percentage =
+                      scans.length > 0 ? (count / scans.length) * 100 : 0;
                     return (
                       <div key={type}>
                         <div className="flex justify-between text-sm mb-1">
                           <span>{getScanTypeLabel(type)}</span>
-                          <span className="font-medium">{count} ({percentage.toFixed(0)}%)</span>
+                          <span className="font-medium">
+                            {count} ({percentage.toFixed(0)}%)
+                          </span>
                         </div>
                         <Progress value={percentage} />
                       </div>
@@ -562,16 +613,24 @@ export default function ComputerVisionDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {['SUCCESS', 'WARNING', 'ERROR'].map(status => {
-                    const count = scans.filter(s => s.status === status).length;
-                    const percentage = scans.length > 0 ? (count / scans.length) * 100 : 0;
+                  {["SUCCESS", "WARNING", "ERROR"].map((status) => {
+                    const count = scans.filter(
+                      (s) => s.status === status,
+                    ).length;
+                    const percentage =
+                      scans.length > 0 ? (count / scans.length) * 100 : 0;
                     return (
                       <div key={status}>
                         <div className="flex justify-between text-sm mb-1">
-                          <Badge variant="outline" className={getStatusColor(status)}>
+                          <Badge
+                            variant="outline"
+                            className={getStatusColor(status)}
+                          >
                             {status}
                           </Badge>
-                          <span className="font-medium">{count} ({percentage.toFixed(0)}%)</span>
+                          <span className="font-medium">
+                            {count} ({percentage.toFixed(0)}%)
+                          </span>
                         </div>
                         <Progress value={percentage} />
                       </div>

@@ -3,13 +3,13 @@
  * Manage IoT devices, health monitoring, maintenance
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import prisma from '@/lib/prisma';
-import { iotMonitoringService } from '@/lib/services/inventory/iot-monitoring-service';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { iotMonitoringService } from "@/lib/services/inventory/iot-monitoring-service";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/inventory/iot/devices
@@ -19,18 +19,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const deviceType = searchParams.get('type'); // RFID, WEIGHT_SENSOR, ENVIRONMENTAL
-    const status = searchParams.get('status'); // ACTIVE, OFFLINE, MAINTENANCE
+    const deviceType = searchParams.get("type"); // RFID, WEIGHT_SENSOR, ENVIRONMENTAL
+    const status = searchParams.get("status"); // ACTIVE, OFFLINE, MAINTENANCE
 
     const where: any = {
-      organizationId: session.user.organizationId
+      organizationId: session.user.organizationId,
     };
 
     if (deviceType) {
@@ -48,27 +45,28 @@ export async function GET(request: NextRequest) {
         _count: {
           select: {
             readings: true,
-            alerts: true
-          }
-        }
+            alerts: true,
+          },
+        },
       },
-      orderBy: { name: 'asc' }
+      orderBy: { name: "asc" },
     });
 
     // Calculate maintenance predictions for each device
     const devicesWithHealth = await Promise.all(
       devices.map(async (device) => {
         try {
-          const maintenance = await iotMonitoringService.predictDeviceMaintenance(device.id);
-          
+          const maintenance =
+            await iotMonitoringService.predictDeviceMaintenance(device.id);
+
           return {
             ...device,
             health: {
               batteryLevel: device.batteryLevel,
               signalStrength: device.signalStrength,
               lastCalibration: device.lastCalibration,
-              maintenance
-            }
+              maintenance,
+            },
           };
         } catch (error) {
           return {
@@ -77,11 +75,11 @@ export async function GET(request: NextRequest) {
               batteryLevel: device.batteryLevel,
               signalStrength: device.signalStrength,
               lastCalibration: device.lastCalibration,
-              maintenance: { required: false }
-            }
+              maintenance: { required: false },
+            },
           };
         }
-      })
+      }),
     );
 
     // Statistics
@@ -103,16 +101,17 @@ export async function GET(request: NextRequest) {
           total: devices.length,
           byType,
           byStatus,
-          needingMaintenance: devicesWithHealth.filter(d => d.health.maintenance.required).length
-        }
-      }
+          needingMaintenance: devicesWithHealth.filter(
+            (d) => d.health.maintenance.required,
+          ).length,
+        },
+      },
     });
-
   } catch (error: any) {
-    console.error('Devices retrieval error:', error);
+    console.error("Devices retrieval error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve devices', message: error.message },
-      { status: 500 }
+      { error: "Failed to retrieve devices", message: error.message },
+      { status: 500 },
     );
   }
 }
@@ -125,10 +124,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -138,16 +134,16 @@ export async function POST(request: NextRequest) {
       serialNumber,
       locationId,
       ipAddress,
-      configuration
+      configuration,
     } = body;
 
     if (!name || !deviceType || !serialNumber) {
       return NextResponse.json(
         {
-          error: 'Missing required fields: name, deviceType, serialNumber',
-          code: 'VALIDATION_ERROR'
+          error: "Missing required fields: name, deviceType, serialNumber",
+          code: "VALIDATION_ERROR",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -159,25 +155,24 @@ export async function POST(request: NextRequest) {
         serialNumber,
         locationId,
         ipAddress,
-        status: 'ACTIVE',
+        status: "ACTIVE",
         batteryLevel: 100,
         signalStrength: 100,
         lastCalibration: new Date(),
-        configuration: configuration || {}
-      }
+        configuration: configuration || {},
+      },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Device registered successfully',
-      data: { device }
+      message: "Device registered successfully",
+      data: { device },
     });
-
   } catch (error: any) {
-    console.error('Device registration error:', error);
+    console.error("Device registration error:", error);
     return NextResponse.json(
-      { error: 'Failed to register device', message: error.message },
-      { status: 500 }
+      { error: "Failed to register device", message: error.message },
+      { status: 500 },
     );
   }
 }

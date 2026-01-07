@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 /**
  * Gate Security Automation Service
@@ -12,14 +12,16 @@ export class GateSecurityAutomationService {
   static async checkDwellTimeViolations() {
     try {
       const maxDwellHours = 24; // Configurable per organization
-      const dwellTimeThreshold = new Date(Date.now() - maxDwellHours * 60 * 60 * 1000);
+      const dwellTimeThreshold = new Date(
+        Date.now() - maxDwellHours * 60 * 60 * 1000,
+      );
 
       // Find vehicles on-site longer than threshold
       const overdueVehicles = await prisma.gateEntry.findMany({
         where: {
           entryTime: { lte: dwellTimeThreshold },
           exitTime: null, // Still on-site
-          status: { in: ['CHECKED_IN', 'LOADING', 'UNLOADING'] },
+          status: { in: ["CHECKED_IN", "LOADING", "UNLOADING"] },
         },
         include: {
           organization: true,
@@ -30,15 +32,15 @@ export class GateSecurityAutomationService {
       // Create alerts for each overdue vehicle
       for (const vehicle of overdueVehicles) {
         const dwellHours = Math.floor(
-          (Date.now() - vehicle.entryTime.getTime()) / (1000 * 60 * 60)
+          (Date.now() - vehicle.entryTime.getTime()) / (1000 * 60 * 60),
         );
 
         // Check if alert already exists
         const existingAlert = await prisma.securityAlert.findFirst({
           where: {
-            type: 'DWELL_TIME_EXCEEDED',
+            type: "DWELL_TIME_EXCEEDED",
             metadata: {
-              path: ['gateEntryId'],
+              path: ["gateEntryId"],
               equals: vehicle.id,
             },
             resolvedAt: null,
@@ -49,8 +51,8 @@ export class GateSecurityAutomationService {
           await prisma.securityAlert.create({
             data: {
               organizationId: vehicle.organizationId,
-              type: 'DWELL_TIME_EXCEEDED',
-              severity: dwellHours > maxDwellHours * 2 ? 'HIGH' : 'MEDIUM',
+              type: "DWELL_TIME_EXCEEDED",
+              severity: dwellHours > maxDwellHours * 2 ? "HIGH" : "MEDIUM",
               message: `Vehicle ${vehicle.licensePlate || vehicle.vehicleNumber} has been on-site for ${dwellHours} hours`,
               metadata: {
                 gateEntryId: vehicle.id,
@@ -69,7 +71,7 @@ export class GateSecurityAutomationService {
         alertsCreated: overdueVehicles.length,
       };
     } catch (error) {
-      console.error('Error checking dwell time violations:', error);
+      console.error("Error checking dwell time violations:", error);
       throw error;
     }
   }
@@ -106,13 +108,13 @@ export class GateSecurityAutomationService {
       for (const [gateEntryId, logs] of Object.entries(violations)) {
         if (logs.length >= 3) {
           const gateEntry = logs[0].gateEntry;
-          
+
           // Check if critical alert already exists
           const existingAlert = await prisma.securityAlert.findFirst({
             where: {
-              type: 'CRITICAL_TEMP_VIOLATION',
+              type: "CRITICAL_TEMP_VIOLATION",
               metadata: {
-                path: ['gateEntryId'],
+                path: ["gateEntryId"],
                 equals: gateEntryId,
               },
               resolvedAt: null,
@@ -123,8 +125,8 @@ export class GateSecurityAutomationService {
             await prisma.securityAlert.create({
               data: {
                 organizationId: gateEntry.organizationId,
-                type: 'CRITICAL_TEMP_VIOLATION',
-                severity: 'CRITICAL',
+                type: "CRITICAL_TEMP_VIOLATION",
+                severity: "CRITICAL",
                 message: `URGENT: Vehicle ${gateEntry.licensePlate} has ${logs.length} temperature violations in last 30 minutes`,
                 metadata: {
                   gateEntryId,
@@ -148,7 +150,7 @@ export class GateSecurityAutomationService {
         criticalAlerts: criticalAlerts.length,
       };
     } catch (error) {
-      console.error('Error monitoring temperatures:', error);
+      console.error("Error monitoring temperatures:", error);
       throw error;
     }
   }
@@ -180,8 +182,8 @@ export class GateSecurityAutomationService {
         await prisma.securityAlert.create({
           data: {
             organizationId: record.organizationId,
-            type: 'EXPIRED_PERMIT',
-            severity: 'HIGH',
+            type: "EXPIRED_PERMIT",
+            severity: "HIGH",
             message: `HAZMAT permit expired for vehicle ${record.gateEntry.licensePlate} - UN${record.unNumber}`,
             metadata: {
               gateEntryId: record.gateEntryId,
@@ -198,7 +200,7 @@ export class GateSecurityAutomationService {
         expiredPermits: expiredHazmatPermits.length,
       };
     } catch (error) {
-      console.error('Error checking expired permits:', error);
+      console.error("Error checking expired permits:", error);
       throw error;
     }
   }
@@ -210,12 +212,9 @@ export class GateSecurityAutomationService {
     try {
       const activeQueues = await prisma.gateQueue.findMany({
         where: {
-          status: { in: ['WAITING', 'CALLED'] },
+          status: { in: ["WAITING", "CALLED"] },
         },
-        orderBy: [
-          { priority: 'desc' },
-          { arrivalTime: 'asc' },
-        ],
+        orderBy: [{ priority: "desc" }, { arrivalTime: "asc" }],
       });
 
       // Update positions
@@ -234,7 +233,7 @@ export class GateSecurityAutomationService {
         queuesUpdated: activeQueues.length,
       };
     } catch (error) {
-      console.error('Error updating queue metrics:', error);
+      console.error("Error updating queue metrics:", error);
       throw error;
     }
   }
@@ -269,8 +268,8 @@ export class GateSecurityAutomationService {
               where: { id: variance.gate_entry_id },
               select: { organizationId: true },
             }))!.organizationId,
-            type: 'SUSPICIOUS_WEIGHT_LOSS',
-            severity: 'HIGH',
+            type: "SUSPICIOUS_WEIGHT_LOSS",
+            severity: "HIGH",
             message: `Suspicious weight variance detected for ${variance.license_plate}: ${variance.variance}kg loss (${variance.variance_pct.toFixed(2)}%)`,
             metadata: variance,
           },
@@ -281,7 +280,7 @@ export class GateSecurityAutomationService {
         suspiciousVehicles: (suspiciousVariances as any[]).length,
       };
     } catch (error) {
-      console.error('Error detecting weight theft:', error);
+      console.error("Error detecting weight theft:", error);
       throw error;
     }
   }
@@ -290,8 +289,8 @@ export class GateSecurityAutomationService {
    * Run all automation checks
    */
   static async runAll() {
-    console.log('Running gate security automation checks...');
-    
+    console.log("Running gate security automation checks...");
+
     const results = {
       dwellTime: await this.checkDwellTimeViolations(),
       temperature: await this.monitorTemperatures(),
@@ -301,7 +300,7 @@ export class GateSecurityAutomationService {
       timestamp: new Date(),
     };
 
-    console.log('Automation checks completed:', results);
+    console.log("Automation checks completed:", results);
     return results;
   }
 }

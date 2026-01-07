@@ -1,6 +1,7 @@
 # Phase 22 Quick Start Guide
 
 ## 🎯 Goal
+
 Build a professional label template & printing system for warehouse operations in **20-25 hours**.
 
 ---
@@ -46,7 +47,7 @@ model LabelTemplate {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   printJobs       PrintJob[]
-  
+
   @@index([organizationId])
   @@index([createdBy])
   @@index([category])
@@ -76,7 +77,7 @@ model PrintJob {
   createdAt       DateTime @default(now())
   startedAt       DateTime?
   completedAt     DateTime?
-  
+
   @@index([organizationId])
   @@index([status])
   @@index([templateId])
@@ -100,13 +101,14 @@ model Printer {
   lastSeen        DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   @@unique([organizationId, printerId])
   @@index([organizationId])
 }
 ```
 
 Run migration:
+
 ```bash
 npx prisma migrate dev --name add_label_printing_system
 npx prisma generate
@@ -175,6 +177,7 @@ apps/web/src/
 **Create:** `apps/web/src/app/(dashboard)/dashboard/labels/designer/page.tsx`
 
 **Features:**
+
 - Canvas with react-konva
 - Add text elements
 - Add barcode/QR code
@@ -183,6 +186,7 @@ apps/web/src/
 - Save template
 
 **Quick Template:**
+
 ```typescript
 "use client";
 
@@ -248,6 +252,7 @@ export default function LabelDesignerPage() {
 **Create:** `apps/web/src/app/(dashboard)/dashboard/labels/templates/page.tsx`
 
 **Features:**
+
 - Grid of templates
 - Search & filter
 - Create/edit/delete
@@ -259,16 +264,18 @@ export default function LabelDesignerPage() {
 **Create:** `apps/web/src/lib/print-engine.ts`
 
 **Features:**
+
 - PDF generation with pdfkit
 - ZPL generation for Zebra
 - PNG/JPG export
 - Field mapping resolver
 
 **Quick Template:**
+
 ```typescript
-import PDFKit from 'pdfkit';
-import JsBarcode from 'jsbarcode';
-import { Canvas } from 'canvas';
+import PDFKit from "pdfkit";
+import JsBarcode from "jsbarcode";
+import { Canvas } from "canvas";
 
 export class PrintEngine {
   static async generatePDF(elements, data, width, height) {
@@ -276,16 +283,16 @@ export class PrintEngine {
       const doc = new PDFKit({ size: [width, height], margin: 0 });
       const chunks = [];
 
-      doc.on('data', chunk => chunks.push(chunk));
-      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on("data", (chunk) => chunks.push(chunk));
+      doc.on("end", () => resolve(Buffer.concat(chunks)));
 
-      elements.forEach(el => {
-        if (el.type === 'text') {
+      elements.forEach((el) => {
+        if (el.type === "text") {
           const text = this.resolveFields(el.text, data);
           doc.fontSize(el.fontSize).text(text, el.x, el.y);
-        } else if (el.type === 'barcode') {
+        } else if (el.type === "barcode") {
           const canvas = new Canvas(200, 80);
-          JsBarcode(canvas, data[el.fieldMapping] || '', { format: 'CODE128' });
+          JsBarcode(canvas, data[el.fieldMapping] || "", { format: "CODE128" });
           doc.image(canvas.toBuffer(), el.x, el.y);
         }
       });
@@ -295,19 +302,19 @@ export class PrintEngine {
   }
 
   static generateZPL(elements, data, width, height) {
-    let zpl = '^XA\n';
-    
-    elements.forEach(el => {
-      if (el.type === 'text') {
+    let zpl = "^XA\n";
+
+    elements.forEach((el) => {
+      if (el.type === "text") {
         const text = this.resolveFields(el.text, data);
         zpl += `^FO${el.x},${el.y}^A0N,${el.fontSize}^FD${text}^FS\n`;
-      } else if (el.type === 'barcode') {
-        const value = data[el.fieldMapping] || '';
+      } else if (el.type === "barcode") {
+        const value = data[el.fieldMapping] || "";
         zpl += `^FO${el.x},${el.y}^BC^FD${value}^FS\n`;
       }
     });
 
-    zpl += '^XZ\n';
+    zpl += "^XZ\n";
     return zpl;
   }
 
@@ -322,6 +329,7 @@ export class PrintEngine {
 **Create:** `apps/web/src/app/api/labels/print/route.ts`
 
 **Features:**
+
 - Submit print job
 - Queue management
 - PrintNode integration
@@ -332,6 +340,7 @@ export class PrintEngine {
 **Create:** `apps/web/src/app/(dashboard)/dashboard/labels/mobile/page.tsx`
 
 **Features:**
+
 - Camera barcode scanner
 - Item lookup
 - One-tap print
@@ -340,6 +349,7 @@ export class PrintEngine {
 ### Day 6: Advanced Features (3-4 hours)
 
 **Features:**
+
 - AI layout suggestions
 - Conditional fields
 - Multi-language
@@ -370,7 +380,7 @@ After implementation, you should achieve:
 ✅ **Print Time:** <3 seconds from click to printer  
 ✅ **Template Creation:** <5 minutes for new template  
 ✅ **Mobile Scan-to-Print:** <10 seconds end-to-end  
-✅ **Batch Print 100 labels:** <30 seconds  
+✅ **Batch Print 100 labels:** <30 seconds
 
 ---
 

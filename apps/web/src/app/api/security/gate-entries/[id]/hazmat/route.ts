@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const createHazmatSchema = z.object({
   unNumber: z.string().min(1),
@@ -23,12 +23,12 @@ const createHazmatSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const gateEntryId = params.id;
@@ -42,7 +42,10 @@ export async function POST(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     // Check if entry already has hazmat record
@@ -52,8 +55,8 @@ export async function POST(
 
     if (existingHazmat) {
       return NextResponse.json(
-        { error: 'Hazmat record already exists for this entry' },
-        { status: 400 }
+        { error: "Hazmat record already exists for this entry" },
+        { status: 400 },
       );
     }
 
@@ -67,8 +70,8 @@ export async function POST(
 
     if (isPermitExpired) {
       return NextResponse.json(
-        { error: 'Hazmat permit has expired' },
-        { status: 400 }
+        { error: "Hazmat permit has expired" },
+        { status: 400 },
       );
     }
 
@@ -84,7 +87,9 @@ export async function POST(
         quantity: data.quantity,
         quantityUnit: data.quantityUnit,
         permitNumber: data.permitNumber,
-        permitExpiryDate: data.permitExpiryDate ? new Date(data.permitExpiryDate) : null,
+        permitExpiryDate: data.permitExpiryDate
+          ? new Date(data.permitExpiryDate)
+          : null,
         emergencyContact: data.emergencyContact,
         emergencyPhone: data.emergencyPhone,
         spillProcedure: data.spillProcedure,
@@ -104,13 +109,13 @@ export async function POST(
     });
 
     // Create alert for high-risk hazmat classes
-    const highRiskClasses = ['1', '2.1', '2.3', '5.2', '6.1', '6.2', '7'];
+    const highRiskClasses = ["1", "2.1", "2.3", "5.2", "6.1", "6.2", "7"];
     if (highRiskClasses.some((cls) => data.hazmatClass.startsWith(cls))) {
       await prisma.securityAlert.create({
         data: {
           organizationId: session.user.organizationId,
-          type: 'HAZMAT_ARRIVAL',
-          severity: 'HIGH',
+          type: "HAZMAT_ARRIVAL",
+          severity: "HIGH",
           message: `High-risk hazmat vehicle arrived: UN${data.unNumber} - ${data.properShippingName} (Class ${data.hazmatClass})`,
           metadata: {
             gateEntryId,
@@ -130,42 +135,45 @@ export async function POST(
           organizationId: session.user.organizationId,
           warehouseId: gateEntry.warehouseId,
           hazmatApproved: true,
-          status: 'AVAILABLE',
+          status: "AVAILABLE",
         },
-        orderBy: { spotNumber: 'asc' },
+        orderBy: { spotNumber: "asc" },
       });
 
       recommendedParking = availableSpot;
     }
 
-    return NextResponse.json({
-      hazmatRecord,
-      recommendedParking,
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        hazmatRecord,
+        recommendedParking,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating hazmat record:', error);
+    console.error("Error creating hazmat record:", error);
     return NextResponse.json(
-      { error: 'Failed to create hazmat record' },
-      { status: 500 }
+      { error: "Failed to create hazmat record" },
+      { status: 500 },
     );
   }
 }
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const gateEntryId = params.id;
@@ -179,20 +187,23 @@ export async function GET(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     const hazmatRecords = await prisma.hazmatRecord.findMany({
       where: { gateEntryId },
-      orderBy: { recordedAt: 'desc' },
+      orderBy: { recordedAt: "desc" },
     });
 
     return NextResponse.json({ hazmatRecords });
   } catch (error) {
-    console.error('Error fetching hazmat records:', error);
+    console.error("Error fetching hazmat records:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch hazmat records' },
-      { status: 500 }
+      { error: "Failed to fetch hazmat records" },
+      { status: 500 },
     );
   }
 }

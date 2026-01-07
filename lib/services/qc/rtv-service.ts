@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import nodemailer from 'nodemailer';
+import { PrismaClient } from "@prisma/client";
+import nodemailer from "nodemailer";
 
 const prisma = new PrismaClient();
 
@@ -12,7 +12,7 @@ export interface CreateRTVData {
   reason: string;
   quantity: number;
   value: number;
-  priority?: 'URGENT' | 'HIGH' | 'MEDIUM' | 'LOW';
+  priority?: "URGENT" | "HIGH" | "MEDIUM" | "LOW";
   createdBy: string;
 }
 
@@ -34,13 +34,15 @@ export class RTVService {
   /**
    * Generate next RTV number
    */
-  private static async generateRTVNumber(organizationId: string): Promise<string> {
+  private static async generateRTVNumber(
+    organizationId: string,
+  ): Promise<string> {
     const today = new Date();
     const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+
     const prefix = `RTV-${year}${month}`;
-    
+
     const lastRTV = await prisma.rTV.findFirst({
       where: {
         organizationId,
@@ -49,17 +51,17 @@ export class RTVService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
 
     let sequence = 1;
     if (lastRTV) {
-      const lastNumber = lastRTV.rtvNumber.split('-').pop();
-      sequence = parseInt(lastNumber || '0') + 1;
+      const lastNumber = lastRTV.rtvNumber.split("-").pop();
+      sequence = parseInt(lastNumber || "0") + 1;
     }
 
-    return `${prefix}-${String(sequence).padStart(6, '0')}`;
+    return `${prefix}-${String(sequence).padStart(6, "0")}`;
   }
 
   /**
@@ -83,7 +85,7 @@ export class RTVService {
     });
 
     if (!defect) {
-      throw new Error('Defect not found');
+      throw new Error("Defect not found");
     }
 
     // Create RTV
@@ -98,8 +100,8 @@ export class RTVService {
         reason: data.reason,
         quantity: data.quantity,
         value: data.value,
-        priority: data.priority || 'MEDIUM',
-        status: 'PENDING',
+        priority: data.priority || "MEDIUM",
+        status: "PENDING",
         createdBy: data.createdBy,
       },
       include: {
@@ -119,20 +121,24 @@ export class RTVService {
     await prisma.qCDefect.update({
       where: { id: data.defectId },
       data: {
-        resolutionStatus: 'RTV_REQUESTED',
+        resolutionStatus: "RTV_REQUESTED",
       },
     });
 
     // Log activity
     await this.logActivity(
       rtv.id,
-      'CREATED',
+      "CREATED",
       `RTV ${rtvNumber} created for defect`,
-      data.createdBy
+      data.createdBy,
     );
 
     // Update vendor quality score
-    await this.updateVendorQualityOnRTV(data.supplierId, data.organizationId, data.value);
+    await this.updateVendorQualityOnRTV(
+      data.supplierId,
+      data.organizationId,
+      data.value,
+    );
 
     return rtv;
   }
@@ -156,11 +162,11 @@ export class RTVService {
     });
 
     if (!rtv) {
-      throw new Error('RTV not found');
+      throw new Error("RTV not found");
     }
 
     if (!rtv.supplier.email) {
-      throw new Error('Supplier email not configured');
+      throw new Error("Supplier email not configured");
     }
 
     // Send email to vendor
@@ -170,16 +176,16 @@ export class RTVService {
     await prisma.rTV.update({
       where: { id: rtvId },
       data: {
-        status: 'VENDOR_NOTIFIED',
+        status: "VENDOR_NOTIFIED",
       },
     });
 
     // Log activity
     await this.logActivity(
       rtvId,
-      'VENDOR_NOTIFIED',
+      "VENDOR_NOTIFIED",
       `Vendor ${rtv.supplier.name} notified via email`,
-      userId
+      userId,
     );
 
     return { success: emailSent, rtv };
@@ -192,8 +198,8 @@ export class RTVService {
     try {
       // Configure email transport (use environment variables in production)
       const transporter = nodemailer.createTransporter({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: parseInt(process.env.SMTP_PORT || '587'),
+        host: process.env.SMTP_HOST || "smtp.gmail.com",
+        port: parseInt(process.env.SMTP_PORT || "587"),
         secure: false,
         auth: {
           user: process.env.SMTP_USER,
@@ -252,7 +258,7 @@ export class RTVService {
       `;
 
       await transporter.sendMail({
-        from: process.env.SMTP_FROM || 'qc@yourcompany.com',
+        from: process.env.SMTP_FROM || "qc@yourcompany.com",
         to: rtv.supplier.email,
         subject: `RTV Request - ${rtv.rtvNumber}`,
         html: htmlContent,
@@ -260,7 +266,7 @@ export class RTVService {
 
       return true;
     } catch (error) {
-      console.error('Failed to send vendor email:', error);
+      console.error("Failed to send vendor email:", error);
       return false;
     }
   }
@@ -272,7 +278,7 @@ export class RTVService {
     const rtv = await prisma.rTV.update({
       where: { id: rtvId },
       data: {
-        status: 'APPROVED',
+        status: "APPROVED",
       },
     });
 
@@ -280,12 +286,12 @@ export class RTVService {
     await prisma.qCDefect.update({
       where: { id: rtv.defectId },
       data: {
-        resolutionStatus: 'RTV_APPROVED',
+        resolutionStatus: "RTV_APPROVED",
       },
     });
 
     // Log activity
-    await this.logActivity(rtvId, 'APPROVED', notes || 'RTV approved', userId);
+    await this.logActivity(rtvId, "APPROVED", notes || "RTV approved", userId);
 
     return rtv;
   }
@@ -297,7 +303,7 @@ export class RTVService {
     const rtv = await prisma.rTV.update({
       where: { id: rtvId },
       data: {
-        status: 'REJECTED',
+        status: "REJECTED",
         internalNotes: reason,
       },
     });
@@ -306,12 +312,12 @@ export class RTVService {
     await prisma.qCDefect.update({
       where: { id: rtv.defectId },
       data: {
-        resolutionStatus: 'REJECTED',
+        resolutionStatus: "REJECTED",
       },
     });
 
     // Log activity
-    await this.logActivity(rtvId, 'REJECTED', reason, userId);
+    await this.logActivity(rtvId, "REJECTED", reason, userId);
 
     return rtv;
   }
@@ -327,12 +333,12 @@ export class RTVService {
       trackingNumber: string;
       shippingCost?: number;
       labelUrl?: string;
-    }
+    },
   ) {
     const rtv = await prisma.rTV.update({
       where: { id: rtvId },
       data: {
-        status: 'SHIPPED',
+        status: "SHIPPED",
         carrier: shippingData.carrier,
         trackingNumber: shippingData.trackingNumber,
         shippingCost: shippingData.shippingCost,
@@ -344,9 +350,9 @@ export class RTVService {
     // Log activity
     await this.logActivity(
       rtvId,
-      'SHIPPED',
+      "SHIPPED",
       `Shipped via ${shippingData.carrier}, tracking: ${shippingData.trackingNumber}`,
-      userId
+      userId,
     );
 
     return rtv;
@@ -361,9 +367,9 @@ export class RTVService {
     responseData: {
       vendorRmaNumber: string;
       vendorNotes?: string;
-      resolutionType: 'CREDIT' | 'REPLACEMENT' | 'REFUSED' | 'PARTIAL_CREDIT';
+      resolutionType: "CREDIT" | "REPLACEMENT" | "REFUSED" | "PARTIAL_CREDIT";
       creditAmount?: number;
-    }
+    },
   ) {
     const rtv = await prisma.rTV.update({
       where: { id: rtvId },
@@ -379,9 +385,9 @@ export class RTVService {
     // Log activity
     await this.logActivity(
       rtvId,
-      'VENDOR_RESPONSE',
+      "VENDOR_RESPONSE",
       `Vendor responded with ${responseData.resolutionType}`,
-      userId
+      userId,
     );
 
     return rtv;
@@ -396,12 +402,12 @@ export class RTVService {
     creditData: {
       creditAmount: number;
       creditMemoNumber: string;
-    }
+    },
   ) {
     const rtv = await prisma.rTV.update({
       where: { id: rtvId },
       data: {
-        status: 'CREDITED',
+        status: "CREDITED",
         creditAmount: creditData.creditAmount,
         creditMemoNumber: creditData.creditMemoNumber,
         creditedAt: new Date(),
@@ -412,7 +418,7 @@ export class RTVService {
     await prisma.qCDefect.update({
       where: { id: rtv.defectId },
       data: {
-        resolutionStatus: 'CREDITED',
+        resolutionStatus: "CREDITED",
         resolutionDate: new Date(),
       },
     });
@@ -420,9 +426,9 @@ export class RTVService {
     // Log activity
     await this.logActivity(
       rtvId,
-      'CREDITED',
+      "CREDITED",
       `Credit received: $${creditData.creditAmount} (Memo: ${creditData.creditMemoNumber})`,
-      userId
+      userId,
     );
 
     return rtv;
@@ -435,12 +441,12 @@ export class RTVService {
     const rtv = await prisma.rTV.update({
       where: { id: rtvId },
       data: {
-        status: 'CLOSED',
+        status: "CLOSED",
       },
     });
 
     // Log activity
-    await this.logActivity(rtvId, 'CLOSED', notes || 'RTV closed', userId);
+    await this.logActivity(rtvId, "CLOSED", notes || "RTV closed", userId);
 
     return rtv;
   }
@@ -455,7 +461,7 @@ export class RTVService {
     });
 
     // Log activity
-    await this.logActivity(rtvId, 'UPDATED', 'RTV updated', userId);
+    await this.logActivity(rtvId, "UPDATED", "RTV updated", userId);
 
     return rtv;
   }
@@ -485,7 +491,7 @@ export class RTVService {
         purchaseOrder: true,
         warehouse: true,
         activities: {
-          orderBy: { createdAt: 'desc' },
+          orderBy: { createdAt: "desc" },
         },
       },
     });
@@ -503,7 +509,7 @@ export class RTVService {
       priority?: string;
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ) {
     const where: any = {
       organizationId,
@@ -536,7 +542,7 @@ export class RTVService {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
     });
   }
@@ -558,25 +564,32 @@ export class RTVService {
     });
 
     const totalRTVs = rtvs.length;
-    const totalValue = rtvs.reduce((sum, rtv) => sum + parseFloat(rtv.value.toString()), 0);
-    const pendingRTVs = rtvs.filter(rtv => rtv.status === 'PENDING').length;
-    const shippedRTVs = rtvs.filter(rtv => rtv.status === 'SHIPPED').length;
-    const creditedRTVs = rtvs.filter(rtv => rtv.status === 'CREDITED').length;
-    const closedRTVs = rtvs.filter(rtv => rtv.status === 'CLOSED').length;
+    const totalValue = rtvs.reduce(
+      (sum, rtv) => sum + parseFloat(rtv.value.toString()),
+      0,
+    );
+    const pendingRTVs = rtvs.filter((rtv) => rtv.status === "PENDING").length;
+    const shippedRTVs = rtvs.filter((rtv) => rtv.status === "SHIPPED").length;
+    const creditedRTVs = rtvs.filter((rtv) => rtv.status === "CREDITED").length;
+    const closedRTVs = rtvs.filter((rtv) => rtv.status === "CLOSED").length;
 
     const totalCredits = rtvs
-      .filter(rtv => rtv.creditAmount)
-      .reduce((sum, rtv) => sum + parseFloat(rtv.creditAmount?.toString() || '0'), 0);
+      .filter((rtv) => rtv.creditAmount)
+      .reduce(
+        (sum, rtv) => sum + parseFloat(rtv.creditAmount?.toString() || "0"),
+        0,
+      );
 
     // Calculate avg resolution time (days)
-    const resolvedRTVs = rtvs.filter(rtv => rtv.creditedAt);
-    const avgResolutionDays = resolvedRTVs.length > 0
-      ? resolvedRTVs.reduce((sum, rtv) => {
-          const created = new Date(rtv.createdAt).getTime();
-          const credited = new Date(rtv.creditedAt!).getTime();
-          return sum + (credited - created) / (1000 * 60 * 60 * 24);
-        }, 0) / resolvedRTVs.length
-      : 0;
+    const resolvedRTVs = rtvs.filter((rtv) => rtv.creditedAt);
+    const avgResolutionDays =
+      resolvedRTVs.length > 0
+        ? resolvedRTVs.reduce((sum, rtv) => {
+            const created = new Date(rtv.createdAt).getTime();
+            const credited = new Date(rtv.creditedAt!).getTime();
+            return sum + (credited - created) / (1000 * 60 * 60 * 24);
+          }, 0) / resolvedRTVs.length
+        : 0;
 
     return {
       totalRTVs,
@@ -596,7 +609,7 @@ export class RTVService {
   private static async updateVendorQualityOnRTV(
     supplierId: string,
     organizationId: string,
-    rtvValue: number
+    rtvValue: number,
   ) {
     const qualityScore = await prisma.vendorQualityScore.findUnique({
       where: {
@@ -631,7 +644,7 @@ export class RTVService {
     rtvId: string,
     activityType: string,
     description: string,
-    performedBy: string
+    performedBy: string,
   ) {
     await prisma.rTVActivity.create({
       data: {

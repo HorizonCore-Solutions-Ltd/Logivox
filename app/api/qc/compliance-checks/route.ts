@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import vendorComplianceService from '@/lib/services/qc/vendor-compliance-service';
+import { NextRequest, NextResponse } from "next/server";
+import vendorComplianceService from "@/lib/services/qc/vendor-compliance-service";
 
 /**
  * GET /api/qc/compliance-checks
@@ -8,14 +8,14 @@ import vendorComplianceService from '@/lib/services/qc/vendor-compliance-service
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get('organizationId');
-    const vendorId = searchParams.get('vendorId');
-    const checkType = searchParams.get('checkType');
+    const organizationId = searchParams.get("organizationId");
+    const vendorId = searchParams.get("vendorId");
+    const checkType = searchParams.get("checkType");
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Organization ID required' },
-        { status: 400 }
+        { error: "Organization ID required" },
+        { status: 400 },
       );
     }
 
@@ -27,10 +27,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error: any) {
-    console.error('Error listing compliance checks:', error);
+    console.error("Error listing compliance checks:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -50,15 +50,15 @@ export async function POST(request: NextRequest) {
       checkDate: new Date(body.checkDate),
       inspectorId: body.inspectorId,
       checklistItems: body.checklistItems,
-      createdBy: body.createdBy || 'system',
+      createdBy: body.createdBy || "system",
     });
 
     return NextResponse.json(check, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating compliance check:', error);
+    console.error("Error creating compliance check:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }

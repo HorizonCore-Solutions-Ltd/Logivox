@@ -7,7 +7,7 @@ import { z } from "zod";
 // GET /api/qc-inspections/[id] - Get inspection details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -62,7 +62,7 @@ export async function GET(
               },
             },
           },
-          orderBy: { sequence: 'asc' },
+          orderBy: { sequence: "asc" },
         },
         approvals: {
           include: {
@@ -74,7 +74,7 @@ export async function GET(
               },
             },
           },
-          orderBy: { level: 'asc' },
+          orderBy: { level: "asc" },
         },
       },
     });
@@ -82,7 +82,7 @@ export async function GET(
     if (!inspection) {
       return NextResponse.json(
         { error: "Inspection not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -91,7 +91,7 @@ export async function GET(
     console.error("Error fetching inspection:", error);
     return NextResponse.json(
       { error: "Failed to fetch inspection" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -99,7 +99,7 @@ export async function GET(
 // PATCH /api/qc-inspections/[id] - Update inspection
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -127,7 +127,7 @@ export async function PATCH(
     console.error("Error updating inspection:", error);
     return NextResponse.json(
       { error: "Failed to update inspection" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

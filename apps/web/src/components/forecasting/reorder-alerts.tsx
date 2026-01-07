@@ -1,6 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Package, Calendar, TrendingDown } from "lucide-react";
@@ -81,7 +87,9 @@ export function ReorderAlerts({ alerts, onRefresh }: ReorderAlertsProps) {
             <div className="text-2xl font-bold text-red-600">
               {alerts.filter((a) => a.urgency === "critical").length}
             </div>
-            <p className="text-xs text-muted-foreground">≤3 days until stockout</p>
+            <p className="text-xs text-muted-foreground">
+              ≤3 days until stockout
+            </p>
           </CardContent>
         </Card>
 
@@ -93,7 +101,9 @@ export function ReorderAlerts({ alerts, onRefresh }: ReorderAlertsProps) {
             <div className="text-2xl font-bold text-orange-600">
               {alerts.filter((a) => a.urgency === "high").length}
             </div>
-            <p className="text-xs text-muted-foreground">≤7 days until stockout</p>
+            <p className="text-xs text-muted-foreground">
+              ≤7 days until stockout
+            </p>
           </CardContent>
         </Card>
 
@@ -105,7 +115,9 @@ export function ReorderAlerts({ alerts, onRefresh }: ReorderAlertsProps) {
             <div className="text-2xl font-bold text-yellow-600">
               {alerts.filter((a) => a.urgency === "medium").length}
             </div>
-            <p className="text-xs text-muted-foreground">≤14 days until stockout</p>
+            <p className="text-xs text-muted-foreground">
+              ≤14 days until stockout
+            </p>
           </CardContent>
         </Card>
 
@@ -117,7 +129,9 @@ export function ReorderAlerts({ alerts, onRefresh }: ReorderAlertsProps) {
             <div className="text-2xl font-bold text-blue-600">
               {alerts.filter((a) => a.urgency === "low").length}
             </div>
-            <p className="text-xs text-muted-foreground">&gt;14 days until stockout</p>
+            <p className="text-xs text-muted-foreground">
+              &gt;14 days until stockout
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -218,11 +232,15 @@ export function ReorderAlerts({ alerts, onRefresh }: ReorderAlertsProps) {
                   <div className="flex-1">
                     <p className="font-medium">{alert.productName}</p>
                     <p className="text-sm text-muted-foreground">
-                      Estimated stockout: {new Date(alert.estimatedStockoutDate).toLocaleDateString("en-US", {
-                        month: "long",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      Estimated stockout:{" "}
+                      {new Date(alert.estimatedStockoutDate).toLocaleDateString(
+                        "en-US",
+                        {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                        },
+                      )}
                     </p>
                   </div>
                   <Badge variant={getUrgencyColor(alert.urgency)}>

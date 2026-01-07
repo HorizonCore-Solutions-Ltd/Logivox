@@ -3,12 +3,12 @@
  * Formal quarterly/annual vendor performance evaluations
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export type ReviewType = 'QUARTERLY' | 'ANNUAL' | 'AD_HOC';
-export type Recommendation = 'CONTINUE' | 'PROBATION' | 'DEVELOP' | 'TERMINATE';
+export type ReviewType = "QUARTERLY" | "ANNUAL" | "AD_HOC";
+export type Recommendation = "CONTINUE" | "PROBATION" | "DEVELOP" | "TERMINATE";
 
 export interface PerformanceMetrics {
   qualityScore: number;
@@ -19,7 +19,6 @@ export interface PerformanceMetrics {
 }
 
 export class SupplierPerformanceReviewService {
-  
   /**
    * Create performance review
    */
@@ -32,17 +31,16 @@ export class SupplierPerformanceReviewService {
     reviewType: ReviewType;
     createdBy: string;
   }) {
-    
     // Generate review number
     const reviewNumber = await this.generateReviewNumber(params.organizationId);
-    
+
     // Calculate performance scores
     const metrics = await this.calculatePerformanceMetrics({
       vendorId: params.vendorId,
       periodStart: params.periodStart,
       periodEnd: params.periodEnd,
     });
-    
+
     // Create review
     const review = await prisma.supplierPerformanceReview.create({
       data: {
@@ -64,10 +62,10 @@ export class SupplierPerformanceReviewService {
         vendor: true,
       },
     });
-    
+
     return review;
   }
-  
+
   /**
    * Calculate performance metrics
    */
@@ -82,12 +80,11 @@ export class SupplierPerformanceReviewService {
     weaknesses: string[];
     improvementAreas: string[];
   }> {
-    
     // Get quality metrics
     const qualityScore = await prisma.vendorQualityScore.findFirst({
       where: { supplierId: params.vendorId },
     });
-    
+
     // Get delivery performance
     const pos = await prisma.purchaseOrder.findMany({
       where: {
@@ -98,20 +95,21 @@ export class SupplierPerformanceReviewService {
         },
       },
     });
-    
-    const onTimeDeliveries = pos.filter(po => {
+
+    const onTimeDeliveries = pos.filter((po) => {
       // TODO: Check if delivery was on time
       return true;
     }).length;
-    
-    const deliveryScore = pos.length > 0 ? (onTimeDeliveries / pos.length) * 100 : 50;
-    
+
+    const deliveryScore =
+      pos.length > 0 ? (onTimeDeliveries / pos.length) * 100 : 50;
+
     // Get responsiveness (from RTVs, issues resolution time)
     const responsivenessScore = 75; // TODO: Calculate based on response times
-    
+
     // Get pricing competitiveness
     const pricingScore = 80; // TODO: Calculate based on market comparison
-    
+
     // Get compliance score
     const complianceChecks = await prisma.vendorComplianceCheck.findMany({
       where: {
@@ -122,11 +120,15 @@ export class SupplierPerformanceReviewService {
         },
       },
     });
-    
-    const avgComplianceRate = complianceChecks.length > 0
-      ? complianceChecks.reduce((sum: number, c: any) => sum + Number(c.complianceRate), 0) / complianceChecks.length
-      : 50;
-    
+
+    const avgComplianceRate =
+      complianceChecks.length > 0
+        ? complianceChecks.reduce(
+            (sum: number, c: any) => sum + Number(c.complianceRate),
+            0,
+          ) / complianceChecks.length
+        : 50;
+
     const scores = {
       qualityScore: Math.round(qualityScore?.overallScore || 50),
       deliveryScore: Math.round(deliveryScore),
@@ -135,39 +137,41 @@ export class SupplierPerformanceReviewService {
       complianceScore: Math.round(avgComplianceRate),
       overallScore: 0,
     };
-    
+
     // Calculate weighted overall score
     scores.overallScore = Math.round(
       scores.qualityScore * 0.3 +
-      scores.deliveryScore * 0.25 +
-      scores.responsivenessScore * 0.2 +
-      scores.pricingScore * 0.15 +
-      scores.complianceScore * 0.1
+        scores.deliveryScore * 0.25 +
+        scores.responsivenessScore * 0.2 +
+        scores.pricingScore * 0.15 +
+        scores.complianceScore * 0.1,
     );
-    
+
     // Identify strengths and weaknesses
     const strengths: string[] = [];
     const weaknesses: string[] = [];
     const improvementAreas: string[] = [];
-    
-    if (scores.qualityScore >= 90) strengths.push('Exceptional product quality');
+
+    if (scores.qualityScore >= 90)
+      strengths.push("Exceptional product quality");
     else if (scores.qualityScore < 70) {
-      weaknesses.push('Quality issues');
-      improvementAreas.push('Implement quality control improvements');
+      weaknesses.push("Quality issues");
+      improvementAreas.push("Implement quality control improvements");
     }
-    
-    if (scores.deliveryScore >= 90) strengths.push('Reliable on-time delivery');
+
+    if (scores.deliveryScore >= 90) strengths.push("Reliable on-time delivery");
     else if (scores.deliveryScore < 70) {
-      weaknesses.push('Delivery delays');
-      improvementAreas.push('Improve production planning and logistics');
+      weaknesses.push("Delivery delays");
+      improvementAreas.push("Improve production planning and logistics");
     }
-    
-    if (scores.responsivenessScore >= 90) strengths.push('Excellent communication');
+
+    if (scores.responsivenessScore >= 90)
+      strengths.push("Excellent communication");
     else if (scores.responsivenessScore < 70) {
-      weaknesses.push('Slow issue resolution');
-      improvementAreas.push('Enhance customer service response times');
+      weaknesses.push("Slow issue resolution");
+      improvementAreas.push("Enhance customer service response times");
     }
-    
+
     return {
       scores,
       snapshot: {
@@ -181,7 +185,7 @@ export class SupplierPerformanceReviewService {
       improvementAreas,
     };
   }
-  
+
   /**
    * Add corrective action plan (stub - correctiveActionsRequired field not in schema)
    */
@@ -205,7 +209,7 @@ export class SupplierPerformanceReviewService {
       },
     });
   }
-  
+
   /**
    * Schedule meeting (stub - fields not in schema)
    */
@@ -219,11 +223,11 @@ export class SupplierPerformanceReviewService {
     return await prisma.supplierPerformanceReview.update({
       where: { id: params.reviewId },
       data: {
-        notes: `Meeting scheduled for ${params.meetingDate.toISOString()} with attendees: ${params.attendees.join(', ')}`,
+        notes: `Meeting scheduled for ${params.meetingDate.toISOString()} with attendees: ${params.attendees.join(", ")}`,
       },
     });
   }
-  
+
   /**
    * Add meeting notes (stub - fields not in schema)
    */
@@ -242,7 +246,7 @@ export class SupplierPerformanceReviewService {
       },
     });
   }
-  
+
   /**
    * Complete review with recommendation
    */
@@ -253,21 +257,21 @@ export class SupplierPerformanceReviewService {
     nextReviewDue?: Date;
   }) {
     const updateData: any = {
-      status: 'APPROVED',
+      status: "APPROVED",
       recommendation: params.recommendation,
       approvedAt: new Date(),
     };
-    
+
     if (params.recommendationReason) {
       updateData.notes = params.recommendationReason;
     }
-    
+
     return await prisma.supplierPerformanceReview.update({
       where: { id: params.reviewId },
       data: updateData,
     });
   }
-  
+
   /**
    * Vendor acknowledges review
    */
@@ -275,11 +279,11 @@ export class SupplierPerformanceReviewService {
     return await prisma.supplierPerformanceReview.update({
       where: { id: reviewId },
       data: {
-        status: 'PUBLISHED',
+        status: "PUBLISHED",
       },
     });
   }
-  
+
   /**
    * List reviews
    */
@@ -294,31 +298,31 @@ export class SupplierPerformanceReviewService {
     const where: any = {
       organizationId: params.organizationId,
     };
-    
+
     if (params.vendorId) where.vendorId = params.vendorId;
     if (params.status) where.status = params.status;
     if (params.reviewType) where.reviewType = params.reviewType;
-    
+
     const [reviews, total] = await Promise.all([
       prisma.supplierPerformanceReview.findMany({
         where,
         include: {
           vendor: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip: params.skip || 0,
         take: params.take || 50,
       }),
       prisma.supplierPerformanceReview.count({ where }),
     ]);
-    
+
     return {
       reviews,
       total,
       hasMore: (params.skip || 0) + reviews.length < total,
     };
   }
-  
+
   /**
    * Get upcoming reviews
    */
@@ -334,15 +338,15 @@ export class SupplierPerformanceReviewService {
     return await prisma.supplierPerformanceReview.findMany({
       where: {
         organizationId: params.organizationId,
-        status: { in: ['UNDER_REVIEW', 'DRAFT'] },
+        status: { in: ["UNDER_REVIEW", "DRAFT"] },
       },
       include: {
         vendor: true,
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
     });
   }
-  
+
   /**
    * Get review statistics
    */
@@ -354,13 +358,13 @@ export class SupplierPerformanceReviewService {
     const where: any = {
       organizationId: params.organizationId,
     };
-    
+
     if (params.startDate || params.endDate) {
       where.createdAt = {};
       if (params.startDate) where.createdAt.gte = params.startDate;
       if (params.endDate) where.createdAt.lte = params.endDate;
     }
-    
+
     const reviews = await prisma.supplierPerformanceReview.findMany({
       where,
       select: {
@@ -393,21 +397,30 @@ export class SupplierPerformanceReviewService {
         approvedBy: true,
       },
     });
-    
-    const avgScore = reviews.length > 0
-      ? reviews.reduce((sum: number, r: any) => sum + r.overallScore, 0) / reviews.length
-      : 0;
-    
-    const byRecommendation = reviews.reduce((acc: Record<string, number>, r: any) => {
-      acc[r.recommendation || 'NONE'] = (acc[r.recommendation || 'NONE'] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
-    const byStatus = reviews.reduce((acc: Record<string, number>, r: any) => {
-      acc[r.status] = (acc[r.status] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    
+
+    const avgScore =
+      reviews.length > 0
+        ? reviews.reduce((sum: number, r: any) => sum + r.overallScore, 0) /
+          reviews.length
+        : 0;
+
+    const byRecommendation = reviews.reduce(
+      (acc: Record<string, number>, r: any) => {
+        acc[r.recommendation || "NONE"] =
+          (acc[r.recommendation || "NONE"] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
+    const byStatus = reviews.reduce(
+      (acc: Record<string, number>, r: any) => {
+        acc[r.status] = (acc[r.status] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
+
     return {
       totalReviews: reviews.length,
       avgScore: Math.round(avgScore),
@@ -415,12 +428,12 @@ export class SupplierPerformanceReviewService {
       byStatus,
     };
   }
-  
+
   // ===== PRIVATE HELPER METHODS =====
-  
+
   private async generateReviewNumber(organizationId: string): Promise<string> {
     const year = new Date().getFullYear();
-    
+
     const count = await prisma.supplierPerformanceReview.count({
       where: {
         organizationId,
@@ -429,11 +442,12 @@ export class SupplierPerformanceReviewService {
         },
       },
     });
-    
-    const sequence = String(count + 1).padStart(4, '0');
+
+    const sequence = String(count + 1).padStart(4, "0");
     return `SPR-${year}-${sequence}`;
   }
 }
 
-export const supplierPerformanceReviewService = new SupplierPerformanceReviewService();
+export const supplierPerformanceReviewService =
+  new SupplierPerformanceReviewService();
 export default supplierPerformanceReviewService;

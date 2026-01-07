@@ -18,12 +18,14 @@ The CAPA (Corrective and Preventive Action) system provides a structured approac
 ## Key Features
 
 ### Risk-Based Prioritization
+
 - **RPN Calculation**: Severity × Occurrence × Detection (1-1000 scale)
 - **Automatic Risk Classification**: High (≥200), Medium (100-199), Low (<100)
 - **Priority-Based Workflow**: Critical issues get immediate attention
 - **Risk Trend Tracking**: Monitor risk reduction over time
 
 ### Action Management
+
 - **Dual-Purpose**: Corrective (fix problems) and Preventive (avoid problems)
 - **Multi-Step Actions**: Immediate, Corrective, Preventive
 - **Owner Assignment**: Clear accountability
@@ -31,12 +33,14 @@ The CAPA (Corrective and Preventive Action) system provides a structured approac
 - **Completion Tracking**: Progress monitoring
 
 ### Effectiveness Verification
+
 - **Verification Planning**: Define how to measure success
 - **Verification Methods**: Inspection, Audit, Data Analysis, etc.
 - **Result Documentation**: Record actual effectiveness
 - **Re-CAPA if Ineffective**: Loop back if solution fails
 
 ### Workflow Control
+
 - **5 Status Stages**: Open → In Progress → Pending Verification → Verified → Closed
 - **State Transitions**: Controlled progression through workflow
 - **Overdue Alerts**: Email notifications for missed dates
@@ -45,6 +49,7 @@ The CAPA (Corrective and Preventive Action) system provides a structured approac
 ## RPN Calculation
 
 ### Formula
+
 ```
 RPN = Severity × Occurrence × Detection
 ```
@@ -52,66 +57,70 @@ RPN = Severity × Occurrence × Detection
 ### Rating Scales (1-10)
 
 #### Severity (S)
+
 How serious is the effect on the customer/process?
 
-| Rating | Description | Examples |
-|--------|-------------|----------|
-| 10 | Hazardous - without warning | Safety hazard, regulatory violation |
-| 9 | Hazardous - with warning | Safety hazard with warning label |
-| 8 | Very High | Product inoperable, loss of primary function |
-| 7 | High | Product operable but reduced performance |
-| 6 | Moderate | Product operable with some inconvenience |
-| 5 | Low | Fit/finish defect noticed by most customers |
-| 4 | Very Low | Fit/finish defect noticed by some customers |
-| 3 | Minor | Fit/finish defect noticed by discriminating customers |
-| 2 | Very Minor | Fit/finish defect noticed by very few customers |
-| 1 | None | No effect |
+| Rating | Description                 | Examples                                              |
+| ------ | --------------------------- | ----------------------------------------------------- |
+| 10     | Hazardous - without warning | Safety hazard, regulatory violation                   |
+| 9      | Hazardous - with warning    | Safety hazard with warning label                      |
+| 8      | Very High                   | Product inoperable, loss of primary function          |
+| 7      | High                        | Product operable but reduced performance              |
+| 6      | Moderate                    | Product operable with some inconvenience              |
+| 5      | Low                         | Fit/finish defect noticed by most customers           |
+| 4      | Very Low                    | Fit/finish defect noticed by some customers           |
+| 3      | Minor                       | Fit/finish defect noticed by discriminating customers |
+| 2      | Very Minor                  | Fit/finish defect noticed by very few customers       |
+| 1      | None                        | No effect                                             |
 
 #### Occurrence (O)
+
 How frequently does the problem occur?
 
-| Rating | Description | Probability | Examples |
-|--------|-------------|-------------|----------|
-| 10 | Very High | ≥1 in 2 (50%) | Chronic failures |
-| 9 | Very High | 1 in 3 (33%) | Frequent failures |
-| 8 | High | 1 in 8 (12.5%) | Regular failures |
-| 7 | High | 1 in 20 (5%) | Repeated failures |
-| 6 | Moderate | 1 in 80 (1.25%) | Moderate failures |
-| 5 | Moderate | 1 in 400 (0.25%) | Occasional failures |
-| 4 | Low | 1 in 2,000 (0.05%) | Few failures |
-| 3 | Low | 1 in 15,000 (0.007%) | Isolated failures |
-| 2 | Remote | 1 in 150,000 (0.0007%) | Rare failures |
-| 1 | Nearly Impossible | <1 in 1,500,000 | Failure unlikely |
+| Rating | Description       | Probability            | Examples            |
+| ------ | ----------------- | ---------------------- | ------------------- |
+| 10     | Very High         | ≥1 in 2 (50%)          | Chronic failures    |
+| 9      | Very High         | 1 in 3 (33%)           | Frequent failures   |
+| 8      | High              | 1 in 8 (12.5%)         | Regular failures    |
+| 7      | High              | 1 in 20 (5%)           | Repeated failures   |
+| 6      | Moderate          | 1 in 80 (1.25%)        | Moderate failures   |
+| 5      | Moderate          | 1 in 400 (0.25%)       | Occasional failures |
+| 4      | Low               | 1 in 2,000 (0.05%)     | Few failures        |
+| 3      | Low               | 1 in 15,000 (0.007%)   | Isolated failures   |
+| 2      | Remote            | 1 in 150,000 (0.0007%) | Rare failures       |
+| 1      | Nearly Impossible | <1 in 1,500,000        | Failure unlikely    |
 
 #### Detection (D)
+
 How likely are we to detect the problem before it reaches the customer?
 
-| Rating | Description | Detection Probability | Examples |
-|--------|-------------|----------------------|----------|
-| 10 | Almost Impossible | 0-5% | No inspection |
-| 9 | Very Remote | 6-15% | Random visual checks |
-| 8 | Remote | 16-25% | Periodic sampling |
-| 7 | Very Low | 26-35% | Basic SPC |
-| 6 | Low | 36-45% | Manual inspection |
-| 5 | Moderate | 46-55% | 100% manual inspection |
-| 4 | Moderately High | 56-75% | Automated inspection (some escapes) |
-| 3 | High | 76-85% | Error-proofing |
-| 2 | Very High | 86-95% | Error-proofing + verification |
-| 1 | Almost Certain | 96-100% | Defect cannot be made |
+| Rating | Description       | Detection Probability | Examples                            |
+| ------ | ----------------- | --------------------- | ----------------------------------- |
+| 10     | Almost Impossible | 0-5%                  | No inspection                       |
+| 9      | Very Remote       | 6-15%                 | Random visual checks                |
+| 8      | Remote            | 16-25%                | Periodic sampling                   |
+| 7      | Very Low          | 26-35%                | Basic SPC                           |
+| 6      | Low               | 36-45%                | Manual inspection                   |
+| 5      | Moderate          | 46-55%                | 100% manual inspection              |
+| 4      | Moderately High   | 56-75%                | Automated inspection (some escapes) |
+| 3      | High              | 76-85%                | Error-proofing                      |
+| 2      | Very High         | 86-95%                | Error-proofing + verification       |
+| 1      | Almost Certain    | 96-100%               | Defect cannot be made               |
 
 ### RPN Interpretation
 
-| RPN Range | Risk Level | Action Required | Timeline |
-|-----------|------------|-----------------|----------|
-| 200-1000 | **High Risk** | Immediate action required | 24-48 hours |
-| 100-199 | **Medium Risk** | Action plan within 1 week | 5-7 days |
-| 1-99 | **Low Risk** | Monitor, plan improvement | 30 days |
+| RPN Range | Risk Level      | Action Required           | Timeline    |
+| --------- | --------------- | ------------------------- | ----------- |
+| 200-1000  | **High Risk**   | Immediate action required | 24-48 hours |
+| 100-199   | **Medium Risk** | Action plan within 1 week | 5-7 days    |
+| 1-99      | **Low Risk**    | Monitor, plan improvement | 30 days     |
 
 ### Example Calculation
 
 **Problem**: Shipping labels printed with wrong addresses
 
 **Ratings:**
+
 - Severity: 8 (Customer receives wrong product)
 - Occurrence: 5 (Happens 0.25% of the time = 1 in 400 shipments)
 - Detection: 7 (Our current QC catches it 30% of the time)
@@ -119,6 +128,7 @@ How likely are we to detect the problem before it reaches the customer?
 **RPN = 8 × 5 × 7 = 280** → **High Risk**
 
 **Actions:**
+
 1. **Reduce Severity**: Can't reduce - wrong delivery is always serious
 2. **Reduce Occurrence**: Implement barcode scanning (5 → 2)
 3. **Reduce Detection**: Add automated address verification (7 → 3)
@@ -130,12 +140,14 @@ How likely are we to detect the problem before it reaches the customer?
 ### CAPA Dashboard (`/dashboard/qc/capa`)
 
 **Statistics Cards:**
+
 - Total CAPAs (all time)
 - Average RPN (current open)
 - Overdue Count (past target date)
 - Avg Completion Time (days)
 
 **Filters:**
+
 - Status: All, Open, In Progress, Pending Verification, Verified, Closed
 - Type: All, Corrective, Preventive, Both
 - Priority: All, Critical, High, Medium, Low
@@ -144,6 +156,7 @@ How likely are we to detect the problem before it reaches the customer?
 - Search: CAPA number, title, description
 
 **Data Table Columns:**
+
 1. CAPA Number (clickable)
 2. Title
 3. Type Badge
@@ -158,17 +171,20 @@ How likely are we to detect the problem before it reaches the customer?
 ### CAPA Detail Page (`/dashboard/qc/capa/[id]`)
 
 **Header Section:**
+
 - CAPA Number and Title
 - Status, Type, Priority, RPN badges
 - Overdue indicator (if applicable)
 - Edit and Delete buttons
 
 **Completion Progress:**
+
 - Visual progress bar
 - Percentage complete (based on fields filled)
 - 5 checkpoints: Root Cause, Immediate Action, Corrective Action, Preventive Action, Verification
 
 **RPN Analysis:**
+
 - Individual ratings display:
   - Severity (1-10)
   - Occurrence (1-10)
@@ -178,6 +194,7 @@ How likely are we to detect the problem before it reaches the customer?
 - Visual risk indicator
 
 **Analysis & Actions:**
+
 - Root Cause Analysis (with checkmark if complete)
 - Immediate Action (temporary fix)
 - Corrective Action (fix the problem)
@@ -185,12 +202,14 @@ How likely are we to detect the problem before it reaches the customer?
 - Each with completion indicator
 
 **Effectiveness Verification:**
+
 - Verification Method
 - Verification Plan
 - Verification Result (Effective/Ineffective)
 - Verified By and Date
 
 **Sidebar Information:**
+
 - Assignment details
 - Target Date (highlighted if overdue)
 - Completion Date
@@ -199,6 +218,7 @@ How likely are we to detect the problem before it reaches the customer?
 - Timeline (created, updated)
 
 **Quick Actions:**
+
 - Start Working (Open → In Progress)
 - Submit for Verification (In Progress → Pending Verification)
 - Print Report
@@ -337,67 +357,76 @@ Steps:
 ## Data Fields
 
 ### Required Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| capaNumber | String | Auto-generated (CAPA-YYYYMMDD-NNN) |
-| title | String | Brief description (50 chars) |
-| description | String | Detailed explanation |
-| type | Enum | CORRECTIVE, PREVENTIVE, BOTH |
-| status | Enum | OPEN, IN_PROGRESS, PENDING_VERIFICATION, VERIFIED, CLOSED |
-| priority | Enum | CRITICAL, HIGH, MEDIUM, LOW |
-| severity | Int | RPN factor (1-10) |
-| occurrence | Int | RPN factor (1-10) |
-| detection | Int | RPN factor (1-10) |
-| rpn | Int | Calculated: S × O × D |
-| targetDate | DateTime | Completion deadline |
+
+| Field       | Type     | Description                                               |
+| ----------- | -------- | --------------------------------------------------------- |
+| capaNumber  | String   | Auto-generated (CAPA-YYYYMMDD-NNN)                        |
+| title       | String   | Brief description (50 chars)                              |
+| description | String   | Detailed explanation                                      |
+| type        | Enum     | CORRECTIVE, PREVENTIVE, BOTH                              |
+| status      | Enum     | OPEN, IN_PROGRESS, PENDING_VERIFICATION, VERIFIED, CLOSED |
+| priority    | Enum     | CRITICAL, HIGH, MEDIUM, LOW                               |
+| severity    | Int      | RPN factor (1-10)                                         |
+| occurrence  | Int      | RPN factor (1-10)                                         |
+| detection   | Int      | RPN factor (1-10)                                         |
+| rpn         | Int      | Calculated: S × O × D                                     |
+| targetDate  | DateTime | Completion deadline                                       |
 
 ### Action Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| rootCause | String | Root cause analysis |
-| immediateAction | String | Temporary containment |
-| correctiveAction | String | Permanent fix |
+
+| Field            | Type   | Description           |
+| ---------------- | ------ | --------------------- |
+| rootCause        | String | Root cause analysis   |
+| immediateAction  | String | Temporary containment |
+| correctiveAction | String | Permanent fix         |
 | preventiveAction | String | Recurrence prevention |
 
 ### Assignment Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| assignedTo | String | Owner responsible |
-| completedDate | DateTime | When finished |
+
+| Field         | Type     | Description       |
+| ------------- | -------- | ----------------- |
+| assignedTo    | String   | Owner responsible |
+| completedDate | DateTime | When finished     |
 
 ### Verification Fields
-| Field | Type | Description |
-|-------|------|-------------|
-| effectivenessVerification | String | Verification plan |
-| verificationMethod | Enum | How to verify |
-| verificationResult | Enum | EFFECTIVE, INEFFECTIVE |
-| verifiedBy | String | Who verified |
-| verifiedDate | DateTime | When verified |
+
+| Field                     | Type     | Description            |
+| ------------------------- | -------- | ---------------------- |
+| effectivenessVerification | String   | Verification plan      |
+| verificationMethod        | Enum     | How to verify          |
+| verificationResult        | Enum     | EFFECTIVE, INEFFECTIVE |
+| verifiedBy                | String   | Who verified           |
+| verifiedDate              | DateTime | When verified          |
 
 ### Relations
-| Field | Type | Description |
-|-------|------|-------------|
+
+| Field | Type   | Description            |
+| ----- | ------ | ---------------------- |
 | ncrId | String | Related NCR (optional) |
 
 ## Integration
 
 ### With NCR Module
+
 - NCRs spawn CAPAs automatically
 - CAPA number linked in NCR
 - NCR can't close until CAPA verified
 - Root cause flows from NCR to CAPA
 
 ### With Quality Holds
+
 - CAPA may trigger hold release
 - Hold disposition depends on CAPA
 - CAPA effectiveness affects hold policy
 
 ### With Supplier Management
+
 - Supplier-related CAPAs affect scorecard
 - Preventive actions may include supplier audits
 - CAPA results shared with suppliers
 
 ### With Training System
+
 - Preventive actions may require training
 - Training completion tracked in CAPA
 - Process changes trigger training updates
@@ -407,6 +436,7 @@ Steps:
 ### When to Create a CAPA
 
 ✅ **DO create CAPAs for:**
+
 - Any NCR (corrective action)
 - Process improvement opportunities (preventive)
 - Audit findings
@@ -416,6 +446,7 @@ Steps:
 - Near-misses (preventive)
 
 ❌ **DON'T create CAPAs for:**
+
 - One-time random events with no pattern
 - Issues already being addressed
 - Minor issues with no recurrence risk
@@ -424,12 +455,15 @@ Steps:
 ### Effective Root Cause Analysis
 
 **Poor Root Cause:**
+
 > "Operator made a mistake"
 
 **Better Root Cause:**
+
 > "Operator skipped verification step because procedure was unclear and workstation lacked verification checklist. Training emphasized speed over accuracy. No poka-yoke in place to prevent skip."
 
 **Key Questions:**
+
 1. Why did it happen? (Immediate cause)
 2. Why was that allowed to happen? (System cause)
 3. Why wasn't it prevented? (Control gap)
@@ -439,6 +473,7 @@ Steps:
 ### Writing Actionable CAPAs
 
 **SMART Criteria:**
+
 - **S**pecific: Clear, detailed action
 - **M**easurable: Can verify completion
 - **A**chievable: Realistic with available resources
@@ -446,14 +481,17 @@ Steps:
 - **T**ime-bound: Has clear deadline
 
 **Poor Corrective Action:**
+
 > "Train operators better"
 
 **Good Corrective Action:**
+
 > "Conduct 2-hour hands-on training session for all 15 operators on verification procedure by 1/15/2026. Update SOP with photos and checklist. Install laminated quick-reference guide at each workstation. Verify understanding with practical test (passing score 90%)."
 
 ### Priority Assignment Guide
 
 **CRITICAL:**
+
 - Safety hazard
 - Regulatory violation
 - Customer shipment at risk
@@ -461,18 +499,21 @@ Steps:
 - Target: 24-48 hours
 
 **HIGH:**
+
 - Major quality impact
 - Significant cost
 - RPN 200-299
 - Target: 1 week
 
 **MEDIUM:**
+
 - Moderate quality impact
 - Process improvement
 - RPN 100-199
 - Target: 2-4 weeks
 
 **LOW:**
+
 - Minor improvement
 - Preventive action
 - RPN < 100
@@ -480,13 +521,13 @@ Steps:
 
 ### Verification Methods Guide
 
-| Method | When to Use | Duration | Example |
-|--------|-------------|----------|---------|
-| **Inspection** | Physical changes | 1-2 weeks | New fixtures, equipment changes |
-| **Audit** | Process changes | 2-4 weeks | Procedure updates, training |
-| **Data Analysis** | Statistical validation | 4-8 weeks | Defect rate reduction, SPC trends |
-| **Customer Feedback** | External impact | 8-12 weeks | Return rate, complaints |
-| **Combination** | Complex changes | 3-6 months | Major system changes |
+| Method                | When to Use            | Duration   | Example                           |
+| --------------------- | ---------------------- | ---------- | --------------------------------- |
+| **Inspection**        | Physical changes       | 1-2 weeks  | New fixtures, equipment changes   |
+| **Audit**             | Process changes        | 2-4 weeks  | Procedure updates, training       |
+| **Data Analysis**     | Statistical validation | 4-8 weeks  | Defect rate reduction, SPC trends |
+| **Customer Feedback** | External impact        | 8-12 weeks | Return rate, complaints           |
+| **Combination**       | Complex changes        | 3-6 months | Major system changes              |
 
 ## Examples
 
@@ -510,14 +551,14 @@ Target RPN: 48 (LOW RISK)
 Linked NCR: NCR-20260105-012
 
 Root Cause Analysis:
-"Current process relies on operators manually typing order numbers into 
-label printer. No verification step. System allows printing without order 
-number validation. Operators under time pressure prioritize speed over 
+"Current process relies on operators manually typing order numbers into
+label printer. No verification step. System allows printing without order
+number validation. Operators under time pressure prioritize speed over
 accuracy. Training emphasized productivity metrics, not accuracy."
 
 Immediate Action:
-"Implemented 100% QC verification of shipping labels before packages leave 
-dock. Added verification station with scanner. Assigned dedicated QC person 
+"Implemented 100% QC verification of shipping labels before packages leave
+dock. Added verification station with scanner. Assigned dedicated QC person
 for label checks. Effective immediately (1/5/2026)."
 
 Corrective Action:
@@ -571,13 +612,13 @@ RPN Analysis:
 - RPN: 120 (MEDIUM RISK)
 
 Root Cause Analysis (Proactive):
-"During annual forklift inspection, noticed 2 of 8 forklifts showing early 
-signs of hydraulic degradation. While not currently failing, this could lead 
-to dropped pallets and product damage. Maintenance is reactive, not preventive. 
+"During annual forklift inspection, noticed 2 of 8 forklifts showing early
+signs of hydraulic degradation. While not currently failing, this could lead
+to dropped pallets and product damage. Maintenance is reactive, not preventive.
 No predictive maintenance program exists."
 
 Immediate Action:
-"Completed full hydraulic system inspection on all 8 forklifts. 
+"Completed full hydraulic system inspection on all 8 forklifts.
 Replaced worn components on 2 units. All units passed safety check."
 
 Corrective Action (N/A - Preventive):
@@ -624,9 +665,9 @@ RPN Analysis:
 Linked NCR: NCR-20260105-003 (Safety valve calibration issue)
 
 Root Cause Analysis:
-"Supplier changed calibration equipment without notification. Our contract 
-lacked clause requiring approval for process changes. No change control 
-system exists. Suppliers routinely make changes without informing us. 
+"Supplier changed calibration equipment without notification. Our contract
+lacked clause requiring approval for process changes. No change control
+system exists. Suppliers routinely make changes without informing us.
 Receiving inspection doesn't verify process certifications."
 
 Immediate Action:
@@ -695,6 +736,7 @@ Current Status: 65% Complete
 ### CAPA Metrics
 
 **Key Performance Indicators:**
+
 - Open CAPA Count
 - Average RPN
 - Overdue CAPA Count
@@ -703,6 +745,7 @@ Current Status: 65% Complete
 - Repeat Issues (%)
 
 **Standard Reports:**
+
 1. **Daily CAPA Dashboard**: Overdue actions requiring attention
 2. **Weekly Status Report**: Progress on in-process CAPAs
 3. **Monthly Effectiveness Report**: Verification results and trends
@@ -712,11 +755,13 @@ Current Status: 65% Complete
 ## Compliance
 
 ### ISO 9001:2015 Alignment
+
 - **Clause 10.2**: Nonconformity and Corrective Action
 - Systematic approach required
 - Effectiveness verification mandatory
 
 ### FDA Requirements
+
 - **21 CFR 820.100**: Corrective and Preventive Action
 - CAPA system required for medical device manufacturers
 - Documentation and verification essential

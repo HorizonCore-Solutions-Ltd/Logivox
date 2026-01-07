@@ -3,26 +3,26 @@
  * Provides ARIA live regions for announcing dynamic content to screen readers
  */
 
-"use client"
+"use client";
 
 /**
  * Global Screen Reader Announcer
- * 
+ *
  * Provides ARIA live regions for dynamic content announcements.
  * Should be placed once in the root layout.
- * 
+ *
  * Usage:
  * - Use announceToScreenReader() from lib/accessibility.ts to announce messages
  * - Or use the useScreenReaderAnnouncements() hook
- * 
+ *
  * @example
  * ```tsx
  * // In root layout
  * <ScreenReaderAnnouncer />
- * 
+ *
  * // In a component
  * import { announceToScreenReader } from '@/lib/accessibility'
- * 
+ *
  * function MyComponent() {
  *   const handleAction = () => {
  *     // Do something
@@ -42,7 +42,7 @@ export function ScreenReaderAnnouncer() {
         aria-atomic="true"
         role="status"
       />
-      
+
       {/* Assertive announcements - interrupt current screen reader output */}
       <div
         id="screen-reader-announcements-assertive"
@@ -52,5 +52,5 @@ export function ScreenReaderAnnouncer() {
         role="alert"
       />
     </>
-  )
+  );
 }

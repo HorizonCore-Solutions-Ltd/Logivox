@@ -1,50 +1,64 @@
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building2, Users, Target, Shield, Zap, Globe } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Building2, Users, Target, Shield, Zap, Globe } from "lucide-react";
 
 export const metadata = {
   title: "About Us",
-  description: "Learn about LogiVox - our mission, values, and the team building the future of enterprise stock booking.",
-}
+  description:
+    "Learn about LogiVox - our mission, values, and the team building the future of enterprise stock booking.",
+};
 
 export default function AboutPage() {
   const values = [
     {
       icon: Shield,
       title: "Security First",
-      description: "Zero-trust architecture and enterprise-grade security in everything we build."
+      description:
+        "Zero-trust architecture and enterprise-grade security in everything we build.",
     },
     {
       icon: Zap,
       title: "Innovation",
-      description: "Constantly pushing boundaries with cutting-edge technology and AI-powered solutions."
+      description:
+        "Constantly pushing boundaries with cutting-edge technology and AI-powered solutions.",
     },
     {
       icon: Users,
       title: "Customer Success",
-      description: "Your success is our success. We're committed to delivering exceptional value."
+      description:
+        "Your success is our success. We're committed to delivering exceptional value.",
     },
     {
       icon: Globe,
       title: "Global Scale",
-      description: "Built to serve enterprises worldwide with reliability and performance."
-    }
-  ]
+      description:
+        "Built to serve enterprises worldwide with reliability and performance.",
+    },
+  ];
 
   const team = [
     {
       name: "Executive Team",
-      description: "Experienced leaders with decades of combined expertise in enterprise software and supply chain management."
+      description:
+        "Experienced leaders with decades of combined expertise in enterprise software and supply chain management.",
     },
     {
       name: "Engineering",
-      description: "World-class engineers building scalable, secure, and innovative solutions."
+      description:
+        "World-class engineers building scalable, secure, and innovative solutions.",
     },
     {
       name: "Customer Success",
-      description: "Dedicated team ensuring your success with LogiVox at every step."
-    }
-  ]
+      description:
+        "Dedicated team ensuring your success with LogiVox at every step.",
+    },
+  ];
 
   return (
     <div className="flex flex-col">
@@ -60,8 +74,9 @@ export default function AboutPage() {
               </span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              LogiVox is transforming how enterprises manage inventory and stock booking 
-              with cutting-edge technology, zero-trust security, and seamless integrations.
+              LogiVox is transforming how enterprises manage inventory and stock
+              booking with cutting-edge technology, zero-trust security, and
+              seamless integrations.
             </p>
           </div>
         </div>
@@ -77,36 +92,46 @@ export default function AboutPage() {
                 <h2 className="text-3xl font-bold">Our Mission</h2>
               </div>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                To empower enterprises with intelligent, secure, and scalable stock booking 
-                solutions that drive operational excellence and accelerate growth.
+                To empower enterprises with intelligent, secure, and scalable
+                stock booking solutions that drive operational excellence and
+                accelerate growth.
               </p>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                We believe that modern enterprises deserve technology that works seamlessly, 
-                scales effortlessly, and provides real-time insights to make better decisions.
+                We believe that modern enterprises deserve technology that works
+                seamlessly, scales effortlessly, and provides real-time insights
+                to make better decisions.
               </p>
             </div>
             <div className="grid grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-3xl font-bold text-primary">500+</CardTitle>
+                  <CardTitle className="text-3xl font-bold text-primary">
+                    500+
+                  </CardTitle>
                   <CardDescription>Enterprise Customers</CardDescription>
                 </CardHeader>
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-3xl font-bold text-primary">50M+</CardTitle>
+                  <CardTitle className="text-3xl font-bold text-primary">
+                    50M+
+                  </CardTitle>
                   <CardDescription>Stock Items Managed</CardDescription>
                 </CardHeader>
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-3xl font-bold text-primary">99.9%</CardTitle>
+                  <CardTitle className="text-3xl font-bold text-primary">
+                    99.9%
+                  </CardTitle>
                   <CardDescription>Uptime SLA</CardDescription>
                 </CardHeader>
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-3xl font-bold text-primary">40+</CardTitle>
+                  <CardTitle className="text-3xl font-bold text-primary">
+                    40+
+                  </CardTitle>
                   <CardDescription>Countries Served</CardDescription>
                 </CardHeader>
               </Card>
@@ -120,11 +145,10 @@ export default function AboutPage() {
         <div className="container-enterprise">
           <div className="text-center space-y-4 mb-16">
             <Badge variant="secondary">Our Values</Badge>
-            <h2 className="text-3xl md:text-4xl font-bold">
-              What Drives Us
-            </h2>
+            <h2 className="text-3xl md:text-4xl font-bold">What Drives Us</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Our core values guide everything we do, from product development to customer support.
+              Our core values guide everything we do, from product development
+              to customer support.
             </p>
           </div>
 
@@ -157,8 +181,8 @@ export default function AboutPage() {
               World-Class Talent
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Our diverse team brings together expertise from leading technology companies 
-              and enterprise software pioneers.
+              Our diverse team brings together expertise from leading technology
+              companies and enterprise software pioneers.
             </p>
           </div>
 
@@ -190,7 +214,7 @@ export default function AboutPage() {
               <Building2 className="h-8 w-8 text-primary" />
               <h2 className="text-3xl font-bold">Company Information</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
@@ -200,7 +224,7 @@ export default function AboutPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Headquarters</CardTitle>
@@ -209,7 +233,7 @@ export default function AboutPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Certifications</CardTitle>
@@ -218,7 +242,7 @@ export default function AboutPage() {
                   </CardDescription>
                 </CardHeader>
               </Card>
-              
+
               <Card>
                 <CardHeader>
                   <CardTitle>Backed By</CardTitle>
@@ -232,5 +256,5 @@ export default function AboutPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

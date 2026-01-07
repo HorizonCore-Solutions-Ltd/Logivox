@@ -3,7 +3,7 @@
  * Intelligently assign load sheets to optimal bay doors
  */
 
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 
 interface AllocationCriteria {
   loadSheetId: string;
@@ -12,8 +12,8 @@ interface AllocationCriteria {
   totalWeight: number;
   totalVolume: number;
   carrierName?: string;
-  priority?: 'URGENT' | 'HIGH' | 'NORMAL' | 'LOW';
-  preferredDoorType?: 'LOADING' | 'UNLOADING' | 'CROSS_DOCK' | 'RETURN';
+  priority?: "URGENT" | "HIGH" | "NORMAL" | "LOW";
+  preferredDoorType?: "LOADING" | "UNLOADING" | "CROSS_DOCK" | "RETURN";
 }
 
 interface AllocationResult {
@@ -28,7 +28,7 @@ interface AllocationResult {
  * Auto-allocate load sheet to optimal bay door
  */
 export async function allocateBayDoor(
-  criteria: AllocationCriteria
+  criteria: AllocationCriteria,
 ): Promise<AllocationResult> {
   try {
     const {
@@ -38,21 +38,21 @@ export async function allocateBayDoor(
       totalWeight,
       totalVolume,
       carrierName,
-      priority = 'NORMAL',
-      preferredDoorType = 'LOADING',
+      priority = "NORMAL",
+      preferredDoorType = "LOADING",
     } = criteria;
 
     // Get all available bay doors in warehouse
     const availableDoors = await prisma.bayDoor.findMany({
       where: {
         warehouseId,
-        status: 'AVAILABLE',
+        status: "AVAILABLE",
         currentLoadSheetId: null,
       },
       include: {
         warehouse: true,
         events: {
-          orderBy: { timestamp: 'desc' },
+          orderBy: { timestamp: "desc" },
           take: 1,
         },
       },
@@ -61,7 +61,7 @@ export async function allocateBayDoor(
     if (availableDoors.length === 0) {
       return {
         success: false,
-        reason: 'No available bay doors in warehouse',
+        reason: "No available bay doors in warehouse",
       };
     }
 
@@ -77,7 +77,7 @@ export async function allocateBayDoor(
       // Capacity match (25 points)
       const weightUtilization = (totalWeight / door.maxWeight) * 100;
       const volumeUtilization = (totalVolume / door.maxVolume) * 100;
-      
+
       // Prefer 70-95% utilization
       if (weightUtilization >= 70 && weightUtilization <= 95) {
         score += 15;
@@ -93,7 +93,7 @@ export async function allocateBayDoor(
 
       // Proximity to warehouse entrance (15 points)
       // Assume door numbers closer to 1 are closer to entrance
-      const doorNum = parseInt(door.doorNumber.replace(/\D/g, '')) || 999;
+      const doorNum = parseInt(door.doorNumber.replace(/\D/g, "")) || 999;
       const proximityScore = Math.max(0, 15 - doorNum);
       score += proximityScore;
 
@@ -103,7 +103,7 @@ export async function allocateBayDoor(
         const lastEvent = door.events[0];
         const hoursSinceLastUse =
           (Date.now() - lastEvent.timestamp.getTime()) / (1000 * 60 * 60);
-        
+
         if (hoursSinceLastUse < 2) {
           score += 15; // Very recently used
         } else if (hoursSinceLastUse < 6) {
@@ -119,7 +119,7 @@ export async function allocateBayDoor(
       }
 
       // Priority boost (5 points)
-      if (priority === 'URGENT') {
+      if (priority === "URGENT") {
         score += 5;
       }
 
@@ -162,7 +162,7 @@ export async function allocateBayDoor(
       prisma.bayDoor.update({
         where: { id: bestDoor.id },
         data: {
-          status: 'OCCUPIED',
+          status: "OCCUPIED",
           currentLoadSheetId: loadSheetId,
         },
         include: {
@@ -175,10 +175,10 @@ export async function allocateBayDoor(
     await prisma.bayDoorEvent.create({
       data: {
         bayDoorId: bestDoor.id,
-        eventType: 'ASSIGNED',
+        eventType: "ASSIGNED",
         description: `Auto-allocated load sheet ${loadSheetId} (score: ${bestDoor.score})`,
         metadata: {
-          algorithm: 'auto-allocation-v1',
+          algorithm: "auto-allocation-v1",
           score: bestDoor.score,
           weightUtilization: bestDoor.weightUtilization,
           volumeUtilization: bestDoor.volumeUtilization,
@@ -194,10 +194,10 @@ export async function allocateBayDoor(
       alternatives: scoredDoors.slice(1, 4), // Top 3 alternatives
     };
   } catch (error) {
-    console.error('Bay door allocation error:', error);
+    console.error("Bay door allocation error:", error);
     return {
       success: false,
-      reason: 'Failed to allocate bay door',
+      reason: "Failed to allocate bay door",
     };
   }
 }
@@ -205,7 +205,10 @@ export async function allocateBayDoor(
 /**
  * Release bay door and make available
  */
-export async function releaseBayDoor(bayDoorId: string, reason?: string): Promise<boolean> {
+export async function releaseBayDoor(
+  bayDoorId: string,
+  reason?: string,
+): Promise<boolean> {
   try {
     const door = await prisma.bayDoor.findUnique({
       where: { id: bayDoorId },
@@ -219,14 +222,14 @@ export async function releaseBayDoor(bayDoorId: string, reason?: string): Promis
       prisma.bayDoor.update({
         where: { id: bayDoorId },
         data: {
-          status: 'AVAILABLE',
+          status: "AVAILABLE",
           currentLoadSheetId: null,
         },
       }),
       prisma.bayDoorEvent.create({
         data: {
           bayDoorId,
-          eventType: 'RELEASED',
+          eventType: "RELEASED",
           description: reason || `Bay door ${door.doorNumber} released`,
         },
       }),
@@ -234,7 +237,7 @@ export async function releaseBayDoor(bayDoorId: string, reason?: string): Promis
 
     return true;
   } catch (error) {
-    console.error('Bay door release error:', error);
+    console.error("Bay door release error:", error);
     return false;
   }
 }
@@ -245,7 +248,7 @@ export async function releaseBayDoor(bayDoorId: string, reason?: string): Promis
 export async function getDoorUtilization(
   warehouseId: string,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ) {
   const doors = await prisma.bayDoor.findMany({
     where: { warehouseId },
@@ -257,7 +260,7 @@ export async function getDoorUtilization(
             lte: endDate,
           },
         },
-        orderBy: { timestamp: 'asc' },
+        orderBy: { timestamp: "asc" },
       },
       loadSheets: {
         where: {
@@ -271,17 +274,17 @@ export async function getDoorUtilization(
   });
 
   const stats = doors.map((door) => {
-    const assignments = door.events.filter((e) => e.eventType === 'ASSIGNED');
-    const releases = door.events.filter((e) => e.eventType === 'RELEASED');
+    const assignments = door.events.filter((e) => e.eventType === "ASSIGNED");
+    const releases = door.events.filter((e) => e.eventType === "RELEASED");
 
     // Calculate occupied time
     let occupiedMinutes = 0;
     let currentOccupiedStart: Date | null = null;
 
     for (const event of door.events) {
-      if (event.eventType === 'ASSIGNED') {
+      if (event.eventType === "ASSIGNED") {
         currentOccupiedStart = event.timestamp;
-      } else if (event.eventType === 'RELEASED' && currentOccupiedStart) {
+      } else if (event.eventType === "RELEASED" && currentOccupiedStart) {
         const duration =
           (event.timestamp.getTime() - currentOccupiedStart.getTime()) /
           (1000 * 60);
@@ -319,12 +322,17 @@ export async function getDoorUtilization(
  * Suggest optimal doors for load sheet
  */
 export async function suggestDoors(criteria: AllocationCriteria) {
-  const { warehouseId, totalWeight, totalVolume, preferredDoorType = 'LOADING' } = criteria;
+  const {
+    warehouseId,
+    totalWeight,
+    totalVolume,
+    preferredDoorType = "LOADING",
+  } = criteria;
 
   const availableDoors = await prisma.bayDoor.findMany({
     where: {
       warehouseId,
-      status: 'AVAILABLE',
+      status: "AVAILABLE",
       currentLoadSheetId: null,
       maxWeight: { gte: totalWeight },
       maxVolume: { gte: totalVolume },
@@ -332,11 +340,11 @@ export async function suggestDoors(criteria: AllocationCriteria) {
     include: {
       warehouse: true,
       events: {
-        orderBy: { timestamp: 'desc' },
+        orderBy: { timestamp: "desc" },
         take: 5,
       },
     },
-    orderBy: { doorNumber: 'asc' },
+    orderBy: { doorNumber: "asc" },
   });
 
   return availableDoors.map((door) => ({

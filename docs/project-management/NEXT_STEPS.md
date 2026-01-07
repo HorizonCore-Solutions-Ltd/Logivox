@@ -32,6 +32,7 @@ You have **3 options**. Choose the one that works best for you:
 **Fastest and easiest setup!**
 
 #### Prerequisites
+
 - Docker Desktop installed ([Download here](https://www.docker.com/products/docker-desktop/))
 
 #### Steps
@@ -39,9 +40,11 @@ You have **3 options**. Choose the one that works best for you:
 1. **Make sure Docker Desktop is running**
 
 2. **Run the setup script:**
+
    ```powershell
    .\scripts\setup-database.ps1
    ```
+
    Choose option **1** (Docker)
 
    The script will automatically:
@@ -81,11 +84,13 @@ You have **3 options**. Choose the one that works best for you:
    - It looks like: `postgresql://postgres.[PROJECT]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres`
 
 4. **Run the setup script:**
+
    ```powershell
    .\scripts\setup-database.ps1
    ```
+
    Choose option **2** (Supabase)
-   
+
    Paste your connection string when prompted
 
 5. **Done!** Your database is now in the cloud and accessible from anywhere!
@@ -97,6 +102,7 @@ You have **3 options**. Choose the one that works best for you:
 **Full control over your database**
 
 #### Prerequisites
+
 - PostgreSQL 14+ installed ([Download here](https://www.postgresql.org/download/windows/))
 
 #### Steps
@@ -104,11 +110,13 @@ You have **3 options**. Choose the one that works best for you:
 1. **Install PostgreSQL** (if not already installed)
 
 2. **Create Database** (as Administrator):
+
    ```powershell
    psql -U postgres
    ```
 
    Then run:
+
    ```sql
    CREATE DATABASE flowstock;
    CREATE USER flowstock WITH ENCRYPTED PASSWORD 'your_password';
@@ -117,9 +125,11 @@ You have **3 options**. Choose the one that works best for you:
    ```
 
 3. **Run the setup script:**
+
    ```powershell
    .\scripts\setup-database.ps1
    ```
+
    Choose option **3** (Local PostgreSQL)
 
 4. **Done!**
@@ -131,6 +141,7 @@ You have **3 options**. Choose the one that works best for you:
 Once you've run the database setup, you can log in with these accounts:
 
 ### Super Admin Account
+
 - **Email:** `admin@logivox.ai`
 - **Password:** `Admin@123`
 - **Role:** SUPER_ADMIN
@@ -138,6 +149,7 @@ Once you've run the database setup, you can log in with these accounts:
 - **Permissions:** Full access to everything
 
 ### Manager Account
+
 - **Email:** `manager@demo-company.com`
 - **Password:** `Manager@123`
 - **Role:** MANAGER
@@ -170,6 +182,7 @@ After seeding, you'll have:
 Once your database is ready, we'll continue with:
 
 ### Phase 4: Integrate Authentication into UI
+
 1. Update `AuthProvider` to use NextAuth `SessionProvider`
 2. Connect sign-in/sign-up pages to real authentication
 3. Implement protected route middleware
@@ -177,6 +190,7 @@ Once your database is ready, we'll continue with:
 5. Test authentication flow
 
 ### Phase 5: Build CRUD Operations
+
 1. Create inventory management interface
 2. Build data tables with sorting/filtering
 3. Implement real-time stock updates
@@ -221,11 +235,13 @@ docker-compose logs -f postgres
 ## ❓ Troubleshooting
 
 ### "Can't reach database server"
+
 - **Docker:** Make sure Docker Desktop is running
 - **Supabase:** Check your connection string is correct
 - **Local:** Ensure PostgreSQL service is running
 
 ### "Port 5432 already in use"
+
 ```powershell
 # Find what's using the port
 netstat -ano | findstr :5432
@@ -235,6 +251,7 @@ taskkill /PID <PID> /F
 ```
 
 ### Migration Errors
+
 ```powershell
 # Reset and start fresh
 npx prisma migrate reset
@@ -243,6 +260,7 @@ npx prisma db seed
 ```
 
 ### Docker Issues
+
 ```powershell
 # Restart Docker containers
 docker-compose down

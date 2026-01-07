@@ -154,6 +154,7 @@ This module was built as a **separate, production-ready system** with full datab
 ### 1. Receiving Inspection
 
 **Inspection Types:**
+
 - RECEIVING - Standard receiving inspection (most common)
 - IN_PROCESS - In-process quality checks
 - FINAL - Final inspection before shipment
@@ -182,15 +183,16 @@ This module was built as a **separate, production-ready system** with full datab
 // ISO 2859-1 standard implementation
 const sampleSize = calculateSampleSize({
   lotSize: 1000,
-  inspectionLevel: 'II',  // General inspection level II
-  aqlCritical: 0.0,       // 0% critical defects allowed
-  aqlMajor: 2.5,          // 2.5% major defects allowed
-  aqlMinor: 4.0           // 4.0% minor defects allowed
+  inspectionLevel: "II", // General inspection level II
+  aqlCritical: 0.0, // 0% critical defects allowed
+  aqlMajor: 2.5, // 2.5% major defects allowed
+  aqlMinor: 4.0, // 4.0% minor defects allowed
 });
 // Returns: { sampleSize: 80, acceptanceCritical: 0, acceptanceMajor: 2, acceptanceMinor: 3 }
 ```
 
 **Inspection Results:**
+
 - **PASS**: No defects or within acceptable limits
 - **FAIL**: Critical defects or exceeds AQL thresholds
 - **CONDITIONAL**: Minor issues requiring follow-up
@@ -198,6 +200,7 @@ const sampleSize = calculateSampleSize({
 ### 2. Defect Management
 
 **Defect Types:**
+
 - COSMETIC - Appearance issues (scratches, dents)
 - FUNCTIONAL - Performance issues
 - PACKAGING - Packaging damage or errors
@@ -209,17 +212,20 @@ const sampleSize = calculateSampleSize({
 - OTHER - Custom defect types
 
 **Defect Categories:**
+
 - **CRITICAL**: Product safety or legal compliance issues
 - **MAJOR**: Significant quality issues affecting usability
 - **MINOR**: Cosmetic or non-functional defects
 
 **Evidence Collection:**
+
 - Multiple photos per defect (up to 10)
 - Video recordings (up to 3 per defect)
 - Cloud storage integration (S3/Azure/GCS)
 - Auto-thumbnail generation
 
 **Defect Resolution:**
+
 - PENDING - Awaiting decision
 - RTV - Return to vendor
 - REWORK - Internal rework/repair
@@ -249,6 +255,7 @@ const sampleSize = calculateSampleSize({
 ```
 
 **RTV Statuses:**
+
 - PENDING - Created, awaiting action
 - VENDOR_NOTIFIED - Email sent to vendor
 - APPROVED - Approved for return
@@ -258,6 +265,7 @@ const sampleSize = calculateSampleSize({
 - CLOSED - RTV completed
 
 **RTV Priority:**
+
 - URGENT - High value or critical defects
 - HIGH - Significant impact
 - MEDIUM - Standard priority
@@ -266,6 +274,7 @@ const sampleSize = calculateSampleSize({
 **Vendor Notification Email:**
 
 Automatically generated HTML email includes:
+
 - RTV number and defect details
 - Product information (SKU, name, qty)
 - Defect photos (embedded)
@@ -281,13 +290,13 @@ Automatically generated HTML email includes:
 // Quality Score (0-100)
 // Based on defect rate with weighted thresholds
 qualityScore = calculateQualityScore({
-  defectRate: 2.3,      // 2.3% defect rate
+  defectRate: 2.3, // 2.3% defect rate
   thresholds: {
-    excellent: 1.0,     // < 1% = 100 points
-    good: 3.0,          // < 3% = 75-99 points
-    fair: 5.0,          // < 5% = 50-74 points
-    poor: 10.0          // > 10% = 0-49 points
-  }
+    excellent: 1.0, // < 1% = 100 points
+    good: 3.0, // < 3% = 75-99 points
+    fair: 5.0, // < 5% = 50-74 points
+    poor: 10.0, // > 10% = 0-49 points
+  },
 });
 // Returns: 85.2
 
@@ -296,7 +305,7 @@ qualityScore = calculateQualityScore({
 reliabilityScore = calculateReliabilityScore({
   inspectionCount: 15,
   totalUnits: 5000,
-  daysActive: 90
+  daysActive: 90,
 });
 // Returns: 92.1
 
@@ -304,7 +313,7 @@ reliabilityScore = calculateReliabilityScore({
 // Based on RTV resolution time
 responseScore = calculateResponseScore({
   avgResolutionDays: 7,
-  targetDays: 10
+  targetDays: 10,
 });
 // Returns: 88.5
 
@@ -314,23 +323,27 @@ overallScore = (qualityScore + reliabilityScore + responseScore) / 3;
 ```
 
 **Supplier Tiers:**
+
 - **PREMIUM** (90+): Top-tier suppliers, priority treatment
 - **STANDARD** (75-89): Reliable suppliers, standard process
 - **BASIC** (60-74): Acceptable suppliers, increased monitoring
 - **POOR** (<60): Problem suppliers, corrective action required
 
 **Supplier Status:**
+
 - **APPROVED**: Good standing, no restrictions
 - **PROBATION**: Warning status, increased inspection frequency
 - **SUSPENDED**: Temporarily restricted, no new orders
 - **BLOCKED**: Permanently blocked, all business ceased
 
 **90-Day Rolling Metrics:**
+
 - Continuously updated with recent performance
 - Weighted more heavily in tier/status decisions
 - Enables quick identification of declining suppliers
 
 **Consecutive Good Orders Tracking:**
+
 - Reward streak for defect-free shipments
 - Badge display for suppliers with 5+ consecutive good orders
 - Automatic tier upgrade consideration
@@ -338,12 +351,14 @@ overallScore = (qualityScore + reliabilityScore + responseScore) / 3;
 ### 5. Audit Trail & Compliance
 
 **Activity Logging:**
+
 - All inspection actions logged with user/timestamp
 - All RTV actions logged with user/timestamp
 - Immutable audit trail for compliance
 - Filterable activity history
 
 **Compliance Features:**
+
 - ISO 2859-1 standard AQL sampling
 - Photo evidence retention
 - Email notification records
@@ -357,6 +372,7 @@ overallScore = (qualityScore + reliabilityScore + responseScore) / 3;
 ### Inspections
 
 **Create Inspection**
+
 ```
 POST /api/qc/inspections
 Body: {
@@ -367,18 +383,21 @@ Response: { inspection }
 ```
 
 **List Inspections**
+
 ```
 GET /api/qc/inspections?organizationId=xxx&status=IN_PROGRESS
 Response: { inspections: [...], count }
 ```
 
 **Get Inspection**
+
 ```
 GET /api/qc/inspections/[id]
 Response: { inspection (with items, defects, activities) }
 ```
 
 **Start Inspection**
+
 ```
 PATCH /api/qc/inspections/[id]
 Body: { action: "start" }
@@ -386,6 +405,7 @@ Response: { inspection }
 ```
 
 **Add Inspection Item**
+
 ```
 PATCH /api/qc/inspections/[id]
 Body: {
@@ -397,6 +417,7 @@ Response: { item }
 ```
 
 **Record Defect**
+
 ```
 PATCH /api/qc/inspections/[id]
 Body: {
@@ -408,6 +429,7 @@ Response: { defect }
 ```
 
 **Complete Inspection**
+
 ```
 PATCH /api/qc/inspections/[id]
 Body: { action: "complete", notes }
@@ -417,6 +439,7 @@ Response: { inspection }
 ### RTVs
 
 **Create RTV**
+
 ```
 POST /api/qc/rtv
 Body: {
@@ -426,18 +449,21 @@ Response: { rtv }
 ```
 
 **List RTVs**
+
 ```
 GET /api/qc/rtv?organizationId=xxx&status=PENDING
 Response: { rtvs: [...], count }
 ```
 
 **Get RTV**
+
 ```
 GET /api/qc/rtv/[id]
 Response: { rtv (with defect, supplier, activities) }
 ```
 
 **Notify Vendor**
+
 ```
 PATCH /api/qc/rtv/[id]
 Body: { action: "notifyVendor" }
@@ -445,6 +471,7 @@ Response: { rtv, emailSent: true }
 ```
 
 **Approve RTV**
+
 ```
 PATCH /api/qc/rtv/[id]
 Body: { action: "approve" }
@@ -452,6 +479,7 @@ Response: { rtv }
 ```
 
 **Reject RTV**
+
 ```
 PATCH /api/qc/rtv/[id]
 Body: { action: "reject", reason }
@@ -459,6 +487,7 @@ Response: { rtv }
 ```
 
 **Ship RTV**
+
 ```
 PATCH /api/qc/rtv/[id]
 Body: {
@@ -469,6 +498,7 @@ Response: { rtv }
 ```
 
 **Record Vendor Response**
+
 ```
 PATCH /api/qc/rtv/[id]
 Body: {
@@ -479,6 +509,7 @@ Response: { rtv }
 ```
 
 **Record Credit**
+
 ```
 PATCH /api/qc/rtv/[id]
 Body: {
@@ -489,6 +520,7 @@ Response: { rtv }
 ```
 
 **Close RTV**
+
 ```
 PATCH /api/qc/rtv/[id]
 Body: { action: "close", notes }
@@ -498,30 +530,35 @@ Response: { rtv }
 ### Supplier Quality
 
 **Get Supplier Quality**
+
 ```
 GET /api/qc/supplier-quality?supplierId=xxx
 Response: { quality }
 ```
 
 **List Supplier Quality**
+
 ```
 GET /api/qc/supplier-quality?organizationId=xxx&tier=PREMIUM&status=APPROVED
 Response: { suppliers: [...], count }
 ```
 
 **Get Quality Trends**
+
 ```
 GET /api/qc/supplier-quality?action=trends&supplierId=xxx&months=6
 Response: { trends: [{ month, defectRate, qualityScore, ... }] }
 ```
 
 **Compare Suppliers**
+
 ```
 GET /api/qc/supplier-quality?action=compare&supplierIds=id1,id2,id3
 Response: { comparison: [...] }
 ```
 
 **Update Supplier Quality**
+
 ```
 POST /api/qc/supplier-quality
 Body: { supplierId, organizationId }
@@ -529,6 +566,7 @@ Response: { quality }
 ```
 
 **Update All Suppliers**
+
 ```
 POST /api/qc/supplier-quality
 Body: { action: "updateAll", organizationId }
@@ -538,6 +576,7 @@ Response: { updated: count }
 ### Statistics
 
 **Get Inspection Stats**
+
 ```
 GET /api/qc/stats?type=inspections&organizationId=xxx&days=30
 Response: {
@@ -547,6 +586,7 @@ Response: {
 ```
 
 **Get RTV Stats**
+
 ```
 GET /api/qc/stats?type=rtv&organizationId=xxx&days=30
 Response: {
@@ -556,6 +596,7 @@ Response: {
 ```
 
 **Get Combined Stats**
+
 ```
 GET /api/qc/stats?organizationId=xxx&days=30
 Response: {
@@ -573,11 +614,13 @@ Response: {
 See [QC_ENVIRONMENT_CONFIG.md](./QC_ENVIRONMENT_CONFIG.md) for detailed configuration.
 
 **Required:**
+
 - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` - Email notifications
 - `SMTP_FROM_EMAIL` - Sender email address
 - `DATABASE_URL` - PostgreSQL connection string
 
 **Optional:**
+
 - `QC_AQL_CRITICAL`, `QC_AQL_MAJOR`, `QC_AQL_MINOR` - AQL levels
 - `QC_MIN_SAMPLE_SIZE`, `QC_MAX_SAMPLE_SIZE` - Sample size limits
 - `QC_SCORE_*_THRESHOLD` - Quality score thresholds
@@ -606,56 +649,56 @@ Adjust based on your industry standards (e.g., medical devices may use lower AQL
 
 ```typescript
 // 1. Create inspection
-const inspection = await fetch('/api/qc/inspections', {
-  method: 'POST',
+const inspection = await fetch("/api/qc/inspections", {
+  method: "POST",
   body: JSON.stringify({
-    organizationId: 'org_123',
-    warehouseId: 'wh_456',
-    supplierId: 'sup_789',
-    purchaseOrderId: 'po_1011',
-    grnId: 'grn_1213',
-    inspectionType: 'RECEIVING',
-    lotSize: 500
-  })
+    organizationId: "org_123",
+    warehouseId: "wh_456",
+    supplierId: "sup_789",
+    purchaseOrderId: "po_1011",
+    grnId: "grn_1213",
+    inspectionType: "RECEIVING",
+    lotSize: 500,
+  }),
 });
 // Sample size automatically calculated: 80 units
 
 // 2. Start inspection
 await fetch(`/api/qc/inspections/${inspection.id}`, {
-  method: 'PATCH',
-  body: JSON.stringify({ action: 'start' })
+  method: "PATCH",
+  body: JSON.stringify({ action: "start" }),
 });
 
 // 3. Add items and record defects
 await fetch(`/api/qc/inspections/${inspection.id}`, {
-  method: 'PATCH',
+  method: "PATCH",
   body: JSON.stringify({
-    action: 'addItem',
-    itemId: 'item_123',
+    action: "addItem",
+    itemId: "item_123",
     quantityInspected: 10,
     quantityPassed: 8,
-    quantityFailed: 2
-  })
+    quantityFailed: 2,
+  }),
 });
 
 await fetch(`/api/qc/inspections/${inspection.id}`, {
-  method: 'PATCH',
+  method: "PATCH",
   body: JSON.stringify({
-    action: 'recordDefect',
-    itemId: 'item_123',
-    defectType: 'COSMETIC',
-    category: 'MINOR',
+    action: "recordDefect",
+    itemId: "item_123",
+    defectType: "COSMETIC",
+    category: "MINOR",
     quantityAffected: 2,
-    severity: 'MINOR',
-    description: 'Scratches on surface',
-    photos: ['https://s3.../photo1.jpg']
-  })
+    severity: "MINOR",
+    description: "Scratches on surface",
+    photos: ["https://s3.../photo1.jpg"],
+  }),
 });
 
 // 4. Complete inspection
 await fetch(`/api/qc/inspections/${inspection.id}`, {
-  method: 'PATCH',
-  body: JSON.stringify({ action: 'complete' })
+  method: "PATCH",
+  body: JSON.stringify({ action: "complete" }),
 });
 // Vendor quality score automatically updated
 ```
@@ -664,67 +707,67 @@ await fetch(`/api/qc/inspections/${inspection.id}`, {
 
 ```typescript
 // 1. Create RTV from defect
-const rtv = await fetch('/api/qc/rtv', {
-  method: 'POST',
+const rtv = await fetch("/api/qc/rtv", {
+  method: "POST",
   body: JSON.stringify({
-    organizationId: 'org_123',
-    defectId: 'defect_456',
+    organizationId: "org_123",
+    defectId: "defect_456",
     quantity: 100,
-    value: 1500.00,
-    priority: 'HIGH',
-    reason: 'Significant cosmetic defects affecting saleability'
-  })
+    value: 1500.0,
+    priority: "HIGH",
+    reason: "Significant cosmetic defects affecting saleability",
+  }),
 });
 // RTV number auto-generated: RTV-202601-000001
 
 // 2. Notify vendor
 await fetch(`/api/qc/rtv/${rtv.id}`, {
-  method: 'PATCH',
-  body: JSON.stringify({ action: 'notifyVendor' })
+  method: "PATCH",
+  body: JSON.stringify({ action: "notifyVendor" }),
 });
 // Email sent to supplier with defect photos and RTV details
 
 // 3. Approve RTV
 await fetch(`/api/qc/rtv/${rtv.id}`, {
-  method: 'PATCH',
-  body: JSON.stringify({ action: 'approve' })
+  method: "PATCH",
+  body: JSON.stringify({ action: "approve" }),
 });
 
 // 4. Ship RTV
 await fetch(`/api/qc/rtv/${rtv.id}`, {
-  method: 'PATCH',
+  method: "PATCH",
   body: JSON.stringify({
-    action: 'ship',
-    carrier: 'UPS',
-    trackingNumber: '1Z999AA10123456784',
-    shippingCost: 25.50
-  })
+    action: "ship",
+    carrier: "UPS",
+    trackingNumber: "1Z999AA10123456784",
+    shippingCost: 25.5,
+  }),
 });
 
 // 5. Record vendor response
 await fetch(`/api/qc/rtv/${rtv.id}`, {
-  method: 'PATCH',
+  method: "PATCH",
   body: JSON.stringify({
-    action: 'recordVendorResponse',
-    vendorRmaNumber: 'RMA-789456',
-    resolutionType: 'CREDIT'
-  })
+    action: "recordVendorResponse",
+    vendorRmaNumber: "RMA-789456",
+    resolutionType: "CREDIT",
+  }),
 });
 
 // 6. Record credit received
 await fetch(`/api/qc/rtv/${rtv.id}`, {
-  method: 'PATCH',
+  method: "PATCH",
   body: JSON.stringify({
-    action: 'recordCredit',
-    creditAmount: 1500.00,
-    creditMemoNumber: 'CM-2026-001'
-  })
+    action: "recordCredit",
+    creditAmount: 1500.0,
+    creditMemoNumber: "CM-2026-001",
+  }),
 });
 
 // 7. Close RTV
 await fetch(`/api/qc/rtv/${rtv.id}`, {
-  method: 'PATCH',
-  body: JSON.stringify({ action: 'close' })
+  method: "PATCH",
+  body: JSON.stringify({ action: "close" }),
 });
 ```
 
@@ -732,31 +775,31 @@ await fetch(`/api/qc/rtv/${rtv.id}`, {
 
 ```typescript
 // Get all suppliers sorted by score
-const response = await fetch('/api/qc/supplier-quality?organizationId=org_123');
+const response = await fetch("/api/qc/supplier-quality?organizationId=org_123");
 const { suppliers } = response;
 
 // Find problem suppliers
-const problemSuppliers = suppliers.filter(s => 
-  s.status === 'PROBATION' || s.tier === 'POOR'
+const problemSuppliers = suppliers.filter(
+  (s) => s.status === "PROBATION" || s.tier === "POOR",
 );
 
 // Get trend data for specific supplier
 const trends = await fetch(
-  '/api/qc/supplier-quality?action=trends&supplierId=sup_789&months=6'
+  "/api/qc/supplier-quality?action=trends&supplierId=sup_789&months=6",
 );
 
 // Compare top 3 suppliers
 const comparison = await fetch(
-  '/api/qc/supplier-quality?action=compare&supplierIds=sup1,sup2,sup3'
+  "/api/qc/supplier-quality?action=compare&supplierIds=sup1,sup2,sup3",
 );
 
 // Recalculate all scores (nightly batch job)
-await fetch('/api/qc/supplier-quality', {
-  method: 'POST',
+await fetch("/api/qc/supplier-quality", {
+  method: "POST",
   body: JSON.stringify({
-    action: 'updateAll',
-    organizationId: 'org_123'
-  })
+    action: "updateAll",
+    organizationId: "org_123",
+  }),
 });
 ```
 
@@ -808,6 +851,7 @@ The QC module UI is fully responsive and mobile-friendly:
 - **RTV Actions**: Mobile-optimized action buttons
 
 Future enhancements:
+
 - Native mobile app for offline inspections
 - Barcode scanning for item identification
 - Signature capture for inspection approval
@@ -899,6 +943,7 @@ npx prisma db seed
 ### Logging
 
 All services include comprehensive logging:
+
 - Inspection actions logged to `QCInspectionActivity`
 - RTV actions logged to `RTVActivity`
 - Email send attempts logged
@@ -907,6 +952,7 @@ All services include comprehensive logging:
 ### Monitoring
 
 Recommended metrics to monitor:
+
 - Inspection completion rate (target: >95%)
 - RTV resolution time (target: <14 days)
 - Email delivery success rate (target: >99%)
@@ -928,7 +974,7 @@ The QC Receiving Module is a complete, production-ready quality control system w
 ✅ **6 API endpoint files** with full CRUD + actions  
 ✅ **4 main UI pages** (1,209 lines) with responsive design  
 ✅ **3 shared components** (527 lines) for reusability  
-✅ **Comprehensive documentation** with examples  
+✅ **Comprehensive documentation** with examples
 
 **Total Lines of Code: ~3,000+ across backend and frontend**
 

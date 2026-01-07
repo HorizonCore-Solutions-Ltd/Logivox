@@ -68,6 +68,7 @@ This guide provides comprehensive instructions for deploying LogiVox WMS in prod
 ### System Requirements
 
 **Production Environment:**
+
 - **CPU**: 8 cores (minimum), 16 cores (recommended)
 - **RAM**: 16 GB (minimum), 32 GB (recommended)
 - **Storage**: 100 GB SSD (minimum), 500 GB (recommended)
@@ -75,6 +76,7 @@ This guide provides comprehensive instructions for deploying LogiVox WMS in prod
 - **OS**: Ubuntu 22.04 LTS, CentOS 8+, or RHEL 8+
 
 **Development Environment:**
+
 - **CPU**: 4 cores
 - **RAM**: 8 GB
 - **Storage**: 50 GB SSD
@@ -101,49 +103,58 @@ This guide provides comprehensive instructions for deploying LogiVox WMS in prod
 ### Option 1: Docker Deployment (Recommended for Small-Medium)
 
 Best for:
+
 - Small to medium-sized deployments
 - Single-server deployments
 - Quick setup and testing
 
 **Pros:**
+
 - Simple setup
 - Easy to manage
 - Portable across environments
 
 **Cons:**
+
 - Limited scalability
 - Single point of failure
 
 ### Option 2: Kubernetes Deployment (Recommended for Enterprise)
 
 Best for:
+
 - Large-scale deployments
 - High availability requirements
 - Auto-scaling needs
 
 **Pros:**
+
 - Highly scalable
 - Auto-healing
 - Load balancing
 - Zero-downtime deployments
 
 **Cons:**
+
 - Complex setup
 - Requires K8s expertise
 
 ### Option 3: Cloud Platform Deployment
 
 Best for:
+
 - Managed infrastructure
 - Pay-as-you-go pricing
 - Global distribution
 
 **Pros:**
+
 - Managed services
 - Built-in monitoring
 - Easy scaling
 
 **Cons:**
+
 - Vendor lock-in
 - Ongoing costs
 
@@ -266,7 +277,7 @@ docker compose -f docker-compose.prod.yml ps
 **docker-compose.prod.yml:**
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   app:
@@ -585,7 +596,7 @@ spec:
   resources:
     requests:
       storage: 100Gi
-  storageClassName: gp3  # AWS EBS gp3, adjust for your provider
+  storageClassName: gp3 # AWS EBS gp3, adjust for your provider
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -603,42 +614,42 @@ spec:
         app: postgres
     spec:
       containers:
-      - name: postgres
-        image: postgres:16-alpine
-        ports:
-        - containerPort: 5432
-        env:
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: database
-        - name: POSTGRES_USER
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: username
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: password
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
-        volumeMounts:
-        - name: postgres-storage
-          mountPath: /var/lib/postgresql/data
-        resources:
-          requests:
-            memory: "2Gi"
-            cpu: "1000m"
-          limits:
-            memory: "4Gi"
-            cpu: "2000m"
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: database
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1000m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
       volumes:
-      - name: postgres-storage
-        persistentVolumeClaim:
-          claimName: postgres-pvc
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
 ---
 apiVersion: v1
 kind: Service
@@ -649,8 +660,8 @@ spec:
   selector:
     app: postgres
   ports:
-  - port: 5432
-    targetPort: 5432
+    - port: 5432
+      targetPort: 5432
   type: ClusterIP
 ```
 
@@ -680,31 +691,31 @@ spec:
         app: redis
     spec:
       containers:
-      - name: redis
-        image: redis:7-alpine
-        ports:
-        - containerPort: 6379
-        command:
-          - redis-server
-          - --requirepass
-          - $(REDIS_PASSWORD)
-          - --maxmemory
-          - 2gb
-          - --maxmemory-policy
-          - allkeys-lru
-        env:
-        - name: REDIS_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: redis-password
-        resources:
-          requests:
-            memory: "1Gi"
-            cpu: "500m"
-          limits:
-            memory: "2Gi"
-            cpu: "1000m"
+        - name: redis
+          image: redis:7-alpine
+          ports:
+            - containerPort: 6379
+          command:
+            - redis-server
+            - --requirepass
+            - $(REDIS_PASSWORD)
+            - --maxmemory
+            - 2gb
+            - --maxmemory-policy
+            - allkeys-lru
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: redis-password
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "1000m"
 ---
 apiVersion: v1
 kind: Service
@@ -715,8 +726,8 @@ spec:
   selector:
     app: redis
   ports:
-  - port: 6379
-    targetPort: 6379
+    - port: 6379
+      targetPort: 6379
   type: ClusterIP
 ```
 
@@ -746,62 +757,62 @@ spec:
         app: logivox-app
     spec:
       containers:
-      - name: app
-        image: your-registry.com/logivox-wms:latest
-        ports:
-        - containerPort: 3000
-        env:
-        - name: NODE_ENV
-          value: "production"
-        - name: PORT
-          value: "3000"
-        - name: DATABASE_HOST
-          value: "postgres-service"
-        - name: DATABASE_PORT
-          value: "5432"
-        - name: DATABASE_NAME
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: database
-        - name: DATABASE_USER
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: username
-        - name: DATABASE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: db-credentials
-              key: password
-        - name: REDIS_HOST
-          value: "redis-service"
-        - name: REDIS_PORT
-          value: "6379"
-        - name: JWT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: jwt-secret
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 60
-          periodSeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 3000
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        resources:
-          requests:
-            memory: "2Gi"
-            cpu: "1000m"
-          limits:
-            memory: "4Gi"
-            cpu: "2000m"
+        - name: app
+          image: your-registry.com/logivox-wms:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3000"
+            - name: DATABASE_HOST
+              value: "postgres-service"
+            - name: DATABASE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: database
+            - name: DATABASE_USER
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: username
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
+            - name: REDIS_HOST
+              value: "redis-service"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: jwt-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          resources:
+            requests:
+              memory: "2Gi"
+              cpu: "1000m"
+            limits:
+              memory: "4Gi"
+              cpu: "2000m"
 ---
 apiVersion: v1
 kind: Service
@@ -812,8 +823,8 @@ spec:
   selector:
     app: logivox-app
   ports:
-  - port: 80
-    targetPort: 3000
+    - port: 80
+      targetPort: 3000
   type: LoadBalancer
 ---
 apiVersion: autoscaling/v2
@@ -829,18 +840,18 @@ spec:
   minReplicas: 3
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
 ```
 
 ```bash
@@ -870,20 +881,20 @@ metadata:
 spec:
   ingressClassName: nginx
   tls:
-  - hosts:
-    - flowstock.yourcompany.com
-    secretName: logivox-tls
+    - hosts:
+        - flowstock.yourcompany.com
+      secretName: logivox-tls
   rules:
-  - host: flowstock.yourcompany.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: logivox-app-service
-            port:
-              number: 80
+    - host: flowstock.yourcompany.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: logivox-app-service
+                port:
+                  number: 80
 ```
 
 ```bash
@@ -1271,9 +1282,9 @@ docker compose logs -f app | grep -i error
 
 # Monitor database queries
 docker exec -it logivox-db psql -U flowstock -d flowstock_prod
-SELECT pid, now() - pg_stat_activity.query_start AS duration, query 
-FROM pg_stat_activity 
-WHERE state = 'active' 
+SELECT pid, now() - pg_stat_activity.query_start AS duration, query
+FROM pg_stat_activity
+WHERE state = 'active'
 ORDER BY duration DESC;
 
 # Clear Redis cache
@@ -1288,15 +1299,17 @@ docker compose restart
 ## Support
 
 **Deployment Support:**
+
 - 📧 Email: devops@logivox.ai
 - 💬 Slack: #deployment-support
 - 📚 Docs: https://docs.logivox.ai/deployment
 
 **Emergency Support:**
+
 - 📞 Phone: 1-800-LOGIVOX (24/7)
 - 🚨 On-call: PagerDuty integration
 
 ---
 
 **LogiVox WMS Deployment Guide - Version 1.0**  
-*Last updated: October 16, 2025*
+_Last updated: October 16, 2025_

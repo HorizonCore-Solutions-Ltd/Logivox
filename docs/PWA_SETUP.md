@@ -7,6 +7,7 @@ LogiVox is now configured as a Progressive Web App (PWA) with full offline suppo
 ## Features Implemented
 
 ### 1. PWA Configuration
+
 - ✅ Web App Manifest (`/public/manifest.json`)
 - ✅ Service Worker with caching strategies
 - ✅ Offline-first architecture
@@ -14,6 +15,7 @@ LogiVox is now configured as a Progressive Web App (PWA) with full offline suppo
 - ✅ Theme color and branding
 
 ### 2. Offline Support
+
 - ✅ IndexedDB for offline data storage
 - ✅ Background sync for offline operations
 - ✅ Automatic retry for failed requests
@@ -21,6 +23,7 @@ LogiVox is now configured as a Progressive Web App (PWA) with full offline suppo
 - ✅ Sync queue management
 
 ### 3. Push Notifications
+
 - ✅ Push notification subscription
 - ✅ Notification permission handling
 - ✅ Notification templates (low stock, bookings, etc.)
@@ -28,6 +31,7 @@ LogiVox is now configured as a Progressive Web App (PWA) with full offline suppo
 - ✅ Badge and icon support
 
 ### 4. Mobile Optimization
+
 - ✅ Responsive design across all pages
 - ✅ Touch-friendly UI components
 - ✅ Mobile navigation
@@ -35,6 +39,7 @@ LogiVox is now configured as a Progressive Web App (PWA) with full offline suppo
 - ✅ Status bar styling
 
 ### 5. Performance
+
 - ✅ Resource caching (images, CSS, JS)
 - ✅ API response caching
 - ✅ Stale-while-revalidate strategy
@@ -46,18 +51,21 @@ LogiVox is now configured as a Progressive Web App (PWA) with full offline suppo
 ### For Users
 
 #### Desktop (Chrome, Edge, etc.)
+
 1. Visit LogiVox in your browser
 2. Look for the install icon in the address bar
 3. Click "Install LogiVox"
 4. The app will be added to your applications
 
 #### Mobile (Android)
+
 1. Open LogiVox in Chrome
 2. Tap the menu (three dots)
 3. Select "Add to Home screen"
 4. Confirm the installation
 
 #### Mobile (iOS/Safari)
+
 1. Open LogiVox in Safari
 2. Tap the Share button
 3. Select "Add to Home Screen"
@@ -66,6 +74,7 @@ LogiVox is now configured as a Progressive Web App (PWA) with full offline suppo
 ### For Developers
 
 #### Prerequisites
+
 ```bash
 npm install next-pwa workbox-window
 ```
@@ -96,14 +105,14 @@ VAPID_PRIVATE_KEY=your_private_key
 The app automatically queues operations when offline:
 
 ```typescript
-import { addToSyncQueue } from '@/lib/offline-sync'
+import { addToSyncQueue } from "@/lib/offline-sync";
 
 // Queue an operation
 await addToSyncQueue({
-  type: 'create',
-  endpoint: '/api/inventory',
-  data: { name: 'New Item', sku: '123' }
-})
+  type: "create",
+  endpoint: "/api/inventory",
+  data: { name: "New Item", sku: "123" },
+});
 
 // Operations sync automatically when online
 ```
@@ -111,31 +120,34 @@ await addToSyncQueue({
 ### Push Notifications
 
 ```typescript
-import { showLocalNotification, NotificationTemplates } from '@/lib/push-notifications'
+import {
+  showLocalNotification,
+  NotificationTemplates,
+} from "@/lib/push-notifications";
 
 // Show a notification
-showLocalNotification(NotificationTemplates.lowStock('Item Name'))
+showLocalNotification(NotificationTemplates.lowStock("Item Name"));
 
 // Request permission
-await requestNotificationPermission()
+await requestNotificationPermission();
 
 // Subscribe to push
-await subscribeToPushNotifications()
+await subscribeToPushNotifications();
 ```
 
 ### Offline Storage
 
 ```typescript
-import { offlineDB } from '@/lib/offline-sync'
+import { offlineDB } from "@/lib/offline-sync";
 
 // Store data offline
-await offlineDB.set('inventory', { id: '1', name: 'Item' })
+await offlineDB.set("inventory", { id: "1", name: "Item" });
 
 // Retrieve offline data
-const item = await offlineDB.get('inventory', '1')
+const item = await offlineDB.get("inventory", "1");
 
 // Get all items
-const items = await offlineDB.getAll('inventory')
+const items = await offlineDB.getAll("inventory");
 ```
 
 ## Testing
@@ -171,20 +183,24 @@ const items = await offlineDB.getAll('inventory')
 ## Caching Strategies
 
 ### API Responses
+
 - Strategy: NetworkFirst
 - Cache Duration: 5 minutes
 - Max Entries: 50
 
 ### Images
+
 - Strategy: CacheFirst
 - Cache Duration: 30 days
 - Max Entries: 60
 
 ### Static Resources (CSS, JS)
+
 - Strategy: StaleWhileRevalidate
 - Updates in background
 
 ### Navigation
+
 - App Shell caching
 - Instant page loads
 
@@ -202,12 +218,15 @@ Access at `/dashboard/pwa-settings`:
 ## Components
 
 ### PWAInstallPrompt
+
 Shows install prompt after 30 seconds, respects dismissal (7 days).
 
 ### ServiceWorkerRegister
+
 Handles service worker updates, shows reload prompt.
 
 ### OfflineIndicator
+
 Displays offline status at top of screen.
 
 ## Troubleshooting
@@ -299,6 +318,7 @@ Displays offline status at top of screen.
 ## Support
 
 For issues or questions:
+
 - Check browser console for errors
 - Review service worker status in DevTools
 - Test in incognito mode to rule out cache issues

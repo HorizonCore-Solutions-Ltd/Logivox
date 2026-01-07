@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import {
   Package,
   ArrowLeft,
@@ -18,8 +18,8 @@ import {
   DollarSign,
   Clock,
   AlertCircle,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface RTVDetail {
   id: string;
@@ -69,14 +69,14 @@ export default function RTVDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
 
   // Form states
-  const [vendorRma, setVendorRma] = useState('');
-  const [resolutionType, setResolutionType] = useState('');
-  const [carrier, setCarrier] = useState('');
-  const [tracking, setTracking] = useState('');
-  const [shippingCost, setShippingCost] = useState('');
-  const [creditAmount, setCreditAmount] = useState('');
-  const [creditMemo, setCreditMemo] = useState('');
-  const [notes, setNotes] = useState('');
+  const [vendorRma, setVendorRma] = useState("");
+  const [resolutionType, setResolutionType] = useState("");
+  const [carrier, setCarrier] = useState("");
+  const [tracking, setTracking] = useState("");
+  const [shippingCost, setShippingCost] = useState("");
+  const [creditAmount, setCreditAmount] = useState("");
+  const [creditMemo, setCreditMemo] = useState("");
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
     fetchRTV();
@@ -89,7 +89,7 @@ export default function RTVDetailPage() {
       const data = await response.json();
       setRtv(data);
     } catch (error) {
-      console.error('Error fetching RTV:', error);
+      console.error("Error fetching RTV:", error);
     } finally {
       setLoading(false);
     }
@@ -99,19 +99,19 @@ export default function RTVDetailPage() {
     try {
       setActionLoading(true);
       const response = await fetch(`/api/qc/rtv/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action, ...payload }),
       });
 
       if (response.ok) {
         await fetchRTV();
       } else {
-        alert('Action failed');
+        alert("Action failed");
       }
     } catch (error) {
-      console.error('Error performing action:', error);
-      alert('Action failed');
+      console.error("Error performing action:", error);
+      alert("Action failed");
     } finally {
       setActionLoading(false);
     }
@@ -119,13 +119,13 @@ export default function RTVDetailPage() {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { color: string; text: string }> = {
-      PENDING: { color: 'bg-gray-500', text: 'Pending' },
-      VENDOR_NOTIFIED: { color: 'bg-blue-500', text: 'Vendor Notified' },
-      APPROVED: { color: 'bg-green-500', text: 'Approved' },
-      REJECTED: { color: 'bg-red-500', text: 'Rejected' },
-      SHIPPED: { color: 'bg-purple-500', text: 'Shipped' },
-      CREDITED: { color: 'bg-teal-500', text: 'Credited' },
-      CLOSED: { color: 'bg-gray-400', text: 'Closed' },
+      PENDING: { color: "bg-gray-500", text: "Pending" },
+      VENDOR_NOTIFIED: { color: "bg-blue-500", text: "Vendor Notified" },
+      APPROVED: { color: "bg-green-500", text: "Approved" },
+      REJECTED: { color: "bg-red-500", text: "Rejected" },
+      SHIPPED: { color: "bg-purple-500", text: "Shipped" },
+      CREDITED: { color: "bg-teal-500", text: "Credited" },
+      CLOSED: { color: "bg-gray-400", text: "Closed" },
     };
 
     const { color, text } = config[status] || config.PENDING;
@@ -178,7 +178,9 @@ export default function RTVDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Defect Type</Label>
-                  <div className="font-medium text-red-600">{rtv.defect.defectType}</div>
+                  <div className="font-medium text-red-600">
+                    {rtv.defect.defectType}
+                  </div>
                 </div>
                 <div>
                   <Label>Category</Label>
@@ -220,7 +222,7 @@ export default function RTVDetailPage() {
           </Card>
 
           {/* Shipping Info */}
-          {rtv.status === 'APPROVED' && (
+          {rtv.status === "APPROVED" && (
             <Card>
               <CardHeader>
                 <CardTitle>Ship RTV</CardTitle>
@@ -254,7 +256,7 @@ export default function RTVDetailPage() {
                 </div>
                 <Button
                   onClick={() =>
-                    handleAction('ship', {
+                    handleAction("ship", {
                       carrier,
                       trackingNumber: tracking,
                       shippingCost: parseFloat(shippingCost),
@@ -271,7 +273,7 @@ export default function RTVDetailPage() {
           )}
 
           {/* Vendor Response */}
-          {rtv.status === 'VENDOR_NOTIFIED' && (
+          {rtv.status === "VENDOR_NOTIFIED" && (
             <Card>
               <CardHeader>
                 <CardTitle>Record Vendor Response</CardTitle>
@@ -300,7 +302,7 @@ export default function RTVDetailPage() {
                 </div>
                 <Button
                   onClick={() =>
-                    handleAction('recordVendorResponse', {
+                    handleAction("recordVendorResponse", {
                       vendorRmaNumber: vendorRma,
                       resolutionType,
                     })
@@ -316,7 +318,7 @@ export default function RTVDetailPage() {
           )}
 
           {/* Credit Recording */}
-          {rtv.status === 'SHIPPED' && rtv.resolutionType === 'CREDIT' && (
+          {rtv.status === "SHIPPED" && rtv.resolutionType === "CREDIT" && (
             <Card>
               <CardHeader>
                 <CardTitle>Record Credit Received</CardTitle>
@@ -342,7 +344,7 @@ export default function RTVDetailPage() {
                 </div>
                 <Button
                   onClick={() =>
-                    handleAction('recordCredit', {
+                    handleAction("recordCredit", {
                       creditAmount: parseFloat(creditAmount),
                       creditMemoNumber: creditMemo,
                     })
@@ -365,7 +367,10 @@ export default function RTVDetailPage() {
             <CardContent>
               <div className="space-y-3">
                 {rtv.activities.map((activity) => (
-                  <div key={activity.id} className="flex gap-3 pb-3 border-b last:border-0">
+                  <div
+                    key={activity.id}
+                    className="flex gap-3 pb-3 border-b last:border-0"
+                  >
                     <Clock className="w-5 h-5 text-muted-foreground" />
                     <div className="flex-1">
                       <div className="font-medium">{activity.action}</div>
@@ -373,7 +378,7 @@ export default function RTVDetailPage() {
                         {activity.description}
                       </div>
                       <div className="text-xs text-muted-foreground mt-1">
-                        {activity.performedBy.name} •{' '}
+                        {activity.performedBy.name} •{" "}
                         {new Date(activity.performedAt).toLocaleString()}
                       </div>
                     </div>
@@ -392,10 +397,10 @@ export default function RTVDetailPage() {
               <CardTitle>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
-              {rtv.status === 'PENDING' && (
+              {rtv.status === "PENDING" && (
                 <>
                   <Button
-                    onClick={() => handleAction('notifyVendor')}
+                    onClick={() => handleAction("notifyVendor")}
                     disabled={actionLoading}
                     className="w-full"
                   >
@@ -403,7 +408,7 @@ export default function RTVDetailPage() {
                     Notify Vendor
                   </Button>
                   <Button
-                    onClick={() => handleAction('approve')}
+                    onClick={() => handleAction("approve")}
                     disabled={actionLoading}
                     className="w-full bg-green-600 hover:bg-green-700"
                   >
@@ -412,8 +417,8 @@ export default function RTVDetailPage() {
                   </Button>
                   <Button
                     onClick={() => {
-                      const reason = prompt('Rejection reason:');
-                      if (reason) handleAction('reject', { reason });
+                      const reason = prompt("Rejection reason:");
+                      if (reason) handleAction("reject", { reason });
                     }}
                     disabled={actionLoading}
                     variant="destructive"
@@ -424,9 +429,9 @@ export default function RTVDetailPage() {
                   </Button>
                 </>
               )}
-              {rtv.status === 'CREDITED' && (
+              {rtv.status === "CREDITED" && (
                 <Button
-                  onClick={() => handleAction('close')}
+                  onClick={() => handleAction("close")}
                   disabled={actionLoading}
                   className="w-full"
                 >
@@ -464,7 +469,9 @@ export default function RTVDetailPage() {
               {rtv.trackingNumber && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tracking:</span>
-                  <span className="font-mono text-xs">{rtv.trackingNumber}</span>
+                  <span className="font-mono text-xs">
+                    {rtv.trackingNumber}
+                  </span>
                 </div>
               )}
               {rtv.resolutionType && (

@@ -1,22 +1,24 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const employeeSchema = z.object({
-  employeeNumber: z.string().min(1, 'Employee number is required'),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Valid email required'),
+  employeeNumber: z.string().min(1, "Employee number is required"),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Valid email required"),
   phone: z.string().optional(),
   warehouseId: z.string(),
   department: z.string().optional(),
   position: z.string().optional(),
-  hireDate: z.string().transform(str => new Date(str)),
+  hireDate: z.string().transform((str) => new Date(str)),
   hourlyRate: z.number().positive().optional(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'ON_LEAVE', 'TERMINATED']).default('ACTIVE'),
+  status: z
+    .enum(["ACTIVE", "INACTIVE", "ON_LEAVE", "TERMINATED"])
+    .default("ACTIVE"),
   isFullTime: z.boolean().default(true),
   skills: z.array(z.string()).optional(),
   certifications: z.array(z.string()).optional(),
@@ -30,23 +32,28 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { searchParams } = new URL(req.url);
-    const warehouseId = searchParams.get('warehouseId');
-    const status = searchParams.get('status');
-    const search = searchParams.get('search');
+    const warehouseId = searchParams.get("warehouseId");
+    const status = searchParams.get("status");
+    const search = searchParams.get("search");
 
     const employees = await prisma.employee.findMany({
       where: {
@@ -55,10 +62,10 @@ export async function GET(req: NextRequest) {
         ...(status && { status: status as any }),
         ...(search && {
           OR: [
-            { firstName: { contains: search, mode: 'insensitive' } },
-            { lastName: { contains: search, mode: 'insensitive' } },
-            { employeeNumber: { contains: search, mode: 'insensitive' } },
-            { email: { contains: search, mode: 'insensitive' } },
+            { firstName: { contains: search, mode: "insensitive" } },
+            { lastName: { contains: search, mode: "insensitive" } },
+            { employeeNumber: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
           ],
         }),
       },
@@ -72,13 +79,16 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(employees);
   } catch (error: any) {
-    console.error('Error fetching employees:', error);
-    return NextResponse.json({ error: 'Failed to fetch employees' }, { status: 500 });
+    console.error("Error fetching employees:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch employees" },
+      { status: 500 },
+    );
   }
 }
 
@@ -90,16 +100,21 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -115,7 +130,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (existing) {
-      return NextResponse.json({ error: 'Employee number already exists' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Employee number already exists" },
+        { status: 400 },
+      );
     }
 
     const employee = await prisma.employee.create({
@@ -133,8 +151,8 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'EMPLOYEE_CREATED',
-        entityType: 'Employee',
+        action: "EMPLOYEE_CREATED",
+        entityType: "Employee",
         entityId: employee.id,
         metadata: {
           employeeNumber: employee.employeeNumber,
@@ -146,9 +164,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(employee, { status: 201 });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Validation error', details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
-    console.error('Error creating employee:', error);
-    return NextResponse.json({ error: 'Failed to create employee' }, { status: 500 });
+    console.error("Error creating employee:", error);
+    return NextResponse.json(
+      { error: "Failed to create employee" },
+      { status: 500 },
+    );
   }
 }

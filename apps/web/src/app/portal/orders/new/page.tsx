@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,7 +56,7 @@ export default function NewOrderPage() {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [items, setItems] = useState<OrderItem[]>([]);
-  
+
   const [shippingAddress, setShippingAddress] = useState("");
   const [shippingCity, setShippingCity] = useState("");
   const [shippingState, setShippingState] = useState("");
@@ -216,8 +222,12 @@ export default function NewOrderPage() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Place New Order</h1>
-            <p className="text-gray-600 mt-1">Add items and submit your order</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Place New Order
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Add items and submit your order
+            </p>
           </div>
         </div>
       </div>
@@ -277,14 +287,19 @@ export default function NewOrderPage() {
                             <SelectContent>
                               {products.map((product) => (
                                 <SelectItem key={product.id} value={product.id}>
-                                  {product.name} ({product.availableQty} available)
+                                  {product.name} ({product.availableQty}{" "}
+                                  available)
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
                         </TableCell>
                         <TableCell>
-                          <Input value={item.sku} disabled className="bg-gray-50" />
+                          <Input
+                            value={item.sku}
+                            disabled
+                            className="bg-gray-50"
+                          />
                         </TableCell>
                         <TableCell>
                           <Input
@@ -292,7 +307,11 @@ export default function NewOrderPage() {
                             min="1"
                             value={item.quantity}
                             onChange={(e) =>
-                              updateItem(index, "quantity", parseInt(e.target.value) || 1)
+                              updateItem(
+                                index,
+                                "quantity",
+                                parseInt(e.target.value) || 1,
+                              )
                             }
                           />
                         </TableCell>
@@ -312,7 +331,9 @@ export default function NewOrderPage() {
                           <Input
                             placeholder="Optional notes"
                             value={item.notes}
-                            onChange={(e) => updateItem(index, "notes", e.target.value)}
+                            onChange={(e) =>
+                              updateItem(index, "notes", e.target.value)
+                            }
                           />
                         </TableCell>
                         <TableCell>
@@ -347,18 +368,25 @@ export default function NewOrderPage() {
         <Card>
           <CardHeader>
             <CardTitle>Shipping Information</CardTitle>
-            <CardDescription>Where should we deliver your order?</CardDescription>
+            <CardDescription>
+              Where should we deliver your order?
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label htmlFor="shippingMethod">Shipping Method</Label>
-                <Select value={shippingMethod} onValueChange={setShippingMethod}>
+                <Select
+                  value={shippingMethod}
+                  onValueChange={setShippingMethod}
+                >
                   <SelectTrigger id="shippingMethod">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="STANDARD">Standard (5-7 days)</SelectItem>
+                    <SelectItem value="STANDARD">
+                      Standard (5-7 days)
+                    </SelectItem>
                     <SelectItem value="EXPRESS">Express (2-3 days)</SelectItem>
                     <SelectItem value="OVERNIGHT">Overnight</SelectItem>
                   </SelectContent>
@@ -366,7 +394,9 @@ export default function NewOrderPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="requestedDate">Requested Delivery Date (Optional)</Label>
+                <Label htmlFor="requestedDate">
+                  Requested Delivery Date (Optional)
+                </Label>
                 <Input
                   id="requestedDate"
                   type="date"
@@ -438,7 +468,9 @@ export default function NewOrderPage() {
         <Card>
           <CardHeader>
             <CardTitle>Order Notes (Optional)</CardTitle>
-            <CardDescription>Any special instructions for this order</CardDescription>
+            <CardDescription>
+              Any special instructions for this order
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <Textarea

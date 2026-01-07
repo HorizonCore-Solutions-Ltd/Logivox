@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -11,27 +11,75 @@ const createIntegrationSchema = z.object({
   code: z.string().min(1, "Code is required"),
   description: z.string().optional(),
   provider: z.enum([
-    "QUICKBOOKS_ONLINE", "QUICKBOOKS_DESKTOP", "XERO", "SAGE", "NETSUITE", "SAP", "MICROSOFT_DYNAMICS",
-    "SHOPIFY", "WOOCOMMERCE", "MAGENTO", "BIGCOMMERCE", "AMAZON", "EBAY", "ETSY",
-    "FEDEX", "UPS", "DHL", "USPS", "SHIPSTATION", "EASYPOST", "SHIPPO",
-    "STRIPE", "PAYPAL", "SQUARE", "BRAINTREE", "AUTHORIZE_NET",
-    "SALESFORCE", "HUBSPOT", "ZOHO_CRM",
-    "TWILIO", "SENDGRID", "MAILCHIMP",
-    "CUSTOM", "WEBHOOK"
+    "QUICKBOOKS_ONLINE",
+    "QUICKBOOKS_DESKTOP",
+    "XERO",
+    "SAGE",
+    "NETSUITE",
+    "SAP",
+    "MICROSOFT_DYNAMICS",
+    "SHOPIFY",
+    "WOOCOMMERCE",
+    "MAGENTO",
+    "BIGCOMMERCE",
+    "AMAZON",
+    "EBAY",
+    "ETSY",
+    "FEDEX",
+    "UPS",
+    "DHL",
+    "USPS",
+    "SHIPSTATION",
+    "EASYPOST",
+    "SHIPPO",
+    "STRIPE",
+    "PAYPAL",
+    "SQUARE",
+    "BRAINTREE",
+    "AUTHORIZE_NET",
+    "SALESFORCE",
+    "HUBSPOT",
+    "ZOHO_CRM",
+    "TWILIO",
+    "SENDGRID",
+    "MAILCHIMP",
+    "CUSTOM",
+    "WEBHOOK",
   ]),
   category: z.enum([
-    "ACCOUNTING", "ECOMMERCE", "SHIPPING", "PAYMENT", "CRM", 
-    "MARKETING", "COMMUNICATION", "ANALYTICS", "CUSTOM"
+    "ACCOUNTING",
+    "ECOMMERCE",
+    "SHIPPING",
+    "PAYMENT",
+    "CRM",
+    "MARKETING",
+    "COMMUNICATION",
+    "ANALYTICS",
+    "CUSTOM",
   ]),
   config: z.record(z.any()),
-  authType: z.enum(["OAUTH2", "API_KEY", "BASIC", "BEARER_TOKEN", "CUSTOM", "NONE"]),
+  authType: z.enum([
+    "OAUTH2",
+    "API_KEY",
+    "BASIC",
+    "BEARER_TOKEN",
+    "CUSTOM",
+    "NONE",
+  ]),
   credentials: z.record(z.any()).optional(),
   webhookSecret: z.string().optional(),
   features: z.record(z.any()),
   syncDirection: z.enum(["IMPORT", "EXPORT", "BIDIRECTIONAL"]),
   syncFrequency: z.enum([
-    "REALTIME", "EVERY_5_MINUTES", "EVERY_15_MINUTES", "EVERY_30_MINUTES",
-    "HOURLY", "EVERY_6_HOURS", "DAILY", "WEEKLY", "MANUAL"
+    "REALTIME",
+    "EVERY_5_MINUTES",
+    "EVERY_15_MINUTES",
+    "EVERY_30_MINUTES",
+    "HOURLY",
+    "EVERY_6_HOURS",
+    "DAILY",
+    "WEEKLY",
+    "MANUAL",
   ]),
   autoSync: z.boolean().default(false),
   fieldMappings: z.record(z.any()),
@@ -65,7 +113,10 @@ export async function GET(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -125,7 +176,7 @@ export async function GET(request: Request) {
     console.error("Error fetching integrations:", error);
     return NextResponse.json(
       { error: "Failed to fetch integrations" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -150,7 +201,10 @@ export async function POST(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -171,7 +225,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Integration with this code already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -197,13 +251,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating integration:", error);
     return NextResponse.json(
       { error: "Failed to create integration" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

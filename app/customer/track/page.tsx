@@ -3,10 +3,19 @@
  * Customers can track their shipments in real-time
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Package, Truck, MapPin, Clock, CheckCircle, Camera, Download, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Package,
+  Truck,
+  MapPin,
+  Clock,
+  CheckCircle,
+  Camera,
+  Download,
+  AlertCircle,
+} from "lucide-react";
 
 interface TrackingResult {
   loadSheet: {
@@ -49,40 +58,44 @@ interface TrackingResult {
 }
 
 export default function CustomerPortal() {
-  const [trackingNumber, setTrackingNumber] = useState('');
+  const [trackingNumber, setTrackingNumber] = useState("");
   const [result, setResult] = useState<TrackingResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   const trackShipment = async () => {
     if (!trackingNumber.trim()) {
-      setError('Please enter a tracking number');
+      setError("Please enter a tracking number");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
     setResult(null);
 
     try {
-      const response = await fetch(`/api/customer/track?number=${encodeURIComponent(trackingNumber)}`);
+      const response = await fetch(
+        `/api/customer/track?number=${encodeURIComponent(trackingNumber)}`,
+      );
       const data = await response.json();
 
       if (data.loadSheet) {
         setResult(data);
       } else {
-        setError('Tracking number not found. Please check and try again.');
+        setError("Tracking number not found. Please check and try again.");
       }
     } catch (err) {
-      setError('Error tracking shipment. Please try again.');
-      console.error('Track error:', err);
+      setError("Error tracking shipment. Please try again.");
+      console.error("Track error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const file = event.target.files?.[0];
     if (!file || !result) return;
 
@@ -90,22 +103,22 @@ export default function CustomerPortal() {
 
     try {
       const formData = new FormData();
-      formData.append('photo', file);
-      formData.append('loadSheetId', result.loadSheet.id);
+      formData.append("photo", file);
+      formData.append("loadSheetId", result.loadSheet.id);
 
-      const response = await fetch('/api/customer/upload-photo', {
-        method: 'POST',
+      const response = await fetch("/api/customer/upload-photo", {
+        method: "POST",
         body: formData,
       });
 
       if (response.ok) {
-        alert('Photo uploaded successfully!');
+        alert("Photo uploaded successfully!");
       } else {
-        alert('Failed to upload photo');
+        alert("Failed to upload photo");
       }
     } catch (err) {
-      console.error('Upload error:', err);
-      alert('Error uploading photo');
+      console.error("Upload error:", err);
+      alert("Error uploading photo");
     } finally {
       setUploadingPhoto(false);
     }
@@ -115,10 +128,12 @@ export default function CustomerPortal() {
     if (!result) return;
 
     try {
-      const response = await fetch(`/api/customer/download-pod?loadSheetId=${result.loadSheet.id}`);
+      const response = await fetch(
+        `/api/customer/download-pod?loadSheetId=${result.loadSheet.id}`,
+      );
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = `POD-${result.loadSheet.loadSheetNumber}.pdf`;
       document.body.appendChild(a);
@@ -126,27 +141,30 @@ export default function CustomerPortal() {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (err) {
-      console.error('Download error:', err);
-      alert('Error downloading proof of delivery');
+      console.error("Download error:", err);
+      alert("Error downloading proof of delivery");
     }
   };
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      BUILDING: 'bg-blue-100 text-blue-800',
-      READY: 'bg-yellow-100 text-yellow-800',
-      CONFIRMED: 'bg-purple-100 text-purple-800',
-      DISTRIBUTED: 'bg-indigo-100 text-indigo-800',
-      DEPARTED: 'bg-green-100 text-green-800',
-      DELIVERED: 'bg-green-600 text-white',
+      BUILDING: "bg-blue-100 text-blue-800",
+      READY: "bg-yellow-100 text-yellow-800",
+      CONFIRMED: "bg-purple-100 text-purple-800",
+      DISTRIBUTED: "bg-indigo-100 text-indigo-800",
+      DEPARTED: "bg-green-100 text-green-800",
+      DELIVERED: "bg-green-600 text-white",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const getStatusIcon = (status: string) => {
-    if (status === 'DELIVERED') return <CheckCircle className="w-6 h-6 text-green-600" />;
-    if (status === 'DEPARTED') return <Truck className="w-6 h-6 text-green-600" />;
-    if (status === 'CONFIRMED') return <Package className="w-6 h-6 text-purple-600" />;
+    if (status === "DELIVERED")
+      return <CheckCircle className="w-6 h-6 text-green-600" />;
+    if (status === "DEPARTED")
+      return <Truck className="w-6 h-6 text-green-600" />;
+    if (status === "CONFIRMED")
+      return <Package className="w-6 h-6 text-purple-600" />;
     return <Clock className="w-6 h-6 text-gray-600" />;
   };
 
@@ -157,9 +175,12 @@ export default function CustomerPortal() {
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Track Your Shipment</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Track Your Shipment
+              </h1>
               <p className="text-sm text-gray-600 mt-2">
-                Enter your load sheet or tracking number to view real-time status
+                Enter your load sheet or tracking number to view real-time
+                status
               </p>
             </div>
             <Package className="w-12 h-12 text-blue-600" />
@@ -176,7 +197,7 @@ export default function CustomerPortal() {
               placeholder="Enter Load Sheet Number (e.g., LS-2026-0001)"
               value={trackingNumber}
               onChange={(e) => setTrackingNumber(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && trackShipment()}
+              onKeyPress={(e) => e.key === "Enter" && trackShipment()}
               className="flex-1 px-6 py-4 border-2 border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
             <button
@@ -184,7 +205,7 @@ export default function CustomerPortal() {
               disabled={loading}
               className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Tracking...' : 'Track'}
+              {loading ? "Tracking..." : "Track"}
             </button>
           </div>
 
@@ -206,11 +227,15 @@ export default function CustomerPortal() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     {result.loadSheet.loadSheetNumber}
                   </h2>
-                  <p className="text-gray-600">{result.loadSheet.customer.name}</p>
+                  <p className="text-gray-600">
+                    {result.loadSheet.customer.name}
+                  </p>
                 </div>
                 <div className="flex flex-col items-end gap-3">
                   {getStatusIcon(result.loadSheet.status)}
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(result.loadSheet.status)}`}>
+                  <span
+                    className={`px-4 py-2 rounded-full text-sm font-semibold ${getStatusColor(result.loadSheet.status)}`}
+                  >
                     {result.loadSheet.status}
                   </span>
                 </div>
@@ -220,7 +245,9 @@ export default function CustomerPortal() {
               <div className="grid grid-cols-3 gap-6 mb-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <Package className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">{result.loadSheet.totalContainers}</div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    {result.loadSheet.totalContainers}
+                  </div>
                   <div className="text-sm text-gray-600">Containers</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -239,14 +266,20 @@ export default function CustomerPortal() {
 
               {/* Timeline */}
               <div className="border-t pt-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Shipment Timeline</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">
+                  Shipment Timeline
+                </h3>
                 <div className="space-y-4">
                   {result.loadSheet.events.map((event, idx) => (
                     <div key={idx} className="flex items-start gap-4">
                       <div className="w-3 h-3 bg-blue-600 rounded-full mt-1.5"></div>
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900">{event.eventType.replace(/_/g, ' ')}</div>
-                        <div className="text-sm text-gray-600">{event.description}</div>
+                        <div className="font-medium text-gray-900">
+                          {event.eventType.replace(/_/g, " ")}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {event.description}
+                        </div>
                         <div className="text-xs text-gray-500 mt-1">
                           {new Date(event.timestamp).toLocaleString()}
                         </div>
@@ -257,32 +290,43 @@ export default function CustomerPortal() {
               </div>
 
               {/* Shipping Details */}
-              {(result.loadSheet.carrierName || result.loadSheet.driverName) && (
+              {(result.loadSheet.carrierName ||
+                result.loadSheet.driverName) && (
                 <div className="border-t pt-6 mt-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">Shipping Details</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    Shipping Details
+                  </h3>
                   <div className="grid grid-cols-2 gap-4">
                     {result.loadSheet.carrierName && (
                       <div>
                         <div className="text-sm text-gray-600">Carrier</div>
-                        <div className="font-medium text-gray-900">{result.loadSheet.carrierName}</div>
+                        <div className="font-medium text-gray-900">
+                          {result.loadSheet.carrierName}
+                        </div>
                       </div>
                     )}
                     {result.loadSheet.driverName && (
                       <div>
                         <div className="text-sm text-gray-600">Driver</div>
-                        <div className="font-medium text-gray-900">{result.loadSheet.driverName}</div>
+                        <div className="font-medium text-gray-900">
+                          {result.loadSheet.driverName}
+                        </div>
                       </div>
                     )}
                     {result.loadSheet.trailerNumber && (
                       <div>
                         <div className="text-sm text-gray-600">Trailer</div>
-                        <div className="font-medium text-gray-900">{result.loadSheet.trailerNumber}</div>
+                        <div className="font-medium text-gray-900">
+                          {result.loadSheet.trailerNumber}
+                        </div>
                       </div>
                     )}
                     {result.loadSheet.bayDoor && (
                       <div>
                         <div className="text-sm text-gray-600">Bay Door</div>
-                        <div className="font-medium text-gray-900">{result.loadSheet.bayDoor.doorNumber}</div>
+                        <div className="font-medium text-gray-900">
+                          {result.loadSheet.bayDoor.doorNumber}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -291,27 +335,39 @@ export default function CustomerPortal() {
 
               {/* Dates */}
               <div className="border-t pt-6 mt-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Important Dates</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">
+                  Important Dates
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <div className="text-sm text-gray-600">Scheduled Shipment</div>
+                    <div className="text-sm text-gray-600">
+                      Scheduled Shipment
+                    </div>
                     <div className="font-medium text-gray-900">
                       {new Date(result.loadSheet.shipmentDate).toLocaleString()}
                     </div>
                   </div>
                   {result.loadSheet.actualDepartureTime && (
                     <div>
-                      <div className="text-sm text-gray-600">Actual Departure</div>
+                      <div className="text-sm text-gray-600">
+                        Actual Departure
+                      </div>
                       <div className="font-medium text-gray-900">
-                        {new Date(result.loadSheet.actualDepartureTime).toLocaleString()}
+                        {new Date(
+                          result.loadSheet.actualDepartureTime,
+                        ).toLocaleString()}
                       </div>
                     </div>
                   )}
                   {result.loadSheet.estimatedArrival && (
                     <div>
-                      <div className="text-sm text-gray-600">Estimated Arrival</div>
+                      <div className="text-sm text-gray-600">
+                        Estimated Arrival
+                      </div>
                       <div className="font-medium text-gray-900">
-                        {new Date(result.loadSheet.estimatedArrival).toLocaleString()}
+                        {new Date(
+                          result.loadSheet.estimatedArrival,
+                        ).toLocaleString()}
                       </div>
                     </div>
                   )}
@@ -330,7 +386,7 @@ export default function CustomerPortal() {
 
                 <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer transition">
                   <Camera className="w-4 h-4" />
-                  {uploadingPhoto ? 'Uploading...' : 'Upload Photo'}
+                  {uploadingPhoto ? "Uploading..." : "Upload Photo"}
                   <input
                     type="file"
                     accept="image/*"
@@ -344,36 +400,55 @@ export default function CustomerPortal() {
 
             {/* Container Details */}
             <div className="bg-white rounded-xl shadow-lg p-8">
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Container Details</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">
+                Container Details
+              </h3>
               <div className="space-y-4">
                 {result.loadSheet.containers.map((container) => (
                   <div key={container.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-bold text-lg text-gray-900">{container.containerNumber}</h4>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(container.status)}`}>
+                      <h4 className="font-bold text-lg text-gray-900">
+                        {container.containerNumber}
+                      </h4>
+                      <span
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(container.status)}`}
+                      >
                         {container.status}
                       </span>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-3 mb-3 text-sm">
                       <div>
                         <span className="text-gray-600">Weight:</span>
-                        <span className="ml-2 font-medium text-gray-900">{container.weight}kg</span>
+                        <span className="ml-2 font-medium text-gray-900">
+                          {container.weight}kg
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Volume:</span>
-                        <span className="ml-2 font-medium text-gray-900">{container.volume.toFixed(2)}m³</span>
+                        <span className="ml-2 font-medium text-gray-900">
+                          {container.volume.toFixed(2)}m³
+                        </span>
                       </div>
                     </div>
 
                     {container.containerItems.length > 0 && (
                       <div className="border-t pt-3">
-                        <div className="text-sm font-semibold text-gray-700 mb-2">Items ({container.containerItems.length}):</div>
+                        <div className="text-sm font-semibold text-gray-700 mb-2">
+                          Items ({container.containerItems.length}):
+                        </div>
                         <div className="space-y-1">
                           {container.containerItems.map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-sm text-gray-600">
-                              <span>{item.productName} (SKU: {item.sku})</span>
-                              <span className="font-medium">Qty: {item.quantity}</span>
+                            <div
+                              key={idx}
+                              className="flex justify-between text-sm text-gray-600"
+                            >
+                              <span>
+                                {item.productName} (SKU: {item.sku})
+                              </span>
+                              <span className="font-medium">
+                                Qty: {item.quantity}
+                              </span>
                             </div>
                           ))}
                         </div>

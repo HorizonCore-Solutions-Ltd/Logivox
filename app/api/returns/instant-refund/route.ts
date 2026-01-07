@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { instantRefundService } from '@/lib/services/returns/instant-refund-service';
+import { NextRequest, NextResponse } from "next/server";
+import { instantRefundService } from "@/lib/services/returns/instant-refund-service";
 
 /**
  * POST /api/returns/instant-refund
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
 
     if (!rmaId || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required fields: rmaId, organizationId' },
-        { status: 400 }
+        { error: "Missing required fields: rmaId, organizationId" },
+        { status: 400 },
       );
     }
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const instantRefund = await instantRefundService.processInstantRefund({
       rmaId,
       organizationId,
-      refundMethod: body.refundMethod || 'ORIGINAL_PAYMENT',
+      refundMethod: body.refundMethod || "ORIGINAL_PAYMENT",
     });
 
     return NextResponse.json({
@@ -42,10 +42,10 @@ export async function POST(request: NextRequest) {
       instantRefund,
     });
   } catch (error: any) {
-    console.error('Instant refund error:', error);
+    console.error("Instant refund error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process instant refund' },
-      { status: 500 }
+      { error: error.message || "Failed to process instant refund" },
+      { status: 500 },
     );
   }
 }
@@ -57,13 +57,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
-    const status = searchParams.get('status');
+    const organizationId = searchParams.get("organizationId");
+    const status = searchParams.get("status");
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Missing organizationId parameter' },
-        { status: 400 }
+        { error: "Missing organizationId parameter" },
+        { status: 400 },
       );
     }
 
@@ -78,13 +78,13 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       instantRefunds: [],
-      message: 'Database integration pending',
+      message: "Database integration pending",
     });
   } catch (error: any) {
-    console.error('Get instant refunds error:', error);
+    console.error("Get instant refunds error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get instant refunds' },
-      { status: 500 }
+      { error: error.message || "Failed to get instant refunds" },
+      { status: 500 },
     );
   }
 }

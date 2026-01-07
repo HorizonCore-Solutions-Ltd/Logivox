@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -10,8 +10,13 @@ const rmaItemSchema = z.object({
   salesOrderItemId: z.string().optional(),
   quantityRequested: z.number().int().positive(),
   unitPrice: z.number(),
-  condition: z.enum(["NEW", "GOOD", "FAIR", "DAMAGED", "DEFECTIVE", "DESTROYED"]).optional(),
-  action: z.enum(["REFUND", "EXCHANGE", "STORE_CREDIT", "REPAIR", "DISPOSE"]).optional().default("REFUND"),
+  condition: z
+    .enum(["NEW", "GOOD", "FAIR", "DAMAGED", "DEFECTIVE", "DESTROYED"])
+    .optional(),
+  action: z
+    .enum(["REFUND", "EXCHANGE", "STORE_CREDIT", "REPAIR", "DISPOSE"])
+    .optional()
+    .default("REFUND"),
   exchangeInventoryId: z.string().optional(),
   exchangeQuantity: z.number().int().positive().optional(),
 });
@@ -41,7 +46,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -123,7 +128,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching RMAs:", error);
     return NextResponse.json(
       { error: "Failed to fetch RMAs" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -143,7 +148,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -161,7 +166,7 @@ export async function POST(request: NextRequest) {
     if (!customer) {
       return NextResponse.json(
         { error: "Customer not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -176,7 +181,7 @@ export async function POST(request: NextRequest) {
     if (!returnReason) {
       return NextResponse.json(
         { error: "Return reason not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -193,14 +198,15 @@ export async function POST(request: NextRequest) {
       if (!salesOrder) {
         return NextResponse.json(
           { error: "Sales order not found or does not belong to customer" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
       // Check return window if configured
       if (returnReason.allowedDays && salesOrder.deliveredDate) {
         const daysSinceDelivery = Math.floor(
-          (Date.now() - salesOrder.deliveredDate.getTime()) / (1000 * 60 * 60 * 24)
+          (Date.now() - salesOrder.deliveredDate.getTime()) /
+            (1000 * 60 * 60 * 24),
         );
 
         if (daysSinceDelivery > returnReason.allowedDays) {
@@ -208,7 +214,7 @@ export async function POST(request: NextRequest) {
             {
               error: `Return window expired. Returns allowed within ${returnReason.allowedDays} days of delivery.`,
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
       }
@@ -226,7 +232,7 @@ export async function POST(request: NextRequest) {
       if (!inventory) {
         return NextResponse.json(
           { error: `Inventory item ${item.inventoryId} not found` },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
@@ -242,7 +248,7 @@ export async function POST(request: NextRequest) {
         if (!exchangeItem) {
           return NextResponse.json(
             { error: `Exchange item ${item.exchangeInventoryId} not found` },
-            { status: 404 }
+            { status: 404 },
           );
         }
       }
@@ -263,9 +269,7 @@ export async function POST(request: NextRequest) {
 
     let sequence = 1;
     if (lastRMA) {
-      const lastSeq = parseInt(
-        (lastRMA.rmaNumber.split("-")[2] || "0") || "0"
-      );
+      const lastSeq = parseInt(lastRMA.rmaNumber.split("-")[2] || "0" || "0");
       sequence = lastSeq + 1;
     }
 
@@ -359,14 +363,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating RMA:", error);
     return NextResponse.json(
       { error: "Failed to create RMA" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

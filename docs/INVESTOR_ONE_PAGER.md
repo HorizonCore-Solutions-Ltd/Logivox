@@ -1,4 +1,5 @@
 # 📊 LogiVox - One-Page Executive Summary
+
 ## The ONLY Inventory Platform with Built-in Security Training
 
 > **Seeking:** $2-5M | **Valuation:** $20-25M Post-Money | **Equity:** 20-25%
@@ -8,6 +9,7 @@
 ## 🎯 The Problem ($1.1 Trillion Opportunity)
 
 Businesses lose **$1.1 TRILLION annually** from:
+
 - ❌ Poor inventory management (stockouts, overstocking)
 - ❌ Security breaches from untrained users (60% of all breaches)
 - ❌ Failed compliance audits (SOC 2, ISO 27001 requirements)
@@ -18,6 +20,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 **LogiVox** = Inventory Management + Security Academy (like KnowBe4) **in ONE platform**
 
 **Unique Features:**
+
 - ✅ Real-time inventory tracking (multi-location, barcode scanning)
 - ✅ **Security awareness training** (125+ lessons, phishing simulations)
 - ✅ Advanced label printing (drag-and-drop designer)
@@ -31,13 +34,14 @@ Businesses lose **$1.1 TRILLION annually** from:
 
 ## 📈 Market Opportunity
 
-| Metric | Value |
-|--------|-------|
-| **TAM** | $12.8B by 2028 (14% CAGR) |
-| **SAM** | $4.2B (SMB + Enterprise) |
+| Metric  | Value                               |
+| ------- | ----------------------------------- |
+| **TAM** | $12.8B by 2028 (14% CAGR)           |
+| **SAM** | $4.2B (SMB + Enterprise)            |
 | **SOM** | $420M (10% market share in 5 years) |
 
 **Market Trends:**
+
 - Post-COVID digital transformation (5-10 years accelerated)
 - Security breaches up 300% (phishing, ransomware)
 - Compliance mandatory for B2B SaaS (SOC 2, ISO 27001)
@@ -48,6 +52,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 ## 💰 Business Model
 
 **Pricing:**
+
 - Starter: $99/month (small businesses)
 - Professional: $199/month (most popular - growing businesses)
 - Enterprise: $299-999/month (unlimited users, white-label)
@@ -67,6 +72,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 ## 🚀 Traction & Milestones
 
 **Current Status:**
+
 - ✅ Product: 95/100 deployment ready
 - ✅ Technology: Modern stack (Next.js 14, PostgreSQL, Prisma)
 - ✅ Security: Military-grade (SOC 2 ready)
@@ -74,6 +80,7 @@ Businesses lose **$1.1 TRILLION annually** from:
 - 📊 Revenue: Pre-revenue (launching Q4 2025)
 
 **12-Month Milestones:**
+
 - Month 3: 100 customers, $20K MRR
 - Month 6: 500 customers, $100K MRR
 - Month 12: 2,000 customers, $670K MRR ($8M ARR)
@@ -82,28 +89,29 @@ Businesses lose **$1.1 TRILLION annually** from:
 
 ## 📊 5-Year Financial Projections
 
-| Year | Customers | ARR | EBITDA | Net Margin |
-|------|-----------|-----|--------|------------|
-| **2026** | 2,000 | $8M | -$2.8M | -35% (invest) |
-| **2027** | 6,500 | $32M | -$500K | -2% (breakeven) |
-| **2028** | 14,000 | $84M | $12M | +14% ✅ |
-| **2029** | 28,000 | $196M | $49M | +25% |
-| **2030** | 52,500 | $420M | $147M | +35% |
+| Year     | Customers | ARR   | EBITDA | Net Margin      |
+| -------- | --------- | ----- | ------ | --------------- |
+| **2026** | 2,000     | $8M   | -$2.8M | -35% (invest)   |
+| **2027** | 6,500     | $32M  | -$500K | -2% (breakeven) |
+| **2028** | 14,000    | $84M  | $12M   | +14% ✅         |
+| **2029** | 28,000    | $196M | $49M   | +25%            |
+| **2030** | 52,500    | $420M | $147M  | +35%            |
 
 ---
 
 ## 🏆 Competitive Advantage
 
-| Feature | LogiVox | Competitors |
-|---------|-----------|-------------|
-| **Security Training** | ✅ Built-in | ❌ None |
-| **Phishing Simulation** | ✅ Automated | ❌ None |
-| **User Certification** | ✅ Yes | ❌ None |
-| **Compliance Ready** | ✅ SOC 2/ISO | ⚠️ Partial |
-| **Modern Tech** | ✅ Next.js 14 | ❌ Legacy |
-| **White-Label** | ✅ Yes | ⚠️ Limited |
+| Feature                 | LogiVox       | Competitors |
+| ----------------------- | ------------- | ----------- |
+| **Security Training**   | ✅ Built-in   | ❌ None     |
+| **Phishing Simulation** | ✅ Automated  | ❌ None     |
+| **User Certification**  | ✅ Yes        | ❌ None     |
+| **Compliance Ready**    | ✅ SOC 2/ISO  | ⚠️ Partial  |
+| **Modern Tech**         | ✅ Next.js 14 | ❌ Legacy   |
+| **White-Label**         | ✅ Yes        | ⚠️ Limited  |
 
 **Why We Win:**
+
 - First-mover: ONLY platform with integrated security training
 - Defensible moat: Compliance certifications (6-18 months to obtain)
 - Lower cost: Replaces 2 tools (inventory + KnowBe4) with 1
@@ -128,17 +136,20 @@ Operations (5%): $250K - Infrastructure
 ## 🎯 Exit Strategy
 
 **Strategic Acquisition (Years 3-5):**
+
 - Potential acquirers: Oracle, SAP, Microsoft, Salesforce, Intuit
 - Valuation: 10-15x ARR (SaaS standard)
 - Year 3: $84M ARR × 12x = **$1.0B exit**
 - Year 5: $420M ARR × 12x = **$5.0B exit**
 
 **IPO (Years 5-7):**
+
 - Requirements: $200M+ ARR, $50M+ EBITDA ✅ (Year 5)
 - Public market: 15-20x ARR
 - Valuation: **$6-8B**
 
 **Investor Return (Based on $5M @ $20M Post):**
+
 - Conservative (Year 3): 50x return ($250M)
 - Base Case (Year 5): 150x return ($750M)
 - Aggressive (Year 5): 250x return ($1.25B)
@@ -164,7 +175,7 @@ Operations (5%): $250K - Infrastructure
 **Structure:** Priced round (Preferred Stock)  
 **Valuation:** $20-25M post-money  
 **Equity:** 20-25%  
-**Board Seat:** Lead investor  
+**Board Seat:** Lead investor
 
 **Contact:**  
 📧 [Your Email]  
@@ -176,4 +187,4 @@ Operations (5%): $250K - Infrastructure
 
 **Let's build a $1B+ company together. 🚀**
 
-*LogiVox Inc. © 2025 - Confidential*
+_LogiVox Inc. © 2025 - Confidential_

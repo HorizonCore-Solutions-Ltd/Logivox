@@ -1,33 +1,33 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Get user's organization
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: { organizations: true },
-    })
+    });
 
     if (!user?.organizations?.[0]?.id) {
       return NextResponse.json(
         { message: "No organization found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
-    const organizationId = user.organizations[0].id
+    const organizationId = user.organizations[0].id;
 
     // Fetch booking
     const booking = await prisma.booking.findFirst({
@@ -48,49 +48,49 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
     if (!booking) {
       return NextResponse.json(
         { message: "Booking not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
-    return NextResponse.json(booking)
+    return NextResponse.json(booking);
   } catch (error) {
-    console.error("Booking fetch error:", error)
+    console.error("Booking fetch error:", error);
     return NextResponse.json(
       { message: "Failed to fetch booking" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Get user's organization
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       include: { organizations: true },
-    })
+    });
 
     if (!user?.organizations?.[0]?.id) {
       return NextResponse.json(
         { message: "No organization found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
-    const organizationId = user.organizations[0].id
+    const organizationId = user.organizations[0].id;
 
     // Verify booking exists and belongs to organization
     const existingBooking = await prisma.booking.findFirst({
@@ -105,33 +105,30 @@ export async function PATCH(
           },
         },
       },
-    })
+    });
 
     if (!existingBooking) {
       return NextResponse.json(
         { message: "Booking not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
     // Parse request body
-    const body = await request.json()
-    const { status } = body
+    const body = await request.json();
+    const { status } = body;
 
     // Validate status transition
-    const validStatuses = ["PENDING", "CONFIRMED", "FULFILLED", "CANCELLED"]
+    const validStatuses = ["PENDING", "CONFIRMED", "FULFILLED", "CANCELLED"];
     if (status && !validStatuses.includes(status)) {
-      return NextResponse.json(
-        { message: "Invalid status" },
-        { status: 400 }
-      )
+      return NextResponse.json({ message: "Invalid status" }, { status: 400 });
     }
 
     // If status is changing to FULFILLED, reserve inventory
     if (status === "FULFILLED" && existingBooking.status !== "FULFILLED") {
       // Update inventory quantities
       for (const item of existingBooking.items) {
-        const inventoryItem = item.inventoryItem
+        const inventoryItem = item.inventoryItem;
 
         // Check if enough stock available
         if (inventoryItem.availableQuantity < item.quantity) {
@@ -139,8 +136,8 @@ export async function PATCH(
             {
               message: `Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.availableQuantity}, Required: ${item.quantity}`,
             },
-            { status: 400 }
-          )
+            { status: 400 },
+          );
         }
 
         // Update inventory - reduce available quantity, increase reserved quantity
@@ -150,7 +147,7 @@ export async function PATCH(
             availableQuantity: inventoryItem.availableQuantity - item.quantity,
             reservedQuantity: inventoryItem.reservedQuantity + item.quantity,
           },
-        })
+        });
 
         // Create stock movement record
         await prisma.stockMovement.create({
@@ -163,7 +160,7 @@ export async function PATCH(
             reason: `Booking #${existingBooking.id.slice(0, 8)} fulfilled`,
             performedById: session.user.id,
           },
-        })
+        });
       }
     }
 
@@ -179,7 +176,7 @@ export async function PATCH(
           },
         },
       },
-    })
+    });
 
     // Create activity log
     await prisma.activityLog.create({
@@ -195,14 +192,14 @@ export async function PATCH(
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
       },
-    })
+    });
 
-    return NextResponse.json(booking)
+    return NextResponse.json(booking);
   } catch (error) {
-    console.error("Booking update error:", error)
+    console.error("Booking update error:", error);
     return NextResponse.json(
       { message: "Failed to update booking" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

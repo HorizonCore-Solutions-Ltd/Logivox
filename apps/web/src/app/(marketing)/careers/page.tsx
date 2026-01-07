@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Users,
   Briefcase,
@@ -17,42 +23,47 @@ import {
   MapPin,
   Clock,
   DollarSign,
-  Zap
-} from "lucide-react"
+  Zap,
+} from "lucide-react";
 
 export default function CareersPage() {
   const benefits = [
     {
       icon: Heart,
       title: "Health & Wellness",
-      description: "Comprehensive health, dental, and vision insurance for you and your family"
+      description:
+        "Comprehensive health, dental, and vision insurance for you and your family",
     },
     {
       icon: TrendingUp,
       title: "Growth & Learning",
-      description: "Annual learning budget, conference attendance, and career development programs"
+      description:
+        "Annual learning budget, conference attendance, and career development programs",
     },
     {
       icon: Globe,
       title: "Remote First",
-      description: "Work from anywhere with flexible hours and home office setup budget"
+      description:
+        "Work from anywhere with flexible hours and home office setup budget",
     },
     {
       icon: DollarSign,
       title: "Competitive Compensation",
-      description: "Market-leading salary, equity options, and performance bonuses"
+      description:
+        "Market-leading salary, equity options, and performance bonuses",
     },
     {
       icon: Coffee,
       title: "Work-Life Balance",
-      description: "Unlimited PTO, parental leave, and wellness days"
+      description: "Unlimited PTO, parental leave, and wellness days",
     },
     {
       icon: Users,
       title: "Amazing Team",
-      description: "Collaborate with talented, passionate people building the future of logistics"
-    }
-  ]
+      description:
+        "Collaborate with talented, passionate people building the future of logistics",
+    },
+  ];
 
   const openPositions = [
     {
@@ -60,63 +71,71 @@ export default function CareersPage() {
       department: "Engineering",
       location: "Remote (US)",
       type: "Full-time",
-      description: "Build scalable features for our warehouse management platform using Next.js, TypeScript, and PostgreSQL."
+      description:
+        "Build scalable features for our warehouse management platform using Next.js, TypeScript, and PostgreSQL.",
     },
     {
       title: "Product Designer",
       department: "Design",
       location: "Remote (Global)",
       type: "Full-time",
-      description: "Design intuitive interfaces for complex warehouse operations and voice-enabled workflows."
+      description:
+        "Design intuitive interfaces for complex warehouse operations and voice-enabled workflows.",
     },
     {
       title: "DevOps Engineer",
       department: "Engineering",
       location: "Remote (US/EU)",
       type: "Full-time",
-      description: "Scale our infrastructure and optimize deployment pipelines for enterprise customers."
+      description:
+        "Scale our infrastructure and optimize deployment pipelines for enterprise customers.",
     },
     {
       title: "Customer Success Manager",
       department: "Customer Success",
       location: "San Francisco, CA",
       type: "Full-time",
-      description: "Help enterprise customers achieve success with LogiVox WMS implementation and optimization."
+      description:
+        "Help enterprise customers achieve success with LogiVox WMS implementation and optimization.",
     },
     {
       title: "Solutions Architect",
       department: "Sales",
       location: "Remote (US)",
       type: "Full-time",
-      description: "Design technical solutions for enterprise prospects and lead integration projects."
+      description:
+        "Design technical solutions for enterprise prospects and lead integration projects.",
     },
     {
       title: "Technical Writer",
       department: "Marketing",
       location: "Remote (Global)",
       type: "Full-time",
-      description: "Create comprehensive documentation, guides, and tutorials for our platform."
-    }
-  ]
+      description:
+        "Create comprehensive documentation, guides, and tutorials for our platform.",
+    },
+  ];
 
   const values = [
     {
       title: "Customer First",
-      description: "We build products that solve real problems for our customers"
+      description:
+        "We build products that solve real problems for our customers",
     },
     {
       title: "Move Fast",
-      description: "We ship quickly, iterate based on feedback, and continuously improve"
+      description:
+        "We ship quickly, iterate based on feedback, and continuously improve",
     },
     {
       title: "Think Big",
-      description: "We tackle ambitious challenges and push boundaries"
+      description: "We tackle ambitious challenges and push boundaries",
     },
     {
       title: "Own It",
-      description: "We take ownership of our work and deliver results"
-    }
-  ]
+      description: "We take ownership of our work and deliver results",
+    },
+  ];
 
   return (
     <div className="flex flex-col">
@@ -131,9 +150,10 @@ export default function CareersPage() {
               Build the Future of Warehouse Management
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Join a team of passionate builders creating enterprise software that powers 
-              global supply chains. We're solving complex logistics challenges with innovative 
-              technology and voice-enabled operations.
+              Join a team of passionate builders creating enterprise software
+              that powers global supply chains. We're solving complex logistics
+              challenges with innovative technology and voice-enabled
+              operations.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -191,7 +211,9 @@ export default function CareersPage() {
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
                   <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
-                  <p className="text-sm text-muted-foreground">{value.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {value.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -217,7 +239,9 @@ export default function CareersPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <CardTitle className="text-xl">{position.title}</CardTitle>
+                        <CardTitle className="text-xl">
+                          {position.title}
+                        </CardTitle>
                         <Badge>{position.department}</Badge>
                       </div>
                       <CardDescription className="text-base mb-3">
@@ -253,8 +277,8 @@ export default function CareersPage() {
               Don't See Your Role?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              We're always looking for talented people. Send us your resume and tell us how 
-              you'd like to contribute to LogiVox.
+              We're always looking for talented people. Send us your resume and
+              tell us how you'd like to contribute to LogiVox.
             </p>
             <div className="mt-8">
               <Button size="lg" asChild>
@@ -267,5 +291,5 @@ export default function CareersPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

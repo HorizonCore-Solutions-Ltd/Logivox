@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Camera, Video, X } from 'lucide-react';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Camera, Video, X } from "lucide-react";
 
 interface DefectRecordingFormProps {
   inspectionId: string;
@@ -34,40 +34,32 @@ export default function DefectRecordingForm({
 }: DefectRecordingFormProps) {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState<DefectData>({
-    defectType: '',
-    category: '',
+    defectType: "",
+    category: "",
     quantityAffected: 1,
-    severity: 'MINOR',
-    description: '',
+    severity: "MINOR",
+    description: "",
     photos: [],
     videos: [],
-    rootCause: '',
-    correctiveAction: '',
+    rootCause: "",
+    correctiveAction: "",
   });
 
   const defectTypes = [
-    'COSMETIC',
-    'FUNCTIONAL',
-    'PACKAGING',
-    'DIMENSION',
-    'MATERIAL',
-    'ASSEMBLY',
-    'LABELING',
-    'DOCUMENTATION',
-    'OTHER',
+    "COSMETIC",
+    "FUNCTIONAL",
+    "PACKAGING",
+    "DIMENSION",
+    "MATERIAL",
+    "ASSEMBLY",
+    "LABELING",
+    "DOCUMENTATION",
+    "OTHER",
   ];
 
-  const categories = [
-    'CRITICAL',
-    'MAJOR',
-    'MINOR',
-  ];
+  const categories = ["CRITICAL", "MAJOR", "MINOR"];
 
-  const severities = [
-    'CRITICAL',
-    'MAJOR',
-    'MINOR',
-  ];
+  const severities = ["CRITICAL", "MAJOR", "MINOR"];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,8 +67,8 @@ export default function DefectRecordingForm({
     try {
       await onSubmit(formData);
     } catch (error) {
-      console.error('Error submitting defect:', error);
-      alert('Failed to record defect');
+      console.error("Error submitting defect:", error);
+      alert("Failed to record defect");
     } finally {
       setLoading(false);
     }
@@ -119,7 +111,9 @@ export default function DefectRecordingForm({
         <Label>Defect Type *</Label>
         <select
           value={formData.defectType}
-          onChange={(e) => setFormData({ ...formData, defectType: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, defectType: e.target.value })
+          }
           className="w-full p-2 border rounded mt-1"
           required
         >
@@ -138,7 +132,9 @@ export default function DefectRecordingForm({
           <Label>Category *</Label>
           <select
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
             className="w-full p-2 border rounded mt-1"
             required
           >
@@ -154,7 +150,9 @@ export default function DefectRecordingForm({
           <Label>Severity *</Label>
           <select
             value={formData.severity}
-            onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, severity: e.target.value })
+            }
             className="w-full p-2 border rounded mt-1"
             required
           >
@@ -175,7 +173,10 @@ export default function DefectRecordingForm({
           min="1"
           value={formData.quantityAffected}
           onChange={(e) =>
-            setFormData({ ...formData, quantityAffected: parseInt(e.target.value) })
+            setFormData({
+              ...formData,
+              quantityAffected: parseInt(e.target.value),
+            })
           }
           required
         />
@@ -186,7 +187,9 @@ export default function DefectRecordingForm({
         <Label>Description *</Label>
         <Textarea
           value={formData.description}
-          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, description: e.target.value })
+          }
           placeholder="Describe the defect in detail..."
           rows={4}
           required
@@ -263,7 +266,10 @@ export default function DefectRecordingForm({
           {formData.videos.length > 0 && (
             <div className="space-y-2">
               {formData.videos.map((video, index) => (
-                <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                <div
+                  key={index}
+                  className="flex items-center gap-2 p-2 border rounded"
+                >
                   <Video className="w-4 h-4" />
                   <span className="text-sm flex-1">Video {index + 1}</span>
                   <button
@@ -285,7 +291,9 @@ export default function DefectRecordingForm({
         <Label>Root Cause (Optional)</Label>
         <Textarea
           value={formData.rootCause}
-          onChange={(e) => setFormData({ ...formData, rootCause: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, rootCause: e.target.value })
+          }
           placeholder="Identify the root cause if known..."
           rows={2}
         />
@@ -296,7 +304,9 @@ export default function DefectRecordingForm({
         <Label>Corrective Action (Optional)</Label>
         <Textarea
           value={formData.correctiveAction}
-          onChange={(e) => setFormData({ ...formData, correctiveAction: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, correctiveAction: e.target.value })
+          }
           placeholder="Recommended corrective actions..."
           rows={2}
         />
@@ -305,7 +315,7 @@ export default function DefectRecordingForm({
       {/* Actions */}
       <div className="flex gap-2">
         <Button type="submit" disabled={loading} className="flex-1">
-          {loading ? 'Recording...' : 'Record Defect'}
+          {loading ? "Recording..." : "Record Defect"}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel

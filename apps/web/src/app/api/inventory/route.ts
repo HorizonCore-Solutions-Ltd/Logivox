@@ -1,40 +1,40 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { getCurrentUser } from "@/lib/auth-helpers"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth-helpers";
 
 // GET /api/inventory - List all inventory items for current organization
 export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url)
-    const organizationId = searchParams.get("organizationId")
-    const warehouseId = searchParams.get("warehouseId")
-    const categoryId = searchParams.get("categoryId")
-    const status = searchParams.get("status")
-    const search = searchParams.get("search")
+    const { searchParams } = new URL(request.url);
+    const organizationId = searchParams.get("organizationId");
+    const warehouseId = searchParams.get("warehouseId");
+    const categoryId = searchParams.get("categoryId");
+    const status = searchParams.get("status");
+    const search = searchParams.get("search");
 
     // Build where clause
-    const where: any = {}
+    const where: any = {};
 
     if (organizationId) {
-      where.organizationId = organizationId
+      where.organizationId = organizationId;
     }
 
     if (warehouseId) {
-      where.warehouseId = warehouseId
+      where.warehouseId = warehouseId;
     }
 
     if (categoryId) {
-      where.categoryId = categoryId
+      where.categoryId = categoryId;
     }
 
     if (status) {
-      where.status = status
+      where.status = status;
     }
 
     if (search) {
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
         { name: { contains: search, mode: "insensitive" } },
         { sku: { contains: search, mode: "insensitive" } },
         { barcode: { contains: search, mode: "insensitive" } },
-      ]
+      ];
     }
 
     const items = await prisma.inventoryItem.findMany({
@@ -55,27 +55,27 @@ export async function GET(request: NextRequest) {
       orderBy: {
         createdAt: "desc",
       },
-    })
+    });
 
-    return NextResponse.json(items)
+    return NextResponse.json(items);
   } catch (error: any) {
-    console.error("Error fetching inventory items:", error)
+    console.error("Error fetching inventory items:", error);
     return NextResponse.json(
       { error: "Failed to fetch inventory items" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 // POST /api/inventory - Create new inventory item
 export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json()
+    const body = await request.json();
     const {
       name,
       sku,
@@ -90,14 +90,14 @@ export async function POST(request: NextRequest) {
       organizationId,
       warehouseId,
       categoryId,
-    } = body
+    } = body;
 
     // Validate required fields
     if (!name || !sku || !organizationId || !warehouseId) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Check if SKU already exists
@@ -106,26 +106,26 @@ export async function POST(request: NextRequest) {
         sku,
         organizationId,
       },
-    })
+    });
 
     if (existingItem) {
       return NextResponse.json(
         { error: "SKU already exists in this organization" },
-        { status: 409 }
-      )
+        { status: 409 },
+      );
     }
 
     // Calculate quantities
-    const qty = quantity || 0
-    const reserved = 0
-    const available = qty - reserved
+    const qty = quantity || 0;
+    const reserved = 0;
+    const available = qty - reserved;
 
     // Determine status
-    let status = "ACTIVE"
+    let status = "ACTIVE";
     if (qty === 0) {
-      status = "OUT_OF_STOCK"
+      status = "OUT_OF_STOCK";
     } else if (minStockLevel && qty <= minStockLevel) {
-      status = "LOW_STOCK"
+      status = "LOW_STOCK";
     }
 
     // Create inventory item
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
         category: true,
         organization: true,
       },
-    })
+    });
 
     // Log activity
     await prisma.activityLog.create({
@@ -167,14 +167,14 @@ export async function POST(request: NextRequest) {
         organizationId,
         userId: user.id,
       },
-    })
+    });
 
-    return NextResponse.json(item, { status: 201 })
+    return NextResponse.json(item, { status: 201 });
   } catch (error: any) {
-    console.error("Error creating inventory item:", error)
+    console.error("Error creating inventory item:", error);
     return NextResponse.json(
       { error: "Failed to create inventory item" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

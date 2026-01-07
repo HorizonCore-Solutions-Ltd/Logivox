@@ -3,13 +3,13 @@
  * Predictive maintenance for IoT devices
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { iotMonitoringService } from '@/lib/services/inventory/iot-monitoring-service';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { iotMonitoringService } from "@/lib/services/inventory/iot-monitoring-service";
+import prisma from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/inventory/iot/device/[deviceId]/maintenance
@@ -17,15 +17,12 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { deviceId: string } }
+  { params }: { params: { deviceId: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { deviceId } = params;
@@ -34,19 +31,17 @@ export async function GET(
     const device = await prisma.ioTDevice.findFirst({
       where: {
         id: deviceId,
-        organizationId: session.user.organizationId
-      }
+        organizationId: session.user.organizationId,
+      },
     });
 
     if (!device) {
-      return NextResponse.json(
-        { error: 'Device not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Device not found" }, { status: 404 });
     }
 
     // Predict maintenance
-    const maintenance = await iotMonitoringService.predictDeviceMaintenance(deviceId);
+    const maintenance =
+      await iotMonitoringService.predictDeviceMaintenance(deviceId);
 
     return NextResponse.json({
       success: true,
@@ -55,23 +50,22 @@ export async function GET(
           id: device.id,
           name: device.name,
           type: device.deviceType,
-          status: device.status
+          status: device.status,
         },
         maintenance,
         currentStatus: {
           batteryLevel: device.batteryLevel,
           signalStrength: device.signalStrength,
           lastCalibration: device.lastCalibration,
-          lastSeen: device.lastSeen
-        }
-      }
+          lastSeen: device.lastSeen,
+        },
+      },
     });
-
   } catch (error: any) {
-    console.error('Maintenance prediction error:', error);
+    console.error("Maintenance prediction error:", error);
     return NextResponse.json(
-      { error: 'Failed to predict maintenance', message: error.message },
-      { status: 500 }
+      { error: "Failed to predict maintenance", message: error.message },
+      { status: 500 },
     );
   }
 }

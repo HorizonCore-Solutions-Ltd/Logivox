@@ -1,24 +1,30 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { X, Settings, Shield, Eye, TrendingUp, Zap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from "react";
+import { X, Settings, Shield, Eye, TrendingUp, Zap } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { 
-  useCookieConsent, 
-  COOKIE_CATEGORIES, 
+} from "@/components/ui/dialog";
+import {
+  useCookieConsent,
+  COOKIE_CATEGORIES,
   CookieCategory,
   CookieConsent,
-} from '@/lib/cookie-consent';
+} from "@/lib/cookie-consent";
 
 // ==========================================
 // COOKIE BANNER COMPONENT
@@ -78,10 +84,11 @@ export function CookieBanner() {
                   We value your privacy
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  We use cookies to enhance your browsing experience, analyze site traffic, and personalize content. 
-                  By clicking "Accept All", you consent to our use of cookies.{' '}
-                  <a 
-                    href="/privacy" 
+                  We use cookies to enhance your browsing experience, analyze
+                  site traffic, and personalize content. By clicking "Accept
+                  All", you consent to our use of cookies.{" "}
+                  <a
+                    href="/privacy"
                     className="text-blue-600 hover:text-blue-800 underline"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -123,8 +130,8 @@ export function CookieBanner() {
       </div>
 
       {/* Cookie Settings Dialog */}
-      <CookieSettingsDialog 
-        open={showSettings} 
+      <CookieSettingsDialog
+        open={showSettings}
         onClose={handleCloseSettings}
         onSave={() => {
           setShowSettings(false);
@@ -145,7 +152,11 @@ interface CookieSettingsDialogProps {
   onSave: () => void;
 }
 
-function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogProps) {
+function CookieSettingsDialog({
+  open,
+  onClose,
+  onSave,
+}: CookieSettingsDialogProps) {
   const { consent, saveCustomConsent } = useCookieConsent();
   const [settings, setSettings] = useState<Record<string, boolean>>({});
 
@@ -153,12 +164,13 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
     if (open) {
       // Initialize settings from current consent or defaults
       const initialSettings: Record<string, boolean> = {};
-      COOKIE_CATEGORIES.forEach(category => {
+      COOKIE_CATEGORIES.forEach((category) => {
         if (category.essential) {
           initialSettings[category.id] = true; // Essential always enabled
         } else {
           const consentValue = consent?.[category.id as keyof CookieConsent];
-          initialSettings[category.id] = typeof consentValue === 'boolean' ? consentValue : false;
+          initialSettings[category.id] =
+            typeof consentValue === "boolean" ? consentValue : false;
         }
       });
       setSettings(initialSettings);
@@ -176,11 +188,11 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
 
   const handleAcceptAll = () => {
     const allEnabled: Record<string, boolean> = {};
-    COOKIE_CATEGORIES.forEach(category => {
+    COOKIE_CATEGORIES.forEach((category) => {
       allEnabled[category.id] = true;
     });
     setSettings(allEnabled);
-    
+
     saveCustomConsent({
       functional: true,
       analytics: true,
@@ -191,13 +203,13 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
 
   const getCategoryIcon = (categoryId: string) => {
     switch (categoryId) {
-      case 'essential':
+      case "essential":
         return <Shield className="h-4 w-4 text-green-600" />;
-      case 'functional':
+      case "functional":
         return <Zap className="h-4 w-4 text-blue-600" />;
-      case 'analytics':
+      case "analytics":
         return <TrendingUp className="h-4 w-4 text-purple-600" />;
-      case 'marketing':
+      case "marketing":
         return <Eye className="h-4 w-4 text-orange-600" />;
       default:
         return <Shield className="h-4 w-4 text-gray-600" />;
@@ -213,8 +225,9 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
             Cookie Preferences
           </DialogTitle>
           <DialogDescription>
-            Manage your cookie preferences. You can enable or disable different types of cookies below.
-            Essential cookies cannot be disabled as they are required for the website to function properly.
+            Manage your cookie preferences. You can enable or disable different
+            types of cookies below. Essential cookies cannot be disabled as they
+            are required for the website to function properly.
           </DialogDescription>
         </DialogHeader>
 
@@ -236,7 +249,10 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
                     checked={settings[category.id] ?? false}
                     onCheckedChange={(checked) => {
                       if (!category.essential) {
-                        setSettings(prev => ({ ...prev, [category.id]: checked }));
+                        setSettings((prev) => ({
+                          ...prev,
+                          [category.id]: checked,
+                        }));
                       }
                     }}
                     disabled={category.essential}
@@ -247,20 +263,30 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
                 <CardDescription className="text-sm">
                   {category.description}
                 </CardDescription>
-                
+
                 {/* Show examples for each category */}
                 <div className="mt-2 text-xs text-muted-foreground">
-                  {category.id === 'essential' && (
-                    <span>Examples: Authentication, security, basic functionality</span>
+                  {category.id === "essential" && (
+                    <span>
+                      Examples: Authentication, security, basic functionality
+                    </span>
                   )}
-                  {category.id === 'functional' && (
-                    <span>Examples: Language preferences, chat widgets, user settings</span>
+                  {category.id === "functional" && (
+                    <span>
+                      Examples: Language preferences, chat widgets, user
+                      settings
+                    </span>
                   )}
-                  {category.id === 'analytics' && (
-                    <span>Examples: Google Analytics, page views, user behavior (anonymized)</span>
+                  {category.id === "analytics" && (
+                    <span>
+                      Examples: Google Analytics, page views, user behavior
+                      (anonymized)
+                    </span>
                   )}
-                  {category.id === 'marketing' && (
-                    <span>Examples: Google Ads, Facebook Pixel, remarketing</span>
+                  {category.id === "marketing" && (
+                    <span>
+                      Examples: Google Ads, Facebook Pixel, remarketing
+                    </span>
                   )}
                 </div>
               </CardContent>
@@ -286,26 +312,33 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
           <Button variant="outline" onClick={onClose} className="flex-1">
             Cancel
           </Button>
-          <Button variant="outline" onClick={handleAcceptAll} className="flex-1">
+          <Button
+            variant="outline"
+            onClick={handleAcceptAll}
+            className="flex-1"
+          >
             Accept All
           </Button>
-          <Button onClick={handleSave} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white">
+          <Button
+            onClick={handleSave}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+          >
             Save Preferences
           </Button>
         </div>
 
         {/* Links */}
         <div className="text-center text-xs text-muted-foreground border-t pt-4">
-          <a 
-            href="/privacy" 
+          <a
+            href="/privacy"
             className="text-blue-600 hover:text-blue-800 underline mr-4"
             target="_blank"
             rel="noopener noreferrer"
           >
             Privacy Policy
           </a>
-          <a 
-            href="/terms" 
+          <a
+            href="/terms"
             className="text-blue-600 hover:text-blue-800 underline"
             target="_blank"
             rel="noopener noreferrer"
@@ -323,19 +356,21 @@ function CookieSettingsDialog({ open, onClose, onSave }: CookieSettingsDialogPro
 // ==========================================
 
 export function CookiePreferences() {
-  const { consent, saveCustomConsent, withdrawConsent, hasConsent } = useCookieConsent();
+  const { consent, saveCustomConsent, withdrawConsent, hasConsent } =
+    useCookieConsent();
   const [settings, setSettings] = useState<Record<string, boolean>>({});
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
 
   useEffect(() => {
     // Initialize settings from current consent
     const initialSettings: Record<string, boolean> = {};
-    COOKIE_CATEGORIES.forEach(category => {
+    COOKIE_CATEGORIES.forEach((category) => {
       if (category.essential) {
         initialSettings[category.id] = true;
       } else {
         const consentValue = consent?.[category.id as keyof CookieConsent];
-        initialSettings[category.id] = typeof consentValue === 'boolean' ? consentValue : false;
+        initialSettings[category.id] =
+          typeof consentValue === "boolean" ? consentValue : false;
       }
     });
     setSettings(initialSettings);
@@ -360,9 +395,12 @@ export function CookiePreferences() {
         <CardContent className="pt-6">
           <div className="text-center py-8">
             <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">No Cookie Preferences Set</h3>
+            <h3 className="text-lg font-semibold mb-2">
+              No Cookie Preferences Set
+            </h3>
             <p className="text-muted-foreground mb-4">
-              You haven't set your cookie preferences yet. Visit our website to configure your preferences.
+              You haven't set your cookie preferences yet. Visit our website to
+              configure your preferences.
             </p>
           </div>
         </CardContent>
@@ -396,7 +434,10 @@ export function CookiePreferences() {
                   checked={settings[category.id] ?? false}
                   onCheckedChange={(checked) => {
                     if (!category.essential) {
-                      setSettings(prev => ({ ...prev, [category.id]: checked }));
+                      setSettings((prev) => ({
+                        ...prev,
+                        [category.id]: checked,
+                      }));
                     }
                   }}
                   disabled={category.essential}
@@ -425,9 +466,15 @@ export function CookiePreferences() {
           <CardContent className="pt-4">
             <h4 className="text-sm font-semibold mb-2">Current Consent</h4>
             <div className="text-xs text-muted-foreground space-y-1">
-              <p>Consent given: {new Date(consent.timestamp).toLocaleString()}</p>
+              <p>
+                Consent given: {new Date(consent.timestamp).toLocaleString()}
+              </p>
               <p>Version: {consent.version}</p>
-              <p>Essential: ✓ | Functional: {consent.functional ? '✓' : '✗'} | Analytics: {consent.analytics ? '✓' : '✗'} | Marketing: {consent.marketing ? '✓' : '✗'}</p>
+              <p>
+                Essential: ✓ | Functional: {consent.functional ? "✓" : "✗"} |
+                Analytics: {consent.analytics ? "✓" : "✗"} | Marketing:{" "}
+                {consent.marketing ? "✓" : "✗"}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -439,12 +486,16 @@ export function CookiePreferences() {
           <DialogHeader>
             <DialogTitle>Withdraw Cookie Consent</DialogTitle>
             <DialogDescription>
-              This will remove all non-essential cookies and reset your preferences. 
-              You'll need to set your preferences again on your next visit.
+              This will remove all non-essential cookies and reset your
+              preferences. You'll need to set your preferences again on your
+              next visit.
             </DialogDescription>
           </DialogHeader>
           <div className="flex gap-2 pt-4">
-            <Button variant="outline" onClick={() => setShowWithdrawDialog(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowWithdrawDialog(false)}
+            >
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleWithdrawAll}>

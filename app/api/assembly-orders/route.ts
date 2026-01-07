@@ -6,7 +6,10 @@ import { z } from "zod";
 
 const createAssemblyOrderSchema = z.object({
   bomId: z.string().min(1, "BOM ID is required"),
-  plannedQuantity: z.number().int().min(1, "Planned quantity must be at least 1"),
+  plannedQuantity: z
+    .number()
+    .int()
+    .min(1, "Planned quantity must be at least 1"),
   priority: z.number().int().min(0).max(10).default(0),
   scheduledStart: z.string().optional(),
   scheduledEnd: z.string().optional(),
@@ -22,10 +25,12 @@ const createAssemblyOrderSchema = z.object({
 });
 
 // Helper function to generate assembly order number
-async function generateAssemblyOrderNumber(organizationId: string): Promise<string> {
+async function generateAssemblyOrderNumber(
+  organizationId: string,
+): Promise<string> {
   const today = new Date();
-  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, '');
-  
+  const dateStr = today.toISOString().slice(0, 10).replace(/-/g, "");
+
   const lastOrder = await prisma.assemblyOrder.findFirst({
     where: {
       organizationId,
@@ -33,23 +38,23 @@ async function generateAssemblyOrderNumber(organizationId: string): Promise<stri
         startsWith: `ASM-${dateStr}`,
       },
     },
-    orderBy: { orderNumber: 'desc' },
+    orderBy: { orderNumber: "desc" },
   });
 
   let sequence = 1;
   if (lastOrder) {
-    const lastSequence = parseInt(lastOrder.orderNumber.split('-')[2]);
+    const lastSequence = parseInt(lastOrder.orderNumber.split("-")[2]);
     sequence = lastSequence + 1;
   }
 
-  return `ASM-${dateStr}-${sequence.toString().padStart(3, '0')}`;
+  return `ASM-${dateStr}-${sequence.toString().padStart(3, "0")}`;
 }
 
 // Helper function to check component availability
 async function checkComponentAvailability(
   bomId: string,
   quantity: number,
-  organizationId: string
+  organizationId: string,
 ) {
   const bom = await prisma.billOfMaterials.findUnique({
     where: { id: bomId },
@@ -67,11 +72,11 @@ async function checkComponentAvailability(
   }
 
   const shortages = [];
-  
+
   for (const bomComp of bom.components) {
     const required = Number(bomComp.quantity) * quantity;
     const available = bomComp.component.availableQty;
-    
+
     if (available < required && !bomComp.isOptional) {
       shortages.push({
         componentId: bomComp.componentId,
@@ -108,7 +113,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -178,7 +183,7 @@ export async function GET(request: Request) {
     console.error("Error fetching assembly orders:", error);
     return NextResponse.json(
       { error: "Failed to fetch assembly orders" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -207,7 +212,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -222,17 +227,14 @@ export async function POST(request: Request) {
     });
 
     if (!bom) {
-      return NextResponse.json(
-        { error: "BOM not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "BOM not found" }, { status: 404 });
     }
 
     // Check component availability
     const shortages = await checkComponentAvailability(
       validatedData.bomId,
       validatedData.plannedQuantity,
-      organizationId
+      organizationId,
     );
 
     if (shortages.length > 0) {
@@ -241,7 +243,7 @@ export async function POST(request: Request) {
           error: "Insufficient components",
           shortages,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -257,8 +259,12 @@ export async function POST(request: Request) {
         productId: bom.productId,
         plannedQuantity: validatedData.plannedQuantity,
         priority: validatedData.priority,
-        scheduledStart: validatedData.scheduledStart ? new Date(validatedData.scheduledStart) : null,
-        scheduledEnd: validatedData.scheduledEnd ? new Date(validatedData.scheduledEnd) : null,
+        scheduledStart: validatedData.scheduledStart
+          ? new Date(validatedData.scheduledStart)
+          : null,
+        scheduledEnd: validatedData.scheduledEnd
+          ? new Date(validatedData.scheduledEnd)
+          : null,
         warehouseId: validatedData.warehouseId,
         workstationId: validatedData.workstationId,
         assignedToId: validatedData.assignedToId,
@@ -268,7 +274,7 @@ export async function POST(request: Request) {
         referenceId: validatedData.referenceId,
         salesOrderId: validatedData.salesOrderId,
         notes: validatedData.notes,
-        status: 'PENDING',
+        status: "PENDING",
         createdById: session.user.id,
       },
       include: {
@@ -290,14 +296,14 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating assembly order:", error);
     return NextResponse.json(
       { error: "Failed to create assembly order" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

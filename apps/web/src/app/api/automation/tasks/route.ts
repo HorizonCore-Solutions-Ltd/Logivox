@@ -1,18 +1,18 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 
 export async function GET(request: Request) {
   try {
     const session = await getServerSession();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const tasks = await (prisma as any).automationTask.findMany({
       where: {
         status: {
-          in: ['QUEUED', 'IN_PROGRESS', 'COMPLETED', 'FAILED'],
+          in: ["QUEUED", "IN_PROGRESS", "COMPLETED", "FAILED"],
         },
         createdAt: {
           gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Last 24 hours
@@ -25,10 +25,7 @@ export async function GET(request: Request) {
           },
         },
       },
-      orderBy: [
-        { priority: 'desc' },
-        { createdAt: 'desc' },
-      ],
+      orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
       take: 100,
     });
 
@@ -47,7 +44,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(formattedTasks);
   } catch (error) {
-    console.error('Error fetching automation tasks:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching automation tasks:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

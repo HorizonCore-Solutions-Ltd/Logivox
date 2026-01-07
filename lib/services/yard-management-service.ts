@@ -5,7 +5,12 @@
  * appointment management, and yard optimization
  */
 
-import { PrismaClient, YardStatus, AppointmentStatus, Prisma } from '@prisma/client';
+import {
+  PrismaClient,
+  YardStatus,
+  AppointmentStatus,
+  Prisma,
+} from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -15,7 +20,7 @@ export interface CreateAppointmentRequest {
   driverPhone?: string;
   vehicleNumber: string;
   trailerNumber?: string;
-  appointmentType: 'INBOUND' | 'OUTBOUND' | 'LIVE_LOAD' | 'LIVE_UNLOAD';
+  appointmentType: "INBOUND" | "OUTBOUND" | "LIVE_LOAD" | "LIVE_UNLOAD";
   scheduledDate: Date;
   scheduledTime: string;
   estimatedDuration?: number; // minutes
@@ -92,7 +97,7 @@ export class YardManagementService {
   async createAppointment(
     organizationId: string,
     userId: string,
-    request: CreateAppointmentRequest
+    request: CreateAppointmentRequest,
   ): Promise<any> {
     // Check dock availability
     const availableDock = await this.findAvailableDock(
@@ -100,11 +105,11 @@ export class YardManagementService {
       request.appointmentType,
       request.scheduledDate,
       request.scheduledTime,
-      request.estimatedDuration || 60
+      request.estimatedDuration || 60,
     );
 
     if (!availableDock) {
-      throw new Error('No dock available at requested time');
+      throw new Error("No dock available at requested time");
     }
 
     // Create appointment
@@ -123,7 +128,7 @@ export class YardManagementService {
         dockId: availableDock.id,
         poNumber: request.poNumber,
         soNumber: request.soNumber,
-        status: 'SCHEDULED',
+        status: "SCHEDULED",
         notes: request.notes,
         createdById: userId,
       },
@@ -143,21 +148,26 @@ export class YardManagementService {
     type: string,
     date: Date,
     time: string,
-    duration: number
+    duration: number,
   ): Promise<any | null> {
     // Get all docks suitable for type
     const docks = await prisma.dock.findMany({
       where: {
         organizationId,
         isActive: true,
-        ...(type.includes('INBOUND') && { supportsInbound: true }),
-        ...(type.includes('OUTBOUND') && { supportsOutbound: true }),
+        ...(type.includes("INBOUND") && { supportsInbound: true }),
+        ...(type.includes("OUTBOUND") && { supportsOutbound: true }),
       },
     });
 
     // Check each dock for availability
     for (const dock of docks) {
-      const isAvailable = await this.isDockAvailable(dock.id, date, time, duration);
+      const isAvailable = await this.isDockAvailable(
+        dock.id,
+        date,
+        time,
+        duration,
+      );
       if (isAvailable) {
         return dock;
       }
@@ -173,10 +183,10 @@ export class YardManagementService {
     dockId: string,
     date: Date,
     time: string,
-    duration: number
+    duration: number,
   ): Promise<boolean> {
     // Parse time
-    const [hours, minutes] = time.split(':').map(Number);
+    const [hours, minutes] = time.split(":").map(Number);
     const requestedStart = new Date(date);
     requestedStart.setHours(hours, minutes, 0, 0);
 
@@ -188,13 +198,15 @@ export class YardManagementService {
       where: {
         dockId,
         scheduledDate: date,
-        status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
+        status: { in: ["SCHEDULED", "IN_PROGRESS"] },
       },
     });
 
     // Check for conflicts
     for (const appt of appointments) {
-      const [apptHours, apptMinutes] = appt.scheduledTime.split(':').map(Number);
+      const [apptHours, apptMinutes] = appt.scheduledTime
+        .split(":")
+        .map(Number);
       const apptStart = new Date(appt.scheduledDate);
       apptStart.setHours(apptHours, apptMinutes, 0, 0);
 
@@ -216,7 +228,7 @@ export class YardManagementService {
   async gateCheckIn(
     organizationId: string,
     userId: string,
-    data: GateEntry
+    data: GateEntry,
   ): Promise<any> {
     let appointment = null;
 
@@ -234,7 +246,7 @@ export class YardManagementService {
         await prisma.appointment.update({
           where: { id: appointment.id },
           data: {
-            status: 'CHECKED_IN',
+            status: "CHECKED_IN",
             actualArrivalTime: data.gateInTime,
           },
         });
@@ -277,13 +289,13 @@ export class YardManagementService {
           organizationId,
           trailerNumber: data.trailerNumber,
           carrierName: data.carrierName,
-          status: 'AT_GATE',
-          currentLocation: 'Gate',
+          status: "AT_GATE",
+          currentLocation: "Gate",
           gateInTime: data.gateInTime,
         },
         update: {
-          status: 'AT_GATE',
-          currentLocation: 'Gate',
+          status: "AT_GATE",
+          currentLocation: "Gate",
           gateInTime: data.gateInTime,
         },
       });
@@ -298,7 +310,7 @@ export class YardManagementService {
   async gateCheckOut(
     organizationId: string,
     gateEntryId: string,
-    userId: string
+    userId: string,
   ): Promise<any> {
     const entry = await prisma.gateEntry.findFirst({
       where: {
@@ -311,7 +323,7 @@ export class YardManagementService {
     });
 
     if (!entry) {
-      throw new Error('Gate entry not found');
+      throw new Error("Gate entry not found");
     }
 
     const gateOutTime = new Date();
@@ -332,7 +344,7 @@ export class YardManagementService {
       await prisma.appointment.update({
         where: { id: entry.appointmentId },
         data: {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           actualDepartureTime: gateOutTime,
         },
       });
@@ -346,7 +358,7 @@ export class YardManagementService {
           trailerNumber: entry.trailerNumber,
         },
         data: {
-          status: 'DEPARTED',
+          status: "DEPARTED",
           gateOutTime,
         },
       });
@@ -362,7 +374,7 @@ export class YardManagementService {
     organizationId: string,
     trailerNumber: string,
     dockId: string,
-    userId: string
+    userId: string,
   ): Promise<any> {
     // Get dock
     const dock = await prisma.dock.findFirst({
@@ -373,7 +385,7 @@ export class YardManagementService {
     });
 
     if (!dock) {
-      throw new Error('Dock not found');
+      throw new Error("Dock not found");
     }
 
     // Update trailer
@@ -383,7 +395,7 @@ export class YardManagementService {
         trailerNumber,
       },
       data: {
-        status: 'AT_DOCK',
+        status: "AT_DOCK",
         currentLocation: dock.name,
         dockId,
         dockAssignedTime: new Date(),
@@ -399,7 +411,7 @@ export class YardManagementService {
   async moveTrailerToYard(
     organizationId: string,
     trailerNumber: string,
-    yardLocation: string
+    yardLocation: string,
   ): Promise<any> {
     return await prisma.trailer.updateMany({
       where: {
@@ -407,7 +419,7 @@ export class YardManagementService {
         trailerNumber,
       },
       data: {
-        status: 'IN_YARD',
+        status: "IN_YARD",
         currentLocation: yardLocation,
         dockId: null,
       },
@@ -419,7 +431,7 @@ export class YardManagementService {
    */
   async trackTrailer(
     organizationId: string,
-    trailerNumber: string
+    trailerNumber: string,
   ): Promise<TrailerTracking> {
     const trailer = await prisma.trailer.findFirst({
       where: {
@@ -432,20 +444,21 @@ export class YardManagementService {
     });
 
     if (!trailer) {
-      throw new Error('Trailer not found');
+      throw new Error("Trailer not found");
     }
 
     let totalYardTime = undefined;
     if (trailer.gateInTime) {
       const endTime = trailer.gateOutTime || new Date();
-      totalYardTime = (endTime.getTime() - trailer.gateInTime.getTime()) / (1000 * 60);
+      totalYardTime =
+        (endTime.getTime() - trailer.gateInTime.getTime()) / (1000 * 60);
     }
 
     return {
       trailerId: trailer.id,
       trailerNumber: trailer.trailerNumber,
       status: trailer.status as YardStatus,
-      location: trailer.currentLocation || 'Unknown',
+      location: trailer.currentLocation || "Unknown",
       carrierName: trailer.carrierName,
       appointmentId: trailer.appointmentId || undefined,
       gateInTime: trailer.gateInTime || undefined,
@@ -463,7 +476,7 @@ export class YardManagementService {
   async getYardMetrics(
     organizationId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<YardMetrics> {
     const dateFilter: any = { organizationId };
 
@@ -482,7 +495,7 @@ export class YardManagementService {
     const activeTrailers = await prisma.trailer.count({
       where: {
         organizationId,
-        status: { in: ['AT_GATE', 'AT_DOCK', 'IN_YARD'] },
+        status: { in: ["AT_GATE", "AT_DOCK", "IN_YARD"] },
       },
     });
 
@@ -495,13 +508,14 @@ export class YardManagementService {
     const activeDocks = await prisma.trailer.count({
       where: {
         organizationId,
-        status: 'AT_DOCK',
+        status: "AT_DOCK",
         dockId: { not: null },
       },
     });
 
     const availableDocks = totalDocks - activeDocks;
-    const dockUtilization = totalDocks > 0 ? (activeDocks / totalDocks) * 100 : 0;
+    const dockUtilization =
+      totalDocks > 0 ? (activeDocks / totalDocks) * 100 : 0;
 
     // Appointments
     const appointments = await prisma.appointment.findMany({
@@ -513,7 +527,10 @@ export class YardManagementService {
 
     // Average turnaround time
     const completedAppts = appointments.filter(
-      (a) => a.status === 'COMPLETED' && a.actualArrivalTime && a.actualDepartureTime
+      (a) =>
+        a.status === "COMPLETED" &&
+        a.actualArrivalTime &&
+        a.actualDepartureTime,
     );
 
     const totalTurnaround = completedAppts.reduce((sum, a) => {
@@ -528,36 +545,44 @@ export class YardManagementService {
     // On-time performance
     const scheduledAppts = appointments.filter((a) => a.actualArrivalTime);
     const onTimeAppts = scheduledAppts.filter((a) => {
-      const [hours, minutes] = a.scheduledTime.split(':').map(Number);
+      const [hours, minutes] = a.scheduledTime.split(":").map(Number);
       const scheduled = new Date(a.scheduledDate);
       scheduled.setHours(hours, minutes, 0, 0);
 
       const actual = a.actualArrivalTime!;
-      const diffMinutes = (actual.getTime() - scheduled.getTime()) / (1000 * 60);
+      const diffMinutes =
+        (actual.getTime() - scheduled.getTime()) / (1000 * 60);
 
       return Math.abs(diffMinutes) <= 15; // Within 15 minutes
     });
 
     const onTimePerformance =
-      scheduledAppts.length > 0 ? (onTimeAppts.length / scheduledAppts.length) * 100 : 0;
+      scheduledAppts.length > 0
+        ? (onTimeAppts.length / scheduledAppts.length) * 100
+        : 0;
 
     // Appointments by type
     const typeGroups = appointments.reduce((acc: any, appt) => {
-      const type = appt.appointmentType || 'OTHER';
+      const type = appt.appointmentType || "OTHER";
       acc[type] = (acc[type] || 0) + 1;
       return acc;
     }, {});
 
-    const appointmentsByType = Object.entries(typeGroups).map(([type, count]) => ({
-      type,
-      count: count as number,
-    }));
+    const appointmentsByType = Object.entries(typeGroups).map(
+      ([type, count]) => ({
+        type,
+        count: count as number,
+      }),
+    );
 
     // Dock performance
     const dockPerformance = docks.map((dock) => {
       const dockAppts = appointments.filter((a) => a.dockId === dock.id);
       const dockCompleted = dockAppts.filter(
-        (a) => a.status === 'COMPLETED' && a.actualArrivalTime && a.actualDepartureTime
+        (a) =>
+          a.status === "COMPLETED" &&
+          a.actualArrivalTime &&
+          a.actualDepartureTime,
       );
 
       const dockTurnaround = dockCompleted.reduce((sum, a) => {
@@ -581,7 +606,7 @@ export class YardManagementService {
     // Recent activity
     const recentGateEntries = await prisma.gateEntry.findMany({
       where: { organizationId },
-      orderBy: { gateInTime: 'desc' },
+      orderBy: { gateInTime: "desc" },
       take: 5,
       include: {
         appointment: {
@@ -594,11 +619,11 @@ export class YardManagementService {
 
     const recentActivity = recentGateEntries.map((entry) => ({
       id: entry.id,
-      type: entry.gateOutTime ? 'GATE_OUT' : 'GATE_IN',
+      type: entry.gateOutTime ? "GATE_OUT" : "GATE_IN",
       carrierName: entry.carrierName,
       dockName: entry.appointment?.dock?.name,
       timestamp: entry.gateOutTime || entry.gateInTime,
-      status: entry.gateOutTime ? 'DEPARTED' : 'ARRIVED',
+      status: entry.gateOutTime ? "DEPARTED" : "ARRIVED",
     }));
 
     return {
@@ -620,7 +645,7 @@ export class YardManagementService {
    */
   async getAppointmentById(
     appointmentId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<any> {
     return await prisma.appointment.findFirst({
       where: {
@@ -647,7 +672,7 @@ export class YardManagementService {
       search?: string;
       page?: number;
       limit?: number;
-    }
+    },
   ): Promise<{
     appointments: any[];
     total: number;
@@ -667,10 +692,10 @@ export class YardManagementService {
 
     if (filters.search) {
       where.OR = [
-        { carrierName: { contains: filters.search, mode: 'insensitive' } },
-        { driverName: { contains: filters.search, mode: 'insensitive' } },
-        { vehicleNumber: { contains: filters.search, mode: 'insensitive' } },
-        { trailerNumber: { contains: filters.search, mode: 'insensitive' } },
+        { carrierName: { contains: filters.search, mode: "insensitive" } },
+        { driverName: { contains: filters.search, mode: "insensitive" } },
+        { vehicleNumber: { contains: filters.search, mode: "insensitive" } },
+        { trailerNumber: { contains: filters.search, mode: "insensitive" } },
       ];
     }
 
@@ -681,7 +706,7 @@ export class YardManagementService {
         include: {
           dock: true,
         },
-        orderBy: [{ scheduledDate: 'asc' }, { scheduledTime: 'asc' }],
+        orderBy: [{ scheduledDate: "asc" }, { scheduledTime: "asc" }],
         skip,
         take: limit,
       }),
@@ -701,7 +726,7 @@ export class YardManagementService {
   async cancelAppointment(
     appointmentId: string,
     organizationId: string,
-    reason: string
+    reason: string,
   ): Promise<any> {
     const appointment = await prisma.appointment.findFirst({
       where: {
@@ -711,17 +736,17 @@ export class YardManagementService {
     });
 
     if (!appointment) {
-      throw new Error('Appointment not found');
+      throw new Error("Appointment not found");
     }
 
-    if (appointment.status === 'COMPLETED') {
-      throw new Error('Cannot cancel completed appointment');
+    if (appointment.status === "COMPLETED") {
+      throw new Error("Cannot cancel completed appointment");
     }
 
     return await prisma.appointment.update({
       where: { id: appointmentId },
       data: {
-        status: 'CANCELLED',
+        status: "CANCELLED",
         notes: `Cancelled: ${reason}`,
       },
     });
@@ -734,7 +759,7 @@ export class YardManagementService {
     const trailers = await prisma.trailer.findMany({
       where: {
         organizationId,
-        status: { in: ['AT_GATE', 'AT_DOCK', 'IN_YARD'] },
+        status: { in: ["AT_GATE", "AT_DOCK", "IN_YARD"] },
       },
       include: {
         appointment: true,
@@ -745,14 +770,15 @@ export class YardManagementService {
       let totalYardTime = undefined;
       if (trailer.gateInTime) {
         const endTime = trailer.gateOutTime || new Date();
-        totalYardTime = (endTime.getTime() - trailer.gateInTime.getTime()) / (1000 * 60);
+        totalYardTime =
+          (endTime.getTime() - trailer.gateInTime.getTime()) / (1000 * 60);
       }
 
       return {
         trailerId: trailer.id,
         trailerNumber: trailer.trailerNumber,
         status: trailer.status as YardStatus,
-        location: trailer.currentLocation || 'Unknown',
+        location: trailer.currentLocation || "Unknown",
         carrierName: trailer.carrierName,
         appointmentId: trailer.appointmentId || undefined,
         gateInTime: trailer.gateInTime || undefined,

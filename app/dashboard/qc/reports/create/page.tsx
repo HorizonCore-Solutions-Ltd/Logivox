@@ -1,26 +1,38 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, FileText, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, FileText, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function CreateReportPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    type: 'NCR_SUMMARY',
-    period: 'MONTHLY',
-    startDate: '',
-    endDate: '',
+    type: "NCR_SUMMARY",
+    period: "MONTHLY",
+    startDate: "",
+    endDate: "",
     includeCharts: true,
     includeDetails: true,
-    format: 'PDF',
+    format: "PDF",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,9 +40,9 @@ export default function CreateReportPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/qc/reports/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/reports/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           startDate: new Date(formData.startDate),
@@ -38,19 +50,19 @@ export default function CreateReportPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to generate report');
+      if (!response.ok) throw new Error("Failed to generate report");
 
       const data = await response.json();
-      
+
       // Download the report
-      if (formData.format === 'PDF') {
-        window.open(data.downloadUrl, '_blank');
+      if (formData.format === "PDF") {
+        window.open(data.downloadUrl, "_blank");
       }
-      
+
       router.push(`/dashboard/qc/reports/${data.id}`);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to generate report');
+      console.error("Error:", error);
+      alert("Failed to generate report");
     } finally {
       setLoading(false);
     }
@@ -84,7 +96,9 @@ export default function CreateReportPage() {
                 <Label htmlFor="type">Report Type *</Label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value) => setFormData({ ...formData, type: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, type: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -108,7 +122,9 @@ export default function CreateReportPage() {
                     </SelectItem>
                     <SelectItem value="SUPPLIER_SCORECARD">
                       <div className="flex flex-col items-start">
-                        <div className="font-semibold">Supplier Quality Scorecard</div>
+                        <div className="font-semibold">
+                          Supplier Quality Scorecard
+                        </div>
                         <div className="text-xs text-muted-foreground">
                           Vendor performance metrics
                         </div>
@@ -124,7 +140,9 @@ export default function CreateReportPage() {
                     </SelectItem>
                     <SelectItem value="COST_IMPACT">
                       <div className="flex flex-col items-start">
-                        <div className="font-semibold">Quality Cost Analysis</div>
+                        <div className="font-semibold">
+                          Quality Cost Analysis
+                        </div>
                         <div className="text-xs text-muted-foreground">
                           Financial impact of quality issues
                         </div>
@@ -167,27 +185,27 @@ export default function CreateReportPage() {
                   onValueChange={(value) => {
                     const today = new Date();
                     let startDate = new Date();
-                    
-                    switch(value) {
-                      case 'WEEKLY':
+
+                    switch (value) {
+                      case "WEEKLY":
                         startDate.setDate(today.getDate() - 7);
                         break;
-                      case 'MONTHLY':
+                      case "MONTHLY":
                         startDate.setMonth(today.getMonth() - 1);
                         break;
-                      case 'QUARTERLY':
+                      case "QUARTERLY":
                         startDate.setMonth(today.getMonth() - 3);
                         break;
-                      case 'YEARLY':
+                      case "YEARLY":
                         startDate.setFullYear(today.getFullYear() - 1);
                         break;
                     }
-                    
+
                     setFormData({
                       ...formData,
                       period: value,
-                      startDate: startDate.toISOString().split('T')[0],
-                      endDate: today.toISOString().split('T')[0],
+                      startDate: startDate.toISOString().split("T")[0],
+                      endDate: today.toISOString().split("T")[0],
                     });
                   }}
                 >
@@ -212,7 +230,9 @@ export default function CreateReportPage() {
                     type="date"
                     required
                     value={formData.startDate}
-                    onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, startDate: e.target.value })
+                    }
                   />
                 </div>
 
@@ -223,7 +243,9 @@ export default function CreateReportPage() {
                     type="date"
                     required
                     value={formData.endDate}
-                    onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, endDate: e.target.value })
+                    }
                   />
                 </div>
               </div>
@@ -240,7 +262,10 @@ export default function CreateReportPage() {
                   id="includeCharts"
                   checked={formData.includeCharts}
                   onCheckedChange={(checked) =>
-                    setFormData({ ...formData, includeCharts: checked as boolean })
+                    setFormData({
+                      ...formData,
+                      includeCharts: checked as boolean,
+                    })
                   }
                 />
                 <label
@@ -256,7 +281,10 @@ export default function CreateReportPage() {
                   id="includeDetails"
                   checked={formData.includeDetails}
                   onCheckedChange={(checked) =>
-                    setFormData({ ...formData, includeDetails: checked as boolean })
+                    setFormData({
+                      ...formData,
+                      includeDetails: checked as boolean,
+                    })
                   }
                 />
                 <label
@@ -271,7 +299,9 @@ export default function CreateReportPage() {
                 <Label htmlFor="format">Export Format *</Label>
                 <Select
                   value={formData.format}
-                  onValueChange={(value) => setFormData({ ...formData, format: value })}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, format: value })
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />

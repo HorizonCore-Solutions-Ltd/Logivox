@@ -2,26 +2,30 @@
  * API Route Tests - Stock Adjustments
  */
 
-import { GET, POST } from '@/app/api/inventory/adjustments/route';
-import { createAuthenticatedRequest, parseResponse, assertSuccessResponse } from '@/lib/test-utils/api-test-utils';
-import { mockPrisma } from '@/lib/test-utils/api-test-utils';
+import { GET, POST } from "@/app/api/inventory/adjustments/route";
+import {
+  createAuthenticatedRequest,
+  parseResponse,
+  assertSuccessResponse,
+} from "@/lib/test-utils/api-test-utils";
+import { mockPrisma } from "@/lib/test-utils/api-test-utils";
 
-describe('API: /api/inventory/adjustments', () => {
+describe("API: /api/inventory/adjustments", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('GET /api/inventory/adjustments', () => {
-    it('should return paginated adjustments', async () => {
+  describe("GET /api/inventory/adjustments", () => {
+    it("should return paginated adjustments", async () => {
       const mockAdjustments = [
         {
-          id: '1',
-          adjustmentNumber: 'ADJ-20240101-001',
-          inventoryItemId: 'item-1',
-          locationId: 'loc-1',
-          adjustmentType: 'COUNT',
+          id: "1",
+          adjustmentNumber: "ADJ-20240101-001",
+          inventoryItemId: "item-1",
+          locationId: "loc-1",
+          adjustmentType: "COUNT",
           quantityChange: -5,
-          reason: 'Cycle count discrepancy',
+          reason: "Cycle count discrepancy",
           createdAt: new Date(),
         },
       ];
@@ -30,8 +34,8 @@ describe('API: /api/inventory/adjustments', () => {
       mockPrisma.stockAdjustment.count.mockResolvedValue(1);
 
       const request = createAuthenticatedRequest({
-        method: 'GET',
-        url: 'http://localhost:3000/api/inventory/adjustments',
+        method: "GET",
+        url: "http://localhost:3000/api/inventory/adjustments",
       });
 
       const response = await GET(request);
@@ -41,10 +45,10 @@ describe('API: /api/inventory/adjustments', () => {
       expect(data.data.adjustments).toEqual(mockAdjustments);
     });
 
-    it('should filter by adjustment type', async () => {
+    it("should filter by adjustment type", async () => {
       const request = createAuthenticatedRequest({
-        method: 'GET',
-        url: 'http://localhost:3000/api/inventory/adjustments?type=COUNT',
+        method: "GET",
+        url: "http://localhost:3000/api/inventory/adjustments?type=COUNT",
       });
 
       await GET(request);
@@ -52,16 +56,16 @@ describe('API: /api/inventory/adjustments', () => {
       expect(mockPrisma.stockAdjustment.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            adjustmentType: 'COUNT',
+            adjustmentType: "COUNT",
           }),
-        })
+        }),
       );
     });
 
-    it('should filter by inventory item', async () => {
+    it("should filter by inventory item", async () => {
       const request = createAuthenticatedRequest({
-        method: 'GET',
-        url: 'http://localhost:3000/api/inventory/adjustments?inventoryItemId=item-1',
+        method: "GET",
+        url: "http://localhost:3000/api/inventory/adjustments?inventoryItemId=item-1",
       });
 
       await GET(request);
@@ -69,21 +73,21 @@ describe('API: /api/inventory/adjustments', () => {
       expect(mockPrisma.stockAdjustment.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            inventoryItemId: 'item-1',
+            inventoryItemId: "item-1",
           }),
-        })
+        }),
       );
     });
   });
 
-  describe('POST /api/inventory/adjustments', () => {
-    it('should create stock adjustment and update stock levels', async () => {
+  describe("POST /api/inventory/adjustments", () => {
+    it("should create stock adjustment and update stock levels", async () => {
       const mockAdjustment = {
-        id: '1',
-        adjustmentNumber: 'ADJ-20240101-001',
-        inventoryItemId: 'item-1',
-        locationId: 'loc-1',
-        adjustmentType: 'COUNT',
+        id: "1",
+        adjustmentNumber: "ADJ-20240101-001",
+        inventoryItemId: "item-1",
+        locationId: "loc-1",
+        adjustmentType: "COUNT",
         quantityChange: 10,
       };
 
@@ -95,14 +99,14 @@ describe('API: /api/inventory/adjustments', () => {
       mockPrisma.stockLevel.upsert.mockResolvedValue({});
 
       const request = createAuthenticatedRequest({
-        method: 'POST',
-        url: 'http://localhost:3000/api/inventory/adjustments',
+        method: "POST",
+        url: "http://localhost:3000/api/inventory/adjustments",
         body: {
-          inventoryItemId: 'item-1',
-          locationId: 'loc-1',
-          adjustmentType: 'COUNT',
+          inventoryItemId: "item-1",
+          locationId: "loc-1",
+          adjustmentType: "COUNT",
           quantityChange: 10,
-          reason: 'Cycle count adjustment',
+          reason: "Cycle count adjustment",
         },
       });
 
@@ -113,35 +117,35 @@ describe('API: /api/inventory/adjustments', () => {
       expect(mockPrisma.$transaction).toHaveBeenCalled();
     });
 
-    it('should validate required fields', async () => {
+    it("should validate required fields", async () => {
       const request = createAuthenticatedRequest({
-        method: 'POST',
-        url: 'http://localhost:3000/api/inventory/adjustments',
+        method: "POST",
+        url: "http://localhost:3000/api/inventory/adjustments",
         body: {
-          inventoryItemId: 'item-1',
+          inventoryItemId: "item-1",
           // Missing locationId, adjustmentType, quantityChange
         },
       });
 
       const response = await POST(request);
-      
+
       expect(response.status).toBe(400);
     });
 
-    it('should auto-generate adjustment number', async () => {
+    it("should auto-generate adjustment number", async () => {
       mockPrisma.$transaction.mockImplementation(async (callback) => {
         return callback(mockPrisma);
       });
 
       const request = createAuthenticatedRequest({
-        method: 'POST',
-        url: 'http://localhost:3000/api/inventory/adjustments',
+        method: "POST",
+        url: "http://localhost:3000/api/inventory/adjustments",
         body: {
-          inventoryItemId: 'item-1',
-          locationId: 'loc-1',
-          adjustmentType: 'COUNT',
+          inventoryItemId: "item-1",
+          locationId: "loc-1",
+          adjustmentType: "COUNT",
           quantityChange: 10,
-          reason: 'Test',
+          reason: "Test",
         },
       });
 
@@ -152,24 +156,24 @@ describe('API: /api/inventory/adjustments', () => {
           data: expect.objectContaining({
             adjustmentNumber: expect.stringMatching(/^ADJ-\d{8}-\d{3}$/),
           }),
-        })
+        }),
       );
     });
 
-    it('should handle different adjustment types', async () => {
+    it("should handle different adjustment types", async () => {
       mockPrisma.$transaction.mockImplementation(async (callback) => {
         return callback(mockPrisma);
       });
 
-      const types = ['COUNT', 'DAMAGE', 'LOSS', 'FOUND', 'TRANSFER'];
+      const types = ["COUNT", "DAMAGE", "LOSS", "FOUND", "TRANSFER"];
 
       for (const type of types) {
         const request = createAuthenticatedRequest({
-          method: 'POST',
-          url: 'http://localhost:3000/api/inventory/adjustments',
+          method: "POST",
+          url: "http://localhost:3000/api/inventory/adjustments",
           body: {
-            inventoryItemId: 'item-1',
-            locationId: 'loc-1',
+            inventoryItemId: "item-1",
+            locationId: "loc-1",
             adjustmentType: type,
             quantityChange: 1,
             reason: `Test ${type}`,
@@ -183,7 +187,7 @@ describe('API: /api/inventory/adjustments', () => {
             data: expect.objectContaining({
               adjustmentType: type,
             }),
-          })
+          }),
         );
 
         jest.clearAllMocks();

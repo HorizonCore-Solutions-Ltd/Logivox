@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching adjustments:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch adjustments" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -179,7 +179,7 @@ export async function POST(request: NextRequest) {
     if (!inventoryItem) {
       return NextResponse.json(
         { error: "Inventory item not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
     if (quantityAfter < 0) {
       return NextResponse.json(
         { error: "Adjustment would result in negative inventory" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -207,7 +207,7 @@ export async function POST(request: NextRequest) {
       if (!location) {
         return NextResponse.json(
           { error: "Location not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
     }
@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
     let sequence = 1;
     if (lastAdjustment) {
       const lastSequence = parseInt(
-        (lastAdjustment.adjustmentNumber.split("-")[2] || "0") || "0"
+        lastAdjustment.adjustmentNumber.split("-")[2] || "0" || "0",
       );
       sequence = lastSequence + 1;
     }
@@ -238,9 +238,10 @@ export async function POST(request: NextRequest) {
     const adjustmentNumber = `${prefix}-${sequence.toString().padStart(3, "0")}`;
 
     // Calculate total cost
-    const unitCost = validatedData.unitCost || inventoryItem.costPrice
-      ? parseFloat(inventoryItem.costPrice.toString())
-      : 0;
+    const unitCost =
+      validatedData.unitCost || inventoryItem.costPrice
+        ? parseFloat(inventoryItem.costPrice.toString())
+        : 0;
     const totalCost = Math.abs(validatedData.quantityChange) * unitCost;
 
     // Determine if requires approval (large adjustments or specific reasons)
@@ -336,13 +337,13 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Failed to create adjustment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

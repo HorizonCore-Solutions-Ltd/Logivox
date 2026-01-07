@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * Kubernetes/Docker readiness probe endpoint
@@ -16,25 +16,25 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        status: 'ready',
+        status: "ready",
         timestamp: new Date().toISOString(),
         checks: {
-          database: 'connected',
+          database: "connected",
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json(
       {
-        status: 'not_ready',
+        status: "not_ready",
         timestamp: new Date().toISOString(),
         checks: {
-          database: 'disconnected',
+          database: "disconnected",
         },
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 503 }
+      { status: 503 },
     );
   }
 }

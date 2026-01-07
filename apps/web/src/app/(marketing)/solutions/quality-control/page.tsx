@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   BadgeCheck,
   ClipboardCheck,
@@ -20,42 +26,48 @@ import {
   ArrowRight,
   Zap,
   Award,
-  Target
-} from "lucide-react"
+  Target,
+} from "lucide-react";
 
 export default function QualityControlPage() {
   const features = [
     {
       icon: ClipboardCheck,
       title: "Receiving Inspection",
-      description: "Verify quality standards upon receipt with AQL sampling plans and automated workflows."
+      description:
+        "Verify quality standards upon receipt with AQL sampling plans and automated workflows.",
     },
     {
       icon: Target,
       title: "AQL Sampling Plans",
-      description: "Statistical sampling based on ANSI/ASQ Z1.4 standards with configurable inspection levels."
+      description:
+        "Statistical sampling based on ANSI/ASQ Z1.4 standards with configurable inspection levels.",
     },
     {
       icon: AlertTriangle,
       title: "Defect Tracking",
-      description: "Categorize and track defects by type, severity, and vendor with root cause analysis."
+      description:
+        "Categorize and track defects by type, severity, and vendor with root cause analysis.",
     },
     {
       icon: BarChart3,
       title: "SPC Charts",
-      description: "Statistical Process Control with real-time trend analysis and automated alerts."
+      description:
+        "Statistical Process Control with real-time trend analysis and automated alerts.",
     },
     {
       icon: FileText,
       title: "CAPA Management",
-      description: "Corrective and Preventive Actions tracking with workflow automation and documentation."
+      description:
+        "Corrective and Preventive Actions tracking with workflow automation and documentation.",
     },
     {
       icon: Award,
       title: "Vendor Scorecards",
-      description: "Track supplier quality metrics and performance trends for data-driven sourcing decisions."
-    }
-  ]
+      description:
+        "Track supplier quality metrics and performance trends for data-driven sourcing decisions.",
+    },
+  ];
 
   const inspectionTypes = [
     {
@@ -68,9 +80,13 @@ export default function QualityControlPage() {
         "Dimensional checks",
         "Label/marking verification",
         "AQL sampling execution",
-        "Certificate of Conformance review"
+        "Certificate of Conformance review",
       ],
-      metrics: ["Pass rate: 98.5%", "Inspection time: 12 min avg", "Reject rate: 1.5%"]
+      metrics: [
+        "Pass rate: 98.5%",
+        "Inspection time: 12 min avg",
+        "Reject rate: 1.5%",
+      ],
     },
     {
       type: "In-Process Inspection",
@@ -82,9 +98,13 @@ export default function QualityControlPage() {
         "Packaging integrity",
         "Label accuracy",
         "Serial number validation",
-        "Weight/dimension verification"
+        "Weight/dimension verification",
       ],
-      metrics: ["Pass rate: 99.2%", "Inspection time: 5 min avg", "Rework rate: 0.8%"]
+      metrics: [
+        "Pass rate: 99.2%",
+        "Inspection time: 5 min avg",
+        "Rework rate: 0.8%",
+      ],
     },
     {
       type: "Final Inspection",
@@ -96,17 +116,36 @@ export default function QualityControlPage() {
         "Shipping label verification",
         "Product condition assessment",
         "Documentation completeness",
-        "Compliance certification"
+        "Compliance certification",
       ],
-      metrics: ["Pass rate: 99.6%", "Inspection time: 8 min avg", "Hold rate: 0.4%"]
-    }
-  ]
+      metrics: [
+        "Pass rate: 99.6%",
+        "Inspection time: 8 min avg",
+        "Hold rate: 0.4%",
+      ],
+    },
+  ];
 
   const defectCategories = [
-    { name: "Critical", color: "destructive", description: "Product safety or compliance issues", action: "Immediate hold" },
-    { name: "Major", color: "warning", description: "Significant quality defects", action: "Hold & review" },
-    { name: "Minor", color: "secondary", description: "Cosmetic or minor issues", action: "Accept with notes" }
-  ]
+    {
+      name: "Critical",
+      color: "destructive",
+      description: "Product safety or compliance issues",
+      action: "Immediate hold",
+    },
+    {
+      name: "Major",
+      color: "warning",
+      description: "Significant quality defects",
+      action: "Hold & review",
+    },
+    {
+      name: "Minor",
+      color: "secondary",
+      description: "Cosmetic or minor issues",
+      action: "Accept with notes",
+    },
+  ];
 
   const complianceStandards = [
     "ISO 9001:2015 Quality Management",
@@ -114,35 +153,59 @@ export default function QualityControlPage() {
     "FDA 21 CFR Part 11 (Electronic Records)",
     "GMP (Good Manufacturing Practices)",
     "HACCP Food Safety",
-    "ANSI/ASQ Z1.4 AQL Sampling"
-  ]
+    "ANSI/ASQ Z1.4 AQL Sampling",
+  ];
 
   const capabilities = [
     {
       title: "Automated Sampling",
       icon: Scan,
-      description: "System automatically calculates sample sizes based on lot size, inspection level, and AQL requirements.",
-      benefits: ["ISO 2859 compliant", "Reduced human error", "Consistent quality", "Audit trail"]
+      description:
+        "System automatically calculates sample sizes based on lot size, inspection level, and AQL requirements.",
+      benefits: [
+        "ISO 2859 compliant",
+        "Reduced human error",
+        "Consistent quality",
+        "Audit trail",
+      ],
     },
     {
       title: "Visual AI Inspection",
       icon: Camera,
-      description: "Computer vision for automated defect detection, damage assessment, and label verification.",
-      benefits: ["99.5% accuracy", "3x faster inspection", "Objective results", "Pattern detection"]
+      description:
+        "Computer vision for automated defect detection, damage assessment, and label verification.",
+      benefits: [
+        "99.5% accuracy",
+        "3x faster inspection",
+        "Objective results",
+        "Pattern detection",
+      ],
     },
     {
       title: "Real-Time Alerts",
       icon: AlertTriangle,
-      description: "Instant notifications when quality metrics exceed thresholds or defect trends are detected.",
-      benefits: ["Proactive quality management", "Trend detection", "Email/SMS alerts", "Escalation workflows"]
+      description:
+        "Instant notifications when quality metrics exceed thresholds or defect trends are detected.",
+      benefits: [
+        "Proactive quality management",
+        "Trend detection",
+        "Email/SMS alerts",
+        "Escalation workflows",
+      ],
     },
     {
       title: "Vendor Performance",
       icon: TrendingUp,
-      description: "Track supplier quality over time with automated scorecards and performance dashboards.",
-      benefits: ["Data-driven sourcing", "Quality trends", "Supplier comparison", "Cost of quality tracking"]
-    }
-  ]
+      description:
+        "Track supplier quality over time with automated scorecards and performance dashboards.",
+      benefits: [
+        "Data-driven sourcing",
+        "Quality trends",
+        "Supplier comparison",
+        "Cost of quality tracking",
+      ],
+    },
+  ];
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -155,11 +218,14 @@ export default function QualityControlPage() {
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mb-6">
               Enterprise Quality Management
-              <span className="block text-primary mt-2">Zero Defects to Customer</span>
+              <span className="block text-primary mt-2">
+                Zero Defects to Customer
+              </span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed mb-8">
-              Comprehensive quality control with AQL sampling, defect tracking, CAPA management, 
-              and real-time SPC charts. Ensure product quality at every touchpoint.
+              Comprehensive quality control with AQL sampling, defect tracking,
+              CAPA management, and real-time SPC charts. Ensure product quality
+              at every touchpoint.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -179,11 +245,15 @@ export default function QualityControlPage() {
                 { label: "Quality Pass Rate", value: "99.2%" },
                 { label: "Inspection Time", value: "-45%" },
                 { label: "Defect Detection", value: "99.5%" },
-                { label: "Cost Savings", value: "$280K" }
+                { label: "Cost Savings", value: "$280K" },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="text-3xl font-bold text-primary mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
                 </div>
               ))}
             </div>
@@ -195,14 +265,19 @@ export default function QualityControlPage() {
       <section className="py-20 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Complete Quality Management Suite</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Complete Quality Management Suite
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Everything you need to maintain quality standards and compliance
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {features.map((feature, index) => (
-              <Card key={index} className="group hover:shadow-lg transition-all">
+              <Card
+                key={index}
+                className="group hover:shadow-lg transition-all"
+              >
                 <CardHeader>
                   <h3 className="text-lg font-bold mb-2 flex items-center gap-3">
                     <div className="inline-flex p-2 rounded-lg bg-primary-100 text-primary-700 group-hover:bg-primary-600 group-hover:text-white transition-colors flex-shrink-0">
@@ -222,9 +297,12 @@ export default function QualityControlPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Three-Level Inspection Process</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Three-Level Inspection Process
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive quality checks at receiving, in-process, and final inspection
+              Comprehensive quality checks at receiving, in-process, and final
+              inspection
             </p>
           </div>
 
@@ -237,17 +315,26 @@ export default function QualityControlPage() {
                       <inspection.icon className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <CardTitle className="text-lg">{inspection.type}</CardTitle>
-                      <CardDescription className="text-sm">{inspection.description}</CardDescription>
+                      <CardTitle className="text-lg">
+                        {inspection.type}
+                      </CardTitle>
+                      <CardDescription className="text-sm">
+                        {inspection.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="mb-6">
-                    <h4 className="font-semibold mb-3 text-sm">Quality Checks:</h4>
+                    <h4 className="font-semibold mb-3 text-sm">
+                      Quality Checks:
+                    </h4>
                     <ul className="space-y-2">
                       {inspection.checks.map((check, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm">
+                        <li
+                          key={idx}
+                          className="flex items-start gap-2 text-sm"
+                        >
                           <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                           <span className="text-muted-foreground">{check}</span>
                         </li>
@@ -258,7 +345,10 @@ export default function QualityControlPage() {
                     <h4 className="font-semibold mb-2 text-sm">Performance:</h4>
                     <div className="space-y-1">
                       {inspection.metrics.map((metric, idx) => (
-                        <div key={idx} className="text-xs text-muted-foreground">
+                        <div
+                          key={idx}
+                          className="text-xs text-muted-foreground"
+                        >
                           {metric}
                         </div>
                       ))}
@@ -275,7 +365,9 @@ export default function QualityControlPage() {
       <section className="py-20 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Defect Classification & Management</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Defect Classification & Management
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Standardized defect categorization with automated workflows
             </p>
@@ -288,17 +380,28 @@ export default function QualityControlPage() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <Badge variant={category.color as any} className="text-lg px-4 py-2">
+                        <Badge
+                          variant={category.color as any}
+                          className="text-lg px-4 py-2"
+                        >
                           {category.name}
                         </Badge>
                         <div>
                           <p className="font-medium">{category.description}</p>
-                          <p className="text-sm text-muted-foreground mt-1">Action: {category.action}</p>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Action: {category.action}
+                          </p>
                         </div>
                       </div>
-                      {index === 0 && <XCircle className="h-8 w-8 text-destructive" />}
-                      {index === 1 && <AlertTriangle className="h-8 w-8 text-warning" />}
-                      {index === 2 && <CheckCircle2 className="h-8 w-8 text-secondary" />}
+                      {index === 0 && (
+                        <XCircle className="h-8 w-8 text-destructive" />
+                      )}
+                      {index === 1 && (
+                        <AlertTriangle className="h-8 w-8 text-warning" />
+                      )}
+                      {index === 2 && (
+                        <CheckCircle2 className="h-8 w-8 text-secondary" />
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -312,7 +415,9 @@ export default function QualityControlPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Advanced Quality Features</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Advanced Quality Features
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Intelligent automation and AI-powered quality management
             </p>
@@ -333,7 +438,10 @@ export default function QualityControlPage() {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-3">
                     {capability.benefits.map((benefit, idx) => (
-                      <div key={idx} className="flex items-center gap-2 text-sm">
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm"
+                      >
                         <Zap className="h-4 w-4 text-primary" />
                         <span>{benefit}</span>
                       </div>
@@ -378,7 +486,8 @@ export default function QualityControlPage() {
             Ready to Improve Your Quality Standards?
           </h2>
           <p className="text-xl opacity-90 mb-8 max-w-2xl mx-auto">
-            Join leading manufacturers and 3PLs using LogiVox to maintain zero-defect quality
+            Join leading manufacturers and 3PLs using LogiVox to maintain
+            zero-defect quality
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
@@ -387,12 +496,17 @@ export default function QualityControlPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-transparent border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              asChild
+            >
               <Link href="/pricing">View Pricing</Link>
             </Button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

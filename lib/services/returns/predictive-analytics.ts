@@ -3,24 +3,30 @@
  * ML-powered forecasting of return volumes, costs, and staffing needs
  */
 
-export type ForecastTarget = 'RETURN_VOLUME' | 'RETURN_RATE' | 'DEFECT_RATE' | 'FRAUD_RATE' | 'RECOVERY_VALUE' | 'PROCESSING_TIME';
-export type ForecastGranularity = 'DAY' | 'WEEK' | 'MONTH';
+export type ForecastTarget =
+  | "RETURN_VOLUME"
+  | "RETURN_RATE"
+  | "DEFECT_RATE"
+  | "FRAUD_RATE"
+  | "RECOVERY_VALUE"
+  | "PROCESSING_TIME";
+export type ForecastGranularity = "DAY" | "WEEK" | "MONTH";
 
 export interface ReturnsForecast {
   id: string;
   generatedAt: Date;
-  
+
   // Scope
   organizationId: string;
   warehouseId?: string;
-  
+
   // Period
   forecastPeriod: {
     start: Date;
     end: Date;
     granularity: ForecastGranularity;
   };
-  
+
   // Predictions
   predictions: {
     date: Date;
@@ -30,28 +36,28 @@ export interface ReturnsForecast {
     upper: number;
     confidence: number; // 0-100
   }[];
-  
+
   // Insights
   insights: {
-    type: 'TREND' | 'ANOMALY' | 'SEASONAL' | 'RECOMMENDATION';
-    severity: 'INFO' | 'WARNING' | 'CRITICAL';
+    type: "TREND" | "ANOMALY" | "SEASONAL" | "RECOMMENDATION";
+    severity: "INFO" | "WARNING" | "CRITICAL";
     message: string;
     impact: string;
     recommendation?: string;
   }[];
-  
+
   // Drivers
   topDrivers: {
     driver: string;
     importance: number; // 0-100
-    trend: 'INCREASING' | 'DECREASING' | 'STABLE';
+    trend: "INCREASING" | "DECREASING" | "STABLE";
   }[];
-  
+
   // Model Info
   modelVersion: string;
   accuracy: number; // historical accuracy %
   lastTrained: Date;
-  
+
   // Metadata
   createdAt: Date;
 }
@@ -59,38 +65,44 @@ export interface ReturnsForecast {
 export interface StaffingRecommendation {
   organizationId: string;
   generatedAt: Date;
-  
+
   // Period
   period: {
     start: Date;
     end: Date;
   };
-  
+
   // Recommendations by function
   staffing: {
-    function: 'RETURNS_RECEIVING' | 'TRIAGE' | 'QC' | 'REFURB' | 'PACKOUT' | 'CUSTOMER_SERVICE';
+    function:
+      | "RETURNS_RECEIVING"
+      | "TRIAGE"
+      | "QC"
+      | "REFURB"
+      | "PACKOUT"
+      | "CUSTOMER_SERVICE";
     recommendedHeadcount: number;
     currentHeadcount: number;
     gap: number;
-    
+
     // By shift
     shifts: {
       name: string; // 'Morning', 'Afternoon', 'Evening', 'Night'
       hours: string; // '6AM-2PM'
       recommendedHeadcount: number;
-      priority: 'LOW' | 'MEDIUM' | 'HIGH';
+      priority: "LOW" | "MEDIUM" | "HIGH";
     }[];
-    
+
     rationale: string;
   }[];
-  
+
   // Skill Requirements
   skills: {
     skill: string;
     requiredCount: number;
-    priority: 'LOW' | 'MEDIUM' | 'HIGH';
+    priority: "LOW" | "MEDIUM" | "HIGH";
   }[];
-  
+
   // SLA Impact
   slaImpact: {
     metric: string;
@@ -98,7 +110,7 @@ export interface StaffingRecommendation {
     predicted: number;
     unit: string;
   }[];
-  
+
   // Cost
   costImpact: {
     currentMonthlyCost: number;
@@ -106,10 +118,10 @@ export interface StaffingRecommendation {
     difference: number;
     roi: number; // % - savings from efficiency
   };
-  
+
   // Confidence
   confidence: number;
-  
+
   // Metadata
   createdAt: Date;
 }
@@ -118,16 +130,16 @@ export interface ReturnRateAnalysis {
   organizationId: string;
   period: { start: Date; end: Date };
   analyzedAt: Date;
-  
+
   // Overall Metrics
   overall: {
     totalOrders: number;
     totalReturns: number;
     returnRate: number; // %
-    trend: 'IMPROVING' | 'WORSENING' | 'STABLE';
+    trend: "IMPROVING" | "WORSENING" | "STABLE";
     changeVsPreviousPeriod: number; // %
   };
-  
+
   // By SKU
   bySKU: {
     sku: string;
@@ -139,7 +151,7 @@ export interface ReturnRateAnalysis {
     estimatedImpact: number; // $ cost
     recommendation: string;
   }[];
-  
+
   // By Supplier
   bySupplier: {
     supplierId: string;
@@ -148,10 +160,10 @@ export interface ReturnRateAnalysis {
     returns: number;
     defectRate: number; // %
     avgQualityScore: number;
-    trending: 'UP' | 'DOWN' | 'STABLE';
+    trending: "UP" | "DOWN" | "STABLE";
     actionRequired: boolean;
   }[];
-  
+
   // By Return Reason
   byReason: {
     reason: string;
@@ -163,7 +175,7 @@ export interface ReturnRateAnalysis {
     rootCause?: string;
     recommendation?: string;
   }[];
-  
+
   // By Customer Segment
   bySegment: {
     segment: string; // 'NEW', 'REGULAR', 'VIP', 'AT_RISK'
@@ -172,7 +184,7 @@ export interface ReturnRateAnalysis {
     returnRate: number;
     avgOrderValue: number;
   }[];
-  
+
   // Seasonal Patterns
   seasonality: {
     identified: boolean;
@@ -180,7 +192,7 @@ export interface ReturnRateAnalysis {
     troughs: { month: string; returnRate: number }[];
     pattern: string;
   };
-  
+
   // Predicted Impact
   predictions: {
     nextPeriod: {
@@ -217,27 +229,27 @@ export class ReturnsForecastingService {
   }): Promise<ReturnsForecast> {
     // Load historical data
     const historicalData = await this.loadHistoricalData(request);
-    
+
     // Generate predictions for each target
-    const predictions: ReturnsForecast['predictions'] = [];
-    
+    const predictions: ReturnsForecast["predictions"] = [];
+
     for (const target of request.targets) {
       const targetPredictions = await this.forecastTarget(
         target,
         historicalData,
         request.startDate,
         request.endDate,
-        request.granularity
+        request.granularity,
       );
       predictions.push(...targetPredictions);
     }
-    
+
     // Identify insights
     const insights = await this.generateInsights(predictions, historicalData);
-    
+
     // Determine top drivers
     const topDrivers = await this.identifyDrivers(historicalData);
-    
+
     return {
       id: `forecast-${Date.now()}`,
       generatedAt: new Date(),
@@ -251,7 +263,7 @@ export class ReturnsForecastingService {
       predictions,
       insights,
       topDrivers,
-      modelVersion: 'v2.3.0',
+      modelVersion: "v2.3.0",
       accuracy: 87.5,
       lastTrained: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       createdAt: new Date(),
@@ -261,64 +273,98 @@ export class ReturnsForecastingService {
   /**
    * Generate staffing recommendations
    */
-  async recommendStaffing(forecast: ReturnsForecast): Promise<StaffingRecommendation> {
+  async recommendStaffing(
+    forecast: ReturnsForecast,
+  ): Promise<StaffingRecommendation> {
     // Extract volume predictions
-    const volumePredictions = forecast.predictions.filter(p => p.target === 'RETURN_VOLUME');
-    const avgDailyReturns = volumePredictions.reduce((sum, p) => sum + p.predicted, 0) / volumePredictions.length;
-    
+    const volumePredictions = forecast.predictions.filter(
+      (p) => p.target === "RETURN_VOLUME",
+    );
+    const avgDailyReturns =
+      volumePredictions.reduce((sum, p) => sum + p.predicted, 0) /
+      volumePredictions.length;
+
     // Calculate headcount needs
     // Assume: 1 receiver can process 40 items/day, 1 QC can inspect 30/day, etc.
     const receiving = Math.ceil(avgDailyReturns / 40);
-    const qc = Math.ceil(avgDailyReturns * 0.5 / 30); // 50% require QC
-    const refurb = Math.ceil(avgDailyReturns * 0.2 / 8); // 20% need refurb, 8 per day
-    
-    const staffing: StaffingRecommendation['staffing'] = [
+    const qc = Math.ceil((avgDailyReturns * 0.5) / 30); // 50% require QC
+    const refurb = Math.ceil((avgDailyReturns * 0.2) / 8); // 20% need refurb, 8 per day
+
+    const staffing: StaffingRecommendation["staffing"] = [
       {
-        function: 'RETURNS_RECEIVING',
+        function: "RETURNS_RECEIVING",
         recommendedHeadcount: receiving,
         currentHeadcount: Math.ceil(receiving * 0.8), // assume 80% staffed
         gap: Math.ceil(receiving * 0.2),
         shifts: [
-          { name: 'Morning', hours: '6AM-2PM', recommendedHeadcount: Math.ceil(receiving * 0.6), priority: 'HIGH' },
-          { name: 'Afternoon', hours: '2PM-10PM', recommendedHeadcount: Math.ceil(receiving * 0.4), priority: 'MEDIUM' },
+          {
+            name: "Morning",
+            hours: "6AM-2PM",
+            recommendedHeadcount: Math.ceil(receiving * 0.6),
+            priority: "HIGH",
+          },
+          {
+            name: "Afternoon",
+            hours: "2PM-10PM",
+            recommendedHeadcount: Math.ceil(receiving * 0.4),
+            priority: "MEDIUM",
+          },
         ],
         rationale: `Based on forecast of ${avgDailyReturns.toFixed(0)} daily returns, need ${receiving} receivers @ 40 items/person/day`,
       },
       {
-        function: 'QC',
+        function: "QC",
         recommendedHeadcount: qc,
         currentHeadcount: Math.ceil(qc * 0.9),
         gap: Math.ceil(qc * 0.1),
         shifts: [
-          { name: 'Morning', hours: '8AM-4PM', recommendedHeadcount: Math.ceil(qc * 0.7), priority: 'HIGH' },
+          {
+            name: "Morning",
+            hours: "8AM-4PM",
+            recommendedHeadcount: Math.ceil(qc * 0.7),
+            priority: "HIGH",
+          },
         ],
         rationale: `~50% of returns require QC inspection, need ${qc} inspectors @ 30 items/person/day`,
       },
       {
-        function: 'REFURB',
+        function: "REFURB",
         recommendedHeadcount: refurb,
         currentHeadcount: refurb,
         gap: 0,
         shifts: [
-          { name: 'Day', hours: '8AM-5PM', recommendedHeadcount: refurb, priority: 'MEDIUM' },
+          {
+            name: "Day",
+            hours: "8AM-5PM",
+            recommendedHeadcount: refurb,
+            priority: "MEDIUM",
+          },
         ],
         rationale: `~20% of returns need refurbishment, need ${refurb} technicians @ 8 items/person/day`,
       },
     ];
-    
+
     return {
       organizationId: forecast.organizationId,
       generatedAt: new Date(),
       period: forecast.forecastPeriod,
       staffing,
       skills: [
-        { skill: 'Barcode Scanning', requiredCount: receiving, priority: 'HIGH' },
-        { skill: 'Quality Inspection', requiredCount: qc, priority: 'HIGH' },
-        { skill: 'Electronics Repair', requiredCount: refurb, priority: 'MEDIUM' },
+        {
+          skill: "Barcode Scanning",
+          requiredCount: receiving,
+          priority: "HIGH",
+        },
+        { skill: "Quality Inspection", requiredCount: qc, priority: "HIGH" },
+        {
+          skill: "Electronics Repair",
+          requiredCount: refurb,
+          priority: "MEDIUM",
+        },
       ],
       slaImpact: [
-        { metric: 'Receiving Time', current: 48, predicted: 24, unit: 'hours' },
-        { metric: 'Credit Issuance', current: 5, predicted: 3, unit: 'days' },
+        { metric: "Receiving Time", current: 48, predicted: 24, unit: "hours" },
+        { metric: "Credit Issuance", current: 5, predicted: 3, unit: "days" },
       ],
       costImpact: {
         currentMonthlyCost: receiving * 0.8 * 25 * 160, // current headcount * $25/hr * 160 hrs/month
@@ -341,17 +387,23 @@ export class ReturnsForecastingService {
   }): Promise<ReturnRateAnalysis> {
     // Query return data
     const data = await this.queryReturnData(request);
-    
+
     // Calculate metrics
     const totalOrders = data.totalOrders;
     const totalReturns = data.totalReturns;
     const returnRate = (totalReturns / totalOrders) * 100;
-    
+
     // Trend analysis
     const previousPeriodRate = data.previousReturnRate;
-    const changeVsPrevious = ((returnRate - previousPeriodRate) / previousPeriodRate) * 100;
-    const trend = changeVsPrevious < -5 ? 'IMPROVING' : changeVsPrevious > 5 ? 'WORSENING' : 'STABLE';
-    
+    const changeVsPrevious =
+      ((returnRate - previousPeriodRate) / previousPeriodRate) * 100;
+    const trend =
+      changeVsPrevious < -5
+        ? "IMPROVING"
+        : changeVsPrevious > 5
+          ? "WORSENING"
+          : "STABLE";
+
     // By SKU analysis
     const bySKU = data.skuData.map((sku: any) => ({
       sku: sku.sku,
@@ -363,7 +415,7 @@ export class ReturnsForecastingService {
       estimatedImpact: sku.returns * sku.avgValue,
       recommendation: this.generateSKURecommendation(sku),
     }));
-    
+
     // Predictions
     const predictions = {
       nextPeriod: {
@@ -381,7 +433,7 @@ export class ReturnsForecastingService {
         roi: 300, // $3 saved for every $1 invested in improvements
       },
     };
-    
+
     return {
       organizationId: request.organizationId,
       period: { start: request.startDate, end: request.endDate },
@@ -417,13 +469,13 @@ export class ReturnsForecastingService {
     historicalData: any,
     startDate: Date,
     endDate: Date,
-    granularity: ForecastGranularity
+    granularity: ForecastGranularity,
   ): Promise<any[]> {
     // Use time series forecasting (ARIMA, Prophet, etc.)
     // For now, return mock predictions
     const predictions = [];
     let currentDate = new Date(startDate);
-    
+
     while (currentDate <= endDate) {
       predictions.push({
         date: new Date(currentDate),
@@ -433,57 +485,65 @@ export class ReturnsForecastingService {
         upper: Math.random() * 100 + 70,
         confidence: 75 + Math.random() * 20,
       });
-      
+
       // Increment by granularity
-      if (granularity === 'DAY') currentDate.setDate(currentDate.getDate() + 1);
-      else if (granularity === 'WEEK') currentDate.setDate(currentDate.getDate() + 7);
+      if (granularity === "DAY") currentDate.setDate(currentDate.getDate() + 1);
+      else if (granularity === "WEEK")
+        currentDate.setDate(currentDate.getDate() + 7);
       else currentDate.setMonth(currentDate.getMonth() + 1);
     }
-    
+
     return predictions;
   }
 
-  private async generateInsights(predictions: any[], historicalData: any): Promise<any[]> {
+  private async generateInsights(
+    predictions: any[],
+    historicalData: any,
+  ): Promise<any[]> {
     const insights = [];
-    
+
     // Check for spikes
-    const avgPrediction = predictions.reduce((sum, p) => sum + p.predicted, 0) / predictions.length;
-    const maxPrediction = Math.max(...predictions.map(p => p.predicted));
-    
+    const avgPrediction =
+      predictions.reduce((sum, p) => sum + p.predicted, 0) / predictions.length;
+    const maxPrediction = Math.max(...predictions.map((p) => p.predicted));
+
     if (maxPrediction > avgPrediction * 1.5) {
       insights.push({
-        type: 'ANOMALY',
-        severity: 'WARNING',
-        message: 'Significant spike in returns predicted',
+        type: "ANOMALY",
+        severity: "WARNING",
+        message: "Significant spike in returns predicted",
         impact: `Expected ${maxPrediction.toFixed(0)} returns vs. average of ${avgPrediction.toFixed(0)}`,
-        recommendation: 'Increase staffing and prepare additional processing capacity',
+        recommendation:
+          "Increase staffing and prepare additional processing capacity",
       });
     }
-    
+
     // Check trend
-    const firstWeek = predictions.slice(0, 7).reduce((sum, p) => sum + p.predicted, 0) / 7;
-    const lastWeek = predictions.slice(-7).reduce((sum, p) => sum + p.predicted, 0) / 7;
-    
+    const firstWeek =
+      predictions.slice(0, 7).reduce((sum, p) => sum + p.predicted, 0) / 7;
+    const lastWeek =
+      predictions.slice(-7).reduce((sum, p) => sum + p.predicted, 0) / 7;
+
     if (lastWeek > firstWeek * 1.2) {
       insights.push({
-        type: 'TREND',
-        severity: 'WARNING',
-        message: 'Returns trending upward',
+        type: "TREND",
+        severity: "WARNING",
+        message: "Returns trending upward",
         impact: `20% increase expected over forecast period`,
-        recommendation: 'Investigate quality issues and review return policies',
+        recommendation: "Investigate quality issues and review return policies",
       });
     }
-    
+
     return insights;
   }
 
   private async identifyDrivers(historicalData: any): Promise<any[]> {
     return [
-      { driver: 'Product Quality', importance: 35, trend: 'DECREASING' },
-      { driver: 'Shipping Damage', importance: 25, trend: 'STABLE' },
-      { driver: 'Wrong Item Shipped', importance: 20, trend: 'IMPROVING' },
-      { driver: 'Customer Expectations', importance: 15, trend: 'INCREASING' },
-      { driver: 'Seasonality', importance: 5, trend: 'STABLE' },
+      { driver: "Product Quality", importance: 35, trend: "DECREASING" },
+      { driver: "Shipping Damage", importance: 25, trend: "STABLE" },
+      { driver: "Wrong Item Shipped", importance: 20, trend: "IMPROVING" },
+      { driver: "Customer Expectations", importance: 15, trend: "INCREASING" },
+      { driver: "Seasonality", importance: 5, trend: "STABLE" },
     ];
   }
 
@@ -493,21 +553,21 @@ export class ReturnsForecastingService {
       totalOrders: 5000,
       totalReturns: 350,
       previousReturnRate: 6.5,
-      avgReturnValue: 75.00,
+      avgReturnValue: 75.0,
       skuData: [],
       supplierData: [],
       reasonData: [],
       segmentData: [],
-      seasonality: { identified: false, peaks: [], troughs: [], pattern: '' },
+      seasonality: { identified: false, peaks: [], troughs: [], pattern: "" },
     };
   }
 
   private generateSKURecommendation(sku: any): string {
     if (sku.returnRate > 20) {
-      return 'CRITICAL: High return rate. Consider removing from catalog or contacting supplier.';
+      return "CRITICAL: High return rate. Consider removing from catalog or contacting supplier.";
     } else if (sku.returnRate > 10) {
-      return 'Review product description and quality. May need supplier discussion.';
+      return "Review product description and quality. May need supplier discussion.";
     }
-    return 'Return rate within acceptable range.';
+    return "Return rate within acceptable range.";
   }
 }

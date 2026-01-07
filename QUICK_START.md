@@ -78,16 +78,19 @@ Open http://localhost:3000 🎉
 ## Key Features to Explore
 
 ### Voice Control
+
 - 30+ voice commands
 - Hands-free operations
 - Browser-based (no hardware)
 
 ### Load Optimization
+
 - 3D bin packing
 - Vehicle recommendations
 - Utilization reports
 
 ### Vehicle Library
+
 - 16+ global vehicle types
 - UK, EU, US, Asia coverage
 - Custom vehicle support
@@ -143,22 +146,26 @@ logivox/
 ## Voice Commands Reference
 
 ### Navigation
+
 - "Show dashboard"
 - "Go to inventory"
 - "Open orders"
 
 ### Orders
+
 - "Show order {number}"
 - "List today's orders"
 - "Create new order"
 
 ### Vehicle & Load Optimization
+
 - "Recommend vehicle for order {number}"
 - "What vehicle fits {volume} cubic feet"
 - "Optimize load for order {number}"
 - "Show UK vehicles"
 
 ### Inventory
+
 - "Check stock for {item}"
 - "What's in location {location}"
 - "Show low stock items"
@@ -168,16 +175,19 @@ logivox/
 ## Troubleshooting
 
 ### Voice Not Working
+
 - Check microphone permissions in browser
 - Try Chrome/Edge (best support)
 - Press Ctrl+M to toggle voice
 
 ### Database Connection Error
+
 - Verify DATABASE_URL in .env.local
 - Check PostgreSQL is running
 - Run: `npm run db:push`
 
 ### Build Errors
+
 - Clear .next folder: `rm -rf .next`
 - Reinstall: `rm -rf node_modules && npm install`
 - Check TypeScript: `npm run type-check`
@@ -204,4 +214,4 @@ logivox/
 
 **Welcome to LogiVox!** 🎤📦✨
 
-*The world's first voice-native warehouse management system*
+_The world's first voice-native warehouse management system_

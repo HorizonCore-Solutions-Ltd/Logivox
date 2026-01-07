@@ -3,7 +3,7 @@
  * Implements ISO 9001:2015, ISO 13485, AS9100 audit requirements
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -65,13 +65,13 @@ export class AuditService {
         auditeeName: data.auditeeName,
         auditeeId: data.auditeeId,
         supplierId: data.supplierId,
-        status: 'PLANNED',
-        createdBy: data.createdBy
+        status: "PLANNED",
+        createdBy: data.createdBy,
       },
       include: {
         supplier: true,
-        findings: true
-      }
+        findings: true,
+      },
     });
 
     return audit;
@@ -93,12 +93,12 @@ export class AuditService {
   }) {
     const audit = await prisma.audit.findUnique({
       where: { id: data.auditId },
-      include: { findings: true }
+      include: { findings: true },
     });
 
-    if (!audit) throw new Error('Audit not found');
+    if (!audit) throw new Error("Audit not found");
 
-    const findingNumber = `${audit.auditNumber}-F${(audit.findings.length + 1).toString().padStart(3, '0')}`;
+    const findingNumber = `${audit.auditNumber}-F${(audit.findings.length + 1).toString().padStart(3, "0")}`;
 
     const finding = await prisma.auditFinding.create({
       data: {
@@ -110,10 +110,10 @@ export class AuditService {
         description: data.description,
         evidence: data.evidence,
         requirement: data.requirement,
-        status: 'OPEN',
+        status: "OPEN",
         responsiblePerson: data.responsiblePerson,
-        dueDate: data.dueDate
-      }
+        dueDate: data.dueDate,
+      },
     });
 
     return finding;
@@ -125,7 +125,7 @@ export class AuditService {
   static async linkFindingToNCR(findingId: string, ncrId: string) {
     return await prisma.auditFinding.update({
       where: { id: findingId },
-      data: { ncrId }
+      data: { ncrId },
     });
   }
 
@@ -135,7 +135,7 @@ export class AuditService {
   static async linkFindingToCAPA(findingId: string, capaId: string) {
     return await prisma.auditFinding.update({
       where: { id: findingId },
-      data: { capaId }
+      data: { capaId },
     });
   }
 
@@ -146,59 +146,76 @@ export class AuditService {
     return await prisma.auditFinding.update({
       where: { id: findingId },
       data: {
-        status: 'CLOSED',
+        status: "CLOSED",
         closedDate: new Date(),
-        closureNotes
-      }
+        closureNotes,
+      },
     });
   }
 
   /**
    * Update audit status
    */
-  static async updateAuditStatus(auditId: string, status: string, summary?: string, recommendations?: string) {
+  static async updateAuditStatus(
+    auditId: string,
+    status: string,
+    summary?: string,
+    recommendations?: string,
+  ) {
     return await prisma.audit.update({
       where: { id: auditId },
       data: {
         status: status as any,
         summary,
-        recommendations
-      }
+        recommendations,
+      },
     });
   }
 
   /**
    * Get audit schedule (overdue audits)
    */
-  static async getAuditSchedule(organizationId: string): Promise<AuditSchedule[]> {
+  static async getAuditSchedule(
+    organizationId: string,
+  ): Promise<AuditSchedule[]> {
     const audits = await prisma.audit.findMany({
       where: { organizationId },
-      orderBy: { auditDate: 'desc' }
+      orderBy: { auditDate: "desc" },
     });
 
     // Group by type and calculate next audit dates
-    const auditTypes = ['INTERNAL', 'SUPPLIER', 'CUSTOMER', 'REGULATORY', 'CERTIFICATION'];
+    const auditTypes = [
+      "INTERNAL",
+      "SUPPLIER",
+      "CUSTOMER",
+      "REGULATORY",
+      "CERTIFICATION",
+    ];
     const schedule: AuditSchedule[] = [];
 
     for (const type of auditTypes) {
-      const typeAudits = audits.filter(a => a.type === type);
+      const typeAudits = audits.filter((a) => a.type === type);
       const lastAudit = typeAudits[0];
 
-      let requiredFrequency = 'ANNUAL';
+      let requiredFrequency = "ANNUAL";
       let monthsToAdd = 12;
 
       // Determine frequency based on type
-      if (type === 'INTERNAL') {
-        requiredFrequency = 'SEMI_ANNUAL';
+      if (type === "INTERNAL") {
+        requiredFrequency = "SEMI_ANNUAL";
         monthsToAdd = 6;
-      } else if (type === 'SUPPLIER') {
-        requiredFrequency = 'ANNUAL';
+      } else if (type === "SUPPLIER") {
+        requiredFrequency = "ANNUAL";
         monthsToAdd = 12;
       }
 
       const lastAuditDate = lastAudit?.auditDate;
-      const nextAuditDate = lastAuditDate 
-        ? new Date(new Date(lastAuditDate).setMonth(new Date(lastAuditDate).getMonth() + monthsToAdd))
+      const nextAuditDate = lastAuditDate
+        ? new Date(
+            new Date(lastAuditDate).setMonth(
+              new Date(lastAuditDate).getMonth() + monthsToAdd,
+            ),
+          )
         : new Date(); // If no audit yet, due now
 
       const overdue = nextAuditDate < new Date();
@@ -208,7 +225,7 @@ export class AuditService {
         requiredFrequency,
         lastAuditDate,
         nextAuditDate,
-        overdue
+        overdue,
       });
     }
 
@@ -220,15 +237,19 @@ export class AuditService {
    */
   static async getOverdueAudits(organizationId: string) {
     const schedule = await this.getAuditSchedule(organizationId);
-    return schedule.filter(s => s.overdue);
+    return schedule.filter((s) => s.overdue);
   }
 
   /**
    * Get audit metrics
    */
-  static async getAuditMetrics(organizationId: string, startDate?: Date, endDate?: Date): Promise<AuditMetrics> {
+  static async getAuditMetrics(
+    organizationId: string,
+    startDate?: Date,
+    endDate?: Date,
+  ): Promise<AuditMetrics> {
     const where: any = { organizationId };
-    
+
     if (startDate || endDate) {
       where.auditDate = {};
       if (startDate) where.auditDate.gte = startDate;
@@ -238,33 +259,36 @@ export class AuditService {
     const audits = await prisma.audit.findMany({
       where,
       include: {
-        findings: true
-      }
+        findings: true,
+      },
     });
 
     const findings = await prisma.auditFinding.findMany({
       where: {
-        audit: where
-      }
+        audit: where,
+      },
     });
 
     const totalAudits = audits.length;
-    const plannedAudits = audits.filter(a => a.status === 'PLANNED').length;
-    const completedAudits = audits.filter(a => a.status === 'COMPLETED' || a.status === 'CLOSED').length;
+    const plannedAudits = audits.filter((a) => a.status === "PLANNED").length;
+    const completedAudits = audits.filter(
+      (a) => a.status === "COMPLETED" || a.status === "CLOSED",
+    ).length;
 
     // Check overdue planned audits
-    const overdueAudits = audits.filter(a => 
-      a.status === 'PLANNED' && a.auditDate < new Date()
+    const overdueAudits = audits.filter(
+      (a) => a.status === "PLANNED" && a.auditDate < new Date(),
     ).length;
 
     const totalFindings = findings.length;
     const criticalFindings = 0; // No CRITICAL in FindingSeverity enum - only MAJOR, MINOR, OBSERVATION
-    const majorFindings = findings.filter(f => f.severity === 'MAJOR').length;
-    const minorFindings = findings.filter(f => f.severity === 'MINOR').length;
-    const openFindings = findings.filter(f => f.status === 'OPEN').length;
-    const closedFindings = findings.filter(f => f.status === 'CLOSED').length;
+    const majorFindings = findings.filter((f) => f.severity === "MAJOR").length;
+    const minorFindings = findings.filter((f) => f.severity === "MINOR").length;
+    const openFindings = findings.filter((f) => f.status === "OPEN").length;
+    const closedFindings = findings.filter((f) => f.status === "CLOSED").length;
 
-    const averageFindingsPerAudit = totalAudits > 0 ? totalFindings / totalAudits : 0;
+    const averageFindingsPerAudit =
+      totalAudits > 0 ? totalFindings / totalAudits : 0;
 
     return {
       totalAudits,
@@ -277,7 +301,7 @@ export class AuditService {
       minorFindings,
       openFindings,
       closedFindings,
-      averageFindingsPerAudit: Math.round(averageFindingsPerAudit * 10) / 10
+      averageFindingsPerAudit: Math.round(averageFindingsPerAudit * 10) / 10,
     };
   }
 
@@ -289,11 +313,11 @@ export class AuditService {
       where: { supplierId },
       include: {
         findings: true,
-        supplier: true
+        supplier: true,
       },
       orderBy: {
-        auditDate: 'desc'
-      }
+        auditDate: "desc",
+      },
     });
   }
 
@@ -306,18 +330,18 @@ export class AuditService {
       include: {
         findings: {
           where: {
-            status: 'OPEN'
-          }
-        }
-      }
+            status: "OPEN",
+          },
+        },
+      },
     });
 
-    return audits.flatMap(audit => 
-      audit.findings.map(finding => ({
+    return audits.flatMap((audit) =>
+      audit.findings.map((finding) => ({
         ...finding,
         auditNumber: audit.auditNumber,
-        auditType: audit.type
-      }))
+        auditType: audit.type,
+      })),
     );
   }
 
@@ -326,28 +350,31 @@ export class AuditService {
    */
   static async getOverdueFindings(organizationId: string) {
     const now = new Date();
-    
+
     const audits = await prisma.audit.findMany({
       where: { organizationId },
       include: {
         findings: {
           where: {
-            status: 'OPEN',
+            status: "OPEN",
             dueDate: {
-              lt: now
-            }
-          }
-        }
-      }
+              lt: now,
+            },
+          },
+        },
+      },
     });
 
-    return audits.flatMap(audit => 
-      audit.findings.map(finding => ({
+    return audits.flatMap((audit) =>
+      audit.findings.map((finding) => ({
         ...finding,
         auditNumber: audit.auditNumber,
         auditType: audit.type,
-        daysOverdue: Math.floor((now.getTime() - (finding.dueDate?.getTime() || 0)) / (1000 * 60 * 60 * 24))
-      }))
+        daysOverdue: Math.floor(
+          (now.getTime() - (finding.dueDate?.getTime() || 0)) /
+            (1000 * 60 * 60 * 24),
+        ),
+      })),
     );
   }
 
@@ -360,36 +387,134 @@ export class AuditService {
     category: string;
   }> {
     // ISO 9001:2015 checklist
-    if (standard === 'ISO 9001:2015') {
+    if (standard === "ISO 9001:2015") {
       return [
-        { clause: '4.1', requirement: 'Understanding the organization and its context', category: 'CONTEXT' },
-        { clause: '4.2', requirement: 'Understanding the needs and expectations of interested parties', category: 'CONTEXT' },
-        { clause: '4.3', requirement: 'Determining the scope of the quality management system', category: 'CONTEXT' },
-        { clause: '4.4', requirement: 'Quality management system and its processes', category: 'CONTEXT' },
-        { clause: '5.1', requirement: 'Leadership and commitment', category: 'LEADERSHIP' },
-        { clause: '5.2', requirement: 'Quality policy', category: 'LEADERSHIP' },
-        { clause: '5.3', requirement: 'Organizational roles, responsibilities and authorities', category: 'LEADERSHIP' },
-        { clause: '6.1', requirement: 'Actions to address risks and opportunities', category: 'PLANNING' },
-        { clause: '6.2', requirement: 'Quality objectives and planning to achieve them', category: 'PLANNING' },
-        { clause: '6.3', requirement: 'Planning of changes', category: 'PLANNING' },
-        { clause: '7.1', requirement: 'Resources', category: 'SUPPORT' },
-        { clause: '7.2', requirement: 'Competence', category: 'SUPPORT' },
-        { clause: '7.3', requirement: 'Awareness', category: 'SUPPORT' },
-        { clause: '7.4', requirement: 'Communication', category: 'SUPPORT' },
-        { clause: '7.5', requirement: 'Documented information', category: 'SUPPORT' },
-        { clause: '8.1', requirement: 'Operational planning and control', category: 'OPERATION' },
-        { clause: '8.2', requirement: 'Requirements for products and services', category: 'OPERATION' },
-        { clause: '8.3', requirement: 'Design and development', category: 'OPERATION' },
-        { clause: '8.4', requirement: 'Control of externally provided processes, products and services', category: 'OPERATION' },
-        { clause: '8.5', requirement: 'Production and service provision', category: 'OPERATION' },
-        { clause: '8.6', requirement: 'Release of products and services', category: 'OPERATION' },
-        { clause: '8.7', requirement: 'Control of nonconforming outputs', category: 'OPERATION' },
-        { clause: '9.1', requirement: 'Monitoring, measurement, analysis and evaluation', category: 'PERFORMANCE' },
-        { clause: '9.2', requirement: 'Internal audit', category: 'PERFORMANCE' },
-        { clause: '9.3', requirement: 'Management review', category: 'PERFORMANCE' },
-        { clause: '10.1', requirement: 'General (Improvement)', category: 'IMPROVEMENT' },
-        { clause: '10.2', requirement: 'Nonconformity and corrective action', category: 'IMPROVEMENT' },
-        { clause: '10.3', requirement: 'Continual improvement', category: 'IMPROVEMENT' }
+        {
+          clause: "4.1",
+          requirement: "Understanding the organization and its context",
+          category: "CONTEXT",
+        },
+        {
+          clause: "4.2",
+          requirement:
+            "Understanding the needs and expectations of interested parties",
+          category: "CONTEXT",
+        },
+        {
+          clause: "4.3",
+          requirement: "Determining the scope of the quality management system",
+          category: "CONTEXT",
+        },
+        {
+          clause: "4.4",
+          requirement: "Quality management system and its processes",
+          category: "CONTEXT",
+        },
+        {
+          clause: "5.1",
+          requirement: "Leadership and commitment",
+          category: "LEADERSHIP",
+        },
+        {
+          clause: "5.2",
+          requirement: "Quality policy",
+          category: "LEADERSHIP",
+        },
+        {
+          clause: "5.3",
+          requirement: "Organizational roles, responsibilities and authorities",
+          category: "LEADERSHIP",
+        },
+        {
+          clause: "6.1",
+          requirement: "Actions to address risks and opportunities",
+          category: "PLANNING",
+        },
+        {
+          clause: "6.2",
+          requirement: "Quality objectives and planning to achieve them",
+          category: "PLANNING",
+        },
+        {
+          clause: "6.3",
+          requirement: "Planning of changes",
+          category: "PLANNING",
+        },
+        { clause: "7.1", requirement: "Resources", category: "SUPPORT" },
+        { clause: "7.2", requirement: "Competence", category: "SUPPORT" },
+        { clause: "7.3", requirement: "Awareness", category: "SUPPORT" },
+        { clause: "7.4", requirement: "Communication", category: "SUPPORT" },
+        {
+          clause: "7.5",
+          requirement: "Documented information",
+          category: "SUPPORT",
+        },
+        {
+          clause: "8.1",
+          requirement: "Operational planning and control",
+          category: "OPERATION",
+        },
+        {
+          clause: "8.2",
+          requirement: "Requirements for products and services",
+          category: "OPERATION",
+        },
+        {
+          clause: "8.3",
+          requirement: "Design and development",
+          category: "OPERATION",
+        },
+        {
+          clause: "8.4",
+          requirement:
+            "Control of externally provided processes, products and services",
+          category: "OPERATION",
+        },
+        {
+          clause: "8.5",
+          requirement: "Production and service provision",
+          category: "OPERATION",
+        },
+        {
+          clause: "8.6",
+          requirement: "Release of products and services",
+          category: "OPERATION",
+        },
+        {
+          clause: "8.7",
+          requirement: "Control of nonconforming outputs",
+          category: "OPERATION",
+        },
+        {
+          clause: "9.1",
+          requirement: "Monitoring, measurement, analysis and evaluation",
+          category: "PERFORMANCE",
+        },
+        {
+          clause: "9.2",
+          requirement: "Internal audit",
+          category: "PERFORMANCE",
+        },
+        {
+          clause: "9.3",
+          requirement: "Management review",
+          category: "PERFORMANCE",
+        },
+        {
+          clause: "10.1",
+          requirement: "General (Improvement)",
+          category: "IMPROVEMENT",
+        },
+        {
+          clause: "10.2",
+          requirement: "Nonconformity and corrective action",
+          category: "IMPROVEMENT",
+        },
+        {
+          clause: "10.3",
+          requirement: "Continual improvement",
+          category: "IMPROVEMENT",
+        },
       ];
     }
 

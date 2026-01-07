@@ -1,19 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
-import { put } from '@vercel/blob';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
+import { put } from "@vercel/blob";
 
 const uploadDocumentSchema = z.object({
   documentType: z.enum([
-    'BILL_OF_LADING',
-    'MANIFEST',
-    'PERMIT',
-    'INSURANCE',
-    'CUSTOMS',
-    'INSPECTION',
-    'OTHER',
+    "BILL_OF_LADING",
+    "MANIFEST",
+    "PERMIT",
+    "INSURANCE",
+    "CUSTOMS",
+    "INSPECTION",
+    "OTHER",
   ]),
   documentNumber: z.string().optional(),
   expiryDate: z.string().datetime().optional(),
@@ -29,12 +29,12 @@ const verifyDocumentSchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const gateEntryId = params.id;
@@ -48,19 +48,22 @@ export async function POST(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     // Parse multipart form data
     const formData = await req.formData();
-    const file = formData.get('file') as File;
-    const documentType = formData.get('documentType') as string;
-    const documentNumber = formData.get('documentNumber') as string | null;
-    const expiryDate = formData.get('expiryDate') as string | null;
-    const notes = formData.get('notes') as string | null;
+    const file = formData.get("file") as File;
+    const documentType = formData.get("documentType") as string;
+    const documentNumber = formData.get("documentNumber") as string | null;
+    const expiryDate = formData.get("expiryDate") as string | null;
+    const notes = formData.get("notes") as string | null;
 
     if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+      return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
     const data = uploadDocumentSchema.parse({
@@ -75,8 +78,8 @@ export async function POST(
       `gate-documents/${gateEntryId}/${Date.now()}-${file.name}`,
       file,
       {
-        access: 'public',
-      }
+        access: "public",
+      },
     );
 
     // Create document record
@@ -97,27 +100,27 @@ export async function POST(
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error uploading document:', error);
+    console.error("Error uploading document:", error);
     return NextResponse.json(
-      { error: 'Failed to upload document' },
-      { status: 500 }
+      { error: "Failed to upload document" },
+      { status: 500 },
     );
   }
 }
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const gateEntryId = params.id;
@@ -131,32 +134,35 @@ export async function GET(
     });
 
     if (!gateEntry) {
-      return NextResponse.json({ error: 'Gate entry not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
-    const documentType = searchParams.get('documentType');
-    const verified = searchParams.get('verified');
+    const documentType = searchParams.get("documentType");
+    const verified = searchParams.get("verified");
 
     const where: any = { gateEntryId };
     if (documentType) {
       where.documentType = documentType;
     }
     if (verified !== null) {
-      where.verified = verified === 'true';
+      where.verified = verified === "true";
     }
 
     const documents = await prisma.gateDocument.findMany({
       where,
-      orderBy: { uploadedAt: 'desc' },
+      orderBy: { uploadedAt: "desc" },
     });
 
     return NextResponse.json({ documents });
   } catch (error) {
-    console.error('Error fetching documents:', error);
+    console.error("Error fetching documents:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch documents' },
-      { status: 500 }
+      { error: "Failed to fetch documents" },
+      { status: 500 },
     );
   }
 }

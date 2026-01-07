@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -9,8 +9,15 @@ const createDashboardSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   slug: z.string().min(1, "Slug is required"),
-  dashboardType: z.enum(['OVERVIEW', 'INVENTORY', 'SALES', 'WAREHOUSE', 'ANALYTICS', 'CUSTOM']),
-  category: z.enum(['OPERATIONS', 'SALES', 'FINANCE', 'INVENTORY']).optional(),
+  dashboardType: z.enum([
+    "OVERVIEW",
+    "INVENTORY",
+    "SALES",
+    "WAREHOUSE",
+    "ANALYTICS",
+    "CUSTOM",
+  ]),
+  category: z.enum(["OPERATIONS", "SALES", "FINANCE", "INVENTORY"]).optional(),
   layout: z.record(z.any()).optional(),
   widgets: z.array(z.record(z.any())).optional(),
   isPublic: z.boolean().default(false),
@@ -45,7 +52,7 @@ export async function GET(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -64,13 +71,13 @@ export async function GET(request: Request) {
     if (dashboardType) where.dashboardType = dashboardType;
     if (category) where.category = category;
     if (isActive !== null && isActive !== undefined) {
-      where.isActive = isActive === 'true';
+      where.isActive = isActive === "true";
     }
     if (search) {
       where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { description: { contains: search, mode: 'insensitive' } },
-        { slug: { contains: search, mode: 'insensitive' } },
+        { name: { contains: search, mode: "insensitive" } },
+        { description: { contains: search, mode: "insensitive" } },
+        { slug: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -85,7 +92,7 @@ export async function GET(request: Request) {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ dashboards });
@@ -93,7 +100,7 @@ export async function GET(request: Request) {
     console.error("Error fetching dashboards:", error);
     return NextResponse.json(
       { error: "Failed to fetch dashboards" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -119,7 +126,7 @@ export async function POST(request: Request) {
     if (!user?.organizationMemberships?.[0]?.organizationId) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -139,7 +146,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Dashboard slug already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -166,13 +173,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating dashboard:", error);
     return NextResponse.json(
       { error: "Failed to create dashboard" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

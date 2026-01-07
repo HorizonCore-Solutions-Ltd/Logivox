@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -14,7 +14,7 @@ const countItemSchema = z.object({
 // POST /api/cycle-counts/[id]/items/[itemId]/count - Record item count
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string; itemId: string } }
+  { params }: { params: { id: string; itemId: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -29,7 +29,7 @@ export async function POST(
     if (!membership) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -43,14 +43,14 @@ export async function POST(
     if (!cycleCount) {
       return NextResponse.json(
         { error: "Cycle count not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (cycleCount.status !== "IN_PROGRESS") {
       return NextResponse.json(
         { error: "Cycle count must be in progress to record counts" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -64,14 +64,14 @@ export async function POST(
     if (!item) {
       return NextResponse.json(
         { error: "Cycle count item not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (item.isCounted) {
       return NextResponse.json(
         { error: "Item has already been counted" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -178,14 +178,14 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error recording item count:", error);
     return NextResponse.json(
       { error: "Failed to record item count" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

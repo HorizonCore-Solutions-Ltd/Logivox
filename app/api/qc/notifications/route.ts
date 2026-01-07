@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import nodemailer from 'nodemailer';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import nodemailer from "nodemailer";
 
 // Email configuration
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
+  host: process.env.SMTP_HOST || "smtp.gmail.com",
+  port: parseInt(process.env.SMTP_PORT || "587"),
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     let htmlContent: string;
 
     switch (type) {
-      case 'ncr_created':
+      case "ncr_created":
         const ncr = await prisma.nonConformanceReport.findUnique({
           where: { id },
         });
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
         htmlContent = generateNCREmail(ncr);
         break;
 
-      case 'capa_overdue':
+      case "capa_overdue":
         const capa = await prisma.correctivePreventiveAction.findUnique({
           where: { id },
         });
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         htmlContent = generateCAPAOverdueEmail(capa);
         break;
 
-      case 'hold_released':
+      case "hold_released":
         const hold = await prisma.qualityHold.findUnique({
           where: { id },
         });
@@ -47,23 +47,23 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
 
     // Send email
     await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@flowstock.com',
-      to: recipients.join(', '),
+      from: process.env.SMTP_FROM || "noreply@flowstock.com",
+      to: recipients.join(", "),
       subject,
       html: htmlContent,
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Email notification error:', error);
+    console.error("Email notification error:", error);
     return NextResponse.json(
-      { error: 'Failed to send notification' },
-      { status: 500 }
+      { error: "Failed to send notification" },
+      { status: 500 },
     );
   }
 }
@@ -215,7 +215,7 @@ export async function GET() {
           lt: new Date(),
         },
         status: {
-          notIn: ['COMPLETED', 'VERIFIED', 'CANCELLED'],
+          notIn: ["COMPLETED", "VERIFIED", "CANCELLED"],
         },
       },
     });
@@ -223,10 +223,10 @@ export async function GET() {
     for (const capa of overdueCAPAs) {
       // Send notification
       await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/qc/notifications`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: 'capa_overdue',
+          type: "capa_overdue",
           id: capa.id,
           recipients: [capa.responsiblePerson], // In production, look up email
         }),
@@ -238,10 +238,10 @@ export async function GET() {
       notificationsSent: overdueCAPAs.length,
     });
   } catch (error) {
-    console.error('Cron job error:', error);
+    console.error("Cron job error:", error);
     return NextResponse.json(
-      { error: 'Failed to process notifications' },
-      { status: 500 }
+      { error: "Failed to process notifications" },
+      { status: 500 },
     );
   }
 }

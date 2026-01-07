@@ -26,18 +26,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  PlayCircle, 
-  Package, 
-  MapPin, 
-  Barcode, 
+import {
+  PlayCircle,
+  Package,
+  MapPin,
+  Barcode,
   Hash,
   CheckCircle2,
   Clock,
   User,
   Building2,
   Calendar,
-  ListChecks
+  ListChecks,
 } from "lucide-react";
 
 interface PickListItem {
@@ -106,7 +106,7 @@ export default function PickListDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const [pickList, setPickList] = useState<PickList | null>(null);
   const [loading, setLoading] = useState(true);
   const [pickingForm, setPickingForm] = useState<PickingForm | null>(null);
@@ -121,7 +121,7 @@ export default function PickListDetailPage() {
     try {
       const response = await fetch(`/api/pick-lists/${params.id}`);
       if (!response.ok) throw new Error("Failed to fetch pick list");
-      
+
       const data = await response.json();
       setPickList(data);
     } catch (error) {
@@ -139,16 +139,16 @@ export default function PickListDetailPage() {
     setProcessing(true);
     try {
       const response = await fetch(`/api/pick-lists/${params.id}/start`, {
-        method: "POST"
+        method: "POST",
       });
-      
+
       if (!response.ok) throw new Error("Failed to start picking");
-      
+
       toast({
         title: "Success",
         description: "Pick list started successfully",
       });
-      
+
       setShowStartDialog(false);
       fetchPickList();
     } catch (error) {
@@ -163,7 +163,7 @@ export default function PickListDetailPage() {
   };
 
   const handlePickItem = async (itemId: string) => {
-    const item = pickList?.items.find(i => i.id === itemId);
+    const item = pickList?.items.find((i) => i.id === itemId);
     if (!item) return;
 
     setPickingForm({
@@ -182,23 +182,23 @@ export default function PickListDetailPage() {
       const response = await fetch(`/api/pick-lists/${params.id}/pick-item`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(pickingForm)
+        body: JSON.stringify(pickingForm),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to pick item");
       }
-      
+
       const data = await response.json();
-      
+
       toast({
         title: "Success",
-        description: data.pickListCompleted 
+        description: data.pickListCompleted
           ? "Pick list completed! All items picked."
           : "Item picked successfully",
       });
-      
+
       setPickingForm(null);
       fetchPickList();
     } catch (error: any) {
@@ -254,7 +254,8 @@ export default function PickListDetailPage() {
             {pickList.pickListNumber}
           </h1>
           <p className="text-gray-600 mt-1">
-            Sales Order: {pickList.salesOrder.soNumber} - {pickList.salesOrder.customer.name}
+            Sales Order: {pickList.salesOrder.soNumber} -{" "}
+            {pickList.salesOrder.customer.name}
           </p>
         </div>
         <div className="flex gap-2">
@@ -265,7 +266,11 @@ export default function PickListDetailPage() {
             </Button>
           )}
           {pickList.status === "PICKED" && (
-            <Button onClick={() => router.push(`/dashboard/sales-orders/${pickList.salesOrder.id}`)}>
+            <Button
+              onClick={() =>
+                router.push(`/dashboard/sales-orders/${pickList.salesOrder.id}`)
+              }
+            >
               View Sales Order
             </Button>
           )}
@@ -300,7 +305,8 @@ export default function PickListDetailPage() {
               {pickList.statistics.progressPercent}%
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              {pickList.statistics.totalQuantityPicked} / {pickList.statistics.totalQuantityToPick} units
+              {pickList.statistics.totalQuantityPicked} /{" "}
+              {pickList.statistics.totalQuantityToPick} units
             </p>
           </CardContent>
         </Card>
@@ -314,7 +320,8 @@ export default function PickListDetailPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {pickList.statistics.completedItems} / {pickList.statistics.totalItems}
+              {pickList.statistics.completedItems} /{" "}
+              {pickList.statistics.totalItems}
             </div>
             <p className="text-xs text-gray-500 mt-1">Items picked</p>
           </CardContent>
@@ -330,7 +337,11 @@ export default function PickListDetailPage() {
           <CardContent>
             <div className="text-2xl font-bold">{pickList.priority}</div>
             <p className="text-xs text-gray-500 mt-1">
-              {pickList.priority >= 8 ? "High" : pickList.priority >= 5 ? "Medium" : "Normal"}
+              {pickList.priority >= 8
+                ? "High"
+                : pickList.priority >= 5
+                  ? "Medium"
+                  : "Normal"}
             </p>
           </CardContent>
         </Card>
@@ -347,7 +358,9 @@ export default function PickListDetailPage() {
           </CardHeader>
           <CardContent>
             <p className="font-semibold">{pickList.warehouse.name}</p>
-            <p className="text-sm text-gray-500">Code: {pickList.warehouse.code}</p>
+            <p className="text-sm text-gray-500">
+              Code: {pickList.warehouse.code}
+            </p>
           </CardContent>
         </Card>
 
@@ -362,7 +375,9 @@ export default function PickListDetailPage() {
             {pickList.assignedTo ? (
               <>
                 <p className="font-semibold">{pickList.assignedTo.name}</p>
-                <p className="text-sm text-gray-500">{pickList.assignedTo.email}</p>
+                <p className="text-sm text-gray-500">
+                  {pickList.assignedTo.email}
+                </p>
               </>
             ) : (
               <p className="text-sm text-gray-500">Not assigned</p>
@@ -478,13 +493,17 @@ export default function PickListDetailPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Start Picking?</AlertDialogTitle>
             <AlertDialogDescription>
-              This will mark the pick list as IN_PROGRESS and you can begin picking items.
-              The pick list will be assigned to you if not already assigned.
+              This will mark the pick list as IN_PROGRESS and you can begin
+              picking items. The pick list will be assigned to you if not
+              already assigned.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={processing}>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleStartPicking} disabled={processing}>
+            <AlertDialogAction
+              onClick={handleStartPicking}
+              disabled={processing}
+            >
               {processing ? "Starting..." : "Start Picking"}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -492,7 +511,10 @@ export default function PickListDetailPage() {
       </AlertDialog>
 
       {/* Pick Item Dialog */}
-      <AlertDialog open={!!pickingForm} onOpenChange={() => setPickingForm(null)}>
+      <AlertDialog
+        open={!!pickingForm}
+        onOpenChange={() => setPickingForm(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Pick Item</AlertDialogTitle>
@@ -500,7 +522,7 @@ export default function PickListDetailPage() {
               Record the quantity picked for this item.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          
+
           {pickingForm && (
             <div className="space-y-4 py-4">
               <div>
@@ -510,10 +532,12 @@ export default function PickListDetailPage() {
                   type="number"
                   min="1"
                   value={pickingForm.quantityPicked}
-                  onChange={(e) => setPickingForm({
-                    ...pickingForm,
-                    quantityPicked: parseInt(e.target.value) || 0
-                  })}
+                  onChange={(e) =>
+                    setPickingForm({
+                      ...pickingForm,
+                      quantityPicked: parseInt(e.target.value) || 0,
+                    })
+                  }
                 />
               </div>
 
@@ -524,10 +548,12 @@ export default function PickListDetailPage() {
                   <Input
                     id="binLocation"
                     value={pickingForm.binLocation || ""}
-                    onChange={(e) => setPickingForm({
-                      ...pickingForm,
-                      binLocation: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setPickingForm({
+                        ...pickingForm,
+                        binLocation: e.target.value,
+                      })
+                    }
                     placeholder="e.g., A-01-02"
                   />
                 </div>
@@ -540,10 +566,12 @@ export default function PickListDetailPage() {
                   <Input
                     id="batchNumber"
                     value={pickingForm.batchNumber || ""}
-                    onChange={(e) => setPickingForm({
-                      ...pickingForm,
-                      batchNumber: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setPickingForm({
+                        ...pickingForm,
+                        batchNumber: e.target.value,
+                      })
+                    }
                     placeholder="e.g., BATCH-2025-001"
                   />
                 </div>

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/task-automations/[id]/executions - Get automation executions
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -46,7 +46,7 @@ export async function GET(
         acc[item.status] = item._count;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     return NextResponse.json({
@@ -63,7 +63,7 @@ export async function GET(
     console.error("Error fetching executions:", error);
     return NextResponse.json(
       { error: "Failed to fetch executions" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

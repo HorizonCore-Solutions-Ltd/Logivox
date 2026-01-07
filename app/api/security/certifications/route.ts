@@ -1,13 +1,24 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const CreateCertificationSchema = z.object({
   guardId: z.string(),
   guardName: z.string(),
-  certificationType: z.enum(['SIA_LICENSE', 'FIRST_AID', 'FIRE_SAFETY', 'CPR', 'DRIVERS_LICENSE', 'FORKLIFT', 'CCTV_OPERATOR', 'CONFLICT_MANAGEMENT', 'HEALTH_SAFETY', 'OTHER']),
+  certificationType: z.enum([
+    "SIA_LICENSE",
+    "FIRST_AID",
+    "FIRE_SAFETY",
+    "CPR",
+    "DRIVERS_LICENSE",
+    "FORKLIFT",
+    "CCTV_OPERATOR",
+    "CONFLICT_MANAGEMENT",
+    "HEALTH_SAFETY",
+    "OTHER",
+  ]),
   certificationName: z.string(),
   certificationNumber: z.string().optional(),
   issuer: z.string().optional(),
@@ -22,7 +33,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const json = await req.json();
@@ -30,20 +41,25 @@ export async function POST(req: NextRequest) {
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     // Determine status based on expiry
-    let status: 'VALID' | 'EXPIRING_SOON' | 'EXPIRED' = 'VALID';
+    let status: "VALID" | "EXPIRING_SOON" | "EXPIRED" = "VALID";
     if (body.expiryDate) {
       const expiryDate = new Date(body.expiryDate);
       const now = new Date();
-      const daysUntilExpiry = Math.floor((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-      
+      const daysUntilExpiry = Math.floor(
+        (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
+      );
+
       if (daysUntilExpiry < 0) {
-        status = 'EXPIRED';
+        status = "EXPIRED";
       } else if (daysUntilExpiry <= 30) {
-        status = 'EXPIRING_SOON';
+        status = "EXPIRING_SOON";
       }
     }
 
@@ -66,11 +82,17 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(certification);
   } catch (error: any) {
-    console.error('Error creating certification:', error);
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 });
+    console.error("Error creating certification:", error);
+    if (error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -79,18 +101,21 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
-    const guardId = searchParams.get('guardId');
-    const status = searchParams.get('status');
-    const type = searchParams.get('type');
+    const guardId = searchParams.get("guardId");
+    const status = searchParams.get("status");
+    const type = searchParams.get("type");
 
     const certifications = await prisma.guardCertification.findMany({
       where: {
@@ -99,15 +124,15 @@ export async function GET(req: NextRequest) {
         ...(status && { status: status as any }),
         ...(type && { certificationType: type as any }),
       },
-      orderBy: [
-        { expiryDate: 'asc' },
-        { guardName: 'asc' },
-      ],
+      orderBy: [{ expiryDate: "asc" }, { guardName: "asc" }],
     });
 
     return NextResponse.json(certifications);
   } catch (error: any) {
-    console.error('Error listing certifications:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error listing certifications:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

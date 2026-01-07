@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { CalibrationService } from '@/lib/services/qc/calibration.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { CalibrationService } from "@/lib/services/qc/calibration.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();

@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
+import * as React from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import {
   TrendingUp,
   TrendingDown,
@@ -14,8 +20,8 @@ import {
   Activity,
   ArrowUpRight,
   ArrowDownRight,
-  MoreVertical
-} from "lucide-react"
+  MoreVertical,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const stats = [
@@ -25,7 +31,7 @@ export default function DashboardPage() {
       change: "+12.5%",
       trend: "up",
       icon: DollarSign,
-      description: "vs last month"
+      description: "vs last month",
     },
     {
       title: "Active Stock Items",
@@ -33,7 +39,7 @@ export default function DashboardPage() {
       change: "+8.2%",
       trend: "up",
       icon: Package,
-      description: "across all locations"
+      description: "across all locations",
     },
     {
       title: "Low Stock Alerts",
@@ -41,7 +47,7 @@ export default function DashboardPage() {
       change: "-23.1%",
       trend: "down",
       icon: AlertTriangle,
-      description: "requires attention"
+      description: "requires attention",
     },
     {
       title: "Stock Turnover Rate",
@@ -49,9 +55,9 @@ export default function DashboardPage() {
       change: "+0.3",
       trend: "up",
       icon: Activity,
-      description: "per quarter"
-    }
-  ]
+      description: "per quarter",
+    },
+  ];
 
   const recentBookings = [
     {
@@ -60,7 +66,7 @@ export default function DashboardPage() {
       items: 324,
       value: "$45,280",
       status: "confirmed",
-      date: "2025-10-14"
+      date: "2025-10-14",
     },
     {
       id: "BK-1002",
@@ -68,7 +74,7 @@ export default function DashboardPage() {
       items: 156,
       value: "$23,450",
       status: "pending",
-      date: "2025-10-14"
+      date: "2025-10-14",
     },
     {
       id: "BK-1003",
@@ -76,7 +82,7 @@ export default function DashboardPage() {
       items: 892,
       value: "$108,920",
       status: "confirmed",
-      date: "2025-10-13"
+      date: "2025-10-13",
     },
     {
       id: "BK-1004",
@@ -84,7 +90,7 @@ export default function DashboardPage() {
       items: 67,
       value: "$8,340",
       status: "processing",
-      date: "2025-10-13"
+      date: "2025-10-13",
     },
     {
       id: "BK-1005",
@@ -92,27 +98,57 @@ export default function DashboardPage() {
       items: 445,
       value: "$67,890",
       status: "confirmed",
-      date: "2025-10-12"
-    }
-  ]
+      date: "2025-10-12",
+    },
+  ];
 
   const lowStockItems = [
-    { sku: "SKU-2834", name: "Industrial Bearings", current: 45, min: 100, status: "critical" },
-    { sku: "SKU-1923", name: "Hydraulic Pumps", current: 78, min: 150, status: "low" },
-    { sku: "SKU-4512", name: "Control Valves", current: 112, min: 200, status: "low" },
-    { sku: "SKU-7834", name: "Safety Sensors", current: 23, min: 75, status: "critical" }
-  ]
+    {
+      sku: "SKU-2834",
+      name: "Industrial Bearings",
+      current: 45,
+      min: 100,
+      status: "critical",
+    },
+    {
+      sku: "SKU-1923",
+      name: "Hydraulic Pumps",
+      current: 78,
+      min: 150,
+      status: "low",
+    },
+    {
+      sku: "SKU-4512",
+      name: "Control Valves",
+      current: 112,
+      min: 200,
+      status: "low",
+    },
+    {
+      sku: "SKU-7834",
+      name: "Safety Sensors",
+      current: 23,
+      min: 75,
+      status: "critical",
+    },
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-      case "pending": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-      case "processing": return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-      case "critical": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
-      case "low": return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
-      default: return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+      case "confirmed":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "processing":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+      case "critical":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      case "low":
+        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200";
     }
-  }
+  };
 
   return (
     <DashboardSidebar>
@@ -126,22 +162,19 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline">
-              Download Report
-            </Button>
-            <Button>
-              New Booking
-            </Button>
+            <Button variant="outline">Download Report</Button>
+            <Button>New Booking</Button>
           </div>
         </div>
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {stats.map((stat) => {
-            const Icon = stat.icon
-            const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown
-            const trendColor = stat.trend === "up" ? "text-green-600" : "text-red-600"
-            
+            const Icon = stat.icon;
+            const TrendIcon = stat.trend === "up" ? TrendingUp : TrendingDown;
+            const trendColor =
+              stat.trend === "up" ? "text-green-600" : "text-red-600";
+
             return (
               <Card key={stat.title}>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -161,7 +194,7 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
 
@@ -172,7 +205,9 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Recent Stock Bookings</CardTitle>
-                  <CardDescription>Latest customer reservations</CardDescription>
+                  <CardDescription>
+                    Latest customer reservations
+                  </CardDescription>
                 </div>
                 <Button variant="ghost" size="sm">
                   View All
@@ -183,11 +218,17 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4">
                 {recentBookings.map((booking) => (
-                  <div key={booking.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={booking.id}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{booking.customer}</p>
-                        <Badge className={getStatusColor(booking.status)} variant="secondary">
+                        <Badge
+                          className={getStatusColor(booking.status)}
+                          variant="secondary"
+                        >
                           {booking.status}
                         </Badge>
                       </div>
@@ -225,11 +266,17 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4">
                 {lowStockItems.map((item) => (
-                  <div key={item.sku} className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors">
+                  <div
+                    key={item.sku}
+                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                  >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{item.name}</p>
-                        <Badge className={getStatusColor(item.status)} variant="secondary">
+                        <Badge
+                          className={getStatusColor(item.status)}
+                          variant="secondary"
+                        >
                           {item.status}
                         </Badge>
                       </div>
@@ -240,9 +287,12 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-red-600">{item.current} units</p>
+                      <p className="font-semibold text-red-600">
+                        {item.current} units
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        {Math.round((item.current / item.min) * 100)}% of minimum
+                        {Math.round((item.current / item.min) * 100)}% of
+                        minimum
                       </p>
                     </div>
                   </div>
@@ -256,7 +306,9 @@ export default function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Inventory Activity</CardTitle>
-            <CardDescription>Stock movements over the last 30 days</CardDescription>
+            <CardDescription>
+              Stock movements over the last 30 days
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] flex items-center justify-center border-2 border-dashed rounded-lg">
@@ -274,5 +326,5 @@ export default function DashboardPage() {
         </Card>
       </div>
     </DashboardSidebar>
-  )
+  );
 }

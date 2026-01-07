@@ -152,7 +152,8 @@ export default function StockAdjustmentsPage() {
             Stock Adjustments
           </h1>
           <p className="text-gray-600 mt-1">
-            Manage inventory quantity adjustments and corrections ({total} total)
+            Manage inventory quantity adjustments and corrections ({total}{" "}
+            total)
           </p>
         </div>
         <button
@@ -236,7 +237,8 @@ export default function StockAdjustmentsPage() {
           </div>
         ) : adjustments.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            No adjustments found. Create an adjustment to correct inventory quantities.
+            No adjustments found. Create an adjustment to correct inventory
+            quantities.
           </div>
         ) : (
           <>

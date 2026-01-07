@@ -3,20 +3,38 @@
  * Comprehensive system configuration interface
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Save, RefreshCw, AlertTriangle, CheckCircle2, Settings as SettingsIcon } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import {
+  Save,
+  RefreshCw,
+  AlertTriangle,
+  CheckCircle2,
+  Settings as SettingsIcon,
+} from "lucide-react";
 
 interface SystemSettings {
   general: {
@@ -79,7 +97,10 @@ export default function SystemSettingsPage() {
   const [settings, setSettings] = useState<SystemSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
   const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
@@ -88,13 +109,13 @@ export default function SystemSettingsPage() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/admin/settings');
+      const response = await fetch("/api/admin/settings");
       if (response.ok) {
         const data = await response.json();
         setSettings(data);
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to load settings' });
+      setMessage({ type: "error", text: "Failed to load settings" });
     } finally {
       setLoading(false);
     }
@@ -105,26 +126,30 @@ export default function SystemSettingsPage() {
     setMessage(null);
 
     try {
-      const response = await fetch('/api/admin/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
 
       if (response.ok) {
-        setMessage({ type: 'success', text: 'Settings saved successfully' });
+        setMessage({ type: "success", text: "Settings saved successfully" });
         setHasChanges(false);
       } else {
-        throw new Error('Failed to save settings');
+        throw new Error("Failed to save settings");
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to save settings' });
+      setMessage({ type: "error", text: "Failed to save settings" });
     } finally {
       setSaving(false);
     }
   };
 
-  const updateSetting = (category: keyof SystemSettings, key: string, value: any) => {
+  const updateSetting = (
+    category: keyof SystemSettings,
+    key: string,
+    value: any,
+  ) => {
     if (!settings) return;
 
     setSettings({
@@ -158,28 +183,21 @@ export default function SystemSettingsPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={fetchSettings}
-            disabled={saving}
-          >
+          <Button variant="outline" onClick={fetchSettings} disabled={saving}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Reset
           </Button>
-          <Button
-            onClick={saveSettings}
-            disabled={saving || !hasChanges}
-          >
+          <Button onClick={saveSettings} disabled={saving || !hasChanges}>
             <Save className="h-4 w-4 mr-2" />
-            {saving ? 'Saving...' : 'Save Changes'}
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
 
       {/* Status Message */}
       {message && (
-        <Alert variant={message.type === 'success' ? 'default' : 'destructive'}>
-          {message.type === 'success' ? (
+        <Alert variant={message.type === "success" ? "default" : "destructive"}>
+          {message.type === "success" ? (
             <CheckCircle2 className="h-4 w-4" />
           ) : (
             <AlertTriangle className="h-4 w-4" />
@@ -214,9 +232,7 @@ export default function SystemSettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>General Settings</CardTitle>
-              <CardDescription>
-                Basic application configuration
-              </CardDescription>
+              <CardDescription>Basic application configuration</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
@@ -225,7 +241,9 @@ export default function SystemSettingsPage() {
                   <Input
                     id="appName"
                     value={settings.general.appName}
-                    onChange={(e) => updateSetting('general', 'appName', e.target.value)}
+                    onChange={(e) =>
+                      updateSetting("general", "appName", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -234,7 +252,9 @@ export default function SystemSettingsPage() {
                     id="appUrl"
                     type="url"
                     value={settings.general.appUrl}
-                    onChange={(e) => updateSetting('general', 'appUrl', e.target.value)}
+                    onChange={(e) =>
+                      updateSetting("general", "appUrl", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -242,24 +262,36 @@ export default function SystemSettingsPage() {
                   <Input
                     id="companyName"
                     value={settings.general.companyName}
-                    onChange={(e) => updateSetting('general', 'companyName', e.target.value)}
+                    onChange={(e) =>
+                      updateSetting("general", "companyName", e.target.value)
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Timezone</Label>
                   <Select
                     value={settings.general.timezone}
-                    onValueChange={(value) => updateSetting('general', 'timezone', value)}
+                    onValueChange={(value) =>
+                      updateSetting("general", "timezone", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="UTC">UTC</SelectItem>
-                      <SelectItem value="America/New_York">Eastern Time</SelectItem>
-                      <SelectItem value="America/Chicago">Central Time</SelectItem>
-                      <SelectItem value="America/Denver">Mountain Time</SelectItem>
-                      <SelectItem value="America/Los_Angeles">Pacific Time</SelectItem>
+                      <SelectItem value="America/New_York">
+                        Eastern Time
+                      </SelectItem>
+                      <SelectItem value="America/Chicago">
+                        Central Time
+                      </SelectItem>
+                      <SelectItem value="America/Denver">
+                        Mountain Time
+                      </SelectItem>
+                      <SelectItem value="America/Los_Angeles">
+                        Pacific Time
+                      </SelectItem>
                       <SelectItem value="Europe/London">London</SelectItem>
                     </SelectContent>
                   </Select>
@@ -268,7 +300,9 @@ export default function SystemSettingsPage() {
                   <Label htmlFor="dateFormat">Date Format</Label>
                   <Select
                     value={settings.general.dateFormat}
-                    onValueChange={(value) => updateSetting('general', 'dateFormat', value)}
+                    onValueChange={(value) =>
+                      updateSetting("general", "dateFormat", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -284,7 +318,9 @@ export default function SystemSettingsPage() {
                   <Label htmlFor="currency">Currency</Label>
                   <Select
                     value={settings.general.currency}
-                    onValueChange={(value) => updateSetting('general', 'currency', value)}
+                    onValueChange={(value) =>
+                      updateSetting("general", "currency", value)
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -317,7 +353,9 @@ export default function SystemSettingsPage() {
                 <Switch
                   id="emailEnabled"
                   checked={settings.email.enabled}
-                  onCheckedChange={(checked) => updateSetting('email', 'enabled', checked)}
+                  onCheckedChange={(checked) =>
+                    updateSetting("email", "enabled", checked)
+                  }
                 />
               </div>
               {settings.email.enabled && (
@@ -327,7 +365,9 @@ export default function SystemSettingsPage() {
                     <Input
                       id="smtpHost"
                       value={settings.email.smtpHost}
-                      onChange={(e) => updateSetting('email', 'smtpHost', e.target.value)}
+                      onChange={(e) =>
+                        updateSetting("email", "smtpHost", e.target.value)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -336,7 +376,13 @@ export default function SystemSettingsPage() {
                       id="smtpPort"
                       type="number"
                       value={settings.email.smtpPort}
-                      onChange={(e) => updateSetting('email', 'smtpPort', parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting(
+                          "email",
+                          "smtpPort",
+                          parseInt(e.target.value),
+                        )
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -344,7 +390,9 @@ export default function SystemSettingsPage() {
                     <Input
                       id="smtpUser"
                       value={settings.email.smtpUser}
-                      onChange={(e) => updateSetting('email', 'smtpUser', e.target.value)}
+                      onChange={(e) =>
+                        updateSetting("email", "smtpUser", e.target.value)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -353,7 +401,9 @@ export default function SystemSettingsPage() {
                       id="smtpPassword"
                       type="password"
                       value={settings.email.smtpPassword}
-                      onChange={(e) => updateSetting('email', 'smtpPassword', e.target.value)}
+                      onChange={(e) =>
+                        updateSetting("email", "smtpPassword", e.target.value)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -362,7 +412,9 @@ export default function SystemSettingsPage() {
                       id="fromEmail"
                       type="email"
                       value={settings.email.fromEmail}
-                      onChange={(e) => updateSetting('email', 'fromEmail', e.target.value)}
+                      onChange={(e) =>
+                        updateSetting("email", "fromEmail", e.target.value)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -370,7 +422,9 @@ export default function SystemSettingsPage() {
                     <Input
                       id="fromName"
                       value={settings.email.fromName}
-                      onChange={(e) => updateSetting('email', 'fromName', e.target.value)}
+                      onChange={(e) =>
+                        updateSetting("email", "fromName", e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -392,7 +446,9 @@ export default function SystemSettingsPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="emailNotifications">Email Notifications</Label>
+                    <Label htmlFor="emailNotifications">
+                      Email Notifications
+                    </Label>
                     <p className="text-sm text-muted-foreground">
                       Receive notifications via email
                     </p>
@@ -401,7 +457,11 @@ export default function SystemSettingsPage() {
                     id="emailNotifications"
                     checked={settings.notifications.emailNotifications}
                     onCheckedChange={(checked) =>
-                      updateSetting('notifications', 'emailNotifications', checked)
+                      updateSetting(
+                        "notifications",
+                        "emailNotifications",
+                        checked,
+                      )
                     }
                   />
                 </div>
@@ -416,7 +476,7 @@ export default function SystemSettingsPage() {
                     id="lowStockAlerts"
                     checked={settings.notifications.lowStockAlerts}
                     onCheckedChange={(checked) =>
-                      updateSetting('notifications', 'lowStockAlerts', checked)
+                      updateSetting("notifications", "lowStockAlerts", checked)
                     }
                   />
                 </div>
@@ -431,7 +491,7 @@ export default function SystemSettingsPage() {
                     id="orderAlerts"
                     checked={settings.notifications.orderAlerts}
                     onCheckedChange={(checked) =>
-                      updateSetting('notifications', 'orderAlerts', checked)
+                      updateSetting("notifications", "orderAlerts", checked)
                     }
                   />
                 </div>
@@ -446,7 +506,7 @@ export default function SystemSettingsPage() {
                     id="systemAlerts"
                     checked={settings.notifications.systemAlerts}
                     onCheckedChange={(checked) =>
-                      updateSetting('notifications', 'systemAlerts', checked)
+                      updateSetting("notifications", "systemAlerts", checked)
                     }
                   />
                 </div>
@@ -467,46 +527,66 @@ export default function SystemSettingsPage() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
-                  <Label htmlFor="sessionTimeout">Session Timeout (minutes)</Label>
+                  <Label htmlFor="sessionTimeout">
+                    Session Timeout (minutes)
+                  </Label>
                   <Input
                     id="sessionTimeout"
                     type="number"
                     value={settings.security.sessionTimeout}
                     onChange={(e) =>
-                      updateSetting('security', 'sessionTimeout', parseInt(e.target.value))
+                      updateSetting(
+                        "security",
+                        "sessionTimeout",
+                        parseInt(e.target.value),
+                      )
                     }
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="passwordMinLength">Minimum Password Length</Label>
+                  <Label htmlFor="passwordMinLength">
+                    Minimum Password Length
+                  </Label>
                   <Input
                     id="passwordMinLength"
                     type="number"
                     value={settings.security.passwordMinLength}
                     onChange={(e) =>
-                      updateSetting('security', 'passwordMinLength', parseInt(e.target.value))
+                      updateSetting(
+                        "security",
+                        "passwordMinLength",
+                        parseInt(e.target.value),
+                      )
                     }
                   />
                 </div>
               </div>
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="twoFactorEnabled">Two-Factor Authentication</Label>
+                  <Label htmlFor="twoFactorEnabled">
+                    Two-Factor Authentication
+                  </Label>
                   <Switch
                     id="twoFactorEnabled"
                     checked={settings.security.twoFactorEnabled}
                     onCheckedChange={(checked) =>
-                      updateSetting('security', 'twoFactorEnabled', checked)
+                      updateSetting("security", "twoFactorEnabled", checked)
                     }
                   />
                 </div>
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="passwordRequireUppercase">Require Uppercase Letters</Label>
+                  <Label htmlFor="passwordRequireUppercase">
+                    Require Uppercase Letters
+                  </Label>
                   <Switch
                     id="passwordRequireUppercase"
                     checked={settings.security.passwordRequireUppercase}
                     onCheckedChange={(checked) =>
-                      updateSetting('security', 'passwordRequireUppercase', checked)
+                      updateSetting(
+                        "security",
+                        "passwordRequireUppercase",
+                        checked,
+                      )
                     }
                   />
                 </div>
@@ -537,13 +617,15 @@ export default function SystemSettingsPage() {
                     id="autoReorder"
                     checked={settings.inventory.autoReorder}
                     onCheckedChange={(checked) =>
-                      updateSetting('inventory', 'autoReorder', checked)
+                      updateSetting("inventory", "autoReorder", checked)
                     }
                   />
                 </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="allowNegativeStock">Allow Negative Stock</Label>
+                    <Label htmlFor="allowNegativeStock">
+                      Allow Negative Stock
+                    </Label>
                     <p className="text-sm text-muted-foreground">
                       Allow orders when inventory is below zero
                     </p>
@@ -552,7 +634,7 @@ export default function SystemSettingsPage() {
                     id="allowNegativeStock"
                     checked={settings.inventory.allowNegativeStock}
                     onCheckedChange={(checked) =>
-                      updateSetting('inventory', 'allowNegativeStock', checked)
+                      updateSetting("inventory", "allowNegativeStock", checked)
                     }
                   />
                 </div>
@@ -575,7 +657,9 @@ export default function SystemSettingsPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Label htmlFor="stripeEnabled">Stripe Payment Processing</Label>
+                    <Label htmlFor="stripeEnabled">
+                      Stripe Payment Processing
+                    </Label>
                     {settings.integrations.stripeEnabled && (
                       <Badge variant="default">Active</Badge>
                     )}
@@ -584,7 +668,7 @@ export default function SystemSettingsPage() {
                     id="stripeEnabled"
                     checked={settings.integrations.stripeEnabled}
                     onCheckedChange={(checked) =>
-                      updateSetting('integrations', 'stripeEnabled', checked)
+                      updateSetting("integrations", "stripeEnabled", checked)
                     }
                   />
                 </div>
@@ -596,7 +680,11 @@ export default function SystemSettingsPage() {
                         id="stripePublicKey"
                         value={settings.integrations.stripePublicKey}
                         onChange={(e) =>
-                          updateSetting('integrations', 'stripePublicKey', e.target.value)
+                          updateSetting(
+                            "integrations",
+                            "stripePublicKey",
+                            e.target.value,
+                          )
                         }
                       />
                     </div>
@@ -607,7 +695,11 @@ export default function SystemSettingsPage() {
                         type="password"
                         value={settings.integrations.stripeSecretKey}
                         onChange={(e) =>
-                          updateSetting('integrations', 'stripeSecretKey', e.target.value)
+                          updateSetting(
+                            "integrations",
+                            "stripeSecretKey",
+                            e.target.value,
+                          )
                         }
                       />
                     </div>
@@ -628,7 +720,7 @@ export default function SystemSettingsPage() {
                     id="slackEnabled"
                     checked={settings.integrations.slackEnabled}
                     onCheckedChange={(checked) =>
-                      updateSetting('integrations', 'slackEnabled', checked)
+                      updateSetting("integrations", "slackEnabled", checked)
                     }
                   />
                 </div>
@@ -640,7 +732,11 @@ export default function SystemSettingsPage() {
                         id="slackWebhook"
                         value={settings.integrations.slackWebhook}
                         onChange={(e) =>
-                          updateSetting('integrations', 'slackWebhook', e.target.value)
+                          updateSetting(
+                            "integrations",
+                            "slackWebhook",
+                            e.target.value,
+                          )
                         }
                         placeholder="https://hooks.slack.com/services/..."
                       />

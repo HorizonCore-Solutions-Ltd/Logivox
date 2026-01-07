@@ -61,6 +61,7 @@ docker --version
 ### 2.1 Kubernetes Cluster
 
 **Create Namespace:**
+
 ```bash
 kubectl create namespace production
 kubectl create namespace staging
@@ -68,11 +69,13 @@ kubectl create namespace monitoring
 ```
 
 **Apply RBAC:**
+
 ```bash
 kubectl apply -f k8s/rbac.yaml
 ```
 
 **Configure Resource Quotas:**
+
 ```bash
 kubectl apply -f k8s/resource-quota.yaml
 ```
@@ -80,6 +83,7 @@ kubectl apply -f k8s/resource-quota.yaml
 ### 2.2 Storage Setup
 
 **Create Persistent Volumes:**
+
 ```bash
 # PostgreSQL storage
 kubectl apply -f k8s/storage.yaml
@@ -92,6 +96,7 @@ kubectl get pvc -n production
 ### 2.3 Secrets Management
 
 **Create Secrets:**
+
 ```bash
 # Database credentials
 kubectl create secret generic flowstock-secrets \
@@ -120,6 +125,7 @@ kubectl create secret generic cloud-credentials \
 ```
 
 **Verify Secrets:**
+
 ```bash
 kubectl get secrets -n production
 kubectl describe secret flowstock-secrets -n production
@@ -128,6 +134,7 @@ kubectl describe secret flowstock-secrets -n production
 ### 2.4 ConfigMaps
 
 **Create ConfigMaps:**
+
 ```bash
 kubectl apply -f k8s/configmap.yaml
 
@@ -142,6 +149,7 @@ kubectl get configmap -n production
 ### 3.1 PostgreSQL Setup
 
 **Deploy PostgreSQL:**
+
 ```bash
 # Option 1: Using Helm
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -159,6 +167,7 @@ helm install postgresql bitnami/postgresql \
 ```
 
 **Verify Database:**
+
 ```bash
 # Test connection
 kubectl run -it --rm debug --image=postgres:16 --restart=Never -- \
@@ -173,6 +182,7 @@ kubectl run -it --rm debug --image=postgres:16 --restart=Never -- \
 ### 3.2 Database Migrations
 
 **Backup Current Database (if upgrading):**
+
 ```bash
 # Run backup script
 ./scripts/backup-db.sh production
@@ -182,6 +192,7 @@ aws s3 ls s3://logivox-backups/production/
 ```
 
 **Run Migrations:**
+
 ```bash
 # Method 1: Via init container (automatic during deployment)
 # This is configured in k8s/deployment.yaml
@@ -197,6 +208,7 @@ kubectl logs job/migration-job
 ```
 
 **Verify Migration:**
+
 ```bash
 # Check migration status
 kubectl exec -it <postgres-pod> -- \
@@ -217,6 +229,7 @@ kubectl run -it --rm seed --image=ghcr.io/pndlovu/flowstock:latest --restart=Nev
 ### 4.1 Deploy Monitoring Stack
 
 **Deploy Prometheus:**
+
 ```bash
 kubectl apply -f k8s/monitoring/prometheus-config.yaml
 
@@ -225,6 +238,7 @@ kubectl wait --for=condition=ready pod -l app=prometheus -n monitoring --timeout
 ```
 
 **Deploy Grafana:**
+
 ```bash
 kubectl apply -f k8s/monitoring/grafana-config.yaml
 
@@ -233,6 +247,7 @@ kubectl get secret grafana-credentials -n monitoring -o jsonpath="{.data.admin-p
 ```
 
 **Deploy Alertmanager:**
+
 ```bash
 kubectl apply -f k8s/monitoring/alertmanager-config.yaml
 ```
@@ -240,6 +255,7 @@ kubectl apply -f k8s/monitoring/alertmanager-config.yaml
 ### 4.2 Deploy Application
 
 **Build and Push Docker Image:**
+
 ```bash
 # Build image
 docker build -t ghcr.io/pndlovu/flowstock:v1.0.0 -t ghcr.io/pndlovu/flowstock:latest .
@@ -250,6 +266,7 @@ docker push ghcr.io/pndlovu/flowstock:latest
 ```
 
 **Deploy Application:**
+
 ```bash
 # Apply all configurations
 kubectl apply -f k8s/deployment.yaml
@@ -264,6 +281,7 @@ kubectl wait --for=condition=available deployment/flowstock-app -n production --
 ```
 
 **Verify Pods:**
+
 ```bash
 # Check pod status
 kubectl get pods -n production -l app=flowstock
@@ -278,6 +296,7 @@ kubectl logs -f -l app=flowstock -n production --all-containers=true
 ### 4.3 Configure Ingress & DNS
 
 **Apply Ingress:**
+
 ```bash
 kubectl apply -f k8s/ingress.yaml
 
@@ -286,6 +305,7 @@ kubectl get ingress -n production
 ```
 
 **Update DNS Records:**
+
 ```bash
 # Example for AWS Route53
 aws route53 change-resource-record-sets \
@@ -304,6 +324,7 @@ aws route53 change-resource-record-sets \
 ```
 
 **Configure SSL/TLS:**
+
 ```bash
 # Install cert-manager (if not already installed)
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.13.0/cert-manager.yaml
@@ -339,6 +360,7 @@ kubectl describe certificate flowstock-tls -n production
 ### 5.1 Health Checks
 
 **Check Application Health:**
+
 ```bash
 # Health endpoint
 curl https://app.logivox.ai/api/health
@@ -353,6 +375,7 @@ curl https://app.logivox.ai/api/health
 ```
 
 **Check Metrics:**
+
 ```bash
 curl https://app.logivox.ai/api/metrics
 ```
@@ -360,6 +383,7 @@ curl https://app.logivox.ai/api/metrics
 ### 5.2 Smoke Tests
 
 **Run Automated Smoke Tests:**
+
 ```bash
 # From CI/CD pipeline
 npm run test:e2e:smoke
@@ -370,6 +394,7 @@ kubectl run -it --rm smoke-test --image=ghcr.io/pndlovu/flowstock:latest --resta
 ```
 
 **Manual Verification:**
+
 ```bash
 # 1. Login
 curl -X POST https://app.logivox.ai/api/auth/signin \
@@ -390,6 +415,7 @@ curl -X POST https://app.logivox.ai/api/orders \
 ### 5.3 Performance Verification
 
 **Check Response Times:**
+
 ```bash
 # Using Apache Bench
 ab -n 1000 -c 10 https://app.logivox.ai/
@@ -399,6 +425,7 @@ k6 run scripts/load-test.js
 ```
 
 **Monitor Resource Usage:**
+
 ```bash
 # Pod resources
 kubectl top pods -n production
@@ -432,6 +459,7 @@ curl -X POST http://prometheus:9090/-/reload
 ### 6.1 Rollback Application
 
 **Quick Rollback:**
+
 ```bash
 # Rollback to previous deployment
 kubectl rollout undo deployment/flowstock-app -n production
@@ -449,6 +477,7 @@ kubectl rollout history deployment/flowstock-app -n production
 ### 6.2 Rollback Database
 
 **Restore from Backup:**
+
 ```bash
 # 1. Stop application
 kubectl scale deployment/flowstock-app -n production --replicas=0
@@ -566,12 +595,12 @@ kubectl logs deployment/flowstock-app -n production > app-logs.txt
 
 ### On-Call Rotation
 
-| Role | Primary | Secondary | Contact |
-|------|---------|-----------|---------|
-| DevOps Lead | John Doe | Jane Smith | +1-555-0100 |
-| Backend Lead | Alice Johnson | Bob Wilson | +1-555-0200 |
+| Role           | Primary       | Secondary    | Contact     |
+| -------------- | ------------- | ------------ | ----------- |
+| DevOps Lead    | John Doe      | Jane Smith   | +1-555-0100 |
+| Backend Lead   | Alice Johnson | Bob Wilson   | +1-555-0200 |
 | Database Admin | Charlie Brown | Diana Prince | +1-555-0300 |
-| Security Lead | Eve Anderson | Frank Castle | +1-555-0400 |
+| Security Lead  | Eve Anderson  | Frank Castle | +1-555-0400 |
 
 ### Communication Channels
 
@@ -670,4 +699,4 @@ kubectl get events -n production --sort-by='.lastTimestamp'
 
 **END OF RUNBOOK**
 
-*For questions or updates, contact: ops@logivox.ai*
+_For questions or updates, contact: ops@logivox.ai_

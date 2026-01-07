@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -12,14 +12,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   AlertTriangle,
   Plus,
@@ -29,8 +29,8 @@ import {
   CheckCircle,
   XCircle,
   FileText,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface NCRStats {
   total: number;
@@ -61,10 +61,10 @@ export default function NCRDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<NCRStats | null>(null);
   const [ncrs, setNCRs] = useState<NCR[]>([]);
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const organizationId = 'org_123'; // TODO: Get from auth context
+  const organizationId = "org_123"; // TODO: Get from auth context
 
   useEffect(() => {
     fetchData();
@@ -73,9 +73,9 @@ export default function NCRDashboardPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       const params = new URLSearchParams({ organizationId });
-      if (statusFilter) params.append('status', statusFilter);
+      if (statusFilter) params.append("status", statusFilter);
 
       const [statsRes, ncrsRes] = await Promise.all([
         fetch(`/api/qc/ncr/stats?organizationId=${organizationId}`),
@@ -85,46 +85,53 @@ export default function NCRDashboardPage() {
       if (statsRes.ok) setStats(await statsRes.json());
       if (ncrsRes.ok) setNCRs(await ncrsRes.json());
     } catch (error) {
-      console.error('Error fetching NCR data:', error);
+      console.error("Error fetching NCR data:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredNCRs = ncrs.filter(ncr =>
-    ncr.ncrNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ncr.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredNCRs = ncrs.filter(
+    (ncr) =>
+      ncr.ncrNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ncr.description.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const getSeverityBadge = (severity: string) => {
     const config: Record<string, string> = {
-      CRITICAL: 'bg-red-600',
-      MAJOR: 'bg-orange-500',
-      MINOR: 'bg-yellow-500',
+      CRITICAL: "bg-red-600",
+      MAJOR: "bg-orange-500",
+      MINOR: "bg-yellow-500",
     };
-    return <Badge className={`${config[severity]} text-white`}>{severity}</Badge>;
+    return (
+      <Badge className={`${config[severity]} text-white`}>{severity}</Badge>
+    );
   };
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, string> = {
-      OPEN: 'bg-blue-500',
-      IN_INVESTIGATION: 'bg-purple-500',
-      IN_PROGRESS: 'bg-yellow-500',
-      CLOSED: 'bg-green-600',
-      CANCELLED: 'bg-gray-500',
+      OPEN: "bg-blue-500",
+      IN_INVESTIGATION: "bg-purple-500",
+      IN_PROGRESS: "bg-yellow-500",
+      CLOSED: "bg-green-600",
+      CANCELLED: "bg-gray-500",
     };
-    return <Badge className={`${config[status]} text-white`}>{status.replace(/_/g, ' ')}</Badge>;
+    return (
+      <Badge className={`${config[status]} text-white`}>
+        {status.replace(/_/g, " ")}
+      </Badge>
+    );
   };
 
   const getClaimStatusBadge = (status: string | null) => {
     if (!status) return <Badge variant="outline">No Claim</Badge>;
-    
+
     const config: Record<string, string> = {
-      PENDING: 'bg-gray-500',
-      SUBMITTED: 'bg-blue-500',
-      APPROVED: 'bg-green-600',
-      REJECTED: 'bg-red-600',
-      PAID: 'bg-emerald-700',
+      PENDING: "bg-gray-500",
+      SUBMITTED: "bg-blue-500",
+      APPROVED: "bg-green-600",
+      REJECTED: "bg-red-600",
+      PAID: "bg-emerald-700",
     };
     return <Badge className={`${config[status]} text-white`}>{status}</Badge>;
   };
@@ -143,7 +150,9 @@ export default function NCRDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Non-Conformance Reports</h1>
-          <p className="text-muted-foreground">Manage NCRs and supplier claims</p>
+          <p className="text-muted-foreground">
+            Manage NCRs and supplier claims
+          </p>
         </div>
         <Link href="/dashboard/qc/ncr/create">
           <Button>
@@ -171,7 +180,9 @@ export default function NCRDashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Claims</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Claims
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -186,11 +197,15 @@ export default function NCRDashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Resolution</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Resolution
+              </CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.avgResolutionDays.toFixed(1)} days</div>
+              <div className="text-2xl font-bold">
+                {stats.avgResolutionDays.toFixed(1)} days
+              </div>
               <p className="text-xs text-muted-foreground">
                 {stats.closureRate.toFixed(1)}% closure rate
               </p>
@@ -232,7 +247,9 @@ export default function NCRDashboardPage() {
               <SelectContent>
                 <SelectItem value="">All Statuses</SelectItem>
                 <SelectItem value="OPEN">Open</SelectItem>
-                <SelectItem value="IN_INVESTIGATION">In Investigation</SelectItem>
+                <SelectItem value="IN_INVESTIGATION">
+                  In Investigation
+                </SelectItem>
                 <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                 <SelectItem value="CLOSED">Closed</SelectItem>
               </SelectContent>
@@ -263,27 +280,42 @@ export default function NCRDashboardPage() {
               <TableBody>
                 {filteredNCRs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={10} className="text-center text-muted-foreground">
+                    <TableCell
+                      colSpan={10}
+                      className="text-center text-muted-foreground"
+                    >
                       No NCRs found
                     </TableCell>
                   </TableRow>
                 ) : (
                   filteredNCRs.map((ncr) => (
                     <TableRow key={ncr.id}>
-                      <TableCell className="font-medium">{ncr.ncrNumber}</TableCell>
-                      <TableCell>{new Date(ncr.reportDate).toLocaleDateString()}</TableCell>
-                      <TableCell>{ncr.sourceType.replace(/_/g, ' ')}</TableCell>
-                      <TableCell className="max-w-xs truncate">{ncr.description}</TableCell>
-                      <TableCell>{ncr.supplier?.name || 'N/A'}</TableCell>
+                      <TableCell className="font-medium">
+                        {ncr.ncrNumber}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(ncr.reportDate).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>{ncr.sourceType.replace(/_/g, " ")}</TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {ncr.description}
+                      </TableCell>
+                      <TableCell>{ncr.supplier?.name || "N/A"}</TableCell>
                       <TableCell>{getSeverityBadge(ncr.severity)}</TableCell>
                       <TableCell>{getStatusBadge(ncr.status)}</TableCell>
                       <TableCell>
-                        {ncr.claimAmount ? `$${ncr.claimAmount.toLocaleString()}` : '-'}
+                        {ncr.claimAmount
+                          ? `$${ncr.claimAmount.toLocaleString()}`
+                          : "-"}
                       </TableCell>
-                      <TableCell>{getClaimStatusBadge(ncr.claimStatus)}</TableCell>
+                      <TableCell>
+                        {getClaimStatusBadge(ncr.claimStatus)}
+                      </TableCell>
                       <TableCell>
                         <Link href={`/dashboard/qc/ncr/${ncr.id}`}>
-                          <Button variant="ghost" size="sm">View</Button>
+                          <Button variant="ghost" size="sm">
+                            View
+                          </Button>
                         </Link>
                       </TableCell>
                     </TableRow>

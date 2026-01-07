@@ -1,25 +1,43 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Code, Copy, CheckCircle2, Book, Globe, Key as KeyIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { toast } from "sonner"
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
+import * as React from "react";
+import {
+  Code,
+  Copy,
+  CheckCircle2,
+  Book,
+  Globe,
+  Key as KeyIcon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 export default function ApiDocsPage() {
-  const [copiedEndpoint, setCopiedEndpoint] = React.useState<string | null>(null)
+  const [copiedEndpoint, setCopiedEndpoint] = React.useState<string | null>(
+    null,
+  );
 
   const copyToClipboard = (text: string, endpoint: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedEndpoint(endpoint)
-    toast.success("Copied to clipboard!")
-    setTimeout(() => setCopiedEndpoint(null), 2000)
-  }
+    navigator.clipboard.writeText(text);
+    setCopiedEndpoint(endpoint);
+    toast.success("Copied to clipboard!");
+    setTimeout(() => setCopiedEndpoint(null), 2000);
+  };
 
-  const baseUrl = typeof window !== "undefined" ? window.location.origin : "https://your-domain.com"
+  const baseUrl =
+    typeof window !== "undefined"
+      ? window.location.origin
+      : "https://your-domain.com";
 
   return (
     <DashboardSidebar>
@@ -47,7 +65,11 @@ export default function ApiDocsPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm">
-              Include your API key in the <code className="bg-muted px-1 py-0.5 rounded">Authorization</code> header:
+              Include your API key in the{" "}
+              <code className="bg-muted px-1 py-0.5 rounded">
+                Authorization
+              </code>{" "}
+              header:
             </p>
             <div className="bg-slate-950 text-slate-50 p-4 rounded-lg font-mono text-sm relative">
               <code>Authorization: Bearer fsk_your_api_key_here</code>
@@ -55,7 +77,12 @@ export default function ApiDocsPage() {
                 variant="ghost"
                 size="icon"
                 className="absolute top-2 right-2 text-slate-400 hover:text-slate-50"
-                onClick={() => copyToClipboard("Authorization: Bearer fsk_your_api_key_here", "auth")}
+                onClick={() =>
+                  copyToClipboard(
+                    "Authorization: Bearer fsk_your_api_key_here",
+                    "auth",
+                  )
+                }
               >
                 {copiedEndpoint === "auth" ? (
                   <CheckCircle2 className="h-4 w-4" />
@@ -66,7 +93,10 @@ export default function ApiDocsPage() {
             </div>
             <p className="text-sm text-muted-foreground">
               You can create and manage API keys in the{" "}
-              <a href="/dashboard/api-keys" className="text-primary hover:underline">
+              <a
+                href="/dashboard/api-keys"
+                className="text-primary hover:underline"
+              >
                 API Keys
               </a>{" "}
               section.
@@ -88,11 +118,16 @@ export default function ApiDocsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>List Inventory Items</CardTitle>
-                  <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-500/10 text-green-600 border-green-500"
+                  >
                     GET
                   </Badge>
                 </div>
-                <CardDescription>Retrieve all inventory items for your organization</CardDescription>
+                <CardDescription>
+                  Retrieve all inventory items for your organization
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -103,7 +138,12 @@ export default function ApiDocsPage() {
                       variant="ghost"
                       size="icon"
                       className="text-slate-400 hover:text-slate-50"
-                      onClick={() => copyToClipboard(`${baseUrl}/api/public/inventory`, "inv-list")}
+                      onClick={() =>
+                        copyToClipboard(
+                          `${baseUrl}/api/public/inventory`,
+                          "inv-list",
+                        )
+                      }
                     >
                       {copiedEndpoint === "inv-list" ? (
                         <CheckCircle2 className="h-4 w-4" />
@@ -141,11 +181,16 @@ export default function ApiDocsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Get Single Inventory Item</CardTitle>
-                  <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-500/10 text-green-600 border-green-500"
+                  >
                     GET
                   </Badge>
                 </div>
-                <CardDescription>Retrieve a specific inventory item with stock movements</CardDescription>
+                <CardDescription>
+                  Retrieve a specific inventory item with stock movements
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -156,7 +201,12 @@ export default function ApiDocsPage() {
                       variant="ghost"
                       size="icon"
                       className="text-slate-400 hover:text-slate-50"
-                      onClick={() => copyToClipboard(`${baseUrl}/api/public/inventory/:id`, "inv-get")}
+                      onClick={() =>
+                        copyToClipboard(
+                          `${baseUrl}/api/public/inventory/:id`,
+                          "inv-get",
+                        )
+                      }
                     >
                       {copiedEndpoint === "inv-get" ? (
                         <CheckCircle2 className="h-4 w-4" />
@@ -176,11 +226,16 @@ export default function ApiDocsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>List Bookings</CardTitle>
-                  <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-500/10 text-green-600 border-green-500"
+                  >
                     GET
                   </Badge>
                 </div>
-                <CardDescription>Retrieve all bookings with customer and item details</CardDescription>
+                <CardDescription>
+                  Retrieve all bookings with customer and item details
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -191,7 +246,12 @@ export default function ApiDocsPage() {
                       variant="ghost"
                       size="icon"
                       className="text-slate-400 hover:text-slate-50"
-                      onClick={() => copyToClipboard(`${baseUrl}/api/public/bookings`, "book-list")}
+                      onClick={() =>
+                        copyToClipboard(
+                          `${baseUrl}/api/public/bookings`,
+                          "book-list",
+                        )
+                      }
                     >
                       {copiedEndpoint === "book-list" ? (
                         <CheckCircle2 className="h-4 w-4" />
@@ -206,7 +266,10 @@ export default function ApiDocsPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex gap-2">
                       <code className="bg-muted px-2 py-1 rounded">status</code>
-                      <span className="text-muted-foreground">Filter by status (PENDING, CONFIRMED, FULFILLED, CANCELLED)</span>
+                      <span className="text-muted-foreground">
+                        Filter by status (PENDING, CONFIRMED, FULFILLED,
+                        CANCELLED)
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -258,11 +321,16 @@ export default function ApiDocsPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>List Customers</CardTitle>
-                  <Badge variant="outline" className="bg-green-500/10 text-green-600 border-green-500">
+                  <Badge
+                    variant="outline"
+                    className="bg-green-500/10 text-green-600 border-green-500"
+                  >
                     GET
                   </Badge>
                 </div>
-                <CardDescription>Retrieve all customers and suppliers</CardDescription>
+                <CardDescription>
+                  Retrieve all customers and suppliers
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -273,7 +341,12 @@ export default function ApiDocsPage() {
                       variant="ghost"
                       size="icon"
                       className="text-slate-400 hover:text-slate-50"
-                      onClick={() => copyToClipboard(`${baseUrl}/api/public/customers`, "cust-list")}
+                      onClick={() =>
+                        copyToClipboard(
+                          `${baseUrl}/api/public/customers`,
+                          "cust-list",
+                        )
+                      }
                     >
                       {copiedEndpoint === "cust-list" ? (
                         <CheckCircle2 className="h-4 w-4" />
@@ -288,7 +361,9 @@ export default function ApiDocsPage() {
                   <div className="space-y-2 text-sm">
                     <div className="flex gap-2">
                       <code className="bg-muted px-2 py-1 rounded">type</code>
-                      <span className="text-muted-foreground">Filter by type (CUSTOMER, SUPPLIER, BOTH)</span>
+                      <span className="text-muted-foreground">
+                        Filter by type (CUSTOMER, SUPPLIER, BOTH)
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -337,7 +412,10 @@ export default function ApiDocsPage() {
           <CardContent>
             <p className="text-sm mb-4">
               Configure webhooks in the{" "}
-              <a href="/dashboard/webhooks" className="text-primary hover:underline">
+              <a
+                href="/dashboard/webhooks"
+                className="text-primary hover:underline"
+              >
                 Webhooks
               </a>{" "}
               section to receive real-time notifications when events occur.
@@ -365,5 +443,5 @@ export default function ApiDocsPage() {
         </Card>
       </div>
     </DashboardSidebar>
-  )
+  );
 }

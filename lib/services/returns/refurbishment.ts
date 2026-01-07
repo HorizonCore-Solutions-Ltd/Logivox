@@ -3,46 +3,71 @@
  * Multi-step workflows, QA gates, parts tracking, cost management
  */
 
-export type RWOStatus = 'CREATED' | 'QUEUED' | 'ASSIGNED' | 'IN_PROGRESS' | 'WAITING_PARTS' | 'QA_PENDING' | 'QA_PASS' | 'QA_FAIL' | 'COMPLETED' | 'FAILED' | 'CANCELLED';
-export type RefurbOutcome = 'RESTOCK_A' | 'RESTOCK_B' | 'RESTOCK_C' | 'RESALE' | 'SCRAP' | 'RTV' | 'QUARANTINE';
-export type StepType = 'INSPECTION' | 'CLEANING' | 'REPAIR' | 'REPLACEMENT' | 'TESTING' | 'PACKAGING' | 'QA';
+export type RWOStatus =
+  | "CREATED"
+  | "QUEUED"
+  | "ASSIGNED"
+  | "IN_PROGRESS"
+  | "WAITING_PARTS"
+  | "QA_PENDING"
+  | "QA_PASS"
+  | "QA_FAIL"
+  | "COMPLETED"
+  | "FAILED"
+  | "CANCELLED";
+export type RefurbOutcome =
+  | "RESTOCK_A"
+  | "RESTOCK_B"
+  | "RESTOCK_C"
+  | "RESALE"
+  | "SCRAP"
+  | "RTV"
+  | "QUARANTINE";
+export type StepType =
+  | "INSPECTION"
+  | "CLEANING"
+  | "REPAIR"
+  | "REPLACEMENT"
+  | "TESTING"
+  | "PACKAGING"
+  | "QA";
 
 export interface RefurbWorkOrder {
   id: string;
   rwoNumber: string; // RWO-YYYYMMDD-XXX
   status: RWOStatus;
-  
+
   // Source
   rmaId?: string;
   receiptLineId: string;
   sku: string;
   serial?: string;
   lot?: string;
-  
+
   // Priority
-  priority: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+  priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   priorityReason?: string;
-  
+
   // Condition
   initialGrade: string; // 'B', 'C', 'D'
   targetGrade: string; // 'A', 'B'
   currentGrade?: string;
-  
+
   // Problem Description
   reportedIssues: string[];
   symptoms: string;
   customerNotes?: string;
-  
+
   // Workflow
   workflowTemplate: string; // Reference to template
   steps: RefurbStep[];
   currentStepIndex: number;
-  
+
   // Assignment
   assignedTo?: string; // technician user ID
   assignedAt?: Date;
   team?: string;
-  
+
   // Parts & Materials
   partsUsed: {
     partSku: string;
@@ -51,7 +76,7 @@ export interface RefurbWorkOrder {
     unitCost: number;
     totalCost: number;
   }[];
-  
+
   // Costs
   costs: {
     labor: number; // hours * rate
@@ -61,25 +86,25 @@ export interface RefurbWorkOrder {
   };
   laborHours: number;
   laborRate: number; // per hour
-  
+
   // QA
   qaResults?: QAResult[];
-  
+
   // Outcome
   outcome?: RefurbOutcome;
   finalGrade?: string;
   restockLocationId?: string;
-  
+
   // Timing
   createdAt: Date;
   startedAt?: Date;
   completedAt?: Date;
   estimatedCompletionAt?: Date;
-  
+
   // SLA
   slaDeadline?: Date;
   slaBreach: boolean;
-  
+
   // Evidence
   photos: {
     stage: string; // 'BEFORE', 'DURING', 'AFTER'
@@ -87,7 +112,7 @@ export interface RefurbWorkOrder {
     caption?: string;
     timestamp: Date;
   }[];
-  
+
   // Notes
   notes: {
     timestamp: Date;
@@ -95,7 +120,7 @@ export interface RefurbWorkOrder {
     userName: string;
     note: string;
   }[];
-  
+
   // Metadata
   updatedAt: Date;
 }
@@ -106,32 +131,32 @@ export interface RefurbStep {
   name: string;
   description: string;
   type: StepType;
-  
+
   // Requirements
   requiresTools?: string[];
   requiresParts?: string[];
   requiredSkills?: string[];
   estimatedMinutes: number;
-  
+
   // Instructions
   instructions: string;
   safetyNotes?: string;
   qualityChecks: string[];
-  
+
   // Status
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'SKIPPED' | 'FAILED';
-  
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "SKIPPED" | "FAILED";
+
   // Execution
   startedAt?: Date;
   completedAt?: Date;
   actualMinutes?: number;
   completedBy?: string;
-  
+
   // Results
   passed: boolean;
   notes?: string;
   photos?: string[];
-  
+
   // Measurements & Tests
   measurements?: {
     name: string;
@@ -140,7 +165,7 @@ export interface RefurbStep {
     spec?: string; // expected spec
     withinSpec: boolean;
   }[];
-  
+
   // Parts used in this step
   partsUsed?: {
     partSku: string;
@@ -153,11 +178,11 @@ export interface QAResult {
   qaAt: Date;
   qaBy: string;
   qaByName: string;
-  
+
   // Inspection
   passed: boolean;
   grade: string; // final condition grade
-  
+
   // Checklist
   checks: {
     category: string; // 'FUNCTIONALITY', 'COSMETIC', 'PACKAGING', 'DOCUMENTATION'
@@ -165,18 +190,18 @@ export interface QAResult {
     passed: boolean;
     notes?: string;
   }[];
-  
+
   // Overall Assessment
   overallNotes: string;
   defectsFound: string[];
-  
+
   // Decision
-  decision: 'PASS' | 'FAIL_MINOR' | 'FAIL_MAJOR' | 'REWORK';
+  decision: "PASS" | "FAIL_MINOR" | "FAIL_MAJOR" | "REWORK";
   reworkRequired?: string[];
-  
+
   // Evidence
   photos: string[];
-  
+
   // Signature
   digitalSignature?: string;
 }
@@ -186,14 +211,14 @@ export interface RefurbWorkflowTemplate {
   name: string;
   sku?: string; // specific to SKU, or null for category-wide
   category?: string;
-  
+
   // Conditions
   applicableFor: {
     initialGrades: string[]; // ['B', 'C']
     targetGrade: string; // 'A'
     issues?: string[]; // specific problems this template addresses
   };
-  
+
   // Steps
   steps: {
     stepNumber: number;
@@ -206,15 +231,15 @@ export interface RefurbWorkflowTemplate {
     requiresParts?: string[];
     qualityChecks: string[];
   }[];
-  
+
   // Costs
   estimatedLaborHours: number;
   estimatedPartsCost: number;
-  
+
   // Active
   active: boolean;
   version: number;
-  
+
   // Metadata
   createdAt: Date;
   updatedAt: Date;
@@ -237,14 +262,14 @@ export class RefurbishmentService {
     targetGrade: string;
     reportedIssues: string[];
     symptoms: string;
-    priority?: 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';
+    priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
     photos?: string[];
   }): Promise<RefurbWorkOrder> {
     // Find appropriate workflow template
     const template = await this.findWorkflowTemplate(
       request.sku,
       request.initialGrade,
-      request.targetGrade
+      request.targetGrade,
     );
 
     if (!template) {
@@ -266,7 +291,7 @@ export class RefurbishmentService {
       estimatedMinutes: templateStep.estimatedMinutes,
       instructions: templateStep.instructions,
       qualityChecks: templateStep.qualityChecks,
-      status: 'PENDING',
+      status: "PENDING",
       passed: false,
     }));
 
@@ -274,12 +299,15 @@ export class RefurbishmentService {
     const priority = request.priority || this.calculatePriority(request);
 
     // Calculate SLA deadline
-    const slaDeadline = this.calculateSLADeadline(priority, template.estimatedLaborHours);
+    const slaDeadline = this.calculateSLADeadline(
+      priority,
+      template.estimatedLaborHours,
+    );
 
     const workOrder: RefurbWorkOrder = {
       id: `rwo-${Date.now()}`,
       rwoNumber,
-      status: 'CREATED',
+      status: "CREATED",
       rmaId: request.rmaId,
       receiptLineId: request.receiptLineId,
       sku: request.sku,
@@ -306,12 +334,13 @@ export class RefurbishmentService {
       estimatedCompletionAt: slaDeadline,
       slaDeadline,
       slaBreach: false,
-      photos: request.photos?.map((url, index) => ({
-        stage: 'BEFORE',
-        url,
-        caption: `Initial condition ${index + 1}`,
-        timestamp: new Date(),
-      })) || [],
+      photos:
+        request.photos?.map((url, index) => ({
+          stage: "BEFORE",
+          url,
+          caption: `Initial condition ${index + 1}`,
+          timestamp: new Date(),
+        })) || [],
       notes: [],
       updatedAt: new Date(),
     };
@@ -322,7 +351,11 @@ export class RefurbishmentService {
   /**
    * Assign work order to technician
    */
-  async assignWorkOrder(rwoId: string, technicianId: string, team?: string): Promise<void> {
+  async assignWorkOrder(
+    rwoId: string,
+    technicianId: string,
+    team?: string,
+  ): Promise<void> {
     // Update work order
     // Send notification to technician
   }
@@ -330,7 +363,11 @@ export class RefurbishmentService {
   /**
    * Start a refurb step
    */
-  async startStep(rwoId: string, stepId: string, userId: string): Promise<void> {
+  async startStep(
+    rwoId: string,
+    stepId: string,
+    userId: string,
+  ): Promise<void> {
     // Update step status to IN_PROGRESS
     // Record start time
     // Update work order status if first step
@@ -339,13 +376,17 @@ export class RefurbishmentService {
   /**
    * Complete a refurb step
    */
-  async completeStep(rwoId: string, stepId: string, result: {
-    passed: boolean;
-    notes?: string;
-    photos?: string[];
-    measurements?: any[];
-    partsUsed?: { partSku: string; quantity: number }[];
-  }): Promise<void> {
+  async completeStep(
+    rwoId: string,
+    stepId: string,
+    result: {
+      passed: boolean;
+      notes?: string;
+      photos?: string[];
+      measurements?: any[];
+      partsUsed?: { partSku: string; quantity: number }[];
+    },
+  ): Promise<void> {
     // Update step with results
     // Calculate actual time
     // Update labor hours and costs
@@ -355,7 +396,10 @@ export class RefurbishmentService {
   /**
    * Add parts to work order
    */
-  async addParts(rwoId: string, parts: { partSku: string; quantity: number; unitCost: number }[]): Promise<void> {
+  async addParts(
+    rwoId: string,
+    parts: { partSku: string; quantity: number; unitCost: number }[],
+  ): Promise<void> {
     // Add parts to partsUsed array
     // Update costs
     // Check if waiting for parts - if so, resume
@@ -372,22 +416,30 @@ export class RefurbishmentService {
   /**
    * Perform QA inspection
    */
-  async performQA(rwoId: string, qa: {
-    qaBy: string;
-    passed: boolean;
-    grade: string;
-    checks: { category: string; item: string; passed: boolean; notes?: string }[];
-    overallNotes: string;
-    defectsFound?: string[];
-    decision: 'PASS' | 'FAIL_MINOR' | 'FAIL_MAJOR' | 'REWORK';
-    reworkRequired?: string[];
-    photos: string[];
-  }): Promise<QAResult> {
+  async performQA(
+    rwoId: string,
+    qa: {
+      qaBy: string;
+      passed: boolean;
+      grade: string;
+      checks: {
+        category: string;
+        item: string;
+        passed: boolean;
+        notes?: string;
+      }[];
+      overallNotes: string;
+      defectsFound?: string[];
+      decision: "PASS" | "FAIL_MINOR" | "FAIL_MAJOR" | "REWORK";
+      reworkRequired?: string[];
+      photos: string[];
+    },
+  ): Promise<QAResult> {
     const qaResult: QAResult = {
       id: `qa-${Date.now()}`,
       qaAt: new Date(),
       qaBy: qa.qaBy,
-      qaByName: 'QA Inspector', // lookup from user ID
+      qaByName: "QA Inspector", // lookup from user ID
       passed: qa.passed,
       grade: qa.grade,
       checks: qa.checks,
@@ -409,11 +461,14 @@ export class RefurbishmentService {
   /**
    * Complete work order
    */
-  async completeWorkOrder(rwoId: string, outcome: {
-    outcome: RefurbOutcome;
-    finalGrade: string;
-    restockLocationId?: string;
-  }): Promise<void> {
+  async completeWorkOrder(
+    rwoId: string,
+    outcome: {
+      outcome: RefurbOutcome;
+      finalGrade: string;
+      restockLocationId?: string;
+    },
+  ): Promise<void> {
     // Update work order status to COMPLETED
     // Record final outcome
     // Update inventory if restocking
@@ -446,13 +501,13 @@ export class RefurbishmentService {
       failed: 2,
       completionRate: 91.0,
       avgCompletionTime: 3.2, // days
-      avgCost: 45.80,
-      totalCostSaved: 12450.00, // value recovered - refurb cost
+      avgCost: 45.8,
+      totalCostSaved: 12450.0, // value recovered - refurb cost
       qcPassRate: 94.5,
       topIssues: [
-        { issue: 'Battery replacement', count: 45, avgCost: 35.00 },
-        { issue: 'Screen repair', count: 38, avgCost: 65.00 },
-        { issue: 'Cleaning/cosmetic', count: 32, avgCost: 15.00 },
+        { issue: "Battery replacement", count: 45, avgCost: 35.0 },
+        { issue: "Screen repair", count: 38, avgCost: 65.0 },
+        { issue: "Cleaning/cosmetic", count: 32, avgCost: 15.0 },
       ],
     };
   }
@@ -461,7 +516,7 @@ export class RefurbishmentService {
   private async findWorkflowTemplate(
     sku: string,
     initialGrade: string,
-    targetGrade: string
+    targetGrade: string,
   ): Promise<RefurbWorkflowTemplate | null> {
     // Query database for matching template
     // Return most specific match (SKU-specific > category > generic)
@@ -470,19 +525,28 @@ export class RefurbishmentService {
 
   private async generateRWONumber(): Promise<string> {
     const date = new Date();
-    const dateStr = date.toISOString().slice(0, 10).replace(/-/g, '');
+    const dateStr = date.toISOString().slice(0, 10).replace(/-/g, "");
     // Query for last number today and increment
     const sequence = 1;
-    return `RWO-${dateStr}-${sequence.toString().padStart(3, '0')}`;
+    return `RWO-${dateStr}-${sequence.toString().padStart(3, "0")}`;
   }
 
-  private calculatePriority(request: any): 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' {
+  private calculatePriority(
+    request: any,
+  ): "LOW" | "MEDIUM" | "HIGH" | "URGENT" {
     // Base on value, customer tier, age, etc.
-    return 'MEDIUM';
+    return "MEDIUM";
   }
 
   private calculateSLADeadline(priority: string, estimatedHours: number): Date {
-    const hoursToAdd = priority === 'URGENT' ? 24 : priority === 'HIGH' ? 48 : priority === 'MEDIUM' ? 72 : 120;
+    const hoursToAdd =
+      priority === "URGENT"
+        ? 24
+        : priority === "HIGH"
+          ? 48
+          : priority === "MEDIUM"
+            ? 72
+            : 120;
     return new Date(Date.now() + hoursToAdd * 60 * 60 * 1000);
   }
 }

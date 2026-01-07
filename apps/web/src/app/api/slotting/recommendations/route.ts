@@ -1,8 +1,8 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/slotting/recommendations
@@ -12,22 +12,27 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { searchParams } = new URL(req.url);
-    const warehouseId = searchParams.get('warehouseId');
-    const status = searchParams.get('status');
+    const warehouseId = searchParams.get("warehouseId");
+    const status = searchParams.get("status");
 
     const recommendations = await prisma.slottingRecommendation.findMany({
       where: {
@@ -42,13 +47,16 @@ export async function GET(req: NextRequest) {
         rule: { select: { name: true } },
         warehouse: { select: { name: true, code: true } },
       },
-      orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
     });
 
     return NextResponse.json(recommendations);
   } catch (error: any) {
-    console.error('Error fetching recommendations:', error);
-    return NextResponse.json({ error: 'Failed to fetch recommendations' }, { status: 500 });
+    console.error("Error fetching recommendations:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch recommendations" },
+      { status: 500 },
+    );
   }
 }
 
@@ -60,23 +68,31 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: 'No organization found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
     const { recommendationIds } = await req.json();
 
     if (!recommendationIds || !Array.isArray(recommendationIds)) {
-      return NextResponse.json({ error: 'recommendationIds array is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "recommendationIds array is required" },
+        { status: 400 },
+      );
     }
 
     const appliedCount = 0;
@@ -87,12 +103,16 @@ export async function POST(req: NextRequest) {
         where: {
           id: recId,
           organizationId,
-          status: 'PENDING',
+          status: "PENDING",
         },
       });
 
       if (!recommendation) {
-        results.push({ id: recId, success: false, error: 'Recommendation not found or already applied' });
+        results.push({
+          id: recId,
+          success: false,
+          error: "Recommendation not found or already applied",
+        });
         continue;
       }
 
@@ -111,9 +131,9 @@ export async function POST(req: NextRequest) {
             fromLocationId: recommendation.currentLocationId,
             toLocationId: recommendation.recommendedLocationId,
             quantity: 1, // Placeholder - should be actual quantity
-            movementType: 'SLOTTING',
+            movementType: "SLOTTING",
             reason: recommendation.reason,
-            status: 'COMPLETED',
+            status: "COMPLETED",
           },
         });
 
@@ -121,7 +141,7 @@ export async function POST(req: NextRequest) {
         await prisma.slottingRecommendation.update({
           where: { id: recId },
           data: {
-            status: 'APPLIED',
+            status: "APPLIED",
             appliedAt: new Date(),
             appliedById: session.user.id,
           },
@@ -138,23 +158,26 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'SLOTTING_RECOMMENDATIONS_APPLIED',
-        entityType: 'SlottingRecommendation',
+        action: "SLOTTING_RECOMMENDATIONS_APPLIED",
+        entityType: "SlottingRecommendation",
         metadata: {
-          appliedCount: results.filter(r => r.success).length,
-          failedCount: results.filter(r => !r.success).length,
+          appliedCount: results.filter((r) => r.success).length,
+          failedCount: results.filter((r) => !r.success).length,
         },
       },
     });
 
     return NextResponse.json({
       success: true,
-      appliedCount: results.filter(r => r.success).length,
-      failedCount: results.filter(r => !r.success).length,
+      appliedCount: results.filter((r) => r.success).length,
+      failedCount: results.filter((r) => !r.success).length,
       results,
     });
   } catch (error: any) {
-    console.error('Error applying recommendations:', error);
-    return NextResponse.json({ error: 'Failed to apply recommendations' }, { status: 500 });
+    console.error("Error applying recommendations:", error);
+    return NextResponse.json(
+      { error: "Failed to apply recommendations" },
+      { status: 500 },
+    );
   }
 }

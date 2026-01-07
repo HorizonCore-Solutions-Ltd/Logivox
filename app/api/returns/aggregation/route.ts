@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { returnAggregationService } from '@/lib/services/returns/return-aggregation-service';
+import { NextRequest, NextResponse } from "next/server";
+import { returnAggregationService } from "@/lib/services/returns/return-aggregation-service";
 
 /**
  * POST /api/returns/aggregation
@@ -12,22 +12,23 @@ export async function POST(request: NextRequest) {
 
     if (!customerId || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required fields: customerId, organizationId' },
-        { status: 400 }
+        { error: "Missing required fields: customerId, organizationId" },
+        { status: 400 },
       );
     }
 
     // Find eligible returns
-    const eligibleReturns = await returnAggregationService.findAggregatableReturns({
-      customerId,
-      organizationId,
-      rmaIds,
-    });
+    const eligibleReturns =
+      await returnAggregationService.findAggregatableReturns({
+        customerId,
+        organizationId,
+        rmaIds,
+      });
 
     if (eligibleReturns.length === 0) {
       return NextResponse.json({
         success: false,
-        message: 'No eligible returns found for aggregation',
+        message: "No eligible returns found for aggregation",
       });
     }
 
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
     const aggregation = await returnAggregationService.createAggregatedReturn({
       customerId,
       organizationId,
-      rmaIds: eligibleReturns.map(r => r.rmaId),
+      rmaIds: eligibleReturns.map((r) => r.rmaId),
     });
 
     return NextResponse.json({
@@ -43,10 +44,10 @@ export async function POST(request: NextRequest) {
       aggregation,
     });
   } catch (error: any) {
-    console.error('Aggregation error:', error);
+    console.error("Aggregation error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create aggregated return' },
-      { status: 500 }
+      { error: error.message || "Failed to create aggregated return" },
+      { status: 500 },
     );
   }
 }
@@ -58,13 +59,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const customerId = searchParams.get('customerId');
-    const organizationId = searchParams.get('organizationId');
+    const customerId = searchParams.get("customerId");
+    const organizationId = searchParams.get("organizationId");
 
     if (!customerId || !organizationId) {
       return NextResponse.json(
-        { error: 'Missing required parameters' },
-        { status: 400 }
+        { error: "Missing required parameters" },
+        { status: 400 },
       );
     }
 
@@ -78,10 +79,10 @@ export async function GET(request: NextRequest) {
       eligibleReturns: eligible,
     });
   } catch (error: any) {
-    console.error('Find eligible error:', error);
+    console.error("Find eligible error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to find eligible returns' },
-      { status: 500 }
+      { error: error.message || "Failed to find eligible returns" },
+      { status: 500 },
     );
   }
 }

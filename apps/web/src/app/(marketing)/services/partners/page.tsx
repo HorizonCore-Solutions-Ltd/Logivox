@@ -1,13 +1,29 @@
-import { Metadata } from "next"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, ArrowRight, Users as HandshakeIcon, Globe, TrendingUp, Users, Award, DollarSign } from "lucide-react"
-import Link from "next/link"
+import { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Users as HandshakeIcon,
+  Globe,
+  TrendingUp,
+  Users,
+  Award,
+  DollarSign,
+} from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Partner Program | LogiVox WMS",
-  description: "Join the LogiVox partner ecosystem. Build your business by implementing, reselling, and supporting LogiVox WMS solutions.",
-}
+  description:
+    "Join the LogiVox partner ecosystem. Build your business by implementing, reselling, and supporting LogiVox WMS solutions.",
+};
 
 export default function PartnersPage() {
   return (
@@ -23,7 +39,8 @@ export default function PartnersPage() {
               Partner With LogiVox
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Join our global partner network and grow your business by delivering world-class WMS solutions to your clients.
+              Join our global partner network and grow your business by
+              delivering world-class WMS solutions to your clients.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -110,7 +127,14 @@ export default function PartnersPage() {
                 commission: "Revenue share on co-sells",
               },
             ].map((program) => (
-              <Card key={program.type} className={program.featured ? "border-2 border-primary-600 shadow-lg" : ""}>
+              <Card
+                key={program.type}
+                className={
+                  program.featured
+                    ? "border-2 border-primary-600 shadow-lg"
+                    : ""
+                }
+              >
                 {program.featured && (
                   <div className="bg-primary-600 text-white text-center py-2 text-sm font-semibold">
                     MOST POPULAR
@@ -127,7 +151,9 @@ export default function PartnersPage() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
-                    <p className="text-sm font-semibold mb-3">Partner Benefits:</p>
+                    <p className="text-sm font-semibold mb-3">
+                      Partner Benefits:
+                    </p>
                     <ul className="space-y-2">
                       {program.benefits.map((benefit, idx) => (
                         <li key={idx} className="flex items-start space-x-2">
@@ -141,15 +167,25 @@ export default function PartnersPage() {
                     <p className="text-sm font-semibold mb-2">Requirements:</p>
                     <ul className="space-y-1">
                       {program.requirements.map((req, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground">• {req}</li>
+                        <li key={idx} className="text-sm text-muted-foreground">
+                          • {req}
+                        </li>
                       ))}
                     </ul>
                   </div>
                   <div className="pt-4 border-t">
-                    <p className="text-sm font-semibold text-primary-600">{program.commission}</p>
+                    <p className="text-sm font-semibold text-primary-600">
+                      {program.commission}
+                    </p>
                   </div>
-                  <Button className="w-full" variant={program.featured ? "default" : "outline"} asChild>
-                    <Link href={`/contact?service=partner-program&type=${program.type.toLowerCase().replace(' ', '-')}`}>
+                  <Button
+                    className="w-full"
+                    variant={program.featured ? "default" : "outline"}
+                    asChild
+                  >
+                    <Link
+                      href={`/contact?service=partner-program&type=${program.type.toLowerCase().replace(" ", "-")}`}
+                    >
                       Apply Now
                     </Link>
                   </Button>
@@ -172,32 +208,38 @@ export default function PartnersPage() {
               {
                 icon: TrendingUp,
                 title: "Recurring Revenue",
-                description: "Build predictable income streams with recurring commissions on subscription renewals and upsells.",
+                description:
+                  "Build predictable income streams with recurring commissions on subscription renewals and upsells.",
               },
               {
                 icon: Award,
                 title: "Industry-Leading Product",
-                description: "Sell a proven WMS that customers love, with 95% customer satisfaction and 98% retention rate.",
+                description:
+                  "Sell a proven WMS that customers love, with 95% customer satisfaction and 98% retention rate.",
               },
               {
                 icon: Users,
                 title: "Partner Enablement",
-                description: "Access training, certifications, sales tools, and technical resources to ensure your success.",
+                description:
+                  "Access training, certifications, sales tools, and technical resources to ensure your success.",
               },
               {
                 icon: Globe,
                 title: "Global Reach",
-                description: "Tap into enterprise and mid-market opportunities with a solution that scales from 1 to 100+ warehouses.",
+                description:
+                  "Tap into enterprise and mid-market opportunities with a solution that scales from 1 to 100+ warehouses.",
               },
               {
                 icon: HandshakeIcon,
                 title: "Co-Marketing Support",
-                description: "Benefit from joint marketing campaigns, case studies, events, and lead generation programs.",
+                description:
+                  "Benefit from joint marketing campaigns, case studies, events, and lead generation programs.",
               },
               {
                 icon: DollarSign,
                 title: "Generous Commissions",
-                description: "Earn up to 30% recurring commissions plus implementation project fees and referral bonuses.",
+                description:
+                  "Earn up to 30% recurring commissions plus implementation project fees and referral bonuses.",
               },
             ].map((benefit, index) => (
               <Card key={index}>
@@ -274,11 +316,15 @@ export default function PartnersPage() {
                 <CardHeader>
                   <div className="text-center mb-4">
                     <div className="text-5xl mb-2">{tier.badge}</div>
-                    <CardTitle className="text-2xl">{tier.tier} Partner</CardTitle>
+                    <CardTitle className="text-2xl">
+                      {tier.tier} Partner
+                    </CardTitle>
                   </div>
                   <CardDescription className="text-center">
                     <p className="font-semibold mb-1">{tier.requirements}</p>
-                    <p className="text-primary-600 font-bold">{tier.commission}</p>
+                    <p className="text-primary-600 font-bold">
+                      {tier.commission}
+                    </p>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -310,13 +356,15 @@ export default function PartnersPage() {
                 partner: "Logistics Solutions Inc.",
                 type: "Implementation Partner",
                 results: "Deployed 25+ implementations, $2.5M in revenue",
-                quote: "Partnering with LogiVox has transformed our business. The product sells itself and our clients love it.",
+                quote:
+                  "Partnering with LogiVox has transformed our business. The product sells itself and our clients love it.",
               },
               {
                 partner: "TechWare Distribution",
                 type: "Reseller Partner",
                 results: "150+ licenses sold, 28% annual growth",
-                quote: "The recurring commission model provides stable revenue. LogiVox's partner support is outstanding.",
+                quote:
+                  "The recurring commission model provides stable revenue. LogiVox's partner support is outstanding.",
               },
             ].map((story, index) => (
               <Card key={index}>
@@ -325,8 +373,12 @@ export default function PartnersPage() {
                   <CardDescription>{story.type}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="font-semibold text-primary-600">{story.results}</p>
-                  <p className="text-muted-foreground italic">"{story.quote}"</p>
+                  <p className="font-semibold text-primary-600">
+                    {story.results}
+                  </p>
+                  <p className="text-muted-foreground italic">
+                    "{story.quote}"
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -340,9 +392,12 @@ export default function PartnersPage() {
           <Card className="bg-gradient-to-br from-primary-600 to-primary-700 text-white border-0">
             <CardContent className="p-12 text-center">
               <HandshakeIcon className="h-16 w-16 mx-auto mb-6 opacity-90" />
-              <h2 className="text-3xl font-bold mb-4">Ready to Grow Your Business?</h2>
+              <h2 className="text-3xl font-bold mb-4">
+                Ready to Grow Your Business?
+              </h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Join our partner ecosystem and start generating revenue with LogiVox WMS. Apply today to get started.
+                Join our partner ecosystem and start generating revenue with
+                LogiVox WMS. Apply today to get started.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="secondary" asChild>
@@ -350,7 +405,12 @@ export default function PartnersPage() {
                     Apply Now <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-transparent border-white text-white hover:bg-white/10"
+                  asChild
+                >
                   <Link href="/partners">Find a Partner</Link>
                 </Button>
               </div>
@@ -359,5 +419,5 @@ export default function PartnersPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

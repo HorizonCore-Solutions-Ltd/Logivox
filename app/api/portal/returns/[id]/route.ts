@@ -4,20 +4,20 @@
  * POST /api/portal/returns/[id]/cancel - Cancel return
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const customerUser = await prisma.customerUser.findFirst({
@@ -28,7 +28,10 @@ export async function GET(
     });
 
     if (!customerUser) {
-      return NextResponse.json({ error: 'Customer access required' }, { status: 403 });
+      return NextResponse.json(
+        { error: "Customer access required" },
+        { status: 403 },
+      );
     }
 
     // Get return - verify it belongs to customer
@@ -60,7 +63,7 @@ export async function GET(
             voidedAt: null,
           },
           orderBy: {
-            createdAt: 'desc',
+            createdAt: "desc",
           },
           take: 1,
         },
@@ -68,7 +71,7 @@ export async function GET(
     });
 
     if (!rma) {
-      return NextResponse.json({ error: 'Return not found' }, { status: 404 });
+      return NextResponse.json({ error: "Return not found" }, { status: 404 });
     }
 
     // Get tracking events if label exists
@@ -92,10 +95,10 @@ export async function GET(
       trackingInfo,
     });
   } catch (error) {
-    console.error('Error fetching return:', error);
+    console.error("Error fetching return:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch return details' },
-      { status: 500 }
+      { error: "Failed to fetch return details" },
+      { status: 500 },
     );
   }
 }

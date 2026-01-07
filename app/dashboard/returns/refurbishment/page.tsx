@@ -1,25 +1,25 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 import {
   Wrench,
   Clock,
@@ -30,8 +30,8 @@ import {
   AlertCircle,
   Plus,
   RefreshCw,
-} from 'lucide-react';
-import { toast } from 'sonner';
+} from "lucide-react";
+import { toast } from "sonner";
 
 interface WorkOrder {
   id: string;
@@ -71,10 +71,12 @@ interface WorkOrderDetails extends WorkOrder {
 export default function RefurbishmentQueuePage() {
   const [loading, setLoading] = useState(true);
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<WorkOrderDetails | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<WorkOrderDetails | null>(
+    null,
+  );
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const [filterStatus, setFilterStatus] = useState('ALL');
-  const [filterPriority, setFilterPriority] = useState('ALL');
+  const [filterStatus, setFilterStatus] = useState("ALL");
+  const [filterPriority, setFilterPriority] = useState("ALL");
 
   useEffect(() => {
     fetchWorkOrders();
@@ -84,15 +86,17 @@ export default function RefurbishmentQueuePage() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (filterStatus !== 'ALL') params.append('status', filterStatus);
-      if (filterPriority !== 'ALL') params.append('priority', filterPriority);
+      if (filterStatus !== "ALL") params.append("status", filterStatus);
+      if (filterPriority !== "ALL") params.append("priority", filterPriority);
 
-      const response = await fetch(`/api/returns/refurbishment/work-orders?${params}`);
+      const response = await fetch(
+        `/api/returns/refurbishment/work-orders?${params}`,
+      );
       const data = await response.json();
       setWorkOrders(data.workOrders || []);
     } catch (error) {
-      console.error('Error fetching work orders:', error);
-      toast.error('Failed to load work orders');
+      console.error("Error fetching work orders:", error);
+      toast.error("Failed to load work orders");
     } finally {
       setLoading(false);
     }
@@ -100,79 +104,96 @@ export default function RefurbishmentQueuePage() {
 
   const fetchWorkOrderDetails = async (id: string) => {
     try {
-      const response = await fetch(`/api/returns/refurbishment/work-orders/${id}`);
+      const response = await fetch(
+        `/api/returns/refurbishment/work-orders/${id}`,
+      );
       const data = await response.json();
       setSelectedOrder(data);
       setDetailsOpen(true);
     } catch (error) {
-      console.error('Error fetching work order details:', error);
-      toast.error('Failed to load work order details');
+      console.error("Error fetching work order details:", error);
+      toast.error("Failed to load work order details");
     }
   };
 
-  const completeStep = async (workOrderId: string, stepId: string, notes: string) => {
+  const completeStep = async (
+    workOrderId: string,
+    stepId: string,
+    notes: string,
+  ) => {
     try {
-      const response = await fetch(`/api/returns/refurbishment/work-orders/${workOrderId}/steps`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stepId, notes }),
-      });
+      const response = await fetch(
+        `/api/returns/refurbishment/work-orders/${workOrderId}/steps`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ stepId, notes }),
+        },
+      );
 
       if (response.ok) {
-        toast.success('Step completed');
+        toast.success("Step completed");
         fetchWorkOrderDetails(workOrderId);
         fetchWorkOrders();
       }
     } catch (error) {
-      console.error('Error completing step:', error);
-      toast.error('Failed to complete step');
+      console.error("Error completing step:", error);
+      toast.error("Failed to complete step");
     }
   };
 
-  const assignTechnician = async (workOrderId: string, technicianId: string) => {
+  const assignTechnician = async (
+    workOrderId: string,
+    technicianId: string,
+  ) => {
     try {
-      const response = await fetch(`/api/returns/refurbishment/work-orders/${workOrderId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ assigned_to: technicianId }),
-      });
+      const response = await fetch(
+        `/api/returns/refurbishment/work-orders/${workOrderId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ assigned_to: technicianId }),
+        },
+      );
 
       if (response.ok) {
-        toast.success('Technician assigned');
+        toast.success("Technician assigned");
         fetchWorkOrders();
       }
     } catch (error) {
-      console.error('Error assigning technician:', error);
-      toast.error('Failed to assign technician');
+      console.error("Error assigning technician:", error);
+      toast.error("Failed to assign technician");
     }
   };
 
   const getPriorityBadge = (priority: string) => {
     const config = {
-      URGENT: { color: 'bg-red-500', text: 'Urgent' },
-      HIGH: { color: 'bg-orange-500', text: 'High' },
-      MEDIUM: { color: 'bg-yellow-500', text: 'Medium' },
-      LOW: { color: 'bg-green-500', text: 'Low' },
+      URGENT: { color: "bg-red-500", text: "Urgent" },
+      HIGH: { color: "bg-orange-500", text: "High" },
+      MEDIUM: { color: "bg-yellow-500", text: "Medium" },
+      LOW: { color: "bg-green-500", text: "Low" },
     };
 
-    const { color, text } = config[priority as keyof typeof config] || config.LOW;
+    const { color, text } =
+      config[priority as keyof typeof config] || config.LOW;
     return <Badge className={`${color} text-white`}>{text}</Badge>;
   };
 
   const getStatusBadge = (status: string) => {
     const config = {
-      PENDING: { color: 'bg-gray-500', icon: Clock },
-      IN_PROGRESS: { color: 'bg-blue-500', icon: Wrench },
-      QA_REVIEW: { color: 'bg-purple-500', icon: AlertCircle },
-      COMPLETED: { color: 'bg-green-500', icon: CheckCircle },
-      FAILED: { color: 'bg-red-500', icon: XCircle },
+      PENDING: { color: "bg-gray-500", icon: Clock },
+      IN_PROGRESS: { color: "bg-blue-500", icon: Wrench },
+      QA_REVIEW: { color: "bg-purple-500", icon: AlertCircle },
+      COMPLETED: { color: "bg-green-500", icon: CheckCircle },
+      FAILED: { color: "bg-red-500", icon: XCircle },
     };
 
-    const { color, icon: Icon } = config[status as keyof typeof config] || config.PENDING;
+    const { color, icon: Icon } =
+      config[status as keyof typeof config] || config.PENDING;
     return (
       <Badge className={`${color} text-white flex items-center gap-1`}>
         <Icon className="w-3 h-3" />
-        {status.replace(/_/g, ' ')}
+        {status.replace(/_/g, " ")}
       </Badge>
     );
   };
@@ -196,7 +217,9 @@ export default function RefurbishmentQueuePage() {
             <Wrench className="w-8 h-8" />
             Refurbishment Queue
           </h1>
-          <p className="text-muted-foreground">Manage work orders and track repairs</p>
+          <p className="text-muted-foreground">
+            Manage work orders and track repairs
+          </p>
         </div>
         <div className="flex gap-2">
           <Button onClick={fetchWorkOrders}>
@@ -214,7 +237,7 @@ export default function RefurbishmentQueuePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {workOrders.filter((w) => w.status === 'PENDING').length}
+              {workOrders.filter((w) => w.status === "PENDING").length}
             </div>
           </CardContent>
         </Card>
@@ -225,7 +248,7 @@ export default function RefurbishmentQueuePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-500">
-              {workOrders.filter((w) => w.status === 'IN_PROGRESS').length}
+              {workOrders.filter((w) => w.status === "IN_PROGRESS").length}
             </div>
           </CardContent>
         </Card>
@@ -236,23 +259,26 @@ export default function RefurbishmentQueuePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-500">
-              {workOrders.filter((w) => w.status === 'QA_REVIEW').length}
+              {workOrders.filter((w) => w.status === "QA_REVIEW").length}
             </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Completed Today</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Completed Today
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-500">
               {
                 workOrders.filter(
                   (w) =>
-                    w.status === 'COMPLETED' &&
+                    w.status === "COMPLETED" &&
                     w.completed_at &&
-                    new Date(w.completed_at).toDateString() === new Date().toDateString()
+                    new Date(w.completed_at).toDateString() ===
+                      new Date().toDateString(),
                 ).length
               }
             </div>
@@ -323,7 +349,9 @@ export default function RefurbishmentQueuePage() {
                     <Wrench className="w-8 h-8 text-primary" />
                     <div>
                       <div className="font-bold">{order.work_order_number}</div>
-                      <div className="text-sm text-muted-foreground">{order.item_name}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {order.item_name}
+                      </div>
                       <div className="text-xs text-muted-foreground mt-1">
                         RMA: {order.rma_number}
                       </div>
@@ -385,22 +413,30 @@ export default function RefurbishmentQueuePage() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <div className="text-muted-foreground">Item</div>
-                        <div className="font-medium">{selectedOrder.item_name}</div>
+                        <div className="font-medium">
+                          {selectedOrder.item_name}
+                        </div>
                       </div>
                       <div>
                         <div className="text-muted-foreground">RMA Number</div>
-                        <div className="font-medium">{selectedOrder.rma_number}</div>
+                        <div className="font-medium">
+                          {selectedOrder.rma_number}
+                        </div>
                       </div>
                       <div>
-                        <div className="text-muted-foreground">Estimated Cost</div>
-                        <div className="font-medium">${selectedOrder.estimated_cost.toFixed(2)}</div>
+                        <div className="text-muted-foreground">
+                          Estimated Cost
+                        </div>
+                        <div className="font-medium">
+                          ${selectedOrder.estimated_cost.toFixed(2)}
+                        </div>
                       </div>
                       <div>
                         <div className="text-muted-foreground">Actual Cost</div>
                         <div className="font-medium">
                           {selectedOrder.actual_cost
                             ? `$${selectedOrder.actual_cost.toFixed(2)}`
-                            : 'TBD'}
+                            : "TBD"}
                         </div>
                       </div>
                     </div>
@@ -410,7 +446,9 @@ export default function RefurbishmentQueuePage() {
                 {/* Steps */}
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-sm">Refurbishment Steps</CardTitle>
+                    <CardTitle className="text-sm">
+                      Refurbishment Steps
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
@@ -422,17 +460,19 @@ export default function RefurbishmentQueuePage() {
                           <div className="flex items-start gap-3">
                             <div
                               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                                step.status === 'COMPLETED'
-                                  ? 'bg-green-500 text-white'
-                                  : step.status === 'IN_PROGRESS'
-                                  ? 'bg-blue-500 text-white'
-                                  : 'bg-gray-200'
+                                step.status === "COMPLETED"
+                                  ? "bg-green-500 text-white"
+                                  : step.status === "IN_PROGRESS"
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-200"
                               }`}
                             >
                               {step.step_number}
                             </div>
                             <div>
-                              <div className="font-medium">{step.description}</div>
+                              <div className="font-medium">
+                                {step.description}
+                              </div>
                               {step.notes && (
                                 <div className="text-sm text-muted-foreground mt-1">
                                   {step.notes}
@@ -440,18 +480,25 @@ export default function RefurbishmentQueuePage() {
                               )}
                               {step.completed_at && (
                                 <div className="text-xs text-muted-foreground mt-1">
-                                  Completed: {new Date(step.completed_at).toLocaleString()}
+                                  Completed:{" "}
+                                  {new Date(step.completed_at).toLocaleString()}
                                 </div>
                               )}
                             </div>
                           </div>
-                          {step.status === 'PENDING' && (
+                          {step.status === "PENDING" && (
                             <Button
                               size="sm"
                               onClick={() => {
-                                const notes = prompt('Enter notes for this step:');
+                                const notes = prompt(
+                                  "Enter notes for this step:",
+                                );
                                 if (notes !== null) {
-                                  completeStep(selectedOrder.id, step.id, notes);
+                                  completeStep(
+                                    selectedOrder.id,
+                                    step.id,
+                                    notes,
+                                  );
                                 }
                               }}
                             >
@@ -478,8 +525,12 @@ export default function RefurbishmentQueuePage() {
                             className="flex items-center justify-between text-sm p-2 border rounded"
                           >
                             <div>
-                              <div className="font-medium">{part.part_name}</div>
-                              <div className="text-muted-foreground">{part.part_sku}</div>
+                              <div className="font-medium">
+                                {part.part_name}
+                              </div>
+                              <div className="text-muted-foreground">
+                                {part.part_sku}
+                              </div>
                             </div>
                             <div className="text-right">
                               <div>Qty: {part.quantity}</div>

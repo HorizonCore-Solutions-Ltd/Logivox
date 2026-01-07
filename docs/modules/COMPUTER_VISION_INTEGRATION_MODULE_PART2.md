@@ -13,6 +13,7 @@ Part 2 elevates LogiVox computer vision to "5–10 years ahead": real-time 3D sc
 This part assumes Part 1's CV infrastructure exists (cameras, object detection, OCR, damage detection, quality inspection).
 
 ### Advanced Capabilities
+
 - **3D Scene Reconstruction**: Real-time spatial mapping for digital twin integration
 - **Activity Recognition**: Human pose estimation, action detection, workflow monitoring
 - **Safety Monitoring**: Fall detection, PPE verification, collision prediction
@@ -26,19 +27,28 @@ This part assumes Part 1's CV infrastructure exists (cameras, object detection, 
 ## 🏗️ 1. Real-Time 3D Scene Reconstruction & Digital Twin
 
 ### Goal
+
 Build live 3D models of warehouse spaces for layout optimization, robot navigation, and AR/VR integration.
 
 ```typescript
-type ReconstructionMethod = 'STEREO' | 'DEPTH_CAMERA' | 'SLAM' | 'PHOTOGRAMMETRY' | 'LIDAR_FUSION';
+type ReconstructionMethod =
+  | "STEREO"
+  | "DEPTH_CAMERA"
+  | "SLAM"
+  | "PHOTOGRAMMETRY"
+  | "LIDAR_FUSION";
 
 interface SceneReconstruction {
   startReconstruction: (config: ReconstructionConfig) => Promise<string>; // session ID
-  updateReconstruction: (sessionId: string, newImages: string[]) => Promise<ReconstructionUpdate>;
+  updateReconstruction: (
+    sessionId: string,
+    newImages: string[],
+  ) => Promise<ReconstructionUpdate>;
   finalizeReconstruction: (sessionId: string) => Promise<Scene3D>;
-  
+
   // Real-time streaming
   streamReconstruction: (sessionId: string) => Promise<void>; // WebSocket/gRPC stream
-  
+
   // Integration
   exportToDigitalTwin: (sceneId: string, twinId: string) => Promise<void>;
 }
@@ -46,21 +56,21 @@ interface SceneReconstruction {
 interface ReconstructionConfig {
   warehouseId: string;
   zone?: string;
-  
+
   method: ReconstructionMethod;
-  
+
   // Camera sources
   cameraIds: string[];
-  
+
   // If mobile capture
   mobilePath?: {
     waypoints: { x: number; y: number; z: number }[];
     captureInterval: number; // seconds
   };
-  
+
   // Accuracy
-  resolution: 'LOW' | 'MEDIUM' | 'HIGH' | 'ULTRA';
-  
+  resolution: "LOW" | "MEDIUM" | "HIGH" | "ULTRA";
+
   // Real-time constraints
   maxLatencyMs?: number;
   targetFps?: number;
@@ -69,19 +79,19 @@ interface ReconstructionConfig {
 interface ReconstructionUpdate {
   sessionId: string;
   timestamp: Date;
-  
+
   progress: {
     areaScannedM2: number;
     totalAreaM2: number;
     percentComplete: number;
   };
-  
+
   // Partial mesh
   meshSegmentRef?: string;
-  
+
   // Detected features
   features: {
-    type: 'FLOOR' | 'WALL' | 'RACK' | 'PALLET' | 'OBSTACLE' | 'DOOR';
+    type: "FLOOR" | "WALL" | "RACK" | "PALLET" | "OBSTACLE" | "DOOR";
     count: number;
   }[];
 }
@@ -90,13 +100,13 @@ interface Scene3D {
   id: string;
   warehouseId: string;
   zone?: string;
-  
+
   createdAt: Date;
   method: ReconstructionMethod;
-  
+
   // 3D mesh
   meshRef: string; // point cloud or mesh file (PLY, OBJ, etc.)
-  
+
   // Dimensions
   bounds: {
     minX: number;
@@ -106,23 +116,23 @@ interface Scene3D {
     maxY: number;
     maxZ: number;
   };
-  
+
   // Identified objects
   objects: {
     id: string;
     type: string;
-    
+
     position: { x: number; y: number; z: number };
     dimensions: { width: number; height: number; depth: number };
-    
+
     confidence: number;
   }[];
-  
+
   // Metadata
   metadata: {
     resolution: number; // points per m³
     accuracy: number; // cm
-    
+
     totalPoints: number;
     totalTriangles?: number;
   };
@@ -141,6 +151,7 @@ const SCENE_RECONSTRUCTION_VOICE_COMMANDS = [
 ## 🏃 2. Human Activity Recognition & Workflow Monitoring
 
 ### Goal
+
 Track worker movements, recognize activities, and monitor workflow adherence for optimization and training.
 
 ```typescript
@@ -175,11 +186,11 @@ type PoseKeypoint =
 
 interface ActivityRecognition {
   recognizeActivity: (imageRef: string) => Promise<ActivityResult>;
-  
+
   // Continuous tracking
   trackPerson: (config: PersonTrackingConfig) => Promise<string>; // tracking session ID
   getTrackingSession: (sessionId: string) => Promise<TrackingSession>;
-  
+
   // Analytics
   getWorkflowMetrics: (filters: WorkflowMetricsFilters) => Promise<WorkflowMetrics>;
 }
@@ -187,14 +198,14 @@ interface ActivityRecognition {
 interface ActivityResult {
   imageRef: string;
   timestamp: Date;
-  
+
   persons: {
     personId: string;
-    
+
     // Activity
     activity: ActivityType;
     confidence: number;
-    
+
     // Pose estimation
     pose?: {
       keypoints: {
@@ -203,12 +214,12 @@ interface ActivityResult {
         y: number;
         confidence: number;
       }[];
-      
+
       // Ergonomic analysis
       posture: 'GOOD' | 'BENT' | 'TWISTED' | 'REACHING' | 'KNEELING';
       risk: 'LOW' | 'MEDIUM' | 'HIGH'; // injury risk
     };
-    
+
     // Location
     boundingBox: {
       x: number;
@@ -216,7 +227,7 @@ interface ActivityResult {
       width: number;
       height: number;
     };
-    
+
     // Optional attributes
     attributes?: {
       carryingLoad: boolean;
@@ -229,15 +240,15 @@ interface ActivityResult {
 interface PersonTrackingConfig {
   cameraIds: string[];
   zone?: string;
-  
+
   // Privacy
   anonymize: boolean;
   blurFaces: boolean;
-  
+
   // Tracking
   maxPersonsToTrack?: number;
   reIdentificationEnabled?: boolean; // track across cameras
-  
+
   // Duration
   startTime?: Date;
   endTime?: Date;
@@ -246,16 +257,16 @@ interface PersonTrackingConfig {
 interface TrackingSession {
   id: string;
   config: PersonTrackingConfig;
-  
+
   status: 'ACTIVE' | 'COMPLETED' | 'STOPPED';
-  
+
   // Tracked persons
   persons: {
     personId: string; // anonymous ID
-    
+
     firstSeen: Date;
     lastSeen: Date;
-    
+
     trajectory: {
       timestamp: Date;
       x: number;
@@ -263,17 +274,17 @@ interface TrackingSession {
       z?: number;
       activity: ActivityType;
     }[];
-    
+
     // Summary
     totalActivities: Record<ActivityType, number>; // seconds spent in each
     totalDistanceM: number;
     avgSpeed: number; // m/s
-    
+
     // Productivity
     productiveTi mePercent: number;
     idleTimePercent: number;
   }[];
-  
+
   startedAt: Date;
   completedAt?: Date;
 }
@@ -287,30 +298,30 @@ interface WorkflowMetricsFilters {
 
 interface WorkflowMetrics {
   period: DateRange;
-  
+
   totalPersonHours: number;
-  
+
   // Time distribution
   activityDistribution: {
     activity: ActivityType;
     totalSeconds: number;
     percent: number;
   }[];
-  
+
   // Movement
   avgDistancePerPersonM: number;
   avgSpeedMps: number;
-  
+
   // Productivity
   productiveTimePercent: number;
   idleTimePercent: number;
-  
+
   // Ergonomics
   ergonomicEvents: {
     type: 'HIGH_RISK_POSTURE' | 'REPETITIVE_MOTION' | 'HEAVY_LIFT';
     count: number;
   }[];
-  
+
   // Insights
   insights: {
     insight: string;
@@ -332,34 +343,47 @@ const ACTIVITY_RECOGNITION_VOICE_COMMANDS = [
 ## 🚨 3. Safety Monitoring & Collision Prevention
 
 ### Goal
+
 Real-time detection of safety violations, near-misses, and collision risks to prevent accidents.
 
 ```typescript
 type SafetyEvent =
-  | 'NO_PPE'
-  | 'FALL_DETECTED'
-  | 'COLLISION_RISK'
-  | 'RESTRICTED_AREA'
-  | 'UNSAFE_POSTURE'
-  | 'SPEEDING_EQUIPMENT'
-  | 'IMPROPER_LIFT'
-  | 'FIRE'
-  | 'SPILL';
+  | "NO_PPE"
+  | "FALL_DETECTED"
+  | "COLLISION_RISK"
+  | "RESTRICTED_AREA"
+  | "UNSAFE_POSTURE"
+  | "SPEEDING_EQUIPMENT"
+  | "IMPROPER_LIFT"
+  | "FIRE"
+  | "SPILL";
 
-type PPEType = 'HARD_HAT' | 'SAFETY_VEST' | 'SAFETY_SHOES' | 'GLOVES' | 'GOGGLES' | 'MASK';
+type PPEType =
+  | "HARD_HAT"
+  | "SAFETY_VEST"
+  | "SAFETY_SHOES"
+  | "GLOVES"
+  | "GOGGLES"
+  | "MASK";
 
 interface SafetyMonitoring {
   monitorSafety: (config: SafetyMonitoringConfig) => Promise<string>; // monitoring session ID
-  
+
   // Real-time alerts
-  subscribeToAlerts: (sessionId: string, callback: (alert: SafetyAlert) => void) => Promise<void>;
-  
+  subscribeToAlerts: (
+    sessionId: string,
+    callback: (alert: SafetyAlert) => void,
+  ) => Promise<void>;
+
   // PPE verification
-  verifyPPE: (imageRef: string, requiredPPE: PPEType[]) => Promise<PPEVerificationResult>;
-  
+  verifyPPE: (
+    imageRef: string,
+    requiredPPE: PPEType[],
+  ) => Promise<PPEVerificationResult>;
+
   // Collision prediction
   predictCollision: (sceneRef: string) => Promise<CollisionPrediction>;
-  
+
   // Analytics
   getSafetyMetrics: (filters: SafetyMetricsFilters) => Promise<SafetyMetrics>;
 }
@@ -367,26 +391,26 @@ interface SafetyMonitoring {
 interface SafetyMonitoringConfig {
   warehouseId: string;
   zones: string[];
-  
+
   cameraIds: string[];
-  
+
   // What to monitor
   monitoring: {
     ppeCompliance: boolean;
     requiredPPE?: PPEType[];
-    
+
     fallDetection: boolean;
     collisionPrevention: boolean;
-    
+
     restrictedAreas?: { zoneId: string; allowedRoles: string[] }[];
-    
+
     equipmentSpeed: boolean;
     maxSpeedKph?: number;
   };
-  
+
   // Alert thresholds
   alertOn: SafetyEvent[];
-  
+
   // Response
   autoAlert: {
     enabled: boolean;
@@ -398,31 +422,31 @@ interface SafetyMonitoringConfig {
 interface SafetyAlert {
   id: string;
   timestamp: Date;
-  
+
   eventType: SafetyEvent;
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
-  
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+
   // Location
   warehouseId: string;
   zone: string;
   cameraId: string;
-  
+
   // Details
   description: string;
-  
+
   // Evidence
   imageRef: string;
   videoClipRef?: string;
-  
+
   // Involved entities
   persons?: string[]; // anonymous IDs
   equipment?: string[];
-  
+
   // Status
   acknowledged: boolean;
   acknowledgedBy?: string;
   acknowledgedAt?: Date;
-  
+
   resolved: boolean;
   resolvedBy?: string;
   resolvedAt?: Date;
@@ -431,43 +455,43 @@ interface SafetyAlert {
 
 interface PPEVerificationResult {
   imageRef: string;
-  
+
   persons: {
     personId: string;
-    
+
     compliant: boolean;
-    
+
     detectedPPE: {
       type: PPEType;
       detected: boolean;
       confidence: number;
     }[];
-    
+
     missingPPE: PPEType[];
   }[];
-  
+
   overallCompliance: number; // 0-1
 }
 
 interface CollisionPrediction {
   sceneRef: string;
   timestamp: Date;
-  
-  collisionRisk: 'NONE' | 'LOW' | 'MEDIUM' | 'HIGH' | 'IMMINENT';
-  
+
+  collisionRisk: "NONE" | "LOW" | "MEDIUM" | "HIGH" | "IMMINENT";
+
   predictions: {
     object1: { type: string; id: string };
     object2: { type: string; id: string };
-    
+
     timeToCollisionSeconds?: number;
     collisionProbability: number; // 0-1
-    
+
     // Trajectory
     object1Trajectory: { x: number; y: number; timestamp: Date }[];
     object2Trajectory: { x: number; y: number; timestamp: Date }[];
-    
+
     // Recommended action
-    recommendation: 'STOP' | 'SLOW_DOWN' | 'CHANGE_PATH' | 'ALERT_OPERATOR';
+    recommendation: "STOP" | "SLOW_DOWN" | "CHANGE_PATH" | "ALERT_OPERATOR";
   }[];
 }
 
@@ -480,28 +504,28 @@ interface SafetyMetricsFilters {
 
 interface SafetyMetrics {
   period: DateRange;
-  
+
   totalEvents: number;
   eventsBySeverity: Record<string, number>;
-  
+
   // By type
   eventDistribution: {
     eventType: SafetyEvent;
     count: number;
-    trend: 'INCREASING' | 'STABLE' | 'DECREASING';
+    trend: "INCREASING" | "STABLE" | "DECREASING";
   }[];
-  
+
   // PPE compliance
   ppeComplianceRate: number; // %
-  
+
   // Near-misses
   nearMisses: number;
   collisionsAvoided: number;
-  
+
   // Response times
   avgAcknowledgmentTimeMinutes: number;
   avgResolutionTimeMinutes: number;
-  
+
   // Top risks
   topRiskZones: {
     zone: string;
@@ -524,20 +548,23 @@ const SAFETY_MONITORING_VOICE_COMMANDS = [
 ## 🔮 4. Predictive Quality Vision
 
 ### Goal
+
 Forecast quality issues and defects before they occur by analyzing visual patterns and trends.
 
 ```typescript
 interface PredictiveQualityVision {
   trainQualityModel: (config: QualityModelConfig) => Promise<string>; // model ID
-  
-  predictQualityIssue: (input: QualityPredictionInput) => Promise<QualityPrediction>;
-  
+
+  predictQualityIssue: (
+    input: QualityPredictionInput,
+  ) => Promise<QualityPrediction>;
+
   identifyVisualTrends: (filters: TrendFilters) => Promise<VisualTrends>;
 }
 
 interface QualityModelConfig {
   name: string;
-  
+
   // Training data
   historicalData: {
     imageRefs: string[];
@@ -545,23 +572,27 @@ interface QualityModelConfig {
       imageRef: string;
       defectType?: string;
       severity?: string;
-      finalDisposition: 'PASS' | 'FAIL' | 'REWORK';
+      finalDisposition: "PASS" | "FAIL" | "REWORK";
     }[];
   };
-  
+
   // What to predict
-  predictionTarget: 'DEFECT_PROBABILITY' | 'DEFECT_TYPE' | 'QUALITY_SCORE' | 'SHELF_LIFE';
-  
+  predictionTarget:
+    | "DEFECT_PROBABILITY"
+    | "DEFECT_TYPE"
+    | "QUALITY_SCORE"
+    | "SHELF_LIFE";
+
   // Features
   visualFeatures: string[]; // 'color_histogram', 'texture', 'edge_density', etc.
 }
 
 interface QualityPredictionInput {
   modelId: string;
-  
+
   // Current state
   imageRef: string;
-  
+
   // Context
   context?: {
     sku?: string;
@@ -575,9 +606,9 @@ interface QualityPredictionInput {
 interface QualityPrediction {
   imageRef: string;
   modelId: string;
-  
+
   predictedAt: Date;
-  
+
   // Prediction
   prediction: {
     defectProbability: number; // 0-1
@@ -585,25 +616,30 @@ interface QualityPrediction {
       type: string;
       probability: number;
     }[];
-    
+
     qualityScore?: number; // 0-100
-    
+
     expectedShelfLifeDays?: number;
   };
-  
+
   confidence: number;
-  
+
   // Contributing factors
   riskFactors: {
     factor: string;
     contribution: number; // % of risk
     description: string;
   }[];
-  
+
   // Recommendations
   recommendations: {
-    action: 'INSPECT_NOW' | 'EXPEDITE_SALE' | 'QUARANTINE' | 'INCREASE_MONITORING' | 'ACCEPTABLE';
-    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+    action:
+      | "INSPECT_NOW"
+      | "EXPEDITE_SALE"
+      | "QUARANTINE"
+      | "INCREASE_MONITORING"
+      | "ACCEPTABLE";
+    priority: "HIGH" | "MEDIUM" | "LOW";
     reason: string;
   }[];
 }
@@ -613,28 +649,28 @@ interface TrendFilters {
   sku?: string;
   supplier?: string;
   category?: string;
-  
+
   period: DateRange;
 }
 
 interface VisualTrends {
   period: DateRange;
-  
+
   trends: {
     trendName: string;
     description: string;
-    
+
     // Evidence
     exampleImages: string[];
-    
+
     // Impact
     affectedSKUs: string[];
     estimatedImpact: string;
-    
+
     // Timeline
     firstDetected: Date;
-    frequency: 'INCREASING' | 'STABLE' | 'DECREASING';
-    
+    frequency: "INCREASING" | "STABLE" | "DECREASING";
+
     // Correlation
     correlatedFactors?: {
       factor: string;
@@ -656,53 +692,58 @@ const PREDICTIVE_QUALITY_VOICE_COMMANDS = [
 ## 🔍 5. Warehouse-Wide Anomaly Detection
 
 ### Goal
+
 Identify unusual patterns, security threats, and operational inefficiencies across the entire facility.
 
 ```typescript
 type AnomalyType =
-  | 'UNUSUAL_ACTIVITY'
-  | 'UNAUTHORIZED_ACCESS'
-  | 'MISPLACED_INVENTORY'
-  | 'EQUIPMENT_MALFUNCTION'
-  | 'PROCESS_DEVIATION'
-  | 'SECURITY_THREAT'
-  | 'ENVIRONMENTAL_HAZARD';
+  | "UNUSUAL_ACTIVITY"
+  | "UNAUTHORIZED_ACCESS"
+  | "MISPLACED_INVENTORY"
+  | "EQUIPMENT_MALFUNCTION"
+  | "PROCESS_DEVIATION"
+  | "SECURITY_THREAT"
+  | "ENVIRONMENTAL_HAZARD";
 
 interface AnomalyDetection {
   enableAnomalyDetection: (config: AnomalyDetectionConfig) => Promise<string>;
-  
-  detectAnomalies: (input: AnomalyDetectionInput) => Promise<AnomalyDetectionResult>;
-  
+
+  detectAnomalies: (
+    input: AnomalyDetectionInput,
+  ) => Promise<AnomalyDetectionResult>;
+
   // Historical analysis
-  analyzeAnomalies: (filters: AnomalyAnalysisFilters) => Promise<AnomalyAnalysis>;
+  analyzeAnomalies: (
+    filters: AnomalyAnalysisFilters,
+  ) => Promise<AnomalyAnalysis>;
 }
 
 interface AnomalyDetectionConfig {
   warehouseId: string;
-  
+
   // Cameras
   cameraIds: string[];
-  
+
   // Baseline learning
   baselinePeriodDays: number; // learn normal patterns
-  
+
   // Sensitivity
-  sensitivity: 'LOW' | 'MEDIUM' | 'HIGH';
-  
+  sensitivity: "LOW" | "MEDIUM" | "HIGH";
+
   // What to detect
   anomalyTypes: AnomalyType[];
-  
+
   // Alerts
   alertOn: {
     type: AnomalyType;
-    minSeverity: 'LOW' | 'MEDIUM' | 'HIGH';
+    minSeverity: "LOW" | "MEDIUM" | "HIGH";
   }[];
 }
 
 interface AnomalyDetectionInput {
   imageRef?: string;
   videoStreamRef?: string;
-  
+
   // Context
   zone?: string;
   timestamp: Date;
@@ -710,26 +751,26 @@ interface AnomalyDetectionInput {
 
 interface AnomalyDetectionResult {
   timestamp: Date;
-  
+
   anomalyDetected: boolean;
-  
+
   anomalies: {
     id: string;
     type: AnomalyType;
-    
-    severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+
+    severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
     confidence: number;
-    
+
     description: string;
-    
+
     // Location
     zone?: string;
     cameraId?: string;
-    
+
     // Evidence
     imageRef?: string;
     videoClipRef?: string;
-    
+
     // Deviation from normal
     deviation: {
       metric: string;
@@ -737,7 +778,7 @@ interface AnomalyDetectionResult {
       observedValue: number;
       deviationPercent: number;
     }[];
-    
+
     // Recommendation
     recommendedAction: string;
   }[];
@@ -752,33 +793,33 @@ interface AnomalyAnalysisFilters {
 
 interface AnomalyAnalysis {
   period: DateRange;
-  
+
   totalAnomalies: number;
-  
+
   // Distribution
   byType: {
     type: AnomalyType;
     count: number;
     avgSeverity: string;
   }[];
-  
+
   byZone: {
     zone: string;
     count: number;
     topTypes: string[];
   }[];
-  
+
   // Temporal patterns
   temporalPatterns: {
-    pattern: 'TIME_OF_DAY' | 'DAY_OF_WEEK' | 'SHIFT' | 'SEASONAL';
+    pattern: "TIME_OF_DAY" | "DAY_OF_WEEK" | "SHIFT" | "SEASONAL";
     description: string;
     confidence: number;
   }[];
-  
+
   // Insights
   insights: {
     insight: string;
-    category: 'SECURITY' | 'OPERATIONS' | 'SAFETY' | 'EFFICIENCY';
+    category: "SECURITY" | "OPERATIONS" | "SAFETY" | "EFFICIENCY";
     actionable: boolean;
   }[];
 }
@@ -796,24 +837,25 @@ const ANOMALY_DETECTION_VOICE_COMMANDS = [
 ## 🤖 6. Autonomous Camera Coordination
 
 ### Goal
+
 Dynamically position and coordinate multiple cameras for optimal coverage and incident tracking.
 
 ```typescript
 interface AutonomousCameraSystem {
   // Camera fleet management
   orchestrateCameras: (config: CameraOrchestrationConfig) => Promise<string>; // orchestration ID
-  
+
   // Dynamic tracking
   trackTarget: (target: TrackingTarget) => Promise<string>; // tracking ID
   stopTracking: (trackingId: string) => Promise<void>;
-  
+
   // Coverage optimization
   optimizeCoverage: (zone: string) => Promise<CoverageOptimization>;
 }
 
 interface CameraOrchestrationConfig {
   warehouseId: string;
-  
+
   // Available cameras
   controllableCameras: {
     cameraId: string;
@@ -824,18 +866,18 @@ interface CameraOrchestrationConfig {
       canMove: boolean; // mobile/drone
     };
   }[];
-  
+
   // Objectives
   objectives: {
     priority: number; // 1-10
     objective:
-      | 'MAXIMIZE_COVERAGE'
-      | 'TRACK_HIGH_VALUE_ITEMS'
-      | 'MONITOR_SAFETY'
-      | 'MINIMIZE_BLIND_SPOTS'
-      | 'OPTIMIZE_FOR_ACTIVITY';
+      | "MAXIMIZE_COVERAGE"
+      | "TRACK_HIGH_VALUE_ITEMS"
+      | "MONITOR_SAFETY"
+      | "MINIMIZE_BLIND_SPOTS"
+      | "OPTIMIZE_FOR_ACTIVITY";
   }[];
-  
+
   // Constraints
   constraints?: {
     restrictedAreas?: string[];
@@ -845,27 +887,27 @@ interface CameraOrchestrationConfig {
 }
 
 interface TrackingTarget {
-  type: 'PERSON' | 'EQUIPMENT' | 'PALLET' | 'OBJECT';
+  type: "PERSON" | "EQUIPMENT" | "PALLET" | "OBJECT";
   targetId?: string;
-  
+
   // Initial location
   initialPosition: {
     x: number;
     y: number;
     zone: string;
   };
-  
+
   // Priority
-  priority: 'HIGH' | 'MEDIUM' | 'LOW';
+  priority: "HIGH" | "MEDIUM" | "LOW";
   reason?: string; // 'safety_event', 'high_value_item', etc.
-  
+
   // Duration
   maxTrackingDuration?: number; // seconds
 }
 
 interface CoverageOptimization {
   zone: string;
-  
+
   currentCoverage: {
     coveredAreaPercent: number;
     blindSpots: {
@@ -874,17 +916,17 @@ interface CoverageOptimization {
       radiusM: number;
     }[];
   };
-  
+
   optimizedCoverage: {
     coveredAreaPercent: number;
     estimatedBlindSpots: number;
   };
-  
+
   recommendations: {
     cameraId: string;
-    action: 'PAN' | 'TILT' | 'ZOOM' | 'MOVE' | 'ADD_CAMERA';
+    action: "PAN" | "TILT" | "ZOOM" | "MOVE" | "ADD_CAMERA";
     parameters: Record<string, unknown>;
-    
+
     coverageImprovementPercent: number;
   }[];
 }
@@ -902,28 +944,29 @@ const AUTONOMOUS_CAMERA_VOICE_COMMANDS = [
 ## 🔗 7. Multi-Modal Sensor Fusion
 
 ### Goal
+
 Combine computer vision with IoT sensors, RFID, and other data sources for comprehensive situational awareness.
 
 ```typescript
 interface MultiModalFusion {
   fuseData: (input: FusionInput) => Promise<FusionResult>;
-  
+
   // Create fusion pipeline
   createFusionPipeline: (config: FusionPipelineConfig) => Promise<string>;
-  
+
   // Real-time fusion
   streamFusedData: (pipelineId: string) => Promise<void>; // WebSocket stream
 }
 
 interface FusionInput {
   timestamp: Date;
-  
+
   // Vision data
   vision?: {
     imageRef: string;
     detections: DetectedObject[];
   };
-  
+
   // IoT sensors
   iot?: {
     temperature?: number;
@@ -932,37 +975,37 @@ interface FusionInput {
     vibration?: number;
     noise?: number;
   };
-  
+
   // RFID
   rfid?: {
     tagId: string;
     location: { x: number; y: number };
     rssi: number;
   }[];
-  
+
   // Other
   other?: Record<string, unknown>;
 }
 
 interface FusionResult {
   timestamp: Date;
-  
+
   // Enriched understanding
   entities: {
     entityId: string;
     type: string;
-    
+
     // Multi-source confidence
     confidence: number;
-    
+
     // Fused attributes
     attributes: {
-      source: 'VISION' | 'IOT' | 'RFID' | 'INFERRED';
+      source: "VISION" | "IOT" | "RFID" | "INFERRED";
       attribute: string;
       value: unknown;
       confidence: number;
     }[];
-    
+
     // Location (fused from multiple sources)
     location: {
       x: number;
@@ -971,7 +1014,7 @@ interface FusionResult {
       accuracy: number; // meters
     };
   }[];
-  
+
   // Context
   context: {
     temperature?: number;
@@ -980,7 +1023,7 @@ interface FusionResult {
     noiseLevel?: number;
     occupancy?: number;
   };
-  
+
   // Insights
   insights: {
     insight: string;
@@ -991,17 +1034,17 @@ interface FusionResult {
 
 interface FusionPipelineConfig {
   name: string;
-  
+
   // Input sources
   sources: {
-    type: 'CAMERA' | 'IOT_SENSOR' | 'RFID_READER' | 'BARCODE_SCANNER';
+    type: "CAMERA" | "IOT_SENSOR" | "RFID_READER" | "BARCODE_SCANNER";
     sourceId: string;
     weight: number; // contribution weight
   }[];
-  
+
   // Fusion algorithm
-  algorithm: 'KALMAN_FILTER' | 'PARTICLE_FILTER' | 'BAYESIAN' | 'NEURAL_FUSION';
-  
+  algorithm: "KALMAN_FILTER" | "PARTICLE_FILTER" | "BAYESIAN" | "NEURAL_FUSION";
+
   // Output
   outputFrequencyHz: number;
   outputDestination: string; // WebSocket, MQTT, HTTP endpoint
@@ -1019,6 +1062,7 @@ const MULTI_MODAL_FUSION_VOICE_COMMANDS = [
 ## 📊 Part 2 Summary
 
 ### Advanced Vision AI Features Covered
+
 ✅ Real-time 3D scene reconstruction for digital twin integration  
 ✅ Human activity recognition with pose estimation and workflow monitoring  
 ✅ Comprehensive safety monitoring (PPE, falls, collisions, restricted areas)  

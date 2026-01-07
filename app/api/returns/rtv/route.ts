@@ -6,19 +6,19 @@
  * POST /api/returns/rtv/policies - Create vendor policy
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { RTVService } from '@/lib/services/returns/rtv-management';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { RTVService } from "@/lib/services/returns/rtv-management";
 
 const createRTVSchema = z.object({
   vendorId: z.string(),
   rmaItemIds: z.array(z.string()),
   reason: z.string(),
-  requestedAction: z.enum(['REFUND', 'REPLACEMENT', 'CREDIT']),
+  requestedAction: z.enum(["REFUND", "REPLACEMENT", "CREDIT"]),
   estimatedValue: z.number(),
   notes: z.string().optional(),
 });
@@ -32,14 +32,14 @@ const createPolicySchema = z.object({
   restockingFee: z.number().optional(),
   acceptedConditions: z.array(z.string()),
   acceptedReasons: z.array(z.string()),
-  shippingResponsibility: z.enum(['VENDOR', 'CUSTOMER', 'SHARED']),
+  shippingResponsibility: z.enum(["VENDOR", "CUSTOMER", "SHARED"]),
 });
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -47,15 +47,18 @@ export async function GET(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
-    const status = searchParams.get('status');
-    const vendorId = searchParams.get('vendorId');
+    const type = searchParams.get("type");
+    const status = searchParams.get("status");
+    const vendorId = searchParams.get("vendorId");
 
-    if (type === 'policies') {
+    if (type === "policies") {
       let query = `
         SELECT * FROM vendor_return_policies
         WHERE organization_id = $1
@@ -101,10 +104,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ requests });
   } catch (error) {
-    console.error('Error fetching RTV data:', error);
+    console.error("Error fetching RTV data:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch RTV data' },
-      { status: 500 }
+      { error: "Failed to fetch RTV data" },
+      { status: 500 },
     );
   }
 }
@@ -113,7 +116,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
@@ -121,14 +124,17 @@ export async function POST(request: NextRequest) {
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'No active organization' }, { status: 404 });
+      return NextResponse.json(
+        { error: "No active organization" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
+    const type = searchParams.get("type");
 
-    if (type === 'policy') {
+    if (type === "policy") {
       const data = createPolicySchema.parse(body);
 
       await prisma.$executeRaw`
@@ -147,7 +153,9 @@ export async function POST(request: NextRequest) {
         )
       `;
 
-      return NextResponse.json({ message: 'Vendor policy created successfully' });
+      return NextResponse.json({
+        message: "Vendor policy created successfully",
+      });
     }
 
     // Create RTV request
@@ -165,27 +173,31 @@ export async function POST(request: NextRequest) {
     });
 
     if (rmaItems.length !== data.rmaItemIds.length) {
-      return NextResponse.json({ error: 'Some RMA items not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Some RMA items not found" },
+        { status: 404 },
+      );
     }
 
     // Verify all items belong to organization
     const invalidItems = rmaItems.filter(
-      item => item.rma.organizationId !== membership.organizationId
+      (item) => item.rma.organizationId !== membership.organizationId,
     );
 
     if (invalidItems.length > 0) {
-      return NextResponse.json({ error: 'Invalid RMA items' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid RMA items" }, { status: 400 });
     }
 
     // Check vendor policy
-    const policy = await prisma.$queryRaw`
+    const policy = (await prisma.$queryRaw`
       SELECT * FROM vendor_return_policies
       WHERE vendor_id = ${data.vendorId}
         AND organization_id = ${membership.organizationId}
         AND allows_returns = true
-    ` as any[];
+    `) as any[];
 
-    const requiresAuth = policy.length > 0 ? policy[0].requires_authorization : true;
+    const requiresAuth =
+      policy.length > 0 ? policy[0].requires_authorization : true;
 
     const rtvService = new RTVService();
     const rtvRequest = await rtvService.createRTVRequest({
@@ -194,11 +206,11 @@ export async function POST(request: NextRequest) {
       reason: data.reason,
       requestedAction: data.requestedAction,
       estimatedValue: data.estimatedValue,
-      items: rmaItems.map(item => ({
+      items: rmaItems.map((item) => ({
         rmaItemId: item.id,
-        sku: item.sku || '',
+        sku: item.sku || "",
         quantity: item.quantity,
-        condition: item.condition || 'USED',
+        condition: item.condition || "USED",
         defectDescription: data.reason,
       })),
     });
@@ -221,15 +233,15 @@ export async function POST(request: NextRequest) {
     // Update RMA items
     await prisma.rMAItem.updateMany({
       where: { id: { in: data.rmaItemIds } },
-      data: { disposition: 'RETURN_TO_VENDOR' },
+      data: { disposition: "RETURN_TO_VENDOR" },
     });
 
     await prisma.activityLog.create({
       data: {
         organizationId: membership.organizationId,
         userId: session.user.id,
-        action: 'RTV_REQUEST_CREATED',
-        entityType: 'RTV_REQUEST',
+        action: "RTV_REQUEST_CREATED",
+        entityType: "RTV_REQUEST",
         entityId: rtvRequest.id,
         metadata: {
           vendorId: data.vendorId,
@@ -241,20 +253,23 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       rtvRequest,
-      message: 'RTV request created successfully',
+      message: "RTV request created successfully",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating RTV data:', error);
+    console.error("Error creating RTV data:", error);
     return NextResponse.json(
-      { error: 'Failed to create RTV data', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Failed to create RTV data",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }

@@ -1,11 +1,11 @@
 /**
  * ARIA Attributes Component
- * 
+ *
  * Reusable component for adding comprehensive ARIA attributes
  * to enhance screen reader support across the application.
  */
 
-import React from 'react';
+import React from "react";
 
 // ==========================================
 // VISUALLY HIDDEN TEXT
@@ -20,7 +20,10 @@ interface VisuallyHiddenProps {
  * Render text that's only visible to screen readers
  * @example <VisuallyHidden>Additional context for screen readers</VisuallyHidden>
  */
-export function VisuallyHidden({ children, as: Component = 'span' }: VisuallyHiddenProps) {
+export function VisuallyHidden({
+  children,
+  as: Component = "span",
+}: VisuallyHiddenProps) {
   return <Component className="sr-only">{children}</Component>;
 }
 
@@ -35,7 +38,7 @@ interface AriaDescribedByProps {
 
 /**
  * Wrapper for description text referenced by aria-describedby
- * @example 
+ * @example
  * <AriaDescribedBy id="help-text">Enter your email address</AriaDescribedBy>
  * <input aria-describedby="help-text" />
  */
@@ -76,22 +79,22 @@ export function AriaLabelText({ id, children }: AriaLabelTextProps) {
 
 interface LoadingSpinnerProps {
   label?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
   className?: string;
 }
 
 /**
  * Accessible loading spinner
  */
-export function LoadingSpinner({ 
-  label = 'Loading...', 
-  size = 'md',
-  className = '' 
+export function LoadingSpinner({
+  label = "Loading...",
+  size = "md",
+  className = "",
 }: LoadingSpinnerProps) {
   const sizeClasses = {
-    sm: 'h-4 w-4',
-    md: 'h-8 w-8',
-    lg: 'h-12 w-12',
+    sm: "h-4 w-4",
+    md: "h-8 w-8",
+    lg: "h-12 w-12",
   };
 
   return (
@@ -115,7 +118,7 @@ export function LoadingSpinner({
 // ==========================================
 
 interface StatusBadgeProps {
-  status: 'success' | 'error' | 'warning' | 'info' | 'neutral';
+  status: "success" | "error" | "warning" | "info" | "neutral";
   children: React.ReactNode;
   icon?: React.ReactNode;
 }
@@ -125,11 +128,11 @@ interface StatusBadgeProps {
  */
 export function StatusBadge({ status, children, icon }: StatusBadgeProps) {
   const statusMap = {
-    success: { role: 'status', ariaLabel: 'Success' },
-    error: { role: 'alert', ariaLabel: 'Error' },
-    warning: { role: 'alert', ariaLabel: 'Warning' },
-    info: { role: 'status', ariaLabel: 'Information' },
-    neutral: { role: 'status', ariaLabel: 'Status' },
+    success: { role: "status", ariaLabel: "Success" },
+    error: { role: "alert", ariaLabel: "Error" },
+    warning: { role: "alert", ariaLabel: "Warning" },
+    info: { role: "status", ariaLabel: "Information" },
+    neutral: { role: "status", ariaLabel: "Status" },
   };
 
   const { role, ariaLabel } = statusMap[status];
@@ -139,11 +142,15 @@ export function StatusBadge({ status, children, icon }: StatusBadgeProps) {
       role={role}
       aria-label={`${ariaLabel}: ${children}`}
       className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-sm font-medium ${
-        status === 'success' ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400' :
-        status === 'error' ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400' :
-        status === 'warning' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400' :
-        status === 'info' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400' :
-        'bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400'
+        status === "success"
+          ? "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400"
+          : status === "error"
+            ? "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
+            : status === "warning"
+              ? "bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400"
+              : status === "info"
+                ? "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+                : "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400"
       }`}
     >
       {icon && <span aria-hidden="true">{icon}</span>}
@@ -169,11 +176,7 @@ interface TooltipTextProps {
  */
 export function TooltipText({ id, children }: TooltipTextProps) {
   return (
-    <div
-      id={id}
-      role="tooltip"
-      className="sr-only"
-    >
+    <div id={id} role="tooltip" className="sr-only">
       {children}
     </div>
   );
@@ -250,7 +253,12 @@ interface EmptyStateProps {
 /**
  * Accessible empty state component
  */
-export function EmptyState({ title, description, icon, action }: EmptyStateProps) {
+export function EmptyState({
+  title,
+  description,
+  icon,
+  action,
+}: EmptyStateProps) {
   return (
     <div
       role="status"
@@ -264,9 +272,7 @@ export function EmptyState({ title, description, icon, action }: EmptyStateProps
       )}
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
       {description && (
-        <p className="text-muted-foreground mb-4 max-w-md">
-          {description}
-        </p>
+        <p className="text-muted-foreground mb-4 max-w-md">{description}</p>
       )}
       {action}
     </div>
@@ -292,7 +298,9 @@ interface TableCaptionProps {
  */
 export function TableCaption({ children, srOnly = false }: TableCaptionProps) {
   return (
-    <caption className={srOnly ? 'sr-only' : 'py-2 text-sm text-muted-foreground'}>
+    <caption
+      className={srOnly ? "sr-only" : "py-2 text-sm text-muted-foreground"}
+    >
       {children}
     </caption>
   );
@@ -330,11 +338,7 @@ export function RequiredIndicator() {
 // ==========================================
 
 export function OptionalIndicator() {
-  return (
-    <span className="text-sm text-muted-foreground ml-2">
-      (optional)
-    </span>
-  );
+  return <span className="text-sm text-muted-foreground ml-2">(optional)</span>;
 }
 
 // ==========================================
@@ -346,28 +350,28 @@ interface ProgressBarProps {
   max?: number;
   label?: string;
   showPercentage?: boolean;
-  size?: 'sm' | 'md' | 'lg';
+  size?: "sm" | "md" | "lg";
 }
 
 /**
  * Accessible progress bar
  */
-export function ProgressBar({ 
-  value, 
-  max = 100, 
+export function ProgressBar({
+  value,
+  max = 100,
   label,
   showPercentage = false,
-  size = 'md'
+  size = "md",
 }: ProgressBarProps) {
   const percentage = Math.round((value / max) * 100);
-  
+
   const sizeClasses = {
-    sm: 'h-1',
-    md: 'h-2',
-    lg: 'h-3',
+    sm: "h-1",
+    md: "h-2",
+    lg: "h-3",
   };
 
-  const ariaLabel = label 
+  const ariaLabel = label
     ? `${label}: ${percentage}% complete`
     : `${percentage}% complete`;
 
@@ -377,9 +381,7 @@ export function ProgressBar({
         <div className="flex items-center justify-between mb-1">
           <span className="text-sm font-medium">{label}</span>
           {showPercentage && (
-            <span className="text-sm text-muted-foreground">
-              {percentage}%
-            </span>
+            <span className="text-sm text-muted-foreground">{percentage}%</span>
           )}
         </div>
       )}
@@ -409,34 +411,28 @@ interface AccessibleCardProps {
   title: string;
   description?: string;
   children: React.ReactNode;
-  as?: 'article' | 'section' | 'div';
-  headingLevel?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  as?: "article" | "section" | "div";
+  headingLevel?: "h2" | "h3" | "h4" | "h5" | "h6";
 }
 
 /**
  * Accessible card component with proper semantic HTML
  */
-export function AccessibleCard({ 
-  title, 
-  description, 
+export function AccessibleCard({
+  title,
+  description,
   children,
-  as: Component = 'article',
-  headingLevel: Heading = 'h3'
+  as: Component = "article",
+  headingLevel: Heading = "h3",
 }: AccessibleCardProps) {
   return (
     <Component className="rounded-lg border bg-card text-card-foreground shadow-sm">
       <div className="p-6">
-        <Heading className="text-lg font-semibold mb-2">
-          {title}
-        </Heading>
+        <Heading className="text-lg font-semibold mb-2">{title}</Heading>
         {description && (
-          <p className="text-sm text-muted-foreground mb-4">
-            {description}
-          </p>
+          <p className="text-sm text-muted-foreground mb-4">{description}</p>
         )}
-        <div>
-          {children}
-        </div>
+        <div>{children}</div>
       </div>
     </Component>
   );

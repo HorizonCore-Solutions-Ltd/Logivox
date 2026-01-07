@@ -7,10 +7,14 @@ import { z } from "zod";
 const updateTemplateSchema = z.object({
   name: z.string().min(1).optional(),
   description: z.string().optional(),
-  category: z.enum(['INCOMING', 'IN_PROCESS', 'FINAL', 'RANDOM', 'COMPLAINT']).optional(),
+  category: z
+    .enum(["INCOMING", "IN_PROCESS", "FINAL", "RANDOM", "COMPLAINT"])
+    .optional(),
   inventoryIds: z.array(z.string()).optional(),
   supplierIds: z.array(z.string()).optional(),
-  samplingType: z.enum(['FULL', 'STATISTICAL', 'PERCENTAGE', 'RANDOM']).optional(),
+  samplingType: z
+    .enum(["FULL", "STATISTICAL", "PERCENTAGE", "RANDOM"])
+    .optional(),
   sampleSize: z.number().int().min(1).optional(),
   samplePercentage: z.number().min(0).max(100).optional(),
   requiresApproval: z.boolean().optional(),
@@ -23,7 +27,7 @@ const updateTemplateSchema = z.object({
 // GET /api/inspection-templates/[id] - Get template details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -43,7 +47,7 @@ export async function GET(
     if (!template) {
       return NextResponse.json(
         { error: "Template not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -52,7 +56,7 @@ export async function GET(
     console.error("Error fetching template:", error);
     return NextResponse.json(
       { error: "Failed to fetch template" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -60,7 +64,7 @@ export async function GET(
 // PATCH /api/inspection-templates/[id] - Update template
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -81,14 +85,14 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error updating template:", error);
     return NextResponse.json(
       { error: "Failed to update template" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -96,7 +100,7 @@ export async function PATCH(
 // DELETE /api/inspection-templates/[id] - Delete template
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -111,11 +115,11 @@ export async function DELETE(
 
     if (inspectionCount > 0) {
       return NextResponse.json(
-        { 
+        {
           error: "Cannot delete template that has been used in inspections",
           inspectionCount,
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -128,7 +132,7 @@ export async function DELETE(
     console.error("Error deleting template:", error);
     return NextResponse.json(
       { error: "Failed to delete template" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

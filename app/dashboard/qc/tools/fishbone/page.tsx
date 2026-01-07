@@ -1,13 +1,25 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, Download } from 'lucide-react';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Trash2, Plus, Download } from "lucide-react";
 
 interface Cause {
   id: string;
@@ -16,53 +28,55 @@ interface Cause {
 }
 
 const FISHBONE_CATEGORIES = [
-  { name: 'Man (People)', color: '#3b82f6' },
-  { name: 'Machine (Equipment)', color: '#10b981' },
-  { name: 'Material', color: '#f59e0b' },
-  { name: 'Method (Process)', color: '#8b5cf6' },
-  { name: 'Measurement', color: '#ec4899' },
-  { name: 'Environment (Mother Nature)', color: '#14b8a6' }
+  { name: "Man (People)", color: "#3b82f6" },
+  { name: "Machine (Equipment)", color: "#10b981" },
+  { name: "Material", color: "#f59e0b" },
+  { name: "Method (Process)", color: "#8b5cf6" },
+  { name: "Measurement", color: "#ec4899" },
+  { name: "Environment (Mother Nature)", color: "#14b8a6" },
 ];
 
 export default function FishboneDiagram() {
-  const [problem, setProblem] = useState('');
+  const [problem, setProblem] = useState("");
   const [causes, setCauses] = useState<Cause[]>([]);
-  const [newCause, setNewCause] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [newCause, setNewCause] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
   const addCause = () => {
     if (newCause.trim() && selectedCategory) {
       const cause: Cause = {
         id: Date.now().toString(),
         text: newCause,
-        category: selectedCategory
+        category: selectedCategory,
       };
       setCauses([...causes, cause]);
-      setNewCause('');
+      setNewCause("");
     }
   };
 
   const removeCause = (id: string) => {
-    setCauses(causes.filter(c => c.id !== id));
+    setCauses(causes.filter((c) => c.id !== id));
   };
 
   const getCausesByCategory = (category: string) => {
-    return causes.filter(c => c.category === category);
+    return causes.filter((c) => c.category === category);
   };
 
   const exportDiagram = () => {
     const data = {
       problem,
-      causes: causes.map(c => ({
+      causes: causes.map((c) => ({
         category: c.category,
-        cause: c.text
+        cause: c.text,
       })),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     };
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
     a.download = `fishbone-${Date.now()}.json`;
     a.click();
@@ -73,14 +87,18 @@ export default function FishboneDiagram() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold">Fishbone Diagram (Ishikawa)</h1>
-        <p className="text-muted-foreground">Root cause analysis using 6M method</p>
+        <p className="text-muted-foreground">
+          Root cause analysis using 6M method
+        </p>
       </div>
 
       {/* Problem Statement */}
       <Card>
         <CardHeader>
           <CardTitle>Problem Statement</CardTitle>
-          <CardDescription>Define the effect/problem you're investigating</CardDescription>
+          <CardDescription>
+            Define the effect/problem you're investigating
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Input
@@ -96,7 +114,9 @@ export default function FishboneDiagram() {
       <Card>
         <CardHeader>
           <CardTitle>Add Root Cause</CardTitle>
-          <CardDescription>Identify contributing factors in each category</CardDescription>
+          <CardDescription>
+            Identify contributing factors in each category
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -106,12 +126,15 @@ export default function FishboneDiagram() {
                 placeholder="Describe the root cause..."
                 value={newCause}
                 onChange={(e) => setNewCause(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && addCause()}
+                onKeyPress={(e) => e.key === "Enter" && addCause()}
               />
             </div>
             <div className="md:col-span-5">
               <Label>Category (6M)</Label>
-              <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <Select
+                value={selectedCategory}
+                onValueChange={setSelectedCategory}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -140,9 +163,15 @@ export default function FishboneDiagram() {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Fishbone Diagram</CardTitle>
-              <CardDescription>Visual representation of root causes</CardDescription>
+              <CardDescription>
+                Visual representation of root causes
+              </CardDescription>
             </div>
-            <Button variant="outline" onClick={exportDiagram} disabled={!problem || causes.length === 0}>
+            <Button
+              variant="outline"
+              onClick={exportDiagram}
+              disabled={!problem || causes.length === 0}
+            >
               <Download className="w-4 h-4 mr-2" />
               Export
             </Button>
@@ -157,7 +186,7 @@ export default function FishboneDiagram() {
             <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
               <div className="bg-blue-600 text-white px-6 py-4 rounded-lg shadow-lg max-w-xs">
                 <p className="font-bold text-center">
-                  {problem || 'Define Problem Statement'}
+                  {problem || "Define Problem Statement"}
                 </p>
               </div>
             </div>
@@ -165,15 +194,19 @@ export default function FishboneDiagram() {
             {/* Categories (Bones) - Top */}
             <div className="absolute top-0 left-0 right-20 h-1/2 flex justify-around items-end">
               {FISHBONE_CATEGORIES.slice(0, 3).map((category, idx) => (
-                <div key={category.name} className="relative" style={{ width: '30%' }}>
+                <div
+                  key={category.name}
+                  className="relative"
+                  style={{ width: "30%" }}
+                >
                   {/* Bone line */}
-                  <div 
+                  <div
                     className="absolute bottom-0 left-1/2 w-0.5 h-32 origin-bottom transform -rotate-45"
                     style={{ backgroundColor: category.color }}
                   />
-                  
+
                   {/* Category label */}
-                  <div 
+                  <div
                     className="absolute -top-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded text-white text-sm font-semibold whitespace-nowrap"
                     style={{ backgroundColor: category.color }}
                   >
@@ -204,15 +237,19 @@ export default function FishboneDiagram() {
             {/* Categories (Bones) - Bottom */}
             <div className="absolute bottom-0 left-0 right-20 h-1/2 flex justify-around items-start">
               {FISHBONE_CATEGORIES.slice(3, 6).map((category, idx) => (
-                <div key={category.name} className="relative" style={{ width: '30%' }}>
+                <div
+                  key={category.name}
+                  className="relative"
+                  style={{ width: "30%" }}
+                >
                   {/* Bone line */}
-                  <div 
+                  <div
                     className="absolute top-0 left-1/2 w-0.5 h-32 origin-top transform rotate-45"
                     style={{ backgroundColor: category.color }}
                   />
-                  
+
                   {/* Category label */}
-                  <div 
+                  <div
                     className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 px-3 py-1 rounded text-white text-sm font-semibold whitespace-nowrap"
                     style={{ backgroundColor: category.color }}
                   >
@@ -257,12 +294,17 @@ export default function FishboneDiagram() {
 
               return (
                 <div key={category.name}>
-                  <Badge style={{ backgroundColor: category.color }} className="text-white mb-2">
+                  <Badge
+                    style={{ backgroundColor: category.color }}
+                    className="text-white mb-2"
+                  >
                     {category.name} ({categoryCauses.length})
                   </Badge>
                   <ul className="list-disc list-inside space-y-1 ml-4">
                     {categoryCauses.map((cause) => (
-                      <li key={cause.id} className="text-sm">{cause.text}</li>
+                      <li key={cause.id} className="text-sm">
+                        {cause.text}
+                      </li>
                     ))}
                   </ul>
                 </div>

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -38,7 +44,9 @@ interface CustomerSegment {
 }
 
 export function CustomerAnalyticsDashboard() {
-  const [churnPredictions, setChurnPredictions] = useState<ChurnPrediction[]>([]);
+  const [churnPredictions, setChurnPredictions] = useState<ChurnPrediction[]>(
+    [],
+  );
   const [segments, setSegments] = useState<CustomerSegment[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRisk, setSelectedRisk] = useState<string>("all");
@@ -139,7 +147,9 @@ export function CustomerAnalyticsDashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Customer Analytics</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Customer Analytics
+          </h2>
           <p className="text-muted-foreground">
             AI-powered insights into customer behavior and churn prediction
           </p>
@@ -173,7 +183,9 @@ export function CustomerAnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-red-600">{churnSummary.critical}</div>
+                  <div className="text-3xl font-bold text-red-600">
+                    {churnSummary.critical}
+                  </div>
                   <AlertTriangle className="h-8 w-8 text-red-600" />
                 </div>
               </CardContent>
@@ -185,7 +197,9 @@ export function CustomerAnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-orange-600">{churnSummary.high}</div>
+                  <div className="text-3xl font-bold text-orange-600">
+                    {churnSummary.high}
+                  </div>
                   <TrendingDown className="h-8 w-8 text-orange-600" />
                 </div>
               </CardContent>
@@ -197,7 +211,9 @@ export function CustomerAnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-yellow-600">{churnSummary.medium}</div>
+                  <div className="text-3xl font-bold text-yellow-600">
+                    {churnSummary.medium}
+                  </div>
                   <Activity className="h-8 w-8 text-yellow-600" />
                 </div>
               </CardContent>
@@ -209,7 +225,9 @@ export function CustomerAnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="flex items-center justify-between">
-                  <div className="text-3xl font-bold text-green-600">{churnSummary.low}</div>
+                  <div className="text-3xl font-bold text-green-600">
+                    {churnSummary.low}
+                  </div>
                   <UserCheck className="h-8 w-8 text-green-600" />
                 </div>
               </CardContent>
@@ -264,16 +282,24 @@ export function CustomerAnalyticsDashboard() {
                     <div className="flex items-center gap-3">
                       {getRiskIcon(prediction.riskLevel)}
                       <div>
-                        <CardTitle className="text-lg">{prediction.customerName}</CardTitle>
-                        <CardDescription>Customer ID: {prediction.customerId}</CardDescription>
+                        <CardTitle className="text-lg">
+                          {prediction.customerName}
+                        </CardTitle>
+                        <CardDescription>
+                          Customer ID: {prediction.customerId}
+                        </CardDescription>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Badge variant={getRiskBadgeVariant(prediction.riskLevel)}>
+                      <Badge
+                        variant={getRiskBadgeVariant(prediction.riskLevel)}
+                      >
                         {prediction.riskLevel.toUpperCase()}
                       </Badge>
                       <div className="text-right">
-                        <p className="text-sm text-muted-foreground">Churn Probability</p>
+                        <p className="text-sm text-muted-foreground">
+                          Churn Probability
+                        </p>
                         <p className="text-2xl font-bold">
                           {(prediction.churnProbability * 100).toFixed(0)}%
                         </p>
@@ -290,7 +316,10 @@ export function CustomerAnalyticsDashboard() {
                     </h4>
                     <ul className="space-y-1">
                       {prediction.reasons.map((reason, index) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <li
+                          key={index}
+                          className="text-sm text-muted-foreground flex items-start gap-2"
+                        >
                           <span className="text-orange-600 mt-0.5">•</span>
                           {reason}
                         </li>
@@ -306,7 +335,10 @@ export function CustomerAnalyticsDashboard() {
                     </h4>
                     <ul className="space-y-1">
                       {prediction.recommendations.map((rec, index) => (
-                        <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <li
+                          key={index}
+                          className="text-sm text-muted-foreground flex items-start gap-2"
+                        >
                           <span className="text-green-600 mt-0.5">✓</span>
                           {rec}
                         </li>
@@ -340,7 +372,9 @@ export function CustomerAnalyticsDashboard() {
                     {getSegmentIcon(segment.segment)}
                     <div>
                       <CardTitle>{segment.segment}</CardTitle>
-                      <CardDescription>{segment.count} customers</CardDescription>
+                      <CardDescription>
+                        {segment.count} customers
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -348,7 +382,9 @@ export function CustomerAnalyticsDashboard() {
                   {/* Metrics */}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-sm text-muted-foreground">Total Revenue</p>
+                      <p className="text-sm text-muted-foreground">
+                        Total Revenue
+                      </p>
                       <p className="text-lg font-bold flex items-center gap-1">
                         <DollarSign className="h-4 w-4" />
                         {segment.totalRevenue.toLocaleString()}
@@ -365,10 +401,16 @@ export function CustomerAnalyticsDashboard() {
 
                   {/* Characteristics */}
                   <div>
-                    <h4 className="font-semibold mb-2 text-sm">Characteristics</h4>
+                    <h4 className="font-semibold mb-2 text-sm">
+                      Characteristics
+                    </h4>
                     <div className="flex flex-wrap gap-1">
                       {segment.characteristics.map((char, index) => (
-                        <Badge key={index} variant="outline" className="text-xs">
+                        <Badge
+                          key={index}
+                          variant="outline"
+                          className="text-xs"
+                        >
                           {char}
                         </Badge>
                       ))}

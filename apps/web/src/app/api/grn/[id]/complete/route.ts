@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 // POST /api/grn/[id]/complete - Complete GRN and update inventory
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -17,7 +17,10 @@ export async function POST(
 
     const organizationId = session.user.organizations[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     // Check if GRN exists and is approved
@@ -48,12 +51,15 @@ export async function POST(
     if (grn.status !== "APPROVED") {
       return NextResponse.json(
         { error: "GRN must be approved before completion" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (grn.status === "COMPLETED") {
-      return NextResponse.json({ error: "GRN already completed" }, { status: 400 });
+      return NextResponse.json(
+        { error: "GRN already completed" },
+        { status: 400 },
+      );
     }
 
     // Complete GRN - Update inventory and PO status
@@ -137,11 +143,11 @@ export async function POST(
       });
 
       const allFullyReceived = poItemsStatus.every(
-        (item: any) => item.quantityReceived >= item.quantityOrdered
+        (item: any) => item.quantityReceived >= item.quantityOrdered,
       );
 
       const anyReceived = poItemsStatus.some(
-        (item: any) => item.quantityReceived > 0
+        (item: any) => item.quantityReceived > 0,
       );
 
       // Update PO status based on receipt status
@@ -175,7 +181,7 @@ export async function POST(
             itemCount: completedGRN.items.length,
             totalAccepted: completedGRN.items.reduce(
               (sum: number, item: any) => sum + item.acceptedQuantity,
-              0
+              0,
             ),
             poStatus: newPOStatus,
           },
@@ -193,7 +199,7 @@ export async function POST(
     console.error("Error completing GRN:", error);
     return NextResponse.json(
       { error: "Failed to complete GRN" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

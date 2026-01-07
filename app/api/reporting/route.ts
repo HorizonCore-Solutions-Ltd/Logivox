@@ -3,30 +3,30 @@
  * Comprehensive WMS reporting including inventory, fulfillment, operations, and financial analytics
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { ReportingService } from '@/lib/services/reporting.service';
+import { NextRequest, NextResponse } from "next/server";
+import { ReportingService } from "@/lib/services/reporting.service";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 // GET - Generate various reports
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const reportType = searchParams.get('type');
-    const organizationId = searchParams.get('organizationId');
+    const reportType = searchParams.get("type");
+    const organizationId = searchParams.get("organizationId");
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Organization ID is required' },
-        { status: 400 }
+        { error: "Organization ID is required" },
+        { status: 400 },
       );
     }
 
-    const warehouseId = searchParams.get('warehouseId') || undefined;
+    const warehouseId = searchParams.get("warehouseId") || undefined;
 
     switch (reportType) {
-      case 'inventory-valuation':
-        const asOfDate = searchParams.get('asOfDate');
+      case "inventory-valuation":
+        const asOfDate = searchParams.get("asOfDate");
         const valuation = await ReportingService.getInventoryValuation({
           organizationId,
           warehouseId,
@@ -34,21 +34,21 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(valuation);
 
-      case 'inventory-aging':
+      case "inventory-aging":
         const aging = await ReportingService.getInventoryAging({
           organizationId,
           warehouseId,
         });
         return NextResponse.json(aging);
 
-      case 'inventory-turnover':
-        const turnoverStart = searchParams.get('startDate');
-        const turnoverEnd = searchParams.get('endDate');
+      case "inventory-turnover":
+        const turnoverStart = searchParams.get("startDate");
+        const turnoverEnd = searchParams.get("endDate");
 
         if (!turnoverStart || !turnoverEnd) {
           return NextResponse.json(
-            { error: 'Start and end dates are required' },
-            { status: 400 }
+            { error: "Start and end dates are required" },
+            { status: 400 },
           );
         }
 
@@ -60,14 +60,14 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(turnover);
 
-      case 'order-fulfillment':
-        const fulfillmentStart = searchParams.get('startDate');
-        const fulfillmentEnd = searchParams.get('endDate');
+      case "order-fulfillment":
+        const fulfillmentStart = searchParams.get("startDate");
+        const fulfillmentEnd = searchParams.get("endDate");
 
         if (!fulfillmentStart || !fulfillmentEnd) {
           return NextResponse.json(
-            { error: 'Start and end dates are required' },
-            { status: 400 }
+            { error: "Start and end dates are required" },
+            { status: 400 },
           );
         }
 
@@ -79,14 +79,14 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(fulfillment);
 
-      case 'receiving-performance':
-        const receivingStart = searchParams.get('startDate');
-        const receivingEnd = searchParams.get('endDate');
+      case "receiving-performance":
+        const receivingStart = searchParams.get("startDate");
+        const receivingEnd = searchParams.get("endDate");
 
         if (!receivingStart || !receivingEnd) {
           return NextResponse.json(
-            { error: 'Start and end dates are required' },
-            { status: 400 }
+            { error: "Start and end dates are required" },
+            { status: 400 },
           );
         }
 
@@ -98,14 +98,14 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(receiving);
 
-      case 'picking-performance':
-        const pickingStart = searchParams.get('startDate');
-        const pickingEnd = searchParams.get('endDate');
+      case "picking-performance":
+        const pickingStart = searchParams.get("startDate");
+        const pickingEnd = searchParams.get("endDate");
 
         if (!pickingStart || !pickingEnd) {
           return NextResponse.json(
-            { error: 'Start and end dates are required' },
-            { status: 400 }
+            { error: "Start and end dates are required" },
+            { status: 400 },
           );
         }
 
@@ -117,11 +117,11 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(picking);
 
-      case 'warehouse-utilization':
+      case "warehouse-utilization":
         if (!warehouseId) {
           return NextResponse.json(
-            { error: 'Warehouse ID is required' },
-            { status: 400 }
+            { error: "Warehouse ID is required" },
+            { status: 400 },
           );
         }
 
@@ -130,14 +130,14 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(utilization);
 
-      case 'kpi-dashboard':
-        const kpiStart = searchParams.get('startDate');
-        const kpiEnd = searchParams.get('endDate');
+      case "kpi-dashboard":
+        const kpiStart = searchParams.get("startDate");
+        const kpiEnd = searchParams.get("endDate");
 
         if (!kpiStart || !kpiEnd) {
           return NextResponse.json(
-            { error: 'Start and end dates are required' },
-            { status: 400 }
+            { error: "Start and end dates are required" },
+            { status: 400 },
           );
         }
 
@@ -149,14 +149,14 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(kpis);
 
-      case 'abc-analysis':
-        const abcStart = searchParams.get('startDate');
-        const abcEnd = searchParams.get('endDate');
+      case "abc-analysis":
+        const abcStart = searchParams.get("startDate");
+        const abcEnd = searchParams.get("endDate");
 
         if (!abcStart || !abcEnd) {
           return NextResponse.json(
-            { error: 'Start and end dates are required' },
-            { status: 400 }
+            { error: "Start and end dates are required" },
+            { status: 400 },
           );
         }
 
@@ -168,21 +168,21 @@ export async function GET(req: NextRequest) {
         });
         return NextResponse.json(abc);
 
-      case 'stock-alerts':
+      case "stock-alerts":
         const alerts = await ReportingService.getStockAlerts({
           organizationId,
           warehouseId,
         });
         return NextResponse.json(alerts);
 
-      case 'financial-summary':
-        const financialStart = searchParams.get('startDate');
-        const financialEnd = searchParams.get('endDate');
+      case "financial-summary":
+        const financialStart = searchParams.get("startDate");
+        const financialEnd = searchParams.get("endDate");
 
         if (!financialStart || !financialEnd) {
           return NextResponse.json(
-            { error: 'Start and end dates are required' },
-            { status: 400 }
+            { error: "Start and end dates are required" },
+            { status: 400 },
           );
         }
 
@@ -195,30 +195,30 @@ export async function GET(req: NextRequest) {
 
       default:
         return NextResponse.json(
-          { 
-            error: 'Invalid report type',
+          {
+            error: "Invalid report type",
             availableTypes: [
-              'inventory-valuation',
-              'inventory-aging',
-              'inventory-turnover',
-              'order-fulfillment',
-              'receiving-performance',
-              'picking-performance',
-              'warehouse-utilization',
-              'kpi-dashboard',
-              'abc-analysis',
-              'stock-alerts',
-              'financial-summary'
-            ]
+              "inventory-valuation",
+              "inventory-aging",
+              "inventory-turnover",
+              "order-fulfillment",
+              "receiving-performance",
+              "picking-performance",
+              "warehouse-utilization",
+              "kpi-dashboard",
+              "abc-analysis",
+              "stock-alerts",
+              "financial-summary",
+            ],
           },
-          { status: 400 }
+          { status: 400 },
         );
     }
   } catch (error: any) {
-    console.error('Reporting GET error:', error);
+    console.error("Reporting GET error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate report' },
-      { status: 500 }
+      { error: error.message || "Failed to generate report" },
+      { status: 500 },
     );
   }
 }

@@ -3,23 +3,37 @@
  * Generate comprehensive quality reports with metrics and trends
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export type ReportType = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'ANNUAL' | 'CUSTOM';
-export type ReportCategory = 'INSPECTION' | 'DEFECTS' | 'NCR' | 'CAPA' | 'SUPPLIER' | 'COMPLIANCE' | 'EXECUTIVE';
+export type ReportType =
+  | "DAILY"
+  | "WEEKLY"
+  | "MONTHLY"
+  | "QUARTERLY"
+  | "ANNUAL"
+  | "CUSTOM";
+export type ReportCategory =
+  | "INSPECTION"
+  | "DEFECTS"
+  | "NCR"
+  | "CAPA"
+  | "SUPPLIER"
+  | "COMPLIANCE"
+  | "EXECUTIVE";
 
 export class QualityReportService {
-  
   /**
    * Generate next report number
    */
-  private static async generateReportNumber(organizationId: string): Promise<string> {
+  private static async generateReportNumber(
+    organizationId: string,
+  ): Promise<string> {
     const date = new Date();
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+
     const lastReport = await prisma.qualityReport.findFirst({
       where: {
         organizationId,
@@ -27,16 +41,18 @@ export class QualityReportService {
           startsWith: `QR-${year}${month}`,
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     let sequence = 1;
     if (lastReport) {
-      const lastSequence = parseInt(lastReport.reportNumber.split('-').pop() || '0');
+      const lastSequence = parseInt(
+        lastReport.reportNumber.split("-").pop() || "0",
+      );
       sequence = lastSequence + 1;
     }
 
-    return `QR-${year}${month}-${String(sequence).padStart(4, '0')}`;
+    return `QR-${year}${month}-${String(sequence).padStart(4, "0")}`;
   }
 
   /**
@@ -47,7 +63,6 @@ export class QualityReportService {
     startDate: Date;
     endDate: Date;
   }) {
-    
     const inspections = await prisma.qCReceivingInspection.findMany({
       where: {
         organizationId: params.organizationId,
@@ -59,9 +74,11 @@ export class QualityReportService {
     });
 
     const total = inspections.length;
-    const passed = inspections.filter(i => i.result === 'PASS').length;
-    const failed = inspections.filter(i => i.result === 'FAIL').length;
-    const conditional = inspections.filter(i => i.result === 'CONDITIONAL_ACCEPTANCE').length;
+    const passed = inspections.filter((i) => i.result === "PASS").length;
+    const failed = inspections.filter((i) => i.result === "FAIL").length;
+    const conditional = inspections.filter(
+      (i) => i.result === "CONDITIONAL_ACCEPTANCE",
+    ).length;
     const passRate = total > 0 ? (passed / total) * 100 : 0;
 
     return {
@@ -82,7 +99,6 @@ export class QualityReportService {
     startDate: Date;
     endDate: Date;
   }) {
-    
     const defects = await prisma.qCDefect.findMany({
       where: {
         organizationId: params.organizationId,
@@ -94,16 +110,21 @@ export class QualityReportService {
     });
 
     const total = defects.length;
-    const critical = defects.filter(d => d.defectType.includes('CRITICAL')).length;
-    const major = defects.filter(d => d.defectType.includes('MAJOR')).length;
-    const minor = defects.filter(d => d.defectType.includes('MINOR')).length;
+    const critical = defects.filter((d) =>
+      d.defectType.includes("CRITICAL"),
+    ).length;
+    const major = defects.filter((d) => d.defectType.includes("MAJOR")).length;
+    const minor = defects.filter((d) => d.defectType.includes("MINOR")).length;
 
     // Group by defect code
-    const byDefectCode = defects.reduce((acc, d) => {
-      const code = d.defectType || 'UNKNOWN';
-      acc[code] = (acc[code] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const byDefectCode = defects.reduce(
+      (acc, d) => {
+        const code = d.defectType || "UNKNOWN";
+        acc[code] = (acc[code] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     // Top 5 defect codes
     const topDefects = Object.entries(byDefectCode)
@@ -130,7 +151,6 @@ export class QualityReportService {
     startDate: Date;
     endDate: Date;
   }) {
-    
     const ncrs = await prisma.nonConformanceReport.findMany({
       where: {
         organizationId: params.organizationId,
@@ -142,23 +162,31 @@ export class QualityReportService {
     });
 
     const total = ncrs.length;
-    const open = ncrs.filter(n => n.status === 'OPEN').length;
-    const inInvestigation = ncrs.filter(n => n.status === 'IN_INVESTIGATION').length;
-    const inProgress = ncrs.filter(n => n.status === 'IN_PROGRESS').length;
-    const closed = ncrs.filter(n => n.status === 'CLOSED').length;
+    const open = ncrs.filter((n) => n.status === "OPEN").length;
+    const inInvestigation = ncrs.filter(
+      (n) => n.status === "IN_INVESTIGATION",
+    ).length;
+    const inProgress = ncrs.filter((n) => n.status === "IN_PROGRESS").length;
+    const closed = ncrs.filter((n) => n.status === "CLOSED").length;
 
     // Supplier claims
-    const claimsPending = ncrs.filter(n => n.claimStatus === 'PENDING').length;
-    const claimsSubmitted = ncrs.filter(n => n.claimStatus === 'SUBMITTED').length;
-    const claimsApproved = ncrs.filter(n => n.claimStatus === 'APPROVED').length;
-    const claimsPaid = ncrs.filter(n => n.claimStatus === 'PAID').length;
-    
+    const claimsPending = ncrs.filter(
+      (n) => n.claimStatus === "PENDING",
+    ).length;
+    const claimsSubmitted = ncrs.filter(
+      (n) => n.claimStatus === "SUBMITTED",
+    ).length;
+    const claimsApproved = ncrs.filter(
+      (n) => n.claimStatus === "APPROVED",
+    ).length;
+    const claimsPaid = ncrs.filter((n) => n.claimStatus === "PAID").length;
+
     const totalClaimAmount = ncrs
-      .filter(n => n.claimAmount !== null)
+      .filter((n) => n.claimAmount !== null)
       .reduce((sum, n) => sum + (Number(n.claimAmount) || 0), 0);
-    
+
     const approvedClaimAmount = ncrs
-      .filter(n => n.claimStatus === 'APPROVED' || n.claimStatus === 'PAID')
+      .filter((n) => n.claimStatus === "APPROVED" || n.claimStatus === "PAID")
       .reduce((sum, n) => sum + (Number(n.claimAmount) || 0), 0);
 
     return {
@@ -187,7 +215,6 @@ export class QualityReportService {
     startDate: Date;
     endDate: Date;
   }) {
-    
     const capas = await prisma.correctivePreventiveAction.findMany({
       where: {
         organizationId: params.organizationId,
@@ -199,26 +226,29 @@ export class QualityReportService {
     });
 
     const total = capas.length;
-    const open = capas.filter(c => c.status === 'OPEN').length;
-    const inProgress = capas.filter(c => c.status === 'IN_PROGRESS').length;
-    const completed = capas.filter(c => c.status === 'COMPLETED').length;
-    const verified = capas.filter(c => c.status === 'VERIFIED').length;
-    const closed = capas.filter(c => c.status === 'CLOSED').length;
+    const open = capas.filter((c) => c.status === "OPEN").length;
+    const inProgress = capas.filter((c) => c.status === "IN_PROGRESS").length;
+    const completed = capas.filter((c) => c.status === "COMPLETED").length;
+    const verified = capas.filter((c) => c.status === "VERIFIED").length;
+    const closed = capas.filter((c) => c.status === "CLOSED").length;
 
     // Calculate average RPN
-    const avgRPN = capas.length > 0
-      ? capas.reduce((sum, c) => sum + (c.riskPriority || 0), 0) / capas.length
-      : 0;
+    const avgRPN =
+      capas.length > 0
+        ? capas.reduce((sum, c) => sum + (c.riskPriority || 0), 0) /
+          capas.length
+        : 0;
 
     // High risk CAPAs (RPN > 100)
-    const highRisk = capas.filter(c => (c.riskPriority || 0) > 100).length;
+    const highRisk = capas.filter((c) => (c.riskPriority || 0) > 100).length;
 
     // Overdue CAPAs
     const now = new Date();
-    const overdue = capas.filter(c => 
-      c.status !== 'CLOSED' && 
-      c.targetCompletionDate && 
-      new Date(c.targetCompletionDate) < now
+    const overdue = capas.filter(
+      (c) =>
+        c.status !== "CLOSED" &&
+        c.targetCompletionDate &&
+        new Date(c.targetCompletionDate) < now,
     ).length;
 
     return {
@@ -243,7 +273,6 @@ export class QualityReportService {
     startDate: Date;
     endDate: Date;
   }) {
-    
     const suppliers = await prisma.supplier.findMany({
       where: { organizationId: params.organizationId },
       include: {
@@ -266,12 +295,15 @@ export class QualityReportService {
       },
     });
 
-    const supplierSummary = suppliers.map(supplier => {
+    const supplierSummary = suppliers.map((supplier) => {
       // Quality scores don't exist as direct relation - calculate from NCRs
       const avgScore = 0; // TODO: Calculate based on NCR metrics
-      
+
       const ncrCount = supplier.ncrs.length;
-      const claimAmount = supplier.ncrs.reduce((sum: number, n: any) => sum + (Number(n.claimAmount) || 0), 0);
+      const claimAmount = supplier.ncrs.reduce(
+        (sum: number, n: any) => sum + (Number(n.claimAmount) || 0),
+        0,
+      );
 
       return {
         supplierId: supplier.id,
@@ -294,9 +326,11 @@ export class QualityReportService {
 
     return {
       totalSuppliers: suppliers.length,
-      avgQualityScore: supplierSummary.length > 0
-        ? supplierSummary.reduce((sum, s) => sum + s.avgQualityScore, 0) / supplierSummary.length
-        : 0,
+      avgQualityScore:
+        supplierSummary.length > 0
+          ? supplierSummary.reduce((sum, s) => sum + s.avgQualityScore, 0) /
+            supplierSummary.length
+          : 0,
       topSuppliers,
       bottomSuppliers,
       supplierSummary,
@@ -311,20 +345,14 @@ export class QualityReportService {
     startDate: Date;
     endDate: Date;
   }) {
-    
-    const [
-      inspectionData,
-      defectsData,
-      ncrData,
-      capaData,
-      supplierData,
-    ] = await Promise.all([
-      this.generateInspectionReport(params),
-      this.generateDefectsReport(params),
-      this.generateNCRReport(params),
-      this.generateCAPAReport(params),
-      this.generateSupplierReport(params),
-    ]);
+    const [inspectionData, defectsData, ncrData, capaData, supplierData] =
+      await Promise.all([
+        this.generateInspectionReport(params),
+        this.generateDefectsReport(params),
+        this.generateNCRReport(params),
+        this.generateCAPAReport(params),
+        this.generateSupplierReport(params),
+      ]);
 
     return {
       period: {
@@ -363,54 +391,53 @@ export class QualityReportService {
     periodEnd: Date;
     generatedBy: string;
   }) {
-    
     const reportNumber = await this.generateReportNumber(params.organizationId);
-    
+
     // Generate metrics based on category
     let metrics: any = {};
-    
+
     switch (params.reportCategory) {
-      case 'INSPECTION':
+      case "INSPECTION":
         metrics = await this.generateInspectionReport({
           organizationId: params.organizationId,
           startDate: params.periodStart,
           endDate: params.periodEnd,
         });
         break;
-      
-      case 'DEFECTS':
+
+      case "DEFECTS":
         metrics = await this.generateDefectsReport({
           organizationId: params.organizationId,
           startDate: params.periodStart,
           endDate: params.periodEnd,
         });
         break;
-      
-      case 'NCR':
+
+      case "NCR":
         metrics = await this.generateNCRReport({
           organizationId: params.organizationId,
           startDate: params.periodStart,
           endDate: params.periodEnd,
         });
         break;
-      
-      case 'CAPA':
+
+      case "CAPA":
         metrics = await this.generateCAPAReport({
           organizationId: params.organizationId,
           startDate: params.periodStart,
           endDate: params.periodEnd,
         });
         break;
-      
-      case 'SUPPLIER':
+
+      case "SUPPLIER":
         metrics = await this.generateSupplierReport({
           organizationId: params.organizationId,
           startDate: params.periodStart,
           endDate: params.periodEnd,
         });
         break;
-      
-      case 'EXECUTIVE':
+
+      case "EXECUTIVE":
         metrics = await this.generateExecutiveSummary({
           organizationId: params.organizationId,
           startDate: params.periodStart,
@@ -429,7 +456,7 @@ export class QualityReportService {
         periodEnd: params.periodEnd,
         metrics,
         reportDate: new Date(),
-        createdBy: params.generatedBy || 'system',
+        createdBy: params.generatedBy || "system",
       },
     });
 
@@ -446,10 +473,10 @@ export class QualityReportService {
       reportCategory?: ReportCategory;
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ) {
     const where: any = { organizationId };
-    
+
     if (filters.reportType) where.reportType = filters.reportType;
     if (filters.reportCategory) where.reportCategory = filters.reportCategory;
     if (filters.startDate || filters.endDate) {
@@ -460,7 +487,7 @@ export class QualityReportService {
 
     return await prisma.qualityReport.findMany({
       where,
-      orderBy: { reportDate: 'desc' },
+      orderBy: { reportDate: "desc" },
     });
   }
 
@@ -488,7 +515,6 @@ export class QualityReportService {
     emailRecipients?: string[];
     createdBy: string;
   }) {
-    
     const report = await prisma.qualityReport.create({
       data: {
         reportNumber: await this.generateReportNumber(params.organizationId),
@@ -499,7 +525,7 @@ export class QualityReportService {
         periodEnd: new Date(),
         reportDate: new Date(),
         metrics: {},
-        createdBy: params.createdBy || 'system',
+        createdBy: params.createdBy || "system",
       },
     });
 

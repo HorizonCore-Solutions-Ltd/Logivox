@@ -1,6 +1,7 @@
 # Testing Guide
 
 ## Table of Contents
+
 1. [Testing Strategy](#testing-strategy)
 2. [Running Tests](#running-tests)
 3. [Unit Tests](#unit-tests)
@@ -32,12 +33,12 @@
 
 ### Test Types
 
-| Type | Purpose | Tools | Speed | Coverage |
-|------|---------|-------|-------|----------|
-| **Unit** | Test individual functions/components | Jest | Fast (ms) | 60% of tests |
-| **Integration** | Test API endpoints and services | Jest + Supertest | Medium (seconds) | 30% of tests |
-| **E2E** | Test complete user workflows | Playwright | Slow (minutes) | 10% of tests |
-| **Manual** | Exploratory testing | Human QA | Variable | As needed |
+| Type            | Purpose                              | Tools            | Speed            | Coverage     |
+| --------------- | ------------------------------------ | ---------------- | ---------------- | ------------ |
+| **Unit**        | Test individual functions/components | Jest             | Fast (ms)        | 60% of tests |
+| **Integration** | Test API endpoints and services      | Jest + Supertest | Medium (seconds) | 30% of tests |
+| **E2E**         | Test complete user workflows         | Playwright       | Slow (minutes)   | 10% of tests |
+| **Manual**      | Exploratory testing                  | Human QA         | Variable         | As needed    |
 
 ---
 
@@ -105,46 +106,45 @@ Unit tests focus on individual functions, classes, and components in isolation.
 
 ```typescript
 // lib/services/__tests__/email-service.test.ts
-import { describe, expect, test, jest, beforeEach } from '@jest/globals';
-import { sendWelcomeEmail, sendPasswordResetEmail } from '../email-service';
-import * as sgMail from '@sendgrid/mail';
+import { describe, expect, test, jest, beforeEach } from "@jest/globals";
+import { sendWelcomeEmail, sendPasswordResetEmail } from "../email-service";
+import * as sgMail from "@sendgrid/mail";
 
 // Mock SendGrid
-jest.mock('@sendgrid/mail');
+jest.mock("@sendgrid/mail");
 
-describe('Email Service', () => {
+describe("Email Service", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.SENDGRID_API_KEY = 'test-key';
-    process.env.SENDGRID_FROM_EMAIL = 'test@example.com';
+    process.env.SENDGRID_API_KEY = "test-key";
+    process.env.SENDGRID_FROM_EMAIL = "test@example.com";
   });
 
-  describe('sendWelcomeEmail', () => {
-    test('should send welcome email with correct content', async () => {
-      const mockSend = jest.spyOn(sgMail, 'send').mockResolvedValue([
-        { statusCode: 202, body: '', headers: {} },
-        {},
-      ]);
+  describe("sendWelcomeEmail", () => {
+    test("should send welcome email with correct content", async () => {
+      const mockSend = jest
+        .spyOn(sgMail, "send")
+        .mockResolvedValue([{ statusCode: 202, body: "", headers: {} }, {}]);
 
       await sendWelcomeEmail({
-        to: 'user@example.com',
-        userName: 'John Doe',
+        to: "user@example.com",
+        userName: "John Doe",
       });
 
       expect(mockSend).toHaveBeenCalledWith(
         expect.objectContaining({
-          to: 'user@example.com',
-          subject: expect.stringContaining('Welcome'),
-        })
+          to: "user@example.com",
+          subject: expect.stringContaining("Welcome"),
+        }),
       );
     });
 
-    test('should handle send failures gracefully', async () => {
-      jest.spyOn(sgMail, 'send').mockRejectedValue(new Error('Send failed'));
+    test("should handle send failures gracefully", async () => {
+      jest.spyOn(sgMail, "send").mockRejectedValue(new Error("Send failed"));
 
       const result = await sendWelcomeEmail({
-        to: 'user@example.com',
-        userName: 'John Doe',
+        to: "user@example.com",
+        userName: "John Doe",
       });
 
       expect(result.success).toBe(false);
@@ -158,39 +158,39 @@ describe('Email Service', () => {
 
 ```typescript
 // lib/utils/__tests__/format.test.ts
-import { describe, expect, test } from '@jest/globals';
-import { formatCurrency, formatDate, truncateString } from '../format';
+import { describe, expect, test } from "@jest/globals";
+import { formatCurrency, formatDate, truncateString } from "../format";
 
-describe('Format Utilities', () => {
-  describe('formatCurrency', () => {
-    test('should format USD correctly', () => {
-      expect(formatCurrency(1234.56, 'USD')).toBe('$1,234.56');
+describe("Format Utilities", () => {
+  describe("formatCurrency", () => {
+    test("should format USD correctly", () => {
+      expect(formatCurrency(1234.56, "USD")).toBe("$1,234.56");
     });
 
-    test('should handle zero', () => {
-      expect(formatCurrency(0, 'USD')).toBe('$0.00');
+    test("should handle zero", () => {
+      expect(formatCurrency(0, "USD")).toBe("$0.00");
     });
 
-    test('should handle negative numbers', () => {
-      expect(formatCurrency(-100, 'USD')).toBe('-$100.00');
-    });
-  });
-
-  describe('formatDate', () => {
-    test('should format date correctly', () => {
-      const date = new Date('2026-01-02T12:00:00Z');
-      expect(formatDate(date, 'MM/DD/YYYY')).toBe('01/02/2026');
+    test("should handle negative numbers", () => {
+      expect(formatCurrency(-100, "USD")).toBe("-$100.00");
     });
   });
 
-  describe('truncateString', () => {
-    test('should truncate long strings', () => {
-      const long = 'This is a very long string that needs truncation';
-      expect(truncateString(long, 20)).toBe('This is a very long...');
+  describe("formatDate", () => {
+    test("should format date correctly", () => {
+      const date = new Date("2026-01-02T12:00:00Z");
+      expect(formatDate(date, "MM/DD/YYYY")).toBe("01/02/2026");
+    });
+  });
+
+  describe("truncateString", () => {
+    test("should truncate long strings", () => {
+      const long = "This is a very long string that needs truncation";
+      expect(truncateString(long, 20)).toBe("This is a very long...");
     });
 
-    test('should not truncate short strings', () => {
-      expect(truncateString('Short', 20)).toBe('Short');
+    test("should not truncate short strings", () => {
+      expect(truncateString("Short", 20)).toBe("Short");
     });
   });
 });
@@ -213,7 +213,7 @@ describe('Button Component', () => {
   test('should call onClick handler', () => {
     const handleClick = jest.fn();
     render(<Button onClick={handleClick}>Click Me</Button>);
-    
+
     fireEvent.click(screen.getByText('Click Me'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
@@ -242,12 +242,12 @@ Integration tests verify that multiple components work together correctly, parti
 
 ```typescript
 // __tests__/api/carriers.test.ts
-import { describe, expect, test, beforeAll, afterAll } from '@jest/globals';
-import { createMocks } from 'node-mocks-http';
-import { GET, POST } from '@/app/api/carriers/route';
-import { prisma } from '@/lib/prisma';
+import { describe, expect, test, beforeAll, afterAll } from "@jest/globals";
+import { createMocks } from "node-mocks-http";
+import { GET, POST } from "@/app/api/carriers/route";
+import { prisma } from "@/lib/prisma";
 
-describe('/api/carriers', () => {
+describe("/api/carriers", () => {
   let testOrg: any;
   let testUser: any;
 
@@ -263,8 +263,8 @@ describe('/api/carriers', () => {
     testUser = await prisma.user.create({
       data: {
         email: `test-${Date.now()}@example.com`,
-        name: 'Test User',
-        password: 'hashed',
+        name: "Test User",
+        password: "hashed",
         organizationId: testOrg.id,
       },
     });
@@ -277,13 +277,13 @@ describe('/api/carriers', () => {
     await prisma.$disconnect();
   });
 
-  describe('GET /api/carriers', () => {
-    test('should return carriers for organization', async () => {
+  describe("GET /api/carriers", () => {
+    test("should return carriers for organization", async () => {
       const { req, res } = createMocks({
-        method: 'GET',
+        method: "GET",
         headers: {
-          'x-organization-id': testOrg.id,
-          'x-user-id': testUser.id,
+          "x-organization-id": testOrg.id,
+          "x-user-id": testUser.id,
         },
       });
 
@@ -295,13 +295,13 @@ describe('/api/carriers', () => {
       expect(Array.isArray(data.carriers)).toBe(true);
     });
 
-    test('should filter carriers by type', async () => {
+    test("should filter carriers by type", async () => {
       const { req } = createMocks({
-        method: 'GET',
-        query: { type: 'PARCEL' },
+        method: "GET",
+        query: { type: "PARCEL" },
         headers: {
-          'x-organization-id': testOrg.id,
-          'x-user-id': testUser.id,
+          "x-organization-id": testOrg.id,
+          "x-user-id": testUser.id,
         },
       });
 
@@ -310,19 +310,19 @@ describe('/api/carriers', () => {
     });
   });
 
-  describe('POST /api/carriers', () => {
-    test('should create a new carrier', async () => {
+  describe("POST /api/carriers", () => {
+    test("should create a new carrier", async () => {
       const { req } = createMocks({
-        method: 'POST',
+        method: "POST",
         body: {
-          name: 'Test Carrier',
+          name: "Test Carrier",
           code: `TC-${Date.now()}`,
-          type: 'PARCEL',
+          type: "PARCEL",
           isActive: true,
         },
         headers: {
-          'x-organization-id': testOrg.id,
-          'x-user-id': testUser.id,
+          "x-organization-id": testOrg.id,
+          "x-user-id": testUser.id,
         },
       });
 
@@ -330,13 +330,13 @@ describe('/api/carriers', () => {
       // Verify carrier created
     });
 
-    test('should validate required fields', async () => {
+    test("should validate required fields", async () => {
       const { req } = createMocks({
-        method: 'POST',
+        method: "POST",
         body: {}, // Missing required fields
         headers: {
-          'x-organization-id': testOrg.id,
-          'x-user-id': testUser.id,
+          "x-organization-id": testOrg.id,
+          "x-user-id": testUser.id,
         },
       });
 
@@ -361,51 +361,53 @@ End-to-end tests simulate real user interactions with the application using Play
 
 ```typescript
 // e2e/auth.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Authentication', () => {
-  test('should login successfully', async ({ page }) => {
-    await page.goto('/login');
+test.describe("Authentication", () => {
+  test("should login successfully", async ({ page }) => {
+    await page.goto("/login");
 
     // Fill in login form
-    await page.fill('input[name="email"]', 'test@example.com');
-    await page.fill('input[name="password"]', 'password123');
+    await page.fill('input[name="email"]', "test@example.com");
+    await page.fill('input[name="password"]', "password123");
     await page.click('button[type="submit"]');
 
     // Should redirect to dashboard
-    await expect(page).toHaveURL('/dashboard');
-    await expect(page.locator('h1')).toContainText('Dashboard');
+    await expect(page).toHaveURL("/dashboard");
+    await expect(page.locator("h1")).toContainText("Dashboard");
   });
 
-  test('should show error for invalid credentials', async ({ page }) => {
-    await page.goto('/login');
+  test("should show error for invalid credentials", async ({ page }) => {
+    await page.goto("/login");
 
-    await page.fill('input[name="email"]', 'test@example.com');
-    await page.fill('input[name="password"]', 'wrongpassword');
+    await page.fill('input[name="email"]', "test@example.com");
+    await page.fill('input[name="password"]', "wrongpassword");
     await page.click('button[type="submit"]');
 
     // Should show error message
-    await expect(page.locator('.error-message')).toBeVisible();
-    await expect(page.locator('.error-message')).toContainText('Invalid credentials');
+    await expect(page.locator(".error-message")).toBeVisible();
+    await expect(page.locator(".error-message")).toContainText(
+      "Invalid credentials",
+    );
   });
 
-  test('should support MFA login', async ({ page }) => {
-    await page.goto('/login');
+  test("should support MFA login", async ({ page }) => {
+    await page.goto("/login");
 
     // Login with credentials
-    await page.fill('input[name="email"]', 'mfa-user@example.com');
-    await page.fill('input[name="password"]', 'password123');
+    await page.fill('input[name="email"]', "mfa-user@example.com");
+    await page.fill('input[name="password"]', "password123");
     await page.click('button[type="submit"]');
 
     // Should show MFA prompt
     await expect(page.locator('input[name="mfaCode"]')).toBeVisible();
 
     // Enter MFA code
-    await page.fill('input[name="mfaCode"]', '123456');
+    await page.fill('input[name="mfaCode"]', "123456");
     await page.click('button[type="submit"]');
 
     // Should redirect to dashboard
-    await expect(page).toHaveURL('/dashboard');
+    await expect(page).toHaveURL("/dashboard");
   });
 });
 ```
@@ -414,22 +416,22 @@ test.describe('Authentication', () => {
 
 ```typescript
 // e2e/orders.spec.ts
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test";
 
-test.describe('Order Management', () => {
+test.describe("Order Management", () => {
   test.beforeEach(async ({ page }) => {
     // Login before each test
-    await page.goto('/login');
-    await page.fill('input[name="email"]', 'test@example.com');
-    await page.fill('input[name="password"]', 'password123');
+    await page.goto("/login");
+    await page.fill('input[name="email"]', "test@example.com");
+    await page.fill('input[name="password"]', "password123");
     await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard');
+    await page.waitForURL("/dashboard");
   });
 
-  test('should create a new order', async ({ page }) => {
+  test("should create a new order", async ({ page }) => {
     // Navigate to orders
     await page.click('a[href="/dashboard/orders"]');
-    await expect(page).toHaveURL('/dashboard/orders');
+    await expect(page).toHaveURL("/dashboard/orders");
 
     // Click create order button
     await page.click('button:has-text("Create Order")');
@@ -439,44 +441,47 @@ test.describe('Order Management', () => {
     await page.selectOption('select[name="warehouseId"]', { index: 1 });
     await page.click('button:has-text("Add Item")');
     await page.selectOption('select[name="items[0].itemId"]', { index: 1 });
-    await page.fill('input[name="items[0].quantity"]', '5');
+    await page.fill('input[name="items[0].quantity"]', "5");
 
     // Submit form
     await page.click('button[type="submit"]:has-text("Create Order")');
 
     // Should show success message
-    await expect(page.locator('.toast-success')).toBeVisible();
-    await expect(page.locator('.toast-success')).toContainText('Order created successfully');
+    await expect(page.locator(".toast-success")).toBeVisible();
+    await expect(page.locator(".toast-success")).toContainText(
+      "Order created successfully",
+    );
 
     // Should redirect to order detail
     await expect(page).toHaveURL(/\/dashboard\/orders\/ORD-/);
   });
 
-  test('should display order list', async ({ page }) => {
-    await page.goto('/dashboard/orders');
+  test("should display order list", async ({ page }) => {
+    await page.goto("/dashboard/orders");
 
     // Should show orders table
-    await expect(page.locator('table')).toBeVisible();
+    await expect(page.locator("table")).toBeVisible();
     await expect(page.locator('th:has-text("Order Number")')).toBeVisible();
     await expect(page.locator('th:has-text("Customer")')).toBeVisible();
     await expect(page.locator('th:has-text("Status")')).toBeVisible();
   });
 
-  test('should filter orders by status', async ({ page }) => {
-    await page.goto('/dashboard/orders');
+  test("should filter orders by status", async ({ page }) => {
+    await page.goto("/dashboard/orders");
 
     // Select status filter
-    await page.selectOption('select[name="status"]', 'PENDING');
+    await page.selectOption('select[name="status"]', "PENDING");
 
     // Table should update
-    await page.waitForResponse(response => 
-      response.url().includes('/api/orders') && response.status() === 200
+    await page.waitForResponse(
+      (response) =>
+        response.url().includes("/api/orders") && response.status() === 200,
     );
 
     // All visible orders should have PENDING status
-    const statusCells = await page.locator('td[data-status]').all();
+    const statusCells = await page.locator("td[data-status]").all();
     for (const cell of statusCells) {
-      await expect(cell).toContainText('PENDING');
+      await expect(cell).toContainText("PENDING");
     }
   });
 });
@@ -529,20 +534,22 @@ module.exports = {
 ### Best Practices
 
 **1. Follow AAA Pattern:**
+
 ```typescript
-test('should do something', () => {
+test("should do something", () => {
   // Arrange: Setup test data
-  const input = { name: 'Test' };
+  const input = { name: "Test" };
 
   // Act: Execute the function
   const result = processInput(input);
 
   // Assert: Verify the result
-  expect(result).toBe('Test processed');
+  expect(result).toBe("Test processed");
 });
 ```
 
 **2. Use Descriptive Test Names:**
+
 ```typescript
 // ❌ Bad
 test('test 1', () => { ... });
@@ -552,37 +559,46 @@ test('should return user when valid ID is provided', () => { ... });
 ```
 
 **3. Test One Thing at a Time:**
+
 ```typescript
 // ❌ Bad - Testing multiple things
-test('user operations', () => {
+test("user operations", () => {
   createUser();
   updateUser();
   deleteUser();
 });
 
 // ✅ Good - Separate tests
-test('should create user', () => { createUser(); });
-test('should update user', () => { updateUser(); });
-test('should delete user', () => { deleteUser(); });
+test("should create user", () => {
+  createUser();
+});
+test("should update user", () => {
+  updateUser();
+});
+test("should delete user", () => {
+  deleteUser();
+});
 ```
 
 **4. Use Test Fixtures:**
+
 ```typescript
 // __tests__/fixtures/users.ts
 export const mockUser = {
-  id: '123',
-  email: 'test@example.com',
-  name: 'Test User',
+  id: "123",
+  email: "test@example.com",
+  name: "Test User",
 };
 
 // In test file
-import { mockUser } from './fixtures/users';
+import { mockUser } from "./fixtures/users";
 ```
 
 **5. Mock External Dependencies:**
+
 ```typescript
 // Mock Prisma
-jest.mock('@/lib/prisma', () => ({
+jest.mock("@/lib/prisma", () => ({
   prisma: {
     user: {
       findUnique: jest.fn(),
@@ -624,7 +640,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Install dependencies
         run: npm ci
@@ -663,14 +679,16 @@ jobs:
 ### Common Issues
 
 **Tests timeout:**
+
 ```typescript
 // Increase timeout for slow tests
-test('slow operation', async () => {
+test("slow operation", async () => {
   // ...
 }, 10000); // 10 seconds
 ```
 
 **Database connection errors:**
+
 ```bash
 # Ensure test database is running
 docker-compose -f docker-compose.test.yml up -d
@@ -680,13 +698,14 @@ psql postgresql://test:test@localhost:5433/test_db
 ```
 
 **Flaky tests:**
+
 ```typescript
 // Use waitFor for async operations
-import { waitFor } from '@testing-library/react';
+import { waitFor } from "@testing-library/react";
 
-test('async test', async () => {
+test("async test", async () => {
   await waitFor(() => {
-    expect(screen.getByText('Loaded')).toBeInTheDocument();
+    expect(screen.getByText("Loaded")).toBeInTheDocument();
   });
 });
 ```

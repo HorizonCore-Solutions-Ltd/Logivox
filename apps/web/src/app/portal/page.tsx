@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
@@ -67,7 +73,9 @@ export default function CustomerPortalPage() {
     const Icon = config.icon;
 
     return (
-      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
+      <span
+        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}
+      >
         <Icon className="h-3 w-3 mr-1" />
         {status}
       </span>
@@ -87,7 +95,9 @@ export default function CustomerPortalPage() {
       {/* Welcome Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome to Your Portal</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome to Your Portal
+          </h1>
           <p className="mt-2 text-gray-600">
             Manage your orders, track shipments, and view your account details.
           </p>
@@ -172,43 +182,61 @@ export default function CustomerPortalPage() {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             <Link href="/portal/orders/new">
-              <Button variant="outline" className="w-full justify-start h-auto py-4">
+              <Button
+                variant="outline"
+                className="w-full justify-start h-auto py-4"
+              >
                 <div className="flex flex-col items-start">
                   <div className="flex items-center mb-1">
                     <ShoppingCart className="h-5 w-5 mr-2 text-blue-600" />
                     <span className="font-semibold">Place Order</span>
                   </div>
-                  <span className="text-xs text-gray-500">Create a new order</span>
+                  <span className="text-xs text-gray-500">
+                    Create a new order
+                  </span>
                 </div>
               </Button>
             </Link>
 
             <Link href="/portal/orders">
-              <Button variant="outline" className="w-full justify-start h-auto py-4">
+              <Button
+                variant="outline"
+                className="w-full justify-start h-auto py-4"
+              >
                 <div className="flex flex-col items-start">
                   <div className="flex items-center mb-1">
                     <History className="h-5 w-5 mr-2 text-purple-600" />
                     <span className="font-semibold">Order History</span>
                   </div>
-                  <span className="text-xs text-gray-500">View past orders</span>
+                  <span className="text-xs text-gray-500">
+                    View past orders
+                  </span>
                 </div>
               </Button>
             </Link>
 
             <Link href="/portal/tracking">
-              <Button variant="outline" className="w-full justify-start h-auto py-4">
+              <Button
+                variant="outline"
+                className="w-full justify-start h-auto py-4"
+              >
                 <div className="flex flex-col items-start">
                   <div className="flex items-center mb-1">
                     <Package className="h-5 w-5 mr-2 text-green-600" />
                     <span className="font-semibold">Track Shipments</span>
                   </div>
-                  <span className="text-xs text-gray-500">Track your packages</span>
+                  <span className="text-xs text-gray-500">
+                    Track your packages
+                  </span>
                 </div>
               </Button>
             </Link>
 
             <Link href="/portal/account">
-              <Button variant="outline" className="w-full justify-start h-auto py-4">
+              <Button
+                variant="outline"
+                className="w-full justify-start h-auto py-4"
+              >
                 <div className="flex flex-col items-start">
                   <div className="flex items-center mb-1">
                     <Package className="h-5 w-5 mr-2 text-gray-600" />
@@ -230,7 +258,9 @@ export default function CustomerPortalPage() {
             <CardDescription>Your latest order activity</CardDescription>
           </div>
           <Link href="/portal/orders">
-            <Button variant="outline" size="sm">View All</Button>
+            <Button variant="outline" size="sm">
+              View All
+            </Button>
           </Link>
         </CardHeader>
         <CardContent>
@@ -245,11 +275,14 @@ export default function CustomerPortalPage() {
                   <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3">
-                        <p className="font-semibold text-gray-900">{order.soNumber}</p>
+                        <p className="font-semibold text-gray-900">
+                          {order.soNumber}
+                        </p>
                         {getStatusBadge(order.status)}
                       </div>
                       <p className="text-sm text-gray-500 mt-1">
-                        {new Date(order.orderDate).toLocaleDateString()} • {order.itemCount} items
+                        {new Date(order.orderDate).toLocaleDateString()} •{" "}
+                        {order.itemCount} items
                       </p>
                     </div>
                     <div className="text-right">

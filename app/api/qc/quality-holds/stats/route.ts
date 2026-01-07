@@ -1,21 +1,21 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { QualityHoldService } from '@/lib/services/qc/quality-hold-service';
+import { NextRequest, NextResponse } from "next/server";
+import { QualityHoldService } from "@/lib/services/qc/quality-hold-service";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
-    const startDate = searchParams.get('startDate') 
-      ? new Date(searchParams.get('startDate')!) 
+    const organizationId = searchParams.get("organizationId");
+    const startDate = searchParams.get("startDate")
+      ? new Date(searchParams.get("startDate")!)
       : undefined;
-    const endDate = searchParams.get('endDate') 
-      ? new Date(searchParams.get('endDate')!) 
+    const endDate = searchParams.get("endDate")
+      ? new Date(searchParams.get("endDate")!)
       : undefined;
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'organizationId is required' },
-        { status: 400 }
+        { error: "organizationId is required" },
+        { status: 400 },
       );
     }
 
@@ -26,10 +26,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(stats);
   } catch (error: any) {
-    console.error('Error fetching quality hold stats:', error);
+    console.error("Error fetching quality hold stats:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to fetch quality hold stats' },
-      { status: 500 }
+      { error: error.message || "Failed to fetch quality hold stats" },
+      { status: 500 },
     );
   }
 }

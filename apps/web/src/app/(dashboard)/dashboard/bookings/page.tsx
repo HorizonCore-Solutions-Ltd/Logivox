@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ColumnDef } from "@tanstack/react-table"
-import { DataTable } from "@/components/ui/data-table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import * as React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/ui/data-table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Plus,
   FileText,
@@ -17,7 +23,7 @@ import {
   MoreHorizontal,
   Eye,
   Ban,
-} from "lucide-react"
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,47 +31,47 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "next/navigation"
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { useToast } from "@/hooks/use-toast";
 
 interface Booking {
-  id: string
-  bookingDate: string
-  deliveryDate: string | null
-  status: string
-  totalAmount: number
-  notes: string | null
+  id: string;
+  bookingDate: string;
+  deliveryDate: string | null;
+  status: string;
+  totalAmount: number;
+  notes: string | null;
   customer: {
-    id: string
-    name: string
-    email: string | null
-    phone: string | null
-    type: string
-  }
+    id: string;
+    name: string;
+    email: string | null;
+    phone: string | null;
+    type: string;
+  };
   _count: {
-    items: number
-  }
-  createdAt: string
+    items: number;
+  };
+  createdAt: string;
 }
 
 export default function BookingsPage() {
-  const { user } = useAuth()
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const { toast } = useToast()
+  const { user } = useAuth();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Fetch bookings
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ["bookings"],
     queryFn: async () => {
-      const res = await fetch("/api/bookings")
-      if (!res.ok) throw new Error("Failed to fetch bookings")
-      return res.json()
+      const res = await fetch("/api/bookings");
+      if (!res.ok) throw new Error("Failed to fetch bookings");
+      return res.json();
     },
-  })
+  });
 
   // Update status mutation
   const updateStatusMutation = useMutation({
@@ -74,41 +80,47 @@ export default function BookingsPage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
-      })
+      });
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.message || "Failed to update booking")
+        const error = await res.json();
+        throw new Error(error.message || "Failed to update booking");
       }
-      return res.json()
+      return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["bookings"] })
+      queryClient.invalidateQueries({ queryKey: ["bookings"] });
       toast({
         title: "Success",
         description: "Booking status updated successfully",
-      })
+      });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   // Calculate stats
   const stats = React.useMemo(() => {
-    const total = bookings.length
-    const pending = bookings.filter((b: Booking) => b.status === "PENDING").length
-    const confirmed = bookings.filter((b: Booking) => b.status === "CONFIRMED").length
-    const fulfilled = bookings.filter((b: Booking) => b.status === "FULFILLED").length
+    const total = bookings.length;
+    const pending = bookings.filter(
+      (b: Booking) => b.status === "PENDING",
+    ).length;
+    const confirmed = bookings.filter(
+      (b: Booking) => b.status === "CONFIRMED",
+    ).length;
+    const fulfilled = bookings.filter(
+      (b: Booking) => b.status === "FULFILLED",
+    ).length;
     const totalRevenue = bookings
       .filter((b: Booking) => b.status === "FULFILLED")
-      .reduce((sum: number, b: Booking) => sum + Number(b.totalAmount), 0)
+      .reduce((sum: number, b: Booking) => sum + Number(b.totalAmount), 0);
 
-    return { total, pending, confirmed, fulfilled, totalRevenue }
-  }, [bookings])
+    return { total, pending, confirmed, fulfilled, totalRevenue };
+  }, [bookings]);
 
   // Table columns
   const columns: ColumnDef<Booking>[] = [
@@ -116,9 +128,7 @@ export default function BookingsPage() {
       accessorKey: "id",
       header: "Booking ID",
       cell: ({ row }) => (
-        <div className="font-mono text-sm">
-          #{row.original.id.slice(0, 8)}
-        </div>
+        <div className="font-mono text-sm">#{row.original.id.slice(0, 8)}</div>
       ),
     },
     {
@@ -138,7 +148,8 @@ export default function BookingsPage() {
     {
       accessorKey: "bookingDate",
       header: "Booking Date",
-      cell: ({ row }) => new Date(row.original.bookingDate).toLocaleDateString(),
+      cell: ({ row }) =>
+        new Date(row.original.bookingDate).toLocaleDateString(),
     },
     {
       accessorKey: "deliveryDate",
@@ -152,15 +163,15 @@ export default function BookingsPage() {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        const status = row.original.status
+        const status = row.original.status;
         const variant =
           status === "FULFILLED"
             ? "success"
             : status === "CONFIRMED"
-            ? "default"
-            : status === "PENDING"
-            ? "warning"
-            : "destructive"
+              ? "default"
+              : status === "PENDING"
+                ? "warning"
+                : "destructive";
 
         const icon =
           status === "FULFILLED" ? (
@@ -171,14 +182,14 @@ export default function BookingsPage() {
             <Clock className="h-3 w-3 mr-1" />
           ) : (
             <XCircle className="h-3 w-3 mr-1" />
-          )
+          );
 
         return (
           <Badge variant={variant as any} className="flex items-center w-fit">
             {icon}
             {status}
           </Badge>
-        )
+        );
       },
     },
     {
@@ -194,7 +205,7 @@ export default function BookingsPage() {
     {
       id: "actions",
       cell: ({ row }) => {
-        const booking = row.original
+        const booking = row.original;
 
         return (
           <DropdownMenu>
@@ -239,7 +250,8 @@ export default function BookingsPage() {
                   Mark as Fulfilled
                 </DropdownMenuItem>
               )}
-              {(booking.status === "PENDING" || booking.status === "CONFIRMED") && (
+              {(booking.status === "PENDING" ||
+                booking.status === "CONFIRMED") && (
                 <>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -258,10 +270,10 @@ export default function BookingsPage() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
   if (isLoading) {
     return (
@@ -275,7 +287,7 @@ export default function BookingsPage() {
           </div>
         </div>
       </DashboardSidebar>
-    )
+    );
   }
 
   return (
@@ -284,7 +296,9 @@ export default function BookingsPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Stock Bookings</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Stock Bookings
+            </h1>
             <p className="text-muted-foreground">
               Manage customer orders and reservations
             </p>
@@ -299,7 +313,9 @@ export default function BookingsPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Bookings
+              </CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -315,7 +331,9 @@ export default function BookingsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.pending}</div>
-              <p className="text-xs text-muted-foreground">Awaiting confirmation</p>
+              <p className="text-xs text-muted-foreground">
+                Awaiting confirmation
+              </p>
             </CardContent>
           </Card>
 
@@ -332,7 +350,9 @@ export default function BookingsPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Revenue
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -365,5 +385,5 @@ export default function BookingsPage() {
         </Card>
       </div>
     </DashboardSidebar>
-  )
+  );
 }

@@ -1,25 +1,25 @@
-import { describe, test, expect } from '@jest/globals';
-import { sendWebhook } from '@/lib/services/webhook-service';
-import { sendEmail } from '@/lib/services/email-service';
-import { sendSMS } from '@/lib/services/sms-service';
+import { describe, test, expect } from "@jest/globals";
+import { sendWebhook } from "@/lib/services/webhook-service";
+import { sendEmail } from "@/lib/services/email-service";
+import { sendSMS } from "@/lib/services/sms-service";
 
-describe('Service Integration Tests', () => {
-  describe('Email Service', () => {
-    test('should validate email parameters', () => {
+describe("Service Integration Tests", () => {
+  describe("Email Service", () => {
+    test("should validate email parameters", () => {
       expect(() => {
         sendEmail({
-          to: '',
-          subject: 'Test',
-          html: 'Test',
+          to: "",
+          subject: "Test",
+          html: "Test",
         });
       }).toThrow();
     });
 
-    test('should format email correctly', async () => {
+    test("should format email correctly", async () => {
       const emailData = {
-        to: 'test@example.com',
-        subject: 'Test Subject',
-        html: '<h1>Test Email</h1>',
+        to: "test@example.com",
+        subject: "Test Subject",
+        html: "<h1>Test Email</h1>",
       };
 
       // This would actually send in production
@@ -27,46 +27,46 @@ describe('Service Integration Tests', () => {
     });
   });
 
-  describe('SMS Service', () => {
-    test('should validate phone number format', () => {
-      const validPhone = '+1234567890';
-      const invalidPhone = '123';
+  describe("SMS Service", () => {
+    test("should validate phone number format", () => {
+      const validPhone = "+1234567890";
+      const invalidPhone = "123";
 
       expect(validPhone).toMatch(/^\+[1-9]\d{1,14}$/);
       expect(invalidPhone).not.toMatch(/^\+[1-9]\d{1,14}$/);
     });
 
-    test('should truncate long messages', () => {
-      const longMessage = 'A'.repeat(200);
+    test("should truncate long messages", () => {
+      const longMessage = "A".repeat(200);
       const truncated = longMessage.substring(0, 160);
 
       expect(truncated.length).toBe(160);
     });
   });
 
-  describe('Webhook Service', () => {
-    test('should generate webhook signature', () => {
+  describe("Webhook Service", () => {
+    test("should generate webhook signature", () => {
       const payload = {
-        event: 'test.event',
-        data: { test: 'data' },
+        event: "test.event",
+        data: { test: "data" },
         timestamp: new Date().toISOString(),
-        organizationId: 'test-org',
+        organizationId: "test-org",
       };
 
-      const crypto = require('crypto');
-      const secret = 'test-secret';
+      const crypto = require("crypto");
+      const secret = "test-secret";
       const signature = crypto
-        .createHmac('sha256', secret)
+        .createHmac("sha256", secret)
         .update(JSON.stringify(payload))
-        .digest('hex');
+        .digest("hex");
 
       expect(signature).toBeDefined();
       expect(signature.length).toBe(64); // SHA256 hex = 64 chars
     });
 
-    test('should implement exponential backoff', () => {
+    test("should implement exponential backoff", () => {
       const delays = [30, 60, 300, 900, 3600];
-      
+
       for (let i = 0; i < delays.length; i++) {
         expect(delays[i]).toBeGreaterThan(0);
         if (i > 0) {
@@ -75,7 +75,7 @@ describe('Service Integration Tests', () => {
       }
     });
 
-    test('should respect max retries', () => {
+    test("should respect max retries", () => {
       const maxRetries = 5;
       let attempts = 0;
 
@@ -87,23 +87,23 @@ describe('Service Integration Tests', () => {
     });
   });
 
-  describe('Service Error Handling', () => {
-    test('should handle network timeouts', async () => {
+  describe("Service Error Handling", () => {
+    test("should handle network timeouts", async () => {
       const timeout = 10000; // 10 seconds
       const startTime = Date.now();
 
       try {
         await new Promise((resolve, reject) => {
-          setTimeout(() => reject(new Error('Timeout')), timeout);
+          setTimeout(() => reject(new Error("Timeout")), timeout);
         });
       } catch (error: any) {
         const elapsed = Date.now() - startTime;
-        expect(error.message).toBe('Timeout');
+        expect(error.message).toBe("Timeout");
         expect(elapsed).toBeGreaterThanOrEqual(timeout);
       }
     });
 
-    test('should retry on 5xx errors but not 4xx', () => {
+    test("should retry on 5xx errors but not 4xx", () => {
       const shouldRetry = (statusCode: number) => {
         return statusCode >= 500;
       };
@@ -115,7 +115,7 @@ describe('Service Integration Tests', () => {
       expect(shouldRetry(404)).toBe(false);
     });
 
-    test('should log failed attempts', () => {
+    test("should log failed attempts", () => {
       const attempts: Array<{ attempt: number; error: string }> = [];
 
       for (let i = 1; i <= 3; i++) {

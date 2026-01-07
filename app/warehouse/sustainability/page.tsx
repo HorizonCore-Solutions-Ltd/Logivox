@@ -3,10 +3,18 @@
  * Environmental impact monitoring and ESG reporting
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Leaf, Zap, Recycle, TrendingDown, Award, FileText, Target } from 'lucide-react';
+import { useState, useEffect } from "react";
+import {
+  Leaf,
+  Zap,
+  Recycle,
+  TrendingDown,
+  Award,
+  FileText,
+  Target,
+} from "lucide-react";
 
 interface CarbonFootprint {
   totalCarbonKg: number;
@@ -51,12 +59,15 @@ interface SustainabilityScore {
 }
 
 export default function SustainabilityDashboard() {
-  const [carbonFootprint, setCarbonFootprint] = useState<CarbonFootprint | null>(null);
+  const [carbonFootprint, setCarbonFootprint] =
+    useState<CarbonFootprint | null>(null);
   const [energy, setEnergy] = useState<EnergyConsumption | null>(null);
   const [waste, setWaste] = useState<WasteMetrics | null>(null);
   const [score, setScore] = useState<SustainabilityScore | null>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'carbon' | 'energy' | 'waste'>('overview');
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "carbon" | "energy" | "waste"
+  >("overview");
 
   useEffect(() => {
     fetchData();
@@ -72,65 +83,69 @@ export default function SustainabilityDashboard() {
         fetchScore(),
       ]);
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error("Fetch error:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const fetchCarbonFootprint = async () => {
-    const response = await fetch('/api/sustainability?action=carbon-footprint');
+    const response = await fetch("/api/sustainability?action=carbon-footprint");
     const data = await response.json();
     setCarbonFootprint(data.footprint);
   };
 
   const fetchEnergy = async () => {
-    const response = await fetch('/api/sustainability?action=energy-consumption');
+    const response = await fetch(
+      "/api/sustainability?action=energy-consumption",
+    );
     const data = await response.json();
     setEnergy(data.energy);
   };
 
   const fetchWaste = async () => {
-    const response = await fetch('/api/sustainability?action=waste-metrics');
+    const response = await fetch("/api/sustainability?action=waste-metrics");
     const data = await response.json();
     setWaste(data.waste);
   };
 
   const fetchScore = async () => {
-    const response = await fetch('/api/sustainability?action=sustainability-score');
+    const response = await fetch(
+      "/api/sustainability?action=sustainability-score",
+    );
     const data = await response.json();
     setScore(data.score);
   };
 
   const generateESGReport = async () => {
-    if (!confirm('Generate ESG Report?')) return;
+    if (!confirm("Generate ESG Report?")) return;
 
     try {
-      const response = await fetch('/api/sustainability', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/sustainability", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'generate-report',
+          action: "generate-report",
           params: {
-            format: 'PDF',
+            format: "PDF",
           },
         }),
       });
 
       const data = await response.json();
       if (data.success) {
-        alert('ESG Report generated successfully!');
+        alert("ESG Report generated successfully!");
       }
     } catch (error) {
-      console.error('Report generation error:', error);
-      alert('Failed to generate report');
+      console.error("Report generation error:", error);
+      alert("Failed to generate report");
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
   };
 
   const getTrendIcon = (trend: number) => {
@@ -144,8 +159,12 @@ export default function SustainabilityDashboard() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Sustainability & Carbon Tracking</h1>
-            <p className="text-gray-600 mt-2">Environmental impact monitoring and ESG reporting</p>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Sustainability & Carbon Tracking
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Environmental impact monitoring and ESG reporting
+            </p>
           </div>
           <div className="flex gap-3">
             <button
@@ -153,7 +172,7 @@ export default function SustainabilityDashboard() {
               disabled={loading}
               className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
             >
-              <Leaf className={`w-4 h-4 ${loading ? 'animate-pulse' : ''}`} />
+              <Leaf className={`w-4 h-4 ${loading ? "animate-pulse" : ""}`} />
               Refresh
             </button>
             <button
@@ -174,15 +193,23 @@ export default function SustainabilityDashboard() {
             <div>
               <div className="flex items-center gap-3 mb-2">
                 <Award className="w-8 h-8 text-green-600" />
-                <h2 className="text-2xl font-bold text-gray-900">Sustainability Score</h2>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Sustainability Score
+                </h2>
               </div>
-              <p className="text-gray-600">Overall environmental performance rating</p>
+              <p className="text-gray-600">
+                Overall environmental performance rating
+              </p>
             </div>
             <div className="text-center">
-              <div className={`text-6xl font-bold ${getScoreColor(score.score)}`}>
+              <div
+                className={`text-6xl font-bold ${getScoreColor(score.score)}`}
+              >
                 {score.score}
               </div>
-              <div className="text-2xl font-bold text-gray-700 mt-2">Grade: {score.grade}</div>
+              <div className="text-2xl font-bold text-gray-700 mt-2">
+                Grade: {score.grade}
+              </div>
             </div>
           </div>
         </div>
@@ -199,7 +226,13 @@ export default function SustainabilityDashboard() {
               </p>
               <div className="flex items-center gap-1 mt-2 text-sm">
                 {carbonFootprint && getTrendIcon(carbonFootprint.trend)}
-                <span className={carbonFootprint?.trend < 0 ? 'text-green-600' : 'text-red-600'}>
+                <span
+                  className={
+                    carbonFootprint?.trend < 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }
+                >
                   {Math.abs(carbonFootprint?.trend || 0)}%
                 </span>
               </div>
@@ -215,7 +248,9 @@ export default function SustainabilityDashboard() {
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {energy?.totalKwh.toLocaleString() || 0} kWh
               </p>
-              <p className="text-sm text-green-600 mt-2">{energy?.renewablePercent || 0}% renewable</p>
+              <p className="text-sm text-green-600 mt-2">
+                {energy?.renewablePercent || 0}% renewable
+              </p>
             </div>
             <Zap className="w-8 h-8 text-yellow-600" />
           </div>
@@ -225,8 +260,12 @@ export default function SustainabilityDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600">Recycling Rate</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{waste?.recyclingRate || 0}%</p>
-              <p className="text-sm text-gray-600 mt-2">{waste?.recycled || 0} kg recycled</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
+                {waste?.recyclingRate || 0}%
+              </p>
+              <p className="text-sm text-gray-600 mt-2">
+                {waste?.recycled || 0} kg recycled
+              </p>
             </div>
             <Recycle className="w-8 h-8 text-blue-600" />
           </div>
@@ -249,44 +288,44 @@ export default function SustainabilityDashboard() {
       {/* Tabs */}
       <div className="mb-6 flex gap-2">
         <button
-          onClick={() => setActiveTab('overview')}
+          onClick={() => setActiveTab("overview")}
           className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition ${
-            activeTab === 'overview'
-              ? 'bg-green-600 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
+            activeTab === "overview"
+              ? "bg-green-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
           <Award className="w-5 h-5" />
           Overview
         </button>
         <button
-          onClick={() => setActiveTab('carbon')}
+          onClick={() => setActiveTab("carbon")}
           className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition ${
-            activeTab === 'carbon'
-              ? 'bg-green-600 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
+            activeTab === "carbon"
+              ? "bg-green-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
           <Leaf className="w-5 h-5" />
           Carbon Footprint
         </button>
         <button
-          onClick={() => setActiveTab('energy')}
+          onClick={() => setActiveTab("energy")}
           className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition ${
-            activeTab === 'energy'
-              ? 'bg-green-600 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
+            activeTab === "energy"
+              ? "bg-green-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
           <Zap className="w-5 h-5" />
           Energy
         </button>
         <button
-          onClick={() => setActiveTab('waste')}
+          onClick={() => setActiveTab("waste")}
           className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition ${
-            activeTab === 'waste'
-              ? 'bg-green-600 text-white'
-              : 'bg-white text-gray-700 hover:bg-gray-100'
+            activeTab === "waste"
+              ? "bg-green-600 text-white"
+              : "bg-white text-gray-700 hover:bg-gray-100"
           }`}
         >
           <Recycle className="w-5 h-5" />
@@ -304,29 +343,35 @@ export default function SustainabilityDashboard() {
         ) : (
           <>
             {/* Overview Tab */}
-            {activeTab === 'overview' && score && (
+            {activeTab === "overview" && score && (
               <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Sustainability Overview</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Sustainability Overview
+                </h2>
 
                 {/* Performance Factors */}
                 <div className="mb-8">
-                  <h3 className="font-semibold text-gray-900 mb-4">Performance Factors</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    Performance Factors
+                  </h3>
                   <div className="grid grid-cols-3 gap-4">
                     {Object.entries(score.factors).map(([key, value]) => (
                       <div
                         key={key}
                         className={`border rounded-lg p-4 ${
-                          value === 'GOOD'
-                            ? 'bg-green-50 border-green-200'
-                            : 'bg-yellow-50 border-yellow-200'
+                          value === "GOOD"
+                            ? "bg-green-50 border-green-200"
+                            : "bg-yellow-50 border-yellow-200"
                         }`}
                       >
                         <div className="font-medium text-gray-900 mb-1">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                          {key.replace(/([A-Z])/g, " $1").trim()}
                         </div>
                         <div
                           className={`text-sm font-semibold ${
-                            value === 'GOOD' ? 'text-green-600' : 'text-yellow-600'
+                            value === "GOOD"
+                              ? "text-green-600"
+                              : "text-yellow-600"
                           }`}
                         >
                           {value}
@@ -338,10 +383,15 @@ export default function SustainabilityDashboard() {
 
                 {/* Recommendations */}
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Improvement Recommendations</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    Improvement Recommendations
+                  </h3>
                   <div className="space-y-3">
                     {score.recommendations.map((rec, idx) => (
-                      <div key={idx} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                      <div
+                        key={idx}
+                        className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
+                      >
                         <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
                           {idx + 1}
                         </div>
@@ -354,13 +404,17 @@ export default function SustainabilityDashboard() {
             )}
 
             {/* Carbon Tab */}
-            {activeTab === 'carbon' && carbonFootprint && (
+            {activeTab === "carbon" && carbonFootprint && (
               <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Carbon Footprint Analysis</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Carbon Footprint Analysis
+                </h2>
 
                 <div className="grid grid-cols-2 gap-6 mb-8">
                   <div className="border border-gray-200 rounded-lg p-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">Total Emissions</h3>
+                    <h3 className="font-semibold text-gray-900 mb-4">
+                      Total Emissions
+                    </h3>
                     <div className="text-4xl font-bold text-green-600 mb-2">
                       {carbonFootprint.totalCarbonTons} tons
                     </div>
@@ -369,27 +423,41 @@ export default function SustainabilityDashboard() {
                     </p>
                     <div className="mt-4 flex items-center gap-2">
                       {getTrendIcon(carbonFootprint.trend)}
-                      <span className={carbonFootprint.trend < 0 ? 'text-green-600' : 'text-red-600'}>
+                      <span
+                        className={
+                          carbonFootprint.trend < 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }
+                      >
                         {Math.abs(carbonFootprint.trend)}% vs last period
                       </span>
                     </div>
                   </div>
 
                   <div className="border border-gray-200 rounded-lg p-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">Average per Shipment</h3>
+                    <h3 className="font-semibold text-gray-900 mb-4">
+                      Average per Shipment
+                    </h3>
                     <div className="text-4xl font-bold text-blue-600 mb-2">
                       {carbonFootprint.avgPerShipment} kg
                     </div>
-                    <p className="text-sm text-gray-600">CO₂ emissions per shipment</p>
+                    <p className="text-sm text-gray-600">
+                      CO₂ emissions per shipment
+                    </p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Emissions Breakdown</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    Emissions Breakdown
+                  </h3>
                   <div className="space-y-3">
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Transportation</span>
+                        <span className="text-sm font-medium text-gray-700">
+                          Transportation
+                        </span>
                         <span className="text-sm font-bold text-gray-900">
                           {carbonFootprint.breakdown.transportation} kg
                         </span>
@@ -410,7 +478,9 @@ export default function SustainabilityDashboard() {
 
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Energy</span>
+                        <span className="text-sm font-medium text-gray-700">
+                          Energy
+                        </span>
                         <span className="text-sm font-bold text-gray-900">
                           {carbonFootprint.breakdown.energy} kg
                         </span>
@@ -420,7 +490,9 @@ export default function SustainabilityDashboard() {
                           className="h-full bg-yellow-600 rounded-full"
                           style={{
                             width: `${
-                              (carbonFootprint.breakdown.energy / carbonFootprint.totalCarbonKg) * 100
+                              (carbonFootprint.breakdown.energy /
+                                carbonFootprint.totalCarbonKg) *
+                              100
                             }%`,
                           }}
                         ></div>
@@ -432,92 +504,136 @@ export default function SustainabilityDashboard() {
             )}
 
             {/* Energy Tab */}
-            {activeTab === 'energy' && energy && (
+            {activeTab === "energy" && energy && (
               <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Energy Consumption</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Energy Consumption
+                </h2>
 
                 <div className="grid grid-cols-3 gap-6 mb-8">
                   <div className="border border-gray-200 rounded-lg p-6 text-center">
-                    <p className="text-sm text-gray-600 mb-2">Total Consumption</p>
-                    <p className="text-3xl font-bold text-gray-900">{energy.totalKwh.toLocaleString()} kWh</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Total Consumption
+                    </p>
+                    <p className="text-3xl font-bold text-gray-900">
+                      {energy.totalKwh.toLocaleString()} kWh
+                    </p>
                   </div>
                   <div className="border border-gray-200 rounded-lg p-6 text-center">
                     <p className="text-sm text-gray-600 mb-2">Total Cost</p>
-                    <p className="text-3xl font-bold text-gray-900">${energy.totalCost.toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-gray-900">
+                      ${energy.totalCost.toLocaleString()}
+                    </p>
                   </div>
                   <div className="border border-gray-200 rounded-lg p-6 text-center">
-                    <p className="text-sm text-gray-600 mb-2">Renewable Energy</p>
-                    <p className="text-3xl font-bold text-green-600">{energy.renewablePercent}%</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Renewable Energy
+                    </p>
+                    <p className="text-3xl font-bold text-green-600">
+                      {energy.renewablePercent}%
+                    </p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Consumption Breakdown</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    Consumption Breakdown
+                  </h3>
                   <div className="space-y-4">
-                    {Object.entries(energy.breakdown).map(([category, value]) => (
-                      <div key={category}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700 capitalize">
-                            {category}
-                          </span>
-                          <span className="text-sm font-bold text-gray-900">{value} kWh</span>
+                    {Object.entries(energy.breakdown).map(
+                      ([category, value]) => (
+                        <div key={category}>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-medium text-gray-700 capitalize">
+                              {category}
+                            </span>
+                            <span className="text-sm font-bold text-gray-900">
+                              {value} kWh
+                            </span>
+                          </div>
+                          <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-yellow-600 rounded-full"
+                              style={{
+                                width: `${(value / energy.totalKwh) * 100}%`,
+                              }}
+                            ></div>
+                          </div>
                         </div>
-                        <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-yellow-600 rounded-full"
-                            style={{
-                              width: `${(value / energy.totalKwh) * 100}%`,
-                            }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 </div>
               </div>
             )}
 
             {/* Waste Tab */}
-            {activeTab === 'waste' && waste && (
+            {activeTab === "waste" && waste && (
               <div className="p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Waste Management</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">
+                  Waste Management
+                </h2>
 
                 <div className="grid grid-cols-3 gap-6 mb-8">
                   <div className="border border-gray-200 rounded-lg p-6 text-center">
                     <p className="text-sm text-gray-600 mb-2">Total Waste</p>
-                    <p className="text-3xl font-bold text-gray-900">{waste.totalWaste} kg</p>
+                    <p className="text-3xl font-bold text-gray-900">
+                      {waste.totalWaste} kg
+                    </p>
                   </div>
                   <div className="border border-green-200 rounded-lg p-6 text-center bg-green-50">
                     <p className="text-sm text-gray-600 mb-2">Recycled</p>
-                    <p className="text-3xl font-bold text-green-600">{waste.recycled} kg</p>
+                    <p className="text-3xl font-bold text-green-600">
+                      {waste.recycled} kg
+                    </p>
                   </div>
                   <div className="border border-gray-200 rounded-lg p-6 text-center">
                     <p className="text-sm text-gray-600 mb-2">Recycling Rate</p>
-                    <p className="text-3xl font-bold text-green-600">{waste.recyclingRate}%</p>
+                    <p className="text-3xl font-bold text-green-600">
+                      {waste.recyclingRate}%
+                    </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-6 mb-8">
                   <div className="border border-gray-200 rounded-lg p-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">Cost Savings</h3>
-                    <p className="text-2xl font-bold text-green-600">${waste.costSavings.toLocaleString()}</p>
-                    <p className="text-sm text-gray-600 mt-1">From recycling programs</p>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      Cost Savings
+                    </h3>
+                    <p className="text-2xl font-bold text-green-600">
+                      ${waste.costSavings.toLocaleString()}
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      From recycling programs
+                    </p>
                   </div>
                   <div className="border border-gray-200 rounded-lg p-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">Carbon Avoided</h3>
-                    <p className="text-2xl font-bold text-blue-600">{waste.carbonAvoided} kg CO₂</p>
-                    <p className="text-sm text-gray-600 mt-1">Through recycling</p>
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      Carbon Avoided
+                    </h3>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {waste.carbonAvoided} kg CO₂
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      Through recycling
+                    </p>
                   </div>
                 </div>
 
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-4">Waste by Type</h3>
+                  <h3 className="font-semibold text-gray-900 mb-4">
+                    Waste by Type
+                  </h3>
                   <div className="space-y-3">
                     {Object.entries(waste.breakdown).map(([type, amount]) => (
                       <div key={type}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-gray-700 capitalize">{type}</span>
-                          <span className="text-sm font-bold text-gray-900">{amount} kg</span>
+                          <span className="text-sm font-medium text-gray-700 capitalize">
+                            {type}
+                          </span>
+                          <span className="text-sm font-bold text-gray-900">
+                            {amount} kg
+                          </span>
                         </div>
                         <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden">
                           <div

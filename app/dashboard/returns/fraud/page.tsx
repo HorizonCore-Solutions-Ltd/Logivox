@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertTriangle,
   Shield,
@@ -16,8 +16,8 @@ import {
   Eye,
   CheckCircle,
   XCircle,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface FraudStats {
   total_analyses: number;
@@ -49,7 +49,7 @@ export default function FraudDetectionDashboard() {
   const [stats, setStats] = useState<FraudStats | null>(null);
   const [topSignals, setTopSignals] = useState<FraudSignal[]>([]);
   const [flaggedReturns, setFlaggedReturns] = useState<FlaggedReturn[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchFraudData();
@@ -60,18 +60,18 @@ export default function FraudDetectionDashboard() {
       setLoading(true);
 
       // Fetch fraud stats
-      const response = await fetch('/api/returns/fraud?type=stats');
+      const response = await fetch("/api/returns/fraud?type=stats");
       const data = await response.json();
 
       setStats(data.stats);
       setTopSignals(data.topSignals || []);
 
       // Fetch flagged returns
-      const flaggedResponse = await fetch('/api/rmas?flagged=true');
+      const flaggedResponse = await fetch("/api/rmas?flagged=true");
       const flaggedData = await flaggedResponse.json();
       setFlaggedReturns(flaggedData.rmas || []);
     } catch (error) {
-      console.error('Error fetching fraud data:', error);
+      console.error("Error fetching fraud data:", error);
     } finally {
       setLoading(false);
     }
@@ -79,13 +79,14 @@ export default function FraudDetectionDashboard() {
 
   const getRiskBadge = (riskLevel: string) => {
     const config = {
-      CRITICAL: { color: 'bg-red-500', text: 'Critical' },
-      HIGH: { color: 'bg-orange-500', text: 'High' },
-      MEDIUM: { color: 'bg-yellow-500', text: 'Medium' },
-      LOW: { color: 'bg-green-500', text: 'Low' },
+      CRITICAL: { color: "bg-red-500", text: "Critical" },
+      HIGH: { color: "bg-orange-500", text: "High" },
+      MEDIUM: { color: "bg-yellow-500", text: "Medium" },
+      LOW: { color: "bg-green-500", text: "Low" },
     };
 
-    const { color, text } = config[riskLevel as keyof typeof config] || config.LOW;
+    const { color, text } =
+      config[riskLevel as keyof typeof config] || config.LOW;
 
     return <Badge className={`${color} text-white`}>{text}</Badge>;
   };
@@ -93,7 +94,7 @@ export default function FraudDetectionDashboard() {
   const filteredReturns = flaggedReturns.filter(
     (r) =>
       r.rma_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.customer_name.toLowerCase().includes(searchTerm.toLowerCase())
+      r.customer_name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   if (loading) {
@@ -127,22 +128,30 @@ export default function FraudDetectionDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Total Analyses</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Analyses
+            </CardTitle>
             <Shield className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.total_analyses || 0}</div>
+            <div className="text-2xl font-bold">
+              {stats?.total_analyses || 0}
+            </div>
             <p className="text-xs text-muted-foreground">Last 30 days</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium">Avg Risk Score</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg Risk Score
+            </CardTitle>
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{(stats?.avg_risk_score || 0).toFixed(1)}</div>
+            <div className="text-2xl font-bold">
+              {(stats?.avg_risk_score || 0).toFixed(1)}
+            </div>
             <p className="text-xs text-green-600">Within normal range</p>
           </CardContent>
         </Card>
@@ -189,7 +198,7 @@ export default function FraudDetectionDashboard() {
                   </div>
                   <div>
                     <div className="font-medium">
-                      {signal.signal_type.replace(/_/g, ' ').toLowerCase()}
+                      {signal.signal_type.replace(/_/g, " ").toLowerCase()}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       Avg severity: {parseFloat(signal.avg_severity).toFixed(1)}
@@ -198,7 +207,9 @@ export default function FraudDetectionDashboard() {
                 </div>
                 <div className="text-right">
                   <div className="font-bold">{signal.occurrences}</div>
-                  <div className="text-sm text-muted-foreground">occurrences</div>
+                  <div className="text-sm text-muted-foreground">
+                    occurrences
+                  </div>
                 </div>
               </div>
             ))}
@@ -228,7 +239,9 @@ export default function FraudDetectionDashboard() {
               <div className="text-center py-8 text-muted-foreground">
                 <CheckCircle className="w-12 h-12 mx-auto mb-2 text-green-500" />
                 <p>No flagged returns found</p>
-                <p className="text-sm">All returns are within acceptable risk thresholds</p>
+                <p className="text-sm">
+                  All returns are within acceptable risk thresholds
+                </p>
               </div>
             ) : (
               filteredReturns.map((ret) => (
@@ -239,11 +252,11 @@ export default function FraudDetectionDashboard() {
                   <div className="flex items-center gap-4">
                     <AlertTriangle
                       className={`w-8 h-8 ${
-                        ret.risk_level === 'CRITICAL'
-                          ? 'text-red-500'
-                          : ret.risk_level === 'HIGH'
-                          ? 'text-orange-500'
-                          : 'text-yellow-500'
+                        ret.risk_level === "CRITICAL"
+                          ? "text-red-500"
+                          : ret.risk_level === "HIGH"
+                            ? "text-orange-500"
+                            : "text-yellow-500"
                       }`}
                     />
                     <div>
@@ -261,7 +274,9 @@ export default function FraudDetectionDashboard() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <div className="text-2xl font-bold">{ret.risk_score}</div>
-                      <div className="text-xs text-muted-foreground">risk score</div>
+                      <div className="text-xs text-muted-foreground">
+                        risk score
+                      </div>
                     </div>
                     {getRiskBadge(ret.risk_level)}
                     <Link href={`/dashboard/rmas/${ret.id}`}>

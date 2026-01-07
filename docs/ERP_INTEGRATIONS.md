@@ -1,4 +1,5 @@
 # 🔌 ERP INTEGRATIONS
+
 ## LogiVox WMS - Enterprise Resource Planning Connectors
 
 ### Overview
@@ -9,33 +10,39 @@ LogiVox provides bidirectional integration with major ERP systems to synchronize
 
 ## 🎯 Supported ERP Systems
 
-| ERP System | Products | Orders | Customers | Inventory | Invoices | Status |
-|------------|----------|--------|-----------|-----------|----------|--------|
-| **SAP** | ✅ | ✅ | ✅ | ✅ | 🔜 | Production Ready |
-| **Oracle NetSuite** | 🔜 | 🔜 | 🔜 | 🔜 | 🔜 | Framework Ready |
-| **Microsoft Dynamics 365** | 🔜 | 🔜 | 🔜 | 🔜 | 🔜 | Planned Q2 2026 |
-| **QuickBooks** | 🔜 | 🔜 | 🔜 | ❌ | 🔜 | Planned Q2 2026 |
+| ERP System                 | Products | Orders | Customers | Inventory | Invoices | Status           |
+| -------------------------- | -------- | ------ | --------- | --------- | -------- | ---------------- |
+| **SAP**                    | ✅       | ✅     | ✅        | ✅        | 🔜       | Production Ready |
+| **Oracle NetSuite**        | 🔜       | 🔜     | 🔜        | 🔜        | 🔜       | Framework Ready  |
+| **Microsoft Dynamics 365** | 🔜       | 🔜     | 🔜        | 🔜        | 🔜       | Planned Q2 2026  |
+| **QuickBooks**             | 🔜       | 🔜     | 🔜        | ❌        | 🔜       | Planned Q2 2026  |
 
 ---
 
 ## 📋 Integration Patterns
 
 ### 1. **Pull from ERP** (Import)
+
 Synchronize data from ERP to LogiVox:
+
 - Product catalog
 - Customer master data
 - Sales orders
 - Inventory levels
 
 ### 2. **Push to ERP** (Export)
+
 Send data from LogiVox to ERP:
+
 - Shipment confirmations
 - Inventory adjustments
 - Invoices
 - Order status updates
 
 ### 3. **Webhook Events** (Real-time)
+
 Real-time notifications for critical events:
+
 - Order created in ERP → Auto-create in LogiVox
 - Shipment dispatched → Update ERP order status
 - Inventory adjusted → Sync to ERP inventory
@@ -72,6 +79,7 @@ client_secret=YOUR_CLIENT_SECRET
 ```
 
 **Response:**
+
 ```json
 {
   "access_token": "eyJhbGciOiJSUzI1NiIs...",
@@ -85,21 +93,20 @@ client_secret=YOUR_CLIENT_SECRET
 #### Get Products
 
 ```typescript
-import { sapConnector } from '@/lib/services/erp-connectors';
+import { sapConnector } from "@/lib/services/erp-connectors";
 
 // Get all products
 const products = await sapConnector.getProducts();
 
 // Get products modified since date
-const recentProducts = await sapConnector.getProducts(
-  new Date('2026-01-01')
-);
+const recentProducts = await sapConnector.getProducts(new Date("2026-01-01"));
 
 // Get single product
-const product = await sapConnector.getProduct('PRODUCT-001');
+const product = await sapConnector.getProduct("PRODUCT-001");
 ```
 
 **SAP OData Endpoint:**
+
 ```
 GET /A_Product
 GET /A_Product?$filter=LastChangeDateTime gt datetime'2026-01-01T00:00:00'
@@ -107,6 +114,7 @@ GET /A_Product('PRODUCT-001')
 ```
 
 **Response Format:**
+
 ```json
 {
   "erpId": "PRODUCT-001",
@@ -114,7 +122,7 @@ GET /A_Product('PRODUCT-001')
   "name": "Widget Pro 3000",
   "description": "Professional grade widget",
   "price": 99.99,
-  "cost": 45.50,
+  "cost": 45.5,
   "uom": "EA",
   "category": "WIDGETS"
 }
@@ -125,21 +133,23 @@ GET /A_Product('PRODUCT-001')
 ```typescript
 // Get orders in date range
 const orders = await sapConnector.getOrders(
-  new Date('2026-01-01'),
-  new Date('2026-01-31')
+  new Date("2026-01-01"),
+  new Date("2026-01-31"),
 );
 
 // Get single order with line items
-const order = await sapConnector.getOrder('SAP-ORDER-12345');
+const order = await sapConnector.getOrder("SAP-ORDER-12345");
 ```
 
 **SAP OData Endpoint:**
+
 ```
 GET /A_SalesOrder?$filter=SalesOrderDate ge datetime'2026-01-01' and SalesOrderDate le datetime'2026-01-31'
 GET /A_SalesOrder('SAP-ORDER-12345')?$expand=to_Item
 ```
 
 **Response Format:**
+
 ```json
 {
   "erpId": "SAP-ORDER-12345",
@@ -156,7 +166,7 @@ GET /A_SalesOrder('SAP-ORDER-12345')?$expand=to_Item
       "sku": "PRODUCT-001",
       "quantity": 10,
       "unitPrice": 99.99,
-      "total": 999.90
+      "total": 999.9
     }
   ]
 }
@@ -169,23 +179,25 @@ GET /A_SalesOrder('SAP-ORDER-12345')?$expand=to_Item
 const customers = await sapConnector.getCustomers();
 
 // Get customer by ERP ID
-const customer = await sapConnector.getCustomer('CUST-001');
+const customer = await sapConnector.getCustomer("CUST-001");
 ```
 
 **SAP OData Endpoint:**
+
 ```
 GET /A_Customer
 GET /A_Customer('CUST-001')
 ```
 
 **Response Format:**
+
 ```json
 {
   "erpId": "CUST-001",
   "name": "Acme Corporation",
   "email": "billing@acme.com",
   "phone": "+1-555-0100",
-  "creditLimit": 50000.00
+  "creditLimit": 50000.0
 }
 ```
 
@@ -193,38 +205,41 @@ GET /A_Customer('CUST-001')
 
 ```typescript
 // Get inventory for SKU across all locations
-const quantity = await sapConnector.getInventoryLevel('PRODUCT-001');
+const quantity = await sapConnector.getInventoryLevel("PRODUCT-001");
 
 // Get inventory for SKU at specific location
 const warehouseQty = await sapConnector.getInventoryLevel(
-  'PRODUCT-001',
-  'WH01'
+  "PRODUCT-001",
+  "WH01",
 );
 ```
 
 **SAP OData Endpoint:**
+
 ```
 GET /A_MaterialStock?$filter=Material eq 'PRODUCT-001'
 GET /A_MaterialStock?$filter=Material eq 'PRODUCT-001' and Plant eq 'WH01'
 ```
 
 **Response:**
+
 ```typescript
-145 // Total quantity available
+145; // Total quantity available
 ```
 
 #### Update Product
 
 ```typescript
 // Update product details
-const updated = await sapConnector.updateProduct('PRODUCT-001', {
-  name: 'Widget Pro 3000 v2',
+const updated = await sapConnector.updateProduct("PRODUCT-001", {
+  name: "Widget Pro 3000 v2",
   price: 109.99,
-  cost: 48.00
+  cost: 48.0,
 });
 ```
 
 **SAP OData Endpoint:**
+
 ```
 PATCH /A_Product('PRODUCT-001')
 Content-Type: application/json
@@ -238,16 +253,16 @@ Content-Type: application/json
 
 ### SAP Field Mapping
 
-| LogiVox | SAP OData | Type | Notes |
-|---------|-----------|------|-------|
-| `sku` | `Product` | String | Material number |
-| `name` | `ProductDescription` | String | Short description |
-| `description` | `ProductLongText` | String | Long text |
-| `price` | `NetPrice` | Decimal | Selling price |
-| `cost` | `StandardCost` | Decimal | Cost price |
-| `uom` | `BaseUnit` | String | EA, KG, etc. |
-| `category` | `ProductGroup` | String | Product hierarchy |
-| `quantity` | `MatlWrhsStkQtyInMatlBaseUnit` | Decimal | Stock quantity |
+| LogiVox       | SAP OData                      | Type    | Notes             |
+| ------------- | ------------------------------ | ------- | ----------------- |
+| `sku`         | `Product`                      | String  | Material number   |
+| `name`        | `ProductDescription`           | String  | Short description |
+| `description` | `ProductLongText`              | String  | Long text         |
+| `price`       | `NetPrice`                     | Decimal | Selling price     |
+| `cost`        | `StandardCost`                 | Decimal | Cost price        |
+| `uom`         | `BaseUnit`                     | String  | EA, KG, etc.      |
+| `category`    | `ProductGroup`                 | String  | Product hierarchy |
+| `quantity`    | `MatlWrhsStkQtyInMatlBaseUnit` | Decimal | Stock quantity    |
 
 ### Error Handling
 
@@ -255,9 +270,9 @@ Content-Type: application/json
 try {
   const products = await sapConnector.getProducts();
 } catch (error) {
-  if (error.message.includes('authentication failed')) {
+  if (error.message.includes("authentication failed")) {
     // Refresh credentials
-  } else if (error.message.includes('rate limit')) {
+  } else if (error.message.includes("rate limit")) {
     // Implement backoff
   }
 }
@@ -266,6 +281,7 @@ try {
 ### Rate Limits
 
 SAP OData APIs typically support:
+
 - **100 requests/minute** per user
 - **10,000 requests/day** per application
 
@@ -321,7 +337,7 @@ Authorization: OAuth realm="YOUR_ACCOUNT_ID",
 ### API Operations (Coming Soon)
 
 ```typescript
-import { netsuiteConnector } from '@/lib/services/erp-connectors';
+import { netsuiteConnector } from "@/lib/services/erp-connectors";
 
 // Get items
 const items = await netsuiteConnector.getProducts();
@@ -334,6 +350,7 @@ const customers = await netsuiteConnector.getCustomers();
 ```
 
 **NetSuite REST Endpoints:**
+
 ```
 GET /services/rest/record/v1/inventoryItem
 GET /services/rest/record/v1/salesOrder
@@ -351,9 +368,9 @@ Import data on a schedule (e.g., every 30 minutes):
 ```typescript
 // Cron job: */30 * * * *
 async function syncProducts() {
-  const lastSync = await getLastSyncTime('products');
+  const lastSync = await getLastSyncTime("products");
   const products = await sapConnector.getProducts(lastSync);
-  
+
   for (const product of products) {
     await prisma.product.upsert({
       where: { sku: product.sku },
@@ -362,7 +379,7 @@ async function syncProducts() {
         price: product.price,
         cost: product.cost,
         erpId: product.erpId,
-        erpSyncedAt: new Date()
+        erpSyncedAt: new Date(),
       },
       create: {
         sku: product.sku,
@@ -370,12 +387,12 @@ async function syncProducts() {
         price: product.price,
         cost: product.cost,
         erpId: product.erpId,
-        organizationId: 'org-id'
-      }
+        organizationId: "org-id",
+      },
     });
   }
-  
-  await updateLastSyncTime('products', new Date());
+
+  await updateLastSyncTime("products", new Date());
 }
 ```
 
@@ -387,24 +404,24 @@ React to ERP events immediately:
 // POST /api/webhooks/erp/order-created
 export async function POST(request: Request) {
   const order = await request.json();
-  
+
   // Create order in LogiVox
   await prisma.salesOrder.create({
     data: {
       orderNumber: order.orderNumber,
       erpOrderId: order.erpId,
       customerId: await getCustomerByErpId(order.customerErpId),
-      status: 'PENDING',
+      status: "PENDING",
       lineItems: {
-        create: order.lineItems.map(line => ({
+        create: order.lineItems.map((line) => ({
           productId: await getProductByErpId(line.productErpId),
           quantity: line.quantity,
-          unitPrice: line.unitPrice
-        }))
-      }
-    }
+          unitPrice: line.unitPrice,
+        })),
+      },
+    },
   });
-  
+
   return Response.json({ success: true });
 }
 ```
@@ -417,20 +434,22 @@ Sync specific records when needed:
 // Sync single product before order fulfillment
 async function ensureProductSync(sku: string) {
   const product = await prisma.product.findUnique({
-    where: { sku }
+    where: { sku },
   });
-  
-  if (!product?.erpSyncedAt || 
-      product.erpSyncedAt < new Date(Date.now() - 3600000)) {
+
+  if (
+    !product?.erpSyncedAt ||
+    product.erpSyncedAt < new Date(Date.now() - 3600000)
+  ) {
     const erpProduct = await sapConnector.getProduct(product.erpId);
-    
+
     await prisma.product.update({
       where: { sku },
       data: {
         price: erpProduct.price,
         cost: erpProduct.cost,
-        erpSyncedAt: new Date()
-      }
+        erpSyncedAt: new Date(),
+      },
     });
   }
 }
@@ -451,9 +470,9 @@ interface ProductMapping {
     price: number;
     cost: number;
     weight: number;
-    dimensions: { l: number, w: number, h: number };
+    dimensions: { l: number; w: number; h: number };
   };
-  
+
   sap: {
     Material: string;
     MaterialDescription: string;
@@ -465,7 +484,7 @@ interface ProductMapping {
     MaterialWidth: string;
     MaterialHeight: string;
   };
-  
+
   netsuite: {
     itemId: string;
     displayName: string;
@@ -485,15 +504,15 @@ Store ERP-specific fields in `customFields` JSON:
 ```typescript
 await prisma.product.create({
   data: {
-    sku: 'PRODUCT-001',
-    name: 'Widget',
+    sku: "PRODUCT-001",
+    name: "Widget",
     customFields: {
-      sapMaterialType: 'FERT',
-      sapProductHierarchy: '001/002/003',
-      netsuiteItemType: 'InvtPart',
-      netsuiteTaxSchedule: 'STANDARD'
-    }
-  }
+      sapMaterialType: "FERT",
+      sapProductHierarchy: "001/002/003",
+      netsuiteItemType: "InvtPart",
+      netsuiteTaxSchedule: "STANDARD",
+    },
+  },
 });
 ```
 
@@ -527,18 +546,18 @@ export async function GET() {
   const logs = await prisma.erpSyncLog.findMany({
     where: {
       startedAt: {
-        gte: new Date(Date.now() - 86400000) // Last 24 hours
-      }
+        gte: new Date(Date.now() - 86400000), // Last 24 hours
+      },
     },
-    orderBy: { startedAt: 'desc' }
+    orderBy: { startedAt: "desc" },
   });
-  
+
   return Response.json({
     totalSyncs: logs.length,
-    successfulSyncs: logs.filter(l => l.recordsFailed === 0).length,
-    failedSyncs: logs.filter(l => l.recordsFailed > 0).length,
+    successfulSyncs: logs.filter((l) => l.recordsFailed === 0).length,
+    failedSyncs: logs.filter((l) => l.recordsFailed > 0).length,
     recordsProcessed: logs.reduce((sum, l) => sum + l.recordsProcessed, 0),
-    recentLogs: logs.slice(0, 10)
+    recentLogs: logs.slice(0, 10),
   });
 }
 ```
@@ -549,39 +568,39 @@ export async function GET() {
 
 ### Common ERP Errors
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| `AUTHENTICATION_FAILED` | Invalid credentials | Refresh OAuth token |
-| `RATE_LIMIT_EXCEEDED` | Too many requests | Implement exponential backoff |
-| `RECORD_NOT_FOUND` | ERP ID invalid | Re-sync or remove mapping |
-| `DUPLICATE_KEY` | Record already exists | Update instead of create |
-| `FIELD_VALIDATION` | Invalid data format | Check field mapping |
+| Error                   | Cause                 | Solution                      |
+| ----------------------- | --------------------- | ----------------------------- |
+| `AUTHENTICATION_FAILED` | Invalid credentials   | Refresh OAuth token           |
+| `RATE_LIMIT_EXCEEDED`   | Too many requests     | Implement exponential backoff |
+| `RECORD_NOT_FOUND`      | ERP ID invalid        | Re-sync or remove mapping     |
+| `DUPLICATE_KEY`         | Record already exists | Update instead of create      |
+| `FIELD_VALIDATION`      | Invalid data format   | Check field mapping           |
 
 ### Retry Strategy
 
 ```typescript
 async function syncWithRetry<T>(
   operation: () => Promise<T>,
-  maxRetries = 3
+  maxRetries = 3,
 ): Promise<T> {
   for (let i = 0; i < maxRetries; i++) {
     try {
       return await operation();
     } catch (error: any) {
       if (i === maxRetries - 1) throw error;
-      
+
       // Don't retry on auth errors
-      if (error.message.includes('authentication')) {
+      if (error.message.includes("authentication")) {
         throw error;
       }
-      
+
       // Exponential backoff
-      await new Promise(resolve => 
-        setTimeout(resolve, Math.pow(2, i) * 1000)
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.pow(2, i) * 1000),
       );
     }
   }
-  throw new Error('Max retries exceeded');
+  throw new Error("Max retries exceeded");
 }
 ```
 
@@ -592,12 +611,14 @@ async function syncWithRetry<T>(
 ### 1. **Credential Storage**
 
 Never store ERP credentials in code. Use:
+
 - **Development**: `.env.local` file (git-ignored)
 - **Production**: AWS Secrets Manager, Azure Key Vault, or HashiCorp Vault
 
 ### 2. **Token Rotation**
 
 Rotate OAuth tokens periodically:
+
 ```typescript
 // Refresh token before expiry
 if (this.tokenExpiry && this.tokenExpiry < new Date(Date.now() + 300000)) {
@@ -608,18 +629,19 @@ if (this.tokenExpiry && this.tokenExpiry < new Date(Date.now() + 300000)) {
 ### 3. **Audit Logging**
 
 Log all ERP operations:
+
 ```typescript
 await prisma.activityLog.create({
   data: {
-    action: 'ERP_SYNC',
-    entityType: 'Product',
-    userId: 'system',
+    action: "ERP_SYNC",
+    entityType: "Product",
+    userId: "system",
     metadata: {
-      erpSystem: 'SAP',
-      operation: 'getProducts',
-      recordCount: products.length
-    }
-  }
+      erpSystem: "SAP",
+      operation: "getProducts",
+      recordCount: products.length,
+    },
+  },
 });
 ```
 
@@ -628,14 +650,17 @@ await prisma.activityLog.create({
 ## 📞 Support
 
 **SAP Issues:**
+
 - Documentation: https://api.sap.com/
 - Support: https://support.sap.com/
 
 **NetSuite Issues:**
+
 - Documentation: https://system.netsuite.com/app/help/helpcenter.nl
 - Support: https://netsuite.custhelp.com/
 
 **LogiVox Integration:**
+
 - Email: support@logivox.com
 - Documentation: https://docs.logivox.com
 - Slack: #erp-integrations

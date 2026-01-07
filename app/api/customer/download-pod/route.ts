@@ -3,18 +3,18 @@
  * Generate and download proof of delivery PDF
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const loadSheetId = searchParams.get('loadSheetId');
+    const loadSheetId = searchParams.get("loadSheetId");
 
     if (!loadSheetId) {
       return NextResponse.json(
-        { error: 'Load sheet ID is required' },
-        { status: 400 }
+        { error: "Load sheet ID is required" },
+        { status: 400 },
       );
     }
 
@@ -30,15 +30,15 @@ export async function GET(req: NextRequest) {
         },
         bayDoor: true,
         events: {
-          orderBy: { timestamp: 'desc' },
+          orderBy: { timestamp: "desc" },
         },
       },
     });
 
     if (!loadSheet) {
       return NextResponse.json(
-        { error: 'Load sheet not found' },
-        { status: 404 }
+        { error: "Load sheet not found" },
+        { status: 404 },
       );
     }
 
@@ -73,16 +73,16 @@ export async function GET(req: NextRequest) {
         <div class="section">
           <h2>Customer Information</h2>
           <p><strong>Customer:</strong> ${loadSheet.customer.name}</p>
-          <p><strong>Customer Code:</strong> ${loadSheet.customer.code || 'N/A'}</p>
+          <p><strong>Customer Code:</strong> ${loadSheet.customer.code || "N/A"}</p>
         </div>
 
         <div class="section">
           <h2>Shipment Details</h2>
           <p><strong>Scheduled Date:</strong> ${new Date(loadSheet.shipmentDate).toLocaleString()}</p>
-          <p><strong>Departure:</strong> ${loadSheet.actualDepartureTime ? new Date(loadSheet.actualDepartureTime).toLocaleString() : 'Pending'}</p>
-          <p><strong>Carrier:</strong> ${loadSheet.carrierName || 'N/A'}</p>
-          <p><strong>Driver:</strong> ${loadSheet.driverName || 'N/A'}</p>
-          <p><strong>Trailer:</strong> ${loadSheet.trailerNumber || 'N/A'}</p>
+          <p><strong>Departure:</strong> ${loadSheet.actualDepartureTime ? new Date(loadSheet.actualDepartureTime).toLocaleString() : "Pending"}</p>
+          <p><strong>Carrier:</strong> ${loadSheet.carrierName || "N/A"}</p>
+          <p><strong>Driver:</strong> ${loadSheet.driverName || "N/A"}</p>
+          <p><strong>Trailer:</strong> ${loadSheet.trailerNumber || "N/A"}</p>
         </div>
 
         <div class="section">
@@ -98,7 +98,9 @@ export async function GET(req: NextRequest) {
               </tr>
             </thead>
             <tbody>
-              ${loadSheet.containers.map((container) => `
+              ${loadSheet.containers
+                .map(
+                  (container) => `
                 <tr>
                   <td>${container.containerNumber}</td>
                   <td>${container.weight}</td>
@@ -106,7 +108,9 @@ export async function GET(req: NextRequest) {
                   <td>${container.containerItems?.length || 0}</td>
                   <td>${container.status}</td>
                 </tr>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </tbody>
           </table>
         </div>
@@ -130,13 +134,17 @@ export async function GET(req: NextRequest) {
               </tr>
             </thead>
             <tbody>
-              ${loadSheet.events.map((event) => `
+              ${loadSheet.events
+                .map(
+                  (event) => `
                 <tr>
                   <td>${event.eventType}</td>
                   <td>${event.description}</td>
                   <td>${new Date(event.timestamp).toLocaleString()}</td>
                 </tr>
-              `).join('')}
+              `,
+                )
+                .join("")}
             </tbody>
           </table>
         </div>
@@ -152,15 +160,15 @@ export async function GET(req: NextRequest) {
     // Return HTML (in production, convert to PDF)
     return new NextResponse(html, {
       headers: {
-        'Content-Type': 'text/html',
-        'Content-Disposition': `attachment; filename="POD-${loadSheet.loadSheetNumber}.html"`,
+        "Content-Type": "text/html",
+        "Content-Disposition": `attachment; filename="POD-${loadSheet.loadSheetNumber}.html"`,
       },
     });
   } catch (error) {
-    console.error('POD download error:', error);
+    console.error("POD download error:", error);
     return NextResponse.json(
-      { error: 'Failed to generate proof of delivery' },
-      { status: 500 }
+      { error: "Failed to generate proof of delivery" },
+      { status: 500 },
     );
   }
 }

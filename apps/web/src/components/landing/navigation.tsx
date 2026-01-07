@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   Building2,
   Menu,
@@ -31,9 +31,9 @@ import {
   Box,
   BadgeCheck,
   Briefcase,
-  Gift
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+  Gift,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -42,20 +42,20 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
+} from "@/components/ui/navigation-menu";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function Navigation() {
-  const [scrolled, setScrolled] = React.useState(false)
-  const [mobileOpen, setMobileOpen] = React.useState(false)
+  const [scrolled, setScrolled] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
 
   React.useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const solutions = [
     {
@@ -148,7 +148,7 @@ export function Navigation() {
       icon: LineChart,
       href: "/solutions/analytics",
     },
-  ]
+  ];
 
   const platform = [
     {
@@ -187,7 +187,7 @@ export function Navigation() {
       icon: Building2,
       href: "/platform/multi-tenant",
     },
-  ]
+  ];
 
   const servicesSupport = [
     {
@@ -226,7 +226,7 @@ export function Navigation() {
       icon: Globe,
       href: "/services/partners",
     },
-  ]
+  ];
 
   const resources = [
     {
@@ -259,15 +259,15 @@ export function Navigation() {
       icon: Radio,
       href: "/supported-devices",
     },
-  ]
+  ];
 
   return (
     <header
       className={cn(
         "sticky top-0 z-50 w-full border-b transition-all duration-200",
-        scrolled 
-          ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm" 
-          : "bg-background/60 backdrop-blur-sm"
+        scrolled
+          ? "bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm"
+          : "bg-background/60 backdrop-blur-sm",
       )}
     >
       <div className="container-enterprise">
@@ -343,7 +343,9 @@ export function Navigation() {
 
               {/* Services & Support */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Services & Support</NavigationMenuTrigger>
+                <NavigationMenuTrigger>
+                  Services & Support
+                </NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {servicesSupport.map((item) => (
@@ -452,7 +454,9 @@ export function Navigation() {
                       >
                         <item.icon className="h-5 w-5 text-primary mt-0.5" />
                         <div>
-                          <div className="font-medium text-sm">{item.title}</div>
+                          <div className="font-medium text-sm">
+                            {item.title}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             {item.description}
                           </div>
@@ -475,7 +479,9 @@ export function Navigation() {
                       >
                         <item.icon className="h-5 w-5 text-primary mt-0.5" />
                         <div>
-                          <div className="font-medium text-sm">{item.title}</div>
+                          <div className="font-medium text-sm">
+                            {item.title}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             {item.description}
                           </div>
@@ -498,7 +504,9 @@ export function Navigation() {
                       >
                         <item.icon className="h-5 w-5 text-primary mt-0.5" />
                         <div>
-                          <div className="font-medium text-sm">{item.title}</div>
+                          <div className="font-medium text-sm">
+                            {item.title}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             {item.description}
                           </div>
@@ -521,7 +529,9 @@ export function Navigation() {
                       >
                         <item.icon className="h-5 w-5 text-primary mt-0.5" />
                         <div>
-                          <div className="font-medium text-sm">{item.title}</div>
+                          <div className="font-medium text-sm">
+                            {item.title}
+                          </div>
                           <div className="text-xs text-muted-foreground">
                             {item.description}
                           </div>
@@ -568,5 +578,5 @@ export function Navigation() {
         </div>
       </div>
     </header>
-  )
+  );
 }

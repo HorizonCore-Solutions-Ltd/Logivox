@@ -1,9 +1,9 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // Validation schema for creating/updating PO
 const purchaseOrderSchema = z.object({
@@ -15,15 +15,19 @@ const purchaseOrderSchema = z.object({
   deliveryNotes: z.string().optional(),
   notes: z.string().optional(),
   internalNotes: z.string().optional(),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
-  items: z.array(z.object({
-    inventoryItemId: z.string().cuid().optional(),
-    sku: z.string().min(1),
-    description: z.string().min(1),
-    quantityOrdered: z.number().int().positive(),
-    unitPrice: z.number().positive(),
-    tax: z.number().nonnegative().optional(),
-  })).min(1),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+  items: z
+    .array(
+      z.object({
+        inventoryItemId: z.string().cuid().optional(),
+        sku: z.string().min(1),
+        description: z.string().min(1),
+        quantityOrdered: z.number().int().positive(),
+        unitPrice: z.number().positive(),
+        tax: z.number().nonnegative().optional(),
+      }),
+    )
+    .min(1),
 });
 
 // ============================================================================
@@ -33,12 +37,9 @@ const purchaseOrderSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -57,8 +58,8 @@ export async function POST(req: NextRequest) {
 
     if (!user?.organizationMemberships[0]) {
       return NextResponse.json(
-        { error: 'No active organization found' },
-        { status: 400 }
+        { error: "No active organization found" },
+        { status: 400 },
       );
     }
 
@@ -68,16 +69,16 @@ export async function POST(req: NextRequest) {
     const poCount = await prisma.purchaseOrder.count({
       where: { organizationId },
     });
-    const poNumber = `PO-${Date.now()}-${String(poCount + 1).padStart(4, '0')}`;
+    const poNumber = `PO-${Date.now()}-${String(poCount + 1).padStart(4, "0")}`;
 
     // Calculate totals
     const subtotal = validatedData.items.reduce(
       (sum, item) => sum + item.quantityOrdered * item.unitPrice,
-      0
+      0,
     );
     const tax = validatedData.items.reduce(
       (sum, item) => sum + (item.tax || 0),
-      0
+      0,
     );
     const totalAmount = subtotal + tax;
 
@@ -88,9 +89,11 @@ export async function POST(req: NextRequest) {
           organizationId,
           supplierId: validatedData.supplierId,
           poNumber,
-          status: 'DRAFT',
-          priority: validatedData.priority || 'MEDIUM',
-          expectedDate: validatedData.expectedDate ? new Date(validatedData.expectedDate) : null,
+          status: "DRAFT",
+          priority: validatedData.priority || "MEDIUM",
+          expectedDate: validatedData.expectedDate
+            ? new Date(validatedData.expectedDate)
+            : null,
           subtotal,
           tax,
           totalAmount,
@@ -122,10 +125,11 @@ export async function POST(req: NextRequest) {
               quantityOrdered: item.quantityOrdered,
               unitPrice: item.unitPrice,
               tax: item.tax || 0,
-              totalPrice: item.quantityOrdered * item.unitPrice + (item.tax || 0),
+              totalPrice:
+                item.quantityOrdered * item.unitPrice + (item.tax || 0),
             },
-          })
-        )
+          }),
+        ),
       );
 
       return { ...po, items };
@@ -136,31 +140,33 @@ export async function POST(req: NextRequest) {
       data: {
         organizationId,
         userId: session.user.id,
-        action: 'CREATE',
-        entityType: 'PurchaseOrder',
+        action: "CREATE",
+        entityType: "PurchaseOrder",
         entityId: purchaseOrder.id,
         metadata: { poNumber },
       },
     });
 
-    return NextResponse.json({
-      purchaseOrder,
-      message: 'Purchase order created successfully',
-    }, { status: 201 });
-
+    return NextResponse.json(
+      {
+        purchaseOrder,
+        message: "Purchase order created successfully",
+      },
+      { status: 201 },
+    );
   } catch (error) {
-    console.error('Error creating purchase order:', error);
-    
+    console.error("Error creating purchase order:", error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to create purchase order' },
-      { status: 500 }
+      { error: "Failed to create purchase order" },
+      { status: 500 },
     );
   }
 }
@@ -172,12 +178,9 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get user's organization
@@ -193,8 +196,8 @@ export async function GET(req: NextRequest) {
 
     if (!user?.organizationMemberships[0]) {
       return NextResponse.json(
-        { error: 'No active organization found' },
-        { status: 400 }
+        { error: "No active organization found" },
+        { status: 400 },
       );
     }
 
@@ -202,10 +205,10 @@ export async function GET(req: NextRequest) {
 
     // Get query parameters
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
-    const supplierId = searchParams.get('supplierId');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const status = searchParams.get("status");
+    const supplierId = searchParams.get("supplierId");
+    const page = parseInt(searchParams.get("page") || "1");
+    const limit = parseInt(searchParams.get("limit") || "20");
     const skip = (page - 1) * limit;
 
     // Build where clause
@@ -245,7 +248,7 @@ export async function GET(req: NextRequest) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
@@ -261,12 +264,11 @@ export async function GET(req: NextRequest) {
         totalPages: Math.ceil(total / limit),
       },
     });
-
   } catch (error) {
-    console.error('Error fetching purchase orders:', error);
+    console.error("Error fetching purchase orders:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch purchase orders' },
-      { status: 500 }
+      { error: "Failed to fetch purchase orders" },
+      { status: 500 },
     );
   }
 }

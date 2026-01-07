@@ -4,8 +4,8 @@
  * Supports regulatory compliance reporting (ISO, FDA, AS9100)
  */
 
-import { prisma } from '@/lib/prisma';
-import { QualityMetricsService } from './quality-metrics.service';
+import { prisma } from "@/lib/prisma";
+import { QualityMetricsService } from "./quality-metrics.service";
 
 export class ReportingEngineService {
   /**
@@ -26,9 +26,11 @@ export class ReportingEngineService {
       },
     });
 
-    const satisfactionRate = 
-      customerComplaints.filter(c => c.customerSatisfied).length /
-      (customerComplaints.filter(c => c.customerSatisfied !== null).length || 1) * 100;
+    const satisfactionRate =
+      (customerComplaints.filter((c) => c.customerSatisfied).length /
+        (customerComplaints.filter((c) => c.customerSatisfied !== null)
+          .length || 1)) *
+      100;
 
     // Process performance and conformity
     const ncrs = await prisma.nonConformanceReport.findMany({
@@ -39,7 +41,7 @@ export class ReportingEngineService {
     });
 
     const ncrByCategory: any = {};
-    ncrs.forEach(ncr => {
+    ncrs.forEach((ncr) => {
       ncrByCategory[ncr.category] = (ncrByCategory[ncr.category] || 0) + 1;
     });
 
@@ -47,13 +49,13 @@ export class ReportingEngineService {
     const completedCapas = await prisma.correctivePreventiveAction.findMany({
       where: {
         organizationId: params.organizationId,
-        status: 'CLOSED',
+        status: "CLOSED",
         closedDate: { gte: startDate, lte: endDate },
       },
     });
 
     const effectiveCapas = completedCapas.filter(
-      c => c.verificationPassed === true
+      (c) => c.verificationPassed === true,
     ).length;
 
     // Audit results
@@ -93,7 +95,7 @@ export class ReportingEngineService {
     });
 
     return {
-      reportType: 'MANAGEMENT_REVIEW',
+      reportType: "MANAGEMENT_REVIEW",
       reportDate: new Date(),
       reviewPeriod: { startDate, endDate },
       reviewedBy: params.reviewedBy,
@@ -101,7 +103,8 @@ export class ReportingEngineService {
         customerFeedback: {
           totalComplaints: customerComplaints.length,
           satisfactionRate: Math.round(satisfactionRate),
-          reportableComplaints: customerComplaints.filter(c => c.isReportable).length,
+          reportableComplaints: customerComplaints.filter((c) => c.isReportable)
+            .length,
           topIssues: this.getTopIssues(customerComplaints),
         },
         processPerformance: {
@@ -114,14 +117,14 @@ export class ReportingEngineService {
           completedCapas: completedCapas.length,
           effectiveCapas,
           effectivenessRate: Math.round(
-            (effectiveCapas / (completedCapas.length || 1)) * 100
+            (effectiveCapas / (completedCapas.length || 1)) * 100,
           ),
         },
         auditResults: {
           auditsCompleted: audits.length,
           totalFindings: auditFindings,
           averageFindingsPerAudit: Math.round(
-            auditFindings / (audits.length || 1)
+            auditFindings / (audits.length || 1),
           ),
         },
         resourceNeeds: {
@@ -156,14 +159,14 @@ export class ReportingEngineService {
       where: {
         organizationId: params.organizationId,
         reportDate: { gte: startDate, lte: endDate },
-        sourceType: 'RECEIVING',
+        sourceType: "RECEIVING",
       },
     });
 
     // Group by supplier
     const bySupplier: any = {};
-    supplierNCRs.forEach(ncr => {
-      const supplier = ncr.supplierName || 'Unknown';
+    supplierNCRs.forEach((ncr) => {
+      const supplier = ncr.supplierName || "Unknown";
       if (!bySupplier[supplier]) {
         bySupplier[supplier] = {
           name: supplier,
@@ -187,7 +190,7 @@ export class ReportingEngineService {
       .sort((a: any, b: any) => a.ncrCount - b.ncrCount);
 
     return {
-      reportType: 'SUPPLIER_QUALITY',
+      reportType: "SUPPLIER_QUALITY",
       reportDate: new Date(),
       period: { startDate, endDate },
       summary: {
@@ -195,7 +198,7 @@ export class ReportingEngineService {
         suppliersWithIssues: Object.keys(bySupplier).length,
         totalDefectQuantity: supplierNCRs.reduce(
           (sum, ncr) => sum + (ncr.quantityAffected || 0),
-          0
+          0,
         ),
       },
       supplierRankings,
@@ -206,17 +209,15 @@ export class ReportingEngineService {
   /**
    * Generate Calibration Status Report (ISO/IEC 17025)
    */
-  static async generateCalibrationReport(params: {
-    organizationId: string;
-  }) {
+  static async generateCalibrationReport(params: { organizationId: string }) {
     const allEquipment = await prisma.calibrationEquipment.findMany({
       where: {
         organizationId: params.organizationId,
-        status: { not: 'RETIRED' },
+        status: { not: "RETIRED" },
       },
       include: {
         calibrationRecords: {
-          orderBy: { calibrationDate: 'desc' },
+          orderBy: { calibrationDate: "desc" },
           take: 1,
         },
       },
@@ -224,12 +225,12 @@ export class ReportingEngineService {
 
     const now = new Date();
     const current = allEquipment.filter(
-      eq => new Date(eq.nextCalibrationDue) > now
+      (eq) => new Date(eq.nextCalibrationDue) > now,
     );
     const overdue = allEquipment.filter(
-      eq => new Date(eq.nextCalibrationDue) <= now
+      (eq) => new Date(eq.nextCalibrationDue) <= now,
     );
-    const criticalOverdue = overdue.filter(eq => eq.criticalEquipment);
+    const criticalOverdue = overdue.filter((eq) => eq.criticalEquipment);
 
     // Out of tolerance analysis
     const last90Days = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
@@ -242,11 +243,13 @@ export class ReportingEngineService {
     });
 
     const outOfTolerance = recentRecords.filter(
-      r => r.asFoundCondition === 'OUT_OF_TOLERANCE' || r.asFoundCondition === 'FAILED'
+      (r) =>
+        r.asFoundCondition === "OUT_OF_TOLERANCE" ||
+        r.asFoundCondition === "FAILED",
     );
 
     return {
-      reportType: 'CALIBRATION_STATUS',
+      reportType: "CALIBRATION_STATUS",
       reportDate: now,
       summary: {
         totalEquipment: allEquipment.length,
@@ -254,23 +257,23 @@ export class ReportingEngineService {
         overdueCalibration: overdue.length,
         criticalOverdue: criticalOverdue.length,
         complianceRate: Math.round(
-          (current.length / allEquipment.length) * 100
+          (current.length / allEquipment.length) * 100,
         ),
       },
       qualityMetrics: {
         calibrationsLast90Days: recentRecords.length,
         outOfToleranceCount: outOfTolerance.length,
         outOfToleranceRate: Math.round(
-          (outOfTolerance.length / (recentRecords.length || 1)) * 100
+          (outOfTolerance.length / (recentRecords.length || 1)) * 100,
         ),
       },
-      overdueDetails: overdue.map(eq => ({
+      overdueDetails: overdue.map((eq) => ({
         equipmentId: eq.equipmentId,
         equipmentName: eq.equipmentName,
         dueDate: eq.nextCalibrationDue,
         daysOverdue: Math.floor(
           (now.getTime() - new Date(eq.nextCalibrationDue).getTime()) /
-            (1000 * 60 * 60 * 24)
+            (1000 * 60 * 60 * 24),
         ),
         critical: eq.criticalEquipment,
         location: eq.location,
@@ -302,33 +305,34 @@ export class ReportingEngineService {
     });
 
     const now = new Date();
-    const employees = [...new Set(records.map(r => r.employeeId))];
+    const employees = [...new Set(records.map((r) => r.employeeId))];
 
-    const employeeCompliance = employees.map(empId => {
-      const empRecords = records.filter(r => r.employeeId === empId);
+    const employeeCompliance = employees.map((empId) => {
+      const empRecords = records.filter((r) => r.employeeId === empId);
       const empName = empRecords[0]?.employeeName || empId;
 
-      const status = requirements.map(req => {
+      const status = requirements.map((req) => {
         const reqRecords = empRecords
-          .filter(r => r.requirementId === req.id)
+          .filter((r) => r.requirementId === req.id)
           .sort(
             (a, b) =>
               new Date(b.completionDate).getTime() -
-              new Date(a.completionDate).getTime()
+              new Date(a.completionDate).getTime(),
           );
 
         const latest = reqRecords[0];
-        
-        if (!latest) return { requirement: req.trainingTitle, status: 'NOT_COMPLETED' };
-        
+
+        if (!latest)
+          return { requirement: req.trainingTitle, status: "NOT_COMPLETED" };
+
         if (latest.expiryDate && new Date(latest.expiryDate) < now) {
-          return { requirement: req.trainingTitle, status: 'EXPIRED' };
+          return { requirement: req.trainingTitle, status: "EXPIRED" };
         }
-        
-        return { requirement: req.trainingTitle, status: 'CURRENT' };
+
+        return { requirement: req.trainingTitle, status: "CURRENT" };
       });
 
-      const compliant = status.filter(s => s.status === 'CURRENT').length;
+      const compliant = status.filter((s) => s.status === "CURRENT").length;
       const total = requirements.length;
 
       return {
@@ -340,24 +344,24 @@ export class ReportingEngineService {
       };
     });
 
-    const fullyCompliant = employeeCompliance.filter(e => e.compliant).length;
+    const fullyCompliant = employeeCompliance.filter((e) => e.compliant).length;
 
     return {
-      reportType: 'TRAINING_COMPLIANCE',
+      reportType: "TRAINING_COMPLIANCE",
       reportDate: now,
       summary: {
         totalEmployees: employees.length,
         fullyCompliant,
         partiallyCompliant: employees.length - fullyCompliant,
         organizationCompliance: Math.round(
-          (fullyCompliant / employees.length) * 100
+          (fullyCompliant / employees.length) * 100,
         ),
         totalRequirements: requirements.length,
       },
       employeeCompliance,
       expiringCertifications: await this.getExpiringCertifications(
         params.organizationId,
-        30
+        30,
       ),
       recommendations: this.getTrainingRecommendations(employeeCompliance),
     };
@@ -385,12 +389,15 @@ export class ReportingEngineService {
     const documents = await prisma.document.findMany({
       where: {
         organizationId: params.organizationId,
-        status: 'EFFECTIVE',
+        status: "EFFECTIVE",
       },
     });
 
     const documentCompliance = documents.filter(
-      d => d.reviewDate && new Date(d.reviewDate) > new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
+      (d) =>
+        d.reviewDate &&
+        new Date(d.reviewDate) >
+          new Date(Date.now() - 365 * 24 * 60 * 60 * 1000),
     ).length;
 
     // Change control compliance
@@ -402,11 +409,11 @@ export class ReportingEngineService {
     });
 
     const validatedChanges = changes.filter(
-      c => c.regulatoryImpact && c.status === 'CLOSED'
+      (c) => c.regulatoryImpact && c.status === "CLOSED",
     ).length;
 
     return {
-      reportType: 'REGULATORY_COMPLIANCE',
+      reportType: "REGULATORY_COMPLIANCE",
       reportDate: new Date(),
       period: { startDate, endDate },
       fdaCompliance: {
@@ -417,7 +424,7 @@ export class ReportingEngineService {
       },
       isoCompliance: {
         documentControl: Math.round(
-          (documentCompliance / (documents.length || 1)) * 100
+          (documentCompliance / (documents.length || 1)) * 100,
         ),
         changeControl: changes.length,
         validatedChanges,
@@ -438,9 +445,9 @@ export class ReportingEngineService {
   static async scheduleReport(params: {
     organizationId: string;
     reportType: string;
-    frequency: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'QUARTERLY';
+    frequency: "DAILY" | "WEEKLY" | "MONTHLY" | "QUARTERLY";
     recipients: string[];
-    format: 'PDF' | 'EXCEL' | 'JSON';
+    format: "PDF" | "EXCEL" | "JSON";
     createdBy: string;
   }) {
     return await prisma.scheduledReport.create({
@@ -461,7 +468,7 @@ export class ReportingEngineService {
 
   private static getTopIssues(complaints: any[]): any[] {
     const categories: any = {};
-    complaints.forEach(c => {
+    complaints.forEach((c) => {
       categories[c.category] = (categories[c.category] || 0) + 1;
     });
     return Object.entries(categories)
@@ -475,28 +482,30 @@ export class ReportingEngineService {
   }
 
   private static getSupplierGrade(ncrCount: number): string {
-    if (ncrCount === 0) return 'A';
-    if (ncrCount <= 2) return 'B';
-    if (ncrCount <= 5) return 'C';
-    return 'D';
+    if (ncrCount === 0) return "A";
+    if (ncrCount <= 2) return "B";
+    if (ncrCount <= 5) return "C";
+    return "D";
   }
 
   private static getSupplierRecommendations(rankings: any[]): string[] {
     const recommendations: string[] = [];
-    const poor = rankings.filter((r: any) => r.grade === 'D' || r.grade === 'C');
-    
+    const poor = rankings.filter(
+      (r: any) => r.grade === "D" || r.grade === "C",
+    );
+
     if (poor.length > 0) {
       recommendations.push(
-        `${poor.length} supplier(s) require quality improvement plans`
+        `${poor.length} supplier(s) require quality improvement plans`,
       );
     }
-    
+
     return recommendations;
   }
 
   private static analyzeOutOfTolerance(records: any[]): any {
     const byEquipment: any = {};
-    records.forEach(r => {
+    records.forEach((r) => {
       const name = r.equipment.equipmentName;
       byEquipment[name] = (byEquipment[name] || 0) + 1;
     });
@@ -512,7 +521,7 @@ export class ReportingEngineService {
 
   private static async getExpiringCertifications(
     organizationId: string,
-    daysAhead: number
+    daysAhead: number,
   ): Promise<any[]> {
     const records = await prisma.trainingRecord.findMany({
       where: {
@@ -525,31 +534,34 @@ export class ReportingEngineService {
       include: { requirement: true },
     });
 
-    return records.map(r => ({
+    return records.map((r) => ({
       employeeId: r.employeeId,
       employeeName: r.employeeName,
       training: r.requirement.trainingTitle,
       expiryDate: r.expiryDate,
       daysUntilExpiry: Math.floor(
-        (new Date(r.expiryDate!).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        (new Date(r.expiryDate!).getTime() - Date.now()) /
+          (1000 * 60 * 60 * 24),
       ),
     }));
   }
 
   private static getTrainingRecommendations(compliance: any[]): string[] {
     const recommendations: string[] = [];
-    const lowCompliance = compliance.filter(e => e.complianceRate < 80);
-    
+    const lowCompliance = compliance.filter((e) => e.complianceRate < 80);
+
     if (lowCompliance.length > 0) {
       recommendations.push(
-        `${lowCompliance.length} employee(s) below 80% training compliance`
+        `${lowCompliance.length} employee(s) below 80% training compliance`,
       );
     }
-    
+
     return recommendations;
   }
 
-  private static async getFMEACompliance(organizationId: string): Promise<boolean> {
+  private static async getFMEACompliance(
+    organizationId: string,
+  ): Promise<boolean> {
     const outdatedFMEAs = await prisma.fMEA.count({
       where: {
         organizationId,
@@ -562,7 +574,9 @@ export class ReportingEngineService {
     return outdatedFMEAs === 0;
   }
 
-  private static async identifyNonCompliances(organizationId: string): Promise<string[]> {
+  private static async identifyNonCompliances(
+    organizationId: string,
+  ): Promise<string[]> {
     const issues: string[] = [];
 
     const overdueAudits = await prisma.audit.count({
@@ -579,24 +593,27 @@ export class ReportingEngineService {
     return issues;
   }
 
-  private static calculateNextRunDate(currentDate: Date, frequency: string): Date {
+  private static calculateNextRunDate(
+    currentDate: Date,
+    frequency: string,
+  ): Date {
     const next = new Date(currentDate);
-    
+
     switch (frequency) {
-      case 'DAILY':
+      case "DAILY":
         next.setDate(next.getDate() + 1);
         break;
-      case 'WEEKLY':
+      case "WEEKLY":
         next.setDate(next.getDate() + 7);
         break;
-      case 'MONTHLY':
+      case "MONTHLY":
         next.setMonth(next.getMonth() + 1);
         break;
-      case 'QUARTERLY':
+      case "QUARTERLY":
         next.setMonth(next.getMonth() + 3);
         break;
     }
-    
+
     return next;
   }
 }

@@ -1,30 +1,36 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  FileText, 
-  Download, 
-  Calendar, 
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  FileText,
+  Download,
+  Calendar,
   Send,
   Plus,
   Eye,
   Trash2,
-  Clock
-} from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+  Clock,
+} from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ReportConfig {
   reportType: string;
@@ -35,37 +41,61 @@ interface ReportConfig {
   endDate?: string;
 }
 
-export default function ReportsManagement({ organizationId }: { organizationId: string }) {
+export default function ReportsManagement({
+  organizationId,
+}: {
+  organizationId: string;
+}) {
   const { toast } = useToast();
   const [config, setConfig] = useState<ReportConfig>({
-    reportType: 'management_review',
-    frequency: 'MONTHLY',
-    format: 'PDF',
+    reportType: "management_review",
+    frequency: "MONTHLY",
+    format: "PDF",
     recipients: [],
   });
-  const [recipientEmail, setRecipientEmail] = useState('');
+  const [recipientEmail, setRecipientEmail] = useState("");
   const [generating, setGenerating] = useState(false);
 
   const reportTypes = [
-    { value: 'management_review', label: 'Management Review Report', description: 'ISO 9001 Clause 9.3' },
-    { value: 'supplier_quality', label: 'Supplier Quality Report', description: 'Supplier scorecard analysis' },
-    { value: 'calibration', label: 'Calibration Status Report', description: 'ISO/IEC 17025 compliance' },
-    { value: 'training', label: 'Training Compliance Report', description: 'ISO 9001 Clause 7.2' },
-    { value: 'regulatory', label: 'Regulatory Compliance Summary', description: 'Multi-standard compliance' },
+    {
+      value: "management_review",
+      label: "Management Review Report",
+      description: "ISO 9001 Clause 9.3",
+    },
+    {
+      value: "supplier_quality",
+      label: "Supplier Quality Report",
+      description: "Supplier scorecard analysis",
+    },
+    {
+      value: "calibration",
+      label: "Calibration Status Report",
+      description: "ISO/IEC 17025 compliance",
+    },
+    {
+      value: "training",
+      label: "Training Compliance Report",
+      description: "ISO 9001 Clause 7.2",
+    },
+    {
+      value: "regulatory",
+      label: "Regulatory Compliance Summary",
+      description: "Multi-standard compliance",
+    },
   ];
 
   const frequencies = [
-    { value: 'DAILY', label: 'Daily' },
-    { value: 'WEEKLY', label: 'Weekly' },
-    { value: 'MONTHLY', label: 'Monthly' },
-    { value: 'QUARTERLY', label: 'Quarterly' },
-    { value: 'ANNUAL', label: 'Annual' },
+    { value: "DAILY", label: "Daily" },
+    { value: "WEEKLY", label: "Weekly" },
+    { value: "MONTHLY", label: "Monthly" },
+    { value: "QUARTERLY", label: "Quarterly" },
+    { value: "ANNUAL", label: "Annual" },
   ];
 
   const formats = [
-    { value: 'PDF', label: 'PDF Document' },
-    { value: 'EXCEL', label: 'Excel Spreadsheet' },
-    { value: 'JSON', label: 'JSON Data' },
+    { value: "PDF", label: "PDF Document" },
+    { value: "EXCEL", label: "Excel Spreadsheet" },
+    { value: "JSON", label: "JSON Data" },
   ];
 
   const addRecipient = () => {
@@ -74,23 +104,23 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
         ...config,
         recipients: [...config.recipients, recipientEmail],
       });
-      setRecipientEmail('');
+      setRecipientEmail("");
     }
   };
 
   const removeRecipient = (email: string) => {
     setConfig({
       ...config,
-      recipients: config.recipients.filter(r => r !== email),
+      recipients: config.recipients.filter((r) => r !== email),
     });
   };
 
   const handleGenerateReport = async () => {
     setGenerating(true);
     try {
-      const response = await fetch('/api/qc/reports/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/reports/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           organizationId,
           reportType: config.reportType,
@@ -103,26 +133,26 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
-        a.download = `${config.reportType}_${new Date().toISOString().split('T')[0]}.${config.format.toLowerCase()}`;
+        a.download = `${config.reportType}_${new Date().toISOString().split("T")[0]}.${config.format.toLowerCase()}`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(a);
 
         toast({
-          title: 'Report Generated',
-          description: 'Your report has been downloaded successfully.',
+          title: "Report Generated",
+          description: "Your report has been downloaded successfully.",
         });
       } else {
-        throw new Error('Failed to generate report');
+        throw new Error("Failed to generate report");
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to generate report. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to generate report. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setGenerating(false);
@@ -131,9 +161,9 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
 
   const handleScheduleReport = async () => {
     try {
-      const response = await fetch('/api/qc/reports', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           organizationId,
           reportType: config.reportType,
@@ -145,24 +175,24 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
 
       if (response.ok) {
         toast({
-          title: 'Report Scheduled',
+          title: "Report Scheduled",
           description: `${config.frequency} ${config.reportType} report has been scheduled.`,
         });
         // Reset form
         setConfig({
-          reportType: 'management_review',
-          frequency: 'MONTHLY',
-          format: 'PDF',
+          reportType: "management_review",
+          frequency: "MONTHLY",
+          format: "PDF",
           recipients: [],
         });
       } else {
-        throw new Error('Failed to schedule report');
+        throw new Error("Failed to schedule report");
       }
     } catch (error) {
       toast({
-        title: 'Error',
-        description: 'Failed to schedule report. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to schedule report. Please try again.",
+        variant: "destructive",
       });
     }
   };
@@ -183,14 +213,18 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                 <FileText className="h-5 w-5" />
                 Generate Quality Report
               </CardTitle>
-              <CardDescription>Create an instant quality management report</CardDescription>
+              <CardDescription>
+                Create an instant quality management report
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="report-type">Report Type</Label>
                 <Select
                   value={config.reportType}
-                  onValueChange={(value) => setConfig({ ...config, reportType: value })}
+                  onValueChange={(value) =>
+                    setConfig({ ...config, reportType: value })
+                  }
                 >
                   <SelectTrigger id="report-type">
                     <SelectValue placeholder="Select report type" />
@@ -200,7 +234,9 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                       <SelectItem key={type.value} value={type.value}>
                         <div className="flex flex-col">
                           <span>{type.label}</span>
-                          <span className="text-xs text-muted-foreground">{type.description}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {type.description}
+                          </span>
                         </div>
                       </SelectItem>
                     ))}
@@ -214,8 +250,10 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                   <Input
                     id="start-date"
                     type="date"
-                    value={config.startDate || ''}
-                    onChange={(e) => setConfig({ ...config, startDate: e.target.value })}
+                    value={config.startDate || ""}
+                    onChange={(e) =>
+                      setConfig({ ...config, startDate: e.target.value })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -223,8 +261,10 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                   <Input
                     id="end-date"
                     type="date"
-                    value={config.endDate || ''}
-                    onChange={(e) => setConfig({ ...config, endDate: e.target.value })}
+                    value={config.endDate || ""}
+                    onChange={(e) =>
+                      setConfig({ ...config, endDate: e.target.value })
+                    }
                   />
                 </div>
               </div>
@@ -233,7 +273,9 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                 <Label htmlFor="format">Export Format</Label>
                 <Select
                   value={config.format}
-                  onValueChange={(value) => setConfig({ ...config, format: value })}
+                  onValueChange={(value) =>
+                    setConfig({ ...config, format: value })
+                  }
                 >
                   <SelectTrigger id="format">
                     <SelectValue placeholder="Select format" />
@@ -254,7 +296,7 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                 className="w-full"
               >
                 <Download className="h-4 w-4 mr-2" />
-                {generating ? 'Generating...' : 'Generate & Download Report'}
+                {generating ? "Generating..." : "Generate & Download Report"}
               </Button>
             </CardContent>
           </Card>
@@ -263,15 +305,22 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
           <Card>
             <CardHeader>
               <CardTitle>Available Report Types</CardTitle>
-              <CardDescription>Regulatory-compliant quality reports</CardDescription>
+              <CardDescription>
+                Regulatory-compliant quality reports
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {reportTypes.map((type) => (
-                  <div key={type.value} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={type.value}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex-1">
                       <div className="font-medium">{type.label}</div>
-                      <div className="text-sm text-muted-foreground">{type.description}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {type.description}
+                      </div>
                     </div>
                     <Badge variant="outline">
                       <FileText className="h-3 w-3 mr-1" />
@@ -292,14 +341,18 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                 <Calendar className="h-5 w-5" />
                 Schedule Automated Reports
               </CardTitle>
-              <CardDescription>Set up recurring report generation and distribution</CardDescription>
+              <CardDescription>
+                Set up recurring report generation and distribution
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="scheduled-report-type">Report Type</Label>
                 <Select
                   value={config.reportType}
-                  onValueChange={(value) => setConfig({ ...config, reportType: value })}
+                  onValueChange={(value) =>
+                    setConfig({ ...config, reportType: value })
+                  }
                 >
                   <SelectTrigger id="scheduled-report-type">
                     <SelectValue placeholder="Select report type" />
@@ -319,7 +372,9 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                   <Label htmlFor="frequency">Frequency</Label>
                   <Select
                     value={config.frequency}
-                    onValueChange={(value) => setConfig({ ...config, frequency: value })}
+                    onValueChange={(value) =>
+                      setConfig({ ...config, frequency: value })
+                    }
                   >
                     <SelectTrigger id="frequency">
                       <SelectValue placeholder="Select frequency" />
@@ -338,7 +393,9 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                   <Label htmlFor="scheduled-format">Format</Label>
                   <Select
                     value={config.format}
-                    onValueChange={(value) => setConfig({ ...config, format: value })}
+                    onValueChange={(value) =>
+                      setConfig({ ...config, format: value })
+                    }
                   >
                     <SelectTrigger id="scheduled-format">
                       <SelectValue placeholder="Select format" />
@@ -363,7 +420,7 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
                     placeholder="Enter email address"
                     value={recipientEmail}
                     onChange={(e) => setRecipientEmail(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addRecipient()}
+                    onKeyPress={(e) => e.key === "Enter" && addRecipient()}
                   />
                   <Button onClick={addRecipient} variant="outline">
                     <Plus className="h-4 w-4" />
@@ -409,11 +466,18 @@ export default function ReportsManagement({ organizationId }: { organizationId: 
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li>• Daily reports are generated at 6:00 AM local time</li>
                 <li>• Weekly reports are sent every Monday</li>
-                <li>• Monthly reports are generated on the 1st of each month</li>
+                <li>
+                  • Monthly reports are generated on the 1st of each month
+                </li>
                 <li>• Quarterly reports align with calendar quarters</li>
                 <li>• Annual reports are generated on January 1st</li>
-                <li>• All reports are automatically emailed to specified recipients</li>
-                <li>• Reports can be managed from the scheduled reports list</li>
+                <li>
+                  • All reports are automatically emailed to specified
+                  recipients
+                </li>
+                <li>
+                  • Reports can be managed from the scheduled reports list
+                </li>
               </ul>
             </CardContent>
           </Card>

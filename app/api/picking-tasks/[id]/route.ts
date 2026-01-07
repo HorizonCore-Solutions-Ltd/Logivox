@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // GET /api/picking-tasks/[id] - Get task details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -93,7 +93,7 @@ export async function GET(
     console.error("Error fetching task:", error);
     return NextResponse.json(
       { error: "Failed to fetch task" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -101,7 +101,7 @@ export async function GET(
 // PATCH /api/picking-tasks/[id] - Update task
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -119,7 +119,7 @@ export async function PATCH(
           return handleAssignTask(
             params.id,
             updateData.assignedToId,
-            session.user.id
+            session.user.id,
           );
         case "start":
           return handleStartTask(params.id, session.user.id);
@@ -130,7 +130,7 @@ export async function PATCH(
         default:
           return NextResponse.json(
             { error: "Invalid action" },
-            { status: 400 }
+            { status: 400 },
           );
       }
     }
@@ -158,7 +158,7 @@ export async function PATCH(
     console.error("Error updating task:", error);
     return NextResponse.json(
       { error: "Failed to update task" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -166,7 +166,7 @@ export async function PATCH(
 // DELETE /api/picking-tasks/[id] - Delete task
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -186,7 +186,7 @@ export async function DELETE(
     if (!["PENDING", "CANCELLED"].includes(task.status)) {
       return NextResponse.json(
         { error: "Cannot delete task in current status" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -199,7 +199,7 @@ export async function DELETE(
     console.error("Error deleting task:", error);
     return NextResponse.json(
       { error: "Failed to delete task" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -208,7 +208,7 @@ export async function DELETE(
 async function handleAssignTask(
   taskId: string,
   assignedToId: string,
-  userId: string
+  userId: string,
 ) {
   const task = await prisma.pickingTask.update({
     where: { id: taskId },
@@ -245,7 +245,7 @@ async function handleStartTask(taskId: string, userId: string) {
   if (!["PENDING", "ASSIGNED"].includes(task.status)) {
     return NextResponse.json(
       { error: "Task cannot be started from current status" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -263,11 +263,7 @@ async function handleStartTask(taskId: string, userId: string) {
 }
 
 // Helper: Complete task
-async function handleCompleteTask(
-  taskId: string,
-  userId: string,
-  data: any
-) {
+async function handleCompleteTask(taskId: string, userId: string, data: any) {
   const task = await prisma.pickingTask.findUnique({
     where: { id: taskId },
     select: { status: true, startedAt: true },
@@ -280,7 +276,7 @@ async function handleCompleteTask(
   if (task.status !== "IN_PROGRESS") {
     return NextResponse.json(
       { error: "Task must be in progress to complete" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -327,7 +323,7 @@ async function handleCancelTask(taskId: string, userId: string) {
   if (["COMPLETED", "CANCELLED"].includes(task.status)) {
     return NextResponse.json(
       { error: "Cannot cancel task in current status" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

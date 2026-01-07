@@ -1,63 +1,67 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useQuery } from "@tanstack/react-query"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
-  AlertTriangle,
-  Package,
-  TrendingDown,
-  X,
-  Eye,
-} from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { AlertTriangle, Package, TrendingDown, X, Eye } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface LowStockItem {
-  id: string
-  name: string
-  sku: string
-  quantity: number
-  minStockLevel: number
-  unit: string
-  status: string
+  id: string;
+  name: string;
+  sku: string;
+  quantity: number;
+  minStockLevel: number;
+  unit: string;
+  status: string;
   warehouse: {
-    name: string
-  }
+    name: string;
+  };
 }
 
 export function LowStockAlerts() {
-  const [isDismissed, setIsDismissed] = React.useState(false)
-  const router = useRouter()
+  const [isDismissed, setIsDismissed] = React.useState(false);
+  const router = useRouter();
 
   // Fetch low stock items
   const { data: items = [] } = useQuery({
     queryKey: ["inventory", "low-stock"],
     queryFn: async () => {
-      const res = await fetch("/api/inventory?status=LOW_STOCK")
-      if (!res.ok) throw new Error("Failed to fetch low stock items")
-      const allItems = await res.json()
-      
+      const res = await fetch("/api/inventory?status=LOW_STOCK");
+      if (!res.ok) throw new Error("Failed to fetch low stock items");
+      const allItems = await res.json();
+
       // Also get out of stock items
-      const outRes = await fetch("/api/inventory?status=OUT_OF_STOCK")
+      const outRes = await fetch("/api/inventory?status=OUT_OF_STOCK");
       if (outRes.ok) {
-        const outItems = await outRes.json()
-        return [...allItems, ...outItems]
+        const outItems = await outRes.json();
+        return [...allItems, ...outItems];
       }
-      
-      return allItems
+
+      return allItems;
     },
     refetchInterval: 30000, // Refetch every 30 seconds
-  })
+  });
 
   if (isDismissed || items.length === 0) {
-    return null
+    return null;
   }
 
-  const outOfStock = items.filter((item: LowStockItem) => item.status === "OUT_OF_STOCK")
-  const lowStock = items.filter((item: LowStockItem) => item.status === "LOW_STOCK")
+  const outOfStock = items.filter(
+    (item: LowStockItem) => item.status === "OUT_OF_STOCK",
+  );
+  const lowStock = items.filter(
+    (item: LowStockItem) => item.status === "LOW_STOCK",
+  );
 
   return (
     <Card className="border-yellow-200 dark:border-yellow-900 bg-yellow-50/50 dark:bg-yellow-950/20">
@@ -70,7 +74,8 @@ export function LowStockAlerts() {
             <div>
               <CardTitle className="text-lg">Stock Alerts</CardTitle>
               <CardDescription>
-                {items.length} item{items.length !== 1 ? "s" : ""} need{items.length === 1 ? "s" : ""} attention
+                {items.length} item{items.length !== 1 ? "s" : ""} need
+                {items.length === 1 ? "s" : ""} attention
               </CardDescription>
             </div>
           </div>
@@ -96,7 +101,10 @@ export function LowStockAlerts() {
           )}
           {lowStock.length > 0 && (
             <div className="flex items-center space-x-2">
-              <Badge variant="warning" className="text-xs bg-yellow-500 text-white">
+              <Badge
+                variant="warning"
+                className="text-xs bg-yellow-500 text-white"
+              >
                 {lowStock.length}
               </Badge>
               <span className="text-muted-foreground">Low Stock</span>
@@ -124,9 +132,11 @@ export function LowStockAlerts() {
               </div>
               <div className="flex items-center space-x-3">
                 <div className="text-right">
-                  <p className={`text-sm font-medium ${
-                    item.quantity === 0 ? "text-red-600" : "text-yellow-600"
-                  }`}>
+                  <p
+                    className={`text-sm font-medium ${
+                      item.quantity === 0 ? "text-red-600" : "text-yellow-600"
+                    }`}
+                  >
                     {item.quantity} {item.unit}
                   </p>
                   <p className="text-xs text-muted-foreground">
@@ -171,5 +181,5 @@ export function LowStockAlerts() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

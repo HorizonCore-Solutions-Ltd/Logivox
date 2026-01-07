@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Plug,
   Zap,
@@ -18,81 +24,87 @@ import {
   Mail,
   MessageSquare,
   FileText,
-  BarChart3
-} from "lucide-react"
+  BarChart3,
+} from "lucide-react";
 
 export default function IntegrationsPage() {
   const integrationCategories = [
     {
       icon: Database,
       title: "ERP Systems",
-      description: "SAP, Oracle NetSuite, Microsoft Dynamics 365, Infor, Epicor, Sage",
-      count: "15+"
+      description:
+        "SAP, Oracle NetSuite, Microsoft Dynamics 365, Infor, Epicor, Sage",
+      count: "15+",
     },
     {
       icon: ShoppingCart,
       title: "E-Commerce",
       description: "Shopify, WooCommerce, Magento, BigCommerce, Amazon, eBay",
-      count: "20+"
+      count: "20+",
     },
     {
       icon: BarChart3,
       title: "Analytics & BI",
       description: "Power BI, Tableau, Looker, Google Analytics, Datadog",
-      count: "10+"
+      count: "10+",
     },
     {
       icon: Mail,
       title: "Communication",
       description: "Slack, Microsoft Teams, Email, SMS, Push Notifications",
-      count: "8+"
+      count: "8+",
     },
     {
       icon: FileText,
       title: "Documentation",
       description: "SharePoint, Google Drive, Dropbox, OneDrive, Box",
-      count: "12+"
+      count: "12+",
     },
     {
       icon: MessageSquare,
       title: "CRM Systems",
       description: "Salesforce, HubSpot, Microsoft Dynamics CRM, Zoho",
-      count: "6+"
-    }
-  ]
+      count: "6+",
+    },
+  ];
 
   const integrationFeatures = [
     {
       icon: Plug,
       title: "Pre-Built Connectors",
-      description: "100+ ready-to-use integrations for popular business applications."
+      description:
+        "100+ ready-to-use integrations for popular business applications.",
     },
     {
       icon: Code,
       title: "REST API",
-      description: "Comprehensive API for custom integrations and automation workflows."
+      description:
+        "Comprehensive API for custom integrations and automation workflows.",
     },
     {
       icon: Webhook,
       title: "Webhooks",
-      description: "Real-time event notifications to trigger actions in external systems."
+      description:
+        "Real-time event notifications to trigger actions in external systems.",
     },
     {
       icon: RefreshCw,
       title: "Bi-Directional Sync",
-      description: "Two-way data synchronization keeps all systems up to date."
+      description: "Two-way data synchronization keeps all systems up to date.",
     },
     {
       icon: Zap,
       title: "Zapier & Make",
-      description: "Connect to 5,000+ apps through no-code automation platforms."
+      description:
+        "Connect to 5,000+ apps through no-code automation platforms.",
     },
     {
       icon: Database,
       title: "Data Mapping",
-      description: "Flexible field mapping and transformation for seamless data flow."
-    }
-  ]
+      description:
+        "Flexible field mapping and transformation for seamless data flow.",
+    },
+  ];
 
   const apiCapabilities = [
     "RESTful architecture with JSON responses",
@@ -102,26 +114,29 @@ export default function IntegrationsPage() {
     "SDKs for popular programming languages",
     "Sandbox environment for testing",
     "Webhook event delivery with retries",
-    "API versioning for backward compatibility"
-  ]
+    "API versioning for backward compatibility",
+  ];
 
   const useCases = [
     {
       title: "Automated Order Processing",
-      description: "Connect e-commerce platforms to automatically create stock reservations and update inventory levels across all channels.",
-      icon: ShoppingCart
+      description:
+        "Connect e-commerce platforms to automatically create stock reservations and update inventory levels across all channels.",
+      icon: ShoppingCart,
     },
     {
       title: "Financial Reconciliation",
-      description: "Sync transactions with accounting systems for real-time financial reporting and automated reconciliation.",
-      icon: FileText
+      description:
+        "Sync transactions with accounting systems for real-time financial reporting and automated reconciliation.",
+      icon: FileText,
     },
     {
       title: "Analytics Pipeline",
-      description: "Stream inventory data to BI tools for advanced analytics, forecasting, and business intelligence.",
-      icon: BarChart3
-    }
-  ]
+      description:
+        "Stream inventory data to BI tools for advanced analytics, forecasting, and business intelligence.",
+      icon: BarChart3,
+    },
+  ];
 
   const benefits = [
     "Connect existing tools without data migration",
@@ -131,8 +146,8 @@ export default function IntegrationsPage() {
     "Reduce integration development time by 70%",
     "Monitor integration health with dashboards",
     "Scale integrations as your business grows",
-    "Expert support for custom integration needs"
-  ]
+    "Expert support for custom integration needs",
+  ];
 
   return (
     <div className="min-h-screen">
@@ -145,7 +160,9 @@ export default function IntegrationsPage() {
               Powerful Integrations
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Connect LogiVox with your entire tech stack. 100+ pre-built integrations, comprehensive APIs, and webhooks for seamless automation.
+              Connect LogiVox with your entire tech stack. 100+ pre-built
+              integrations, comprehensive APIs, and webhooks for seamless
+              automation.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -166,7 +183,9 @@ export default function IntegrationsPage() {
       <section className="py-20 lg:py-28 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">100+ Pre-Built Integrations</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              100+ Pre-Built Integrations
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Connect with the tools you already use
             </p>
@@ -174,9 +193,12 @@ export default function IntegrationsPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {integrationCategories.map((category) => {
-              const Icon = category.icon
+              const Icon = category.icon;
               return (
-                <Card key={category.title} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={category.title}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-primary-600 to-primary-500 flex items-center justify-center">
@@ -188,7 +210,7 @@ export default function IntegrationsPage() {
                     <CardDescription>{category.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -198,7 +220,9 @@ export default function IntegrationsPage() {
       <section className="py-20 lg:py-28">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Flexible Integration Options</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Flexible Integration Options
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Choose the integration method that fits your needs
             </p>
@@ -206,7 +230,7 @@ export default function IntegrationsPage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
             {integrationFeatures.map((feature) => {
-              const Icon = feature.icon
+              const Icon = feature.icon;
               return (
                 <Card key={feature.title}>
                   <CardHeader>
@@ -217,7 +241,7 @@ export default function IntegrationsPage() {
                     <CardDescription>{feature.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -233,7 +257,8 @@ export default function IntegrationsPage() {
                 Developer-Friendly REST API
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Build custom integrations with our comprehensive, well-documented API.
+                Build custom integrations with our comprehensive,
+                well-documented API.
               </p>
               <div className="space-y-3">
                 {apiCapabilities.map((capability) => (
@@ -257,7 +282,9 @@ export default function IntegrationsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>API Example</CardTitle>
-                  <CardDescription>Simple and intuitive endpoints</CardDescription>
+                  <CardDescription>
+                    Simple and intuitive endpoints
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="bg-slate-900 text-slate-50 p-4 rounded-lg font-mono text-sm overflow-x-auto">
@@ -273,7 +300,8 @@ export default function IntegrationsPage() {
                     </div>
                     <div className="mt-2 text-slate-400">{"{"}</div>
                     <div className="ml-4 text-slate-400">
-                      <span className="text-blue-300">"customer_id"</span>: <span className="text-yellow-300">"12345"</span>,
+                      <span className="text-blue-300">"customer_id"</span>:{" "}
+                      <span className="text-yellow-300">"12345"</span>,
                     </div>
                     <div className="ml-4 text-slate-400">
                       <span className="text-blue-300">"items"</span>: [...]
@@ -304,7 +332,7 @@ export default function IntegrationsPage() {
 
           <div className="grid gap-8 lg:grid-cols-3">
             {useCases.map((useCase) => {
-              const Icon = useCase.icon
+              const Icon = useCase.icon;
               return (
                 <Card key={useCase.title}>
                   <CardHeader>
@@ -315,7 +343,7 @@ export default function IntegrationsPage() {
                     <CardDescription>{useCase.description}</CardDescription>
                   </CardHeader>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -329,7 +357,9 @@ export default function IntegrationsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Integration Hub</CardTitle>
-                  <CardDescription>Manage all connections in one place</CardDescription>
+                  <CardDescription>
+                    Manage all connections in one place
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="aspect-square bg-gradient-to-br from-primary-100 to-primary-50 rounded-lg flex items-center justify-center border-2 border-dashed">
@@ -346,11 +376,10 @@ export default function IntegrationsPage() {
 
             <div>
               <Badge className="mb-4">Benefits</Badge>
-              <h2 className="text-3xl font-bold mb-4">
-                Seamless Connectivity
-              </h2>
+              <h2 className="text-3xl font-bold mb-4">Seamless Connectivity</h2>
               <p className="text-lg text-muted-foreground mb-6">
-                Our integration platform eliminates data silos and automates workflows.
+                Our integration platform eliminates data silos and automates
+                workflows.
               </p>
               <div className="space-y-3">
                 {benefits.map((benefit) => (
@@ -381,12 +410,17 @@ export default function IntegrationsPage() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-white/10 border-white text-white hover:bg-white/20" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-white/10 border-white text-white hover:bg-white/20"
+              asChild
+            >
               <Link href="/contact">Explore Integrations</Link>
             </Button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

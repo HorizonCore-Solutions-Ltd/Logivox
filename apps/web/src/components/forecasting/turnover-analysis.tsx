@@ -1,8 +1,24 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import { TrendingUp, TrendingDown, Package, AlertTriangle } from "lucide-react";
 
 interface TurnoverData {
@@ -59,7 +75,11 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
     { name: "Fast", count: fastMovers.length, fill: "hsl(var(--chart-1))" },
     { name: "Medium", count: mediumMovers.length, fill: "hsl(var(--chart-2))" },
     { name: "Slow", count: slowMovers.length, fill: "hsl(var(--chart-3))" },
-    { name: "Obsolete", count: obsolete.length, fill: "hsl(var(--destructive))" },
+    {
+      name: "Obsolete",
+      count: obsolete.length,
+      fill: "hsl(var(--destructive))",
+    },
   ];
 
   if (data.length === 0) {
@@ -90,8 +110,12 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{fastMovers.length}</div>
-            <p className="text-xs text-muted-foreground">&lt;30 days in inventory</p>
+            <div className="text-2xl font-bold text-green-600">
+              {fastMovers.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              &lt;30 days in inventory
+            </p>
           </CardContent>
         </Card>
 
@@ -103,8 +127,12 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{mediumMovers.length}</div>
-            <p className="text-xs text-muted-foreground">30-90 days in inventory</p>
+            <div className="text-2xl font-bold text-blue-600">
+              {mediumMovers.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              30-90 days in inventory
+            </p>
           </CardContent>
         </Card>
 
@@ -116,8 +144,12 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{slowMovers.length}</div>
-            <p className="text-xs text-muted-foreground">90-180 days in inventory</p>
+            <div className="text-2xl font-bold text-yellow-600">
+              {slowMovers.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              90-180 days in inventory
+            </p>
           </CardContent>
         </Card>
 
@@ -129,8 +161,12 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{obsolete.length}</div>
-            <p className="text-xs text-muted-foreground">&gt;180 days in inventory</p>
+            <div className="text-2xl font-bold text-red-600">
+              {obsolete.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              &gt;180 days in inventory
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -149,11 +185,11 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
               <YAxis />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: "hsl(var(--background))", 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--background))",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px"
+                  borderRadius: "6px",
                 }}
               />
               <Legend />
@@ -191,11 +227,15 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
                     {getClassificationIcon(item.classification)}
                     <div>
                       <p className="font-medium">{item.productName}</p>
-                      <p className="text-sm text-muted-foreground">{item.recommendation}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.recommendation}
+                      </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{item.turnoverRate.toFixed(2)}x</p>
+                    <p className="font-medium">
+                      {item.turnoverRate.toFixed(2)}x
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {item.daysInInventory} days in stock
                     </p>
@@ -214,7 +254,9 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-500" />
               Slow Moving & Obsolete Products
-              <Badge variant="destructive">{slowMovers.length + obsolete.length}</Badge>
+              <Badge variant="destructive">
+                {slowMovers.length + obsolete.length}
+              </Badge>
             </CardTitle>
             <CardDescription>
               Consider liquidation, promotions, or discontinuation
@@ -231,14 +273,20 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
                     {getClassificationIcon(item.classification)}
                     <div>
                       <p className="font-medium">{item.productName}</p>
-                      <p className="text-sm text-muted-foreground">{item.recommendation}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.recommendation}
+                      </p>
                     </div>
-                    <Badge variant={getClassificationColor(item.classification)}>
+                    <Badge
+                      variant={getClassificationColor(item.classification)}
+                    >
                       {item.classification}
                     </Badge>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{item.turnoverRate.toFixed(2)}x</p>
+                    <p className="font-medium">
+                      {item.turnoverRate.toFixed(2)}x
+                    </p>
                     <p className="text-xs text-muted-foreground">
                       {item.daysInInventory} days in stock
                     </p>
@@ -264,7 +312,9 @@ export function TurnoverAnalysis({ data }: TurnoverAnalysisProps) {
               <ul className="space-y-1 text-sm text-green-700 dark:text-green-300">
                 <li>• Increase safety stock to prevent stockouts</li>
                 <li>• Consider more frequent reorder cycles</li>
-                <li>• Negotiate better pricing with suppliers for bulk orders</li>
+                <li>
+                  • Negotiate better pricing with suppliers for bulk orders
+                </li>
                 <li>• Monitor for demand spikes and seasonal patterns</li>
               </ul>
             </div>

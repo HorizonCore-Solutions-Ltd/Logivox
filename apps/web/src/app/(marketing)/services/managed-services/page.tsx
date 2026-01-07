@@ -1,13 +1,29 @@
-import { Metadata } from "next"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, ArrowRight, Shield, Server, BarChart3, HeadphonesIcon, Clock, TrendingUp } from "lucide-react"
-import Link from "next/link"
+import { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Shield,
+  Server,
+  BarChart3,
+  HeadphonesIcon,
+  Clock,
+  TrendingUp,
+} from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Managed Services | LogiVox WMS",
-  description: "Let us manage your WMS infrastructure. Focus on your business while our experts handle deployment, monitoring, and optimization.",
-}
+  description:
+    "Let us manage your WMS infrastructure. Focus on your business while our experts handle deployment, monitoring, and optimization.",
+};
 
 export default function ManagedServicesPage() {
   return (
@@ -23,7 +39,9 @@ export default function ManagedServicesPage() {
               Managed WMS Services
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Focus on growing your business, not managing infrastructure. Our team handles everything from deployment to daily operations and continuous optimization.
+              Focus on growing your business, not managing infrastructure. Our
+              team handles everything from deployment to daily operations and
+              continuous optimization.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -199,7 +217,8 @@ export default function ManagedServicesPage() {
               {
                 name: "Enterprise",
                 price: "Custom",
-                description: "White-glove service for mission-critical operations",
+                description:
+                  "White-glove service for mission-critical operations",
                 features: [
                   "Everything in Professional",
                   "Multi-region deployment",
@@ -215,7 +234,12 @@ export default function ManagedServicesPage() {
                 warehouses: "Unlimited warehouses",
               },
             ].map((tier) => (
-              <Card key={tier.name} className={tier.featured ? "border-2 border-primary-600 shadow-lg" : ""}>
+              <Card
+                key={tier.name}
+                className={
+                  tier.featured ? "border-2 border-primary-600 shadow-lg" : ""
+                }
+              >
                 {tier.featured && (
                   <div className="bg-primary-600 text-white text-center py-2 text-sm font-semibold">
                     MOST POPULAR
@@ -223,13 +247,17 @@ export default function ManagedServicesPage() {
                 )}
                 <CardHeader>
                   <CardTitle className="text-2xl">{tier.name}</CardTitle>
-                  <div className="text-3xl font-bold text-primary-600">{tier.price}</div>
+                  <div className="text-3xl font-bold text-primary-600">
+                    {tier.price}
+                  </div>
                   <CardDescription>{tier.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div>
                     <p className="text-sm font-semibold mb-1">{tier.users}</p>
-                    <p className="text-sm text-muted-foreground">{tier.warehouses}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {tier.warehouses}
+                    </p>
                   </div>
                   <ul className="space-y-3">
                     {tier.features.map((feature, idx) => (
@@ -239,8 +267,14 @@ export default function ManagedServicesPage() {
                       </li>
                     ))}
                   </ul>
-                  <Button className="w-full" variant={tier.featured ? "default" : "outline"} asChild>
-                    <Link href={`/contact?service=managed-services&tier=${tier.name.toLowerCase()}`}>
+                  <Button
+                    className="w-full"
+                    variant={tier.featured ? "default" : "outline"}
+                    asChild
+                  >
+                    <Link
+                      href={`/contact?service=managed-services&tier=${tier.name.toLowerCase()}`}
+                    >
                       Get Started
                     </Link>
                   </Button>
@@ -255,34 +289,42 @@ export default function ManagedServicesPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Why Choose Managed Services?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Why Choose Managed Services?
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
                 title: "Reduce IT Burden",
-                description: "Free up your IT team to focus on strategic initiatives, not daily maintenance and troubleshooting.",
+                description:
+                  "Free up your IT team to focus on strategic initiatives, not daily maintenance and troubleshooting.",
               },
               {
                 title: "Predictable Costs",
-                description: "Fixed monthly pricing eliminates unexpected infrastructure and support costs.",
+                description:
+                  "Fixed monthly pricing eliminates unexpected infrastructure and support costs.",
               },
               {
                 title: "Expert Management",
-                description: "Leverage our WMS expertise without hiring specialized in-house staff.",
+                description:
+                  "Leverage our WMS expertise without hiring specialized in-house staff.",
               },
               {
                 title: "Faster Time to Value",
-                description: "We handle setup and optimization, so you can go live faster and see ROI sooner.",
+                description:
+                  "We handle setup and optimization, so you can go live faster and see ROI sooner.",
               },
               {
                 title: "Guaranteed Uptime",
-                description: "SLA-backed availability ensures your warehouse operations never stop.",
+                description:
+                  "SLA-backed availability ensures your warehouse operations never stop.",
               },
               {
                 title: "Continuous Improvement",
-                description: "Benefit from ongoing optimization and best practices without extra effort.",
+                description:
+                  "Benefit from ongoing optimization and best practices without extra effort.",
               },
             ].map((benefit, index) => (
               <Card key={index}>
@@ -313,7 +355,9 @@ export default function ManagedServicesPage() {
               { metric: "100+", label: "Clients Managed" },
             ].map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-4xl font-bold text-primary-600 mb-2">{stat.metric}</div>
+                <div className="text-4xl font-bold text-primary-600 mb-2">
+                  {stat.metric}
+                </div>
                 <div className="text-muted-foreground">{stat.label}</div>
               </div>
             ))}
@@ -327,17 +371,27 @@ export default function ManagedServicesPage() {
           <Card className="bg-gradient-to-br from-primary-600 to-primary-700 text-white border-0">
             <CardContent className="p-12 text-center">
               <Shield className="h-16 w-16 mx-auto mb-6 opacity-90" />
-              <h2 className="text-3xl font-bold mb-4">Ready to Let Experts Manage Your WMS?</h2>
+              <h2 className="text-3xl font-bold mb-4">
+                Ready to Let Experts Manage Your WMS?
+              </h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Stop worrying about infrastructure and focus on growing your business. Schedule a consultation to learn how managed services can benefit you.
+                Stop worrying about infrastructure and focus on growing your
+                business. Schedule a consultation to learn how managed services
+                can benefit you.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="secondary" asChild>
                   <Link href="/contact?service=managed-services">
-                    Schedule Consultation <ArrowRight className="ml-2 h-5 w-5" />
+                    Schedule Consultation{" "}
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-transparent border-white text-white hover:bg-white/10"
+                  asChild
+                >
                   <Link href="/pricing">View Pricing</Link>
                 </Button>
               </div>
@@ -346,5 +400,5 @@ export default function ManagedServicesPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

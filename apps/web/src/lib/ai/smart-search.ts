@@ -62,16 +62,16 @@ export function calculateSimilarity(str1: string, str2: string): number {
   // Word-based similarity
   const words1 = s1.split(/\s+/);
   const words2 = s2.split(/\s+/);
-  
-  const commonWords = words1.filter(w => words2.includes(w));
+
+  const commonWords = words1.filter((w) => words2.includes(w));
   const similarity = (2 * commonWords.length) / (words1.length + words2.length);
 
   // Character-based similarity (Levenshtein distance approximation)
   const maxLen = Math.max(s1.length, s2.length);
-  const charSimilarity = 1 - (levenshteinDistance(s1, s2) / maxLen);
+  const charSimilarity = 1 - levenshteinDistance(s1, s2) / maxLen;
 
   // Combined score (weighted average)
-  return (similarity * 0.6) + (charSimilarity * 0.4);
+  return similarity * 0.6 + charSimilarity * 0.4;
 }
 
 /**
@@ -80,16 +80,16 @@ export function calculateSimilarity(str1: string, str2: string): number {
 function levenshteinDistance(str1: string, str2: string): number {
   const m = str1.length;
   const n = str2.length;
-  
+
   if (m === 0) return n;
   if (n === 0) return m;
 
   const dp: number[][] = [];
-  
+
   for (let i = 0; i <= m; i++) {
     dp[i] = [i];
   }
-  
+
   for (let j = 1; j <= n; j++) {
     dp[0]![j] = j;
   }
@@ -99,11 +99,13 @@ function levenshteinDistance(str1: string, str2: string): number {
       if (str1[i - 1] === str2[j - 1]) {
         dp[i]![j] = dp[i - 1]![j - 1]!;
       } else {
-        dp[i]![j] = 1 + Math.min(
-          dp[i - 1]![j]!,     // deletion
-          dp[i]![j - 1]!,     // insertion
-          dp[i - 1]![j - 1]!  // substitution
-        );
+        dp[i]![j] =
+          1 +
+          Math.min(
+            dp[i - 1]![j]!, // deletion
+            dp[i]![j - 1]!, // insertion
+            dp[i - 1]![j - 1]!, // substitution
+          );
       }
     }
   }
@@ -116,26 +118,50 @@ function levenshteinDistance(str1: string, str2: string): number {
  */
 export function extractKeywords(text: string): string[] {
   const stopWords = new Set([
-    'a', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'for', 'from',
-    'has', 'he', 'in', 'is', 'it', 'its', 'of', 'on', 'that', 'the',
-    'to', 'was', 'will', 'with'
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "for",
+    "from",
+    "has",
+    "he",
+    "in",
+    "is",
+    "it",
+    "its",
+    "of",
+    "on",
+    "that",
+    "the",
+    "to",
+    "was",
+    "will",
+    "with",
   ]);
 
   return text
     .toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
+    .replace(/[^\w\s]/g, " ")
     .split(/\s+/)
-    .filter(word => word.length > 2 && !stopWords.has(word));
+    .filter((word) => word.length > 2 && !stopWords.has(word));
 }
 
 /**
  * Rank search results by relevance
  */
-export function rankResults(results: SearchResult[], query: string): SearchResult[] {
+export function rankResults(
+  results: SearchResult[],
+  query: string,
+): SearchResult[] {
   const queryKeywords = extractKeywords(query);
 
   return results
-    .map(result => {
+    .map((result) => {
       let score = result.relevanceScore;
 
       // Boost exact title matches
@@ -152,10 +178,12 @@ export function rankResults(results: SearchResult[], query: string): SearchResul
       const titleKeywords = extractKeywords(result.title);
       const descKeywords = extractKeywords(result.description);
       const allKeywords = [...titleKeywords, ...descKeywords];
-      
-      const matchingKeywords = queryKeywords.filter(kw => allKeywords.includes(kw));
+
+      const matchingKeywords = queryKeywords.filter((kw) =>
+        allKeywords.includes(kw),
+      );
       const keywordScore = matchingKeywords.length / queryKeywords.length;
-      score *= (1 + keywordScore);
+      score *= 1 + keywordScore;
 
       return { ...result, relevanceScore: score };
     })
@@ -165,20 +193,23 @@ export function rankResults(results: SearchResult[], query: string): SearchResul
 /**
  * Generate search suggestions based on partial input
  */
-export function generateSuggestions(partial: string, items: string[]): string[] {
+export function generateSuggestions(
+  partial: string,
+  items: string[],
+): string[] {
   if (!partial || partial.length < 2) return [];
 
   const normalized = partial.toLowerCase();
-  
+
   return items
-    .filter(item => item.toLowerCase().includes(normalized))
-    .map(item => ({
+    .filter((item) => item.toLowerCase().includes(normalized))
+    .map((item) => ({
       item,
-      score: calculateSimilarity(partial, item)
+      score: calculateSimilarity(partial, item),
     }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
-    .map(s => s.item);
+    .map((s) => s.item);
 }
 
 /**
@@ -188,9 +219,9 @@ export function highlightMatches(text: string, query: string): string {
   const keywords = extractKeywords(query);
   let highlighted = text;
 
-  keywords.forEach(keyword => {
-    const regex = new RegExp(`(${keyword})`, 'gi');
-    highlighted = highlighted.replace(regex, '<mark>$1</mark>');
+  keywords.forEach((keyword) => {
+    const regex = new RegExp(`(${keyword})`, "gi");
+    highlighted = highlighted.replace(regex, "<mark>$1</mark>");
   });
 
   return highlighted;
@@ -204,8 +235,8 @@ export class SearchIndex {
 
   addDocument(id: string, text: string) {
     const keywords = extractKeywords(text);
-    
-    keywords.forEach(keyword => {
+
+    keywords.forEach((keyword) => {
       if (!this.index.has(keyword)) {
         this.index.set(keyword, new Set());
       }
@@ -217,10 +248,10 @@ export class SearchIndex {
     const keywords = extractKeywords(query);
     const results = new Set<string>();
 
-    keywords.forEach(keyword => {
+    keywords.forEach((keyword) => {
       const docs = this.index.get(keyword);
       if (docs) {
-        docs.forEach(doc => results.add(doc));
+        docs.forEach((doc) => results.add(doc));
       }
     });
 
@@ -261,49 +292,64 @@ export function createSearchEngine<T>(): SearchEngine<T> {
 
       items.forEach((item: any) => {
         const id = item.id || item._id || Math.random().toString(36);
-        const text = `${item.name || item.title || ''} ${item.description || ''} ${item.tags?.join(' ') || ''}`;
-        
+        const text = `${item.name || item.title || ""} ${item.description || ""} ${item.tags?.join(" ") || ""}`;
+
         searchIndex.addDocument(id, text);
         indexedItems.set(id, item);
       });
     },
 
     search: async (options: SearchOptions) => {
-      const { query, filters, limit = 20, offset = 0, sortBy = 'relevance', sortOrder = 'desc' } = options;
+      const {
+        query,
+        filters,
+        limit = 20,
+        offset = 0,
+        sortBy = "relevance",
+        sortOrder = "desc",
+      } = options;
 
       // Get matching document IDs
       const matchingIds = searchIndex.search(query);
 
       // Convert to search results
       let results: SearchResult[] = Array.from(matchingIds)
-        .map(id => {
+        .map((id) => {
           const item: any = indexedItems.get(id);
           if (!item) return null;
 
-          const title = item.name || item.title || '';
-          const description = item.description || '';
-          const relevanceScore = calculateSimilarity(query, `${title} ${description}`);
+          const title = item.name || item.title || "";
+          const description = item.description || "";
+          const relevanceScore = calculateSimilarity(
+            query,
+            `${title} ${description}`,
+          );
 
           return {
             id,
-            type: item.type || 'product',
+            type: item.type || "product",
             title,
             description,
             relevanceScore,
             metadata: item,
-            highlights: [highlightMatches(title, query)]
+            highlights: [highlightMatches(title, query)],
           };
         })
         .filter((r): r is SearchResult => r !== null);
 
       // Apply filters
       if (filters) {
-        results = results.filter(result => {
+        results = results.filter((result) => {
           if (filters.type && !filters.type.includes(result.type)) return false;
-          if (filters.inStock !== undefined && result.metadata.stock <= 0) return false;
+          if (filters.inStock !== undefined && result.metadata.stock <= 0)
+            return false;
           if (filters.priceRange) {
             const price = result.metadata.price || 0;
-            if (price < filters.priceRange.min || price > filters.priceRange.max) return false;
+            if (
+              price < filters.priceRange.min ||
+              price > filters.priceRange.max
+            )
+              return false;
           }
           return true;
         });
@@ -312,20 +358,20 @@ export function createSearchEngine<T>(): SearchEngine<T> {
       // Rank and sort
       results = rankResults(results, query);
 
-      if (sortBy !== 'relevance') {
+      if (sortBy !== "relevance") {
         results.sort((a, b) => {
           let aVal: any, bVal: any;
-          
+
           switch (sortBy) {
-            case 'name':
+            case "name":
               aVal = a.title;
               bVal = b.title;
               break;
-            case 'price':
+            case "price":
               aVal = a.metadata.price || 0;
               bVal = b.metadata.price || 0;
               break;
-            case 'date':
+            case "date":
               aVal = a.metadata.createdAt || 0;
               bVal = b.metadata.createdAt || 0;
               break;
@@ -334,7 +380,7 @@ export function createSearchEngine<T>(): SearchEngine<T> {
           }
 
           const comparison = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-          return sortOrder === 'asc' ? comparison : -comparison;
+          return sortOrder === "asc" ? comparison : -comparison;
         });
       }
 
@@ -346,19 +392,21 @@ export function createSearchEngine<T>(): SearchEngine<T> {
         results: paginatedResults,
         total,
         page: Math.floor(offset / limit) + 1,
-        hasMore: offset + limit < total
+        hasMore: offset + limit < total,
       };
     },
 
     suggest: async (partial: string) => {
-      const allTitles = Array.from(indexedItems.values()).map((item: any) => item.name || item.title || '');
+      const allTitles = Array.from(indexedItems.values()).map(
+        (item: any) => item.name || item.title || "",
+      );
       return generateSuggestions(partial, allTitles);
     },
 
     clearIndex: () => {
       searchIndex.clear();
       indexedItems.clear();
-    }
+    },
   };
 }
 
@@ -371,11 +419,11 @@ export class SearchHistory {
 
   add(query: string) {
     // Remove duplicates
-    this.history = this.history.filter(q => q !== query);
-    
+    this.history = this.history.filter((q) => q !== query);
+
     // Add to front
     this.history.unshift(query);
-    
+
     // Limit size
     if (this.history.length > this.maxSize) {
       this.history = this.history.slice(0, this.maxSize);

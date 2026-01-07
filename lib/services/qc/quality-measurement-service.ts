@@ -3,22 +3,31 @@
  * Parametric measurement tracking with SPC
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export type MeasurementType = 'DIMENSIONAL' | 'WEIGHT' | 'TEMPERATURE' | 'PRESSURE' | 'PH' | 'HARDNESS' | 'THICKNESS' | 'VISCOSITY';
+export type MeasurementType =
+  | "DIMENSIONAL"
+  | "WEIGHT"
+  | "TEMPERATURE"
+  | "PRESSURE"
+  | "PH"
+  | "HARDNESS"
+  | "THICKNESS"
+  | "VISCOSITY";
 
 export class QualityMeasurementService {
-  
   /**
    * Generate next measurement number
    */
-  private static async generateMeasurementNumber(organizationId: string): Promise<string> {
+  private static async generateMeasurementNumber(
+    organizationId: string,
+  ): Promise<string> {
     const date = new Date();
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+
     const lastMeasurement = await prisma.qualityMeasurement.findFirst({
       where: {
         organizationId,
@@ -26,16 +35,18 @@ export class QualityMeasurementService {
           startsWith: `QM-${year}${month}`,
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     let sequence = 1;
     if (lastMeasurement) {
-      const lastSequence = parseInt(lastMeasurement.measurementNumber.split('-').pop() || '0');
+      const lastSequence = parseInt(
+        lastMeasurement.measurementNumber.split("-").pop() || "0",
+      );
       sequence = lastSequence + 1;
     }
 
-    return `QM-${year}${month}-${String(sequence).padStart(5, '0')}`;
+    return `QM-${year}${month}-${String(sequence).padStart(5, "0")}`;
   }
 
   /**
@@ -68,25 +79,34 @@ export class QualityMeasurementService {
     calibrationDate?: Date;
     notes?: string;
   }) {
-    
-    const measurementNumber = params.measurementNumber || 
-      await this.generateMeasurementNumber(params.organizationId);
-    
+    const measurementNumber =
+      params.measurementNumber ||
+      (await this.generateMeasurementNumber(params.organizationId));
+
     // Calculate conformance
     let isConforming = true;
     let deviation = 0;
     let deviationPercentage = 0;
-    
-    if (params.lowerSpecLimit !== undefined && params.measurementValue < params.lowerSpecLimit) {
+
+    if (
+      params.lowerSpecLimit !== undefined &&
+      params.measurementValue < params.lowerSpecLimit
+    ) {
       isConforming = false;
       deviation = params.measurementValue - params.lowerSpecLimit;
-    } else if (params.upperSpecLimit !== undefined && params.measurementValue > params.upperSpecLimit) {
+    } else if (
+      params.upperSpecLimit !== undefined &&
+      params.measurementValue > params.upperSpecLimit
+    ) {
       isConforming = false;
       deviation = params.measurementValue - params.upperSpecLimit;
     }
-    
+
     if (params.nominalValue && params.nominalValue !== 0) {
-      deviationPercentage = ((params.measurementValue - params.nominalValue) / params.nominalValue) * 100;
+      deviationPercentage =
+        ((params.measurementValue - params.nominalValue) /
+          params.nominalValue) *
+        100;
     }
 
     const measurement = await prisma.qualityMeasurement.create({
@@ -96,7 +116,7 @@ export class QualityMeasurementService {
         // referenceType removed - not in QualityMeasurement schema
         // Use inspectionId or ncrId instead
         productSku: params.referenceId, // Map referenceId to productSku
-        productName: params.referenceName || 'Unknown',
+        productName: params.referenceName || "Unknown",
         lotNumber: params.batchLotNumber,
         measurementType: params.measurementType,
         parameterName: params.measurementName,
@@ -136,15 +156,20 @@ export class QualityMeasurementService {
     measurementName: string;
     startDate?: Date;
     endDate?: Date;
-  }): Promise<{ cpk: number; mean: number; sigma: number; cpu: number; cpl: number } | null> {
-    
+  }): Promise<{
+    cpk: number;
+    mean: number;
+    sigma: number;
+    cpu: number;
+    cpl: number;
+  } | null> {
     const where: any = {
       organizationId: params.organizationId,
       referenceType: params.referenceType,
       referenceId: params.referenceId,
       measurementName: params.measurementName,
     };
-    
+
     if (params.startDate) {
       where.measurementDate = { gte: params.startDate };
     }
@@ -154,7 +179,7 @@ export class QualityMeasurementService {
 
     const measurements = await prisma.qualityMeasurement.findMany({
       where,
-      orderBy: { measurementDate: 'asc' },
+      orderBy: { measurementDate: "asc" },
     });
 
     if (measurements.length < 2) return null;
@@ -163,15 +188,23 @@ export class QualityMeasurementService {
     const firstMeasurement = measurements[0];
     const lsl = firstMeasurement.lowerSpecLimit;
     const usl = firstMeasurement.upperSpecLimit;
-    
+
     if (lsl === null && usl === null) return null;
 
     // Calculate mean
-    const values = measurements.map(m => parseFloat(m.measuredValue.toString()));
-    const mean = values.reduce((sum: number, val: number) => sum + val, 0) / values.length;
+    const values = measurements.map((m) =>
+      parseFloat(m.measuredValue.toString()),
+    );
+    const mean =
+      values.reduce((sum: number, val: number) => sum + val, 0) / values.length;
 
     // Calculate standard deviation (sigma)
-    const variance = values.reduce((sum: number, val: number) => sum + Math.pow(val - mean, 2), 0) / (values.length - 1);
+    const variance =
+      values.reduce(
+        (sum: number, val: number) => sum + Math.pow(val - mean, 2),
+        0,
+      ) /
+      (values.length - 1);
     const sigma = Math.sqrt(variance);
 
     if (sigma === 0) return null;
@@ -199,14 +232,19 @@ export class QualityMeasurementService {
     measurementName: string;
     startDate?: Date;
     endDate?: Date;
-  }): Promise<{ ppk: number; mean: number; sigma: number; ppu: number; ppl: number } | null> {
-    
+  }): Promise<{
+    ppk: number;
+    mean: number;
+    sigma: number;
+    ppu: number;
+    ppl: number;
+  } | null> {
     // For simplicity, using same calculation as CPK
     // In production, PPK should use long-term sigma
     const result = await this.calculateCPK(params);
-    
+
     if (!result) return null;
-    
+
     return {
       ppk: result.cpk,
       mean: result.mean,
@@ -228,14 +266,13 @@ export class QualityMeasurementService {
     endDate?: Date;
     limit?: number;
   }) {
-    
     const where: any = {
       organizationId: params.organizationId,
       referenceType: params.referenceType,
       referenceId: params.referenceId,
       measurementName: params.measurementName,
     };
-    
+
     if (params.startDate) {
       where.measurementDate = { gte: params.startDate };
     }
@@ -245,30 +282,41 @@ export class QualityMeasurementService {
 
     const measurements = await prisma.qualityMeasurement.findMany({
       where,
-      orderBy: { measurementDate: 'asc' },
+      orderBy: { measurementDate: "asc" },
       take: params.limit,
     });
 
     if (measurements.length === 0) return null;
 
     // Calculate control limits if not set
-    const values = measurements.map(m => parseFloat(m.measuredValue.toString()));
-    const mean = values.reduce((sum: number, val: number) => sum + val, 0) / values.length;
-    const variance = values.reduce((sum: number, val: number) => sum + Math.pow(val - mean, 2), 0) / values.length;
+    const values = measurements.map((m) =>
+      parseFloat(m.measuredValue.toString()),
+    );
+    const mean =
+      values.reduce((sum: number, val: number) => sum + val, 0) / values.length;
+    const variance =
+      values.reduce(
+        (sum: number, val: number) => sum + Math.pow(val - mean, 2),
+        0,
+      ) / values.length;
     const sigma = Math.sqrt(variance);
 
-    const lcl = parseFloat((measurements[0].lowerControlLimit ?? (mean - 3 * sigma)).toString());
-    const ucl = parseFloat((measurements[0].upperControlLimit ?? (mean + 3 * sigma)).toString());
+    const lcl = parseFloat(
+      (measurements[0].lowerControlLimit ?? mean - 3 * sigma).toString(),
+    );
+    const ucl = parseFloat(
+      (measurements[0].upperControlLimit ?? mean + 3 * sigma).toString(),
+    );
     const centerLine = mean;
 
     // Identify out-of-control points
-    const outOfControlPoints = measurements.filter(m => {
+    const outOfControlPoints = measurements.filter((m) => {
       const val = parseFloat(m.measuredValue.toString());
       return val < lcl || val > ucl;
     });
 
     return {
-      measurements: measurements.map(m => ({
+      measurements: measurements.map((m) => ({
         id: m.id,
         date: m.measurementDate,
         value: m.measuredValue,
@@ -288,7 +336,7 @@ export class QualityMeasurementService {
         mean,
         sigma,
         count: measurements.length,
-        conformingCount: measurements.filter(m => m.withinSpec).length,
+        conformingCount: measurements.filter((m) => m.withinSpec).length,
         outOfControlCount: outOfControlPoints.length,
       },
     };
@@ -352,13 +400,14 @@ export class QualityMeasurementService {
       measurementType?: MeasurementType;
       startDate?: Date;
       endDate?: Date;
-    } = {}
+    } = {},
   ) {
     const where: any = { organizationId };
-    
+
     if (filters.referenceType) where.referenceType = filters.referenceType;
     if (filters.referenceId) where.referenceId = filters.referenceId;
-    if (filters.measurementType) where.measurementType = filters.measurementType;
+    if (filters.measurementType)
+      where.measurementType = filters.measurementType;
     if (filters.startDate || filters.endDate) {
       where.measurementDate = {};
       if (filters.startDate) where.measurementDate.gte = filters.startDate;
@@ -370,20 +419,23 @@ export class QualityMeasurementService {
     });
 
     const total = measurements.length;
-    const conforming = measurements.filter(m => m.withinSpec).length;
+    const conforming = measurements.filter((m) => m.withinSpec).length;
     const nonConforming = total - conforming;
     const conformanceRate = total > 0 ? (conforming / total) * 100 : 0;
 
     // Group by measurement type
-    const byType = measurements.reduce((acc, m) => {
-      const type = m.measurementType;
-      if (!acc[type]) {
-        acc[type] = { count: 0, conforming: 0 };
-      }
-      acc[type].count++;
-      if (m.withinSpec) acc[type].conforming++;
-      return acc;
-    }, {} as Record<string, { count: number; conforming: number }>);
+    const byType = measurements.reduce(
+      (acc, m) => {
+        const type = m.measurementType;
+        if (!acc[type]) {
+          acc[type] = { count: 0, conforming: 0 };
+        }
+        acc[type].count++;
+        if (m.withinSpec) acc[type].conforming++;
+        return acc;
+      },
+      {} as Record<string, { count: number; conforming: number }>,
+    );
 
     return {
       total,
@@ -408,15 +460,17 @@ export class QualityMeasurementService {
       startDate?: Date;
       endDate?: Date;
       limit?: number;
-    } = {}
+    } = {},
   ) {
     const where: any = { organizationId };
-    
+
     if (filters.referenceType) where.sourceType = filters.referenceType;
     if (filters.referenceId) where.inspectionId = filters.referenceId;
-    if (filters.measurementType) where.measurementType = filters.measurementType;
+    if (filters.measurementType)
+      where.measurementType = filters.measurementType;
     if (filters.measurementName) where.parameterName = filters.measurementName;
-    if (filters.isConforming !== undefined) where.withinSpec = filters.isConforming;
+    if (filters.isConforming !== undefined)
+      where.withinSpec = filters.isConforming;
     if (filters.startDate || filters.endDate) {
       where.measurementDate = {};
       if (filters.startDate) where.measurementDate.gte = filters.startDate;
@@ -425,7 +479,7 @@ export class QualityMeasurementService {
 
     return await prisma.qualityMeasurement.findMany({
       where,
-      orderBy: { measurementDate: 'desc' },
+      orderBy: { measurementDate: "desc" },
       take: filters.limit,
     });
   }

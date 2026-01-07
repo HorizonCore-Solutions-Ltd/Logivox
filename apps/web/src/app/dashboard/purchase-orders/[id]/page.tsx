@@ -2,10 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
+import {
   ArrowLeft,
   Edit,
   Send,
@@ -89,10 +95,16 @@ interface PurchaseOrder {
   receipts: any[];
 }
 
-export default function PurchaseOrderDetailPage({ params }: { params: { id: string } }) {
+export default function PurchaseOrderDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
   const { toast } = useToast();
-  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder | null>(null);
+  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [showApproveDialog, setShowApproveDialog] = useState(false);
@@ -109,7 +121,7 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
       setLoading(true);
       const response = await fetch(`/api/purchase-orders/${params.id}`);
       const data = await response.json();
-      
+
       if (response.ok) {
         setPurchaseOrder(data.purchaseOrder);
       } else {
@@ -134,11 +146,14 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
   const handleApprove = async () => {
     try {
       setActionLoading(true);
-      const response = await fetch(`/api/purchase-orders/${params.id}/approve`, {
-        method: "POST",
-      });
+      const response = await fetch(
+        `/api/purchase-orders/${params.id}/approve`,
+        {
+          method: "POST",
+        },
+      );
       const data = await response.json();
-      
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -172,7 +187,7 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
         method: "POST",
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -208,7 +223,7 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
         body: JSON.stringify({ reason: cancelReason }),
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         toast({
           title: "Success",
@@ -261,10 +276,14 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
     return colors[priority] || "bg-gray-100 text-gray-800";
   };
 
-  const canEdit = purchaseOrder?.status === "DRAFT" || purchaseOrder?.status === "PENDING";
-  const canApprove = purchaseOrder?.status === "DRAFT" || purchaseOrder?.status === "PENDING";
+  const canEdit =
+    purchaseOrder?.status === "DRAFT" || purchaseOrder?.status === "PENDING";
+  const canApprove =
+    purchaseOrder?.status === "DRAFT" || purchaseOrder?.status === "PENDING";
   const canSend = purchaseOrder?.status === "APPROVED";
-  const canCancel = purchaseOrder?.status && !["RECEIVED", "CLOSED", "CANCELLED"].includes(purchaseOrder.status);
+  const canCancel =
+    purchaseOrder?.status &&
+    !["RECEIVED", "CLOSED", "CANCELLED"].includes(purchaseOrder.status);
 
   if (loading) {
     return (
@@ -281,7 +300,9 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
           <CardContent className="pt-6">
             <div className="text-center py-12">
               <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Purchase Order Not Found</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Purchase Order Not Found
+              </h3>
               <Button onClick={() => router.push("/dashboard/purchase-orders")}>
                 Back to Purchase Orders
               </Button>
@@ -308,14 +329,18 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
           <div className="flex items-center gap-3">
             <h1 className="text-3xl font-bold">{purchaseOrder.poNumber}</h1>
             <Badge className={getStatusColor(purchaseOrder.status)}>
-              {purchaseOrder.status.replace(/_/g, ' ')}
+              {purchaseOrder.status.replace(/_/g, " ")}
             </Badge>
-            <Badge variant="outline" className={getPriorityColor(purchaseOrder.priority)}>
+            <Badge
+              variant="outline"
+              className={getPriorityColor(purchaseOrder.priority)}
+            >
               {purchaseOrder.priority}
             </Badge>
           </div>
           <p className="text-muted-foreground">
-            Created on {new Date(purchaseOrder.orderDate).toLocaleDateString()} by {purchaseOrder.createdBy.name}
+            Created on {new Date(purchaseOrder.orderDate).toLocaleDateString()}{" "}
+            by {purchaseOrder.createdBy.name}
           </p>
         </div>
 
@@ -323,20 +348,28 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
           {canEdit && (
             <Button
               variant="outline"
-              onClick={() => router.push(`/dashboard/purchase-orders/${params.id}/edit`)}
+              onClick={() =>
+                router.push(`/dashboard/purchase-orders/${params.id}/edit`)
+              }
             >
               <Edit className="h-4 w-4 mr-2" />
               Edit
             </Button>
           )}
           {canApprove && (
-            <Button onClick={() => setShowApproveDialog(true)} disabled={actionLoading}>
+            <Button
+              onClick={() => setShowApproveDialog(true)}
+              disabled={actionLoading}
+            >
               <CheckCircle className="h-4 w-4 mr-2" />
               Approve
             </Button>
           )}
           {canSend && (
-            <Button onClick={() => setShowSendDialog(true)} disabled={actionLoading}>
+            <Button
+              onClick={() => setShowSendDialog(true)}
+              disabled={actionLoading}
+            >
               <Send className="h-4 w-4 mr-2" />
               Send to Supplier
             </Button>
@@ -366,7 +399,9 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
             <CardHeader>
               <CardTitle>Items</CardTitle>
               <CardDescription>
-                {purchaseOrder.items.length} item{purchaseOrder.items.length !== 1 ? 's' : ''} in this purchase order
+                {purchaseOrder.items.length} item
+                {purchaseOrder.items.length !== 1 ? "s" : ""} in this purchase
+                order
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -385,30 +420,46 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
                   <tbody>
                     {purchaseOrder.items.map((item) => (
                       <tr key={item.id} className="border-b">
-                        <td className="py-3 px-4 font-mono text-sm">{item.sku}</td>
+                        <td className="py-3 px-4 font-mono text-sm">
+                          {item.sku}
+                        </td>
                         <td className="py-3 px-4">{item.description}</td>
-                        <td className="py-3 px-4 text-right">{item.quantityOrdered}</td>
                         <td className="py-3 px-4 text-right">
-                          <span className={item.quantityReceived > 0 ? "text-green-600 font-semibold" : ""}>
+                          {item.quantityOrdered}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <span
+                            className={
+                              item.quantityReceived > 0
+                                ? "text-green-600 font-semibold"
+                                : ""
+                            }
+                          >
                             {item.quantityReceived}
                           </span>
                         </td>
                         <td className="py-3 px-4 text-right">
-                          {purchaseOrder.currency} {Number(item.unitPrice).toFixed(2)}
+                          {purchaseOrder.currency}{" "}
+                          {Number(item.unitPrice).toFixed(2)}
                         </td>
                         <td className="py-3 px-4 text-right font-semibold">
-                          {purchaseOrder.currency} {Number(item.totalPrice).toFixed(2)}
+                          {purchaseOrder.currency}{" "}
+                          {Number(item.totalPrice).toFixed(2)}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
                     <tr className="border-t-2">
-                      <td colSpan={5} className="py-3 px-4 text-right font-semibold">
+                      <td
+                        colSpan={5}
+                        className="py-3 px-4 text-right font-semibold"
+                      >
                         Subtotal:
                       </td>
                       <td className="py-3 px-4 text-right font-semibold">
-                        {purchaseOrder.currency} {Number(purchaseOrder.subtotal || 0).toFixed(2)}
+                        {purchaseOrder.currency}{" "}
+                        {Number(purchaseOrder.subtotal || 0).toFixed(2)}
                       </td>
                     </tr>
                     {purchaseOrder.tax > 0 && (
@@ -417,7 +468,8 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
                           Tax:
                         </td>
                         <td className="py-2 px-4 text-right">
-                          {purchaseOrder.currency} {Number(purchaseOrder.tax).toFixed(2)}
+                          {purchaseOrder.currency}{" "}
+                          {Number(purchaseOrder.tax).toFixed(2)}
                         </td>
                       </tr>
                     )}
@@ -427,16 +479,21 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
                           Shipping:
                         </td>
                         <td className="py-2 px-4 text-right">
-                          {purchaseOrder.currency} {Number(purchaseOrder.shipping).toFixed(2)}
+                          {purchaseOrder.currency}{" "}
+                          {Number(purchaseOrder.shipping).toFixed(2)}
                         </td>
                       </tr>
                     )}
                     <tr className="border-t-2">
-                      <td colSpan={5} className="py-3 px-4 text-right font-bold text-lg">
+                      <td
+                        colSpan={5}
+                        className="py-3 px-4 text-right font-bold text-lg"
+                      >
                         Total:
                       </td>
                       <td className="py-3 px-4 text-right font-bold text-lg">
-                        {purchaseOrder.currency} {Number(purchaseOrder.totalAmount || 0).toFixed(2)}
+                        {purchaseOrder.currency}{" "}
+                        {Number(purchaseOrder.totalAmount || 0).toFixed(2)}
                       </td>
                     </tr>
                   </tfoot>
@@ -454,16 +511,26 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
               <CardContent className="space-y-3">
                 {purchaseOrder.deliveryAddress && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Address</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Address
+                    </label>
                     <p>{purchaseOrder.deliveryAddress}</p>
-                    {purchaseOrder.deliveryCity && <p>{purchaseOrder.deliveryCity}</p>}
-                    {purchaseOrder.deliveryCountry && <p>{purchaseOrder.deliveryCountry}</p>}
+                    {purchaseOrder.deliveryCity && (
+                      <p>{purchaseOrder.deliveryCity}</p>
+                    )}
+                    {purchaseOrder.deliveryCountry && (
+                      <p>{purchaseOrder.deliveryCountry}</p>
+                    )}
                   </div>
                 )}
                 {purchaseOrder.deliveryNotes && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Delivery Notes</label>
-                    <p className="text-sm mt-1">{purchaseOrder.deliveryNotes}</p>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Delivery Notes
+                    </label>
+                    <p className="text-sm mt-1">
+                      {purchaseOrder.deliveryNotes}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -479,14 +546,22 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
               <CardContent className="space-y-4">
                 {purchaseOrder.notes && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Notes</label>
-                    <p className="text-sm mt-1 whitespace-pre-wrap">{purchaseOrder.notes}</p>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Notes
+                    </label>
+                    <p className="text-sm mt-1 whitespace-pre-wrap">
+                      {purchaseOrder.notes}
+                    </p>
                   </div>
                 )}
                 {purchaseOrder.internalNotes && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Internal Notes</label>
-                    <p className="text-sm mt-1 whitespace-pre-wrap">{purchaseOrder.internalNotes}</p>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Internal Notes
+                    </label>
+                    <p className="text-sm mt-1 whitespace-pre-wrap">
+                      {purchaseOrder.internalNotes}
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -507,23 +582,31 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
             <CardContent className="space-y-3">
               <div>
                 <p className="font-semibold">{purchaseOrder.supplier.name}</p>
-                <p className="text-sm text-muted-foreground">Code: {purchaseOrder.supplier.code}</p>
+                <p className="text-sm text-muted-foreground">
+                  Code: {purchaseOrder.supplier.code}
+                </p>
               </div>
               {purchaseOrder.supplier.email && (
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Email</label>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Email
+                  </label>
                   <p className="text-sm">{purchaseOrder.supplier.email}</p>
                 </div>
               )}
               {purchaseOrder.supplier.phone && (
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Phone</label>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Phone
+                  </label>
                   <p className="text-sm">{purchaseOrder.supplier.phone}</p>
                 </div>
               )}
               {purchaseOrder.supplier.address && (
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Address</label>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Address
+                  </label>
                   <p className="text-sm">{purchaseOrder.supplier.address}</p>
                 </div>
               )}
@@ -540,34 +623,56 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-muted-foreground">Created</label>
-                <p className="text-sm">{new Date(purchaseOrder.orderDate).toLocaleString()}</p>
+                <label className="text-xs font-medium text-muted-foreground">
+                  Created
+                </label>
+                <p className="text-sm">
+                  {new Date(purchaseOrder.orderDate).toLocaleString()}
+                </p>
               </div>
               {purchaseOrder.expectedDate && (
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Expected Delivery</label>
-                  <p className="text-sm">{new Date(purchaseOrder.expectedDate).toLocaleString()}</p>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Expected Delivery
+                  </label>
+                  <p className="text-sm">
+                    {new Date(purchaseOrder.expectedDate).toLocaleString()}
+                  </p>
                 </div>
               )}
               {purchaseOrder.approvedDate && (
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Approved</label>
-                  <p className="text-sm">{new Date(purchaseOrder.approvedDate).toLocaleString()}</p>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Approved
+                  </label>
+                  <p className="text-sm">
+                    {new Date(purchaseOrder.approvedDate).toLocaleString()}
+                  </p>
                   {purchaseOrder.approvedBy && (
-                    <p className="text-xs text-muted-foreground">by {purchaseOrder.approvedBy.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      by {purchaseOrder.approvedBy.name}
+                    </p>
                   )}
                 </div>
               )}
               {purchaseOrder.receivedDate && (
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Received</label>
-                  <p className="text-sm">{new Date(purchaseOrder.receivedDate).toLocaleString()}</p>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Received
+                  </label>
+                  <p className="text-sm">
+                    {new Date(purchaseOrder.receivedDate).toLocaleString()}
+                  </p>
                 </div>
               )}
               {purchaseOrder.cancelledDate && (
                 <div>
-                  <label className="text-xs font-medium text-muted-foreground">Cancelled</label>
-                  <p className="text-sm text-red-600">{new Date(purchaseOrder.cancelledDate).toLocaleString()}</p>
+                  <label className="text-xs font-medium text-muted-foreground">
+                    Cancelled
+                  </label>
+                  <p className="text-sm text-red-600">
+                    {new Date(purchaseOrder.cancelledDate).toLocaleString()}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -583,26 +688,50 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Items</span>
-                <span className="font-semibold">{purchaseOrder.items.length}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Quantity</span>
+                <span className="text-sm text-muted-foreground">
+                  Total Items
+                </span>
                 <span className="font-semibold">
-                  {purchaseOrder.items.reduce((sum, item) => sum + item.quantityOrdered, 0)}
+                  {purchaseOrder.items.length}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Received Quantity</span>
+                <span className="text-sm text-muted-foreground">
+                  Total Quantity
+                </span>
+                <span className="font-semibold">
+                  {purchaseOrder.items.reduce(
+                    (sum, item) => sum + item.quantityOrdered,
+                    0,
+                  )}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Received Quantity
+                </span>
                 <span className="font-semibold text-green-600">
-                  {purchaseOrder.items.reduce((sum, item) => sum + item.quantityReceived, 0)}
+                  {purchaseOrder.items.reduce(
+                    (sum, item) => sum + item.quantityReceived,
+                    0,
+                  )}
                 </span>
               </div>
               <div className="flex justify-between pt-3 border-t">
                 <span className="text-sm font-medium">Completion</span>
                 <span className="font-bold">
-                  {((purchaseOrder.items.reduce((sum, item) => sum + item.quantityReceived, 0) /
-                    purchaseOrder.items.reduce((sum, item) => sum + item.quantityOrdered, 0)) * 100).toFixed(0)}%
+                  {(
+                    (purchaseOrder.items.reduce(
+                      (sum, item) => sum + item.quantityReceived,
+                      0,
+                    ) /
+                      purchaseOrder.items.reduce(
+                        (sum, item) => sum + item.quantityOrdered,
+                        0,
+                      )) *
+                    100
+                  ).toFixed(0)}
+                  %
                 </span>
               </div>
             </CardContent>
@@ -616,11 +745,14 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
           <AlertDialogHeader>
             <AlertDialogTitle>Approve Purchase Order</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to approve {purchaseOrder.poNumber}? This will allow the purchase order to be sent to the supplier.
+              Are you sure you want to approve {purchaseOrder.poNumber}? This
+              will allow the purchase order to be sent to the supplier.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={actionLoading}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction onClick={handleApprove} disabled={actionLoading}>
               {actionLoading ? "Approving..." : "Approve"}
             </AlertDialogAction>
@@ -634,11 +766,14 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
           <AlertDialogHeader>
             <AlertDialogTitle>Send Purchase Order</AlertDialogTitle>
             <AlertDialogDescription>
-              Send {purchaseOrder.poNumber} to {purchaseOrder.supplier.name} at {purchaseOrder.supplier.email}?
+              Send {purchaseOrder.poNumber} to {purchaseOrder.supplier.name} at{" "}
+              {purchaseOrder.supplier.email}?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={actionLoading}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction onClick={handleSend} disabled={actionLoading}>
               {actionLoading ? "Sending..." : "Send"}
             </AlertDialogAction>
@@ -652,11 +787,14 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
           <AlertDialogHeader>
             <AlertDialogTitle>Cancel Purchase Order</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to cancel {purchaseOrder.poNumber}? This action cannot be undone.
+              Are you sure you want to cancel {purchaseOrder.poNumber}? This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
-            <label className="text-sm font-medium">Cancellation Reason (Optional)</label>
+            <label className="text-sm font-medium">
+              Cancellation Reason (Optional)
+            </label>
             <textarea
               className="w-full mt-2 p-2 border rounded-md"
               rows={3}
@@ -666,7 +804,9 @@ export default function PurchaseOrderDetailPage({ params }: { params: { id: stri
             />
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={actionLoading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={actionLoading}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleCancel}
               disabled={actionLoading}

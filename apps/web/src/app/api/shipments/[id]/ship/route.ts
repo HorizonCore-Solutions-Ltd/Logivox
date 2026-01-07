@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -12,16 +12,13 @@ import { Prisma } from "@prisma/client";
  */
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const shipmentId = params.id;
@@ -32,133 +29,136 @@ export async function POST(
       include: {
         organizationMemberships: {
           where: { isActive: true },
-          include: { organization: true }
-        }
-      }
+          include: { organization: true },
+        },
+      },
     });
 
     if (!user?.organizationMemberships?.[0]) {
       return NextResponse.json(
         { error: "No active organization found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
 
     // Transaction to mark as shipped
-    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Get shipment
-      const shipment = await tx.shipment.findFirst({
-        where: {
-          id: shipmentId,
-          organizationId
-        },
-        include: {
-          salesOrder: true
+    const result = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        // Get shipment
+        const shipment = await tx.shipment.findFirst({
+          where: {
+            id: shipmentId,
+            organizationId,
+          },
+          include: {
+            salesOrder: true,
+          },
+        });
+
+        if (!shipment) {
+          throw new Error("Shipment not found");
         }
-      });
 
-      if (!shipment) {
-        throw new Error("Shipment not found");
-      }
-
-      // Must have tracking number to ship
-      if (!shipment.trackingNumber) {
-        throw new Error("Cannot ship without tracking number. Generate label first.");
-      }
-
-      // Check current status
-      if (shipment.status === "SHIPPED" || shipment.status === "DELIVERED") {
-        throw new Error(`Shipment already ${shipment.status.toLowerCase()}`);
-      }
-
-      // Update tracking events
-      const existingEvents = (shipment.trackingEvents as any[]) || [];
-      const newEvent = {
-        status: "IN_TRANSIT",
-        description: "Package picked up by carrier",
-        location: "Origin Facility",
-        timestamp: new Date().toISOString()
-      };
-
-      // Update shipment status
-      const updatedShipment = await tx.shipment.update({
-        where: { id: shipmentId },
-        data: {
-          status: "SHIPPED",
-          shippedDate: new Date(),
-          trackingEvents: [...existingEvents, newEvent] as any,
-          lastTrackingUpdate: new Date()
+        // Must have tracking number to ship
+        if (!shipment.trackingNumber) {
+          throw new Error(
+            "Cannot ship without tracking number. Generate label first.",
+          );
         }
-      });
 
-      // Update sales order status
-      await tx.salesOrder.update({
-        where: { id: shipment.salesOrderId },
-        data: {
-          status: "SHIPPED",
-          shippedDate: new Date()
+        // Check current status
+        if (shipment.status === "SHIPPED" || shipment.status === "DELIVERED") {
+          throw new Error(`Shipment already ${shipment.status.toLowerCase()}`);
         }
-      });
 
-      // Release reserved inventory (convert to shipped)
-      const soItems = await tx.salesOrderItem.findMany({
-        where: { salesOrderId: shipment.salesOrderId },
-        include: { inventoryItem: true }
-      });
+        // Update tracking events
+        const existingEvents = (shipment.trackingEvents as any[]) || [];
+        const newEvent = {
+          status: "IN_TRANSIT",
+          description: "Package picked up by carrier",
+          location: "Origin Facility",
+          timestamp: new Date().toISOString(),
+        };
 
-      for (const item of soItems) {
-        await tx.inventoryItem.update({
-          where: { id: item.inventoryItemId },
+        // Update shipment status
+        const updatedShipment = await tx.shipment.update({
+          where: { id: shipmentId },
           data: {
-            reservedQty: {
-              decrement: item.quantityShipped
+            status: "SHIPPED",
+            shippedDate: new Date(),
+            trackingEvents: [...existingEvents, newEvent] as any,
+            lastTrackingUpdate: new Date(),
+          },
+        });
+
+        // Update sales order status
+        await tx.salesOrder.update({
+          where: { id: shipment.salesOrderId },
+          data: {
+            status: "SHIPPED",
+            shippedDate: new Date(),
+          },
+        });
+
+        // Release reserved inventory (convert to shipped)
+        const soItems = await tx.salesOrderItem.findMany({
+          where: { salesOrderId: shipment.salesOrderId },
+          include: { inventoryItem: true },
+        });
+
+        for (const item of soItems) {
+          await tx.inventoryItem.update({
+            where: { id: item.inventoryItemId },
+            data: {
+              reservedQty: {
+                decrement: item.quantityShipped,
+              },
+              // Optionally track as shipped inventory
+              availableQty: {
+                // Already decremented during picking
+              },
             },
-            // Optionally track as shipped inventory
-            availableQty: {
-              // Already decremented during picking
-            }
-          }
-        });
+          });
 
-        // Update SO item shipped quantity
-        await tx.salesOrderItem.update({
-          where: { id: item.id },
-          data: {
-            quantityShipped: item.quantityPacked
-          }
-        });
-      }
-
-      // Create activity log
-      await tx.activityLog.create({
-        data: {
-          organizationId,
-          userId: session.user.id,
-          action: "SHIPMENT_SHIPPED",
-          entityType: "SHIPMENT",
-          entityId: shipmentId,
-          metadata: {
-            shipmentNumber: shipment.shipmentNumber,
-            salesOrderNumber: shipment.salesOrder.soNumber,
-            trackingNumber: shipment.trackingNumber,
-            carrier: shipment.carrierCode,
-            shippedDate: new Date().toISOString()
-          }
+          // Update SO item shipped quantity
+          await tx.salesOrderItem.update({
+            where: { id: item.id },
+            data: {
+              quantityShipped: item.quantityPacked,
+            },
+          });
         }
-      });
 
-      return updatedShipment;
-    });
+        // Create activity log
+        await tx.activityLog.create({
+          data: {
+            organizationId,
+            userId: session.user.id,
+            action: "SHIPMENT_SHIPPED",
+            entityType: "SHIPMENT",
+            entityId: shipmentId,
+            metadata: {
+              shipmentNumber: shipment.shipmentNumber,
+              salesOrderNumber: shipment.salesOrder.soNumber,
+              trackingNumber: shipment.trackingNumber,
+              carrier: shipment.carrierCode,
+              shippedDate: new Date().toISOString(),
+            },
+          },
+        });
+
+        return updatedShipment;
+      },
+    );
 
     return NextResponse.json(result);
-
   } catch (error: any) {
     console.error("Error shipping order:", error);
     return NextResponse.json(
       { error: error.message || "Failed to mark as shipped" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -34,6 +34,7 @@ When working on features, always consider:
 ## Feature Development Prompts
 
 ### For Stock Management Features
+
 ```
 You're implementing stock management features for LogiVox. Consider these requirements:
 
@@ -57,6 +58,7 @@ AUDIT REQUIREMENTS:
 ```
 
 ### For ERP Integration Features
+
 ```
 You're building ERP integration capabilities for LogiVox. Key considerations:
 
@@ -80,6 +82,7 @@ DATA FLOW:
 ```
 
 ### For Supplier Portal Features
+
 ```
 You're developing supplier collaboration features for LogiVox:
 
@@ -105,6 +108,7 @@ PERFORMANCE ANALYTICS:
 ## Code Generation Prompts
 
 ### For React Components
+
 ```
 Generate React components for LogiVox following these patterns:
 
@@ -136,6 +140,7 @@ REQUIREMENTS:
 ```
 
 ### For API Endpoints
+
 ```
 Create API endpoints for LogiVox following these standards:
 
@@ -146,7 +151,7 @@ ROUTE STRUCTURE:
 - Return consistent response formats
 
 EXAMPLE PATTERN:
-router.post('/api/resource', 
+router.post('/api/resource',
   authenticateToken,
   requirePermission('resource:create'),
   validateInput,
@@ -157,7 +162,7 @@ router.post('/api/resource',
         ...req.body,
         organizationId: req.user.organizationId
       });
-      
+
       res.status(201).json({
         success: true,
         data: result,
@@ -180,6 +185,7 @@ SECURITY REQUIREMENTS:
 ```
 
 ### For Database Operations
+
 ```
 Implement database operations for LogiVox using these Prisma patterns:
 
@@ -228,6 +234,7 @@ PERFORMANCE REQUIREMENTS:
 ## Testing Prompts
 
 ### For Component Testing
+
 ```
 Create comprehensive tests for LogiVox React components:
 
@@ -252,6 +259,7 @@ EXAMPLE AREAS:
 ```
 
 ### For API Testing
+
 ```
 Create integration tests for LogiVox API endpoints:
 
@@ -277,6 +285,7 @@ COVERAGE AREAS:
 ## Troubleshooting Prompts
 
 ### For Performance Issues
+
 ```
 When troubleshooting LogiVox performance issues:
 
@@ -300,6 +309,7 @@ MONITORING TOOLS:
 ```
 
 ### For Multi-Tenant Issues
+
 ```
 When debugging multi-tenant problems in LogiVox:
 

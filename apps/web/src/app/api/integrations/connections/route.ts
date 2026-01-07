@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -22,7 +22,9 @@ const createConnectionSchema = z.object({
   password: z.string().optional(),
   baseUrl: z.string().url().optional(),
   webhookUrl: z.string().url().optional(),
-  environment: z.enum(["PRODUCTION", "SANDBOX", "DEVELOPMENT"]).default("PRODUCTION"),
+  environment: z
+    .enum(["PRODUCTION", "SANDBOX", "DEVELOPMENT"])
+    .default("PRODUCTION"),
   metadata: z.record(z.any()).optional(),
 });
 
@@ -46,7 +48,10 @@ export async function GET(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -89,21 +94,23 @@ export async function GET(request: Request) {
     });
 
     // Remove sensitive data before sending
-    const sanitizedConnections = connections.map((conn: typeof connections[number]) => ({
-      ...conn,
-      accessToken: conn.accessToken ? "****" : null,
-      refreshToken: conn.refreshToken ? "****" : null,
-      apiKey: conn.apiKey ? "****" : null,
-      apiSecret: conn.apiSecret ? "****" : null,
-      password: conn.password ? "****" : null,
-    }));
+    const sanitizedConnections = connections.map(
+      (conn: (typeof connections)[number]) => ({
+        ...conn,
+        accessToken: conn.accessToken ? "****" : null,
+        refreshToken: conn.refreshToken ? "****" : null,
+        apiKey: conn.apiKey ? "****" : null,
+        apiSecret: conn.apiSecret ? "****" : null,
+        password: conn.password ? "****" : null,
+      }),
+    );
 
     return NextResponse.json(sanitizedConnections);
   } catch (error) {
     console.error("Error fetching connections:", error);
     return NextResponse.json(
       { error: "Failed to fetch connections" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -128,7 +135,10 @@ export async function POST(request: Request) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -144,7 +154,7 @@ export async function POST(request: Request) {
     if (!integration) {
       return NextResponse.json(
         { error: "Integration not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -156,7 +166,9 @@ export async function POST(request: Request) {
         ...validatedData,
         organizationId,
         createdById: session.user.id,
-        expiresAt: validatedData.expiresAt ? new Date(validatedData.expiresAt) : null,
+        expiresAt: validatedData.expiresAt
+          ? new Date(validatedData.expiresAt)
+          : null,
         status: "CONNECTED",
         connectedAt: new Date(),
       },
@@ -194,13 +206,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating connection:", error);
     return NextResponse.json(
       { error: "Failed to create connection" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

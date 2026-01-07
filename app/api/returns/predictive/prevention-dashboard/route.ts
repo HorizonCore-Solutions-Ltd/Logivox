@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { enhancedPredictiveService } from '@/lib/services/returns/enhanced-predictive-service';
+import { NextRequest, NextResponse } from "next/server";
+import { enhancedPredictiveService } from "@/lib/services/returns/enhanced-predictive-service";
 
 /**
  * POST /api/returns/predictive/prevention-dashboard
@@ -12,28 +12,29 @@ export async function POST(request: NextRequest) {
 
     if (!organizationId || !periodStart || !periodEnd) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
-    const dashboard = await enhancedPredictiveService.generatePreventionDashboard({
-      organizationId,
-      period: {
-        start: new Date(periodStart),
-        end: new Date(periodEnd),
-      },
-    });
+    const dashboard =
+      await enhancedPredictiveService.generatePreventionDashboard({
+        organizationId,
+        period: {
+          start: new Date(periodStart),
+          end: new Date(periodEnd),
+        },
+      });
 
     return NextResponse.json({
       success: true,
       dashboard,
     });
   } catch (error: any) {
-    console.error('Prevention dashboard error:', error);
+    console.error("Prevention dashboard error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate dashboard' },
-      { status: 500 }
+      { error: error.message || "Failed to generate dashboard" },
+      { status: 500 },
     );
   }
 }

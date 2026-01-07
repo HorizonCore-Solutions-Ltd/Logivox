@@ -6,24 +6,30 @@
  * POST /api/portal/returns/[id]/cancel - Cancel return request
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const createReturnSchema = z.object({
   salesOrderId: z.string(),
-  items: z.array(z.object({
-    salesOrderItemId: z.string(),
-    quantity: z.number().int().positive(),
-    reason: z.string(),
-    condition: z.enum(['NEW', 'GOOD', 'FAIR', 'DAMAGED', 'DEFECTIVE']),
-    notes: z.string().optional(),
-    photos: z.array(z.string()).optional(),
-  })).min(1),
-  returnMethod: z.enum(['PREPAID_LABEL', 'DROP_OFF', 'PICKUP']).default('PREPAID_LABEL'),
+  items: z
+    .array(
+      z.object({
+        salesOrderItemId: z.string(),
+        quantity: z.number().int().positive(),
+        reason: z.string(),
+        condition: z.enum(["NEW", "GOOD", "FAIR", "DAMAGED", "DEFECTIVE"]),
+        notes: z.string().optional(),
+        photos: z.array(z.string()).optional(),
+      }),
+    )
+    .min(1),
+  returnMethod: z
+    .enum(["PREPAID_LABEL", "DROP_OFF", "PICKUP"])
+    .default("PREPAID_LABEL"),
   notes: z.string().optional(),
 });
 
@@ -31,7 +37,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Verify user is a customer
@@ -46,7 +52,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (!customerUser) {
-      return NextResponse.json({ error: 'Customer access required' }, { status: 403 });
+      return NextResponse.json(
+        { error: "Customer access required" },
+        { status: 403 },
+      );
     }
 
     // Get customer's returns
@@ -78,17 +87,17 @@ export async function GET(request: NextRequest) {
         },
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       take: 50,
     });
 
     return NextResponse.json({ returns });
   } catch (error) {
-    console.error('Error fetching returns:', error);
+    console.error("Error fetching returns:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch returns' },
-      { status: 500 }
+      { error: "Failed to fetch returns" },
+      { status: 500 },
     );
   }
 }
@@ -97,7 +106,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Verify user is a customer
@@ -112,7 +121,10 @@ export async function POST(request: NextRequest) {
     });
 
     if (!customerUser) {
-      return NextResponse.json({ error: 'Customer access required' }, { status: 403 });
+      return NextResponse.json(
+        { error: "Customer access required" },
+        { status: 403 },
+      );
     }
 
     const body = await request.json();
@@ -135,14 +147,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!salesOrder) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
     // Check if order is eligible for return
     if (!salesOrder.deliveredDate) {
       return NextResponse.json(
-        { error: 'Order must be delivered before return can be initiated' },
-        { status: 400 }
+        { error: "Order must be delivered before return can be initiated" },
+        { status: 400 },
       );
     }
 
@@ -163,10 +175,10 @@ export async function POST(request: NextRequest) {
             data: {
               organizationId: customerUser.customer.organizationId,
               reason: item.reason,
-              category: 'OTHER',
+              category: "OTHER",
               allowedDays: 30,
               autoApprove: false,
-              defaultAction: 'REFUND',
+              defaultAction: "REFUND",
               requiresQC: true,
             },
           });
@@ -181,7 +193,7 @@ export async function POST(request: NextRequest) {
 
     // Generate RMA number
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0]!.replace(/-/g, '');
+    const dateStr = today.toISOString().split("T")[0]!.replace(/-/g, "");
     const prefix = `RMA-${dateStr}`;
 
     const lastRMA = await prisma.rMA.findFirst({
@@ -189,16 +201,16 @@ export async function POST(request: NextRequest) {
         organizationId: customerUser.customer.organizationId,
         rmaNumber: { startsWith: prefix },
       },
-      orderBy: { rmaNumber: 'desc' },
+      orderBy: { rmaNumber: "desc" },
     });
 
     let sequence = 1;
     if (lastRMA) {
-      const lastSeq = parseInt(lastRMA.rmaNumber.split('-')[2] || '0');
+      const lastSeq = parseInt(lastRMA.rmaNumber.split("-")[2] || "0");
       sequence = lastSeq + 1;
     }
 
-    const rmaNumber = `${prefix}-${sequence.toString().padStart(3, '0')}`;
+    const rmaNumber = `${prefix}-${sequence.toString().padStart(3, "0")}`;
 
     // Create RMA items array
     const rmaItems = [];
@@ -206,20 +218,22 @@ export async function POST(request: NextRequest) {
 
     for (const item of data.items) {
       const orderItem = salesOrder.items.find(
-        (oi: any) => oi.id === item.salesOrderItemId
+        (oi: any) => oi.id === item.salesOrderItemId,
       );
 
       if (!orderItem) {
         return NextResponse.json(
           { error: `Order item ${item.salesOrderItemId} not found` },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
       if (item.quantity > orderItem.quantity) {
         return NextResponse.json(
-          { error: `Return quantity exceeds ordered quantity for ${orderItem.inventoryItem.name}` },
-          { status: 400 }
+          {
+            error: `Return quantity exceeds ordered quantity for ${orderItem.inventoryItem.name}`,
+          },
+          { status: 400 },
         );
       }
 
@@ -231,7 +245,7 @@ export async function POST(request: NextRequest) {
         salesOrderItemId: item.salesOrderItemId,
         quantityRequested: item.quantity,
         condition: item.condition,
-        action: 'REFUND',
+        action: "REFUND",
         unitPrice: orderItem.unitPrice,
         refundAmount,
         metadata: {
@@ -247,7 +261,7 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: customerUser.customer.organizationId,
         rmaNumber,
-        status: 'PENDING', // Requires approval
+        status: "PENDING", // Requires approval
         salesOrderId: data.salesOrderId,
         customerId: customerUser.customerId,
         returnReasonId: primaryReasonId,
@@ -257,7 +271,7 @@ export async function POST(request: NextRequest) {
         notifyCustomer: true,
         metadata: {
           returnMethod: data.returnMethod,
-          initiatedVia: 'CUSTOMER_PORTAL',
+          initiatedVia: "CUSTOMER_PORTAL",
         },
         items: {
           create: rmaItems,
@@ -288,8 +302,8 @@ export async function POST(request: NextRequest) {
       data: {
         organizationId: customerUser.customer.organizationId,
         userId: session.user.id,
-        action: 'RETURN_INITIATED_BY_CUSTOMER',
-        entityType: 'RMA',
+        action: "RETURN_INITIATED_BY_CUSTOMER",
+        entityType: "RMA",
         entityId: rma.id,
         metadata: {
           rmaNumber: rma.rmaNumber,
@@ -300,22 +314,26 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      rma,
-      message: 'Return request submitted successfully. You will receive a confirmation email shortly.',
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        rma,
+        message:
+          "Return request submitted successfully. You will receive a confirmation email shortly.",
+      },
+      { status: 201 },
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating return:', error);
+    console.error("Error creating return:", error);
     return NextResponse.json(
-      { error: 'Failed to create return request' },
-      { status: 500 }
+      { error: "Failed to create return request" },
+      { status: 500 },
     );
   }
 }

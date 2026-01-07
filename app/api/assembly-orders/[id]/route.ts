@@ -18,20 +18,22 @@ const completeProductionSchema = z.object({
 });
 
 const issueComponentsSchema = z.object({
-  components: z.array(z.object({
-    bomComponentId: z.string().optional(),
-    componentId: z.string(),
-    requiredQuantity: z.number(),
-    issuedQuantity: z.number(),
-    lotId: z.string().optional(),
-    fromLocationId: z.string().optional(),
-  })),
+  components: z.array(
+    z.object({
+      bomComponentId: z.string().optional(),
+      componentId: z.string(),
+      requiredQuantity: z.number(),
+      issuedQuantity: z.number(),
+      lotId: z.string().optional(),
+      fromLocationId: z.string().optional(),
+    }),
+  ),
 });
 
 // GET /api/assembly-orders/[id] - Get assembly order details
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -57,7 +59,7 @@ export async function GET(
                   },
                 },
               },
-              orderBy: { sequence: 'asc' },
+              orderBy: { sequence: "asc" },
             },
           },
         },
@@ -115,7 +117,7 @@ export async function GET(
               },
             },
           },
-          orderBy: { eventDate: 'desc' },
+          orderBy: { eventDate: "desc" },
         },
       },
     });
@@ -123,7 +125,7 @@ export async function GET(
     if (!order) {
       return NextResponse.json(
         { error: "Assembly order not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -132,7 +134,7 @@ export async function GET(
     console.error("Error fetching assembly order:", error);
     return NextResponse.json(
       { error: "Failed to fetch assembly order" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -140,7 +142,7 @@ export async function GET(
 // POST /api/assembly-orders/[id]/start - Start production
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -158,11 +160,13 @@ export async function POST(
       const order = await prisma.assemblyOrder.update({
         where: { id: params.id },
         data: {
-          status: 'IN_PROGRESS',
-          actualStart: validatedData.actualStart ? new Date(validatedData.actualStart) : new Date(),
+          status: "IN_PROGRESS",
+          actualStart: validatedData.actualStart
+            ? new Date(validatedData.actualStart)
+            : new Date(),
           productionLogs: {
             create: {
-              eventType: 'START',
+              eventType: "START",
               eventDate: new Date(),
               operatorId: session.user.id,
             },
@@ -192,14 +196,15 @@ export async function POST(
       if (!order) {
         return NextResponse.json(
           { error: "Assembly order not found" },
-          { status: 404 }
+          { status: 404 },
         );
       }
 
       // Calculate actual yield
-      const actualYield = order.plannedQuantity > 0 
-        ? (validatedData.producedQuantity / order.plannedQuantity) * 100 
-        : 0;
+      const actualYield =
+        order.plannedQuantity > 0
+          ? (validatedData.producedQuantity / order.plannedQuantity) * 100
+          : 0;
 
       const yieldVariance = actualYield - Number(order.bom.standardYield);
 
@@ -207,18 +212,20 @@ export async function POST(
       const updatedOrder = await prisma.assemblyOrder.update({
         where: { id: params.id },
         data: {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           producedQuantity: validatedData.producedQuantity,
           scrapQuantity: validatedData.scrapQuantity,
           actualYield,
           yieldVariance,
-          actualEnd: validatedData.actualEnd ? new Date(validatedData.actualEnd) : new Date(),
+          actualEnd: validatedData.actualEnd
+            ? new Date(validatedData.actualEnd)
+            : new Date(),
           qcStatus: validatedData.qcStatus,
           qcNotes: validatedData.qcNotes,
           notes: validatedData.notes,
           productionLogs: {
             create: {
-              eventType: 'COMPLETE',
+              eventType: "COMPLETE",
               eventDate: new Date(),
               quantityProduced: validatedData.producedQuantity,
               quantityScrapped: validatedData.scrapQuantity,
@@ -249,7 +256,7 @@ export async function POST(
           await prisma.inventoryMovement.create({
             data: {
               inventoryItemId: issue.componentId,
-              type: 'SALE', // Using SALE type for component consumption
+              type: "SALE", // Using SALE type for component consumption
               quantity: -Number(issue.issuedQuantity),
               reason: `Assembly order ${order.orderNumber} completed`,
             },
@@ -273,7 +280,7 @@ export async function POST(
         await prisma.inventoryMovement.create({
           data: {
             inventoryItemId: order.productId,
-            type: 'PURCHASE', // Using PURCHASE type for production
+            type: "PURCHASE", // Using PURCHASE type for production
             quantity: validatedData.producedQuantity,
             reason: `Assembly order ${order.orderNumber} produced ${validatedData.producedQuantity} units`,
           },
@@ -299,14 +306,14 @@ export async function POST(
               lotId: comp.lotId,
               fromLocationId: comp.fromLocationId,
               issuedById: session.user.id,
-              status: 'ISSUED',
+              status: "ISSUED",
             },
             include: {
               component: true,
               lot: true,
             },
-          })
-        )
+          }),
+        ),
       );
 
       // Update order status
@@ -314,29 +321,26 @@ export async function POST(
         where: { id: params.id },
         data: {
           componentsIssued: true,
-          status: 'READY',
+          status: "READY",
         },
       });
 
       return NextResponse.json({ issues });
     }
 
-    return NextResponse.json(
-      { error: "Invalid action" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error processing assembly order action:", error);
     return NextResponse.json(
       { error: "Failed to process action" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

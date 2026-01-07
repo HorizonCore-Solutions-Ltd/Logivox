@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Package,
   RefreshCw,
@@ -12,8 +12,8 @@ import {
   CheckCircle,
   XCircle,
   Truck,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface RTV {
   id: string;
@@ -35,9 +35,9 @@ interface RTV {
 export default function RTVManagementPage() {
   const [loading, setLoading] = useState(true);
   const [rtvs, setRtvs] = useState<RTV[]>([]);
-  const [filterStatus, setFilterStatus] = useState('ALL');
+  const [filterStatus, setFilterStatus] = useState("ALL");
 
-  const organizationId = 'org_123';
+  const organizationId = "org_123";
 
   useEffect(() => {
     fetchRTVs();
@@ -47,13 +47,13 @@ export default function RTVManagementPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams({ organizationId });
-      if (filterStatus !== 'ALL') params.append('status', filterStatus);
+      if (filterStatus !== "ALL") params.append("status", filterStatus);
 
       const response = await fetch(`/api/qc/rtv?${params}`);
       const data = await response.json();
       setRtvs(data.rtvs || []);
     } catch (error) {
-      console.error('Error fetching RTVs:', error);
+      console.error("Error fetching RTVs:", error);
     } finally {
       setLoading(false);
     }
@@ -61,13 +61,13 @@ export default function RTVManagementPage() {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { color: string; text: string }> = {
-      PENDING: { color: 'bg-gray-500', text: 'Pending' },
-      VENDOR_NOTIFIED: { color: 'bg-blue-500', text: 'Vendor Notified' },
-      APPROVED: { color: 'bg-green-500', text: 'Approved' },
-      REJECTED: { color: 'bg-red-500', text: 'Rejected' },
-      SHIPPED: { color: 'bg-purple-500', text: 'Shipped' },
-      CREDITED: { color: 'bg-teal-500', text: 'Credited' },
-      CLOSED: { color: 'bg-gray-400', text: 'Closed' },
+      PENDING: { color: "bg-gray-500", text: "Pending" },
+      VENDOR_NOTIFIED: { color: "bg-blue-500", text: "Vendor Notified" },
+      APPROVED: { color: "bg-green-500", text: "Approved" },
+      REJECTED: { color: "bg-red-500", text: "Rejected" },
+      SHIPPED: { color: "bg-purple-500", text: "Shipped" },
+      CREDITED: { color: "bg-teal-500", text: "Credited" },
+      CLOSED: { color: "bg-gray-400", text: "Closed" },
     };
 
     const { color, text } = config[status] || config.PENDING;
@@ -76,10 +76,10 @@ export default function RTVManagementPage() {
 
   const getPriorityBadge = (priority: string) => {
     const config: Record<string, { color: string; text: string }> = {
-      URGENT: { color: 'bg-red-500', text: 'Urgent' },
-      HIGH: { color: 'bg-orange-500', text: 'High' },
-      MEDIUM: { color: 'bg-yellow-500', text: 'Medium' },
-      LOW: { color: 'bg-green-500', text: 'Low' },
+      URGENT: { color: "bg-red-500", text: "Urgent" },
+      HIGH: { color: "bg-orange-500", text: "High" },
+      MEDIUM: { color: "bg-yellow-500", text: "Medium" },
+      LOW: { color: "bg-green-500", text: "Low" },
     };
 
     const { color, text } = config[priority] || config.MEDIUM;
@@ -118,7 +118,7 @@ export default function RTVManagementPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              {rtvs.filter(r => r.status === 'PENDING').length}
+              {rtvs.filter((r) => r.status === "PENDING").length}
             </div>
             <div className="text-sm text-muted-foreground">Pending</div>
           </CardContent>
@@ -126,7 +126,7 @@ export default function RTVManagementPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-blue-500">
-              {rtvs.filter(r => r.status === 'SHIPPED').length}
+              {rtvs.filter((r) => r.status === "SHIPPED").length}
             </div>
             <div className="text-sm text-muted-foreground">Shipped</div>
           </CardContent>
@@ -134,7 +134,7 @@ export default function RTVManagementPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-green-500">
-              {rtvs.filter(r => r.status === 'CREDITED').length}
+              {rtvs.filter((r) => r.status === "CREDITED").length}
             </div>
             <div className="text-sm text-muted-foreground">Credited</div>
           </CardContent>
@@ -142,7 +142,10 @@ export default function RTVManagementPage() {
         <Card>
           <CardContent className="pt-6">
             <div className="text-2xl font-bold">
-              ${rtvs.reduce((sum, r) => sum + parseFloat(r.value.toString()), 0).toFixed(2)}
+              $
+              {rtvs
+                .reduce((sum, r) => sum + parseFloat(r.value.toString()), 0)
+                .toFixed(2)}
             </div>
             <div className="text-sm text-muted-foreground">Total Value</div>
           </CardContent>
@@ -153,16 +156,18 @@ export default function RTVManagementPage() {
       <Card>
         <CardContent className="pt-6">
           <div className="flex gap-2">
-            {['ALL', 'PENDING', 'APPROVED', 'SHIPPED', 'CREDITED'].map((status) => (
-              <Button
-                key={status}
-                variant={filterStatus === status ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setFilterStatus(status)}
-              >
-                {status}
-              </Button>
-            ))}
+            {["ALL", "PENDING", "APPROVED", "SHIPPED", "CREDITED"].map(
+              (status) => (
+                <Button
+                  key={status}
+                  variant={filterStatus === status ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setFilterStatus(status)}
+                >
+                  {status}
+                </Button>
+              ),
+            )}
           </div>
         </CardContent>
       </Card>
@@ -203,7 +208,9 @@ export default function RTVManagementPage() {
 
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <div className="text-lg font-bold">${rtv.value.toFixed(2)}</div>
+                      <div className="text-lg font-bold">
+                        ${rtv.value.toFixed(2)}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         Qty: {rtv.quantity}
                       </div>

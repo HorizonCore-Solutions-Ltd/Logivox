@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Mail, Crown, Users, Eye } from "lucide-react"
+import * as React from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Mail, Crown, Users, Eye } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -13,30 +13,30 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { toast } from "sonner"
+} from "@/components/ui/select";
+import { toast } from "sonner";
 
 const inviteSchema = z.object({
   email: z.string().email("Invalid email address"),
   role: z.enum(["ADMIN", "MEMBER", "VIEWER"]),
-})
+});
 
-type InviteFormData = z.infer<typeof inviteSchema>
+type InviteFormData = z.infer<typeof inviteSchema>;
 
 interface InviteMemberDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  organizationId: string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  organizationId: string;
 }
 
 export function InviteMemberDialog({
@@ -44,7 +44,7 @@ export function InviteMemberDialog({
   onOpenChange,
   organizationId,
 }: InviteMemberDialogProps) {
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
@@ -58,37 +58,42 @@ export function InviteMemberDialog({
       email: "",
       role: "MEMBER",
     },
-  })
+  });
 
-  const role = watch("role")
+  const role = watch("role");
 
   const inviteMutation = useMutation({
     mutationFn: async (data: InviteFormData) => {
-      const response = await fetch(`/api/organizations/${organizationId}/invitations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
+      const response = await fetch(
+        `/api/organizations/${organizationId}/invitations`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        },
+      );
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || "Failed to send invitation")
+        const error = await response.json();
+        throw new Error(error.message || "Failed to send invitation");
       }
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["organization", organizationId, "invitations"] })
-      toast.success("Invitation sent successfully")
-      reset()
-      onOpenChange(false)
+      queryClient.invalidateQueries({
+        queryKey: ["organization", organizationId, "invitations"],
+      });
+      toast.success("Invitation sent successfully");
+      reset();
+      onOpenChange(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message)
+      toast.error(error.message);
     },
-  })
+  });
 
   const onSubmit = (data: InviteFormData) => {
-    inviteMutation.mutate(data)
-  }
+    inviteMutation.mutate(data);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -96,7 +101,8 @@ export function InviteMemberDialog({
         <DialogHeader>
           <DialogTitle>Invite Team Member</DialogTitle>
           <DialogDescription>
-            Send an invitation to join your organization. They'll receive an email with a link to accept.
+            Send an invitation to join your organization. They'll receive an
+            email with a link to accept.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -121,7 +127,9 @@ export function InviteMemberDialog({
             <Label htmlFor="role">Role</Label>
             <Select
               value={role}
-              onValueChange={(value) => setValue("role", value as "ADMIN" | "MEMBER" | "VIEWER")}
+              onValueChange={(value) =>
+                setValue("role", value as "ADMIN" | "MEMBER" | "VIEWER")
+              }
             >
               <SelectTrigger id="role">
                 <SelectValue />
@@ -182,5 +190,5 @@ export function InviteMemberDialog({
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

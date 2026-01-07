@@ -3,12 +3,15 @@
  * Protects against Cross-Site Request Forgery attacks
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { generateCSRFToken, constantTimeCompare } from '@/lib/security/authentication';
-import { cookies } from 'next/headers';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  generateCSRFToken,
+  constantTimeCompare,
+} from "@/lib/security/authentication";
+import { cookies } from "next/headers";
 
-const CSRF_COOKIE_NAME = 'csrf_token';
-const CSRF_HEADER_NAME = 'x-csrf-token';
+const CSRF_COOKIE_NAME = "csrf_token";
+const CSRF_HEADER_NAME = "x-csrf-token";
 const CSRF_TOKEN_LENGTH = 32;
 
 /**
@@ -21,7 +24,7 @@ export interface CSRFConfig {
   cookieOptions?: {
     httpOnly?: boolean;
     secure?: boolean;
-    sameSite?: 'strict' | 'lax' | 'none';
+    sameSite?: "strict" | "lax" | "none";
     maxAge?: number;
   };
 
@@ -44,18 +47,21 @@ export interface CSRFConfig {
 const defaultConfig: CSRFConfig = {
   cookieOptions: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
     maxAge: 86400, // 24 hours
   },
-  exemptMethods: ['GET', 'HEAD', 'OPTIONS'],
-  errorMessage: 'Invalid or missing CSRF token',
+  exemptMethods: ["GET", "HEAD", "OPTIONS"],
+  errorMessage: "Invalid or missing CSRF token",
 };
 
 /**
  * Generate and set CSRF token cookie
  */
-export function setCSRFToken(response: NextResponse, config: CSRFConfig = defaultConfig): string {
+export function setCSRFToken(
+  response: NextResponse,
+  config: CSRFConfig = defaultConfig,
+): string {
   const token = generateCSRFToken();
 
   response.cookies.set(CSRF_COOKIE_NAME, token, {
@@ -113,7 +119,7 @@ function isExemptMethod(method: string, exemptMethods: string[] = []): boolean {
  */
 export async function csrfProtection(
   req: NextRequest,
-  config: CSRFConfig = defaultConfig
+  config: CSRFConfig = defaultConfig,
 ): Promise<NextResponse | null> {
   const mergedConfig = { ...defaultConfig, ...config };
   const { pathname } = req.nextUrl;
@@ -145,9 +151,9 @@ export async function csrfProtection(
       {
         success: false,
         error: mergedConfig.errorMessage,
-        code: 'CSRF_TOKEN_INVALID',
+        code: "CSRF_TOKEN_INVALID",
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 
@@ -172,8 +178,8 @@ export async function getCSRFToken(): Promise<string> {
     token = generateCSRFToken();
     cookieStore.set(CSRF_COOKIE_NAME, token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 86400,
     });
   }

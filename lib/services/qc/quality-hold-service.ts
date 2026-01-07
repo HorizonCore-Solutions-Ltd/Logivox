@@ -3,22 +3,29 @@
  * Enterprise quarantine management with release workflows
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export type HoldType = 'PRODUCT' | 'LOT' | 'LOCATION' | 'VENDOR' | 'ORDER';
-export type HoldDisposition = 'RELEASE' | 'REWORK' | 'RETURN_TO_VENDOR' | 'SCRAP' | 'DESTROY' | 'USE_AS_IS';
+export type HoldType = "PRODUCT" | "LOT" | "LOCATION" | "VENDOR" | "ORDER";
+export type HoldDisposition =
+  | "RELEASE"
+  | "REWORK"
+  | "RETURN_TO_VENDOR"
+  | "SCRAP"
+  | "DESTROY"
+  | "USE_AS_IS";
 
 export class QualityHoldService {
-  
   /**
    * Generate next hold number
    */
-  private static async generateHoldNumber(organizationId: string): Promise<string> {
+  private static async generateHoldNumber(
+    organizationId: string,
+  ): Promise<string> {
     const year = new Date().getFullYear();
-    const month = String(new Date().getMonth() + 1).padStart(2, '0');
-    
+    const month = String(new Date().getMonth() + 1).padStart(2, "0");
+
     const lastHold = await prisma.qualityHold.findFirst({
       where: {
         organizationId,
@@ -26,16 +33,18 @@ export class QualityHoldService {
           startsWith: `QH-${year}${month}`,
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     let sequence = 1;
     if (lastHold) {
-      const lastSequence = parseInt(lastHold.holdNumber.split('-').pop() || '0');
+      const lastSequence = parseInt(
+        lastHold.holdNumber.split("-").pop() || "0",
+      );
       sequence = lastSequence + 1;
     }
 
-    return `QH-${year}${month}-${String(sequence).padStart(4, '0')}`;
+    return `QH-${year}${month}-${String(sequence).padStart(4, "0")}`;
   }
 
   /**
@@ -68,9 +77,8 @@ export class QualityHoldService {
     investigationRequired?: boolean;
     createdBy: string;
   }) {
-    
     const holdNumber = await this.generateHoldNumber(params.organizationId);
-    
+
     const hold = await prisma.qualityHold.create({
       data: {
         holdNumber,
@@ -97,9 +105,10 @@ export class QualityHoldService {
         estimatedValue: params.estimatedValue,
         photos: params.photos || [],
         documents: params.documents || [],
-        priority: params.priority || 'MEDIUM',
+        priority: params.priority || "MEDIUM",
         investigationRequired: params.investigationRequired !== false,
-        investigationStatus: params.investigationRequired !== false ? 'PENDING' : null,
+        investigationStatus:
+          params.investigationRequired !== false ? "PENDING" : null,
         createdBy: params.createdBy,
       },
     });
@@ -141,7 +150,7 @@ export class QualityHoldService {
       where: { id: params.holdId },
     });
 
-    if (!hold) throw new Error('Hold not found');
+    if (!hold) throw new Error("Hold not found");
 
     const releaseQty = params.quantity || hold.quantityRemaining;
     const newRemaining = hold.quantityRemaining - releaseQty;
@@ -157,18 +166,22 @@ export class QualityHoldService {
     };
 
     if (params.approved) {
-      if (params.disposition === 'RELEASE') {
+      if (params.disposition === "RELEASE") {
         data.quantityReleased = hold.quantityReleased + releaseQty;
-      } else if (params.disposition === 'SCRAP' || params.disposition === 'DESTROY') {
+      } else if (
+        params.disposition === "SCRAP" ||
+        params.disposition === "DESTROY"
+      ) {
         data.quantityRejected = hold.quantityRejected + releaseQty;
       }
-      
+
       data.quantityRemaining = newRemaining;
-      
+
       if (newRemaining === 0) {
-        data.status = params.disposition === 'RELEASE' ? 'RELEASED' : 'REJECTED';
+        data.status =
+          params.disposition === "RELEASE" ? "RELEASED" : "REJECTED";
       } else if (newRemaining < hold.quantityOnHold) {
-        data.status = 'PARTIAL_RELEASE';
+        data.status = "PARTIAL_RELEASE";
       }
     }
 
@@ -198,10 +211,7 @@ export class QualityHoldService {
   /**
    * Escalate hold
    */
-  static async escalateHold(params: {
-    holdId: string;
-    escalatedTo: string;
-  }) {
+  static async escalateHold(params: { holdId: string; escalatedTo: string }) {
     return await prisma.qualityHold.update({
       where: { id: params.holdId },
       data: {
@@ -219,7 +229,7 @@ export class QualityHoldService {
     return await prisma.qualityHold.update({
       where: { id: holdId },
       data: {
-        status: 'CANCELLED',
+        status: "CANCELLED",
         notes: reason,
       },
     });
@@ -245,7 +255,7 @@ export class QualityHoldService {
       severity?: string;
       vendorId?: string;
       productSku?: string;
-    } = {}
+    } = {},
   ) {
     const where: any = { organizationId };
 
@@ -257,7 +267,7 @@ export class QualityHoldService {
 
     return await prisma.qualityHold.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -276,16 +286,16 @@ export class QualityHoldService {
     });
 
     const totalHolds = holds.length;
-    const activeHolds = holds.filter(h => h.status === 'ACTIVE').length;
-    const releasedHolds = holds.filter(h => h.status === 'RELEASED').length;
-    const rejectedHolds = holds.filter(h => h.status === 'REJECTED').length;
+    const activeHolds = holds.filter((h) => h.status === "ACTIVE").length;
+    const releasedHolds = holds.filter((h) => h.status === "RELEASED").length;
+    const rejectedHolds = holds.filter((h) => h.status === "REJECTED").length;
 
     const totalQuantityOnHold = holds
-      .filter(h => h.status === 'ACTIVE')
+      .filter((h) => h.status === "ACTIVE")
       .reduce((sum, h) => sum + h.quantityRemaining, 0);
 
     const totalValue = holds
-      .filter(h => h.estimatedValue && h.status === 'ACTIVE')
+      .filter((h) => h.estimatedValue && h.status === "ACTIVE")
       .reduce((sum, h) => sum + Number(h.estimatedValue), 0);
 
     const avgResolutionDays = this.calculateAvgResolutionDays(holds);
@@ -306,15 +316,18 @@ export class QualityHoldService {
    * Calculate average resolution days
    */
   private static calculateAvgResolutionDays(holds: any[]): number {
-    const resolved = holds.filter(h => 
-      (h.status === 'RELEASED' || h.status === 'REJECTED') && h.dispositionDate
+    const resolved = holds.filter(
+      (h) =>
+        (h.status === "RELEASED" || h.status === "REJECTED") &&
+        h.dispositionDate,
     );
-    
+
     if (resolved.length === 0) return 0;
 
     const totalDays = resolved.reduce((sum, hold) => {
       const days = Math.floor(
-        (hold.dispositionDate.getTime() - hold.initiatedDate.getTime()) / (1000 * 60 * 60 * 24)
+        (hold.dispositionDate.getTime() - hold.initiatedDate.getTime()) /
+          (1000 * 60 * 60 * 24),
       );
       return sum + days;
     }, 0);

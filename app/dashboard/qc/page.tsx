@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   ClipboardCheck,
   Package,
@@ -13,8 +13,8 @@ import {
   Plus,
   Eye,
   Smartphone,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 interface QCStats {
   inspections: {
@@ -53,7 +53,7 @@ export default function QCDashboardPage() {
   const [stats, setStats] = useState<QCStats | null>(null);
   const [recentInspections, setRecentInspections] = useState<Inspection[]>([]);
 
-  const organizationId = 'org_123'; // TODO: Get from auth context
+  const organizationId = "org_123"; // TODO: Get from auth context
 
   useEffect(() => {
     fetchDashboardData();
@@ -74,7 +74,7 @@ export default function QCDashboardPage() {
       setStats(statsData);
       setRecentInspections(inspectionsData.inspections.slice(0, 10));
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
+      console.error("Error fetching dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -82,10 +82,10 @@ export default function QCDashboardPage() {
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { color: string; text: string }> = {
-      PENDING: { color: 'bg-gray-500', text: 'Pending' },
-      IN_PROGRESS: { color: 'bg-blue-500', text: 'In Progress' },
-      COMPLETED: { color: 'bg-green-500', text: 'Completed' },
-      CANCELLED: { color: 'bg-red-500', text: 'Cancelled' },
+      PENDING: { color: "bg-gray-500", text: "Pending" },
+      IN_PROGRESS: { color: "bg-blue-500", text: "In Progress" },
+      COMPLETED: { color: "bg-green-500", text: "Completed" },
+      CANCELLED: { color: "bg-red-500", text: "Cancelled" },
     };
 
     const { color, text } = config[status] || config.PENDING;
@@ -93,12 +93,13 @@ export default function QCDashboardPage() {
   };
 
   const getResultBadge = (result: string | null) => {
-    if (!result) return <Badge className="bg-gray-400 text-white">Pending</Badge>;
+    if (!result)
+      return <Badge className="bg-gray-400 text-white">Pending</Badge>;
 
     const config: Record<string, { color: string; text: string }> = {
-      PASS: { color: 'bg-green-500', text: 'Pass' },
-      FAIL: { color: 'bg-red-500', text: 'Fail' },
-      CONDITIONAL: { color: 'bg-yellow-500', text: 'Conditional' },
+      PASS: { color: "bg-green-500", text: "Pass" },
+      FAIL: { color: "bg-red-500", text: "Fail" },
+      CONDITIONAL: { color: "bg-yellow-500", text: "Conditional" },
     };
 
     const { color, text } = config[result] || config.PASS;
@@ -240,7 +241,9 @@ export default function QCDashboardPage() {
                 </div>
                 <div>
                   <div className="font-bold text-lg">Return to Vendor</div>
-                  <div className="text-sm text-muted-foreground">Manage RTVs</div>
+                  <div className="text-sm text-muted-foreground">
+                    Manage RTVs
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -268,7 +271,9 @@ export default function QCDashboardPage() {
 
       {/* Advanced Modules - Financial Recovery & Compliance */}
       <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-4">Financial Recovery & Compliance</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Financial Recovery & Compliance
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link href="/dashboard/qc/vendor-chargebacks">
             <Card className="cursor-pointer hover:bg-accent transition-colors">
@@ -279,7 +284,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Chargebacks</div>
-                    <div className="text-xs text-muted-foreground">Cost recovery</div>
+                    <div className="text-xs text-muted-foreground">
+                      Cost recovery
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -295,7 +302,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Debit Memos</div>
-                    <div className="text-xs text-muted-foreground">Vendor penalties</div>
+                    <div className="text-xs text-muted-foreground">
+                      Vendor penalties
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -311,7 +320,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Concessions</div>
-                    <div className="text-xs text-muted-foreground">Vendor credits</div>
+                    <div className="text-xs text-muted-foreground">
+                      Vendor credits
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -327,7 +338,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Compliance</div>
-                    <div className="text-xs text-muted-foreground">Standards audit</div>
+                    <div className="text-xs text-muted-foreground">
+                      Standards audit
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -380,7 +393,9 @@ export default function QCDashboardPage() {
 
       {/* Advanced Quality Assurance */}
       <div className="mt-6">
-        <h2 className="text-xl font-semibold mb-4">Advanced Quality Assurance</h2>
+        <h2 className="text-xl font-semibold mb-4">
+          Advanced Quality Assurance
+        </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Link href="/dashboard/qc/ncr">
             <Card className="cursor-pointer hover:bg-accent transition-colors">
@@ -391,7 +406,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">NCR Management</div>
-                    <div className="text-xs text-muted-foreground">Non-conformance reports</div>
+                    <div className="text-xs text-muted-foreground">
+                      Non-conformance reports
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -407,7 +424,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">CAPA System</div>
-                    <div className="text-xs text-muted-foreground">Corrective & preventive actions</div>
+                    <div className="text-xs text-muted-foreground">
+                      Corrective & preventive actions
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -423,7 +442,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Quality Holds</div>
-                    <div className="text-xs text-muted-foreground">Quarantine management</div>
+                    <div className="text-xs text-muted-foreground">
+                      Quarantine management
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -439,7 +460,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Sampling Plans</div>
-                    <div className="text-xs text-muted-foreground">AQL inspection plans</div>
+                    <div className="text-xs text-muted-foreground">
+                      AQL inspection plans
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -455,7 +478,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Measurements</div>
-                    <div className="text-xs text-muted-foreground">Parametric quality data</div>
+                    <div className="text-xs text-muted-foreground">
+                      Parametric quality data
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -471,7 +496,9 @@ export default function QCDashboardPage() {
                   </div>
                   <div>
                     <div className="font-semibold">Quality Reports</div>
-                    <div className="text-xs text-muted-foreground">Analytics & insights</div>
+                    <div className="text-xs text-muted-foreground">
+                      Analytics & insights
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -491,12 +518,16 @@ export default function QCDashboardPage() {
                   <Smartphone className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className="font-bold text-lg">Mobile Inspection Interface</div>
+                  <div className="font-bold text-lg">
+                    Mobile Inspection Interface
+                  </div>
                   <div className="text-sm text-muted-foreground">
                     Quick receiving inspections on mobile devices
                   </div>
                 </div>
-                <Badge variant="secondary" className="ml-auto">New</Badge>
+                <Badge variant="secondary" className="ml-auto">
+                  New
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -524,7 +555,9 @@ export default function QCDashboardPage() {
                   <div className="flex items-center gap-4">
                     <ClipboardCheck className="w-8 h-8 text-primary" />
                     <div>
-                      <div className="font-bold">{inspection.inspectionNumber}</div>
+                      <div className="font-bold">
+                        {inspection.inspectionNumber}
+                      </div>
                       <div className="text-sm text-muted-foreground">
                         {inspection.supplier.name} • {inspection.warehouse.name}
                       </div>
@@ -540,7 +573,8 @@ export default function QCDashboardPage() {
                         {inspection.totalUnits} units
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {inspection.passedUnits} passed / {inspection.failedUnits} failed
+                        {inspection.passedUnits} passed /{" "}
+                        {inspection.failedUnits} failed
                       </div>
                     </div>
                     <div className="flex flex-col gap-2">

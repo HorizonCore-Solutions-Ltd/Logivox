@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { CustomerComplaintService } from '@/lib/services/qc/customer-complaint.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { CustomerComplaintService } from "@/lib/services/qc/customer-complaint.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -19,7 +19,7 @@ export async function POST(
       resolutionType: body.resolutionType,
       compensationAmount: body.compensationAmount,
       resolutionDate: new Date(body.resolutionDate),
-      resolvedBy: session.user.email || '',
+      resolvedBy: session.user.email || "",
       customerNotified: body.customerNotified,
       preventiveActions: body.preventiveActions,
     });

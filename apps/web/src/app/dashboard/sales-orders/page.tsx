@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -21,9 +27,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  ShoppingCart, 
-  Search, 
+import {
+  ShoppingCart,
+  Search,
   Plus,
   CheckCircle,
   Clock,
@@ -114,12 +120,27 @@ export default function SalesOrdersListPage() {
             if (so.status === "DRAFT") acc.draft++;
             if (so.status === "PENDING_APPROVAL") acc.pending++;
             if (so.status === "APPROVED") acc.approved++;
-            if (so.status === "PICKING" || so.status === "PICKED" || so.status === "PACKING") acc.picking++;
-            if (so.status === "SHIPPED" || so.status === "DELIVERED") acc.shipped++;
-            if (so.status === "DELIVERED") acc.revenue += parseFloat(so.total.toString());
+            if (
+              so.status === "PICKING" ||
+              so.status === "PICKED" ||
+              so.status === "PACKING"
+            )
+              acc.picking++;
+            if (so.status === "SHIPPED" || so.status === "DELIVERED")
+              acc.shipped++;
+            if (so.status === "DELIVERED")
+              acc.revenue += parseFloat(so.total.toString());
             return acc;
           },
-          { total: 0, draft: 0, pending: 0, approved: 0, picking: 0, shipped: 0, revenue: 0 }
+          {
+            total: 0,
+            draft: 0,
+            pending: 0,
+            approved: 0,
+            picking: 0,
+            shipped: 0,
+            revenue: 0,
+          },
         );
         setStatistics(stats);
       }
@@ -246,7 +267,9 @@ export default function SalesOrdersListPage() {
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${statistics.revenue.toFixed(0)}</div>
+            <div className="text-2xl font-bold">
+              ${statistics.revenue.toFixed(0)}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -277,7 +300,9 @@ export default function SalesOrdersListPage() {
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="DRAFT">Draft</SelectItem>
-                <SelectItem value="PENDING_APPROVAL">Pending Approval</SelectItem>
+                <SelectItem value="PENDING_APPROVAL">
+                  Pending Approval
+                </SelectItem>
                 <SelectItem value="APPROVED">Approved</SelectItem>
                 <SelectItem value="PICKING">Picking</SelectItem>
                 <SelectItem value="PICKED">Picked</SelectItem>
@@ -297,9 +322,7 @@ export default function SalesOrdersListPage() {
       <Card>
         <CardHeader>
           <CardTitle>Order History</CardTitle>
-          <CardDescription>
-            {pagination.total} total orders
-          </CardDescription>
+          <CardDescription>{pagination.total} total orders</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -330,7 +353,9 @@ export default function SalesOrdersListPage() {
                     <TableRow
                       key={so.id}
                       className="cursor-pointer hover:bg-muted/50"
-                      onClick={() => router.push(`/dashboard/sales-orders/${so.id}`)}
+                      onClick={() =>
+                        router.push(`/dashboard/sales-orders/${so.id}`)
+                      }
                     >
                       <TableCell className="font-medium">
                         {so.soNumber}
@@ -359,7 +384,9 @@ export default function SalesOrdersListPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge className={getPaymentStatusColor(so.paymentStatus)}>
+                        <Badge
+                          className={getPaymentStatusColor(so.paymentStatus)}
+                        >
                           {so.paymentStatus}
                         </Badge>
                       </TableCell>
@@ -394,7 +421,10 @@ export default function SalesOrdersListPage() {
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page - 1,
+                        }))
                       }
                       disabled={pagination.page === 1}
                     >
@@ -404,7 +434,10 @@ export default function SalesOrdersListPage() {
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: prev.page + 1,
+                        }))
                       }
                       disabled={pagination.page === pagination.pages}
                     >

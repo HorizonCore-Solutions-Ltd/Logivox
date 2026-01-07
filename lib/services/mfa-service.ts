@@ -4,9 +4,9 @@
 // Handles TOTP (Time-based One-Time Password) generation and verification
 // for two-factor authentication using the authenticator app method.
 
-import { authenticator } from 'otplib';
-import QRCode from 'qrcode';
-import { randomBytes } from 'crypto';
+import { authenticator } from "otplib";
+import QRCode from "qrcode";
+import { randomBytes } from "crypto";
 
 // Configure OTP library
 authenticator.options = {
@@ -34,7 +34,7 @@ export interface MFAUser {
 export async function generateMFASetup(
   userId: string,
   userEmail: string,
-  appName: string = 'LogiVox WMS'
+  appName: string = "LogiVox WMS",
 ): Promise<MFASetupData> {
   // Generate a secret key
   const secret = authenticator.generateSecret();
@@ -62,7 +62,7 @@ export function verifyMFACode(secret: string, token: string): boolean {
   try {
     return authenticator.verify({ token, secret });
   } catch (error) {
-    console.error('Error verifying MFA code:', error);
+    console.error("Error verifying MFA code:", error);
     return false;
   }
 }
@@ -75,7 +75,7 @@ export function generateBackupCodes(count: number = 10): string[] {
 
   for (let i = 0; i < count; i++) {
     // Generate 8-character alphanumeric code
-    const code = randomBytes(4).toString('hex').toUpperCase();
+    const code = randomBytes(4).toString("hex").toUpperCase();
     // Format as XXXX-XXXX for better readability
     const formattedCode = `${code.slice(0, 4)}-${code.slice(4, 8)}`;
     codes.push(formattedCode);
@@ -89,11 +89,11 @@ export function generateBackupCodes(count: number = 10): string[] {
  * Use bcrypt to hash codes before storing in database
  */
 export async function hashBackupCodes(codes: string[]): Promise<string[]> {
-  const bcrypt = require('bcrypt');
+  const bcrypt = require("bcrypt");
   const saltRounds = 12;
 
   const hashedCodes = await Promise.all(
-    codes.map((code) => bcrypt.hash(code.replace('-', ''), saltRounds))
+    codes.map((code) => bcrypt.hash(code.replace("-", ""), saltRounds)),
   );
 
   return hashedCodes;
@@ -104,10 +104,10 @@ export async function hashBackupCodes(codes: string[]): Promise<string[]> {
  */
 export async function verifyBackupCode(
   code: string,
-  hashedCodes: string[]
+  hashedCodes: string[],
 ): Promise<{ valid: boolean; codeIndex: number }> {
-  const bcrypt = require('bcrypt');
-  const normalizedCode = code.replace('-', '').toUpperCase();
+  const bcrypt = require("bcrypt");
+  const normalizedCode = code.replace("-", "").toUpperCase();
 
   for (let i = 0; i < hashedCodes.length; i++) {
     const isValid = await bcrypt.compare(normalizedCode, hashedCodes[i]);
@@ -131,7 +131,7 @@ export function validateMFASetup(secret: string, token: string): boolean {
  * This should only be used in exceptional circumstances
  */
 export function generateBypassCode(): string {
-  const code = randomBytes(6).toString('hex').toUpperCase();
+  const code = randomBytes(6).toString("hex").toUpperCase();
   return `BYPASS-${code}`;
 }
 
@@ -140,7 +140,7 @@ export function generateBypassCode(): string {
  */
 export function isMFARequired(
   userRole: string,
-  orgSettings: { mfaRequired: boolean; mfaRequiredRoles: string[] }
+  orgSettings: { mfaRequired: boolean; mfaRequiredRoles: string[] },
 ): boolean {
   if (!orgSettings.mfaRequired) return false;
 

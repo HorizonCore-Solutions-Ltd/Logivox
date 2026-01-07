@@ -1,10 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Package, TruckIcon, CheckCircle2, MapPin, Clock, ExternalLink } from "lucide-react";
+import {
+  Package,
+  TruckIcon,
+  CheckCircle2,
+  MapPin,
+  Clock,
+  ExternalLink,
+} from "lucide-react";
 
 interface Shipment {
   id: string;
@@ -62,16 +75,27 @@ export default function TrackingPage() {
 
   const getStatusIcon = (status: string) => {
     if (status === "DELIVERED") return CheckCircle2;
-    if (status === "SHIPPED" || status === "IN_TRANSIT" || status === "OUT_FOR_DELIVERY") return TruckIcon;
+    if (
+      status === "SHIPPED" ||
+      status === "IN_TRANSIT" ||
+      status === "OUT_FOR_DELIVERY"
+    )
+      return TruckIcon;
     return Package;
   };
 
   const filteredShipments = trackingSearch
     ? shipments.filter(
         (s) =>
-          s.trackingNumber?.toLowerCase().includes(trackingSearch.toLowerCase()) ||
-          s.shipmentNumber.toLowerCase().includes(trackingSearch.toLowerCase()) ||
-          s.salesOrder.soNumber.toLowerCase().includes(trackingSearch.toLowerCase())
+          s.trackingNumber
+            ?.toLowerCase()
+            .includes(trackingSearch.toLowerCase()) ||
+          s.shipmentNumber
+            .toLowerCase()
+            .includes(trackingSearch.toLowerCase()) ||
+          s.salesOrder.soNumber
+            .toLowerCase()
+            .includes(trackingSearch.toLowerCase()),
       )
     : shipments;
 
@@ -80,7 +104,9 @@ export default function TrackingPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Track Shipments</h1>
-        <p className="text-gray-600 mt-1">Monitor your shipments in real-time</p>
+        <p className="text-gray-600 mt-1">
+          Monitor your shipments in real-time
+        </p>
       </div>
 
       {/* Search */}
@@ -120,7 +146,10 @@ export default function TrackingPage() {
           {filteredShipments.map((shipment) => {
             const StatusIcon = getStatusIcon(shipment.status);
             return (
-              <Card key={shipment.id} className="hover:shadow-md transition-shadow">
+              <Card
+                key={shipment.id}
+                className="hover:shadow-md transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div>
@@ -128,7 +157,7 @@ export default function TrackingPage() {
                         <span>{shipment.shipmentNumber}</span>
                         <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                            shipment.status
+                            shipment.status,
                           )}`}
                         >
                           <StatusIcon className="h-4 w-4 mr-1" />
@@ -159,7 +188,9 @@ export default function TrackingPage() {
                     {/* Tracking Info */}
                     <div className="space-y-3">
                       <div>
-                        <p className="text-sm text-gray-500 mb-1">Tracking Number</p>
+                        <p className="text-sm text-gray-500 mb-1">
+                          Tracking Number
+                        </p>
                         <p className="font-mono font-medium">
                           {shipment.trackingNumber || "Pending"}
                         </p>
@@ -181,7 +212,9 @@ export default function TrackingPage() {
                             Shipped
                           </p>
                           <p className="font-medium">
-                            {new Date(shipment.shippedDate).toLocaleDateString()}
+                            {new Date(
+                              shipment.shippedDate,
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                       )}
@@ -192,7 +225,9 @@ export default function TrackingPage() {
                             Estimated Delivery
                           </p>
                           <p className="font-medium">
-                            {new Date(shipment.estimatedDelivery).toLocaleDateString()}
+                            {new Date(
+                              shipment.estimatedDelivery,
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                       )}
@@ -203,7 +238,9 @@ export default function TrackingPage() {
                             Delivered
                           </p>
                           <p className="font-medium text-green-600">
-                            {new Date(shipment.deliveredDate).toLocaleDateString()}
+                            {new Date(
+                              shipment.deliveredDate,
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                       )}
@@ -216,10 +253,13 @@ export default function TrackingPage() {
                         Delivery Address
                       </p>
                       <div className="text-sm">
-                        <p className="font-medium">{shipment.salesOrder.shippingAddress}</p>
+                        <p className="font-medium">
+                          {shipment.salesOrder.shippingAddress}
+                        </p>
                         <p className="text-gray-600">
                           {shipment.salesOrder.shippingCity}
-                          {shipment.salesOrder.shippingState && `, ${shipment.salesOrder.shippingState}`}
+                          {shipment.salesOrder.shippingState &&
+                            `, ${shipment.salesOrder.shippingState}`}
                         </p>
                       </div>
                     </div>

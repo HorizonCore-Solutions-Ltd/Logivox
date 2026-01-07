@@ -1,21 +1,21 @@
-import { describe, test, expect, beforeAll, afterAll } from '@jest/globals';
-import { prisma } from '@/lib/prisma';
+import { describe, test, expect, beforeAll, afterAll } from "@jest/globals";
+import { prisma } from "@/lib/prisma";
 
-describe('Temperature Monitoring & Hazmat Tests', () => {
+describe("Temperature Monitoring & Hazmat Tests", () => {
   let testOrganizationId: string;
   let testWarehouseId: string;
   let testProductId: string;
 
   beforeAll(async () => {
     const org = await prisma.organization.create({
-      data: { name: 'Test Compliance Org', code: 'TCOMP' },
+      data: { name: "Test Compliance Org", code: "TCOMP" },
     });
     testOrganizationId = org.id;
 
     const warehouse = await prisma.warehouse.create({
       data: {
-        name: 'Cold Storage Facility',
-        code: 'COLD01',
+        name: "Cold Storage Facility",
+        code: "COLD01",
         organizationId: testOrganizationId,
         minTemperature: 2,
         maxTemperature: 8,
@@ -26,9 +26,9 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
     const product = await prisma.product.create({
       data: {
         organizationId: testOrganizationId,
-        name: 'Hazardous Chemical X',
-        sku: 'HAZ-CHEM-001',
-        barcode: '123456789',
+        name: "Hazardous Chemical X",
+        sku: "HAZ-CHEM-001",
+        barcode: "123456789",
         isHazmat: true,
       },
     });
@@ -36,22 +36,30 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
   });
 
   afterAll(async () => {
-    await prisma.temperatureLog.deleteMany({ where: { organizationId: testOrganizationId } });
-    await prisma.hazmatRecord.deleteMany({ where: { organizationId: testOrganizationId } });
-    await prisma.product.deleteMany({ where: { organizationId: testOrganizationId } });
-    await prisma.warehouse.deleteMany({ where: { organizationId: testOrganizationId } });
+    await prisma.temperatureLog.deleteMany({
+      where: { organizationId: testOrganizationId },
+    });
+    await prisma.hazmatRecord.deleteMany({
+      where: { organizationId: testOrganizationId },
+    });
+    await prisma.product.deleteMany({
+      where: { organizationId: testOrganizationId },
+    });
+    await prisma.warehouse.deleteMany({
+      where: { organizationId: testOrganizationId },
+    });
     await prisma.organization.delete({ where: { id: testOrganizationId } });
   });
 
-  describe('Temperature Monitoring', () => {
-    test('should record temperature within range', async () => {
+  describe("Temperature Monitoring", () => {
+    test("should record temperature within range", async () => {
       const log = await prisma.temperatureLog.create({
         data: {
           organizationId: testOrganizationId,
           warehouseId: testWarehouseId,
           temperature: 5.0,
           humidity: 60,
-          sensorType: 'AUTOMATED',
+          sensorType: "AUTOMATED",
           timestamp: new Date(),
           isViolation: false,
         },
@@ -61,7 +69,7 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
       expect(log.isViolation).toBe(false);
     });
 
-    test('should detect temperature violation', async () => {
+    test("should detect temperature violation", async () => {
       const warehouse = await prisma.warehouse.findUnique({
         where: { id: testWarehouseId },
       });
@@ -74,7 +82,7 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
           organizationId: testOrganizationId,
           warehouseId: testWarehouseId,
           temperature,
-          sensorType: 'AUTOMATED',
+          sensorType: "AUTOMATED",
           timestamp: new Date(),
           isViolation,
         },
@@ -83,21 +91,22 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
       expect(log.isViolation).toBe(true);
     });
 
-    test('should calculate compliance rate', async () => {
+    test("should calculate compliance rate", async () => {
       const allLogs = await prisma.temperatureLog.findMany({
         where: { organizationId: testOrganizationId },
       });
 
-      const violations = allLogs.filter(log => log.isViolation).length;
-      const complianceRate = allLogs.length > 0 
-        ? ((allLogs.length - violations) / allLogs.length) * 100 
-        : 100;
+      const violations = allLogs.filter((log) => log.isViolation).length;
+      const complianceRate =
+        allLogs.length > 0
+          ? ((allLogs.length - violations) / allLogs.length) * 100
+          : 100;
 
       expect(complianceRate).toBeGreaterThanOrEqual(0);
       expect(complianceRate).toBeLessThanOrEqual(100);
     });
 
-    test('should list violations in date range', async () => {
+    test("should list violations in date range", async () => {
       const today = new Date();
       const violations = await prisma.temperatureLog.findMany({
         where: {
@@ -113,29 +122,30 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
     });
   });
 
-  describe('Hazmat Records', () => {
-    test('should create hazmat record', async () => {
+  describe("Hazmat Records", () => {
+    test("should create hazmat record", async () => {
       const hazmat = await prisma.hazmatRecord.create({
         data: {
           organizationId: testOrganizationId,
           productId: testProductId,
-          unNumber: 'UN1090',
-          hazardClass: 'Class 3 - Flammable Liquids',
-          packingGroup: 'II',
-          properShippingName: 'Acetone',
-          storageRequirements: 'Store in cool, dry place away from ignition sources',
-          handlingInstructions: 'Use protective equipment. Avoid inhalation.',
-          emergencyContact: '+1-800-HAZMAT',
-          certificationNumber: 'CERT-2026-001',
+          unNumber: "UN1090",
+          hazardClass: "Class 3 - Flammable Liquids",
+          packingGroup: "II",
+          properShippingName: "Acetone",
+          storageRequirements:
+            "Store in cool, dry place away from ignition sources",
+          handlingInstructions: "Use protective equipment. Avoid inhalation.",
+          emergencyContact: "+1-800-HAZMAT",
+          certificationNumber: "CERT-2026-001",
           isActive: true,
         },
       });
 
-      expect(hazmat.unNumber).toBe('UN1090');
-      expect(hazmat.hazardClass).toBe('Class 3 - Flammable Liquids');
+      expect(hazmat.unNumber).toBe("UN1090");
+      expect(hazmat.hazardClass).toBe("Class 3 - Flammable Liquids");
     });
 
-    test('should prevent duplicate active hazmat records', async () => {
+    test("should prevent duplicate active hazmat records", async () => {
       const existing = await prisma.hazmatRecord.findFirst({
         where: {
           organizationId: testOrganizationId,
@@ -158,11 +168,11 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
       expect(count).toBe(1);
     });
 
-    test('should list hazmat products by class', async () => {
+    test("should list hazmat products by class", async () => {
       const flammableProducts = await prisma.hazmatRecord.findMany({
         where: {
           organizationId: testOrganizationId,
-          hazardClass: { contains: 'Flammable' },
+          hazardClass: { contains: "Flammable" },
           isActive: true,
         },
       });
@@ -170,7 +180,7 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
       expect(flammableProducts.length).toBeGreaterThan(0);
     });
 
-    test('should check for expiring certifications', async () => {
+    test("should check for expiring certifications", async () => {
       const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
       const expiringSoon = await prisma.hazmatRecord.findMany({
@@ -188,7 +198,7 @@ describe('Temperature Monitoring & Hazmat Tests', () => {
       expect(expiringSoon).toBeDefined();
     });
 
-    test('should mark product as hazmat', async () => {
+    test("should mark product as hazmat", async () => {
       const product = await prisma.product.findUnique({
         where: { id: testProductId },
       });

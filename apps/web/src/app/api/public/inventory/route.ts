@@ -1,12 +1,12 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { authenticateApiKey, checkApiKeyScope } from "@/lib/api-auth"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { authenticateApiKey, checkApiKeyScope } from "@/lib/api-auth";
 
 export async function GET(request: NextRequest) {
   // Authenticate API key
-  const auth = await authenticateApiKey(request)
-  if (!auth.authenticated) return auth.error!
+  const auth = await authenticateApiKey(request);
+  if (!auth.authenticated) return auth.error!;
 
   // Optionally check for required scope
   // if (!checkApiKeyScope(auth.apiKey, "inventory:read")) {
@@ -31,6 +31,6 @@ export async function GET(request: NextRequest) {
       updatedAt: true,
     },
     orderBy: { createdAt: "desc" },
-  })
-  return NextResponse.json(items)
+  });
+  return NextResponse.json(items);
 }

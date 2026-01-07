@@ -1,6 +1,6 @@
 /**
  * Load Optimization Types
- * 
+ *
  * Type definitions for load planning, trailer management,
  * and 3D bin packing operations.
  */
@@ -9,28 +9,23 @@
 // CORE TYPES
 // ============================================================================
 
-export type TrailerType = 
-  | 'DRY_VAN'
-  | 'REEFER'
-  | 'BOX_TRUCK'
-  | 'CONTAINER'
-  | 'FLATBED'
-  | 'STEP_DECK'
-  | 'LOWBOY';
+export type TrailerType =
+  | "DRY_VAN"
+  | "REEFER"
+  | "BOX_TRUCK"
+  | "CONTAINER"
+  | "FLATBED"
+  | "STEP_DECK"
+  | "LOWBOY";
 
-export type DoorType = 
-  | 'REAR'
-  | 'SIDE'
-  | 'REAR_ROLLUP'
-  | 'SWING'
-  | 'OPEN';
+export type DoorType = "REAR" | "SIDE" | "REAR_ROLLUP" | "SWING" | "OPEN";
 
 export type LoadPlanStatus =
-  | 'DRAFT'
-  | 'OPTIMIZED'
-  | 'IN_PROGRESS'
-  | 'COMPLETED'
-  | 'CANCELLED';
+  | "DRAFT"
+  | "OPTIMIZED"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CANCELLED";
 
 // ============================================================================
 // TRAILER INTERFACES
@@ -40,24 +35,24 @@ export interface Trailer {
   id: string;
   name: string;
   type: TrailerType;
-  
+
   // Dimensions (inches)
   length: number;
   width: number;
   height: number;
-  
+
   // Weight (lbs)
   maxWeight: number;
   axleWeights?: {
     front: number;
     rear: number;
   };
-  
+
   // Configuration
   doorType: DoorType;
   doorWidth?: number;
   doorHeight?: number;
-  
+
   // Features
   features?: TrailerFeature[];
   temperatureRange?: {
@@ -65,12 +60,12 @@ export interface Trailer {
     max: number;
   };
   liftGateCapacity?: number; // lbs
-  
+
   // Status
-  status?: 'AVAILABLE' | 'AT_DOCK' | 'LOADING' | 'IN_TRANSIT' | 'MAINTENANCE';
+  status?: "AVAILABLE" | "AT_DOCK" | "LOADING" | "IN_TRANSIT" | "MAINTENANCE";
   currentDockDoorId?: string;
   warehouseId?: string;
-  
+
   // Metadata
   licensePlate?: string;
   registrationExpiry?: Date;
@@ -79,19 +74,19 @@ export interface Trailer {
 }
 
 export type TrailerFeature =
-  | 'STANDARD'
-  | 'TEMPERATURE_CONTROLLED'
-  | 'MULTI_ZONE'
-  | 'LIFT_GATE'
-  | 'STACKABLE'
-  | 'WEATHERPROOF'
-  | 'TARPING'
-  | 'OVERSIZED'
-  | 'HAZMAT_CERTIFIED'
-  | 'FOOD_GRADE'
-  | 'AIR_RIDE'
-  | 'E_TRACK'
-  | 'LOAD_LOCKS';
+  | "STANDARD"
+  | "TEMPERATURE_CONTROLLED"
+  | "MULTI_ZONE"
+  | "LIFT_GATE"
+  | "STACKABLE"
+  | "WEATHERPROOF"
+  | "TARPING"
+  | "OVERSIZED"
+  | "HAZMAT_CERTIFIED"
+  | "FOOD_GRADE"
+  | "AIR_RIDE"
+  | "E_TRACK"
+  | "LOAD_LOCKS";
 
 // ============================================================================
 // LOAD ITEM INTERFACES
@@ -103,7 +98,7 @@ export interface LoadItem {
   productId: string;
   sku: string;
   name: string;
-  
+
   // Physical properties
   dimensions: {
     length: number; // inches
@@ -111,7 +106,7 @@ export interface LoadItem {
     height: number;
   };
   weight: number; // lbs
-  
+
   // Loading properties
   stackable: boolean;
   maxStackHeight?: number; // how many can stack
@@ -119,19 +114,19 @@ export interface LoadItem {
   hazmat: boolean;
   requiresTemp: boolean;
   tempRange?: { min: number; max: number };
-  
+
   // Multi-stop delivery
   deliveryStop?: number;
   deliverySequence?: number;
-  
+
   // Special handling
-  orientation?: 'UPRIGHT_ONLY' | 'ANY';
+  orientation?: "UPRIGHT_ONLY" | "ANY";
   loadingInstructions?: string;
 }
 
 export interface Container {
   id: string;
-  type: 'PALLET' | 'CRATE' | 'BOX' | 'BAG' | 'DRUM' | 'GAYLORD';
+  type: "PALLET" | "CRATE" | "BOX" | "BAG" | "DRUM" | "GAYLORD";
   dimensions: {
     length: number;
     width: number;
@@ -151,17 +146,17 @@ export interface LoadPlan {
   id: string;
   trailerId: string;
   warehouseId: string;
-  
+
   // Orders
   orderIds: string[];
-  
+
   // Status
   status: LoadPlanStatus;
   createdAt: Date;
   updatedAt: Date;
   loadingStartedAt?: Date;
   loadingCompletedAt?: Date;
-  
+
   // Planning data
   totalItems: number;
   totalWeight: number; // lbs
@@ -170,18 +165,18 @@ export interface LoadPlan {
     weightPercent: number;
     floorPercent: number;
   };
-  
+
   // Load sequence (for multi-stop)
   stops?: DeliveryStop[];
-  
+
   // Assignments
   dockDoorId?: string;
   assignedLoaders?: string[]; // user IDs
-  
+
   // Notes
   loadingInstructions?: string;
   specialRequirements?: string[];
-  
+
   // Metadata
   estimatedLoadTime?: number; // minutes
   actualLoadTime?: number;
@@ -196,21 +191,21 @@ export interface DeliveryStop {
   city: string;
   state: string;
   zipCode: string;
-  
+
   // Items for this stop
   orderIds: string[];
   itemIds: string[];
   totalWeight: number;
-  
+
   // Loading position
   loadPosition: {
     startZ: number; // position in trailer
     endZ: number;
   };
-  
+
   // Access
   accessLane: boolean; // space for unloading this stop
-  
+
   // Timing
   estimatedUnloadTime?: number; // minutes
   deliveryWindow?: {
@@ -226,24 +221,24 @@ export interface DeliveryStop {
 export interface LoadOptimizationResult {
   success: boolean;
   loadPlan: LoadPlan | null;
-  
+
   // Utilization metrics
   utilization: {
     volumePercent: number;
     weightPercent: number;
     floorPercent: number;
   };
-  
+
   // Weight distribution
   weightDistribution?: WeightDistribution;
-  
+
   // Issues and recommendations
   issues: string[];
   recommendations: string[];
-  
+
   // Items that didn't fit
   unloadedItems?: LoadItem[];
-  
+
   // Alternative plans
   alternatives?: LoadPlan[];
 }
@@ -252,11 +247,11 @@ export interface WeightDistribution {
   front: number; // lbs
   rear: number;
   total: number;
-  
+
   // Percentages
   frontPercent: number;
   rearPercent: number;
-  
+
   // Validation
   balanced: boolean;
   warnings: string[];
@@ -266,29 +261,29 @@ export interface LoadConstraints {
   // Weight constraints
   maxTotalWeight?: number;
   maxItemWeight?: number;
-  
+
   // Dimension constraints
   maxItemLength?: number;
   maxItemWidth?: number;
   maxItemHeight?: number;
-  
+
   // Stacking constraints
   maxStackHeight?: number; // max height of stacked items
   maxStackWeight?: number; // max weight on bottom item
-  
+
   // Special requirements
   separateHazmat?: boolean;
   separateFragile?: boolean;
   temperatureZones?: number; // number of temp zones needed
-  
+
   // Loading constraints
   loadFromRear?: boolean;
   loadFromSide?: boolean;
   accessLaneWidth?: number; // inches between stops
-  
+
   // Time constraints
   maxLoadTime?: number; // minutes
-  
+
   // Priority
   priorityOrderIds?: string[]; // orders to load first
 }
@@ -322,13 +317,13 @@ export interface LoadVisualization {
     stop: number; // delivery stop
     color: string; // for rendering
   }>;
-  
+
   // Visual aids
   accessLanes: Array<{
     z: number;
     width: number;
   }>;
-  
+
   // Metrics for display
   metrics: {
     volumeUsed: number;
@@ -370,7 +365,7 @@ export interface CreateLoadPlanResponse {
 export interface OptimizeLoadRequest {
   loadPlanId: string;
   constraints?: LoadConstraints;
-  algorithm?: '3D_BIN_PACKING' | 'WEIGHT_BALANCED' | 'MULTI_STOP';
+  algorithm?: "3D_BIN_PACKING" | "WEIGHT_BALANCED" | "MULTI_STOP";
 }
 
 export interface OptimizeLoadResponse {
@@ -416,21 +411,24 @@ export interface LoadPlanStatistics {
     floor: number;
   };
   averageLoadTime: number; // minutes
-  
+
   // By trailer type
-  byTrailerType: Record<TrailerType, {
-    count: number;
-    avgUtilization: number;
-    avgLoadTime: number;
-  }>;
-  
+  byTrailerType: Record<
+    TrailerType,
+    {
+      count: number;
+      avgUtilization: number;
+      avgLoadTime: number;
+    }
+  >;
+
   // Trends
   trends: {
     date: Date;
     loadPlans: number;
     avgUtilization: number;
   }[];
-  
+
   // Issues
   commonIssues: Array<{
     issue: string;
@@ -442,20 +440,20 @@ export interface LoadPlanStatistics {
 export interface LoaderPerformance {
   userId: string;
   userName: string;
-  
+
   // Counts
   totalLoads: number;
   completedLoads: number;
-  
+
   // Time metrics
   averageLoadTime: number; // minutes
   fastestLoadTime: number;
   slowestLoadTime: number;
-  
+
   // Quality metrics
   accuracy: number; // percent
   damageRate: number; // percent
-  
+
   // Efficiency
   itemsPerHour: number;
   palletsPerHour: number;
@@ -476,15 +474,15 @@ export interface LoadPlanEvent {
 }
 
 export type LoadPlanEventType =
-  | 'CREATED'
-  | 'OPTIMIZED'
-  | 'ASSIGNED'
-  | 'LOADING_STARTED'
-  | 'ITEM_LOADED'
-  | 'STOP_COMPLETED'
-  | 'LOADING_PAUSED'
-  | 'LOADING_RESUMED'
-  | 'LOADING_COMPLETED'
-  | 'ISSUE_REPORTED'
-  | 'MODIFIED'
-  | 'CANCELLED';
+  | "CREATED"
+  | "OPTIMIZED"
+  | "ASSIGNED"
+  | "LOADING_STARTED"
+  | "ITEM_LOADED"
+  | "STOP_COMPLETED"
+  | "LOADING_PAUSED"
+  | "LOADING_RESUMED"
+  | "LOADING_COMPLETED"
+  | "ISSUE_REPORTED"
+  | "MODIFIED"
+  | "CANCELLED";

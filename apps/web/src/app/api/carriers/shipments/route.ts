@@ -1,36 +1,50 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { carrierService, Address, Package } from '@/lib/services/carrier-integrations';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import {
+  carrierService,
+  Address,
+  Package,
+} from "@/lib/services/carrier-integrations";
+import { prisma } from "@/lib/prisma";
 
 /**
  * POST /api/carriers/shipments
- * 
+ *
  * Create a shipment with a carrier
  */
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
-    const { 
-      carrier, 
-      service, 
-      origin, 
-      destination, 
+    const {
+      carrier,
+      service,
+      origin,
+      destination,
       packages,
-      shipmentId // Optional - to link with existing shipment
+      shipmentId, // Optional - to link with existing shipment
     } = body;
 
     // Validate required fields
-    if (!carrier || !service || !origin || !destination || !packages || packages.length === 0) {
+    if (
+      !carrier ||
+      !service ||
+      !origin ||
+      !destination ||
+      !packages ||
+      packages.length === 0
+    ) {
       return NextResponse.json(
-        { error: 'Carrier, service, origin, destination, and packages are required' },
-        { status: 400 }
+        {
+          error:
+            "Carrier, service, origin, destination, and packages are required",
+        },
+        { status: 400 },
       );
     }
 
@@ -40,7 +54,7 @@ export async function POST(request: NextRequest) {
       origin as Address,
       destination as Address,
       packages as Package[],
-      service
+      service,
     );
 
     // If shipmentId provided, update the shipment record
@@ -53,7 +67,7 @@ export async function POST(request: NextRequest) {
           service: label.service,
           shippingCost: label.cost,
           labelUrl: label.labelUrl,
-          status: 'SHIPPED',
+          status: "SHIPPED",
           shippedAt: new Date(),
         },
       });
@@ -61,8 +75,8 @@ export async function POST(request: NextRequest) {
       // Log activity
       await prisma.activityLog.create({
         data: {
-          action: 'SHIPMENT_CREATED',
-          entityType: 'Shipment',
+          action: "SHIPMENT_CREATED",
+          entityType: "Shipment",
           entityId: shipmentId,
           userId: session.user.id,
           organizationId: session.user.organizationId,
@@ -81,15 +95,14 @@ export async function POST(request: NextRequest) {
       label,
       shipmentId,
     });
-
   } catch (error: any) {
-    console.error('Error creating shipment:', error);
+    console.error("Error creating shipment:", error);
     return NextResponse.json(
-      { 
-        error: 'Failed to create shipment',
-        message: error.message 
+      {
+        error: "Failed to create shipment",
+        message: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

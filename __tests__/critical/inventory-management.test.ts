@@ -1,10 +1,10 @@
 // =============================================================================
 // CRITICAL PATH TESTS - Inventory Management
 // =============================================================================
-import { describe, test, expect, beforeEach } from '@jest/globals';
-import { prisma } from '@/lib/prisma';
+import { describe, test, expect, beforeEach } from "@jest/globals";
+import { prisma } from "@/lib/prisma";
 
-describe('Inventory Management Critical Path', () => {
+describe("Inventory Management Critical Path", () => {
   let organizationId: string;
   let warehouseId: string;
   let locationId: string;
@@ -14,7 +14,7 @@ describe('Inventory Management Critical Path', () => {
     // Create test organization
     const org = await prisma.organization.create({
       data: {
-        name: 'Test Organization',
+        name: "Test Organization",
         slug: `test-org-${Date.now()}`,
       },
     });
@@ -24,8 +24,8 @@ describe('Inventory Management Critical Path', () => {
     const user = await prisma.user.create({
       data: {
         email: `test-${Date.now()}@example.com`,
-        name: 'Test User',
-        password: 'hashed_password',
+        name: "Test User",
+        password: "hashed_password",
       },
     });
     userId = user.id;
@@ -33,14 +33,14 @@ describe('Inventory Management Critical Path', () => {
     // Create test warehouse
     const warehouse = await prisma.warehouse.create({
       data: {
-        name: 'Test Warehouse',
+        name: "Test Warehouse",
         code: `WH-${Date.now()}`,
         organizationId,
-        address: '123 Test St',
-        city: 'Test City',
-        state: 'TS',
-        country: 'Test Country',
-        postalCode: '12345',
+        address: "123 Test St",
+        city: "Test City",
+        state: "TS",
+        country: "Test Country",
+        postalCode: "12345",
       },
     });
     warehouseId = warehouse.id;
@@ -51,8 +51,8 @@ describe('Inventory Management Critical Path', () => {
         organizationId,
         warehouseId,
         locationCode: `LOC-${Date.now()}`,
-        name: 'Test Location',
-        type: 'BIN',
+        name: "Test Location",
+        type: "BIN",
         isActive: true,
       },
     });
@@ -69,14 +69,14 @@ describe('Inventory Management Critical Path', () => {
     await prisma.user.deleteMany({ where: { id: userId } });
   });
 
-  describe('Inventory Item Creation', () => {
-    test('should create inventory item with basic details', async () => {
+  describe("Inventory Item Creation", () => {
+    test("should create inventory item with basic details", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
-          description: 'Test Description',
+          name: "Test Product",
+          description: "Test Description",
           quantity: 100,
           locationId,
           warehouseId,
@@ -84,19 +84,19 @@ describe('Inventory Management Critical Path', () => {
       });
 
       expect(item).toBeDefined();
-      expect(item.sku).toContain('SKU-');
-      expect(item.name).toBe('Test Product');
+      expect(item.sku).toContain("SKU-");
+      expect(item.name).toBe("Test Product");
       expect(item.quantity).toBe(100);
     });
 
-    test('should not allow duplicate SKUs in same organization', async () => {
+    test("should not allow duplicate SKUs in same organization", async () => {
       const sku = `SKU-${Date.now()}`;
 
       await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku,
-          name: 'Test Product 1',
+          name: "Test Product 1",
           quantity: 100,
           locationId,
           warehouseId,
@@ -108,21 +108,21 @@ describe('Inventory Management Critical Path', () => {
           data: {
             organizationId,
             sku,
-            name: 'Test Product 2',
+            name: "Test Product 2",
             quantity: 50,
             locationId,
             warehouseId,
           },
-        })
+        }),
       ).rejects.toThrow();
     });
 
-    test('should set reorder point and low stock threshold', async () => {
+    test("should set reorder point and low stock threshold", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
+          name: "Test Product",
           quantity: 100,
           reorderPoint: 20,
           reorderQuantity: 100,
@@ -136,13 +136,13 @@ describe('Inventory Management Critical Path', () => {
     });
   });
 
-  describe('Inventory Adjustments', () => {
-    test('should increase inventory quantity', async () => {
+  describe("Inventory Adjustments", () => {
+    test("should increase inventory quantity", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
+          name: "Test Product",
           quantity: 100,
           locationId,
           warehouseId,
@@ -154,10 +154,10 @@ describe('Inventory Management Critical Path', () => {
           organizationId,
           inventoryItemId: item.id,
           locationId,
-          adjustmentType: 'INCREASE',
+          adjustmentType: "INCREASE",
           quantity: 50,
-          reason: 'RECEIVING',
-          notes: 'Test increase',
+          reason: "RECEIVING",
+          notes: "Test increase",
         },
       });
 
@@ -170,12 +170,12 @@ describe('Inventory Management Critical Path', () => {
       expect(updatedItem.quantity).toBe(150);
     });
 
-    test('should decrease inventory quantity', async () => {
+    test("should decrease inventory quantity", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
+          name: "Test Product",
           quantity: 100,
           locationId,
           warehouseId,
@@ -187,10 +187,10 @@ describe('Inventory Management Critical Path', () => {
           organizationId,
           inventoryItemId: item.id,
           locationId,
-          adjustmentType: 'DECREASE',
+          adjustmentType: "DECREASE",
           quantity: 30,
-          reason: 'DAMAGE',
-          notes: 'Test decrease',
+          reason: "DAMAGE",
+          notes: "Test decrease",
         },
       });
 
@@ -203,12 +203,12 @@ describe('Inventory Management Critical Path', () => {
       expect(updatedItem.quantity).toBe(70);
     });
 
-    test('should not allow negative inventory', async () => {
+    test("should not allow negative inventory", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
+          name: "Test Product",
           quantity: 10,
           locationId,
           warehouseId,
@@ -221,13 +221,13 @@ describe('Inventory Management Critical Path', () => {
     });
   });
 
-  describe('Inventory Movements', () => {
-    test('should move inventory between locations', async () => {
+  describe("Inventory Movements", () => {
+    test("should move inventory between locations", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
+          name: "Test Product",
           quantity: 100,
           locationId,
           warehouseId,
@@ -240,8 +240,8 @@ describe('Inventory Management Critical Path', () => {
           organizationId,
           warehouseId,
           locationCode: `LOC-DEST-${Date.now()}`,
-          name: 'Destination Location',
-          type: 'BIN',
+          name: "Destination Location",
+          type: "BIN",
           isActive: true,
         },
       });
@@ -253,8 +253,8 @@ describe('Inventory Management Critical Path', () => {
           fromLocationId: locationId,
           toLocationId: destLocation.id,
           quantity: 50,
-          movementType: 'TRANSFER',
-          status: 'COMPLETED',
+          movementType: "TRANSFER",
+          status: "COMPLETED",
         },
       });
 
@@ -268,13 +268,13 @@ describe('Inventory Management Critical Path', () => {
     });
   });
 
-  describe('Low Stock Alerts', () => {
-    test('should detect low stock items', async () => {
+  describe("Low Stock Alerts", () => {
+    test("should detect low stock items", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
+          name: "Test Product",
           quantity: 15,
           reorderPoint: 20,
           reorderQuantity: 100,
@@ -288,12 +288,12 @@ describe('Inventory Management Critical Path', () => {
       expect(isLowStock).toBe(true);
     });
 
-    test('should not alert when stock is sufficient', async () => {
+    test("should not alert when stock is sufficient", async () => {
       const item = await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-${Date.now()}`,
-          name: 'Test Product',
+          name: "Test Product",
           quantity: 100,
           reorderPoint: 20,
           reorderQuantity: 100,
@@ -307,15 +307,15 @@ describe('Inventory Management Critical Path', () => {
     });
   });
 
-  describe('Inventory Search and Filtering', () => {
-    test('should find inventory by SKU', async () => {
+  describe("Inventory Search and Filtering", () => {
+    test("should find inventory by SKU", async () => {
       const sku = `SKU-SEARCH-${Date.now()}`;
-      
+
       await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku,
-          name: 'Searchable Product',
+          name: "Searchable Product",
           quantity: 100,
           locationId,
           warehouseId,
@@ -325,7 +325,7 @@ describe('Inventory Management Critical Path', () => {
       const found = await prisma.inventoryItem.findFirst({
         where: {
           organizationId,
-          sku: { contains: 'SEARCH', mode: 'insensitive' },
+          sku: { contains: "SEARCH", mode: "insensitive" },
         },
       });
 
@@ -333,12 +333,12 @@ describe('Inventory Management Critical Path', () => {
       expect(found!.sku).toBe(sku);
     });
 
-    test('should filter inventory by location', async () => {
+    test("should filter inventory by location", async () => {
       await prisma.inventoryItem.create({
         data: {
           organizationId,
           sku: `SKU-LOC-${Date.now()}`,
-          name: 'Location Test Product',
+          name: "Location Test Product",
           quantity: 100,
           locationId,
           warehouseId,
@@ -353,7 +353,7 @@ describe('Inventory Management Critical Path', () => {
       });
 
       expect(items.length).toBeGreaterThan(0);
-      items.forEach(item => {
+      items.forEach((item) => {
         expect(item.locationId).toBe(locationId);
       });
     });

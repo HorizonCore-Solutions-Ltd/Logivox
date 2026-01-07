@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Header, Footer } from "@/components/layout"
-import { ThemeProvider } from "@/components/providers/theme-provider"
-import { QueryProvider } from "@/components/providers/query-provider"
-import { AuthProvider } from "@/components/providers/auth-provider"
-import { Toaster } from "@/components/ui/toaster"
+import * as React from "react";
+import { Header, Footer } from "@/components/layout";
+import { ThemeProvider } from "@/components/providers/theme-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { AuthProvider } from "@/components/providers/auth-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 interface RootLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function RootLayout({ children }: RootLayoutProps) {
@@ -25,5 +25,5 @@ export function RootLayout({ children }: RootLayoutProps) {
         </AuthProvider>
       </QueryProvider>
     </ThemeProvider>
-  )
+  );
 }

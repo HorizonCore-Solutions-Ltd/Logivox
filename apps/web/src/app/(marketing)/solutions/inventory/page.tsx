@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Package,
   BarChart3,
@@ -19,42 +25,48 @@ import {
   Search,
   FileText,
   Calendar,
-  Box
-} from "lucide-react"
+  Box,
+} from "lucide-react";
 
 export default function InventoryManagementPage() {
   const features = [
     {
       icon: Package,
       title: "Real-Time Tracking",
-      description: "Live inventory visibility across all locations with instant updates on stock levels and movements."
+      description:
+        "Live inventory visibility across all locations with instant updates on stock levels and movements.",
     },
     {
       icon: Scan,
       title: "Barcode & RFID",
-      description: "Support for barcode scanning, RFID tags, and serial number tracking for complete traceability."
+      description:
+        "Support for barcode scanning, RFID tags, and serial number tracking for complete traceability.",
     },
     {
       icon: RefreshCcw,
       title: "Cycle Counting",
-      description: "Continuous accuracy verification without disrupting operations, improving inventory precision to 99.9%."
+      description:
+        "Continuous accuracy verification without disrupting operations, improving inventory precision to 99.9%.",
     },
     {
       icon: AlertCircle,
       title: "Low Stock Alerts",
-      description: "Automated notifications when inventory reaches reorder points with smart replenishment suggestions."
+      description:
+        "Automated notifications when inventory reaches reorder points with smart replenishment suggestions.",
     },
     {
       icon: Database,
       title: "Multi-Location Management",
-      description: "Track inventory across warehouses, stores, and distribution centers with centralized control."
+      description:
+        "Track inventory across warehouses, stores, and distribution centers with centralized control.",
     },
     {
       icon: BarChart3,
       title: "ABC Analysis",
-      description: "Automatic classification of inventory by value and velocity for optimized storage and handling."
-    }
-  ]
+      description:
+        "Automatic classification of inventory by value and velocity for optimized storage and handling.",
+    },
+  ];
 
   const capabilities = [
     {
@@ -69,8 +81,8 @@ export default function InventoryManagementPage() {
         "Min/max reorder point automation",
         "Safety stock calculations",
         "Reserved inventory and allocations",
-        "Available-to-promise (ATP) calculations"
-      ]
+        "Available-to-promise (ATP) calculations",
+      ],
     },
     {
       title: "Cycle Counting & Physical Inventory",
@@ -84,8 +96,8 @@ export default function InventoryManagementPage() {
         "Variance analysis and investigation",
         "Automatic inventory adjustments",
         "Count history and audit trails",
-        "Annual physical inventory support"
-      ]
+        "Annual physical inventory support",
+      ],
     },
     {
       title: "Inventory Valuation & Costing",
@@ -99,8 +111,8 @@ export default function InventoryManagementPage() {
         "Carrying cost calculations",
         "Write-off and obsolescence tracking",
         "Inventory turnover metrics",
-        "Financial system integration"
-      ]
+        "Financial system integration",
+      ],
     },
     {
       title: "Replenishment Automation",
@@ -114,64 +126,64 @@ export default function InventoryManagementPage() {
         "Multi-echelon inventory optimization",
         "Purchase order generation",
         "Vendor selection optimization",
-        "Replenishment performance analytics"
-      ]
-    }
-  ]
+        "Replenishment performance analytics",
+      ],
+    },
+  ];
 
   const trackingFeatures = [
     {
       title: "Lot Tracking",
-      description: "Complete traceability for lot-controlled items"
+      description: "Complete traceability for lot-controlled items",
     },
     {
       title: "Serial Number Management",
-      description: "Individual item tracking from receipt to sale"
+      description: "Individual item tracking from receipt to sale",
     },
     {
       title: "Expiration Date (FEFO)",
-      description: "First-Expired-First-Out for perishable goods"
+      description: "First-Expired-First-Out for perishable goods",
     },
     {
       title: "Batch Management",
-      description: "Production batch tracking and quality control"
+      description: "Production batch tracking and quality control",
     },
     {
       title: "Catch Weight",
-      description: "Variable weight item management"
+      description: "Variable weight item management",
     },
     {
       title: "Kit & Bundle Tracking",
-      description: "Assembled product component visibility"
-    }
-  ]
+      description: "Assembled product component visibility",
+    },
+  ];
 
   const benefits = [
     {
       metric: "99.9%",
-      description: "Inventory accuracy with cycle counting"
+      description: "Inventory accuracy with cycle counting",
     },
     {
       metric: "35%",
-      description: "Reduction in excess inventory"
+      description: "Reduction in excess inventory",
     },
     {
       metric: "60%",
-      description: "Decrease in stockout incidents"
+      description: "Decrease in stockout incidents",
     },
     {
       metric: "50%",
-      description: "Faster stock reconciliation"
+      description: "Faster stock reconciliation",
     },
     {
       metric: "25%",
-      description: "Improvement in inventory turnover"
+      description: "Improvement in inventory turnover",
     },
     {
       metric: "Real-time",
-      description: "Inventory visibility across all channels"
-    }
-  ]
+      description: "Inventory visibility across all channels",
+    },
+  ];
 
   const integrations = [
     "ERP systems (SAP, Oracle, NetSuite)",
@@ -181,8 +193,8 @@ export default function InventoryManagementPage() {
     "Supply chain management systems",
     "EDI for supplier communication",
     "Business intelligence tools",
-    "Financial reporting systems"
-  ]
+    "Financial reporting systems",
+  ];
 
   return (
     <div className="flex flex-col">
@@ -197,9 +209,10 @@ export default function InventoryManagementPage() {
               Real-Time Inventory Management for Perfect Stock Control
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
-              Achieve 99.9% inventory accuracy with real-time tracking, automated cycle counting, 
-              and smart replenishment. Reduce stockouts by 60% and excess inventory by 35% with 
-              our comprehensive inventory management system.
+              Achieve 99.9% inventory accuracy with real-time tracking,
+              automated cycle counting, and smart replenishment. Reduce
+              stockouts by 60% and excess inventory by 35% with our
+              comprehensive inventory management system.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -266,8 +279,12 @@ export default function InventoryManagementPage() {
                       <capability.icon className="h-6 w-6" />
                     </div>
                     <div>
-                      <CardTitle className="text-xl">{capability.title}</CardTitle>
-                      <CardDescription className="mt-1">{capability.description}</CardDescription>
+                      <CardTitle className="text-xl">
+                        {capability.title}
+                      </CardTitle>
+                      <CardDescription className="mt-1">
+                        {capability.description}
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -304,7 +321,9 @@ export default function InventoryManagementPage() {
                 <CardContent className="pt-6">
                   <Box className="h-8 w-8 text-primary mb-3" />
                   <h3 className="font-semibold">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{feature.description}</p>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -327,8 +346,12 @@ export default function InventoryManagementPage() {
             {benefits.map((benefit, index) => (
               <Card key={index} className="text-center">
                 <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">{benefit.metric}</div>
-                  <p className="mt-2 text-sm text-muted-foreground">{benefit.description}</p>
+                  <div className="text-4xl font-bold text-primary">
+                    {benefit.metric}
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {benefit.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -370,7 +393,8 @@ export default function InventoryManagementPage() {
               Ready for Perfect Inventory Control?
             </h2>
             <p className="mt-4 text-lg text-muted-foreground">
-              Join companies achieving 99.9% accuracy and eliminating stockouts with LogiVox
+              Join companies achieving 99.9% accuracy and eliminating stockouts
+              with LogiVox
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
@@ -386,5 +410,5 @@ export default function InventoryManagementPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

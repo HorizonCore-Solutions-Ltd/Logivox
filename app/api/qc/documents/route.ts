@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
-import DocumentService from '@/lib/services/document.service';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import DocumentService from "@/lib/services/document.service";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -11,9 +11,9 @@ const prisma = new PrismaClient();
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId') || 'org-1';
-    const type = searchParams.get('type');
-    const status = searchParams.get('status');
+    const organizationId = searchParams.get("organizationId") || "org-1";
+    const type = searchParams.get("type");
+    const status = searchParams.get("status");
 
     const where: any = { organizationId };
     if (type) where.type = type;
@@ -23,24 +23,23 @@ export async function GET(request: Request) {
       where,
       include: {
         revisions: {
-          orderBy: { changeDate: 'desc' },
-          take: 1
+          orderBy: { changeDate: "desc" },
+          take: 1,
         },
-        trainingRecords: true
+        trainingRecords: true,
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({
       success: true,
-      data: documents
+      data: documents,
     });
-
   } catch (error: any) {
-    console.error('Get documents error:', error);
+    console.error("Get documents error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get documents' },
-      { status: 500 }
+      { error: error.message || "Failed to get documents" },
+      { status: 500 },
     );
   }
 }
@@ -54,7 +53,7 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // Calculate next review date if not provided
-    const nextReviewDate = body.reviewDate 
+    const nextReviewDate = body.reviewDate
       ? new Date(body.reviewDate)
       : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // Default: 1 year
 
@@ -70,24 +69,23 @@ export async function POST(request: Request) {
         fileType: body.fileType,
         owner: body.owner,
         department: body.department,
-        status: 'DRAFT',
+        status: "DRAFT",
         trainingRequired: body.trainingRequired || false,
         effectiveDate: body.effectiveDate ? new Date(body.effectiveDate) : null,
         nextReviewDate,
-        createdBy: body.createdBy
-      }
+        createdBy: body.createdBy,
+      },
     });
 
     return NextResponse.json({
       success: true,
-      data: document
+      data: document,
     });
-
   } catch (error: any) {
-    console.error('Create document error:', error);
+    console.error("Create document error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create document' },
-      { status: 500 }
+      { error: error.message || "Failed to create document" },
+      { status: 500 },
     );
   }
 }

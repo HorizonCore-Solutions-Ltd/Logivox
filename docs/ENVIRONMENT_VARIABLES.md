@@ -1,6 +1,7 @@
 # LogiVox Environment Variables Guide
 
 ## Overview
+
 This document outlines all environment variables used across the LogiVox platform for development, staging, and production environments.
 
 ## Backend API Environment Variables
@@ -8,6 +9,7 @@ This document outlines all environment variables used across the LogiVox platfor
 ### Required Variables
 
 #### Database Configuration
+
 ```bash
 # PostgreSQL connection string
 DATABASE_URL="postgresql://username:password@localhost:5432/flowstock"
@@ -18,6 +20,7 @@ DATABASE_TIMEOUT=60000
 ```
 
 #### Authentication & Security
+
 ```bash
 # JWT secret for token signing (generate with: openssl rand -base64 32)
 JWT_SECRET="your-super-secret-jwt-key-change-in-production"
@@ -33,6 +36,7 @@ CORS_ORIGINS="http://localhost:5173,https://app.logivox.ai"
 ```
 
 #### Server Configuration
+
 ```bash
 # Server port
 PORT=5000
@@ -45,6 +49,7 @@ API_BASE_PATH="/api"
 ```
 
 #### Email Configuration
+
 ```bash
 # SMTP settings for transactional emails
 SMTP_HOST="smtp.sendgrid.net"
@@ -55,6 +60,7 @@ EMAIL_FROM="noreply@logivox.ai"
 ```
 
 #### File Storage (AWS S3)
+
 ```bash
 # AWS credentials
 AWS_ACCESS_KEY_ID="your-aws-access-key"
@@ -68,6 +74,7 @@ S3_UPLOAD_LIMIT="10MB"
 ```
 
 #### External Integrations
+
 ```bash
 # Stripe for subscription billing
 STRIPE_SECRET_KEY="sk_test_your-stripe-secret-key"
@@ -81,6 +88,7 @@ SENTRY_DSN="https://your-sentry-dsn@sentry.io/project-id"
 ```
 
 #### Redis (Optional - for caching and sessions)
+
 ```bash
 # Redis connection
 REDIS_URL="redis://localhost:6379"
@@ -90,6 +98,7 @@ REDIS_PASSWORD="your-redis-password"
 ### Optional Variables
 
 #### Rate Limiting
+
 ```bash
 # API rate limiting
 RATE_LIMIT_WINDOW_MS=900000  # 15 minutes
@@ -97,6 +106,7 @@ RATE_LIMIT_MAX_REQUESTS=100
 ```
 
 #### Logging
+
 ```bash
 # Log level
 LOG_LEVEL="debug" # error | warn | info | debug
@@ -106,6 +116,7 @@ LOG_FORMAT="combined" # combined | common | dev
 ```
 
 #### WebSocket Configuration
+
 ```bash
 # Socket.io settings
 SOCKET_CORS_ORIGINS="http://localhost:5173"
@@ -117,6 +128,7 @@ SOCKET_MAX_CONNECTIONS=1000
 ### Required Variables
 
 #### API Configuration
+
 ```bash
 # Backend API URL
 VITE_API_URL="http://localhost:5000/api"
@@ -126,12 +138,14 @@ VITE_WEBSOCKET_URL="http://localhost:5000"
 ```
 
 #### Authentication
+
 ```bash
 # Clerk publishable key (if using Clerk)
 VITE_CLERK_PUBLISHABLE_KEY="pk_test_your-clerk-publishable-key"
 ```
 
 #### Payment Integration
+
 ```bash
 # Stripe publishable key
 VITE_STRIPE_PUBLISHABLE_KEY="pk_test_your-stripe-publishable-key"
@@ -140,6 +154,7 @@ VITE_STRIPE_PUBLISHABLE_KEY="pk_test_your-stripe-publishable-key"
 ### Optional Variables
 
 #### Analytics & Monitoring
+
 ```bash
 # Google Analytics
 VITE_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
@@ -149,6 +164,7 @@ VITE_SENTRY_DSN="https://your-frontend-sentry-dsn@sentry.io/project-id"
 ```
 
 #### Feature Flags
+
 ```bash
 # Feature toggles
 VITE_ENABLE_BARCODE_SCANNING="true"
@@ -157,6 +173,7 @@ VITE_ENABLE_PWA="true"
 ```
 
 #### Development Tools
+
 ```bash
 # Development mode settings
 VITE_DEV_TOOLS="true"
@@ -166,12 +183,14 @@ VITE_DEBUG_MODE="false"
 ## Database Package Environment Variables
 
 ### Required Variables
+
 ```bash
 # Same DATABASE_URL as backend
 DATABASE_URL="postgresql://username:password@localhost:5432/flowstock"
 ```
 
 ### Migration Variables
+
 ```bash
 # Migration settings
 MIGRATE_DEPLOY_TIMEOUT=300000
@@ -181,6 +200,7 @@ SHADOW_DATABASE_URL="postgresql://username:password@localhost:5432/flowstock_sha
 ## Environment-Specific Configurations
 
 ### Development Environment
+
 ```bash
 # Relaxed security for local development
 NODE_ENV="development"
@@ -191,6 +211,7 @@ BCRYPT_SALT_ROUNDS=4  # Faster for development
 ```
 
 ### Staging Environment
+
 ```bash
 # Production-like settings with test data
 NODE_ENV="staging"
@@ -201,6 +222,7 @@ BCRYPT_SALT_ROUNDS=12
 ```
 
 ### Production Environment
+
 ```bash
 # Secure production settings
 NODE_ENV="production"
@@ -214,6 +236,7 @@ RATE_LIMIT_MAX_REQUESTS=50  # Stricter rate limiting
 ## Security Best Practices
 
 ### Environment Variable Security
+
 1. **Never commit .env files to version control**
 2. **Use different secrets for each environment**
 3. **Generate strong, random secrets**
@@ -221,6 +244,7 @@ RATE_LIMIT_MAX_REQUESTS=50  # Stricter rate limiting
 5. **Use environment-specific service accounts**
 
 ### Secret Generation Commands
+
 ```bash
 # Generate JWT secret
 openssl rand -base64 32
@@ -233,6 +257,7 @@ uuidgen
 ```
 
 ### Deployment Considerations
+
 1. **Use secret management services in production**
 2. **Set environment variables at deployment time**
 3. **Validate required environment variables on startup**
@@ -241,11 +266,12 @@ uuidgen
 ## Environment Variable Validation
 
 ### Backend Validation (src/config/env.ts)
+
 ```typescript
-import { z } from 'zod';
+import { z } from "zod";
 
 const envSchema = z.object({
-  NODE_ENV: z.enum(['development', 'staging', 'production']),
+  NODE_ENV: z.enum(["development", "staging", "production"]),
   PORT: z.string().transform(Number).pipe(z.number().min(1)),
   DATABASE_URL: z.string().url(),
   JWT_SECRET: z.string().min(32),
@@ -256,10 +282,11 @@ export const env = envSchema.parse(process.env);
 ```
 
 ### Frontend Validation (src/config/env.ts)
+
 ```typescript
 const envSchema = z.object({
   VITE_API_URL: z.string().url(),
-  VITE_STRIPE_PUBLISHABLE_KEY: z.string().startsWith('pk_'),
+  VITE_STRIPE_PUBLISHABLE_KEY: z.string().startsWith("pk_"),
   // ... other validations
 });
 
@@ -269,12 +296,14 @@ export const env = envSchema.parse(import.meta.env);
 ## Troubleshooting
 
 ### Common Issues
+
 1. **Database connection fails**: Check DATABASE_URL format and credentials
 2. **CORS errors**: Verify CORS_ORIGINS includes your frontend URL
 3. **JWT errors**: Ensure JWT_SECRET is consistent across services
 4. **File upload fails**: Check AWS credentials and S3 bucket permissions
 
 ### Debug Commands
+
 ```bash
 # Test database connection
 npx prisma db pull
@@ -289,6 +318,7 @@ curl http://localhost:5000/api/health
 ## Example .env Files
 
 ### apps/api/.env.example
+
 ```bash
 # Database
 DATABASE_URL="postgresql://flowstock_user:password@localhost:5432/flowstock"
@@ -321,6 +351,7 @@ STRIPE_WEBHOOK_SECRET="whsec_your-webhook-secret"
 ```
 
 ### apps/web/.env.example
+
 ```bash
 # API Configuration
 VITE_API_URL="http://localhost:5000/api"

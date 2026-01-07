@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,7 +75,7 @@ export default function ReceiveGoodsPage() {
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>([]);
   const [selectedPO, setSelectedPO] = useState<PurchaseOrder | null>(null);
   const [receivedDate, setReceivedDate] = useState(
-    new Date().toISOString().split("T")[0]
+    new Date().toISOString().split("T")[0],
   );
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<GRNItemForm[]>([]);
@@ -131,7 +137,7 @@ export default function ReceiveGoodsPage() {
   const calculateTotal = () => {
     return items.reduce(
       (sum, item) => sum + item.receivedQuantity * item.unitPrice,
-      0
+      0,
     );
   };
 
@@ -248,10 +254,7 @@ export default function ReceiveGoodsPage() {
         <CardContent className="space-y-4">
           <div>
             <Label>Purchase Order</Label>
-            <Select
-              value={selectedPO?.id || ""}
-              onValueChange={handlePOSelect}
-            >
+            <Select value={selectedPO?.id || ""} onValueChange={handlePOSelect}>
               <SelectTrigger>
                 <SelectValue placeholder="Select a purchase order" />
               </SelectTrigger>
@@ -367,7 +370,7 @@ export default function ReceiveGoodsPage() {
                             updateItem(
                               index,
                               "receivedQuantity",
-                              parseInt(e.target.value) || 0
+                              parseInt(e.target.value) || 0,
                             )
                           }
                           className="w-24"
@@ -377,9 +380,7 @@ export default function ReceiveGoodsPage() {
                           <AlertCircle className="inline ml-1 h-4 w-4 text-yellow-500" />
                         )}
                       </TableCell>
-                      <TableCell>
-                        ${item.unitPrice.toFixed(2)}
-                      </TableCell>
+                      <TableCell>${item.unitPrice.toFixed(2)}</TableCell>
                       <TableCell>
                         <Input
                           value={item.batchNumber}

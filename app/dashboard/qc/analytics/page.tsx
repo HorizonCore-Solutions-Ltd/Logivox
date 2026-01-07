@@ -1,37 +1,49 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  AlertTriangle, 
-  CheckCircle2, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+  TrendingUp,
+  TrendingDown,
+  AlertTriangle,
+  CheckCircle2,
   DollarSign,
   FileText,
   Users,
   Target,
   BarChart3,
-  Activity
-} from 'lucide-react';
-import { 
-  LineChart, 
-  Line, 
-  BarChart, 
-  Bar, 
-  PieChart, 
-  Pie, 
+  Activity,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
-} from 'recharts';
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface KPIData {
   totalNCRs: number;
@@ -73,9 +85,9 @@ interface ComplianceMetric {
 }
 
 export default function AnalyticsDashboard() {
-  const [period, setPeriod] = useState('30');
+  const [period, setPeriod] = useState("30");
   const [loading, setLoading] = useState(true);
-  
+
   const [kpis, setKpis] = useState<KPIData>({
     totalNCRs: 0,
     openCAPAs: 0,
@@ -84,7 +96,7 @@ export default function AnalyticsDashboard() {
     totalClaims: 0,
     qualityScore: 0,
     ncrTrend: 0,
-    capaTrend: 0
+    capaTrend: 0,
   });
 
   const [trendData, setTrendData] = useState<TrendData[]>([]);
@@ -100,7 +112,7 @@ export default function AnalyticsDashboard() {
     try {
       const [kpiRes, trendRes] = await Promise.all([
         fetch(`/api/qc/analytics/kpis?period=${period}`),
-        fetch(`/api/qc/analytics/trends?period=${period}`)
+        fetch(`/api/qc/analytics/trends?period=${period}`),
       ]);
 
       if (kpiRes.ok) {
@@ -116,17 +128,17 @@ export default function AnalyticsDashboard() {
         setCompliance(trendDataRes.data.compliance);
       }
     } catch (error: any) {
-      console.error('Error fetching analytics:', error);
+      console.error("Error fetching analytics:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
     }).format(value);
   };
 
@@ -137,12 +149,12 @@ export default function AnalyticsDashboard() {
   };
 
   const getTrendColor = (trend: number) => {
-    if (trend > 0) return 'text-red-600';
-    if (trend < 0) return 'text-green-600';
-    return 'text-gray-600';
+    if (trend > 0) return "text-red-600";
+    if (trend < 0) return "text-green-600";
+    return "text-gray-600";
   };
 
-  const COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6'];
+  const COLORS = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#3b82f6"];
 
   if (loading) {
     return <div className="p-6">Loading analytics...</div>;
@@ -154,7 +166,9 @@ export default function AnalyticsDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Quality Analytics</h1>
-          <p className="text-muted-foreground">Comprehensive quality management insights</p>
+          <p className="text-muted-foreground">
+            Comprehensive quality management insights
+          </p>
         </div>
 
         <Select value={period} onValueChange={setPeriod}>
@@ -216,7 +230,9 @@ export default function AnalyticsDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-600">{kpis.criticalRisks}</div>
+            <div className="text-3xl font-bold text-red-600">
+              {kpis.criticalRisks}
+            </div>
             <p className="text-xs text-muted-foreground mt-1">RPN ≥ 200</p>
           </CardContent>
         </Card>
@@ -229,8 +245,12 @@ export default function AnalyticsDashboard() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-green-600">{kpis.qualityScore}%</div>
-            <p className="text-xs text-muted-foreground mt-1">Overall performance</p>
+            <div className="text-3xl font-bold text-green-600">
+              {kpis.qualityScore}%
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              Overall performance
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -247,17 +267,27 @@ export default function AnalyticsDashboard() {
           <div className="grid grid-cols-3 gap-6">
             <div>
               <p className="text-sm text-muted-foreground mb-1">Total Claims</p>
-              <p className="text-3xl font-bold">{formatCurrency(kpis.totalClaims)}</p>
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground mb-1">Average per NCR</p>
               <p className="text-3xl font-bold">
-                {formatCurrency(kpis.totalNCRs > 0 ? kpis.totalClaims / kpis.totalNCRs : 0)}
+                {formatCurrency(kpis.totalClaims)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-muted-foreground mb-1">Overdue Audits</p>
-              <p className="text-3xl font-bold text-orange-600">{kpis.overdueAudits}</p>
+              <p className="text-sm text-muted-foreground mb-1">
+                Average per NCR
+              </p>
+              <p className="text-3xl font-bold">
+                {formatCurrency(
+                  kpis.totalNCRs > 0 ? kpis.totalClaims / kpis.totalNCRs : 0,
+                )}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">
+                Overdue Audits
+              </p>
+              <p className="text-3xl font-bold text-orange-600">
+                {kpis.overdueAudits}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -277,7 +307,9 @@ export default function AnalyticsDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Quality Trends</CardTitle>
-              <CardDescription>NCRs, CAPAs, and Risks over time</CardDescription>
+              <CardDescription>
+                NCRs, CAPAs, and Risks over time
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
@@ -287,9 +319,27 @@ export default function AnalyticsDashboard() {
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="ncrs" stroke="#ef4444" name="NCRs" strokeWidth={2} />
-                  <Line type="monotone" dataKey="capas" stroke="#f97316" name="CAPAs" strokeWidth={2} />
-                  <Line type="monotone" dataKey="risks" stroke="#eab308" name="Risks" strokeWidth={2} />
+                  <Line
+                    type="monotone"
+                    dataKey="ncrs"
+                    stroke="#ef4444"
+                    name="NCRs"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="capas"
+                    stroke="#f97316"
+                    name="CAPAs"
+                    strokeWidth={2}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="risks"
+                    stroke="#eab308"
+                    name="Risks"
+                    strokeWidth={2}
+                  />
                 </LineChart>
               </ResponsiveContainer>
             </CardContent>
@@ -306,17 +356,28 @@ export default function AnalyticsDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {supplierScores.map((supplier, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
                     <div className="flex items-center space-x-4 flex-1">
-                      <div className="text-2xl font-bold text-muted-foreground">#{index + 1}</div>
+                      <div className="text-2xl font-bold text-muted-foreground">
+                        #{index + 1}
+                      </div>
                       <div>
                         <p className="font-semibold">{supplier.name}</p>
-                        <p className="text-sm text-muted-foreground">{supplier.ncrs} NCRs</p>
+                        <p className="text-sm text-muted-foreground">
+                          {supplier.ncrs} NCRs
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-green-600">{supplier.score}</div>
-                      <p className="text-xs text-muted-foreground">Quality Score</p>
+                      <div className="text-2xl font-bold text-green-600">
+                        {supplier.score}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Quality Score
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -342,24 +403,37 @@ export default function AnalyticsDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>SPC Control Chart Alerts</CardTitle>
-              <CardDescription>Out-of-control conditions detected</CardDescription>
+              <CardDescription>
+                Out-of-control conditions detected
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {spcAlerts.length === 0 ? (
                 <div className="text-center py-12">
                   <CheckCircle2 className="w-12 h-12 mx-auto text-green-600 mb-4" />
-                  <p className="text-lg font-semibold">All Processes In Control</p>
-                  <p className="text-sm text-muted-foreground">No Western Electric violations detected</p>
+                  <p className="text-lg font-semibold">
+                    All Processes In Control
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    No Western Electric violations detected
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {spcAlerts.map((alert) => (
-                    <div key={alert.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={alert.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center space-x-3">
                         <AlertTriangle className="w-5 h-5 text-red-600" />
                         <div>
-                          <p className="font-semibold">{alert.measurementType}</p>
-                          <p className="text-sm text-muted-foreground">{alert.rule}</p>
+                          <p className="font-semibold">
+                            {alert.measurementType}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {alert.rule}
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
@@ -381,7 +455,9 @@ export default function AnalyticsDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Compliance Status</CardTitle>
-              <CardDescription>ISO 9001:2015 requirements tracking</CardDescription>
+              <CardDescription>
+                ISO 9001:2015 requirements tracking
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -389,19 +465,25 @@ export default function AnalyticsDashboard() {
                   <div key={index}>
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium">{metric.name}</span>
-                      <span className="text-sm font-bold">{metric.value}/{metric.total}</span>
+                      <span className="text-sm font-bold">
+                        {metric.value}/{metric.total}
+                      </span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
                         className={`h-full ${
-                          metric.percentage >= 90 ? 'bg-green-600' :
-                          metric.percentage >= 70 ? 'bg-yellow-600' :
-                          'bg-red-600'
+                          metric.percentage >= 90
+                            ? "bg-green-600"
+                            : metric.percentage >= 70
+                              ? "bg-yellow-600"
+                              : "bg-red-600"
                         }`}
                         style={{ width: `${metric.percentage}%` }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">{metric.percentage}% complete</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {metric.percentage}% complete
+                    </p>
                   </div>
                 ))}
               </div>
@@ -419,7 +501,10 @@ export default function AnalyticsDashboard() {
                       label={(entry) => `${entry.name}: ${entry.percentage}%`}
                     >
                       {compliance.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={COLORS[index % COLORS.length]}
+                        />
                       ))}
                     </Pie>
                     <Tooltip />

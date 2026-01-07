@@ -3,27 +3,33 @@
  * Comprehensive UI for packing operations, cartonization, and workflow management
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Package, 
-  Box, 
-  TrendingUp, 
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Package,
+  Box,
+  TrendingUp,
   Users,
   Clock,
   CheckCircle,
   AlertCircle,
   Layers,
   Weight,
-  Ruler
-} from 'lucide-react';
+  Ruler,
+} from "lucide-react";
 import {
   Table,
   TableBody,
@@ -31,15 +37,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Progress } from '@/components/ui/progress';
+} from "@/components/ui/table";
+import { Progress } from "@/components/ui/progress";
 
 interface PackOrder {
   id: string;
   packNumber: string;
   orderNumber: string;
   customerName: string;
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
   totalItems: number;
   packedItems: number;
   totalCartons: number;
@@ -66,7 +72,7 @@ interface Carton {
     name: string;
     quantity: number;
   }>;
-  status: 'OPEN' | 'SEALED' | 'SHIPPED';
+  status: "OPEN" | "SEALED" | "SHIPPED";
 }
 
 interface PackStation {
@@ -74,7 +80,7 @@ interface PackStation {
   stationNumber: string;
   packerId: string;
   packerName: string;
-  status: 'ACTIVE' | 'IDLE' | 'OFFLINE';
+  status: "ACTIVE" | "IDLE" | "OFFLINE";
   currentPack: string;
   packsToday: number;
   itemsPerHour: number;
@@ -107,12 +113,12 @@ export default function PackingDashboard() {
   const [stations, setStations] = useState<PackStation[]>([]);
   const [stats, setStats] = useState<PackingStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
   const [cartonRecs, setCartonRecs] = useState<CartonRecommendation[]>([]);
 
   // Form states
-  const [newPackOrder, setNewPackOrder] = useState('');
-  const [selectedPacker, setSelectedPacker] = useState('');
+  const [newPackOrder, setNewPackOrder] = useState("");
+  const [selectedPacker, setSelectedPacker] = useState("");
 
   useEffect(() => {
     loadDashboardData();
@@ -124,29 +130,28 @@ export default function PackingDashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Load packs
-      const packsResponse = await fetch('/api/packing?action=list-packs');
+      const packsResponse = await fetch("/api/packing?action=list-packs");
       const packsData = await packsResponse.json();
       setPacks(packsData.packs || []);
 
       // Load statistics
-      const statsResponse = await fetch('/api/packing?action=statistics');
+      const statsResponse = await fetch("/api/packing?action=statistics");
       const statsData = await statsResponse.json();
       setStats(statsData);
 
       // Load cartons
-      const cartonsResponse = await fetch('/api/packing?action=cartons');
+      const cartonsResponse = await fetch("/api/packing?action=cartons");
       const cartonsData = await cartonsResponse.json();
       setCartons(cartonsData.cartons || []);
 
       // Load stations
-      const stationsResponse = await fetch('/api/packing?action=stations');
+      const stationsResponse = await fetch("/api/packing?action=stations");
       const stationsData = await stationsResponse.json();
       setStations(stationsData.stations || []);
-
     } catch (error) {
-      console.error('Failed to load dashboard data:', error);
+      console.error("Failed to load dashboard data:", error);
     } finally {
       setLoading(false);
     }
@@ -154,37 +159,37 @@ export default function PackingDashboard() {
 
   const createPack = async () => {
     try {
-      const response = await fetch('/api/packing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/packing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'create-pack',
+          action: "create-pack",
           orderId: newPackOrder,
           packerId: selectedPacker,
-          stationId: 'STATION-01'
-        })
+          stationId: "STATION-01",
+        }),
       });
 
       if (response.ok) {
-        setNewPackOrder('');
-        setSelectedPacker('');
+        setNewPackOrder("");
+        setSelectedPacker("");
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to create pack:', error);
+      console.error("Failed to create pack:", error);
     }
   };
 
   const cartonize = async (packId: string) => {
     try {
-      const response = await fetch('/api/packing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/packing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'cartonize',
+          action: "cartonize",
           packId,
-          strategy: 'MINIMIZE_CARTONS'
-        })
+          strategy: "MINIMIZE_CARTONS",
+        }),
       });
 
       if (response.ok) {
@@ -193,69 +198,70 @@ export default function PackingDashboard() {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to cartonize:', error);
+      console.error("Failed to cartonize:", error);
     }
   };
 
   const startPacking = async (packId: string) => {
     try {
-      const response = await fetch('/api/packing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/packing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'start-packing',
-          packId
-        })
+          action: "start-packing",
+          packId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to start packing:', error);
+      console.error("Failed to start packing:", error);
     }
   };
 
   const completePack = async (packId: string) => {
     try {
-      const response = await fetch('/api/packing', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/packing", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'complete-pack',
-          packId
-        })
+          action: "complete-pack",
+          packId,
+        }),
       });
 
       if (response.ok) {
         loadDashboardData();
       }
     } catch (error) {
-      console.error('Failed to complete pack:', error);
+      console.error("Failed to complete pack:", error);
     }
   };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      PENDING: { variant: 'secondary' as const, icon: Clock },
-      IN_PROGRESS: { variant: 'default' as const, icon: Package },
-      COMPLETED: { variant: 'success' as const, icon: CheckCircle },
-      CANCELLED: { variant: 'destructive' as const, icon: AlertCircle },
-      ACTIVE: { variant: 'success' as const, icon: CheckCircle },
-      IDLE: { variant: 'secondary' as const, icon: Clock },
-      OFFLINE: { variant: 'destructive' as const, icon: AlertCircle },
-      OPEN: { variant: 'default' as const, icon: Box },
-      SEALED: { variant: 'success' as const, icon: Package },
-      SHIPPED: { variant: 'success' as const, icon: CheckCircle },
+      PENDING: { variant: "secondary" as const, icon: Clock },
+      IN_PROGRESS: { variant: "default" as const, icon: Package },
+      COMPLETED: { variant: "success" as const, icon: CheckCircle },
+      CANCELLED: { variant: "destructive" as const, icon: AlertCircle },
+      ACTIVE: { variant: "success" as const, icon: CheckCircle },
+      IDLE: { variant: "secondary" as const, icon: Clock },
+      OFFLINE: { variant: "destructive" as const, icon: AlertCircle },
+      OPEN: { variant: "default" as const, icon: Box },
+      SEALED: { variant: "success" as const, icon: Package },
+      SHIPPED: { variant: "success" as const, icon: CheckCircle },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDING;
     const Icon = config.icon;
 
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="h-3 w-3" />
-        {status.replace('_', ' ')}
+        {status.replace("_", " ")}
       </Badge>
     );
   };
@@ -289,7 +295,7 @@ export default function PackingDashboard() {
             Manage packing operations, cartonization, and pack stations
           </p>
         </div>
-        <Button onClick={() => setActiveTab('create-pack')}>
+        <Button onClick={() => setActiveTab("create-pack")}>
           <Package className="mr-2 h-4 w-4" />
           Create Pack
         </Button>
@@ -300,7 +306,9 @@ export default function PackingDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Packs</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Packs
+              </CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -330,7 +338,9 @@ export default function PackingDashboard() {
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.packingAccuracy.toFixed(1)}%</div>
+              <div className="text-2xl font-bold">
+                {stats.packingAccuracy.toFixed(1)}%
+              </div>
               <p className="text-xs text-muted-foreground">
                 Overall packing accuracy
               </p>
@@ -339,7 +349,9 @@ export default function PackingDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Stations</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Stations
+              </CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -371,24 +383,32 @@ export default function PackingDashboard() {
                 <CardDescription>Currently being packed</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {packs.filter(p => p.status === 'IN_PROGRESS').slice(0, 5).map((pack) => (
-                  <div key={pack.id} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{pack.packNumber}</span>
-                        {getStatusBadge(pack.status)}
+                {packs
+                  .filter((p) => p.status === "IN_PROGRESS")
+                  .slice(0, 5)
+                  .map((pack) => (
+                    <div key={pack.id} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{pack.packNumber}</span>
+                          {getStatusBadge(pack.status)}
+                        </div>
+                        <span className="text-sm text-muted-foreground">
+                          {pack.packerName}
+                        </span>
                       </div>
-                      <span className="text-sm text-muted-foreground">
-                        {pack.packerName}
-                      </span>
+                      <Progress
+                        value={calculateProgress(pack)}
+                        className="h-2"
+                      />
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>
+                          {pack.packedItems}/{pack.totalItems} items
+                        </span>
+                        <span>{pack.totalCartons} cartons</span>
+                      </div>
                     </div>
-                    <Progress value={calculateProgress(pack)} className="h-2" />
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{pack.packedItems}/{pack.totalItems} items</span>
-                      <span>{pack.totalCartons} cartons</span>
-                    </div>
-                  </div>
-                ))}
+                  ))}
               </CardContent>
             </Card>
 
@@ -410,7 +430,9 @@ export default function PackingDashboard() {
                   <TableBody>
                     {stations.slice(0, 5).map((station) => (
                       <TableRow key={station.id}>
-                        <TableCell className="font-medium">{station.stationNumber}</TableCell>
+                        <TableCell className="font-medium">
+                          {station.stationNumber}
+                        </TableCell>
                         <TableCell>{station.packerName}</TableCell>
                         <TableCell>{getStatusBadge(station.status)}</TableCell>
                         <TableCell>{station.itemsPerHour.toFixed(0)}</TableCell>
@@ -447,13 +469,18 @@ export default function PackingDashboard() {
                 <TableBody>
                   {packs.map((pack) => (
                     <TableRow key={pack.id}>
-                      <TableCell className="font-medium">{pack.packNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {pack.packNumber}
+                      </TableCell>
                       <TableCell>{pack.orderNumber}</TableCell>
                       <TableCell>{pack.customerName}</TableCell>
                       <TableCell>{getStatusBadge(pack.status)}</TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <Progress value={calculateProgress(pack)} className="h-2" />
+                          <Progress
+                            value={calculateProgress(pack)}
+                            className="h-2"
+                          />
                           <span className="text-xs text-muted-foreground">
                             {pack.packedItems}/{pack.totalItems}
                           </span>
@@ -462,25 +489,34 @@ export default function PackingDashboard() {
                       <TableCell>{pack.totalCartons}</TableCell>
                       <TableCell>{pack.packerName}</TableCell>
                       <TableCell>
-                        {pack.startedAt ? 
-                          new Date(pack.startedAt).toLocaleTimeString() 
-                          : '-'
-                        }
+                        {pack.startedAt
+                          ? new Date(pack.startedAt).toLocaleTimeString()
+                          : "-"}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          {pack.status === 'PENDING' && (
+                          {pack.status === "PENDING" && (
                             <>
-                              <Button size="sm" variant="outline" onClick={() => cartonize(pack.id)}>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => cartonize(pack.id)}
+                              >
                                 Cartonize
                               </Button>
-                              <Button size="sm" onClick={() => startPacking(pack.id)}>
+                              <Button
+                                size="sm"
+                                onClick={() => startPacking(pack.id)}
+                              >
                                 Start
                               </Button>
                             </>
                           )}
-                          {pack.status === 'IN_PROGRESS' && (
-                            <Button size="sm" onClick={() => completePack(pack.id)}>
+                          {pack.status === "IN_PROGRESS" && (
+                            <Button
+                              size="sm"
+                              onClick={() => completePack(pack.id)}
+                            >
                               Complete
                             </Button>
                           )}
@@ -498,7 +534,9 @@ export default function PackingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Cartons</CardTitle>
-              <CardDescription>View all cartons and their contents</CardDescription>
+              <CardDescription>
+                View all cartons and their contents
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -516,11 +554,14 @@ export default function PackingDashboard() {
                 <TableBody>
                   {cartons.map((carton) => (
                     <TableRow key={carton.id}>
-                      <TableCell className="font-medium">{carton.cartonNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {carton.cartonNumber}
+                      </TableCell>
                       <TableCell>{carton.packNumber}</TableCell>
                       <TableCell>{carton.cartonType}</TableCell>
                       <TableCell className="font-mono text-xs">
-                        {carton.dimensions.length}×{carton.dimensions.width}×{carton.dimensions.height}"
+                        {carton.dimensions.length}×{carton.dimensions.width}×
+                        {carton.dimensions.height}"
                       </TableCell>
                       <TableCell>{carton.weight} lbs</TableCell>
                       <TableCell>{carton.items.length}</TableCell>
@@ -552,13 +593,20 @@ export default function PackingDashboard() {
                   <TableBody>
                     {cartonRecs.map((rec, index) => (
                       <TableRow key={index}>
-                        <TableCell className="font-medium">{rec.cartonType}</TableCell>
+                        <TableCell className="font-medium">
+                          {rec.cartonType}
+                        </TableCell>
                         <TableCell>{rec.dimensions}</TableCell>
                         <TableCell>{rec.weight} lbs</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Progress value={rec.utilization} className="h-2 w-16" />
-                            <span className="text-sm">{rec.utilization.toFixed(0)}%</span>
+                            <Progress
+                              value={rec.utilization}
+                              className="h-2 w-16"
+                            />
+                            <span className="text-sm">
+                              {rec.utilization.toFixed(0)}%
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>${rec.cost.toFixed(2)}</TableCell>
@@ -575,7 +623,9 @@ export default function PackingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Packing Stations</CardTitle>
-              <CardDescription>Station performance and activity</CardDescription>
+              <CardDescription>
+                Station performance and activity
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -593,18 +643,25 @@ export default function PackingDashboard() {
                 <TableBody>
                   {stations.map((station) => (
                     <TableRow key={station.id}>
-                      <TableCell className="font-medium">{station.stationNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {station.stationNumber}
+                      </TableCell>
                       <TableCell>{station.packerName}</TableCell>
                       <TableCell>{getStatusBadge(station.status)}</TableCell>
-                      <TableCell>{station.currentPack || '-'}</TableCell>
+                      <TableCell>{station.currentPack || "-"}</TableCell>
                       <TableCell>{station.packsToday}</TableCell>
                       <TableCell className="text-lg font-bold">
                         {station.itemsPerHour.toFixed(0)}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={station.accuracy} className="h-2 w-16" />
-                          <span className="text-sm">{station.accuracy.toFixed(0)}%</span>
+                          <Progress
+                            value={station.accuracy}
+                            className="h-2 w-16"
+                          />
+                          <span className="text-sm">
+                            {station.accuracy.toFixed(0)}%
+                          </span>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -642,7 +699,10 @@ export default function PackingDashboard() {
                   />
                 </div>
               </div>
-              <Button onClick={createPack} disabled={!newPackOrder || !selectedPacker}>
+              <Button
+                onClick={createPack}
+                disabled={!newPackOrder || !selectedPacker}
+              >
                 Create Pack
               </Button>
             </CardContent>
@@ -658,7 +718,9 @@ export default function PackingDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-center">
-                  <div className="text-4xl font-bold">{stats?.completedToday}</div>
+                  <div className="text-4xl font-bold">
+                    {stats?.completedToday}
+                  </div>
                   <p className="text-sm text-muted-foreground">
                     Average time: {stats?.avgPackTime.toFixed(0)} minutes
                   </p>
@@ -678,14 +740,23 @@ export default function PackingDashboard() {
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">Items/Hour</span>
-                    <span className="text-sm">{stats?.avgItemsPerHour.toFixed(0)}</span>
+                    <span className="text-sm">
+                      {stats?.avgItemsPerHour.toFixed(0)}
+                    </span>
                   </div>
-                  <Progress value={Math.min((stats?.avgItemsPerHour || 0) / 100 * 100, 100)} />
+                  <Progress
+                    value={Math.min(
+                      ((stats?.avgItemsPerHour || 0) / 100) * 100,
+                      100,
+                    )}
+                  />
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">Accuracy</span>
-                    <span className="text-sm">{stats?.packingAccuracy.toFixed(1)}%</span>
+                    <span className="text-sm">
+                      {stats?.packingAccuracy.toFixed(1)}%
+                    </span>
                   </div>
                   <Progress value={stats?.packingAccuracy || 0} />
                 </div>

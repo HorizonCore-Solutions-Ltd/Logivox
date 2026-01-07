@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { 
-  ArrowRight, 
+import * as React from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowRight,
   Play,
   TrendingDown,
   Zap,
   Target,
-  CheckCircle
-} from "lucide-react"
+  CheckCircle,
+} from "lucide-react";
 
 export function HeroSection() {
   const benefits = [
@@ -19,7 +19,7 @@ export function HeroSection() {
     { label: "Speed Up Order Fulfillment 3x" },
     { label: "Cut Labor Costs by 40%" },
     { label: "Scale Without Adding Staff" },
-  ]
+  ];
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-muted/10">
@@ -34,7 +34,10 @@ export function HeroSection() {
       <div className="container-enterprise relative">
         <div className="flex flex-col items-center text-center space-y-8 py-20 md:py-28 lg:py-32">
           {/* Announcement badge */}
-          <Badge variant="secondary" className="px-4 py-1.5 text-sm font-bold shadow-md border border-primary/20">
+          <Badge
+            variant="secondary"
+            className="px-4 py-1.5 text-sm font-bold shadow-md border border-primary/20"
+          >
             🎯 Complete Warehouse Management • Pay Only $49/user
           </Badge>
 
@@ -47,8 +50,9 @@ export function HeroSection() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-              LogiVox eliminates picking errors, speeds up fulfillment, and cuts labor costs—so you can grow 
-              your business without drowning in operational complexity.
+              LogiVox eliminates picking errors, speeds up fulfillment, and cuts
+              labor costs—so you can grow your business without drowning in
+              operational complexity.
             </p>
           </div>
 
@@ -60,20 +64,31 @@ export function HeroSection() {
                 className="flex items-center justify-center space-x-2 bg-card border-2 border-primary/20 rounded-lg px-3 py-3 shadow-md hover:shadow-lg hover:border-primary/50 hover:scale-105 transition-all"
               >
                 <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-semibold text-left">{benefit.label}</span>
+                <span className="text-sm font-semibold text-left">
+                  {benefit.label}
+                </span>
               </div>
             ))}
           </div>
 
           {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
-            <Button size="lg" className="text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-105 transition-all font-bold" asChild>
+            <Button
+              size="lg"
+              className="text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-105 transition-all font-bold"
+              asChild
+            >
               <Link href="/sign-up">
                 Start Free 30-Day Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-2 hover:scale-105 transition-all font-semibold" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="text-lg px-8 py-6 border-2 hover:scale-105 transition-all font-semibold"
+              asChild
+            >
               <Link href="/demo">
                 <Play className="mr-2 h-5 w-5" />
                 See How It Works
@@ -99,7 +114,8 @@ export function HeroSection() {
 
           {/* Social proof */}
           <p className="text-sm text-muted-foreground pt-4">
-            Join growing businesses who've eliminated warehouse chaos with LogiVox
+            Join growing businesses who've eliminated warehouse chaos with
+            LogiVox
           </p>
         </div>
       </div>
@@ -107,5 +123,5 @@ export function HeroSection() {
       {/* Bottom gradient fade */}
       <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
     </section>
-  )
+  );
 }

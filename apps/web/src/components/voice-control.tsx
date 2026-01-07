@@ -1,6 +1,6 @@
 /**
  * Voice Control UI Component for LogiVox
- * 
+ *
  * Provides a beautiful floating voice control interface with:
  * - Microphone permission handling
  * - Visual feedback for listening state
@@ -8,31 +8,44 @@
  * - Voice command help
  * - Accessibility compliance (keyboard shortcuts, screen reader support)
  * - Mobile-responsive design
- * 
+ *
  * Competitive advantage: No inventory management system has voice control!
  */
 
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { 
-  useVoiceControl, 
-  announceToScreenReader, 
+import React, { useState, useEffect } from "react";
+import {
+  useVoiceControl,
+  announceToScreenReader,
   getVoiceCommandsHelp,
-  VOICE_COMMANDS 
-} from '@/lib/voice-control';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Mic, 
-  MicOff, 
-  Volume2, 
-  VolumeX, 
-  HelpCircle, 
-  Settings, 
+  VOICE_COMMANDS,
+} from "@/lib/voice-control";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX,
+  HelpCircle,
+  Settings,
   AlertCircle,
   CheckCircle,
   Headphones,
@@ -40,9 +53,9 @@ import {
   Navigation,
   Search,
   Edit3,
-  Zap
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  Zap,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // ==========================================
 // MAIN VOICE CONTROL COMPONENT
@@ -69,18 +82,23 @@ export function VoiceControl() {
   useEffect(() => {
     const checkPermission = async () => {
       try {
-        const result = await navigator.permissions.query({ name: 'microphone' as PermissionName });
-        setHasPermission(result.state === 'granted');
-        
+        const result = await navigator.permissions.query({
+          name: "microphone" as PermissionName,
+        });
+        setHasPermission(result.state === "granted");
+
         result.onchange = () => {
-          setHasPermission(result.state === 'granted');
+          setHasPermission(result.state === "granted");
         };
       } catch (error) {
-        console.warn('[VoiceControl] Could not check microphone permission:', error);
+        console.warn(
+          "[VoiceControl] Could not check microphone permission:",
+          error,
+        );
       }
     };
 
-    if (typeof navigator !== 'undefined' && navigator.permissions) {
+    if (typeof navigator !== "undefined" && navigator.permissions) {
       checkPermission();
     }
   }, []);
@@ -89,44 +107,56 @@ export function VoiceControl() {
   useEffect(() => {
     const handleKeydown = (event: KeyboardEvent) => {
       // Ctrl+Shift+V or Cmd+Shift+V to toggle voice control
-      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'V') {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.shiftKey &&
+        event.key === "V"
+      ) {
         event.preventDefault();
         if (listening) {
           stopListening();
-          announceToScreenReader('Voice control stopped');
+          announceToScreenReader("Voice control stopped");
         } else {
           handleStartListening();
         }
       }
-      
+
       // Ctrl+Shift+H or Cmd+Shift+H to show help
-      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'H') {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.shiftKey &&
+        event.key === "H"
+      ) {
         event.preventDefault();
         setShowHelp(true);
       }
     };
 
-    document.addEventListener('keydown', handleKeydown);
-    return () => document.removeEventListener('keydown', handleKeydown);
+    document.addEventListener("keydown", handleKeydown);
+    return () => document.removeEventListener("keydown", handleKeydown);
   }, [listening, stopListening]);
 
   const handleStartListening = async () => {
     if (hasPermission === false) {
       const granted = await requestPermission();
       if (!granted) {
-        announceToScreenReader('Microphone permission required for voice control');
+        announceToScreenReader(
+          "Microphone permission required for voice control",
+        );
         return;
       }
       setHasPermission(true);
     }
-    
+
     startListening();
-    announceToScreenReader('Voice control started. Say a command or "help" for assistance.');
+    announceToScreenReader(
+      'Voice control started. Say a command or "help" for assistance.',
+    );
   };
 
   const handleStopListening = () => {
     stopListening();
-    announceToScreenReader('Voice control stopped');
+    announceToScreenReader("Voice control stopped");
   };
 
   // Don't render if not supported
@@ -144,11 +174,15 @@ export function VoiceControl() {
           variant={listening ? "default" : "outline"}
           className={cn(
             "h-12 w-12 rounded-full shadow-lg transition-all duration-200",
-            listening && "bg-red-500 hover:bg-red-600 animate-pulse"
+            listening && "bg-red-500 hover:bg-red-600 animate-pulse",
           )}
           aria-label="Show voice control"
         >
-          {listening ? <Volume2 className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+          {listening ? (
+            <Volume2 className="h-6 w-6" />
+          ) : (
+            <Mic className="h-6 w-6" />
+          )}
         </Button>
       </div>
     );
@@ -173,10 +207,10 @@ export function VoiceControl() {
                 </DialogTrigger>
                 <VoiceCommandHelp />
               </Dialog>
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
+
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-8 w-8"
                 onClick={() => setIsMinimized(true)}
                 aria-label="Minimize voice control"
@@ -185,7 +219,7 @@ export function VoiceControl() {
               </Button>
             </div>
           </div>
-          
+
           <CardDescription>
             Use voice commands to navigate LogiVox hands-free
           </CardDescription>
@@ -202,8 +236,8 @@ export function VoiceControl() {
                   <div className="flex-1">
                     <div className="text-sm text-yellow-800 dark:text-yellow-200">
                       Microphone permission required for voice control.
-                      <Button 
-                        variant="link" 
+                      <Button
+                        variant="link"
                         className="h-auto p-0 ml-1 text-yellow-800 dark:text-yellow-200"
                         onClick={requestPermission}
                       >
@@ -236,7 +270,7 @@ export function VoiceControl() {
                 variant={listening ? "destructive" : "default"}
                 className={cn(
                   "flex-1 transition-all duration-200",
-                  listening && "animate-pulse"
+                  listening && "animate-pulse",
                 )}
               >
                 {listening ? (
@@ -259,7 +293,11 @@ export function VoiceControl() {
 
             {/* Keyboard Shortcut Hint */}
             <div className="text-xs text-muted-foreground text-center">
-              Press <kbd className="px-1 py-0.5 text-xs bg-muted rounded">Ctrl+Shift+V</kbd> to toggle
+              Press{" "}
+              <kbd className="px-1 py-0.5 text-xs bg-muted rounded">
+                Ctrl+Shift+V
+              </kbd>{" "}
+              to toggle
             </div>
           </div>
 
@@ -279,16 +317,21 @@ export function VoiceControl() {
                     ) : null}
                   </div>
                 </div>
-                
+
                 {confidence > 0 && (
                   <div className="mt-2 flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground">Confidence:</span>
+                    <span className="text-xs text-muted-foreground">
+                      Confidence:
+                    </span>
                     <div className="flex-1 bg-muted rounded-full h-2">
-                      <div 
+                      <div
                         className={cn(
                           "h-2 rounded-full transition-all duration-300",
-                          confidence > 0.8 ? "bg-green-500" :
-                          confidence > 0.6 ? "bg-yellow-500" : "bg-red-500"
+                          confidence > 0.8
+                            ? "bg-green-500"
+                            : confidence > 0.6
+                              ? "bg-yellow-500"
+                              : "bg-red-500",
                         )}
                         style={{ width: `${confidence * 100}%` }}
                       />
@@ -314,20 +357,20 @@ export function VoiceControl() {
 
           {/* Quick Command Examples */}
           <div className="grid grid-cols-2 gap-2">
-            <QuickCommandButton 
-              command="Go to inventory" 
+            <QuickCommandButton
+              command="Go to inventory"
               icon={<Navigation className="h-3 w-3" />}
             />
-            <QuickCommandButton 
-              command="Check alerts" 
+            <QuickCommandButton
+              command="Check alerts"
               icon={<AlertCircle className="h-3 w-3" />}
             />
-            <QuickCommandButton 
-              command="Find supplier ABC" 
+            <QuickCommandButton
+              command="Find supplier ABC"
               icon={<Search className="h-3 w-3" />}
             />
-            <QuickCommandButton 
-              command="Show help" 
+            <QuickCommandButton
+              command="Show help"
               icon={<HelpCircle className="h-3 w-3" />}
             />
           </div>
@@ -370,26 +413,29 @@ function QuickCommandButton({ command, icon }: QuickCommandButtonProps) {
 // ==========================================
 
 function VoiceCommandHelp() {
-  const commandsByCategory = VOICE_COMMANDS.reduce((acc, cmd) => {
-    if (!acc[cmd.category]) {
-      acc[cmd.category] = [];
-    }
-    acc[cmd.category]!.push(cmd);
-    return acc;
-  }, {} as Record<string, typeof VOICE_COMMANDS[0][]>);
+  const commandsByCategory = VOICE_COMMANDS.reduce(
+    (acc, cmd) => {
+      if (!acc[cmd.category]) {
+        acc[cmd.category] = [];
+      }
+      acc[cmd.category]!.push(cmd);
+      return acc;
+    },
+    {} as Record<string, (typeof VOICE_COMMANDS)[0][]>,
+  );
 
   const categoryIcons = {
     navigation: <Navigation className="h-4 w-4" />,
     search: <Search className="h-4 w-4" />,
-    'data-entry': <Edit3 className="h-4 w-4" />,
+    "data-entry": <Edit3 className="h-4 w-4" />,
     action: <Zap className="h-4 w-4" />,
   };
 
   const categoryDescriptions = {
-    navigation: 'Navigate between different pages and sections',
-    search: 'Search for products, customers, and suppliers',
-    'data-entry': 'Add inventory, create bookings, and manage data',
-    action: 'Perform system actions and get help',
+    navigation: "Navigate between different pages and sections",
+    search: "Search for products, customers, and suppliers",
+    "data-entry": "Add inventory, create bookings, and manage data",
+    action: "Perform system actions and get help",
   };
 
   return (
@@ -414,49 +460,68 @@ function VoiceCommandHelp() {
         <TabsContent value="commands" className="mt-4">
           <div className="max-h-[50vh] overflow-y-auto">
             <div className="space-y-6">
-              {Object.entries(commandsByCategory).map(([category, commands]) => (
-                <Card key={category}>
-                  <CardHeader className="pb-3">
-                    <CardTitle className="flex items-center gap-2 text-lg capitalize">
-                      {categoryIcons[category as keyof typeof categoryIcons]}
-                      {category.replace('-', ' ')} Commands
-                    </CardTitle>
-                    <CardDescription>
-                      {categoryDescriptions[category as keyof typeof categoryDescriptions]}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-3">
-                      {commands.map((command, index) => (
-                        <div key={index} className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg">
-                          <div className="flex-1">
-                            <div className="font-medium text-sm mb-1">
-                              {command.description}
-                            </div>
-                            <div className="space-y-1">
-                              {command.patterns.map((pattern, patternIndex) => (
-                                <Badge key={patternIndex} variant="outline" className="mr-1 mb-1">
-                                  "{pattern}"
-                                </Badge>
-                              ))}
-                            </div>
-                            {command.parameters && command.parameters.length > 0 && (
-                              <div className="mt-2 text-xs text-muted-foreground">
-                                Parameters: {command.parameters.map(p => p.name).join(', ')}
+              {Object.entries(commandsByCategory).map(
+                ([category, commands]) => (
+                  <Card key={category}>
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-lg capitalize">
+                        {categoryIcons[category as keyof typeof categoryIcons]}
+                        {category.replace("-", " ")} Commands
+                      </CardTitle>
+                      <CardDescription>
+                        {
+                          categoryDescriptions[
+                            category as keyof typeof categoryDescriptions
+                          ]
+                        }
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-3">
+                        {commands.map((command, index) => (
+                          <div
+                            key={index}
+                            className="flex items-start gap-3 p-3 bg-muted/50 rounded-lg"
+                          >
+                            <div className="flex-1">
+                              <div className="font-medium text-sm mb-1">
+                                {command.description}
                               </div>
+                              <div className="space-y-1">
+                                {command.patterns.map(
+                                  (pattern, patternIndex) => (
+                                    <Badge
+                                      key={patternIndex}
+                                      variant="outline"
+                                      className="mr-1 mb-1"
+                                    >
+                                      "{pattern}"
+                                    </Badge>
+                                  ),
+                                )}
+                              </div>
+                              {command.parameters &&
+                                command.parameters.length > 0 && (
+                                  <div className="mt-2 text-xs text-muted-foreground">
+                                    Parameters:{" "}
+                                    {command.parameters
+                                      .map((p) => p.name)
+                                      .join(", ")}
+                                  </div>
+                                )}
+                            </div>
+                            {command.requiresAuth && (
+                              <Badge variant="secondary" className="text-xs">
+                                Auth Required
+                              </Badge>
                             )}
                           </div>
-                          {command.requiresAuth && (
-                            <Badge variant="secondary" className="text-xs">
-                              Auth Required
-                            </Badge>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ),
+              )}
             </div>
           </div>
         </TabsContent>
@@ -471,13 +536,15 @@ function VoiceCommandHelp() {
                 <div className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                   <div>
-                    <div className="font-medium">Speak clearly and naturally</div>
+                    <div className="font-medium">
+                      Speak clearly and naturally
+                    </div>
                     <div className="text-sm text-muted-foreground">
                       Use your normal speaking voice at a moderate pace
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                   <div>
@@ -487,7 +554,7 @@ function VoiceCommandHelp() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                   <div>
@@ -497,7 +564,7 @@ function VoiceCommandHelp() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                   <div>
@@ -547,11 +614,15 @@ function VoiceCommandHelp() {
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span>Toggle voice control</span>
-                  <kbd className="px-2 py-1 bg-muted rounded text-sm">Ctrl+Shift+V</kbd>
+                  <kbd className="px-2 py-1 bg-muted rounded text-sm">
+                    Ctrl+Shift+V
+                  </kbd>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Show this help</span>
-                  <kbd className="px-2 py-1 bg-muted rounded text-sm">Ctrl+Shift+H</kbd>
+                  <kbd className="px-2 py-1 bg-muted rounded text-sm">
+                    Ctrl+Shift+H
+                  </kbd>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Stop listening (voice)</span>
@@ -562,7 +633,9 @@ function VoiceCommandHelp() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Accessibility Features</CardTitle>
+                <CardTitle className="text-lg">
+                  Accessibility Features
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="flex items-start gap-3">
@@ -574,7 +647,7 @@ function VoiceCommandHelp() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                   <div>
@@ -584,7 +657,7 @@ function VoiceCommandHelp() {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                   <div>
@@ -612,7 +685,9 @@ export function VoiceControlAnnouncer() {
 
   useEffect(() => {
     if (listening) {
-      announceToScreenReader('Voice control activated. Listening for commands.');
+      announceToScreenReader(
+        "Voice control activated. Listening for commands.",
+      );
     }
   }, [listening]);
 

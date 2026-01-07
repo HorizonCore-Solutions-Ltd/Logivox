@@ -907,6 +907,11 @@ export class InstantRefundService {
   private async incrementCustomerInstantRefunds(customerId: string): Promise<void> {
     // Database integration - see database-integration.ts
     console.log(`Incremented instant refund count for customer ${customerId}`);
+  }
+      
+  private formatChargebackData(record: any) {
+    return {
+      verification: {
         verifiedAt: record.verifiedAt || undefined,
         itemReceivedAt: record.itemReceivedAt || undefined,
         discrepancies: record.discrepancies as string[] || [],

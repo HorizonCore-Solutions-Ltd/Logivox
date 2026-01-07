@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import debitMemoService from '@/lib/services/qc/debit-memo-service';
+import { NextRequest, NextResponse } from "next/server";
+import debitMemoService from "@/lib/services/qc/debit-memo-service";
 
 /**
  * GET /api/qc/debit-memos
@@ -8,17 +8,17 @@ import debitMemoService from '@/lib/services/qc/debit-memo-service';
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get('organizationId');
-    const vendorId = searchParams.get('vendorId');
-    const status = searchParams.get('status');
-    const reason = searchParams.get('reason');
-    const skip = searchParams.get('skip');
-    const take = searchParams.get('take');
+    const organizationId = searchParams.get("organizationId");
+    const vendorId = searchParams.get("vendorId");
+    const status = searchParams.get("status");
+    const reason = searchParams.get("reason");
+    const skip = searchParams.get("skip");
+    const take = searchParams.get("take");
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Organization ID required' },
-        { status: 400 }
+        { error: "Organization ID required" },
+        { status: 400 },
       );
     }
 
@@ -33,10 +33,10 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error: any) {
-    console.error('Error listing debit memos:', error);
+    console.error("Error listing debit memos:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -61,15 +61,15 @@ export async function POST(request: NextRequest) {
       calculationDetails: body.calculationDetails,
       offsetFromPayment: body.offsetFromPayment,
       notes: body.notes,
-      createdBy: body.createdBy || 'system',
+      createdBy: body.createdBy || "system",
     });
 
     return NextResponse.json(debitMemo, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating debit memo:', error);
+    console.error("Error creating debit memo:", error);
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
-      { status: 500 }
+      { error: error.message || "Internal server error" },
+      { status: 500 },
     );
   }
 }

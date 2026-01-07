@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Camera, Upload, X, Image as ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { useState } from "react";
+import { Camera, Upload, X, Image as ImageIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface PhotoUploadProps {
   value: string[];
@@ -17,12 +17,14 @@ export function PhotoUpload({
   value = [],
   onChange,
   maxPhotos = 10,
-  label = 'Photos',
+  label = "Photos",
   required = false,
 }: PhotoUploadProps) {
   const [uploading, setUploading] = useState(false);
 
-  const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const files = event.target.files;
     if (!files) return;
 
@@ -36,23 +38,23 @@ export function PhotoUpload({
     try {
       const formData = new FormData();
       Array.from(files).forEach((file) => {
-        formData.append('files', file);
+        formData.append("files", file);
       });
 
-      const response = await fetch('/api/upload/photos', {
-        method: 'POST',
+      const response = await fetch("/api/upload/photos", {
+        method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Upload failed');
+        throw new Error("Upload failed");
       }
 
       const data = await response.json();
       onChange([...value, ...data.urls]);
     } catch (error) {
-      console.error('Upload error:', error);
-      alert('Failed to upload photos');
+      console.error("Upload error:", error);
+      alert("Failed to upload photos");
     } finally {
       setUploading(false);
     }
@@ -60,10 +62,10 @@ export function PhotoUpload({
 
   const handleCapture = async () => {
     // Trigger camera capture on mobile devices
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.capture = 'environment';
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment";
     input.multiple = true;
     input.onchange = handleFileSelect as any;
     input.click();
@@ -90,7 +92,10 @@ export function PhotoUpload({
       {value.length > 0 && (
         <div className="grid grid-cols-3 gap-4">
           {value.map((photo, index) => (
-            <Card key={index} className="relative aspect-square overflow-hidden">
+            <Card
+              key={index}
+              className="relative aspect-square overflow-hidden"
+            >
               <img
                 src={photo}
                 alt={`Photo ${index + 1}`}
@@ -121,7 +126,7 @@ export function PhotoUpload({
             disabled={uploading}
           >
             <Camera className="mr-2 h-4 w-4" />
-            {uploading ? 'Uploading...' : 'Take Photo'}
+            {uploading ? "Uploading..." : "Take Photo"}
           </Button>
 
           <label className="flex-1">
@@ -130,10 +135,10 @@ export function PhotoUpload({
               variant="outline"
               className="w-full"
               disabled={uploading}
-              onClick={() => document.getElementById('photo-upload')?.click()}
+              onClick={() => document.getElementById("photo-upload")?.click()}
             >
               <Upload className="mr-2 h-4 w-4" />
-              {uploading ? 'Uploading...' : 'Upload'}
+              {uploading ? "Uploading..." : "Upload"}
             </Button>
             <input
               id="photo-upload"
@@ -151,9 +156,7 @@ export function PhotoUpload({
       {value.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 text-center">
           <ImageIcon className="mb-4 h-12 w-12 text-muted-foreground/50" />
-          <p className="text-sm text-muted-foreground">
-            No photos added yet
-          </p>
+          <p className="text-sm text-muted-foreground">No photos added yet</p>
         </div>
       )}
     </div>

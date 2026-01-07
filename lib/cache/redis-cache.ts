@@ -3,13 +3,13 @@
  * Centralized caching layer for improved performance
  */
 
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
 
 // Initialize Redis client
 const redis = process.env.UPSTASH_REDIS_REST_URL
   ? new Redis({
       url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN || '',
+      token: process.env.UPSTASH_REDIS_REST_TOKEN || "",
     })
   : null;
 
@@ -17,17 +17,17 @@ const redis = process.env.UPSTASH_REDIS_REST_URL
  * Cache key prefixes for different data types
  */
 export const CachePrefix = {
-  USER: 'user:',
-  INVENTORY: 'inventory:',
-  ORDER: 'order:',
-  WAREHOUSE: 'warehouse:',
-  PRODUCT: 'product:',
-  CUSTOMER: 'customer:',
-  SUPPLIER: 'supplier:',
-  STATS: 'stats:',
-  REPORT: 'report:',
-  SETTINGS: 'settings:',
-  SESSION: 'session:',
+  USER: "user:",
+  INVENTORY: "inventory:",
+  ORDER: "order:",
+  WAREHOUSE: "warehouse:",
+  PRODUCT: "product:",
+  CUSTOMER: "customer:",
+  SUPPLIER: "supplier:",
+  STATS: "stats:",
+  REPORT: "report:",
+  SETTINGS: "settings:",
+  SESSION: "session:",
 } as const;
 
 /**
@@ -83,7 +83,7 @@ export class CacheManager {
 
       return null;
     } catch (error) {
-      console.error('Cache get error:', error);
+      console.error("Cache get error:", error);
       return null;
     }
   }
@@ -91,7 +91,11 @@ export class CacheManager {
   /**
    * Set value in cache with TTL
    */
-  async set(key: string, value: any, ttl: number = CacheTTL.MEDIUM): Promise<void> {
+  async set(
+    key: string,
+    value: any,
+    ttl: number = CacheTTL.MEDIUM,
+  ): Promise<void> {
     try {
       // Set in Redis
       if (this.redis) {
@@ -104,7 +108,7 @@ export class CacheManager {
         expiry: Date.now() + ttl * 1000,
       });
     } catch (error) {
-      console.error('Cache set error:', error);
+      console.error("Cache set error:", error);
     }
   }
 
@@ -118,7 +122,7 @@ export class CacheManager {
       }
       this.memoryCache.delete(key);
     } catch (error) {
-      console.error('Cache delete error:', error);
+      console.error("Cache delete error:", error);
     }
   }
 
@@ -136,12 +140,12 @@ export class CacheManager {
 
       // Clear matching keys from memory cache
       for (const key of this.memoryCache.keys()) {
-        if (key.includes(pattern.replace('*', ''))) {
+        if (key.includes(pattern.replace("*", ""))) {
           this.memoryCache.delete(key);
         }
       }
     } catch (error) {
-      console.error('Cache delete pattern error:', error);
+      console.error("Cache delete pattern error:", error);
     }
   }
 
@@ -158,7 +162,7 @@ export class CacheManager {
       const cached = this.memoryCache.get(key);
       return cached !== undefined && Date.now() < cached.expiry;
     } catch (error) {
-      console.error('Cache exists error:', error);
+      console.error("Cache exists error:", error);
       return false;
     }
   }
@@ -169,7 +173,7 @@ export class CacheManager {
   async getOrSet<T>(
     key: string,
     fetchFn: () => Promise<T>,
-    ttl: number = CacheTTL.MEDIUM
+    ttl: number = CacheTTL.MEDIUM,
   ): Promise<T> {
     // Try to get from cache
     const cached = await this.get<T>(key);
@@ -193,7 +197,7 @@ export class CacheManager {
       }
       this.memoryCache.clear();
     } catch (error) {
-      console.error('Cache clear error:', error);
+      console.error("Cache clear error:", error);
     }
   }
 
@@ -220,7 +224,11 @@ export async function getCached<T>(key: string): Promise<T | null> {
   return cache.get<T>(key);
 }
 
-export async function setCached(key: string, value: any, ttl?: number): Promise<void> {
+export async function setCached(
+  key: string,
+  value: any,
+  ttl?: number,
+): Promise<void> {
   return cache.set(key, value, ttl);
 }
 
@@ -239,7 +247,9 @@ export async function invalidateUserCache(userId: string): Promise<void> {
   await invalidateCache(`${CachePrefix.USER}${userId}*`);
 }
 
-export async function invalidateInventoryCache(inventoryId?: string): Promise<void> {
+export async function invalidateInventoryCache(
+  inventoryId?: string,
+): Promise<void> {
   if (inventoryId) {
     await invalidateCache(`${CachePrefix.INVENTORY}${inventoryId}*`);
   } else {
@@ -255,7 +265,9 @@ export async function invalidateOrderCache(orderId?: string): Promise<void> {
   }
 }
 
-export async function invalidateWarehouseCache(warehouseId?: string): Promise<void> {
+export async function invalidateWarehouseCache(
+  warehouseId?: string,
+): Promise<void> {
   if (warehouseId) {
     await invalidateCache(`${CachePrefix.WAREHOUSE}${warehouseId}*`);
   } else {
@@ -274,13 +286,13 @@ export function Cached(prefix: string, ttl: number = CacheTTL.MEDIUM) {
   return function (
     target: any,
     propertyKey: string,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
   ) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
       const cacheKey = `${prefix}:${propertyKey}:${JSON.stringify(args)}`;
-      
+
       const cached = await getCached(cacheKey);
       if (cached !== null) {
         return cached;

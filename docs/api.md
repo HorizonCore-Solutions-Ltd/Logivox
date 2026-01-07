@@ -49,9 +49,11 @@ Error responses:
 ### Authentication
 
 #### POST /api/auth/register
+
 Register a new user account.
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -63,6 +65,7 @@ Register a new user account.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -79,9 +82,11 @@ Register a new user account.
 ```
 
 #### POST /api/auth/login
+
 Authenticate user and receive JWT token.
 
 **Request Body:**
+
 ```json
 {
   "email": "user@example.com",
@@ -90,6 +95,7 @@ Authenticate user and receive JWT token.
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -108,9 +114,11 @@ Authenticate user and receive JWT token.
 ### Warehouses
 
 #### GET /api/warehouses
+
 Get list of warehouses for the authenticated user's organization.
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -137,9 +145,11 @@ Get list of warehouses for the authenticated user's organization.
 ```
 
 #### POST /api/warehouses
+
 Create a new warehouse.
 
 **Request Body:**
+
 ```json
 {
   "name": "New Warehouse",
@@ -156,20 +166,25 @@ Create a new warehouse.
 ```
 
 #### GET /api/warehouses/:id
+
 Get specific warehouse details.
 
 #### PUT /api/warehouses/:id
+
 Update warehouse information.
 
 #### DELETE /api/warehouses/:id
+
 Delete a warehouse (soft delete).
 
 ### Inventory
 
 #### GET /api/inventory
+
 Get inventory items with filtering and pagination.
 
 **Query Parameters:**
+
 - `page` (number): Page number (default: 1)
 - `limit` (number): Items per page (default: 20)
 - `search` (string): Search by SKU or name
@@ -178,6 +193,7 @@ Get inventory items with filtering and pagination.
 - `status` (string): Filter by status (active, inactive, discontinued)
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -193,8 +209,8 @@ Get inventory items with filtering and pagination.
         "availableQuantity": 95,
         "reservedQuantity": 5,
         "reorderLevel": 20,
-        "costPrice": 25.50,
-        "sellingPrice": 45.00,
+        "costPrice": 25.5,
+        "sellingPrice": 45.0,
         "currency": "USD",
         "warehouse": {
           "id": "wh_123",
@@ -219,18 +235,23 @@ Get inventory items with filtering and pagination.
 ```
 
 #### POST /api/inventory
+
 Create a new inventory item.
 
 #### GET /api/inventory/:id
+
 Get specific inventory item details.
 
 #### PUT /api/inventory/:id
+
 Update inventory item.
 
 #### POST /api/inventory/:id/scan
+
 Record a barcode scan for inventory item.
 
 **Request Body:**
+
 ```json
 {
   "barcode": "1234567890123",
@@ -243,18 +264,22 @@ Record a barcode scan for inventory item.
 ### Purchase Orders
 
 #### GET /api/purchase-orders
+
 Get list of purchase orders with filtering.
 
 **Query Parameters:**
+
 - `page`, `limit`: Pagination
 - `status`: Filter by status (draft, pending, approved, sent, received, etc.)
 - `supplierId`: Filter by supplier
 - `dateFrom`, `dateTo`: Date range filter
 
 #### POST /api/purchase-orders
+
 Create a new purchase order.
 
 **Request Body:**
+
 ```json
 {
   "supplierId": "sup_123",
@@ -265,7 +290,7 @@ Create a new purchase order.
     {
       "inventoryItemId": "item_123",
       "quantity": 50,
-      "unitPrice": 25.50,
+      "unitPrice": 25.5,
       "description": "Premium widgets"
     }
   ]
@@ -273,23 +298,29 @@ Create a new purchase order.
 ```
 
 #### GET /api/purchase-orders/:id
+
 Get specific purchase order with line items.
 
 #### PUT /api/purchase-orders/:id
+
 Update purchase order.
 
 #### POST /api/purchase-orders/:id/receive
+
 Mark purchase order as received and update inventory.
 
 ### Suppliers
 
 #### GET /api/suppliers
+
 Get list of suppliers.
 
 #### POST /api/suppliers
+
 Create a new supplier.
 
 **Request Body:**
+
 ```json
 {
   "name": "ABC Electronics",
@@ -312,29 +343,37 @@ Create a new supplier.
 ### Integrations
 
 #### GET /api/integrations/erp/systems
+
 Get list of available ERP systems.
 
 #### POST /api/integrations/erp/:system/connect
+
 Connect to an ERP system.
 
 #### GET /api/integrations/erp/status
+
 Get current ERP integration status.
 
 #### POST /api/integrations/sync
+
 Trigger manual sync with connected ERP systems.
 
 ### Reports
 
 #### GET /api/reporting/dashboard
+
 Get dashboard data with key metrics.
 
 #### GET /api/reporting/analytics/inventory
+
 Get inventory analytics data.
 
 #### POST /api/reporting/reports/custom
+
 Generate custom report.
 
 **Request Body:**
+
 ```json
 {
   "name": "Monthly Inventory Report",
@@ -354,15 +393,15 @@ Generate custom report.
 
 ## Error Codes
 
-| Code | Description |
-|------|-------------|
-| `UNAUTHORIZED` | Invalid or missing authentication token |
-| `FORBIDDEN` | Insufficient permissions |
-| `NOT_FOUND` | Requested resource not found |
-| `VALIDATION_ERROR` | Request data validation failed |
-| `DUPLICATE_ENTRY` | Attempting to create duplicate resource |
-| `INTEGRATION_ERROR` | ERP integration failure |
-| `RATE_LIMIT_EXCEEDED` | Too many requests |
+| Code                  | Description                             |
+| --------------------- | --------------------------------------- |
+| `UNAUTHORIZED`        | Invalid or missing authentication token |
+| `FORBIDDEN`           | Insufficient permissions                |
+| `NOT_FOUND`           | Requested resource not found            |
+| `VALIDATION_ERROR`    | Request data validation failed          |
+| `DUPLICATE_ENTRY`     | Attempting to create duplicate resource |
+| `INTEGRATION_ERROR`   | ERP integration failure                 |
+| `RATE_LIMIT_EXCEEDED` | Too many requests                       |
 
 ## Rate Limiting
 
@@ -384,20 +423,20 @@ The API supports real-time updates via WebSocket connections at `/socket.io`.
 ### Connection
 
 ```javascript
-import io from 'socket.io-client';
+import io from "socket.io-client";
 
-const socket = io('http://localhost:5000', {
+const socket = io("http://localhost:5000", {
   auth: {
-    token: 'your-jwt-token'
-  }
+    token: "your-jwt-token",
+  },
 });
 
 // Join warehouse-specific updates
-socket.emit('join_warehouse', 'warehouse_id');
+socket.emit("join_warehouse", "warehouse_id");
 
 // Listen for inventory updates
-socket.on('inventory_updated', (data) => {
-  console.log('Inventory updated:', data);
+socket.on("inventory_updated", (data) => {
+  console.log("Inventory updated:", data);
 });
 ```
 
@@ -410,22 +449,23 @@ npm install @logivox/sdk
 ```
 
 ```javascript
-import { LogiVoxClient } from '@logivox/sdk';
+import { LogiVoxClient } from "@logivox/sdk";
 
 const client = new LogiVoxClient({
-  apiUrl: 'http://localhost:5000/api',
-  apiKey: 'your-api-key'
+  apiUrl: "http://localhost:5000/api",
+  apiKey: "your-api-key",
 });
 
 // Get inventory
 const inventory = await client.inventory.list({
-  warehouseId: 'wh_123'
+  warehouseId: "wh_123",
 });
 ```
 
 ## Changelog
 
 ### v1.0.0
+
 - Initial API release
 - Basic CRUD operations for all entities
 - JWT authentication
@@ -435,6 +475,7 @@ const inventory = await client.inventory.list({
 ## Support
 
 For API support, please:
+
 1. Check this documentation
 2. Review the [GitHub issues](https://github.com/flowstock/flowstock/issues)
 3. Contact support at api-support@logivox.ai

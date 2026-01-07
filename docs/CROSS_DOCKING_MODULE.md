@@ -169,11 +169,13 @@ When all allocations for a shipment are shipped, shipment status automatically c
 ### Appointments
 
 #### List Appointments
+
 ```bash
 GET /api/cross-dock/appointments?warehouseId=wh-1&status=RECEIVING&status=SORTING
 ```
 
 #### Create Appointment
+
 ```bash
 POST /api/cross-dock/appointments
 {
@@ -189,11 +191,13 @@ POST /api/cross-dock/appointments
 ```
 
 #### Get Appointment Details
+
 ```bash
 GET /api/cross-dock/appointments/{id}
 ```
 
 #### Update Status
+
 ```bash
 PATCH /api/cross-dock/appointments/{id}
 {
@@ -203,6 +207,7 @@ PATCH /api/cross-dock/appointments/{id}
 ```
 
 #### Assign Door
+
 ```bash
 PATCH /api/cross-dock/appointments/{id}
 {
@@ -213,11 +218,13 @@ PATCH /api/cross-dock/appointments/{id}
 ```
 
 #### Get Calendar View
+
 ```bash
 GET /api/cross-dock/appointments/calendar?startDate=2025-01-10&endDate=2025-01-17
 ```
 
 #### Get Statistics
+
 ```bash
 GET /api/cross-dock/appointments/stats?warehouseId=wh-1&startDate=2025-01-10
 ```
@@ -225,6 +232,7 @@ GET /api/cross-dock/appointments/stats?warehouseId=wh-1&startDate=2025-01-10
 ### Matching & Allocation
 
 #### Auto-Match
+
 ```bash
 POST /api/cross-dock/matching/auto
 {
@@ -234,16 +242,19 @@ POST /api/cross-dock/matching/auto
 ```
 
 #### Get Recommendations
+
 ```bash
 GET /api/cross-dock/matching/recommendations?appointmentId=appt-123&strategy=FIFO
 ```
 
 #### List Allocations
+
 ```bash
 GET /api/cross-dock/allocations?appointmentId=appt-123&status=PICKING
 ```
 
 #### Create Manual Allocation
+
 ```bash
 POST /api/cross-dock/allocations
 {
@@ -254,6 +265,7 @@ POST /api/cross-dock/allocations
 ```
 
 #### Update Allocation (Pick)
+
 ```bash
 PATCH /api/cross-dock/allocations/{id}
 {
@@ -264,6 +276,7 @@ PATCH /api/cross-dock/allocations/{id}
 ```
 
 #### Remove Allocation
+
 ```bash
 DELETE /api/cross-dock/allocations/{id}
 ```
@@ -271,11 +284,13 @@ DELETE /api/cross-dock/allocations/{id}
 ### Sorting Tasks
 
 #### List Sorting Tasks
+
 ```bash
 GET /api/cross-dock/sorting?appointmentId=appt-123&status=IN_PROGRESS
 ```
 
 #### Create Sorting Task
+
 ```bash
 POST /api/cross-dock/sorting
 {
@@ -288,6 +303,7 @@ POST /api/cross-dock/sorting
 ```
 
 #### Update Progress
+
 ```bash
 PATCH /api/cross-dock/sorting/{id}
 {
@@ -299,6 +315,7 @@ PATCH /api/cross-dock/sorting/{id}
 ```
 
 #### Assign Worker
+
 ```bash
 PATCH /api/cross-dock/sorting/{id}
 {
@@ -374,12 +391,14 @@ Access real-time metrics at **Dashboard > Cross-Dock**:
 
 **Symptoms**: Items sitting > 4 hours
 **Causes**:
+
 - Insufficient sorting workers
 - Outbound trucks delayed
 - Matching strategy mismatch
 - Dock door congestion
 
 **Solutions**:
+
 1. Add more sorting workers
 2. Update outbound carrier ETA
 3. Try CLOSEST_DUE_DATE strategy
@@ -389,12 +408,14 @@ Access real-time metrics at **Dashboard > Cross-Dock**:
 
 **Symptoms**: < 80 units/hour per worker
 **Causes**:
+
 - Manual sorting (no scanning)
 - Poor product placement
 - Unclear instructions
 - System delays
 
 **Solutions**:
+
 1. Enable scan validation
 2. Optimize sorting area layout
 3. Provide worker training
@@ -404,12 +425,14 @@ Access real-time metrics at **Dashboard > Cross-Dock**:
 
 **Symptoms**: Many unmatched items
 **Causes**:
+
 - SKU mismatches between systems
 - No pending outbound orders
 - Quantity mismatches
 - Expired allocations
 
 **Solutions**:
+
 1. Verify SKU mapping
 2. Create outbound shipments first
 3. Allow partial allocations
@@ -419,12 +442,14 @@ Access real-time metrics at **Dashboard > Cross-Dock**:
 
 **Symptoms**: Items going to wrong shipments
 **Causes**:
+
 - Manual sorting without scans
 - Similar SKUs confused
 - Worker fatigue
 - Poor labeling
 
 **Solutions**:
+
 1. Require scan validation
 2. Add visual confirmation
 3. Rotate workers every 2 hours
@@ -461,6 +486,7 @@ Cross-docking integrates with core WMS features:
 ### Core Models
 
 #### CrossDockingAppointment
+
 - `appointmentNumber`: XD-YYYYMMDD-NNN format
 - `type`: DIRECT, MERGE, SPLIT, TRANSLOAD, CONSOLIDATION
 - `status`: SCHEDULED → RECEIVING → SORTING → STAGED → LOADING → COMPLETED
@@ -474,11 +500,13 @@ Cross-docking integrates with core WMS features:
 - Metrics: `totalUnits`, `receivedUnits`, `sortedUnits`, `shippedUnits`
 
 #### CrossDockReceipt
+
 - Links to `CrossDockingAppointment` and `Supplier`
 - `receiptNumber`, `carrier`, `referenceNumber`
 - `status`: RECEIVING, COMPLETED
 
 #### CrossDockReceiptItem
+
 - Links to `CrossDockReceipt` and `InventoryItem`
 - `sku`, `productName`
 - Quantities: `quantityReceived`, `quantityAllocated`, `quantityShipped`, `quantityRemaining`
@@ -486,6 +514,7 @@ Cross-docking integrates with core WMS features:
 - `currentLocationId`: Tracks location during flow
 
 #### CrossDockShipment
+
 - Links to `CrossDockingAppointment`, `Customer`, `SalesOrder`
 - `shipmentNumber`, `carrier`, `trackingNumber`
 - `outboundDoorId`, `loadSheetId`
@@ -493,28 +522,33 @@ Cross-docking integrates with core WMS features:
 - Metrics: `totalUnits`, `packedUnits`
 
 #### CrossDockAllocation
+
 - Links `CrossDockReceiptItem` to `CrossDockShipment`
 - Quantities: `quantityAllocated`, `quantityPicked`, `quantityShipped`
 - `assignedTo`: Worker ID
 - `status`: ALLOCATED → PICKING → PICKED → STAGED → LOADED → SHIPPED
 
 #### CrossDockSorting
+
 - Links to `CrossDockingAppointment` and sorting area
 - `sortingMethod`, `assignedWorkerId`, `teamSize`
 - Metrics: `totalUnits`, `sortedUnits`, `unitsPerHour`, `accuracy`
 - `status`: PENDING → IN_PROGRESS → COMPLETED
 
 #### CrossDockActivity
+
 - Audit log for all appointment activities
 - `action`, `description`, `performedBy`, `metadata` (JSON)
 
 #### CrossDockSettings
+
 - Organization-level configuration
 - Matching strategy, dwell time defaults, notification preferences
 
 ## UI Components
 
 ### Dashboard (`/dashboard/cross-dock`)
+
 - Real-time KPI cards
 - Active appointments list with progress bars
 - Status breakdown charts
@@ -522,12 +556,14 @@ Cross-docking integrates with core WMS features:
 - Auto-refresh every 30 seconds
 
 ### Calendar (`/dashboard/cross-dock/calendar`)
+
 - Week view with 7-day grid
 - Color-coded by status
 - Create appointment dialog
 - Filter by warehouse, status, type
 
 ### Sorting Station (`/warehouse/sorting-station`)
+
 - Barcode scanning interface
 - Real-time progress tracking
 - Session statistics (units/hour, accuracy)
@@ -535,6 +571,7 @@ Cross-docking integrates with core WMS features:
 - Visual confirmation and error handling
 
 ### Shared Components (`/components/cross-dock/shared.tsx`)
+
 - `AppointmentCard`: Displays appointment with all metrics
 - `AllocationList`: Shows allocations with from/to details
 - `DwellTimeIndicator`: Visual dwell time with warnings
@@ -558,12 +595,12 @@ npx prisma migrate deploy
 // Create default settings
 await prisma.crossDockSettings.create({
   data: {
-    organizationId: 'org-123',
+    organizationId: "org-123",
     enableAutomaticMatching: true,
-    matchingStrategy: 'FIFO',
+    matchingStrategy: "FIFO",
     defaultDwellTimeHours: 4,
     maxDwellTimeHours: 24,
-    defaultSortingMethod: 'SCAN_SORT',
+    defaultSortingMethod: "SCAN_SORT",
     requireScanValidation: true,
     allowPartialAllocations: true,
     targetThroughput: 100,
@@ -576,10 +613,10 @@ await prisma.crossDockSettings.create({
 ```typescript
 // Enable cross-docking for organization
 await prisma.organization.update({
-  where: { id: 'org-123' },
+  where: { id: "org-123" },
   data: {
     enabledFeatures: {
-      push: 'CROSS_DOCKING',
+      push: "CROSS_DOCKING",
     },
   },
 });
@@ -588,16 +625,19 @@ await prisma.organization.update({
 ## Support & Resources
 
 ### Training Materials
+
 - Video: "Cross-Docking Overview" (15 min)
 - Guide: "Sorting Station Quick Start" (2 pages)
 - Checklist: "Daily Cross-Dock Operations"
 
 ### Technical Support
+
 - Email: support@flowstock.com
 - Slack: #cross-docking-help
 - Docs: https://docs.flowstock.com/cross-docking
 
 ### Advanced Topics
+
 - Custom matching algorithms
 - Multi-facility cross-docking
 - Carrier integration APIs

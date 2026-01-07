@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Scan, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { Scan, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
 interface BarcodeScannerProps {
   onScan: (code: string) => void;
@@ -20,10 +20,10 @@ interface BarcodeScannerProps {
 
 export function BarcodeScanner({
   onScan,
-  placeholder = 'Scan or enter barcode',
-  label = 'Barcode',
+  placeholder = "Scan or enter barcode",
+  label = "Barcode",
 }: BarcodeScannerProps) {
-  const [manualCode, setManualCode] = useState('');
+  const [manualCode, setManualCode] = useState("");
   const [showScanner, setShowScanner] = useState(false);
   const [scanning, setScanning] = useState(false);
 
@@ -31,7 +31,7 @@ export function BarcodeScanner({
     e.preventDefault();
     if (manualCode.trim()) {
       onScan(manualCode.trim());
-      setManualCode('');
+      setManualCode("");
     }
   };
 
@@ -47,13 +47,13 @@ export function BarcodeScanner({
 
       // Simulate scanner for demo
       setTimeout(() => {
-        const mockCode = '1234567890123';
+        const mockCode = "1234567890123";
         onScan(mockCode);
         setShowScanner(false);
         setScanning(false);
       }, 2000);
     } catch (error) {
-      console.error('Scanner error:', error);
+      console.error("Scanner error:", error);
       setScanning(false);
     }
   };
@@ -61,7 +61,7 @@ export function BarcodeScanner({
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium">{label}</label>
-      
+
       <div className="flex gap-2">
         <form onSubmit={handleManualSubmit} className="flex-1">
           <div className="relative">
@@ -102,9 +102,7 @@ export function BarcodeScanner({
                 <div className="flex h-full items-center justify-center">
                   <div className="text-center">
                     <Scan className="mx-auto mb-4 h-16 w-16 animate-pulse text-primary" />
-                    <p className="text-sm text-muted-foreground">
-                      Scanning...
-                    </p>
+                    <p className="text-sm text-muted-foreground">Scanning...</p>
                   </div>
                 </div>
               ) : (

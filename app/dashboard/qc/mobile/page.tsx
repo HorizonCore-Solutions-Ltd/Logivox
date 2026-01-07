@@ -1,44 +1,52 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Scan, CheckCircle2, XCircle, Camera, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PhotoUpload } from '@/components/qc/PhotoUpload';
-import { SignatureCapture } from '@/components/qc/SignatureCapture';
+import { useState } from "react";
+import { Scan, CheckCircle2, XCircle, Camera, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PhotoUpload } from "@/components/qc/PhotoUpload";
+import { SignatureCapture } from "@/components/qc/SignatureCapture";
 
 export default function MobileInspectionPage() {
-  const [step, setStep] = useState<'scan' | 'inspect' | 'record' | 'complete'>('scan');
-  const [lotNumber, setLotNumber] = useState('');
+  const [step, setStep] = useState<"scan" | "inspect" | "record" | "complete">(
+    "scan",
+  );
+  const [lotNumber, setLotNumber] = useState("");
   const [inspectionData, setInspectionData] = useState({
-    result: '',
+    result: "",
     defects: 0,
     sampleSize: 0,
     photos: [] as string[],
-    notes: '',
-    signature: '',
+    notes: "",
+    signature: "",
   });
 
   const handleScan = (code: string) => {
     setLotNumber(code);
-    setStep('inspect');
+    setStep("inspect");
   };
 
-  const handleInspectionResult = (result: 'PASS' | 'FAIL') => {
+  const handleInspectionResult = (result: "PASS" | "FAIL") => {
     setInspectionData({ ...inspectionData, result });
-    setStep('record');
+    setStep("record");
   };
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('/api/qc/mobile/inspection', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/mobile/inspection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           lotNumber,
           ...inspectionData,
@@ -46,22 +54,22 @@ export default function MobileInspectionPage() {
       });
 
       if (response.ok) {
-        setStep('complete');
+        setStep("complete");
         setTimeout(() => {
-          setStep('scan');
-          setLotNumber('');
+          setStep("scan");
+          setLotNumber("");
           setInspectionData({
-            result: '',
+            result: "",
             defects: 0,
             sampleSize: 0,
             photos: [],
-            notes: '',
-            signature: '',
+            notes: "",
+            signature: "",
           });
         }, 3000);
       }
     } catch (error) {
-      alert('Failed to submit inspection');
+      alert("Failed to submit inspection");
     }
   };
 
@@ -74,13 +82,13 @@ export default function MobileInspectionPage() {
       </Card>
 
       {/* Step: Scan */}
-      {step === 'scan' && (
+      {step === "scan" && (
         <Card className="p-6">
           <div className="space-y-6 text-center">
             <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-blue-50">
               <Scan className="h-16 w-16 text-blue-600" />
             </div>
-            
+
             <div>
               <h2 className="text-xl font-semibold">Scan Lot Number</h2>
               <p className="text-sm text-muted-foreground">
@@ -91,13 +99,15 @@ export default function MobileInspectionPage() {
             <Button
               size="lg"
               className="w-full"
-              onClick={() => handleScan('LOT-' + Date.now())}
+              onClick={() => handleScan("LOT-" + Date.now())}
             >
               <Scan className="mr-2 h-5 w-5" />
               Scan Barcode
             </Button>
 
-            <div className="text-sm text-muted-foreground">or enter manually</div>
+            <div className="text-sm text-muted-foreground">
+              or enter manually
+            </div>
 
             <Input
               placeholder="Enter lot number"
@@ -110,7 +120,7 @@ export default function MobileInspectionPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => setStep('inspect')}
+                onClick={() => setStep("inspect")}
               >
                 Continue
               </Button>
@@ -120,7 +130,7 @@ export default function MobileInspectionPage() {
       )}
 
       {/* Step: Inspect */}
-      {step === 'inspect' && (
+      {step === "inspect" && (
         <div className="space-y-4">
           <Card className="p-4">
             <div className="flex items-center justify-between">
@@ -171,7 +181,7 @@ export default function MobileInspectionPage() {
               size="lg"
               variant="outline"
               className="h-32 flex-col gap-2 border-green-500 bg-green-50 hover:bg-green-100"
-              onClick={() => handleInspectionResult('PASS')}
+              onClick={() => handleInspectionResult("PASS")}
             >
               <CheckCircle2 className="h-12 w-12 text-green-600" />
               <span className="text-lg font-semibold text-green-700">PASS</span>
@@ -181,7 +191,7 @@ export default function MobileInspectionPage() {
               size="lg"
               variant="outline"
               className="h-32 flex-col gap-2 border-red-500 bg-red-50 hover:bg-red-100"
-              onClick={() => handleInspectionResult('FAIL')}
+              onClick={() => handleInspectionResult("FAIL")}
             >
               <XCircle className="h-12 w-12 text-red-600" />
               <span className="text-lg font-semibold text-red-700">FAIL</span>
@@ -191,7 +201,7 @@ export default function MobileInspectionPage() {
       )}
 
       {/* Step: Record Details */}
-      {step === 'record' && (
+      {step === "record" && (
         <div className="space-y-4">
           <Card className="p-4">
             <div className="flex items-center justify-between">
@@ -200,7 +210,9 @@ export default function MobileInspectionPage() {
                 <div className="text-lg font-bold">{lotNumber}</div>
               </div>
               <Badge
-                variant={inspectionData.result === 'PASS' ? 'default' : 'destructive'}
+                variant={
+                  inspectionData.result === "PASS" ? "default" : "destructive"
+                }
               >
                 {inspectionData.result}
               </Badge>
@@ -225,7 +237,10 @@ export default function MobileInspectionPage() {
                 rows={4}
                 value={inspectionData.notes}
                 onChange={(e) =>
-                  setInspectionData({ ...inspectionData, notes: e.target.value })
+                  setInspectionData({
+                    ...inspectionData,
+                    notes: e.target.value,
+                  })
                 }
                 placeholder="Observations, defects found, etc..."
               />
@@ -244,16 +259,10 @@ export default function MobileInspectionPage() {
           </Card>
 
           <div className="grid grid-cols-2 gap-4">
-            <Button
-              variant="outline"
-              onClick={() => setStep('inspect')}
-            >
+            <Button variant="outline" onClick={() => setStep("inspect")}>
               Back
             </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={!inspectionData.signature}
-            >
+            <Button onClick={handleSubmit} disabled={!inspectionData.signature}>
               <FileText className="mr-2 h-4 w-4" />
               Submit
             </Button>
@@ -262,7 +271,7 @@ export default function MobileInspectionPage() {
       )}
 
       {/* Step: Complete */}
-      {step === 'complete' && (
+      {step === "complete" && (
         <Card className="p-6">
           <div className="space-y-4 text-center">
             <div className="mx-auto flex h-32 w-32 items-center justify-center rounded-full bg-green-50">
@@ -278,9 +287,7 @@ export default function MobileInspectionPage() {
               </p>
             </div>
 
-            <div className="text-sm">
-              Redirecting to next inspection...
-            </div>
+            <div className="text-sm">Redirecting to next inspection...</div>
           </div>
         </Card>
       )}

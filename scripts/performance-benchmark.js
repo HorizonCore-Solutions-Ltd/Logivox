@@ -2,20 +2,20 @@
 
 /**
  * FlowStock WMS - Performance Benchmark Tool
- * 
+ *
  * Runs performance benchmarks and generates reports.
- * 
+ *
  * Usage:
  *   node scripts/performance-benchmark.js --suite api
  *   node scripts/performance-benchmark.js --suite database
  *   node scripts/performance-benchmark.js --suite all
  */
 
-const axios = require('axios');
-const { PrismaClient } = require('@prisma/client');
-const { performance } = require('perf_hooks');
-const fs = require('fs');
-const path = require('path');
+const axios = require("axios");
+const { PrismaClient } = require("@prisma/client");
+const { performance } = require("perf_hooks");
+const fs = require("fs");
+const path = require("path");
 
 const prisma = new PrismaClient();
 
@@ -26,7 +26,7 @@ const results = {
 };
 
 const config = {
-  baseUrl: process.env.API_BASE_URL || 'http://localhost:3000',
+  baseUrl: process.env.API_BASE_URL || "http://localhost:3000",
   iterations: parseInt(process.env.BENCHMARK_ITERATIONS) || 100,
   concurrency: parseInt(process.env.BENCHMARK_CONCURRENCY) || 10,
 };
@@ -35,7 +35,7 @@ const config = {
  * Main benchmark function
  */
 async function runBenchmarks(suite) {
-  console.log('\n⚡ FlowStock WMS Performance Benchmark Tool\n');
+  console.log("\n⚡ FlowStock WMS Performance Benchmark Tool\n");
   console.log(`Configuration:`);
   console.log(`  Base URL: ${config.baseUrl}`);
   console.log(`  Iterations: ${config.iterations}`);
@@ -45,14 +45,14 @@ async function runBenchmarks(suite) {
 
   try {
     switch (suite) {
-      case 'all':
+      case "all":
         await benchmarkAPI();
         await benchmarkDatabase();
         break;
-      case 'api':
+      case "api":
         await benchmarkAPI();
         break;
-      case 'database':
+      case "database":
         await benchmarkDatabase();
         break;
       default:
@@ -71,7 +71,6 @@ async function runBenchmarks(suite) {
 
     // Save results to file
     await saveResults();
-
   } catch (error) {
     console.error(`\n❌ Benchmark failed: ${error.message}`);
     process.exit(1);
@@ -84,16 +83,16 @@ async function runBenchmarks(suite) {
  * Benchmark API endpoints
  */
 async function benchmarkAPI() {
-  console.log('🌐 Benchmarking API Endpoints...\n');
+  console.log("🌐 Benchmarking API Endpoints...\n");
 
   const endpoints = [
-    { name: 'Health Check', method: 'GET', path: '/api/health' },
-    { name: 'List Products', method: 'GET', path: '/api/products' },
-    { name: 'Get Product', method: 'GET', path: '/api/products/1' },
-    { name: 'List Inventory', method: 'GET', path: '/api/inventory' },
-    { name: 'List Orders', method: 'GET', path: '/api/orders' },
-    { name: 'Get Order', method: 'GET', path: '/api/orders/1' },
-    { name: 'List Customers', method: 'GET', path: '/api/customers' },
+    { name: "Health Check", method: "GET", path: "/api/health" },
+    { name: "List Products", method: "GET", path: "/api/products" },
+    { name: "Get Product", method: "GET", path: "/api/products/1" },
+    { name: "List Inventory", method: "GET", path: "/api/inventory" },
+    { name: "List Orders", method: "GET", path: "/api/orders" },
+    { name: "Get Order", method: "GET", path: "/api/orders/1" },
+    { name: "List Customers", method: "GET", path: "/api/customers" },
   ];
 
   for (const endpoint of endpoints) {
@@ -103,7 +102,7 @@ async function benchmarkAPI() {
     displayEndpointStats(endpoint.name, stats);
   }
 
-  console.log('✅ API benchmarks complete\n');
+  console.log("✅ API benchmarks complete\n");
 }
 
 /**
@@ -143,73 +142,76 @@ async function benchmarkEndpoint(endpoint) {
  * Benchmark database queries
  */
 async function benchmarkDatabase() {
-  console.log('💾 Benchmarking Database Queries...\n');
+  console.log("💾 Benchmarking Database Queries...\n");
 
   const queries = [
     {
-      name: 'Count Products',
+      name: "Count Products",
       fn: () => prisma.product.count(),
     },
     {
-      name: 'Find First Product',
+      name: "Find First Product",
       fn: () => prisma.product.findFirst(),
     },
     {
-      name: 'List Products (10)',
+      name: "List Products (10)",
       fn: () => prisma.product.findMany({ take: 10 }),
     },
     {
-      name: 'List Products with Relations',
-      fn: () => prisma.product.findMany({
-        take: 10,
-        include: {
-          category: true,
-          inventoryLevels: true,
-        },
-      }),
+      name: "List Products with Relations",
+      fn: () =>
+        prisma.product.findMany({
+          take: 10,
+          include: {
+            category: true,
+            inventoryLevels: true,
+          },
+        }),
     },
     {
-      name: 'Count Inventory Levels',
+      name: "Count Inventory Levels",
       fn: () => prisma.inventoryLevel.count(),
     },
     {
-      name: 'List Inventory Levels (10)',
+      name: "List Inventory Levels (10)",
       fn: () => prisma.inventoryLevel.findMany({ take: 10 }),
     },
     {
-      name: 'Complex Query - Low Stock',
-      fn: () => prisma.inventoryLevel.findMany({
-        where: {
-          quantity: { lte: 10 },
-        },
-        include: {
-          product: true,
-          warehouse: true,
-        },
-        take: 10,
-      }),
+      name: "Complex Query - Low Stock",
+      fn: () =>
+        prisma.inventoryLevel.findMany({
+          where: {
+            quantity: { lte: 10 },
+          },
+          include: {
+            product: true,
+            warehouse: true,
+          },
+          take: 10,
+        }),
     },
     {
-      name: 'Count Orders',
+      name: "Count Orders",
       fn: () => prisma.salesOrder.count(),
     },
     {
-      name: 'List Orders (10)',
+      name: "List Orders (10)",
       fn: () => prisma.salesOrder.findMany({ take: 10 }),
     },
     {
-      name: 'List Orders with Relations',
-      fn: () => prisma.salesOrder.findMany({
-        take: 10,
-        include: {
-          customer: true,
-          lineItems: {
-            include: {
-              product: true,
+      name: "List Orders with Relations",
+      fn: () =>
+        prisma.salesOrder.findMany({
+          take: 10,
+          include: {
+            customer: true,
+            lineItems: {
+              include: {
+                product: true,
+              },
             },
           },
-        },
-      }),
+        }),
     },
   ];
 
@@ -220,7 +222,7 @@ async function benchmarkDatabase() {
     displayQueryStats(query.name, stats);
   }
 
-  console.log('✅ Database benchmarks complete\n');
+  console.log("✅ Database benchmarks complete\n");
 }
 
 /**
@@ -299,55 +301,59 @@ function displayQueryStats(name, stats) {
  * Display overall results
  */
 function displayResults() {
-  console.log('\n' + '='.repeat(60));
-  console.log('📊 Benchmark Results');
-  console.log('='.repeat(60));
+  console.log("\n" + "=".repeat(60));
+  console.log("📊 Benchmark Results");
+  console.log("=".repeat(60));
 
   if (results.api.length > 0) {
-    console.log('\n🌐 API Endpoints:\n');
-    console.log('Endpoint'.padEnd(30) + 'Mean'.padEnd(12) + 'P95'.padEnd(12) + 'Errors');
-    console.log('-'.repeat(60));
+    console.log("\n🌐 API Endpoints:\n");
+    console.log(
+      "Endpoint".padEnd(30) + "Mean".padEnd(12) + "P95".padEnd(12) + "Errors",
+    );
+    console.log("-".repeat(60));
 
-    results.api.forEach(result => {
+    results.api.forEach((result) => {
       console.log(
         result.endpoint.padEnd(30) +
-        `${result.mean.toFixed(2)}ms`.padEnd(12) +
-        `${result.p95.toFixed(2)}ms`.padEnd(12) +
-        `${result.errors}`
+          `${result.mean.toFixed(2)}ms`.padEnd(12) +
+          `${result.p95.toFixed(2)}ms`.padEnd(12) +
+          `${result.errors}`,
       );
     });
   }
 
   if (results.database.length > 0) {
-    console.log('\n💾 Database Queries:\n');
-    console.log('Query'.padEnd(35) + 'Mean'.padEnd(12) + 'P95'.padEnd(12) + 'Errors');
-    console.log('-'.repeat(60));
+    console.log("\n💾 Database Queries:\n");
+    console.log(
+      "Query".padEnd(35) + "Mean".padEnd(12) + "P95".padEnd(12) + "Errors",
+    );
+    console.log("-".repeat(60));
 
-    results.database.forEach(result => {
+    results.database.forEach((result) => {
       console.log(
         result.query.padEnd(35) +
-        `${result.mean.toFixed(2)}ms`.padEnd(12) +
-        `${result.p95.toFixed(2)}ms`.padEnd(12) +
-        `${result.errors}`
+          `${result.mean.toFixed(2)}ms`.padEnd(12) +
+          `${result.p95.toFixed(2)}ms`.padEnd(12) +
+          `${result.errors}`,
       );
     });
   }
 
   console.log(`\n⏱️  Total Time: ${results.summary.totalTime}s`);
-  console.log('='.repeat(60) + '\n');
+  console.log("=".repeat(60) + "\n");
 }
 
 /**
  * Save results to file
  */
 async function saveResults() {
-  const outputDir = path.join(process.cwd(), 'benchmark-results');
+  const outputDir = path.join(process.cwd(), "benchmark-results");
 
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const filename = `benchmark-${timestamp}.json`;
   const filepath = path.join(outputDir, filename);
 
@@ -566,7 +572,9 @@ async function generateHTMLReport(outputDir, timestamp) {
       </div>
     </div>
 
-    ${results.api.length > 0 ? `
+    ${
+      results.api.length > 0
+        ? `
     <h2>🌐 API Endpoint Benchmarks</h2>
     <table>
       <thead>
@@ -582,7 +590,9 @@ async function generateHTMLReport(outputDir, timestamp) {
         </tr>
       </thead>
       <tbody>
-        ${results.api.map(result => `
+        ${results.api
+          .map(
+            (result) => `
         <tr>
           <td><strong>${result.endpoint}</strong></td>
           <td>${result.min.toFixed(2)}</td>
@@ -593,12 +603,18 @@ async function generateHTMLReport(outputDir, timestamp) {
           <td>${result.max.toFixed(2)}</td>
           <td>${result.errors}</td>
         </tr>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </tbody>
     </table>
-    ` : ''}
+    `
+        : ""
+    }
 
-    ${results.database.length > 0 ? `
+    ${
+      results.database.length > 0
+        ? `
     <h2>💾 Database Query Benchmarks</h2>
     <table>
       <thead>
@@ -614,7 +630,9 @@ async function generateHTMLReport(outputDir, timestamp) {
         </tr>
       </thead>
       <tbody>
-        ${results.database.map(result => `
+        ${results.database
+          .map(
+            (result) => `
         <tr>
           <td><strong>${result.query}</strong></td>
           <td>${result.min.toFixed(2)}</td>
@@ -625,10 +643,14 @@ async function generateHTMLReport(outputDir, timestamp) {
           <td>${result.max.toFixed(2)}</td>
           <td>${result.errors}</td>
         </tr>
-        `).join('')}
+        `,
+          )
+          .join("")}
       </tbody>
     </table>
-    ` : ''}
+    `
+        : ""
+    }
 
   </div>
 
@@ -655,9 +677,9 @@ async function generateHTMLReport(outputDir, timestamp) {
  * Get performance class for styling
  */
 function getPerformanceClass(value) {
-  if (value < 100) return 'fast';
-  if (value < 500) return 'medium';
-  return 'slow';
+  if (value < 100) return "fast";
+  if (value < 500) return "medium";
+  return "slow";
 }
 
 /**
@@ -665,13 +687,13 @@ function getPerformanceClass(value) {
  */
 function parseArgs() {
   const args = process.argv.slice(2);
-  let suite = 'all';
+  let suite = "all";
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--suite' && args[i + 1]) {
+    if (args[i] === "--suite" && args[i + 1]) {
       suite = args[i + 1];
       i++;
-    } else if (args[i] === '--help' || args[i] === '-h') {
+    } else if (args[i] === "--help" || args[i] === "-h") {
       displayHelp();
       process.exit(0);
     }

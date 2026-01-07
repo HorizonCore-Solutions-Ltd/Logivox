@@ -1,8 +1,8 @@
 /**
  * Cookie Consent Management System
- * 
+ *
  * GDPR & CCPA compliant cookie consent with granular control
- * 
+ *
  * Features:
  * - Granular cookie categories (essential, functional, analytics, marketing)
  * - User consent management and persistence
@@ -31,37 +31,41 @@ export interface CookieConsent {
 
 export const COOKIE_CATEGORIES: CookieCategory[] = [
   {
-    id: 'essential',
-    name: 'Essential Cookies',
-    description: 'Required for the website to function properly. These include authentication, security, and basic functionality.',
+    id: "essential",
+    name: "Essential Cookies",
+    description:
+      "Required for the website to function properly. These include authentication, security, and basic functionality.",
     essential: true,
     enabled: true,
   },
   {
-    id: 'functional',
-    name: 'Functional Cookies',
-    description: 'Enhance your experience with features like language preferences, region selection, and personalized content.',
+    id: "functional",
+    name: "Functional Cookies",
+    description:
+      "Enhance your experience with features like language preferences, region selection, and personalized content.",
     essential: false,
     enabled: false,
   },
   {
-    id: 'analytics',
-    name: 'Analytics Cookies',
-    description: 'Help us understand how visitors interact with our website by collecting anonymous usage data.',
+    id: "analytics",
+    name: "Analytics Cookies",
+    description:
+      "Help us understand how visitors interact with our website by collecting anonymous usage data.",
     essential: false,
     enabled: false,
   },
   {
-    id: 'marketing',
-    name: 'Marketing Cookies',
-    description: 'Used to track visitors across websites for marketing purposes and to display relevant advertisements.',
+    id: "marketing",
+    name: "Marketing Cookies",
+    description:
+      "Used to track visitors across websites for marketing purposes and to display relevant advertisements.",
     essential: false,
     enabled: false,
   },
 ];
 
-export const CONSENT_VERSION = '1.0';
-export const CONSENT_COOKIE_NAME = 'flowstock_cookie_consent';
+export const CONSENT_VERSION = "1.0";
+export const CONSENT_COOKIE_NAME = "flowstock_cookie_consent";
 export const CONSENT_DURATION_DAYS = 365;
 
 // ==========================================
@@ -81,7 +85,7 @@ export class CookieConsentManager {
   }
 
   constructor() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       this.loadConsent();
     }
   }
@@ -97,7 +101,7 @@ export class CookieConsentManager {
         return this.consent;
       }
     } catch (error) {
-      console.error('[CookieConsent] Failed to load consent:', error);
+      console.error("[CookieConsent] Failed to load consent:", error);
     }
     return null;
   }
@@ -120,12 +124,12 @@ export class CookieConsentManager {
     // Save to cookie
     const expires = new Date();
     expires.setDate(expires.getDate() + CONSENT_DURATION_DAYS);
-    
+
     const cookieValue = encodeURIComponent(JSON.stringify(fullConsent));
     document.cookie = `${CONSENT_COOKIE_NAME}=${cookieValue}; expires=${expires.toUTCString()}; path=/; secure; samesite=strict`;
 
     // Notify listeners
-    this.listeners.forEach(listener => listener(fullConsent));
+    this.listeners.forEach((listener) => listener(fullConsent));
 
     // Initialize analytics/marketing based on consent
     this.initializeServices(fullConsent);
@@ -150,7 +154,7 @@ export class CookieConsentManager {
    */
   hasConsentFor(category: keyof CookieConsent): boolean {
     if (!this.consent) return false;
-    if (category === 'timestamp' || category === 'version') return false;
+    if (category === "timestamp" || category === "version") return false;
     return this.consent[category] === true;
   }
 
@@ -181,22 +185,24 @@ export class CookieConsentManager {
    */
   withdrawConsent(): void {
     this.consent = null;
-    
+
     // Delete consent cookie
     document.cookie = `${CONSENT_COOKIE_NAME}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    
+
     // Delete all non-essential cookies
     this.deleteNonEssentialCookies();
-    
+
     // Notify listeners
-    this.listeners.forEach(listener => listener({
-      essential: true,
-      functional: false,
-      analytics: false,
-      marketing: false,
-      timestamp: Date.now(),
-      version: CONSENT_VERSION,
-    }));
+    this.listeners.forEach((listener) =>
+      listener({
+        essential: true,
+        functional: false,
+        analytics: false,
+        marketing: false,
+        timestamp: Date.now(),
+        version: CONSENT_VERSION,
+      }),
+    );
   }
 
   /**
@@ -244,56 +250,56 @@ export class CookieConsentManager {
 
   private initializeAnalytics(): void {
     // TODO: Initialize Google Analytics
-    console.log('[CookieConsent] Analytics enabled');
-    
+    console.log("[CookieConsent] Analytics enabled");
+
     // Example: Google Analytics 4
     // gtag('config', 'GA_MEASUREMENT_ID');
   }
 
   private disableAnalytics(): void {
-    console.log('[CookieConsent] Analytics disabled');
-    
+    console.log("[CookieConsent] Analytics disabled");
+
     // Example: Disable Google Analytics
     // gtag('config', 'GA_MEASUREMENT_ID', { send_page_view: false });
   }
 
   private initializeMarketing(): void {
-    console.log('[CookieConsent] Marketing enabled');
-    
+    console.log("[CookieConsent] Marketing enabled");
+
     // TODO: Initialize marketing pixels
     // Facebook Pixel, Google Ads, etc.
   }
 
   private disableMarketing(): void {
-    console.log('[CookieConsent] Marketing disabled');
+    console.log("[CookieConsent] Marketing disabled");
   }
 
   private initializeFunctional(): void {
-    console.log('[CookieConsent] Functional enabled');
-    
+    console.log("[CookieConsent] Functional enabled");
+
     // TODO: Initialize chat widgets, etc.
   }
 
   private disableFunctional(): void {
-    console.log('[CookieConsent] Functional disabled');
+    console.log("[CookieConsent] Functional disabled");
   }
 
   /**
    * Delete all non-essential cookies
    */
   private deleteNonEssentialCookies(): void {
-    const cookies = document.cookie.split(';');
-    
+    const cookies = document.cookie.split(";");
+
     const essentialCookies = [
-      'next-auth.session-token',
-      'next-auth.csrf-token',
-      'next-auth.callback-url',
-      'flowstock_session',
+      "next-auth.session-token",
+      "next-auth.csrf-token",
+      "next-auth.callback-url",
+      "flowstock_session",
       CONSENT_COOKIE_NAME,
     ];
 
-    cookies.forEach(cookie => {
-      const [name] = cookie.trim().split('=');
+    cookies.forEach((cookie) => {
+      const [name] = cookie.trim().split("=");
       if (name && !essentialCookies.includes(name)) {
         // Delete cookie
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
@@ -306,18 +312,18 @@ export class CookieConsentManager {
    * Get cookie value by name
    */
   private getCookie(name: string): string | null {
-    if (typeof document === 'undefined') return null;
-    
-    const nameEQ = name + '=';
-    const ca = document.cookie.split(';');
-    
+    if (typeof document === "undefined") return null;
+
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(";");
+
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i];
       if (!c) continue;
-      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      while (c.charAt(0) === " ") c = c.substring(1, c.length);
       if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
     }
-    
+
     return null;
   }
 }
@@ -326,7 +332,7 @@ export class CookieConsentManager {
 // REACT HOOKS
 // ==========================================
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export function useCookieConsent() {
   const [consent, setConsent] = useState<CookieConsent | null>(null);
@@ -335,7 +341,7 @@ export function useCookieConsent() {
   useEffect(() => {
     const manager = CookieConsentManager.getInstance();
     const currentConsent = manager.getConsent();
-    
+
     setConsent(currentConsent);
     setHasConsent(currentConsent !== null);
 
@@ -393,10 +399,11 @@ export function useCookieConsent() {
  */
 export function areCookiesEnabled(): boolean {
   try {
-    document.cookie = 'cookietest=1; SameSite=Strict; Secure';
-    const enabled = document.cookie.indexOf('cookietest=') !== -1;
+    document.cookie = "cookietest=1; SameSite=Strict; Secure";
+    const enabled = document.cookie.indexOf("cookietest=") !== -1;
     // Clean up test cookie
-    document.cookie = 'cookietest=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie =
+      "cookietest=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     return enabled;
   } catch {
     return false;
@@ -409,11 +416,11 @@ export function areCookiesEnabled(): boolean {
 export async function getPrivacyFriendlyIP(): Promise<string> {
   try {
     // Use a service that provides hashed/anonymized IP
-    const response = await fetch('/api/privacy/ip');
+    const response = await fetch("/api/privacy/ip");
     const data = await response.json();
-    return data.hashedIP || 'unknown';
+    return data.hashedIP || "unknown";
   } catch {
-    return 'unknown';
+    return "unknown";
   }
 }
 
@@ -422,7 +429,7 @@ export async function getPrivacyFriendlyIP(): Promise<string> {
  */
 export async function isUserInEU(): Promise<boolean> {
   try {
-    const response = await fetch('/api/privacy/location');
+    const response = await fetch("/api/privacy/location");
     const data = await response.json();
     return data.isEU || false;
   } catch {

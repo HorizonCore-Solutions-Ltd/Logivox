@@ -140,7 +140,9 @@ export default function AssemblyDashboard() {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Kitting & Assembly</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Kitting & Assembly
+          </h1>
           <p className="mt-2 text-gray-600">
             Manage BOMs, assembly orders, and production
           </p>
@@ -253,19 +255,23 @@ export default function AssemblyDashboard() {
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {bom.bomNumber}
-                          <div className="text-xs text-gray-500">v{bom.version}</div>
+                          <div className="text-xs text-gray-500">
+                            v{bom.version}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {bom.name}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <div className="font-medium">{bom.product.sku}</div>
-                          <div className="text-gray-500">{bom.product.name}</div>
+                          <div className="text-gray-500">
+                            {bom.product.name}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getBOMTypeBadge(
-                              bom.bomType
+                              bom.bomType,
                             )}`}
                           >
                             {bom.bomType}
@@ -274,7 +280,7 @@ export default function AssemblyDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(
-                              bom.status
+                              bom.status,
                             )}`}
                           >
                             {bom.status.replace(/_/g, " ")}
@@ -287,7 +293,9 @@ export default function AssemblyDashboard() {
                           {bom.standardYield}%
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {bom.totalCost !== null ? `$${Number(bom.totalCost).toFixed(2)}` : "-"}
+                          {bom.totalCost !== null
+                            ? `$${Number(bom.totalCost).toFixed(2)}`
+                            : "-"}
                         </td>
                       </tr>
                     ))}
@@ -371,7 +379,9 @@ export default function AssemblyDashboard() {
                     {orders.map((order) => (
                       <tr
                         key={order.id}
-                        onClick={() => router.push(`/assembly/orders/${order.id}`)}
+                        onClick={() =>
+                          router.push(`/assembly/orders/${order.id}`)
+                        }
                         className="hover:bg-gray-50 cursor-pointer"
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -379,7 +389,9 @@ export default function AssemblyDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <div className="font-medium">{order.product.sku}</div>
-                          <div className="text-gray-500">{order.product.name}</div>
+                          <div className="text-gray-500">
+                            {order.product.name}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {order.bom.name}
@@ -387,7 +399,7 @@ export default function AssemblyDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(
-                              order.status
+                              order.status,
                             )}`}
                           >
                             {order.status.replace(/_/g, " ")}
@@ -395,7 +407,9 @@ export default function AssemblyDashboard() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <span className={getPriorityColor(order.priority)}>
-                            {order.priority > 0 ? `P${order.priority}` : "Normal"}
+                            {order.priority > 0
+                              ? `P${order.priority}`
+                              : "Normal"}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -405,15 +419,19 @@ export default function AssemblyDashboard() {
                               className="bg-blue-600 h-2 rounded-full"
                               style={{
                                 width: `${Math.min(
-                                  (order.producedQuantity / order.plannedQuantity) * 100,
-                                  100
+                                  (order.producedQuantity /
+                                    order.plannedQuantity) *
+                                    100,
+                                  100,
                                 )}%`,
                               }}
                             ></div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {order.actualYield !== null ? `${order.actualYield.toFixed(1)}%` : "-"}
+                          {order.actualYield !== null
+                            ? `${order.actualYield.toFixed(1)}%`
+                            : "-"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {order.assignedTo?.name || "Unassigned"}

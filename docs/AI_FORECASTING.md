@@ -7,6 +7,7 @@ The AI-Powered Inventory Forecasting system uses advanced machine learning algor
 ## Key Features
 
 ### 1. **Machine Learning Forecasting**
+
 - **4 Forecasting Methods:**
   - Simple Moving Average (SMA) - Basic trend analysis
   - Exponential Moving Average (EMA) - Recent data weighted more heavily
@@ -19,6 +20,7 @@ The AI-Powered Inventory Forecasting system uses advanced machine learning algor
   - Strength scoring (0-1) for pattern confidence
 
 ### 2. **Inventory Optimization**
+
 - **Safety Stock Calculation:** Z-score based buffer stock (95% or 99% service level)
 - **Economic Order Quantity (EOQ):** Minimize total ordering and holding costs
 - **Reorder Point:** Optimal timing for reordering (demand × lead time + safety stock)
@@ -26,6 +28,7 @@ The AI-Powered Inventory Forecasting system uses advanced machine learning algor
 - **Turnover Analysis:** Fast/medium/slow/obsolete classification
 
 ### 3. **Smart Reorder Alerts**
+
 - **4 Urgency Levels:**
   - Critical: ≤3 days until stockout
   - High: ≤7 days until stockout
@@ -38,6 +41,7 @@ The AI-Powered Inventory Forecasting system uses advanced machine learning algor
   - Priority ranking
 
 ### 4. **Stock Optimization**
+
 - **Overstock Analysis:** Identify excess inventory and holding costs
 - **Understock Analysis:** Detect shortage risks
 - **Action Recommendations:** Order/reduce/maintain decisions
@@ -104,26 +108,31 @@ Navigate to **Dashboard → AI Forecasting** to view the forecasting interface.
 ## Best Practices
 
 ### 1. **Regular Monitoring**
+
 - Review forecasts weekly
 - Update reorder points based on trends
 - Monitor forecast accuracy over time
 
 ### 2. **Seasonal Planning**
+
 - Prepare for peak seasons in advance
 - Increase safety stock before high-demand periods
 - Reduce inventory after seasonal peaks
 
 ### 3. **Data Quality**
+
 - Ensure accurate sales data recording
 - Regular inventory counts to verify stock levels
 - Clean data leads to better predictions
 
 ### 4. **Action on Alerts**
+
 - Address critical alerts within 24 hours
 - Review high-priority alerts within 3 days
 - Plan for medium/low alerts weekly
 
 ### 5. **Optimization Cycles**
+
 - Run stock optimization monthly
 - Implement recommendations systematically
 - Track cost savings and improvements
@@ -133,29 +142,34 @@ Navigate to **Dashboard → AI Forecasting** to view the forecasting interface.
 ### Algorithms Used
 
 1. **Simple Moving Average (SMA)**
+
    ```
    SMA = (Sum of last N periods) / N
    ```
 
 2. **Exponential Moving Average (EMA)**
+
    ```
    EMA = (Current Value × α) + (Previous EMA × (1 - α))
    where α = 2 / (N + 1)
    ```
 
 3. **Linear Regression**
+
    ```
    y = mx + b
    where m = slope, b = intercept
    ```
 
 4. **Safety Stock**
+
    ```
    Safety Stock = Z-score × σ × √(lead time)
    where Z = 1.65 (95%) or 2.33 (99%)
    ```
 
 5. **Economic Order Quantity (EOQ)**
+
    ```
    EOQ = √((2 × D × S) / H)
    where D = annual demand, S = order cost, H = holding cost
@@ -234,18 +248,22 @@ Navigate to **Dashboard → AI Forecasting** to view the forecasting interface.
 ## Troubleshooting
 
 ### Low Forecast Confidence
+
 - **Cause:** Irregular sales patterns, insufficient data
 - **Solution:** Collect more historical data, investigate anomalies
 
 ### No Seasonal Patterns Detected
+
 - **Cause:** Insufficient data, truly random demand
 - **Solution:** Gather 90+ days data, check for longer patterns
 
 ### Frequent Stockouts Despite Forecasts
+
 - **Cause:** Lead times inaccurate, demand spikes
 - **Solution:** Increase safety stock, improve supplier lead times
 
 ### High Holding Costs
+
 - **Cause:** Overstock, slow-moving items
 - **Solution:** Follow optimization recommendations, run ABC analysis
 
@@ -260,11 +278,12 @@ Navigate to **Dashboard → AI Forecasting** to view the forecasting interface.
 ✅ **Confidence intervals** vs point estimates  
 ✅ **Accuracy tracking** vs no validation  
 ✅ **Smart alerts** with 4 urgency levels  
-✅ **Machine learning** that improves over time  
+✅ **Machine learning** that improves over time
 
 ## Support
 
 For questions or issues with the AI Forecasting system:
+
 - Contact: support@logivox.ai
 - Documentation: https://docs.logivox.ai/ai-forecasting
 - Training Videos: https://academy.logivox.ai/forecasting

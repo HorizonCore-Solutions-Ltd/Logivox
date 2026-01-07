@@ -2,13 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Plus, 
-  FileText, 
-  Calendar, 
+import {
+  Plus,
+  FileText,
+  Calendar,
   DollarSign,
   Package,
   TrendingUp,
@@ -60,10 +66,10 @@ export default function PurchaseOrdersPage() {
       setLoading(true);
       const params = new URLSearchParams();
       if (statusFilter !== "all") params.append("status", statusFilter);
-      
+
       const response = await fetch(`/api/purchase-orders?${params.toString()}`);
       const data = await response.json();
-      
+
       setPurchaseOrders(data.purchaseOrders || []);
     } catch (error) {
       console.error("Error fetching purchase orders:", error);
@@ -97,18 +103,26 @@ export default function PurchaseOrdersPage() {
     return colors[priority] || "bg-gray-100 text-gray-800";
   };
 
-  const filteredOrders = purchaseOrders.filter((po) =>
-    po.poNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    po.supplier.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredOrders = purchaseOrders.filter(
+    (po) =>
+      po.poNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      po.supplier.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   // Calculate statistics
   const stats = {
     total: purchaseOrders.length,
-    draft: purchaseOrders.filter(po => po.status === 'DRAFT').length,
-    pending: purchaseOrders.filter(po => po.status === 'PENDING' || po.status === 'APPROVED').length,
-    sent: purchaseOrders.filter(po => po.status === 'SENT' || po.status === 'CONFIRMED').length,
-    totalValue: purchaseOrders.reduce((sum, po) => sum + Number(po.totalAmount || 0), 0),
+    draft: purchaseOrders.filter((po) => po.status === "DRAFT").length,
+    pending: purchaseOrders.filter(
+      (po) => po.status === "PENDING" || po.status === "APPROVED",
+    ).length,
+    sent: purchaseOrders.filter(
+      (po) => po.status === "SENT" || po.status === "CONFIRMED",
+    ).length,
+    totalValue: purchaseOrders.reduce(
+      (sum, po) => sum + Number(po.totalAmount || 0),
+      0,
+    ),
   };
 
   return (
@@ -145,7 +159,9 @@ export default function PurchaseOrdersPage() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.draft + stats.pending}</div>
+            <div className="text-2xl font-bold">
+              {stats.draft + stats.pending}
+            </div>
             <p className="text-xs text-muted-foreground">
               {stats.draft} draft, {stats.pending} pending
             </p>
@@ -201,7 +217,9 @@ export default function PurchaseOrdersPage() {
                 <SelectItem value="APPROVED">Approved</SelectItem>
                 <SelectItem value="SENT">Sent</SelectItem>
                 <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-                <SelectItem value="PARTIALLY_RECEIVED">Partially Received</SelectItem>
+                <SelectItem value="PARTIALLY_RECEIVED">
+                  Partially Received
+                </SelectItem>
                 <SelectItem value="RECEIVED">Received</SelectItem>
                 <SelectItem value="CANCELLED">Cancelled</SelectItem>
               </SelectContent>
@@ -215,7 +233,8 @@ export default function PurchaseOrdersPage() {
         <CardHeader>
           <CardTitle>Purchase Orders</CardTitle>
           <CardDescription>
-            {filteredOrders.length} purchase order{filteredOrders.length !== 1 ? 's' : ''} found
+            {filteredOrders.length} purchase order
+            {filteredOrders.length !== 1 ? "s" : ""} found
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -231,15 +250,20 @@ export default function PurchaseOrdersPage() {
                 <div
                   key={po.id}
                   className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                  onClick={() => router.push(`/dashboard/purchase-orders/${po.id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/purchase-orders/${po.id}`)
+                  }
                 >
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-semibold">{po.poNumber}</span>
                       <Badge className={getStatusColor(po.status)}>
-                        {po.status.replace(/_/g, ' ')}
+                        {po.status.replace(/_/g, " ")}
                       </Badge>
-                      <Badge variant="outline" className={getPriorityColor(po.priority)}>
+                      <Badge
+                        variant="outline"
+                        className={getPriorityColor(po.priority)}
+                      >
                         {po.priority}
                       </Badge>
                     </div>
@@ -247,16 +271,24 @@ export default function PurchaseOrdersPage() {
                       Supplier: {po.supplier.name} ({po.supplier.code})
                     </div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <span>Created: {new Date(po.orderDate).toLocaleDateString()}</span>
+                      <span>
+                        Created: {new Date(po.orderDate).toLocaleDateString()}
+                      </span>
                       {po.expectedDate && (
-                        <span>Expected: {new Date(po.expectedDate).toLocaleDateString()}</span>
+                        <span>
+                          Expected:{" "}
+                          {new Date(po.expectedDate).toLocaleDateString()}
+                        </span>
                       )}
-                      <span>{po.items.length} item{po.items.length !== 1 ? 's' : ''}</span>
+                      <span>
+                        {po.items.length} item{po.items.length !== 1 ? "s" : ""}
+                      </span>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="font-semibold">
-                      {po.currency} {Number(po.totalAmount || 0).toLocaleString()}
+                      {po.currency}{" "}
+                      {Number(po.totalAmount || 0).toLocaleString()}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       by {po.createdBy.name}

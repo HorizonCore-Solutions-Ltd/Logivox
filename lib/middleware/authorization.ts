@@ -3,22 +3,22 @@
  * Role-based access control (RBAC) and permission checking
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth/auth-options';
-import prisma from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth/auth-options";
+import prisma from "@/lib/prisma";
 
 /**
  * User roles
  */
 export enum UserRole {
-  ADMIN = 'ADMIN',
-  WAREHOUSE_MANAGER = 'WAREHOUSE_MANAGER',
-  WAREHOUSE_OPERATOR = 'WAREHOUSE_OPERATOR',
-  INVENTORY_CONTROLLER = 'INVENTORY_CONTROLLER',
-  SALES_MANAGER = 'SALES_MANAGER',
-  PURCHASING_MANAGER = 'PURCHASING_MANAGER',
-  VIEWER = 'VIEWER',
+  ADMIN = "ADMIN",
+  WAREHOUSE_MANAGER = "WAREHOUSE_MANAGER",
+  WAREHOUSE_OPERATOR = "WAREHOUSE_OPERATOR",
+  INVENTORY_CONTROLLER = "INVENTORY_CONTROLLER",
+  SALES_MANAGER = "SALES_MANAGER",
+  PURCHASING_MANAGER = "PURCHASING_MANAGER",
+  VIEWER = "VIEWER",
 }
 
 /**
@@ -26,41 +26,41 @@ export enum UserRole {
  */
 export enum Permission {
   // Inventory permissions
-  INVENTORY_VIEW = 'inventory.view',
-  INVENTORY_CREATE = 'inventory.create',
-  INVENTORY_EDIT = 'inventory.edit',
-  INVENTORY_DELETE = 'inventory.delete',
-  INVENTORY_ADJUST = 'inventory.adjust',
+  INVENTORY_VIEW = "inventory.view",
+  INVENTORY_CREATE = "inventory.create",
+  INVENTORY_EDIT = "inventory.edit",
+  INVENTORY_DELETE = "inventory.delete",
+  INVENTORY_ADJUST = "inventory.adjust",
 
   // Order permissions
-  ORDERS_VIEW = 'orders.view',
-  ORDERS_CREATE = 'orders.create',
-  ORDERS_EDIT = 'orders.edit',
-  ORDERS_DELETE = 'orders.delete',
-  ORDERS_APPROVE = 'orders.approve',
-  ORDERS_CANCEL = 'orders.cancel',
+  ORDERS_VIEW = "orders.view",
+  ORDERS_CREATE = "orders.create",
+  ORDERS_EDIT = "orders.edit",
+  ORDERS_DELETE = "orders.delete",
+  ORDERS_APPROVE = "orders.approve",
+  ORDERS_CANCEL = "orders.cancel",
 
   // Warehouse permissions
-  WAREHOUSE_VIEW = 'warehouse.view',
-  WAREHOUSE_MANAGE = 'warehouse.manage',
-  LOCATION_MANAGE = 'location.manage',
-  WAVE_CREATE = 'wave.create',
-  TASK_ASSIGN = 'task.assign',
+  WAREHOUSE_VIEW = "warehouse.view",
+  WAREHOUSE_MANAGE = "warehouse.manage",
+  LOCATION_MANAGE = "location.manage",
+  WAVE_CREATE = "wave.create",
+  TASK_ASSIGN = "task.assign",
 
   // User permissions
-  USERS_VIEW = 'users.view',
-  USERS_MANAGE = 'users.manage',
-  ROLES_MANAGE = 'roles.manage',
+  USERS_VIEW = "users.view",
+  USERS_MANAGE = "users.manage",
+  ROLES_MANAGE = "roles.manage",
 
   // Report permissions
-  REPORTS_VIEW = 'reports.view',
-  REPORTS_EXPORT = 'reports.export',
-  ANALYTICS_VIEW = 'analytics.view',
+  REPORTS_VIEW = "reports.view",
+  REPORTS_EXPORT = "reports.export",
+  ANALYTICS_VIEW = "analytics.view",
 
   // System permissions
-  SETTINGS_VIEW = 'settings.view',
-  SETTINGS_MANAGE = 'settings.manage',
-  AUDIT_VIEW = 'audit.view',
+  SETTINGS_VIEW = "settings.view",
+  SETTINGS_MANAGE = "settings.manage",
+  AUDIT_VIEW = "audit.view",
 }
 
 /**
@@ -149,7 +149,7 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
  */
 export function hasPermission(
   userRole: UserRole,
-  permission: Permission
+  permission: Permission,
 ): boolean {
   const rolePermissions = RolePermissions[userRole] || [];
   return rolePermissions.includes(permission);
@@ -160,7 +160,7 @@ export function hasPermission(
  */
 export function hasAnyPermission(
   userRole: UserRole,
-  permissions: Permission[]
+  permissions: Permission[],
 ): boolean {
   return permissions.some((permission) => hasPermission(userRole, permission));
 }
@@ -170,7 +170,7 @@ export function hasAnyPermission(
  */
 export function hasAllPermissions(
   userRole: UserRole,
-  permissions: Permission[]
+  permissions: Permission[],
 ): boolean {
   return permissions.every((permission) => hasPermission(userRole, permission));
 }
@@ -231,7 +231,7 @@ export async function getAuthenticatedUser(req: NextRequest) {
  */
 export async function authorize(
   req: NextRequest,
-  config: AuthorizationConfig
+  config: AuthorizationConfig,
 ): Promise<NextResponse | null> {
   // Get authenticated user
   const user = await getAuthenticatedUser(req);
@@ -240,10 +240,10 @@ export async function authorize(
     return NextResponse.json(
       {
         success: false,
-        error: 'Authentication required',
-        code: 'UNAUTHORIZED',
+        error: "Authentication required",
+        code: "UNAUTHORIZED",
       },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -257,10 +257,10 @@ export async function authorize(
       return NextResponse.json(
         {
           success: false,
-          error: config.message || 'Insufficient permissions',
-          code: 'FORBIDDEN',
+          error: config.message || "Insufficient permissions",
+          code: "FORBIDDEN",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
   }
@@ -279,10 +279,10 @@ export async function authorize(
       return NextResponse.json(
         {
           success: false,
-          error: config.message || 'Insufficient permissions',
-          code: 'FORBIDDEN',
+          error: config.message || "Insufficient permissions",
+          code: "FORBIDDEN",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
   }
@@ -294,10 +294,10 @@ export async function authorize(
       return NextResponse.json(
         {
           success: false,
-          error: config.message || 'Access denied',
-          code: 'FORBIDDEN',
+          error: config.message || "Access denied",
+          code: "FORBIDDEN",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
   }
@@ -309,10 +309,7 @@ export async function authorize(
 /**
  * Check if user can access warehouse
  */
-export function canAccessWarehouse(
-  user: any,
-  warehouseId: string
-): boolean {
+export function canAccessWarehouse(user: any, warehouseId: string): boolean {
   // Admin can access all warehouses
   if (user.role === UserRole.ADMIN) return true;
 
@@ -326,18 +323,18 @@ export function canAccessWarehouse(
 export async function isResourceOwner(
   userId: string,
   resourceType: string,
-  resourceId: string
+  resourceId: string,
 ): Promise<boolean> {
   try {
     switch (resourceType) {
-      case 'order':
+      case "order":
         const order = await prisma.salesOrder.findUnique({
           where: { id: resourceId },
           select: { createdById: true },
         });
         return order?.createdById === userId;
 
-      case 'task':
+      case "task":
         const task = await prisma.pickingTask.findUnique({
           where: { id: resourceId },
           select: { assignedToId: true },
@@ -363,7 +360,7 @@ export function requireAuth(config: AuthorizationConfig = {}) {
  * Require admin role
  */
 export const requireAdmin = () =>
-  requireAuth({ roles: UserRole.ADMIN, message: 'Admin access required' });
+  requireAuth({ roles: UserRole.ADMIN, message: "Admin access required" });
 
 /**
  * Require warehouse manager or admin
@@ -371,7 +368,7 @@ export const requireAdmin = () =>
 export const requireManager = () =>
   requireAuth({
     roles: [UserRole.ADMIN, UserRole.WAREHOUSE_MANAGER],
-    message: 'Manager access required',
+    message: "Manager access required",
   });
 
 /**
@@ -380,7 +377,7 @@ export const requireManager = () =>
 export const requireInventoryAccess = () =>
   requireAuth({
     permissions: Permission.INVENTORY_VIEW,
-    message: 'Inventory access required',
+    message: "Inventory access required",
   });
 
 /**
@@ -389,5 +386,5 @@ export const requireInventoryAccess = () =>
 export const requireOrderAccess = () =>
   requireAuth({
     permissions: Permission.ORDERS_VIEW,
-    message: 'Order access required',
+    message: "Order access required",
   });

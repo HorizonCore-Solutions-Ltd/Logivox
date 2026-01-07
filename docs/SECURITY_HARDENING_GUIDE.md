@@ -1,4 +1,5 @@
 # 🔐 LogiVox Security Hardening Guide
+
 ## Enterprise-Grade Security Framework - Military-Grade Protection
 
 > **SECURITY LEVEL**: BANK-GRADE + HEALTHCARE-GRADE + GOVERNMENT-GRADE  
@@ -110,10 +111,10 @@
 
 ```typescript
 // lib/auth/mfa.ts
-import { authenticator } from 'otplib';
-import { toDataURL } from 'qrcode';
-import { prisma } from '@/lib/prisma';
-import { encrypt, decrypt } from '@/lib/encryption';
+import { authenticator } from "otplib";
+import { toDataURL } from "qrcode";
+import { prisma } from "@/lib/prisma";
+import { encrypt, decrypt } from "@/lib/encryption";
 
 /**
  * MFA Service - TOTP-based Multi-Factor Authentication
@@ -133,24 +134,20 @@ export class MFAService {
   }> {
     const secret = authenticator.generateSecret();
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+
     // Generate QR code for authenticator apps
-    const otpauth = authenticator.keyuri(
-      user!.email,
-      'LogiVox',
-      secret
-    );
+    const otpauth = authenticator.keyuri(user!.email, "LogiVox", secret);
     const qrCode = await toDataURL(otpauth);
-    
+
     // Generate 10 backup codes
-    const backupCodes = Array.from({ length: 10 }, () => 
-      Math.random().toString(36).substring(2, 10).toUpperCase()
+    const backupCodes = Array.from({ length: 10 }, () =>
+      Math.random().toString(36).substring(2, 10).toUpperCase(),
     );
-    
+
     // Encrypt and store secret
     const encryptedSecret = encrypt(secret);
-    const encryptedBackupCodes = backupCodes.map(code => encrypt(code));
-    
+    const encryptedBackupCodes = backupCodes.map((code) => encrypt(code));
+
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -159,7 +156,7 @@ export class MFAService {
         mfaEnabled: false, // User must verify first
       },
     });
-    
+
     return { secret, qrCode, backupCodes };
   }
 
@@ -168,28 +165,28 @@ export class MFAService {
    */
   static async verifyCode(userId: string, token: string): Promise<boolean> {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+
     if (!user?.mfaSecret) {
       return false;
     }
-    
+
     const secret = decrypt(user.mfaSecret);
     const isValid = authenticator.verify({ token, secret });
-    
+
     if (isValid) {
       // Log successful MFA verification
       await prisma.auditLog.create({
         data: {
           userId,
-          action: 'MFA_VERIFY_SUCCESS',
-          resource: 'User',
+          action: "MFA_VERIFY_SUCCESS",
+          resource: "User",
           resourceId: userId,
-          ipAddress: 'SERVER',
-          userAgent: 'SERVER',
+          ipAddress: "SERVER",
+          userAgent: "SERVER",
         },
       });
     }
-    
+
     return isValid;
   }
 
@@ -198,66 +195,71 @@ export class MFAService {
    */
   static async enableMFA(userId: string, token: string): Promise<boolean> {
     const isValid = await this.verifyCode(userId, token);
-    
+
     if (isValid) {
       await prisma.user.update({
         where: { id: userId },
         data: { mfaEnabled: true },
       });
-      
+
       await prisma.auditLog.create({
         data: {
           userId,
-          action: 'MFA_ENABLED',
-          resource: 'User',
+          action: "MFA_ENABLED",
+          resource: "User",
           resourceId: userId,
-          ipAddress: 'SERVER',
-          userAgent: 'SERVER',
+          ipAddress: "SERVER",
+          userAgent: "SERVER",
         },
       });
     }
-    
+
     return isValid;
   }
 
   /**
    * Verify backup code
    */
-  static async verifyBackupCode(userId: string, code: string): Promise<boolean> {
+  static async verifyBackupCode(
+    userId: string,
+    code: string,
+  ): Promise<boolean> {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+
     if (!user?.mfaBackupCodes) {
       return false;
     }
-    
+
     // Check if code matches any backup code
-    const backupCodes = user.mfaBackupCodes.map(encrypted => decrypt(encrypted));
+    const backupCodes = user.mfaBackupCodes.map((encrypted) =>
+      decrypt(encrypted),
+    );
     const index = backupCodes.indexOf(code.toUpperCase());
-    
+
     if (index === -1) {
       return false;
     }
-    
+
     // Remove used backup code
     const updatedBackupCodes = [...user.mfaBackupCodes];
     updatedBackupCodes.splice(index, 1);
-    
+
     await prisma.user.update({
       where: { id: userId },
       data: { mfaBackupCodes: updatedBackupCodes },
     });
-    
+
     await prisma.auditLog.create({
       data: {
         userId,
-        action: 'MFA_BACKUP_CODE_USED',
-        resource: 'User',
+        action: "MFA_BACKUP_CODE_USED",
+        resource: "User",
         resourceId: userId,
-        ipAddress: 'SERVER',
-        userAgent: 'SERVER',
+        ipAddress: "SERVER",
+        userAgent: "SERVER",
       },
     });
-    
+
     return true;
   }
 }
@@ -267,16 +269,16 @@ export class MFAService {
 
 ```typescript
 // lib/auth/webauthn.ts
-import { 
+import {
   generateRegistrationOptions,
   verifyRegistrationResponse,
   generateAuthenticationOptions,
   verifyAuthenticationResponse,
-} from '@simplewebauthn/server';
-import type { 
+} from "@simplewebauthn/server";
+import type {
   RegistrationResponseJSON,
   AuthenticationResponseJSON,
-} from '@simplewebauthn/types';
+} from "@simplewebauthn/types";
 
 /**
  * WebAuthn Service - Hardware Security Key Support
@@ -285,8 +287,8 @@ import type {
  * - Phishing-Resistant Authentication
  */
 export class WebAuthnService {
-  private static RP_NAME = 'LogiVox';
-  private static RP_ID = process.env.NEXTAUTH_URL!.replace(/https?:\/\//, '');
+  private static RP_NAME = "LogiVox";
+  private static RP_ID = process.env.NEXTAUTH_URL!.replace(/https?:\/\//, "");
   private static ORIGIN = process.env.NEXTAUTH_URL!;
 
   /**
@@ -303,15 +305,15 @@ export class WebAuthnService {
       rpID: this.RP_ID,
       userID: userId,
       userName: user!.email,
-      attestationType: 'none',
-      excludeCredentials: user!.securityKeys.map(key => ({
-        id: Buffer.from(key.credentialId, 'base64'),
-        type: 'public-key',
+      attestationType: "none",
+      excludeCredentials: user!.securityKeys.map((key) => ({
+        id: Buffer.from(key.credentialId, "base64"),
+        type: "public-key",
         transports: key.transports as AuthenticatorTransport[],
       })),
       authenticatorSelection: {
-        residentKey: 'preferred',
-        userVerification: 'preferred',
+        residentKey: "preferred",
+        userVerification: "preferred",
       },
     });
 
@@ -330,10 +332,10 @@ export class WebAuthnService {
   static async verifyRegistration(
     userId: string,
     response: RegistrationResponseJSON,
-    keyName: string
+    keyName: string,
   ) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+
     const verification = await verifyRegistrationResponse({
       response,
       expectedChallenge: user!.webauthnChallenge!,
@@ -342,14 +344,15 @@ export class WebAuthnService {
     });
 
     if (verification.verified && verification.registrationInfo) {
-      const { credentialPublicKey, credentialID, counter } = verification.registrationInfo;
+      const { credentialPublicKey, credentialID, counter } =
+        verification.registrationInfo;
 
       await prisma.securityKey.create({
         data: {
           userId,
           name: keyName,
-          credentialId: Buffer.from(credentialID).toString('base64'),
-          publicKey: Buffer.from(credentialPublicKey).toString('base64'),
+          credentialId: Buffer.from(credentialID).toString("base64"),
+          publicKey: Buffer.from(credentialPublicKey).toString("base64"),
           counter,
           transports: response.response.transports || [],
         },
@@ -358,11 +361,11 @@ export class WebAuthnService {
       await prisma.auditLog.create({
         data: {
           userId,
-          action: 'SECURITY_KEY_REGISTERED',
-          resource: 'SecurityKey',
+          action: "SECURITY_KEY_REGISTERED",
+          resource: "SecurityKey",
           resourceId: keyName,
-          ipAddress: 'SERVER',
-          userAgent: 'SERVER',
+          ipAddress: "SERVER",
+          userAgent: "SERVER",
         },
       });
     }
@@ -376,9 +379,9 @@ export class WebAuthnService {
 
 ```typescript
 // lib/auth/session.ts
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { redis } from '@/lib/redis';
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 
 /**
  * Session Security Configuration
@@ -420,7 +423,7 @@ export class SessionManager {
     await redis.setex(
       `session:activity:${sessionToken}`,
       SESSION_CONFIG.ABSOLUTE_TIMEOUT,
-      Date.now().toString()
+      Date.now().toString(),
     );
 
     return true;
@@ -434,7 +437,7 @@ export class SessionManager {
     await redis.setex(
       `session:blacklist:${sessionToken}`,
       SESSION_CONFIG.ABSOLUTE_TIMEOUT,
-      '1'
+      "1",
     );
 
     // Remove from active sessions
@@ -444,9 +447,12 @@ export class SessionManager {
   /**
    * Enforce concurrent session limit
    */
-  static async enforceConcurrentSessionLimit(userId: string, newSessionToken: string): Promise<void> {
+  static async enforceConcurrentSessionLimit(
+    userId: string,
+    newSessionToken: string,
+  ): Promise<void> {
     const sessionKey = `user:sessions:${userId}`;
-    
+
     // Add new session
     await redis.zadd(sessionKey, Date.now(), newSessionToken);
 
@@ -457,7 +463,7 @@ export class SessionManager {
     if (sessions.length > SESSION_CONFIG.MAX_CONCURRENT_SESSIONS) {
       const sessionsToRemove = sessions.slice(
         0,
-        sessions.length - SESSION_CONFIG.MAX_CONCURRENT_SESSIONS
+        sessions.length - SESSION_CONFIG.MAX_CONCURRENT_SESSIONS,
       );
 
       for (const session of sessionsToRemove) {
@@ -477,7 +483,7 @@ export class SessionManager {
 
 ```typescript
 // lib/encryption.ts
-import crypto from 'crypto';
+import crypto from "crypto";
 
 /**
  * AES-256-GCM Encryption for Sensitive Data
@@ -486,7 +492,7 @@ import crypto from 'crypto';
  * - Random IV for each encryption
  */
 export class EncryptionService {
-  private static readonly ALGORITHM = 'aes-256-gcm';
+  private static readonly ALGORITHM = "aes-256-gcm";
   private static readonly KEY_LENGTH = 32;
   private static readonly IV_LENGTH = 16;
   private static readonly AUTH_TAG_LENGTH = 16;
@@ -501,9 +507,9 @@ export class EncryptionService {
   static initialize() {
     const masterKeyEnv = process.env.ENCRYPTION_MASTER_KEY;
     if (!masterKeyEnv) {
-      throw new Error('ENCRYPTION_MASTER_KEY environment variable not set');
+      throw new Error("ENCRYPTION_MASTER_KEY environment variable not set");
     }
-    this.masterKey = Buffer.from(masterKeyEnv, 'hex');
+    this.masterKey = Buffer.from(masterKeyEnv, "hex");
   }
 
   /**
@@ -522,7 +528,7 @@ export class EncryptionService {
 
     // Encrypt data
     const encrypted = Buffer.concat([
-      cipher.update(plaintext, 'utf8'),
+      cipher.update(plaintext, "utf8"),
       cipher.final(),
     ]);
 
@@ -532,7 +538,7 @@ export class EncryptionService {
     // Combine IV + Auth Tag + Encrypted Data
     const combined = Buffer.concat([iv, authTag, encrypted]);
 
-    return combined.toString('base64');
+    return combined.toString("base64");
   }
 
   /**
@@ -544,15 +550,22 @@ export class EncryptionService {
     }
 
     // Decode from base64
-    const combined = Buffer.from(ciphertext, 'base64');
+    const combined = Buffer.from(ciphertext, "base64");
 
     // Extract IV, Auth Tag, and Encrypted Data
     const iv = combined.slice(0, this.IV_LENGTH);
-    const authTag = combined.slice(this.IV_LENGTH, this.IV_LENGTH + this.AUTH_TAG_LENGTH);
+    const authTag = combined.slice(
+      this.IV_LENGTH,
+      this.IV_LENGTH + this.AUTH_TAG_LENGTH,
+    );
     const encrypted = combined.slice(this.IV_LENGTH + this.AUTH_TAG_LENGTH);
 
     // Create decipher
-    const decipher = crypto.createDecipheriv(this.ALGORITHM, this.masterKey, iv);
+    const decipher = crypto.createDecipheriv(
+      this.ALGORITHM,
+      this.masterKey,
+      iv,
+    );
     decipher.setAuthTag(authTag);
 
     // Decrypt data
@@ -561,34 +574,32 @@ export class EncryptionService {
       decipher.final(),
     ]);
 
-    return decrypted.toString('utf8');
+    return decrypted.toString("utf8");
   }
 
   /**
    * Hash sensitive data (one-way)
    */
   static hash(data: string, salt?: string): string {
-    const actualSalt = salt || crypto.randomBytes(this.SALT_LENGTH).toString('hex');
+    const actualSalt =
+      salt || crypto.randomBytes(this.SALT_LENGTH).toString("hex");
     const hash = crypto.pbkdf2Sync(
       data,
       actualSalt,
       this.PBKDF2_ITERATIONS,
       this.KEY_LENGTH,
-      'sha512'
+      "sha512",
     );
-    return `${actualSalt}:${hash.toString('hex')}`;
+    return `${actualSalt}:${hash.toString("hex")}`;
   }
 
   /**
    * Verify hashed data
    */
   static verifyHash(data: string, hashedData: string): boolean {
-    const [salt] = hashedData.split(':');
+    const [salt] = hashedData.split(":");
     const hash = this.hash(data, salt);
-    return crypto.timingSafeEqual(
-      Buffer.from(hash),
-      Buffer.from(hashedData)
-    );
+    return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(hashedData));
   }
 }
 ```
@@ -597,8 +608,8 @@ export class EncryptionService {
 
 ```typescript
 // lib/prisma-encryption-middleware.ts
-import { Prisma } from '@prisma/client';
-import { EncryptionService } from './encryption';
+import { Prisma } from "@prisma/client";
+import { EncryptionService } from "./encryption";
 
 /**
  * Prisma Middleware for Automatic Field-Level Encryption
@@ -606,10 +617,10 @@ import { EncryptionService } from './encryption';
  * - Decrypts sensitive fields when reading from database
  */
 const ENCRYPTED_FIELDS = {
-  User: ['mfaSecret', 'mfaBackupCodes'],
-  Organization: ['apiKey', 'encryptionKey'],
-  Integration: ['credentials', 'apiKey', 'apiSecret'],
-  SecurityKey: ['publicKey'],
+  User: ["mfaSecret", "mfaBackupCodes"],
+  Organization: ["apiKey", "encryptionKey"],
+  Integration: ["credentials", "apiKey", "apiSecret"],
+  SecurityKey: ["publicKey"],
 };
 
 export function encryptionMiddleware(): Prisma.Middleware {
@@ -622,17 +633,17 @@ export function encryptionMiddleware(): Prisma.Middleware {
     }
 
     // ENCRYPT before write operations
-    if (params.action === 'create' || params.action === 'update') {
+    if (params.action === "create" || params.action === "update") {
       if (params.args.data) {
         for (const field of fieldsToEncrypt) {
           if (params.args.data[field]) {
             if (Array.isArray(params.args.data[field])) {
               params.args.data[field] = params.args.data[field].map(
-                (item: string) => EncryptionService.encrypt(item)
+                (item: string) => EncryptionService.encrypt(item),
               );
             } else {
               params.args.data[field] = EncryptionService.encrypt(
-                params.args.data[field]
+                params.args.data[field],
               );
             }
           }
@@ -645,16 +656,16 @@ export function encryptionMiddleware(): Prisma.Middleware {
     // DECRYPT after read operations
     if (
       result &&
-      (params.action === 'findUnique' ||
-        params.action === 'findFirst' ||
-        params.action === 'findMany')
+      (params.action === "findUnique" ||
+        params.action === "findFirst" ||
+        params.action === "findMany")
     ) {
       const decrypt = (obj: any) => {
         for (const field of fieldsToEncrypt) {
           if (obj[field]) {
             if (Array.isArray(obj[field])) {
               obj[field] = obj[field].map((item: string) =>
-                EncryptionService.decrypt(item)
+                EncryptionService.decrypt(item),
               );
             } else {
               obj[field] = EncryptionService.decrypt(obj[field]);
@@ -680,10 +691,10 @@ export function encryptionMiddleware(): Prisma.Middleware {
 
 ```typescript
 // lib/file-encryption.ts
-import crypto from 'crypto';
-import fs from 'fs';
-import stream from 'stream';
-import { promisify } from 'util';
+import crypto from "crypto";
+import fs from "fs";
+import stream from "stream";
+import { promisify } from "util";
 
 const pipeline = promisify(stream.pipeline);
 
@@ -693,13 +704,19 @@ const pipeline = promisify(stream.pipeline);
  * - Supports streaming for large files
  */
 export class FileEncryptionService {
-  private static readonly ALGORITHM = 'aes-256-ctr';
-  private static readonly KEY = Buffer.from(process.env.FILE_ENCRYPTION_KEY || '', 'hex');
+  private static readonly ALGORITHM = "aes-256-ctr";
+  private static readonly KEY = Buffer.from(
+    process.env.FILE_ENCRYPTION_KEY || "",
+    "hex",
+  );
 
   /**
    * Encrypt file (streaming)
    */
-  static async encryptFile(inputPath: string, outputPath: string): Promise<void> {
+  static async encryptFile(
+    inputPath: string,
+    outputPath: string,
+  ): Promise<void> {
     const iv = crypto.randomBytes(16);
     const cipher = crypto.createCipheriv(this.ALGORITHM, this.KEY, iv);
 
@@ -710,14 +727,17 @@ export class FileEncryptionService {
     await pipeline(
       fs.createReadStream(inputPath),
       cipher,
-      fs.createWriteStream(outputPath, { flags: 'a' })
+      fs.createWriteStream(outputPath, { flags: "a" }),
     );
   }
 
   /**
    * Decrypt file (streaming)
    */
-  static async decryptFile(inputPath: string, outputPath: string): Promise<void> {
+  static async decryptFile(
+    inputPath: string,
+    outputPath: string,
+  ): Promise<void> {
     // Read IV from beginning of file
     const fileBuffer = await fs.promises.readFile(inputPath);
     const iv = fileBuffer.slice(0, 16);
@@ -744,9 +764,9 @@ export class FileEncryptionService {
 
 ```typescript
 // lib/ddos-protection.ts
-import { RateLimiterRedis } from 'rate-limiter-flexible';
-import { redis } from './redis';
-import { NextRequest, NextResponse } from 'next/server';
+import { RateLimiterRedis } from "rate-limiter-flexible";
+import { redis } from "./redis";
+import { NextRequest, NextResponse } from "next/server";
 
 /**
  * DDoS Protection Middleware
@@ -759,25 +779,25 @@ export class DDoSProtection {
     // Aggressive rate limiter (short window)
     aggressive: new RateLimiterRedis({
       storeClient: redis,
-      keyPrefix: 'ddos:aggressive',
+      keyPrefix: "ddos:aggressive",
       points: 20, // 20 requests
       duration: 1, // per 1 second
       blockDuration: 60, // Block for 1 minute
     }),
-    
+
     // Moderate rate limiter (medium window)
     moderate: new RateLimiterRedis({
       storeClient: redis,
-      keyPrefix: 'ddos:moderate',
+      keyPrefix: "ddos:moderate",
       points: 100, // 100 requests
       duration: 60, // per 1 minute
       blockDuration: 300, // Block for 5 minutes
     }),
-    
+
     // Relaxed rate limiter (long window)
     relaxed: new RateLimiterRedis({
       storeClient: redis,
-      keyPrefix: 'ddos:relaxed',
+      keyPrefix: "ddos:relaxed",
       points: 1000, // 1000 requests
       duration: 3600, // per 1 hour
       blockDuration: 3600, // Block for 1 hour
@@ -811,23 +831,26 @@ export class DDoSProtection {
    */
   private static getClientIP(request: NextRequest): string {
     return (
-      request.headers.get('x-real-ip') ||
-      request.headers.get('x-forwarded-for')?.split(',')[0] ||
-      request.headers.get('cf-connecting-ip') || // Cloudflare
-      'unknown'
+      request.headers.get("x-real-ip") ||
+      request.headers.get("x-forwarded-for")?.split(",")[0] ||
+      request.headers.get("cf-connecting-ip") || // Cloudflare
+      "unknown"
     );
   }
 
   /**
    * Log DDoS attempt
    */
-  private static async logDDoSAttempt(ip: string, request: NextRequest): Promise<void> {
+  private static async logDDoSAttempt(
+    ip: string,
+    request: NextRequest,
+  ): Promise<void> {
     await prisma.securityEvent.create({
       data: {
-        type: 'DDOS_ATTEMPT',
-        severity: 'HIGH',
+        type: "DDOS_ATTEMPT",
+        severity: "HIGH",
         ipAddress: ip,
-        userAgent: request.headers.get('user-agent') || 'unknown',
+        userAgent: request.headers.get("user-agent") || "unknown",
         path: request.nextUrl.pathname,
         details: JSON.stringify({
           method: request.method,
@@ -838,7 +861,7 @@ export class DDoSProtection {
 
     // Alert security team
     await this.alertSecurityTeam({
-      type: 'DDoS Attempt Detected',
+      type: "DDoS Attempt Detected",
       ip,
       path: request.nextUrl.pathname,
     });
@@ -846,7 +869,7 @@ export class DDoSProtection {
 
   private static async alertSecurityTeam(alert: any): Promise<void> {
     // Implement alerting (email, Slack, PagerDuty, etc.)
-    console.error('[SECURITY ALERT]', alert);
+    console.error("[SECURITY ALERT]", alert);
   }
 }
 ```
@@ -855,8 +878,8 @@ export class DDoSProtection {
 
 ```typescript
 // lib/ip-security.ts
-import { NextRequest } from 'next/server';
-import { redis } from './redis';
+import { NextRequest } from "next/server";
+import { redis } from "./redis";
 
 /**
  * IP Security Service
@@ -870,10 +893,12 @@ export class IPSecurityService {
    */
   static async isIPWhitelisted(
     organizationId: string,
-    ip: string
+    ip: string,
   ): Promise<boolean> {
-    const whitelist = await redis.smembers(`org:${organizationId}:ip-whitelist`);
-    
+    const whitelist = await redis.smembers(
+      `org:${organizationId}:ip-whitelist`,
+    );
+
     if (whitelist.length === 0) {
       // No whitelist = allow all
       return true;
@@ -886,7 +911,7 @@ export class IPSecurityService {
 
     // Check CIDR ranges
     for (const entry of whitelist) {
-      if (entry.includes('/') && this.isIPInCIDR(ip, entry)) {
+      if (entry.includes("/") && this.isIPInCIDR(ip, entry)) {
         return true;
       }
     }
@@ -908,10 +933,10 @@ export class IPSecurityService {
    */
   static async isCountryAllowed(
     organizationId: string,
-    countryCode: string
+    countryCode: string,
   ): Promise<boolean> {
     const blockedCountries = await redis.smembers(
-      `org:${organizationId}:blocked-countries`
+      `org:${organizationId}:blocked-countries`,
     );
 
     return !blockedCountries.includes(countryCode);
@@ -945,9 +970,9 @@ export class IPSecurityService {
 
 ```typescript
 // lib/validation.ts
-import { z } from 'zod';
-import DOMPurify from 'isomorphic-dompurify';
-import validator from 'validator';
+import { z } from "zod";
+import DOMPurify from "isomorphic-dompurify";
+import validator from "validator";
 
 /**
  * Input Validation Service
@@ -961,8 +986,19 @@ export class ValidationService {
    */
   static sanitizeHTML(html: string): string {
     return DOMPurify.sanitize(html, {
-      ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li'],
-      ALLOWED_ATTR: ['href', 'target', 'rel'],
+      ALLOWED_TAGS: [
+        "b",
+        "i",
+        "em",
+        "strong",
+        "a",
+        "p",
+        "br",
+        "ul",
+        "ol",
+        "li",
+      ],
+      ALLOWED_ATTR: ["href", "target", "rel"],
       ALLOWED_URI_REGEXP: /^https?:\/\//,
     });
   }
@@ -972,7 +1008,9 @@ export class ValidationService {
    */
   static sanitizeSQL(input: string): string {
     // Remove SQL keywords and dangerous characters
-    return input.replace(/[;'"\\]/g, '').replace(/(\bDROP\b|\bDELETE\b|\bUPDATE\b|\bINSERT\b)/gi, '');
+    return input
+      .replace(/[;'"\\]/g, "")
+      .replace(/(\bDROP\b|\bDELETE\b|\bUPDATE\b|\bINSERT\b)/gi, "");
   }
 
   /**
@@ -987,14 +1025,14 @@ export class ValidationService {
    */
   static isDisposableEmail(email: string): boolean {
     const disposableDomains = [
-      'tempmail.com',
-      'guerrillamail.com',
-      '10minutemail.com',
-      'throwaway.email',
+      "tempmail.com",
+      "guerrillamail.com",
+      "10minutemail.com",
+      "throwaway.email",
       // Add more...
     ];
 
-    const domain = email.split('@')[1]?.toLowerCase();
+    const domain = email.split("@")[1]?.toLowerCase();
     return disposableDomains.includes(domain);
   }
 
@@ -1003,7 +1041,7 @@ export class ValidationService {
    */
   static isValidURL(url: string): boolean {
     return validator.isURL(url, {
-      protocols: ['http', 'https'],
+      protocols: ["http", "https"],
       require_protocol: true,
       require_valid_protocol: true,
     });
@@ -1013,7 +1051,7 @@ export class ValidationService {
    * Validate phone number
    */
   static isValidPhone(phone: string): boolean {
-    return validator.isMobilePhone(phone, 'any', { strictMode: false });
+    return validator.isMobilePhone(phone, "any", { strictMode: false });
   }
 
   /**
@@ -1029,7 +1067,7 @@ export class ValidationService {
       /\$\{.*\}/g, // Template injection
     ];
 
-    return patterns.some(pattern => pattern.test(input));
+    return patterns.some((pattern) => pattern.test(input));
   }
 }
 ```
@@ -1038,8 +1076,8 @@ export class ValidationService {
 
 ```typescript
 // middleware/csrf.ts
-import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 
 /**
  * CSRF Protection Middleware
@@ -1053,7 +1091,7 @@ export class CSRFProtection {
    * Generate CSRF token
    */
   static generateToken(): string {
-    return crypto.randomBytes(this.TOKEN_LENGTH).toString('hex');
+    return crypto.randomBytes(this.TOKEN_LENGTH).toString("hex");
   }
 
   /**
@@ -1061,12 +1099,12 @@ export class CSRFProtection {
    */
   static validateToken(request: NextRequest): boolean {
     // Skip for safe methods
-    if (['GET', 'HEAD', 'OPTIONS'].includes(request.method)) {
+    if (["GET", "HEAD", "OPTIONS"].includes(request.method)) {
       return true;
     }
 
-    const headerToken = request.headers.get('x-csrf-token');
-    const cookieToken = request.cookies.get('csrf-token')?.value;
+    const headerToken = request.headers.get("x-csrf-token");
+    const cookieToken = request.cookies.get("csrf-token")?.value;
 
     if (!headerToken || !cookieToken) {
       return false;
@@ -1075,7 +1113,7 @@ export class CSRFProtection {
     // Timing-safe comparison
     return crypto.timingSafeEqual(
       Buffer.from(headerToken),
-      Buffer.from(cookieToken)
+      Buffer.from(cookieToken),
     );
   }
 }
@@ -1158,6 +1196,7 @@ export class CSRFProtection {
 ## 🎯 SECURITY MATURITY LEVELS
 
 ### Level 1: Basic Security (MVP)
+
 - ✅ Authentication + Authorization
 - ✅ HTTPS/TLS
 - ✅ Input validation
@@ -1165,6 +1204,7 @@ export class CSRFProtection {
 - ✅ Basic rate limiting
 
 ### Level 2: Enhanced Security (Production)
+
 - ✅ MFA required
 - ✅ Encryption at rest
 - ✅ Audit logging
@@ -1172,6 +1212,7 @@ export class CSRFProtection {
 - ✅ Regular backups
 
 ### Level 3: Enterprise Security (Current Target)
+
 - ✅ Hardware security keys
 - ✅ Field-level encryption
 - ✅ SIEM integration
@@ -1179,6 +1220,7 @@ export class CSRFProtection {
 - ✅ Zero-trust architecture
 
 ### Level 4: Military-Grade Security (Future)
+
 - ⏳ HSM integration
 - ⏳ Blockchain audit trail
 - ⏳ AI threat detection

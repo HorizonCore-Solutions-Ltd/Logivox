@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const checkVehicleSchema = z.object({
   licensePlate: z.string().min(1),
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
 
     if (blacklisted) {
       return NextResponse.json({
-        status: 'BLOCKED',
-        reason: 'BLACKLISTED',
+        status: "BLOCKED",
+        reason: "BLACKLISTED",
         severity: blacklisted.severity,
         message: blacklisted.reason,
         autoApprove: false,
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
     const whitelisted = await prisma.vehicleWhitelist.findFirst({
       where: {
         organizationId: session.user.organizationId,
-        type: 'VEHICLE',
+        type: "VEHICLE",
         identifier: plate,
         isActive: true,
         validFrom: { lte: new Date() },
@@ -61,8 +61,8 @@ export async function POST(req: NextRequest) {
 
     if (whitelisted) {
       return NextResponse.json({
-        status: 'APPROVED',
-        reason: 'WHITELISTED',
+        status: "APPROVED",
+        reason: "WHITELISTED",
         autoApprove: whitelisted.autoApprove,
         skipWeighBridge: whitelisted.skipWeighBridge,
         skipInspection: whitelisted.skipInspection,
@@ -72,8 +72,8 @@ export async function POST(req: NextRequest) {
 
     // Not in any list - requires manual approval
     return NextResponse.json({
-      status: 'PENDING',
-      reason: 'NOT_LISTED',
+      status: "PENDING",
+      reason: "NOT_LISTED",
       autoApprove: false,
       skipWeighBridge: false,
       skipInspection: false,
@@ -81,15 +81,15 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error checking vehicle:', error);
+    console.error("Error checking vehicle:", error);
     return NextResponse.json(
-      { error: 'Failed to check vehicle' },
-      { status: 500 }
+      { error: "Failed to check vehicle" },
+      { status: 500 },
     );
   }
 }

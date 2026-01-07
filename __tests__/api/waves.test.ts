@@ -2,23 +2,27 @@
  * API Route Tests - Wave Picking
  */
 
-import { GET, POST } from '@/app/api/waves/route';
-import { createAuthenticatedRequest, parseResponse, assertSuccessResponse } from '@/lib/test-utils/api-test-utils';
-import { mockPrisma } from '@/lib/test-utils/api-test-utils';
+import { GET, POST } from "@/app/api/waves/route";
+import {
+  createAuthenticatedRequest,
+  parseResponse,
+  assertSuccessResponse,
+} from "@/lib/test-utils/api-test-utils";
+import { mockPrisma } from "@/lib/test-utils/api-test-utils";
 
-describe('API: /api/waves', () => {
+describe("API: /api/waves", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('GET /api/waves', () => {
-    it('should return paginated waves', async () => {
+  describe("GET /api/waves", () => {
+    it("should return paginated waves", async () => {
       const mockWaves = [
         {
-          id: 'wave-1',
-          waveNumber: 'WAVE-20240115-001',
-          status: 'PENDING',
-          warehouseId: 'wh-1',
+          id: "wave-1",
+          waveNumber: "WAVE-20240115-001",
+          status: "PENDING",
+          warehouseId: "wh-1",
           createdAt: new Date(),
           orders: [],
         },
@@ -28,8 +32,8 @@ describe('API: /api/waves', () => {
       mockPrisma.pickingWave.count.mockResolvedValue(1);
 
       const request = createAuthenticatedRequest({
-        method: 'GET',
-        url: 'http://localhost:3000/api/waves',
+        method: "GET",
+        url: "http://localhost:3000/api/waves",
       });
 
       const response = await GET(request);
@@ -39,10 +43,10 @@ describe('API: /api/waves', () => {
       expect(data.data.waves).toEqual(mockWaves);
     });
 
-    it('should filter by status', async () => {
+    it("should filter by status", async () => {
       const request = createAuthenticatedRequest({
-        method: 'GET',
-        url: 'http://localhost:3000/api/waves?status=IN_PROGRESS',
+        method: "GET",
+        url: "http://localhost:3000/api/waves?status=IN_PROGRESS",
       });
 
       await GET(request);
@@ -50,20 +54,20 @@ describe('API: /api/waves', () => {
       expect(mockPrisma.pickingWave.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            status: 'IN_PROGRESS',
+            status: "IN_PROGRESS",
           }),
-        })
+        }),
       );
     });
   });
 
-  describe('POST /api/waves', () => {
-    it('should create wave from order selection', async () => {
+  describe("POST /api/waves", () => {
+    it("should create wave from order selection", async () => {
       const mockWave = {
-        id: 'wave-1',
-        waveNumber: 'WAVE-20240115-001',
-        status: 'PENDING',
-        orders: [{ id: 'order-1' }, { id: 'order-2' }],
+        id: "wave-1",
+        waveNumber: "WAVE-20240115-001",
+        status: "PENDING",
+        orders: [{ id: "order-1" }, { id: "order-2" }],
       };
 
       mockPrisma.$transaction.mockImplementation(async (callback) => {
@@ -73,11 +77,11 @@ describe('API: /api/waves', () => {
       mockPrisma.pickingWave.create.mockResolvedValue(mockWave);
 
       const request = createAuthenticatedRequest({
-        method: 'POST',
-        url: 'http://localhost:3000/api/waves',
+        method: "POST",
+        url: "http://localhost:3000/api/waves",
         body: {
-          warehouseId: 'wh-1',
-          orderIds: ['order-1', 'order-2'],
+          warehouseId: "wh-1",
+          orderIds: ["order-1", "order-2"],
         },
       });
 
@@ -88,17 +92,17 @@ describe('API: /api/waves', () => {
       expect(mockPrisma.$transaction).toHaveBeenCalled();
     });
 
-    it('should auto-generate wave number', async () => {
+    it("should auto-generate wave number", async () => {
       mockPrisma.$transaction.mockImplementation(async (callback) => {
         return callback(mockPrisma);
       });
 
       const request = createAuthenticatedRequest({
-        method: 'POST',
-        url: 'http://localhost:3000/api/waves',
+        method: "POST",
+        url: "http://localhost:3000/api/waves",
         body: {
-          warehouseId: 'wh-1',
-          orderIds: ['order-1'],
+          warehouseId: "wh-1",
+          orderIds: ["order-1"],
         },
       });
 
@@ -109,21 +113,21 @@ describe('API: /api/waves', () => {
           data: expect.objectContaining({
             waveNumber: expect.stringMatching(/^WAVE-\d{8}-\d{3}$/),
           }),
-        })
+        }),
       );
     });
 
-    it('should create picking tasks for wave', async () => {
+    it("should create picking tasks for wave", async () => {
       mockPrisma.$transaction.mockImplementation(async (callback) => {
         return callback(mockPrisma);
       });
 
       const request = createAuthenticatedRequest({
-        method: 'POST',
-        url: 'http://localhost:3000/api/waves',
+        method: "POST",
+        url: "http://localhost:3000/api/waves",
         body: {
-          warehouseId: 'wh-1',
-          orderIds: ['order-1'],
+          warehouseId: "wh-1",
+          orderIds: ["order-1"],
         },
       });
 

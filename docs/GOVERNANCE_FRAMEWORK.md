@@ -1,4 +1,5 @@
 # 🏛️ LogiVox Governance Framework
+
 ## Enterprise Governance, Compliance & Multi-Executive Control System
 
 > **GOVERNANCE LEVEL**: Fortune 500 Standard  
@@ -54,14 +55,14 @@ enum ApprovalAction {
   EXPORT_ALL_DATA
   CHANGE_ENCRYPTION_KEY
   DISABLE_AUDIT_LOGGING
-  
+
   // HIGH RISK - Requires 2 approvals
   DELETE_USERS_BULK
   MODIFY_RBAC_SYSTEM
   CHANGE_PRICING
   DISABLE_MFA
   GRANT_SUPER_ADMIN
-  
+
   // MEDIUM RISK - Requires 1 approval
   DELETE_USER
   MODIFY_USER_ROLE
@@ -86,55 +87,55 @@ model Executive {
   role              ExecutiveRole
   organizationId    String
   organization      Organization     @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  
+
   // Multi-factor requirements for executives
   hardwareKeyRequired Boolean        @default(true)
   biometricRequired   Boolean        @default(true)
-  
+
   // Approval tracking
   approvalsGiven    ApprovalRequest[] @relation("ApproverExecutive")
   approvalsRequested ApprovalRequest[] @relation("RequesterExecutive")
-  
+
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  
+
   @@index([organizationId])
   @@index([userId])
 }
 
 model ApprovalRequest {
   id                String           @id @default(cuid())
-  
+
   // Request details
   action            ApprovalAction
   status            ApprovalStatus   @default(PENDING)
   requester         Executive        @relation("RequesterExecutive", fields: [requesterId], references: [id])
   requesterId       String
-  
+
   // Approval requirements
   requiredApprovals Int              @default(2) // 2-of-3 or 3-of-5
   approvals         Approval[]
-  
+
   // Request context
   reason            String           // Why is this needed?
   metadata          Json             // Action-specific data
   ipAddress         String
   userAgent         String
-  
+
   // Execution
   executedAt        DateTime?
   executedBy        String?
   executionResult   Json?
-  
+
   // Expiration (requests expire after 24 hours)
   expiresAt         DateTime
-  
+
   // Immutable audit trail
   auditLog          AuditLog[]
-  
+
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt
-  
+
   @@index([status])
   @@index([requesterId])
   @@index([action])
@@ -143,26 +144,26 @@ model ApprovalRequest {
 
 model Approval {
   id                String           @id @default(cuid())
-  
+
   requestId         String
   request           ApprovalRequest  @relation(fields: [requestId], references: [id], onDelete: Cascade)
-  
+
   approver          Executive        @relation("ApproverExecutive", fields: [approverId], references: [id])
   approverId        String
-  
+
   decision          String           // "APPROVED" | "REJECTED"
   comment           String?
-  
+
   // Security verification
   mfaVerified       Boolean          @default(false)
   hardwareKeyVerified Boolean        @default(false)
   biometricVerified Boolean          @default(false)
-  
+
   ipAddress         String
   userAgent         String
-  
+
   createdAt         DateTime         @default(now())
-  
+
   @@unique([requestId, approverId]) // Each executive can only approve once
   @@index([requestId])
   @@index([approverId])
@@ -170,24 +171,24 @@ model Approval {
 
 model CriticalOperationLog {
   id                String           @id @default(cuid())
-  
+
   operation         String
   performedBy       String
   approvalRequestId String?
-  
+
   // Before/After state for rollback
   beforeState       Json?
   afterState        Json?
-  
+
   success           Boolean
   errorMessage      String?
-  
+
   // Blockchain verification (optional)
   blockchainHash    String?          // SHA-256 hash for tamper detection
   previousHash      String?          // Link to previous operation
-  
+
   createdAt         DateTime         @default(now())
-  
+
   @@index([operation])
   @@index([performedBy])
   @@index([createdAt])
@@ -198,9 +199,9 @@ model CriticalOperationLog {
 
 ```typescript
 // lib/governance/approval-system.ts
-import { prisma } from '@/lib/prisma';
-import { ApprovalAction, ApprovalStatus, ExecutiveRole } from '@prisma/client';
-import crypto from 'crypto';
+import { prisma } from "@/lib/prisma";
+import { ApprovalAction, ApprovalStatus, ExecutiveRole } from "@prisma/client";
+import crypto from "crypto";
 
 /**
  * Multi-Executive Approval System
@@ -231,7 +232,11 @@ export class ApprovalSystem {
     },
     [ApprovalAction.EXPORT_ALL_DATA]: {
       required: 3,
-      roles: [ExecutiveRole.CEO, ExecutiveRole.CISO, ExecutiveRole.LEGAL_COUNSEL],
+      roles: [
+        ExecutiveRole.CEO,
+        ExecutiveRole.CISO,
+        ExecutiveRole.LEGAL_COUNSEL,
+      ],
       minRoles: 2,
     },
     [ApprovalAction.CHANGE_ENCRYPTION_KEY]: {
@@ -241,7 +246,11 @@ export class ApprovalSystem {
     },
     [ApprovalAction.DISABLE_AUDIT_LOGGING]: {
       required: 3,
-      roles: [ExecutiveRole.CISO, ExecutiveRole.COMPLIANCE_OFFICER, ExecutiveRole.CEO],
+      roles: [
+        ExecutiveRole.CISO,
+        ExecutiveRole.COMPLIANCE_OFFICER,
+        ExecutiveRole.CEO,
+      ],
       minRoles: 3,
     },
 
@@ -314,7 +323,7 @@ export class ApprovalSystem {
     });
 
     if (!requester) {
-      throw new Error('Only executives can request critical operations');
+      throw new Error("Only executives can request critical operations");
     }
 
     // Create approval request
@@ -335,8 +344,8 @@ export class ApprovalSystem {
     await prisma.auditLog.create({
       data: {
         userId: params.requesterId,
-        action: 'APPROVAL_REQUEST_CREATED',
-        resource: 'ApprovalRequest',
+        action: "APPROVAL_REQUEST_CREATED",
+        resource: "ApprovalRequest",
         resourceId: request.id,
         ipAddress: params.ipAddress,
         userAgent: params.userAgent,
@@ -359,7 +368,7 @@ export class ApprovalSystem {
   static async processApproval(params: {
     requestId: string;
     approverId: string;
-    decision: 'APPROVED' | 'REJECTED';
+    decision: "APPROVED" | "REJECTED";
     comment?: string;
     mfaVerified: boolean;
     hardwareKeyVerified: boolean;
@@ -373,7 +382,7 @@ export class ApprovalSystem {
     });
 
     if (!approver) {
-      throw new Error('Only executives can approve requests');
+      throw new Error("Only executives can approve requests");
     }
 
     // Get request
@@ -383,7 +392,7 @@ export class ApprovalSystem {
     });
 
     if (!request) {
-      throw new Error('Approval request not found');
+      throw new Error("Approval request not found");
     }
 
     // Verify request not expired
@@ -392,19 +401,21 @@ export class ApprovalSystem {
         where: { id: params.requestId },
         data: { status: ApprovalStatus.EXPIRED },
       });
-      throw new Error('Approval request has expired');
+      throw new Error("Approval request has expired");
     }
 
     // Verify approver != requester (can't approve own request)
     if (approver.id === request.requesterId) {
-      throw new Error('Cannot approve your own request');
+      throw new Error("Cannot approve your own request");
     }
 
     // Verify MFA/hardware key for CRITICAL operations
     const requirements = this.APPROVAL_REQUIREMENTS[request.action];
     if (requirements.required >= 3) {
       if (!params.mfaVerified || !params.hardwareKeyVerified) {
-        throw new Error('MFA and hardware key required for critical operations');
+        throw new Error(
+          "MFA and hardware key required for critical operations",
+        );
       }
     }
 
@@ -424,30 +435,31 @@ export class ApprovalSystem {
     });
 
     // Check if request should be rejected
-    if (params.decision === 'REJECTED') {
+    if (params.decision === "REJECTED") {
       await prisma.approvalRequest.update({
         where: { id: params.requestId },
         data: { status: ApprovalStatus.REJECTED },
       });
 
-      await this.notifyRequester(request, 'REJECTED');
+      await this.notifyRequester(request, "REJECTED");
       return;
     }
 
     // Check if enough approvals
-    const approvedCount = request.approvals.filter(a => a.decision === 'APPROVED').length + 1;
-    
+    const approvedCount =
+      request.approvals.filter((a) => a.decision === "APPROVED").length + 1;
+
     if (approvedCount >= request.requiredApprovals) {
       // Verify role diversity requirement
       const approverRoles = [
         approver.role,
-        ...request.approvals.map(a => a.approver.role),
+        ...request.approvals.map((a) => a.approver.role),
       ];
       const uniqueRoles = new Set(approverRoles).size;
 
       if (uniqueRoles < requirements.minRoles) {
         throw new Error(
-          `Requires approvals from ${requirements.minRoles} different executive roles`
+          `Requires approvals from ${requirements.minRoles} different executive roles`,
         );
       }
 
@@ -457,30 +469,33 @@ export class ApprovalSystem {
         data: { status: ApprovalStatus.APPROVED },
       });
 
-      await this.notifyRequester(request, 'APPROVED');
+      await this.notifyRequester(request, "APPROVED");
     }
   }
 
   /**
    * Execute approved request
    */
-  static async executeApprovedRequest(requestId: string, executorId: string): Promise<void> {
+  static async executeApprovedRequest(
+    requestId: string,
+    executorId: string,
+  ): Promise<void> {
     const request = await prisma.approvalRequest.findUnique({
       where: { id: requestId },
       include: { approvals: true },
     });
 
     if (!request) {
-      throw new Error('Request not found');
+      throw new Error("Request not found");
     }
 
     if (request.status !== ApprovalStatus.APPROVED) {
-      throw new Error('Request not approved');
+      throw new Error("Request not approved");
     }
 
     // Verify executor is the original requester
     if (request.requester.userId !== executorId) {
-      throw new Error('Only the original requester can execute');
+      throw new Error("Only the original requester can execute");
     }
 
     try {
@@ -507,7 +522,7 @@ export class ApprovalSystem {
         data: {
           executionResult: {
             success: false,
-            error: error instanceof Error ? error.message : 'Unknown error',
+            error: error instanceof Error ? error.message : "Unknown error",
           },
         },
       });
@@ -549,18 +564,22 @@ export class ApprovalSystem {
    * - Creates backup before deletion
    * - Irreversible
    */
-  private static async deleteOrganization(organizationId: string): Promise<any> {
+  private static async deleteOrganization(
+    organizationId: string,
+  ): Promise<any> {
     // 1. Create full backup
     const backup = await this.createOrganizationBackup(organizationId);
 
     // 2. Verify no active subscriptions
     const org = await prisma.organization.findUnique({
       where: { id: organizationId },
-      include: { _count: { select: { users: true, inventory: true, bookings: true } } },
+      include: {
+        _count: { select: { users: true, inventory: true, bookings: true } },
+      },
     });
 
     if (!org) {
-      throw new Error('Organization not found');
+      throw new Error("Organization not found");
     }
 
     // 3. Soft delete first (mark as deleted, actual deletion after 30 days)
@@ -568,8 +587,8 @@ export class ApprovalSystem {
       where: { id: organizationId },
       data: {
         deletedAt: new Date(),
-        deletedBy: 'EXECUTIVE_APPROVAL',
-        status: 'DELETED',
+        deletedBy: "EXECUTIVE_APPROVAL",
+        status: "DELETED",
       },
     });
 
@@ -582,25 +601,30 @@ export class ApprovalSystem {
         inventory: org._count.inventory,
         bookings: org._count.bookings,
       },
-      note: 'Soft deleted. Permanent deletion in 30 days. Backup created.',
+      note: "Soft deleted. Permanent deletion in 30 days. Backup created.",
     };
   }
 
   /**
    * Create organization backup before deletion
    */
-  private static async createOrganizationBackup(organizationId: string): Promise<any> {
+  private static async createOrganizationBackup(
+    organizationId: string,
+  ): Promise<any> {
     // Implementation: Export all organization data to secure backup location
-    return { id: 'backup-' + Date.now() };
+    return { id: "backup-" + Date.now() };
   }
 
   /**
    * Log critical operation with blockchain hash
    */
-  private static async logCriticalOperation(request: any, result: any): Promise<void> {
+  private static async logCriticalOperation(
+    request: any,
+    result: any,
+  ): Promise<void> {
     // Get previous hash for blockchain linking
     const previousLog = await prisma.criticalOperationLog.findFirst({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
 
     const logData = {
@@ -616,9 +640,9 @@ export class ApprovalSystem {
 
     // Create blockchain hash (SHA-256 of log data + previous hash)
     const hash = crypto
-      .createHash('sha256')
-      .update(JSON.stringify(logData) + (previousLog?.blockchainHash || ''))
-      .digest('hex');
+      .createHash("sha256")
+      .update(JSON.stringify(logData) + (previousLog?.blockchainHash || ""))
+      .digest("hex");
 
     await prisma.criticalOperationLog.create({
       data: {
@@ -634,7 +658,7 @@ export class ApprovalSystem {
   private static async notifyExecutives(
     requestId: string,
     action: ApprovalAction,
-    roles: ExecutiveRole[]
+    roles: ExecutiveRole[],
   ): Promise<void> {
     // Get all executives with required roles
     const executives = await prisma.executive.findMany({
@@ -645,33 +669,38 @@ export class ApprovalSystem {
     // Send notifications (email, SMS, push)
     for (const executive of executives) {
       // Implementation: Send email/SMS/push notification
-      console.log(`[NOTIFICATION] Executive ${executive.user.email} notified about ${action}`);
+      console.log(
+        `[NOTIFICATION] Executive ${executive.user.email} notified about ${action}`,
+      );
     }
   }
 
   /**
    * Notify requester about approval decision
    */
-  private static async notifyRequester(request: any, decision: string): Promise<void> {
+  private static async notifyRequester(
+    request: any,
+    decision: string,
+  ): Promise<void> {
     // Implementation: Send notification to requester
     console.log(`[NOTIFICATION] Request ${request.id} ${decision}`);
   }
 
   // Additional critical operation implementations...
   private static async deleteDatabase(databaseId: string): Promise<any> {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   private static async exportAllData(organizationId: string): Promise<any> {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   private static async deleteUsersBulk(userIds: string[]): Promise<any> {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 
   private static async grantSuperAdmin(userId: string): Promise<any> {
-    throw new Error('Not implemented');
+    throw new Error("Not implemented");
   }
 }
 ```
@@ -682,18 +711,18 @@ export class ApprovalSystem {
 
 ### Role Separation Matrix
 
-| Operation | CEO | CTO | CFO | COO | CISO | Compliance | Legal |
-|-----------|-----|-----|-----|-----|------|-----------|-------|
-| Delete Organization | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| Delete Database | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| Disable Security | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| Export All Data | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ✅ |
-| Change Encryption | ✅ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| Disable Audit Log | ✅ | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ |
-| Delete Users Bulk | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ |
-| Modify RBAC | ❌ | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| Change Pricing | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Grant Super Admin | ✅ | ❌ | ❌ | ❌ | ✅ | ❌ | ❌ |
+| Operation           | CEO | CTO | CFO | COO | CISO | Compliance | Legal |
+| ------------------- | --- | --- | --- | --- | ---- | ---------- | ----- |
+| Delete Organization | ✅  | ✅  | ❌  | ❌  | ✅   | ❌         | ❌    |
+| Delete Database     | ✅  | ✅  | ❌  | ❌  | ✅   | ❌         | ❌    |
+| Disable Security    | ✅  | ✅  | ❌  | ❌  | ✅   | ❌         | ❌    |
+| Export All Data     | ✅  | ❌  | ❌  | ❌  | ✅   | ❌         | ✅    |
+| Change Encryption   | ✅  | ✅  | ❌  | ❌  | ✅   | ❌         | ❌    |
+| Disable Audit Log   | ✅  | ❌  | ❌  | ❌  | ✅   | ✅         | ❌    |
+| Delete Users Bulk   | ❌  | ❌  | ❌  | ✅  | ✅   | ❌         | ❌    |
+| Modify RBAC         | ❌  | ✅  | ❌  | ❌  | ✅   | ❌         | ❌    |
+| Change Pricing      | ✅  | ❌  | ✅  | ❌  | ❌   | ❌         | ❌    |
+| Grant Super Admin   | ✅  | ❌  | ❌  | ❌  | ✅   | ❌         | ❌    |
 
 ### Key Principles
 
@@ -712,9 +741,10 @@ export class ApprovalSystem {
 #### Scenario 1: Complete Data Center Failure
 
 **Recovery Time Objective (RTO)**: 4 hours  
-**Recovery Point Objective (RPO)**: 6 hours  
+**Recovery Point Objective (RPO)**: 6 hours
 
 **Procedure**:
+
 1. **Detection** (0-15 min):
    - Automated health checks detect failure
    - PagerDuty alerts on-call engineer
@@ -750,9 +780,10 @@ export class ApprovalSystem {
 #### Scenario 2: Database Corruption
 
 **RTO**: 2 hours  
-**RPO**: 6 hours  
+**RPO**: 6 hours
 
 **Procedure**:
+
 1. Immediately stop all write operations
 2. Isolate corrupted database
 3. Restore from latest verified backup
@@ -763,9 +794,10 @@ export class ApprovalSystem {
 #### Scenario 3: Ransomware Attack
 
 **RTO**: 8 hours  
-**RPO**: 6 hours  
+**RPO**: 6 hours
 
 **Procedure**:
+
 1. Immediately isolate infected systems
 2. Activate incident response team
 3. DO NOT pay ransom
@@ -778,9 +810,10 @@ export class ApprovalSystem {
 #### Scenario 4: Key Personnel Unavailable
 
 **RTO**: 1 hour  
-**RPO**: N/A  
+**RPO**: N/A
 
 **Procedure**:
+
 1. Activate deputy/backup personnel
 2. Access shared password vault (1Password/LastPass)
 3. Follow runbooks for critical operations
@@ -796,10 +829,10 @@ export class ApprovalSystem {
 
 ```typescript
 // lib/backup/database-backup.ts
-import { exec } from 'child_process';
-import { promisify } from 'util';
-import AWS from 'aws-sdk';
-import crypto from 'crypto';
+import { exec } from "child_process";
+import { promisify } from "util";
+import AWS from "aws-sdk";
+import crypto from "crypto";
 
 const execAsync = promisify(exec);
 
@@ -824,7 +857,7 @@ export class DatabaseBackupService {
    * Create full database backup
    */
   static async createFullBackup(): Promise<string> {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const filename = `logivox-full-${timestamp}.sql`;
     const encryptedFilename = `${filename}.enc`;
 
@@ -832,14 +865,17 @@ export class DatabaseBackupService {
       // 1. Create PostgreSQL dump
       const databaseUrl = process.env.DATABASE_URL!;
       await execAsync(
-        `pg_dump "${databaseUrl}" --format=custom --file=/tmp/${filename}`
+        `pg_dump "${databaseUrl}" --format=custom --file=/tmp/${filename}`,
       );
 
       // 2. Encrypt backup
       await this.encryptFile(`/tmp/${filename}`, `/tmp/${encryptedFilename}`);
 
       // 3. Upload to S3
-      await this.uploadToS3(`/tmp/${encryptedFilename}`, `backups/database/${encryptedFilename}`);
+      await this.uploadToS3(
+        `/tmp/${encryptedFilename}`,
+        `backups/database/${encryptedFilename}`,
+      );
 
       // 4. Upload to Glacier (long-term storage)
       await this.uploadToGlacier(`/tmp/${encryptedFilename}`);
@@ -847,16 +883,16 @@ export class DatabaseBackupService {
       // 5. Verify backup integrity
       const isValid = await this.verifyBackup(`/tmp/${encryptedFilename}`);
       if (!isValid) {
-        throw new Error('Backup verification failed');
+        throw new Error("Backup verification failed");
       }
 
       // 6. Log backup
       await prisma.backupLog.create({
         data: {
-          type: 'FULL',
+          type: "FULL",
           filename: encryptedFilename,
           size: (await fs.promises.stat(`/tmp/${encryptedFilename}`)).size,
-          location: 'S3_GLACIER',
+          location: "S3_GLACIER",
           encrypted: true,
           verified: true,
           checksum: await this.calculateChecksum(`/tmp/${encryptedFilename}`),
@@ -870,7 +906,7 @@ export class DatabaseBackupService {
       return encryptedFilename;
     } catch (error) {
       // Alert ops team
-      console.error('[BACKUP ERROR]', error);
+      console.error("[BACKUP ERROR]", error);
       throw error;
     }
   }
@@ -878,10 +914,13 @@ export class DatabaseBackupService {
   /**
    * Encrypt backup file
    */
-  private static async encryptFile(inputPath: string, outputPath: string): Promise<void> {
-    const key = Buffer.from(process.env.BACKUP_ENCRYPTION_KEY!, 'hex');
+  private static async encryptFile(
+    inputPath: string,
+    outputPath: string,
+  ): Promise<void> {
+    const key = Buffer.from(process.env.BACKUP_ENCRYPTION_KEY!, "hex");
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv('aes-256-cbc', key, iv);
+    const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
 
     const input = fs.createReadStream(inputPath);
     const output = fs.createWriteStream(outputPath);
@@ -890,27 +929,28 @@ export class DatabaseBackupService {
     output.write(iv);
 
     await new Promise((resolve, reject) => {
-      input
-        .pipe(cipher)
-        .pipe(output)
-        .on('finish', resolve)
-        .on('error', reject);
+      input.pipe(cipher).pipe(output).on("finish", resolve).on("error", reject);
     });
   }
 
   /**
    * Upload to S3
    */
-  private static async uploadToS3(localPath: string, s3Key: string): Promise<void> {
+  private static async uploadToS3(
+    localPath: string,
+    s3Key: string,
+  ): Promise<void> {
     const fileContent = await fs.promises.readFile(localPath);
 
-    await this.s3.putObject({
-      Bucket: process.env.AWS_S3_BACKUP_BUCKET!,
-      Key: s3Key,
-      Body: fileContent,
-      ServerSideEncryption: 'AES256',
-      StorageClass: 'STANDARD_IA', // Infrequent Access
-    }).promise();
+    await this.s3
+      .putObject({
+        Bucket: process.env.AWS_S3_BACKUP_BUCKET!,
+        Key: s3Key,
+        Body: fileContent,
+        ServerSideEncryption: "AES256",
+        StorageClass: "STANDARD_IA", // Infrequent Access
+      })
+      .promise();
   }
 
   /**
@@ -937,16 +977,16 @@ export class DatabaseBackupService {
    * Calculate SHA-256 checksum
    */
   private static async calculateChecksum(filePath: string): Promise<string> {
-    const hash = crypto.createHash('sha256');
+    const hash = crypto.createHash("sha256");
     const stream = fs.createReadStream(filePath);
 
     await new Promise((resolve, reject) => {
-      stream.on('data', chunk => hash.update(chunk));
-      stream.on('end', resolve);
-      stream.on('error', reject);
+      stream.on("data", (chunk) => hash.update(chunk));
+      stream.on("end", resolve);
+      stream.on("error", reject);
     });
 
-    return hash.digest('hex');
+    return hash.digest("hex");
   }
 
   /**

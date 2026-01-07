@@ -1,11 +1,11 @@
 /**
  * Report Export System for LogiVox
- * 
+ *
  * Handles exporting reports to PDF, Excel (XLSX), and CSV formats.
  * Supports custom formatting, charts, and branding.
  */
 
-import { ReportConfig, FieldType, getFieldById } from './report-types';
+import { ReportConfig, FieldType, getFieldById } from "./report-types";
 
 // Import ReportResult from report-engine
 export interface ReportResult {
@@ -20,10 +20,10 @@ export interface ReportResult {
 // ============================================================================
 
 export enum ExportFormat {
-  PDF = 'pdf',
-  EXCEL = 'xlsx',
-  CSV = 'csv',
-  JSON = 'json',
+  PDF = "pdf",
+  EXCEL = "xlsx",
+  CSV = "csv",
+  JSON = "json",
 }
 
 export interface ExportOptions {
@@ -32,7 +32,7 @@ export interface ExportOptions {
   includeCharts?: boolean;
   includeHeaders?: boolean;
   includeSummary?: boolean;
-  pageOrientation?: 'portrait' | 'landscape';
+  pageOrientation?: "portrait" | "landscape";
 }
 
 // ============================================================================
@@ -41,12 +41,12 @@ export interface ExportOptions {
 
 export function exportToCSV(
   result: ReportResult,
-  options: ExportOptions = { format: ExportFormat.CSV }
+  options: ExportOptions = { format: ExportFormat.CSV },
 ): string {
   const { data, config } = result;
 
   if (data.length === 0) {
-    return '';
+    return "";
   }
 
   const headers = config.fields.map((fieldId) => {
@@ -62,29 +62,29 @@ export function exportToCSV(
   });
 
   // Build CSV content
-  let csv = '';
+  let csv = "";
 
   // Add headers
   if (options.includeHeaders !== false) {
-    csv += headers.map(escapeCSV).join(',') + '\n';
+    csv += headers.map(escapeCSV).join(",") + "\n";
   }
 
   // Add data rows
   rows.forEach((row) => {
-    csv += row.map(escapeCSV).join(',') + '\n';
+    csv += row.map(escapeCSV).join(",") + "\n";
   });
 
   return csv;
 }
 
 function formatCSVValue(value: any): string {
-  if (value === null || value === undefined) return '';
+  if (value === null || value === undefined) return "";
   if (value instanceof Date) return value.toISOString();
   return String(value);
 }
 
 function escapeCSV(value: string): string {
-  if (value.includes(',') || value.includes('"') || value.includes('\n')) {
+  if (value.includes(",") || value.includes('"') || value.includes("\n")) {
     return `"${value.replace(/"/g, '""')}"`;
   }
   return value;
@@ -96,14 +96,14 @@ function escapeCSV(value: string): string {
 
 export function exportToExcel(
   result: ReportResult,
-  options: ExportOptions = { format: ExportFormat.EXCEL }
+  options: ExportOptions = { format: ExportFormat.EXCEL },
 ): string {
   // In production, this would use the 'xlsx' library
   // For now, return Excel-compatible CSV (tab-delimited)
   const { data, config } = result;
 
   if (data.length === 0) {
-    return '';
+    return "";
   }
 
   const headers = config.fields.map((fieldId) => {
@@ -119,7 +119,7 @@ export function exportToExcel(
   });
 
   // Build tab-delimited content
-  let content = '';
+  let content = "";
 
   // Add title and metadata
   if (options.includeSummary !== false) {
@@ -129,20 +129,20 @@ export function exportToExcel(
   }
 
   // Add headers
-  content += headers.join('\t') + '\n';
+  content += headers.join("\t") + "\n";
 
   // Add data rows
   rows.forEach((row) => {
-    content += row.join('\t') + '\n';
+    content += row.join("\t") + "\n";
   });
 
   return content;
 }
 
 function formatExcelValue(value: any): string {
-  if (value === null || value === undefined) return '';
+  if (value === null || value === undefined) return "";
   if (value instanceof Date) return value.toLocaleDateString();
-  if (typeof value === 'number') return value.toString();
+  if (typeof value === "number") return value.toString();
   return String(value);
 }
 
@@ -152,7 +152,7 @@ function formatExcelValue(value: any): string {
 
 export function exportToJSON(
   result: ReportResult,
-  options: ExportOptions = { format: ExportFormat.JSON }
+  options: ExportOptions = { format: ExportFormat.JSON },
 ): string {
   const exportData: any = {
     report: {
@@ -179,7 +179,7 @@ export function exportToJSON(
 
 export function exportToPDF(
   result: ReportResult,
-  options: ExportOptions = { format: ExportFormat.PDF }
+  options: ExportOptions = { format: ExportFormat.PDF },
 ): string {
   // In production, this would use 'pdfkit' or similar
   // For now, return HTML that can be converted to PDF by the browser
@@ -265,7 +265,7 @@ export function exportToPDF(
   <div class="header">
     <h1>${config.name}</h1>
     <div class="meta">
-      ${config.description || ''}
+      ${config.description || ""}
       <br>Generated: ${new Date().toLocaleString()}
       <br>Category: ${config.category}
     </div>
@@ -280,13 +280,13 @@ export function exportToPDF(
     <div>Execution Time: ${result.executionTime}ms</div>
   </div>
   `
-      : ''
+      : ""
   }
 
   <table>
     <thead>
       <tr>
-        ${headers.map((header) => `<th>${header}</th>`).join('')}
+        ${headers.map((header) => `<th>${header}</th>`).join("")}
       </tr>
     </thead>
     <tbody>
@@ -299,11 +299,11 @@ export function exportToPDF(
               const value = row[fieldId];
               return `<td>${formatPDFValue(value)}</td>`;
             })
-            .join('')}
+            .join("")}
         </tr>
-      `
+      `,
         )
-        .join('')}
+        .join("")}
     </tbody>
   </table>
 
@@ -319,12 +319,12 @@ export function exportToPDF(
 }
 
 function formatPDFValue(value: any): string {
-  if (value === null || value === undefined) return '-';
+  if (value === null || value === undefined) return "-";
   if (value instanceof Date) return value.toLocaleDateString();
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     // Format currency
     if (value >= 0.01 && value < 1000000) {
-      return value.toLocaleString('en-US', {
+      return value.toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
@@ -351,7 +351,10 @@ function generateSummary(result: ReportResult): any {
   config.fields.forEach((fieldId) => {
     const field = getFieldById(fieldId, config.category);
 
-    if (field?.type === FieldType.NUMBER || field?.type === FieldType.CURRENCY) {
+    if (
+      field?.type === FieldType.NUMBER ||
+      field?.type === FieldType.CURRENCY
+    ) {
       const values = data.map((row) => row[fieldId]).filter((v) => v != null);
 
       if (values.length > 0) {
@@ -380,7 +383,7 @@ function generateSummary(result: ReportResult): any {
 
 export function exportReport(
   result: ReportResult,
-  options: ExportOptions
+  options: ExportOptions,
 ): string {
   switch (options.format) {
     case ExportFormat.CSV:
@@ -407,25 +410,25 @@ export function exportReport(
 export function downloadReport(
   content: string,
   filename: string,
-  format: ExportFormat
+  format: ExportFormat,
 ): void {
   const mimeTypes: Record<ExportFormat, string> = {
-    [ExportFormat.CSV]: 'text/csv',
-    [ExportFormat.EXCEL]: 'application/vnd.ms-excel',
-    [ExportFormat.JSON]: 'application/json',
-    [ExportFormat.PDF]: 'text/html', // Would be 'application/pdf' with proper PDF generation
+    [ExportFormat.CSV]: "text/csv",
+    [ExportFormat.EXCEL]: "application/vnd.ms-excel",
+    [ExportFormat.JSON]: "application/json",
+    [ExportFormat.PDF]: "text/html", // Would be 'application/pdf' with proper PDF generation
   };
 
   const extensions: Record<ExportFormat, string> = {
-    [ExportFormat.CSV]: 'csv',
-    [ExportFormat.EXCEL]: 'xlsx',
-    [ExportFormat.JSON]: 'json',
-    [ExportFormat.PDF]: 'html', // Would be 'pdf' with proper PDF generation
+    [ExportFormat.CSV]: "csv",
+    [ExportFormat.EXCEL]: "xlsx",
+    [ExportFormat.JSON]: "json",
+    [ExportFormat.PDF]: "html", // Would be 'pdf' with proper PDF generation
   };
 
   const blob = new Blob([content], { type: mimeTypes[format] });
   const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = url;
   link.download = `${filename}.${extensions[format]}`;
   document.body.appendChild(link);
@@ -440,7 +443,7 @@ export function downloadReport(
 
 export function estimateExportSize(
   result: ReportResult,
-  format: ExportFormat
+  format: ExportFormat,
 ): number {
   const { data, config } = result;
 
@@ -467,10 +470,10 @@ export function estimateExportSize(
 }
 
 export function formatFileSize(bytes: number): string {
-  if (bytes === 0) return '0 Bytes';
+  if (bytes === 0) return "0 Bytes";
 
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const sizes = ["Bytes", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;

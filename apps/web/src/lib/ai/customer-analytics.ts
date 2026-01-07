@@ -47,19 +47,19 @@ export interface CustomerSegment {
 export function calculateRFM(
   customerId: string,
   purchases: Array<{ date: Date; amount: number }>,
-  referenceDate: Date = new Date()
+  referenceDate: Date = new Date(),
 ): { recency: number; frequency: number; monetary: number } {
   if (purchases.length === 0) {
     return { recency: 0, frequency: 0, monetary: 0 };
   }
 
   // Recency: days since last purchase
-  const lastPurchase = purchases.reduce((latest, p) =>
-    p.date > latest ? p.date : latest,
-    purchases[0]?.date ?? new Date()
+  const lastPurchase = purchases.reduce(
+    (latest, p) => (p.date > latest ? p.date : latest),
+    purchases[0]?.date ?? new Date(),
   );
   const recencyDays = Math.floor(
-    (referenceDate.getTime() - lastPurchase.getTime()) / (1000 * 60 * 60 * 24)
+    (referenceDate.getTime() - lastPurchase.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   // Frequency: number of purchases
@@ -74,9 +74,11 @@ export function calculateRFM(
 /**
  * Segment customers based on RFM scores
  */
-export function segmentCustomer(
-  rfm: { recency: number; frequency: number; monetary: number }
-): "VIP" | "Loyal" | "Regular" | "At-Risk" | "Churned" {
+export function segmentCustomer(rfm: {
+  recency: number;
+  frequency: number;
+  monetary: number;
+}): "VIP" | "Loyal" | "Regular" | "At-Risk" | "Churned" {
   const { recency, frequency, monetary } = rfm;
 
   // VIP: Recent, frequent, high-value customers
@@ -107,20 +109,26 @@ export function segmentCustomer(
  * Predict customer churn probability
  */
 export function predictChurn(
-  customerBehavior: CustomerBehavior
+  customerBehavior: CustomerBehavior,
 ): ChurnPrediction {
   let churnProbability = 0;
   const reasons: string[] = [];
 
   // Factor 1: Days since last purchase (40% weight)
-  const recencyScore = Math.min(customerBehavior.daysSinceLastPurchase / 180, 1);
+  const recencyScore = Math.min(
+    customerBehavior.daysSinceLastPurchase / 180,
+    1,
+  );
   churnProbability += recencyScore * 0.4;
   if (customerBehavior.daysSinceLastPurchase > 90) {
-    reasons.push(`No purchase in ${customerBehavior.daysSinceLastPurchase} days`);
+    reasons.push(
+      `No purchase in ${customerBehavior.daysSinceLastPurchase} days`,
+    );
   }
 
   // Factor 2: Purchase frequency decline (30% weight)
-  const frequencyScore = 1 - Math.min(customerBehavior.purchaseFrequency / 5, 1);
+  const frequencyScore =
+    1 - Math.min(customerBehavior.purchaseFrequency / 5, 1);
   churnProbability += frequencyScore * 0.3;
   if (customerBehavior.purchaseFrequency < 1) {
     reasons.push("Low purchase frequency (less than once per month)");
@@ -178,7 +186,7 @@ export function predictChurn(
  * Analyze purchase patterns
  */
 export function analyzePurchasePattern(
-  purchases: Array<{ date: Date; amount: number }>
+  purchases: Array<{ date: Date; amount: number }>,
 ): PurchasePattern {
   if (purchases.length < 3) {
     return {
@@ -190,11 +198,16 @@ export function analyzePurchasePattern(
   }
 
   // Sort by date
-  const sorted = [...purchases].sort((a, b) => a.date.getTime() - b.date.getTime());
+  const sorted = [...purchases].sort(
+    (a, b) => a.date.getTime() - b.date.getTime(),
+  );
 
   // Calculate trend using linear regression
   const n = sorted.length;
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  let sumX = 0,
+    sumY = 0,
+    sumXY = 0,
+    sumX2 = 0;
 
   sorted.forEach((purchase, index) => {
     const x = index;
@@ -227,12 +240,16 @@ export function analyzePurchasePattern(
     const diff = purchase.date.getTime() - prevPurchase.date.getTime();
     return diff / (1000 * 60 * 60 * 24);
   });
-  const avgDaysBetween = daysBetweenPurchases.length > 0 
-    ? daysBetweenPurchases.reduce((sum, d) => sum + d, 0) / daysBetweenPurchases.length
-    : 30; // Default to 30 days if no history
-  
+  const avgDaysBetween =
+    daysBetweenPurchases.length > 0
+      ? daysBetweenPurchases.reduce((sum, d) => sum + d, 0) /
+        daysBetweenPurchases.length
+      : 30; // Default to 30 days if no history
+
   const lastDate = sorted[sorted.length - 1]?.date ?? new Date();
-  const nextDate = new Date(lastDate.getTime() + avgDaysBetween * 24 * 60 * 60 * 1000);
+  const nextDate = new Date(
+    lastDate.getTime() + avgDaysBetween * 24 * 60 * 60 * 1000,
+  );
 
   return {
     pattern: seasonality ? "seasonal" : pattern,
@@ -246,12 +263,14 @@ export function analyzePurchasePattern(
 /**
  * Detect seasonality in purchase data
  */
-function detectSeasonality(purchases: Array<{ date: Date; amount: number }>): boolean {
+function detectSeasonality(
+  purchases: Array<{ date: Date; amount: number }>,
+): boolean {
   if (purchases.length < 12) return false;
 
   // Group by month
   const monthlyTotals = new Map<number, number>();
-  purchases.forEach(p => {
+  purchases.forEach((p) => {
     const month = p.date.getMonth();
     const current = monthlyTotals.get(month) || 0;
     monthlyTotals.set(month, current + p.amount);
@@ -260,7 +279,8 @@ function detectSeasonality(purchases: Array<{ date: Date; amount: number }>): bo
   // Check if variance is significant
   const values = Array.from(monthlyTotals.values());
   const mean = values.reduce((sum, v) => sum + v, 0) / values.length;
-  const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
+  const variance =
+    values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
   const stdDev = Math.sqrt(variance);
   const cv = stdDev / mean; // Coefficient of variation
 
@@ -273,16 +293,16 @@ function detectSeasonality(purchases: Array<{ date: Date; amount: number }>): bo
 export function calculateCLV(
   customerBehavior: CustomerBehavior,
   retentionRate: number = 0.8,
-  discountRate: number = 0.1
+  discountRate: number = 0.1,
 ): number {
   const { averageOrderValue, purchaseFrequency } = customerBehavior;
-  
+
   // CLV = (Average Order Value × Purchase Frequency) × Customer Lifespan
   // Customer Lifespan = 1 / Churn Rate = 1 / (1 - Retention Rate)
-  
+
   const customerLifespan = 1 / (1 - retentionRate);
   const annualValue = averageOrderValue * purchaseFrequency * 12;
-  
+
   // Present value of future cash flows
   let clv = 0;
   for (let year = 1; year <= customerLifespan; year++) {
@@ -296,11 +316,11 @@ export function calculateCLV(
  * Segment customers into groups
  */
 export function segmentCustomers(
-  customers: CustomerBehavior[]
+  customers: CustomerBehavior[],
 ): CustomerSegment[] {
   const segments = new Map<string, CustomerBehavior[]>();
 
-  customers.forEach(customer => {
+  customers.forEach((customer) => {
     const segment = customer.segment;
     if (!segments.has(segment)) {
       segments.set(segment, []);
@@ -342,7 +362,7 @@ export function segmentCustomers(
  */
 export function getTopCustomers(
   customers: CustomerBehavior[],
-  limit: number = 20
+  limit: number = 20,
 ): CustomerBehavior[] {
   return [...customers]
     .sort((a, b) => b.totalSpent - a.totalSpent)
@@ -355,10 +375,10 @@ export function getTopCustomers(
 export function calculateRetentionRate(
   customersAtStart: number,
   customersAtEnd: number,
-  newCustomers: number
+  newCustomers: number,
 ): number {
   if (customersAtStart === 0) return 0;
-  
+
   const retainedCustomers = customersAtEnd - newCustomers;
   return (retainedCustomers / customersAtStart) * 100;
 }
@@ -380,13 +400,13 @@ export function analyzeCohorts(
     joinDate: Date;
     purchases: Array<{ date: Date; amount: number }>;
   }>,
-  periodMonths: number = 1
+  periodMonths: number = 1,
 ): CohortAnalysis[] {
   // Group by cohort (month joined)
   const cohorts = new Map<string, typeof customers>();
 
-  customers.forEach(customer => {
-    const cohortKey = `${customer.joinDate.getFullYear()}-${String(customer.joinDate.getMonth() + 1).padStart(2, '0')}`;
+  customers.forEach((customer) => {
+    const cohortKey = `${customer.joinDate.getFullYear()}-${String(customer.joinDate.getMonth() + 1).padStart(2, "0")}`;
     if (!cohorts.has(cohortKey)) {
       cohorts.set(cohortKey, []);
     }
@@ -396,16 +416,17 @@ export function analyzeCohorts(
   // Analyze each cohort
   return Array.from(cohorts.entries()).map(([cohort, customers]) => {
     const size = customers.length;
-    const totalValue = customers.reduce((sum, c) =>
-      sum + c.purchases.reduce((pSum, p) => pSum + p.amount, 0), 0
+    const totalValue = customers.reduce(
+      (sum, c) => sum + c.purchases.reduce((pSum, p) => pSum + p.amount, 0),
+      0,
     );
     const averageValue = totalValue / size;
 
     // Calculate retention (customers who made purchase in last period)
     const cutoffDate = new Date();
     cutoffDate.setMonth(cutoffDate.getMonth() - periodMonths);
-    const activeCustomers = customers.filter(c =>
-      c.purchases.some(p => p.date >= cutoffDate)
+    const activeCustomers = customers.filter((c) =>
+      c.purchases.some((p) => p.date >= cutoffDate),
     ).length;
     const retentionRate = (activeCustomers / size) * 100;
     const churnRate = 100 - retentionRate;

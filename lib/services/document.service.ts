@@ -3,7 +3,7 @@
  * Implements ISO 9001:2015 Clause 7.5 (Documented Information)
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -53,11 +53,11 @@ export class DocumentService {
         fileType: data.fileType,
         owner: data.owner,
         department: data.department,
-        status: 'DRAFT',
+        status: "DRAFT",
         trainingRequired: data.trainingRequired || false,
         createdBy: data.createdBy,
-        version: '1.0'
-      }
+        version: "1.0",
+      },
     });
 
     return document;
@@ -72,7 +72,7 @@ export class DocumentService {
     changes: string,
     reason: string,
     changedBy: string,
-    newFilePath: string
+    newFilePath: string,
   ) {
     // Create revision record
     const revision = await prisma.documentRevision.create({
@@ -82,8 +82,8 @@ export class DocumentService {
         changes,
         reason,
         changedBy,
-        changeDate: new Date()
-      }
+        changeDate: new Date(),
+      },
     });
 
     // Update document
@@ -92,8 +92,8 @@ export class DocumentService {
       data: {
         version: newVersion,
         filePath: newFilePath,
-        status: 'DRAFT' // New revision goes to draft
-      }
+        status: "DRAFT", // New revision goes to draft
+      },
     });
 
     return { revision, document };
@@ -106,8 +106,8 @@ export class DocumentService {
     return await prisma.document.update({
       where: { id: documentId },
       data: {
-        status: 'PENDING_APPROVAL'
-      }
+        status: "PENDING_APPROVAL",
+      },
     });
   }
 
@@ -122,12 +122,12 @@ export class DocumentService {
     return await prisma.document.update({
       where: { id: documentId },
       data: {
-        status: 'APPROVED',
+        status: "APPROVED",
         approvedBy,
         approvedDate: now,
         effectiveDate: now,
-        nextReviewDate
-      }
+        nextReviewDate,
+      },
     });
   }
 
@@ -138,8 +138,8 @@ export class DocumentService {
     return await prisma.document.update({
       where: { id: documentId },
       data: {
-        status: 'EFFECTIVE'
-      }
+        status: "EFFECTIVE",
+      },
     });
   }
 
@@ -150,10 +150,10 @@ export class DocumentService {
     return await prisma.document.update({
       where: { id: documentId },
       data: {
-        status: 'OBSOLETE',
+        status: "OBSOLETE",
         obsoleteDate: new Date(),
-        notes: reason
-      }
+        notes: reason,
+      },
     });
   }
 
@@ -176,8 +176,8 @@ export class DocumentService {
         trainedDate: new Date(),
         signature: data.signature,
         passed: data.passed !== undefined ? data.passed : true,
-        notes: data.notes
-      }
+        notes: data.notes,
+      },
     });
   }
 
@@ -191,15 +191,15 @@ export class DocumentService {
       where: {
         organizationId,
         nextReviewDate: {
-          lte: now
+          lte: now,
         },
         status: {
-          in: ['APPROVED', 'EFFECTIVE']
-        }
+          in: ["APPROVED", "EFFECTIVE"],
+        },
       },
       orderBy: {
-        nextReviewDate: 'asc'
-      }
+        nextReviewDate: "asc",
+      },
     });
   }
 
@@ -210,19 +210,19 @@ export class DocumentService {
     return await prisma.document.findMany({
       where: {
         organizationId,
-        status: 'PENDING_APPROVAL'
+        status: "PENDING_APPROVAL",
       },
       include: {
         revisions: {
           orderBy: {
-            changeDate: 'desc'
+            changeDate: "desc",
           },
-          take: 1
-        }
+          take: 1,
+        },
       },
       orderBy: {
-        updatedAt: 'asc'
-      }
+        updatedAt: "asc",
+      },
     });
   }
 
@@ -235,15 +235,15 @@ export class DocumentService {
       include: {
         revisions: {
           orderBy: {
-            changeDate: 'desc'
-          }
+            changeDate: "desc",
+          },
         },
         trainingRecords: {
           orderBy: {
-            trainedDate: 'desc'
-          }
-        }
-      }
+            trainedDate: "desc",
+          },
+        },
+      },
     });
   }
 
@@ -254,8 +254,8 @@ export class DocumentService {
     const document = await prisma.document.findUnique({
       where: { id: documentId },
       include: {
-        trainingRecords: true
-      }
+        trainingRecords: true,
+      },
     });
 
     if (!document || !document.trainingRequired) {
@@ -264,13 +264,13 @@ export class DocumentService {
         totalUsers: 0,
         trained: 0,
         pending: 0,
-        percentage: 100
+        percentage: 100,
       };
     }
 
     // Get all users who should be trained (simplified)
     const totalUsers = 50; // In real implementation, query users by department/role
-    const trained = document.trainingRecords.filter(t => t.passed).length;
+    const trained = document.trainingRecords.filter((t) => t.passed).length;
     const pending = Math.max(0, totalUsers - trained);
     const percentage = (trained / totalUsers) * 100;
 
@@ -279,55 +279,63 @@ export class DocumentService {
       totalUsers,
       trained,
       pending,
-      percentage: Math.round(percentage)
+      percentage: Math.round(percentage),
     };
   }
 
   /**
    * Get document metrics
    */
-  static async getDocumentMetrics(organizationId: string): Promise<DocumentMetrics> {
+  static async getDocumentMetrics(
+    organizationId: string,
+  ): Promise<DocumentMetrics> {
     const documents = await prisma.document.findMany({
       where: { organizationId },
       include: {
-        trainingRecords: true
-      }
+        trainingRecords: true,
+      },
     });
 
     // Count by type
     const byType: Record<string, number> = {};
-    documents.forEach(doc => {
+    documents.forEach((doc) => {
       byType[doc.type] = (byType[doc.type] || 0) + 1;
     });
 
     // Count by status
     const byStatus: Record<string, number> = {};
-    documents.forEach(doc => {
+    documents.forEach((doc) => {
       byStatus[doc.status] = (byStatus[doc.status] || 0) + 1;
     });
 
     // Due for review
     const now = new Date();
-    const dueForReview = documents.filter(d => 
-      d.nextReviewDate && d.nextReviewDate <= now && 
-      (d.status === 'APPROVED' || d.status === 'EFFECTIVE')
+    const dueForReview = documents.filter(
+      (d) =>
+        d.nextReviewDate &&
+        d.nextReviewDate <= now &&
+        (d.status === "APPROVED" || d.status === "EFFECTIVE"),
     ).length;
 
     // Obsolete
-    const obsolete = documents.filter(d => d.status === 'OBSOLETE').length;
+    const obsolete = documents.filter((d) => d.status === "OBSOLETE").length;
 
     // Pending approval
-    const pendingApproval = documents.filter(d => d.status === 'PENDING_APPROVAL').length;
+    const pendingApproval = documents.filter(
+      (d) => d.status === "PENDING_APPROVAL",
+    ).length;
 
     // Training compliance (for documents requiring training)
-    const trainingRequired = documents.filter(d => d.trainingRequired);
-    const totalTrainingRecords = trainingRequired.reduce((sum, doc) => 
-      sum + doc.trainingRecords.length, 0
+    const trainingRequired = documents.filter((d) => d.trainingRequired);
+    const totalTrainingRecords = trainingRequired.reduce(
+      (sum, doc) => sum + doc.trainingRecords.length,
+      0,
     );
     const expectedTrainingRecords = trainingRequired.length * 50; // Assuming 50 users
-    const trainingPercentage = expectedTrainingRecords > 0 
-      ? (totalTrainingRecords / expectedTrainingRecords) * 100 
-      : 100;
+    const trainingPercentage =
+      expectedTrainingRecords > 0
+        ? (totalTrainingRecords / expectedTrainingRecords) * 100
+        : 100;
 
     return {
       totalDocuments: documents.length,
@@ -340,8 +348,8 @@ export class DocumentService {
         total: trainingRequired.length,
         completed: totalTrainingRecords,
         pending: Math.max(0, expectedTrainingRecords - totalTrainingRecords),
-        percentage: Math.round(trainingPercentage)
-      }
+        percentage: Math.round(trainingPercentage),
+      },
     };
   }
 
@@ -352,15 +360,15 @@ export class DocumentService {
     organizationId: string,
     query: string,
     type?: string,
-    status?: string
+    status?: string,
   ) {
     const where: any = {
       organizationId,
       OR: [
-        { title: { contains: query, mode: 'insensitive' } },
-        { docNumber: { contains: query, mode: 'insensitive' } },
-        { description: { contains: query, mode: 'insensitive' } }
-      ]
+        { title: { contains: query, mode: "insensitive" } },
+        { docNumber: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
+      ],
     };
 
     if (type) where.type = type;
@@ -369,8 +377,8 @@ export class DocumentService {
     return await prisma.document.findMany({
       where,
       orderBy: {
-        updatedAt: 'desc'
-      }
+        updatedAt: "desc",
+      },
     });
   }
 
@@ -379,16 +387,16 @@ export class DocumentService {
    */
   static async linkToNCR(documentId: string, ncrId: string) {
     const document = await prisma.document.findUnique({
-      where: { id: documentId }
+      where: { id: documentId },
     });
 
-    if (!document) throw new Error('Document not found');
+    if (!document) throw new Error("Document not found");
 
     const linkedNCRIds = [...document.linkedNCRIds, ncrId];
 
     return await prisma.document.update({
       where: { id: documentId },
-      data: { linkedNCRIds }
+      data: { linkedNCRIds },
     });
   }
 
@@ -397,16 +405,16 @@ export class DocumentService {
    */
   static async linkToCAPA(documentId: string, capaId: string) {
     const document = await prisma.document.findUnique({
-      where: { id: documentId }
+      where: { id: documentId },
     });
 
-    if (!document) throw new Error('Document not found');
+    if (!document) throw new Error("Document not found");
 
     const linkedCAPAIds = [...document.linkedCAPAIds, capaId];
 
     return await prisma.document.update({
       where: { id: documentId },
-      data: { linkedCAPAIds }
+      data: { linkedCAPAIds },
     });
   }
 
@@ -415,16 +423,16 @@ export class DocumentService {
    */
   static async linkToRisk(documentId: string, riskId: string) {
     const document = await prisma.document.findUnique({
-      where: { id: documentId }
+      where: { id: documentId },
     });
 
-    if (!document) throw new Error('Document not found');
+    if (!document) throw new Error("Document not found");
 
     const linkedRiskIds = [...document.linkedRiskIds, riskId];
 
     return await prisma.document.update({
       where: { id: documentId },
-      data: { linkedRiskIds }
+      data: { linkedRiskIds },
     });
   }
 }

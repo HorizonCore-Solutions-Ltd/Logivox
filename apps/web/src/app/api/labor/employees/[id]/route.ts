@@ -1,16 +1,20 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const updateEmployeeSchema = z.object({
   firstName: z.string().optional(),
   lastName: z.string().optional(),
   email: z.string().email().optional(),
   phone: z.string().optional(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'ON_LEAVE', 'SUSPENDED', 'TERMINATED']).optional(),
-  employmentType: z.enum(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'TEMPORARY', 'SEASONAL']).optional(),
+  status: z
+    .enum(["ACTIVE", "INACTIVE", "ON_LEAVE", "SUSPENDED", "TERMINATED"])
+    .optional(),
+  employmentType: z
+    .enum(["FULL_TIME", "PART_TIME", "CONTRACT", "TEMPORARY", "SEASONAL"])
+    .optional(),
   department: z.string().optional(),
   position: z.string().optional(),
   hourlyRate: z.number().optional(),
@@ -18,7 +22,9 @@ const updateEmployeeSchema = z.object({
   defaultZoneId: z.string().optional(),
   skills: z.array(z.string()).optional(),
   certifications: z.any().optional(),
-  preferredShiftType: z.enum(['DAY', 'EVENING', 'NIGHT', 'ROTATING', 'SPLIT', 'ON_CALL']).optional(),
+  preferredShiftType: z
+    .enum(["DAY", "EVENING", "NIGHT", "ROTATING", "SPLIT", "ON_CALL"])
+    .optional(),
   maxHoursPerWeek: z.number().optional(),
   notes: z.string().optional(),
   terminationDate: z.string().datetime().optional(),
@@ -27,12 +33,12 @@ const updateEmployeeSchema = z.object({
 // GET /api/labor/employees/[id] - Get single employee
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const employee = await prisma.employee.findFirst({
@@ -48,15 +54,15 @@ export async function GET(
           include: {
             shift: true,
           },
-          orderBy: { assignedDate: 'desc' },
+          orderBy: { assignedDate: "desc" },
           take: 10,
         },
         timeEntries: {
-          orderBy: { startTime: 'desc' },
+          orderBy: { startTime: "desc" },
           take: 10,
         },
         productivity: {
-          orderBy: { recordDate: 'desc' },
+          orderBy: { recordDate: "desc" },
           take: 30,
         },
         _count: {
@@ -71,15 +77,18 @@ export async function GET(
     });
 
     if (!employee) {
-      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(employee);
   } catch (error) {
-    console.error('Error fetching employee:', error);
+    console.error("Error fetching employee:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch employee' },
-      { status: 500 }
+      { error: "Failed to fetch employee" },
+      { status: 500 },
     );
   }
 }
@@ -87,12 +96,12 @@ export async function GET(
 // PATCH /api/labor/employees/[id] - Update employee
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -107,7 +116,10 @@ export async function PATCH(
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 },
+      );
     }
 
     const employee = await prisma.employee.update({
@@ -129,8 +141,8 @@ export async function PATCH(
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'UPDATE',
-        entityType: 'EMPLOYEE',
+        action: "UPDATE",
+        entityType: "EMPLOYEE",
         entityId: employee.id,
         description: `Updated employee: ${employee.firstName} ${employee.lastName}`,
       },
@@ -141,10 +153,10 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors }, { status: 400 });
     }
-    console.error('Error updating employee:', error);
+    console.error("Error updating employee:", error);
     return NextResponse.json(
-      { error: 'Failed to update employee' },
-      { status: 500 }
+      { error: "Failed to update employee" },
+      { status: 500 },
     );
   }
 }
@@ -152,12 +164,12 @@ export async function PATCH(
 // DELETE /api/labor/employees/[id] - Soft delete employee
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if employee exists
@@ -169,7 +181,10 @@ export async function DELETE(
     });
 
     if (!existing) {
-      return NextResponse.json({ error: 'Employee not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 },
+      );
     }
 
     // Soft delete by setting isActive to false
@@ -177,7 +192,7 @@ export async function DELETE(
       where: { id: params.id },
       data: {
         isActive: false,
-        status: 'TERMINATED',
+        status: "TERMINATED",
         terminationDate: new Date(),
       },
     });
@@ -187,8 +202,8 @@ export async function DELETE(
       data: {
         organizationId: session.user.organizationId,
         userId: session.user.id,
-        action: 'DELETE',
-        entityType: 'EMPLOYEE',
+        action: "DELETE",
+        entityType: "EMPLOYEE",
         entityId: employee.id,
         description: `Terminated employee: ${employee.firstName} ${employee.lastName}`,
       },
@@ -196,10 +211,10 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting employee:', error);
+    console.error("Error deleting employee:", error);
     return NextResponse.json(
-      { error: 'Failed to delete employee' },
-      { status: 500 }
+      { error: "Failed to delete employee" },
+      { status: 500 },
     );
   }
 }

@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -123,7 +129,11 @@ export default function OrderDetailPage() {
       <Card>
         <CardContent className="text-center py-12">
           <p className="text-gray-500">Order not found</p>
-          <Button variant="outline" onClick={() => router.push("/portal/orders")} className="mt-4">
+          <Button
+            variant="outline"
+            onClick={() => router.push("/portal/orders")}
+            className="mt-4"
+          >
             Back to Orders
           </Button>
         </CardContent>
@@ -144,13 +154,17 @@ export default function OrderDetailPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Order {order.orderNumber}</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Order {order.orderNumber}
+            </h1>
             <p className="text-gray-600 mt-1">
               Placed on {new Date(order.createdAt).toLocaleDateString()}
             </p>
           </div>
         </div>
-        <Badge className={statusColors[order.status] || "bg-gray-100 text-gray-800"}>
+        <Badge
+          className={statusColors[order.status] || "bg-gray-100 text-gray-800"}
+        >
           {order.status.replace(/_/g, " ")}
         </Badge>
       </div>
@@ -168,12 +182,21 @@ export default function OrderDetailPage() {
             <CardContent>
               <div className="space-y-4">
                 {order.items.map((item) => (
-                  <div key={item.id} className="flex items-start justify-between pb-4 border-b last:border-0">
+                  <div
+                    key={item.id}
+                    className="flex items-start justify-between pb-4 border-b last:border-0"
+                  >
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{item.inventory.name}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{item.inventory.sku}</p>
+                      <h3 className="font-semibold text-gray-900">
+                        {item.inventory.name}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {item.inventory.sku}
+                      </p>
                       {item.inventory.description && (
-                        <p className="text-sm text-gray-500 mt-1">{item.inventory.description}</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {item.inventory.description}
+                        </p>
                       )}
                       <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
                         <span>Quantity: {item.quantity}</span>
@@ -182,7 +205,9 @@ export default function OrderDetailPage() {
                       </div>
                     </div>
                     <div className="text-right ml-4">
-                      <p className="font-semibold text-gray-900">${item.totalPrice.toFixed(2)}</p>
+                      <p className="font-semibold text-gray-900">
+                        ${item.totalPrice.toFixed(2)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -191,7 +216,9 @@ export default function OrderDetailPage() {
               <Separator className="my-4" />
 
               <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold text-gray-900">Total</span>
+                <span className="text-lg font-semibold text-gray-900">
+                  Total
+                </span>
                 <span className="text-2xl font-bold text-gray-900">
                   ${order.totalAmount.toFixed(2)}
                 </span>
@@ -222,7 +249,12 @@ export default function OrderDetailPage() {
                             <h3 className="font-semibold text-gray-900">
                               {shipment.shipmentNumber}
                             </h3>
-                            <Badge className={statusColors[shipment.status] || "bg-gray-100 text-gray-800"}>
+                            <Badge
+                              className={
+                                statusColors[shipment.status] ||
+                                "bg-gray-100 text-gray-800"
+                              }
+                            >
                               {shipment.status.replace(/_/g, " ")}
                             </Badge>
                           </div>
@@ -239,7 +271,7 @@ export default function OrderDetailPage() {
                               <a
                                 href={getTrackingUrl(
                                   shipment.carrier?.name || "Carrier",
-                                  shipment.trackingNumber
+                                  shipment.trackingNumber,
                                 )}
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -252,12 +284,18 @@ export default function OrderDetailPage() {
                           <div className="flex items-center space-x-4 mt-2 text-sm text-gray-500">
                             {shipment.shippedDate && (
                               <span>
-                                Shipped: {new Date(shipment.shippedDate).toLocaleDateString()}
+                                Shipped:{" "}
+                                {new Date(
+                                  shipment.shippedDate,
+                                ).toLocaleDateString()}
                               </span>
                             )}
                             {shipment.deliveredDate && (
                               <span>
-                                Delivered: {new Date(shipment.deliveredDate).toLocaleDateString()}
+                                Delivered:{" "}
+                                {new Date(
+                                  shipment.deliveredDate,
+                                ).toLocaleDateString()}
                               </span>
                             )}
                           </div>
@@ -308,21 +346,31 @@ export default function OrderDetailPage() {
             <CardContent className="space-y-3">
               <div>
                 <p className="text-sm text-gray-600">Order Number</p>
-                <p className="font-mono text-sm font-semibold">{order.orderNumber}</p>
+                <p className="font-mono text-sm font-semibold">
+                  {order.orderNumber}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Status</p>
-                <Badge className={statusColors[order.status] || "bg-gray-100 text-gray-800"}>
+                <Badge
+                  className={
+                    statusColors[order.status] || "bg-gray-100 text-gray-800"
+                  }
+                >
                   {order.status.replace(/_/g, " ")}
                 </Badge>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Created</p>
-                <p className="text-sm">{new Date(order.createdAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(order.createdAt).toLocaleString()}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Last Updated</p>
-                <p className="text-sm">{new Date(order.updatedAt).toLocaleString()}</p>
+                <p className="text-sm">
+                  {new Date(order.updatedAt).toLocaleString()}
+                </p>
               </div>
               {order.notes && (
                 <div>

@@ -1,17 +1,35 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  ReferenceLine,
+} from "recharts";
 
 interface ForecastData {
   productId: string;
   productName: string;
   currentStock: number;
   historicalSales: Array<{ date: string; quantity: number }>;
-  predictions: Array<{ 
-    date: string; 
-    demand: number; 
-    confidence: { lower: number; upper: number } 
+  predictions: Array<{
+    date: string;
+    demand: number;
+    confidence: { lower: number; upper: number };
   }>;
   trend: {
     direction: "increasing" | "decreasing" | "stable";
@@ -40,7 +58,10 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
   // Combine historical and predicted data
   const chartData = [
     ...forecast.historicalSales.map((sale) => ({
-      date: new Date(sale.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: new Date(sale.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
       actual: sale.quantity,
       predicted: null,
       lower: null,
@@ -48,7 +69,10 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
       type: "historical",
     })),
     ...forecast.predictions.map((pred) => ({
-      date: new Date(pred.date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+      date: new Date(pred.date).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
       actual: null,
       predicted: pred.demand,
       lower: pred.confidence.lower,
@@ -60,9 +84,11 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
   // Calculate trend line data
   const trendLineData = chartData.map((point, index) => {
     const x = index - forecast.historicalSales.length;
-    const trendValue = forecast.trend.slope * x + 
-      (forecast.historicalSales.length > 0 
-        ? (forecast.historicalSales[forecast.historicalSales.length - 1]?.quantity || 0)
+    const trendValue =
+      forecast.trend.slope * x +
+      (forecast.historicalSales.length > 0
+        ? forecast.historicalSales[forecast.historicalSales.length - 1]
+            ?.quantity || 0
         : 0);
     return {
       ...point,
@@ -77,28 +103,29 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
         <CardHeader>
           <CardTitle>Demand Forecast Visualization</CardTitle>
           <CardDescription>
-            Historical sales data and 30-day AI predictions with confidence intervals
+            Historical sales data and 30-day AI predictions with confidence
+            intervals
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
             <AreaChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tick={{ fontSize: 12 }}
                 interval="preserveStartEnd"
               />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: "hsl(var(--background))", 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--background))",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px"
+                  borderRadius: "6px",
                 }}
               />
               <Legend />
-              
+
               {/* Confidence interval area */}
               <Area
                 type="monotone"
@@ -116,7 +143,7 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
                 fillOpacity={0.1}
                 name="Lower Bound"
               />
-              
+
               {/* Historical actual sales */}
               <Line
                 type="monotone"
@@ -126,7 +153,7 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
                 dot={{ fill: "hsl(var(--primary))", r: 4 }}
                 name="Actual Sales"
               />
-              
+
               {/* Predicted demand */}
               <Line
                 type="monotone"
@@ -137,28 +164,28 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
                 dot={{ fill: "hsl(var(--chart-2))", r: 4 }}
                 name="Predicted Demand"
               />
-              
+
               {/* Reorder point reference line */}
               <ReferenceLine
                 y={forecast.reorderPoint}
                 stroke="hsl(var(--destructive))"
                 strokeDasharray="3 3"
-                label={{ 
-                  value: `Reorder Point (${forecast.reorderPoint})`, 
+                label={{
+                  value: `Reorder Point (${forecast.reorderPoint})`,
                   position: "right",
-                  fill: "hsl(var(--destructive))"
+                  fill: "hsl(var(--destructive))",
                 }}
               />
-              
+
               {/* Safety stock reference line */}
               <ReferenceLine
                 y={forecast.safetyStock}
                 stroke="hsl(var(--warning))"
                 strokeDasharray="3 3"
-                label={{ 
-                  value: `Safety Stock (${forecast.safetyStock})`, 
+                label={{
+                  value: `Safety Stock (${forecast.safetyStock})`,
                   position: "right",
-                  fill: "hsl(var(--warning))"
+                  fill: "hsl(var(--warning))",
                 }}
               />
             </AreaChart>
@@ -178,21 +205,21 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trendLineData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="date" 
+              <XAxis
+                dataKey="date"
                 tick={{ fontSize: 12 }}
                 interval="preserveStartEnd"
               />
               <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip 
-                contentStyle={{ 
-                  backgroundColor: "hsl(var(--background))", 
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--background))",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px"
+                  borderRadius: "6px",
                 }}
               />
               <Legend />
-              
+
               {/* Actual and predicted data */}
               <Line
                 type="monotone"
@@ -211,14 +238,14 @@ export function ForecastCharts({ forecast }: ForecastChartsProps) {
                 dot={false}
                 name="Predicted"
               />
-              
+
               {/* Trend line */}
               <Line
                 type="monotone"
                 dataKey="trend"
                 stroke={
-                  forecast.trend.direction === "increasing" 
-                    ? "hsl(var(--chart-3))" 
+                  forecast.trend.direction === "increasing"
+                    ? "hsl(var(--chart-3))"
                     : forecast.trend.direction === "decreasing"
                       ? "hsl(var(--destructive))"
                       : "hsl(var(--muted-foreground))"

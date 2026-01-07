@@ -1,17 +1,17 @@
-import { prisma } from "@/lib/prisma"
-import crypto from "crypto"
+import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 
 export interface WebhookPayload {
-  event: string
-  data: any
-  timestamp: string
-  organizationId: string
+  event: string;
+  data: any;
+  timestamp: string;
+  organizationId: string;
 }
 
 export async function triggerWebhook(
   organizationId: string,
   event: string,
-  data: any
+  data: any,
 ) {
   try {
     // Find all active webhooks subscribed to this event
@@ -23,10 +23,10 @@ export async function triggerWebhook(
           has: event,
         },
       },
-    })
+    });
 
     if (webhooks.length === 0) {
-      return
+      return;
     }
 
     // Create payload
@@ -35,25 +35,25 @@ export async function triggerWebhook(
       data,
       timestamp: new Date().toISOString(),
       organizationId,
-    }
+    };
 
     // Deliver to each webhook
     const deliveryPromises = webhooks.map((webhook: any) =>
-      deliverWebhook(webhook, payload)
-    )
+      deliverWebhook(webhook, payload),
+    );
 
-    await Promise.allSettled(deliveryPromises)
+    await Promise.allSettled(deliveryPromises);
   } catch (error) {
-    console.error("Webhook trigger error:", error)
+    console.error("Webhook trigger error:", error);
   }
 }
 
 async function deliverWebhook(
   webhook: { id: string; url: string; secret: string | null },
-  payload: WebhookPayload
+  payload: WebhookPayload,
 ) {
-  const deliveryId = crypto.randomUUID()
-  const startTime = Date.now()
+  const deliveryId = crypto.randomUUID();
+  const startTime = Date.now();
 
   try {
     // Create signature if secret is provided
@@ -61,14 +61,14 @@ async function deliverWebhook(
       "Content-Type": "application/json",
       "X-Webhook-Event": payload.event,
       "X-Webhook-Delivery": deliveryId,
-    }
+    };
 
     if (webhook.secret) {
       const signature = crypto
         .createHmac("sha256", webhook.secret)
         .update(JSON.stringify(payload))
-        .digest("hex")
-      headers["X-Webhook-Signature"] = `sha256=${signature}`
+        .digest("hex");
+      headers["X-Webhook-Signature"] = `sha256=${signature}`;
     }
 
     // Send webhook
@@ -77,10 +77,10 @@ async function deliverWebhook(
       headers,
       body: JSON.stringify(payload),
       signal: AbortSignal.timeout(30000), // 30 second timeout
-    })
+    });
 
-    const duration = Date.now() - startTime
-    const responseBody = await response.text().catch(() => "")
+    const duration = Date.now() - startTime;
+    const responseBody = await response.text().catch(() => "");
 
     // Log delivery
     await prisma.webhookDelivery.create({
@@ -93,12 +93,13 @@ async function deliverWebhook(
         duration,
         success: response.ok,
       },
-    })
+    });
 
-    return { success: response.ok, statusCode: response.status }
+    return { success: response.ok, statusCode: response.status };
   } catch (error) {
-    const duration = Date.now() - startTime
-    const errorMessage = error instanceof Error ? error.message : "Unknown error"
+    const duration = Date.now() - startTime;
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
 
     // Log failed delivery
     await prisma.webhookDelivery.create({
@@ -111,9 +112,9 @@ async function deliverWebhook(
         duration,
         success: false,
       },
-    })
+    });
 
-    return { success: false, error: errorMessage }
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -129,4 +130,4 @@ export const WebhookEvents = {
   CUSTOMER_CREATED: "customer.created",
   CUSTOMER_UPDATED: "customer.updated",
   LOW_STOCK_ALERT: "inventory.low_stock",
-}
+};

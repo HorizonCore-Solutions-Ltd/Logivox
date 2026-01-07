@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 // POST /api/qc-inspections/[id]/certificate - Generate Certificate of Analysis
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -21,12 +21,12 @@ export async function POST(
         inventoryItem: true,
         inspectedBy: { select: { name: true, email: true } },
         organization: { select: { name: true, logo: true } },
-        checkpoints: { orderBy: { sequence: 'asc' } },
+        checkpoints: { orderBy: { sequence: "asc" } },
         approvals: {
           include: {
             approver: { select: { name: true } },
           },
-          orderBy: { level: 'asc' },
+          orderBy: { level: "asc" },
         },
         lot: true,
       },
@@ -35,14 +35,17 @@ export async function POST(
     if (!inspection) {
       return NextResponse.json(
         { error: "Inspection not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    if (inspection.result !== 'PASS' && inspection.result !== 'PASS_WITH_NOTES') {
+    if (
+      inspection.result !== "PASS" &&
+      inspection.result !== "PASS_WITH_NOTES"
+    ) {
       return NextResponse.json(
         { error: "Certificate can only be generated for passed inspections" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -70,11 +73,13 @@ export async function POST(
         quantity: inspection.quantity,
         sampleSize: inspection.sampleSize,
       },
-      lot: inspection.lot ? {
-        lotNumber: inspection.lot.lotNumber,
-        manufacturingDate: inspection.lot.manufacturingDate,
-        expiryDate: inspection.lot.expiryDate,
-      } : null,
+      lot: inspection.lot
+        ? {
+            lotNumber: inspection.lot.lotNumber,
+            manufacturingDate: inspection.lot.manufacturingDate,
+            expiryDate: inspection.lot.expiryDate,
+          }
+        : null,
       results: {
         result: inspection.result,
         qualityScore: inspection.qualityScore,
@@ -122,7 +127,7 @@ export async function POST(
     console.error("Error generating certificate:", error);
     return NextResponse.json(
       { error: "Failed to generate certificate" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

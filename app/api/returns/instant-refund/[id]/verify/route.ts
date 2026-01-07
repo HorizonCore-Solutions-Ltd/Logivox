@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { instantRefundService } from '@/lib/services/returns/instant-refund-service';
+import { NextRequest, NextResponse } from "next/server";
+import { instantRefundService } from "@/lib/services/returns/instant-refund-service";
 
 /**
  * POST /api/returns/instant-refund/[id]/verify
@@ -7,7 +7,7 @@ import { instantRefundService } from '@/lib/services/returns/instant-refund-serv
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
@@ -15,8 +15,8 @@ export async function POST(
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Missing required field: organizationId' },
-        { status: 400 }
+        { error: "Missing required field: organizationId" },
+        { status: 400 },
       );
     }
 
@@ -33,10 +33,10 @@ export async function POST(
       verification: result,
     });
   } catch (error: any) {
-    console.error('Verification error:', error);
+    console.error("Verification error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to verify item' },
-      { status: 500 }
+      { error: error.message || "Failed to verify item" },
+      { status: 500 },
     );
   }
 }

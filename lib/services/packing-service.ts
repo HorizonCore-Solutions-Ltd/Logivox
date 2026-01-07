@@ -5,7 +5,7 @@
  * shipping preparation, and packing analytics
  */
 
-import { PrismaClient, PackStatus, Prisma } from '@prisma/client';
+import { PrismaClient, PackStatus, Prisma } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -40,7 +40,7 @@ export interface CartonizationRequest {
       height: number;
     };
   }>;
-  optimizationGoal?: 'MINIMIZE_BOXES' | 'MINIMIZE_COST' | 'MINIMIZE_WEIGHT';
+  optimizationGoal?: "MINIMIZE_BOXES" | "MINIMIZE_COST" | "MINIMIZE_WEIGHT";
 }
 
 export interface CartonizationSuggestion {
@@ -112,7 +112,7 @@ export class PackingService {
    */
   private async generatePackNumber(organizationId: string): Promise<string> {
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+    const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
 
     const lastPack = await prisma.pack.findFirst({
       where: {
@@ -122,17 +122,17 @@ export class PackingService {
         },
       },
       orderBy: {
-        packNumber: 'desc',
+        packNumber: "desc",
       },
     });
 
     let sequence = 1;
     if (lastPack) {
-      const lastSequence = parseInt(lastPack.packNumber.split('-')[2]);
+      const lastSequence = parseInt(lastPack.packNumber.split("-")[2]);
       sequence = lastSequence + 1;
     }
 
-    return `PACK-${dateStr}-${sequence.toString().padStart(4, '0')}`;
+    return `PACK-${dateStr}-${sequence.toString().padStart(4, "0")}`;
   }
 
   /**
@@ -140,7 +140,7 @@ export class PackingService {
    */
   async calculateCartonization(
     organizationId: string,
-    request: CartonizationRequest
+    request: CartonizationRequest,
   ): Promise<CartonizationSuggestion> {
     // Get available box types
     const boxTypes = await prisma.boxType.findMany({
@@ -149,12 +149,12 @@ export class PackingService {
         isActive: true,
       },
       orderBy: {
-        volume: 'asc', // Start with smallest boxes
+        volume: "asc", // Start with smallest boxes
       },
     });
 
     if (boxTypes.length === 0) {
-      throw new Error('No box types available');
+      throw new Error("No box types available");
     }
 
     // Calculate total volume and weight of items
@@ -165,11 +165,11 @@ export class PackingService {
 
     const totalWeight = request.items.reduce(
       (sum, item) => sum + (item.weight || 1) * item.quantity,
-      0
+      0,
     );
 
     // Simple bin packing algorithm
-    const boxes: CartonizationSuggestion['boxes'] = [];
+    const boxes: CartonizationSuggestion["boxes"] = [];
     let remainingItems = [...request.items];
 
     while (remainingItems.length > 0) {
@@ -187,8 +187,13 @@ export class PackingService {
         let currentWeight = 0;
 
         for (const item of remainingItems) {
-          const itemDims = item.dimensions || { length: 10, width: 10, height: 10 };
-          const itemVolume = itemDims.length * itemDims.width * itemDims.height * item.quantity;
+          const itemDims = item.dimensions || {
+            length: 10,
+            width: 10,
+            height: 10,
+          };
+          const itemVolume =
+            itemDims.length * itemDims.width * itemDims.height * item.quantity;
           const itemWeight = (item.weight || 1) * item.quantity;
 
           if (
@@ -221,7 +226,10 @@ export class PackingService {
           width: selectedBox.width,
           height: selectedBox.height,
         },
-        weight: boxItems.reduce((sum, item) => sum + (item.weight || 1) * item.quantity, 0),
+        weight: boxItems.reduce(
+          (sum, item) => sum + (item.weight || 1) * item.quantity,
+          0,
+        ),
         items: boxItems.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -229,7 +237,9 @@ export class PackingService {
       });
 
       // Remove packed items from remaining
-      remainingItems = remainingItems.filter((item) => !boxItems.includes(item));
+      remainingItems = remainingItems.filter(
+        (item) => !boxItems.includes(item),
+      );
     }
 
     const estimatedCost = boxes.reduce((sum, box) => {
@@ -252,7 +262,7 @@ export class PackingService {
   async createPack(
     organizationId: string,
     userId: string,
-    request: CreatePackRequest
+    request: CreatePackRequest,
   ): Promise<any> {
     // Validate sales order
     const salesOrder = await prisma.salesOrder.findFirst({
@@ -266,11 +276,11 @@ export class PackingService {
     });
 
     if (!salesOrder) {
-      throw new Error('Sales order not found');
+      throw new Error("Sales order not found");
     }
 
-    if (salesOrder.status !== 'PICKED') {
-      throw new Error('Sales order must be picked before packing');
+    if (salesOrder.status !== "PICKED") {
+      throw new Error("Sales order must be picked before packing");
     }
 
     // Generate pack number
@@ -282,7 +292,7 @@ export class PackingService {
         organizationId,
         packNumber,
         salesOrderId: request.salesOrderId,
-        status: 'IN_PROGRESS',
+        status: "IN_PROGRESS",
         packerId: request.packerId || userId,
         packingStationId: request.packingStationId,
         notes: request.notes,
@@ -336,7 +346,7 @@ export class PackingService {
       width?: number;
       height?: number;
       trackingNumber?: string;
-    }
+    },
   ): Promise<any> {
     const pack = await prisma.pack.findFirst({
       where: {
@@ -346,7 +356,7 @@ export class PackingService {
     });
 
     if (!pack) {
-      throw new Error('Pack not found');
+      throw new Error("Pack not found");
     }
 
     // Get box type
@@ -355,7 +365,7 @@ export class PackingService {
     });
 
     if (!boxType) {
-      throw new Error('Box type not found');
+      throw new Error("Box type not found");
     }
 
     // Create box
@@ -386,7 +396,7 @@ export class PackingService {
         salesOrderItemId: string;
         actualQuantity: number;
       }>;
-    }
+    },
   ): Promise<PackingVerification> {
     const pack = await prisma.pack.findFirst({
       where: {
@@ -407,14 +417,14 @@ export class PackingService {
     });
 
     if (!pack) {
-      throw new Error('Pack not found');
+      throw new Error("Pack not found");
     }
 
-    const discrepancies: PackingVerification['discrepancies'] = [];
+    const discrepancies: PackingVerification["discrepancies"] = [];
 
     for (const item of pack.items) {
       const verification = verificationData.items.find(
-        (v) => v.salesOrderItemId === item.salesOrderItemId
+        (v) => v.salesOrderItemId === item.salesOrderItemId,
       );
 
       const actualQuantity = verification?.actualQuantity || 0;
@@ -435,7 +445,9 @@ export class PackingService {
     const totalItems = pack.items.length;
     const totalDiscrepancies = discrepancies.length;
     const accuracyRate =
-      totalItems > 0 ? ((totalItems - totalDiscrepancies) / totalItems) * 100 : 100;
+      totalItems > 0
+        ? ((totalItems - totalDiscrepancies) / totalItems) * 100
+        : 100;
 
     // Update pack verification status
     await prisma.pack.update({
@@ -463,7 +475,7 @@ export class PackingService {
   async completePack(
     packId: string,
     organizationId: string,
-    userId: string
+    userId: string,
   ): Promise<any> {
     const pack = await prisma.pack.findFirst({
       where: {
@@ -476,18 +488,18 @@ export class PackingService {
     });
 
     if (!pack) {
-      throw new Error('Pack not found');
+      throw new Error("Pack not found");
     }
 
-    if (pack.status === 'COMPLETED') {
-      throw new Error('Pack already completed');
+    if (pack.status === "COMPLETED") {
+      throw new Error("Pack already completed");
     }
 
     // Update pack
     const updatedPack = await prisma.pack.update({
       where: { id: packId },
       data: {
-        status: 'COMPLETED',
+        status: "COMPLETED",
         packedAt: new Date(),
       },
       include: {
@@ -509,7 +521,7 @@ export class PackingService {
     await prisma.salesOrder.update({
       where: { id: pack.salesOrderId },
       data: {
-        status: 'PACKED',
+        status: "PACKED",
       },
     });
 
@@ -521,7 +533,7 @@ export class PackingService {
    */
   async generatePackingSlip(
     packId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<string> {
     const pack = await prisma.pack.findFirst({
       where: {
@@ -553,7 +565,7 @@ export class PackingService {
     });
 
     if (!pack) {
-      throw new Error('Pack not found');
+      throw new Error("Pack not found");
     }
 
     // Would generate actual PDF
@@ -569,7 +581,7 @@ export class PackingService {
   async getPackingMetrics(
     organizationId: string,
     startDate?: Date,
-    endDate?: Date
+    endDate?: Date,
   ): Promise<PackingMetrics> {
     const dateFilter: any = { organizationId };
 
@@ -583,12 +595,12 @@ export class PackingService {
     const totalPacks = await prisma.pack.count({ where: dateFilter });
 
     const completedPacks = await prisma.pack.count({
-      where: { ...dateFilter, status: 'COMPLETED' },
+      where: { ...dateFilter, status: "COMPLETED" },
     });
 
     // Get packs with details
     const packs = await prisma.pack.findMany({
-      where: { ...dateFilter, status: 'COMPLETED' },
+      where: { ...dateFilter, status: "COMPLETED" },
       include: {
         items: true,
         boxes: true,
@@ -608,14 +620,16 @@ export class PackingService {
       packsWithTime.length > 0 ? totalPackTime / packsWithTime.length : 0;
 
     const totalItems = packs.reduce((sum, p) => sum + p.items.length, 0);
-    const averageItemsPerPack = packs.length > 0 ? totalItems / packs.length : 0;
+    const averageItemsPerPack =
+      packs.length > 0 ? totalItems / packs.length : 0;
 
     const totalBoxes = packs.reduce((sum, p) => sum + p.boxes.length, 0);
-    const averageBoxesPerOrder = packs.length > 0 ? totalBoxes / packs.length : 0;
+    const averageBoxesPerOrder =
+      packs.length > 0 ? totalBoxes / packs.length : 0;
 
     // Packer performance
     const packerGroups = packs.reduce((acc: any, p) => {
-      const packerId = p.packerId || 'UNKNOWN';
+      const packerId = p.packerId || "UNKNOWN";
       if (!acc[packerId]) {
         acc[packerId] = [];
       }
@@ -624,30 +638,32 @@ export class PackingService {
     }, {});
 
     const packerPerformance = await Promise.all(
-      Object.entries(packerGroups).map(async ([packerId, packerPacks]: [string, any]) => {
-        const packer = await prisma.user.findUnique({
-          where: { id: packerId },
-        });
+      Object.entries(packerGroups).map(
+        async ([packerId, packerPacks]: [string, any]) => {
+          const packer = await prisma.user.findUnique({
+            where: { id: packerId },
+          });
 
-        const packerTime = packerPacks.reduce((sum: number, p: any) => {
-          if (!p.packedAt) return sum;
-          const start = p.createdAt.getTime();
-          const end = p.packedAt.getTime();
-          return sum + (end - start) / (1000 * 60);
-        }, 0);
+          const packerTime = packerPacks.reduce((sum: number, p: any) => {
+            if (!p.packedAt) return sum;
+            const start = p.createdAt.getTime();
+            const end = p.packedAt.getTime();
+            return sum + (end - start) / (1000 * 60);
+          }, 0);
 
-        const avgTime =
-          packerPacks.length > 0 ? packerTime / packerPacks.length : 0;
+          const avgTime =
+            packerPacks.length > 0 ? packerTime / packerPacks.length : 0;
 
-        return {
-          packerId,
-          packerName: packer?.name || 'Unknown',
-          totalPacks: packerPacks.length,
-          avgPackTime: avgTime,
-          accuracy: 98, // Placeholder
-          efficiency: 85, // Placeholder
-        };
-      })
+          return {
+            packerId,
+            packerName: packer?.name || "Unknown",
+            totalPacks: packerPacks.length,
+            avgPackTime: avgTime,
+            accuracy: 98, // Placeholder
+            efficiency: 85, // Placeholder
+          };
+        },
+      ),
     );
 
     // Popular box types
@@ -663,17 +679,19 @@ export class PackingService {
     }, {});
 
     const popularBoxTypes = await Promise.all(
-      Object.entries(boxTypeGroups).map(async ([typeId, count]: [string, any]) => {
-        const boxType = await prisma.boxType.findUnique({
-          where: { id: typeId },
-        });
+      Object.entries(boxTypeGroups).map(
+        async ([typeId, count]: [string, any]) => {
+          const boxType = await prisma.boxType.findUnique({
+            where: { id: typeId },
+          });
 
-        return {
-          boxTypeId: typeId,
-          boxTypeName: boxType?.name || 'Unknown',
-          count,
-        };
-      })
+          return {
+            boxTypeId: typeId,
+            boxTypeName: boxType?.name || "Unknown",
+            count,
+          };
+        },
+      ),
     );
 
     // Recent packs
@@ -683,7 +701,7 @@ export class PackingService {
         items: true,
         salesOrder: true,
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: 10,
     });
 
@@ -694,7 +712,9 @@ export class PackingService {
       averageItemsPerPack,
       averageBoxesPerOrder,
       packerPerformance,
-      popularBoxTypes: popularBoxTypes.sort((a, b) => b.count - a.count).slice(0, 5),
+      popularBoxTypes: popularBoxTypes
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5),
       recentPacks: recentPacks.map((p) => ({
         id: p.id,
         packNumber: p.packNumber,
@@ -755,7 +775,7 @@ export class PackingService {
       search?: string;
       page?: number;
       limit?: number;
-    }
+    },
   ): Promise<{ packs: any[]; total: number; page: number; pages: number }> {
     const page = filters.page || 1;
     const limit = filters.limit || 20;
@@ -774,10 +794,10 @@ export class PackingService {
 
     if (filters.search) {
       where.OR = [
-        { packNumber: { contains: filters.search, mode: 'insensitive' } },
+        { packNumber: { contains: filters.search, mode: "insensitive" } },
         {
           salesOrder: {
-            soNumber: { contains: filters.search, mode: 'insensitive' },
+            soNumber: { contains: filters.search, mode: "insensitive" },
           },
         },
       ];
@@ -797,7 +817,7 @@ export class PackingService {
           boxes: true,
           packer: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         skip,
         take: limit,
       }),
@@ -817,7 +837,7 @@ export class PackingService {
   async cancelPack(
     packId: string,
     organizationId: string,
-    reason: string
+    reason: string,
   ): Promise<any> {
     const pack = await prisma.pack.findFirst({
       where: {
@@ -827,17 +847,17 @@ export class PackingService {
     });
 
     if (!pack) {
-      throw new Error('Pack not found');
+      throw new Error("Pack not found");
     }
 
-    if (pack.status === 'COMPLETED') {
-      throw new Error('Cannot cancel completed pack');
+    if (pack.status === "COMPLETED") {
+      throw new Error("Cannot cancel completed pack");
     }
 
     return await prisma.pack.update({
       where: { id: packId },
       data: {
-        status: 'CANCELLED',
+        status: "CANCELLED",
         notes: `Cancelled: ${reason}`,
       },
     });

@@ -1,15 +1,15 @@
 // =============================================================================
 // CRITICAL PATH TESTS - Authentication Flow
 // =============================================================================
-import { describe, test, expect, beforeEach, jest } from '@jest/globals';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
+import { describe, test, expect, beforeEach, jest } from "@jest/globals";
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
-describe('Authentication Critical Path', () => {
+describe("Authentication Critical Path", () => {
   const testUser = {
-    email: 'test@example.com',
-    name: 'Test User',
-    password: 'SecurePass123!',
+    email: "test@example.com",
+    name: "Test User",
+    password: "SecurePass123!",
   };
 
   beforeEach(async () => {
@@ -19,8 +19,8 @@ describe('Authentication Critical Path', () => {
     });
   });
 
-  describe('User Registration', () => {
-    test('should create a new user account', async () => {
+  describe("User Registration", () => {
+    test("should create a new user account", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
 
       const user = await prisma.user.create({
@@ -37,7 +37,7 @@ describe('Authentication Critical Path', () => {
       expect(user.password).not.toBe(testUser.password); // Password should be hashed
     });
 
-    test('should not allow duplicate email addresses', async () => {
+    test("should not allow duplicate email addresses", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
 
       // Create first user
@@ -54,22 +54,22 @@ describe('Authentication Critical Path', () => {
         prisma.user.create({
           data: {
             email: testUser.email,
-            name: 'Another User',
+            name: "Another User",
             password: hashedPassword,
           },
-        })
+        }),
       ).rejects.toThrow();
     });
 
-    test('should hash password correctly', async () => {
+    test("should hash password correctly", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
       const isValid = await bcrypt.compare(testUser.password, hashedPassword);
       expect(isValid).toBe(true);
     });
   });
 
-  describe('User Login', () => {
-    test('should authenticate with correct credentials', async () => {
+  describe("User Login", () => {
+    test("should authenticate with correct credentials", async () => {
       // Create user
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
       const user = await prisma.user.create({
@@ -88,12 +88,12 @@ describe('Authentication Critical Path', () => {
       expect(foundUser).toBeDefined();
       const isValidPassword = await bcrypt.compare(
         testUser.password,
-        foundUser!.password!
+        foundUser!.password!,
       );
       expect(isValidPassword).toBe(true);
     });
 
-    test('should reject incorrect password', async () => {
+    test("should reject incorrect password", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
       await prisma.user.create({
         data: {
@@ -108,22 +108,22 @@ describe('Authentication Critical Path', () => {
       });
 
       const isValidPassword = await bcrypt.compare(
-        'WrongPassword',
-        foundUser!.password!
+        "WrongPassword",
+        foundUser!.password!,
       );
       expect(isValidPassword).toBe(false);
     });
 
-    test('should reject non-existent user', async () => {
+    test("should reject non-existent user", async () => {
       const foundUser = await prisma.user.findUnique({
-        where: { email: 'nonexistent@example.com' },
+        where: { email: "nonexistent@example.com" },
       });
       expect(foundUser).toBeNull();
     });
   });
 
-  describe('Session Management', () => {
-    test('should create and retrieve user session', async () => {
+  describe("Session Management", () => {
+    test("should create and retrieve user session", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
       const user = await prisma.user.create({
         data: {
@@ -156,7 +156,7 @@ describe('Authentication Critical Path', () => {
       expect(foundSession!.user.email).toBe(testUser.email);
     });
 
-    test('should invalidate expired sessions', async () => {
+    test("should invalidate expired sessions", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
       const user = await prisma.user.create({
         data: {
@@ -185,8 +185,8 @@ describe('Authentication Critical Path', () => {
     });
   });
 
-  describe('Password Reset', () => {
-    test('should generate password reset token', async () => {
+  describe("Password Reset", () => {
+    test("should generate password reset token", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
       const user = await prisma.user.create({
         data: {
@@ -215,10 +215,10 @@ describe('Authentication Critical Path', () => {
       expect(updatedUser!.resetTokenExpiry).toEqual(tokenExpiry);
     });
 
-    test('should reset password with valid token', async () => {
+    test("should reset password with valid token", async () => {
       const hashedPassword = await bcrypt.hash(testUser.password, 12);
       const resetToken = `reset_${Date.now()}`;
-      
+
       const user = await prisma.user.create({
         data: {
           email: testUser.email,
@@ -240,7 +240,7 @@ describe('Authentication Critical Path', () => {
       expect(foundUser).toBeDefined();
 
       // Reset password
-      const newPassword = 'NewSecurePass123!';
+      const newPassword = "NewSecurePass123!";
       const newHashedPassword = await bcrypt.hash(newPassword, 12);
 
       await prisma.user.update({
@@ -258,7 +258,7 @@ describe('Authentication Critical Path', () => {
 
       const isNewPasswordValid = await bcrypt.compare(
         newPassword,
-        updatedUser!.password!
+        updatedUser!.password!,
       );
       expect(isNewPasswordValid).toBe(true);
       expect(updatedUser!.resetToken).toBeNull();

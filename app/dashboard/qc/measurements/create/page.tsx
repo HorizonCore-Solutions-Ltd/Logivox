@@ -1,34 +1,46 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { TrendingUp, TrendingDown, CheckCircle2, XCircle } from 'lucide-react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { TrendingUp, TrendingDown, CheckCircle2, XCircle } from "lucide-react";
 
 export default function CreateMeasurementPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    type: 'DIMENSIONAL',
-    characteristic: '',
-    productId: '',
-    lotNumber: '',
-    measuredValue: '',
-    lowerLimit: '',
-    upperLimit: '',
-    target: '',
-    unit: '',
-    inspectionMethod: '',
-    inspector: '',
-    notes: '',
+    type: "DIMENSIONAL",
+    characteristic: "",
+    productId: "",
+    lotNumber: "",
+    measuredValue: "",
+    lowerLimit: "",
+    upperLimit: "",
+    target: "",
+    unit: "",
+    inspectionMethod: "",
+    inspector: "",
+    notes: "",
   });
 
   // Calculate CPK
@@ -49,7 +61,7 @@ export default function CreateMeasurementPage() {
     return {
       cpk: cpk.toFixed(2),
       withinSpec: value >= lsl && value <= usl,
-      status: cpk >= 1.33 ? 'Capable' : cpk >= 1.0 ? 'Marginal' : 'Not Capable',
+      status: cpk >= 1.33 ? "Capable" : cpk >= 1.0 ? "Marginal" : "Not Capable",
     };
   };
 
@@ -60,9 +72,9 @@ export default function CreateMeasurementPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/qc/measurements', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/measurements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           measuredValue: parseFloat(formData.measuredValue),
@@ -72,13 +84,13 @@ export default function CreateMeasurementPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to create measurement');
+      if (!response.ok) throw new Error("Failed to create measurement");
 
       const data = await response.json();
       router.push(`/dashboard/qc/measurements/${data.id}`);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to create measurement');
+      console.error("Error:", error);
+      alert("Failed to create measurement");
     } finally {
       setLoading(false);
     }
@@ -110,7 +122,9 @@ export default function CreateMeasurementPage() {
                   <Label htmlFor="type">Measurement Type *</Label>
                   <Select
                     value={formData.type}
-                    onValueChange={(value) => setFormData({ ...formData, type: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, type: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -119,8 +133,12 @@ export default function CreateMeasurementPage() {
                       <SelectItem value="DIMENSIONAL">Dimensional</SelectItem>
                       <SelectItem value="WEIGHT">Weight</SelectItem>
                       <SelectItem value="VISUAL">Visual Inspection</SelectItem>
-                      <SelectItem value="FUNCTIONAL">Functional Test</SelectItem>
-                      <SelectItem value="CHEMICAL">Chemical Analysis</SelectItem>
+                      <SelectItem value="FUNCTIONAL">
+                        Functional Test
+                      </SelectItem>
+                      <SelectItem value="CHEMICAL">
+                        Chemical Analysis
+                      </SelectItem>
                       <SelectItem value="ELECTRICAL">Electrical</SelectItem>
                       <SelectItem value="HARDNESS">Hardness</SelectItem>
                       <SelectItem value="OTHER">Other</SelectItem>
@@ -134,7 +152,12 @@ export default function CreateMeasurementPage() {
                     id="characteristic"
                     required
                     value={formData.characteristic}
-                    onChange={(e) => setFormData({ ...formData, characteristic: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        characteristic: e.target.value,
+                      })
+                    }
                     placeholder="e.g., Length, Diameter, Resistance"
                   />
                 </div>
@@ -154,7 +177,9 @@ export default function CreateMeasurementPage() {
                     id="productId"
                     required
                     value={formData.productId}
-                    onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, productId: e.target.value })
+                    }
                     placeholder="Product identifier"
                   />
                 </div>
@@ -165,7 +190,9 @@ export default function CreateMeasurementPage() {
                     id="lotNumber"
                     required
                     value={formData.lotNumber}
-                    onChange={(e) => setFormData({ ...formData, lotNumber: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lotNumber: e.target.value })
+                    }
                     placeholder="Lot/batch number"
                   />
                 </div>
@@ -189,7 +216,9 @@ export default function CreateMeasurementPage() {
                     type="number"
                     step="any"
                     value={formData.lowerLimit}
-                    onChange={(e) => setFormData({ ...formData, lowerLimit: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lowerLimit: e.target.value })
+                    }
                     placeholder="Min spec"
                   />
                 </div>
@@ -201,7 +230,9 @@ export default function CreateMeasurementPage() {
                     type="number"
                     step="any"
                     value={formData.target}
-                    onChange={(e) => setFormData({ ...formData, target: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, target: e.target.value })
+                    }
                     placeholder="Nominal"
                   />
                 </div>
@@ -213,7 +244,9 @@ export default function CreateMeasurementPage() {
                     type="number"
                     step="any"
                     value={formData.upperLimit}
-                    onChange={(e) => setFormData({ ...formData, upperLimit: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, upperLimit: e.target.value })
+                    }
                     placeholder="Max spec"
                   />
                 </div>
@@ -224,7 +257,9 @@ export default function CreateMeasurementPage() {
                     id="unit"
                     required
                     value={formData.unit}
-                    onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, unit: e.target.value })
+                    }
                     placeholder="mm, kg, Ω"
                   />
                 </div>
@@ -238,7 +273,9 @@ export default function CreateMeasurementPage() {
                   step="any"
                   required
                   value={formData.measuredValue}
-                  onChange={(e) => setFormData({ ...formData, measuredValue: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, measuredValue: e.target.value })
+                  }
                   placeholder="Actual measured value"
                   className="text-lg font-semibold"
                 />
@@ -246,7 +283,13 @@ export default function CreateMeasurementPage() {
 
               {/* CPK Indicator */}
               {stats && (
-                <Alert className={stats.withinSpec ? 'border-green-500 bg-green-50' : 'border-red-500 bg-red-50'}>
+                <Alert
+                  className={
+                    stats.withinSpec
+                      ? "border-green-500 bg-green-50"
+                      : "border-red-500 bg-red-50"
+                  }
+                >
                   <AlertDescription className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {stats.withinSpec ? (
@@ -254,12 +297,24 @@ export default function CreateMeasurementPage() {
                       ) : (
                         <XCircle className="h-4 w-4 text-red-600" />
                       )}
-                      <span className={stats.withinSpec ? 'text-green-600' : 'text-red-600'}>
-                        {stats.withinSpec ? 'Within Specification' : 'Out of Specification'}
+                      <span
+                        className={
+                          stats.withinSpec ? "text-green-600" : "text-red-600"
+                        }
+                      >
+                        {stats.withinSpec
+                          ? "Within Specification"
+                          : "Out of Specification"}
                       </span>
                     </div>
                     <div>
-                      <Badge variant={(stats.cpk && parseFloat(stats.cpk) >= 1.33) ? 'default' : 'destructive'}>
+                      <Badge
+                        variant={
+                          stats.cpk && parseFloat(stats.cpk) >= 1.33
+                            ? "default"
+                            : "destructive"
+                        }
+                      >
                         CPK: {stats.cpk} - {stats.status}
                       </Badge>
                     </div>
@@ -281,7 +336,12 @@ export default function CreateMeasurementPage() {
                     id="inspectionMethod"
                     required
                     value={formData.inspectionMethod}
-                    onChange={(e) => setFormData({ ...formData, inspectionMethod: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        inspectionMethod: e.target.value,
+                      })
+                    }
                     placeholder="e.g., Caliper, Scale, Multimeter"
                   />
                 </div>
@@ -292,7 +352,9 @@ export default function CreateMeasurementPage() {
                     id="inspector"
                     required
                     value={formData.inspector}
-                    onChange={(e) => setFormData({ ...formData, inspector: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, inspector: e.target.value })
+                    }
                     placeholder="Your name"
                   />
                 </div>
@@ -304,7 +366,9 @@ export default function CreateMeasurementPage() {
                   id="notes"
                   rows={3}
                   value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, notes: e.target.value })
+                  }
                   placeholder="Additional observations or comments..."
                 />
               </div>
@@ -322,7 +386,7 @@ export default function CreateMeasurementPage() {
             </Button>
             <Button type="submit" disabled={loading}>
               <Save className="mr-2 h-4 w-4" />
-              {loading ? 'Recording...' : 'Record Measurement'}
+              {loading ? "Recording..." : "Record Measurement"}
             </Button>
           </div>
         </div>

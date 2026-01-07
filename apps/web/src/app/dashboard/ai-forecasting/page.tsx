@@ -1,7 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,18 +31,18 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
-} from 'recharts';
-import { 
-  TrendingUp, 
-  Brain, 
-  Target, 
-  AlertTriangle, 
+} from "recharts";
+import {
+  TrendingUp,
+  Brain,
+  Target,
+  AlertTriangle,
   CheckCircle2,
   RefreshCw,
   Download,
   Settings,
-  Zap
-} from 'lucide-react';
+  Zap,
+} from "lucide-react";
 
 interface Forecast {
   id: string;
@@ -57,7 +63,7 @@ interface SlottingRecommendation {
   recommendedLocation: string;
   pickFrequency: number;
   expectedImprovement: number;
-  status: 'PENDING' | 'APPROVED' | 'IMPLEMENTED' | 'REJECTED';
+  status: "PENDING" | "APPROVED" | "IMPLEMENTED" | "REJECTED";
 }
 
 interface ModelMetrics {
@@ -72,11 +78,15 @@ interface ModelMetrics {
 
 export default function AIForecastingPage() {
   const [forecasts, setForecasts] = useState<Forecast[]>([]);
-  const [slottingRecs, setSlottingRecs] = useState<SlottingRecommendation[]>([]);
+  const [slottingRecs, setSlottingRecs] = useState<SlottingRecommendation[]>(
+    [],
+  );
   const [models, setModels] = useState<ModelMetrics[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSKU, setSelectedSKU] = useState<string>('ALL');
-  const [timeHorizon, setTimeHorizon] = useState<'7' | '14' | '30' | '90'>('30');
+  const [selectedSKU, setSelectedSKU] = useState<string>("ALL");
+  const [timeHorizon, setTimeHorizon] = useState<"7" | "14" | "30" | "90">(
+    "30",
+  );
 
   useEffect(() => {
     fetchData();
@@ -87,43 +97,48 @@ export default function AIForecastingPage() {
       setLoading(true);
       const [forecastRes, slottingRes, modelsRes] = await Promise.all([
         fetch(`/api/ml/forecasts?horizon=${timeHorizon}`),
-        fetch('/api/ml/slotting-recommendations'),
-        fetch('/api/ml/models/metrics'),
+        fetch("/api/ml/slotting-recommendations"),
+        fetch("/api/ml/models/metrics"),
       ]);
 
       if (forecastRes.ok) setForecasts(await forecastRes.json());
       if (slottingRes.ok) setSlottingRecs(await slottingRes.json());
       if (modelsRes.ok) setModels(await modelsRes.json());
     } catch (error) {
-      console.error('Error fetching AI/ML data:', error);
+      console.error("Error fetching AI/ML data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   // Calculate metrics
-  const avgAccuracy = forecasts
-    .filter(f => f.accuracy !== undefined)
-    .reduce((sum, f) => sum + (f.accuracy || 0), 0) / forecasts.filter(f => f.accuracy).length || 0;
+  const avgAccuracy =
+    forecasts
+      .filter((f) => f.accuracy !== undefined)
+      .reduce((sum, f) => sum + (f.accuracy || 0), 0) /
+      forecasts.filter((f) => f.accuracy).length || 0;
 
-  const pendingRecs = slottingRecs.filter(r => r.status === 'PENDING').length;
-  const approvedRecs = slottingRecs.filter(r => r.status === 'APPROVED').length;
+  const pendingRecs = slottingRecs.filter((r) => r.status === "PENDING").length;
+  const approvedRecs = slottingRecs.filter(
+    (r) => r.status === "APPROVED",
+  ).length;
 
   const totalImprovementPotential = slottingRecs
-    .filter(r => r.status === 'PENDING' || r.status === 'APPROVED')
+    .filter((r) => r.status === "PENDING" || r.status === "APPROVED")
     .reduce((sum, r) => sum + r.expectedImprovement, 0);
 
   // Prepare chart data
-  const forecastChartData = forecasts
-    .slice(0, 30)
-    .map(f => ({
-      date: new Date(f.forecastDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      predicted: f.predictedDemand,
-      actual: f.actualDemand || null,
-      confidence: f.confidence * 100,
-    }));
+  const forecastChartData = forecasts.slice(0, 30).map((f) => ({
+    date: new Date(f.forecastDate).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    }),
+    predicted: f.predictedDemand,
+    actual: f.actualDemand || null,
+    confidence: f.confidence * 100,
+  }));
 
-  const accuracyTrendData = models.map(m => ({
+  const accuracyTrendData = models.map((m) => ({
     model: m.modelName,
     accuracy: m.accuracy * 100,
     mape: m.mape,
@@ -134,13 +149,18 @@ export default function AIForecastingPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">AI/ML Forecasting & Optimization</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            AI/ML Forecasting & Optimization
+          </h1>
           <p className="text-gray-600 mt-1">
             Demand forecasting, slotting optimization, and predictive analytics
           </p>
         </div>
         <div className="flex gap-2">
-          <Select value={timeHorizon} onValueChange={(v: any) => setTimeHorizon(v)}>
+          <Select
+            value={timeHorizon}
+            onValueChange={(v: any) => setTimeHorizon(v)}
+          >
             <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
@@ -175,7 +195,9 @@ export default function AIForecastingPage() {
             <div className="text-3xl font-bold text-blue-600">
               {(avgAccuracy * 100).toFixed(1)}%
             </div>
-            <p className="text-xs text-gray-500 mt-1">Last {timeHorizon} days average</p>
+            <p className="text-xs text-gray-500 mt-1">
+              Last {timeHorizon} days average
+            </p>
           </CardContent>
         </Card>
 
@@ -205,7 +227,9 @@ export default function AIForecastingPage() {
             <div className="text-3xl font-bold text-orange-600">
               {pendingRecs}
             </div>
-            <p className="text-xs text-gray-500 mt-1">{approvedRecs} approved, awaiting implementation</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {approvedRecs} approved, awaiting implementation
+            </p>
           </CardContent>
         </Card>
 
@@ -220,7 +244,9 @@ export default function AIForecastingPage() {
             <div className="text-3xl font-bold text-green-600">
               +{totalImprovementPotential.toFixed(0)}%
             </div>
-            <p className="text-xs text-gray-500 mt-1">From pending optimizations</p>
+            <p className="text-xs text-gray-500 mt-1">
+              From pending optimizations
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -248,30 +274,47 @@ export default function AIForecastingPage() {
             <CardHeader>
               <CardTitle>Demand Forecast vs Actuals</CardTitle>
               <CardDescription>
-                AI-predicted demand compared to actual demand ({timeHorizon} day horizon)
+                AI-predicted demand compared to actual demand ({timeHorizon} day
+                horizon)
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
                 <AreaChart data={forecastChartData}>
                   <defs>
-                    <linearGradient id="colorPredicted" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    <linearGradient
+                      id="colorPredicted"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
                     </linearGradient>
-                    <linearGradient id="colorActual" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    <linearGradient
+                      id="colorActual"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="date" stroke="#6b7280" style={{ fontSize: '12px' }} />
-                  <YAxis stroke="#6b7280" style={{ fontSize: '12px' }} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#ffffff', 
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '6px'
+                  <XAxis
+                    dataKey="date"
+                    stroke="#6b7280"
+                    style={{ fontSize: "12px" }}
+                  />
+                  <YAxis stroke="#6b7280" style={{ fontSize: "12px" }} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "6px",
                     }}
                   />
                   <Legend />
@@ -304,28 +347,45 @@ export default function AIForecastingPage() {
             <CardContent>
               <div className="space-y-4">
                 {forecasts.slice(0, 10).map((forecast) => (
-                  <div key={forecast.id} className="flex items-center justify-between border-b pb-3">
+                  <div
+                    key={forecast.id}
+                    className="flex items-center justify-between border-b pb-3"
+                  >
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">{forecast.productName}</div>
-                      <div className="text-sm text-gray-500">SKU: {forecast.sku}</div>
+                      <div className="font-medium text-gray-900">
+                        {forecast.productName}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        SKU: {forecast.sku}
+                      </div>
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="text-right">
-                        <div className="text-sm text-gray-600">Predicted Demand</div>
+                        <div className="text-sm text-gray-600">
+                          Predicted Demand
+                        </div>
                         <div className="text-lg font-bold text-blue-600">
                           {forecast.predictedDemand.toLocaleString()} units
                         </div>
                       </div>
                       <div className="text-right">
                         <div className="text-sm text-gray-600">Confidence</div>
-                        <Badge variant={forecast.confidence > 0.8 ? 'default' : 'secondary'}>
+                        <Badge
+                          variant={
+                            forecast.confidence > 0.8 ? "default" : "secondary"
+                          }
+                        >
                           {(forecast.confidence * 100).toFixed(0)}%
                         </Badge>
                       </div>
                       {forecast.accuracy !== undefined && (
                         <div className="text-right">
                           <div className="text-sm text-gray-600">Accuracy</div>
-                          <Badge variant={forecast.accuracy > 0.85 ? 'default' : 'outline'}>
+                          <Badge
+                            variant={
+                              forecast.accuracy > 0.85 ? "default" : "outline"
+                            }
+                          >
                             {(forecast.accuracy * 100).toFixed(1)}%
                           </Badge>
                         </div>
@@ -350,14 +410,18 @@ export default function AIForecastingPage() {
             <CardContent>
               <div className="space-y-3">
                 {slottingRecs.map((rec) => (
-                  <div 
-                    key={rec.id} 
+                  <div
+                    key={rec.id}
                     className="flex items-center justify-between border rounded-lg p-4 hover:bg-gray-50"
                   >
                     <div className="flex-1">
-                      <div className="font-medium text-gray-900">SKU: {rec.sku}</div>
+                      <div className="font-medium text-gray-900">
+                        SKU: {rec.sku}
+                      </div>
                       <div className="text-sm text-gray-600 mt-1">
-                        Pick Frequency: <span className="font-medium">{rec.pickFrequency}</span> times/day
+                        Pick Frequency:{" "}
+                        <span className="font-medium">{rec.pickFrequency}</span>{" "}
+                        times/day
                       </div>
                       <div className="text-sm text-gray-500 mt-1">
                         {rec.currentLocation} → {rec.recommendedLocation}
@@ -365,24 +429,29 @@ export default function AIForecastingPage() {
                     </div>
                     <div className="flex items-center gap-6">
                       <div className="text-right">
-                        <div className="text-sm text-gray-600">Expected Improvement</div>
+                        <div className="text-sm text-gray-600">
+                          Expected Improvement
+                        </div>
                         <div className="text-2xl font-bold text-green-600">
                           +{rec.expectedImprovement.toFixed(1)}%
                         </div>
                       </div>
                       <div>
-                        <Badge 
+                        <Badge
                           variant={
-                            rec.status === 'APPROVED' ? 'default' :
-                            rec.status === 'IMPLEMENTED' ? 'outline' :
-                            rec.status === 'REJECTED' ? 'destructive' :
-                            'secondary'
+                            rec.status === "APPROVED"
+                              ? "default"
+                              : rec.status === "IMPLEMENTED"
+                                ? "outline"
+                                : rec.status === "REJECTED"
+                                  ? "destructive"
+                                  : "secondary"
                           }
                         >
                           {rec.status}
                         </Badge>
                       </div>
-                      {rec.status === 'PENDING' && (
+                      {rec.status === "PENDING" && (
                         <div className="flex gap-2">
                           <Button size="sm" variant="default">
                             <CheckCircle2 className="h-4 w-4 mr-1" />
@@ -406,7 +475,9 @@ export default function AIForecastingPage() {
           <Card>
             <CardHeader>
               <CardTitle>Model Accuracy Comparison</CardTitle>
-              <CardDescription>Performance metrics across all ML models</CardDescription>
+              <CardDescription>
+                Performance metrics across all ML models
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -414,11 +485,11 @@ export default function AIForecastingPage() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="model" stroke="#6b7280" />
                   <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#ffffff', 
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '6px'
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "6px",
                     }}
                   />
                   <Legend />
@@ -455,7 +526,9 @@ export default function AIForecastingPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Training Data Points</span>
-                    <span className="font-bold">{model.trainingDataPoints.toLocaleString()}</span>
+                    <span className="font-bold">
+                      {model.trainingDataPoints.toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Last Trained</span>

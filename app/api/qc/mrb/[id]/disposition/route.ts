@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { MRBService } from '@/lib/services/qc/mrb.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { MRBService } from "@/lib/services/qc/mrb.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -23,7 +23,9 @@ export async function POST(
       approvalLevel: body.approvalLevel,
       approvers: body.approvers,
       effectiveDate: new Date(body.effectiveDate),
-      expirationDate: body.expirationDate ? new Date(body.expirationDate) : undefined,
+      expirationDate: body.expirationDate
+        ? new Date(body.expirationDate)
+        : undefined,
       limitedQuantity: body.limitedQuantity,
       costImpact: body.costImpact,
       scheduleImpact: body.scheduleImpact,

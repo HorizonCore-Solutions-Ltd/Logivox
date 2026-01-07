@@ -1,8 +1,21 @@
 "use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  Legend,
+  Tooltip,
+} from "recharts";
 import { TrendingUp, Package, DollarSign } from "lucide-react";
 
 interface ABCCategory {
@@ -78,7 +91,9 @@ export function ABCAnalysis({ categories }: ABCAnalysisProps) {
           <Card key={category.category}>
             <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Category {category.category}</CardTitle>
+                <CardTitle className="text-base">
+                  Category {category.category}
+                </CardTitle>
                 <Badge variant={getCategoryBadge(category.category)}>
                   {category.category}
                 </Badge>
@@ -90,16 +105,26 @@ export function ABCAnalysis({ categories }: ABCAnalysisProps) {
             <CardContent>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Products</span>
+                  <span className="text-sm text-muted-foreground">
+                    Products
+                  </span>
                   <span className="font-medium">{category.count}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Total Value</span>
-                  <span className="font-medium">${category.totalValue.toLocaleString()}</span>
+                  <span className="text-sm text-muted-foreground">
+                    Total Value
+                  </span>
+                  <span className="font-medium">
+                    ${category.totalValue.toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">% of Total</span>
-                  <span className="font-medium">{category.percentageOfTotal.toFixed(1)}%</span>
+                  <span className="text-sm text-muted-foreground">
+                    % of Total
+                  </span>
+                  <span className="font-medium">
+                    {category.percentageOfTotal.toFixed(1)}%
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -123,21 +148,26 @@ export function ABCAnalysis({ categories }: ABCAnalysisProps) {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, percentage }) => `${name}: ${percentage.toFixed(1)}%`}
+                label={({ name, percentage }) =>
+                  `${name}: ${percentage.toFixed(1)}%`
+                }
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
               >
                 {pieData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[categories[index]?.category || 'C']} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[categories[index]?.category || "C"]}
+                  />
                 ))}
               </Pie>
-              <Tooltip 
+              <Tooltip
                 formatter={(value: number) => `$${value.toLocaleString()}`}
-                contentStyle={{ 
-                  backgroundColor: "hsl(var(--background))", 
+                contentStyle={{
+                  backgroundColor: "hsl(var(--background))",
                   border: "1px solid hsl(var(--border))",
-                  borderRadius: "6px"
+                  borderRadius: "6px",
                 }}
               />
               <Legend />
@@ -164,7 +194,9 @@ export function ABCAnalysis({ categories }: ABCAnalysisProps) {
               </div>
               <div className="text-right">
                 <p className="text-sm text-muted-foreground">Total Value</p>
-                <p className="text-2xl font-bold">${category.totalValue.toLocaleString()}</p>
+                <p className="text-2xl font-bold">
+                  ${category.totalValue.toLocaleString()}
+                </p>
               </div>
             </div>
           </CardHeader>
@@ -185,8 +217,12 @@ export function ABCAnalysis({ categories }: ABCAnalysisProps) {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${product.value.toLocaleString()}</p>
-                    <p className="text-xs text-muted-foreground">annual value</p>
+                    <p className="font-medium">
+                      ${product.value.toLocaleString()}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      annual value
+                    </p>
                   </div>
                 </div>
               ))}

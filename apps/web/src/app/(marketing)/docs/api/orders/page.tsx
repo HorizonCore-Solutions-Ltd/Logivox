@@ -1,24 +1,31 @@
-import { Metadata } from "next"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { 
-  ShoppingCart, 
-  Package, 
-  Truck, 
+import { Metadata } from "next";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  ShoppingCart,
+  Package,
+  Truck,
   CheckCircle2,
   Copy,
   Code,
   AlertCircle,
-  ArrowRight
-} from "lucide-react"
+  ArrowRight,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Orders API | LogiVox Documentation",
-  description: "Complete API reference for order management. Create orders, track fulfillment status, and manage order lifecycle.",
-}
+  description:
+    "Complete API reference for order management. Create orders, track fulfillment status, and manage order lifecycle.",
+};
 
 export default function OrdersAPIPage() {
   const endpoints = [
@@ -27,55 +34,58 @@ export default function OrdersAPIPage() {
       path: "/v2/orders",
       description: "List all orders",
       color: "text-green-600",
-      bgColor: "bg-green-100"
+      bgColor: "bg-green-100",
     },
     {
       method: "GET",
       path: "/v2/orders/:id",
       description: "Get specific order details",
       color: "text-green-600",
-      bgColor: "bg-green-100"
+      bgColor: "bg-green-100",
     },
     {
       method: "POST",
       path: "/v2/orders",
       description: "Create new order",
       color: "text-blue-600",
-      bgColor: "bg-blue-100"
+      bgColor: "bg-blue-100",
     },
     {
       method: "PUT",
       path: "/v2/orders/:id",
       description: "Update order",
       color: "text-yellow-600",
-      bgColor: "bg-yellow-100"
+      bgColor: "bg-yellow-100",
     },
     {
       method: "POST",
       path: "/v2/orders/:id/cancel",
       description: "Cancel order",
       color: "text-blue-600",
-      bgColor: "bg-blue-100"
+      bgColor: "bg-blue-100",
     },
     {
       method: "POST",
       path: "/v2/orders/:id/fulfill",
       description: "Mark order as fulfilled",
       color: "text-blue-600",
-      bgColor: "bg-blue-100"
-    }
-  ]
+      bgColor: "bg-blue-100",
+    },
+  ];
 
   const orderStatuses = [
     { status: "pending", description: "Order created, awaiting processing" },
-    { status: "confirmed", description: "Order confirmed and queued for fulfillment" },
+    {
+      status: "confirmed",
+      description: "Order confirmed and queued for fulfillment",
+    },
     { status: "picking", description: "Items being picked from warehouse" },
     { status: "packing", description: "Items being packed for shipment" },
     { status: "ready_to_ship", description: "Order ready for carrier pickup" },
     { status: "shipped", description: "Order shipped to customer" },
     { status: "delivered", description: "Order delivered successfully" },
-    { status: "cancelled", description: "Order cancelled" }
-  ]
+    { status: "cancelled", description: "Order cancelled" },
+  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -83,9 +93,13 @@ export default function OrdersAPIPage() {
       <section className="bg-gradient-to-b from-slate-900 to-slate-800 text-white border-b py-16">
         <div className="container-enterprise">
           <div className="flex items-center gap-2 text-sm text-slate-300 mb-4">
-            <Link href="/docs" className="hover:text-white">Documentation</Link>
+            <Link href="/docs" className="hover:text-white">
+              Documentation
+            </Link>
             <span>/</span>
-            <Link href="/docs/api" className="hover:text-white">API Reference</Link>
+            <Link href="/docs/api" className="hover:text-white">
+              API Reference
+            </Link>
             <span>/</span>
             <span>Orders</span>
           </div>
@@ -96,7 +110,8 @@ export default function OrdersAPIPage() {
             <h1 className="text-5xl font-bold">Orders API</h1>
           </div>
           <p className="text-xl text-slate-300 max-w-3xl">
-            Manage the complete order lifecycle from creation to fulfillment. Create orders, track status, and automate your order processing.
+            Manage the complete order lifecycle from creation to fulfillment.
+            Create orders, track status, and automate your order processing.
           </p>
         </div>
       </section>
@@ -105,17 +120,23 @@ export default function OrdersAPIPage() {
       <section className="py-16">
         <div className="container-enterprise max-w-4xl">
           <h2 className="text-3xl font-bold mb-8">Available Endpoints</h2>
-          
+
           <div className="space-y-3">
             {endpoints.map((endpoint, index) => (
               <Card key={index} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
-                    <Badge className={`${endpoint.bgColor} ${endpoint.color} font-mono`}>
+                    <Badge
+                      className={`${endpoint.bgColor} ${endpoint.color} font-mono`}
+                    >
                       {endpoint.method}
                     </Badge>
-                    <code className="flex-1 font-mono text-sm">{endpoint.path}</code>
-                    <span className="text-sm text-muted-foreground">{endpoint.description}</span>
+                    <code className="flex-1 font-mono text-sm">
+                      {endpoint.path}
+                    </code>
+                    <span className="text-sm text-muted-foreground">
+                      {endpoint.description}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -128,18 +149,25 @@ export default function OrdersAPIPage() {
       <section className="py-16 bg-muted/30">
         <div className="container-enterprise max-w-4xl">
           <h2 className="text-3xl font-bold mb-8">Order Status Lifecycle</h2>
-          
+
           <Card>
             <CardContent className="p-6">
               <div className="space-y-3">
                 {orderStatuses.map((item, index) => (
-                  <div key={index} className="flex items-start gap-4 p-3 border rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-start gap-4 p-3 border rounded-lg"
+                  >
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100 text-primary-600 font-bold text-sm flex-shrink-0">
                       {index + 1}
                     </div>
                     <div className="flex-1">
-                      <code className="font-semibold text-primary-600">{item.status}</code>
-                      <p className="text-sm text-muted-foreground mt-1">{item.description}</p>
+                      <code className="font-semibold text-primary-600">
+                        {item.status}
+                      </code>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {item.description}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -153,33 +181,38 @@ export default function OrdersAPIPage() {
       <section className="py-16">
         <div className="container-enterprise max-w-4xl">
           <h2 className="text-3xl font-bold mb-8">Create New Order</h2>
-          
+
           <Card className="mb-6">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Badge className="bg-blue-100 text-blue-600 font-mono">POST</Badge>
+                  <Badge className="bg-blue-100 text-blue-600 font-mono">
+                    POST
+                  </Badge>
                   <code className="font-mono">/v2/orders</code>
                 </div>
                 <Button size="sm" variant="ghost">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
-              <CardDescription>Create a new order for fulfillment</CardDescription>
+              <CardDescription>
+                Create a new order for fulfillment
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>Automatic Inventory Allocation</AlertTitle>
                 <AlertDescription>
-                  When you create an order, inventory is automatically reserved for the order items, updating the quantity_reserved field.
+                  When you create an order, inventory is automatically reserved
+                  for the order items, updating the quantity_reserved field.
                 </AlertDescription>
               </Alert>
 
               <div>
                 <h4 className="font-semibold mb-3">Request Body</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`{
+                  {`{
   "order_number": "ORD-2026-001",
   "warehouse_id": "wh_123",
   "customer": {
@@ -220,7 +253,7 @@ export default function OrdersAPIPage() {
               <div>
                 <h4 className="font-semibold mb-3">Example Request</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`curl -X POST https://api.logivox.com/v2/orders \\
+                  {`curl -X POST https://api.logivox.com/v2/orders \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d @order.json`}
@@ -230,7 +263,7 @@ export default function OrdersAPIPage() {
               <div>
                 <h4 className="font-semibold mb-3">Example Response</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`{
+                  {`{
   "id": "ord_xyz789",
   "order_number": "ORD-2026-001",
   "warehouse_id": "wh_123",
@@ -286,19 +319,24 @@ export default function OrdersAPIPage() {
       <section className="py-16 bg-muted/30">
         <div className="container-enterprise max-w-4xl">
           <h2 className="text-3xl font-bold mb-8">Get Order Details</h2>
-          
+
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Badge className="bg-green-100 text-green-600 font-mono">GET</Badge>
+                  <Badge className="bg-green-100 text-green-600 font-mono">
+                    GET
+                  </Badge>
                   <code className="font-mono">/v2/orders/:id</code>
                 </div>
                 <Button size="sm" variant="ghost">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
-              <CardDescription>Retrieve complete order information including fulfillment status and tracking</CardDescription>
+              <CardDescription>
+                Retrieve complete order information including fulfillment status
+                and tracking
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
@@ -312,7 +350,7 @@ export default function OrdersAPIPage() {
               <div>
                 <h4 className="font-semibold mb-3">Example Request</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`curl https://api.logivox.com/v2/orders/ord_xyz789 \\
+                  {`curl https://api.logivox.com/v2/orders/ord_xyz789 \\
   -H "Authorization: Bearer YOUR_API_KEY"`}
                 </pre>
               </div>
@@ -320,7 +358,7 @@ export default function OrdersAPIPage() {
               <div>
                 <h4 className="font-semibold mb-3">Example Response</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`{
+                  {`{
   "id": "ord_xyz789",
   "order_number": "ORD-2026-001",
   "warehouse_id": "wh_123",
@@ -384,25 +422,29 @@ export default function OrdersAPIPage() {
       <section className="py-16">
         <div className="container-enterprise max-w-4xl">
           <h2 className="text-3xl font-bold mb-8">Fulfill Order</h2>
-          
+
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Badge className="bg-blue-100 text-blue-600 font-mono">POST</Badge>
+                  <Badge className="bg-blue-100 text-blue-600 font-mono">
+                    POST
+                  </Badge>
                   <code className="font-mono">/v2/orders/:id/fulfill</code>
                 </div>
                 <Button size="sm" variant="ghost">
                   <Copy className="h-4 w-4" />
                 </Button>
               </div>
-              <CardDescription>Mark order as fulfilled and create shipment record</CardDescription>
+              <CardDescription>
+                Mark order as fulfilled and create shipment record
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
                 <h4 className="font-semibold mb-3">Request Body</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`{
+                  {`{
   "tracking_number": "123456789012",
   "carrier": "FedEx",
   "service": "Ground",
@@ -425,14 +467,15 @@ export default function OrdersAPIPage() {
                 <CheckCircle2 className="h-4 w-4" />
                 <AlertTitle>Automated Customer Notifications</AlertTitle>
                 <AlertDescription>
-                  When notify_customer is true, LogiVox automatically sends a shipping confirmation email with tracking information.
+                  When notify_customer is true, LogiVox automatically sends a
+                  shipping confirmation email with tracking information.
                 </AlertDescription>
               </Alert>
 
               <div>
                 <h4 className="font-semibold mb-3">Example Request</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`curl -X POST https://api.logivox.com/v2/orders/ord_xyz789/fulfill \\
+                  {`curl -X POST https://api.logivox.com/v2/orders/ord_xyz789/fulfill \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -447,7 +490,7 @@ export default function OrdersAPIPage() {
               <div>
                 <h4 className="font-semibold mb-3">Example Response</h4>
                 <pre className="bg-slate-900 text-slate-100 p-4 rounded-lg overflow-x-auto text-sm">
-{`{
+                  {`{
   "id": "ord_xyz789",
   "status": "shipped",
   "shipment": {
@@ -472,7 +515,7 @@ export default function OrdersAPIPage() {
       <section className="py-16 bg-muted/30">
         <div className="container-enterprise max-w-4xl">
           <h2 className="text-3xl font-bold mb-8">Related Endpoints</h2>
-          
+
           <div className="grid gap-4 md:grid-cols-2">
             <Link href="/docs/api/inventory" className="group">
               <Card className="h-full hover:shadow-lg hover:border-primary transition-all">
@@ -480,12 +523,18 @@ export default function OrdersAPIPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 mb-3">
                     <Package className="h-5 w-5 text-primary-600" />
                   </div>
-                  <CardTitle className="group-hover:text-primary transition-colors">Inventory API</CardTitle>
-                  <CardDescription>Manage stock levels and products</CardDescription>
+                  <CardTitle className="group-hover:text-primary transition-colors">
+                    Inventory API
+                  </CardTitle>
+                  <CardDescription>
+                    Manage stock levels and products
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center text-primary">
-                    <span className="text-sm font-medium">View documentation</span>
+                    <span className="text-sm font-medium">
+                      View documentation
+                    </span>
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </CardContent>
@@ -498,12 +547,16 @@ export default function OrdersAPIPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 mb-3">
                     <Truck className="h-5 w-5 text-primary-600" />
                   </div>
-                  <CardTitle className="group-hover:text-primary transition-colors">Shipments API</CardTitle>
+                  <CardTitle className="group-hover:text-primary transition-colors">
+                    Shipments API
+                  </CardTitle>
                   <CardDescription>Track and manage shipments</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center text-primary">
-                    <span className="text-sm font-medium">View documentation</span>
+                    <span className="text-sm font-medium">
+                      View documentation
+                    </span>
                     <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </CardContent>
@@ -516,7 +569,9 @@ export default function OrdersAPIPage() {
       {/* CTA */}
       <section className="py-16 bg-slate-900 text-white">
         <div className="container-enterprise max-w-4xl text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Integrate Orders?</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to Integrate Orders?
+          </h2>
           <p className="text-lg text-slate-300 mb-8">
             Start automating your order fulfillment with our powerful API.
           </p>
@@ -527,14 +582,17 @@ export default function OrdersAPIPage() {
                 Getting Started Guide
               </Link>
             </Button>
-            <Button size="lg" variant="outline" asChild className="bg-transparent hover:bg-white/10 text-white border-white">
-              <Link href="/contact">
-                Contact Support
-              </Link>
+            <Button
+              size="lg"
+              variant="outline"
+              asChild
+              className="bg-transparent hover:bg-white/10 text-white border-white"
+            >
+              <Link href="/contact">Contact Support</Link>
             </Button>
           </div>
         </div>
       </section>
     </div>
-  )
+  );
 }

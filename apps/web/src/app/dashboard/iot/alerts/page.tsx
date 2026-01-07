@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -116,7 +122,8 @@ export default function IoTAlertsPage() {
       LOW: { color: "bg-blue-100 text-blue-800", icon: AlertTriangle },
     };
 
-    const severityConfig = (config[severity as keyof typeof config] || config.MEDIUM) as { color: string; icon: any };
+    const severityConfig = (config[severity as keyof typeof config] ||
+      config.MEDIUM) as { color: string; icon: any };
     const { color, icon: Icon } = severityConfig;
 
     return (
@@ -164,7 +171,9 @@ export default function IoTAlertsPage() {
       <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Total Alerts</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Total Alerts
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -173,37 +182,53 @@ export default function IoTAlertsPage() {
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Critical</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Critical
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.critical}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.critical}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">High</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              High
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{stats.high}</div>
+            <div className="text-2xl font-bold text-orange-600">
+              {stats.high}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Active</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Active
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.active}</div>
+            <div className="text-2xl font-bold text-yellow-600">
+              {stats.active}
+            </div>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-gray-600">Resolved</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Resolved
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.resolved}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -252,7 +277,8 @@ export default function IoTAlertsPage() {
         <CardHeader>
           <CardTitle>Alert History</CardTitle>
           <CardDescription>
-            {filteredAlerts.length} alert{filteredAlerts.length !== 1 ? "s" : ""} found
+            {filteredAlerts.length} alert
+            {filteredAlerts.length !== 1 ? "s" : ""} found
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -283,12 +309,18 @@ export default function IoTAlertsPage() {
                   <TableRow key={alert.id}>
                     <TableCell>
                       <div>
-                        <p className="font-medium text-gray-900">{alert.device.name}</p>
-                        <p className="text-xs text-gray-500">{alert.device.location || "—"}</p>
+                        <p className="font-medium text-gray-900">
+                          {alert.device.name}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {alert.device.location || "—"}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{alert.alertType.replace(/_/g, " ")}</span>
+                      <span className="text-sm">
+                        {alert.alertType.replace(/_/g, " ")}
+                      </span>
                     </TableCell>
                     <TableCell>{getSeverityBadge(alert.severity)}</TableCell>
                     <TableCell>
@@ -297,7 +329,9 @@ export default function IoTAlertsPage() {
                     <TableCell>
                       <div className="flex items-center space-x-2 text-sm text-gray-600">
                         <Clock className="h-4 w-4" />
-                        <span>{new Date(alert.createdAt).toLocaleString()}</span>
+                        <span>
+                          {new Date(alert.createdAt).toLocaleString()}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell>

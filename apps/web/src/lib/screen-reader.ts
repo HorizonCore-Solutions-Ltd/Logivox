@@ -1,11 +1,11 @@
 /**
  * Screen Reader Utilities
- * 
+ *
  * Comprehensive utilities for enhancing screen reader support
  * across the LogiVox application. WCAG 2.1 AA compliant.
  */
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from "react";
 
 // ==========================================
 // ARIA LABEL GENERATORS
@@ -17,48 +17,48 @@ import { useEffect, useRef } from 'react';
 export const ariaLabels = {
   // Navigation
   navigation: {
-    main: 'Main navigation',
-    breadcrumb: 'Breadcrumb navigation',
-    pagination: 'Pagination navigation',
-    user: 'User account navigation',
-    sidebar: 'Sidebar navigation',
+    main: "Main navigation",
+    breadcrumb: "Breadcrumb navigation",
+    pagination: "Pagination navigation",
+    user: "User account navigation",
+    sidebar: "Sidebar navigation",
   },
 
   // Actions
   actions: {
-    close: 'Close',
-    delete: 'Delete',
-    edit: 'Edit',
-    save: 'Save',
-    cancel: 'Cancel',
-    submit: 'Submit',
-    search: 'Search',
-    filter: 'Filter',
-    sort: 'Sort',
-    refresh: 'Refresh',
-    download: 'Download',
-    upload: 'Upload',
-    add: 'Add',
-    remove: 'Remove',
-    expand: 'Expand',
-    collapse: 'Collapse',
+    close: "Close",
+    delete: "Delete",
+    edit: "Edit",
+    save: "Save",
+    cancel: "Cancel",
+    submit: "Submit",
+    search: "Search",
+    filter: "Filter",
+    sort: "Sort",
+    refresh: "Refresh",
+    download: "Download",
+    upload: "Upload",
+    add: "Add",
+    remove: "Remove",
+    expand: "Expand",
+    collapse: "Collapse",
   },
 
   // Status
   status: {
-    loading: 'Loading...',
-    success: 'Success',
-    error: 'Error',
-    warning: 'Warning',
-    info: 'Information',
+    loading: "Loading...",
+    success: "Success",
+    error: "Error",
+    warning: "Warning",
+    info: "Information",
   },
 
   // Forms
   forms: {
-    required: '(required)',
-    optional: '(optional)',
-    error: 'Error:',
-    help: 'Help text:',
+    required: "(required)",
+    optional: "(optional)",
+    error: "Error:",
+    help: "Help text:",
   },
 };
 
@@ -77,7 +77,7 @@ export function getIconButtonLabel(action: string, target?: string): string {
 export function getTableActionLabel(
   action: string,
   itemType: string,
-  itemName: string
+  itemName: string,
 ): string {
   return `${action} ${itemType} ${itemName}`;
 }
@@ -96,10 +96,10 @@ export function getPaginationLabel(page: number, isCurrent: boolean): string {
  */
 export function getSortLabel(
   column: string,
-  direction?: 'asc' | 'desc'
+  direction?: "asc" | "desc",
 ): string {
   if (!direction) return `Sort by ${column}`;
-  const dir = direction === 'asc' ? 'ascending' : 'descending';
+  const dir = direction === "asc" ? "ascending" : "descending";
   return `Sort by ${column}, ${dir}`;
 }
 
@@ -107,7 +107,7 @@ export function getSortLabel(
 // ARIA LIVE REGIONS
 // ==========================================
 
-export type AriaLivePriority = 'polite' | 'assertive' | 'off';
+export type AriaLivePriority = "polite" | "assertive" | "off";
 
 /**
  * Announce a message to screen readers
@@ -115,8 +115,8 @@ export type AriaLivePriority = 'polite' | 'assertive' | 'off';
  */
 export function announceToScreenReader(
   message: string,
-  priority: AriaLivePriority = 'polite',
-  timeout: number = 5000
+  priority: AriaLivePriority = "polite",
+  timeout: number = 5000,
 ): void {
   // Create or get existing live region
   const regionId = `sr-announce-${priority}`;
@@ -124,17 +124,17 @@ export function announceToScreenReader(
 
   if (!region) {
     // Fallback: create temporary live region if ScreenReaderAnnouncer not mounted
-    region = document.createElement('div');
+    region = document.createElement("div");
     region.id = regionId;
-    region.setAttribute('role', 'status');
-    region.setAttribute('aria-live', priority);
-    region.setAttribute('aria-atomic', 'true');
-    region.className = 'sr-only';
+    region.setAttribute("role", "status");
+    region.setAttribute("aria-live", priority);
+    region.setAttribute("aria-atomic", "true");
+    region.className = "sr-only";
     document.body.appendChild(region);
   }
 
   // Clear previous message
-  region.textContent = '';
+  region.textContent = "";
 
   // Announce new message (delay ensures screen reader picks it up)
   setTimeout(() => {
@@ -147,7 +147,7 @@ export function announceToScreenReader(
   if (timeout > 0) {
     setTimeout(() => {
       if (region && region.textContent === message) {
-        region.textContent = '';
+        region.textContent = "";
       }
     }, timeout);
   }
@@ -158,7 +158,7 @@ export function announceToScreenReader(
  */
 export function useScreenReaderAnnouncement() {
   return {
-    announce: (message: string, priority: AriaLivePriority = 'polite') => {
+    announce: (message: string, priority: AriaLivePriority = "polite") => {
       announceToScreenReader(message, priority);
     },
   };
@@ -183,7 +183,7 @@ export interface LoadingAnnouncementProps {
  */
 export function useLoadingAnnouncement({
   isLoading,
-  loadingMessage = 'Loading...',
+  loadingMessage = "Loading...",
   successMessage,
   errorMessage,
 }: LoadingAnnouncementProps) {
@@ -192,12 +192,12 @@ export function useLoadingAnnouncement({
   useEffect(() => {
     // Loading started
     if (isLoading && !previousLoadingRef.current) {
-      announceToScreenReader(loadingMessage, 'polite');
+      announceToScreenReader(loadingMessage, "polite");
     }
 
     // Loading finished successfully
     if (!isLoading && previousLoadingRef.current && successMessage) {
-      announceToScreenReader(successMessage, 'polite');
+      announceToScreenReader(successMessage, "polite");
     }
 
     previousLoadingRef.current = isLoading;
@@ -205,7 +205,10 @@ export function useLoadingAnnouncement({
 
   // Announce errors separately
   const announceError = (error?: string) => {
-    announceToScreenReader(error || errorMessage || 'An error occurred', 'assertive');
+    announceToScreenReader(
+      error || errorMessage || "An error occurred",
+      "assertive",
+    );
   };
 
   return { announceError };
@@ -220,7 +223,7 @@ export function useLoadingAnnouncement({
  */
 export function getFieldErrorMessage(
   fieldLabel: string,
-  error: string
+  error: string,
 ): string {
   return `${fieldLabel}: ${error}`;
 }
@@ -238,12 +241,12 @@ export function getFormSuccessMessage(formName: string): string {
 export function useFormValidationAnnouncement() {
   const announceError = (fieldLabel: string, error: string) => {
     const message = getFieldErrorMessage(fieldLabel, error);
-    announceToScreenReader(message, 'assertive');
+    announceToScreenReader(message, "assertive");
   };
 
   const announceSuccess = (formName: string) => {
     const message = getFormSuccessMessage(formName);
-    announceToScreenReader(message, 'polite');
+    announceToScreenReader(message, "polite");
   };
 
   return { announceError, announceSuccess };
@@ -257,18 +260,18 @@ export function useFormValidationAnnouncement() {
  * Announce table updates
  */
 export function announceTableUpdate(
-  action: 'loaded' | 'updated' | 'sorted' | 'filtered',
+  action: "loaded" | "updated" | "sorted" | "filtered",
   itemCount: number,
-  itemType: string
+  itemType: string,
 ): void {
   const messages = {
-    loaded: `Loaded ${itemCount} ${itemType}${itemCount !== 1 ? 's' : ''}`,
-    updated: `Table updated with ${itemCount} ${itemType}${itemCount !== 1 ? 's' : ''}`,
-    sorted: `Table sorted, showing ${itemCount} ${itemType}${itemCount !== 1 ? 's' : ''}`,
-    filtered: `Filtered to ${itemCount} ${itemType}${itemCount !== 1 ? 's' : ''}`,
+    loaded: `Loaded ${itemCount} ${itemType}${itemCount !== 1 ? "s" : ""}`,
+    updated: `Table updated with ${itemCount} ${itemType}${itemCount !== 1 ? "s" : ""}`,
+    sorted: `Table sorted, showing ${itemCount} ${itemType}${itemCount !== 1 ? "s" : ""}`,
+    filtered: `Filtered to ${itemCount} ${itemType}${itemCount !== 1 ? "s" : ""}`,
   };
 
-  announceToScreenReader(messages[action], 'polite');
+  announceToScreenReader(messages[action], "polite");
 }
 
 /**
@@ -276,10 +279,14 @@ export function announceTableUpdate(
  */
 export function useTableAnnouncement(itemType: string) {
   return {
-    announceLoaded: (count: number) => announceTableUpdate('loaded', count, itemType),
-    announceUpdated: (count: number) => announceTableUpdate('updated', count, itemType),
-    announceSorted: (count: number) => announceTableUpdate('sorted', count, itemType),
-    announceFiltered: (count: number) => announceTableUpdate('filtered', count, itemType),
+    announceLoaded: (count: number) =>
+      announceTableUpdate("loaded", count, itemType),
+    announceUpdated: (count: number) =>
+      announceTableUpdate("updated", count, itemType),
+    announceSorted: (count: number) =>
+      announceTableUpdate("sorted", count, itemType),
+    announceFiltered: (count: number) =>
+      announceTableUpdate("filtered", count, itemType),
   };
 }
 
@@ -290,14 +297,11 @@ export function useTableAnnouncement(itemType: string) {
 /**
  * Announce modal state changes
  */
-export function announceModalState(
-  isOpen: boolean,
-  modalTitle: string
-): void {
+export function announceModalState(isOpen: boolean, modalTitle: string): void {
   if (isOpen) {
-    announceToScreenReader(`${modalTitle} dialog opened`, 'polite');
+    announceToScreenReader(`${modalTitle} dialog opened`, "polite");
   } else {
-    announceToScreenReader('Dialog closed', 'polite');
+    announceToScreenReader("Dialog closed", "polite");
   }
 }
 
@@ -311,13 +315,13 @@ export function useModalAnnouncement(title: string) {
     return () => {
       // Announce when modal closes
       if (previousOpenRef.current) {
-        announceToScreenReader('Dialog closed', 'polite');
+        announceToScreenReader("Dialog closed", "polite");
       }
     };
   }, []);
 
   const announceOpen = () => {
-    announceToScreenReader(`${title} dialog opened`, 'polite');
+    announceToScreenReader(`${title} dialog opened`, "polite");
     previousOpenRef.current = true;
   };
 
@@ -332,11 +336,11 @@ export function useModalAnnouncement(title: string) {
  * Announce toast/notification messages
  */
 export function announceNotification(
-  type: 'success' | 'error' | 'warning' | 'info',
-  message: string
+  type: "success" | "error" | "warning" | "info",
+  message: string,
 ): void {
-  const priority: AriaLivePriority = type === 'error' ? 'assertive' : 'polite';
-  const prefix = type === 'error' ? 'Error: ' : '';
+  const priority: AriaLivePriority = type === "error" ? "assertive" : "polite";
+  const prefix = type === "error" ? "Error: " : "";
   announceToScreenReader(`${prefix}${message}`, priority);
 }
 
@@ -348,7 +352,7 @@ export function announceNotification(
  * Announce route changes
  */
 export function announceRouteChange(pageName: string): void {
-  announceToScreenReader(`Navigated to ${pageName}`, 'polite', 3000);
+  announceToScreenReader(`Navigated to ${pageName}`, "polite", 3000);
 }
 
 /**
@@ -372,7 +376,7 @@ export function useRouteAnnouncement() {
 export function announceProgress(
   current: number,
   total: number,
-  label?: string
+  label?: string,
 ): void {
   const percentage = Math.round((current / total) * 100);
   const message = label
@@ -381,7 +385,7 @@ export function announceProgress(
 
   // Only announce at 25% intervals to avoid spam
   if (percentage % 25 === 0 || percentage === 100) {
-    announceToScreenReader(message, 'polite');
+    announceToScreenReader(message, "polite");
   }
 }
 
@@ -392,7 +396,9 @@ export function announceProgress(
 /**
  * Get appropriate heading level based on section depth
  */
-export function getHeadingLevel(depth: number): 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' {
+export function getHeadingLevel(
+  depth: number,
+): "h1" | "h2" | "h3" | "h4" | "h5" | "h6" {
   const level = Math.min(Math.max(depth, 1), 6) as 1 | 2 | 3 | 4 | 5 | 6;
   return `h${level}`;
 }
@@ -401,14 +407,14 @@ export function getHeadingLevel(depth: number): 'h1' | 'h2' | 'h3' | 'h4' | 'h5'
  * Generate landmark role labels
  */
 export const landmarkLabels = {
-  header: 'Site header',
-  nav: 'Main navigation',
-  main: 'Main content',
-  aside: 'Sidebar',
-  footer: 'Site footer',
-  search: 'Search',
-  form: 'Form',
-  region: 'Region',
+  header: "Site header",
+  nav: "Main navigation",
+  main: "Main content",
+  aside: "Sidebar",
+  footer: "Site footer",
+  search: "Search",
+  form: "Form",
+  region: "Region",
 };
 
 // ==========================================
@@ -427,14 +433,14 @@ export function getAvatarAltText(userName: string, hasImage: boolean): string {
  */
 export function getStatusIconAltText(status: string): string {
   const statusMap: Record<string, string> = {
-    success: 'Success icon',
-    error: 'Error icon',
-    warning: 'Warning icon',
-    info: 'Information icon',
-    loading: 'Loading spinner',
-    active: 'Active status',
-    inactive: 'Inactive status',
-    pending: 'Pending status',
+    success: "Success icon",
+    error: "Error icon",
+    warning: "Warning icon",
+    info: "Information icon",
+    loading: "Loading spinner",
+    active: "Active status",
+    inactive: "Inactive status",
+    pending: "Pending status",
   };
 
   return statusMap[status.toLowerCase()] || `${status} icon`;
@@ -446,10 +452,10 @@ export function getStatusIconAltText(status: string): string {
 export function getChartAltText(
   chartType: string,
   dataPoints: number,
-  trend?: 'increasing' | 'decreasing' | 'stable'
+  trend?: "increasing" | "decreasing" | "stable",
 ): string {
-  let alt = `${chartType} chart with ${dataPoints} data point${dataPoints !== 1 ? 's' : ''}`;
-  
+  let alt = `${chartType} chart with ${dataPoints} data point${dataPoints !== 1 ? "s" : ""}`;
+
   if (trend) {
     alt += `, showing ${trend} trend`;
   }
@@ -466,7 +472,7 @@ export function getChartAltText(
  * @example formatNumberForScreenReader(1234567) => '1,234,567'
  */
 export function formatNumberForScreenReader(num: number): string {
-  return new Intl.NumberFormat('en-US').format(num);
+  return new Intl.NumberFormat("en-US").format(num);
 }
 
 /**
@@ -475,10 +481,10 @@ export function formatNumberForScreenReader(num: number): string {
  */
 export function formatCurrencyForScreenReader(
   amount: number,
-  currency: string = 'USD'
+  currency: string = "USD",
 ): string {
-  const formatted = new Intl.NumberFormat('en-US', {
-    style: 'currency',
+  const formatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
     currency,
   }).format(amount);
 
@@ -490,10 +496,10 @@ export function formatCurrencyForScreenReader(
  * @example formatDateForScreenReader(new Date()) => 'October 15, 2025'
  */
 export function formatDateForScreenReader(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  return new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   }).format(date);
 }
 
@@ -502,9 +508,9 @@ export function formatDateForScreenReader(date: Date): string {
  * @example formatTimeForScreenReader(new Date()) => '2:30 PM'
  */
 export function formatTimeForScreenReader(date: Date): string {
-  return new Intl.DateTimeFormat('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
     hour12: true,
   }).format(date);
 }
@@ -516,12 +522,14 @@ export function formatTimeForScreenReader(date: Date): string {
 /**
  * Get appropriate role for interactive elements
  */
-export function getInteractiveRole(element: 'link' | 'button' | 'tab' | 'menuitem'): string {
+export function getInteractiveRole(
+  element: "link" | "button" | "tab" | "menuitem",
+): string {
   const roleMap = {
-    link: 'link',
-    button: 'button',
-    tab: 'tab',
-    menuitem: 'menuitem',
+    link: "link",
+    button: "button",
+    tab: "tab",
+    menuitem: "menuitem",
   };
 
   return roleMap[element];
@@ -533,7 +541,7 @@ export function getInteractiveRole(element: 'link' | 'button' | 'tab' | 'menuite
 export function getIconOnlyButtonLabel(
   icon: string,
   action: string,
-  target?: string
+  target?: string,
 ): string {
   if (target) {
     return `${action} ${target}`;

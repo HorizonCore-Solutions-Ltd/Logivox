@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,7 +71,7 @@ export default function NewSalesOrderPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
-  
+
   const [customerId, setCustomerId] = useState("");
   const [warehouseId, setWarehouseId] = useState("");
   const [requestedDate, setRequestedDate] = useState("");
@@ -169,7 +175,7 @@ export default function NewSalesOrderPage() {
   const calculateSubtotal = () => {
     return items.reduce(
       (sum, item) => sum + item.quantity * item.unitPrice - item.discount,
-      0
+      0,
     );
   };
 
@@ -281,7 +287,9 @@ export default function NewSalesOrderPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">New Sales Order</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              New Sales Order
+            </h1>
             <p className="text-muted-foreground">Create a new customer order</p>
           </div>
         </div>
@@ -474,7 +482,8 @@ export default function NewSalesOrderPage() {
                 </TableHeader>
                 <TableBody>
                   {items.map((item, index) => {
-                    const lineSubtotal = item.quantity * item.unitPrice - item.discount;
+                    const lineSubtotal =
+                      item.quantity * item.unitPrice - item.discount;
                     const lineTax = lineSubtotal * (item.taxRate / 100);
                     const lineTotal = lineSubtotal + lineTax;
 
@@ -493,7 +502,8 @@ export default function NewSalesOrderPage() {
                             <SelectContent>
                               {inventoryItems.map((invItem) => (
                                 <SelectItem key={invItem.id} value={invItem.id}>
-                                  {invItem.name} ({invItem.sku}) - Stock: {invItem.availableQty}
+                                  {invItem.name} ({invItem.sku}) - Stock:{" "}
+                                  {invItem.availableQty}
                                 </SelectItem>
                               ))}
                             </SelectContent>
@@ -504,7 +514,11 @@ export default function NewSalesOrderPage() {
                             type="number"
                             value={item.quantity}
                             onChange={(e) =>
-                              updateItem(index, "quantity", parseInt(e.target.value) || 0)
+                              updateItem(
+                                index,
+                                "quantity",
+                                parseInt(e.target.value) || 0,
+                              )
                             }
                             className="w-20"
                             min={1}
@@ -515,7 +529,11 @@ export default function NewSalesOrderPage() {
                             type="number"
                             value={item.unitPrice}
                             onChange={(e) =>
-                              updateItem(index, "unitPrice", parseFloat(e.target.value) || 0)
+                              updateItem(
+                                index,
+                                "unitPrice",
+                                parseFloat(e.target.value) || 0,
+                              )
                             }
                             className="w-24"
                             step="0.01"
@@ -527,7 +545,11 @@ export default function NewSalesOrderPage() {
                             type="number"
                             value={item.discount}
                             onChange={(e) =>
-                              updateItem(index, "discount", parseFloat(e.target.value) || 0)
+                              updateItem(
+                                index,
+                                "discount",
+                                parseFloat(e.target.value) || 0,
+                              )
                             }
                             className="w-24"
                             step="0.01"
@@ -539,7 +561,11 @@ export default function NewSalesOrderPage() {
                             type="number"
                             value={item.taxRate}
                             onChange={(e) =>
-                              updateItem(index, "taxRate", parseFloat(e.target.value) || 0)
+                              updateItem(
+                                index,
+                                "taxRate",
+                                parseFloat(e.target.value) || 0,
+                              )
                             }
                             className="w-20"
                             step="0.01"
@@ -566,11 +592,15 @@ export default function NewSalesOrderPage() {
                 <div className="w-80 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal:</span>
-                    <span className="font-medium">${calculateSubtotal().toFixed(2)}</span>
+                    <span className="font-medium">
+                      ${calculateSubtotal().toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Tax:</span>
-                    <span className="font-medium">${calculateTax().toFixed(2)}</span>
+                    <span className="font-medium">
+                      ${calculateTax().toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-lg font-bold border-t pt-2">
                     <span>Total:</span>
@@ -628,7 +658,10 @@ export default function NewSalesOrderPage() {
         >
           Save as Draft
         </Button>
-        <Button onClick={() => handleSubmit("PENDING_APPROVAL")} disabled={loading}>
+        <Button
+          onClick={() => handleSubmit("PENDING_APPROVAL")}
+          disabled={loading}
+        >
           {loading ? "Creating..." : "Submit for Approval"}
         </Button>
       </div>

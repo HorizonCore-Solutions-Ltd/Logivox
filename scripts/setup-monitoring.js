@@ -2,36 +2,36 @@
 
 /**
  * FlowStock WMS - Monitoring Dashboard Setup
- * 
+ *
  * Sets up monitoring dashboards and alerts for production deployment.
- * 
+ *
  * Usage:
  *   node scripts/setup-monitoring.js --platform grafana
  *   node scripts/setup-monitoring.js --platform datadog
  */
 
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 /**
  * Main setup function
  */
 async function setupMonitoring(platform) {
-  console.log('\n📊 FlowStock WMS Monitoring Dashboard Setup\n');
+  console.log("\n📊 FlowStock WMS Monitoring Dashboard Setup\n");
   console.log(`Setting up for platform: ${platform}\n`);
 
   try {
     switch (platform) {
-      case 'grafana':
+      case "grafana":
         await setupGrafana();
         break;
-      case 'datadog':
+      case "datadog":
         await setupDatadog();
         break;
-      case 'cloudwatch':
+      case "cloudwatch":
         await setupCloudWatch();
         break;
-      case 'prometheus':
+      case "prometheus":
         await setupPrometheus();
         break;
       default:
@@ -39,14 +39,13 @@ async function setupMonitoring(platform) {
         process.exit(1);
     }
 
-    console.log('\n✅ Monitoring setup complete!');
-    console.log('\nNext steps:');
-    console.log('1. Review generated configuration files');
-    console.log('2. Apply configurations to your monitoring platform');
-    console.log('3. Configure alert webhooks and notification channels');
-    console.log('4. Test alerts by triggering threshold violations');
-    console.log('5. Document dashboard access for team members\n');
-
+    console.log("\n✅ Monitoring setup complete!");
+    console.log("\nNext steps:");
+    console.log("1. Review generated configuration files");
+    console.log("2. Apply configurations to your monitoring platform");
+    console.log("3. Configure alert webhooks and notification channels");
+    console.log("4. Test alerts by triggering threshold violations");
+    console.log("5. Document dashboard access for team members\n");
   } catch (error) {
     console.error(`\n❌ Setup failed: ${error.message}`);
     process.exit(1);
@@ -57,17 +56,17 @@ async function setupMonitoring(platform) {
  * Setup Grafana dashboards
  */
 async function setupGrafana() {
-  console.log('📈 Setting up Grafana dashboards...\n');
+  console.log("📈 Setting up Grafana dashboards...\n");
 
   const dashboards = {
-    'system-overview': createSystemOverviewDashboard(),
-    'api-performance': createAPIPerformanceDashboard(),
-    'database-metrics': createDatabaseMetricsDashboard(),
-    'business-metrics': createBusinessMetricsDashboard(),
-    'alerts': createAlertsDashboard(),
+    "system-overview": createSystemOverviewDashboard(),
+    "api-performance": createAPIPerformanceDashboard(),
+    "database-metrics": createDatabaseMetricsDashboard(),
+    "business-metrics": createBusinessMetricsDashboard(),
+    alerts: createAlertsDashboard(),
   };
 
-  const outputDir = path.join(process.cwd(), 'monitoring', 'grafana');
+  const outputDir = path.join(process.cwd(), "monitoring", "grafana");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
@@ -81,13 +80,13 @@ async function setupGrafana() {
 
   // Create Prometheus scrape config
   const prometheusConfig = createPrometheusConfig();
-  const prometheusConfigPath = path.join(outputDir, 'prometheus.yml');
+  const prometheusConfigPath = path.join(outputDir, "prometheus.yml");
   fs.writeFileSync(prometheusConfigPath, prometheusConfig);
   console.log(`✅ Created: prometheus.yml`);
 
   // Create alerts config
   const alertsConfig = createGrafanaAlertsConfig();
-  const alertsConfigPath = path.join(outputDir, 'alerts.yml');
+  const alertsConfigPath = path.join(outputDir, "alerts.yml");
   fs.writeFileSync(alertsConfigPath, alertsConfig);
   console.log(`✅ Created: alerts.yml`);
 
@@ -100,69 +99,61 @@ async function setupGrafana() {
 function createSystemOverviewDashboard() {
   return {
     dashboard: {
-      title: 'FlowStock WMS - System Overview',
-      tags: ['flowstock', 'system', 'overview'],
-      timezone: 'browser',
+      title: "FlowStock WMS - System Overview",
+      tags: ["flowstock", "system", "overview"],
+      timezone: "browser",
       panels: [
         {
           id: 1,
-          title: 'CPU Usage',
-          type: 'graph',
+          title: "CPU Usage",
+          type: "graph",
           targets: [
             {
               expr: '100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)',
-              legendFormat: 'CPU Usage %',
+              legendFormat: "CPU Usage %",
             },
           ],
-          yaxes: [
-            { format: 'percent', max: 100, min: 0 },
-          ],
+          yaxes: [{ format: "percent", max: 100, min: 0 }],
         },
         {
           id: 2,
-          title: 'Memory Usage',
-          type: 'graph',
+          title: "Memory Usage",
+          type: "graph",
           targets: [
             {
-              expr: '(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100',
-              legendFormat: 'Memory Usage %',
+              expr: "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+              legendFormat: "Memory Usage %",
             },
           ],
-          yaxes: [
-            { format: 'percent', max: 100, min: 0 },
-          ],
+          yaxes: [{ format: "percent", max: 100, min: 0 }],
         },
         {
           id: 3,
-          title: 'Disk Usage',
-          type: 'graph',
+          title: "Disk Usage",
+          type: "graph",
           targets: [
             {
-              expr: '(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100',
-              legendFormat: 'Disk Usage %',
+              expr: "(1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)) * 100",
+              legendFormat: "Disk Usage %",
             },
           ],
-          yaxes: [
-            { format: 'percent', max: 100, min: 0 },
-          ],
+          yaxes: [{ format: "percent", max: 100, min: 0 }],
         },
         {
           id: 4,
-          title: 'Network Traffic',
-          type: 'graph',
+          title: "Network Traffic",
+          type: "graph",
           targets: [
             {
-              expr: 'rate(node_network_receive_bytes_total[5m])',
-              legendFormat: 'Inbound',
+              expr: "rate(node_network_receive_bytes_total[5m])",
+              legendFormat: "Inbound",
             },
             {
-              expr: 'rate(node_network_transmit_bytes_total[5m])',
-              legendFormat: 'Outbound',
+              expr: "rate(node_network_transmit_bytes_total[5m])",
+              legendFormat: "Outbound",
             },
           ],
-          yaxes: [
-            { format: 'bytes', min: 0 },
-          ],
+          yaxes: [{ format: "bytes", min: 0 }],
         },
       ],
     },
@@ -175,57 +166,53 @@ function createSystemOverviewDashboard() {
 function createAPIPerformanceDashboard() {
   return {
     dashboard: {
-      title: 'FlowStock WMS - API Performance',
-      tags: ['flowstock', 'api', 'performance'],
-      timezone: 'browser',
+      title: "FlowStock WMS - API Performance",
+      tags: ["flowstock", "api", "performance"],
+      timezone: "browser",
       panels: [
         {
           id: 1,
-          title: 'Request Rate',
-          type: 'graph',
+          title: "Request Rate",
+          type: "graph",
           targets: [
             {
-              expr: 'rate(http_requests_total[5m])',
-              legendFormat: '{{method}} {{endpoint}}',
+              expr: "rate(http_requests_total[5m])",
+              legendFormat: "{{method}} {{endpoint}}",
             },
           ],
         },
         {
           id: 2,
-          title: 'Response Time (P95)',
-          type: 'graph',
+          title: "Response Time (P95)",
+          type: "graph",
           targets: [
             {
-              expr: 'histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))',
-              legendFormat: '{{endpoint}}',
+              expr: "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+              legendFormat: "{{endpoint}}",
             },
           ],
-          yaxes: [
-            { format: 'ms', min: 0 },
-          ],
+          yaxes: [{ format: "ms", min: 0 }],
         },
         {
           id: 3,
-          title: 'Error Rate',
-          type: 'graph',
+          title: "Error Rate",
+          type: "graph",
           targets: [
             {
               expr: 'rate(http_requests_total{status=~"5.."}[5m]) / rate(http_requests_total[5m]) * 100',
-              legendFormat: 'Error Rate %',
+              legendFormat: "Error Rate %",
             },
           ],
-          yaxes: [
-            { format: 'percent', max: 100, min: 0 },
-          ],
+          yaxes: [{ format: "percent", max: 100, min: 0 }],
         },
         {
           id: 4,
-          title: 'Status Code Distribution',
-          type: 'piechart',
+          title: "Status Code Distribution",
+          type: "piechart",
           targets: [
             {
-              expr: 'sum by (status) (rate(http_requests_total[5m]))',
-              legendFormat: '{{status}}',
+              expr: "sum by (status) (rate(http_requests_total[5m]))",
+              legendFormat: "{{status}}",
             },
           ],
         },
@@ -240,73 +227,67 @@ function createAPIPerformanceDashboard() {
 function createDatabaseMetricsDashboard() {
   return {
     dashboard: {
-      title: 'FlowStock WMS - Database Metrics',
-      tags: ['flowstock', 'database', 'postgres'],
-      timezone: 'browser',
+      title: "FlowStock WMS - Database Metrics",
+      tags: ["flowstock", "database", "postgres"],
+      timezone: "browser",
       panels: [
         {
           id: 1,
-          title: 'Active Connections',
-          type: 'graph',
+          title: "Active Connections",
+          type: "graph",
           targets: [
             {
-              expr: 'pg_stat_database_numbackends',
-              legendFormat: 'Connections',
+              expr: "pg_stat_database_numbackends",
+              legendFormat: "Connections",
             },
           ],
         },
         {
           id: 2,
-          title: 'Query Duration (P95)',
-          type: 'graph',
+          title: "Query Duration (P95)",
+          type: "graph",
           targets: [
             {
-              expr: 'histogram_quantile(0.95, rate(pg_stat_statements_total_time_bucket[5m]))',
-              legendFormat: '{{query}}',
+              expr: "histogram_quantile(0.95, rate(pg_stat_statements_total_time_bucket[5m]))",
+              legendFormat: "{{query}}",
             },
           ],
-          yaxes: [
-            { format: 'ms', min: 0 },
-          ],
+          yaxes: [{ format: "ms", min: 0 }],
         },
         {
           id: 3,
-          title: 'Transactions Per Second',
-          type: 'graph',
+          title: "Transactions Per Second",
+          type: "graph",
           targets: [
             {
-              expr: 'rate(pg_stat_database_xact_commit[5m]) + rate(pg_stat_database_xact_rollback[5m])',
-              legendFormat: 'TPS',
+              expr: "rate(pg_stat_database_xact_commit[5m]) + rate(pg_stat_database_xact_rollback[5m])",
+              legendFormat: "TPS",
             },
           ],
         },
         {
           id: 4,
-          title: 'Cache Hit Ratio',
-          type: 'graph',
+          title: "Cache Hit Ratio",
+          type: "graph",
           targets: [
             {
-              expr: 'pg_stat_database_blks_hit / (pg_stat_database_blks_hit + pg_stat_database_blks_read) * 100',
-              legendFormat: 'Cache Hit %',
+              expr: "pg_stat_database_blks_hit / (pg_stat_database_blks_hit + pg_stat_database_blks_read) * 100",
+              legendFormat: "Cache Hit %",
             },
           ],
-          yaxes: [
-            { format: 'percent', max: 100, min: 0 },
-          ],
+          yaxes: [{ format: "percent", max: 100, min: 0 }],
         },
         {
           id: 5,
-          title: 'Database Size',
-          type: 'graph',
+          title: "Database Size",
+          type: "graph",
           targets: [
             {
-              expr: 'pg_database_size_bytes',
-              legendFormat: 'Size',
+              expr: "pg_database_size_bytes",
+              legendFormat: "Size",
             },
           ],
-          yaxes: [
-            { format: 'bytes', min: 0 },
-          ],
+          yaxes: [{ format: "bytes", min: 0 }],
         },
       ],
     },
@@ -319,78 +300,78 @@ function createDatabaseMetricsDashboard() {
 function createBusinessMetricsDashboard() {
   return {
     dashboard: {
-      title: 'FlowStock WMS - Business Metrics',
-      tags: ['flowstock', 'business', 'kpi'],
-      timezone: 'browser',
+      title: "FlowStock WMS - Business Metrics",
+      tags: ["flowstock", "business", "kpi"],
+      timezone: "browser",
       panels: [
         {
           id: 1,
-          title: 'Active Users',
-          type: 'stat',
+          title: "Active Users",
+          type: "stat",
           targets: [
             {
-              expr: 'count(count by (user_id) (rate(user_activity[5m])))',
-              legendFormat: 'Active Users',
+              expr: "count(count by (user_id) (rate(user_activity[5m])))",
+              legendFormat: "Active Users",
             },
           ],
         },
         {
           id: 2,
-          title: 'Orders Created (Today)',
-          type: 'stat',
+          title: "Orders Created (Today)",
+          type: "stat",
           targets: [
             {
-              expr: 'sum(increase(orders_created_total[1d]))',
-              legendFormat: 'Orders',
+              expr: "sum(increase(orders_created_total[1d]))",
+              legendFormat: "Orders",
             },
           ],
         },
         {
           id: 3,
-          title: 'Inventory Transactions',
-          type: 'graph',
+          title: "Inventory Transactions",
+          type: "graph",
           targets: [
             {
-              expr: 'rate(inventory_transactions_total[5m])',
-              legendFormat: '{{type}}',
+              expr: "rate(inventory_transactions_total[5m])",
+              legendFormat: "{{type}}",
             },
           ],
         },
         {
           id: 4,
-          title: 'Order Status Distribution',
-          type: 'piechart',
+          title: "Order Status Distribution",
+          type: "piechart",
           targets: [
             {
-              expr: 'sum by (status) (orders_by_status)',
-              legendFormat: '{{status}}',
+              expr: "sum by (status) (orders_by_status)",
+              legendFormat: "{{status}}",
             },
           ],
         },
         {
           id: 5,
-          title: 'Low Stock Alerts',
-          type: 'stat',
+          title: "Low Stock Alerts",
+          type: "stat",
           targets: [
             {
-              expr: 'count(inventory_levels{quantity<reorder_point})',
-              legendFormat: 'Low Stock Items',
+              expr: "count(inventory_levels{quantity<reorder_point})",
+              legendFormat: "Low Stock Items",
             },
           ],
         },
         {
           id: 6,
-          title: 'Revenue (Today)',
-          type: 'stat',
+          title: "Revenue (Today)",
+          type: "stat",
           targets: [
             {
-              expr: 'sum(increase(order_value_total[1d]))',
-              legendFormat: 'Revenue',
+              expr: "sum(increase(order_value_total[1d]))",
+              legendFormat: "Revenue",
             },
           ],
           fieldConfig: {
             defaults: {
-              unit: 'currencyUSD',
+              unit: "currencyUSD",
             },
           },
         },
@@ -405,14 +386,14 @@ function createBusinessMetricsDashboard() {
 function createAlertsDashboard() {
   return {
     dashboard: {
-      title: 'FlowStock WMS - Alerts',
-      tags: ['flowstock', 'alerts'],
-      timezone: 'browser',
+      title: "FlowStock WMS - Alerts",
+      tags: ["flowstock", "alerts"],
+      timezone: "browser",
       panels: [
         {
           id: 1,
-          title: 'Active Alerts',
-          type: 'table',
+          title: "Active Alerts",
+          type: "table",
           targets: [
             {
               expr: 'ALERTS{alertstate="firing"}',
@@ -421,12 +402,12 @@ function createAlertsDashboard() {
         },
         {
           id: 2,
-          title: 'Alert History',
-          type: 'graph',
+          title: "Alert History",
+          type: "graph",
           targets: [
             {
-              expr: 'sum by (alertname) (rate(alerts_total[5m]))',
-              legendFormat: '{{alertname}}',
+              expr: "sum by (alertname) (rate(alerts_total[5m]))",
+              legendFormat: "{{alertname}}",
             },
           ],
         },
@@ -610,46 +591,46 @@ groups:
  * Setup DataDog
  */
 async function setupDatadog() {
-  console.log('📈 Setting up DataDog dashboards...\n');
-  console.log('Please follow these steps:');
-  console.log('1. Install DataDog agent on your server');
-  console.log('2. Configure APM tracing in your application');
-  console.log('3. Import pre-built dashboards from DataDog marketplace');
-  console.log('4. Configure alert monitors');
-  console.log('\nSee DataDog documentation for details.');
+  console.log("📈 Setting up DataDog dashboards...\n");
+  console.log("Please follow these steps:");
+  console.log("1. Install DataDog agent on your server");
+  console.log("2. Configure APM tracing in your application");
+  console.log("3. Import pre-built dashboards from DataDog marketplace");
+  console.log("4. Configure alert monitors");
+  console.log("\nSee DataDog documentation for details.");
 }
 
 /**
  * Setup CloudWatch
  */
 async function setupCloudWatch() {
-  console.log('📈 Setting up CloudWatch dashboards...\n');
-  console.log('Please follow these steps:');
-  console.log('1. Enable CloudWatch agent on EC2 instances');
-  console.log('2. Configure custom metrics from your application');
-  console.log('3. Create dashboards in CloudWatch console');
-  console.log('4. Set up CloudWatch alarms');
-  console.log('\nSee AWS CloudWatch documentation for details.');
+  console.log("📈 Setting up CloudWatch dashboards...\n");
+  console.log("Please follow these steps:");
+  console.log("1. Enable CloudWatch agent on EC2 instances");
+  console.log("2. Configure custom metrics from your application");
+  console.log("3. Create dashboards in CloudWatch console");
+  console.log("4. Set up CloudWatch alarms");
+  console.log("\nSee AWS CloudWatch documentation for details.");
 }
 
 /**
  * Setup Prometheus
  */
 async function setupPrometheus() {
-  console.log('📈 Setting up Prometheus...\n');
-  
-  const outputDir = path.join(process.cwd(), 'monitoring', 'prometheus');
+  console.log("📈 Setting up Prometheus...\n");
+
+  const outputDir = path.join(process.cwd(), "monitoring", "prometheus");
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
   const prometheusConfig = createPrometheusConfig();
-  const prometheusConfigPath = path.join(outputDir, 'prometheus.yml');
+  const prometheusConfigPath = path.join(outputDir, "prometheus.yml");
   fs.writeFileSync(prometheusConfigPath, prometheusConfig);
   console.log(`✅ Created: prometheus.yml`);
 
   const alertsConfig = createGrafanaAlertsConfig();
-  const alertsConfigPath = path.join(outputDir, 'alerts.yml');
+  const alertsConfigPath = path.join(outputDir, "alerts.yml");
   fs.writeFileSync(alertsConfigPath, alertsConfig);
   console.log(`✅ Created: alerts.yml`);
 
@@ -661,13 +642,13 @@ async function setupPrometheus() {
  */
 function parseArgs() {
   const args = process.argv.slice(2);
-  let platform = 'grafana';
+  let platform = "grafana";
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--platform' && args[i + 1]) {
+    if (args[i] === "--platform" && args[i + 1]) {
       platform = args[i + 1];
       i++;
-    } else if (args[i] === '--help' || args[i] === '-h') {
+    } else if (args[i] === "--help" || args[i] === "-h") {
       displayHelp();
       process.exit(0);
     }

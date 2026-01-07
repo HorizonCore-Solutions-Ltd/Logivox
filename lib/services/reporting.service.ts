@@ -1,6 +1,6 @@
 /**
  * Reporting Service
- * 
+ *
  * Comprehensive reporting and analytics:
  * - Inventory reports (valuation, aging, turnover)
  * - Order fulfillment reports
@@ -10,11 +10,10 @@
  * - Export capabilities
  */
 
-import { prisma } from '@/lib/prisma';
-import { SalesOrderStatus } from '@prisma/client';
+import { prisma } from "@/lib/prisma";
+import { SalesOrderStatus } from "@prisma/client";
 
 export class ReportingService {
-  
   /**
    * Generate inventory valuation report
    */
@@ -39,11 +38,11 @@ export class ReportingService {
     let totalValue = 0;
     let totalQuantity = 0;
 
-    const itemDetails = items.map(item => {
+    const itemDetails = items.map((item) => {
       const quantity = item.quantity;
       const unitCost = Number(item.costPrice || 0);
       const value = quantity * unitCost;
-      
+
       totalValue += value;
       totalQuantity += quantity;
 
@@ -64,7 +63,9 @@ export class ReportingService {
       totalItems: items.length,
       totalQuantity,
       totalValue: totalValue.toFixed(2),
-      items: itemDetails.sort((a, b) => parseFloat(b.totalValue) - parseFloat(a.totalValue)),
+      items: itemDetails.sort(
+        (a, b) => parseFloat(b.totalValue) - parseFloat(a.totalValue),
+      ),
     };
   }
 
@@ -97,7 +98,8 @@ export class ReportingService {
     };
 
     for (const item of items) {
-      const ageInDays = (now.getTime() - item.createdAt.getTime()) / (1000 * 60 * 60 * 24);
+      const ageInDays =
+        (now.getTime() - item.createdAt.getTime()) / (1000 * 60 * 60 * 24);
       const value = item.quantity * Number(item.costPrice || 0);
 
       if (ageInDays <= 30) {
@@ -176,7 +178,7 @@ export class ReportingService {
 
     for (const movement of movements) {
       const itemId = movement.inventoryItemId;
-      
+
       if (!itemTurnover[itemId]) {
         itemTurnover[itemId] = {
           sku: movement.inventoryItem.sku,
@@ -186,16 +188,15 @@ export class ReportingService {
         };
       }
 
-      if (movement.type === 'SALE') {
+      if (movement.type === "SALE") {
         itemTurnover[itemId].totalSold += Math.abs(movement.quantity);
       }
     }
 
     // Calculate turnover ratio
     const turnoverData = Object.values(itemTurnover).map((item: any) => {
-      const turnoverRatio = item.averageInventory > 0 
-        ? item.totalSold / item.averageInventory 
-        : 0;
+      const turnoverRatio =
+        item.averageInventory > 0 ? item.totalSold / item.averageInventory : 0;
 
       return {
         ...item,
@@ -206,7 +207,9 @@ export class ReportingService {
     return {
       organizationId: params.organizationId,
       period: { startDate: params.startDate, endDate: params.endDate },
-      items: turnoverData.sort((a, b) => parseFloat(b.turnoverRatio) - parseFloat(a.turnoverRatio)),
+      items: turnoverData.sort(
+        (a, b) => parseFloat(b.turnoverRatio) - parseFloat(a.turnoverRatio),
+      ),
     };
   }
 
@@ -260,19 +263,26 @@ export class ReportingService {
       stats.totalItems += order.items.length;
 
       // Check on-time delivery
-      if (order.status === SalesOrderStatus.DELIVERED && order.requestedDate && order.shippedDate) {
+      if (
+        order.status === SalesOrderStatus.DELIVERED &&
+        order.requestedDate &&
+        order.shippedDate
+      ) {
         if (order.shippedDate <= order.requestedDate) {
           stats.onTimeDelivery++;
         }
       }
     }
 
-    stats.averageOrderValue = stats.totalOrders > 0 ? stats.totalRevenue / stats.totalOrders : 0;
-    stats.averageItemsPerOrder = stats.totalOrders > 0 ? stats.totalItems / stats.totalOrders : 0;
+    stats.averageOrderValue =
+      stats.totalOrders > 0 ? stats.totalRevenue / stats.totalOrders : 0;
+    stats.averageItemsPerOrder =
+      stats.totalOrders > 0 ? stats.totalItems / stats.totalOrders : 0;
 
-    const onTimeRate = stats.totalOrders > 0 
-      ? (stats.onTimeDelivery / stats.totalOrders) * 100 
-      : 0;
+    const onTimeRate =
+      stats.totalOrders > 0
+        ? (stats.onTimeDelivery / stats.totalOrders) * 100
+        : 0;
 
     return {
       organizationId: params.organizationId,
@@ -283,7 +293,7 @@ export class ReportingService {
       averageOrderValue: stats.averageOrderValue.toFixed(2),
       totalItems: stats.totalItems,
       averageItemsPerOrder: stats.averageItemsPerOrder.toFixed(2),
-      onTimeDeliveryRate: onTimeRate.toFixed(2) + '%',
+      onTimeDeliveryRate: onTimeRate.toFixed(2) + "%",
     };
   }
 
@@ -336,15 +346,15 @@ export class ReportingService {
 
       // Calculate processing time
       if (grn.receivedDate && grn.createdAt) {
-        const processingTime = (grn.receivedDate.getTime() - grn.createdAt.getTime()) / (1000 * 60);
+        const processingTime =
+          (grn.receivedDate.getTime() - grn.createdAt.getTime()) / (1000 * 60);
         totalProcessingMinutes += processingTime;
         processedCount++;
       }
     }
 
-    stats.averageProcessingTime = processedCount > 0 
-      ? totalProcessingMinutes / processedCount 
-      : 0;
+    stats.averageProcessingTime =
+      processedCount > 0 ? totalProcessingMinutes / processedCount : 0;
 
     return {
       organizationId: params.organizationId,
@@ -399,7 +409,8 @@ export class ReportingService {
     let accurateItems = 0;
 
     for (const pickList of pickLists) {
-      stats.byStatus[pickList.status] = (stats.byStatus[pickList.status] || 0) + 1;
+      stats.byStatus[pickList.status] =
+        (stats.byStatus[pickList.status] || 0) + 1;
 
       for (const item of pickList.items) {
         stats.totalItems++;
@@ -414,19 +425,19 @@ export class ReportingService {
 
       // Calculate pick time
       if (pickList.completedDate && pickList.assignedDate) {
-        const pickTime = (pickList.completedDate.getTime() - pickList.assignedDate.getTime()) / (1000 * 60);
+        const pickTime =
+          (pickList.completedDate.getTime() - pickList.assignedDate.getTime()) /
+          (1000 * 60);
         totalPickMinutes += pickTime;
         completedCount++;
       }
     }
 
-    stats.accuracyRate = stats.totalItems > 0 
-      ? (accurateItems / stats.totalItems) * 100 
-      : 100;
+    stats.accuracyRate =
+      stats.totalItems > 0 ? (accurateItems / stats.totalItems) * 100 : 100;
 
-    stats.averagePickTime = completedCount > 0 
-      ? totalPickMinutes / completedCount 
-      : 0;
+    stats.averagePickTime =
+      completedCount > 0 ? totalPickMinutes / completedCount : 0;
 
     return {
       organizationId: params.organizationId,
@@ -434,7 +445,7 @@ export class ReportingService {
       totalPickLists: stats.totalPickLists,
       totalItems: stats.totalItems,
       totalQuantityPicked: stats.totalQuantityPicked,
-      accuracyRate: stats.accuracyRate.toFixed(2) + '%',
+      accuracyRate: stats.accuracyRate.toFixed(2) + "%",
       averagePickMinutes: stats.averagePickTime.toFixed(0),
       pickListsByStatus: stats.byStatus,
     };
@@ -443,15 +454,13 @@ export class ReportingService {
   /**
    * Generate warehouse utilization report
    */
-  static async getWarehouseUtilization(params: {
-    warehouseId: string;
-  }) {
+  static async getWarehouseUtilization(params: { warehouseId: string }) {
     const warehouse = await prisma.warehouse.findUnique({
       where: { id: params.warehouseId },
     });
 
     if (!warehouse) {
-      throw new Error('Warehouse not found');
+      throw new Error("Warehouse not found");
     }
 
     // Get inventory
@@ -460,13 +469,21 @@ export class ReportingService {
     });
 
     const totalItems = inventoryItems.length;
-    const totalQuantity = inventoryItems.reduce((sum, item) => sum + item.quantity, 0);
-    const reservedQty = inventoryItems.reduce((sum, item) => sum + item.reservedQty, 0);
-    const availableQty = inventoryItems.reduce((sum, item) => sum + item.availableQty, 0);
+    const totalQuantity = inventoryItems.reduce(
+      (sum, item) => sum + item.quantity,
+      0,
+    );
+    const reservedQty = inventoryItems.reduce(
+      (sum, item) => sum + item.reservedQty,
+      0,
+    );
+    const availableQty = inventoryItems.reduce(
+      (sum, item) => sum + item.availableQty,
+      0,
+    );
 
-    const utilizationRate = totalQuantity > 0 
-      ? (reservedQty / totalQuantity) * 100 
-      : 0;
+    const utilizationRate =
+      totalQuantity > 0 ? (reservedQty / totalQuantity) * 100 : 0;
 
     return {
       warehouseId: params.warehouseId,
@@ -475,7 +492,7 @@ export class ReportingService {
       totalQuantity,
       reservedQuantity: reservedQty,
       availableQuantity: availableQty,
-      utilizationRate: utilizationRate.toFixed(2) + '%',
+      utilizationRate: utilizationRate.toFixed(2) + "%",
     };
   }
 
@@ -532,7 +549,7 @@ export class ReportingService {
     // Get sales data
     const movements = await prisma.inventoryMovement.findMany({
       where: {
-        type: 'SALE',
+        type: "SALE",
         createdAt: {
           gte: params.startDate,
           lte: params.endDate,
@@ -566,10 +583,15 @@ export class ReportingService {
     }
 
     // Sort by revenue
-    const sorted = Object.values(itemRevenue).sort((a: any, b: any) => b.revenue - a.revenue);
+    const sorted = Object.values(itemRevenue).sort(
+      (a: any, b: any) => b.revenue - a.revenue,
+    );
 
     // Calculate total revenue
-    const totalRevenue = sorted.reduce((sum: number, item: any) => sum + item.revenue, 0);
+    const totalRevenue = sorted.reduce(
+      (sum: number, item: any) => sum + item.revenue,
+      0,
+    );
 
     // Classify items (A: 80%, B: 15%, C: 5%)
     let cumulativeRevenue = 0;
@@ -577,11 +599,11 @@ export class ReportingService {
       cumulativeRevenue += item.revenue;
       const percentage = (cumulativeRevenue / totalRevenue) * 100;
 
-      let classification = 'C';
+      let classification = "C";
       if (percentage <= 80) {
-        classification = 'A';
+        classification = "A";
       } else if (percentage <= 95) {
-        classification = 'B';
+        classification = "B";
       }
 
       return {
@@ -593,9 +615,9 @@ export class ReportingService {
     });
 
     const categoryCount = {
-      A: classified.filter(i => i.classification === 'A').length,
-      B: classified.filter(i => i.classification === 'B').length,
-      C: classified.filter(i => i.classification === 'C').length,
+      A: classified.filter((i) => i.classification === "A").length,
+      B: classified.filter((i) => i.classification === "B").length,
+      C: classified.filter((i) => i.classification === "C").length,
     };
 
     return {
@@ -708,8 +730,14 @@ export class ReportingService {
       },
     });
 
-    const totalSales = salesOrders.reduce((sum, order) => sum + Number(order.total || 0), 0);
-    const totalPurchases = purchaseOrders.reduce((sum, order) => sum + Number(order.totalAmount || 0), 0);
+    const totalSales = salesOrders.reduce(
+      (sum, order) => sum + Number(order.total || 0),
+      0,
+    );
+    const totalPurchases = purchaseOrders.reduce(
+      (sum, order) => sum + Number(order.totalAmount || 0),
+      0,
+    );
     const grossProfit = totalSales - totalPurchases;
     const profitMargin = totalSales > 0 ? (grossProfit / totalSales) * 100 : 0;
 
@@ -719,7 +747,7 @@ export class ReportingService {
       totalSales: totalSales.toFixed(2),
       totalPurchases: totalPurchases.toFixed(2),
       grossProfit: grossProfit.toFixed(2),
-      profitMargin: profitMargin.toFixed(2) + '%',
+      profitMargin: profitMargin.toFixed(2) + "%",
       salesOrderCount: salesOrders.length,
       purchaseOrderCount: purchaseOrders.length,
     };

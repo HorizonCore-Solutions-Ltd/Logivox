@@ -1,13 +1,29 @@
-import { Metadata } from "next"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, ArrowRight, Code, Puzzle, Zap, Database, Globe, Shield } from "lucide-react"
-import Link from "next/link"
+import { Metadata } from "next";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CheckCircle2,
+  ArrowRight,
+  Code,
+  Puzzle,
+  Zap,
+  Database,
+  Globe,
+  Shield,
+} from "lucide-react";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Custom Development Services | LogiVox WMS",
-  description: "Tailored WMS solutions for unique requirements. Custom integrations, workflows, and features built by our expert development team.",
-}
+  description:
+    "Tailored WMS solutions for unique requirements. Custom integrations, workflows, and features built by our expert development team.",
+};
 
 export default function CustomDevelopmentPage() {
   return (
@@ -23,7 +39,9 @@ export default function CustomDevelopmentPage() {
               Custom Development Services
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Extend LogiVox to meet your unique requirements. Our development team builds custom features, integrations, and workflows tailored to your business.
+              Extend LogiVox to meet your unique requirements. Our development
+              team builds custom features, integrations, and workflows tailored
+              to your business.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>
@@ -145,7 +163,9 @@ export default function CustomDevelopmentPage() {
                     {service.examples.map((example, idx) => (
                       <li key={idx} className="flex items-start space-x-2">
                         <CheckCircle2 className="h-4 w-4 text-primary-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">{example}</span>
+                        <span className="text-sm text-muted-foreground">
+                          {example}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -171,25 +191,29 @@ export default function CustomDevelopmentPage() {
               {
                 step: "1",
                 title: "Discovery",
-                description: "Requirements gathering, technical feasibility assessment, and scope definition",
+                description:
+                  "Requirements gathering, technical feasibility assessment, and scope definition",
                 deliverable: "Technical specification document",
               },
               {
                 step: "2",
                 title: "Design",
-                description: "Architecture design, UI/UX mockups, and integration planning",
+                description:
+                  "Architecture design, UI/UX mockups, and integration planning",
                 deliverable: "Design documents & prototypes",
               },
               {
                 step: "3",
                 title: "Development",
-                description: "Agile development with 2-week sprints and regular demos",
+                description:
+                  "Agile development with 2-week sprints and regular demos",
                 deliverable: "Working software increments",
               },
               {
                 step: "4",
                 title: "Deployment",
-                description: "Testing, staging deployment, training, and production go-live",
+                description:
+                  "Testing, staging deployment, training, and production go-live",
                 deliverable: "Live custom solution",
               },
             ].map((phase) => (
@@ -201,10 +225,14 @@ export default function CustomDevelopmentPage() {
                     </div>
                     {phase.title}
                   </CardTitle>
-                  <CardDescription className="text-sm">{phase.description}</CardDescription>
+                  <CardDescription className="text-sm">
+                    {phase.description}
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm font-medium text-primary-600">Deliverable: {phase.deliverable}</p>
+                  <p className="text-sm font-medium text-primary-600">
+                    Deliverable: {phase.deliverable}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -216,7 +244,9 @@ export default function CustomDevelopmentPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Flexible Engagement Models</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Flexible Engagement Models
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Choose the pricing structure that fits your project
             </p>
@@ -265,7 +295,14 @@ export default function CustomDevelopmentPage() {
                 ideal: "Long-term development needs",
               },
             ].map((pricing) => (
-              <Card key={pricing.model} className={pricing.featured ? "border-2 border-primary-600 shadow-lg" : ""}>
+              <Card
+                key={pricing.model}
+                className={
+                  pricing.featured
+                    ? "border-2 border-primary-600 shadow-lg"
+                    : ""
+                }
+              >
                 {pricing.featured && (
                   <div className="bg-primary-600 text-white text-center py-2 text-sm font-semibold">
                     MOST FLEXIBLE
@@ -273,7 +310,9 @@ export default function CustomDevelopmentPage() {
                 )}
                 <CardHeader>
                   <CardTitle className="text-2xl">{pricing.model}</CardTitle>
-                  <div className="text-2xl font-bold text-primary-600">{pricing.price}</div>
+                  <div className="text-2xl font-bold text-primary-600">
+                    {pricing.price}
+                  </div>
                   <CardDescription>{pricing.description}</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -287,10 +326,18 @@ export default function CustomDevelopmentPage() {
                   </ul>
                   <div>
                     <p className="text-sm font-semibold mb-2">Ideal for:</p>
-                    <p className="text-sm text-muted-foreground">{pricing.ideal}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {pricing.ideal}
+                    </p>
                   </div>
-                  <Button className="w-full" variant={pricing.featured ? "default" : "outline"} asChild>
-                    <Link href={`/contact?service=custom-development&model=${pricing.model.toLowerCase().replace(' ', '-')}`}>
+                  <Button
+                    className="w-full"
+                    variant={pricing.featured ? "default" : "outline"}
+                    asChild
+                  >
+                    <Link
+                      href={`/contact?service=custom-development&model=${pricing.model.toLowerCase().replace(" ", "-")}`}
+                    >
                       Get Quote
                     </Link>
                   </Button>
@@ -305,34 +352,42 @@ export default function CustomDevelopmentPage() {
       <section className="py-20 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Why Choose Our Development Team</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Why Choose Our Development Team
+            </h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {[
               {
                 title: "Deep WMS Expertise",
-                description: "Our developers built LogiVox from the ground up. We know every corner of the system.",
+                description:
+                  "Our developers built LogiVox from the ground up. We know every corner of the system.",
               },
               {
                 title: "Industry Experience",
-                description: "10+ years of warehouse management and logistics domain expertise across multiple industries.",
+                description:
+                  "10+ years of warehouse management and logistics domain expertise across multiple industries.",
               },
               {
                 title: "Modern Tech Stack",
-                description: "Built with Next.js, TypeScript, PostgreSQL, and modern cloud-native architecture.",
+                description:
+                  "Built with Next.js, TypeScript, PostgreSQL, and modern cloud-native architecture.",
               },
               {
                 title: "Agile Methodology",
-                description: "2-week sprints with regular demos ensure you see progress and can provide feedback early.",
+                description:
+                  "2-week sprints with regular demos ensure you see progress and can provide feedback early.",
               },
               {
                 title: "Quality Assurance",
-                description: "Comprehensive testing including unit tests, integration tests, and user acceptance testing.",
+                description:
+                  "Comprehensive testing including unit tests, integration tests, and user acceptance testing.",
               },
               {
                 title: "Ongoing Support",
-                description: "We support what we build. Custom features are maintained just like core product features.",
+                description:
+                  "We support what we build. Custom features are maintained just like core product features.",
               },
             ].map((benefit, index) => (
               <div key={index} className="flex space-x-4">
@@ -357,17 +412,27 @@ export default function CustomDevelopmentPage() {
           <Card className="bg-gradient-to-br from-primary-600 to-primary-700 text-white border-0">
             <CardContent className="p-12 text-center">
               <Code className="h-16 w-16 mx-auto mb-6 opacity-90" />
-              <h2 className="text-3xl font-bold mb-4">Have a Custom Requirement?</h2>
+              <h2 className="text-3xl font-bold mb-4">
+                Have a Custom Requirement?
+              </h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Let's discuss how we can build a solution tailored to your unique needs. Schedule a free consultation with our development team.
+                Let's discuss how we can build a solution tailored to your
+                unique needs. Schedule a free consultation with our development
+                team.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" variant="secondary" asChild>
                   <Link href="/contact?service=custom-development">
-                    Schedule Consultation <ArrowRight className="ml-2 h-5 w-5" />
+                    Schedule Consultation{" "}
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10" asChild>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-transparent border-white text-white hover:bg-white/10"
+                  asChild
+                >
                   <Link href="/docs/api">Explore API</Link>
                 </Button>
               </div>
@@ -376,5 +441,5 @@ export default function CustomDevelopmentPage() {
         </div>
       </section>
     </div>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { TrainingService } from '@/lib/services/qc/training.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { TrainingService } from "@/lib/services/qc/training.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -22,11 +22,13 @@ export async function POST(req: NextRequest) {
       location: body.location,
       assessmentScore: body.assessmentScore,
       certificationNumber: body.certificationNumber,
-      certificationExpiry: body.certificationExpiry ? new Date(body.certificationExpiry) : undefined,
+      certificationExpiry: body.certificationExpiry
+        ? new Date(body.certificationExpiry)
+        : undefined,
       attendanceVerified: body.attendanceVerified,
       effectiveness: body.effectiveness,
       notes: body.notes,
-      recordedBy: session.user.email || '',
+      recordedBy: session.user.email || "",
     });
 
     return NextResponse.json(record);

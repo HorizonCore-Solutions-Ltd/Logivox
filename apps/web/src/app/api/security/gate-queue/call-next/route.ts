@@ -1,22 +1,22 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { sendSMS } from '@/lib/services/sms-service';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { sendSMS } from "@/lib/services/sms-service";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const gateId = searchParams.get('gateId');
+    const gateId = searchParams.get("gateId");
 
     const where: any = {
       organizationId: session.user.organizationId,
-      status: 'WAITING',
+      status: "WAITING",
     };
 
     if (gateId) {
@@ -26,16 +26,13 @@ export async function POST(req: NextRequest) {
     // Get next vehicle in queue (highest priority, then earliest arrival)
     const nextInQueue = await prisma.gateQueue.findFirst({
       where,
-      orderBy: [
-        { priority: 'desc' },
-        { arrivalTime: 'asc' },
-      ],
+      orderBy: [{ priority: "desc" }, { arrivalTime: "asc" }],
     });
 
     if (!nextInQueue) {
       return NextResponse.json(
-        { error: 'No vehicles in queue' },
-        { status: 404 }
+        { error: "No vehicles in queue" },
+        { status: 404 },
       );
     }
 
@@ -43,7 +40,7 @@ export async function POST(req: NextRequest) {
     const updated = await prisma.gateQueue.update({
       where: { id: nextInQueue.id },
       data: {
-        status: 'CALLED',
+        status: "CALLED",
         calledAt: new Date(),
       },
     });
@@ -58,10 +55,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error('Error calling next vehicle:', error);
+    console.error("Error calling next vehicle:", error);
     return NextResponse.json(
-      { error: 'Failed to call next vehicle' },
-      { status: 500 }
+      { error: "Failed to call next vehicle" },
+      { status: 500 },
     );
   }
 }

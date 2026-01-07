@@ -23,15 +23,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
-  Package, 
-  Plus, 
-  Weight, 
-  Ruler, 
+import {
+  Package,
+  Plus,
+  Weight,
+  Ruler,
   Box,
   CheckCircle2,
   Barcode,
-  MapPin
+  MapPin,
 } from "lucide-react";
 
 interface PackItem {
@@ -92,13 +92,13 @@ export default function PackingStationPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const [pack, setPack] = useState<Pack | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPackageForm, setShowPackageForm] = useState(false);
   const [packageForm, setPackageForm] = useState<PackageForm>({
     packageType: "Box",
-    items: []
+    items: [],
   });
   const [processing, setProcessing] = useState(false);
 
@@ -110,7 +110,7 @@ export default function PackingStationPage() {
     try {
       const response = await fetch(`/api/packs/${params.id}`);
       if (!response.ok) throw new Error("Failed to fetch pack");
-      
+
       const data = await response.json();
       setPack(data);
     } catch (error) {
@@ -127,14 +127,16 @@ export default function PackingStationPage() {
   const getAvailableItems = (): PackItem[] => {
     if (!pack) return [];
 
-    return pack.salesOrder.items.map((item: any) => ({
-      id: item.id,
-      name: item.inventoryItem.name,
-      sku: item.inventoryItem.sku,
-      quantityPicked: item.quantityPicked,
-      quantityPacked: item.quantityPacked,
-      remaining: item.quantityPicked - item.quantityPacked
-    })).filter((item: PackItem) => item.remaining > 0);
+    return pack.salesOrder.items
+      .map((item: any) => ({
+        id: item.id,
+        name: item.inventoryItem.name,
+        sku: item.inventoryItem.sku,
+        quantityPicked: item.quantityPicked,
+        quantityPacked: item.quantityPacked,
+        remaining: item.quantityPicked - item.quantityPacked,
+      }))
+      .filter((item: PackItem) => item.remaining > 0);
   };
 
   const addItemToPackage = (itemId: string) => {
@@ -142,7 +144,7 @@ export default function PackingStationPage() {
     if (!item) return;
 
     const remaining = item.quantityPicked - item.quantityPacked;
-    
+
     setPackageForm({
       ...packageForm,
       items: [
@@ -152,16 +154,16 @@ export default function PackingStationPage() {
           inventoryItemId: item.inventoryItemId,
           quantity: remaining,
           binLocation: item.binLocation,
-          batchNumber: item.batchNumber
-        }
-      ]
+          batchNumber: item.batchNumber,
+        },
+      ],
     });
   };
 
   const removeItemFromPackage = (index: number) => {
     setPackageForm({
       ...packageForm,
-      items: packageForm.items.filter((_, i) => i !== index)
+      items: packageForm.items.filter((_, i) => i !== index),
     });
   };
 
@@ -169,11 +171,11 @@ export default function PackingStationPage() {
     const updatedItems = [...packageForm.items];
     updatedItems[index] = {
       ...updatedItems[index],
-      [field]: value
+      [field]: value,
     } as PackageItem;
     setPackageForm({
       ...packageForm,
-      items: updatedItems
+      items: updatedItems,
     });
   };
 
@@ -197,24 +199,24 @@ export default function PackingStationPage() {
           packageType: packageForm.packageType,
           weight: packageForm.weight,
           weightUnit: "kg",
-          items: packageForm.items
-        })
+          items: packageForm.items,
+        }),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to create package");
       }
-      
+
       const data = await response.json();
-      
+
       toast({
         title: "Success",
         description: data.allItemsPacked
           ? "Package created! All items packed - pack complete."
           : "Package created successfully",
       });
-      
+
       setShowPackageForm(false);
       setPackageForm({ packageType: "Box", items: [] });
       fetchPack();
@@ -273,16 +275,19 @@ export default function PackingStationPage() {
             {pack.packNumber}
           </h1>
           <p className="text-gray-600 mt-1">
-            Sales Order: {pack.salesOrder.soNumber} - {pack.salesOrder.customer.name}
+            Sales Order: {pack.salesOrder.soNumber} -{" "}
+            {pack.salesOrder.customer.name}
           </p>
         </div>
         <div className="flex gap-2">
-          {pack.status !== "PACKED" && pack.status !== "CANCELLED" && availableItems.length > 0 && (
-            <Button onClick={() => setShowPackageForm(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Package
-            </Button>
-          )}
+          {pack.status !== "PACKED" &&
+            pack.status !== "CANCELLED" &&
+            availableItems.length > 0 && (
+              <Button onClick={() => setShowPackageForm(true)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Add Package
+              </Button>
+            )}
         </div>
       </div>
 
@@ -296,9 +301,7 @@ export default function PackingStationPage() {
             <Box className="w-4 h-4 text-gray-400" />
           </CardHeader>
           <CardContent>
-            <Badge className={getStatusColor(pack.status)}>
-              {pack.status}
-            </Badge>
+            <Badge className={getStatusColor(pack.status)}>{pack.status}</Badge>
           </CardContent>
         </Card>
 
@@ -314,7 +317,8 @@ export default function PackingStationPage() {
               {pack.statistics.progressPercent}%
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              {pack.statistics.totalItemsPacked} / {pack.statistics.totalItemsToPack} items
+              {pack.statistics.totalItemsPacked} /{" "}
+              {pack.statistics.totalItemsToPack} items
             </p>
           </CardContent>
         </Card>
@@ -343,7 +347,9 @@ export default function PackingStationPage() {
             <div className="text-2xl font-bold">
               {pack.totalWeight?.toFixed(2) || "0.00"}
             </div>
-            <p className="text-xs text-gray-500 mt-1">{pack.weightUnit || "kg"}</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {pack.weightUnit || "kg"}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -369,10 +375,16 @@ export default function PackingStationPage() {
                 <TableBody>
                   {availableItems.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-mono text-sm">{item.sku}</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {item.sku}
+                      </TableCell>
                       <TableCell>{item.name}</TableCell>
-                      <TableCell className="text-center">{item.quantityPicked}</TableCell>
-                      <TableCell className="text-center">{item.quantityPacked}</TableCell>
+                      <TableCell className="text-center">
+                        {item.quantityPicked}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {item.quantityPacked}
+                      </TableCell>
                       <TableCell className="text-center font-semibold text-blue-600">
                         {item.remaining}
                       </TableCell>
@@ -431,7 +443,9 @@ export default function PackingStationPage() {
                       <TableHeader>
                         <TableRow>
                           <TableHead>Item</TableHead>
-                          <TableHead className="text-center">Quantity</TableHead>
+                          <TableHead className="text-center">
+                            Quantity
+                          </TableHead>
                           <TableHead>Bin Location</TableHead>
                           <TableHead>Batch</TableHead>
                         </TableRow>
@@ -454,7 +468,9 @@ export default function PackingStationPage() {
                                   <MapPin className="w-3 h-3 mr-1 text-gray-400" />
                                   {item.binLocation}
                                 </div>
-                              ) : "-"}
+                              ) : (
+                                "-"
+                              )}
                             </TableCell>
                             <TableCell className="text-sm">
                               {item.batchNumber || "-"}
@@ -485,7 +501,9 @@ export default function PackingStationPage() {
                   <Label htmlFor="packageType">Package Type</Label>
                   <Select
                     value={packageForm.packageType}
-                    onValueChange={(value) => setPackageForm({ ...packageForm, packageType: value })}
+                    onValueChange={(value) =>
+                      setPackageForm({ ...packageForm, packageType: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -509,10 +527,12 @@ export default function PackingStationPage() {
                       type="number"
                       step="0.01"
                       value={packageForm.weight || ""}
-                      onChange={(e) => setPackageForm({
-                        ...packageForm,
-                        weight: parseFloat(e.target.value) || undefined
-                      })}
+                      onChange={(e) =>
+                        setPackageForm({
+                          ...packageForm,
+                          weight: parseFloat(e.target.value) || undefined,
+                        })
+                      }
                       placeholder="0.00"
                     />
                   </div>
@@ -522,10 +542,7 @@ export default function PackingStationPage() {
               {/* Add Items */}
               <div>
                 <Label>Add Items to Package</Label>
-                <Select
-                  onValueChange={addItemToPackage}
-                  value=""
-                >
+                <Select onValueChange={addItemToPackage} value="">
                   <SelectTrigger>
                     <SelectValue placeholder="Select item to add..." />
                   </SelectTrigger>
@@ -545,15 +562,20 @@ export default function PackingStationPage() {
                   <Label>Items in Package</Label>
                   <div className="mt-2 space-y-2">
                     {packageForm.items.map((item, index) => {
-                      const soItem = pack.salesOrder.items.find((i: any) => i.id === item.salesOrderItemId);
-                      const maxQty = soItem ? soItem.quantityPicked - soItem.quantityPacked : 0;
+                      const soItem = pack.salesOrder.items.find(
+                        (i: any) => i.id === item.salesOrderItemId,
+                      );
+                      const maxQty = soItem
+                        ? soItem.quantityPicked - soItem.quantityPacked
+                        : 0;
 
                       return (
                         <Card key={index}>
                           <CardContent className="pt-4">
                             <div className="flex items-center justify-between mb-2">
                               <span className="font-semibold">
-                                {soItem?.inventoryItem.name} ({soItem?.inventoryItem.sku})
+                                {soItem?.inventoryItem.name} (
+                                {soItem?.inventoryItem.sku})
                               </span>
                               <Button
                                 size="sm"
@@ -572,35 +594,45 @@ export default function PackingStationPage() {
                                   min="1"
                                   max={maxQty}
                                   value={item.quantity}
-                                  onChange={(e) => updatePackageItem(
-                                    index,
-                                    "quantity",
-                                    parseInt(e.target.value) || 0
-                                  )}
+                                  onChange={(e) =>
+                                    updatePackageItem(
+                                      index,
+                                      "quantity",
+                                      parseInt(e.target.value) || 0,
+                                    )
+                                  }
                                 />
                               </div>
                               <div>
-                                <Label htmlFor={`bin-${index}`}>Bin Location</Label>
+                                <Label htmlFor={`bin-${index}`}>
+                                  Bin Location
+                                </Label>
                                 <Input
                                   id={`bin-${index}`}
                                   value={item.binLocation || ""}
-                                  onChange={(e) => updatePackageItem(
-                                    index,
-                                    "binLocation",
-                                    e.target.value
-                                  )}
+                                  onChange={(e) =>
+                                    updatePackageItem(
+                                      index,
+                                      "binLocation",
+                                      e.target.value,
+                                    )
+                                  }
                                 />
                               </div>
                               <div>
-                                <Label htmlFor={`batch-${index}`}>Batch Number</Label>
+                                <Label htmlFor={`batch-${index}`}>
+                                  Batch Number
+                                </Label>
                                 <Input
                                   id={`batch-${index}`}
                                   value={item.batchNumber || ""}
-                                  onChange={(e) => updatePackageItem(
-                                    index,
-                                    "batchNumber",
-                                    e.target.value
-                                  )}
+                                  onChange={(e) =>
+                                    updatePackageItem(
+                                      index,
+                                      "batchNumber",
+                                      e.target.value,
+                                    )
+                                  }
                                 />
                               </div>
                             </div>

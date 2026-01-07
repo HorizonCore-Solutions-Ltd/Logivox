@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { ColumnDef } from "@tanstack/react-table"
-import { DataTable } from "@/components/ui/data-table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import * as React from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
+import { DataTable } from "@/components/ui/data-table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Plus,
   Users,
@@ -18,7 +24,7 @@ import {
   Eye,
   Mail,
   Phone,
-} from "lucide-react"
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,89 +32,90 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth"
-import { useRouter } from "next/navigation"
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar"
-import { CustomerDialog } from "@/components/customers/customer-dialog"
-import { useToast } from "@/hooks/use-toast"
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
+import { CustomerDialog } from "@/components/customers/customer-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface Customer {
-  id: string
-  name: string
-  email: string | null
-  phone: string | null
-  address: string | null
-  type: string
-  taxId: string | null
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  type: string;
+  taxId: string | null;
   _count: {
-    bookings: number
-  }
-  createdAt: string
+    bookings: number;
+  };
+  createdAt: string;
 }
 
 export default function CustomersPage() {
-  const { user } = useAuth()
-  const router = useRouter()
-  const queryClient = useQueryClient()
-  const { toast } = useToast()
-  const [selectedCustomer, setSelectedCustomer] = React.useState<Customer | null>(null)
-  const [isDialogOpen, setIsDialogOpen] = React.useState(false)
+  const { user } = useAuth();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [selectedCustomer, setSelectedCustomer] =
+    React.useState<Customer | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
   // Fetch customers
   const { data: customers = [], isLoading } = useQuery({
     queryKey: ["customers"],
     queryFn: async () => {
-      const res = await fetch("/api/customers")
-      if (!res.ok) throw new Error("Failed to fetch customers")
-      return res.json()
+      const res = await fetch("/api/customers");
+      if (!res.ok) throw new Error("Failed to fetch customers");
+      return res.json();
     },
-  })
+  });
 
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/customers/${id}`, {
         method: "DELETE",
-      })
+      });
       if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.message || "Failed to delete customer")
+        const error = await res.json();
+        throw new Error(error.message || "Failed to delete customer");
       }
-      return res.json()
+      return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["customers"] })
+      queryClient.invalidateQueries({ queryKey: ["customers"] });
       toast({
         title: "Success",
         description: "Customer deleted successfully",
-      })
+      });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
-      })
+      });
     },
-  })
+  });
 
   // Calculate stats
   const stats = React.useMemo(() => {
-    const total = customers.length
-    const customerCount = customers.filter((c: Customer) => 
-      c.type === "CUSTOMER" || c.type === "BOTH"
-    ).length
-    const supplierCount = customers.filter((c: Customer) => 
-      c.type === "SUPPLIER" || c.type === "BOTH"
-    ).length
+    const total = customers.length;
+    const customerCount = customers.filter(
+      (c: Customer) => c.type === "CUSTOMER" || c.type === "BOTH",
+    ).length;
+    const supplierCount = customers.filter(
+      (c: Customer) => c.type === "SUPPLIER" || c.type === "BOTH",
+    ).length;
     const totalBookings = customers.reduce(
       (sum: number, c: Customer) => sum + c._count.bookings,
-      0
-    )
+      0,
+    );
 
-    return { total, customerCount, supplierCount, totalBookings }
-  }, [customers])
+    return { total, customerCount, supplierCount, totalBookings };
+  }, [customers]);
 
   // Table columns
   const columns: ColumnDef<Customer>[] = [
@@ -126,26 +133,22 @@ export default function CustomersPage() {
       accessorKey: "type",
       header: "Type",
       cell: ({ row }) => {
-        const type = row.original.type
+        const type = row.original.type;
         const variant =
           type === "CUSTOMER"
             ? "default"
             : type === "SUPPLIER"
-            ? "secondary"
-            : "outline"
+              ? "secondary"
+              : "outline";
 
-        return (
-          <Badge variant={variant as any}>
-            {type}
-          </Badge>
-        )
+        return <Badge variant={variant as any}>{type}</Badge>;
       },
     },
     {
       accessorKey: "email",
       header: "Email",
       cell: ({ row }) => {
-        const email = row.original.email
+        const email = row.original.email;
         return email ? (
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Mail className="h-3 w-3" />
@@ -153,14 +156,14 @@ export default function CustomersPage() {
           </div>
         ) : (
           <span className="text-muted-foreground">—</span>
-        )
+        );
       },
     },
     {
       accessorKey: "phone",
       header: "Phone",
       cell: ({ row }) => {
-        const phone = row.original.phone
+        const phone = row.original.phone;
         return phone ? (
           <div className="flex items-center space-x-2 text-sm text-muted-foreground">
             <Phone className="h-3 w-3" />
@@ -168,7 +171,7 @@ export default function CustomersPage() {
           </div>
         ) : (
           <span className="text-muted-foreground">—</span>
-        )
+        );
       },
     },
     {
@@ -184,7 +187,7 @@ export default function CustomersPage() {
     {
       id: "actions",
       cell: ({ row }) => {
-        const customer = row.original
+        const customer = row.original;
 
         return (
           <DropdownMenu>
@@ -197,15 +200,17 @@ export default function CustomersPage() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => router.push(`/dashboard/customers/${customer.id}`)}
+                onClick={() =>
+                  router.push(`/dashboard/customers/${customer.id}`)
+                }
               >
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  setSelectedCustomer(customer)
-                  setIsDialogOpen(true)
+                  setSelectedCustomer(customer);
+                  setIsDialogOpen(true);
                 }}
               >
                 <Pencil className="mr-2 h-4 w-4" />
@@ -217,10 +222,10 @@ export default function CustomersPage() {
                 onClick={() => {
                   if (
                     confirm(
-                      `Are you sure you want to delete ${customer.name}? This action cannot be undone.`
+                      `Are you sure you want to delete ${customer.name}? This action cannot be undone.`,
                     )
                   ) {
-                    deleteMutation.mutate(customer.id)
+                    deleteMutation.mutate(customer.id);
                   }
                 }}
               >
@@ -229,10 +234,10 @@ export default function CustomersPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )
+        );
       },
     },
-  ]
+  ];
 
   if (isLoading) {
     return (
@@ -246,7 +251,7 @@ export default function CustomersPage() {
           </div>
         </div>
       </DashboardSidebar>
-    )
+    );
   }
 
   return (
@@ -255,15 +260,17 @@ export default function CustomersPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Customers & Suppliers</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Customers & Suppliers
+            </h1>
             <p className="text-muted-foreground">
               Manage your customers and suppliers
             </p>
           </div>
           <Button
             onClick={() => {
-              setSelectedCustomer(null)
-              setIsDialogOpen(true)
+              setSelectedCustomer(null);
+              setIsDialogOpen(true);
             }}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -293,9 +300,7 @@ export default function CustomersPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.customerCount}</div>
-              <p className="text-xs text-muted-foreground">
-                Active customers
-              </p>
+              <p className="text-xs text-muted-foreground">Active customers</p>
             </CardContent>
           </Card>
 
@@ -306,22 +311,20 @@ export default function CustomersPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.supplierCount}</div>
-              <p className="text-xs text-muted-foreground">
-                Active suppliers
-              </p>
+              <p className="text-xs text-muted-foreground">Active suppliers</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Bookings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Bookings
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-purple-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalBookings}</div>
-              <p className="text-xs text-muted-foreground">
-                All time bookings
-              </p>
+              <p className="text-xs text-muted-foreground">All time bookings</p>
             </CardContent>
           </Card>
         </div>
@@ -350,10 +353,10 @@ export default function CustomersPage() {
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ["customers"] })
+            queryClient.invalidateQueries({ queryKey: ["customers"] });
           }}
         />
       </div>
     </DashboardSidebar>
-  )
+  );
 }

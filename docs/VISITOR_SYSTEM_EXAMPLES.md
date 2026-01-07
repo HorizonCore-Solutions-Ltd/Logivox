@@ -6,6 +6,7 @@
 **Preset**: `ENTERPRISE`
 
 ### Their Requirements
+
 - IP protection critical
 - NDA required
 - Background checks
@@ -15,6 +16,7 @@
 ### How They Use LogiVox
 
 **Setup** (2 minutes):
+
 ```bash
 # Admin chooses ENTERPRISE preset
 PUT /api/security/settings
@@ -24,11 +26,13 @@ PUT /api/security/settings
 **Daily Operations**:
 
 **8:00 AM** - Visitor "Jane Smith" pre-registered yesterday
+
 - ✅ Host approved
 - ✅ Background check passed
 - ✅ Arrival notification sent to host
 
 **9:15 AM** - Jane arrives at gate
+
 ```
 Security Guard:
 1. Scans Jane's QR code → Auto check-in
@@ -39,14 +43,17 @@ Security Guard:
 ```
 
 **9:20 AM** - Mike escorts Jane to conference room
+
 - Badge allows access only to approved zones
 - System tracks: Jane + Mike + Conference Room B + 9:20 AM
 
 **1:30 PM** - Jane still in building (4+ hours)
+
 - ⚠️ Alert sent to security: "Visitor overdue"
 - Security checks: Still in meeting with Mike ✓
 
 **2:45 PM** - Jane leaves
+
 - Badge returned
 - Auto check-out
 - Host notified: "Jane checked out"
@@ -62,6 +69,7 @@ Security Guard:
 **Preset**: `SMB_CASUAL`
 
 ### Their Requirements
+
 - No bureaucracy
 - Walk-ins welcome
 - Fast turnaround
@@ -70,6 +78,7 @@ Security Guard:
 ### How They Use LogiVox
 
 **Setup** (1 minute):
+
 ```bash
 PUT /api/security/settings
 { "preset": "SMB_CASUAL" }
@@ -78,6 +87,7 @@ PUT /api/security/settings
 **Daily Operations**:
 
 **10:30 AM** - Delivery driver walks in
+
 ```
 Driver:
 1. iPad at entrance: "Sign in"
@@ -92,6 +102,7 @@ Driver:
 **No security guard. No physical badges. No pre-registration. No escort.**
 
 Just a digital logbook that:
+
 - Tracks who's on-site
 - Keeps 90-day history
 - Email summary to owner weekly
@@ -106,6 +117,7 @@ Just a digital logbook that:
 **Preset**: `MANUFACTURING`
 
 ### Their Requirements
+
 - OSHA compliance
 - Safety briefings mandatory
 - Hard hats/PPE required
@@ -115,6 +127,7 @@ Just a digital logbook that:
 ### How They Use LogiVox
 
 **Setup**:
+
 ```bash
 PUT /api/security/settings
 { "preset": "MANUFACTURING" }
@@ -123,9 +136,11 @@ PUT /api/security/settings
 **Daily Operations**:
 
 **7:00 AM** - Supplier rep "Carlos" visiting for quality audit
+
 - Pre-registered with emergency contact
 
 **7:30 AM** - Carlos arrives
+
 ```
 Security Process:
 1. Scan QR code → Check-in
@@ -137,16 +152,19 @@ Security Process:
 ```
 
 **7:50 AM** - Sarah escorts Carlos through plant
+
 - Badge allows access to Quality Lab only
 - System logs: Carlos + Sarah + Quality Lab + 7:50 AM
 - If Carlos tries restricted area → Badge denied + alert
 
 **12:30 PM** - Audit complete
+
 - Carlos returns PPE
 - Check-out
 - OSHA log updated: "Visitor - Carlos - 5 hours - No incidents"
 
 **Compliance**:
+
 - ✅ Safety briefing: Recorded
 - ✅ PPE issued: Logged
 - ✅ Escort: Tracked
@@ -163,6 +181,7 @@ Security Process:
 **Preset**: `THREE_PL`
 
 ### Their Requirements
+
 - 24/7 operations
 - 100+ daily visitors
 - Client-specific zones
@@ -172,6 +191,7 @@ Security Process:
 ### How They Use LogiVox
 
 **Setup**:
+
 ```bash
 PUT /api/security/settings
 { "preset": "THREE_PL" }
@@ -180,6 +200,7 @@ PUT /api/security/settings
 **Daily Operations**:
 
 **2:30 AM** - Truck "ABC-123" arrives (Client: Nike)
+
 ```
 Automated Gate:
 1. LPR reads: ABC-123
@@ -191,10 +212,12 @@ Automated Gate:
 ```
 
 **2:35 AM** - Driver enters Nike zone
+
 - Badge allows Nike zone only
 - If tries Adidas zone → Denied + alert
 
 **11:45 AM** - Client rep "Sarah" (Adidas) visiting
+
 ```
 Walk-In Process:
 1. Self-service kiosk
@@ -205,6 +228,7 @@ Walk-In Process:
 ```
 
 **3:00 PM** - 47 visitors currently on-site
+
 - Dashboard shows:
   - Nike zone: 12 visitors
   - Adidas zone: 8 visitors
@@ -212,6 +236,7 @@ Walk-In Process:
   - Common area: 12 visitors
 
 **Scalability**:
+
 - ✅ 24/7 automated gates (no night shift guards)
 - ✅ 100+ daily visitors processed
 - ✅ Client zones enforced automatically
@@ -227,6 +252,7 @@ Walk-In Process:
 **Preset**: `EU_GDPR`
 
 ### Their Requirements
+
 - GDPR strict compliance
 - 30-day data retention max
 - No biometric data without consent
@@ -236,6 +262,7 @@ Walk-In Process:
 ### How They Use LogiVox
 
 **Setup**:
+
 ```bash
 PUT /api/security/settings
 { "preset": "EU_GDPR" }
@@ -244,6 +271,7 @@ PUT /api/security/settings
 **Daily Operations**:
 
 **9:00 AM** - Visitor "Hans" pre-registers
+
 ```
 Pre-Registration Form:
 ☑️ "I consent to LogistikWerk storing my name, company, and visit details"
@@ -254,16 +282,19 @@ Pre-Registration Form:
 ```
 
 **9:30 AM** - Hans arrives
+
 - Badge issued (no photo - biometric data requires separate consent)
 - Check-in: Name + Company + Purpose logged
 - No photo capture
 - No fingerprint scan
 
 **Day 31** - Auto-deletion
+
 - System automatically deletes Hans's data after 30 days
 - GDPR compliant
 
 **Visitor Rights**:
+
 ```bash
 # Hans emails: "Delete my data per GDPR Article 17"
 # Admin clicks: "Erase Hans's data"
@@ -272,6 +303,7 @@ Pre-Registration Form:
 ```
 
 **Compliance**:
+
 - ✅ Explicit consent: Collected
 - ✅ 30-day retention: Enforced
 - ✅ Right to erasure: Honored

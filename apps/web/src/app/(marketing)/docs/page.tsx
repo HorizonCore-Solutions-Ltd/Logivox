@@ -1,14 +1,20 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Navigation } from '@/components/landing'
-import { Footer } from '@/components/layout/footer'
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { AutoSuggestSearch } from "@/components/ui/auto-suggest-search"
-import Link from "next/link"
-import { 
+import * as React from "react";
+import { Navigation } from "@/components/landing";
+import { Footer } from "@/components/layout/footer";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { AutoSuggestSearch } from "@/components/ui/auto-suggest-search";
+import Link from "next/link";
+import {
   BookOpen,
   Code,
   Zap,
@@ -20,43 +26,48 @@ import {
   Video,
   Download,
   ExternalLink,
-  Rocket
-} from "lucide-react"
+  Rocket,
+} from "lucide-react";
 
 export default function DocsPage() {
-  const [searchQuery, setSearchQuery] = React.useState("")
-  const [suggestions, setSuggestions] = React.useState<Array<{ id: string; text: string; type?: string; category?: string }>>([])
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [suggestions, setSuggestions] = React.useState<
+    Array<{ id: string; text: string; type?: string; category?: string }>
+  >([]);
 
   const quickStart = [
     {
       icon: Rocket,
       title: "Getting Started",
-      description: "Set up your LogiVox account and configure your first warehouse in minutes",
+      description:
+        "Set up your LogiVox account and configure your first warehouse in minutes",
       href: "/docs/getting-started",
-      time: "5 min"
+      time: "5 min",
     },
     {
       icon: Code,
       title: "API Quickstart",
-      description: "Make your first API call and integrate LogiVox into your applications",
+      description:
+        "Make your first API call and integrate LogiVox into your applications",
       href: "/docs/api/quickstart",
-      time: "10 min"
+      time: "10 min",
     },
     {
       icon: Database,
       title: "Data Import Guide",
       description: "Import existing inventory data from CSV, Excel, or via API",
       href: "/docs/guides/data-import",
-      time: "15 min"
+      time: "15 min",
     },
     {
       icon: Shield,
       title: "Security Setup",
-      description: "Configure zero-trust security, RBAC, and compliance settings",
+      description:
+        "Configure zero-trust security, RBAC, and compliance settings",
       href: "/docs/security/setup",
-      time: "20 min"
-    }
-  ]
+      time: "20 min",
+    },
+  ];
 
   const documentation = [
     {
@@ -68,8 +79,8 @@ export default function DocsPage() {
         { title: "Inventory Endpoints", href: "/docs/api/inventory" },
         { title: "Bookings API", href: "/docs/api/bookings" },
         { title: "Webhooks", href: "/docs/api/webhooks" },
-        { title: "Rate Limits", href: "/docs/api/rate-limits" }
-      ]
+        { title: "Rate Limits", href: "/docs/api/rate-limits" },
+      ],
     },
     {
       category: "Integration Guides",
@@ -79,21 +90,27 @@ export default function DocsPage() {
         { title: "Oracle ERP Integration", href: "/docs/integrations/oracle" },
         { title: "SAP Integration", href: "/docs/integrations/sap" },
         { title: "NetSuite Integration", href: "/docs/integrations/netsuite" },
-        { title: "QuickBooks Integration", href: "/docs/integrations/quickbooks" },
-        { title: "Custom Integrations", href: "/docs/integrations/custom" }
-      ]
+        {
+          title: "QuickBooks Integration",
+          href: "/docs/integrations/quickbooks",
+        },
+        { title: "Custom Integrations", href: "/docs/integrations/custom" },
+      ],
     },
     {
       category: "Features",
       icon: Layers,
       description: "In-depth guides for all platform features",
       links: [
-        { title: "Multi-Tenant Architecture", href: "/docs/features/multi-tenant" },
+        {
+          title: "Multi-Tenant Architecture",
+          href: "/docs/features/multi-tenant",
+        },
         { title: "Stock Booking", href: "/docs/features/bookings" },
         { title: "Analytics & Reporting", href: "/docs/features/analytics" },
         { title: "PWA & Offline Mode", href: "/docs/features/pwa" },
-        { title: "RBAC & Permissions", href: "/docs/features/rbac" }
-      ]
+        { title: "RBAC & Permissions", href: "/docs/features/rbac" },
+      ],
     },
     {
       category: "Security & Compliance",
@@ -104,64 +121,64 @@ export default function DocsPage() {
         { title: "Data Encryption", href: "/docs/security/encryption" },
         { title: "Audit Logs", href: "/docs/security/audit-logs" },
         { title: "GDPR Compliance", href: "/docs/compliance/gdpr" },
-        { title: "SOC 2", href: "/docs/compliance/soc2" }
-      ]
-    }
-  ]
+        { title: "SOC 2", href: "/docs/compliance/soc2" },
+      ],
+    },
+  ];
 
   const resources = [
     {
       icon: FileText,
       title: "Tutorials",
       count: "50+",
-      description: "Step-by-step tutorials for common tasks"
+      description: "Step-by-step tutorials for common tasks",
     },
     {
       icon: Video,
       title: "Video Guides",
       count: "30+",
-      description: "Video walkthroughs and demonstrations"
+      description: "Video walkthroughs and demonstrations",
     },
     {
       icon: Code,
       title: "Code Examples",
       count: "100+",
-      description: "Ready-to-use code snippets and examples"
+      description: "Ready-to-use code snippets and examples",
     },
     {
       icon: Download,
       title: "SDKs",
       count: "5",
-      description: "Official SDKs for popular languages"
-    }
-  ]
+      description: "Official SDKs for popular languages",
+    },
+  ];
 
   const sdks = [
     {
       name: "Node.js",
       description: "Official Node.js SDK for LogiVox API",
       command: "npm install @logivox/sdk",
-      docsHref: "/docs/sdks/nodejs"
+      docsHref: "/docs/sdks/nodejs",
     },
     {
       name: "Python",
       description: "Official Python SDK for LogiVox API",
       command: "pip install flowstock",
-      docsHref: "/docs/sdks/python"
+      docsHref: "/docs/sdks/python",
     },
     {
       name: "Java",
       description: "Official Java SDK for enterprise applications",
       command: "maven install com.flowstock:sdk",
-      docsHref: "/docs/sdks/java"
+      docsHref: "/docs/sdks/java",
     },
     {
       name: "C# / .NET",
       description: "Official .NET SDK for LogiVox integration",
       command: "dotnet add package LogiVox.SDK",
-      docsHref: "/docs/sdks/dotnet"
-    }
-  ]
+      docsHref: "/docs/sdks/dotnet",
+    },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -182,7 +199,7 @@ export default function DocsPage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground leading-relaxed">
-                Comprehensive guides, API references, and resources to help you 
+                Comprehensive guides, API references, and resources to help you
                 integrate and extend LogiVox for your enterprise needs.
               </p>
             </div>
@@ -192,25 +209,30 @@ export default function DocsPage() {
               <AutoSuggestSearch
                 value={searchQuery}
                 onValueChange={(value) => {
-                  setSearchQuery(value)
+                  setSearchQuery(value);
                   // Generate contextual suggestions
                   if (value.trim()) {
-                    const allItems = [...quickStart, ...apiDocs, ...categories]
+                    const allItems = [...quickStart, ...apiDocs, ...categories];
                     const filtered = allItems
-                      .filter(item => 
-                        item.title.toLowerCase().includes(value.toLowerCase()) ||
-                        item.description?.toLowerCase().includes(value.toLowerCase())
+                      .filter(
+                        (item) =>
+                          item.title
+                            .toLowerCase()
+                            .includes(value.toLowerCase()) ||
+                          item.description
+                            ?.toLowerCase()
+                            .includes(value.toLowerCase()),
                       )
                       .slice(0, 6)
-                      .map(item => ({
+                      .map((item) => ({
                         id: item.title,
                         text: item.title,
                         type: "page" as const,
-                        category: item.description || "Documentation"
-                      }))
-                    setSuggestions(filtered)
+                        category: item.description || "Documentation",
+                      }));
+                    setSuggestions(filtered);
                   } else {
-                    setSuggestions([])
+                    setSuggestions([]);
                   }
                 }}
                 suggestions={suggestions}
@@ -272,13 +294,18 @@ export default function DocsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {documentation.map((section) => (
-                <Card key={section.category} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={section.category}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex items-center space-x-3 mb-4">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                         <section.icon className="h-5 w-5 text-primary" />
                       </div>
-                      <CardTitle className="text-xl">{section.category}</CardTitle>
+                      <CardTitle className="text-xl">
+                        {section.category}
+                      </CardTitle>
                     </div>
                     <CardDescription>{section.description}</CardDescription>
                   </CardHeader>
@@ -315,7 +342,10 @@ export default function DocsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
               {resources.map((resource) => (
-                <Card key={resource.title} className="text-center hover:shadow-lg transition-shadow">
+                <Card
+                  key={resource.title}
+                  className="text-center hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex justify-center mb-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/50 text-white">
@@ -352,7 +382,10 @@ export default function DocsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {sdks.map((sdk) => (
-                <Card key={sdk.name} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={sdk.name}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader>
                     <div className="flex items-center justify-between mb-4">
                       <CardTitle className="text-xl">{sdk.name}</CardTitle>
@@ -390,14 +423,10 @@ export default function DocsPage() {
               </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" className="px-8" asChild>
-                  <Link href="/contact">
-                    Contact Support
-                  </Link>
+                  <Link href="/contact">Contact Support</Link>
                 </Button>
                 <Button size="lg" variant="outline" className="px-8" asChild>
-                  <Link href="/help">
-                    Visit Help Center
-                  </Link>
+                  <Link href="/help">Visit Help Center</Link>
                 </Button>
               </div>
             </div>
@@ -406,5 +435,5 @@ export default function DocsPage() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

@@ -119,7 +119,7 @@ export async function GET(request: Request) {
     console.error("Error fetching routes:", error);
     return NextResponse.json(
       { error: "Failed to fetch routes" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -164,12 +164,12 @@ export async function POST(request: Request) {
     for (let i = 1; i < validatedData.waypoints.length; i++) {
       const prev = validatedData.waypoints[i - 1];
       const curr = validatedData.waypoints[i];
-      
+
       // Add distance from waypoint metadata if provided
       if (curr.distance) {
         totalDistance += curr.distance;
       }
-      
+
       // Add estimated time if provided
       if (curr.estimatedTime) {
         estimatedDuration += curr.estimatedTime;
@@ -228,13 +228,13 @@ export async function POST(request: Request) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error creating route:", error);
     return NextResponse.json(
       { error: "Failed to create route" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

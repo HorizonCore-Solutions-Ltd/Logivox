@@ -1,12 +1,12 @@
-import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
 
 export async function GET(request: Request) {
   try {
     const session = await getServerSession();
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const models = await (prisma as any).mLModel.findMany({
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
         isActive: true,
       },
       orderBy: {
-        lastTrainedAt: 'desc',
+        lastTrainedAt: "desc",
       },
     });
 
@@ -30,7 +30,10 @@ export async function GET(request: Request) {
 
     return NextResponse.json(metrics);
   } catch (error) {
-    console.error('Error fetching model metrics:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error fetching model metrics:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

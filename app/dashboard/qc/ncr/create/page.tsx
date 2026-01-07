@@ -1,35 +1,47 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { PhotoUpload } from '@/components/qc/PhotoUpload';
-import { BarcodeScanner } from '@/components/qc/BarcodeScanner';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PhotoUpload } from "@/components/qc/PhotoUpload";
+import { BarcodeScanner } from "@/components/qc/BarcodeScanner";
 
 export default function CreateNCRPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    category: 'MATERIAL_DEFECT',
-    severity: 'MAJOR',
-    productId: '',
-    lotNumber: '',
-    supplierId: '',
-    quantity: '',
-    description: '',
-    rootCause: '',
-    immediateAction: '',
-    disposition: 'PENDING',
+    title: "",
+    category: "MATERIAL_DEFECT",
+    severity: "MAJOR",
+    productId: "",
+    lotNumber: "",
+    supplierId: "",
+    quantity: "",
+    description: "",
+    rootCause: "",
+    immediateAction: "",
+    disposition: "PENDING",
     photos: [] as string[],
-    detectedBy: '',
-    detectedAt: new Date().toISOString().split('T')[0],
+    detectedBy: "",
+    detectedAt: new Date().toISOString().split("T")[0],
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,9 +49,9 @@ export default function CreateNCRPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/qc/ncr', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/ncr", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           quantity: parseInt(formData.quantity) || 0,
@@ -47,13 +59,13 @@ export default function CreateNCRPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to create NCR');
+      if (!response.ok) throw new Error("Failed to create NCR");
 
       const data = await response.json();
       router.push(`/dashboard/qc/ncr/${data.id}`);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to create NCR');
+      console.error("Error:", error);
+      alert("Failed to create NCR");
     } finally {
       setLoading(false);
     }
@@ -68,7 +80,7 @@ export default function CreateNCRPage() {
         setFormData({ ...formData, productId: data.product.id });
       }
     } catch (error) {
-      console.error('Barcode lookup error:', error);
+      console.error("Barcode lookup error:", error);
     }
   };
 
@@ -76,11 +88,7 @@ export default function CreateNCRPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.back()}
-        >
+        <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
@@ -109,7 +117,9 @@ export default function CreateNCRPage() {
                   id="title"
                   required
                   value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
                   placeholder="Brief description of the issue"
                 />
               </div>
@@ -119,16 +129,22 @@ export default function CreateNCRPage() {
                   <Label htmlFor="category">Category *</Label>
                   <Select
                     value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, category: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="MATERIAL_DEFECT">Material Defect</SelectItem>
+                      <SelectItem value="MATERIAL_DEFECT">
+                        Material Defect
+                      </SelectItem>
                       <SelectItem value="PACKAGING">Packaging Issue</SelectItem>
                       <SelectItem value="LABELING">Labeling Error</SelectItem>
-                      <SelectItem value="DOCUMENTATION">Documentation</SelectItem>
+                      <SelectItem value="DOCUMENTATION">
+                        Documentation
+                      </SelectItem>
                       <SelectItem value="PROCESS">Process Deviation</SelectItem>
                       <SelectItem value="SHIPPING">Shipping Damage</SelectItem>
                       <SelectItem value="OTHER">Other</SelectItem>
@@ -140,7 +156,9 @@ export default function CreateNCRPage() {
                   <Label htmlFor="severity">Severity *</Label>
                   <Select
                     value={formData.severity}
-                    onValueChange={(value) => setFormData({ ...formData, severity: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, severity: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -160,7 +178,9 @@ export default function CreateNCRPage() {
                     type="date"
                     required
                     value={formData.detectedAt}
-                    onChange={(e) => setFormData({ ...formData, detectedAt: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, detectedAt: e.target.value })
+                    }
                   />
                 </div>
               </div>
@@ -171,9 +191,7 @@ export default function CreateNCRPage() {
           <Card>
             <CardHeader>
               <CardTitle>Product Information</CardTitle>
-              <CardDescription>
-                Product and lot details
-              </CardDescription>
+              <CardDescription>Product and lot details</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <BarcodeScanner
@@ -188,7 +206,9 @@ export default function CreateNCRPage() {
                   <Input
                     id="productId"
                     value={formData.productId}
-                    onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, productId: e.target.value })
+                    }
                     placeholder="Product identifier"
                   />
                 </div>
@@ -199,7 +219,9 @@ export default function CreateNCRPage() {
                     id="lotNumber"
                     required
                     value={formData.lotNumber}
-                    onChange={(e) => setFormData({ ...formData, lotNumber: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lotNumber: e.target.value })
+                    }
                     placeholder="Lot/batch number"
                   />
                 </div>
@@ -211,7 +233,9 @@ export default function CreateNCRPage() {
                   <Input
                     id="supplierId"
                     value={formData.supplierId}
-                    onChange={(e) => setFormData({ ...formData, supplierId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, supplierId: e.target.value })
+                    }
                     placeholder="Supplier identifier"
                   />
                 </div>
@@ -223,7 +247,9 @@ export default function CreateNCRPage() {
                     type="number"
                     required
                     value={formData.quantity}
-                    onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, quantity: e.target.value })
+                    }
                     placeholder="Number of units affected"
                   />
                 </div>
@@ -247,7 +273,9 @@ export default function CreateNCRPage() {
                   required
                   rows={4}
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="Detailed description of the non-conformance..."
                 />
               </div>
@@ -258,7 +286,9 @@ export default function CreateNCRPage() {
                   id="rootCause"
                   rows={3}
                   value={formData.rootCause}
-                  onChange={(e) => setFormData({ ...formData, rootCause: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, rootCause: e.target.value })
+                  }
                   placeholder="Root cause findings (use 5 Whys method)..."
                 />
               </div>
@@ -269,7 +299,12 @@ export default function CreateNCRPage() {
                   id="immediateAction"
                   rows={3}
                   value={formData.immediateAction}
-                  onChange={(e) => setFormData({ ...formData, immediateAction: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      immediateAction: e.target.value,
+                    })
+                  }
                   placeholder="Actions taken immediately to contain the issue..."
                 />
               </div>
@@ -306,7 +341,7 @@ export default function CreateNCRPage() {
             </Button>
             <Button type="submit" disabled={loading}>
               <Save className="mr-2 h-4 w-4" />
-              {loading ? 'Creating...' : 'Create NCR'}
+              {loading ? "Creating..." : "Create NCR"}
             </Button>
           </div>
         </div>

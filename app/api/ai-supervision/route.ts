@@ -3,24 +3,24 @@
  * Monitor worker performance and trigger interventions
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 // GET - List supervision sessions or get specific session
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const sessionId = searchParams.get('sessionId');
-    const workerId = searchParams.get('workerId');
-    const active = searchParams.get('active');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const sessionId = searchParams.get("sessionId");
+    const workerId = searchParams.get("workerId");
+    const active = searchParams.get("active");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     // Get specific session
     if (sessionId) {
@@ -36,17 +36,20 @@ export async function GET(req: NextRequest) {
           },
           warehouse: true,
           interventions: {
-            orderBy: { timestamp: 'desc' },
+            orderBy: { timestamp: "desc" },
           },
           performanceMetrics: {
-            orderBy: { timestamp: 'desc' },
+            orderBy: { timestamp: "desc" },
             take: 20,
           },
         },
       });
 
       if (!aiSession) {
-        return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+        return NextResponse.json(
+          { error: "Session not found" },
+          { status: 404 },
+        );
       }
 
       return NextResponse.json({ session: aiSession });
@@ -59,8 +62,8 @@ export async function GET(req: NextRequest) {
       where.workerId = workerId;
     }
 
-    if (active === 'true') {
-      where.status = 'ACTIVE';
+    if (active === "true") {
+      where.status = "ACTIVE";
     }
 
     if (startDate || endDate) {
@@ -93,18 +96,18 @@ export async function GET(req: NextRequest) {
           },
         },
       },
-      orderBy: { startTime: 'desc' },
+      orderBy: { startTime: "desc" },
       take: 100,
     });
 
     // Calculate aggregate stats
-    const activeSessions = sessions.filter((s) => s.status === 'ACTIVE').length;
+    const activeSessions = sessions.filter((s) => s.status === "ACTIVE").length;
     const avgProductivity =
       sessions.reduce((sum, s) => sum + (s.productivityScore || 0), 0) /
         sessions.length || 0;
     const totalInterventions = sessions.reduce(
       (sum, s) => sum + s._count.interventions,
-      0
+      0,
     );
 
     return NextResponse.json({
@@ -117,10 +120,10 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('AI Supervision GET error:', error);
+    console.error("AI Supervision GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch sessions' },
-      { status: 500 }
+      { error: "Failed to fetch sessions" },
+      { status: 500 },
     );
   }
 }
@@ -130,7 +133,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -138,8 +141,8 @@ export async function POST(req: NextRequest) {
 
     if (!workerId || !warehouseId) {
       return NextResponse.json(
-        { error: 'Worker ID and warehouse ID are required' },
-        { status: 400 }
+        { error: "Worker ID and warehouse ID are required" },
+        { status: 400 },
       );
     }
 
@@ -148,9 +151,9 @@ export async function POST(req: NextRequest) {
       data: {
         workerId,
         warehouseId,
-        sessionType: sessionType || 'CONTINUOUS',
+        sessionType: sessionType || "CONTINUOUS",
         taskId,
-        status: 'ACTIVE',
+        status: "ACTIVE",
         startTime: new Date(),
       },
       include: {
@@ -168,13 +171,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       session: aiSession,
-      message: 'AI supervision session started',
+      message: "AI supervision session started",
     });
   } catch (error) {
-    console.error('AI Supervision POST error:', error);
+    console.error("AI Supervision POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to start session' },
-      { status: 500 }
+      { error: "Failed to start session" },
+      { status: 500 },
     );
   }
 }
@@ -184,7 +187,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -192,8 +195,8 @@ export async function PATCH(req: NextRequest) {
 
     if (!sessionId) {
       return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
+        { error: "Session ID is required" },
+        { status: 400 },
       );
     }
 
@@ -202,15 +205,15 @@ export async function PATCH(req: NextRequest) {
     });
 
     if (!aiSession) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    if (action === 'end') {
+    if (action === "end") {
       // End session
       const updatedSession = await prisma.aISupervisionSession.update({
         where: { id: sessionId },
         data: {
-          status: 'COMPLETED',
+          status: "COMPLETED",
           endTime: new Date(),
         },
       });
@@ -218,29 +221,29 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({
         success: true,
         session: updatedSession,
-        message: 'Session ended successfully',
+        message: "Session ended successfully",
       });
-    } else if (action === 'pause') {
+    } else if (action === "pause") {
       const updatedSession = await prisma.aISupervisionSession.update({
         where: { id: sessionId },
-        data: { status: 'PAUSED' },
+        data: { status: "PAUSED" },
       });
 
       return NextResponse.json({
         success: true,
         session: updatedSession,
       });
-    } else if (action === 'resume') {
+    } else if (action === "resume") {
       const updatedSession = await prisma.aISupervisionSession.update({
         where: { id: sessionId },
-        data: { status: 'ACTIVE' },
+        data: { status: "ACTIVE" },
       });
 
       return NextResponse.json({
         success: true,
         session: updatedSession,
       });
-    } else if (action === 'updateMetrics' && metrics) {
+    } else if (action === "updateMetrics" && metrics) {
       // Update session metrics
       const updatedSession = await prisma.aISupervisionSession.update({
         where: { id: sessionId },
@@ -260,7 +263,7 @@ export async function PATCH(req: NextRequest) {
         data: {
           userId: aiSession.workerId,
           warehouseId: aiSession.warehouseId,
-          metricType: 'SUPERVISION_SNAPSHOT',
+          metricType: "SUPERVISION_SNAPSHOT",
           value: metrics.productivityScore || 0,
           metadata: metrics,
         },
@@ -272,15 +275,12 @@ export async function PATCH(req: NextRequest) {
       });
     }
 
-    return NextResponse.json(
-      { error: 'Invalid action' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('AI Supervision PATCH error:', error);
+    console.error("AI Supervision PATCH error:", error);
     return NextResponse.json(
-      { error: 'Failed to update session' },
-      { status: 500 }
+      { error: "Failed to update session" },
+      { status: 500 },
     );
   }
 }
@@ -290,16 +290,16 @@ export async function DELETE(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const sessionId = searchParams.get('sessionId');
+    const sessionId = searchParams.get("sessionId");
 
     if (!sessionId) {
       return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
+        { error: "Session ID is required" },
+        { status: 400 },
       );
     }
 
@@ -310,13 +310,13 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Session deleted successfully',
+      message: "Session deleted successfully",
     });
   } catch (error) {
-    console.error('AI Supervision DELETE error:', error);
+    console.error("AI Supervision DELETE error:", error);
     return NextResponse.json(
-      { error: 'Failed to delete session' },
-      { status: 500 }
+      { error: "Failed to delete session" },
+      { status: 500 },
     );
   }
 }

@@ -1,10 +1,16 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import {
   Smartphone,
   Bell,
@@ -13,123 +19,123 @@ import {
   Trash2,
   Database,
   WifiOff,
-} from "lucide-react"
+} from "lucide-react";
 import {
   requestNotificationPermission,
   subscribeToPushNotifications,
   unsubscribeFromPushNotifications,
-} from "@/lib/push-notifications"
-import { offlineDB, processSyncQueue } from "@/lib/offline-sync"
-import { toast } from "@/hooks/use-toast"
+} from "@/lib/push-notifications";
+import { offlineDB, processSyncQueue } from "@/lib/offline-sync";
+import { toast } from "@/hooks/use-toast";
 
 export default function PWASettingsPage() {
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
-  const [offlineStorageSize, setOfflineStorageSize] = useState(0)
-  const [pendingSyncCount, setPendingSyncCount] = useState(0)
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [offlineStorageSize, setOfflineStorageSize] = useState(0);
+  const [pendingSyncCount, setPendingSyncCount] = useState(0);
 
   useEffect(() => {
     // Check if PWA is installed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-      setIsInstalled(true)
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstalled(true);
     }
 
     // Check notification permission
-    if ('Notification' in window) {
-      setNotificationsEnabled(Notification.permission === 'granted')
+    if ("Notification" in window) {
+      setNotificationsEnabled(Notification.permission === "granted");
     }
 
     // Calculate offline storage size
-    calculateStorageSize()
-    checkPendingSync()
-  }, [])
+    calculateStorageSize();
+    checkPendingSync();
+  }, []);
 
   const calculateStorageSize = async () => {
-    if ('storage' in navigator && 'estimate' in navigator.storage) {
-      const estimate = await navigator.storage.estimate()
-      setOfflineStorageSize(estimate.usage || 0)
+    if ("storage" in navigator && "estimate" in navigator.storage) {
+      const estimate = await navigator.storage.estimate();
+      setOfflineStorageSize(estimate.usage || 0);
     }
-  }
+  };
 
   const checkPendingSync = async () => {
     try {
-      const items = await offlineDB.getAll('pendingSync')
-      setPendingSyncCount(items.length)
+      const items = await offlineDB.getAll("pendingSync");
+      setPendingSyncCount(items.length);
     } catch (error) {
-      console.error('Failed to check pending sync:', error)
+      console.error("Failed to check pending sync:", error);
     }
-  }
+  };
 
   const handleNotificationToggle = async (enabled: boolean) => {
     if (enabled) {
-      const permission = await requestNotificationPermission()
-      if (permission === 'granted') {
-        await subscribeToPushNotifications()
-        setNotificationsEnabled(true)
+      const permission = await requestNotificationPermission();
+      if (permission === "granted") {
+        await subscribeToPushNotifications();
+        setNotificationsEnabled(true);
         toast({
           title: "Notifications Enabled",
           description: "You'll now receive push notifications",
-        })
+        });
       } else {
         toast({
           title: "Permission Denied",
           description: "Please enable notifications in your browser settings",
           variant: "destructive",
-        })
+        });
       }
     } else {
-      await unsubscribeFromPushNotifications()
-      setNotificationsEnabled(false)
+      await unsubscribeFromPushNotifications();
+      setNotificationsEnabled(false);
       toast({
         title: "Notifications Disabled",
         description: "You won't receive push notifications anymore",
-      })
+      });
     }
-  }
+  };
 
   const handleClearOfflineData = async () => {
     try {
-      await offlineDB.clear('inventory')
-      await offlineDB.clear('bookings')
-      await offlineDB.clear('customers')
-      await calculateStorageSize()
+      await offlineDB.clear("inventory");
+      await offlineDB.clear("bookings");
+      await offlineDB.clear("customers");
+      await calculateStorageSize();
       toast({
         title: "Offline Data Cleared",
         description: "All cached data has been removed",
-      })
+      });
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to clear offline data",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const handleSyncNow = async () => {
     try {
-      await processSyncQueue()
-      await checkPendingSync()
+      await processSyncQueue();
+      await checkPendingSync();
       toast({
         title: "Sync Complete",
         description: "All pending changes have been synchronized",
-      })
+      });
     } catch (error) {
       toast({
         title: "Sync Failed",
         description: "Some changes could not be synchronized",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i]
-  }
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
+  };
 
   return (
     <div className="space-y-6">
@@ -154,23 +160,24 @@ export default function PWASettingsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">
-                  {isInstalled ? 'Installed' : 'Not Installed'}
+                  {isInstalled ? "Installed" : "Not Installed"}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   {isInstalled
-                    ? 'LogiVox is running as an installed app'
-                    : 'Install LogiVox for a better experience'}
+                    ? "LogiVox is running as an installed app"
+                    : "Install LogiVox for a better experience"}
                 </p>
               </div>
               <div
                 className={`h-3 w-3 rounded-full ${
-                  isInstalled ? 'bg-green-500' : 'bg-gray-300'
+                  isInstalled ? "bg-green-500" : "bg-gray-300"
                 }`}
               />
             </div>
             {!isInstalled && (
               <p className="text-xs text-muted-foreground">
-                Look for the install prompt in your browser's address bar or menu
+                Look for the install prompt in your browser's address bar or
+                menu
               </p>
             )}
           </CardContent>
@@ -218,7 +225,9 @@ export default function PWASettingsPage() {
           <CardContent className="space-y-4">
             <div>
               <p className="text-sm font-medium">Storage Used</p>
-              <p className="text-2xl font-bold">{formatBytes(offlineStorageSize)}</p>
+              <p className="text-2xl font-bold">
+                {formatBytes(offlineStorageSize)}
+              </p>
             </div>
             <Button
               variant="outline"
@@ -314,5 +323,5 @@ export default function PWASettingsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

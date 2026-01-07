@@ -82,10 +82,14 @@ export default function PickingTasksPage() {
 
       // Calculate stats
       const total = data.tasks?.length || 0;
-      const pending = data.tasks?.filter((t: Task) => t.status === "PENDING").length || 0;
-      const assigned = data.tasks?.filter((t: Task) => t.status === "ASSIGNED").length || 0;
-      const inProgress = data.tasks?.filter((t: Task) => t.status === "IN_PROGRESS").length || 0;
-      const completed = data.tasks?.filter((t: Task) => t.status === "COMPLETED").length || 0;
+      const pending =
+        data.tasks?.filter((t: Task) => t.status === "PENDING").length || 0;
+      const assigned =
+        data.tasks?.filter((t: Task) => t.status === "ASSIGNED").length || 0;
+      const inProgress =
+        data.tasks?.filter((t: Task) => t.status === "IN_PROGRESS").length || 0;
+      const completed =
+        data.tasks?.filter((t: Task) => t.status === "COMPLETED").length || 0;
 
       setStats({ total, pending, assigned, inProgress, completed });
     } catch (error) {
@@ -314,7 +318,7 @@ export default function PickingTasksPage() {
                 <div className="flex items-start gap-3 flex-1">
                   <div
                     className={`w-1 h-full rounded-full ${getPriorityColor(
-                      task.priority
+                      task.priority,
                     )}`}
                   ></div>
                   <div className="flex-1">
@@ -350,7 +354,7 @@ export default function PickingTasksPage() {
                 <div className="flex flex-col items-end gap-2">
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getStatusColor(
-                      task.status
+                      task.status,
                     )}`}
                   >
                     {getStatusIcon(task.status)}

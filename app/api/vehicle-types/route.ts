@@ -1,11 +1,11 @@
 /**
  * Vehicle Recommendation API
- * 
+ *
  * Simple API for getting vehicle type recommendations based on order dimensions.
  * Used by LoadOptimizationService to determine appropriate vehicle size.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import {
   getAllVehicleTypes,
   getVehicleTypesByRegion,
@@ -13,7 +13,7 @@ import {
   findSuitableVehicles,
   addCustomVehicleType,
   type VehicleType,
-} from '@/lib/vehicle-types';
+} from "@/lib/vehicle-types";
 
 // ============================================================================
 // GET /api/vehicle-types
@@ -23,22 +23,22 @@ import {
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
-    const region = searchParams.get('region') as VehicleType['region'] | null;
-    
-    const vehicleTypes = region 
+    const region = searchParams.get("region") as VehicleType["region"] | null;
+
+    const vehicleTypes = region
       ? getVehicleTypesByRegion(region)
       : getAllVehicleTypes();
-    
+
     return NextResponse.json({
       success: true,
       vehicleTypes,
       total: vehicleTypes.length,
     });
   } catch (error) {
-    console.error('Get vehicle types error:', error);
+    console.error("Get vehicle types error:", error);
     return NextResponse.json(
-      { error: 'Failed to get vehicle types' },
-      { status: 500 }
+      { error: "Failed to get vehicle types" },
+      { status: 500 },
     );
   }
 }
@@ -51,16 +51,16 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    
+
     const {
       totalVolumeCubicFeet,
       totalWeightLbs,
       palletCount,
       requiresTemperatureControl,
       region,
-      prioritize = 'utilization',
+      prioritize = "utilization",
     } = body;
-    
+
     // Get recommendation
     const recommended = recommendVehicle({
       totalVolumeCubicFeet,
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       region,
       prioritize,
     });
-    
+
     // Get all suitable vehicles
     const suitable = findSuitableVehicles({
       totalVolumeCubicFeet,
@@ -79,19 +79,21 @@ export async function POST(req: NextRequest) {
       requiresTemperatureControl,
       region,
     });
-    
+
     if (!recommended) {
       return NextResponse.json({
         success: false,
-        message: 'No suitable vehicle found for this load',
+        message: "No suitable vehicle found for this load",
         suitable: [],
       });
     }
-    
+
     // Calculate utilization
-    const utilizationPercent = (totalVolumeCubicFeet / recommended.volumeCubicFeet) * 100;
-    const weightUtilizationPercent = (totalWeightLbs / recommended.maxWeightLbs) * 100;
-    
+    const utilizationPercent =
+      (totalVolumeCubicFeet / recommended.volumeCubicFeet) * 100;
+    const weightUtilizationPercent =
+      (totalWeightLbs / recommended.maxWeightLbs) * 100;
+
     return NextResponse.json({
       success: true,
       recommended: {
@@ -106,10 +108,10 @@ export async function POST(req: NextRequest) {
       totalSuitable: suitable.length,
     });
   } catch (error) {
-    console.error('Recommend vehicle error:', error);
+    console.error("Recommend vehicle error:", error);
     return NextResponse.json(
-      { error: 'Failed to recommend vehicle' },
-      { status: 500 }
+      { error: "Failed to recommend vehicle" },
+      { status: 500 },
     );
   }
 }
@@ -123,28 +125,28 @@ export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
     const vehicleType: VehicleType = body;
-    
+
     // Validate required fields
     if (!vehicleType.id || !vehicleType.name || !vehicleType.dimensions) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
-    
+
     // Add custom vehicle type
     addCustomVehicleType(vehicleType);
-    
+
     return NextResponse.json({
       success: true,
-      message: 'Custom vehicle type added',
+      message: "Custom vehicle type added",
       vehicleType,
     });
   } catch (error) {
-    console.error('Add custom vehicle error:', error);
+    console.error("Add custom vehicle error:", error);
     return NextResponse.json(
-      { error: 'Failed to add custom vehicle type' },
-      { status: 500 }
+      { error: "Failed to add custom vehicle type" },
+      { status: 500 },
     );
   }
 }

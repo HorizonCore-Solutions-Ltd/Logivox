@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching transfers:", error);
     return NextResponse.json(
       { error: error.message || "Failed to fetch transfers" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json(
         { error: "No organization found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -189,7 +189,7 @@ export async function POST(request: NextRequest) {
     if (!fromLocation || !toLocation) {
       return NextResponse.json(
         { error: "Invalid location(s)" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
     if (validatedData.fromLocationId === validatedData.toLocationId) {
       return NextResponse.json(
         { error: "From and To locations must be different" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -212,7 +212,7 @@ export async function POST(request: NextRequest) {
     if (!inventoryItem) {
       return NextResponse.json(
         { error: "Inventory item not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
     let sequence = 1;
     if (lastTransfer) {
       const lastSequence = parseInt(
-        (lastTransfer.transferNumber.split("-")[2] || "0") || "0"
+        lastTransfer.transferNumber.split("-")[2] || "0" || "0",
       );
       sequence = lastSequence + 1;
     }
@@ -318,13 +318,13 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: error.message || "Failed to create transfer" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,59 +1,76 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { signIn } from "next-auth/react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Building2, Mail, Lock, User, Building, ArrowRight, Github, Chrome, Check, AlertCircle } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
+import * as React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Building2,
+  Mail,
+  Lock,
+  User,
+  Building,
+  ArrowRight,
+  Github,
+  Chrome,
+  Check,
+  AlertCircle,
+} from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function SignUpPage() {
-  const router = useRouter()
-  const { isAuthenticated, isLoading } = useAuth()
-  
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
   const [formData, setFormData] = React.useState({
     fullName: "",
     email: "",
     company: "",
     password: "",
     confirmPassword: "",
-    agreeToTerms: false
-  })
-  const [isSubmitting, setIsSubmitting] = React.useState(false)
-  const [passwordStrength, setPasswordStrength] = React.useState(0)
-  const [error, setError] = React.useState<string | null>(null)
+    agreeToTerms: false,
+  });
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [passwordStrength, setPasswordStrength] = React.useState(0);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Redirect if already authenticated
   React.useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      router.push("/dashboard/dashboard")
+      router.push("/dashboard/dashboard");
     }
-  }, [isAuthenticated, isLoading, router])
+  }, [isAuthenticated, isLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError(null)
-    
+    e.preventDefault();
+    setError(null);
+
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      return
+      setError("Passwords do not match");
+      return;
     }
 
     if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long")
-      return
+      setError("Password must be at least 8 characters long");
+      return;
     }
 
     if (!formData.agreeToTerms) {
-      setError("Please agree to the Terms of Service and Privacy Policy")
-      return
+      setError("Please agree to the Terms of Service and Privacy Policy");
+      return;
     }
 
-    setIsSubmitting(true)
-    
+    setIsSubmitting(true);
+
     try {
       // Register user
       const response = await fetch("/api/auth/register", {
@@ -67,14 +84,14 @@ export default function SignUpPage() {
           password: formData.password,
           organizationName: formData.company || undefined,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Failed to create account")
-        setIsSubmitting(false)
-        return
+        setError(data.error || "Failed to create account");
+        setIsSubmitting(false);
+        return;
       }
 
       // Auto sign-in after successful registration
@@ -82,68 +99,69 @@ export default function SignUpPage() {
         email: formData.email,
         password: formData.password,
         redirect: false,
-      })
+      });
 
       if (signInResult?.ok) {
-        router.push("/dashboard/dashboard")
+        router.push("/dashboard/dashboard");
       } else {
         // Registration successful but auto sign-in failed
-        router.push("/sign-in?registered=true")
+        router.push("/sign-in?registered=true");
       }
     } catch (err) {
-      setError("An unexpected error occurred. Please try again.")
-      setIsSubmitting(false)
+      setError("An unexpected error occurred. Please try again.");
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
-    setFormData(prev => ({
+    const value =
+      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: value
-    }))
+      [e.target.name]: value,
+    }));
 
     // Clear error when user starts typing
-    if (error) setError(null)
+    if (error) setError(null);
 
     // Calculate password strength
-    if (e.target.name === 'password') {
-      const password = e.target.value
-      let strength = 0
-      if (password.length >= 8) strength++
-      if (password.length >= 12) strength++
-      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++
-      if (/\d/.test(password)) strength++
-      if (/[^a-zA-Z0-9]/.test(password)) strength++
-      setPasswordStrength(strength)
+    if (e.target.name === "password") {
+      const password = e.target.value;
+      let strength = 0;
+      if (password.length >= 8) strength++;
+      if (password.length >= 12) strength++;
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+      if (/\d/.test(password)) strength++;
+      if (/[^a-zA-Z0-9]/.test(password)) strength++;
+      setPasswordStrength(strength);
     }
-  }
+  };
 
   const handleOAuthSignUp = async (provider: "google" | "github") => {
-    setIsSubmitting(true)
-    setError(null)
-    
+    setIsSubmitting(true);
+    setError(null);
+
     try {
       await signIn(provider, {
         callbackUrl: "/dashboard/dashboard",
-      })
+      });
     } catch (err) {
-      setError(`Failed to sign up with ${provider}. Please try again.`)
-      setIsSubmitting(false)
+      setError(`Failed to sign up with ${provider}. Please try again.`);
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const getPasswordStrengthColor = () => {
-    if (passwordStrength <= 1) return 'bg-red-500'
-    if (passwordStrength <= 3) return 'bg-yellow-500'
-    return 'bg-green-500'
-  }
+    if (passwordStrength <= 1) return "bg-red-500";
+    if (passwordStrength <= 3) return "bg-yellow-500";
+    return "bg-green-500";
+  };
 
   const getPasswordStrengthText = () => {
-    if (passwordStrength <= 1) return 'Weak'
-    if (passwordStrength <= 3) return 'Medium'
-    return 'Strong'
-  }
+    if (passwordStrength <= 1) return "Weak";
+    if (passwordStrength <= 3) return "Medium";
+    return "Strong";
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-background to-muted/20 py-12 px-4">
@@ -160,12 +178,14 @@ export default function SignUpPage() {
 
         <Card>
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              Create an account
+            </CardTitle>
             <CardDescription>
               Get started with your free 14-day trial
             </CardDescription>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             {/* Error Message */}
             {error && (
@@ -186,7 +206,7 @@ export default function SignUpPage() {
                 <Chrome className="mr-2 h-4 w-4" />
                 Continue with Google
               </Button>
-              
+
               <Button
                 variant="outline"
                 className="w-full"
@@ -289,12 +309,18 @@ export default function SignUpPage() {
                 {formData.password && (
                   <div className="mt-2">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs text-muted-foreground">Password strength:</span>
-                      <span className={`text-xs font-medium ${
-                        passwordStrength <= 1 ? 'text-red-600' :
-                        passwordStrength <= 3 ? 'text-yellow-600' :
-                        'text-green-600'
-                      }`}>
+                      <span className="text-xs text-muted-foreground">
+                        Password strength:
+                      </span>
+                      <span
+                        className={`text-xs font-medium ${
+                          passwordStrength <= 1
+                            ? "text-red-600"
+                            : passwordStrength <= 3
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                        }`}
+                      >
                         {getPasswordStrengthText()}
                       </span>
                     </div>
@@ -340,12 +366,15 @@ export default function SignUpPage() {
                   htmlFor="agreeToTerms"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  I agree to the{' '}
+                  I agree to the{" "}
                   <Link href="/terms" className="text-primary hover:underline">
                     Terms of Service
-                  </Link>
-                  {' '}and{' '}
-                  <Link href="/privacy" className="text-primary hover:underline">
+                  </Link>{" "}
+                  and{" "}
+                  <Link
+                    href="/privacy"
+                    className="text-primary hover:underline"
+                  >
                     Privacy Policy
                   </Link>
                 </label>
@@ -373,15 +402,20 @@ export default function SignUpPage() {
 
             {/* Features List */}
             <div className="pt-4 border-t space-y-2">
-              <p className="text-xs font-medium text-muted-foreground">What's included:</p>
+              <p className="text-xs font-medium text-muted-foreground">
+                What's included:
+              </p>
               <div className="space-y-1">
                 {[
                   "14-day free trial",
                   "No credit card required",
                   "Full access to all features",
-                  "24/7 support"
+                  "24/7 support",
                 ].map((feature) => (
-                  <div key={feature} className="flex items-center space-x-2 text-xs text-muted-foreground">
+                  <div
+                    key={feature}
+                    className="flex items-center space-x-2 text-xs text-muted-foreground"
+                  >
                     <Check className="h-3 w-3 text-green-600" />
                     <span>{feature}</span>
                   </div>
@@ -393,8 +427,13 @@ export default function SignUpPage() {
 
         {/* Sign In Link */}
         <div className="mt-6 text-center text-sm">
-          <span className="text-muted-foreground">Already have an account? </span>
-          <Link href="/sign-in" className="text-primary font-medium hover:underline">
+          <span className="text-muted-foreground">
+            Already have an account?{" "}
+          </span>
+          <Link
+            href="/sign-in"
+            className="text-primary font-medium hover:underline"
+          >
             Sign in
           </Link>
         </div>
@@ -411,5 +450,5 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

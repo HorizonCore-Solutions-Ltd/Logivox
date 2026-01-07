@@ -1,10 +1,10 @@
-import { NextAuthOptions } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import GoogleProvider from "next-auth/providers/google"
-import GitHubProvider from "next-auth/providers/github"
-import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
-import { prisma } from "@/lib/prisma"
+import { NextAuthOptions } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import GoogleProvider from "next-auth/providers/google";
+import GitHubProvider from "next-auth/providers/github";
+import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -21,30 +21,30 @@ export const authOptions: NextAuthOptions = {
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials")
+          throw new Error("Invalid credentials");
         }
 
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email
-          }
-        })
+            email: credentials.email,
+          },
+        });
 
         if (!user || !user.password) {
-          throw new Error("Invalid credentials")
+          throw new Error("Invalid credentials");
         }
 
         const isCorrectPassword = await bcrypt.compare(
           credentials.password,
-          user.password
-        )
+          user.password,
+        );
 
         if (!isCorrectPassword) {
-          throw new Error("Invalid credentials")
+          throw new Error("Invalid credentials");
         }
 
         return {
@@ -52,9 +52,9 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name,
           image: user.image,
-        }
-      }
-    })
+        };
+      },
+    }),
   ],
   pages: {
     signIn: "/sign-in",
@@ -68,8 +68,8 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       if (user) {
-        token.id = user.id
-        
+        token.id = user.id;
+
         // Get user's organization memberships and role
         const dbUser = await prisma.user.findUnique({
           where: { id: user.id },
@@ -77,33 +77,35 @@ export const authOptions: NextAuthOptions = {
             organizationMemberships: {
               where: { isActive: true },
               include: {
-                organization: true
-              }
-            }
-          }
-        })
+                organization: true,
+              },
+            },
+          },
+        });
 
         if (dbUser) {
-          token.role = dbUser.role
-          token.organizations = dbUser.organizationMemberships.map((m: any) => ({
-            id: m.organization.id,
-            name: m.organization.name,
-            role: m.role,
-            slug: m.organization.slug
-          }))
+          token.role = dbUser.role;
+          token.organizations = dbUser.organizationMemberships.map(
+            (m: any) => ({
+              id: m.organization.id,
+              name: m.organization.name,
+              role: m.role,
+              slug: m.organization.slug,
+            }),
+          );
         }
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string
-        session.user.role = token.role as string
-        session.user.organizations = token.organizations as any
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.organizations = token.organizations as any;
       }
-      return session
-    }
+      return session;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
-}
+};

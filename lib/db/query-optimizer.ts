@@ -3,7 +3,7 @@
  * Provides optimized query patterns and utilities
  */
 
-import { Prisma } from '@prisma/client';
+import { Prisma } from "@prisma/client";
 
 /**
  * Common select fields to reduce data transfer
@@ -66,7 +66,7 @@ export interface PaginationParams {
   page?: number;
   limit?: number;
   sortBy?: string;
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
 }
 
 export interface PaginatedResult<T> {
@@ -97,7 +97,7 @@ export function buildPaginatedResult<T>(
   data: T[],
   total: number,
   page: number,
-  limit: number
+  limit: number,
 ): PaginatedResult<T> {
   const totalPages = Math.ceil(total / limit);
 
@@ -118,7 +118,7 @@ export function buildPaginatedResult<T>(
  */
 export function buildSearchQuery(
   searchTerm: string,
-  fields: string[]
+  fields: string[],
 ): Prisma.InputJsonValue {
   if (!searchTerm || fields.length === 0) {
     return {};
@@ -127,7 +127,7 @@ export function buildSearchQuery(
   const searchConditions = fields.map((field) => ({
     [field]: {
       contains: searchTerm,
-      mode: 'insensitive' as Prisma.QueryMode,
+      mode: "insensitive" as Prisma.QueryMode,
     },
   }));
 
@@ -139,7 +139,7 @@ export function buildSearchQuery(
 export function buildDateRangeQuery(
   field: string,
   startDate?: Date,
-  endDate?: Date
+  endDate?: Date,
 ): Prisma.InputJsonValue {
   const conditions: any = {};
 
@@ -162,10 +162,10 @@ export function buildDateRangeQuery(
 
 export function buildSortOrder(
   sortBy?: string,
-  sortOrder: 'asc' | 'desc' = 'desc'
+  sortOrder: "asc" | "desc" = "desc",
 ): Prisma.InputJsonValue {
   if (!sortBy) {
-    return { createdAt: 'desc' };
+    return { createdAt: "desc" };
   }
 
   return {
@@ -187,7 +187,7 @@ export function chunkArray<T>(array: T[], size: number): T[][] {
 export async function batchProcess<T, R>(
   items: T[],
   processor: (batch: T[]) => Promise<R[]>,
-  batchSize: number = 100
+  batchSize: number = 100,
 ): Promise<R[]> {
   const chunks = chunkArray(items, batchSize);
   const results: R[] = [];
@@ -222,7 +222,7 @@ export const OptimizedIncludes = {
     },
     movements: {
       take: 10,
-      orderBy: { createdAt: 'desc' as const },
+      orderBy: { createdAt: "desc" as const },
       select: {
         id: true,
         type: true,
@@ -387,7 +387,8 @@ model AuditLog {
  * Query performance monitoring
  */
 export class QueryPerformanceMonitor {
-  private static queries: Map<string, { count: number; totalTime: number }> = new Map();
+  private static queries: Map<string, { count: number; totalTime: number }> =
+    new Map();
 
   static track(queryName: string, executionTime: number): void {
     const existing = this.queries.get(queryName) || { count: 0, totalTime: 0 };
@@ -423,7 +424,7 @@ export function TrackQuery(queryName: string) {
   return function (
     target: any,
     propertyKey: string,
-    descriptor: PropertyDescriptor
+    descriptor: PropertyDescriptor,
   ) {
     const originalMethod = descriptor.value;
 
@@ -438,7 +439,7 @@ export function TrackQuery(queryName: string) {
         // Log slow queries (> 1 second)
         if (executionTime > 1000) {
           console.warn(
-            `Slow query detected: ${queryName} took ${executionTime}ms`
+            `Slow query detected: ${queryName} took ${executionTime}ms`,
           );
         }
       }

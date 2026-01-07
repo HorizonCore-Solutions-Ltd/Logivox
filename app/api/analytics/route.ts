@@ -3,29 +3,29 @@
  * Calculate and return KPI metrics
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const range = searchParams.get('range') || 'today';
+    const range = searchParams.get("range") || "today";
 
     // Calculate date range
     const now = new Date();
     let startDate: Date;
 
-    if (range === 'today') {
+    if (range === "today") {
       startDate = new Date(now.setHours(0, 0, 0, 0));
-    } else if (range === 'week') {
+    } else if (range === "week") {
       startDate = new Date(now.setDate(now.getDate() - 7));
-    } else if (range === 'month') {
+    } else if (range === "month") {
       startDate = new Date(now.setMonth(now.getMonth() - 1));
     } else {
       startDate = new Date(now.setHours(0, 0, 0, 0));
@@ -42,7 +42,9 @@ export async function GET(req: NextRequest) {
     });
 
     const approvedLoadSheets = loadSheets.filter((ls) => ls.approved);
-    const departedLoadSheets = loadSheets.filter((ls) => ls.status === 'DEPARTED');
+    const departedLoadSheets = loadSheets.filter(
+      (ls) => ls.status === "DEPARTED",
+    );
 
     const avgApprovalTime =
       approvedLoadSheets.reduce((sum, ls) => {
@@ -66,7 +68,8 @@ export async function GET(req: NextRequest) {
     });
 
     const avgWeight =
-      containers.reduce((sum, c) => sum + c.weight, 0) / (containers.length || 1);
+      containers.reduce((sum, c) => sum + c.weight, 0) /
+      (containers.length || 1);
 
     const avgUtilization =
       containers.reduce((sum, c) => {
@@ -78,24 +81,24 @@ export async function GET(req: NextRequest) {
     // Worker Analytics
     const workers = await prisma.user.count({
       where: {
-        role: { in: ['USER', 'MANAGER'] },
+        role: { in: ["USER", "MANAGER"] },
       },
     });
 
     const activeSessions = await prisma.aISupervisionSession.findMany({
       where: {
-        status: 'ACTIVE',
+        status: "ACTIVE",
         startTime: { gte: startDate },
       },
     });
 
     const avgProductivity =
       activeSessions.reduce((sum, s) => sum + (s.productivityScore || 0), 0) /
-        (activeSessions.length || 1);
+      (activeSessions.length || 1);
 
     const avgAccuracy =
       activeSessions.reduce((sum, s) => sum + (s.accuracyScore || 0), 0) /
-        (activeSessions.length || 1);
+      (activeSessions.length || 1);
 
     // Voice Analytics
     const voiceCommands = await prisma.voiceCommand.findMany({
@@ -106,11 +109,11 @@ export async function GET(req: NextRequest) {
 
     const avgVoiceAccuracy =
       voiceCommands.reduce((sum, vc) => sum + (vc.confidence || 0) * 100, 0) /
-        (voiceCommands.length || 1);
+      (voiceCommands.length || 1);
 
     const avgResponseTime =
       voiceCommands.reduce((sum, vc) => sum + (vc.processingTime || 0), 0) /
-        (voiceCommands.length || 1);
+      (voiceCommands.length || 1);
 
     const intentCounts = new Map<string, number>();
     voiceCommands.forEach((vc) => {
@@ -164,8 +167,8 @@ export async function GET(req: NextRequest) {
       },
       containers: {
         total: containers.length,
-        packed: containers.filter((c) => c.status === 'PACKED').length,
-        shipped: containers.filter((c) => c.status === 'SHIPPED').length,
+        packed: containers.filter((c) => c.status === "PACKED").length,
+        shipped: containers.filter((c) => c.status === "SHIPPED").length,
         avgWeight: Math.round(avgWeight),
         avgUtilization: Math.round(avgUtilization * 10) / 10,
       },
@@ -195,10 +198,10 @@ export async function GET(req: NextRequest) {
       startDate,
     });
   } catch (error) {
-    console.error('Analytics GET error:', error);
+    console.error("Analytics GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch analytics' },
-      { status: 500 }
+      { error: "Failed to fetch analytics" },
+      { status: 500 },
     );
   }
 }

@@ -13,6 +13,7 @@ Part 2 delivers "5–10 years ahead" appointment scheduling: AI-driven slot opti
 This part assumes Part 1's core appointment lifecycle exists (booking, check-in, door assignment, execution, KPIs).
 
 ### Advanced Capabilities
+
 - **AI Slot Optimizer**: Machine learning suggests optimal appointment times and resource allocation
 - **Predictive No-Show & Late Scoring**: Risk-based confirmations and buffer management
 - **Dynamic Pricing & Priority Bidding**: Market-based slot allocation with surge pricing
@@ -25,34 +26,45 @@ This part assumes Part 1's core appointment lifecycle exists (booking, check-in,
 ## 🧠 1. AI-Driven Slot Optimization Engine
 
 ### Goal
+
 Maximize dock throughput, minimize wait times, and balance labor/equipment utilization using ML.
 
 ```typescript
 type OptimizationObjective =
-  | 'MAXIMIZE_THROUGHPUT'
-  | 'MINIMIZE_WAIT_TIME'
-  | 'BALANCE_LABOR'
-  | 'MINIMIZE_IDLE_DOORS'
-  | 'MAXIMIZE_REVENUE'
-  | 'MULTI_OBJECTIVE';
+  | "MAXIMIZE_THROUGHPUT"
+  | "MINIMIZE_WAIT_TIME"
+  | "BALANCE_LABOR"
+  | "MINIMIZE_IDLE_DOORS"
+  | "MAXIMIZE_REVENUE"
+  | "MULTI_OBJECTIVE";
 
 type SlotRecommendationReason =
-  | 'LOW_CONGESTION_WINDOW'
-  | 'LABOR_AVAILABILITY'
-  | 'EQUIPMENT_AVAILABLE'
-  | 'CROSS_DOCK_MATCH'
-  | 'PREFERRED_CARRIER_SLOT'
-  | 'REVENUE_OPTIMIZATION';
+  | "LOW_CONGESTION_WINDOW"
+  | "LABOR_AVAILABILITY"
+  | "EQUIPMENT_AVAILABLE"
+  | "CROSS_DOCK_MATCH"
+  | "PREFERRED_CARRIER_SLOT"
+  | "REVENUE_OPTIMIZATION";
 
 interface AISlotOptimizer {
-  trainModel: (warehouseId: string, historicalMonths: number) => Promise<ModelTrainingResult>;
+  trainModel: (
+    warehouseId: string,
+    historicalMonths: number,
+  ) => Promise<ModelTrainingResult>;
   getModelStatus: (warehouseId: string) => Promise<ModelStatus>;
 
-  optimizeSchedule: (input: ScheduleOptimizationInput) => Promise<ScheduleOptimizationResult>;
-  suggestBestSlot: (appointmentRequest: AppointmentRequest) => Promise<SlotSuggestion[]>;
+  optimizeSchedule: (
+    input: ScheduleOptimizationInput,
+  ) => Promise<ScheduleOptimizationResult>;
+  suggestBestSlot: (
+    appointmentRequest: AppointmentRequest,
+  ) => Promise<SlotSuggestion[]>;
 
   // Continuous learning
-  recordOutcome: (appointmentId: string, outcome: AppointmentOutcome) => Promise<void>;
+  recordOutcome: (
+    appointmentId: string,
+    outcome: AppointmentOutcome,
+  ) => Promise<void>;
 }
 
 interface ScheduleOptimizationInput {
@@ -61,10 +73,10 @@ interface ScheduleOptimizationInput {
 
   objective: OptimizationObjective;
   weights?: {
-    throughput?: number;    // 0-1
-    waitTime?: number;      // 0-1
-    laborCost?: number;     // 0-1
-    revenue?: number;       // 0-1
+    throughput?: number; // 0-1
+    waitTime?: number; // 0-1
+    laborCost?: number; // 0-1
+    revenue?: number; // 0-1
   };
 
   constraints: {
@@ -87,9 +99,9 @@ interface ScheduleOptimizationResult {
 
   recommendations: {
     appointmentId?: string; // if existing
-    requestId?: string;     // if pending
+    requestId?: string; // if pending
 
-    action: 'KEEP' | 'MOVE' | 'ASSIGN';
+    action: "KEEP" | "MOVE" | "ASSIGN";
 
     // if move or assign
     suggestedStart?: Date;
@@ -133,12 +145,12 @@ interface ModelTrainingResult {
   accuracy: number;
   rmse?: number;
 
-  status: 'TRAINING' | 'READY' | 'FAILED';
+  status: "TRAINING" | "READY" | "FAILED";
 }
 
 interface ModelStatus {
   modelId?: string;
-  status: 'NOT_TRAINED' | 'TRAINING' | 'READY' | 'STALE';
+  status: "NOT_TRAINED" | "TRAINING" | "READY" | "STALE";
 
   lastTrainedAt?: Date;
   recordsUsed?: number;
@@ -173,29 +185,40 @@ const AI_OPTIMIZER_VOICE_COMMANDS = [
 ## 🎯 2. Predictive No-Show & Late Arrival Scoring
 
 ### Goal
+
 Proactively identify risky appointments and take preventive actions (confirmations, overbooking, buffers).
 
 ```typescript
-type RiskBand = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+type RiskBand = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 type RiskMitigationAction =
-  | 'SEND_CONFIRMATION'
-  | 'CALL_CARRIER'
-  | 'ALLOW_OVERBOOK'
-  | 'ASSIGN_BUFFER_SLOT'
-  | 'ESCALATE_TO_MANAGER'
-  | 'CHARGE_NO_SHOW_FEE';
+  | "SEND_CONFIRMATION"
+  | "CALL_CARRIER"
+  | "ALLOW_OVERBOOK"
+  | "ASSIGN_BUFFER_SLOT"
+  | "ESCALATE_TO_MANAGER"
+  | "CHARGE_NO_SHOW_FEE";
 
 interface PredictiveRiskScoring {
   scoreAppointment: (appointmentId: string) => Promise<AppointmentRiskScore>;
-  scorePendingRequest: (request: AppointmentRequest) => Promise<AppointmentRiskScore>;
+  scorePendingRequest: (
+    request: AppointmentRequest,
+  ) => Promise<AppointmentRiskScore>;
 
   // Bulk
-  identifyRiskyAppointments: (filters: RiskIdentificationFilters) => Promise<AppointmentRiskScore[]>;
+  identifyRiskyAppointments: (
+    filters: RiskIdentificationFilters,
+  ) => Promise<AppointmentRiskScore[]>;
 
   // Actions
-  recommendMitigation: (appointmentId: string) => Promise<MitigationRecommendation>;
-  applyMitigation: (appointmentId: string, action: RiskMitigationAction, userId: string) => Promise<void>;
+  recommendMitigation: (
+    appointmentId: string,
+  ) => Promise<MitigationRecommendation>;
+  applyMitigation: (
+    appointmentId: string,
+    action: RiskMitigationAction,
+    userId: string,
+  ) => Promise<void>;
 }
 
 interface AppointmentRiskScore {
@@ -237,7 +260,7 @@ interface MitigationRecommendation {
 
   suggestedActions: {
     action: RiskMitigationAction;
-    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+    priority: "HIGH" | "MEDIUM" | "LOW";
     reason: string;
     estimatedImpact: string;
   }[];
@@ -260,21 +283,25 @@ const PREDICTIVE_RISK_VOICE_COMMANDS = [
 ## 💰 3. Dynamic Pricing & Priority Bidding
 
 ### Goal
+
 Monetize high-demand slots and allow priority carriers to bid for premium times.
 
 ```typescript
 type PricingStrategy =
-  | 'FLAT_RATE'
-  | 'SURGE_PRICING'
-  | 'TIME_OF_DAY'
-  | 'DEMAND_BASED'
-  | 'AUCTION';
+  | "FLAT_RATE"
+  | "SURGE_PRICING"
+  | "TIME_OF_DAY"
+  | "DEMAND_BASED"
+  | "AUCTION";
 
-type BidStatus = 'SUBMITTED' | 'ACCEPTED' | 'REJECTED' | 'OUTBID' | 'EXPIRED';
+type BidStatus = "SUBMITTED" | "ACCEPTED" | "REJECTED" | "OUTBID" | "EXPIRED";
 
 interface DynamicPricingEngine {
   configurePricing: (config: PricingConfig) => Promise<void>;
-  calculateSlotPrice: (slot: AvailableSlot, context: PricingContext) => Promise<SlotPrice>;
+  calculateSlotPrice: (
+    slot: AvailableSlot,
+    context: PricingContext,
+  ) => Promise<SlotPrice>;
 
   // Bidding
   submitBid: (bid: AppointmentBid) => Promise<BidResult>;
@@ -308,7 +335,10 @@ interface PricingConfig {
   };
 
   discounts?: {
-    volumeCarriers?: { minAppointmentsPerMonth: number; discountPercent: number }[];
+    volumeCarriers?: {
+      minAppointmentsPerMonth: number;
+      discountPercent: number;
+    }[];
     preferredCarriers?: { carrierId: string; discountPercent: number }[];
   };
 }
@@ -424,24 +454,25 @@ const DYNAMIC_PRICING_VOICE_COMMANDS = [
 ## 🌐 4. Disruption-Aware Auto-Reschedule & Multi-Party Negotiation
 
 ### Goal
+
 When weather, traffic, or carrier delays occur, automatically propose and coordinate reschedules.
 
 ```typescript
 type DisruptionSource =
-  | 'WEATHER_API'
-  | 'TRAFFIC_API'
-  | 'CARRIER_API'
-  | 'TMS'
-  | 'WMS_INTERNAL'
-  | 'USER';
+  | "WEATHER_API"
+  | "TRAFFIC_API"
+  | "CARRIER_API"
+  | "TMS"
+  | "WMS_INTERNAL"
+  | "USER";
 
 type RescheduleTrigger =
-  | 'LATE_ETA'
-  | 'SEVERE_WEATHER'
-  | 'TRAFFIC_ALERT'
-  | 'CARRIER_EQUIPMENT_FAILURE'
-  | 'DOCK_UNAVAILABLE'
-  | 'LABOR_SHORTAGE';
+  | "LATE_ETA"
+  | "SEVERE_WEATHER"
+  | "TRAFFIC_ALERT"
+  | "CARRIER_EQUIPMENT_FAILURE"
+  | "DOCK_UNAVAILABLE"
+  | "LABOR_SHORTAGE";
 
 interface DisruptionEvent {
   id: string;
@@ -452,7 +483,7 @@ interface DisruptionEvent {
 
   affectedAppointments: string[];
 
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   message: string;
 
   estimatedDelayMinutes?: number;
@@ -461,13 +492,22 @@ interface DisruptionEvent {
 interface AutoRescheduleEngine {
   ingestDisruption: (event: DisruptionEvent) => Promise<void>;
 
-  proposeReschedule: (appointmentId: string, disruption: DisruptionEvent) => Promise<RescheduleProposal>;
-  simulateReschedule: (proposal: RescheduleProposal) => Promise<RescheduleSimulation>;
+  proposeReschedule: (
+    appointmentId: string,
+    disruption: DisruptionEvent,
+  ) => Promise<RescheduleProposal>;
+  simulateReschedule: (
+    proposal: RescheduleProposal,
+  ) => Promise<RescheduleSimulation>;
 
   // Multi-party negotiation
   sendProposal: (proposalId: string, parties: string[]) => Promise<void>;
   acceptProposal: (proposalId: string, partyId: string) => Promise<void>;
-  rejectProposal: (proposalId: string, partyId: string, counterOffer?: Date) => Promise<void>;
+  rejectProposal: (
+    proposalId: string,
+    partyId: string,
+    counterOffer?: Date,
+  ) => Promise<void>;
 
   // Autonomous mode
   autoApproveWithinGuardrails: (proposalId: string) => Promise<boolean>;
@@ -494,18 +534,18 @@ interface RescheduleProposal {
   reason: string;
   impacts: {
     description: string;
-    severity: 'LOW' | 'MEDIUM' | 'HIGH';
+    severity: "LOW" | "MEDIUM" | "HIGH";
   }[];
 
   // Who must approve
   approvers: {
-    party: 'CARRIER' | 'WAREHOUSE' | 'CUSTOMER' | 'SUPPLIER';
+    party: "CARRIER" | "WAREHOUSE" | "CUSTOMER" | "SUPPLIER";
     partyId: string;
     required: boolean;
     approvedAt?: Date;
   }[];
 
-  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'AUTO_APPROVED' | 'EXPIRED';
+  status: "PENDING" | "APPROVED" | "REJECTED" | "AUTO_APPROVED" | "EXPIRED";
 
   createdAt: Date;
   expiresAt: Date;
@@ -543,12 +583,13 @@ const AUTO_RESCHEDULE_VOICE_COMMANDS = [
 ## 👁️ 5. IoT/CV Gate & Door Validation
 
 ### Goal
+
 Automate trailer verification at gate check-in and dock arrival using sensors and cameras.
 
 ```typescript
-type ValidationCheckpoint = 'GATE' | 'YARD' | 'DOOR';
+type ValidationCheckpoint = "GATE" | "YARD" | "DOOR";
 
-type ValidationOutcome = 'PASS' | 'FLAG' | 'HOLD' | 'REJECT';
+type ValidationOutcome = "PASS" | "FLAG" | "HOLD" | "REJECT";
 
 interface TrailerValidation {
   id: string;
@@ -558,8 +599,15 @@ interface TrailerValidation {
   validatedAt: Date;
 
   checks: {
-    check: 'TRAILER_ID' | 'SEAL_NUMBER' | 'PLACARD' | 'TEMPERATURE' | 'DAMAGE' | 'LICENSE_PLATE' | 'SIZE';
-    method: 'CV' | 'IOT' | 'RFID' | 'MANUAL';
+    check:
+      | "TRAILER_ID"
+      | "SEAL_NUMBER"
+      | "PLACARD"
+      | "TEMPERATURE"
+      | "DAMAGE"
+      | "LICENSE_PLATE"
+      | "SIZE";
+    method: "CV" | "IOT" | "RFID" | "MANUAL";
 
     expected?: string;
     actual?: string;
@@ -575,11 +623,17 @@ interface TrailerValidation {
 }
 
 interface IoTCVValidationEngine {
-  validateAtCheckpoint: (input: ValidationRequest) => Promise<TrailerValidation>;
+  validateAtCheckpoint: (
+    input: ValidationRequest,
+  ) => Promise<TrailerValidation>;
   getValidationHistory: (appointmentId: string) => Promise<TrailerValidation[]>;
 
   // Exception handling
-  overrideValidation: (validationId: string, userId: string, reason: string) => Promise<void>;
+  overrideValidation: (
+    validationId: string,
+    userId: string,
+    reason: string,
+  ) => Promise<void>;
 }
 
 interface ValidationRequest {
@@ -608,20 +662,21 @@ const IOT_CV_VALIDATION_VOICE_COMMANDS = [
 ## 🤖 6. Autonomous Multi-Party Orchestration
 
 ### Goal
+
 System automatically coordinates appointment execution across Yard, Dock, Labor, Wave, and Carrier.
 
 ```typescript
-type OrchestrationMode = 'MANUAL' | 'SEMI_AUTONOMOUS' | 'FULL_AUTONOMOUS';
+type OrchestrationMode = "MANUAL" | "SEMI_AUTONOMOUS" | "FULL_AUTONOMOUS";
 
 type OrchestrationDecision =
-  | 'ASSIGN_YARD_SPOT'
-  | 'RELEASE_FROM_YARD'
-  | 'ASSIGN_DOCK_DOOR'
-  | 'ALLOCATE_LABOR_TEAM'
-  | 'ASSIGN_FORKLIFT'
-  | 'TRIGGER_WAVE_RELEASE'
-  | 'NOTIFY_CARRIER'
-  | 'CREATE_CROSS_DOCK_PLAN';
+  | "ASSIGN_YARD_SPOT"
+  | "RELEASE_FROM_YARD"
+  | "ASSIGN_DOCK_DOOR"
+  | "ALLOCATE_LABOR_TEAM"
+  | "ASSIGN_FORKLIFT"
+  | "TRIGGER_WAVE_RELEASE"
+  | "NOTIFY_CARRIER"
+  | "CREATE_CROSS_DOCK_PLAN";
 
 interface AutonomousOrchestrator {
   setMode: (warehouseId: string, mode: OrchestrationMode) => Promise<void>;
@@ -656,7 +711,7 @@ interface OrchestrationPlan {
     executedAt?: Date;
   }[];
 
-  status: 'PENDING' | 'APPROVED' | 'EXECUTING' | 'COMPLETED' | 'FAILED';
+  status: "PENDING" | "APPROVED" | "EXECUTING" | "COMPLETED" | "FAILED";
 
   audit: {
     immutableLogRef: string;
@@ -695,6 +750,7 @@ const AUTONOMOUS_ORCHESTRATION_VOICE_COMMANDS = [
 ## 📊 Part 2 Summary
 
 ### Advanced Features Covered
+
 ✅ AI slot optimization (ML-driven throughput/wait/labor balancing)  
 ✅ Predictive no-show & late arrival risk scoring + mitigation  
 ✅ Dynamic pricing & priority bidding (surge pricing, auctions)  

@@ -1,39 +1,55 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, ArrowLeft, Save } from 'lucide-react';
-import { format } from 'date-fns';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, ArrowLeft, Save } from "lucide-react";
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
 
 export default function CreateAudit() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const [type, setType] = useState('');
-  const [scope, setScope] = useState('');
-  const [standard, setStandard] = useState('');
+  const [type, setType] = useState("");
+  const [scope, setScope] = useState("");
+  const [standard, setStandard] = useState("");
   const [auditDate, setAuditDate] = useState<Date>();
-  const [location, setLocation] = useState('');
-  const [auditorName, setAuditorName] = useState('');
-  const [auditorOrg, setAuditorOrg] = useState('');
-  const [auditeeName, setAuditeeName] = useState('');
+  const [location, setLocation] = useState("");
+  const [auditorName, setAuditorName] = useState("");
+  const [auditorOrg, setAuditorOrg] = useState("");
+  const [auditeeName, setAuditeeName] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const response = await fetch('/api/qc/audits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/audits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type,
           scope,
@@ -43,12 +59,12 @@ export default function CreateAudit() {
           auditorName,
           auditorOrg,
           auditeeName,
-          organizationId: 'org-1',
-          createdBy: 'current-user'
-        })
+          organizationId: "org-1",
+          createdBy: "current-user",
+        }),
       });
 
-      if (!response.ok) throw new Error('Failed to create audit');
+      if (!response.ok) throw new Error("Failed to create audit");
 
       const result = await response.json();
       router.push(`/dashboard/qc/audits/${result.data.id}`);
@@ -64,7 +80,9 @@ export default function CreateAudit() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Schedule New Audit</h1>
-          <p className="text-muted-foreground">Plan internal, supplier, or regulatory audit</p>
+          <p className="text-muted-foreground">
+            Plan internal, supplier, or regulatory audit
+          </p>
         </div>
         <Button variant="outline" onClick={() => router.back()}>
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -90,7 +108,9 @@ export default function CreateAudit() {
                     <SelectItem value="SUPPLIER">Supplier Audit</SelectItem>
                     <SelectItem value="CUSTOMER">Customer Audit</SelectItem>
                     <SelectItem value="REGULATORY">Regulatory Audit</SelectItem>
-                    <SelectItem value="CERTIFICATION">Certification Audit</SelectItem>
+                    <SelectItem value="CERTIFICATION">
+                      Certification Audit
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -106,7 +126,9 @@ export default function CreateAudit() {
                     <SelectItem value="ISO_13485">ISO 13485</SelectItem>
                     <SelectItem value="AS9100">AS9100</SelectItem>
                     <SelectItem value="IATF_16949">IATF 16949</SelectItem>
-                    <SelectItem value="FDA_21_CFR_820">FDA 21 CFR Part 820</SelectItem>
+                    <SelectItem value="FDA_21_CFR_820">
+                      FDA 21 CFR Part 820
+                    </SelectItem>
                     <SelectItem value="GMP">GMP</SelectItem>
                   </SelectContent>
                 </Select>
@@ -131,7 +153,7 @@ export default function CreateAudit() {
                   <PopoverTrigger asChild>
                     <Button variant="outline" className="w-full justify-start">
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {auditDate ? format(auditDate, 'PPP') : 'Select date'}
+                      {auditDate ? format(auditDate, "PPP") : "Select date"}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent>
@@ -197,7 +219,9 @@ export default function CreateAudit() {
             Cancel
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? 'Creating...' : (
+            {loading ? (
+              "Creating..."
+            ) : (
               <>
                 <Save className="w-4 h-4 mr-2" />
                 Schedule Audit

@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 const CreateDARSchema = z.object({
   warehouseId: z.string().optional(),
   reportDate: z.string(),
-  shiftType: z.enum(['DAY', 'EVENING', 'NIGHT']),
+  shiftType: z.enum(["DAY", "EVENING", "NIGHT"]),
   guardId: z.string(),
   guardName: z.string(),
   supervisorId: z.string().optional(),
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const json = await req.json();
@@ -35,7 +35,10 @@ export async function POST(req: NextRequest) {
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     // Generate report number
@@ -50,24 +53,30 @@ export async function POST(req: NextRequest) {
         },
       },
     });
-    const reportNumber = `DAR-${year}-${String(count + 1).padStart(4, '0')}`;
+    const reportNumber = `DAR-${year}-${String(count + 1).padStart(4, "0")}`;
 
     // Calculate activity counts from actual data
     const shiftStart = new Date(body.shiftStart);
     const shiftEnd = new Date(body.shiftEnd);
 
-    const [gateEntriesCount, gateExitsCount, visitorsCheckIns, incidentsCount, patrolsCount] = await Promise.all([
+    const [
+      gateEntriesCount,
+      gateExitsCount,
+      visitorsCheckIns,
+      incidentsCount,
+      patrolsCount,
+    ] = await Promise.all([
       prisma.gateEntry.count({
         where: {
           organizationId,
-          direction: 'INBOUND',
+          direction: "INBOUND",
           entryTime: { gte: shiftStart, lte: shiftEnd },
         },
       }),
       prisma.gateEntry.count({
         where: {
           organizationId,
-          direction: 'OUTBOUND',
+          direction: "OUTBOUND",
           exitTime: { gte: shiftStart, lte: shiftEnd },
         },
       }),
@@ -88,7 +97,7 @@ export async function POST(req: NextRequest) {
           organizationId,
           guardId: body.guardId,
           startTime: { gte: shiftStart, lte: shiftEnd },
-          status: 'COMPLETED',
+          status: "COMPLETED",
         },
       }),
     ]);
@@ -102,7 +111,8 @@ export async function POST(req: NextRequest) {
     });
 
     // Calculate total hours
-    const totalHours = (shiftEnd.getTime() - shiftStart.getTime()) / (1000 * 60 * 60);
+    const totalHours =
+      (shiftEnd.getTime() - shiftStart.getTime()) / (1000 * 60 * 60);
 
     const report = await prisma.dailyActivityReport.create({
       data: {
@@ -130,17 +140,23 @@ export async function POST(req: NextRequest) {
         observations: body.observations,
         significantEvents: body.significantEvents,
         handoverNotes: body.handoverNotes,
-        status: 'DRAFT',
+        status: "DRAFT",
       },
     });
 
     return NextResponse.json(report);
   } catch (error: any) {
-    console.error('Error creating daily report:', error);
-    if (error.name === 'ZodError') {
-      return NextResponse.json({ error: 'Invalid request data', details: error.errors }, { status: 400 });
+    console.error("Error creating daily report:", error);
+    if (error.name === "ZodError") {
+      return NextResponse.json(
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
+      );
     }
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -149,39 +165,46 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const organizationId = session.user.organizationId;
     if (!organizationId) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: "Organization not found" },
+        { status: 400 },
+      );
     }
 
     const { searchParams } = new URL(req.url);
-    const guardId = searchParams.get('guardId');
-    const status = searchParams.get('status');
-    const from = searchParams.get('from');
-    const to = searchParams.get('to');
+    const guardId = searchParams.get("guardId");
+    const status = searchParams.get("status");
+    const from = searchParams.get("from");
+    const to = searchParams.get("to");
 
     const reports = await prisma.dailyActivityReport.findMany({
       where: {
         organizationId,
         ...(guardId && { guardId }),
         ...(status && { status: status as any }),
-        ...(from && to && {
-          reportDate: {
-            gte: new Date(from),
-            lte: new Date(to),
-          },
-        }),
+        ...(from &&
+          to && {
+            reportDate: {
+              gte: new Date(from),
+              lte: new Date(to),
+            },
+          }),
       },
-      orderBy: { reportDate: 'desc' },
+      orderBy: { reportDate: "desc" },
       take: 50,
     });
 
     return NextResponse.json(reports);
   } catch (error: any) {
-    console.error('Error listing daily reports:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error("Error listing daily reports:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

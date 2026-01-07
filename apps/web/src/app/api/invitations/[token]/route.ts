@@ -1,17 +1,17 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: { token: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Find invitation by token
@@ -26,57 +26,57 @@ export async function GET(
           },
         },
       },
-    })
+    });
 
     if (!invitation) {
       return NextResponse.json(
         { message: "Invitation not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
     // Check if invitation is expired
     if (invitation.expiresAt < new Date()) {
       return NextResponse.json(
         { message: "Invitation has expired" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Check if invitation status is PENDING
     if (invitation.status !== "PENDING") {
       return NextResponse.json(
         { message: "Invitation has already been used" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Check if user's email matches invitation email
     if (session.user.email !== invitation.email) {
       return NextResponse.json(
         { message: "This invitation was sent to a different email address" },
-        { status: 403 }
-      )
+        { status: 403 },
+      );
     }
 
-    return NextResponse.json(invitation)
+    return NextResponse.json(invitation);
   } catch (error) {
-    console.error("Invitation fetch error:", error)
+    console.error("Invitation fetch error:", error);
     return NextResponse.json(
       { message: "Failed to fetch invitation" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { token: string } }
+  { params }: { params: { token: string } },
 ) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     // Find invitation by token
@@ -85,13 +85,13 @@ export async function POST(
       include: {
         organization: true,
       },
-    })
+    });
 
     if (!invitation) {
       return NextResponse.json(
         { message: "Invitation not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
     // Check if invitation is expired
@@ -99,27 +99,27 @@ export async function POST(
       await prisma.invitation.update({
         where: { id: invitation.id },
         data: { status: "EXPIRED" },
-      })
+      });
       return NextResponse.json(
         { message: "Invitation has expired" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Check if invitation status is PENDING
     if (invitation.status !== "PENDING") {
       return NextResponse.json(
         { message: "Invitation has already been used" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Check if user's email matches invitation email
     if (session.user.email !== invitation.email) {
       return NextResponse.json(
         { message: "This invitation was sent to a different email address" },
-        { status: 403 }
-      )
+        { status: 403 },
+      );
     }
 
     // Check if user is already a member
@@ -128,17 +128,17 @@ export async function POST(
         userId: session.user.id,
         organizationId: invitation.organizationId,
       },
-    })
+    });
 
     if (existingMembership) {
       await prisma.invitation.update({
         where: { id: invitation.id },
         data: { status: "ACCEPTED" },
-      })
+      });
       return NextResponse.json(
         { message: "You are already a member of this organization" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Add user to organization
@@ -175,17 +175,17 @@ export async function POST(
           userAgent: request.headers.get("user-agent") || "unknown",
         },
       }),
-    ])
+    ]);
 
     return NextResponse.json({
       message: "Successfully joined organization",
       organization: invitation.organization,
-    })
+    });
   } catch (error) {
-    console.error("Invitation acceptance error:", error)
+    console.error("Invitation acceptance error:", error);
     return NextResponse.json(
       { message: "Failed to accept invitation" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

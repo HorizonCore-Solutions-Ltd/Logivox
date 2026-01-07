@@ -1,10 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/db';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/db";
 
-export const runtime = 'nodejs';
-export const dynamic = 'force-dynamic';
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/sustainability/metrics
@@ -14,15 +14,12 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get('days') || '30');
-    
+    const days = parseInt(searchParams.get("days") || "30");
+
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
@@ -34,7 +31,7 @@ export async function GET(request: NextRequest) {
           gte: startDate,
         },
       },
-      orderBy: { timestamp: 'desc' },
+      orderBy: { timestamp: "desc" },
     });
 
     // Calculate current metrics
@@ -57,11 +54,33 @@ export async function GET(request: NextRequest) {
     };
 
     const trends = {
-      recyclingRate: previousMetric ? calculateTrend(currentMetrics.recyclingRate, previousMetric.recyclingRate) : 0,
-      wasteReduction: previousMetric ? calculateTrend(currentMetrics.wasteReduction, previousMetric.wasteReduction) : 0,
-      energyConsumption: previousMetric ? calculateTrend(currentMetrics.energyConsumption, previousMetric.energyConsumption) : 0,
-      waterUsage: previousMetric ? calculateTrend(currentMetrics.waterUsage, previousMetric.waterUsage) : 0,
-      carbonNeutralityProgress: previousMetric ? calculateTrend(currentMetrics.carbonNeutralityProgress, previousMetric.carbonNeutralityProgress) : 0,
+      recyclingRate: previousMetric
+        ? calculateTrend(
+            currentMetrics.recyclingRate,
+            previousMetric.recyclingRate,
+          )
+        : 0,
+      wasteReduction: previousMetric
+        ? calculateTrend(
+            currentMetrics.wasteReduction,
+            previousMetric.wasteReduction,
+          )
+        : 0,
+      energyConsumption: previousMetric
+        ? calculateTrend(
+            currentMetrics.energyConsumption,
+            previousMetric.energyConsumption,
+          )
+        : 0,
+      waterUsage: previousMetric
+        ? calculateTrend(currentMetrics.waterUsage, previousMetric.waterUsage)
+        : 0,
+      carbonNeutralityProgress: previousMetric
+        ? calculateTrend(
+            currentMetrics.carbonNeutralityProgress,
+            previousMetric.carbonNeutralityProgress,
+          )
+        : 0,
     };
 
     // Get targets
@@ -77,16 +96,19 @@ export async function GET(request: NextRequest) {
       data: {
         current: currentMetrics,
         trends,
-        targets: targets.map(t => ({
+        targets: targets.map((t) => ({
           id: t.id,
           metric: t.metricName,
           target: t.targetValue,
           current: (currentMetrics as any)[t.metricName] || 0,
           deadline: t.deadline,
-          progress: ((((currentMetrics as any)[t.metricName] || 0) / t.targetValue) * 100).toFixed(1),
+          progress: (
+            (((currentMetrics as any)[t.metricName] || 0) / t.targetValue) *
+            100
+          ).toFixed(1),
         })),
-        history: metrics.slice(0, 90).map(m => ({
-          date: m.timestamp.toISOString().split('T')[0],
+        history: metrics.slice(0, 90).map((m) => ({
+          date: m.timestamp.toISOString().split("T")[0],
           recyclingRate: m.recyclingRate,
           wasteReduction: m.wasteReduction,
           energyConsumption: m.energyConsumption,
@@ -95,15 +117,14 @@ export async function GET(request: NextRequest) {
         })),
       },
     });
-
   } catch (error) {
-    console.error('Failed to fetch sustainability metrics:', error);
+    console.error("Failed to fetch sustainability metrics:", error);
     return NextResponse.json(
-      { 
-        error: 'Failed to fetch metrics',
-        message: error instanceof Error ? error.message : 'Unknown error',
+      {
+        error: "Failed to fetch metrics",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -116,10 +137,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -149,15 +167,14 @@ export async function POST(request: NextRequest) {
       success: true,
       data: metric,
     });
-
   } catch (error) {
-    console.error('Failed to create metric:', error);
+    console.error("Failed to create metric:", error);
     return NextResponse.json(
-      { 
-        error: 'Failed to create metric',
-        message: error instanceof Error ? error.message : 'Unknown error',
+      {
+        error: "Failed to create metric",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

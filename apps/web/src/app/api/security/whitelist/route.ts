@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { z } from "zod";
 
 const createWhitelistSchema = z.object({
-  type: z.enum(['CARRIER', 'VEHICLE', 'DRIVER']),
+  type: z.enum(["CARRIER", "VEHICLE", "DRIVER"]),
   identifier: z.string().min(1), // License plate, carrier name, or driver ID
   carrierName: z.string().optional(),
   autoApprove: z.boolean().default(true),
@@ -17,7 +17,7 @@ const createWhitelistSchema = z.object({
 });
 
 const listSchema = z.object({
-  type: z.enum(['CARRIER', 'VEHICLE', 'DRIVER']).optional(),
+  type: z.enum(["CARRIER", "VEHICLE", "DRIVER"]).optional(),
   isActive: z.string().optional(),
   search: z.string().optional(),
   page: z.string().optional(),
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -46,8 +46,8 @@ export async function POST(req: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: 'Entry already exists in whitelist' },
-        { status: 400 }
+        { error: "Entry already exists in whitelist" },
+        { status: 400 },
       );
     }
 
@@ -71,15 +71,15 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Error creating whitelist entry:', error);
+    console.error("Error creating whitelist entry:", error);
     return NextResponse.json(
-      { error: 'Failed to create whitelist entry' },
-      { status: 500 }
+      { error: "Failed to create whitelist entry" },
+      { status: 500 },
     );
   }
 }
@@ -88,16 +88,16 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
     const params = listSchema.parse({
-      type: searchParams.get('type') || undefined,
-      isActive: searchParams.get('isActive') || undefined,
-      search: searchParams.get('search') || undefined,
-      page: searchParams.get('page') || '1',
-      limit: searchParams.get('limit') || '50',
+      type: searchParams.get("type") || undefined,
+      isActive: searchParams.get("isActive") || undefined,
+      search: searchParams.get("search") || undefined,
+      page: searchParams.get("page") || "1",
+      limit: searchParams.get("limit") || "50",
     });
 
     const page = parseInt(params.page);
@@ -113,13 +113,13 @@ export async function GET(req: NextRequest) {
     }
 
     if (params.isActive !== undefined) {
-      where.isActive = params.isActive === 'true';
+      where.isActive = params.isActive === "true";
     }
 
     if (params.search) {
       where.OR = [
-        { identifier: { contains: params.search, mode: 'insensitive' } },
-        { carrierName: { contains: params.search, mode: 'insensitive' } },
+        { identifier: { contains: params.search, mode: "insensitive" } },
+        { carrierName: { contains: params.search, mode: "insensitive" } },
       ];
     }
 
@@ -128,7 +128,7 @@ export async function GET(req: NextRequest) {
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       }),
       prisma.vehicleWhitelist.count({ where }),
     ]);
@@ -143,10 +143,10 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error fetching whitelist:', error);
+    console.error("Error fetching whitelist:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch whitelist' },
-      { status: 500 }
+      { error: "Failed to fetch whitelist" },
+      { status: 500 },
     );
   }
 }

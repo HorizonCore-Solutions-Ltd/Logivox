@@ -79,7 +79,7 @@ export default function IntegrationDetailPage() {
       });
 
       if (!response.ok) throw new Error("Failed to start sync");
-      
+
       alert("Sync started successfully!");
       fetchIntegration();
     } catch (error) {
@@ -139,7 +139,9 @@ export default function IntegrationDetailPage() {
               ← Back
             </button>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{integration.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {integration.name}
+              </h1>
               <p className="text-gray-600">{integration.code}</p>
             </div>
           </div>
@@ -163,36 +165,47 @@ export default function IntegrationDetailPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600 mb-1">Status</p>
-            <p className={`text-xl font-bold ${
-              integration.status === 'ACTIVE' ? 'text-green-600' :
-              integration.status === 'ERROR' ? 'text-red-600' :
-              'text-gray-600'
-            }`}>
+            <p
+              className={`text-xl font-bold ${
+                integration.status === "ACTIVE"
+                  ? "text-green-600"
+                  : integration.status === "ERROR"
+                    ? "text-red-600"
+                    : "text-gray-600"
+              }`}
+            >
               {integration.status}
             </p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600 mb-1">Health</p>
-            <p className={`text-xl font-bold ${
-              integration.healthStatus === 'HEALTHY' ? 'text-green-600' :
-              integration.healthStatus === 'DEGRADED' ? 'text-yellow-600' :
-              integration.healthStatus === 'UNHEALTHY' ? 'text-red-600' :
-              'text-gray-600'
-            }`}>
+            <p
+              className={`text-xl font-bold ${
+                integration.healthStatus === "HEALTHY"
+                  ? "text-green-600"
+                  : integration.healthStatus === "DEGRADED"
+                    ? "text-yellow-600"
+                    : integration.healthStatus === "UNHEALTHY"
+                      ? "text-red-600"
+                      : "text-gray-600"
+              }`}
+            >
               {integration.healthStatus}
             </p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600 mb-1">Total Syncs</p>
-            <p className="text-xl font-bold text-gray-900">{integration.syncCount}</p>
+            <p className="text-xl font-bold text-gray-900">
+              {integration.syncCount}
+            </p>
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600 mb-1">Uptime</p>
             <p className="text-xl font-bold text-gray-900">
-              {integration.uptime ? `${integration.uptime}%` : 'N/A'}
+              {integration.uptime ? `${integration.uptime}%` : "N/A"}
             </p>
           </div>
         </div>
@@ -202,20 +215,40 @@ export default function IntegrationDetailPage() {
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
               {[
-                { id: 'overview', label: '📊 Overview' },
-                { id: 'connections', label: '🔗 Connections', count: integration._count.connections },
-                { id: 'syncs', label: '🔄 Syncs', count: integration._count.syncs },
-                { id: 'mappings', label: '🗺️ Mappings', count: integration.mappings?.length || 0 },
-                { id: 'logs', label: '📝 Logs', count: integration._count.logs },
-                { id: 'webhooks', label: '🪝 Webhooks', count: integration.webhooks?.length || 0 },
+                { id: "overview", label: "📊 Overview" },
+                {
+                  id: "connections",
+                  label: "🔗 Connections",
+                  count: integration._count.connections,
+                },
+                {
+                  id: "syncs",
+                  label: "🔄 Syncs",
+                  count: integration._count.syncs,
+                },
+                {
+                  id: "mappings",
+                  label: "🗺️ Mappings",
+                  count: integration.mappings?.length || 0,
+                },
+                {
+                  id: "logs",
+                  label: "📝 Logs",
+                  count: integration._count.logs,
+                },
+                {
+                  id: "webhooks",
+                  label: "🪝 Webhooks",
+                  count: integration.webhooks?.length || 0,
+                },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-6 py-3 text-sm font-medium border-b-2 ${
                     activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? "border-blue-500 text-blue-600"
+                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}
                 >
                   {tab.label}
@@ -232,37 +265,47 @@ export default function IntegrationDetailPage() {
           {/* Tab Content */}
           <div className="p-6">
             {/* Overview Tab */}
-            {activeTab === 'overview' && (
+            {activeTab === "overview" && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Configuration</h3>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                    Configuration
+                  </h3>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-sm text-gray-600">Provider</p>
-                      <p className="text-sm font-medium text-gray-900">{integration.provider}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {integration.provider}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Category</p>
-                      <p className="text-sm font-medium text-gray-900">{integration.category}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {integration.category}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Sync Direction</p>
-                      <p className="text-sm font-medium text-gray-900">{integration.syncDirection}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {integration.syncDirection}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Sync Frequency</p>
-                      <p className="text-sm font-medium text-gray-900">{integration.syncFrequency}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {integration.syncFrequency}
+                      </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">Auto Sync</p>
                       <p className="text-sm font-medium text-gray-900">
-                        {integration.autoSync ? 'Enabled' : 'Disabled'}
+                        {integration.autoSync ? "Enabled" : "Disabled"}
                       </p>
                     </div>
                     <div>
                       <p className="text-sm text-gray-600">API Version</p>
                       <p className="text-sm font-medium text-gray-900">
-                        {integration.apiVersion || 'N/A'}
+                        {integration.apiVersion || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -270,15 +313,21 @@ export default function IntegrationDetailPage() {
 
                 {integration.description && (
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Description
+                    </h3>
                     <p className="text-gray-700">{integration.description}</p>
                   </div>
                 )}
 
                 {integration.lastError && (
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <h3 className="text-sm font-semibold text-red-900 mb-2">Last Error</h3>
-                    <p className="text-sm text-red-700">{integration.lastError}</p>
+                    <h3 className="text-sm font-semibold text-red-900 mb-2">
+                      Last Error
+                    </h3>
+                    <p className="text-sm text-red-700">
+                      {integration.lastError}
+                    </p>
                     {integration.lastErrorAt && (
                       <p className="text-xs text-red-600 mt-1">
                         {new Date(integration.lastErrorAt).toLocaleString()}
@@ -290,28 +339,42 @@ export default function IntegrationDetailPage() {
             )}
 
             {/* Connections Tab */}
-            {activeTab === 'connections' && (
+            {activeTab === "connections" && (
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Connections</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Connections
+                  </h3>
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                     ➕ Add Connection
                   </button>
                 </div>
-                {integration.connections && integration.connections.length > 0 ? (
+                {integration.connections &&
+                integration.connections.length > 0 ? (
                   <div className="space-y-3">
                     {integration.connections.map((conn: any) => (
-                      <div key={conn.id} className="border border-gray-200 rounded-lg p-4">
+                      <div
+                        key={conn.id}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium text-gray-900">{conn.name}</h4>
-                            <p className="text-sm text-gray-600">{conn.connectionType}</p>
+                            <h4 className="font-medium text-gray-900">
+                              {conn.name}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {conn.connectionType}
+                            </p>
                           </div>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            conn.status === 'CONNECTED' ? 'bg-green-100 text-green-800' :
-                            conn.status === 'ERROR' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              conn.status === "CONNECTED"
+                                ? "bg-green-100 text-green-800"
+                                : conn.status === "ERROR"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
                             {conn.status}
                           </span>
                         </div>
@@ -330,10 +393,12 @@ export default function IntegrationDetailPage() {
             )}
 
             {/* Syncs Tab */}
-            {activeTab === 'syncs' && (
+            {activeTab === "syncs" && (
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Recent Syncs</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Recent Syncs
+                  </h3>
                   <button
                     onClick={handleSync}
                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -344,20 +409,30 @@ export default function IntegrationDetailPage() {
                 {integration.syncs && integration.syncs.length > 0 ? (
                   <div className="space-y-3">
                     {integration.syncs.map((sync: any) => (
-                      <div key={sync.id} className="border border-gray-200 rounded-lg p-4">
+                      <div
+                        key={sync.id}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <h4 className="font-medium text-gray-900">{sync.syncNumber}</h4>
+                            <h4 className="font-medium text-gray-900">
+                              {sync.syncNumber}
+                            </h4>
                             <p className="text-sm text-gray-600">
                               {sync.syncType} - {sync.direction}
                             </p>
                           </div>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            sync.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
-                            sync.status === 'RUNNING' ? 'bg-blue-100 text-blue-800' :
-                            sync.status === 'FAILED' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              sync.status === "COMPLETED"
+                                ? "bg-green-100 text-green-800"
+                                : sync.status === "RUNNING"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : sync.status === "FAILED"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
                             {sync.status}
                           </span>
                         </div>
@@ -368,11 +443,15 @@ export default function IntegrationDetailPage() {
                           </div>
                           <div>
                             <p className="text-gray-600">Success</p>
-                            <p className="font-medium text-green-600">{sync.successfulRecords}</p>
+                            <p className="font-medium text-green-600">
+                              {sync.successfulRecords}
+                            </p>
                           </div>
                           <div>
                             <p className="text-gray-600">Failed</p>
-                            <p className="font-medium text-red-600">{sync.failedRecords}</p>
+                            <p className="font-medium text-red-600">
+                              {sync.failedRecords}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -387,10 +466,12 @@ export default function IntegrationDetailPage() {
             )}
 
             {/* Mappings Tab */}
-            {activeTab === 'mappings' && (
+            {activeTab === "mappings" && (
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Field Mappings</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Field Mappings
+                  </h3>
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                     ➕ Add Mapping
                   </button>
@@ -398,18 +479,27 @@ export default function IntegrationDetailPage() {
                 {integration.mappings && integration.mappings.length > 0 ? (
                   <div className="space-y-3">
                     {integration.mappings.map((mapping: any) => (
-                      <div key={mapping.id} className="border border-gray-200 rounded-lg p-4">
+                      <div
+                        key={mapping.id}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium text-gray-900">{mapping.name}</h4>
+                            <h4 className="font-medium text-gray-900">
+                              {mapping.name}
+                            </h4>
                             <p className="text-sm text-gray-600">
                               {mapping.entityType} - {mapping.direction}
                             </p>
                           </div>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            mapping.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
-                            {mapping.isActive ? 'Active' : 'Inactive'}
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              mapping.isActive
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
+                            {mapping.isActive ? "Active" : "Inactive"}
                           </span>
                         </div>
                       </div>
@@ -424,9 +514,11 @@ export default function IntegrationDetailPage() {
             )}
 
             {/* Logs Tab */}
-            {activeTab === 'logs' && (
+            {activeTab === "logs" && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Activity Logs</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Activity Logs
+                </h3>
                 <div className="text-center py-8 text-gray-500">
                   Logs will be displayed here
                 </div>
@@ -434,10 +526,12 @@ export default function IntegrationDetailPage() {
             )}
 
             {/* Webhooks Tab */}
-            {activeTab === 'webhooks' && (
+            {activeTab === "webhooks" && (
               <div>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Webhooks</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Webhooks
+                  </h3>
                   <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                     ➕ Add Webhook
                   </button>
@@ -445,16 +539,29 @@ export default function IntegrationDetailPage() {
                 {integration.webhooks && integration.webhooks.length > 0 ? (
                   <div className="space-y-3">
                     {integration.webhooks.map((webhook: any) => (
-                      <div key={webhook.id} className="border border-gray-200 rounded-lg p-4">
+                      <div
+                        key={webhook.id}
+                        className="border border-gray-200 rounded-lg p-4"
+                      >
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-medium text-gray-900">{webhook.name}</h4>
-                            <p className="text-sm text-gray-600">{webhook.event}</p>
-                            <p className="text-xs text-gray-500 mt-1">{webhook.url}</p>
+                            <h4 className="font-medium text-gray-900">
+                              {webhook.name}
+                            </h4>
+                            <p className="text-sm text-gray-600">
+                              {webhook.event}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {webhook.url}
+                            </p>
                           </div>
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            webhook.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded text-xs font-medium ${
+                              webhook.status === "ACTIVE"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
                             {webhook.status}
                           </span>
                         </div>

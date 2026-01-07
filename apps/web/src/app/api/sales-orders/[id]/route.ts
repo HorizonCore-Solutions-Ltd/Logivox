@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -11,7 +11,9 @@ const updateSOSchema = z.object({
   warehouseId: z.string().optional(),
   requestedDate: z.string().optional(),
   promisedDate: z.string().optional(),
-  shippingMethod: z.enum(["STANDARD", "EXPRESS", "OVERNIGHT", "PICKUP", "FREIGHT"]).optional(),
+  shippingMethod: z
+    .enum(["STANDARD", "EXPRESS", "OVERNIGHT", "PICKUP", "FREIGHT"])
+    .optional(),
   shippingAddress: z.string().optional(),
   shippingCity: z.string().optional(),
   shippingState: z.string().optional(),
@@ -21,13 +23,15 @@ const updateSOSchema = z.object({
   priority: z.number().optional(),
   notes: z.string().optional(),
   internalNotes: z.string().optional(),
-  status: z.enum(["DRAFT", "PENDING_APPROVAL", "APPROVED", "ON_HOLD", "CANCELLED"]).optional(),
+  status: z
+    .enum(["DRAFT", "PENDING_APPROVAL", "APPROVED", "ON_HOLD", "CANCELLED"])
+    .optional(),
 });
 
 //GET /api/sales-orders/[id] - Get a single sales order
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -37,7 +41,10 @@ export async function GET(
 
     const organizationId = (session.user as any).organizations?.[0]?.id;
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const salesOrder = await prisma.salesOrder.findFirst({
@@ -98,7 +105,10 @@ export async function GET(
     });
 
     if (!salesOrder) {
-      return NextResponse.json({ error: "Sales order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Sales order not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(salesOrder);
@@ -106,7 +116,7 @@ export async function GET(
     console.error("Error fetching sales order:", error);
     return NextResponse.json(
       { error: "Failed to fetch sales order" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -114,7 +124,7 @@ export async function GET(
 // PUT /api/sales-orders/[id] - Update a sales order
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -126,7 +136,10 @@ export async function PUT(
     const userId = session.user.id;
 
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const existingSO = await prisma.salesOrder.findFirst({
@@ -137,68 +150,80 @@ export async function PUT(
     });
 
     if (!existingSO) {
-      return NextResponse.json({ error: "Sales order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Sales order not found" },
+        { status: 404 },
+      );
     }
 
     // Cannot update if already shipped or delivered
     if (["SHIPPED", "DELIVERED"].includes(existingSO.status)) {
       return NextResponse.json(
-        { error: "Cannot update sales order that is already shipped or delivered" },
-        { status: 400 }
+        {
+          error:
+            "Cannot update sales order that is already shipped or delivered",
+        },
+        { status: 400 },
       );
     }
 
     const body = await request.json();
     const validatedData = updateSOSchema.parse(body);
 
-    const salesOrder = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      const updated = await tx.salesOrder.update({
-        where: { id: params.id },
-        data: {
-          customerId: validatedData.customerId,
-          warehouseId: validatedData.warehouseId,
-          requestedDate: validatedData.requestedDate ? new Date(validatedData.requestedDate) : undefined,
-          promisedDate: validatedData.promisedDate ? new Date(validatedData.promisedDate) : undefined,
-          shippingMethod: validatedData.shippingMethod as any,
-          shippingAddress: validatedData.shippingAddress,
-          shippingCity: validatedData.shippingCity,
-          shippingState: validatedData.shippingState,
-          shippingZip: validatedData.shippingZip,
-          shippingCountry: validatedData.shippingCountry,
-          paymentMethod: validatedData.paymentMethod,
-          priority: validatedData.priority,
-          notes: validatedData.notes,
-          internalNotes: validatedData.internalNotes,
-          status: validatedData.status as any,
-        },
-        include: {
-          items: {
-            include: {
-              inventoryItem: true,
+    const salesOrder = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const updated = await tx.salesOrder.update({
+          where: { id: params.id },
+          data: {
+            customerId: validatedData.customerId,
+            warehouseId: validatedData.warehouseId,
+            requestedDate: validatedData.requestedDate
+              ? new Date(validatedData.requestedDate)
+              : undefined,
+            promisedDate: validatedData.promisedDate
+              ? new Date(validatedData.promisedDate)
+              : undefined,
+            shippingMethod: validatedData.shippingMethod as any,
+            shippingAddress: validatedData.shippingAddress,
+            shippingCity: validatedData.shippingCity,
+            shippingState: validatedData.shippingState,
+            shippingZip: validatedData.shippingZip,
+            shippingCountry: validatedData.shippingCountry,
+            paymentMethod: validatedData.paymentMethod,
+            priority: validatedData.priority,
+            notes: validatedData.notes,
+            internalNotes: validatedData.internalNotes,
+            status: validatedData.status as any,
+          },
+          include: {
+            items: {
+              include: {
+                inventoryItem: true,
+              },
+            },
+            customer: true,
+            warehouse: true,
+          },
+        });
+
+        // Log activity
+        await tx.activityLog.create({
+          data: {
+            organizationId,
+            userId,
+            action: "SALES_ORDER_UPDATED",
+            entityType: "SalesOrder",
+            entityId: updated.id,
+            metadata: {
+              soNumber: updated.soNumber,
+              changes: validatedData,
             },
           },
-          customer: true,
-          warehouse: true,
-        },
-      });
+        });
 
-      // Log activity
-      await tx.activityLog.create({
-        data: {
-          organizationId,
-          userId,
-          action: "SALES_ORDER_UPDATED",
-          entityType: "SalesOrder",
-          entityId: updated.id,
-          metadata: {
-            soNumber: updated.soNumber,
-            changes: validatedData,
-          },
-        },
-      });
-
-      return updated;
-    });
+        return updated;
+      },
+    );
 
     return NextResponse.json(salesOrder);
   } catch (error) {
@@ -208,7 +233,7 @@ export async function PUT(
     console.error("Error updating sales order:", error);
     return NextResponse.json(
       { error: "Failed to update sales order" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -216,7 +241,7 @@ export async function PUT(
 // DELETE /api/sales-orders/[id] - Delete a sales order
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -228,7 +253,10 @@ export async function DELETE(
     const userId = session.user.id;
 
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 403 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 403 },
+      );
     }
 
     const existingSO = await prisma.salesOrder.findFirst({
@@ -239,14 +267,17 @@ export async function DELETE(
     });
 
     if (!existingSO) {
-      return NextResponse.json({ error: "Sales order not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Sales order not found" },
+        { status: 404 },
+      );
     }
 
     // Can only delete DRAFT or CANCELLED orders
     if (!["DRAFT", "CANCELLED"].includes(existingSO.status)) {
       return NextResponse.json(
         { error: "Can only delete DRAFT or CANCELLED sales orders" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -275,7 +306,7 @@ export async function DELETE(
     console.error("Error deleting sales order:", error);
     return NextResponse.json(
       { error: "Failed to delete sales order" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

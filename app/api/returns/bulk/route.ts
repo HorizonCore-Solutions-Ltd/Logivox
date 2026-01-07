@@ -6,13 +6,13 @@
  * POST /api/returns/bulk/export - Export returns data
  */
 
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import { returnsNotificationService } from '@/lib/services/returns/notification-service';
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import { returnsNotificationService } from "@/lib/services/returns/notification-service";
 
 const bulkApproveSchema = z.object({
   rmaIds: z.array(z.string()).min(1).max(100),
@@ -22,7 +22,7 @@ const bulkApproveSchema = z.object({
 
 const bulkProcessSchema = z.object({
   rmaIds: z.array(z.string()).min(1).max(100),
-  action: z.enum(['restock', 'refund', 'both']),
+  action: z.enum(["restock", "refund", "both"]),
   restockLocation: z.string().optional(),
 });
 
@@ -36,47 +36,53 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const membership = await prisma.organizationMember.findFirst({
       where: {
         userId: session.user.id,
         isActive: true,
-        role: { in: ['ADMIN', 'MANAGER'] },
+        role: { in: ["ADMIN", "MANAGER"] },
       },
     });
 
     if (!membership) {
-      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 });
+      return NextResponse.json(
+        { error: "Insufficient permissions" },
+        { status: 403 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
-    const operation = searchParams.get('operation');
+    const operation = searchParams.get("operation");
     const body = await request.json();
 
-    if (operation === 'approve') {
+    if (operation === "approve") {
       return await handleBulkApprove(body, membership, session.user.id);
     }
 
-    if (operation === 'process') {
+    if (operation === "process") {
       return await handleBulkProcess(body, membership, session.user.id);
     }
 
-    if (operation === 'labels') {
+    if (operation === "labels") {
       return await handleBulkLabels(body, membership, session.user.id);
     }
 
-    if (operation === 'export') {
+    if (operation === "export") {
       return await handleBulkExport(body, membership);
     }
 
-    return NextResponse.json({ error: 'Invalid operation' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid operation" }, { status: 400 });
   } catch (error) {
-    console.error('Bulk operation error:', error);
+    console.error("Bulk operation error:", error);
     return NextResponse.json(
-      { error: 'Bulk operation failed', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
+      {
+        error: "Bulk operation failed",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
     );
   }
 }
@@ -84,7 +90,7 @@ export async function POST(request: NextRequest) {
 async function handleBulkApprove(
   body: any,
   membership: any,
-  userId: string
+  userId: string,
 ): Promise<NextResponse> {
   const data = bulkApproveSchema.parse(body);
 
@@ -93,7 +99,7 @@ async function handleBulkApprove(
     where: {
       id: { in: data.rmaIds },
       organizationId: membership.organizationId,
-      status: 'PENDING',
+      status: "PENDING",
     },
     include: {
       customer: true,
@@ -102,8 +108,8 @@ async function handleBulkApprove(
 
   if (rmas.length !== data.rmaIds.length) {
     return NextResponse.json(
-      { error: 'Some RMAs not found or already processed' },
-      { status: 404 }
+      { error: "Some RMAs not found or already processed" },
+      { status: 404 },
     );
   }
 
@@ -118,7 +124,7 @@ async function handleBulkApprove(
       await prisma.rMA.update({
         where: { id: rma.id },
         data: {
-          status: data.approve ? 'APPROVED' : 'REJECTED',
+          status: data.approve ? "APPROVED" : "REJECTED",
           approvedById: userId,
           approvedDate: new Date(),
           rejectionReason: data.approve ? null : data.rejectionReason,
@@ -127,8 +133,8 @@ async function handleBulkApprove(
 
       // Send notification
       await returnsNotificationService.notifyCustomer(
-        data.approve ? 'return_approved' : 'return_rejected',
-        rma.id
+        data.approve ? "return_approved" : "return_rejected",
+        rma.id,
       );
 
       results.succeeded.push(rma.id);
@@ -138,8 +144,8 @@ async function handleBulkApprove(
         data: {
           organizationId: membership.organizationId,
           userId,
-          action: data.approve ? 'RMA_BULK_APPROVED' : 'RMA_BULK_REJECTED',
-          entityType: 'RMA',
+          action: data.approve ? "RMA_BULK_APPROVED" : "RMA_BULK_REJECTED",
+          entityType: "RMA",
           entityId: rma.id,
           metadata: {
             rmaNumber: rma.rmaNumber,
@@ -150,7 +156,7 @@ async function handleBulkApprove(
     } catch (error) {
       results.failed.push({
         id: rma.id,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
@@ -164,7 +170,7 @@ async function handleBulkApprove(
 async function handleBulkProcess(
   body: any,
   membership: any,
-  userId: string
+  userId: string,
 ): Promise<NextResponse> {
   const data = bulkProcessSchema.parse(body);
 
@@ -172,7 +178,7 @@ async function handleBulkProcess(
     where: {
       id: { in: data.rmaIds },
       organizationId: membership.organizationId,
-      status: { in: ['RECEIVED', 'INSPECTING'] },
+      status: { in: ["RECEIVED", "INSPECTING"] },
     },
     include: {
       items: {
@@ -185,8 +191,8 @@ async function handleBulkProcess(
 
   if (rmas.length !== data.rmaIds.length) {
     return NextResponse.json(
-      { error: 'Some RMAs not found or not ready for processing' },
-      { status: 404 }
+      { error: "Some RMAs not found or not ready for processing" },
+      { status: 404 },
     );
   }
 
@@ -199,7 +205,7 @@ async function handleBulkProcess(
     try {
       await prisma.$transaction(async (tx) => {
         // Restock items if requested
-        if (data.action === 'restock' || data.action === 'both') {
+        if (data.action === "restock" || data.action === "both") {
           for (const item of rma.items) {
             if (item.quantityAccepted && item.quantityAccepted > 0) {
               await tx.inventoryItem.update({
@@ -226,7 +232,7 @@ async function handleBulkProcess(
         await tx.rMA.update({
           where: { id: rma.id },
           data: {
-            status: 'COMPLETED',
+            status: "COMPLETED",
             completedDate: new Date(),
             inspectedById: userId,
             inspectedDate: new Date(),
@@ -235,7 +241,10 @@ async function handleBulkProcess(
       });
 
       // Send notification
-      await returnsNotificationService.notifyCustomer('return_processed', rma.id);
+      await returnsNotificationService.notifyCustomer(
+        "return_processed",
+        rma.id,
+      );
 
       results.succeeded.push(rma.id);
 
@@ -244,8 +253,8 @@ async function handleBulkProcess(
         data: {
           organizationId: membership.organizationId,
           userId,
-          action: 'RMA_BULK_PROCESSED',
-          entityType: 'RMA',
+          action: "RMA_BULK_PROCESSED",
+          entityType: "RMA",
           entityId: rma.id,
           metadata: {
             rmaNumber: rma.rmaNumber,
@@ -257,7 +266,7 @@ async function handleBulkProcess(
     } catch (error) {
       results.failed.push({
         id: rma.id,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
@@ -271,21 +280,21 @@ async function handleBulkProcess(
 async function handleBulkLabels(
   body: any,
   membership: any,
-  userId: string
+  userId: string,
 ): Promise<NextResponse> {
   const data = bulkLabelsSchema.parse(body);
 
   return NextResponse.json({
-    message: 'Bulk label generation not yet implemented',
-    note: 'Use individual label generation API for now',
+    message: "Bulk label generation not yet implemented",
+    note: "Use individual label generation API for now",
   });
 }
 
 async function handleBulkExport(
   body: any,
-  membership: any
+  membership: any,
 ): Promise<NextResponse> {
-  const { rmaIds, format = 'csv' } = body;
+  const { rmaIds, format = "csv" } = body;
 
   // Get RMAs with all details
   const rmas = await prisma.rMA.findMany({
@@ -313,15 +322,24 @@ async function handleBulkExport(
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      createdAt: "desc",
     },
     take: rmaIds ? undefined : 1000,
   });
 
-  if (format === 'csv') {
+  if (format === "csv") {
     // Generate CSV
     const csvRows = [
-      ['RMA Number', 'Status', 'Customer', 'Order', 'Items', 'Total Amount', 'Requested Date', 'Reason'].join(','),
+      [
+        "RMA Number",
+        "Status",
+        "Customer",
+        "Order",
+        "Items",
+        "Total Amount",
+        "Requested Date",
+        "Reason",
+      ].join(","),
     ];
 
     for (const rma of rmas) {
@@ -330,21 +348,21 @@ async function handleBulkExport(
           rma.rmaNumber,
           rma.status,
           rma.customer.name,
-          rma.salesOrder?.soNumber || 'N/A',
+          rma.salesOrder?.soNumber || "N/A",
           rma.items.length.toString(),
-          rma.totalRefundAmount?.toString() || '0',
-          rma.requestedDate.toISOString().split('T')[0],
+          rma.totalRefundAmount?.toString() || "0",
+          rma.requestedDate.toISOString().split("T")[0],
           rma.returnReason.reason,
-        ].join(',')
+        ].join(","),
       );
     }
 
-    const csv = csvRows.join('\n');
+    const csv = csvRows.join("\n");
 
     return new NextResponse(csv, {
       headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': `attachment; filename="returns-${Date.now()}.csv"`,
+        "Content-Type": "text/csv",
+        "Content-Disposition": `attachment; filename="returns-${Date.now()}.csv"`,
       },
     });
   }

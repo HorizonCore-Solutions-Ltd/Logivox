@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -21,7 +27,16 @@ import {
   TrendingUp,
   TrendingDown,
 } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
 interface SensorReading {
   id: string;
@@ -72,7 +87,9 @@ export default function IoTMonitoringPage() {
       if (response.ok) {
         const data = await response.json();
         const sensorDevices = data.devices.filter((d: Device) =>
-          ["TEMPERATURE_SENSOR", "HUMIDITY_SENSOR", "WEIGHT_SCALE"].includes(d.deviceType)
+          ["TEMPERATURE_SENSOR", "HUMIDITY_SENSOR", "WEIGHT_SCALE"].includes(
+            d.deviceType,
+          ),
         );
         setDevices(sensorDevices);
         if (sensorDevices.length > 0 && !selectedDevice) {
@@ -88,7 +105,9 @@ export default function IoTMonitoringPage() {
 
   const fetchReadings = async (deviceId: string) => {
     try {
-      const response = await fetch(`/api/iot/devices/${deviceId}/readings?limit=50`);
+      const response = await fetch(
+        `/api/iot/devices/${deviceId}/readings?limit=50`,
+      );
       if (response.ok) {
         const data = await response.json();
         setReadings(data.readings || []);
@@ -117,7 +136,10 @@ export default function IoTMonitoringPage() {
       .reverse()
       .map((reading) => ({
         timestamp: new Date(reading.timestamp).toLocaleTimeString(),
-        value: typeof reading.value === "object" ? reading.value.value : reading.value,
+        value:
+          typeof reading.value === "object"
+            ? reading.value.value
+            : reading.value,
       }));
   };
 
@@ -125,7 +147,8 @@ export default function IoTMonitoringPage() {
     if (readings.length === 0) return null;
     const latest = readings[0];
     return {
-      value: typeof latest.value === "object" ? latest.value.value : latest.value,
+      value:
+        typeof latest.value === "object" ? latest.value.value : latest.value,
       unit: latest.unit || "",
       timestamp: new Date(latest.timestamp).toLocaleString(),
     };
@@ -135,7 +158,7 @@ export default function IoTMonitoringPage() {
     if (readings.length === 0) return null;
 
     const values = readings.map((r) =>
-      typeof r.value === "object" ? r.value.value : r.value
+      typeof r.value === "object" ? r.value.value : r.value,
     );
     const avg = values.reduce((a, b) => a + b, 0) / values.length;
     const min = Math.min(...values);
@@ -153,7 +176,9 @@ export default function IoTMonitoringPage() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Real-Time Monitoring</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Real-Time Monitoring
+          </h1>
           <p className="text-gray-600 mt-1">
             Monitor sensor readings and environmental conditions in real-time
           </p>
@@ -166,7 +191,10 @@ export default function IoTMonitoringPage() {
             <Activity className="h-4 w-4 mr-2" />
             {autoRefresh ? "Live" : "Paused"}
           </Button>
-          <Button onClick={() => selectedDevice && fetchReadings(selectedDevice)} variant="outline">
+          <Button
+            onClick={() => selectedDevice && fetchReadings(selectedDevice)}
+            variant="outline"
+          >
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -224,8 +252,11 @@ export default function IoTMonitoringPage() {
             <Card className="md:col-span-1">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-medium">Current Reading</CardTitle>
-                  {selectedDeviceInfo && getDeviceIcon(selectedDeviceInfo.deviceType)}
+                  <CardTitle className="text-sm font-medium">
+                    Current Reading
+                  </CardTitle>
+                  {selectedDeviceInfo &&
+                    getDeviceIcon(selectedDeviceInfo.deviceType)}
                 </div>
               </CardHeader>
               <CardContent>
@@ -233,9 +264,13 @@ export default function IoTMonitoringPage() {
                   <>
                     <div className="text-4xl font-bold text-gray-900">
                       {latestReading.value.toFixed(1)}
-                      <span className="text-lg text-gray-500 ml-2">{latestReading.unit}</span>
+                      <span className="text-lg text-gray-500 ml-2">
+                        {latestReading.unit}
+                      </span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">{latestReading.timestamp}</p>
+                    <p className="text-xs text-gray-500 mt-2">
+                      {latestReading.timestamp}
+                    </p>
                   </>
                 ) : (
                   <p className="text-gray-500">No readings available</p>
@@ -247,38 +282,50 @@ export default function IoTMonitoringPage() {
               <>
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-sm font-medium">Average</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Average
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-blue-600">
                       {stats.avg.toFixed(1)}
-                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit || ''}</span>
+                      <span className="text-sm text-gray-500 ml-2">
+                        {latestReading?.unit || ""}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-sm font-medium">Minimum</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Minimum
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-green-600 flex items-center">
                       <TrendingDown className="h-5 w-5 mr-2" />
                       {stats.min.toFixed(1)}
-                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit || ''}</span>
+                      <span className="text-sm text-gray-500 ml-2">
+                        {latestReading?.unit || ""}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
 
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-sm font-medium">Maximum</CardTitle>
+                    <CardTitle className="text-sm font-medium">
+                      Maximum
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-red-600 flex items-center">
                       <TrendingUp className="h-5 w-5 mr-2" />
                       {stats.max.toFixed(1)}
-                      <span className="text-sm text-gray-500 ml-2">{latestReading?.unit || ''}</span>
+                      <span className="text-sm text-gray-500 ml-2">
+                        {latestReading?.unit || ""}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>

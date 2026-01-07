@@ -1,83 +1,83 @@
-export const dynamic = 'force-dynamic';
-import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { getCurrentUser } from "@/lib/auth-helpers"
+export const dynamic = "force-dynamic";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth-helpers";
 
 // POST /api/inventory/[id]/adjust - Adjust inventory quantity
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json()
-    const { quantity, type, reference, notes } = body
+    const body = await request.json();
+    const { quantity, type, reference, notes } = body;
 
     // Validate required fields
     if (quantity === undefined || !type) {
       return NextResponse.json(
         { error: "Missing required fields: quantity, type" },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Get current inventory item
     const item = await prisma.inventoryItem.findUnique({
       where: { id: params.id },
-    })
+    });
 
     if (!item) {
       return NextResponse.json(
         { error: "Inventory item not found" },
-        { status: 404 }
-      )
+        { status: 404 },
+      );
     }
 
     // Calculate new quantity based on movement type
-    let newQuantity = item.quantity
-    const adjustmentAmount = Math.abs(quantity)
+    let newQuantity = item.quantity;
+    const adjustmentAmount = Math.abs(quantity);
 
     switch (type) {
       case "PURCHASE":
       case "RETURN":
       case "ADJUSTMENT":
-        newQuantity += adjustmentAmount
-        break
+        newQuantity += adjustmentAmount;
+        break;
       case "SALE":
       case "DAMAGE":
       case "TRANSFER":
-        newQuantity -= adjustmentAmount
-        break
+        newQuantity -= adjustmentAmount;
+        break;
       default:
         return NextResponse.json(
           { error: "Invalid movement type" },
-          { status: 400 }
-        )
+          { status: 400 },
+        );
     }
 
     // Ensure quantity doesn't go negative
     if (newQuantity < 0) {
       return NextResponse.json(
         { error: "Insufficient quantity. Cannot reduce below 0." },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
     // Calculate new available quantity
-    const newAvailableQuantity = newQuantity - item.reservedQuantity
+    const newAvailableQuantity = newQuantity - item.reservedQuantity;
 
     // Determine new status
-    let newStatus = item.status
+    let newStatus = item.status;
     if (newQuantity === 0) {
-      newStatus = "OUT_OF_STOCK"
+      newStatus = "OUT_OF_STOCK";
     } else if (item.minStockLevel && newQuantity <= item.minStockLevel) {
-      newStatus = "LOW_STOCK"
+      newStatus = "LOW_STOCK";
     } else {
-      newStatus = "ACTIVE"
+      newStatus = "ACTIVE";
     }
 
     // Update item and create movement in a transaction
@@ -94,7 +94,7 @@ export async function POST(
           warehouse: true,
           category: true,
         },
-      })
+      });
 
       // Create movement record
       const movement = await tx.inventoryMovement.create({
@@ -108,7 +108,7 @@ export async function POST(
           warehouseId: item.warehouseId,
           userId: user.id,
         },
-      })
+      });
 
       // Log activity
       await tx.activityLog.create({
@@ -122,17 +122,17 @@ export async function POST(
           organizationId: item.organizationId,
           userId: user.id,
         },
-      })
+      });
 
-      return { updatedItem, movement }
-    })
+      return { updatedItem, movement };
+    });
 
-    return NextResponse.json(result)
+    return NextResponse.json(result);
   } catch (error: any) {
-    console.error("Error adjusting inventory:", error)
+    console.error("Error adjusting inventory:", error);
     return NextResponse.json(
       { error: "Failed to adjust inventory" },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

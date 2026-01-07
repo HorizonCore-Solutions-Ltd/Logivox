@@ -4,18 +4,20 @@
 
 **Purpose**: Simple vehicle dimensions and capacity library for load optimization  
 **Scope**: ONLY dimensions, weight, and capacity - NO fleet management  
-**Coverage**: Global vehicle types (UK, EU, US, Asia)  
+**Coverage**: Global vehicle types (UK, EU, US, Asia)
 
 ---
 
 ## What This Is
 
 A lightweight library of vehicle dimensions used by `LoadOptimizationService` to:
+
 1. Determine which vehicle size fits a set of orders
 2. Calculate optimal load utilization
 3. Recommend cost-effective vehicle choices
 
 **This is NOT:**
+
 - ❌ Fleet management system
 - ❌ Vehicle tracking
 - ❌ Insurance/compliance tracking
@@ -24,6 +26,7 @@ A lightweight library of vehicle dimensions used by `LoadOptimizationService` to
 - ❌ Maintenance scheduling
 
 **This IS:**
+
 - ✅ Vehicle dimension library
 - ✅ Load capacity reference
 - ✅ Simple recommendation engine
@@ -34,6 +37,7 @@ A lightweight library of vehicle dimensions used by `LoadOptimizationService` to
 ## Vehicle Types Included
 
 ### UK Vehicles
+
 ```typescript
 UK_ARTIC_53         - 53ft Articulated Lorry (3,800 cu ft, 26 pallets)
 UK_RIGID_7.5T       - 7.5 Tonne Box Truck (1,400 cu ft, 9 pallets)
@@ -43,6 +47,7 @@ UK_SPRINTER_LWB     - Mercedes Sprinter LWB (533 cu ft, 4 pallets)
 ```
 
 ### US Vehicles
+
 ```typescript
 US_53FT_TRAILER     - 53ft Dry Van Trailer (3,900 cu ft, 26 pallets)
 US_26FT_BOX         - 26ft Box Truck (1,700 cu ft, 12 pallets)
@@ -51,6 +56,7 @@ US_CARGO_VAN        - Cargo Van (350 cu ft, 2 pallets)
 ```
 
 ### EU Vehicles
+
 ```typescript
 EU_13.6M_TRAILER    - 13.6m Mega Trailer (3,400 cu ft, 33 pallets)
 EU_7.5T_TRUCK       - 7.5 Tonne Truck (1,400 cu ft, 9 pallets)
@@ -58,6 +64,7 @@ EU_3.5T_VAN         - 3.5 Tonne Panel Van (520 cu ft, 4 pallets)
 ```
 
 ### Asia Vehicles
+
 ```typescript
 ASIA_20FT_CONTAINER - 20ft Container (1,165 cu ft, 10 pallets)
 ASIA_40FT_CONTAINER - 40ft Container (2,350 cu ft, 20 pallets)
@@ -65,6 +72,7 @@ ASIA_LIGHT_TRUCK    - Light Truck 3T (480 cu ft, 4 pallets)
 ```
 
 ### Refrigerated
+
 ```typescript
 REEFER_TRAILER_53   - 53ft Refrigerated Trailer (3,500 cu ft, 24 pallets)
 REEFER_VAN          - Refrigerated Van (400 cu ft, 3 pallets)
@@ -77,15 +85,15 @@ REEFER_VAN          - Refrigerated Van (400 cu ft, 3 pallets)
 ### 1. Get Vehicle Recommendation
 
 ```typescript
-import { recommendVehicle } from '@/lib/vehicle-types';
+import { recommendVehicle } from "@/lib/vehicle-types";
 
 // After calculating total order volume and weight
 const vehicle = recommendVehicle({
   totalVolumeCubicFeet: 1200,
   totalWeightLbs: 8000,
   palletCount: 8,
-  region: 'UK',
-  prioritize: 'utilization', // or 'cost' or 'capacity'
+  region: "UK",
+  prioritize: "utilization", // or 'cost' or 'capacity'
 });
 
 console.log(vehicle);
@@ -102,12 +110,12 @@ console.log(vehicle);
 ### 2. Find All Suitable Vehicles
 
 ```typescript
-import { findSuitableVehicles } from '@/lib/vehicle-types';
+import { findSuitableVehicles } from "@/lib/vehicle-types";
 
 const suitable = findSuitableVehicles({
   totalVolumeCubicFeet: 800,
   totalWeightLbs: 5000,
-  region: 'US',
+  region: "US",
 });
 
 // Returns array of vehicles sorted by size (smallest first)
@@ -116,23 +124,23 @@ const suitable = findSuitableVehicles({
 ### 3. Get Vehicles by Region
 
 ```typescript
-import { getVehicleTypesByRegion } from '@/lib/vehicle-types';
+import { getVehicleTypesByRegion } from "@/lib/vehicle-types";
 
-const ukVehicles = getVehicleTypesByRegion('UK');
-const usVehicles = getVehicleTypesByRegion('US');
-const euVehicles = getVehicleTypesByRegion('EU');
+const ukVehicles = getVehicleTypesByRegion("UK");
+const usVehicles = getVehicleTypesByRegion("US");
+const euVehicles = getVehicleTypesByRegion("EU");
 ```
 
 ### 4. Add Custom Vehicle Type
 
 ```typescript
-import { addCustomVehicleType } from '@/lib/vehicle-types';
+import { addCustomVehicleType } from "@/lib/vehicle-types";
 
 addCustomVehicleType({
-  id: 'CUSTOM_MEGA_60',
-  name: '60ft Mega Trailer',
-  region: 'UK',
-  category: 'TRAILER',
+  id: "CUSTOM_MEGA_60",
+  name: "60ft Mega Trailer",
+  region: "UK",
+  category: "TRAILER",
   dimensions: {
     lengthInches: 720,
     widthInches: 102,
@@ -144,7 +152,7 @@ addCustomVehicleType({
   maxWeightLbs: 80000,
   volumeCubicFeet: 6500,
   palletCapacity: 44,
-  estimatedCostPerMile: 2.50,
+  estimatedCostPerMile: 2.5,
 });
 ```
 
@@ -157,11 +165,13 @@ addCustomVehicleType({
 Get all vehicle types (optionally filter by region)
 
 **Request:**
+
 ```http
 GET /api/vehicle-types?region=UK
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -177,6 +187,7 @@ GET /api/vehicle-types?region=UK
 Get vehicle recommendation for a load
 
 **Request:**
+
 ```json
 {
   "totalVolumeCubicFeet": 1200,
@@ -188,6 +199,7 @@ Get vehicle recommendation for a load
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -214,6 +226,7 @@ Get vehicle recommendation for a load
 Add custom vehicle type
 
 **Request:**
+
 ```json
 {
   "id": "CUSTOM_MEGA_60",
@@ -232,6 +245,7 @@ Add custom vehicle type
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -245,8 +259,8 @@ Add custom vehicle type
 ## Integration with LoadOptimizationService
 
 ```typescript
-import { LoadOptimizationService } from '@/lib/services/load-optimization-service';
-import { recommendVehicle } from '@/lib/vehicle-types';
+import { LoadOptimizationService } from "@/lib/services/load-optimization-service";
+import { recommendVehicle } from "@/lib/vehicle-types";
 
 // 1. Calculate total dimensions and weight from orders
 const totalVolume = orders.reduce((sum, o) => sum + o.volumeCubicFeet, 0);
@@ -259,7 +273,7 @@ const vehicle = recommendVehicle({
   totalWeightLbs: totalWeight,
   palletCount,
   region: warehouse.region,
-  prioritize: 'utilization',
+  prioritize: "utilization",
 });
 
 // 3. Use vehicle dimensions for 3D bin packing
@@ -297,9 +311,9 @@ console.log(`Utilization: ${loadPlan.utilizationPercent}%`);
 interface VehicleType {
   id: string;
   name: string;
-  region: 'UK' | 'EU' | 'US' | 'ASIA' | 'GLOBAL';
-  category: 'VAN' | 'TRUCK' | 'TRAILER' | 'CONTAINER';
-  
+  region: "UK" | "EU" | "US" | "ASIA" | "GLOBAL";
+  category: "VAN" | "TRUCK" | "TRAILER" | "CONTAINER";
+
   dimensions: {
     lengthInches: number;
     widthInches: number;
@@ -308,11 +322,11 @@ interface VehicleType {
     usableWidthInches?: number;
     usableHeightInches?: number;
   };
-  
+
   maxWeightLbs: number;
   volumeCubicFeet: number;
   palletCapacity: number;
-  
+
   features?: {
     hasLiftGate?: boolean;
     hasSideLoading?: boolean;
@@ -320,7 +334,7 @@ interface VehicleType {
     tempRangeMin?: number;
     tempRangeMax?: number;
   };
-  
+
   estimatedCostPerMile?: number;
 }
 ```
@@ -334,12 +348,12 @@ Simply add to the `VEHICLE_TYPES` object in `lib/vehicle-types.ts`:
 ```typescript
 export const VEHICLE_TYPES: Record<string, VehicleType> = {
   // ... existing types
-  
-  'YOUR_CUSTOM_TYPE': {
-    id: 'YOUR_CUSTOM_TYPE',
-    name: 'Your Vehicle Name',
-    region: 'UK',
-    category: 'TRUCK',
+
+  YOUR_CUSTOM_TYPE: {
+    id: "YOUR_CUSTOM_TYPE",
+    name: "Your Vehicle Name",
+    region: "UK",
+    category: "TRUCK",
     dimensions: {
       lengthInches: 300,
       widthInches: 96,
@@ -364,15 +378,16 @@ export const VEHICLE_TYPES: Record<string, VehicleType> = {
 ✅ Integration with LoadOptimizationService  
 ✅ No complex database models  
 ✅ No fleet management overhead  
-✅ Voice command support  
+✅ Voice command support
 
 **Total files:** 2 (vehicle-types.ts + API route)  
 **Database tables:** 0 (just code)  
 **Complexity:** Low  
-**Purpose:** Load optimization ONLY  
+**Purpose:** Load optimization ONLY
 
 ---
 
 **Files:**
+
 - `/workspaces/Flowstock/lib/vehicle-types.ts` - Vehicle library
 - `/workspaces/Flowstock/app/api/vehicle-types/route.ts` - API endpoints

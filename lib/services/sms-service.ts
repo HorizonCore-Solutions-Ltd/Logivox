@@ -3,8 +3,8 @@
 // =============================================================================
 // Send SMS notifications for alerts, OTP, and emergency communications
 
-import twilio from 'twilio';
-import { logger } from './logger';
+import twilio from "twilio";
+import { logger } from "./logger";
 
 // Initialize Twilio client
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -27,7 +27,7 @@ export interface SMSOptions {
 
 export interface OTPOptions {
   to: string;
-  channel?: 'sms' | 'call' | 'email';
+  channel?: "sms" | "call" | "email";
 }
 
 export interface VerifyOTPOptions {
@@ -45,11 +45,15 @@ export function isSMSConfigured(): boolean {
 /**
  * Send SMS message
  */
-export async function sendSMS(options: SMSOptions): Promise<{ success: boolean; messageId?: string; error?: string }> {
+export async function sendSMS(
+  options: SMSOptions,
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
   try {
     if (!twilioClient) {
-      logger.error('SMS service not configured. Please set TWILIO credentials.');
-      return { success: false, error: 'SMS service not configured' };
+      logger.error(
+        "SMS service not configured. Please set TWILIO credentials.",
+      );
+      return { success: false, error: "SMS service not configured" };
     }
 
     const startTime = Date.now();
@@ -62,7 +66,7 @@ export async function sendSMS(options: SMSOptions): Promise<{ success: boolean; 
 
     const duration = Date.now() - startTime;
 
-    logger.info('SMS sent successfully', {
+    logger.info("SMS sent successfully", {
       messageId: message.sid,
       to: options.to,
       duration,
@@ -73,7 +77,7 @@ export async function sendSMS(options: SMSOptions): Promise<{ success: boolean; 
       messageId: message.sid,
     };
   } catch (error: any) {
-    logger.error('Failed to send SMS', {
+    logger.error("Failed to send SMS", {
       error,
       to: options.to,
       errorMessage: error.message,
@@ -89,11 +93,13 @@ export async function sendSMS(options: SMSOptions): Promise<{ success: boolean; 
 /**
  * Send OTP using Twilio Verify
  */
-export async function sendOTP(options: OTPOptions): Promise<{ success: boolean; error?: string }> {
+export async function sendOTP(
+  options: OTPOptions,
+): Promise<{ success: boolean; error?: string }> {
   try {
     if (!twilioClient || !verifyServiceSid) {
-      logger.error('Twilio Verify service not configured');
-      return { success: false, error: 'Verify service not configured' };
+      logger.error("Twilio Verify service not configured");
+      return { success: false, error: "Verify service not configured" };
     }
 
     const startTime = Date.now();
@@ -102,20 +108,20 @@ export async function sendOTP(options: OTPOptions): Promise<{ success: boolean; 
       .services(verifyServiceSid)
       .verifications.create({
         to: options.to,
-        channel: options.channel || 'sms',
+        channel: options.channel || "sms",
       });
 
     const duration = Date.now() - startTime;
 
-    logger.info('OTP sent successfully', {
+    logger.info("OTP sent successfully", {
       to: options.to,
-      channel: options.channel || 'sms',
+      channel: options.channel || "sms",
       duration,
     });
 
     return { success: true };
   } catch (error: any) {
-    logger.error('Failed to send OTP', {
+    logger.error("Failed to send OTP", {
       error,
       to: options.to,
       errorMessage: error.message,
@@ -131,11 +137,13 @@ export async function sendOTP(options: OTPOptions): Promise<{ success: boolean; 
 /**
  * Verify OTP code
  */
-export async function verifyOTP(options: VerifyOTPOptions): Promise<{ success: boolean; error?: string }> {
+export async function verifyOTP(
+  options: VerifyOTPOptions,
+): Promise<{ success: boolean; error?: string }> {
   try {
     if (!twilioClient || !verifyServiceSid) {
-      logger.error('Twilio Verify service not configured');
-      return { success: false, error: 'Verify service not configured' };
+      logger.error("Twilio Verify service not configured");
+      return { success: false, error: "Verify service not configured" };
     }
 
     const startTime = Date.now();
@@ -149,9 +157,9 @@ export async function verifyOTP(options: VerifyOTPOptions): Promise<{ success: b
 
     const duration = Date.now() - startTime;
 
-    const success = verificationCheck.status === 'approved';
+    const success = verificationCheck.status === "approved";
 
-    logger.info('OTP verification completed', {
+    logger.info("OTP verification completed", {
       to: options.to,
       success,
       status: verificationCheck.status,
@@ -160,10 +168,10 @@ export async function verifyOTP(options: VerifyOTPOptions): Promise<{ success: b
 
     return {
       success,
-      error: success ? undefined : 'Invalid or expired code',
+      error: success ? undefined : "Invalid or expired code",
     };
   } catch (error: any) {
-    logger.error('Failed to verify OTP', {
+    logger.error("Failed to verify OTP", {
       error,
       to: options.to,
       errorMessage: error.message,
@@ -179,11 +187,14 @@ export async function verifyOTP(options: VerifyOTPOptions): Promise<{ success: b
 /**
  * Send gate entry notification
  */
-export async function sendGateEntryNotification(phoneNumber: string, details: {
-  visitorName: string;
-  gateName: string;
-  time: string;
-}): Promise<{ success: boolean }> {
+export async function sendGateEntryNotification(
+  phoneNumber: string,
+  details: {
+    visitorName: string;
+    gateName: string;
+    time: string;
+  },
+): Promise<{ success: boolean }> {
   const message = `🚪 Gate Entry Alert\n\nVisitor: ${details.visitorName}\nGate: ${details.gateName}\nTime: ${details.time}\n\nLogiVox WMS`;
 
   const result = await sendSMS({
@@ -197,11 +208,14 @@ export async function sendGateEntryNotification(phoneNumber: string, details: {
 /**
  * Send emergency panic alert
  */
-export async function sendPanicAlert(phoneNumbers: string[], details: {
-  location: string;
-  triggeredBy: string;
-  time: string;
-}): Promise<{ success: boolean; sent: number; failed: number }> {
+export async function sendPanicAlert(
+  phoneNumbers: string[],
+  details: {
+    location: string;
+    triggeredBy: string;
+    time: string;
+  },
+): Promise<{ success: boolean; sent: number; failed: number }> {
   const message = `🚨 EMERGENCY ALERT\n\nLocation: ${details.location}\nTriggered by: ${details.triggeredBy}\nTime: ${details.time}\n\nImmediate response required!`;
 
   let sent = 0;
@@ -226,12 +240,15 @@ export async function sendPanicAlert(phoneNumbers: string[], details: {
 /**
  * Send low stock alert
  */
-export async function sendLowStockAlert(phoneNumber: string, details: {
-  itemName: string;
-  currentQty: number;
-  minQty: number;
-  warehouse: string;
-}): Promise<{ success: boolean }> {
+export async function sendLowStockAlert(
+  phoneNumber: string,
+  details: {
+    itemName: string;
+    currentQty: number;
+    minQty: number;
+    warehouse: string;
+  },
+): Promise<{ success: boolean }> {
   const message = `⚠️ Low Stock Alert\n\nItem: ${details.itemName}\nCurrent: ${details.currentQty}\nMinimum: ${details.minQty}\nWarehouse: ${details.warehouse}\n\nLogiVox WMS`;
 
   const result = await sendSMS({
@@ -245,11 +262,14 @@ export async function sendLowStockAlert(phoneNumber: string, details: {
 /**
  * Send shipment notification
  */
-export async function sendShipmentNotification(phoneNumber: string, details: {
-  trackingNumber: string;
-  carrier: string;
-  status: string;
-}): Promise<{ success: boolean }> {
+export async function sendShipmentNotification(
+  phoneNumber: string,
+  details: {
+    trackingNumber: string;
+    carrier: string;
+    status: string;
+  },
+): Promise<{ success: boolean }> {
   const message = `📦 Shipment Update\n\nTracking: ${details.trackingNumber}\nCarrier: ${details.carrier}\nStatus: ${details.status}\n\nLogiVox WMS`;
 
   const result = await sendSMS({
@@ -263,10 +283,13 @@ export async function sendShipmentNotification(phoneNumber: string, details: {
 /**
  * Send order ready notification
  */
-export async function sendOrderReadyNotification(phoneNumber: string, details: {
-  orderNumber: string;
-  customerName: string;
-}): Promise<{ success: boolean }> {
+export async function sendOrderReadyNotification(
+  phoneNumber: string,
+  details: {
+    orderNumber: string;
+    customerName: string;
+  },
+): Promise<{ success: boolean }> {
   const message = `✅ Order Ready for Pickup\n\nOrder: ${details.orderNumber}\nCustomer: ${details.customerName}\n\nLogiVox WMS`;
 
   const result = await sendSMS({

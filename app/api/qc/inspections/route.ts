@@ -1,29 +1,35 @@
-import { NextResponse } from 'next/server';
-import QCInspectionService from '@/lib/services/qc/inspection-service';
+import { NextResponse } from "next/server";
+import QCInspectionService from "@/lib/services/qc/inspection-service";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
-    const warehouseId = searchParams.get('warehouseId');
-    const supplierId = searchParams.get('supplierId');
-    const status = searchParams.get('status');
-    const result = searchParams.get('result');
+    const organizationId = searchParams.get("organizationId");
+    const warehouseId = searchParams.get("warehouseId");
+    const supplierId = searchParams.get("supplierId");
+    const status = searchParams.get("status");
+    const result = searchParams.get("result");
 
     if (!organizationId) {
-      return NextResponse.json({ error: 'organizationId required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "organizationId required" },
+        { status: 400 },
+      );
     }
 
-    const inspections = await QCInspectionService.listInspections(organizationId, {
-      warehouseId: warehouseId || undefined,
-      supplierId: supplierId || undefined,
-      status: status || undefined,
-      result: result || undefined,
-    });
+    const inspections = await QCInspectionService.listInspections(
+      organizationId,
+      {
+        warehouseId: warehouseId || undefined,
+        supplierId: supplierId || undefined,
+        status: status || undefined,
+        result: result || undefined,
+      },
+    );
 
     return NextResponse.json({ inspections });
   } catch (error: any) {
-    console.error('Error fetching inspections:', error);
+    console.error("Error fetching inspections:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -31,7 +37,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     const inspection = await QCInspectionService.createInspection({
       organizationId: body.organizationId,
       warehouseId: body.warehouseId,
@@ -47,7 +53,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ inspection }, { status: 201 });
   } catch (error: any) {
-    console.error('Error creating inspection:', error);
+    console.error("Error creating inspection:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

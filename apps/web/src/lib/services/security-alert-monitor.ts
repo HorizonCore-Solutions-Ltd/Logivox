@@ -1,6 +1,6 @@
 // Automated Security Alert Monitoring
-import { prisma } from '@/lib/prisma';
-import { SecurityNotificationService } from './security-notifications';
+import { prisma } from "@/lib/prisma";
+import { SecurityNotificationService } from "./security-notifications";
 
 export class SecurityAlertMonitor {
   // Check for overdue visitors every 15 minutes
@@ -9,7 +9,7 @@ export class SecurityAlertMonitor {
 
     const overdueVisitors = await prisma.visitor.findMany({
       where: {
-        status: 'CHECKED_IN',
+        status: "CHECKED_IN",
         checkInTime: {
           lt: overdueThreshold,
         },
@@ -26,23 +26,23 @@ export class SecurityAlertMonitor {
       const alert = await prisma.securityAlert.create({
         data: {
           organizationId: visitor.organizationId,
-          alertType: 'VISITOR_OVERDUE',
-          severity: 'MEDIUM',
+          alertType: "VISITOR_OVERDUE",
+          severity: "MEDIUM",
           title: `Visitor ${visitor.badgeNumber} Overdue`,
           description: `Visitor ${visitor.firstName} ${visitor.lastName} has been on-site for over 4 hours without checking out.`,
-          location: visitor.warehouseId || 'Unknown',
-          relatedEntity: 'VISITOR',
+          location: visitor.warehouseId || "Unknown",
+          relatedEntity: "VISITOR",
           relatedEntityId: visitor.id,
-          status: 'ACTIVE',
-          triggerSource: 'SYSTEM',
-          triggeredBy: 'AUTOMATED_MONITOR',
+          status: "ACTIVE",
+          triggerSource: "SYSTEM",
+          triggeredBy: "AUTOMATED_MONITOR",
         },
       });
 
       // Send notification
       await SecurityNotificationService.notifyVisitorOverdue(
         visitor.organizationId,
-        visitor
+        visitor,
       );
 
       await prisma.securityAlert.update({
@@ -72,7 +72,7 @@ export class SecurityAlertMonitor {
         entryTime: {
           gte: last15Minutes,
         },
-        direction: 'IN',
+        direction: "IN",
       },
       include: {
         organization: true,
@@ -83,16 +83,16 @@ export class SecurityAlertMonitor {
       await prisma.securityAlert.create({
         data: {
           organizationId: entry.organizationId,
-          alertType: 'AFTER_HOURS_ACCESS',
-          severity: 'HIGH',
-          title: 'After-Hours Gate Entry',
+          alertType: "AFTER_HOURS_ACCESS",
+          severity: "HIGH",
+          title: "After-Hours Gate Entry",
           description: `Vehicle ${entry.licensePlate || entry.vehicleNumber} entered during after-hours (${now.toLocaleTimeString()})`,
-          location: entry.parkingLocation || 'Main Gate',
-          relatedEntity: 'GATE_ENTRY',
+          location: entry.parkingLocation || "Main Gate",
+          relatedEntity: "GATE_ENTRY",
           relatedEntityId: entry.id,
-          status: 'ACTIVE',
-          triggerSource: 'SYSTEM',
-          triggeredBy: 'AUTOMATED_MONITOR',
+          status: "ACTIVE",
+          triggerSource: "SYSTEM",
+          triggeredBy: "AUTOMATED_MONITOR",
         },
       });
     }
@@ -116,7 +116,7 @@ export class SecurityAlertMonitor {
 
     // Count failures by person
     const failuresByPerson: Record<string, any[]> = {};
-    failedAccess.forEach(log => {
+    failedAccess.forEach((log) => {
       const key = `${log.organizationId}-${log.personId}`;
       if (!failuresByPerson[key]) {
         failuresByPerson[key] = [];
@@ -130,19 +130,19 @@ export class SecurityAlertMonitor {
     for (const [key, logs] of Object.entries(failuresByPerson)) {
       if (logs.length >= 3) {
         const firstLog = logs[0];
-        
+
         await prisma.securityAlert.create({
           data: {
             organizationId: firstLog.organizationId,
-            alertType: 'MULTIPLE_FAILED_ACCESS',
-            severity: 'HIGH',
-            title: 'Multiple Failed Access Attempts',
+            alertType: "MULTIPLE_FAILED_ACCESS",
+            severity: "HIGH",
+            title: "Multiple Failed Access Attempts",
             description: `${firstLog.personName} has ${logs.length} failed access attempts in the last 30 minutes at ${firstLog.accessPoint}`,
             location: firstLog.accessPoint,
-            relatedEntity: 'ACCESS_LOG',
-            status: 'ACTIVE',
-            triggerSource: 'SYSTEM',
-            triggeredBy: 'AUTOMATED_MONITOR',
+            relatedEntity: "ACCESS_LOG",
+            status: "ACTIVE",
+            triggerSource: "SYSTEM",
+            triggeredBy: "AUTOMATED_MONITOR",
             metadata: {
               failureCount: logs.length,
               personId: firstLog.personId,
@@ -162,7 +162,7 @@ export class SecurityAlertMonitor {
   static async checkCameraStatus() {
     const cameras = await prisma.cameraSystem.findMany({
       where: {
-        status: 'OFFLINE',
+        status: "OFFLINE",
         isActive: true,
       },
     });
@@ -172,8 +172,8 @@ export class SecurityAlertMonitor {
       const existingAlert = await prisma.securityAlert.findFirst({
         where: {
           organizationId: camera.organizationId,
-          alertType: 'CAMERA_OFFLINE',
-          relatedEntity: 'CAMERA',
+          alertType: "CAMERA_OFFLINE",
+          relatedEntity: "CAMERA",
           relatedEntityId: camera.id,
           triggerTime: {
             gte: new Date(Date.now() - 60 * 60 * 1000),
@@ -185,16 +185,16 @@ export class SecurityAlertMonitor {
         await prisma.securityAlert.create({
           data: {
             organizationId: camera.organizationId,
-            alertType: 'CAMERA_OFFLINE',
-            severity: 'MEDIUM',
-            title: 'Camera System Offline',
+            alertType: "CAMERA_OFFLINE",
+            severity: "MEDIUM",
+            title: "Camera System Offline",
             description: `Camera ${camera.name} at ${camera.location} is offline`,
             location: camera.location,
-            relatedEntity: 'CAMERA',
+            relatedEntity: "CAMERA",
             relatedEntityId: camera.id,
-            status: 'ACTIVE',
-            triggerSource: 'SYSTEM',
-            triggeredBy: 'AUTOMATED_MONITOR',
+            status: "ACTIVE",
+            triggerSource: "SYSTEM",
+            triggeredBy: "AUTOMATED_MONITOR",
           },
         });
       }
@@ -205,7 +205,7 @@ export class SecurityAlertMonitor {
 
   // Run all checks
   static async runAllChecks() {
-    console.log('Running security alert checks...');
+    console.log("Running security alert checks...");
 
     const results = {
       overdueVisitors: await this.checkOverdueVisitors(),
@@ -214,7 +214,7 @@ export class SecurityAlertMonitor {
       offlineCameras: await this.checkCameraStatus(),
     };
 
-    console.log('Security alert check results:', results);
+    console.log("Security alert check results:", results);
     return results;
   }
 }
@@ -224,6 +224,6 @@ export async function runSecurityMonitoring() {
   try {
     await SecurityAlertMonitor.runAllChecks();
   } catch (error) {
-    console.error('Security monitoring error:', error);
+    console.error("Security monitoring error:", error);
   }
 }

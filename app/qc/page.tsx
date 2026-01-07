@@ -44,7 +44,9 @@ export default function QCDashboard() {
   const [inspections, setInspections] = useState<QCInspection[]>([]);
   const [templates, setTemplates] = useState<InspectionTemplate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"inspections" | "templates">("inspections");
+  const [activeTab, setActiveTab] = useState<"inspections" | "templates">(
+    "inspections",
+  );
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [resultFilter, setResultFilter] = useState<string>("all");
 
@@ -230,15 +232,21 @@ export default function QCDashboard() {
                     {inspections.map((inspection) => (
                       <tr
                         key={inspection.id}
-                        onClick={() => router.push(`/qc/inspections/${inspection.id}`)}
+                        onClick={() =>
+                          router.push(`/qc/inspections/${inspection.id}`)
+                        }
                         className="hover:bg-gray-50 cursor-pointer"
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {inspection.inspectionNumber}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <div className="font-medium">{inspection.inventoryItem.sku}</div>
-                          <div className="text-gray-500">{inspection.inventoryItem.name}</div>
+                          <div className="font-medium">
+                            {inspection.inventoryItem.sku}
+                          </div>
+                          <div className="text-gray-500">
+                            {inspection.inventoryItem.name}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           {inspection.template.name}
@@ -246,7 +254,7 @@ export default function QCDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadge(
-                              inspection.status
+                              inspection.status,
                             )}`}
                           >
                             {inspection.status.replace(/_/g, " ")}
@@ -256,7 +264,7 @@ export default function QCDashboard() {
                           {inspection.result ? (
                             <span
                               className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getResultBadge(
-                                inspection.result
+                                inspection.result,
                               )}`}
                             >
                               {inspection.result.replace(/_/g, " ")}
@@ -268,7 +276,9 @@ export default function QCDashboard() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {inspection.qualityScore !== null ? (
                             <div className="flex items-center">
-                              <span className="font-medium">{inspection.qualityScore}%</span>
+                              <span className="font-medium">
+                                {inspection.qualityScore}%
+                              </span>
                             </div>
                           ) : (
                             <span className="text-gray-400">-</span>
@@ -331,7 +341,9 @@ export default function QCDashboard() {
                     {templates.map((template) => (
                       <tr
                         key={template.id}
-                        onClick={() => router.push(`/qc/templates/${template.id}`)}
+                        onClick={() =>
+                          router.push(`/qc/templates/${template.id}`)
+                        }
                         className="hover:bg-gray-50 cursor-pointer"
                       >
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">

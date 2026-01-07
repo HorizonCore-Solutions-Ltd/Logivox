@@ -1,63 +1,75 @@
-import { NextResponse } from 'next/server';
-import RTVService from '@/lib/services/qc/rtv-service';
+import { NextResponse } from "next/server";
+import RTVService from "@/lib/services/qc/rtv-service";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const rtv = await RTVService.getRTVById(params.id);
-    
+
     if (!rtv) {
-      return NextResponse.json({ error: 'RTV not found' }, { status: 404 });
+      return NextResponse.json({ error: "RTV not found" }, { status: 404 });
     }
 
     return NextResponse.json({ rtv });
   } catch (error: any) {
-    console.error('Error fetching RTV:', error);
+    console.error("Error fetching RTV:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const body = await request.json();
     const { action, userId } = body;
 
-    if (action === 'notifyVendor') {
+    if (action === "notifyVendor") {
       const result = await RTVService.notifyVendor(params.id, userId);
       return NextResponse.json(result);
     }
 
-    if (action === 'approve') {
+    if (action === "approve") {
       const rtv = await RTVService.approveRTV(params.id, userId, body.notes);
       return NextResponse.json({ rtv });
     }
 
-    if (action === 'reject') {
+    if (action === "reject") {
       const rtv = await RTVService.rejectRTV(params.id, userId, body.reason);
       return NextResponse.json({ rtv });
     }
 
-    if (action === 'ship') {
-      const rtv = await RTVService.shipRTV(params.id, userId, body.shippingData);
+    if (action === "ship") {
+      const rtv = await RTVService.shipRTV(
+        params.id,
+        userId,
+        body.shippingData,
+      );
       return NextResponse.json({ rtv });
     }
 
-    if (action === 'recordVendorResponse') {
-      const rtv = await RTVService.recordVendorResponse(params.id, userId, body.responseData);
+    if (action === "recordVendorResponse") {
+      const rtv = await RTVService.recordVendorResponse(
+        params.id,
+        userId,
+        body.responseData,
+      );
       return NextResponse.json({ rtv });
     }
 
-    if (action === 'recordCredit') {
-      const rtv = await RTVService.recordCredit(params.id, userId, body.creditData);
+    if (action === "recordCredit") {
+      const rtv = await RTVService.recordCredit(
+        params.id,
+        userId,
+        body.creditData,
+      );
       return NextResponse.json({ rtv });
     }
 
-    if (action === 'close') {
+    if (action === "close") {
       const rtv = await RTVService.closeRTV(params.id, userId, body.notes);
       return NextResponse.json({ rtv });
     }
@@ -66,7 +78,7 @@ export async function PATCH(
     const rtv = await RTVService.updateRTV(params.id, body.data, userId);
     return NextResponse.json({ rtv });
   } catch (error: any) {
-    console.error('Error updating RTV:', error);
+    console.error("Error updating RTV:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ChangeControlService } from '@/lib/services/qc/change-control.service';
-import { getServerSession } from 'next-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { ChangeControlService } from "@/lib/services/qc/change-control.service";
+import { getServerSession } from "next-auth";
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       description: body.description,
       reasonForChange: body.reasonForChange,
       urgency: body.urgency,
-      requestedBy: session.user.email || '',
+      requestedBy: session.user.email || "",
       department: body.department,
       affectedProducts: body.affectedProducts,
       affectedDocuments: body.affectedDocuments,
@@ -39,16 +39,19 @@ export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);
-    const organizationId = searchParams.get('organizationId');
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
+    const organizationId = searchParams.get("organizationId");
+    const startDate = searchParams.get("startDate");
+    const endDate = searchParams.get("endDate");
 
     if (!organizationId) {
-      return NextResponse.json({ error: 'organizationId required' }, { status: 400 });
+      return NextResponse.json(
+        { error: "organizationId required" },
+        { status: 400 },
+      );
     }
 
     const stats = await ChangeControlService.getStatistics({

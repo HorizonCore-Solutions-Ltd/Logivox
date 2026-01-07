@@ -13,6 +13,7 @@ Part 1 delivers enterprise-grade cross-docking execution: inbound pre-advice, do
 Cross-docking reduces storage and handling by moving goods directly from receiving to shipping.
 
 ### Core Capabilities
+
 - **Cross-Dock Modes**: Pre-planned, opportunistic, and hybrid
 - **Dock-to-Dock Allocation**: Match inbound supply to outbound demand in real time
 - **Rapid Receiving**: ASN-driven scan, exception handling, minimal putaway
@@ -26,36 +27,41 @@ Cross-docking reduces storage and handling by moving goods directly from receivi
 ## 🧩 1. Cross-Dock Strategy & Workflows
 
 ### Define how cross-docking runs per customer, SKU, and lane
+
 ```typescript
-type CrossDockMode = 'PRE_PLANNED' | 'OPPORTUNISTIC' | 'HYBRID';
+type CrossDockMode = "PRE_PLANNED" | "OPPORTUNISTIC" | "HYBRID";
 
 type CrossDockTrigger =
-  | 'ASN_MATCH'
-  | 'PO_MATCH'
-  | 'ORDER_MATCH'
-  | 'WAVE_DEMAND'
-  | 'ROUTE_PLAN'
-  | 'MANUAL';
+  | "ASN_MATCH"
+  | "PO_MATCH"
+  | "ORDER_MATCH"
+  | "WAVE_DEMAND"
+  | "ROUTE_PLAN"
+  | "MANUAL";
 
 type CrossDockStatus =
-  | 'PLANNED'
-  | 'INBOUND_ARRIVED'
-  | 'RECEIVING'
-  | 'SORTING'
-  | 'STAGED'
-  | 'LOADING'
-  | 'SHIPPED'
-  | 'EXCEPTION'
-  | 'CANCELLED';
+  | "PLANNED"
+  | "INBOUND_ARRIVED"
+  | "RECEIVING"
+  | "SORTING"
+  | "STAGED"
+  | "LOADING"
+  | "SHIPPED"
+  | "EXCEPTION"
+  | "CANCELLED";
 
 interface CrossDockSystem {
   // Policy
   createCrossDockPolicy: (policy: CrossDockPolicy) => Promise<string>;
   getCrossDockPolicy: (policyId: string) => Promise<CrossDockPolicy>;
-  evaluateEligibility: (input: CrossDockEligibilityInput) => Promise<CrossDockEligibilityResult>;
+  evaluateEligibility: (
+    input: CrossDockEligibilityInput,
+  ) => Promise<CrossDockEligibilityResult>;
 
   // Execution
-  createCrossDockPlan: (input: CreateCrossDockPlanInput) => Promise<CrossDockPlan>;
+  createCrossDockPlan: (
+    input: CreateCrossDockPlanInput,
+  ) => Promise<CrossDockPlan>;
   updatePlanStatus: (planId: string, status: CrossDockStatus) => Promise<void>;
 
   // Visibility
@@ -103,7 +109,11 @@ interface CrossDockPolicy {
     requireSerialForSerialized?: boolean;
 
     allowPartialCrossDock: boolean;
-    splitBehavior: 'SPLIT_BY_ORDER' | 'SPLIT_BY_ROUTE' | 'SPLIT_BY_CUSTOMER' | 'NO_SPLIT';
+    splitBehavior:
+      | "SPLIT_BY_ORDER"
+      | "SPLIT_BY_ROUTE"
+      | "SPLIT_BY_CUSTOMER"
+      | "NO_SPLIT";
 
     quarantineOnDamage: boolean;
     quarantineOnMismatch: boolean;
@@ -170,7 +180,7 @@ interface CrossDockEligibilityResult {
 
   // If eligible, suggested plan
   suggestedPlan?: {
-    allocationStrategy: 'FIFO' | 'FEFO' | 'ORDER_PRIORITY' | 'ROUTE_PRIORITY';
+    allocationStrategy: "FIFO" | "FEFO" | "ORDER_PRIORITY" | "ROUTE_PRIORITY";
     stagingLanePreference?: string;
     dockDoorPreference?: string;
   };
@@ -298,7 +308,7 @@ interface CrossDockInboundLine {
   }[];
 
   // Status
-  status: 'PENDING' | 'RECEIVED' | 'SHORT' | 'OVER' | 'DAMAGED' | 'MISMATCH';
+  status: "PENDING" | "RECEIVED" | "SHORT" | "OVER" | "DAMAGED" | "MISMATCH";
 
   // Evidence
   photos?: string[];
@@ -313,7 +323,7 @@ interface CrossDockOutboundShipment {
   doorId?: string;
   stagingLaneId?: string;
 
-  status: 'CREATED' | 'ALLOCATED' | 'STAGED' | 'LOADING' | 'SHIPPED' | 'HELD';
+  status: "CREATED" | "ALLOCATED" | "STAGED" | "LOADING" | "SHIPPED" | "HELD";
 
   // Required contents
   requiredLines: {
@@ -339,28 +349,28 @@ interface CrossDockException {
   at: Date;
 
   type:
-    | 'SHORT_RECEIPT'
-    | 'OVER_RECEIPT'
-    | 'DAMAGE'
-    | 'MISSING_LOT'
-    | 'MISSING_SERIAL'
-    | 'NO_OUTBOUND_DEMAND'
-    | 'MISROUTE'
-    | 'DOOR_CHANGE_REQUIRED'
-    | 'CUTOFF_RISK'
-    | 'OTHER';
+    | "SHORT_RECEIPT"
+    | "OVER_RECEIPT"
+    | "DAMAGE"
+    | "MISSING_LOT"
+    | "MISSING_SERIAL"
+    | "NO_OUTBOUND_DEMAND"
+    | "MISROUTE"
+    | "DOOR_CHANGE_REQUIRED"
+    | "CUTOFF_RISK"
+    | "OTHER";
 
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
   message: string;
   recommendedAction:
-    | 'QUARANTINE'
-    | 'MOVE_TO_STORAGE'
-    | 'CREATE_BACKORDER'
-    | 'REASSIGN_SHIPMENT'
-    | 'CHANGE_DOOR'
-    | 'EXPEDITE'
-    | 'MANAGER_REVIEW';
+    | "QUARANTINE"
+    | "MOVE_TO_STORAGE"
+    | "CREATE_BACKORDER"
+    | "REASSIGN_SHIPMENT"
+    | "CHANGE_DOOR"
+    | "EXPEDITE"
+    | "MANAGER_REVIEW";
 
   resolved: boolean;
   resolvedAt?: Date;
@@ -420,23 +430,39 @@ const CROSS_DOCK_VOICE_COMMANDS = [
 ## 📥 2. ASN-Driven Cross-Dock Receiving
 
 ### Fast receiving focused on verification and flow-through
-```typescript
-type ReceivingOutcome = 'ACCEPT' | 'HOLD' | 'QUARANTINE' | 'REJECT';
 
-type ReceivingExceptionType = 'DAMAGE' | 'SHORT' | 'OVER' | 'LOT_MISSING' | 'SERIAL_MISSING' | 'SKU_MISMATCH';
+```typescript
+type ReceivingOutcome = "ACCEPT" | "HOLD" | "QUARANTINE" | "REJECT";
+
+type ReceivingExceptionType =
+  | "DAMAGE"
+  | "SHORT"
+  | "OVER"
+  | "LOT_MISSING"
+  | "SERIAL_MISSING"
+  | "SKU_MISMATCH";
 
 interface CrossDockReceiving {
   startReceiving: (planId: string, userId: string) => Promise<void>;
-  scanInboundUnit: (planId: string, input: InboundScanInput) => Promise<InboundScanResult>;
+  scanInboundUnit: (
+    planId: string,
+    input: InboundScanInput,
+  ) => Promise<InboundScanResult>;
   completeReceiving: (planId: string) => Promise<void>;
 
   // Exceptions
-  recordReceivingException: (planId: string, exception: ReceivingException) => Promise<string>;
-  resolveReceivingException: (exceptionId: string, resolution: ExceptionResolution) => Promise<void>;
+  recordReceivingException: (
+    planId: string,
+    exception: ReceivingException,
+  ) => Promise<string>;
+  resolveReceivingException: (
+    exceptionId: string,
+    resolution: ExceptionResolution,
+  ) => Promise<void>;
 }
 
 interface InboundScanInput {
-  scanType: 'PALLET' | 'CARTON' | 'EACH' | 'LABEL' | 'BARCODE';
+  scanType: "PALLET" | "CARTON" | "EACH" | "LABEL" | "BARCODE";
   barcode: string;
 
   // Optional manual entry
@@ -465,11 +491,11 @@ interface InboundScanResult {
   // Routing
   allocatedToShipment?: string;
   routeTo:
-    | 'DIRECT_TO_STAGE'
-    | 'SORT_AREA'
-    | 'QC_INSPECTION'
-    | 'QUARANTINE'
-    | 'PUTAWAY_TO_STORAGE';
+    | "DIRECT_TO_STAGE"
+    | "SORT_AREA"
+    | "QC_INSPECTION"
+    | "QUARANTINE"
+    | "PUTAWAY_TO_STORAGE";
 
   outcome: ReceivingOutcome;
   reason?: string;
@@ -483,17 +509,17 @@ interface ReceivingException {
 
   quantity?: number;
 
-  severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
   description: string;
   photos?: string[];
 
   recommendedAction:
-    | 'QUARANTINE'
-    | 'REJECT'
-    | 'ACCEPT_AS_IS'
-    | 'MOVE_TO_STORAGE'
-    | 'MANAGER_REVIEW';
+    | "QUARANTINE"
+    | "REJECT"
+    | "ACCEPT_AS_IS"
+    | "MOVE_TO_STORAGE"
+    | "MANAGER_REVIEW";
 
   createdAt: Date;
   createdBy: string;
@@ -502,7 +528,13 @@ interface ReceivingException {
 interface ExceptionResolution {
   resolvedAt: Date;
   resolvedBy: string;
-  action: 'QUARANTINE' | 'ACCEPT' | 'REJECT' | 'MOVE_TO_STORAGE' | 'BACKORDER' | 'ADJUST';
+  action:
+    | "QUARANTINE"
+    | "ACCEPT"
+    | "REJECT"
+    | "MOVE_TO_STORAGE"
+    | "BACKORDER"
+    | "ADJUST";
   notes?: string;
 }
 
@@ -520,18 +552,36 @@ const CROSS_DOCK_RECEIVING_VOICE_COMMANDS = [
 ## 🧮 3. Real-Time Allocation (Inbound → Outbound)
 
 ### Match supply to demand in seconds
-```typescript
-type AllocationStrategy = 'FIFO' | 'FEFO' | 'ORDER_PRIORITY' | 'ROUTE_PRIORITY' | 'CUSTOMER_PRIORITY';
 
-type AllocationStatus = 'PENDING' | 'ALLOCATED' | 'PARTIAL' | 'UNALLOCATED' | 'REALLOCATED';
+```typescript
+type AllocationStrategy =
+  | "FIFO"
+  | "FEFO"
+  | "ORDER_PRIORITY"
+  | "ROUTE_PRIORITY"
+  | "CUSTOMER_PRIORITY";
+
+type AllocationStatus =
+  | "PENDING"
+  | "ALLOCATED"
+  | "PARTIAL"
+  | "UNALLOCATED"
+  | "REALLOCATED";
 
 interface CrossDockAllocationEngine {
   allocate: (input: AllocationRequest) => Promise<AllocationResult>;
   reallocate: (planId: string, reason: string) => Promise<AllocationResult>;
 
   // Shortage handling
-  createBackorder: (orderId: string, sku: string, quantity: number) => Promise<void>;
-  suggestSubstitutions: (sku: string, quantity: number) => Promise<SubstitutionSuggestion[]>;
+  createBackorder: (
+    orderId: string,
+    sku: string,
+    quantity: number,
+  ) => Promise<void>;
+  suggestSubstitutions: (
+    sku: string,
+    quantity: number,
+  ) => Promise<SubstitutionSuggestion[]>;
 }
 
 interface AllocationRequest {
@@ -585,7 +635,11 @@ interface AllocationResult {
     shipmentId: string;
     sku: string;
     quantityShort: number;
-    recommendedAction: 'BACKORDER' | 'SUBSTITUTE' | 'EXPEDITE' | 'SPLIT_SHIPMENT';
+    recommendedAction:
+      | "BACKORDER"
+      | "SUBSTITUTE"
+      | "EXPEDITE"
+      | "SPLIT_SHIPMENT";
   }[];
 
   notes?: string;
@@ -612,10 +666,16 @@ const CROSS_DOCK_ALLOCATION_VOICE_COMMANDS = [
 ## 🧱 4. Sorting, Consolidation & Staging Lanes
 
 ### Minimal touches with strict lane control
-```typescript
-type SortMethod = 'BY_SHIPMENT' | 'BY_ROUTE' | 'BY_CUSTOMER' | 'BY_ZONE' | 'BY_CARRIER';
 
-type LaneStatus = 'OPEN' | 'FULL' | 'HOLD' | 'CLOSED';
+```typescript
+type SortMethod =
+  | "BY_SHIPMENT"
+  | "BY_ROUTE"
+  | "BY_CUSTOMER"
+  | "BY_ZONE"
+  | "BY_CARRIER";
+
+type LaneStatus = "OPEN" | "FULL" | "HOLD" | "CLOSED";
 
 interface CrossDockSorting {
   configureSortPlan: (planId: string, config: SortPlanConfig) => Promise<void>;
@@ -629,7 +689,10 @@ interface CrossDockSorting {
 
 interface SortPlanConfig {
   method: SortMethod;
-  laneStrategy: 'DEDICATED_PER_SHIPMENT' | 'SHARED_PER_ROUTE' | 'SHARED_PER_CUSTOMER';
+  laneStrategy:
+    | "DEDICATED_PER_SHIPMENT"
+    | "SHARED_PER_ROUTE"
+    | "SHARED_PER_CUSTOMER";
 
   lanes: {
     laneId: string;
@@ -679,7 +742,7 @@ interface StagingLane {
 
   shipments: {
     shipmentId: string;
-    status: 'STAGING' | 'READY' | 'HELD';
+    status: "STAGING" | "READY" | "HELD";
     cutoffAt?: Date;
   }[];
 
@@ -700,8 +763,9 @@ const CROSS_DOCK_SORTING_VOICE_COMMANDS = [
 ## 🚪 5. Dock Door & Departure Control
 
 ### Ensure cutoffs are met and loads leave on time
+
 ```typescript
-type DepartureRisk = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+type DepartureRisk = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 interface DepartureControl {
   evaluateCutoffRisk: (shipmentId: string) => Promise<CutoffRiskResult>;
@@ -724,13 +788,19 @@ interface CutoffRiskResult {
   minutesToCutoff: number;
 
   blockers: {
-    blocker: 'MISSING_UNITS' | 'LANE_NOT_SEALED' | 'DOOR_CONGESTION' | 'EQUIPMENT_SHORTAGE' | 'QC_HOLD' | 'PAPERWORK_MISSING';
+    blocker:
+      | "MISSING_UNITS"
+      | "LANE_NOT_SEALED"
+      | "DOOR_CONGESTION"
+      | "EQUIPMENT_SHORTAGE"
+      | "QC_HOLD"
+      | "PAPERWORK_MISSING";
     details: string;
   }[];
 
   recommendedActions: {
     action: string;
-    priority: 'HIGH' | 'MEDIUM' | 'LOW';
+    priority: "HIGH" | "MEDIUM" | "LOW";
   }[];
 }
 
@@ -757,6 +827,7 @@ const DEPARTURE_CONTROL_VOICE_COMMANDS = [
 ## 📊 Part 1 Summary
 
 ### Core Features Covered
+
 ✅ Cross-dock policies + eligibility  
 ✅ ASN-driven rapid receiving + exceptions  
 ✅ Real-time allocation inbound→outbound  
@@ -766,6 +837,7 @@ const DEPARTURE_CONTROL_VOICE_COMMANDS = [
 **Voice Commands in Part 1**: 30+ commands
 
 **Coming in Part 2 (Advanced)**:
+
 - AI cross-dock optimization (door, lane, labor)
 - Computer vision at cross-dock stations
 - IoT trailer monitoring + cold-chain enforcement

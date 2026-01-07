@@ -1,6 +1,6 @@
 /**
  * ERP Integration Framework
- * 
+ *
  * Unified interface for major ERP systems:
  * - SAP
  * - Oracle NetSuite
@@ -67,7 +67,7 @@ export interface ERPInventoryUpdate {
   sku: string;
   quantity: number;
   location?: string;
-  transactionType: 'ADJUSTMENT' | 'RECEIPT' | 'SHIPMENT' | 'TRANSFER';
+  transactionType: "ADJUSTMENT" | "RECEIPT" | "SHIPMENT" | "TRANSFER";
   reason?: string;
 }
 
@@ -79,7 +79,7 @@ export interface ERPInvoice {
   dueDate: Date;
   total: number;
   currency: string;
-  status: 'DRAFT' | 'SENT' | 'PAID' | 'OVERDUE';
+  status: "DRAFT" | "SENT" | "PAID" | "OVERDUE";
   lineItems: ERPInvoiceLine[];
 }
 
@@ -97,26 +97,29 @@ export interface IERPConnector {
   // Product/Item Management
   getProducts(lastModified?: Date): Promise<ERPProduct[]>;
   getProduct(erpId: string): Promise<ERPProduct>;
-  updateProduct(erpId: string, product: Partial<ERPProduct>): Promise<ERPProduct>;
-  
+  updateProduct(
+    erpId: string,
+    product: Partial<ERPProduct>,
+  ): Promise<ERPProduct>;
+
   // Order Management
   getOrders(startDate?: Date, endDate?: Date): Promise<ERPOrder[]>;
   getOrder(erpId: string): Promise<ERPOrder>;
-  createOrder(order: Omit<ERPOrder, 'erpId'>): Promise<ERPOrder>;
+  createOrder(order: Omit<ERPOrder, "erpId">): Promise<ERPOrder>;
   updateOrderStatus(erpId: string, status: string): Promise<ERPOrder>;
-  
+
   // Customer Management
   getCustomers(lastModified?: Date): Promise<ERPCustomer[]>;
   getCustomer(erpId: string): Promise<ERPCustomer>;
-  
+
   // Inventory Management
   updateInventory(update: ERPInventoryUpdate): Promise<void>;
   getInventoryLevel(sku: string, location?: string): Promise<number>;
-  
+
   // Invoice Management
-  createInvoice(invoice: Omit<ERPInvoice, 'erpId'>): Promise<ERPInvoice>;
+  createInvoice(invoice: Omit<ERPInvoice, "erpId">): Promise<ERPInvoice>;
   getInvoice(erpId: string): Promise<ERPInvoice>;
-  
+
   // Connection Test
   testConnection(): Promise<boolean>;
 }
@@ -132,9 +135,9 @@ export class SAPConnector implements IERPConnector {
   private tokenExpiry?: Date;
 
   constructor() {
-    this.apiUrl = process.env.SAP_API_URL || '';
-    this.clientId = process.env.SAP_CLIENT_ID || '';
-    this.clientSecret = process.env.SAP_CLIENT_SECRET || '';
+    this.apiUrl = process.env.SAP_API_URL || "";
+    this.clientId = process.env.SAP_CLIENT_ID || "";
+    this.clientSecret = process.env.SAP_CLIENT_SECRET || "";
   }
 
   private async getAccessToken(): Promise<string> {
@@ -143,12 +146,12 @@ export class SAPConnector implements IERPConnector {
     }
 
     const response = await fetch(`${this.apiUrl}/oauth/token`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        grant_type: 'client_credentials',
+        grant_type: "client_credentials",
         client_id: this.clientId,
         client_secret: this.clientSecret,
       }),
@@ -160,14 +163,14 @@ export class SAPConnector implements IERPConnector {
 
     const data = await response.json();
     this.token = data.access_token;
-    this.tokenExpiry = new Date(Date.now() + (data.expires_in * 1000));
-    
+    this.tokenExpiry = new Date(Date.now() + data.expires_in * 1000);
+
     return this.token;
   }
 
   async getProducts(lastModified?: Date): Promise<ERPProduct[]> {
     const token = await this.getAccessToken();
-    
+
     let url = `${this.apiUrl}/A_Product`;
     if (lastModified) {
       url += `?$filter=LastChangeDateTime gt datetime'${lastModified.toISOString()}'`;
@@ -175,8 +178,8 @@ export class SAPConnector implements IERPConnector {
 
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
       },
     });
 
@@ -202,8 +205,8 @@ export class SAPConnector implements IERPConnector {
 
     const response = await fetch(`${this.apiUrl}/A_Product('${erpId}')`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
       },
     });
 
@@ -224,14 +227,17 @@ export class SAPConnector implements IERPConnector {
     };
   }
 
-  async updateProduct(erpId: string, product: Partial<ERPProduct>): Promise<ERPProduct> {
+  async updateProduct(
+    erpId: string,
+    product: Partial<ERPProduct>,
+  ): Promise<ERPProduct> {
     const token = await this.getAccessToken();
 
     const response = await fetch(`${this.apiUrl}/A_Product('${erpId}')`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         ProductDescription: product.name,
@@ -250,25 +256,25 @@ export class SAPConnector implements IERPConnector {
 
   async getOrders(startDate?: Date, endDate?: Date): Promise<ERPOrder[]> {
     const token = await this.getAccessToken();
-    
+
     let url = `${this.apiUrl}/A_SalesOrder`;
     const filters: string[] = [];
-    
+
     if (startDate) {
       filters.push(`SalesOrderDate ge datetime'${startDate.toISOString()}'`);
     }
     if (endDate) {
       filters.push(`SalesOrderDate le datetime'${endDate.toISOString()}'`);
     }
-    
+
     if (filters.length > 0) {
-      url += `?$filter=${filters.join(' and ')}`;
+      url += `?$filter=${filters.join(" and ")}`;
     }
 
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
       },
     });
 
@@ -292,12 +298,15 @@ export class SAPConnector implements IERPConnector {
   async getOrder(erpId: string): Promise<ERPOrder> {
     const token = await this.getAccessToken();
 
-    const response = await fetch(`${this.apiUrl}/A_SalesOrder('${erpId}')?$expand=to_Item`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
+    const response = await fetch(
+      `${this.apiUrl}/A_SalesOrder('${erpId}')?$expand=to_Item`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
       },
-    });
+    );
 
     if (!response.ok) {
       throw new Error(`SAP get order failed: ${response.statusText}`);
@@ -325,17 +334,17 @@ export class SAPConnector implements IERPConnector {
     };
   }
 
-  async createOrder(order: Omit<ERPOrder, 'erpId'>): Promise<ERPOrder> {
-    throw new Error('SAP create order not yet implemented');
+  async createOrder(order: Omit<ERPOrder, "erpId">): Promise<ERPOrder> {
+    throw new Error("SAP create order not yet implemented");
   }
 
   async updateOrderStatus(erpId: string, status: string): Promise<ERPOrder> {
-    throw new Error('SAP update order status not yet implemented');
+    throw new Error("SAP update order status not yet implemented");
   }
 
   async getCustomers(lastModified?: Date): Promise<ERPCustomer[]> {
     const token = await this.getAccessToken();
-    
+
     let url = `${this.apiUrl}/A_Customer`;
     if (lastModified) {
       url += `?$filter=LastChangeDateTime gt datetime'${lastModified.toISOString()}'`;
@@ -343,8 +352,8 @@ export class SAPConnector implements IERPConnector {
 
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
       },
     });
 
@@ -367,8 +376,8 @@ export class SAPConnector implements IERPConnector {
 
     const response = await fetch(`${this.apiUrl}/A_Customer('${erpId}')`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
       },
     });
 
@@ -387,7 +396,7 @@ export class SAPConnector implements IERPConnector {
   }
 
   async updateInventory(update: ERPInventoryUpdate): Promise<void> {
-    throw new Error('SAP update inventory not yet implemented');
+    throw new Error("SAP update inventory not yet implemented");
   }
 
   async getInventoryLevel(sku: string, location?: string): Promise<number> {
@@ -400,8 +409,8 @@ export class SAPConnector implements IERPConnector {
 
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json',
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
       },
     });
 
@@ -415,12 +424,12 @@ export class SAPConnector implements IERPConnector {
     }, 0);
   }
 
-  async createInvoice(invoice: Omit<ERPInvoice, 'erpId'>): Promise<ERPInvoice> {
-    throw new Error('SAP create invoice not yet implemented');
+  async createInvoice(invoice: Omit<ERPInvoice, "erpId">): Promise<ERPInvoice> {
+    throw new Error("SAP create invoice not yet implemented");
   }
 
   async getInvoice(erpId: string): Promise<ERPInvoice> {
-    throw new Error('SAP get invoice not yet implemented');
+    throw new Error("SAP get invoice not yet implemented");
   }
 
   async testConnection(): Promise<boolean> {
@@ -428,7 +437,7 @@ export class SAPConnector implements IERPConnector {
       await this.getAccessToken();
       return true;
     } catch (error) {
-      console.error('SAP connection test failed:', error);
+      console.error("SAP connection test failed:", error);
       return false;
     }
   }
@@ -446,11 +455,11 @@ export class NetSuiteConnector implements IERPConnector {
   private baseUrl: string;
 
   constructor() {
-    this.accountId = process.env.NETSUITE_ACCOUNT_ID || '';
-    this.consumerKey = process.env.NETSUITE_CONSUMER_KEY || '';
-    this.consumerSecret = process.env.NETSUITE_CONSUMER_SECRET || '';
-    this.tokenId = process.env.NETSUITE_TOKEN_ID || '';
-    this.tokenSecret = process.env.NETSUITE_TOKEN_SECRET || '';
+    this.accountId = process.env.NETSUITE_ACCOUNT_ID || "";
+    this.consumerKey = process.env.NETSUITE_CONSUMER_KEY || "";
+    this.consumerSecret = process.env.NETSUITE_CONSUMER_SECRET || "";
+    this.tokenId = process.env.NETSUITE_TOKEN_ID || "";
+    this.tokenSecret = process.env.NETSUITE_TOKEN_SECRET || "";
     this.baseUrl = `https://${this.accountId}.suitetalk.api.netsuite.com/services/rest`;
   }
 
@@ -458,60 +467,63 @@ export class NetSuiteConnector implements IERPConnector {
     // OAuth 1.0a signature generation (simplified - use oauth-1.0a library in production)
     const timestamp = Math.floor(Date.now() / 1000);
     const nonce = Math.random().toString(36).substring(7);
-    
+
     return `OAuth realm="${this.accountId}", oauth_consumer_key="${this.consumerKey}", oauth_token="${this.tokenId}", oauth_signature_method="HMAC-SHA256", oauth_timestamp="${timestamp}", oauth_nonce="${nonce}", oauth_version="1.0"`;
   }
 
   async getProducts(lastModified?: Date): Promise<ERPProduct[]> {
-    throw new Error('NetSuite get products not yet implemented');
+    throw new Error("NetSuite get products not yet implemented");
   }
 
   async getProduct(erpId: string): Promise<ERPProduct> {
-    throw new Error('NetSuite get product not yet implemented');
+    throw new Error("NetSuite get product not yet implemented");
   }
 
-  async updateProduct(erpId: string, product: Partial<ERPProduct>): Promise<ERPProduct> {
-    throw new Error('NetSuite update product not yet implemented');
+  async updateProduct(
+    erpId: string,
+    product: Partial<ERPProduct>,
+  ): Promise<ERPProduct> {
+    throw new Error("NetSuite update product not yet implemented");
   }
 
   async getOrders(startDate?: Date, endDate?: Date): Promise<ERPOrder[]> {
-    throw new Error('NetSuite get orders not yet implemented');
+    throw new Error("NetSuite get orders not yet implemented");
   }
 
   async getOrder(erpId: string): Promise<ERPOrder> {
-    throw new Error('NetSuite get order not yet implemented');
+    throw new Error("NetSuite get order not yet implemented");
   }
 
-  async createOrder(order: Omit<ERPOrder, 'erpId'>): Promise<ERPOrder> {
-    throw new Error('NetSuite create order not yet implemented');
+  async createOrder(order: Omit<ERPOrder, "erpId">): Promise<ERPOrder> {
+    throw new Error("NetSuite create order not yet implemented");
   }
 
   async updateOrderStatus(erpId: string, status: string): Promise<ERPOrder> {
-    throw new Error('NetSuite update order status not yet implemented');
+    throw new Error("NetSuite update order status not yet implemented");
   }
 
   async getCustomers(lastModified?: Date): Promise<ERPCustomer[]> {
-    throw new Error('NetSuite get customers not yet implemented');
+    throw new Error("NetSuite get customers not yet implemented");
   }
 
   async getCustomer(erpId: string): Promise<ERPCustomer> {
-    throw new Error('NetSuite get customer not yet implemented');
+    throw new Error("NetSuite get customer not yet implemented");
   }
 
   async updateInventory(update: ERPInventoryUpdate): Promise<void> {
-    throw new Error('NetSuite update inventory not yet implemented');
+    throw new Error("NetSuite update inventory not yet implemented");
   }
 
   async getInventoryLevel(sku: string, location?: string): Promise<number> {
-    throw new Error('NetSuite get inventory level not yet implemented');
+    throw new Error("NetSuite get inventory level not yet implemented");
   }
 
-  async createInvoice(invoice: Omit<ERPInvoice, 'erpId'>): Promise<ERPInvoice> {
-    throw new Error('NetSuite create invoice not yet implemented');
+  async createInvoice(invoice: Omit<ERPInvoice, "erpId">): Promise<ERPInvoice> {
+    throw new Error("NetSuite create invoice not yet implemented");
   }
 
   async getInvoice(erpId: string): Promise<ERPInvoice> {
-    throw new Error('NetSuite get invoice not yet implemented');
+    throw new Error("NetSuite get invoice not yet implemented");
   }
 
   async testConnection(): Promise<boolean> {
@@ -519,7 +531,7 @@ export class NetSuiteConnector implements IERPConnector {
       // Test API connection
       return false; // Not implemented yet
     } catch (error) {
-      console.error('NetSuite connection test failed:', error);
+      console.error("NetSuite connection test failed:", error);
       return false;
     }
   }
@@ -531,9 +543,9 @@ export class NetSuiteConnector implements IERPConnector {
 export class ERPConnectorFactory {
   static create(erpSystem: string): IERPConnector {
     switch (erpSystem.toLowerCase()) {
-      case 'sap':
+      case "sap":
         return new SAPConnector();
-      case 'netsuite':
+      case "netsuite":
         return new NetSuiteConnector();
       default:
         throw new Error(`Unsupported ERP system: ${erpSystem}`);

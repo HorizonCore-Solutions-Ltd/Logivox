@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { vendorChargebackService } from '@/lib/services/returns/vendor-chargeback-service';
+import { NextRequest, NextResponse } from "next/server";
+import { vendorChargebackService } from "@/lib/services/returns/vendor-chargeback-service";
 
 /**
  * POST /api/returns/vendor-chargeback
@@ -12,8 +12,8 @@ export async function POST(request: NextRequest) {
 
     if (!organizationId || !supplierId || !periodStart || !periodEnd) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
+        { error: "Missing required fields" },
+        { status: 400 },
       );
     }
 
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     if (!chargeback) {
       return NextResponse.json({
         success: false,
-        message: 'Defect rate below threshold - no chargeback required',
+        message: "Defect rate below threshold - no chargeback required",
       });
     }
 
@@ -39,10 +39,10 @@ export async function POST(request: NextRequest) {
       chargeback,
     });
   } catch (error: any) {
-    console.error('Chargeback error:', error);
+    console.error("Chargeback error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create chargeback' },
-      { status: 500 }
+      { error: error.message || "Failed to create chargeback" },
+      { status: 500 },
     );
   }
 }
@@ -54,26 +54,26 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
-    const status = searchParams.get('status');
+    const organizationId = searchParams.get("organizationId");
+    const status = searchParams.get("status");
 
     if (!organizationId) {
       return NextResponse.json(
-        { error: 'Missing organizationId parameter' },
-        { status: 400 }
+        { error: "Missing organizationId parameter" },
+        { status: 400 },
       );
     }
 
     // TODO: Implement database query
     return NextResponse.json({
       chargebacks: [],
-      message: 'Database integration pending',
+      message: "Database integration pending",
     });
   } catch (error: any) {
-    console.error('Get chargebacks error:', error);
+    console.error("Get chargebacks error:", error);
     return NextResponse.json(
-      { error: error.message || 'Failed to get chargebacks' },
-      { status: 500 }
+      { error: error.message || "Failed to get chargebacks" },
+      { status: 500 },
     );
   }
 }

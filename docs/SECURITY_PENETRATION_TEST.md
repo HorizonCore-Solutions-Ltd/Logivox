@@ -1,4 +1,5 @@
 # 🔒 SECURITY PENETRATION TESTING PLAN
+
 ## LogiVox WMS - Comprehensive Security Assessment
 
 ### Overview
@@ -20,6 +21,7 @@ This document outlines the security penetration testing strategy for LogiVox WMS
 ### Scope
 
 **In Scope:**
+
 - Web application (Next.js frontend)
 - API endpoints (GraphQL + REST)
 - Authentication/Authorization (NextAuth.js)
@@ -28,6 +30,7 @@ This document outlines the security penetration testing strategy for LogiVox WMS
 - Third-party integrations (carriers, ERP)
 
 **Out of Scope:**
+
 - Physical security
 - Social engineering
 - DDoS attacks (handled by infrastructure)
@@ -41,6 +44,7 @@ This document outlines the security penetration testing strategy for LogiVox WMS
 **Tests:**
 
 ✅ **Horizontal Privilege Escalation**
+
 ```bash
 # Test: User A accessing User B's resources
 curl -H "Authorization: Bearer USER_A_TOKEN" \
@@ -49,6 +53,7 @@ curl -H "Authorization: Bearer USER_A_TOKEN" \
 ```
 
 ✅ **Vertical Privilege Escalation**
+
 ```bash
 # Test: Regular user accessing admin endpoints
 curl -H "Authorization: Bearer USER_TOKEN" \
@@ -57,6 +62,7 @@ curl -H "Authorization: Bearer USER_TOKEN" \
 ```
 
 ✅ **IDOR (Insecure Direct Object Reference)**
+
 ```bash
 # Test: Guessing object IDs
 curl -H "Authorization: Bearer TOKEN" \
@@ -67,6 +73,7 @@ curl -H "Authorization: Bearer TOKEN" \
 ```
 
 ✅ **Path Traversal**
+
 ```bash
 # Test: Directory traversal in file access
 curl "https://logivox.com/api/files/../../etc/passwd"
@@ -74,6 +81,7 @@ curl "https://logivox.com/api/files/../../etc/passwd"
 ```
 
 **Checklist:**
+
 - [ ] All API endpoints require authentication
 - [ ] Role-based access control enforced
 - [ ] Organization-level data isolation verified
@@ -85,6 +93,7 @@ curl "https://logivox.com/api/files/../../etc/passwd"
 **Tests:**
 
 ✅ **SSL/TLS Configuration**
+
 ```bash
 # Test: SSL Labs scan
 curl https://www.ssllabs.com/ssltest/analyze.html?d=logivox.com
@@ -94,6 +103,7 @@ nmap --script ssl-enum-ciphers -p 443 logivox.com
 ```
 
 ✅ **Sensitive Data in Transit**
+
 ```bash
 # Test: Capture traffic without HTTPS
 curl http://logivox.com/api/login -d '{"email":"test@test.com","password":"pass"}'
@@ -101,6 +111,7 @@ curl http://logivox.com/api/login -d '{"email":"test@test.com","password":"pass"
 ```
 
 ✅ **Sensitive Data at Rest**
+
 ```sql
 -- Test: Check if passwords are hashed
 SELECT password FROM users LIMIT 1;
@@ -112,6 +123,7 @@ SELECT api_key FROM integrations LIMIT 1;
 ```
 
 **Checklist:**
+
 - [ ] HTTPS enforced everywhere
 - [ ] TLS 1.2+ only
 - [ ] Strong cipher suites
@@ -124,6 +136,7 @@ SELECT api_key FROM integrations LIMIT 1;
 **Tests:**
 
 ✅ **SQL Injection**
+
 ```bash
 # Test: SQL injection in search
 curl "https://logivox.com/api/inventory?search='; DROP TABLE inventory; --"
@@ -135,10 +148,11 @@ curl "https://logivox.com/api/products?id=1 UNION SELECT * FROM users"
 ```
 
 ✅ **GraphQL Injection**
+
 ```graphql
 # Test: Field injection
 query {
-  products(where: {sku: "' OR '1'='1"}) {
+  products(where: { sku: "' OR '1'='1" }) {
     id
   }
 }
@@ -146,12 +160,14 @@ query {
 ```
 
 ✅ **NoSQL Injection**
+
 ```javascript
 // Test: MongoDB injection (if using NoSQL)
 { "username": {"$gt": ""}, "password": {"$gt": ""} }
 ```
 
 ✅ **Command Injection**
+
 ```bash
 # Test: Command injection in file processing
 curl -F "file=@test.csv; cat /etc/passwd" \
@@ -160,6 +176,7 @@ curl -F "file=@test.csv; cat /etc/passwd" \
 ```
 
 **Checklist:**
+
 - [ ] Parameterized queries (Prisma ORM)
 - [ ] Input validation on all endpoints
 - [ ] GraphQL query depth limiting
@@ -171,6 +188,7 @@ curl -F "file=@test.csv; cat /etc/passwd" \
 **Tests:**
 
 ✅ **Business Logic Flaws**
+
 ```bash
 # Test: Negative quantity order
 curl -X POST https://logivox.com/api/orders \
@@ -183,6 +201,7 @@ curl -X POST https://logivox.com/api/orders \
 ```
 
 ✅ **Missing Rate Limiting**
+
 ```bash
 # Test: Brute force attempt
 for i in {1..1000}; do
@@ -193,6 +212,7 @@ done
 ```
 
 **Checklist:**
+
 - [ ] Rate limiting on authentication endpoints
 - [ ] Transaction isolation for critical operations
 - [ ] Proper error handling (no stack traces)
@@ -204,6 +224,7 @@ done
 **Tests:**
 
 ✅ **Default Credentials**
+
 ```bash
 # Test: Default admin account
 curl -X POST https://logivox.com/api/login \
@@ -212,6 +233,7 @@ curl -X POST https://logivox.com/api/login \
 ```
 
 ✅ **Directory Listing**
+
 ```bash
 # Test: Directory browsing
 curl https://logivox.com/uploads/
@@ -222,6 +244,7 @@ curl https://logivox.com/.git/
 ```
 
 ✅ **Error Handling**
+
 ```bash
 # Test: Verbose error messages
 curl https://logivox.com/api/nonexistent
@@ -229,6 +252,7 @@ curl https://logivox.com/api/nonexistent
 ```
 
 ✅ **Security Headers**
+
 ```bash
 # Test: Security headers present
 curl -I https://logivox.com
@@ -242,6 +266,7 @@ curl -I https://logivox.com
 ```
 
 **Checklist:**
+
 - [ ] No default credentials
 - [ ] Directory listing disabled
 - [ ] Error messages generic (no tech details)
@@ -254,6 +279,7 @@ curl -I https://logivox.com
 **Tests:**
 
 ✅ **Dependency Audit**
+
 ```bash
 # Test: npm audit
 npm audit
@@ -263,6 +289,7 @@ dependency-check --project "LogiVox" --scan ./package.json
 ```
 
 ✅ **Version Disclosure**
+
 ```bash
 # Test: Server version disclosure
 curl -I https://logivox.com
@@ -270,6 +297,7 @@ curl -I https://logivox.com
 ```
 
 **Checklist:**
+
 - [ ] npm audit shows 0 critical vulnerabilities
 - [ ] All dependencies up to date
 - [ ] No known CVEs in dependencies
@@ -281,6 +309,7 @@ curl -I https://logivox.com
 **Tests:**
 
 ✅ **Weak Password Policy**
+
 ```bash
 # Test: Create account with weak password
 curl -X POST https://logivox.com/api/register \
@@ -289,6 +318,7 @@ curl -X POST https://logivox.com/api/register \
 ```
 
 ✅ **Session Management**
+
 ```bash
 # Test: Session expiration
 # 1. Login and get token
@@ -303,6 +333,7 @@ curl -H "Authorization: Bearer OLD_TOKEN" \
 ```
 
 ✅ **Brute Force Protection**
+
 ```bash
 # Test: Account lockout
 for i in {1..20}; do
@@ -313,6 +344,7 @@ done
 ```
 
 ✅ **Multi-Factor Authentication**
+
 ```bash
 # Test: MFA bypass
 curl -H "Authorization: Bearer TOKEN_WITHOUT_MFA" \
@@ -321,6 +353,7 @@ curl -H "Authorization: Bearer TOKEN_WITHOUT_MFA" \
 ```
 
 **Checklist:**
+
 - [ ] Password complexity enforced (8+ chars, special chars)
 - [ ] Account lockout after 5 failed attempts
 - [ ] Session timeout (24 hours)
@@ -333,12 +366,14 @@ curl -H "Authorization: Bearer TOKEN_WITHOUT_MFA" \
 **Tests:**
 
 ✅ **Unsigned Code**
+
 ```bash
 # Test: Verify npm packages
 npm audit signatures
 ```
 
 ✅ **Deserialization Attacks**
+
 ```bash
 # Test: Malicious serialized object
 curl -X POST https://logivox.com/api/import \
@@ -348,6 +383,7 @@ curl -X POST https://logivox.com/api/import \
 ```
 
 **Checklist:**
+
 - [ ] All npm packages verified
 - [ ] No eval() or Function() with user input
 - [ ] JSON parsing without prototype pollution
@@ -359,20 +395,23 @@ curl -X POST https://logivox.com/api/import \
 **Tests:**
 
 ✅ **Login Attempts Logged**
+
 ```bash
 # Check logs for failed login attempts
 grep "Failed login" /var/log/logivox/auth.log
 ```
 
 ✅ **Sensitive Operations Audited**
+
 ```sql
 -- Check audit log
-SELECT * FROM audit_log 
-WHERE action = 'USER_DELETED' 
+SELECT * FROM audit_log
+WHERE action = 'USER_DELETED'
 ORDER BY created_at DESC;
 ```
 
 **Checklist:**
+
 - [ ] All authentication attempts logged
 - [ ] Failed authorization logged
 - [ ] Sensitive operations audited
@@ -385,6 +424,7 @@ ORDER BY created_at DESC;
 **Tests:**
 
 ✅ **SSRF in URL Parameters**
+
 ```bash
 # Test: Internal network access
 curl "https://logivox.com/api/fetch?url=http://localhost:5432"
@@ -396,6 +436,7 @@ curl "https://logivox.com/api/fetch?url=http://169.254.169.254/latest/meta-data/
 ```
 
 **Checklist:**
+
 - [ ] URL validation with whitelist
 - [ ] No access to internal IPs (127.0.0.1, 10.0.0.0/8)
 - [ ] Cloud metadata endpoint blocked
@@ -410,24 +451,28 @@ curl "https://logivox.com/api/fetch?url=http://169.254.169.254/latest/meta-data/
 **Tests:**
 
 ✅ **Token Signature Verification**
+
 ```javascript
 // Test: Modify JWT payload without re-signing
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...";
-const [header, payload, signature] = token.split('.');
-const modifiedPayload = btoa(JSON.stringify({
-  ...JSON.parse(atob(payload)),
-  role: 'ADMIN'
-}));
+const [header, payload, signature] = token.split(".");
+const modifiedPayload = btoa(
+  JSON.stringify({
+    ...JSON.parse(atob(payload)),
+    role: "ADMIN",
+  }),
+);
 const maliciousToken = `${header}.${modifiedPayload}.${signature}`;
 
 // Use malicious token
-fetch('/api/admin', {
-  headers: { Authorization: `Bearer ${maliciousToken}` }
+fetch("/api/admin", {
+  headers: { Authorization: `Bearer ${maliciousToken}` },
 });
 // Expected: 401 Unauthorized
 ```
 
 ✅ **Token Expiration**
+
 ```bash
 # Use expired token
 curl -H "Authorization: Bearer EXPIRED_TOKEN" \
@@ -436,6 +481,7 @@ curl -H "Authorization: Bearer EXPIRED_TOKEN" \
 ```
 
 ✅ **Algorithm Confusion**
+
 ```javascript
 // Test: Change alg to "none"
 const header = btoa(JSON.stringify({ alg: "none", typ: "JWT" }));
@@ -449,32 +495,32 @@ const noneToken = `${header}.${payload}.`;
 
 **Test Matrix:**
 
-| Endpoint | VIEWER | OPERATOR | MANAGER | ADMIN |
-|----------|--------|----------|---------|-------|
-| GET /api/inventory | ✅ | ✅ | ✅ | ✅ |
-| POST /api/inventory | ❌ | ✅ | ✅ | ✅ |
-| DELETE /api/inventory | ❌ | ❌ | ✅ | ✅ |
-| GET /api/users | ❌ | ❌ | ✅ | ✅ |
-| DELETE /api/users | ❌ | ❌ | ❌ | ✅ |
+| Endpoint              | VIEWER | OPERATOR | MANAGER | ADMIN |
+| --------------------- | ------ | -------- | ------- | ----- |
+| GET /api/inventory    | ✅     | ✅       | ✅      | ✅    |
+| POST /api/inventory   | ❌     | ✅       | ✅      | ✅    |
+| DELETE /api/inventory | ❌     | ❌       | ✅      | ✅    |
+| GET /api/users        | ❌     | ❌       | ✅      | ✅    |
+| DELETE /api/users     | ❌     | ❌       | ❌      | ✅    |
 
 **Automated Test:**
 
 ```typescript
 // rbac.test.ts
-describe('RBAC Tests', () => {
-  it('VIEWER cannot create inventory', async () => {
-    const response = await fetch('/api/inventory', {
-      method: 'POST',
+describe("RBAC Tests", () => {
+  it("VIEWER cannot create inventory", async () => {
+    const response = await fetch("/api/inventory", {
+      method: "POST",
       headers: { Authorization: `Bearer ${VIEWER_TOKEN}` },
-      body: JSON.stringify({ sku: 'TEST', quantity: 10 })
+      body: JSON.stringify({ sku: "TEST", quantity: 10 }),
     });
     expect(response.status).toBe(403);
   });
 
-  it('ADMIN can delete users', async () => {
-    const response = await fetch('/api/users/USER-123', {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${ADMIN_TOKEN}` }
+  it("ADMIN can delete users", async () => {
+    const response = await fetch("/api/users/USER-123", {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${ADMIN_TOKEN}` },
     });
     expect(response.status).toBe(200);
   });
@@ -488,6 +534,7 @@ describe('RBAC Tests', () => {
 ### 1. OWASP ZAP (Zed Attack Proxy)
 
 **Installation:**
+
 ```bash
 # macOS
 brew install --cask owasp-zap
@@ -499,6 +546,7 @@ chmod +x ZAP_2_14_0_unix.sh
 ```
 
 **Automated Scan:**
+
 ```bash
 # Docker scan
 docker run -t owasp/zap2docker-stable zap-baseline.py \
@@ -507,6 +555,7 @@ docker run -t owasp/zap2docker-stable zap-baseline.py \
 ```
 
 **Manual Testing Steps:**
+
 1. Configure browser proxy to ZAP (localhost:8080)
 2. Navigate through application
 3. Spider the application
@@ -516,12 +565,14 @@ docker run -t owasp/zap2docker-stable zap-baseline.py \
 ### 2. Burp Suite
 
 **Setup:**
+
 ```bash
 # Download from https://portswigger.net/burp
 # Community edition is free
 ```
 
 **Key Features:**
+
 - Intercept and modify requests
 - Repeater for replaying requests
 - Intruder for brute force
@@ -530,6 +581,7 @@ docker run -t owasp/zap2docker-stable zap-baseline.py \
 ### 3. Nikto
 
 **Web Server Scanner:**
+
 ```bash
 # Install
 brew install nikto
@@ -541,6 +593,7 @@ nikto -h https://logivox.com -ssl -Format html -output nikto_report.html
 ### 4. SQLMap
 
 **SQL Injection Testing:**
+
 ```bash
 # Install
 pip install sqlmap
@@ -554,6 +607,7 @@ sqlmap -u "https://logivox.com/api/products?id=1" \
 ### 5. Nmap
 
 **Network Scanning:**
+
 ```bash
 # Port scan
 nmap -sV -sC logivox.com
@@ -574,21 +628,21 @@ wpscan --url https://logivox.com/blog --enumerate u,t,p
 
 ### CVSS v3.1 Scoring
 
-| Severity | Score | Examples |
-|----------|-------|----------|
+| Severity     | Score    | Examples                                  |
+| ------------ | -------- | ----------------------------------------- |
 | **Critical** | 9.0-10.0 | SQL injection with data exfiltration, RCE |
-| **High** | 7.0-8.9 | Privilege escalation, auth bypass |
-| **Medium** | 4.0-6.9 | XSS, CSRF, information disclosure |
-| **Low** | 0.1-3.9 | Missing security headers, verbose errors |
+| **High**     | 7.0-8.9  | Privilege escalation, auth bypass         |
+| **Medium**   | 4.0-6.9  | XSS, CSRF, information disclosure         |
+| **Low**      | 0.1-3.9  | Missing security headers, verbose errors  |
 
 ### Response Time SLA
 
-| Severity | Response Time | Remediation Time |
-|----------|---------------|------------------|
-| **Critical** | 1 hour | 24 hours |
-| **High** | 4 hours | 7 days |
-| **Medium** | 1 day | 30 days |
-| **Low** | 1 week | 90 days |
+| Severity     | Response Time | Remediation Time |
+| ------------ | ------------- | ---------------- |
+| **Critical** | 1 hour        | 24 hours         |
+| **High**     | 4 hours       | 7 days           |
+| **Medium**   | 1 day         | 30 days          |
+| **Low**      | 1 week        | 90 days          |
 
 ---
 
@@ -643,7 +697,7 @@ wpscan --url https://logivox.com/blog --enumerate u,t,p
 
 ## 📝 Penetration Test Report Template
 
-```markdown
+````markdown
 # Penetration Test Report
 
 **Client:** LogiVox Inc.
@@ -674,17 +728,20 @@ Brief overview of findings, risk level, and recommendations.
 The search endpoint is vulnerable to SQL injection...
 
 **Steps to Reproduce:**
+
 1. Navigate to /api/search
 2. Enter payload: `'; DROP TABLE users; --`
 3. Observe error message revealing database structure
 
 **Impact:**
+
 - Complete database compromise
 - Data exfiltration
 - Data destruction
 
 **Remediation:**
 Use parameterized queries (Prisma ORM):
+
 ```typescript
 // VULNERABLE
 const results = await prisma.$queryRaw`
@@ -693,9 +750,10 @@ const results = await prisma.$queryRaw`
 
 // FIXED
 const results = await prisma.product.findMany({
-  where: { name: { contains: searchTerm } }
+  where: { name: { contains: searchTerm } },
 });
 ```
+````
 
 **Status:** Open / In Progress / Resolved
 
@@ -720,6 +778,7 @@ const results = await prisma.product.findMany({
 Overall security posture: Good / Fair / Poor
 
 Priority actions:
+
 1. Fix SQL injection immediately
 2. Implement rate limiting
 3. Add security headers
@@ -729,7 +788,8 @@ Priority actions:
 - Appendix A: Detailed test cases
 - Appendix B: Tool outputs
 - Appendix C: Network diagrams
-```
+
+````
 
 ---
 
@@ -754,24 +814,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Run npm audit
         run: npm audit --audit-level=moderate
-      
+
       - name: OWASP Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
           project: 'LogiVox'
           path: '.'
           format: 'HTML'
-      
+
       - name: Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
           scan-ref: '.'
           severity: 'CRITICAL,HIGH'
-```
+````
 
 ### Regular Scans
 

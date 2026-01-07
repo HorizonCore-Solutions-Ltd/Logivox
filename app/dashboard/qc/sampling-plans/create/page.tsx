@@ -1,32 +1,44 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft, Save } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 export default function CreateSamplingPlanPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    name: '',
-    aqlLevel: '2.5',
-    inspectionLevel: 'II',
-    lotSizeMin: '',
-    lotSizeMax: '',
-    sampleSize: '',
-    acceptNumber: '',
-    rejectNumber: '',
-    description: '',
-    applicableProducts: '',
+    name: "",
+    aqlLevel: "2.5",
+    inspectionLevel: "II",
+    lotSizeMin: "",
+    lotSizeMax: "",
+    sampleSize: "",
+    acceptNumber: "",
+    rejectNumber: "",
+    description: "",
+    applicableProducts: "",
   });
 
   // AQL lookup table (simplified)
@@ -35,33 +47,33 @@ export default function CreateSamplingPlanPage() {
     const level = formData.inspectionLevel;
     const aql = parseFloat(formData.aqlLevel);
 
-    let code = '';
+    let code = "";
     let sampleSize = 0;
     let accept = 0;
     let reject = 0;
 
     // Simplified AQL table - in production, use full ANSI/ASQ Z1.4 tables
-    if (level === 'II') {
+    if (level === "II") {
       if (lotSize <= 90) {
-        code = 'E';
+        code = "E";
         sampleSize = 13;
       } else if (lotSize <= 150) {
-        code = 'F';
+        code = "F";
         sampleSize = 20;
       } else if (lotSize <= 280) {
-        code = 'G';
+        code = "G";
         sampleSize = 32;
       } else if (lotSize <= 500) {
-        code = 'H';
+        code = "H";
         sampleSize = 50;
       } else if (lotSize <= 1200) {
-        code = 'J';
+        code = "J";
         sampleSize = 80;
       } else if (lotSize <= 3200) {
-        code = 'K';
+        code = "K";
         sampleSize = 125;
       } else {
-        code = 'L';
+        code = "L";
         sampleSize = 200;
       }
     }
@@ -100,9 +112,9 @@ export default function CreateSamplingPlanPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/qc/sampling-plans', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/qc/sampling-plans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
           lotSizeMin: parseInt(formData.lotSizeMin) || 0,
@@ -113,13 +125,13 @@ export default function CreateSamplingPlanPage() {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to create sampling plan');
+      if (!response.ok) throw new Error("Failed to create sampling plan");
 
       const data = await response.json();
       router.push(`/dashboard/qc/sampling-plans/${data.id}`);
     } catch (error) {
-      console.error('Error:', error);
-      alert('Failed to create sampling plan');
+      console.error("Error:", error);
+      alert("Failed to create sampling plan");
     } finally {
       setLoading(false);
     }
@@ -159,7 +171,9 @@ export default function CreateSamplingPlanPage() {
                   id="name"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   placeholder="e.g., Electronics Components - General"
                 />
               </div>
@@ -170,7 +184,9 @@ export default function CreateSamplingPlanPage() {
                   id="description"
                   rows={2}
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   placeholder="When and how to use this plan..."
                 />
               </div>
@@ -180,7 +196,12 @@ export default function CreateSamplingPlanPage() {
                 <Input
                   id="applicableProducts"
                   value={formData.applicableProducts}
-                  onChange={(e) => setFormData({ ...formData, applicableProducts: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      applicableProducts: e.target.value,
+                    })
+                  }
                   placeholder="Product categories or SKUs (comma-separated)"
                 />
               </div>
@@ -200,21 +221,37 @@ export default function CreateSamplingPlanPage() {
                   <Label htmlFor="aqlLevel">AQL Level * (%)</Label>
                   <Select
                     value={formData.aqlLevel}
-                    onValueChange={(value) => setFormData({ ...formData, aqlLevel: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, aqlLevel: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="0.065">0.065% - Critical defects</SelectItem>
-                      <SelectItem value="0.10">0.10% - Critical defects</SelectItem>
-                      <SelectItem value="0.15">0.15% - Critical defects</SelectItem>
-                      <SelectItem value="0.25">0.25% - Critical defects</SelectItem>
-                      <SelectItem value="0.40">0.40% - Major defects</SelectItem>
-                      <SelectItem value="0.65">0.65% - Major defects</SelectItem>
+                      <SelectItem value="0.065">
+                        0.065% - Critical defects
+                      </SelectItem>
+                      <SelectItem value="0.10">
+                        0.10% - Critical defects
+                      </SelectItem>
+                      <SelectItem value="0.15">
+                        0.15% - Critical defects
+                      </SelectItem>
+                      <SelectItem value="0.25">
+                        0.25% - Critical defects
+                      </SelectItem>
+                      <SelectItem value="0.40">
+                        0.40% - Major defects
+                      </SelectItem>
+                      <SelectItem value="0.65">
+                        0.65% - Major defects
+                      </SelectItem>
                       <SelectItem value="1.0">1.0% - Major defects</SelectItem>
                       <SelectItem value="1.5">1.5% - Major defects</SelectItem>
-                      <SelectItem value="2.5">2.5% - Major defects (standard)</SelectItem>
+                      <SelectItem value="2.5">
+                        2.5% - Major defects (standard)
+                      </SelectItem>
                       <SelectItem value="4.0">4.0% - Minor defects</SelectItem>
                       <SelectItem value="6.5">6.5% - Minor defects</SelectItem>
                     </SelectContent>
@@ -225,7 +262,9 @@ export default function CreateSamplingPlanPage() {
                   <Label htmlFor="inspectionLevel">Inspection Level *</Label>
                   <Select
                     value={formData.inspectionLevel}
-                    onValueChange={(value) => setFormData({ ...formData, inspectionLevel: value })}
+                    onValueChange={(value) =>
+                      setFormData({ ...formData, inspectionLevel: value })
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -237,7 +276,9 @@ export default function CreateSamplingPlanPage() {
                       <SelectItem value="S4">S-4 (Reduced sample)</SelectItem>
                       <SelectItem value="I">I (Less discrimination)</SelectItem>
                       <SelectItem value="II">II (Normal - standard)</SelectItem>
-                      <SelectItem value="III">III (More discrimination)</SelectItem>
+                      <SelectItem value="III">
+                        III (More discrimination)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -251,7 +292,9 @@ export default function CreateSamplingPlanPage() {
                     type="number"
                     required
                     value={formData.lotSizeMin}
-                    onChange={(e) => setFormData({ ...formData, lotSizeMin: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lotSizeMin: e.target.value })
+                    }
                     placeholder="e.g., 91"
                   />
                 </div>
@@ -263,7 +306,9 @@ export default function CreateSamplingPlanPage() {
                     type="number"
                     required
                     value={formData.lotSizeMax}
-                    onChange={(e) => setFormData({ ...formData, lotSizeMax: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, lotSizeMax: e.target.value })
+                    }
                     onBlur={calculateSampleSize}
                     placeholder="e.g., 150"
                   />
@@ -297,7 +342,9 @@ export default function CreateSamplingPlanPage() {
                     type="number"
                     required
                     value={formData.sampleSize}
-                    onChange={(e) => setFormData({ ...formData, sampleSize: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, sampleSize: e.target.value })
+                    }
                     placeholder="Auto-calculated"
                   />
                 </div>
@@ -309,7 +356,9 @@ export default function CreateSamplingPlanPage() {
                     type="number"
                     required
                     value={formData.acceptNumber}
-                    onChange={(e) => setFormData({ ...formData, acceptNumber: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, acceptNumber: e.target.value })
+                    }
                     placeholder="Max defects to accept"
                   />
                 </div>
@@ -321,7 +370,9 @@ export default function CreateSamplingPlanPage() {
                     type="number"
                     required
                     value={formData.rejectNumber}
-                    onChange={(e) => setFormData({ ...formData, rejectNumber: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, rejectNumber: e.target.value })
+                    }
                     placeholder="Min defects to reject"
                   />
                 </div>
@@ -330,9 +381,10 @@ export default function CreateSamplingPlanPage() {
               {formData.sampleSize && formData.acceptNumber && (
                 <Alert>
                   <AlertDescription>
-                    <strong>Decision Rule:</strong> Inspect {formData.sampleSize} units.
-                    Accept lot if ≤ {formData.acceptNumber} defects found.
-                    Reject lot if ≥ {formData.rejectNumber} defects found.
+                    <strong>Decision Rule:</strong> Inspect{" "}
+                    {formData.sampleSize} units. Accept lot if ≤{" "}
+                    {formData.acceptNumber} defects found. Reject lot if ≥{" "}
+                    {formData.rejectNumber} defects found.
                   </AlertDescription>
                 </Alert>
               )}
@@ -350,7 +402,7 @@ export default function CreateSamplingPlanPage() {
             </Button>
             <Button type="submit" disabled={loading}>
               <Save className="mr-2 h-4 w-4" />
-              {loading ? 'Creating...' : 'Create Sampling Plan'}
+              {loading ? "Creating..." : "Create Sampling Plan"}
             </Button>
           </div>
         </div>

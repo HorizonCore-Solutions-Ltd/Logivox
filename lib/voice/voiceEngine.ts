@@ -4,8 +4,8 @@
  * Zero-training adaptive learning system
  */
 
-import OpenAI from 'openai';
-import { prisma } from '@/lib/prisma';
+import OpenAI from "openai";
+import { prisma } from "@/lib/prisma";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -45,40 +45,49 @@ export interface VoiceResponse {
  * Main voice processing function
  * Handles speech-to-text, NLU, and response generation
  */
-export async function processVoiceCommand(input: VoiceInput): Promise<VoiceResponse> {
+export async function processVoiceCommand(
+  input: VoiceInput,
+): Promise<VoiceResponse> {
   const startTime = Date.now();
-  
+
   try {
     // 1. Get or create voice profile
     const voiceProfile = await getOrCreateVoiceProfile(input.userId);
-    
+
     // 2. Transcribe audio using Whisper
-    const transcription = await transcribeAudio(input.audioData, voiceProfile.language);
-    
+    const transcription = await transcribeAudio(
+      input.audioData,
+      voiceProfile.language,
+    );
+
     if (!transcription.text) {
       return {
         success: false,
-        recognizedText: '',
-        intent: 'UNKNOWN',
+        recognizedText: "",
+        intent: "UNKNOWN",
         confidence: 0,
-        responseText: 'Sorry, I couldn\'t hear that clearly. Please try again.',
-        error: 'Transcription failed',
+        responseText: "Sorry, I couldn't hear that clearly. Please try again.",
+        error: "Transcription failed",
       };
     }
-    
+
     // 3. Understand intent using GPT-4
     const nluResult = await understandIntent(
       transcription.text,
       input.context,
-      voiceProfile
+      voiceProfile,
     );
-    
+
     // 4. Execute action based on intent
     const actionResult = await executeAction(nluResult, input);
-    
+
     // 5. Generate response
-    const responseText = await generateResponse(nluResult, actionResult, voiceProfile);
-    
+    const responseText = await generateResponse(
+      nluResult,
+      actionResult,
+      voiceProfile,
+    );
+
     // 6. Store command in database
     const processingTime = Date.now() - startTime;
     await storeVoiceCommand({
@@ -90,15 +99,15 @@ export async function processVoiceCommand(input: VoiceInput): Promise<VoiceRespo
       confidence: nluResult.confidence,
       processingTime,
       successful: true,
-      commandType: 'USER_INITIATED',
+      commandType: "USER_INITIATED",
       metadata: input.context,
       responseText,
       organizationId: voiceProfile.organizationId,
     });
-    
+
     // 7. Update voice profile (adaptive learning)
     await updateVoiceProfile(voiceProfile.id, transcription, true);
-    
+
     return {
       success: true,
       recognizedText: transcription.text,
@@ -107,17 +116,17 @@ export async function processVoiceCommand(input: VoiceInput): Promise<VoiceRespo
       responseText,
       action: actionResult,
     };
-    
   } catch (error) {
-    console.error('Voice processing error:', error);
-    
+    console.error("Voice processing error:", error);
+
     return {
       success: false,
-      recognizedText: '',
-      intent: 'ERROR',
+      recognizedText: "",
+      intent: "ERROR",
       confidence: 0,
-      responseText: 'I encountered an error. Please try again or request assistance.',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      responseText:
+        "I encountered an error. Please try again or request assistance.",
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -127,30 +136,30 @@ export async function processVoiceCommand(input: VoiceInput): Promise<VoiceRespo
  */
 async function transcribeAudio(
   audioData: Buffer | Blob,
-  language: string = 'en'
+  language: string = "en",
 ): Promise<{ text: string; language: string; confidence: number }> {
   try {
     // Convert Buffer to File if needed
-    const audioFile = audioData instanceof Buffer
-      ? new File([audioData], 'audio.wav', { type: 'audio/wav' })
-      : audioData as File;
-    
+    const audioFile =
+      audioData instanceof Buffer
+        ? new File([audioData], "audio.wav", { type: "audio/wav" })
+        : (audioData as File);
+
     const transcription = await openai.audio.transcriptions.create({
       file: audioFile,
-      model: 'whisper-1',
-      language: language.split('-')[0], // e.g., 'en' from 'en-US'
-      response_format: 'verbose_json',
+      model: "whisper-1",
+      language: language.split("-")[0], // e.g., 'en' from 'en-US'
+      response_format: "verbose_json",
     });
-    
+
     return {
-      text: transcription.text || '',
+      text: transcription.text || "",
       language: (transcription as any).language || language,
       confidence: 1.0, // Whisper doesn't provide confidence, assume high
     };
-    
   } catch (error) {
-    console.error('Transcription error:', error);
-    throw new Error('Audio transcription failed');
+    console.error("Transcription error:", error);
+    throw new Error("Audio transcription failed");
   }
 }
 
@@ -166,14 +175,14 @@ interface NLUResult {
 
 async function understandIntent(
   text: string,
-  context: VoiceInput['context'] = {},
-  voiceProfile: any
+  context: VoiceInput["context"] = {},
+  voiceProfile: any,
 ): Promise<NLUResult> {
   const systemPrompt = `You are a warehouse voice assistant AI. Analyze the user's speech and determine their intent.
 
 Current context:
-- Task type: ${context.taskType || 'unknown'}
-- Location: ${context.location || 'unknown'}
+- Task type: ${context.taskType || "unknown"}
+- Location: ${context.location || "unknown"}
 - Additional context: ${JSON.stringify(context.metadata || {})}
 
 Possible intents:
@@ -207,27 +216,26 @@ Respond in JSON format:
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: "gpt-4",
       messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: text },
+        { role: "system", content: systemPrompt },
+        { role: "user", content: text },
       ],
       temperature: 0.3, // Lower temperature for more consistent intent classification
-      response_format: { type: 'json_object' },
+      response_format: { type: "json_object" },
     });
-    
-    const result = JSON.parse(completion.choices[0].message.content || '{}');
-    
+
+    const result = JSON.parse(completion.choices[0].message.content || "{}");
+
     return {
-      intent: result.intent || 'UNKNOWN',
+      intent: result.intent || "UNKNOWN",
       confidence: result.confidence || 0.5,
       entities: result.entities || {},
-      reasoning: result.reasoning || '',
+      reasoning: result.reasoning || "",
     };
-    
   } catch (error) {
-    console.error('Intent understanding error:', error);
-    
+    console.error("Intent understanding error:", error);
+
     // Fallback: Simple keyword matching
     return simpleIntentMatch(text);
   }
@@ -238,74 +246,74 @@ Respond in JSON format:
  */
 function simpleIntentMatch(text: string): NLUResult {
   const lowerText = text.toLowerCase();
-  
+
   // Confirmation
   if (/\b(yes|yeah|yep|correct|confirmed|okay|ok|sure)\b/i.test(lowerText)) {
     return {
-      intent: 'CONFIRM',
+      intent: "CONFIRM",
       confidence: 0.8,
       entities: { confirmation: true },
-      reasoning: 'Keyword match for confirmation',
+      reasoning: "Keyword match for confirmation",
     };
   }
-  
+
   // Cancellation
   if (/\b(no|nope|cancel|back|stop|negative)\b/i.test(lowerText)) {
     return {
-      intent: 'CANCEL',
+      intent: "CANCEL",
       confidence: 0.8,
       entities: { confirmation: false },
-      reasoning: 'Keyword match for cancellation',
+      reasoning: "Keyword match for cancellation",
     };
   }
-  
+
   // Help request
   if (/\b(help|assist|stuck|problem|issue)\b/i.test(lowerText)) {
     return {
-      intent: 'REQUEST_HELP',
+      intent: "REQUEST_HELP",
       confidence: 0.9,
       entities: {},
-      reasoning: 'Keyword match for help request',
+      reasoning: "Keyword match for help request",
     };
   }
-  
+
   // Container number (T#### format)
   const containerMatch = lowerText.match(/\b[t]\s?(\d{3,4})\b/i);
   if (containerMatch) {
     return {
-      intent: 'ASSIGN_CONTAINER',
+      intent: "ASSIGN_CONTAINER",
       confidence: 0.95,
       entities: { container: `T${containerMatch[1]}` },
-      reasoning: 'Container number detected',
+      reasoning: "Container number detected",
     };
   }
-  
+
   // Quantity reporting (numbers)
   const quantityMatch = lowerText.match(/\b(\d+)\b/);
   if (quantityMatch) {
     return {
-      intent: 'REPORT_QUANTITY',
+      intent: "REPORT_QUANTITY",
       confidence: 0.7,
       entities: { quantity: parseInt(quantityMatch[1]) },
-      reasoning: 'Number detected',
+      reasoning: "Number detected",
     };
   }
-  
+
   // Complete task
   if (/\b(done|complete|finished|all set)\b/i.test(lowerText)) {
     return {
-      intent: 'COMPLETE_TASK',
+      intent: "COMPLETE_TASK",
       confidence: 0.85,
       entities: {},
-      reasoning: 'Completion keywords detected',
+      reasoning: "Completion keywords detected",
     };
   }
-  
+
   return {
-    intent: 'UNKNOWN',
+    intent: "UNKNOWN",
     confidence: 0.3,
     entities: {},
-    reasoning: 'No clear intent detected',
+    reasoning: "No clear intent detected",
   };
 }
 
@@ -314,13 +322,13 @@ function simpleIntentMatch(text: string): NLUResult {
  */
 async function executeAction(
   nluResult: NLUResult,
-  input: VoiceInput
+  input: VoiceInput,
 ): Promise<{ type: string; data: Record<string, any> } | undefined> {
   const { intent, entities } = nluResult;
-  
+
   try {
     switch (intent) {
-      case 'ASSIGN_CONTAINER':
+      case "ASSIGN_CONTAINER":
         if (entities.container) {
           // Create or find container
           const container = await prisma.container.upsert({
@@ -328,23 +336,23 @@ async function executeAction(
             update: {
               assignedBy: input.userId,
               assignedAt: new Date(),
-              assignmentMethod: 'VOICE',
-              status: 'IN_PROGRESS',
+              assignmentMethod: "VOICE",
+              status: "IN_PROGRESS",
             },
             create: {
               containerNumber: entities.container,
-              containerType: 'PALLET',
+              containerType: "PALLET",
               assignedBy: input.userId,
               assignedAt: new Date(),
-              assignmentMethod: 'VOICE',
-              status: 'IN_PROGRESS',
-              organizationId: input.context?.metadata?.organizationId || '',
+              assignmentMethod: "VOICE",
+              status: "IN_PROGRESS",
+              organizationId: input.context?.metadata?.organizationId || "",
               warehouseId: input.context?.metadata?.warehouseId,
             },
           });
-          
+
           return {
-            type: 'CONTAINER_ASSIGNED',
+            type: "CONTAINER_ASSIGNED",
             data: {
               containerId: container.id,
               containerNumber: container.containerNumber,
@@ -352,46 +360,46 @@ async function executeAction(
           };
         }
         break;
-        
-      case 'PICK_ITEM':
+
+      case "PICK_ITEM":
         // Handle item picking logic
         return {
-          type: 'ITEM_PICKED',
+          type: "ITEM_PICKED",
           data: entities,
         };
-        
-      case 'REQUEST_HELP':
+
+      case "REQUEST_HELP":
         // Create collaboration request
         await prisma.collaborationRequest.create({
           data: {
-            requestType: 'PEER_HELP',
+            requestType: "PEER_HELP",
             priority: 7,
-            status: 'PENDING',
+            status: "PENDING",
             requesterId: input.userId,
-            requestReason: 'Voice assistance requested',
-            taskDescription: 'User requested help via voice',
+            requestReason: "Voice assistance requested",
+            taskDescription: "User requested help via voice",
             taskLocation: input.context?.location,
             warehouseId: input.context?.metadata?.warehouseId,
-            organizationId: input.context?.metadata?.organizationId || '',
+            organizationId: input.context?.metadata?.organizationId || "",
           },
         });
-        
+
         return {
-          type: 'HELP_REQUESTED',
-          data: { status: 'pending' },
+          type: "HELP_REQUESTED",
+          data: { status: "pending" },
         };
-        
-      case 'COMPLETE_TASK':
+
+      case "COMPLETE_TASK":
         return {
-          type: 'TASK_COMPLETED',
+          type: "TASK_COMPLETED",
           data: { completedAt: new Date().toISOString() },
         };
-        
+
       default:
         return undefined;
     }
   } catch (error) {
-    console.error('Action execution error:', error);
+    console.error("Action execution error:", error);
     return undefined;
   }
 }
@@ -402,37 +410,37 @@ async function executeAction(
 async function generateResponse(
   nluResult: NLUResult,
   actionResult: any,
-  voiceProfile: any
+  voiceProfile: any,
 ): Promise<string> {
   const { intent, entities } = nluResult;
-  
+
   // Default responses based on intent
   const responses: Record<string, string> = {
-    'ASSIGN_CONTAINER': `Container ${entities.container} assigned. Start picking.`,
-    'PICK_ITEM': `Item confirmed. Continue to next pick.`,
-    'CONFIRM': `Confirmed. Proceeding.`,
-    'CANCEL': `Cancelled. Returning to previous step.`,
-    'REQUEST_HELP': `Help request sent. A team member will assist you shortly.`,
-    'REPORT_QUANTITY': `${entities.quantity} units recorded.`,
-    'COMPLETE_TASK': `Great job! Task completed.`,
-    'UNKNOWN': `I didn't understand that. Please try again or say "help" for assistance.`,
+    ASSIGN_CONTAINER: `Container ${entities.container} assigned. Start picking.`,
+    PICK_ITEM: `Item confirmed. Continue to next pick.`,
+    CONFIRM: `Confirmed. Proceeding.`,
+    CANCEL: `Cancelled. Returning to previous step.`,
+    REQUEST_HELP: `Help request sent. A team member will assist you shortly.`,
+    REPORT_QUANTITY: `${entities.quantity} units recorded.`,
+    COMPLETE_TASK: `Great job! Task completed.`,
+    UNKNOWN: `I didn't understand that. Please try again or say "help" for assistance.`,
   };
-  
+
   // Get base response
-  let response = responses[intent] || responses['UNKNOWN'];
-  
+  let response = responses[intent] || responses["UNKNOWN"];
+
   // Add action result info if available
   if (actionResult) {
     switch (actionResult.type) {
-      case 'CONTAINER_ASSIGNED':
+      case "CONTAINER_ASSIGNED":
         response = `Container ${actionResult.data.containerNumber} is ready. What would you like to pick?`;
         break;
-      case 'HELP_REQUESTED':
+      case "HELP_REQUESTED":
         response = `Help is on the way. A supervisor has been notified and will assist you soon.`;
         break;
     }
   }
-  
+
   return response;
 }
 
@@ -444,35 +452,35 @@ async function getOrCreateVoiceProfile(userId: string) {
     where: { id: userId },
     include: { organizationMemberships: true },
   });
-  
+
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
-  
+
   const organizationId = user.organizationMemberships[0]?.organizationId;
-  
+
   if (!organizationId) {
-    throw new Error('User has no organization');
+    throw new Error("User has no organization");
   }
-  
+
   let voiceProfile = await prisma.voiceProfile.findUnique({
     where: { userId },
   });
-  
+
   if (!voiceProfile) {
     voiceProfile = await prisma.voiceProfile.create({
       data: {
         userId,
         organizationId,
-        language: 'en-US',
+        language: "en-US",
         confidence: 0.0,
         voiceEnabled: true,
         autoLearn: true,
-        feedbackLevel: 'NORMAL',
+        feedbackLevel: "NORMAL",
       },
     });
   }
-  
+
   return voiceProfile;
 }
 
@@ -496,7 +504,7 @@ async function storeVoiceCommand(data: {
   return prisma.voiceCommand.create({
     data: {
       ...data,
-      language: 'en-US', // TODO: Get from voice profile
+      language: "en-US", // TODO: Get from voice profile
       metadata: data.metadata || {},
     },
   });
@@ -508,18 +516,20 @@ async function storeVoiceCommand(data: {
 async function updateVoiceProfile(
   profileId: string,
   transcription: { text: string; confidence: number },
-  successful: boolean
+  successful: boolean,
 ) {
   const profile = await prisma.voiceProfile.findUnique({
     where: { id: profileId },
   });
-  
+
   if (!profile) return;
-  
+
   const totalCommands = profile.totalCommands + 1;
-  const successfulCmds = successful ? profile.successfulCmds + 1 : profile.successfulCmds;
+  const successfulCmds = successful
+    ? profile.successfulCmds + 1
+    : profile.successfulCmds;
   const accuracy = successfulCmds / totalCommands;
-  
+
   await prisma.voiceProfile.update({
     where: { id: profileId },
     data: {
@@ -540,21 +550,21 @@ export async function startVoiceSession(
   userId: string,
   sessionType: string,
   warehouseId?: string,
-  taskType?: string
+  taskType?: string,
 ) {
   const voiceProfile = await getOrCreateVoiceProfile(userId);
-  
+
   const session = await prisma.voiceSession.create({
     data: {
       voiceProfileId: voiceProfile.id,
       sessionType,
-      status: 'ACTIVE',
+      status: "ACTIVE",
       warehouseId,
       taskType,
       organizationId: voiceProfile.organizationId,
     },
   });
-  
+
   return session;
 }
 
@@ -563,20 +573,25 @@ export async function endVoiceSession(sessionId: string) {
     where: { id: sessionId },
     include: { commands: true },
   });
-  
+
   if (!session) {
-    throw new Error('Session not found');
+    throw new Error("Session not found");
   }
-  
-  const duration = Math.floor((Date.now() - session.startedAt.getTime()) / 1000);
+
+  const duration = Math.floor(
+    (Date.now() - session.startedAt.getTime()) / 1000,
+  );
   const commandCount = session.commands.length;
-  const errorCount = session.commands.filter((cmd: any) => !cmd.successful).length;
-  const accuracy = commandCount > 0 ? ((commandCount - errorCount) / commandCount) : 0;
-  
+  const errorCount = session.commands.filter(
+    (cmd: any) => !cmd.successful,
+  ).length;
+  const accuracy =
+    commandCount > 0 ? (commandCount - errorCount) / commandCount : 0;
+
   return prisma.voiceSession.update({
     where: { id: sessionId },
     data: {
-      status: 'COMPLETED',
+      status: "COMPLETED",
       endedAt: new Date(),
       duration,
       commandCount,
@@ -590,19 +605,21 @@ export async function endVoiceSession(sessionId: string) {
 // TEXT-TO-SPEECH (OPTIONAL)
 // ==========================================
 
-export async function synthesizeSpeech(text: string, voice: string = 'alloy'): Promise<Buffer> {
+export async function synthesizeSpeech(
+  text: string,
+  voice: string = "alloy",
+): Promise<Buffer> {
   try {
     const response = await openai.audio.speech.create({
-      model: 'tts-1',
+      model: "tts-1",
       voice: voice as any,
       input: text,
     });
-    
+
     const buffer = Buffer.from(await response.arrayBuffer());
     return buffer;
-    
   } catch (error) {
-    console.error('Speech synthesis error:', error);
-    throw new Error('Text-to-speech conversion failed');
+    console.error("Speech synthesis error:", error);
+    throw new Error("Text-to-speech conversion failed");
   }
 }
