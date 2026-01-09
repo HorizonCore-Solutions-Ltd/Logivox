@@ -15,10 +15,17 @@ import {
 
 export function HeroSection() {
   const benefits = [
-    { label: "Reduce Picking Errors by 95%" },
-    { label: "Speed Up Order Fulfillment 3x" },
-    { label: "Cut Labor Costs by 40%" },
-    { label: "Scale Without Adding Staff" },
+    { label: "95% Reduction in Picking Errors" },
+    { label: "3x Faster Order Fulfillment" },
+    { label: "$52M+ Avg Annual Savings" },
+    { label: "936% ROI in First Year" },
+  ];
+
+  const stats = [
+    { value: "100%", label: "Automation", sublabel: "Eliminate Manual Work" },
+    { value: "44+", label: "Powerful Features", sublabel: "Everything You Need" },
+    { value: "99.99%", label: "Reliability", sublabel: "Always Available" },
+    { value: "Zero", label: "IT Headaches", sublabel: "We Handle Everything" },
   ];
 
   return (
@@ -38,33 +45,53 @@ export function HeroSection() {
             variant="secondary"
             className="px-4 py-1.5 text-sm font-bold shadow-md border border-primary/20"
           >
-            🎯 Complete Warehouse Management • Pay Only $49/user
+            🚀 Complete Warehouse Management • Voice-Enabled • AI-Powered • Bank-Level Security
           </Badge>
 
           {/* Hero headline */}
           <div className="space-y-6 max-w-5xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] drop-shadow-sm">
-              Stop Losing Money to
+              Run Your Warehouse
               <span className="block bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent drop-shadow-lg">
-                Warehouse Chaos
+                With Your Voice
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-              LogiVox eliminates picking errors, speeds up fulfillment, and cuts
-              labor costs—so you can grow your business without drowning in
-              operational complexity.
+              Stop juggling spreadsheets and paperwork. LogiVox gives you complete control
+              with voice commands, automated quality checks, and real-time visibility
+              —everything you need in one simple platform.
             </p>
           </div>
 
-          {/* Problem-solving benefits */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-4xl pt-4">
+          {/* Platform stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 w-full max-w-5xl pt-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="flex flex-col items-center justify-center bg-card border-2 border-primary/20 rounded-lg px-4 py-5 shadow-md hover:shadow-xl hover:border-primary/50 hover:scale-105 transition-all"
+              >
+                <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm font-semibold text-foreground mb-0.5">
+                  {stat.label}
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {stat.sublabel}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ROI benefits */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-4xl">
             {benefits.map((benefit) => (
               <div
                 key={benefit.label}
-                className="flex items-center justify-center space-x-2 bg-card border-2 border-primary/20 rounded-lg px-3 py-3 shadow-md hover:shadow-lg hover:border-primary/50 hover:scale-105 transition-all"
+                className="flex items-center justify-center space-x-2 bg-gradient-to-br from-green-500/10 to-green-600/10 border border-green-500/20 rounded-lg px-3 py-2.5 shadow-sm hover:shadow-md transition-all"
               >
-                <CheckCircle className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-semibold text-left">
+                <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                <span className="text-xs font-semibold text-left">
                   {benefit.label}
                 </span>
               </div>
@@ -79,7 +106,7 @@ export function HeroSection() {
               asChild
             >
               <Link href="/sign-up">
-                Start Free 30-Day Trial
+                Start Free Trial
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -89,9 +116,9 @@ export function HeroSection() {
               className="text-lg px-8 py-6 border-2 hover:scale-105 transition-all font-semibold"
               asChild
             >
-              <Link href="/demo">
+              <Link href="/contact">
                 <Play className="mr-2 h-5 w-5" />
-                See How It Works
+                Schedule Demo
               </Link>
             </Button>
           </div>

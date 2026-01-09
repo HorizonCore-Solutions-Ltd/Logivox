@@ -214,18 +214,18 @@ export default function QualityControlPage() {
         <div className="container-enterprise relative">
           <div className="max-w-3xl mx-auto text-center">
             <Badge className="mb-4" variant="secondary">
-              Quality Control & Inspection
+              Quality Control & Inspection • Industry-Leading
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl mb-6">
-              Enterprise Quality Management
-              <span className="block text-primary mt-2">
-                Zero Defects to Customer
+              Industry-Leading Quality Management
+              <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent mt-2">
+                Comprehensive Quality Control
               </span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed mb-8">
-              Comprehensive quality control with AQL sampling, defect tracking,
-              CAPA management, and real-time SPC charts. Ensure product quality
-              at every touchpoint.
+              The most comprehensive quality control system in the industry. 86 production-ready
+              API endpoints covering AQL sampling, defect tracking, computer vision inspection,
+              CAPA management, and real-time SPC charts. Ensure product quality at every touchpoint.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>

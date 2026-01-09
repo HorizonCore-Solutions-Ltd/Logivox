@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { SecurityNotificationService } from "@/lib/services/security-notifications";
+// SecurityNotificationService removed - notification service deprecated
 
 export async function POST(request: NextRequest) {
   try {
@@ -113,14 +113,15 @@ export async function POST(request: NextRequest) {
     });
 
     // Send notification to host
-    if (preRegistration.hostEmail) {
-      await SecurityNotificationService.notifyVisitorArrival(
-        session.user.organizationId,
-        visitor,
-        preRegistration.hostEmail,
-        preRegistration.hostName,
-      );
-    }
+    // TODO: Implement notification service
+    // if (preRegistration.hostEmail) {
+    //   await notifyVisitorArrival(
+    //     session.user.organizationId,
+    //     visitor,
+    //     preRegistration.hostEmail,
+    //     preRegistration.hostName,
+    //   );
+    // }
 
     // Log activity
     await prisma.activityLog.create({

@@ -2,7 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { SECURITY_PRESETS } from "@/lib/security-config";
+
+// Security presets for gate check-in security settings
+const SECURITY_PRESETS = {
+  SMB_CASUAL: {
+    requirePhotoId: false,
+    requireSignature: true,
+    requireVehicleInspection: false,
+    autoApproveVisitors: true,
+    maxVisitDuration: 480, // 8 hours
+  },
+  ENTERPRISE_STANDARD: {
+    requirePhotoId: true,
+    requireSignature: true,
+    requireVehicleInspection: true,
+    autoApproveVisitors: false,
+    maxVisitDuration: 240, // 4 hours
+  },
+  HIGH_SECURITY: {
+    requirePhotoId: true,
+    requireSignature: true,
+    requireVehicleInspection: true,
+    autoApproveVisitors: false,
+    maxVisitDuration: 120, // 2 hours
+    requireEscort: true,
+  },
+};
 
 export async function GET(request: NextRequest) {
   try {

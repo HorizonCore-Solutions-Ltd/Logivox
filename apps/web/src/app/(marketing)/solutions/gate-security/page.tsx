@@ -13,421 +13,208 @@ import {
 import { Badge } from "@/components/ui/badge";
 import {
   ShieldCheck,
-  Radio,
-  MapPin,
-  AlertTriangle,
+  Truck,
   Users,
   ClipboardCheck,
-  Truck,
   Camera,
   ArrowRight,
   CheckCircle2,
-  Zap,
   Clock,
   FileText,
-  Shield,
-  Navigation,
   Package,
+  QrCode,
+  Scale,
 } from "lucide-react";
 
-export default function GateSecurityPage() {
+export default function GateCheckInPage() {
   const features = [
     {
       icon: ShieldCheck,
       title: "Gate Entry Management",
       description:
-        "Complete visitor, contractor, and delivery tracking with document verification and badge printing.",
+        "Streamline truck check-ins with automated verification, documentation capture, and dock assignment.",
     },
     {
-      icon: Radio,
-      title: "Guard Management",
+      icon: Users,
+      title: "Visitor Management",
       description:
-        "Digital patrol routes, panic buttons, GPS tracking, and shift handover for security personnel.",
+        "Complete visitor tracking with pre-registration, badge printing, and host notifications.",
     },
     {
-      icon: MapPin,
-      title: "Real-Time GPS Tracking",
+      icon: Truck,
+      title: "Carrier Documentation",
       description:
-        "Live location monitoring of all security guards with geofencing and violation alerts.",
-    },
-    {
-      icon: AlertTriangle,
-      title: "Panic Alert System",
-      description:
-        "Instant emergency response with auto-dispatch to 3 nearest guards and supervisor notification.",
+        "Digital capture of BOL, manifests, driver licenses, and delivery documents with OCR.",
     },
     {
       icon: ClipboardCheck,
-      title: "Digital Patrol Verification",
+      title: "Compliance Verification",
       description:
-        "QR code, NFC, and GPS checkpoint verification with photo evidence and incident reporting.",
+        "Automated checks for appointment matching, hazmat compliance, and seal number validation.",
     },
     {
       icon: Camera,
-      title: "Incident Management",
+      title: "Photo Documentation",
       description:
-        "Complete incident documentation with photos, videos, witness statements, and investigation tracking.",
+        "Capture photos of vehicles, trailers, cargo damage, and driver identification.",
+    },
+    {
+      icon: Scale,
+      title: "Weigh Bridge Integration",
+      description:
+        "Automatic weight capture for inbound and outbound vehicles with discrepancy alerts.",
     },
   ];
 
   const gateOperations = [
     {
+      title: "Truck Check-In",
+      description: "Fast and efficient carrier processing",
+      icon: Truck,
+      capabilities: [
+        "Appointment verification",
+        "Driver ID and license scanning",
+        "Manifest and BOL capture",
+        "Seal number validation",
+        "Automatic dock assignment",
+        "Weight-in-motion integration",
+        "Hazmat documentation verification",
+        "Carrier performance tracking",
+      ],
+    },
+    {
       title: "Visitor Management",
-      description: "Complete visitor lifecycle from pre-registration to exit",
+      description: "Professional visitor experience",
       icon: Users,
       capabilities: [
         "Online pre-registration portal",
         "Photo capture and badge printing",
         "Host notification system",
-        "Background check integration",
         "Parking pass issuance",
         "Automatic exit processing",
         "Visitor analytics and reporting",
-        "VIP visitor handling",
+        "Escort requirement tracking",
+        "Access control integration",
       ],
     },
     {
-      title: "Delivery & Carrier Management",
-      description: "Streamline inbound and outbound logistics",
-      icon: Truck,
+      title: "Documentation & Compliance",
+      description: "Digital records and audit trails",
+      icon: FileText,
       capabilities: [
-        "Truck manifest verification",
-        "BOL and documentation scanning",
-        "Seal number validation",
-        "Weight ticket processing",
-        "Hazmat documentation compliance",
-        "Appointment matching and scheduling",
-        "Carrier performance tracking",
-        "Dwell time monitoring",
-      ],
-    },
-    {
-      title: "Security Patrols",
-      description: "Comprehensive guard patrol management",
-      icon: Navigation,
-      capabilities: [
-        "Custom patrol route creation",
-        "QR/NFC checkpoint verification",
-        "Photo evidence requirements",
-        "Missed checkpoint alerts",
-        "Patrol completion analytics",
-        "Incident documentation",
-        "Route optimization",
-        "Historical patrol data",
-      ],
-    },
-    {
-      title: "Equipment & Asset Tracking",
-      description: "Complete accountability for security equipment",
-      icon: Package,
-      capabilities: [
-        "Check-out/check-in workflows",
-        "Radios, flashlights, keys tracking",
-        "Vehicle mileage monitoring",
-        "Maintenance scheduling",
-        "Condition assessments",
-        "Replacement alerts",
-        "Cost tracking",
-        "Usage analytics",
+        "OCR document scanning",
+        "Blockchain BOL verification",
+        "Compliance report generation",
+        "Audit trail with timestamps",
+        "Photo evidence storage",
+        "E-signature capture",
+        "OSHA compliance reporting",
+        "Export documentation",
       ],
     },
   ];
 
-  const guardFeatures = [
+  const workflow = [
     {
-      title: "Patrol Routes",
-      description:
-        "Create routes with checkpoints, verification methods, and time requirements",
+      step: "1. Arrival",
+      description: "Truck arrives at gate, license plate automatically scanned",
+      icon: Truck,
     },
     {
-      title: "GPS Tracking",
-      description:
-        "Real-time location of all active guards with history playback",
+      step: "2. Check-In",
+      description: "Gate personnel verify appointment and capture documents",
+      icon: ClipboardCheck,
     },
     {
-      title: "Panic Button",
-      description: "Emergency alert with auto-dispatch and audio recording",
+      step: "3. Documentation",
+      description: "BOL, manifest, and driver ID digitally captured with OCR",
+      icon: Camera,
     },
     {
-      title: "Daily Reports",
-      description: "End-of-shift activity summaries and incident documentation",
+      step: "4. Dock Assignment",
+      description: "System assigns optimal dock door based on appointment and cargo",
+      icon: Package,
     },
     {
-      title: "Equipment Management",
-      description:
-        "Asset tracking with maintenance schedules and check-out logs",
-    },
-    {
-      title: "Shift Handover",
-      description:
-        "Digital handover notes between outgoing and incoming shifts",
-    },
-    {
-      title: "Training & Certifications",
-      description: "Track licenses, certifications, and expiration alerts",
-    },
-    {
-      title: "Geofencing",
-      description:
-        "Virtual boundaries with entry/exit alerts and violation tracking",
+      step: "5. Entry",
+      description: "Gate opens, driver receives directions to assigned dock",
+      icon: CheckCircle2,
     },
   ];
 
   const benefits = [
     {
-      metric: "60%",
-      description: "Faster gate processing times",
+      metric: "5 min",
+      label: "Average Check-In Time",
+      description: "Fast processing keeps trucks moving",
     },
     {
       metric: "100%",
-      description: "Patrol completion verification",
+      label: "Digital Documentation",
+      description: "Eliminate paper and manual data entry",
     },
     {
-      metric: "< 2 min",
-      description: "Emergency response time with panic alerts",
+      metric: "98%",
+      label: "Compliance Rate",
+      description: "Automated verification ensures adherence",
     },
     {
-      metric: "95%",
-      description: "Reduction in manual paperwork",
+      metric: "70%",
+      label: "Reduced Wait Times",
+      description: "Faster gate processing improves flow",
     },
-    {
-      metric: "24/7",
-      description: "Real-time guard location monitoring",
-    },
-    {
-      metric: "Zero",
-      description: "Lost or untracked security equipment",
-    },
-  ];
-
-  const entryWorkflow = [
-    {
-      step: "Vehicle Arrival",
-      description: "Driver presents documentation at gate",
-      icon: Truck,
-    },
-    {
-      step: "Identity Verification",
-      description: "Guard scans ID and validates credentials",
-      icon: ShieldCheck,
-    },
-    {
-      step: "Document Capture",
-      description: "BOL, manifest, and required docs photographed",
-      icon: FileText,
-    },
-    {
-      step: "System Check",
-      description: "Automated verification against appointments and watchlists",
-      icon: CheckCircle2,
-    },
-    {
-      step: "Badge Issuance",
-      description: "Temporary badge printed with photo and access level",
-      icon: Users,
-    },
-    {
-      step: "Location Assignment",
-      description: "Yard management assigns parking or dock",
-      icon: MapPin,
-    },
-  ];
-
-  const complianceFeatures = [
-    "Complete audit trail for all entries and exits",
-    "OSHA compliance reporting for incidents",
-    "Background check integration",
-    "Hazmat documentation verification",
-    "Insurance certificate validation",
-    "DOT hours of service tracking",
-    "Customizable compliance checklists",
-    "Regulatory report generation",
   ];
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b bg-gradient-to-b from-primary-50 to-background py-20 md:py-32">
-        <div className="container-enterprise relative z-10">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge className="mb-4" variant="secondary">
-              Complete Security Management Platform
-            </Badge>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              Gate Entry & Security Guard Management System
-            </h1>
-            <p className="mt-6 text-lg text-muted-foreground">
-              Comprehensive security solution combining gate operations, guard
-              management, and incident tracking. Real-time GPS monitoring,
-              digital patrols, and instant emergency response for complete
-              facility protection.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Button size="lg" asChild>
-                <Link href="/sign-up">
-                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/contact">Schedule Demo</Link>
-              </Button>
-            </div>
+      <section className="container py-24 lg:py-32">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <Badge variant="outline" className="mb-4">
+            Gate Check-In Solution
+          </Badge>
+          <h1 className="text-4xl lg:text-6xl font-bold tracking-tight">
+            Streamline Your{" "}
+            <span className="text-primary">Gate Operations</span>
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Fast, secure truck check-ins and visitor management with digital documentation,
+            automated compliance, and seamless dock coordination.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button size="lg" asChild>
+              <Link href="/contact">
+                Schedule a Demo
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/pricing">View Pricing</Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Core Features */}
-      <section className="py-20">
-        <div className="container-enterprise">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Integrated Security Features
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Complete security operations in one unified platform
+      {/* Benefits Section */}
+      <section className="bg-muted/50 py-16">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Measurable Results</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Real improvements from optimized gate operations
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <feature.icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <CardTitle>{feature.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Gate Operations */}
-      <section className="border-t bg-muted/30 py-20">
-        <div className="container-enterprise">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Complete Gate & Security Operations
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Manage every aspect of facility access and security
-            </p>
-          </div>
-          <div className="grid gap-8 lg:grid-cols-2">
-            {gateOperations.map((operation, index) => (
-              <Card key={index} className="border-2">
-                <CardHeader>
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br from-primary-600 to-primary-500 text-white">
-                      <operation.icon className="h-6 w-6" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-xl">
-                        {operation.title}
-                      </CardTitle>
-                      <CardDescription className="mt-1">
-                        {operation.description}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="grid gap-2 sm:grid-cols-2">
-                    {operation.capabilities.map((capability, idx) => (
-                      <li key={idx} className="flex items-start space-x-2">
-                        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
-                        <span className="text-sm">{capability}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Entry Workflow */}
-      <section className="py-20">
-        <div className="container-enterprise">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Streamlined Gate Entry Process
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Fast, secure processing from arrival to facility access
-            </p>
-          </div>
-          <div className="mx-auto max-w-4xl grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {entryWorkflow.map((item, index) => (
-              <Card key={index}>
-                <CardContent className="pt-6">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-white">
-                      <item.icon className="h-6 w-6" />
-                    </div>
-                    <h3 className="mt-3 font-semibold">{item.step}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {item.description}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Guard Management Features */}
-      <section className="border-t bg-muted/30 py-20">
-        <div className="container-enterprise">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Advanced Guard Management
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Digital tools for modern security personnel operations
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {guardFeatures.map((feature, index) => (
-              <Card key={index}>
-                <CardContent className="pt-6">
-                  <h3 className="font-semibold">{feature.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {feature.description}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="py-20">
-        <div className="container-enterprise">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Security Performance Metrics
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Quantifiable improvements in security operations
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {benefits.map((benefit, index) => (
-              <Card key={index} className="text-center">
-                <CardContent className="pt-6">
-                  <div className="text-4xl font-bold text-primary">
+              <Card key={index}>
+                <CardHeader className="text-center">
+                  <div className="text-4xl font-bold text-primary mb-2">
                     {benefit.metric}
                   </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
+                  <CardTitle className="text-lg">{benefit.label}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-center text-muted-foreground">
                     {benefit.description}
                   </p>
                 </CardContent>
@@ -437,53 +224,174 @@ export default function GateSecurityPage() {
         </div>
       </section>
 
-      {/* Compliance */}
-      <section className="border-t bg-muted/30 py-20">
-        <div className="container-enterprise">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Compliance & Audit Ready
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Built-in compliance features for regulatory requirements
+      {/* Features Section */}
+      <section className="container py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Core Features</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Everything you need for efficient gate management
+          </p>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <Card key={index}>
+                <CardHeader>
+                  <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <CardTitle>{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Workflow Section */}
+      <section className="bg-muted/50 py-16">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Check-In Workflow</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Simple 5-step process from arrival to dock assignment
             </p>
           </div>
-          <Card className="mx-auto max-w-3xl">
-            <CardContent className="pt-6">
-              <ul className="grid gap-3 sm:grid-cols-2">
-                {complianceFeatures.map((feature, index) => (
-                  <li key={index} className="flex items-center space-x-2">
-                    <Shield className="h-4 w-4 text-primary" />
-                    <span className="text-sm">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-4">
+              {workflow.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <Card key={index}>
+                    <CardContent className="flex items-center gap-4 p-6">
+                      <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                        <Icon className="h-6 w-6 text-primary-foreground" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold mb-1">{item.step}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          {item.description}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gate Operations Section */}
+      <section className="container py-16">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold mb-4">Comprehensive Gate Management</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Handle all types of gate operations
+          </p>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {gateOperations.map((type, index) => {
+            const Icon = type.icon;
+            return (
+              <Card key={index}>
+                <CardHeader>
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-3">
+                    <Icon className="h-5 w-5 text-primary" />
+                  </div>
+                  <CardTitle>{type.title}</CardTitle>
+                  <CardDescription>{type.description}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {type.capabilities.map((capability, cIndex) => (
+                      <li key={cIndex} className="flex items-start gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm">{capability}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Integration Section */}
+      <section className="bg-muted/50 py-16">
+        <div className="container">
+          <div className="max-w-4xl mx-auto">
+            <Card>
+              <CardHeader className="text-center">
+                <CardTitle className="text-2xl mb-2">
+                  Seamless WMS Integration
+                </CardTitle>
+                <CardDescription>
+                  Gate check-in flows directly into your warehouse operations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid md:grid-cols-3 gap-6 mt-6">
+                  <div className="text-center">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                      <ShieldCheck className="h-6 w-6 text-primary" />
+                    </div>
+                    <h4 className="font-semibold mb-2">Gate Check-In</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Truck clears security with all documents verified
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                      <Package className="h-6 w-6 text-primary" />
+                    </div>
+                    <h4 className="font-semibold mb-2">Dock Assignment</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Automatic dock door assignment based on appointment
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+                      <CheckCircle2 className="h-6 w-6 text-primary" />
+                    </div>
+                    <h4 className="font-semibold mb-2">Receiving Start</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Warehouse team notified, unloading begins immediately
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="border-t py-20">
-        <div className="container-enterprise">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Enhance Your Facility Security
-            </h2>
-            <p className="mt-4 text-lg text-muted-foreground">
-              Join organizations modernizing their security operations with
-              LogiVox
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              <Button size="lg" asChild>
-                <Link href="/sign-up">
-                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/contact">Contact Security Team</Link>
-              </Button>
-            </div>
+      <section className="container py-24">
+        <div className="max-w-3xl mx-auto text-center space-y-8">
+          <h2 className="text-3xl font-bold">
+            Ready to Modernize Your Gate Operations?
+          </h2>
+          <p className="text-xl text-muted-foreground">
+            Join warehouses reducing check-in times by 70% with digital gate management.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Button size="lg" asChild>
+              <Link href="/contact">
+                Get Started Today
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+            <Button size="lg" variant="outline" asChild>
+              <Link href="/solutions/warehouse-management">
+                Explore All WMS Solutions
+              </Link>
+            </Button>
           </div>
         </div>
       </section>

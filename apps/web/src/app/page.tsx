@@ -2,7 +2,6 @@ import {
   Navigation,
   HeroSection,
   FeaturesSection,
-  PricingSection,
   TrustSection,
   CTASection,
 } from "@/components/landing";
@@ -16,7 +15,6 @@ export default function HomePage() {
         <HeroSection />
         <TrustSection />
         <FeaturesSection />
-        <PricingSection />
         <CTASection />
       </main>
       <Footer />

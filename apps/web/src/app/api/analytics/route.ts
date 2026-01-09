@@ -1,231 +1,206 @@
-export const dynamic = "force-dynamic";
+/**
+ * Analytics API
+ * Calculate and return KPI metrics
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { subDays, startOfDay, endOfDay, format } from "date-fns";
 
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    const session = await getServerSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: { organizations: { take: 1 } },
-    });
-
-    if (!user || user.organizations.length === 0) {
-      return NextResponse.json(
-        { message: "No organization found" },
-        { status: 404 },
-      );
-    }
-
-    const organizationId = user.organizations[0].id;
-    const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get("days") || "30");
+    const { searchParams } = new URL(req.url);
+    const range = searchParams.get("range") || "today";
 
     // Calculate date range
-    const endDate = endOfDay(new Date());
-    const startDate = startOfDay(subDays(endDate, days));
+    const now = new Date();
+    let startDate: Date;
 
-    // Parallel queries for performance
-    const [
-      totalInventory,
-      lowStockItems,
-      totalBookings,
-      revenueData,
-      topCustomers,
-      recentActivity,
-      inventoryByCategory,
-      bookingsByStatus,
-      dailyRevenue,
-    ] = await Promise.all([
-      // Total inventory count and value
-      prisma.inventoryItem.aggregate({
-        where: { organizationId },
-        _count: true,
-        _sum: {
-          availableQuantity: true,
-          reservedQuantity: true,
-        },
-      }),
+    if (range === "today") {
+      startDate = new Date(now.setHours(0, 0, 0, 0));
+    } else if (range === "week") {
+      startDate = new Date(now.setDate(now.getDate() - 7));
+    } else if (range === "month") {
+      startDate = new Date(now.setMonth(now.getMonth() - 1));
+    } else {
+      startDate = new Date(now.setHours(0, 0, 0, 0));
+    }
 
-      // Low stock items
-      prisma.inventoryItem.count({
-        where: {
-          organizationId,
-          availableQuantity: {
-            lte: prisma.inventoryItem.fields.lowStockThreshold,
-          },
-        },
-      }),
-
-      // Total bookings
-      prisma.booking.aggregate({
-        where: { organizationId },
-        _count: true,
-        _sum: {
-          totalAmount: true,
-        },
-      }),
-
-      // Revenue by period
-      prisma.booking.findMany({
-        where: {
-          organizationId,
-          status: "FULFILLED",
-          createdAt: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
-        select: {
-          totalAmount: true,
-          createdAt: true,
-        },
-      }),
-
-      // Top customers by revenue
-      prisma.customer.findMany({
-        where: { organizationId },
-        select: {
-          id: true,
-          name: true,
-          email: true,
-          bookings: {
-            where: { status: "FULFILLED" },
-            select: {
-              totalAmount: true,
-            },
-          },
-        },
-        take: 10,
-      }),
-
-      // Recent activity logs
-      prisma.activityLog.findMany({
-        where: {
-          user: {
-            organizations: {
-              some: { id: organizationId },
-            },
-          },
-        },
-        include: {
-          user: {
-            select: {
-              name: true,
-              email: true,
-            },
-          },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 20,
-      }),
-
-      // Inventory by category
-      prisma.category.findMany({
-        where: { organizationId },
-        select: {
-          name: true,
-          _count: {
-            select: {
-              inventoryItems: true,
-            },
-          },
-        },
-        orderBy: {
-          inventoryItems: {
-            _count: "desc",
-          },
-        },
-        take: 5,
-      }),
-
-      // Bookings by status
-      prisma.booking.groupBy({
-        by: ["status"],
-        where: { organizationId },
-        _count: true,
-      }),
-
-      // Daily revenue for chart
-      prisma.$queryRaw<Array<{ date: Date; revenue: string }>>`
-        SELECT 
-          DATE(b."createdAt") as date,
-          SUM(CAST(b."totalAmount" AS DECIMAL))::text as revenue
-        FROM "Booking" b
-        WHERE b."organizationId" = ${organizationId}
-          AND b.status = 'FULFILLED'
-          AND b."createdAt" >= ${startDate}
-          AND b."createdAt" <= ${endDate}
-        GROUP BY DATE(b."createdAt")
-        ORDER BY date ASC
-      `,
-    ]);
-
-    // Process top customers
-    const topCustomersWithRevenue = topCustomers
-      .map((customer: any) => ({
-        id: customer.id,
-        name: customer.name,
-        email: customer.email,
-        totalRevenue: customer.bookings.reduce(
-          (sum: number, booking: any) => sum + Number(booking.totalAmount),
-          0,
-        ),
-        bookingsCount: customer.bookings.length,
-      }))
-      .sort((a: any, b: any) => b.totalRevenue - a.totalRevenue)
-      .slice(0, 5);
-
-    // Format daily revenue for chart
-    const formattedDailyRevenue = dailyRevenue.map((item: any) => ({
-      date: format(new Date(item.date), "MMM dd"),
-      revenue: Number(item.revenue),
-    }));
-
-    // Build response
-    const analytics = {
-      overview: {
-        totalInventoryItems: totalInventory._count || 0,
-        totalInventoryUnits:
-          (totalInventory._sum.availableQuantity || 0) +
-          (totalInventory._sum.reservedQuantity || 0),
-        lowStockItems,
-        totalBookings: totalBookings._count || 0,
-        totalRevenue: Number(totalBookings._sum.totalAmount || 0),
+    // Load Sheet Analytics
+    const loadSheets = await prisma.loadSheet.findMany({
+      where: {
+        createdAt: { gte: startDate },
       },
-      charts: {
-        dailyRevenue: formattedDailyRevenue,
-        inventoryByCategory: inventoryByCategory.map((cat: any) => ({
-          name: cat.name,
-          value: cat._count.inventoryItems,
-        })),
-        bookingsByStatus: bookingsByStatus.map((item: any) => ({
-          status: item.status,
-          count: item._count,
-        })),
+      include: {
+        events: true,
       },
-      topCustomers: topCustomersWithRevenue,
-      recentActivity: recentActivity.map((log: any) => ({
-        id: log.id,
-        action: log.action,
-        entityType: log.entityType,
-        userName: log.user.name || log.user.email,
-        createdAt: log.createdAt,
-      })),
+    });
+
+    const approvedLoadSheets = loadSheets.filter((ls) => ls.approved);
+    const departedLoadSheets = loadSheets.filter(
+      (ls) => ls.status === "DEPARTED",
+    );
+
+    const avgApprovalTime =
+      approvedLoadSheets.reduce((sum, ls) => {
+        if (ls.approvedAt) {
+          const diff = ls.approvedAt.getTime() - ls.createdAt.getTime();
+          return sum + diff / (1000 * 60); // minutes
+        }
+        return sum;
+      }, 0) / (approvedLoadSheets.length || 1);
+
+    const onTimeShipments = departedLoadSheets.filter((ls) => {
+      if (!ls.shipmentDate || !ls.actualDepartureTime) return false;
+      return ls.actualDepartureTime <= ls.shipmentDate;
+    });
+
+    // Container Analytics
+    const containers = await prisma.container.findMany({
+      where: {
+        createdAt: { gte: startDate },
+      },
+    });
+
+    const avgWeight =
+      containers.reduce((sum, c) => sum + c.weight, 0) /
+      (containers.length || 1);
+
+    const avgUtilization =
+      containers.reduce((sum, c) => {
+        const weightUtil = (c.weight / 1000) * 100; // Assuming 1000kg max
+        const volumeUtil = (c.volume / 10) * 100; // Assuming 10m³ max
+        return sum + (weightUtil + volumeUtil) / 2;
+      }, 0) / (containers.length || 1);
+
+    // Worker Analytics
+    const workers = await prisma.user.count({
+      where: {
+        role: { in: ["USER", "MANAGER"] },
+      },
+    });
+
+    const activeSessions = await prisma.aISupervisionSession.findMany({
+      where: {
+        status: "ACTIVE",
+        startTime: { gte: startDate },
+      },
+    });
+
+    const avgProductivity =
+      activeSessions.reduce((sum, s) => sum + (s.productivityScore || 0), 0) /
+      (activeSessions.length || 1);
+
+    const avgAccuracy =
+      activeSessions.reduce((sum, s) => sum + (s.accuracyScore || 0), 0) /
+      (activeSessions.length || 1);
+
+    // Voice Analytics
+    const voiceCommands = await prisma.voiceCommand.findMany({
+      where: {
+        timestamp: { gte: startDate },
+      },
+    });
+
+    const avgVoiceAccuracy =
+      voiceCommands.reduce((sum, vc) => sum + (vc.confidence || 0) * 100, 0) /
+      (voiceCommands.length || 1);
+
+    const avgResponseTime =
+      voiceCommands.reduce((sum, vc) => sum + (vc.processingTime || 0), 0) /
+      (voiceCommands.length || 1);
+
+    const intentCounts = new Map<string, number>();
+    voiceCommands.forEach((vc) => {
+      if (vc.intent) {
+        intentCounts.set(vc.intent, (intentCounts.get(vc.intent) || 0) + 1);
+      }
+    });
+
+    const topIntents = Array.from(intentCounts.entries())
+      .map(([intent, count]) => ({ intent, count }))
+      .sort((a, b) => b.count - a.count);
+
+    // Intervention Analytics
+    const interventions = await prisma.aIIntervention.findMany({
+      where: {
+        timestamp: { gte: startDate },
+      },
+    });
+
+    const resolvedInterventions = interventions.filter((i) => i.resolved);
+
+    const avgResolutionTime =
+      resolvedInterventions.reduce((sum, i) => {
+        if (i.resolvedAt) {
+          const diff = i.resolvedAt.getTime() - i.timestamp.getTime();
+          return sum + diff / (1000 * 60); // minutes
+        }
+        return sum;
+      }, 0) / (resolvedInterventions.length || 1);
+
+    const bySeverity: Record<string, number> = {
+      CRITICAL: 0,
+      HIGH: 0,
+      MEDIUM: 0,
+      LOW: 0,
     };
 
-    return NextResponse.json(analytics);
+    interventions.forEach((i) => {
+      bySeverity[i.severity] = (bySeverity[i.severity] || 0) + 1;
+    });
+
+    // Build analytics response
+    const analytics = {
+      loadSheets: {
+        total: loadSheets.length,
+        approved: approvedLoadSheets.length,
+        departed: departedLoadSheets.length,
+        avgApprovalTime: Math.round(avgApprovalTime * 10) / 10,
+        onTimePercentage:
+          (onTimeShipments.length / (departedLoadSheets.length || 1)) * 100,
+      },
+      containers: {
+        total: containers.length,
+        packed: containers.filter((c) => c.status === "PACKED").length,
+        shipped: containers.filter((c) => c.status === "SHIPPED").length,
+        avgWeight: Math.round(avgWeight),
+        avgUtilization: Math.round(avgUtilization * 10) / 10,
+      },
+      workers: {
+        total: workers,
+        active: activeSessions.length,
+        avgProductivity: Math.round(avgProductivity * 10) / 10,
+        avgAccuracy: Math.round(avgAccuracy * 10) / 10,
+      },
+      voice: {
+        totalCommands: voiceCommands.length,
+        avgAccuracy: Math.round(avgVoiceAccuracy * 10) / 10,
+        avgResponseTime: Math.round(avgResponseTime),
+        topIntents,
+      },
+      interventions: {
+        total: interventions.length,
+        resolved: resolvedInterventions.length,
+        avgResolutionTime: Math.round(avgResolutionTime * 10) / 10,
+        bySeverity,
+      },
+    };
+
+    return NextResponse.json({
+      analytics,
+      dateRange: range,
+      startDate,
+    });
   } catch (error) {
-    console.error("Analytics fetch error:", error);
+    console.error("Analytics GET error:", error);
     return NextResponse.json(
-      { message: "Failed to fetch analytics" },
+      { error: "Failed to fetch analytics" },
       { status: 500 },
     );
   }
