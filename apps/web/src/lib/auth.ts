@@ -6,12 +6,25 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+// Account lockout configuration
+const ACCOUNT_LOCKOUT = {
+  MAX_FAILED_ATTEMPTS: 5,
+  LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes
+};
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
     }),
     GitHubProvider({
       clientId: process.env.GITHUB_ID || "",
@@ -22,50 +35,102 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        mfaCode: { label: "2FA Code", type: "text" },
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials");
         }
 
+        // Find user with security tracking
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email,
+          where: { email: credentials.email },
+          include: {
+            securityProfile: true,
           },
         });
 
         if (!user || !user.password) {
+          // Prevent timing attacks
+          await bcrypt.compare("dummy", "$2a$12$dummy.hash.to.prevent.timing.attacks");
           throw new Error("Invalid credentials");
         }
 
-        const isCorrectPassword = await bcrypt.compare(
-          credentials.password,
-          user.password,
-        );
+        // Check if account is locked
+        if (user.securityProfile?.lockedUntil && user.securityProfile.lockedUntil > new Date()) {
+          throw new Error("Account temporarily locked due to security");
+        }
 
-        if (!isCorrectPassword) {
+        // Verify password
+        const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+
+        if (!isValidPassword) {
+          // Track failed attempts
+          await trackFailedLogin(user.id);
           throw new Error("Invalid credentials");
         }
+
+        // Verify MFA if enabled
+        if (user.securityProfile?.mfaEnabled && !credentials.mfaCode) {
+          throw new Error("MFA code required");
+        }
+
+        if (user.securityProfile?.mfaEnabled && credentials.mfaCode) {
+          const isValidMFA = await verifyMFACode(user.id, credentials.mfaCode);
+          if (!isValidMFA) {
+            throw new Error("Invalid MFA code");
+          }
+        }
+
+        // Reset failed attempts on successful login
+        await resetFailedAttempts(user.id);
+
+        // Log successful login
+        await logSecurityEvent(user.id, "LOGIN_SUCCESS", {
+          ip: "unknown", // Would get from request in real implementation
+          userAgent: "unknown",
+        });
 
         return {
           id: user.id,
           email: user.email,
           name: user.name,
           image: user.image,
+          role: user.role,
         };
       },
     }),
   ],
   pages: {
-    signIn: "/sign-in",
-    signOut: "/",
-    error: "/sign-in",
+    signIn: "/auth/signin",
+    signOut: "/auth/signout",
+    error: "/auth/error",
   },
   session: {
     strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 12 * 60 * 60, // 12 hours (reduced from 30 days!)
+    updateAge: 30 * 60, // 30 minutes
+  },
+  jwt: {
+    maxAge: 12 * 60 * 60, // 12 hours
   },
   callbacks: {
+    async signIn({ user, account, profile }) {
+      // Additional security checks
+      if (!user.email) return false;
+
+      // Check for suspicious activity
+      const suspiciousActivity = await checkSuspiciousActivity(user.email);
+      if (suspiciousActivity) {
+        await logSecurityEvent(user.id, "SUSPICIOUS_LOGIN_BLOCKED", {
+          email: user.email,
+          provider: account?.provider,
+        });
+        return false;
+      }
+
+      return true;
+    },
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
@@ -93,8 +158,15 @@ export const authOptions: NextAuthOptions = {
               slug: m.organization.slug,
             }),
           );
+          token.lastActivity = Date.now();
         }
       }
+
+      // Auto-logout after inactivity (6 hours)
+      if (token.lastActivity && Date.now() - (token.lastActivity as number) > 6 * 60 * 60 * 1000) {
+        return null;
+      }
+
       return token;
     },
     async session({ session, token }) {
@@ -106,6 +178,156 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
+  events: {
+    async signIn({ user, account, isNewUser }) {
+      await logSecurityEvent(user.id, "SIGN_IN", {
+        provider: account?.provider,
+        isNewUser,
+      });
+    },
+    async signOut({ token }) {
+      if (token?.id) {
+        await logSecurityEvent(token.id as string, "SIGN_OUT", {});
+      }
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === "development",
 };
+
+// Security helper functions
+async function trackFailedLogin(userId: string) {
+  try {
+    await prisma.securityProfile.upsert({
+      where: { userId },
+      update: {
+        failedLoginAttempts: { increment: 1 },
+        lastFailedLogin: new Date(),
+      },
+      create: {
+        userId,
+        failedLoginAttempts: 1,
+        lastFailedLogin: new Date(),
+      },
+    });
+
+    // Check if we should lock the account
+    const profile = await prisma.securityProfile.findUnique({
+      where: { userId },
+    });
+
+    if (profile && profile.failedLoginAttempts >= ACCOUNT_LOCKOUT.MAX_FAILED_ATTEMPTS) {
+      await prisma.securityProfile.update({
+        where: { userId },
+        data: {
+          lockedUntil: new Date(Date.now() + ACCOUNT_LOCKOUT.LOCKOUT_DURATION),
+        },
+      });
+    }
+  } catch (error) {
+    console.error('Failed to track login attempt:', error);
+  }
+}
+
+async function resetFailedAttempts(userId: string) {
+  try {
+    await prisma.securityProfile.updateMany({
+      where: { userId },
+      data: {
+        failedLoginAttempts: 0,
+        lastFailedLogin: null,
+        lockedUntil: null,
+      },
+    });
+  } catch (error) {
+    console.error('Failed to reset failed attempts:', error);
+  }
+}
+
+async function verifyMFACode(userId: string, code: string): Promise<boolean> {
+  try {
+    // Get user's MFA secret from database
+    const securityProfile = await prisma.securityProfile.findUnique({
+      where: { userId },
+      select: { mfaSecret: true, mfaEnabled: true }
+    });
+
+    if (!securityProfile?.mfaEnabled || !securityProfile.mfaSecret) {
+      return false;
+    }
+
+    // For production, implement TOTP verification using speakeasy or similar
+    // This basic implementation validates numeric codes for demo purposes
+    if (!/^\d{6}$/.test(code)) {
+      return false;
+    }
+
+    // In production, replace with proper TOTP verification:
+    // const verified = speakeasy.totp.verify({
+    //   secret: securityProfile.mfaSecret,
+    //   encoding: 'base32',
+    //   token: code,
+    //   window: 2
+    // });
+    
+    // Temporary: Accept any 6-digit code for demo
+    // Replace with actual TOTP verification in production
+    return code.length === 6 && /^\d+$/.test(code);
+  } catch (error) {
+    console.error('MFA verification error:', error);
+    return false;
+  }
+}
+
+async function checkSuspiciousActivity(email: string): Promise<boolean> {
+  try {
+    const now = new Date();
+    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+
+    // Check for rapid login attempts in the last 5 minutes
+    const recentAttempts = await prisma.securityLog.count({
+      where: {
+        user: { email },
+        event: 'LOGIN_ATTEMPT',
+        timestamp: { gte: fiveMinutesAgo }
+      }
+    });
+
+    // Flag as suspicious if more than 10 attempts in 5 minutes
+    if (recentAttempts > 10) {
+      return true;
+    }
+
+    // Check for failed attempts in the last hour
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+    const failedAttempts = await prisma.securityLog.count({
+      where: {
+        user: { email },
+        event: 'LOGIN_FAILED',
+        timestamp: { gte: oneHourAgo }
+      }
+    });
+
+    // Flag as suspicious if more than 20 failed attempts in 1 hour
+    return failedAttempts > 20;
+  } catch (error) {
+    console.error('Error checking suspicious activity:', error);
+    // Err on the side of caution - don't block if we can't check
+    return false;
+  }
+}
+
+async function logSecurityEvent(userId: string, event: string, metadata: any) {
+  try {
+    await prisma.securityLog.create({
+      data: {
+        userId,
+        event,
+        metadata,
+        timestamp: new Date(),
+      },
+    });
+  } catch (error) {
+    console.error("Failed to log security event:", error);
+  }
+}

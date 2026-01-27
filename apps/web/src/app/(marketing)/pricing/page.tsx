@@ -147,7 +147,7 @@ export default function PricingPage() {
         operations: [
           { name: "All Professional features, plus:", included: true },
           { name: "Cross-Docking Operations", included: true },
-          { name: "Yard & Gate Management", included: true },
+          { name: "Yard Management", included: true },
           { name: "Assembly & Kitting", included: true },
           { name: "Digital Twin Technology", included: true },
           { name: "Transportation Management", included: true },

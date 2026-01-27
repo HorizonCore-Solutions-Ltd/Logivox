@@ -199,7 +199,7 @@ export default function LoadPlanning() {
                     </div>
                   ))}
                 </div>
-              </CardHeader>
+              </CardContent>
             </Card>
 
             {/* Needs Optimization */}

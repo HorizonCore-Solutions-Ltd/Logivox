@@ -11,6 +11,8 @@ function getPrismaClient() {
         process.env.NODE_ENV === "development"
           ? ["query", "error", "warn"]
           : ["error"],
+      // Production optimizations
+      datasourceUrl: process.env.DATABASE_URL,
     });
   }
   return globalForPrisma.prisma;
@@ -20,3 +22,6 @@ export const prisma = getPrismaClient();
 
 // Re-export Prisma namespace for type usage
 export { Prisma };
+
+// Default export for compatibility with existing imports
+export default prisma;

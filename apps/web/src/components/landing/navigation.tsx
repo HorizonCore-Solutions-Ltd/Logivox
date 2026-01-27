@@ -83,12 +83,6 @@ export function Navigation() {
       href: "/solutions/yard-management",
     },
     {
-      title: "Gate & Security",
-      description: "Complete gate entry and guard management system",
-      icon: ShieldCheck,
-      href: "/solutions/gate-security",
-    },
-    {
       title: "Inventory Management",
       description: "Real-time stock tracking and cycle counting",
       icon: Package,

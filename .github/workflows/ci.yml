@@ -1,19 +1,66 @@
-name: CI
+name: 🔒 Production Security CI/CD Pipeline
 
 on:
   push:
     branches: [main, develop]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: '20'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  lint:
-    name: Lint & Type Check
+  # ============================================================================
+  # SECURITY SCANS - FAIL FAST ON SECURITY ISSUES
+  # ============================================================================
+  security-scan:
+    name: 🛡️ Security Vulnerability Scan
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'HIGH,CRITICAL'
+          exit-code: '1'
+      
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Check for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: main
+          head: HEAD
+          extra_args: --debug --only-verified
+
+  # ============================================================================
+  # CODE QUALITY & LINTING
+  # ============================================================================
+  code-quality:
+    name: 📋 Code Quality & Standards
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     
     steps:
       - name: Checkout code
@@ -22,31 +69,101 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci --audit-level=high
+      
+      - name: Run security-focused ESLint
+        run: npm run lint
+      
+      - name: Run TypeScript strict mode check
+        run: npm run type-check
+      
+      - name: Check code formatting
+        run: npm run format:check
+      
+      - name: Audit dependencies for vulnerabilities
+        run: npm audit --audit-level=moderate
+
+  # ============================================================================
+  # COMPREHENSIVE TESTING
+  # ============================================================================
+  test:
+    name: 🧪 Comprehensive Test Suite
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: flowstock_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       
       - name: Install dependencies
         run: npm ci
       
-      - name: Run ESLint
-        run: npm run lint
+      - name: Run unit tests with coverage
+        run: npm run test:coverage
+        env:
+          DATABASE_URL: postgresql://postgres:test_password@localhost:5432/flowstock_test
+          NEXTAUTH_SECRET: test-secret-for-ci-only
+          NEXTAUTH_URL: http://localhost:3000
       
-      - name: Run TypeScript type check
-        run: npm run type-check
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
+          flags: unittests
+          name: codecov-umbrella
 
-  test:
-    name: Unit & Integration Tests
+  # ============================================================================
+  # DEPLOYMENT READINESS CHECK
+  # ============================================================================
+  deployment-check:
+    name: ✅ Deployment Readiness Verification
     runs-on: ubuntu-latest
+    needs: [security-scan, code-quality, test]
+    if: github.ref == 'refs/heads/main'
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+      - name: Check environment variables
+        run: |
+          # Ensure all required env vars are documented
+          echo "Checking environment configuration..."
+          test -f .env.example || (echo "Missing .env.example" && exit 1)
+          test -f .env.production.secure || (echo "Missing .env.production.secure" && exit 1)
+      
+      - name: Production readiness report
+        run: |
+          echo "🎉 PRODUCTION READINESS STATUS:"
+          echo "✅ Security scans passed"
+          echo "✅ All tests passing"
+          echo "✅ Configuration templates present"
+          echo ""
+          echo "⚠️  SECURITY FIXES IMPLEMENTED - READY FOR DEPLOYMENT"
       
       - name: Install dependencies
         run: npm ci

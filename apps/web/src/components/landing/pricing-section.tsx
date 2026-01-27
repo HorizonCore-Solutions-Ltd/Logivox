@@ -217,12 +217,6 @@ export function PricingSection() {
           enterprise: true,
         },
         {
-          name: "Gate & Security",
-          starter: false,
-          professional: false,
-          enterprise: true,
-        },
-        {
           name: "Transportation Management",
           starter: false,
           professional: false,

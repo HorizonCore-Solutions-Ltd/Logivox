@@ -505,10 +505,9 @@ export async function GET(request: NextRequest) {
     })
 
     // Statistics
-    const stats = {(w: any) => w.isActive).length,
-      totalInstances: workflows.reduce((sum: number, w: any
-      activeWorkflows: workflows.filter(w => w.isActive).length,
-      totalInstances: workflows.reduce((sum, w) => sum + w._count.instances, 0),
+    const stats = {
+      activeWorkflows: workflows.filter((w: any) => w.isActive).length,
+      totalInstances: workflows.reduce((sum: number, w: any) => sum + w._count.instances, 0),
       templatesAvailable: Object.keys(WORKFLOW_TEMPLATES).length
     }
 

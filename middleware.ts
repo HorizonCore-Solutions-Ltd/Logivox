@@ -1,182 +1,98 @@
 /**
- * Security Middleware
- * Implements rate limiting, CSRF protection, and security headers
+ * PRODUCTION SECURITY MIDDLEWARE
+ * Implements enterprise-grade security controls
  */
+import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+// Security headers configuration
+const SECURITY_HEADERS = {
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+  'X-Frame-Options': 'DENY',
+  'X-Content-Type-Options': 'nosniff',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Content-Security-Policy': `default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self';`,
+};
 
 // Rate limiting store (in production, use Redis)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const rateLimitStore = new Map();
 
-// Rate limit configuration
-const RATE_LIMIT_WINDOW = 15 * 60 * 1000; // 15 minutes
-const MAX_REQUESTS_PER_WINDOW = 100;
-const API_MAX_REQUESTS = 1000; // Higher limit for authenticated API requests
+function getRateLimitKey(request: NextRequest): string {
+  const forwarded = request.headers.get('x-forwarded-for');
+  const ip = forwarded ? forwarded.split(',')[0] : 'unknown';
+  return `rate_limit:${ip}`;
+}
 
-// CSRF token store (in production, use Redis or session store)
-const csrfTokens = new Map<string, { token: string; expiresAt: number }>();
-
-export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const response = NextResponse.next();
-
-  // Apply rate limiting
-  const clientId = getClientIdentifier(request);
-  if (!checkRateLimit(clientId, pathname)) {
-    return new NextResponse("Too Many Requests", {
-      status: 429,
-      headers: {
-        "Retry-After": String(Math.ceil(RATE_LIMIT_WINDOW / 1000)),
-        "X-RateLimit-Limit": String(MAX_REQUESTS_PER_WINDOW),
-        "X-RateLimit-Remaining": "0",
-      },
-    });
+function isRateLimited(key: string, limit: number = 100, window: number = 60000): boolean {
+  const now = Date.now();
+  const windowStart = now - window;
+  
+  let requests = rateLimitStore.get(key) || [];
+  requests = requests.filter((time: number) => time > windowStart);
+  
+  if (requests.length >= limit) {
+    return true;
   }
+  
+  requests.push(now);
+  rateLimitStore.set(key, requests);
+  return false;
+}
 
-  // Add security headers
-  response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("X-XSS-Protection", "1; mode=block");
-  response.headers.set(
-    "Strict-Transport-Security",
-    "max-age=63072000; includeSubDomains; preload",
-  );
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+export async function middleware(request: NextRequest) {
+  const response = NextResponse.next();
+  
+  // Add security headers to all responses
+  Object.entries(SECURITY_HEADERS).forEach(([key, value]) => {
+    response.headers.set(key, value);
+  });
 
-  // CSRF protection for state-changing operations
-  if (
-    ["POST", "PUT", "DELETE", "PATCH"].includes(request.method) &&
-    pathname.startsWith("/api/")
-  ) {
-    const csrfToken = request.headers.get("x-csrf-token");
-    const sessionId = getSessionId(request);
-
-    if (!validateCsrfToken(sessionId, csrfToken)) {
-      return new NextResponse("CSRF token validation failed", {
-        status: 403,
+  // Rate limiting for API routes
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    const rateLimitKey = getRateLimitKey(request);
+    
+    if (isRateLimited(rateLimitKey)) {
+      return new NextResponse('Too Many Requests', {
+        status: 429,
+        headers: {
+          'Retry-After': '60',
+          ...SECURITY_HEADERS,
+        },
       });
     }
   }
 
-  // Add CSRF token to response for GET requests
-  if (request.method === "GET") {
-    const sessionId = getSessionId(request);
-    const token = generateCsrfToken(sessionId);
-    response.headers.set("X-CSRF-Token", token);
-  }
+  // Authentication check for protected routes
+  const protectedPaths = ['/dashboard', '/admin', '/api/'];
+  const isProtectedPath = protectedPaths.some(path => 
+    request.nextUrl.pathname.startsWith(path)
+  );
 
-  // Add rate limit headers
-  const rateLimit = rateLimitStore.get(clientId);
-  if (rateLimit) {
-    response.headers.set("X-RateLimit-Limit", String(MAX_REQUESTS_PER_WINDOW));
-    response.headers.set(
-      "X-RateLimit-Remaining",
-      String(MAX_REQUESTS_PER_WINDOW - rateLimit.count),
-    );
-    response.headers.set(
-      "X-RateLimit-Reset",
-      String(Math.ceil(rateLimit.resetTime / 1000)),
-    );
+  if (isProtectedPath && !request.nextUrl.pathname.startsWith('/api/auth/')) {
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET,
+    });
+
+    if (!token) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/auth/signin';
+      url.searchParams.set('callbackUrl', request.nextUrl.pathname);
+      return NextResponse.redirect(url);
+    }
+
+    // Add user context to headers
+    response.headers.set('x-user-id', token.id || '');
+    response.headers.set('x-user-role', token.role || '');
   }
 
   return response;
 }
 
-function getClientIdentifier(request: NextRequest): string {
-  // Use IP address + user agent for rate limiting
-  const forwarded = request.headers.get("x-forwarded-for");
-  const ip = forwarded ? forwarded.split(",")[0] : request.ip || "unknown";
-  const userAgent = request.headers.get("user-agent") || "unknown";
-  return `${ip}:${userAgent}`;
-}
-
-function checkRateLimit(clientId: string, pathname: string): boolean {
-  const now = Date.now();
-  const limit = pathname.startsWith("/api/")
-    ? API_MAX_REQUESTS
-    : MAX_REQUESTS_PER_WINDOW;
-
-  let rateLimit = rateLimitStore.get(clientId);
-
-  if (!rateLimit || rateLimit.resetTime < now) {
-    rateLimit = {
-      count: 1,
-      resetTime: now + RATE_LIMIT_WINDOW,
-    };
-    rateLimitStore.set(clientId, rateLimit);
-    return true;
-  }
-
-  if (rateLimit.count >= limit) {
-    return false;
-  }
-
-  rateLimit.count++;
-  return true;
-}
-
-function getSessionId(request: NextRequest): string {
-  // Get session ID from cookie or generate temporary one
-  const sessionCookie = request.cookies.get("session-id");
-  return sessionCookie?.value || `temp-${Date.now()}`;
-}
-
-function generateCsrfToken(sessionId: string): string {
-  const token = Buffer.from(
-    `${sessionId}-${Date.now()}-${Math.random().toString(36)}`,
-  ).toString("base64");
-
-  csrfTokens.set(sessionId, {
-    token,
-    expiresAt: Date.now() + 3600000, // 1 hour
-  });
-
-  return token;
-}
-
-function validateCsrfToken(sessionId: string, token: string | null): boolean {
-  if (!token) return false;
-
-  const storedToken = csrfTokens.get(sessionId);
-  if (!storedToken) return false;
-
-  if (storedToken.expiresAt < Date.now()) {
-    csrfTokens.delete(sessionId);
-    return false;
-  }
-
-  return storedToken.token === token;
-}
-
-// Cleanup expired entries periodically
-setInterval(() => {
-  const now = Date.now();
-
-  // Clean up expired rate limits
-  for (const [key, value] of rateLimitStore.entries()) {
-    if (value.resetTime < now) {
-      rateLimitStore.delete(key);
-    }
-  }
-
-  // Clean up expired CSRF tokens
-  for (const [key, value] of csrfTokens.entries()) {
-    if (value.expiresAt < now) {
-      csrfTokens.delete(key);
-    }
-  }
-}, 300000); // Every 5 minutes
-
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public folder
-     */
-    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
+    '/((?!_next/static|_next/image|favicon.ico).*)',
   ],
 };

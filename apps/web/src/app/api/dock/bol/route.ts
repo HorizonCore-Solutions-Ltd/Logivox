@@ -58,7 +58,7 @@ interface BOL {
   id: string;
   bolNumber: string;
   shipmentId: string;
-  carrierName: z.string();
+  carrierName: string;
   status: string;
   createdAt: Date;
   createdBy: string;

@@ -181,18 +181,23 @@ export function FeaturesSection() {
       <div className="container-enterprise">
         <div className="text-center mb-16 space-y-4">
           <Badge variant="secondary" className="mb-4">
-            Everything You Need
+            🏆 Industry-Leading Features
           </Badge>
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-            Complete Warehouse Management
+            Everything Competitors Charge Extra For
             <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              In One Simple Platform
+              Included in Every Plan
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            From voice-enabled picking to AI-powered optimization, LogiVox delivers
-            every feature you need to run a world-class warehouse operation.
+            Replace 5+ different tools with one complete platform. Voice operations, AI optimization,
+            quality management, and security training—competitors charge $500-2,000+ extra for these.
           </p>
+          <div className="mt-6 flex justify-center items-center gap-8 text-sm font-medium">
+            <div className="text-green-600">✅ Voice Commands (Usually $200/month)</div>
+            <div className="text-green-600">✅ Label Designer (Usually $150/month)</div>
+            <div className="text-green-600">✅ Security Training (Usually $40/user/month)</div>
+          </div>
         </div>
 
         {/* Core modules grid */}

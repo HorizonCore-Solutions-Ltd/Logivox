@@ -115,23 +115,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="/icons/icon-192x192.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="/icons/icon-192x192.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="/icons/icon-192x192.png"
-        />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/favicon.svg" />
         <meta name="theme-color" content="#0ea5e9" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -139,24 +125,18 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="LogiVox" />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <SkipLinks />
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >
-          <VisualAccessibilityProvider>
-            <QueryProvider>
-              <AuthProvider>
-                {children}
-                <Toaster />
-                <CookieBanner />
-                <KeyboardShortcutsHelp />
-                <ScreenReaderAnnouncer />
-              </AuthProvider>
-            </QueryProvider>
-          </VisualAccessibilityProvider>
+          <QueryProvider>
+            <AuthProvider>
+              {children}
+              <Toaster />
+            </AuthProvider>
+          </QueryProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
