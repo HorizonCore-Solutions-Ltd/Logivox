@@ -88,14 +88,14 @@ export function Footer() {
   ];
 
   const socialLinks = [
-    { name: "Twitter", href: "https://twitter.com/flowstock", icon: Twitter },
+    { name: "Twitter", href: "https://twitter.com/logivox", icon: Twitter },
     {
       name: "LinkedIn",
-      href: "https://linkedin.com/company/flowstock",
+      href: "https://linkedin.com/company/logivox",
       icon: Linkedin,
     },
-    { name: "GitHub", href: "https://github.com/flowstock", icon: Github },
-    { name: "YouTube", href: "https://youtube.com/flowstock", icon: Youtube },
+    { name: "GitHub", href: "https://github.com/logivox", icon: Github },
+    { name: "YouTube", href: "https://youtube.com/logivox", icon: Youtube },
   ];
 
   return (
