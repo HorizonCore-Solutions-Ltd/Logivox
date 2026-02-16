@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // ASN (ADVANCED SHIP NOTICE) PROCESSING SYSTEM API
@@ -35,92 +35,94 @@ import { z } from 'zod';
 
 // ASN status codes
 const ASN_STATUS = {
-  RECEIVED: 'ASN Received',
-  VALIDATED: 'Validated',
-  SCHEDULED: 'Dock Scheduled',
-  IN_TRANSIT: 'In Transit',
-  ARRIVED: 'Arrived at Dock',
-  RECEIVING: 'Receiving in Progress',
-  COMPLETED: 'Receiving Completed',
-  DISCREPANCY: 'Discrepancy Detected',
-  CANCELLED: 'Cancelled'
+  RECEIVED: "ASN Received",
+  VALIDATED: "Validated",
+  SCHEDULED: "Dock Scheduled",
+  IN_TRANSIT: "In Transit",
+  ARRIVED: "Arrived at Dock",
+  RECEIVING: "Receiving in Progress",
+  COMPLETED: "Receiving Completed",
+  DISCREPANCY: "Discrepancy Detected",
+  CANCELLED: "Cancelled",
 } as const;
 
 // ASN format types
 const ASN_FORMATS = {
-  EDI_856: 'EDI 856 (Ship Notice/Manifest)',
-  XML: 'XML Format',
-  JSON: 'JSON Format',
-  CSV: 'CSV Format',
-  API: 'API Integration'
+  EDI_856: "EDI 856 (Ship Notice/Manifest)",
+  XML: "XML Format",
+  JSON: "JSON Format",
+  CSV: "CSV Format",
+  API: "API Integration",
 } as const;
 
 // Carrier types
 const CARRIER_TYPES = {
-  LTL: 'Less Than Truckload',
-  FTL: 'Full Truckload',
-  PARCEL: 'Parcel/Small Package',
-  INTERMODAL: 'Intermodal',
-  COURIER: 'Courier Service'
+  LTL: "Less Than Truckload",
+  FTL: "Full Truckload",
+  PARCEL: "Parcel/Small Package",
+  INTERMODAL: "Intermodal",
+  COURIER: "Courier Service",
 } as const;
 
 // Validation schemas
 const ProcessASNSchema = z.object({
-  action: z.literal('process_asn'),
-  format: z.enum(['EDI_856', 'XML', 'JSON', 'CSV', 'API']),
+  action: z.literal("process_asn"),
+  format: z.enum(["EDI_856", "XML", "JSON", "CSV", "API"]),
   data: z.string(), // Raw ASN data
   supplierId: z.string().optional(),
-  purchaseOrderId: z.string().optional()
+  purchaseOrderId: z.string().optional(),
 });
 
 const ValidateASNSchema = z.object({
-  action: z.literal('validate_asn'),
-  asnId: z.string()
+  action: z.literal("validate_asn"),
+  asnId: z.string(),
 });
 
 const ScheduleDockSchema = z.object({
-  action: z.literal('schedule_dock'),
+  action: z.literal("schedule_dock"),
   asnId: z.string(),
   dockDoorNumber: z.number().optional(),
   scheduledArrival: z.string(), // ISO datetime
-  estimatedDuration: z.number().optional() // minutes
+  estimatedDuration: z.number().optional(), // minutes
 });
 
 const UpdateTrackingSchema = z.object({
-  action: z.literal('update_tracking'),
+  action: z.literal("update_tracking"),
   asnId: z.string(),
   trackingNumber: z.string(),
   carrier: z.string(),
   status: z.string(),
   location: z.string().optional(),
-  estimatedArrival: z.string().optional()
+  estimatedArrival: z.string().optional(),
 });
 
 const ReportDiscrepancySchema = z.object({
-  action: z.literal('report_discrepancy'),
+  action: z.literal("report_discrepancy"),
   asnId: z.string(),
   discrepancyType: z.enum([
-    'QUANTITY_MISMATCH',
-    'PRODUCT_MISMATCH',
-    'QUALITY_ISSUE',
-    'MISSING_ITEMS',
-    'DAMAGED_ITEMS',
-    'DOCUMENTATION_ERROR'
+    "QUANTITY_MISMATCH",
+    "PRODUCT_MISMATCH",
+    "QUALITY_ISSUE",
+    "MISSING_ITEMS",
+    "DAMAGED_ITEMS",
+    "DOCUMENTATION_ERROR",
   ]),
   details: z.string(),
-  affectedItems: z.array(z.object({
-    sku: z.string(),
-    expectedQty: z.number(),
-    actualQty: z.number()
-  }))
+  affectedItems: z.array(
+    z.object({
+      sku: z.string(),
+      expectedQty: z.number(),
+      actualQty: z.number(),
+    }),
+  ),
 });
 
-const ExecuteActionSchema = z.discriminatedUnion('action', [
+const ExecuteActionSchema = z.discriminatedUnion("action", [
   ProcessASNSchema,
   ValidateASNSchema,
   ScheduleDockSchema,
   UpdateTrackingSchema,
-  ReportDiscrepancySchema
+  ReportDiscrepancySchema,
 ]);
 
 // Parse EDI 856 ASN (simplified parser)
@@ -144,46 +146,49 @@ function parseEDI856(ediData: string): {
 } {
   try {
     // Simplified EDI parser - production would use proper EDI library
-    const lines = ediData.split('~');
-    const segments = lines.map(line => line.split('*'));
+    const lines = ediData.split("~");
+    const segments = lines.map((line) => line.split("*"));
 
-    let shipmentId = '';
-    let carrierProNumber = '';
-    let carrierSCAC = '';
-    let shipDate = '';
-    let expectedDelivery = '';
+    let shipmentId = "";
+    let carrierProNumber = "";
+    let carrierSCAC = "";
+    let shipDate = "";
+    let expectedDelivery = "";
     const items: any[] = [];
 
     for (const segment of segments) {
       const segmentId = segment[0];
 
-      if (segmentId === 'BSN') {
+      if (segmentId === "BSN") {
         // Beginning Segment for Ship Notice
-        shipmentId = segment[2] || '';
-        shipDate = segment[3] || '';
-      } else if (segmentId === 'TD5') {
+        shipmentId = segment[2] || "";
+        shipDate = segment[3] || "";
+      } else if (segmentId === "TD5") {
         // Carrier Details
-        carrierSCAC = segment[3] || '';
-      } else if (segmentId === 'REF' && segment[1] === 'CN') {
+        carrierSCAC = segment[3] || "";
+      } else if (segmentId === "REF" && segment[1] === "CN") {
         // Pro Number
-        carrierProNumber = segment[2] || '';
-      } else if (segmentId === 'DTM' && segment[1] === '002') {
+        carrierProNumber = segment[2] || "";
+      } else if (segmentId === "DTM" && segment[1] === "002") {
         // Expected Delivery Date
-        expectedDelivery = segment[2] || '';
-      } else if (segmentId === 'LIN') {
+        expectedDelivery = segment[2] || "";
+      } else if (segmentId === "LIN") {
         // Item Identification
-        const sku = segment[3] || '';
-        items.push({ sku, quantity: 0, uom: 'EA' });
-      } else if (segmentId === 'SN1' && items.length > 0) {
+        const sku = segment[3] || "";
+        items.push({ sku, quantity: 0, uom: "EA" });
+      } else if (segmentId === "SN1" && items.length > 0) {
         // Item Detail (Quantity)
         const lastItem = items[items.length - 1];
-        lastItem.quantity = parseInt(segment[2] || '0', 10);
-        lastItem.uom = segment[3] || 'EA';
+        lastItem.quantity = parseInt(segment[2] || "0", 10);
+        lastItem.uom = segment[3] || "EA";
       }
     }
 
     if (!shipmentId || items.length === 0) {
-      return { success: false, error: 'Invalid EDI 856 format: missing required fields' };
+      return {
+        success: false,
+        error: "Invalid EDI 856 format: missing required fields",
+      };
     }
 
     return {
@@ -194,36 +199,39 @@ function parseEDI856(ediData: string): {
         carrierSCAC,
         shipDate,
         expectedDelivery,
-        items
-      }
+        items,
+      },
     };
   } catch (error) {
-    return { success: false, error: 'Failed to parse EDI 856 data' };
+    return { success: false, error: "Failed to parse EDI 856 data" };
   }
 }
 
 // Parse JSON/XML ASN (simplified)
-function parseASN(data: string, format: keyof typeof ASN_FORMATS): {
+function parseASN(
+  data: string,
+  format: keyof typeof ASN_FORMATS,
+): {
   success: boolean;
   asn?: any;
   error?: string;
 } {
   try {
-    if (format === 'EDI_856') {
+    if (format === "EDI_856") {
       return parseEDI856(data);
-    } else if (format === 'JSON' || format === 'API') {
+    } else if (format === "JSON" || format === "API") {
       const asn = JSON.parse(data);
       return { success: true, asn };
-    } else if (format === 'XML') {
+    } else if (format === "XML") {
       // Simplified - production would use XML parser
-      return { success: false, error: 'XML parsing not implemented in demo' };
-    } else if (format === 'CSV') {
+      return { success: false, error: "XML parsing not implemented in demo" };
+    } else if (format === "CSV") {
       // Simplified - production would use CSV parser
-      return { success: false, error: 'CSV parsing not implemented in demo' };
+      return { success: false, error: "CSV parsing not implemented in demo" };
     }
-    return { success: false, error: 'Unsupported format' };
+    return { success: false, error: "Unsupported format" };
   } catch (error) {
-    return { success: false, error: 'Failed to parse ASN data' };
+    return { success: false, error: "Failed to parse ASN data" };
   }
 }
 
@@ -231,7 +239,7 @@ function parseASN(data: string, format: keyof typeof ASN_FORMATS): {
 async function validateASNAgainstPO(
   asnItems: Array<{ sku: string; quantity: number }>,
   purchaseOrderId: string,
-  organizationId: string
+  organizationId: string,
 ): Promise<{
   valid: boolean;
   discrepancies: Array<{
@@ -246,8 +254,8 @@ async function validateASNAgainstPO(
     where: {
       organizationId,
       entityId: purchaseOrderId,
-      action: 'PO_CREATED'
-    }
+      action: "PO_CREATED",
+    },
   });
 
   if (!poItems) {
@@ -258,27 +266,27 @@ async function validateASNAgainstPO(
   const discrepancies: any[] = [];
 
   for (const expected of expectedItems) {
-    const asnItem = asnItems.find(item => item.sku === expected.sku);
+    const asnItem = asnItems.find((item) => item.sku === expected.sku);
     if (!asnItem) {
       discrepancies.push({
         sku: expected.sku,
         expectedQty: expected.quantity,
         asnQty: 0,
-        variance: -expected.quantity
+        variance: -expected.quantity,
       });
     } else if (asnItem.quantity !== expected.quantity) {
       discrepancies.push({
         sku: expected.sku,
         expectedQty: expected.quantity,
         asnQty: asnItem.quantity,
-        variance: asnItem.quantity - expected.quantity
+        variance: asnItem.quantity - expected.quantity,
       });
     }
   }
 
   return {
     valid: discrepancies.length === 0,
-    discrepancies
+    discrepancies,
   };
 }
 
@@ -286,16 +294,16 @@ async function validateASNAgainstPO(
 function assignDockDoor(
   scheduledArrival: Date,
   estimatedDuration: number,
-  carrierType: string
+  carrierType: string,
 ): number {
   // Simplified dock assignment - production would check actual dock schedule
   // Dock doors 1-5: LTL/Parcel
   // Dock doors 6-10: FTL
   // Dock doors 11-12: Intermodal
 
-  if (carrierType === 'FTL') {
+  if (carrierType === "FTL") {
     return 6 + Math.floor(Math.random() * 5);
-  } else if (carrierType === 'INTERMODAL') {
+  } else if (carrierType === "INTERMODAL") {
     return 11 + Math.floor(Math.random() * 2);
   } else {
     return 1 + Math.floor(Math.random() * 5);
@@ -307,55 +315,56 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action') || 'stats';
-    const organizationId = session.user.organizationId || 'default-org';
+    const action = searchParams.get("action") || "stats";
+    const organizationId = session.user.organizationId || "default-org";
 
-    if (action === 'stats') {
+    if (action === "stats") {
       // Get ASN processing statistics
-      const [
-        asnLogs,
-        scheduledASNsData,
-        discrepancyLogs
-      ] = await Promise.all([
+      const [asnLogs, scheduledASNsData, discrepancyLogs] = await Promise.all([
         // ASN processing logs
         prisma.activityLog.findMany({
           where: {
             organizationId,
             action: {
-              in: ['ASN_RECEIVED', 'ASN_VALIDATED', 'ASN_SCHEDULED', 'ASN_COMPLETED']
+              in: [
+                "ASN_RECEIVED",
+                "ASN_VALIDATED",
+                "ASN_SCHEDULED",
+                "ASN_COMPLETED",
+              ],
             },
             createdAt: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-            }
+              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: "desc" },
         }),
 
         // Scheduled ASNs
         prisma.activityLog.findMany({
           where: {
             organizationId,
-            action: 'ASN_SCHEDULED',
+            action: "ASN_SCHEDULED",
             createdAt: {
-              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-            }
-          }
+              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+            },
+          },
         }),
 
         // Discrepancies
         prisma.activityLog.findMany({
           where: {
             organizationId,
-            action: 'ASN_DISCREPANCY',
+            action: "ASN_DISCREPANCY",
             createdAt: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-            }
-          }
-        })
+              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
+          },
+        }),
       ]);
 
       // Calculate metrics
@@ -371,34 +380,31 @@ export async function GET(request: NextRequest) {
       for (const log of asnLogs) {
         const metadata = log.metadata as any;
 
-        if (log.action === 'ASN_RECEIVED') {
+        if (log.action === "ASN_RECEIVED") {
           totalASNs++;
           const itemCount = metadata?.items?.length || 0;
           totalItems += itemCount;
-        } else if (log.action === 'ASN_VALIDATED') {
+        } else if (log.action === "ASN_VALIDATED") {
           validatedASNs++;
-        } else if (log.action === 'ASN_SCHEDULED') {
+        } else if (log.action === "ASN_SCHEDULED") {
           scheduledASNs++;
-        } else if (log.action === 'ASN_COMPLETED') {
+        } else if (log.action === "ASN_COMPLETED") {
           completedASNs++;
           totalCheckInTime += metadata?.checkInTimeMinutes || 0;
         }
 
-        const status = metadata?.status || 'UNKNOWN';
+        const status = metadata?.status || "UNKNOWN";
         statusCounts.set(status, (statusCounts.get(status) || 0) + 1);
       }
 
-      const averageCheckInTime = completedASNs > 0 
-        ? Math.round(totalCheckInTime / completedASNs) 
-        : 0;
+      const averageCheckInTime =
+        completedASNs > 0 ? Math.round(totalCheckInTime / completedASNs) : 0;
 
-      const validationRate = totalASNs > 0 
-        ? (validatedASNs / totalASNs) * 100 
-        : 0;
+      const validationRate =
+        totalASNs > 0 ? (validatedASNs / totalASNs) * 100 : 0;
 
-      const discrepancyRate = totalASNs > 0 
-        ? (discrepancyLogs.length / totalASNs) * 100 
-        : 0;
+      const discrepancyRate =
+        totalASNs > 0 ? (discrepancyLogs.length / totalASNs) * 100 : 0;
 
       // Calculate savings
       const manualCheckInTime = 30; // minutes without ASN
@@ -425,28 +431,28 @@ export async function GET(request: NextRequest) {
             const arrival = new Date(metadata?.scheduledArrival || 0);
             return arrival > new Date();
           }).length,
-          lastUpdated: new Date().toISOString()
-        }
+          lastUpdated: new Date().toISOString(),
+        },
       });
     }
 
-    if (action === 'incoming-asns') {
+    if (action === "incoming-asns") {
       // Get incoming ASNs
       const incomingASNs = await prisma.activityLog.findMany({
         where: {
           organizationId,
-          action: 'ASN_SCHEDULED',
+          action: "ASN_SCHEDULED",
           createdAt: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-          }
+            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          },
         },
-        orderBy: { createdAt: 'desc' },
-        take: 50
+        orderBy: { createdAt: "desc" },
+        take: 50,
       });
 
       return NextResponse.json({
         success: true,
-        asns: incomingASNs.map(asn => ({
+        asns: incomingASNs.map((asn) => ({
           id: asn.id,
           asnId: (asn.metadata as any)?.asnId,
           shipmentId: (asn.metadata as any)?.shipmentId,
@@ -457,46 +463,45 @@ export async function GET(request: NextRequest) {
           dockDoor: (asn.metadata as any)?.dockDoor,
           status: (asn.metadata as any)?.status,
           items: (asn.metadata as any)?.items,
-          receivedAt: asn.createdAt
-        }))
+          receivedAt: asn.createdAt,
+        })),
       });
     }
 
-    if (action === 'recent-discrepancies') {
+    if (action === "recent-discrepancies") {
       // Get recent ASN discrepancies
       const discrepancies = await prisma.activityLog.findMany({
         where: {
           organizationId,
-          action: 'ASN_DISCREPANCY'
+          action: "ASN_DISCREPANCY",
         },
-        orderBy: { createdAt: 'desc' },
-        take: 50
+        orderBy: { createdAt: "desc" },
+        take: 50,
       });
 
       return NextResponse.json({
         success: true,
-        discrepancies: discrepancies.map(disc => ({
+        discrepancies: discrepancies.map((disc) => ({
           id: disc.id,
           asnId: (disc.metadata as any)?.asnId,
           type: (disc.metadata as any)?.discrepancyType,
           details: (disc.metadata as any)?.details,
           affectedItems: (disc.metadata as any)?.affectedItems,
           reportedAt: disc.createdAt,
-          userId: disc.userId
-        }))
+          userId: disc.userId,
+        })),
       });
     }
 
     return NextResponse.json(
-      { error: 'Invalid action parameter' },
-      { status: 400 }
+      { error: "Invalid action parameter" },
+      { status: 400 },
     );
-
   } catch (error) {
-    console.error('ASN processing API error:', error);
+    console.error("ASN processing API error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -506,22 +511,22 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const validatedData = ExecuteActionSchema.parse(body);
-    const organizationId = session.user.organizationId || 'default-org';
+    const organizationId = session.user.organizationId || "default-org";
 
     switch (validatedData.action) {
-      case 'process_asn': {
+      case "process_asn": {
         // Parse ASN data
         const parseResult = parseASN(validatedData.data, validatedData.format);
 
         if (!parseResult.success) {
           return NextResponse.json(
-            { error: parseResult.error || 'Failed to parse ASN' },
-            { status: 400 }
+            { error: parseResult.error || "Failed to parse ASN" },
+            { status: 400 },
           );
         }
 
@@ -529,12 +534,15 @@ export async function POST(request: NextRequest) {
         const asnId = `ASN-${Date.now()}`;
 
         // Validate against PO if provided
-        let validation: { valid: boolean; discrepancies: any[] } = { valid: true, discrepancies: [] };
+        let validation: { valid: boolean; discrepancies: any[] } = {
+          valid: true,
+          discrepancies: [],
+        };
         if (validatedData.purchaseOrderId) {
           validation = await validateASNAgainstPO(
             asnData.items,
             validatedData.purchaseOrderId,
-            organizationId
+            organizationId,
           );
         }
 
@@ -543,8 +551,8 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'ASN_RECEIVED',
-            entityType: 'ASN',
+            action: "ASN_RECEIVED",
+            entityType: "ASN",
             entityId: asnId,
             metadata: {
               asnId,
@@ -557,11 +565,11 @@ export async function POST(request: NextRequest) {
               carrierSCAC: asnData.carrierSCAC,
               shipDate: asnData.shipDate,
               expectedDelivery: asnData.expectedDelivery,
-              status: 'RECEIVED',
+              status: "RECEIVED",
               validation,
-              receivedAt: new Date().toISOString()
-            }
-          }
+              receivedAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -569,49 +577,49 @@ export async function POST(request: NextRequest) {
           asn: {
             asnId,
             shipmentId: asnData.shipmentId,
-            status: 'RECEIVED',
+            status: "RECEIVED",
             items: asnData.items,
             validation,
-            receivedAt: new Date().toISOString()
-          }
+            receivedAt: new Date().toISOString(),
+          },
         });
       }
 
-      case 'validate_asn': {
+      case "validate_asn": {
         // Validate ASN
         const asnLog = await prisma.activityLog.findFirst({
           where: {
             organizationId,
             entityId: validatedData.asnId,
-            action: 'ASN_RECEIVED'
-          }
+            action: "ASN_RECEIVED",
+          },
         });
 
         if (!asnLog) {
-          return NextResponse.json(
-            { error: 'ASN not found' },
-            { status: 404 }
-          );
+          return NextResponse.json({ error: "ASN not found" }, { status: 404 });
         }
 
         const metadata = asnLog.metadata as any;
-        const validation = metadata.validation || { valid: true, discrepancies: [] };
+        const validation = metadata.validation || {
+          valid: true,
+          discrepancies: [],
+        };
 
         // Update status to validated
         await prisma.activityLog.create({
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'ASN_VALIDATED',
-            entityType: 'ASN',
+            action: "ASN_VALIDATED",
+            entityType: "ASN",
             entityId: validatedData.asnId,
             metadata: {
               asnId: validatedData.asnId,
-              status: validation.valid ? 'VALIDATED' : 'DISCREPANCY',
+              status: validation.valid ? "VALIDATED" : "DISCREPANCY",
               validation,
-              validatedAt: new Date().toISOString()
-            }
-          }
+              validatedAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -620,36 +628,37 @@ export async function POST(request: NextRequest) {
             asnId: validatedData.asnId,
             valid: validation.valid,
             discrepancies: validation.discrepancies,
-            status: validation.valid ? 'VALIDATED' : 'DISCREPANCY'
-          }
+            status: validation.valid ? "VALIDATED" : "DISCREPANCY",
+          },
         });
       }
 
-      case 'schedule_dock': {
+      case "schedule_dock": {
         // Schedule dock door assignment
         const scheduledArrival = new Date(validatedData.scheduledArrival);
         const estimatedDuration = validatedData.estimatedDuration || 60;
 
         // Auto-assign dock door if not provided
-        const dockDoor = validatedData.dockDoorNumber || 
-          assignDockDoor(scheduledArrival, estimatedDuration, 'LTL');
+        const dockDoor =
+          validatedData.dockDoorNumber ||
+          assignDockDoor(scheduledArrival, estimatedDuration, "LTL");
 
         await prisma.activityLog.create({
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'ASN_SCHEDULED',
-            entityType: 'ASN',
+            action: "ASN_SCHEDULED",
+            entityType: "ASN",
             entityId: validatedData.asnId,
             metadata: {
               asnId: validatedData.asnId,
               dockDoor,
               scheduledArrival: scheduledArrival.toISOString(),
               estimatedDuration,
-              status: 'SCHEDULED',
-              scheduledAt: new Date().toISOString()
-            }
-          }
+              status: "SCHEDULED",
+              scheduledAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -659,19 +668,19 @@ export async function POST(request: NextRequest) {
             dockDoor,
             scheduledArrival: scheduledArrival.toISOString(),
             estimatedDuration,
-            status: 'SCHEDULED'
-          }
+            status: "SCHEDULED",
+          },
         });
       }
 
-      case 'update_tracking': {
+      case "update_tracking": {
         // Update carrier tracking info
         await prisma.activityLog.create({
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'ASN_TRACKING_UPDATED',
-            entityType: 'ASN',
+            action: "ASN_TRACKING_UPDATED",
+            entityType: "ASN",
             entityId: validatedData.asnId,
             metadata: {
               asnId: validatedData.asnId,
@@ -680,9 +689,9 @@ export async function POST(request: NextRequest) {
               status: validatedData.status,
               location: validatedData.location,
               estimatedArrival: validatedData.estimatedArrival,
-              updatedAt: new Date().toISOString()
-            }
-          }
+              updatedAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -693,28 +702,28 @@ export async function POST(request: NextRequest) {
             carrier: validatedData.carrier,
             status: validatedData.status,
             location: validatedData.location,
-            estimatedArrival: validatedData.estimatedArrival
-          }
+            estimatedArrival: validatedData.estimatedArrival,
+          },
         });
       }
 
-      case 'report_discrepancy': {
+      case "report_discrepancy": {
         // Report ASN discrepancy
         await prisma.activityLog.create({
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'ASN_DISCREPANCY',
-            entityType: 'ASN',
+            action: "ASN_DISCREPANCY",
+            entityType: "ASN",
             entityId: validatedData.asnId,
             metadata: {
               asnId: validatedData.asnId,
               discrepancyType: validatedData.discrepancyType,
               details: validatedData.details,
               affectedItems: validatedData.affectedItems,
-              reportedAt: new Date().toISOString()
-            }
-          }
+              reportedAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -724,30 +733,26 @@ export async function POST(request: NextRequest) {
             type: validatedData.discrepancyType,
             details: validatedData.details,
             affectedItems: validatedData.affectedItems,
-            reportedAt: new Date().toISOString()
-          }
+            reportedAt: new Date().toISOString(),
+          },
         });
       }
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('ASN processing API error:', error);
+    console.error("ASN processing API error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

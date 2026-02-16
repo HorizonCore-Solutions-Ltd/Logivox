@@ -1,10 +1,10 @@
 /**
  * MULTI-WAREHOUSE INVENTORY BALANCING API
  * ========================================
- * 
+ *
  * System 12 - Outstanding ROI (692% ROI)
  * Investment: $24K → Savings: $166K/year
- * 
+ *
  * Capabilities:
  * - Network-wide inventory visibility and analysis
  * - Automatic rebalancing recommendations
@@ -12,13 +12,13 @@
  * - Dead stock redistribution
  * - Seasonal demand balancing
  * - Regional optimization
- * 
+ *
  * Key Metrics:
  * - 25% reduction in safety stock costs
  * - 15% improvement in fill rates
  * - 30% reduction in dead stock
  * - 20% faster regional fulfillment
- * 
+ *
  * @version 1.0.0
  * @author Flowstock Platform
  * @date January 8, 2026
@@ -37,23 +37,23 @@ import { z } from "zod";
 const BALANCING_CONFIG = {
   // Transfer cost per mile (includes labor, fuel, handling)
   COST_PER_MILE: 0.85,
-  
+
   // Minimum viable transfer quantity
   MIN_TRANSFER_QTY: 10,
-  
+
   // Maximum distance for economical transfers (miles)
   MAX_TRANSFER_DISTANCE: 500,
-  
+
   // Safety stock multiplier
   SAFETY_STOCK_WEEKS: 2,
-  
+
   // Thresholds for balancing decisions
   THRESHOLDS: {
     OVERSTOCK_PERCENT: 150, // >150% of demand = overstock
-    UNDERSTOCK_PERCENT: 50,  // <50% of demand = understock
-    DEADSTOCK_DAYS: 90,      // No sales for 90 days = dead
+    UNDERSTOCK_PERCENT: 50, // <50% of demand = understock
+    DEADSTOCK_DAYS: 90, // No sales for 90 days = dead
   },
-  
+
   // Priority weights for optimization
   WEIGHTS: {
     COST_SAVINGS: 0.4,
@@ -153,7 +153,7 @@ function calculateDistance(
   lat1: number,
   lng1: number,
   lat2: number,
-  lng2: number
+  lng2: number,
 ): number {
   const R = 3959; // Earth radius in miles
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -175,7 +175,7 @@ function analyzeInventoryHealth(
   quantity: number,
   reserved: number,
   avgDailySales: number,
-  lastSaleDate: Date | null
+  lastSaleDate: Date | null,
 ): {
   status: "OVERSTOCK" | "OPTIMAL" | "UNDERSTOCK" | "DEADSTOCK";
   daysOnHand: number;
@@ -183,7 +183,7 @@ function analyzeInventoryHealth(
 } {
   const available = quantity - reserved;
   const daysOnHand = avgDailySales > 0 ? available / avgDailySales : 999;
-  
+
   // Check for dead stock
   if (lastSaleDate) {
     const daysSinceLastSale =
@@ -192,11 +192,11 @@ function analyzeInventoryHealth(
       return { status: "DEADSTOCK", daysOnHand, stockLevel: 0 };
     }
   }
-  
+
   // Calculate optimal stock level (safety stock)
   const optimalStock = avgDailySales * BALANCING_CONFIG.SAFETY_STOCK_WEEKS * 7;
   const stockLevel = optimalStock > 0 ? (available / optimalStock) * 100 : 100;
-  
+
   if (stockLevel > BALANCING_CONFIG.THRESHOLDS.OVERSTOCK_PERCENT) {
     return { status: "OVERSTOCK", daysOnHand, stockLevel };
   } else if (stockLevel < BALANCING_CONFIG.THRESHOLDS.UNDERSTOCK_PERCENT) {
@@ -211,7 +211,7 @@ function analyzeInventoryHealth(
  */
 function analyzeDemandPattern(
   last30Days: number,
-  last90Days: number
+  last90Days: number,
 ): {
   last30Days: number;
   last90Days: number;
@@ -220,12 +220,12 @@ function analyzeDemandPattern(
   pattern: "HIGH" | "MEDIUM" | "LOW" | "MINIMAL";
 } {
   const avgWeekly = (last30Days / 30) * 7;
-  
+
   // Calculate trend
   const recentRate = last30Days / 30;
   const historicRate = (last90Days - last30Days) / 60;
   let trend: "INCREASING" | "STABLE" | "DECREASING";
-  
+
   if (recentRate > historicRate * 1.2) {
     trend = "INCREASING";
   } else if (recentRate < historicRate * 0.8) {
@@ -233,14 +233,14 @@ function analyzeDemandPattern(
   } else {
     trend = "STABLE";
   }
-  
+
   // Determine pattern
   let pattern: "HIGH" | "MEDIUM" | "LOW" | "MINIMAL";
   if (avgWeekly >= DEMAND_PATTERNS.HIGH.min) pattern = "HIGH";
   else if (avgWeekly >= DEMAND_PATTERNS.MEDIUM.min) pattern = "MEDIUM";
   else if (avgWeekly >= DEMAND_PATTERNS.LOW.min) pattern = "LOW";
   else pattern = "MINIMAL";
-  
+
   return { last30Days, last90Days, avgWeekly, trend, pattern };
 }
 
@@ -249,24 +249,24 @@ function analyzeDemandPattern(
  */
 function generateTransferRecommendations(
   network: WarehouseInventory[],
-  warehouses: Map<string, any>
+  warehouses: Map<string, any>,
 ): TransferRecommendation[] {
   const recommendations: TransferRecommendation[] = [];
-  
+
   // Identify overstock and understock warehouses
   const overstock = network.filter((wh) => wh.status === "OVERSTOCK");
   const understock = network.filter((wh) => wh.status === "UNDERSTOCK");
   const deadstock = network.filter((wh) => wh.status === "DEADSTOCK");
-  
+
   // Generate transfers from overstock to understock
   for (const source of overstock) {
     for (const target of understock) {
       if (source.warehouseId === target.warehouseId) continue;
-      
+
       const sourceWH = warehouses.get(source.warehouseId);
       const targetWH = warehouses.get(target.warehouseId);
       if (!sourceWH || !targetWH) continue;
-      
+
       // Calculate excess and shortage
       const sourceOptimal =
         source.inventory.avgDailySales *
@@ -276,48 +276,51 @@ function generateTransferRecommendations(
         target.inventory.avgDailySales *
         BALANCING_CONFIG.SAFETY_STOCK_WEEKS *
         7;
-      
+
       const excess = Math.max(0, source.inventory.available - sourceOptimal);
       const shortage = Math.max(0, targetOptimal - target.inventory.available);
-      
+
       if (excess < BALANCING_CONFIG.MIN_TRANSFER_QTY) continue;
-      
+
       const transferQty = Math.min(excess, shortage);
       if (transferQty < BALANCING_CONFIG.MIN_TRANSFER_QTY) continue;
-      
+
       // Calculate costs and benefits
       const distance = calculateDistance(
         sourceWH.latitude,
         sourceWH.longitude,
         targetWH.latitude,
-        targetWH.longitude
+        targetWH.longitude,
       );
-      
+
       if (distance > BALANCING_CONFIG.MAX_TRANSFER_DISTANCE) continue;
-      
+
       const transportCost = distance * BALANCING_CONFIG.COST_PER_MILE;
-      
+
       // Calculate savings (holding cost reduction + stockout prevention)
       const holdingCostSavings = excess * 0.25 * 30; // $0.25/unit/month
       const stockoutPrevention = shortage * target.demand.avgWeekly * 2; // 2 weeks of lost sales
       const expectedSavings = holdingCostSavings + stockoutPrevention * 0.1;
-      
+
       const netBenefit = expectedSavings - transportCost;
-      
+
       if (netBenefit <= 0) continue;
-      
+
       // Determine priority
       let priority: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
       if (target.inventory.available < target.inventory.avgDailySales * 3) {
         priority = "URGENT";
-      } else if (target.status === "UNDERSTOCK" && target.demand.trend === "INCREASING") {
+      } else if (
+        target.status === "UNDERSTOCK" &&
+        target.demand.trend === "INCREASING"
+      ) {
         priority = "HIGH";
       } else if (netBenefit > 500) {
         priority = "MEDIUM";
       } else {
         priority = "LOW";
       }
-      
+
       recommendations.push({
         id: `TR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         productId: source.inventory.productId,
@@ -335,39 +338,40 @@ function generateTransferRecommendations(
       });
     }
   }
-  
+
   // Generate transfers from deadstock to any warehouse with demand
   for (const source of deadstock) {
     for (const target of network) {
       if (source.warehouseId === target.warehouseId) continue;
-      if (target.status === "OVERSTOCK" || target.status === "DEADSTOCK") continue;
-      
+      if (target.status === "OVERSTOCK" || target.status === "DEADSTOCK")
+        continue;
+
       const sourceWH = warehouses.get(source.warehouseId);
       const targetWH = warehouses.get(target.warehouseId);
       if (!sourceWH || !targetWH) continue;
-      
+
       const transferQty = Math.min(
         source.inventory.available,
-        target.demand.avgWeekly * 4 // 4 weeks of demand
+        target.demand.avgWeekly * 4, // 4 weeks of demand
       );
-      
+
       if (transferQty < BALANCING_CONFIG.MIN_TRANSFER_QTY) continue;
-      
+
       const distance = calculateDistance(
         sourceWH.latitude,
         sourceWH.longitude,
         targetWH.latitude,
-        targetWH.longitude
+        targetWH.longitude,
       );
-      
+
       if (distance > BALANCING_CONFIG.MAX_TRANSFER_DISTANCE) continue;
-      
+
       const transportCost = distance * BALANCING_CONFIG.COST_PER_MILE;
       const expectedSavings = transferQty * 5; // Avoid write-off
       const netBenefit = expectedSavings - transportCost;
-      
+
       if (netBenefit <= 0) continue;
-      
+
       recommendations.push({
         id: `TR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         productId: source.inventory.productId,
@@ -385,7 +389,7 @@ function generateTransferRecommendations(
       });
     }
   }
-  
+
   // Sort by net benefit (highest first)
   return recommendations.sort((a, b) => b.netBenefit - a.netBenefit);
 }
@@ -423,11 +427,13 @@ export async function GET(request: NextRequest) {
       thisMonth.setHours(0, 0, 0, 0);
 
       const completedThisMonth = transfers.filter(
-        (t) => new Date(t.createdAt) >= thisMonth && (t.metadata as any)?.status === "COMPLETED"
+        (t) =>
+          new Date(t.createdAt) >= thisMonth &&
+          (t.metadata as any)?.status === "COMPLETED",
       ).length;
 
       const activeTransfers = transfers.filter(
-        (t) => (t.metadata as any)?.status === "IN_TRANSIT"
+        (t) => (t.metadata as any)?.status === "IN_TRANSIT",
       ).length;
 
       const totalSavings = transfers.reduce((sum, t) => {
@@ -447,7 +453,8 @@ export async function GET(request: NextRequest) {
           totalTransfers: transfers.length,
           totalSavings,
           netBenefit: totalSavings - totalCosts,
-          avgSavingsPerTransfer: transfers.length > 0 ? totalSavings / transfers.length : 0,
+          avgSavingsPerTransfer:
+            transfers.length > 0 ? totalSavings / transfers.length : 0,
         },
       });
     }
@@ -456,7 +463,7 @@ export async function GET(request: NextRequest) {
     if (action === "analyzeNetwork") {
       const productId = searchParams.get("productId");
       const warehouseId = searchParams.get("warehouseId");
-      
+
       // Get all warehouses
       const warehouses = await prisma.warehouse.findMany({
         where: {
@@ -495,7 +502,7 @@ export async function GET(request: NextRequest) {
           inv.quantity,
           inv.reservedQty || 0,
           avgDailySales,
-          lastSaleDate
+          lastSaleDate,
         );
 
         const demand = analyzeDemandPattern(last30Days, last90Days);
@@ -515,7 +522,10 @@ export async function GET(request: NextRequest) {
             available: inv.quantity - (inv.reservedQty || 0),
             avgDailySales,
             lastSaleDate,
-            daysOnHand: avgDailySales > 0 ? (inv.quantity - (inv.reservedQty || 0)) / avgDailySales : 999,
+            daysOnHand:
+              avgDailySales > 0
+                ? (inv.quantity - (inv.reservedQty || 0)) / avgDailySales
+                : 999,
           },
           demand,
           status: health.status,
@@ -528,13 +538,20 @@ export async function GET(request: NextRequest) {
       // Calculate summary metrics
       const summary = {
         totalWarehouses: networkAnalysis.length,
-        overstock: networkAnalysis.filter((w) => w.status === "OVERSTOCK").length,
-        understock: networkAnalysis.filter((w) => w.status === "UNDERSTOCK").length,
-        deadstock: networkAnalysis.filter((w) => w.status === "DEADSTOCK").length,
+        overstock: networkAnalysis.filter((w) => w.status === "OVERSTOCK")
+          .length,
+        understock: networkAnalysis.filter((w) => w.status === "UNDERSTOCK")
+          .length,
+        deadstock: networkAnalysis.filter((w) => w.status === "DEADSTOCK")
+          .length,
         optimal: networkAnalysis.filter((w) => w.status === "OPTIMAL").length,
         totalRecommendations: recommendations.length,
-        potentialSavings: recommendations.reduce((sum, r) => sum + r.netBenefit, 0),
-        urgentTransfers: recommendations.filter((r) => r.priority === "URGENT").length,
+        potentialSavings: recommendations.reduce(
+          (sum, r) => sum + r.netBenefit,
+          0,
+        ),
+        urgentTransfers: recommendations.filter((r) => r.priority === "URGENT")
+          .length,
       };
 
       return NextResponse.json({
@@ -550,7 +567,7 @@ export async function GET(request: NextRequest) {
     console.error("Error in multi-warehouse balancing GET:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -605,14 +622,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error in multi-warehouse balancing POST:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

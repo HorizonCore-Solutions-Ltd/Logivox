@@ -1,10 +1,10 @@
 /**
  * RETURNS PRE-PROCESSING SYSTEM
  * ==============================
- * 
+ *
  * Optimization System 8 - Excellent ROI (713%)
  * Investment: $6,000 → Annual Savings: $43,000
- * 
+ *
  * Features:
  * - AI-powered return classification
  * - Automated disposition decisions
@@ -43,10 +43,17 @@ const returnPreProcessSchema = z.object({
         "ARRIVED_TOO_LATE",
         "OTHER",
       ]),
-      condition: z.enum(["NEW", "LIKE_NEW", "GOOD", "ACCEPTABLE", "POOR", "DAMAGED"]),
+      condition: z.enum([
+        "NEW",
+        "LIKE_NEW",
+        "GOOD",
+        "ACCEPTABLE",
+        "POOR",
+        "DAMAGED",
+      ]),
       images: z.array(z.string().url()).optional(),
       customerNotes: z.string().optional(),
-    })
+    }),
   ),
 });
 
@@ -80,7 +87,13 @@ type ReturnReason =
   | "ARRIVED_TOO_LATE"
   | "OTHER";
 
-type Condition = "NEW" | "LIKE_NEW" | "GOOD" | "ACCEPTABLE" | "POOR" | "DAMAGED";
+type Condition =
+  | "NEW"
+  | "LIKE_NEW"
+  | "GOOD"
+  | "ACCEPTABLE"
+  | "POOR"
+  | "DAMAGED";
 
 type Disposition =
   | "RESTOCK"
@@ -103,7 +116,7 @@ function determineDisposition(
   reason: ReturnReason,
   condition: Condition,
   productValue: number,
-  daysFromPurchase: number
+  daysFromPurchase: number,
 ): DispositionRule {
   // High-value threshold
   const isHighValue = productValue > 100;
@@ -179,7 +192,11 @@ function determineDisposition(
   }
 
   // DAMAGED items
-  if (reason === "DAMAGED_SHIPPING" || condition === "DAMAGED" || condition === "POOR") {
+  if (
+    reason === "DAMAGED_SHIPPING" ||
+    condition === "DAMAGED" ||
+    condition === "POOR"
+  ) {
     if (productValue > 200) {
       return {
         disposition: "REFURBISH",
@@ -263,7 +280,7 @@ interface ProcessingMetrics {
 function calculateProcessingTime(
   disposition: Disposition,
   requiresInspection: boolean,
-  itemCount: number
+  itemCount: number,
 ): ProcessingMetrics {
   const inspectionTime = requiresInspection ? itemCount * 5 : 0;
   let dispositionTime = 0;
@@ -324,7 +341,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -473,10 +493,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ error: "Invalid action parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid action parameter" },
+      { status: 400 },
+    );
   } catch (error: any) {
     console.error("Returns Pre-Processing GET error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -499,7 +525,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -516,7 +545,7 @@ export async function POST(req: NextRequest) {
           item.returnReason,
           item.condition,
           150, // Mock product value
-          15 // Mock days from purchase
+          15, // Mock days from purchase
         );
 
         return {
@@ -555,7 +584,10 @@ export async function POST(req: NextRequest) {
       const { returnIds } = body;
 
       if (!Array.isArray(returnIds)) {
-        return NextResponse.json({ error: "returnIds array required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "returnIds array required" },
+          { status: 400 },
+        );
       }
 
       // TODO: Auto-process all eligible returns
@@ -574,10 +606,13 @@ export async function POST(req: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }

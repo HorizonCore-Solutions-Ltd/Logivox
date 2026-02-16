@@ -1,10 +1,10 @@
 /**
  * WAVE PREDICTION & PRE-STAGING SYSTEM
  * =====================================
- * 
+ *
  * Optimization System 13 - Outstanding ROI (949%)
  * Investment: $15,000 → Annual Savings: $142,300
- * 
+ *
  * Features:
  * - AI-powered wave demand forecasting
  * - Intelligent pre-staging recommendations
@@ -43,7 +43,7 @@ const preStageRecommendationSchema = z.object({
       stagingLocation: z.string(),
       priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]),
       reason: z.string(),
-    })
+    }),
   ),
   waveId: z.string().optional(),
   targetTime: z.string().datetime(),
@@ -89,10 +89,12 @@ function predictWaveLoad(
   dayOfWeek: number,
   historicalData: HistoricalPattern[],
   trendMultiplier: number = 1.0,
-  seasonalMultiplier: number = 1.0
+  seasonalMultiplier: number = 1.0,
 ): WaveForecast {
   // Find historical pattern for this time slot
-  const pattern = historicalData.find((p) => p.hour === hour && p.dayOfWeek === dayOfWeek) || {
+  const pattern = historicalData.find(
+    (p) => p.hour === hour && p.dayOfWeek === dayOfWeek,
+  ) || {
     avgOrders: 50,
     avgLines: 180,
     avgUnits: 420,
@@ -144,9 +146,15 @@ function predictWaveLoad(
     id: `forecast-${hour}-${dayOfWeek}`,
     date: new Date(),
     hour,
-    dayOfWeek: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][
-      dayOfWeek
-    ],
+    dayOfWeek: [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ][dayOfWeek],
     predictedOrders,
     predictedLines,
     predictedUnits,
@@ -200,7 +208,7 @@ interface PreStageRecommendation {
 
 function generatePreStageRecommendations(
   velocities: ProductVelocity[],
-  predictedWaveLoad: number
+  predictedWaveLoad: number,
 ): PreStageRecommendation[] {
   const recommendations: PreStageRecommendation[] = [];
 
@@ -280,7 +288,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -293,15 +304,27 @@ export async function GET(req: NextRequest) {
       const dayOfWeek = today.getDay();
 
       // Mock historical data
-      const historicalData: HistoricalPattern[] = Array.from({ length: 24 }, (_, hour) => ({
-        dayOfWeek,
-        hour,
-        avgOrders: hour >= 8 && hour <= 18 ? 40 + Math.random() * 30 : 10 + Math.random() * 10,
-        avgLines: hour >= 8 && hour <= 18 ? 150 + Math.random() * 100 : 30 + Math.random() * 20,
-        avgUnits: hour >= 8 && hour <= 18 ? 350 + Math.random() * 200 : 70 + Math.random() * 50,
-        peakOrders: hour >= 8 && hour <= 18 ? 80 : 25,
-        variance: 0.12 + Math.random() * 0.08,
-      }));
+      const historicalData: HistoricalPattern[] = Array.from(
+        { length: 24 },
+        (_, hour) => ({
+          dayOfWeek,
+          hour,
+          avgOrders:
+            hour >= 8 && hour <= 18
+              ? 40 + Math.random() * 30
+              : 10 + Math.random() * 10,
+          avgLines:
+            hour >= 8 && hour <= 18
+              ? 150 + Math.random() * 100
+              : 30 + Math.random() * 20,
+          avgUnits:
+            hour >= 8 && hour <= 18
+              ? 350 + Math.random() * 200
+              : 70 + Math.random() * 50,
+          peakOrders: hour >= 8 && hour <= 18 ? 80 : 25,
+          variance: 0.12 + Math.random() * 0.08,
+        }),
+      );
 
       // Generate forecasts for next 24 hours
       const forecasts = Array.from({ length: 24 }, (_, i) => {
@@ -313,10 +336,20 @@ export async function GET(req: NextRequest) {
         forecasts,
         total: forecasts.length,
         summary: {
-          totalPredictedOrders: forecasts.reduce((sum, f) => sum + f.predictedOrders, 0),
-          totalPredictedLines: forecasts.reduce((sum, f) => sum + f.predictedLines, 0),
-          peakHour: forecasts.reduce((max, f) => (f.predictedOrders > max.predictedOrders ? f : max)),
-          avgConfidence: forecasts.reduce((sum, f) => sum + f.confidence, 0) / forecasts.length,
+          totalPredictedOrders: forecasts.reduce(
+            (sum, f) => sum + f.predictedOrders,
+            0,
+          ),
+          totalPredictedLines: forecasts.reduce(
+            (sum, f) => sum + f.predictedLines,
+            0,
+          ),
+          peakHour: forecasts.reduce((max, f) =>
+            f.predictedOrders > max.predictedOrders ? f : max,
+          ),
+          avgConfidence:
+            forecasts.reduce((sum, f) => sum + f.confidence, 0) /
+            forecasts.length,
         },
       });
     }
@@ -360,15 +393,26 @@ export async function GET(req: NextRequest) {
         },
       ];
 
-      const recommendations = generatePreStageRecommendations(mockVelocities, 450);
+      const recommendations = generatePreStageRecommendations(
+        mockVelocities,
+        450,
+      );
 
       return NextResponse.json({
         recommendations,
         total: recommendations.length,
         summary: {
-          totalTimeSavings: recommendations.reduce((sum, r) => sum + r.netBenefit, 0),
-          totalItemsToMove: recommendations.reduce((sum, r) => sum + r.recommendedQuantity, 0),
-          criticalItems: recommendations.filter((r) => r.priority === "CRITICAL").length,
+          totalTimeSavings: recommendations.reduce(
+            (sum, r) => sum + r.netBenefit,
+            0,
+          ),
+          totalItemsToMove: recommendations.reduce(
+            (sum, r) => sum + r.recommendedQuantity,
+            0,
+          ),
+          criticalItems: recommendations.filter(
+            (r) => r.priority === "CRITICAL",
+          ).length,
         },
       });
     }
@@ -425,10 +469,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ error: "Invalid action parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid action parameter" },
+      { status: 400 },
+    );
   } catch (error: any) {
     console.error("Wave Prediction GET error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -451,7 +501,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -477,7 +530,10 @@ export async function POST(req: NextRequest) {
       const { forecastId, adjustStaffing } = body;
 
       if (!forecastId) {
-        return NextResponse.json({ error: "forecastId required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "forecastId required" },
+          { status: 400 },
+        );
       }
 
       // TODO: Apply forecast to staffing schedule
@@ -496,10 +552,13 @@ export async function POST(req: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }

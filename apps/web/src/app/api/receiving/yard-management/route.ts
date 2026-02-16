@@ -1,12 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // Validation schemas
-const yardActionSchema = z.discriminatedUnion('action', [
+const yardActionSchema = z.discriminatedUnion("action", [
   z.object({
-    action: z.literal('check_in_truck'),
+    action: z.literal("check_in_truck"),
     truckNumber: z.string(),
     carrier: z.string(),
     driverName: z.string(),
@@ -15,47 +15,51 @@ const yardActionSchema = z.discriminatedUnion('action', [
     trailerNumber: z.string().optional(),
   }),
   z.object({
-    action: z.literal('assign_parking_spot'),
+    action: z.literal("assign_parking_spot"),
     truckId: z.string(),
     spotNumber: z.string(),
-    spotType: z.enum(['WAITING', 'LIVE_LOAD', 'DROP_TRAILER', 'STAGING']),
+    spotType: z.enum(["WAITING", "LIVE_LOAD", "DROP_TRAILER", "STAGING"]),
   }),
   z.object({
-    action: z.literal('call_to_dock'),
+    action: z.literal("call_to_dock"),
     truckId: z.string(),
     dockNumber: z.number(),
-    priority: z.enum(['URGENT', 'HIGH', 'NORMAL', 'LOW']),
+    priority: z.enum(["URGENT", "HIGH", "NORMAL", "LOW"]),
   }),
   z.object({
-    action: z.literal('check_out_truck'),
+    action: z.literal("check_out_truck"),
     truckId: z.string(),
     notes: z.string().optional(),
   }),
   z.object({
-    action: z.literal('update_truck_status'),
+    action: z.literal("update_truck_status"),
     truckId: z.string(),
     status: z.enum([
-      'CHECKED_IN',
-      'WAITING',
-      'CALLED_TO_DOCK',
-      'AT_DOCK',
-      'UNLOADING',
-      'COMPLETED',
-      'CHECKED_OUT',
+      "CHECKED_IN",
+      "WAITING",
+      "CALLED_TO_DOCK",
+      "AT_DOCK",
+      "UNLOADING",
+      "COMPLETED",
+      "CHECKED_OUT",
     ]),
     location: z.string().optional(),
   }),
   z.object({
-    action: z.literal('record_detention'),
+    action: z.literal("record_detention"),
     truckId: z.string(),
     detentionMinutes: z.number(),
     reason: z.string(),
     chargeable: z.boolean(),
   }),
   z.object({
-    action: z.literal('send_driver_notification'),
+    action: z.literal("send_driver_notification"),
     truckId: z.string(),
-    notificationType: z.enum(['DOCK_READY', 'UNLOADING_COMPLETE', 'DELAY_ALERT']),
+    notificationType: z.enum([
+      "DOCK_READY",
+      "UNLOADING_COMPLETE",
+      "DELAY_ALERT",
+    ]),
     message: z.string().optional(),
   }),
 ]);
@@ -89,32 +93,34 @@ async function getParkingSpots(organizationId: string) {
     // Waiting area (10 spots)
     ...Array.from({ length: 10 }, (_, i) => ({
       spotNumber: `W-${i + 1}`,
-      type: 'WAITING',
-      status: i < 4 ? 'OCCUPIED' : 'AVAILABLE',
+      type: "WAITING",
+      status: i < 4 ? "OCCUPIED" : "AVAILABLE",
       truckNumber: i < 4 ? `TRUCK-${i + 1}` : null,
-      occupiedSince: i < 4 ? new Date(Date.now() - (i + 1) * 30 * 60 * 1000) : null,
+      occupiedSince:
+        i < 4 ? new Date(Date.now() - (i + 1) * 30 * 60 * 1000) : null,
     })),
     // Live load (4 spots)
     ...Array.from({ length: 4 }, (_, i) => ({
       spotNumber: `L-${i + 1}`,
-      type: 'LIVE_LOAD',
-      status: i < 2 ? 'OCCUPIED' : 'AVAILABLE',
+      type: "LIVE_LOAD",
+      status: i < 2 ? "OCCUPIED" : "AVAILABLE",
       truckNumber: i < 2 ? `TRUCK-${i + 11}` : null,
-      occupiedSince: i < 2 ? new Date(Date.now() - (i + 1) * 45 * 60 * 1000) : null,
+      occupiedSince:
+        i < 2 ? new Date(Date.now() - (i + 1) * 45 * 60 * 1000) : null,
     })),
     // Drop trailer (4 spots)
     ...Array.from({ length: 4 }, (_, i) => ({
       spotNumber: `D-${i + 1}`,
-      type: 'DROP_TRAILER',
-      status: i < 1 ? 'OCCUPIED' : 'AVAILABLE',
+      type: "DROP_TRAILER",
+      status: i < 1 ? "OCCUPIED" : "AVAILABLE",
       truckNumber: i < 1 ? `TRUCK-${i + 21}` : null,
       occupiedSince: i < 1 ? new Date(Date.now() - 120 * 60 * 1000) : null,
     })),
     // Staging (2 spots)
     ...Array.from({ length: 2 }, (_, i) => ({
       spotNumber: `S-${i + 1}`,
-      type: 'STAGING',
-      status: i < 1 ? 'OCCUPIED' : 'AVAILABLE',
+      type: "STAGING",
+      status: i < 1 ? "OCCUPIED" : "AVAILABLE",
       truckNumber: i < 1 ? `TRUCK-${i + 31}` : null,
       occupiedSince: i < 1 ? new Date(Date.now() - 15 * 60 * 1000) : null,
     })),
@@ -128,40 +134,40 @@ async function getTrucksInYard(organizationId: string) {
   // Simulate trucks currently in yard
   const trucks = [
     {
-      id: 'truck_1',
-      truckNumber: 'TRUCK-001',
-      carrier: 'ABC Transport',
-      driverName: 'John Smith',
-      driverPhone: '555-0101',
-      status: 'WAITING',
+      id: "truck_1",
+      truckNumber: "TRUCK-001",
+      carrier: "ABC Transport",
+      driverName: "John Smith",
+      driverPhone: "555-0101",
+      status: "WAITING",
       checkInTime: new Date(Date.now() - 45 * 60 * 1000),
-      parkingSpot: 'W-1',
+      parkingSpot: "W-1",
       appointmentTime: new Date(Date.now() - 30 * 60 * 1000),
-      priority: 'NORMAL',
+      priority: "NORMAL",
     },
     {
-      id: 'truck_2',
-      truckNumber: 'TRUCK-002',
-      carrier: 'XYZ Logistics',
-      driverName: 'Sarah Johnson',
-      driverPhone: '555-0102',
-      status: 'AT_DOCK',
+      id: "truck_2",
+      truckNumber: "TRUCK-002",
+      carrier: "XYZ Logistics",
+      driverName: "Sarah Johnson",
+      driverPhone: "555-0102",
+      status: "AT_DOCK",
       checkInTime: new Date(Date.now() - 90 * 60 * 1000),
       dockNumber: 3,
       appointmentTime: new Date(Date.now() - 60 * 60 * 1000),
-      priority: 'HIGH',
+      priority: "HIGH",
     },
     {
-      id: 'truck_3',
-      truckNumber: 'TRUCK-003',
-      carrier: 'Fast Freight',
-      driverName: 'Mike Brown',
-      driverPhone: '555-0103',
-      status: 'UNLOADING',
+      id: "truck_3",
+      truckNumber: "TRUCK-003",
+      carrier: "Fast Freight",
+      driverName: "Mike Brown",
+      driverPhone: "555-0103",
+      status: "UNLOADING",
       checkInTime: new Date(Date.now() - 120 * 60 * 1000),
       dockNumber: 7,
       appointmentTime: new Date(Date.now() - 90 * 60 * 1000),
-      priority: 'URGENT',
+      priority: "URGENT",
     },
   ];
 
@@ -172,21 +178,21 @@ async function getDetentionEvents(organizationId: string) {
   // In production, fetch from database
   const events = [
     {
-      id: 'det_1',
-      truckNumber: 'TRUCK-045',
-      carrier: 'ABC Transport',
+      id: "det_1",
+      truckNumber: "TRUCK-045",
+      carrier: "ABC Transport",
       detentionMinutes: 145,
-      reason: 'Dock delay - previous shipment took longer',
+      reason: "Dock delay - previous shipment took longer",
       chargeable: false,
       timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
       cost: 0,
     },
     {
-      id: 'det_2',
-      truckNumber: 'TRUCK-046',
-      carrier: 'XYZ Logistics',
+      id: "det_2",
+      truckNumber: "TRUCK-046",
+      carrier: "XYZ Logistics",
       detentionMinutes: 180,
-      reason: 'Missing paperwork',
+      reason: "Missing paperwork",
       chargeable: true,
       timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
       cost: 120, // $120 detention charge
@@ -201,7 +207,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -210,13 +216,13 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action') || 'yard_overview';
+    const action = searchParams.get("action") || "yard_overview";
 
-    if (action === 'yard_overview') {
+    if (action === "yard_overview") {
       const [metrics, parkingSpots, trucksInYard] = await Promise.all([
         calculateYardMetrics(user.organizationId),
         getParkingSpots(user.organizationId),
@@ -230,22 +236,22 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    if (action === 'parking_spots') {
+    if (action === "parking_spots") {
       const spots = await getParkingSpots(user.organizationId);
       return NextResponse.json({ spots });
     }
 
-    if (action === 'trucks_in_yard') {
+    if (action === "trucks_in_yard") {
       const trucks = await getTrucksInYard(user.organizationId);
       return NextResponse.json({ trucks });
     }
 
-    if (action === 'detention_events') {
+    if (action === "detention_events") {
       const events = await getDetentionEvents(user.organizationId);
       return NextResponse.json({ events });
     }
 
-    if (action === 'yard_stats') {
+    if (action === "yard_stats") {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -261,12 +267,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ stats });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('GET /api/receiving/yard-management error:', error);
+    console.error("GET /api/receiving/yard-management error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch yard data' },
-      { status: 500 }
+      { error: "Failed to fetch yard data" },
+      { status: 500 },
     );
   }
 }
@@ -276,7 +282,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -285,14 +291,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await request.json();
     const validated = yardActionSchema.parse(body);
 
     switch (validated.action) {
-      case 'check_in_truck': {
+      case "check_in_truck": {
         // Check in truck at gate
         // In production, create YardTruck record
         const truck = {
@@ -303,7 +309,7 @@ export async function POST(request: NextRequest) {
           driverName: validated.driverName,
           driverPhone: validated.driverPhone,
           trailerNumber: validated.trailerNumber,
-          status: 'CHECKED_IN',
+          status: "CHECKED_IN",
           checkInTime: new Date(),
           checkInBy: user.id,
         };
@@ -313,8 +319,8 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId: user.organizationId,
             userId: user.id,
-            action: 'TRUCK_CHECK_IN',
-            entityType: 'YARD_TRUCK',
+            action: "TRUCK_CHECK_IN",
+            entityType: "YARD_TRUCK",
             entityId: truck.id,
             changes: {
               truckNumber: validated.truckNumber,
@@ -327,19 +333,19 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           truck,
-          message: 'Truck checked in successfully',
+          message: "Truck checked in successfully",
         });
       }
 
-      case 'assign_parking_spot': {
+      case "assign_parking_spot": {
         // Assign truck to parking spot
         // In production, update YardTruck record
         await prisma.auditLog.create({
           data: {
             organizationId: user.organizationId,
             userId: user.id,
-            action: 'ASSIGN_PARKING_SPOT',
-            entityType: 'YARD_TRUCK',
+            action: "ASSIGN_PARKING_SPOT",
+            entityType: "YARD_TRUCK",
             entityId: validated.truckId,
             changes: {
               spotNumber: validated.spotNumber,
@@ -355,15 +361,15 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      case 'call_to_dock': {
+      case "call_to_dock": {
         // Call truck to dock
         // In production, update YardTruck status and notify driver
         await prisma.auditLog.create({
           data: {
             organizationId: user.organizationId,
             userId: user.id,
-            action: 'CALL_TO_DOCK',
-            entityType: 'YARD_TRUCK',
+            action: "CALL_TO_DOCK",
+            entityType: "YARD_TRUCK",
             entityId: validated.truckId,
             changes: {
               dockNumber: validated.dockNumber,
@@ -380,7 +386,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      case 'check_out_truck': {
+      case "check_out_truck": {
         // Check out truck from yard
         // In production, update YardTruck status and calculate dwell time
         const checkOutTime = new Date();
@@ -389,8 +395,8 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId: user.organizationId,
             userId: user.id,
-            action: 'TRUCK_CHECK_OUT',
-            entityType: 'YARD_TRUCK',
+            action: "TRUCK_CHECK_OUT",
+            entityType: "YARD_TRUCK",
             entityId: validated.truckId,
             changes: {
               checkOutTime,
@@ -401,18 +407,18 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
-          message: 'Truck checked out successfully',
+          message: "Truck checked out successfully",
         });
       }
 
-      case 'update_truck_status': {
+      case "update_truck_status": {
         // Update truck status
         await prisma.auditLog.create({
           data: {
             organizationId: user.organizationId,
             userId: user.id,
-            action: 'UPDATE_TRUCK_STATUS',
-            entityType: 'YARD_TRUCK',
+            action: "UPDATE_TRUCK_STATUS",
+            entityType: "YARD_TRUCK",
             entityId: validated.truckId,
             changes: {
               status: validated.status,
@@ -424,11 +430,11 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
-          message: 'Truck status updated',
+          message: "Truck status updated",
         });
       }
 
-      case 'record_detention': {
+      case "record_detention": {
         // Record detention event
         // In production, create DetentionEvent record
         const detentionCost = validated.chargeable
@@ -451,8 +457,8 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId: user.organizationId,
             userId: user.id,
-            action: 'RECORD_DETENTION',
-            entityType: 'DETENTION_EVENT',
+            action: "RECORD_DETENTION",
+            entityType: "DETENTION_EVENT",
             entityId: detentionEvent.id,
             changes: {
               detentionMinutes: validated.detentionMinutes,
@@ -466,56 +472,57 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           detentionEvent,
-          message: 'Detention recorded',
+          message: "Detention recorded",
         });
       }
 
-      case 'send_driver_notification': {
+      case "send_driver_notification": {
         // Send notification to driver
         // In production, send via SMS, app push, or display system
         const notification = {
           truckId: validated.truckId,
           type: validated.notificationType,
-          message: validated.message || getDefaultMessage(validated.notificationType),
+          message:
+            validated.message || getDefaultMessage(validated.notificationType),
           sentAt: new Date(),
         };
 
         return NextResponse.json({
           success: true,
           notification,
-          message: 'Driver notified',
+          message: "Driver notified",
         });
       }
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('POST /api/receiving/yard-management error:', error);
+    console.error("POST /api/receiving/yard-management error:", error);
     return NextResponse.json(
-      { error: 'Failed to process yard action' },
-      { status: 500 }
+      { error: "Failed to process yard action" },
+      { status: 500 },
     );
   }
 }
 
 function getDefaultMessage(notificationType: string): string {
   switch (notificationType) {
-    case 'DOCK_READY':
-      return 'Your dock is ready. Please proceed to the assigned dock.';
-    case 'UNLOADING_COMPLETE':
-      return 'Unloading complete. Please proceed to the exit gate.';
-    case 'DELAY_ALERT':
-      return 'There is a delay. Please wait in your assigned parking spot.';
+    case "DOCK_READY":
+      return "Your dock is ready. Please proceed to the assigned dock.";
+    case "UNLOADING_COMPLETE":
+      return "Unloading complete. Please proceed to the exit gate.";
+    case "DELAY_ALERT":
+      return "There is a delay. Please wait in your assigned parking spot.";
     default:
-      return 'Notification from warehouse';
+      return "Notification from warehouse";
   }
 }
 
@@ -539,9 +546,9 @@ export const YARD_MANAGEMENT_ROI = {
   roi: 414, // 414% ROI
   paybackMonths: 2.9,
   impact: {
-    avgWaitTime: '65% reduction',
-    yardThroughput: '40% increase',
-    detentionEvents: '75% reduction',
-    driverSatisfaction: '90% satisfaction',
+    avgWaitTime: "65% reduction",
+    yardThroughput: "40% increase",
+    detentionEvents: "75% reduction",
+    driverSatisfaction: "90% satisfaction",
   },
 };

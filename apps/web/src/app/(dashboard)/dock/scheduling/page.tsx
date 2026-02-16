@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Appointment {
   id: string;
@@ -37,7 +37,9 @@ interface Conflict {
 export default function DockScheduling() {
   const [schedule, setSchedule] = useState<any>(null);
   const [conflicts, setConflicts] = useState<Conflict[]>([]);
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split("T")[0],
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -58,7 +60,7 @@ export default function DockScheduling() {
       setSchedule(scheduleData);
       setConflicts(conflictsData.conflicts || []);
     } catch (error) {
-      console.error('Failed to fetch schedule:', error);
+      console.error("Failed to fetch schedule:", error);
     } finally {
       setLoading(false);
     }
@@ -66,11 +68,11 @@ export default function DockScheduling() {
 
   const optimizeSchedule = async () => {
     try {
-      const res = await fetch('/api/dock/scheduling', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const res = await fetch("/api/dock/scheduling", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'optimize_schedule',
+          action: "optimize_schedule",
           date: selectedDate,
           constraints: {
             minTurnaroundTime: 30,
@@ -81,41 +83,58 @@ export default function DockScheduling() {
 
       const data = await res.json();
       if (data.success) {
-        alert(`Schedule optimized! Resolved ${data.conflictsResolved} conflicts. Efficiency: ${data.efficiency}`);
+        alert(
+          `Schedule optimized! Resolved ${data.conflictsResolved} conflicts. Efficiency: ${data.efficiency}`,
+        );
         fetchScheduleData();
       }
     } catch (error) {
-      console.error('Optimization failed:', error);
+      console.error("Optimization failed:", error);
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'URGENT': return 'bg-red-100 text-red-800 border-red-300';
-      case 'HIGH': return 'bg-orange-100 text-orange-800 border-orange-300';
-      case 'NORMAL': return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'LOW': return 'bg-gray-100 text-gray-800 border-gray-300';
-      default: return 'bg-gray-100 text-gray-800';
+      case "URGENT":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800 border-orange-300";
+      case "NORMAL":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      case "LOW":
+        return "bg-gray-100 text-gray-800 border-gray-300";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'SCHEDULED': return 'bg-blue-100 text-blue-800';
-      case 'IN_PROGRESS': return 'bg-green-100 text-green-800';
-      case 'COMPLETED': return 'bg-gray-100 text-gray-800';
-      case 'CANCELLED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "SCHEDULED":
+        return "bg-blue-100 text-blue-800";
+      case "IN_PROGRESS":
+        return "bg-green-100 text-green-800";
+      case "COMPLETED":
+        return "bg-gray-100 text-gray-800";
+      case "CANCELLED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getDockStatusColor = (status: string) => {
     switch (status) {
-      case 'AVAILABLE': return 'bg-green-500';
-      case 'OCCUPIED': return 'bg-red-500';
-      case 'RESERVED': return 'bg-yellow-500';
-      case 'MAINTENANCE': return 'bg-gray-500';
-      default: return 'bg-gray-300';
+      case "AVAILABLE":
+        return "bg-green-500";
+      case "OCCUPIED":
+        return "bg-red-500";
+      case "RESERVED":
+        return "bg-yellow-500";
+      case "MAINTENANCE":
+        return "bg-gray-500";
+      default:
+        return "bg-gray-300";
     }
   };
 
@@ -152,8 +171,12 @@ export default function DockScheduling() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">🚚 Dock Scheduling & Assignment</h1>
-          <p className="text-gray-600">Smart dock allocation and conflict resolution</p>
+          <h1 className="text-3xl font-bold">
+            🚚 Dock Scheduling & Assignment
+          </h1>
+          <p className="text-gray-600">
+            Smart dock allocation and conflict resolution
+          </p>
         </div>
         <div className="flex gap-2">
           <input
@@ -173,28 +196,40 @@ export default function DockScheduling() {
         <Card className="border-red-300 bg-red-50">
           <CardHeader>
             <CardTitle className="text-red-800 flex items-center gap-2">
-              ⚠️ {conflicts.length} Scheduling Conflict{conflicts.length !== 1 ? 's' : ''} Detected
+              ⚠️ {conflicts.length} Scheduling Conflict
+              {conflicts.length !== 1 ? "s" : ""} Detected
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               {conflicts.slice(0, 3).map((conflict) => (
-                <div key={conflict.id} className="p-3 bg-white rounded border border-red-200">
+                <div
+                  key={conflict.id}
+                  className="p-3 bg-white rounded border border-red-200"
+                >
                   <div className="flex justify-between items-start">
                     <div>
-                      <div className="font-medium text-red-900">{conflict.type.replace('_', ' ')}</div>
-                      <div className="text-sm text-red-700 mt-1">{conflict.description}</div>
+                      <div className="font-medium text-red-900">
+                        {conflict.type.replace("_", " ")}
+                      </div>
+                      <div className="text-sm text-red-700 mt-1">
+                        {conflict.description}
+                      </div>
                       {conflict.suggestedResolution && (
                         <div className="text-sm text-blue-600 mt-1">
                           💡 {conflict.suggestedResolution}
                         </div>
                       )}
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      conflict.severity === 'CRITICAL' ? 'bg-red-200 text-red-800' :
-                      conflict.severity === 'HIGH' ? 'bg-orange-200 text-orange-800' :
-                      'bg-yellow-200 text-yellow-800'
-                    }`}>
+                    <span
+                      className={`text-xs px-2 py-1 rounded ${
+                        conflict.severity === "CRITICAL"
+                          ? "bg-red-200 text-red-800"
+                          : conflict.severity === "HIGH"
+                            ? "bg-orange-200 text-orange-800"
+                            : "bg-yellow-200 text-yellow-800"
+                      }`}
+                    >
                       {conflict.severity}
                     </span>
                   </div>
@@ -231,7 +266,8 @@ export default function DockScheduling() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600">
-              {schedule.docks?.filter((d: Dock) => d.status !== 'MAINTENANCE').length || 0}
+              {schedule.docks?.filter((d: Dock) => d.status !== "MAINTENANCE")
+                .length || 0}
             </div>
             <div className="text-sm text-gray-600 mt-1">
               of {schedule.docks?.length || 0} total
@@ -260,11 +296,13 @@ export default function DockScheduling() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-3xl font-bold ${conflicts.length > 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <div
+              className={`text-3xl font-bold ${conflicts.length > 0 ? "text-red-600" : "text-green-600"}`}
+            >
               {conflicts.length}
             </div>
             <div className="text-sm text-gray-600 mt-1">
-              {conflicts.length > 0 ? 'Needs attention' : 'All clear'}
+              {conflicts.length > 0 ? "Needs attention" : "All clear"}
             </div>
           </CardContent>
         </Card>
@@ -287,44 +325,58 @@ export default function DockScheduling() {
             <CardContent>
               <div className="space-y-3">
                 {schedule.appointments?.map((apt: Appointment) => (
-                  <div key={apt.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                  <div
+                    key={apt.id}
+                    className="border rounded-lg p-4 hover:bg-gray-50"
+                  >
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className={`text-xs px-2 py-1 rounded border ${getPriorityColor(apt.priority)}`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded border ${getPriorityColor(apt.priority)}`}
+                          >
                             {apt.priority}
                           </span>
-                          <span className={`text-xs px-2 py-1 rounded ${getStatusColor(apt.status)}`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${getStatusColor(apt.status)}`}
+                          >
                             {apt.status}
                           </span>
                           <span className="text-xs px-2 py-1 rounded bg-gray-100">
                             {apt.shipmentType}
                           </span>
                         </div>
-                        
+
                         <div className="font-medium text-lg">{apt.carrier}</div>
                         <div className="text-sm text-gray-600">
                           Shipment: {apt.shipmentId}
                         </div>
-                        
+
                         <div className="flex gap-4 mt-2 text-sm">
                           <div>
-                            <span className="text-gray-600">Time:</span>{' '}
+                            <span className="text-gray-600">Time:</span>{" "}
                             <span className="font-medium">
-                              {new Date(apt.appointmentTime).toLocaleTimeString('en-US', {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
+                              {new Date(apt.appointmentTime).toLocaleTimeString(
+                                "en-US",
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                },
+                              )}
                             </span>
                           </div>
                           <div>
-                            <span className="text-gray-600">Duration:</span>{' '}
-                            <span className="font-medium">{apt.estimatedDuration} min</span>
+                            <span className="text-gray-600">Duration:</span>{" "}
+                            <span className="font-medium">
+                              {apt.estimatedDuration} min
+                            </span>
                           </div>
                           {apt.assignedDockId && (
                             <div>
-                              <span className="text-gray-600">Dock:</span>{' '}
-                              <span className="font-medium">{apt.assignedDockId}</span>
+                              <span className="text-gray-600">Dock:</span>{" "}
+                              <span className="font-medium">
+                                {apt.assignedDockId}
+                              </span>
                             </div>
                           )}
                         </div>
@@ -342,7 +394,7 @@ export default function DockScheduling() {
                           </div>
                         )}
                       </div>
-                      
+
                       <div className="flex gap-2">
                         {!apt.assignedDockId && (
                           <Button size="sm" variant="outline">
@@ -365,43 +417,54 @@ export default function DockScheduling() {
         <TabsContent value="docks" className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {schedule.docks?.map((dock: Dock) => {
-              const dockAppointments = schedule.appointments?.filter(
-                (a: Appointment) => a.assignedDockId === dock.id
-              ) || [];
-              
+              const dockAppointments =
+                schedule.appointments?.filter(
+                  (a: Appointment) => a.assignedDockId === dock.id,
+                ) || [];
+
               return (
                 <Card key={dock.id}>
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-center">
                       <CardTitle className="text-lg">{dock.name}</CardTitle>
-                      <div className={`w-3 h-3 rounded-full ${getDockStatusColor(dock.status)}`} />
+                      <div
+                        className={`w-3 h-3 rounded-full ${getDockStatusColor(dock.status)}`}
+                      />
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-2">
                       <div className="text-sm">
-                        <span className="text-gray-600">Type:</span>{' '}
+                        <span className="text-gray-600">Type:</span>{" "}
                         <span className="font-medium">{dock.type}</span>
                       </div>
-                      
+
                       <div className="text-sm">
-                        <span className="text-gray-600">Status:</span>{' '}
-                        <span className={`font-medium ${
-                          dock.status === 'AVAILABLE' ? 'text-green-600' :
-                          dock.status === 'MAINTENANCE' ? 'text-gray-600' :
-                          'text-red-600'
-                        }`}>
+                        <span className="text-gray-600">Status:</span>{" "}
+                        <span
+                          className={`font-medium ${
+                            dock.status === "AVAILABLE"
+                              ? "text-green-600"
+                              : dock.status === "MAINTENANCE"
+                                ? "text-gray-600"
+                                : "text-red-600"
+                          }`}
+                        >
                           {dock.status}
                         </span>
                       </div>
-                      
+
                       <div className="text-sm">
-                        <span className="text-gray-600">Appointments:</span>{' '}
-                        <span className="font-medium">{dockAppointments.length}</span>
+                        <span className="text-gray-600">Appointments:</span>{" "}
+                        <span className="font-medium">
+                          {dockAppointments.length}
+                        </span>
                       </div>
-                      
+
                       <div className="mt-3">
-                        <div className="text-xs text-gray-600 mb-1">Capabilities:</div>
+                        <div className="text-xs text-gray-600 mb-1">
+                          Capabilities:
+                        </div>
                         <div className="flex flex-wrap gap-1">
                           {dock.capabilities.map((cap) => (
                             <span
@@ -498,7 +561,9 @@ export default function DockScheduling() {
                   </div>
                   <div className="flex justify-between py-3 bg-green-50 -mx-4 px-4">
                     <span className="font-bold">Total Annual Savings</span>
-                    <span className="font-bold text-lg text-green-600">$343,000</span>
+                    <span className="font-bold text-lg text-green-600">
+                      $343,000
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -517,15 +582,21 @@ export default function DockScheduling() {
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded">
                   <div className="text-3xl font-bold text-blue-600">2.3</div>
-                  <div className="text-sm text-gray-600 mt-1">Payback (months)</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Payback (months)
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded">
                   <div className="text-3xl font-bold text-purple-600">45%</div>
-                  <div className="text-sm text-gray-600 mt-1">Wait reduction</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Wait reduction
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
                   <div className="text-3xl font-bold text-orange-600">92%</div>
-                  <div className="text-sm text-gray-600 mt-1">Dock utilization</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Dock utilization
+                  </div>
                 </div>
               </div>
 
@@ -534,19 +605,31 @@ export default function DockScheduling() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>45% reduction in carrier wait times</strong> - Better on-time performance</span>
+                    <span>
+                      <strong>45% reduction in carrier wait times</strong> -
+                      Better on-time performance
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>92% dock utilization</strong> - Maximize facility capacity</span>
+                    <span>
+                      <strong>92% dock utilization</strong> - Maximize facility
+                      capacity
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>85% automated conflict resolution</strong> - Less manual intervention</span>
+                    <span>
+                      <strong>85% automated conflict resolution</strong> - Less
+                      manual intervention
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>100% real-time visibility</strong> - Know dock status instantly</span>
+                    <span>
+                      <strong>100% real-time visibility</strong> - Know dock
+                      status instantly
+                    </span>
                   </li>
                 </ul>
               </div>

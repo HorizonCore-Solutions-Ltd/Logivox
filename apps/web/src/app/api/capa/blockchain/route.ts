@@ -53,10 +53,7 @@ export async function GET(request: NextRequest) {
     const verify = searchParams.get("verify") === "true";
 
     if (!capaId) {
-      return NextResponse.json(
-        { error: "CAPA ID required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "CAPA ID required" }, { status: 400 });
     }
 
     // Verify CAPA belongs to organization
@@ -111,7 +108,7 @@ export async function GET(request: NextRequest) {
     console.error("Error retrieving blockchain:", error);
     return NextResponse.json(
       { error: "Failed to retrieve blockchain" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -198,14 +195,11 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error adding blockchain block:", error);
-    return NextResponse.json(
-      { error: "Failed to add block" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to add block" }, { status: 500 });
   }
 }
 
@@ -311,20 +305,14 @@ function calculateComplianceMetrics(blockchain: BlockchainBlock[]) {
   const verifiedBlocks = blockchain.filter((b) => b.verified).length;
 
   // Check for required actions
-  const hasCreation = blockchain.some((b) =>
-    b.action.includes("CREATED")
+  const hasCreation = blockchain.some((b) => b.action.includes("CREATED"));
+  const hasRCA = blockchain.some(
+    (b) => b.action.includes("RCA") || b.action.includes("ROOT_CAUSE"),
   );
-  const hasRCA = blockchain.some((b) =>
-    b.action.includes("RCA") || b.action.includes("ROOT_CAUSE")
-  );
-  const hasActions = blockchain.some((b) =>
-    b.action.includes("ACTION")
-  );
-  const hasVerification = blockchain.some((b) =>
-    b.action.includes("VERIF")
-  );
-  const hasClosure = blockchain.some((b) =>
-    b.action.includes("CLOSED") || b.action.includes("COMPLETE")
+  const hasActions = blockchain.some((b) => b.action.includes("ACTION"));
+  const hasVerification = blockchain.some((b) => b.action.includes("VERIF"));
+  const hasClosure = blockchain.some(
+    (b) => b.action.includes("CLOSED") || b.action.includes("COMPLETE"),
   );
 
   const requiredSteps = [
@@ -346,8 +334,7 @@ function calculateComplianceMetrics(blockchain: BlockchainBlock[]) {
     completedSteps,
     requiredSteps: 5,
     compliancePercentage: Math.round((completedSteps / 5) * 100),
-    fdaCompliant:
-      completedSteps === 5 && verifiedBlocks === totalActions,
+    fdaCompliant: completedSteps === 5 && verifiedBlocks === totalActions,
     requirements: {
       creation: hasCreation,
       rootCauseAnalysis: hasRCA,

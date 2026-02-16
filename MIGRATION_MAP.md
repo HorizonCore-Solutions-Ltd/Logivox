@@ -32,7 +32,8 @@ Cut these folders from /app/api/:
 └── errors/                → /apps/web/src/app/api/errors/
 ```
 
-**ACTION**: 
+**ACTION**:
+
 1. Open `/app/api/` in left panel
 2. Open `/apps/web/src/app/api/` in right panel
 3. Select all folders above
@@ -71,6 +72,7 @@ Cut these folders from /app/:
 ```
 
 **ACTION**:
+
 1. Open `/app/` in left panel
 2. Open `/apps/web/src/app/(dashboard)/` in right panel
 3. Cut each folder and paste
@@ -92,6 +94,7 @@ Cut these folders from /components/:
 ```
 
 **ACTION**:
+
 1. Open `/components/` (root) in left panel
 2. Open `/apps/web/src/components/` in right panel
 3. Cut folders and paste (DON'T overwrite inventory/, mobile/, ui/)
@@ -108,6 +111,7 @@ Cut this folder from /lib/:
 ```
 
 **ACTION**:
+
 1. Open `/lib/services/` in left panel
 2. Open `/apps/web/src/lib/services/` in right panel
 3. Cut `qc` folder and paste
@@ -117,16 +121,19 @@ Cut this folder from /lib/:
 ## ⚠️ IMPORTANT RULES
 
 ### ✅ DO:
+
 - Cut entire folders (not individual files)
 - Paste at exact locations shown above
 - Keep folder names identical
 
 ### ❌ DON'T:
+
 - Don't merge - if folder exists, skip it (already migrated)
 - Don't rename folders
 - Don't move files individually
 
 ### 📁 Folders to SKIP (already in /apps/web/):
+
 - `/app/api/inventory/` - Already migrated ✅
 - `/app/api/rmas/` - Already migrated ✅
 - `/app/api/grn/` - Already migrated ✅

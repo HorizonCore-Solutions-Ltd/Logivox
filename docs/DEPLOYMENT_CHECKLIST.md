@@ -1,6 +1,6 @@
 # ✅ PRE-LAUNCH CHECKLIST - LOGIVOX WMS
 
-**Target Go-Live Date:** _____________  
+**Target Go-Live Date:** ******\_******  
 **Estimated Time:** 5-10 hours total
 
 ---
@@ -10,6 +10,7 @@
 ### **Phase 1: Environment Setup** (2 hours)
 
 #### ☐ **1.1 Production Database**
+
 ```bash
 # Create production PostgreSQL database
 # Recommended: Supabase, Neon, or AWS RDS
@@ -20,6 +21,7 @@ DATABASE_DIRECT_URL="postgresql://user:pass@host:5432/logivox_prod"
 ```
 
 #### ☐ **1.2 Generate Secrets**
+
 ```bash
 # Generate NextAuth secret
 openssl rand -base64 32
@@ -32,34 +34,42 @@ NEXTAUTH_URL="https://your-domain.com"
 #### ☐ **1.3 Configure External Services**
 
 **OpenAI (for voice & AI)**
+
 ```env
 OPENAI_API_KEY="sk-proj-..."
 ```
+
 - Sign up: https://platform.openai.com/
 - Cost: ~$10-50/month depending on usage
 
 **Pusher (for real-time updates)**
+
 ```env
 NEXT_PUBLIC_PUSHER_APP_KEY="..."
 PUSHER_APP_ID="..."
 PUSHER_SECRET="..."
 NEXT_PUBLIC_PUSHER_CLUSTER="us2"
 ```
+
 - Sign up: https://pusher.com/
 - Free tier: 200k messages/day
 
 **SendGrid (for emails)**
+
 ```env
 SENDGRID_API_KEY="SG...."
 EMAIL_FROM="noreply@your-domain.com"
 ```
+
 - Sign up: https://sendgrid.com/
 - Free tier: 100 emails/day
 
 **Vercel Blob (for file storage)**
+
 ```env
 BLOB_READ_WRITE_TOKEN="vercel_blob_..."
 ```
+
 - Included with Vercel deployment
 - Alternative: AWS S3
 
@@ -68,6 +78,7 @@ BLOB_READ_WRITE_TOKEN="vercel_blob_..."
 ### **Phase 2: Database Migration** (1 hour)
 
 #### ☐ **2.1 Run Migrations**
+
 ```bash
 # Test locally first
 npx prisma migrate deploy --preview-feature
@@ -77,17 +88,20 @@ npx prisma migrate deploy
 ```
 
 #### ☐ **2.2 Verify Schema**
+
 ```bash
 npx prisma db push --skip-generate
 npx prisma db pull
 ```
 
 #### ☐ **2.3 Seed Initial Data** (Optional)
+
 ```bash
 npx prisma db seed
 ```
 
 Create seed data for:
+
 - [ ] Default admin user
 - [ ] Default warehouse locations
 - [ ] Sample products (for demo)
@@ -98,6 +112,7 @@ Create seed data for:
 ### **Phase 3: Deployment** (1-2 hours)
 
 #### ☐ **3.1 Production Build Test**
+
 ```bash
 # Test build locally
 npm run build
@@ -113,6 +128,7 @@ npm run start
 ```
 
 #### ☐ **3.2 Deploy to Vercel** (Recommended)
+
 ```bash
 # Install Vercel CLI
 npm i -g vercel
@@ -124,6 +140,7 @@ vercel --prod
 ```
 
 #### ☐ **3.3 Deploy to Alternative** (Optional)
+
 <details>
 <summary>Docker Deployment</summary>
 
@@ -131,12 +148,14 @@ vercel --prod
 docker build -t logivox-wms .
 docker run -p 3000:3000 logivox-wms
 ```
+
 </details>
 
 <details>
 <summary>AWS/Azure/GCP</summary>
 
 Use provided docker-compose files or deploy as containerized app.
+
 </details>
 
 ---
@@ -144,12 +163,14 @@ Use provided docker-compose files or deploy as containerized app.
 ### **Phase 4: Error Tracking & Monitoring** (30 minutes)
 
 #### ☐ **4.1 Set Up Sentry**
+
 ```bash
 npm install @sentry/nextjs
 npx @sentry/wizard@latest -i nextjs
 ```
 
 Configure in `.env.production`:
+
 ```env
 SENTRY_DSN="https://...@sentry.io/..."
 SENTRY_ORG="your-org"
@@ -157,6 +178,7 @@ SENTRY_PROJECT="logivox"
 ```
 
 #### ☐ **4.2 Configure Alerts**
+
 - [ ] Error rate threshold alerts
 - [ ] Performance degradation alerts
 - [ ] Database connection alerts
@@ -166,22 +188,26 @@ SENTRY_PROJECT="logivox"
 ### **Phase 5: Security** (1 hour)
 
 #### ☐ **5.1 SSL/TLS Certificate**
+
 - [ ] Ensure HTTPS is enabled (automatic with Vercel)
 - [ ] Verify certificate is valid
 - [ ] Test force HTTPS redirect
 
 #### ☐ **5.2 Environment Variables**
+
 - [ ] Remove all `.env` files from git
 - [ ] Verify `.env*` in `.gitignore`
 - [ ] Set variables in hosting platform
 
 #### ☐ **5.3 Database Security**
+
 - [ ] Enable connection encryption
 - [ ] Set up database firewall rules
 - [ ] Whitelist only application IPs
 - [ ] Create read-only user for analytics
 
 #### ☐ **5.4 API Security**
+
 - [ ] Verify all routes require authentication
 - [ ] Test unauthorized access attempts
 - [ ] Check CORS settings
@@ -191,6 +217,7 @@ SENTRY_PROJECT="logivox"
 ### **Phase 6: Performance** (30 minutes)
 
 #### ☐ **6.1 Database Indexes**
+
 ```sql
 -- Already in schema, but verify:
 CREATE INDEX IF NOT EXISTS idx_products_sku ON products(sku);
@@ -199,11 +226,13 @@ CREATE INDEX IF NOT EXISTS idx_inventory_product ON inventory(product_id);
 ```
 
 #### ☐ **6.2 CDN & Caching**
+
 - [ ] Enable Vercel Edge caching (automatic)
 - [ ] Configure cache headers
 - [ ] Test asset delivery speed
 
 #### ☐ **6.3 Optimize Images**
+
 - [ ] Verify Next.js Image component usage
 - [ ] Enable image optimization
 - [ ] Set up image CDN
@@ -213,7 +242,9 @@ CREATE INDEX IF NOT EXISTS idx_inventory_product ON inventory(product_id);
 ### **Phase 7: User Training** (3-5 hours)
 
 #### ☐ **7.1 Create User Accounts**
+
 Create accounts for each role:
+
 - [ ] Admin (full access)
 - [ ] Warehouse Manager
 - [ ] Receiving Operator
@@ -224,12 +255,14 @@ Create accounts for each role:
 #### ☐ **7.2 Training Sessions**
 
 **Executive Training** (30 minutes)
+
 - [ ] Dashboard overview
 - [ ] Key metrics & KPIs
 - [ ] Analytics & reporting
 - [ ] Alert management
 
 **Manager Training** (1 hour)
+
 - [ ] Inventory management
 - [ ] Order processing
 - [ ] User management
@@ -237,6 +270,7 @@ Create accounts for each role:
 - [ ] Performance monitoring
 
 **Operator Training** (1.5 hours)
+
 - [ ] Receiving process
 - [ ] Picking workflow
 - [ ] Packing procedures
@@ -244,12 +278,14 @@ Create accounts for each role:
 - [ ] Mobile app usage
 
 **QC Inspector Training** (1 hour)
+
 - [ ] Quality inspections
 - [ ] CAPA creation
 - [ ] Defect reporting
 - [ ] Root cause analysis
 
 #### ☐ **7.3 Training Materials**
+
 - [ ] Quick reference guides
 - [ ] Video tutorials (optional)
 - [ ] FAQ document
@@ -260,9 +296,11 @@ Create accounts for each role:
 ### **Phase 8: Testing** (1-2 hours)
 
 #### ☐ **8.1 Smoke Tests**
+
 Test critical workflows end-to-end:
 
 **Receiving Flow:**
+
 1. [ ] Create ASN
 2. [ ] Schedule appointment
 3. [ ] Check in truck
@@ -272,6 +310,7 @@ Test critical workflows end-to-end:
 7. [ ] Complete putaway
 
 **Picking Flow:**
+
 1. [ ] Create sales order
 2. [ ] Create wave
 3. [ ] Release picks
@@ -281,6 +320,7 @@ Test critical workflows end-to-end:
 7. [ ] Mark shipped
 
 **Quality Flow:**
+
 1. [ ] Create inspection
 2. [ ] Record measurements
 3. [ ] Generate defect
@@ -289,6 +329,7 @@ Test critical workflows end-to-end:
 6. [ ] Verify effectiveness
 
 #### ☐ **8.2 Integration Tests**
+
 - [ ] Test OpenAI voice recognition
 - [ ] Test Pusher real-time updates
 - [ ] Test email sending
@@ -296,6 +337,7 @@ Test critical workflows end-to-end:
 - [ ] Test barcode scanning
 
 #### ☐ **8.3 Load Testing** (Optional)
+
 ```bash
 # Using k6 or similar
 k6 run load-test.js
@@ -306,12 +348,14 @@ k6 run load-test.js
 ### **Phase 9: Documentation** (1 hour)
 
 #### ☐ **9.1 User Documentation**
+
 - [ ] Getting Started guide
 - [ ] Module-specific guides
 - [ ] Troubleshooting FAQ
 - [ ] API documentation (if exposing to customers)
 
 #### ☐ **9.2 Operations Documentation**
+
 - [ ] Deployment procedures
 - [ ] Backup procedures
 - [ ] Disaster recovery plan
@@ -322,6 +366,7 @@ k6 run load-test.js
 ### **Phase 10: Go-Live Preparation** (30 minutes)
 
 #### ☐ **10.1 Final Checklist**
+
 - [ ] All environment variables set
 - [ ] Database migrated successfully
 - [ ] SSL certificate active
@@ -331,12 +376,14 @@ k6 run load-test.js
 - [ ] Support plan in place
 
 #### ☐ **10.2 Backup Plan**
+
 - [ ] Database backup created
 - [ ] Rollback procedure documented
 - [ ] Previous version tagged in Git
 - [ ] Emergency contacts listed
 
 #### ☐ **10.3 Communication**
+
 - [ ] Notify users of go-live date
 - [ ] Send welcome email with login info
 - [ ] Schedule post-launch check-in
@@ -349,6 +396,7 @@ k6 run load-test.js
 ### ☐ **Launch Day Tasks**
 
 **Morning:**
+
 - [ ] Final database backup
 - [ ] Deploy production build
 - [ ] Verify all services running
@@ -356,12 +404,14 @@ k6 run load-test.js
 - [ ] Monitor error logs
 
 **Throughout Day:**
+
 - [ ] Monitor Sentry for errors
 - [ ] Check database performance
 - [ ] Watch for support requests
 - [ ] Track user adoption
 
 **End of Day:**
+
 - [ ] Review error logs
 - [ ] Document any issues
 - [ ] Plan fixes for next sprint
@@ -374,6 +424,7 @@ k6 run load-test.js
 Track these metrics post-launch:
 
 ### Week 1
+
 - [ ] User login rate
 - [ ] Error rate < 0.1%
 - [ ] Page load time < 2 seconds
@@ -381,6 +432,7 @@ Track these metrics post-launch:
 - [ ] Support tickets < 5/day
 
 ### Week 2-4
+
 - [ ] User adoption rate
 - [ ] Feature utilization
 - [ ] Time savings vs manual process
@@ -406,29 +458,29 @@ Support Email: support@...
 
 ## ✅ **SIGN-OFF**
 
-**Deployment Completed By:** _______________  
-**Date:** _______________  
-**Sign-off:** _______________
+**Deployment Completed By:** ******\_\_\_******  
+**Date:** ******\_\_\_******  
+**Sign-off:** ******\_\_\_******
 
-**Post-Launch Review Scheduled:** _______________
+**Post-Launch Review Scheduled:** ******\_\_\_******
 
 ---
 
 ## 🎯 **ESTIMATED TIMELINE**
 
-| Phase | Duration | Status |
-|-------|----------|--------|
-| Environment Setup | 2 hours | ☐ |
-| Database Migration | 1 hour | ☐ |
-| Deployment | 1-2 hours | ☐ |
-| Error Tracking | 30 min | ☐ |
-| Security | 1 hour | ☐ |
-| Performance | 30 min | ☐ |
-| User Training | 3-5 hours | ☐ |
-| Testing | 1-2 hours | ☐ |
-| Documentation | 1 hour | ☐ |
-| Go-Live Prep | 30 min | ☐ |
-| **TOTAL** | **10-14 hours** | **☐** |
+| Phase              | Duration        | Status |
+| ------------------ | --------------- | ------ |
+| Environment Setup  | 2 hours         | ☐      |
+| Database Migration | 1 hour          | ☐      |
+| Deployment         | 1-2 hours       | ☐      |
+| Error Tracking     | 30 min          | ☐      |
+| Security           | 1 hour          | ☐      |
+| Performance        | 30 min          | ☐      |
+| User Training      | 3-5 hours       | ☐      |
+| Testing            | 1-2 hours       | ☐      |
+| Documentation      | 1 hour          | ☐      |
+| Go-Live Prep       | 30 min          | ☐      |
+| **TOTAL**          | **10-14 hours** | **☐**  |
 
 ---
 

@@ -34,7 +34,9 @@ import {
 } from "lucide-react";
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">("annual");
+  const [billingCycle, setBillingCycle] = React.useState<"monthly" | "annual">(
+    "annual",
+  );
   const [selectedModules, setSelectedModules] = React.useState<string[]>([
     "core",
     "qc",
@@ -219,49 +221,189 @@ export default function PricingPage() {
     {
       category: "Core Features",
       features: [
-        { name: "Warehouse Locations", starter: "1", professional: "5", enterprise: "Unlimited" },
-        { name: "SKU Limit", starter: "10,000", professional: "Unlimited", enterprise: "Unlimited" },
-        { name: "Users", starter: "1-5", professional: "5-50", enterprise: "Unlimited" },
-        { name: "Mobile App", starter: true, professional: true, enterprise: true },
-        { name: "Barcode Scanning", starter: true, professional: true, enterprise: true },
-        { name: "System Integrations", starter: false, professional: true, enterprise: true },
+        {
+          name: "Warehouse Locations",
+          starter: "1",
+          professional: "5",
+          enterprise: "Unlimited",
+        },
+        {
+          name: "SKU Limit",
+          starter: "10,000",
+          professional: "Unlimited",
+          enterprise: "Unlimited",
+        },
+        {
+          name: "Users",
+          starter: "1-5",
+          professional: "5-50",
+          enterprise: "Unlimited",
+        },
+        {
+          name: "Mobile App",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Barcode Scanning",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "System Integrations",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
       ],
     },
     {
       category: "Complete Operations",
       features: [
-        { name: "Receiving & Putaway", starter: true, professional: true, enterprise: true },
-        { name: "Inventory Management", starter: true, professional: true, enterprise: true },
-        { name: "Picking Modes", starter: "Single", professional: "4 modes", enterprise: "4 modes + Custom" },
-        { name: "Quality Control", starter: false, professional: true, enterprise: true },
-        { name: "Returns Processing", starter: false, professional: true, enterprise: true },
-        { name: "Wave Picking", starter: false, professional: true, enterprise: true },
-        { name: "Cross-Docking", starter: false, professional: false, enterprise: true },
-        { name: "Assembly & Kitting", starter: false, professional: false, enterprise: true },
+        {
+          name: "Receiving & Putaway",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Inventory Management",
+          starter: true,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Picking Modes",
+          starter: "Single",
+          professional: "4 modes",
+          enterprise: "4 modes + Custom",
+        },
+        {
+          name: "Quality Control",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Returns Processing",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Wave Picking",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Cross-Docking",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Assembly & Kitting",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
       ],
     },
     {
       category: "Advanced Features",
       features: [
-        { name: "Voice Operations", starter: false, professional: true, enterprise: true },
-        { name: "AI Optimization", starter: false, professional: "Basic", enterprise: "Full" },
-        { name: "Computer Vision", starter: false, professional: false, enterprise: true },
-        { name: "CAPA Management", starter: false, professional: true, enterprise: true },
-        { name: "Digital Twin", starter: false, professional: false, enterprise: true },
-        { name: "Sustainability Tracking", starter: false, professional: false, enterprise: true },
-        { name: "Yard Management", starter: false, professional: false, enterprise: true },
-        { name: "Labor Management", starter: false, professional: false, enterprise: true },
+        {
+          name: "Voice Operations",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "AI Optimization",
+          starter: false,
+          professional: "Basic",
+          enterprise: "Full",
+        },
+        {
+          name: "Computer Vision",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "CAPA Management",
+          starter: false,
+          professional: true,
+          enterprise: true,
+        },
+        {
+          name: "Digital Twin",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Sustainability Tracking",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Yard Management",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Labor Management",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
       ],
     },
     {
       category: "Support & Security",
       features: [
-        { name: "Support Response Time", starter: "24 hours", professional: "2 hours", enterprise: "30 minutes" },
-        { name: "Availability Guarantee", starter: "99.5%", professional: "99.9%", enterprise: "99.99%" },
-        { name: "Dedicated Success Manager", starter: false, professional: false, enterprise: true },
-        { name: "Custom Training", starter: false, professional: "Add-on", enterprise: true },
-        { name: "White-Label Option", starter: false, professional: false, enterprise: true },
-        { name: "On-Premise Deployment", starter: false, professional: false, enterprise: true },
+        {
+          name: "Support Response Time",
+          starter: "24 hours",
+          professional: "2 hours",
+          enterprise: "30 minutes",
+        },
+        {
+          name: "Availability Guarantee",
+          starter: "99.5%",
+          professional: "99.9%",
+          enterprise: "99.99%",
+        },
+        {
+          name: "Dedicated Success Manager",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Custom Training",
+          starter: false,
+          professional: "Add-on",
+          enterprise: true,
+        },
+        {
+          name: "White-Label Option",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "On-Premise Deployment",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
       ],
     },
   ];
@@ -276,17 +418,18 @@ export default function PricingPage() {
               <Sparkles className="h-4 w-4 mr-2 inline" />
               Simple, Transparent Pricing
             </Badge>
-            
+
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
               Pricing that scales
               <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
                 with your business
               </span>
             </h1>
-            
+
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              From small warehouses to global enterprises, LogiVox delivers complete warehouse
-              management in one simple platform. Start smallll, scale infinitely.
+              From small warehouses to global enterprises, LogiVox delivers
+              complete warehouse management in one simple platform. Start
+              smallll, scale infinitely.
             </p>
 
             {/* Billing Toggle */}
@@ -345,7 +488,7 @@ export default function PricingPage() {
                   <div className="text-sm text-primary font-semibold">
                     {plan.tagline}
                   </div>
-                  
+
                   <div className="pt-6">
                     {plan.monthlyPrice === 0 ? (
                       <div className="text-4xl font-bold">Custom</div>
@@ -355,7 +498,9 @@ export default function PricingPage() {
                           <span className="text-5xl font-bold text-primary">
                             ${getPrice(plan.monthlyPrice)}
                           </span>
-                          <span className="text-muted-foreground">/user/month</span>
+                          <span className="text-muted-foreground">
+                            /user/month
+                          </span>
                         </div>
                         {billingCycle === "annual" && (
                           <p className="text-sm text-green-600 mt-2 font-medium">
@@ -375,7 +520,10 @@ export default function PricingPage() {
                     </h4>
                     <ul className="space-y-2.5">
                       {plan.features.core.map((feature) => (
-                        <li key={feature} className="flex items-start space-x-3">
+                        <li
+                          key={feature}
+                          className="flex items-start space-x-3"
+                        >
                           <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                           <span className="text-sm">{feature}</span>
                         </li>
@@ -390,13 +538,18 @@ export default function PricingPage() {
                     </h4>
                     <ul className="space-y-2.5">
                       {plan.features.operations.map((feature) => (
-                        <li key={feature.name} className="flex items-start space-x-3">
+                        <li
+                          key={feature.name}
+                          className="flex items-start space-x-3"
+                        >
                           {feature.included ? (
                             <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                           ) : (
                             <X className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                           )}
-                          <span className={`text-sm ${!feature.included ? "text-muted-foreground" : ""}`}>
+                          <span
+                            className={`text-sm ${!feature.included ? "text-muted-foreground" : ""}`}
+                          >
                             {feature.name}
                           </span>
                         </li>
@@ -411,13 +564,18 @@ export default function PricingPage() {
                     </h4>
                     <ul className="space-y-2.5">
                       {plan.features.advanced.map((feature) => (
-                        <li key={feature.name} className="flex items-start space-x-3">
+                        <li
+                          key={feature.name}
+                          className="flex items-start space-x-3"
+                        >
                           {feature.included ? (
                             <Check className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                           ) : (
                             <X className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
                           )}
-                          <span className={`text-sm ${!feature.included ? "text-muted-foreground" : ""}`}>
+                          <span
+                            className={`text-sm ${!feature.included ? "text-muted-foreground" : ""}`}
+                          >
                             {feature.name}
                           </span>
                         </li>
@@ -431,12 +589,16 @@ export default function PricingPage() {
                     size="lg"
                     asChild
                   >
-                    <Link href={plan.monthlyPrice === 0 ? "/contact" : "/sign-up"}>
-                      {plan.monthlyPrice === 0 ? "Contact Sales" : "Start Free Trial"}
+                    <Link
+                      href={plan.monthlyPrice === 0 ? "/contact" : "/sign-up"}
+                    >
+                      {plan.monthlyPrice === 0
+                        ? "Contact Sales"
+                        : "Start Free Trial"}
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  
+
                   {plan.monthlyPrice !== 0 && (
                     <p className="text-xs text-center text-muted-foreground">
                       30-day free trial • No credit card required
@@ -450,11 +612,10 @@ export default function PricingPage() {
           {/* Module Add-ons */}
           <div className="mb-20">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold mb-4">
-                Modular Add-Ons
-              </h2>
+              <h2 className="text-3xl font-bold mb-4">Modular Add-Ons</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Enhance any plan with specialized modules. Mix and match to build your perfect solution.
+                Enhance any plan with specialized modules. Mix and match to
+                build your perfect solution.
               </p>
             </div>
 
@@ -463,14 +624,16 @@ export default function PricingPage() {
                 <Card
                   key={module.id}
                   className={`hover:shadow-lg transition-all cursor-pointer ${
-                    selectedModules.includes(module.id) ? "border-2 border-primary" : ""
+                    selectedModules.includes(module.id)
+                      ? "border-2 border-primary"
+                      : ""
                   }`}
                   onClick={() => {
                     if (module.id === "core") return;
                     setSelectedModules((prev) =>
                       prev.includes(module.id)
                         ? prev.filter((m) => m !== module.id)
-                        : [...prev, module.id]
+                        : [...prev, module.id],
                     );
                   }}
                 >
@@ -494,8 +657,16 @@ export default function PricingPage() {
                         {module.price}
                       </span>
                       {module.id !== "core" && (
-                        <Badge variant={selectedModules.includes(module.id) ? "default" : "outline"}>
-                          {selectedModules.includes(module.id) ? "Selected" : "Add"}
+                        <Badge
+                          variant={
+                            selectedModules.includes(module.id)
+                              ? "default"
+                              : "outline"
+                          }
+                        >
+                          {selectedModules.includes(module.id)
+                            ? "Selected"
+                            : "Add"}
                         </Badge>
                       )}
                     </div>
@@ -529,14 +700,16 @@ export default function PricingPage() {
                         min="1"
                         max="100"
                         value={calculatorUsers}
-                        onChange={(e) => setCalculatorUsers(Number(e.target.value))}
+                        onChange={(e) =>
+                          setCalculatorUsers(Number(e.target.value))
+                        }
                         className="w-full"
                       />
                       <div className="text-2xl font-bold text-primary mt-2">
                         {calculatorUsers} users
                       </div>
                     </div>
-                    
+
                     <div>
                       <label className="text-sm font-semibold mb-2 block">
                         Monthly Orders
@@ -547,7 +720,9 @@ export default function PricingPage() {
                         max="50000"
                         step="1000"
                         value={calculatorOrders}
-                        onChange={(e) => setCalculatorOrders(Number(e.target.value))}
+                        onChange={(e) =>
+                          setCalculatorOrders(Number(e.target.value))
+                        }
                         className="w-full"
                       />
                       <div className="text-2xl font-bold text-primary mt-2">
@@ -558,28 +733,36 @@ export default function PricingPage() {
 
                   <div className="bg-card rounded-lg p-6 space-y-4">
                     <div className="flex items-center justify-between pb-4 border-b">
-                      <span className="text-muted-foreground">LogiVox Cost</span>
+                      <span className="text-muted-foreground">
+                        LogiVox Cost
+                      </span>
                       <span className="text-2xl font-bold">
                         ${(calculatorUsers * getPrice(99)).toLocaleString()}/mo
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between pb-4 border-b">
-                      <span className="text-muted-foreground">Monthly Savings</span>
+                      <span className="text-muted-foreground">
+                        Monthly Savings
+                      </span>
                       <span className="text-2xl font-bold text-green-600">
                         ${calculateROI().savings.toLocaleString()}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between pb-4 border-b">
-                      <span className="text-muted-foreground">Annual Savings</span>
+                      <span className="text-muted-foreground">
+                        Annual Savings
+                      </span>
                       <span className="text-3xl font-bold text-green-600">
                         ${(calculateROI().savings * 12).toLocaleString()}
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between pt-2">
-                      <span className="text-sm font-semibold">Return on Investment</span>
+                      <span className="text-sm font-semibold">
+                        Return on Investment
+                      </span>
                       <Badge className="text-xl px-4 py-2 bg-green-600">
                         {calculateROI().roi}% ROI
                       </Badge>
@@ -647,7 +830,9 @@ export default function PricingPage() {
                                 <X className="h-5 w-5 text-muted-foreground mx-auto" />
                               )
                             ) : (
-                              <span className="text-sm font-medium">{feature.starter}</span>
+                              <span className="text-sm font-medium">
+                                {feature.starter}
+                              </span>
                             )}
                           </td>
                           <td className="text-center p-4 bg-primary/5">
@@ -658,7 +843,9 @@ export default function PricingPage() {
                                 <X className="h-5 w-5 text-muted-foreground mx-auto" />
                               )
                             ) : (
-                              <span className="text-sm font-medium">{feature.professional}</span>
+                              <span className="text-sm font-medium">
+                                {feature.professional}
+                              </span>
                             )}
                           </td>
                           <td className="text-center p-4">
@@ -669,7 +856,9 @@ export default function PricingPage() {
                                 <X className="h-5 w-5 text-muted-foreground mx-auto" />
                               )
                             ) : (
-                              <span className="text-sm font-medium">{feature.enterprise}</span>
+                              <span className="text-sm font-medium">
+                                {feature.enterprise}
+                              </span>
                             )}
                           </td>
                         </tr>
@@ -766,15 +955,21 @@ export default function PricingPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl font-bold text-primary mb-2">99.99%</div>
-              <div className="text-sm text-muted-foreground">Always Available</div>
+              <div className="text-sm text-muted-foreground">
+                Always Available
+              </div>
             </div>
             <div>
               <div className="text-4xl font-bold text-primary mb-2">44+</div>
-              <div className="text-sm text-muted-foreground">Powerful Features</div>
+              <div className="text-sm text-muted-foreground">
+                Powerful Features
+              </div>
             </div>
             <div>
               <div className="text-4xl font-bold text-primary mb-2">$52M+</div>
-              <div className="text-sm text-muted-foreground">Average Annual Savings</div>
+              <div className="text-sm text-muted-foreground">
+                Average Annual Savings
+              </div>
             </div>
             <div>
               <div className="text-4xl font-bold text-primary mb-2">936%</div>

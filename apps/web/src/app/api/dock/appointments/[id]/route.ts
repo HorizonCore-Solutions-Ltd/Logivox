@@ -5,7 +5,9 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const updateSchema = z.object({
-  appointmentType: z.enum(["INBOUND", "OUTBOUND", "CROSS_DOCK", "MAINTENANCE", "OTHER"]).optional(),
+  appointmentType: z
+    .enum(["INBOUND", "OUTBOUND", "CROSS_DOCK", "MAINTENANCE", "OTHER"])
+    .optional(),
   yardLocationId: z.string().nullable().optional(),
   scheduledDate: z.string().datetime().optional(),
   scheduledStart: z.string().datetime().optional(),
@@ -21,12 +23,22 @@ const updateSchema = z.object({
   expectedWeight: z.number().positive().nullable().optional(),
   actualPallets: z.number().int().positive().nullable().optional(),
   actualWeight: z.number().positive().nullable().optional(),
-  status: z.enum(["SCHEDULED", "CONFIRMED", "CHECKED_IN", "IN_PROGRESS", "COMPLETED", "NO_SHOW", "CANCELLED"]).optional(),
+  status: z
+    .enum([
+      "SCHEDULED",
+      "CONFIRMED",
+      "CHECKED_IN",
+      "IN_PROGRESS",
+      "COMPLETED",
+      "NO_SHOW",
+      "CANCELLED",
+    ])
+    .optional(),
 });
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -50,7 +62,7 @@ export async function GET(
     if (!appointment) {
       return NextResponse.json(
         { error: "Appointment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -59,14 +71,14 @@ export async function GET(
     console.error("Error fetching appointment:", error);
     return NextResponse.json(
       { error: "Failed to fetch appointment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -88,15 +100,26 @@ export async function PATCH(
     if (!existing) {
       return NextResponse.json(
         { error: "Appointment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     // Check for dock conflicts if updating schedule or location
-    if (validatedData.yardLocationId || validatedData.scheduledStart || validatedData.scheduledEnd) {
-      const scheduledStart = validatedData.scheduledStart ? new Date(validatedData.scheduledStart) : existing.scheduledStart;
-      const scheduledEnd = validatedData.scheduledEnd ? new Date(validatedData.scheduledEnd) : existing.scheduledEnd;
-      const yardLocationId = validatedData.yardLocationId !== undefined ? validatedData.yardLocationId : existing.yardLocationId;
+    if (
+      validatedData.yardLocationId ||
+      validatedData.scheduledStart ||
+      validatedData.scheduledEnd
+    ) {
+      const scheduledStart = validatedData.scheduledStart
+        ? new Date(validatedData.scheduledStart)
+        : existing.scheduledStart;
+      const scheduledEnd = validatedData.scheduledEnd
+        ? new Date(validatedData.scheduledEnd)
+        : existing.scheduledEnd;
+      const yardLocationId =
+        validatedData.yardLocationId !== undefined
+          ? validatedData.yardLocationId
+          : existing.yardLocationId;
 
       if (yardLocationId) {
         const conflicts = await prisma.dockAppointment.findMany({
@@ -129,7 +152,7 @@ export async function PATCH(
               message: "Another appointment is scheduled during this time slot",
               conflicts,
             },
-            { status: 409 }
+            { status: 409 },
           );
         }
       }
@@ -150,7 +173,8 @@ export async function PATCH(
     if (validatedData.status === "COMPLETED" && existing.actualArrival) {
       const now = new Date();
       updateData.actualEnd = now;
-      updateData.actualDuration = (now.getTime() - existing.actualArrival.getTime()) / (1000 * 60); // minutes
+      updateData.actualDuration =
+        (now.getTime() - existing.actualArrival.getTime()) / (1000 * 60); // minutes
     }
 
     const appointment = await prisma.dockAppointment.update({
@@ -185,21 +209,21 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error updating appointment:", error);
     return NextResponse.json(
       { error: "Failed to update appointment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -217,7 +241,7 @@ export async function DELETE(
     if (!appointment) {
       return NextResponse.json(
         { error: "Appointment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -249,7 +273,7 @@ export async function DELETE(
     console.error("Error cancelling appointment:", error);
     return NextResponse.json(
       { error: "Failed to cancel appointment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

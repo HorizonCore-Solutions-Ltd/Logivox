@@ -3,10 +3,10 @@
 /**
  * SUPPLIER INTEGRATION PLATFORM DASHBOARD
  * ========================================
- * 
+ *
  * System 4 - Outstanding ROI (275% ROI)
  * Investment: $60K → Savings: $165K/year
- * 
+ *
  * Features:
  * - EDI/API integrations
  * - Automated PO management
@@ -79,7 +79,9 @@ export default function SupplierIntegrationPage() {
   const [suppliers, setSuppliers] = useState<SupplierProfile[] | null>(null);
   const [recommendations, setRecommendations] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "suppliers" | "orders">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "suppliers" | "orders"
+  >("overview");
 
   useEffect(() => {
     loadStats();
@@ -88,7 +90,9 @@ export default function SupplierIntegrationPage() {
   async function loadStats() {
     setLoading(true);
     try {
-      const res = await fetch("/api/optimization/supplier-integration?action=stats");
+      const res = await fetch(
+        "/api/optimization/supplier-integration?action=stats",
+      );
       const data = await res.json();
       setStats(data.stats);
     } catch (error) {
@@ -101,7 +105,9 @@ export default function SupplierIntegrationPage() {
   async function loadSuppliers() {
     setLoading(true);
     try {
-      const res = await fetch("/api/optimization/supplier-integration?action=suppliers");
+      const res = await fetch(
+        "/api/optimization/supplier-integration?action=suppliers",
+      );
       const data = await res.json();
       setSuppliers(data.suppliers);
       setActiveTab("suppliers");
@@ -116,7 +122,9 @@ export default function SupplierIntegrationPage() {
   async function loadRecommendations() {
     setLoading(true);
     try {
-      const res = await fetch("/api/optimization/supplier-integration?action=recommendations");
+      const res = await fetch(
+        "/api/optimization/supplier-integration?action=recommendations",
+      );
       const data = await res.json();
       setRecommendations(data);
       setActiveTab("orders");
@@ -145,7 +153,9 @@ export default function SupplierIntegrationPage() {
                 unitPrice: rec.estimatedCost / rec.recommendedQty,
               },
             ],
-            deliveryDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+            deliveryDate: new Date(
+              Date.now() + 14 * 24 * 60 * 60 * 1000,
+            ).toISOString(),
             warehouseId: "WH-001",
             notes: rec.reason,
           },
@@ -235,7 +245,11 @@ export default function SupplierIntegrationPage() {
             <Users className="h-4 w-4 mr-2" />
             View Suppliers
           </Button>
-          <Button onClick={loadRecommendations} disabled={loading} variant="outline">
+          <Button
+            onClick={loadRecommendations}
+            disabled={loading}
+            variant="outline"
+          >
             <ShoppingCart className="h-4 w-4 mr-2" />
             PO Recommendations
           </Button>
@@ -261,7 +275,9 @@ export default function SupplierIntegrationPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Pending Approval</p>
-                <p className="text-2xl font-bold">{stats?.pendingApproval || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.pendingApproval || 0}
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-orange-500" />
             </div>
@@ -313,7 +329,9 @@ export default function SupplierIntegrationPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Suppliers</p>
-                <p className="text-2xl font-bold">{stats?.activeSuppliers || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.activeSuppliers || 0}
+                </p>
               </div>
               <Users className="h-8 w-8 text-blue-500" />
             </div>
@@ -395,7 +413,9 @@ export default function SupplierIntegrationPage() {
                     </div>
                     <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
                       <span className="text-sm font-medium">API</span>
-                      <span className="text-xs text-gray-600">REST/GraphQL</span>
+                      <span className="text-xs text-gray-600">
+                        REST/GraphQL
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-2 bg-green-50 rounded">
                       <span className="text-sm font-medium">Portal</span>
@@ -403,7 +423,9 @@ export default function SupplierIntegrationPage() {
                     </div>
                     <div className="flex items-center justify-between p-2 bg-yellow-50 rounded">
                       <span className="text-sm font-medium">FTP</span>
-                      <span className="text-xs text-gray-600">File Transfer</span>
+                      <span className="text-xs text-gray-600">
+                        File Transfer
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -430,7 +452,9 @@ export default function SupplierIntegrationPage() {
                     <div className="flex items-center gap-3">
                       <Star className="h-5 w-5 text-yellow-500" />
                       <div>
-                        <h3 className="font-semibold">{supplier.supplierName}</h3>
+                        <h3 className="font-semibold">
+                          {supplier.supplierName}
+                        </h3>
                         <p className="text-sm text-gray-600">
                           {supplier.supplierId} • {supplier.integrationType}
                         </p>
@@ -440,7 +464,9 @@ export default function SupplierIntegrationPage() {
                       <Badge className={getTierColor(supplier.tier)}>
                         {supplier.tier}
                       </Badge>
-                      <span className={`text-2xl font-bold ${getScoreColor(supplier.performanceScore)}`}>
+                      <span
+                        className={`text-2xl font-bold ${getScoreColor(supplier.performanceScore)}`}
+                      >
                         {supplier.performanceScore}
                       </span>
                     </div>
@@ -449,19 +475,27 @@ export default function SupplierIntegrationPage() {
                   <div className="grid grid-cols-4 gap-4 mb-3">
                     <div>
                       <p className="text-xs text-gray-600">On-Time Delivery</p>
-                      <p className="text-lg font-semibold">{supplier.metrics.onTimeDelivery}%</p>
+                      <p className="text-lg font-semibold">
+                        {supplier.metrics.onTimeDelivery}%
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600">Quality Score</p>
-                      <p className="text-lg font-semibold">{supplier.metrics.qualityScore}%</p>
+                      <p className="text-lg font-semibold">
+                        {supplier.metrics.qualityScore}%
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600">Order Accuracy</p>
-                      <p className="text-lg font-semibold">{supplier.metrics.orderAccuracy}%</p>
+                      <p className="text-lg font-semibold">
+                        {supplier.metrics.orderAccuracy}%
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-600">Avg Response</p>
-                      <p className="text-lg font-semibold">{supplier.metrics.avgResponseTime}h</p>
+                      <p className="text-lg font-semibold">
+                        {supplier.metrics.avgResponseTime}h
+                      </p>
                     </div>
                   </div>
 
@@ -469,7 +503,8 @@ export default function SupplierIntegrationPage() {
                     <div>
                       <p className="text-gray-600">Orders</p>
                       <p className="font-medium">
-                        {supplier.orders.active} active / {supplier.orders.total} total
+                        {supplier.orders.active} active /{" "}
+                        {supplier.orders.total} total
                       </p>
                     </div>
                     <div>
@@ -518,41 +553,55 @@ export default function SupplierIntegrationPage() {
                 <div>
                   <p className="text-sm text-gray-600">Estimated Cost</p>
                   <p className="text-2xl font-bold text-green-600">
-                    ${(recommendations.summary.estimatedTotalCost / 1000).toFixed(1)}K
+                    $
+                    {(
+                      recommendations.summary.estimatedTotalCost / 1000
+                    ).toFixed(1)}
+                    K
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-3">
-              {recommendations.recommendations.map((rec: Recommendation, idx: number) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge className={getUrgencyColor(rec.urgency)}>
-                        {rec.urgency}
-                      </Badge>
-                      <span className="font-medium">{rec.sku}</span>
-                      <span className="text-sm text-gray-600">• {rec.supplierId}</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{rec.reason}</p>
-                    <div className="flex items-center gap-4 text-xs">
-                      <span>Qty: <strong>{rec.recommendedQty}</strong></span>
-                      <span>Cost: <strong>${rec.estimatedCost.toFixed(2)}</strong></span>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => createPO(rec)}
-                    size="sm"
-                    variant={rec.urgency === "CRITICAL" ? "default" : "outline"}
+              {recommendations.recommendations.map(
+                (rec: Recommendation, idx: number) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                   >
-                    Create PO
-                  </Button>
-                </div>
-              ))}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className={getUrgencyColor(rec.urgency)}>
+                          {rec.urgency}
+                        </Badge>
+                        <span className="font-medium">{rec.sku}</span>
+                        <span className="text-sm text-gray-600">
+                          • {rec.supplierId}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{rec.reason}</p>
+                      <div className="flex items-center gap-4 text-xs">
+                        <span>
+                          Qty: <strong>{rec.recommendedQty}</strong>
+                        </span>
+                        <span>
+                          Cost: <strong>${rec.estimatedCost.toFixed(2)}</strong>
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => createPO(rec)}
+                      size="sm"
+                      variant={
+                        rec.urgency === "CRITICAL" ? "default" : "outline"
+                      }
+                    >
+                      Create PO
+                    </Button>
+                  </div>
+                ),
+              )}
             </div>
           </CardContent>
         </Card>

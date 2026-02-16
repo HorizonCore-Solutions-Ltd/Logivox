@@ -82,7 +82,7 @@ export default function CAPADashboard() {
     costSavings: 0,
   });
   const [predictiveAlerts, setPredictiveAlerts] = useState<PredictiveAlert[]>(
-    []
+    [],
   );
   const [riskIndicators, setRiskIndicators] = useState<RiskIndicator[]>([]);
   const [loading, setLoading] = useState(true);
@@ -137,7 +137,7 @@ export default function CAPADashboard() {
       if (response.ok) {
         const data = await response.json();
         toast.success(
-          `AI RCA generated with ${data.analysis.confidenceScore}% confidence`
+          `AI RCA generated with ${data.analysis.confidenceScore}% confidence`,
         );
       }
     } catch (error) {
@@ -345,7 +345,9 @@ export default function CAPADashboard() {
                 <div className="text-center py-8 text-gray-500">
                   <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-2" />
                   <p>No predictive alerts at this time</p>
-                  <p className="text-sm">All quality metrics within normal range</p>
+                  <p className="text-sm">
+                    All quality metrics within normal range
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -431,7 +433,9 @@ export default function CAPADashboard() {
                       <ul className="space-y-2 text-sm text-gray-600">
                         <li>✓ 5 Whys automation</li>
                         <li>✓ Fishbone diagram generation</li>
-                        <li>✓ Pattern matching across 1,000+ historical CAPAs</li>
+                        <li>
+                          ✓ Pattern matching across 1,000+ historical CAPAs
+                        </li>
                         <li>✓ Confidence scoring (80-95%)</li>
                         <li>✓ Recommended corrective actions</li>
                       </ul>

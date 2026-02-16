@@ -1,23 +1,23 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // Validation schemas
 const documentSchema = z.object({
   receivingRecordId: z.string(),
   documentType: z.enum([
-    'PACKING_SLIP',
-    'BOL',
-    'INVOICE',
-    'COA',
-    'MSDS',
-    'PHOTO',
-    'SIGNATURE',
-    'INSPECTION_REPORT',
-    'CUSTOMS_DECLARATION',
-    'TEMPERATURE_LOG',
-    'OTHER',
+    "PACKING_SLIP",
+    "BOL",
+    "INVOICE",
+    "COA",
+    "MSDS",
+    "PHOTO",
+    "SIGNATURE",
+    "INSPECTION_REPORT",
+    "CUSTOMS_DECLARATION",
+    "TEMPERATURE_LOG",
+    "OTHER",
   ]),
   title: z.string().min(1),
   description: z.string().optional(),
@@ -29,83 +29,86 @@ const documentSchema = z.object({
   metadata: z.record(z.any()).optional(),
 });
 
-const actionSchema = z.discriminatedUnion('action', [
+const actionSchema = z.discriminatedUnion("action", [
   z.object({
-    action: z.literal('upload_document'),
+    action: z.literal("upload_document"),
     document: documentSchema,
   }),
   z.object({
-    action: z.literal('verify_document'),
+    action: z.literal("verify_document"),
     documentId: z.string(),
     verified: z.boolean(),
     notes: z.string().optional(),
   }),
   z.object({
-    action: z.literal('delete_document'),
+    action: z.literal("delete_document"),
     documentId: z.string(),
   }),
   z.object({
-    action: z.literal('request_document'),
+    action: z.literal("request_document"),
     receivingRecordId: z.string(),
     documentType: z.string(),
     notes: z.string(),
-    urgency: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']),
+    urgency: z.enum(["LOW", "NORMAL", "HIGH", "URGENT"]),
   }),
   z.object({
-    action: z.literal('check_completeness'),
+    action: z.literal("check_completeness"),
     receivingRecordId: z.string(),
   }),
   z.object({
-    action: z.literal('generate_report'),
+    action: z.literal("generate_report"),
     receivingRecordId: z.string(),
-    reportType: z.enum(['SUMMARY', 'DETAILED', 'COMPLIANCE']),
+    reportType: z.enum(["SUMMARY", "DETAILED", "COMPLIANCE"]),
   }),
 ]);
 
 // Document completeness checker
 function checkDocumentCompleteness(
   documents: any[],
-  receivingRecord: any
+  receivingRecord: any,
 ): {
   complete: boolean;
   missing: string[];
   optional: string[];
   score: number;
 } {
-  const required = ['PACKING_SLIP', 'BOL'];
-  const optional = ['INVOICE', 'COA', 'MSDS', 'PHOTO'];
+  const required = ["PACKING_SLIP", "BOL"];
+  const optional = ["INVOICE", "COA", "MSDS", "PHOTO"];
 
   // Add conditional requirements
-  if (receivingRecord.itemType === 'HAZMAT') {
-    required.push('MSDS');
-    optional.push('CUSTOMS_DECLARATION');
+  if (receivingRecord.itemType === "HAZMAT") {
+    required.push("MSDS");
+    optional.push("CUSTOMS_DECLARATION");
   }
 
-  if (receivingRecord.itemType === 'REFRIGERATED') {
-    required.push('TEMPERATURE_LOG');
+  if (receivingRecord.itemType === "REFRIGERATED") {
+    required.push("TEMPERATURE_LOG");
   }
 
-  if (receivingRecord.itemType === 'HIGH_VALUE') {
-    required.push('SIGNATURE');
-    optional.push('PHOTO');
+  if (receivingRecord.itemType === "HIGH_VALUE") {
+    required.push("SIGNATURE");
+    optional.push("PHOTO");
   }
 
   const documentTypes = documents.map((d) => d.documentType);
   const missing = required.filter((type) => !documentTypes.includes(type));
-  const optionalMissing = optional.filter((type) => !documentTypes.includes(type));
+  const optionalMissing = optional.filter(
+    (type) => !documentTypes.includes(type),
+  );
 
   const requiredCount = required.length;
   const hasRequiredCount = required.filter((type) =>
-    documentTypes.includes(type)
+    documentTypes.includes(type),
   ).length;
   const optionalCount = optional.length;
   const hasOptionalCount = optional.filter((type) =>
-    documentTypes.includes(type)
+    documentTypes.includes(type),
   ).length;
 
   // Score: Required documents worth 70%, optional worth 30%
   const requiredScore = (hasRequiredCount / requiredCount) * 70;
-  const optionalScore = optionalCount > 0 ? (hasOptionalCount / optionalCount) * 30 : 30;
+  const optionalScore =
+    optionalCount > 0 ? (hasOptionalCount / optionalCount) * 30 : 30;
   const score = Math.round(requiredScore + optionalScore);
 
   return {
@@ -121,7 +124,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -130,18 +133,18 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action') || 'documents';
-    const receivingRecordId = searchParams.get('receivingRecordId');
+    const action = searchParams.get("action") || "documents";
+    const receivingRecordId = searchParams.get("receivingRecordId");
 
-    if (action === 'documents') {
+    if (action === "documents") {
       if (!receivingRecordId) {
         return NextResponse.json(
-          { error: 'receivingRecordId required' },
-          { status: 400 }
+          { error: "receivingRecordId required" },
+          { status: 400 },
         );
       }
 
@@ -158,7 +161,7 @@ export async function GET(request: NextRequest) {
             select: { name: true, email: true },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
 
       const receivingRecord = await prisma.receivingRecord.findFirst({
@@ -175,7 +178,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ documents, completeness });
     }
 
-    if (action === 'stats') {
+    if (action === "stats") {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -200,13 +203,13 @@ export async function GET(request: NextRequest) {
       const pendingRequests = await prisma.documentRequest.count({
         where: {
           organizationId: user.organizationId,
-          status: 'PENDING',
+          status: "PENDING",
         },
       });
 
       const byType = await prisma.receivingDocument.groupBy({
         where: { organizationId: user.organizationId },
-        by: ['documentType'],
+        by: ["documentType"],
         _count: { id: true },
       });
 
@@ -216,9 +219,10 @@ export async function GET(request: NextRequest) {
           todayDocuments,
           verifiedDocuments,
           pendingRequests,
-          verificationRate: totalDocuments > 0
-            ? Math.round((verifiedDocuments / totalDocuments) * 100)
-            : 0,
+          verificationRate:
+            totalDocuments > 0
+              ? Math.round((verifiedDocuments / totalDocuments) * 100)
+              : 0,
           byType: byType.reduce((acc: any, item) => {
             acc[item.documentType] = item._count.id;
             return acc;
@@ -227,7 +231,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    if (action === 'requests') {
+    if (action === "requests") {
       const requests = await prisma.documentRequest.findMany({
         where: {
           organizationId: user.organizationId,
@@ -244,18 +248,18 @@ export async function GET(request: NextRequest) {
             select: { name: true },
           },
         },
-        orderBy: [{ urgency: 'desc' }, { createdAt: 'desc' }],
+        orderBy: [{ urgency: "desc" }, { createdAt: "desc" }],
         take: 50,
       });
 
       return NextResponse.json({ requests });
     }
 
-    if (action === 'incomplete-shipments') {
+    if (action === "incomplete-shipments") {
       const shipments = await prisma.receivingRecord.findMany({
         where: {
           organizationId: user.organizationId,
-          status: { in: ['PENDING', 'IN_PROGRESS', 'COMPLETED'] },
+          status: { in: ["PENDING", "IN_PROGRESS", "COMPLETED"] },
         },
         include: {
           supplier: {
@@ -263,7 +267,7 @@ export async function GET(request: NextRequest) {
           },
           documents: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 100,
       });
 
@@ -271,11 +275,11 @@ export async function GET(request: NextRequest) {
         .map((shipment) => {
           const completeness = checkDocumentCompleteness(
             shipment.documents,
-            shipment
+            shipment,
           );
           return {
             id: shipment.id,
-            supplier: shipment.supplier?.name || 'Unknown',
+            supplier: shipment.supplier?.name || "Unknown",
             poNumber: shipment.poNumber,
             status: shipment.status,
             completeness,
@@ -288,12 +292,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ shipments: incompleteShipments });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('GET /api/receiving/document-management error:', error);
+    console.error("GET /api/receiving/document-management error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch documents' },
-      { status: 500 }
+      { error: "Failed to fetch documents" },
+      { status: 500 },
     );
   }
 }
@@ -303,7 +307,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -312,14 +316,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await request.json();
     const validated = actionSchema.parse(body);
 
     switch (validated.action) {
-      case 'upload_document': {
+      case "upload_document": {
         const document = await prisma.receivingDocument.create({
           data: {
             organizationId: user.organizationId,
@@ -360,11 +364,11 @@ export async function POST(request: NextRequest) {
           success: true,
           document,
           completeness,
-          message: 'Document uploaded successfully',
+          message: "Document uploaded successfully",
         });
       }
 
-      case 'verify_document': {
+      case "verify_document": {
         const document = await prisma.receivingDocument.update({
           where: {
             id: validated.documentId,
@@ -382,12 +386,12 @@ export async function POST(request: NextRequest) {
           success: true,
           document,
           message: validated.verified
-            ? 'Document verified'
-            : 'Verification removed',
+            ? "Document verified"
+            : "Verification removed",
         });
       }
 
-      case 'delete_document': {
+      case "delete_document": {
         await prisma.receivingDocument.delete({
           where: {
             id: validated.documentId,
@@ -397,11 +401,11 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
-          message: 'Document deleted successfully',
+          message: "Document deleted successfully",
         });
       }
 
-      case 'request_document': {
+      case "request_document": {
         const request = await prisma.documentRequest.create({
           data: {
             organizationId: user.organizationId,
@@ -410,7 +414,7 @@ export async function POST(request: NextRequest) {
             notes: validated.notes,
             urgency: validated.urgency,
             requestedBy: user.id,
-            status: 'PENDING',
+            status: "PENDING",
           },
         });
 
@@ -419,11 +423,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           request,
-          message: 'Document request sent',
+          message: "Document request sent",
         });
       }
 
-      case 'check_completeness': {
+      case "check_completeness": {
         const receivingRecord = await prisma.receivingRecord.findFirst({
           where: {
             id: validated.receivingRecordId,
@@ -433,8 +437,8 @@ export async function POST(request: NextRequest) {
 
         if (!receivingRecord) {
           return NextResponse.json(
-            { error: 'Receiving record not found' },
-            { status: 404 }
+            { error: "Receiving record not found" },
+            { status: 404 },
           );
         }
 
@@ -447,19 +451,19 @@ export async function POST(request: NextRequest) {
 
         const completeness = checkDocumentCompleteness(
           documents,
-          receivingRecord
+          receivingRecord,
         );
 
         return NextResponse.json({
           success: true,
           completeness,
           message: completeness.complete
-            ? 'All required documents present'
+            ? "All required documents present"
             : `Missing ${completeness.missing.length} required documents`,
         });
       }
 
-      case 'generate_report': {
+      case "generate_report": {
         const receivingRecord = await prisma.receivingRecord.findFirst({
           where: {
             id: validated.receivingRecordId,
@@ -482,14 +486,14 @@ export async function POST(request: NextRequest) {
 
         if (!receivingRecord) {
           return NextResponse.json(
-            { error: 'Receiving record not found' },
-            { status: 404 }
+            { error: "Receiving record not found" },
+            { status: 404 },
           );
         }
 
         const completeness = checkDocumentCompleteness(
           receivingRecord.documents,
-          receivingRecord
+          receivingRecord,
         );
 
         const report = {
@@ -505,11 +509,12 @@ export async function POST(request: NextRequest) {
           },
           documentSummary: {
             total: receivingRecord.documents.length,
-            verified: receivingRecord.documents.filter((d) => d.verified).length,
+            verified: receivingRecord.documents.filter((d) => d.verified)
+              .length,
             completeness,
           },
           documents:
-            validated.reportType === 'DETAILED'
+            validated.reportType === "DETAILED"
               ? receivingRecord.documents.map((d) => ({
                   type: d.documentType,
                   title: d.title,
@@ -525,25 +530,25 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           report,
-          message: 'Report generated successfully',
+          message: "Report generated successfully",
         });
       }
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('POST /api/receiving/document-management error:', error);
+    console.error("POST /api/receiving/document-management error:", error);
     return NextResponse.json(
-      { error: 'Failed to process document action' },
-      { status: 500 }
+      { error: "Failed to process document action" },
+      { status: 500 },
     );
   }
 }
@@ -567,9 +572,9 @@ export const DOCUMENT_MANAGEMENT_ROI = {
   roi: 369, // 369% ROI
   paybackMonths: 3.3,
   impact: {
-    retrievalSpeed: '70% faster', // Document retrieval time
-    complianceRate: '98% complete', // Document completeness
-    auditPrepTime: '85% reduction',
-    storageElimination: '100% digital',
+    retrievalSpeed: "70% faster", // Document retrieval time
+    complianceRate: "98% complete", // Document completeness
+    auditPrepTime: "85% reduction",
+    storageElimination: "100% digital",
   },
 };

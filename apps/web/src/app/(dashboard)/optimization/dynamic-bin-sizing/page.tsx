@@ -3,10 +3,10 @@
 /**
  * DYNAMIC BIN SIZING DASHBOARD
  * =============================
- * 
+ *
  * System 14 - Ultra High ROI Optimization (1,350%)
  * Investment: $5K → Savings: $68K/year
- * 
+ *
  * Features:
  * - Real-time bin size recommendations
  * - Velocity-based optimization
@@ -16,7 +16,13 @@
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -114,7 +120,9 @@ export default function DynamicBinSizingDashboard() {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
-  const [recommendations, setRecommendations] = useState<BinRecommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<BinRecommendation[]>(
+    [],
+  );
   const [reallocations, setReallocations] = useState<Reallocation[]>([]);
   const [selectedPriority, setSelectedPriority] = useState<string>("ALL");
 
@@ -130,17 +138,21 @@ export default function DynamicBinSizingDashboard() {
     try {
       setLoading(true);
 
-      const [statsRes, recommendationsRes, reallocationsRes] = await Promise.all([
-        fetch("/api/optimization/dynamic-bin-sizing?action=stats"),
-        fetch(`/api/optimization/dynamic-bin-sizing?action=recommendations&priority=${selectedPriority}`),
-        fetch("/api/optimization/dynamic-bin-sizing?action=reallocations"),
-      ]);
+      const [statsRes, recommendationsRes, reallocationsRes] =
+        await Promise.all([
+          fetch("/api/optimization/dynamic-bin-sizing?action=stats"),
+          fetch(
+            `/api/optimization/dynamic-bin-sizing?action=recommendations&priority=${selectedPriority}`,
+          ),
+          fetch("/api/optimization/dynamic-bin-sizing?action=reallocations"),
+        ]);
 
-      const [statsData, recommendationsData, reallocationsData] = await Promise.all([
-        statsRes.json(),
-        recommendationsRes.json(),
-        reallocationsRes.json(),
-      ]);
+      const [statsData, recommendationsData, reallocationsData] =
+        await Promise.all([
+          statsRes.json(),
+          recommendationsRes.json(),
+          reallocationsRes.json(),
+        ]);
 
       setStats(statsData);
       setRecommendations(recommendationsData.recommendations || []);
@@ -285,7 +297,9 @@ export default function DynamicBinSizingDashboard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Dynamic Bin Sizing Dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Loading Dynamic Bin Sizing Dashboard...
+          </p>
         </div>
       </div>
     );
@@ -321,19 +335,26 @@ export default function DynamicBinSizingDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Bins</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Total Bins
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalBins.toLocaleString()}</div>
+              <div className="text-2xl font-bold">
+                {stats.totalBins.toLocaleString()}
+              </div>
               <p className="text-xs text-gray-500 mt-1">
-                {stats.optimizedBins.toLocaleString()} optimized ({stats.optimizationRate}%)
+                {stats.optimizedBins.toLocaleString()} optimized (
+                {stats.optimizationRate}%)
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Avg Utilization</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Avg Utilization
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.avgUtilization}%</div>
@@ -343,10 +364,14 @@ export default function DynamicBinSizingDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Space Saved</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Space Saved
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.spaceSaved.toLocaleString()} ft³</div>
+              <div className="text-2xl font-bold">
+                {stats.spaceSaved.toLocaleString()} ft³
+              </div>
               <p className="text-xs text-gray-500 mt-1">
                 {stats.reallocationsPending} reallocations pending
               </p>
@@ -355,13 +380,17 @@ export default function DynamicBinSizingDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Annual Savings</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Annual Savings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
                 {formatCurrency(stats.yearlyCostSavings)}
               </div>
-              <p className="text-xs text-gray-500 mt-1">ROI: {stats.roi.toLocaleString()}%</p>
+              <p className="text-xs text-gray-500 mt-1">
+                ROI: {stats.roi.toLocaleString()}%
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -383,7 +412,8 @@ export default function DynamicBinSizingDashboard() {
                 <div>
                   <CardTitle>Bin Size Recommendations</CardTitle>
                   <CardDescription>
-                    AI-powered recommendations based on product velocity and utilization
+                    AI-powered recommendations based on product velocity and
+                    utilization
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -395,14 +425,18 @@ export default function DynamicBinSizingDashboard() {
                     All
                   </Button>
                   <Button
-                    variant={selectedPriority === "CRITICAL" ? "default" : "outline"}
+                    variant={
+                      selectedPriority === "CRITICAL" ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => setSelectedPriority("CRITICAL")}
                   >
                     Critical
                   </Button>
                   <Button
-                    variant={selectedPriority === "HIGH" ? "default" : "outline"}
+                    variant={
+                      selectedPriority === "HIGH" ? "default" : "outline"
+                    }
                     size="sm"
                     onClick={() => setSelectedPriority("HIGH")}
                   >
@@ -429,14 +463,20 @@ export default function DynamicBinSizingDashboard() {
                 <TableBody>
                   {recommendations.map((rec) => (
                     <TableRow key={rec.locationId}>
-                      <TableCell className="font-medium">{rec.locationCode}</TableCell>
+                      <TableCell className="font-medium">
+                        {rec.locationCode}
+                      </TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">{rec.productSku}</div>
-                          <div className="text-xs text-gray-500">{rec.productName}</div>
+                          <div className="text-xs text-gray-500">
+                            {rec.productName}
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell>{getBinSizeBadge(rec.currentBinSize)}</TableCell>
+                      <TableCell>
+                        {getBinSizeBadge(rec.currentBinSize)}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           {rec.recommendedBinSize !== rec.currentBinSize && (
@@ -469,12 +509,23 @@ export default function DynamicBinSizingDashboard() {
                               {rec.utilizationProjected}%
                             </span>
                           </div>
-                          <Progress value={rec.utilizationCurrent} className="h-2" />
+                          <Progress
+                            value={rec.utilizationCurrent}
+                            className="h-2"
+                          />
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className={rec.yearlySavings > 0 ? "text-green-600" : "text-red-600"}>
-                          <div className="font-bold">{formatCurrency(rec.yearlySavings)}</div>
+                        <div
+                          className={
+                            rec.yearlySavings > 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }
+                        >
+                          <div className="font-bold">
+                            {formatCurrency(rec.yearlySavings)}
+                          </div>
                           <div className="text-xs">
                             {formatCurrency(rec.monthlySavings)}/mo
                           </div>
@@ -482,7 +533,10 @@ export default function DynamicBinSizingDashboard() {
                       </TableCell>
                       <TableCell>{getPriorityBadge(rec.priority)}</TableCell>
                       <TableCell>
-                        <Button size="sm" onClick={() => applyRecommendation(rec)}>
+                        <Button
+                          size="sm"
+                          onClick={() => applyRecommendation(rec)}
+                        >
                           Apply
                         </Button>
                       </TableCell>
@@ -521,19 +575,31 @@ export default function DynamicBinSizingDashboard() {
                     <TableRow key={realloc.id}>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{realloc.productSku}</div>
-                          <div className="text-xs text-gray-500">{realloc.productName}</div>
+                          <div className="font-medium">
+                            {realloc.productSku}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {realloc.productName}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-sm">{realloc.sourceLocation}</span>
+                          <span className="font-mono text-sm">
+                            {realloc.sourceLocation}
+                          </span>
                           <ArrowDown className="w-4 h-4" />
-                          <span className="font-mono text-sm">{realloc.targetLocation}</span>
+                          <span className="font-mono text-sm">
+                            {realloc.targetLocation}
+                          </span>
                         </div>
                       </TableCell>
-                      <TableCell>{realloc.quantity.toLocaleString()} units</TableCell>
-                      <TableCell className="max-w-xs">{realloc.reason}</TableCell>
+                      <TableCell>
+                        {realloc.quantity.toLocaleString()} units
+                      </TableCell>
+                      <TableCell className="max-w-xs">
+                        {realloc.reason}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
@@ -543,7 +609,11 @@ export default function DynamicBinSizingDashboard() {
                       <TableCell>{realloc.estimatedDuration} min</TableCell>
                       <TableCell>
                         <Badge
-                          variant={realloc.status === "PENDING" ? "secondary" : "default"}
+                          variant={
+                            realloc.status === "PENDING"
+                              ? "secondary"
+                              : "default"
+                          }
                         >
                           {realloc.status}
                         </Badge>
@@ -568,17 +638,23 @@ export default function DynamicBinSizingDashboard() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Under-utilized (&lt;30%)</span>
-                      <Badge variant="secondary">{stats.underutilizedBins}</Badge>
+                      <Badge variant="secondary">
+                        {stats.underutilizedBins}
+                      </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Optimal (30-90%)</span>
                       <Badge variant="default">
-                        {stats.totalBins - stats.underutilizedBins - stats.overutilizedBins}
+                        {stats.totalBins -
+                          stats.underutilizedBins -
+                          stats.overutilizedBins}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Over-utilized (&gt;90%)</span>
-                      <Badge variant="destructive">{stats.overutilizedBins}</Badge>
+                      <Badge variant="destructive">
+                        {stats.overutilizedBins}
+                      </Badge>
                     </div>
                   </div>
                 )}

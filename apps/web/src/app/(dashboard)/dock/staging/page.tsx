@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface StagingZone {
   id: string;
@@ -45,10 +45,10 @@ export default function StagingManagement() {
     try {
       setLoading(true);
       const [zonesRes, shipmentsRes, metricsRes, oppRes] = await Promise.all([
-        fetch('/api/dock/staging?action=staging_zones'),
-        fetch('/api/dock/staging?action=shipment_staging'),
-        fetch('/api/dock/staging?action=staging_metrics'),
-        fetch('/api/dock/staging?action=consolidation_opportunities'),
+        fetch("/api/dock/staging?action=staging_zones"),
+        fetch("/api/dock/staging?action=shipment_staging"),
+        fetch("/api/dock/staging?action=staging_metrics"),
+        fetch("/api/dock/staging?action=consolidation_opportunities"),
       ]);
 
       const zonesData = await zonesRes.json();
@@ -61,7 +61,7 @@ export default function StagingManagement() {
       setMetrics(metricsData.metrics);
       setOpportunities(oppData.opportunities || []);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -69,32 +69,48 @@ export default function StagingManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'AVAILABLE': return 'bg-green-500';
-      case 'RESERVED': return 'bg-yellow-500';
-      case 'OCCUPIED': return 'bg-blue-500';
-      case 'FULL': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case "AVAILABLE":
+        return "bg-green-500";
+      case "RESERVED":
+        return "bg-yellow-500";
+      case "OCCUPIED":
+        return "bg-blue-500";
+      case "FULL":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
   const getShipmentStatusColor = (status: string) => {
     switch (status) {
-      case 'PICKING': return 'bg-purple-100 text-purple-800';
-      case 'STAGING': return 'bg-blue-100 text-blue-800';
-      case 'READY': return 'bg-green-100 text-green-800';
-      case 'LOADING': return 'bg-orange-100 text-orange-800';
-      case 'COMPLETE': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "PICKING":
+        return "bg-purple-100 text-purple-800";
+      case "STAGING":
+        return "bg-blue-100 text-blue-800";
+      case "READY":
+        return "bg-green-100 text-green-800";
+      case "LOADING":
+        return "bg-orange-100 text-orange-800";
+      case "COMPLETE":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'URGENT': return 'bg-red-100 text-red-800 border-red-300';
-      case 'HIGH': return 'bg-orange-100 text-orange-800 border-orange-300';
-      case 'NORMAL': return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'LOW': return 'bg-gray-100 text-gray-800 border-gray-300';
-      default: return 'bg-gray-100 text-gray-800';
+      case "URGENT":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800 border-orange-300";
+      case "NORMAL":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      case "LOW":
+        return "bg-gray-100 text-gray-800 border-gray-300";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -131,12 +147,15 @@ export default function StagingManagement() {
         <Card className="border-yellow-300 bg-yellow-50">
           <CardHeader>
             <CardTitle className="text-yellow-800 flex items-center gap-2">
-              💡 {opportunities.length} Consolidation Opportunit{opportunities.length !== 1 ? 'ies' : 'y'} Found
+              💡 {opportunities.length} Consolidation Opportunit
+              {opportunities.length !== 1 ? "ies" : "y"} Found
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-sm text-yellow-700 mb-2">
-              Potential space saved: {opportunities.reduce((sum, opp) => sum + opp.spaceSaved, 0)} units
+              Potential space saved:{" "}
+              {opportunities.reduce((sum, opp) => sum + opp.spaceSaved, 0)}{" "}
+              units
             </div>
             <Button size="sm" variant="outline">
               Review Opportunities
@@ -158,7 +177,7 @@ export default function StagingManagement() {
               {zones.length}
             </div>
             <div className="text-sm text-gray-600 mt-1">
-              {zones.filter(z => z.status === 'AVAILABLE').length} available
+              {zones.filter((z) => z.status === "AVAILABLE").length} available
             </div>
           </CardContent>
         </Card>
@@ -174,7 +193,8 @@ export default function StagingManagement() {
               {metrics?.utilizationPercent?.toFixed(0) || 0}%
             </div>
             <div className="text-sm text-gray-600 mt-1">
-              {metrics?.currentUtilization || 0} / {metrics?.totalCapacity || 0} units
+              {metrics?.currentUtilization || 0} / {metrics?.totalCapacity || 0}{" "}
+              units
             </div>
           </CardContent>
         </Card>
@@ -222,8 +242,9 @@ export default function StagingManagement() {
         <TabsContent value="zones" className="space-y-4">
           <div className="grid grid-cols-3 gap-4">
             {zones.map((zone) => {
-              const utilizationPercent = (zone.currentUtilization / zone.capacity) * 100;
-              
+              const utilizationPercent =
+                (zone.currentUtilization / zone.capacity) * 100;
+
               return (
                 <Card key={zone.id}>
                   <CardHeader className="pb-3">
@@ -232,50 +253,62 @@ export default function StagingManagement() {
                         <CardTitle className="text-lg">{zone.name}</CardTitle>
                         <div className="text-sm text-gray-600">{zone.id}</div>
                       </div>
-                      <div className={`w-3 h-3 rounded-full ${getStatusColor(zone.status)}`} />
+                      <div
+                        className={`w-3 h-3 rounded-full ${getStatusColor(zone.status)}`}
+                      />
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
                       <div className="text-sm">
-                        <span className="text-gray-600">Type:</span>{' '}
+                        <span className="text-gray-600">Type:</span>{" "}
                         <span className="font-medium">{zone.type}</span>
                       </div>
-                      
+
                       <div className="text-sm">
-                        <span className="text-gray-600">Location:</span>{' '}
+                        <span className="text-gray-600">Location:</span>{" "}
                         <span className="font-medium">{zone.location}</span>
                       </div>
-                      
+
                       <div className="text-sm">
-                        <span className="text-gray-600">Status:</span>{' '}
-                        <span className={`font-medium ${
-                          zone.status === 'AVAILABLE' ? 'text-green-600' :
-                          zone.status === 'FULL' ? 'text-red-600' :
-                          'text-blue-600'
-                        }`}>
+                        <span className="text-gray-600">Status:</span>{" "}
+                        <span
+                          className={`font-medium ${
+                            zone.status === "AVAILABLE"
+                              ? "text-green-600"
+                              : zone.status === "FULL"
+                                ? "text-red-600"
+                                : "text-blue-600"
+                          }`}
+                        >
                           {zone.status}
                         </span>
                       </div>
 
                       {zone.assignedShipment && (
                         <div className="text-sm">
-                          <span className="text-gray-600">Assigned:</span>{' '}
-                          <span className="font-medium">{zone.assignedShipment}</span>
+                          <span className="text-gray-600">Assigned:</span>{" "}
+                          <span className="font-medium">
+                            {zone.assignedShipment}
+                          </span>
                         </div>
                       )}
-                      
+
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span className="text-gray-600">Utilization</span>
-                          <span className="font-medium">{utilizationPercent.toFixed(0)}%</span>
+                          <span className="font-medium">
+                            {utilizationPercent.toFixed(0)}%
+                          </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full ${
-                              utilizationPercent >= 90 ? 'bg-red-500' :
-                              utilizationPercent >= 70 ? 'bg-yellow-500' :
-                              'bg-green-500'
+                              utilizationPercent >= 90
+                                ? "bg-red-500"
+                                : utilizationPercent >= 70
+                                  ? "bg-yellow-500"
+                                  : "bg-green-500"
                             }`}
                             style={{ width: `${utilizationPercent}%` }}
                           />
@@ -301,44 +334,56 @@ export default function StagingManagement() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`text-xs px-2 py-1 rounded border ${getPriorityColor(shipment.priority)}`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded border ${getPriorityColor(shipment.priority)}`}
+                        >
                           {shipment.priority}
                         </span>
-                        <span className={`text-xs px-2 py-1 rounded ${getShipmentStatusColor(shipment.status)}`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${getShipmentStatusColor(shipment.status)}`}
+                        >
                           {shipment.status}
                         </span>
                       </div>
-                      
-                      <div className="font-medium text-lg mb-1">{shipment.carrier}</div>
-                      <div className="text-sm text-gray-600">{shipment.shipmentId}</div>
-                      
+
+                      <div className="font-medium text-lg mb-1">
+                        {shipment.carrier}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {shipment.shipmentId}
+                      </div>
+
                       <div className="grid grid-cols-3 gap-4 mt-3 text-sm">
                         <div>
-                          <span className="text-gray-600">Load Time:</span>{' '}
+                          <span className="text-gray-600">Load Time:</span>{" "}
                           <span className="font-medium">
-                            {new Date(shipment.loadTime).toLocaleTimeString('en-US', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
+                            {new Date(shipment.loadTime).toLocaleTimeString(
+                              "en-US",
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              },
+                            )}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Items:</span>{' '}
+                          <span className="text-gray-600">Items:</span>{" "}
                           <span className="font-medium">
                             {shipment.stagedItems} / {shipment.totalItems}
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Zones:</span>{' '}
+                          <span className="text-gray-600">Zones:</span>{" "}
                           <span className="font-medium">
-                            {shipment.allocatedZones.join(', ')}
+                            {shipment.allocatedZones.join(", ")}
                           </span>
                         </div>
                       </div>
 
                       {shipment.verifiedAt && (
                         <div className="mt-3 p-2 bg-green-50 rounded text-sm">
-                          <span className="text-green-600">✓</span> Verified by {shipment.verifiedBy} at{' '}
+                          <span className="text-green-600">✓</span> Verified by{" "}
+                          {shipment.verifiedBy} at{" "}
                           {new Date(shipment.verifiedAt).toLocaleTimeString()}
                         </div>
                       )}
@@ -357,11 +402,12 @@ export default function StagingManagement() {
                           style={{ width: `${shipment.completionPercent}%` }}
                         />
                       </div>
-                      {shipment.status === 'STAGING' && shipment.completionPercent === 100 && (
-                        <Button size="sm" className="w-full mt-2">
-                          Mark Ready
-                        </Button>
-                      )}
+                      {shipment.status === "STAGING" &&
+                        shipment.completionPercent === 100 && (
+                          <Button size="sm" className="w-full mt-2">
+                            Mark Ready
+                          </Button>
+                        )}
                     </div>
                   </div>
                 </CardContent>
@@ -379,11 +425,36 @@ export default function StagingManagement() {
             <CardContent>
               <div className="space-y-6">
                 {[
-                  { step: 1, title: 'Allocate Staging Zone', desc: 'System assigns optimal zone based on shipment requirements', icon: '🎯' },
-                  { step: 2, title: 'Pick Items', desc: 'Workers pick items from warehouse and scan', icon: '📦' },
-                  { step: 3, title: 'Stage to Zone', desc: 'Items moved to allocated staging zone', icon: '➡️' },
-                  { step: 4, title: 'Verify Completeness', desc: 'Supervisor verifies all items staged', icon: '✓' },
-                  { step: 5, title: 'Mark Load Ready', desc: 'Shipment ready for loading at dock', icon: '🚚' },
+                  {
+                    step: 1,
+                    title: "Allocate Staging Zone",
+                    desc: "System assigns optimal zone based on shipment requirements",
+                    icon: "🎯",
+                  },
+                  {
+                    step: 2,
+                    title: "Pick Items",
+                    desc: "Workers pick items from warehouse and scan",
+                    icon: "📦",
+                  },
+                  {
+                    step: 3,
+                    title: "Stage to Zone",
+                    desc: "Items moved to allocated staging zone",
+                    icon: "➡️",
+                  },
+                  {
+                    step: 4,
+                    title: "Verify Completeness",
+                    desc: "Supervisor verifies all items staged",
+                    icon: "✓",
+                  },
+                  {
+                    step: 5,
+                    title: "Mark Load Ready",
+                    desc: "Shipment ready for loading at dock",
+                    icon: "🚚",
+                  },
                 ].map((step) => (
                   <div key={step.step} className="flex items-start gap-4">
                     <div className="flex-shrink-0">
@@ -414,7 +485,9 @@ export default function StagingManagement() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span>Stage heavy/large items first for efficient loading</span>
+                    <span>
+                      Stage heavy/large items first for efficient loading
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
@@ -422,7 +495,9 @@ export default function StagingManagement() {
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span>Consolidate underutilized zones to free up space</span>
+                    <span>
+                      Consolidate underutilized zones to free up space
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
@@ -444,7 +519,9 @@ export default function StagingManagement() {
                   </div>
                   <div className="p-2 bg-purple-50 rounded">
                     <div className="font-medium">REFRIGERATED</div>
-                    <div className="text-gray-600">Temperature-controlled items</div>
+                    <div className="text-gray-600">
+                      Temperature-controlled items
+                    </div>
                   </div>
                   <div className="p-2 bg-red-50 rounded">
                     <div className="font-medium">HAZMAT</div>
@@ -517,7 +594,9 @@ export default function StagingManagement() {
                   </div>
                   <div className="flex justify-between py-3 bg-green-50 -mx-4 px-4">
                     <span className="font-bold">Total Annual Savings</span>
-                    <span className="font-bold text-lg text-green-600">$317,000</span>
+                    <span className="font-bold text-lg text-green-600">
+                      $317,000
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -536,11 +615,15 @@ export default function StagingManagement() {
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded">
                   <div className="text-3xl font-bold text-blue-600">2.4</div>
-                  <div className="text-sm text-gray-600 mt-1">Payback (months)</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Payback (months)
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded">
                   <div className="text-3xl font-bold text-purple-600">40%</div>
-                  <div className="text-sm text-gray-600 mt-1">Faster staging</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Faster staging
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
                   <div className="text-3xl font-bold text-orange-600">95%</div>
@@ -553,19 +636,31 @@ export default function StagingManagement() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>40% faster staging process</strong> - Organized workflow reduces time</span>
+                    <span>
+                      <strong>40% faster staging process</strong> - Organized
+                      workflow reduces time
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>95% staging accuracy</strong> - Verification prevents errors</span>
+                    <span>
+                      <strong>95% staging accuracy</strong> - Verification
+                      prevents errors
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>30% better space utilization</strong> - Smart zone allocation</span>
+                    <span>
+                      <strong>30% better space utilization</strong> - Smart zone
+                      allocation
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>100% load visibility</strong> - Real-time readiness tracking</span>
+                    <span>
+                      <strong>100% load visibility</strong> - Real-time
+                      readiness tracking
+                    </span>
                   </li>
                 </ul>
               </div>

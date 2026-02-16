@@ -3,10 +3,10 @@
 /**
  * WAVE PREDICTION & PRE-STAGING DASHBOARD
  * ========================================
- * 
+ *
  * System 13 - Outstanding ROI (949%)
  * Investment: $15K → Savings: $142K/year
- * 
+ *
  * Features:
  * - 24-hour wave demand forecasting
  * - Intelligent pre-staging
@@ -15,7 +15,13 @@
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -105,7 +111,9 @@ export default function WavePredictionDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
   const [forecasts, setForecasts] = useState<WaveForecast[]>([]);
-  const [preStageRecs, setPreStageRecs] = useState<PreStageRecommendation[]>([]);
+  const [preStageRecs, setPreStageRecs] = useState<PreStageRecommendation[]>(
+    [],
+  );
   const [performance, setPerformance] = useState<any>(null);
 
   useEffect(() => {
@@ -116,19 +124,21 @@ export default function WavePredictionDashboard() {
     try {
       setLoading(true);
 
-      const [statsRes, forecastsRes, preStageRes, performanceRes] = await Promise.all([
-        fetch("/api/optimization/wave-prediction?action=stats"),
-        fetch("/api/optimization/wave-prediction?action=forecasts"),
-        fetch("/api/optimization/wave-prediction?action=prestage"),
-        fetch("/api/optimization/wave-prediction?action=performance"),
-      ]);
+      const [statsRes, forecastsRes, preStageRes, performanceRes] =
+        await Promise.all([
+          fetch("/api/optimization/wave-prediction?action=stats"),
+          fetch("/api/optimization/wave-prediction?action=forecasts"),
+          fetch("/api/optimization/wave-prediction?action=prestage"),
+          fetch("/api/optimization/wave-prediction?action=performance"),
+        ]);
 
-      const [statsData, forecastsData, preStageData, performanceData] = await Promise.all([
-        statsRes.json(),
-        forecastsRes.json(),
-        preStageRes.json(),
-        performanceRes.json(),
-      ]);
+      const [statsData, forecastsData, preStageData, performanceData] =
+        await Promise.all([
+          statsRes.json(),
+          forecastsRes.json(),
+          preStageRes.json(),
+          performanceRes.json(),
+        ]);
 
       setStats(statsData);
       setForecasts(forecastsData.forecasts || []);
@@ -212,7 +222,9 @@ export default function WavePredictionDashboard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Wave Prediction Dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Loading Wave Prediction Dashboard...
+          </p>
         </div>
       </div>
     );
@@ -247,7 +259,9 @@ export default function WavePredictionDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.forecastAccuracy}%</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.forecastAccuracy}%
+              </div>
               <Progress value={stats.forecastAccuracy} className="mt-2" />
             </CardContent>
           </Card>
@@ -260,7 +274,9 @@ export default function WavePredictionDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.avgWaveTime} min</div>
-              <p className="text-xs text-gray-500 mt-1">Target: {stats.targetWaveTime} min</p>
+              <p className="text-xs text-gray-500 mt-1">
+                Target: {stats.targetWaveTime} min
+              </p>
             </CardContent>
           </Card>
 
@@ -282,7 +298,9 @@ export default function WavePredictionDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Annual Savings</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Annual Savings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -304,18 +322,24 @@ export default function WavePredictionDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <div className="text-sm text-gray-600">Wave Number</div>
-                <div className="text-xl font-bold">{performance.currentWave.waveNumber}</div>
+                <div className="text-xl font-bold">
+                  {performance.currentWave.waveNumber}
+                </div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Orders / Lines</div>
                 <div className="text-xl font-bold">
-                  {performance.currentWave.orders} / {performance.currentWave.lines}
+                  {performance.currentWave.orders} /{" "}
+                  {performance.currentWave.lines}
                 </div>
               </div>
               <div>
                 <div className="text-sm text-gray-600">Progress</div>
                 <div className="flex items-center gap-2 mt-1">
-                  <Progress value={performance.currentWave.progressPercentage} className="flex-1" />
+                  <Progress
+                    value={performance.currentWave.progressPercentage}
+                    className="flex-1"
+                  />
                   <span className="text-sm font-medium">
                     {performance.currentWave.progressPercentage.toFixed(1)}%
                   </span>
@@ -345,7 +369,9 @@ export default function WavePredictionDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>24-Hour Wave Forecast</CardTitle>
-              <CardDescription>AI-powered demand prediction for optimal staffing</CardDescription>
+              <CardDescription>
+                AI-powered demand prediction for optimal staffing
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -367,13 +393,18 @@ export default function WavePredictionDashboard() {
                         <div className="font-medium">
                           {forecast.hour.toString().padStart(2, "0")}:00
                         </div>
-                        <div className="text-xs text-gray-500">{forecast.dayOfWeek}</div>
+                        <div className="text-xs text-gray-500">
+                          {forecast.dayOfWeek}
+                        </div>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{forecast.predictedOrders} orders</div>
+                          <div className="font-medium">
+                            {forecast.predictedOrders} orders
+                          </div>
                           <div className="text-xs text-gray-500">
-                            {forecast.predictedLines} lines / {forecast.predictedUnits} units
+                            {forecast.predictedLines} lines /{" "}
+                            {forecast.predictedUnits} units
                           </div>
                         </div>
                       </TableCell>
@@ -396,8 +427,13 @@ export default function WavePredictionDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={forecast.confidence} className="w-16" />
-                          <span className="text-sm">{forecast.confidence.toFixed(0)}%</span>
+                          <Progress
+                            value={forecast.confidence}
+                            className="w-16"
+                          />
+                          <span className="text-sm">
+                            {forecast.confidence.toFixed(0)}%
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -446,7 +482,9 @@ export default function WavePredictionDashboard() {
                       <TableCell>
                         <div>
                           <div className="font-medium">{rec.productSku}</div>
-                          <div className="text-xs text-gray-500">{rec.productName}</div>
+                          <div className="text-xs text-gray-500">
+                            {rec.productName}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -456,14 +494,18 @@ export default function WavePredictionDashboard() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{rec.recommendedQuantity} units</div>
+                          <div className="font-medium">
+                            {rec.recommendedQuantity} units
+                          </div>
                           <div className="text-xs text-gray-500">
                             Current: {rec.currentStock}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline">{rec.predictedDemand} picks</Badge>
+                        <Badge variant="outline">
+                          {rec.predictedDemand} picks
+                        </Badge>
                       </TableCell>
                       <TableCell>
                         <div className="text-green-600 font-medium">
@@ -497,11 +539,15 @@ export default function WavePredictionDashboard() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Per Wave</span>
-                      <Badge variant="default">{stats.timeSaved.perWave} min</Badge>
+                      <Badge variant="default">
+                        {stats.timeSaved.perWave} min
+                      </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Daily</span>
-                      <Badge variant="default">{stats.timeSaved.daily} min</Badge>
+                      <Badge variant="default">
+                        {stats.timeSaved.daily} min
+                      </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Monthly</span>

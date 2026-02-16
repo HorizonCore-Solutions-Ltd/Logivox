@@ -63,7 +63,7 @@ export function EffectivenessVerification({
 }: EffectivenessVerificationProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verificationPassed, setVerificationPassed] = useState<boolean | null>(
-    null
+    null,
   );
 
   const {
@@ -110,7 +110,9 @@ export function EffectivenessVerification({
     } catch (error) {
       console.error("Error verifying effectiveness:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to verify effectiveness"
+        error instanceof Error
+          ? error.message
+          : "Failed to verify effectiveness",
       );
     } finally {
       setIsSubmitting(false);
@@ -133,7 +135,7 @@ export function EffectivenessVerification({
   if (!capa) return null;
 
   const daysSinceClosure = Math.floor(
-    (Date.now() - new Date(capa.closedDate).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - new Date(capa.closedDate).getTime()) / (1000 * 60 * 60 * 24),
   );
 
   return (
@@ -162,8 +164,8 @@ export function EffectivenessVerification({
               </div>
               <div>
                 <span className="font-medium">Closed Date:</span>{" "}
-                {new Date(capa.closedDate).toLocaleDateString()} ({daysSinceClosure}{" "}
-                days ago)
+                {new Date(capa.closedDate).toLocaleDateString()} (
+                {daysSinceClosure} days ago)
               </div>
             </div>
           </div>
@@ -187,13 +189,9 @@ export function EffectivenessVerification({
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Verification Method */}
             <div className="space-y-2">
-              <Label htmlFor="verificationMethod">
-                Verification Method *
-              </Label>
+              <Label htmlFor="verificationMethod">Verification Method *</Label>
               <Select
-                onValueChange={(value) =>
-                  setValue("verificationMethod", value)
-                }
+                onValueChange={(value) => setValue("verificationMethod", value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select verification method" />
@@ -235,7 +233,8 @@ export function EffectivenessVerification({
                   onClick={() => {
                     setVerificationPassed(true);
                     setValue("verificationPassed", true);
-                    if (effectivenessScore < 70) setValue("effectivenessScore", 85);
+                    if (effectivenessScore < 70)
+                      setValue("effectivenessScore", 85);
                   }}
                   className={`p-4 border-2 rounded-lg flex items-center gap-3 transition-all ${
                     verificationPassed === true
@@ -263,7 +262,8 @@ export function EffectivenessVerification({
                   onClick={() => {
                     setVerificationPassed(false);
                     setValue("verificationPassed", false);
-                    if (effectivenessScore > 60) setValue("effectivenessScore", 50);
+                    if (effectivenessScore > 60)
+                      setValue("effectivenessScore", 50);
                   }}
                   className={`p-4 border-2 rounded-lg flex items-center gap-3 transition-all ${
                     verificationPassed === false
@@ -314,8 +314,8 @@ export function EffectivenessVerification({
                       effectivenessScore >= 85
                         ? "bg-green-100 text-green-800"
                         : effectivenessScore >= 70
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : "bg-red-100 text-red-800"
                     }
                   >
                     {getScoreLabel(effectivenessScore)}
@@ -370,8 +370,8 @@ export function EffectivenessVerification({
                 {isSubmitting
                   ? "Submitting..."
                   : verificationPassed === false
-                  ? "Submit & Trigger Re-CAPA"
-                  : "Submit Verification"}
+                    ? "Submit & Trigger Re-CAPA"
+                    : "Submit Verification"}
               </Button>
             </DialogFooter>
           </form>

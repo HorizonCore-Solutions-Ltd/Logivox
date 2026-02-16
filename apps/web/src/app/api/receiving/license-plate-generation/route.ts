@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // LICENSE PLATE GENERATION (LPN/SSCC) API
@@ -32,42 +32,42 @@ import { z } from 'zod';
 
 // Label formats
 type LabelFormat =
-  | 'SSCC'              // GS1-128 SSCC-18 (Serial Shipping Container Code)
-  | 'LPN'               // Internal License Plate Number
-  | 'PALLET_LPN'        // Pallet-level tracking
-  | 'CASE_LPN'          // Case-level tracking
-  | 'ITEM_SERIAL';      // Item-level serialization
+  | "SSCC" // GS1-128 SSCC-18 (Serial Shipping Container Code)
+  | "LPN" // Internal License Plate Number
+  | "PALLET_LPN" // Pallet-level tracking
+  | "CASE_LPN" // Case-level tracking
+  | "ITEM_SERIAL"; // Item-level serialization
 
 // Label status
 type LabelStatus =
-  | 'PENDING'           // Queued for printing
-  | 'PRINTED'           // Label printed
-  | 'APPLIED'           // Label applied to container
-  | 'VOIDED'            // Label voided/reprinted
-  | 'ARCHIVED';         // Historical record
+  | "PENDING" // Queued for printing
+  | "PRINTED" // Label printed
+  | "APPLIED" // Label applied to container
+  | "VOIDED" // Label voided/reprinted
+  | "ARCHIVED"; // Historical record
 
 // Print priority
-type PrintPriority = 'LOW' | 'NORMAL' | 'HIGH' | 'URGENT';
+type PrintPriority = "LOW" | "NORMAL" | "HIGH" | "URGENT";
 
 // Validation schemas
 const generateLabelsSchema = z.object({
-  action: z.literal('generate_labels'),
+  action: z.literal("generate_labels"),
   receivingId: z.string().uuid(),
-  format: z.enum(['SSCC', 'LPN', 'PALLET_LPN', 'CASE_LPN', 'ITEM_SERIAL']),
+  format: z.enum(["SSCC", "LPN", "PALLET_LPN", "CASE_LPN", "ITEM_SERIAL"]),
   quantity: z.number().int().positive().max(1000),
   prefix: z.string().max(10).optional(),
-  priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).optional(),
+  priority: z.enum(["LOW", "NORMAL", "HIGH", "URGENT"]).optional(),
 });
 
 const printLabelsSchema = z.object({
-  action: z.literal('print_labels'),
+  action: z.literal("print_labels"),
   labelIds: z.array(z.string().uuid()).min(1).max(100),
   printerId: z.string(),
   copies: z.number().int().positive().max(10).optional(),
 });
 
 const applyLabelSchema = z.object({
-  action: z.literal('apply_label'),
+  action: z.literal("apply_label"),
   labelId: z.string().uuid(),
   containerId: z.string().optional(),
   palletId: z.string().optional(),
@@ -76,18 +76,18 @@ const applyLabelSchema = z.object({
 });
 
 const voidLabelSchema = z.object({
-  action: z.literal('void_label'),
+  action: z.literal("void_label"),
   labelId: z.string().uuid(),
   reason: z.string(),
 });
 
 const reprintLabelSchema = z.object({
-  action: z.literal('reprint_label'),
+  action: z.literal("reprint_label"),
   originalLabelId: z.string().uuid(),
   reason: z.string(),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   generateLabelsSchema,
   printLabelsSchema,
   applyLabelSchema,
@@ -97,27 +97,27 @@ const requestSchema = z.discriminatedUnion('action', [
 
 // Generate GS1-128 SSCC (18-digit code)
 function generateSSCC(
-  companyPrefix: string,  // 7-9 digits (GS1 Company Prefix)
-  serialNumber: number     // Unique serial
+  companyPrefix: string, // 7-9 digits (GS1 Company Prefix)
+  serialNumber: number, // Unique serial
 ): string {
   // SSCC format: Extension Digit (1) + Company Prefix (7-9) + Serial (rest) + Check Digit (1)
   // Total: 18 digits
-  
-  const extensionDigit = '0'; // Typically 0 for logistics units
-  const paddedSerial = serialNumber.toString().padStart(8, '0'); // 8 digits for serial
-  
+
+  const extensionDigit = "0"; // Typically 0 for logistics units
+  const paddedSerial = serialNumber.toString().padStart(8, "0"); // 8 digits for serial
+
   // Build 17-digit code (without check digit)
   const codeWithoutCheck = extensionDigit + companyPrefix + paddedSerial;
-  
+
   // Calculate GS1 check digit (mod 10)
   let sum = 0;
   for (let i = 0; i < codeWithoutCheck.length; i++) {
     const digit = parseInt(codeWithoutCheck[i]);
-    const weight = (i % 2 === 0) ? 3 : 1; // Alternate 3-1 weights
+    const weight = i % 2 === 0 ? 3 : 1; // Alternate 3-1 weights
     sum += digit * weight;
   }
   const checkDigit = (10 - (sum % 10)) % 10;
-  
+
   return codeWithoutCheck + checkDigit;
 }
 
@@ -125,14 +125,14 @@ function generateSSCC(
 function generateLPN(
   organizationId: string,
   format: LabelFormat,
-  prefix: string = 'LPN',
-  serialNumber: number
+  prefix: string = "LPN",
+  serialNumber: number,
 ): string {
   // Format: PREFIX-ORGCODE-YYYYMMDD-SERIAL
   const orgCode = organizationId.substring(0, 6).toUpperCase();
-  const date = new Date().toISOString().split('T')[0].replace(/-/g, '');
-  const serial = serialNumber.toString().padStart(6, '0');
-  
+  const date = new Date().toISOString().split("T")[0].replace(/-/g, "");
+  const serial = serialNumber.toString().padStart(6, "0");
+
   return `${prefix}-${orgCode}-${date}-${serial}`;
 }
 
@@ -141,7 +141,7 @@ function generateCheckDigit(code: string): string {
   let sum = 0;
   for (let i = 0; i < code.length; i++) {
     const digit = parseInt(code[i]);
-    const weight = (i % 2 === 0) ? 3 : 1;
+    const weight = i % 2 === 0 ? 3 : 1;
     sum += digit * weight;
   }
   return ((10 - (sum % 10)) % 10).toString();
@@ -151,7 +151,7 @@ function generateCheckDigit(code: string): string {
 function generateBarcodeData(
   labelNumber: string,
   format: LabelFormat,
-  metadata: any
+  metadata: any,
 ): {
   barcodeType: string;
   data: string;
@@ -161,28 +161,28 @@ function generateBarcodeData(
   let barcodeType: string;
   let data: string;
   let humanReadable: string;
-  
-  if (format === 'SSCC') {
-    barcodeType = 'GS1-128';
+
+  if (format === "SSCC") {
+    barcodeType = "GS1-128";
     data = `(00)${labelNumber}`; // Application Identifier 00 = SSCC
     humanReadable = `SSCC: ${labelNumber}`;
   } else {
-    barcodeType = 'CODE128';
+    barcodeType = "CODE128";
     data = labelNumber;
     humanReadable = `LPN: ${labelNumber}`;
   }
-  
+
   // Generate ZPL code for Zebra printers
   const zplCode = `
 ^XA
 ^FO50,50^A0N,40,40^FD${humanReadable}^FS
 ^FO50,120^BY3^BCN,100,Y,N,N^FD${data}^FS
 ^FO50,250^A0N,25,25^FDReceived: ${new Date().toLocaleDateString()}^FS
-^FO50,290^A0N,25,25^FDItem: ${metadata.itemSKU || 'N/A'}^FS
-^FO50,330^A0N,25,25^FDQty: ${metadata.quantity || 'N/A'}^FS
+^FO50,290^A0N,25,25^FDItem: ${metadata.itemSKU || "N/A"}^FS
+^FO50,330^A0N,25,25^FDQty: ${metadata.quantity || "N/A"}^FS
 ^XZ
 `.trim();
-  
+
   return {
     barcodeType,
     data,
@@ -194,7 +194,7 @@ function generateBarcodeData(
 // Generate labels
 async function generateLabels(
   session: any,
-  data: z.infer<typeof generateLabelsSchema>
+  data: z.infer<typeof generateLabelsSchema>,
 ) {
   // Get next serial number for organization
   const lastLabel = await prisma.licenseLabel.findFirst({
@@ -203,7 +203,7 @@ async function generateLabels(
       format: data.format,
     },
     orderBy: {
-      serialNumber: 'desc',
+      serialNumber: "desc",
     },
   });
 
@@ -219,7 +219,7 @@ async function generateLabels(
   });
 
   if (!receiving) {
-    throw new Error('Receiving record not found');
+    throw new Error("Receiving record not found");
   }
 
   // Generate batch of labels
@@ -227,9 +227,9 @@ async function generateLabels(
     const serialNumber = startSerial + i;
     let labelNumber: string;
 
-    if (data.format === 'SSCC') {
+    if (data.format === "SSCC") {
       // Use organization's GS1 Company Prefix (would be in settings)
-      const companyPrefix = '1234567'; // Would come from org settings
+      const companyPrefix = "1234567"; // Would come from org settings
       labelNumber = generateSSCC(companyPrefix, serialNumber);
     } else {
       const prefix = data.prefix || data.format;
@@ -237,7 +237,7 @@ async function generateLabels(
         session.user.organizationId,
         data.format,
         prefix,
-        serialNumber
+        serialNumber,
       );
     }
 
@@ -253,8 +253,8 @@ async function generateLabels(
       labelNumber,
       format: data.format,
       serialNumber,
-      status: 'PENDING',
-      priority: data.priority || 'NORMAL',
+      status: "PENDING",
+      priority: data.priority || "NORMAL",
       barcodeType: barcodeData.barcodeType,
       barcodeData: barcodeData.data,
       zplCode: barcodeData.zplCode,
@@ -282,7 +282,7 @@ async function generateLabels(
         lt: startSerial + data.quantity,
       },
     },
-    orderBy: { serialNumber: 'asc' },
+    orderBy: { serialNumber: "asc" },
   });
 
   // Log activity
@@ -290,9 +290,9 @@ async function generateLabels(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'LICENSE_LABELS_GENERATED',
-      entityType: 'LICENSE_LABEL',
-      entityId: createdLabels[0]?.id || '',
+      action: "LICENSE_LABELS_GENERATED",
+      entityType: "LICENSE_LABEL",
+      entityId: createdLabels[0]?.id || "",
       metadata: {
         receivingId: data.receivingId,
         format: data.format,
@@ -313,7 +313,7 @@ async function generateLabels(
 // Print labels
 async function printLabels(
   session: any,
-  data: z.infer<typeof printLabelsSchema>
+  data: z.infer<typeof printLabelsSchema>,
 ) {
   const copies = data.copies || 1;
 
@@ -322,12 +322,12 @@ async function printLabels(
     where: {
       id: { in: data.labelIds },
       organizationId: session.user.organizationId,
-      status: 'PENDING',
+      status: "PENDING",
     },
   });
 
   if (labels.length === 0) {
-    throw new Error('No printable labels found');
+    throw new Error("No printable labels found");
   }
 
   // Create print job
@@ -337,7 +337,7 @@ async function printLabels(
       printerId: data.printerId,
       labelCount: labels.length,
       copies,
-      status: 'QUEUED',
+      status: "QUEUED",
       queuedAt: new Date(),
     },
   });
@@ -348,7 +348,7 @@ async function printLabels(
       id: { in: data.labelIds },
     },
     data: {
-      status: 'PRINTED',
+      status: "PRINTED",
       printJobId: printJob.id,
       printedAt: new Date(),
     },
@@ -359,7 +359,7 @@ async function printLabels(
   await prisma.labelPrintJob.update({
     where: { id: printJob.id },
     data: {
-      status: 'COMPLETED',
+      status: "COMPLETED",
       completedAt: new Date(),
     },
   });
@@ -369,8 +369,8 @@ async function printLabels(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'LABELS_PRINTED',
-      entityType: 'LABEL_PRINT_JOB',
+      action: "LABELS_PRINTED",
+      entityType: "LABEL_PRINT_JOB",
       entityId: printJob.id,
       metadata: {
         labelCount: labels.length,
@@ -391,7 +391,7 @@ async function printLabels(
 // Apply label to container
 async function applyLabel(
   session: any,
-  data: z.infer<typeof applyLabelSchema>
+  data: z.infer<typeof applyLabelSchema>,
 ) {
   const label = await prisma.licenseLabel.update({
     where: {
@@ -399,7 +399,7 @@ async function applyLabel(
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'APPLIED',
+      status: "APPLIED",
       containerId: data.containerId,
       palletId: data.palletId,
       location: data.location,
@@ -413,8 +413,8 @@ async function applyLabel(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'LABEL_APPLIED',
-      entityType: 'LICENSE_LABEL',
+      action: "LABEL_APPLIED",
+      entityType: "LICENSE_LABEL",
       entityId: data.labelId,
       metadata: {
         labelNumber: label.labelNumber,
@@ -426,22 +426,19 @@ async function applyLabel(
   return {
     success: true,
     label,
-    message: 'Label applied successfully',
+    message: "Label applied successfully",
   };
 }
 
 // Void label
-async function voidLabel(
-  session: any,
-  data: z.infer<typeof voidLabelSchema>
-) {
+async function voidLabel(session: any, data: z.infer<typeof voidLabelSchema>) {
   const label = await prisma.licenseLabel.update({
     where: {
       id: data.labelId,
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'VOIDED',
+      status: "VOIDED",
       voidedAt: new Date(),
       voidReason: data.reason,
     },
@@ -452,8 +449,8 @@ async function voidLabel(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'LABEL_VOIDED',
-      entityType: 'LICENSE_LABEL',
+      action: "LABEL_VOIDED",
+      entityType: "LICENSE_LABEL",
       entityId: data.labelId,
       metadata: {
         labelNumber: label.labelNumber,
@@ -465,14 +462,14 @@ async function voidLabel(
   return {
     success: true,
     label,
-    message: 'Label voided',
+    message: "Label voided",
   };
 }
 
 // Reprint label
 async function reprintLabel(
   session: any,
-  data: z.infer<typeof reprintLabelSchema>
+  data: z.infer<typeof reprintLabelSchema>,
 ) {
   // Get original label
   const original = await prisma.licenseLabel.findUnique({
@@ -483,7 +480,7 @@ async function reprintLabel(
   });
 
   if (!original) {
-    throw new Error('Original label not found');
+    throw new Error("Original label not found");
   }
 
   // Create new label with same number
@@ -494,8 +491,8 @@ async function reprintLabel(
       labelNumber: original.labelNumber,
       format: original.format,
       serialNumber: original.serialNumber,
-      status: 'PENDING',
-      priority: 'HIGH', // Reprints are high priority
+      status: "PENDING",
+      priority: "HIGH", // Reprints are high priority
       barcodeType: original.barcodeType,
       barcodeData: original.barcodeData,
       zplCode: original.zplCode,
@@ -509,11 +506,11 @@ async function reprintLabel(
   });
 
   // Void original if it was printed/applied
-  if (original.status === 'PRINTED' || original.status === 'APPLIED') {
+  if (original.status === "PRINTED" || original.status === "APPLIED") {
     await prisma.licenseLabel.update({
       where: { id: data.originalLabelId },
       data: {
-        status: 'VOIDED',
+        status: "VOIDED",
         voidedAt: new Date(),
         voidReason: `Reprinted: ${data.reason}`,
       },
@@ -525,8 +522,8 @@ async function reprintLabel(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'LABEL_REPRINTED',
-      entityType: 'LICENSE_LABEL',
+      action: "LABEL_REPRINTED",
+      entityType: "LICENSE_LABEL",
       entityId: newLabel.id,
       metadata: {
         originalLabelId: data.originalLabelId,
@@ -539,7 +536,7 @@ async function reprintLabel(
   return {
     success: true,
     label: newLabel,
-    message: 'Reprint label created',
+    message: "Reprint label created",
   };
 }
 
@@ -548,15 +545,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get statistics
-    if (action === 'stats') {
-      const stats = await prisma.$queryRaw`
+    if (action === "stats") {
+      const stats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalLabels",
           COUNT(CASE WHEN status = 'PRINTED' THEN 1 END)::int as "printedLabels",
@@ -566,20 +563,23 @@ export async function GET(request: NextRequest) {
         FROM "LicenseLabel"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const printJobStats = await prisma.$queryRaw`
+      const printJobStats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalPrintJobs",
           COALESCE(SUM("labelCount"), 0)::int as "totalLabelsPrinted"
         FROM "LabelPrintJob"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const accuracy = stats[0].totalLabels > 0
-        ? ((stats[0].totalLabels - stats[0].voidedLabels) / stats[0].totalLabels) * 100
-        : 99.9;
+      const accuracy =
+        stats[0].totalLabels > 0
+          ? ((stats[0].totalLabels - stats[0].voidedLabels) /
+              stats[0].totalLabels) *
+            100
+          : 99.9;
 
       const monthlySavings = 9000; // Based on ROI calculation
 
@@ -595,11 +595,11 @@ export async function GET(request: NextRequest) {
     }
 
     // Get pending labels
-    if (action === 'pending-labels') {
+    if (action === "pending-labels") {
       const labels = await prisma.licenseLabel.findMany({
         where: {
           organizationId: session.user.organizationId,
-          status: 'PENDING',
+          status: "PENDING",
         },
         include: {
           receiving: {
@@ -608,10 +608,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: [
-          { priority: 'desc' },
-          { createdAt: 'asc' },
-        ],
+        orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
         take: 100,
       });
 
@@ -619,7 +616,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent labels
-    if (action === 'recent-labels') {
+    if (action === "recent-labels") {
       const labels = await prisma.licenseLabel.findMany({
         where: {
           organizationId: session.user.organizationId,
@@ -631,19 +628,19 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 50,
       });
 
       return NextResponse.json({ labels });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('License label GET error:', error);
+    console.error("License label GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve label data' },
-      { status: 500 }
+      { error: "Failed to retrieve label data" },
+      { status: 500 },
     );
   }
 }
@@ -653,43 +650,43 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'generate_labels':
+      case "generate_labels":
         return NextResponse.json(await generateLabels(session, data));
 
-      case 'print_labels':
+      case "print_labels":
         return NextResponse.json(await printLabels(session, data));
 
-      case 'apply_label':
+      case "apply_label":
         return NextResponse.json(await applyLabel(session, data));
 
-      case 'void_label':
+      case "void_label":
         return NextResponse.json(await voidLabel(session, data));
 
-      case 'reprint_label':
+      case "reprint_label":
         return NextResponse.json(await reprintLabel(session, data));
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('License label POST error:', error);
+    console.error("License label POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process label operation' },
-      { status: 500 }
+      { error: "Failed to process label operation" },
+      { status: 500 },
     );
   }
 }

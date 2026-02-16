@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           session.user.organizationId,
           session.user.id,
           validatedData.transcript,
-          validatedData.context
+          validatedData.context,
         );
         break;
 
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         response = await handleAddAction(
           session.user.organizationId,
           validatedData.capaId!,
-          validatedData.transcript
+          validatedData.transcript,
         );
         break;
 
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         response = await handleUpdateStatus(
           session.user.organizationId,
           validatedData.capaId!,
-          validatedData.transcript
+          validatedData.transcript,
         );
         break;
 
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         response = await handle5WhysInterview(
           session.user.organizationId,
           validatedData.capaId!,
-          validatedData.transcript
+          validatedData.transcript,
         );
         break;
 
@@ -88,22 +88,19 @@ export async function POST(request: NextRequest) {
           session.user.organizationId,
           session.user.id,
           validatedData.capaId!,
-          validatedData.transcript
+          validatedData.transcript,
         );
         break;
 
       case "SEARCH_CAPA":
         response = await handleSearchCAPA(
           session.user.organizationId,
-          validatedData.transcript
+          validatedData.transcript,
         );
         break;
 
       default:
-        return NextResponse.json(
-          { error: "Unknown command" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Unknown command" }, { status: 400 });
     }
 
     return NextResponse.json(response);
@@ -111,13 +108,13 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error processing voice command:", error);
     return NextResponse.json(
       { error: "Failed to process voice command" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -129,7 +126,7 @@ async function handleCreateCAPA(
   organizationId: string,
   userId: string,
   transcript: string,
-  context?: any
+  context?: any,
 ) {
   // Parse natural language into structured CAPA data
   const parsed = parseVoiceCAPA(transcript, context);
@@ -165,7 +162,7 @@ async function handleCreateCAPA(
       priority: parsed.severity === "CRITICAL" ? "HIGH" : "MEDIUM",
       status: "OPEN",
       createdBy: userId,
-      notes: `Voice Created. Transcript: ${transcript}. Location: ${context?.location || 'N/A'}. Equipment: ${context?.equipment || 'N/A'}`,
+      notes: `Voice Created. Transcript: ${transcript}. Location: ${context?.location || "N/A"}. Equipment: ${context?.equipment || "N/A"}`,
     },
   });
 
@@ -198,7 +195,7 @@ async function handleCreateCAPA(
 async function handleAddAction(
   organizationId: string,
   capaId: string,
-  transcript: string
+  transcript: string,
 ) {
   // Parse action from transcript
   const action = {
@@ -245,7 +242,7 @@ async function handleAddAction(
 async function handle5WhysInterview(
   organizationId: string,
   capaId: string,
-  transcript: string
+  transcript: string,
 ) {
   const capa = await prisma.correctivePreventiveAction.findUnique({
     where: { id: capaId, organizationId },
@@ -318,7 +315,7 @@ async function handle5WhysInterview(
 async function handleUpdateStatus(
   organizationId: string,
   capaId: string,
-  transcript: string
+  transcript: string,
 ) {
   const status = extractStatus(transcript);
 
@@ -356,7 +353,7 @@ async function handleVoiceVerification(
   organizationId: string,
   userId: string,
   capaId: string,
-  transcript: string
+  transcript: string,
 ) {
   // Parse verification result from transcript
   const verification = parseVerification(transcript);
@@ -441,11 +438,20 @@ function parseVoiceCAPA(transcript: string, context?: any) {
 
   // Detect severity
   let severity: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" = "MEDIUM";
-  if (lowerTranscript.includes("critical") || lowerTranscript.includes("urgent")) {
+  if (
+    lowerTranscript.includes("critical") ||
+    lowerTranscript.includes("urgent")
+  ) {
     severity = "CRITICAL";
-  } else if (lowerTranscript.includes("high") || lowerTranscript.includes("serious")) {
+  } else if (
+    lowerTranscript.includes("high") ||
+    lowerTranscript.includes("serious")
+  ) {
     severity = "HIGH";
-  } else if (lowerTranscript.includes("low") || lowerTranscript.includes("minor")) {
+  } else if (
+    lowerTranscript.includes("low") ||
+    lowerTranscript.includes("minor")
+  ) {
     severity = "LOW";
   }
 
@@ -509,13 +515,14 @@ function generateNextWhy(whys: any[]): string {
  * Extract status from transcript
  */
 function extractStatus(
-  transcript: string
+  transcript: string,
 ): "OPEN" | "IN_PROGRESS" | "UNDER_REVIEW" | "CLOSED" | null {
   const lower = transcript.toLowerCase();
 
   if (lower.includes("close") || lower.includes("complete")) return "CLOSED";
   if (lower.includes("review")) return "UNDER_REVIEW";
-  if (lower.includes("progress") || lower.includes("working")) return "IN_PROGRESS";
+  if (lower.includes("progress") || lower.includes("working"))
+    return "IN_PROGRESS";
   if (lower.includes("open") || lower.includes("start")) return "OPEN";
 
   return null;

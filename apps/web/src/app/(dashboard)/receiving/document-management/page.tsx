@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function DocumentManagementPage() {
   const [stats, setStats] = useState<any>(null);
@@ -22,9 +22,9 @@ export default function DocumentManagementPage() {
     setLoading(true);
     try {
       const [statsRes, requestsRes, incompleteRes] = await Promise.all([
-        fetch('/api/receiving/document-management?action=stats'),
-        fetch('/api/receiving/document-management?action=requests'),
-        fetch('/api/receiving/document-management?action=incomplete-shipments'),
+        fetch("/api/receiving/document-management?action=stats"),
+        fetch("/api/receiving/document-management?action=requests"),
+        fetch("/api/receiving/document-management?action=incomplete-shipments"),
       ]);
 
       const statsData = await statsRes.json();
@@ -35,7 +35,7 @@ export default function DocumentManagementPage() {
       setRequests(requestsData.requests || []);
       setIncompleteShipments(incompleteData.shipments || []);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     }
     setLoading(false);
   };
@@ -43,51 +43,51 @@ export default function DocumentManagementPage() {
   const fetchShipmentDocuments = async (shipmentId: string) => {
     try {
       const res = await fetch(
-        `/api/receiving/document-management?action=documents&receivingRecordId=${shipmentId}`
+        `/api/receiving/document-management?action=documents&receivingRecordId=${shipmentId}`,
       );
       const data = await res.json();
       setDocuments(data.documents || []);
       setSelectedShipment(shipmentId);
     } catch (error) {
-      console.error('Failed to fetch documents:', error);
+      console.error("Failed to fetch documents:", error);
     }
   };
 
   const getDocumentTypeIcon = (type: string) => {
     const icons: Record<string, string> = {
-      PACKING_SLIP: '📋',
-      BOL: '🚚',
-      INVOICE: '💰',
-      COA: '✅',
-      MSDS: '⚗️',
-      PHOTO: '📸',
-      SIGNATURE: '✍️',
-      INSPECTION_REPORT: '🔍',
-      CUSTOMS_DECLARATION: '🛂',
-      TEMPERATURE_LOG: '🌡️',
-      OTHER: '📄',
+      PACKING_SLIP: "📋",
+      BOL: "🚚",
+      INVOICE: "💰",
+      COA: "✅",
+      MSDS: "⚗️",
+      PHOTO: "📸",
+      SIGNATURE: "✍️",
+      INSPECTION_REPORT: "🔍",
+      CUSTOMS_DECLARATION: "🛂",
+      TEMPERATURE_LOG: "🌡️",
+      OTHER: "📄",
     };
-    return icons[type] || '📄';
+    return icons[type] || "📄";
   };
 
   const getDocumentTypeName = (type: string) => {
-    return type.replace(/_/g, ' ');
+    return type.replace(/_/g, " ");
   };
 
   const getUrgencyBadge = (urgency: string) => {
     const badges: Record<string, string> = {
-      URGENT: 'bg-red-100 text-red-800',
-      HIGH: 'bg-orange-100 text-orange-800',
-      NORMAL: 'bg-blue-100 text-blue-800',
-      LOW: 'bg-gray-100 text-gray-800',
+      URGENT: "bg-red-100 text-red-800",
+      HIGH: "bg-orange-100 text-orange-800",
+      NORMAL: "bg-blue-100 text-blue-800",
+      LOW: "bg-gray-100 text-gray-800",
     };
-    return badges[urgency] || 'bg-gray-100 text-gray-800';
+    return badges[urgency] || "bg-gray-100 text-gray-800";
   };
 
   const getCompletenessColor = (score: number) => {
-    if (score >= 90) return 'text-green-600';
-    if (score >= 70) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 90) return "text-green-600";
+    if (score >= 70) return "text-yellow-600";
+    return "text-red-600";
   };
 
   if (loading) {
@@ -210,7 +210,7 @@ export default function DocumentManagementPage() {
                       <div className="text-right">
                         <div
                           className={`text-3xl font-bold ${getCompletenessColor(
-                            shipment.completeness.score
+                            shipment.completeness.score,
                           )}`}
                         >
                           {shipment.completeness.score}%
@@ -226,8 +226,11 @@ export default function DocumentManagementPage() {
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {shipment.completeness.missing.map((type: string) => (
-                            <Badge key={type} className="bg-red-100 text-red-800">
-                              {getDocumentTypeIcon(type)}{' '}
+                            <Badge
+                              key={type}
+                              className="bg-red-100 text-red-800"
+                            >
+                              {getDocumentTypeIcon(type)}{" "}
                               {getDocumentTypeName(type)}
                             </Badge>
                           ))}
@@ -241,15 +244,17 @@ export default function DocumentManagementPage() {
                           Missing Optional Documents:
                         </div>
                         <div className="flex flex-wrap gap-2">
-                          {shipment.completeness.optional.map((type: string) => (
-                            <Badge
-                              key={type}
-                              className="bg-yellow-100 text-yellow-800"
-                            >
-                              {getDocumentTypeIcon(type)}{' '}
-                              {getDocumentTypeName(type)}
-                            </Badge>
-                          ))}
+                          {shipment.completeness.optional.map(
+                            (type: string) => (
+                              <Badge
+                                key={type}
+                                className="bg-yellow-100 text-yellow-800"
+                              >
+                                {getDocumentTypeIcon(type)}{" "}
+                                {getDocumentTypeName(type)}
+                              </Badge>
+                            ),
+                          )}
                         </div>
                       </div>
                     )}
@@ -311,7 +316,7 @@ export default function DocumentManagementPage() {
                         <td className="px-4 py-3">
                           <div className="font-medium">
                             {request.receivingRecord?.supplier?.name ||
-                              'Unknown'}
+                              "Unknown"}
                           </div>
                         </td>
                         <td className="px-4 py-3">
@@ -333,7 +338,7 @@ export default function DocumentManagementPage() {
                           {request.notes}
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          {request.requestedByUser?.name || 'Unknown'}
+                          {request.requestedByUser?.name || "Unknown"}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           {new Date(request.createdAt).toLocaleDateString()}
@@ -441,7 +446,10 @@ export default function DocumentManagementPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {stats?.byType &&
                   Object.entries(stats.byType).map(([type, count]: any) => (
-                    <div key={type} className="bg-gray-50 rounded p-3 text-center">
+                    <div
+                      key={type}
+                      className="bg-gray-50 rounded p-3 text-center"
+                    >
                       <div className="text-2xl mb-1">
                         {getDocumentTypeIcon(type)}
                       </div>

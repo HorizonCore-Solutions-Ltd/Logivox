@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   FileText,
   CheckCircle,
@@ -14,8 +20,8 @@ import {
   Package,
   DollarSign,
   Clock,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+} from "lucide-react";
 
 // ============================================================================
 // ASN PROCESSING DASHBOARD
@@ -84,9 +90,11 @@ interface ASNDiscrepancy {
 export default function ASNProcessingPage() {
   const [stats, setStats] = useState<ASNStats | null>(null);
   const [incomingASNs, setIncomingASNs] = useState<IncomingASN[]>([]);
-  const [recentDiscrepancies, setRecentDiscrepancies] = useState<ASNDiscrepancy[]>([]);
+  const [recentDiscrepancies, setRecentDiscrepancies] = useState<
+    ASNDiscrepancy[]
+  >([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch data
   useEffect(() => {
@@ -98,9 +106,9 @@ export default function ASNProcessingPage() {
   const fetchData = async () => {
     try {
       const [statsRes, asnsRes, discrepanciesRes] = await Promise.all([
-        fetch('/api/receiving/asn-processing?action=stats'),
-        fetch('/api/receiving/asn-processing?action=incoming-asns'),
-        fetch('/api/receiving/asn-processing?action=recent-discrepancies')
+        fetch("/api/receiving/asn-processing?action=stats"),
+        fetch("/api/receiving/asn-processing?action=incoming-asns"),
+        fetch("/api/receiving/asn-processing?action=recent-discrepancies"),
       ]);
 
       if (statsRes.ok) {
@@ -118,7 +126,7 @@ export default function ASNProcessingPage() {
         setRecentDiscrepancies(data.discrepancies || []);
       }
     } catch (error) {
-      console.error('Failed to fetch ASN data:', error);
+      console.error("Failed to fetch ASN data:", error);
     } finally {
       setLoading(false);
     }
@@ -126,20 +134,31 @@ export default function ASNProcessingPage() {
 
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'COMPLETED': return 'text-green-600';
-      case 'SCHEDULED': return 'text-blue-600';
-      case 'IN_TRANSIT': return 'text-yellow-600';
-      case 'DISCREPANCY': return 'text-red-600';
-      default: return 'text-gray-600';
+      case "COMPLETED":
+        return "text-green-600";
+      case "SCHEDULED":
+        return "text-blue-600";
+      case "IN_TRANSIT":
+        return "text-yellow-600";
+      case "DISCREPANCY":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
     }
   };
 
-  const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getStatusBadgeVariant = (
+    status: string,
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
-      case 'COMPLETED': return 'default';
-      case 'SCHEDULED': return 'secondary';
-      case 'DISCREPANCY': return 'destructive';
-      default: return 'outline';
+      case "COMPLETED":
+        return "default";
+      case "SCHEDULED":
+        return "secondary";
+      case "DISCREPANCY":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
@@ -167,9 +186,7 @@ export default function ASNProcessingPage() {
             Advanced Ship Notice (EDI 856) processing and dock scheduling
           </p>
         </div>
-        <Button onClick={fetchData}>
-          Refresh Data
-        </Button>
+        <Button onClick={fetchData}>Refresh Data</Button>
       </div>
 
       {/* Key Metrics */}
@@ -177,7 +194,9 @@ export default function ASNProcessingPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Validation Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Validation Rate
+              </CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -195,16 +214,16 @@ export default function ASNProcessingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">ASNs Processed</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                ASNs Processed
+              </CardTitle>
               <BarChart3 className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
                 {stats.totalASNs.toLocaleString()}
               </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Last 30 days
-              </p>
+              <p className="text-xs text-muted-foreground mt-1">Last 30 days</p>
               <div className="text-xs text-muted-foreground mt-2">
                 {stats.totalItems.toLocaleString()} items
               </div>
@@ -213,7 +232,9 @@ export default function ASNProcessingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Check-in Time</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Check-in Time
+              </CardTitle>
               <Clock className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -231,7 +252,9 @@ export default function ASNProcessingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Monthly Savings
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -309,7 +332,9 @@ export default function ASNProcessingPage() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Check-in Time:</span>
-                        <span className="font-medium">{stats.averageCheckInTime} min</span>
+                        <span className="font-medium">
+                          {stats.averageCheckInTime} min
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -324,9 +349,7 @@ export default function ASNProcessingPage() {
                   <FileText className="h-5 w-5" />
                   Supported Formats
                 </CardTitle>
-                <CardDescription>
-                  ASN data format compatibility
-                </CardDescription>
+                <CardDescription>ASN data format compatibility</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -380,9 +403,7 @@ export default function ASNProcessingPage() {
                   <CheckCircle className="h-5 w-5" />
                   System Features
                 </CardTitle>
-                <CardDescription>
-                  Key capabilities and benefits
-                </CardDescription>
+                <CardDescription>Key capabilities and benefits</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-4">
@@ -417,7 +438,9 @@ export default function ASNProcessingPage() {
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
-                        <div className="font-medium">Pre-Receiving Planning</div>
+                        <div className="font-medium">
+                          Pre-Receiving Planning
+                        </div>
                         <div className="text-sm text-muted-foreground">
                           Plan inventory before arrival
                         </div>
@@ -486,17 +509,16 @@ export default function ASNProcessingPage() {
                   </div>
                 ) : (
                   incomingASNs.slice(0, 20).map((asn) => (
-                    <div 
+                    <div
                       key={asn.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-start justify-between mb-3">
                         <div>
-                          <div className="font-medium">
-                            ASN: {asn.asnId}
-                          </div>
+                          <div className="font-medium">ASN: {asn.asnId}</div>
                           <div className="text-sm text-muted-foreground">
-                            Shipment: {asn.shipmentId} • Supplier: {asn.supplier}
+                            Shipment: {asn.shipmentId} • Supplier:{" "}
+                            {asn.supplier}
                           </div>
                         </div>
                         <Badge variant={getStatusBadgeVariant(asn.status)}>
@@ -506,23 +528,32 @@ export default function ASNProcessingPage() {
 
                       <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
-                          <span className="text-muted-foreground">Dock Door:</span>
+                          <span className="text-muted-foreground">
+                            Dock Door:
+                          </span>
                           <div className="font-medium">Door {asn.dockDoor}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Arrival:</span>
+                          <span className="text-muted-foreground">
+                            Arrival:
+                          </span>
                           <div className="font-medium">
                             {new Date(asn.scheduledArrival).toLocaleString()}
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Carrier:</span>
+                          <span className="text-muted-foreground">
+                            Carrier:
+                          </span>
                           <div className="font-medium">{asn.carrier}</div>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Items:</span>
                           <div className="font-medium">
-                            {asn.items.reduce((sum, item) => sum + item.quantity, 0)}
+                            {asn.items.reduce(
+                              (sum, item) => sum + item.quantity,
+                              0,
+                            )}
                           </div>
                         </div>
                       </div>
@@ -559,11 +590,13 @@ export default function ASNProcessingPage() {
                   <div className="text-center py-8 text-muted-foreground">
                     <CheckCircle className="h-12 w-12 mx-auto mb-3 opacity-50 text-green-600" />
                     <p>No recent discrepancies</p>
-                    <p className="text-xs mt-1">All ASNs validated successfully</p>
+                    <p className="text-xs mt-1">
+                      All ASNs validated successfully
+                    </p>
                   </div>
                 ) : (
                   recentDiscrepancies.slice(0, 20).map((disc) => (
-                    <div 
+                    <div
                       key={disc.id}
                       className="p-4 border border-red-200 bg-red-50 rounded-lg"
                     >
@@ -571,7 +604,9 @@ export default function ASNProcessingPage() {
                         <div className="flex items-start gap-2">
                           <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
                           <div>
-                            <div className="font-medium">{disc.type.replace(/_/g, ' ')}</div>
+                            <div className="font-medium">
+                              {disc.type.replace(/_/g, " ")}
+                            </div>
                             <div className="text-sm text-muted-foreground">
                               ASN: {disc.asnId}
                             </div>
@@ -583,15 +618,30 @@ export default function ASNProcessingPage() {
                       </div>
 
                       <div className="mt-3 pt-3 border-t border-red-200">
-                        <div className="text-sm text-muted-foreground mb-2">{disc.details}</div>
+                        <div className="text-sm text-muted-foreground mb-2">
+                          {disc.details}
+                        </div>
                         <div className="space-y-1">
                           {disc.affectedItems.map((item, idx) => (
-                            <div key={idx} className="text-sm flex justify-between">
+                            <div
+                              key={idx}
+                              className="text-sm flex justify-between"
+                            >
                               <span className="font-medium">{item.sku}</span>
                               <span>
-                                Expected: {item.expectedQty} • Actual: {item.actualQty} • 
-                                Variance: <span className={item.actualQty < item.expectedQty ? 'text-red-600' : 'text-yellow-600'}>
-                                  {item.actualQty - item.expectedQty > 0 ? '+' : ''}{item.actualQty - item.expectedQty}
+                                Expected: {item.expectedQty} • Actual:{" "}
+                                {item.actualQty} • Variance:{" "}
+                                <span
+                                  className={
+                                    item.actualQty < item.expectedQty
+                                      ? "text-red-600"
+                                      : "text-yellow-600"
+                                  }
+                                >
+                                  {item.actualQty - item.expectedQty > 0
+                                    ? "+"
+                                    : ""}
+                                  {item.actualQty - item.expectedQty}
                                 </span>
                               </span>
                             </div>

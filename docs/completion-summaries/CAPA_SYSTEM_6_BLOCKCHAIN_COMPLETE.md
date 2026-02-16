@@ -21,6 +21,7 @@ Successfully implemented **Blockchain-Based Audit Trail** providing immutable CA
 ## System Overview
 
 Creates an immutable blockchain record for every CAPA action, where each "block" contains:
+
 - Cryptographic hash (SHA-256)
 - Previous block hash (chain linkage)
 - Timestamp, user, action type
@@ -35,7 +36,7 @@ Any tampering breaks the chain and is immediately detected during integrity veri
 
 - **Blockchain Infrastructure:** $68,000
 - **Cryptography Implementation:** $42,000
-- **FDA Compliance Features:** $28,000  
+- **FDA Compliance Features:** $28,000
 - **UI/UX Development:** $18,000
 - **Total:** $156,000
 
@@ -65,14 +66,17 @@ Any tampering breaks the chain and is immediately detected during integrity veri
 ### Files Created (3 Files, 766 Lines)
 
 #### 1. `/app/api/capa/blockchain/route.ts` (360 lines)
+
 **Blockchain API for immutable audit trails**
 
 **GET /api/capa/blockchain?capaId={id}&verify=true**
+
 - Retrieves complete blockchain for a CAPA
 - Optional integrity verification
 - Returns compliance metrics
 
 **Response:**
+
 ```json
 {
   "blockchain": [
@@ -100,11 +104,13 @@ Any tampering breaks the chain and is immediately detected during integrity veri
 ```
 
 **POST /api/capa/blockchain**
+
 - Adds new block to blockchain
 - Body: `{ capaId, action, data, signature? }`
 - Automatically links to previous block
 
 **Key Features:**
+
 - **SHA-256 Hashing:** Cryptographic integrity
 - **Chain Validation:** Detects broken links
 - **Tamper Detection:** Identifies modified blocks
@@ -113,19 +119,23 @@ Any tampering breaks the chain and is immediately detected during integrity veri
 ---
 
 #### 2. `/app/capa/blockchain/[id]/page.tsx` (540 lines)
+
 **Blockchain Visualization Dashboard**
 
 **Integrity Status Card:**
+
 - ✅ Green: All blocks verified, chain intact
 - ❌ Red: Tampering detected, shows affected blocks
 
 **Compliance Metrics (4 Cards):**
+
 1. **FDA Compliance:** 0-100% based on required steps
 2. **Integrity Score:** % of verified blocks
 3. **Digital Signatures:** Count and percentage signed
 4. **Audit Participants:** Unique users in trail
 
 **FDA Requirements Checklist:**
+
 - ✅ Creation
 - ✅ Root Cause Analysis
 - ✅ Corrective Actions
@@ -133,6 +143,7 @@ Any tampering breaks the chain and is immediately detected during integrity veri
 - ✅ Closure
 
 **Blockchain Visualization:**
+
 - Visual chain with connecting lines
 - Each block shows: Index, Action, Timestamp, User, Hash
 - Color-coded: Blue (verified), Red (tampered)
@@ -140,15 +151,18 @@ Any tampering breaks the chain and is immediately detected during integrity veri
 - Hash chain linkage display
 
 **Actions:**
+
 - **Verify Integrity:** Runs full blockchain verification
 - **Export Audit Trail:** Downloads JSON with all blocks
 
 ---
 
 #### 3. `/lib/services/capa-blockchain-service.ts` (406 lines)
+
 **Service layer for blockchain integration**
 
 **Methods:**
+
 - `createCAPA()` - Creates CAPA + genesis block
 - `updateCAPA()` - Updates CAPA + adds blockchain record
 - `addAction()` - Adds action + blockchain record
@@ -157,14 +171,16 @@ Any tampering breaks the chain and is immediately detected during integrity veri
 - `closeCAPA()` - Closes CAPA + final blockchain record
 
 **Helper Methods:**
+
 - `addBlockchainRecord()` - Internal block creation
 - `generateHash()` - SHA-256 hash generation
 - `verifyBlockchain()` - Chain integrity verification
 - `exportBlockchain()` - Full audit trail export
 
 **Usage Example:**
+
 ```typescript
-import { CAPABlockchainService } from '@/lib/services/capa-blockchain-service';
+import { CAPABlockchainService } from "@/lib/services/capa-blockchain-service";
 
 // Create CAPA with blockchain
 const capa = await CAPABlockchainService.createCAPA(
@@ -175,7 +191,7 @@ const capa = await CAPABlockchainService.createCAPA(
     problemStatement: "Defective welds",
     // ... other fields
   },
-  { enabled: true, signature: userSignature }
+  { enabled: true, signature: userSignature },
 );
 
 // Add action with blockchain record
@@ -187,14 +203,14 @@ await CAPABlockchainService.addAction(
   {
     description: "Retrain welders",
     assignedTo: "john.doe@example.com",
-    targetDate: "2026-01-15"
-  }
+    targetDate: "2026-01-15",
+  },
 );
 
 // Verify blockchain integrity
 const verification = await CAPABlockchainService.verifyBlockchain(
   organizationId,
-  capaId
+  capaId,
 );
 // { isValid: true, tamperedBlocks: [], totalBlocks: 8 }
 ```
@@ -204,6 +220,7 @@ const verification = await CAPABlockchainService.verifyBlockchain(
 ## Blockchain Structure
 
 ### Block Format
+
 ```typescript
 {
   index: number,              // Sequential block number
@@ -221,21 +238,25 @@ const verification = await CAPABlockchainService.verifyBlockchain(
 ```
 
 ### Genesis Block
+
 First block uses special previous hash:
+
 ```
 "0000000000000000000000000000000000000000000000000000000000000000"
 ```
 
 ### Hash Calculation
+
 ```typescript
-SHA-256({
-  timestamp,
-  userId,
-  action,
-  entityId,
-  data,
-  previousHash
-})
+SHA -
+  256({
+    timestamp,
+    userId,
+    action,
+    entityId,
+    data,
+    previousHash,
+  });
 ```
 
 ---
@@ -245,6 +266,7 @@ SHA-256({
 ### Requirements Met
 
 **§11.10 Controls for closed systems:**
+
 - ✅ (a) Validation of systems - Blockchain integrity verification
 - ✅ (b) Ability to generate accurate copies - Export function
 - ✅ (c) Protection of records - Immutable blockchain
@@ -253,10 +275,12 @@ SHA-256({
 - ✅ (h) Use of device checks - IP/user agent logging
 
 **§11.50 Signature manifestations:**
+
 - ✅ Signed records display user name, timestamp, action
 - ✅ Digital signatures stored in blockchain metadata
 
 **§11.70 Signature/record linking:**
+
 - ✅ Signatures cryptographically linked to records
 - ✅ Cannot be removed or transferred
 
@@ -264,30 +288,33 @@ SHA-256({
 
 ## Performance Metrics
 
-| Metric | Target | Achieved |
-|--------|--------|----------|
-| Hash Generation Time | < 10ms | 3ms |
-| Blockchain Verification Time | < 500ms | 287ms |
-| Tamper Detection Rate | 100% | 100% |
-| False Positive Rate | 0% | 0% |
-| Audit Trail Export Time | < 2sec | 0.8sec |
+| Metric                       | Target  | Achieved |
+| ---------------------------- | ------- | -------- |
+| Hash Generation Time         | < 10ms  | 3ms      |
+| Blockchain Verification Time | < 500ms | 287ms    |
+| Tamper Detection Rate        | 100%    | 100%     |
+| False Positive Rate          | 0%      | 0%       |
+| Audit Trail Export Time      | < 2sec  | 0.8sec   |
 
 ---
 
 ## Security Features
 
 ### Cryptographic Integrity
+
 - **Algorithm:** SHA-256 (NIST approved)
 - **Hash Length:** 64 hexadecimal characters
 - **Collision Resistance:** 2^256 (effectively impossible)
 
 ### Tamper Detection
+
 - **Modified Block:** Hash won't match stored value
 - **Inserted Block:** Chain breaks (previousHash mismatch)
 - **Deleted Block:** Chain breaks at deletion point
 - **Reordered Blocks:** Chain breaks at reorder point
 
 ### Access Control
+
 - Multi-tenant organization isolation
 - Session-based authentication
 - User ID tracked for all actions
@@ -298,6 +325,7 @@ SHA-256({
 ## Compliance Reporting
 
 ### Audit Trail Export Format
+
 ```json
 {
   "capaNumber": "CAPA-000123",
@@ -320,6 +348,7 @@ SHA-256({
 ```
 
 ### Integrity Report
+
 ```json
 {
   "isValid": true,
@@ -336,7 +365,9 @@ SHA-256({
 ## Integration with Existing Systems
 
 ### Automatic Blockchain Creation
+
 Every CAPA action automatically creates blockchain record:
+
 - CAPA creation → Genesis block
 - RCA completion → RCA block
 - Action added → Action block
@@ -345,11 +376,13 @@ Every CAPA action automatically creates blockchain record:
 - Closure → Closure block
 
 ### Backward Compatibility
+
 - Existing CAPAs use ActivityLog as blockchain source
 - New CAPAs store hashes in ActivityLog metadata
 - No schema changes required
 
 ### Performance Impact
+
 - Minimal: 3ms overhead per action
 - Async hash calculation
 - No blocking operations
@@ -359,16 +392,19 @@ Every CAPA action automatically creates blockchain record:
 ## Future Enhancements
 
 ### Digital Signatures (Phase 2)
+
 - RSA-2048 public/private key pairs
 - Certificate authority integration
 - Signature verification UI
 
 ### Distributed Ledger (Phase 3)
+
 - Multi-node blockchain
 - Consensus mechanism
 - Geographic redundancy
 
 ### Smart Contracts (Phase 4)
+
 - Automated CAPA workflows
 - Rule-based actions
 - Self-executing compliance
@@ -388,6 +424,7 @@ Every CAPA action automatically creates blockchain record:
 ## Summary Statistics
 
 **System 6 Delivery:**
+
 - **Files Created:** 3
 - **Total Lines of Code:** 766
 - **API Endpoints:** 2 (GET, POST)
@@ -399,6 +436,7 @@ Every CAPA action automatically creates blockchain record:
 - **TypeScript Errors:** 0
 
 **Cumulative Progress (Systems 1-6):**
+
 - **Total Files:** 11
 - **Total Lines:** 4,198
 - **Total Investment:** $668,000
@@ -411,16 +449,19 @@ Every CAPA action automatically creates blockchain record:
 ## User Benefits
 
 ### For Quality Managers
+
 - Instant audit trail access
 - One-click compliance reports
 - Tamper-proof evidence
 
 ### For Auditors
+
 - Cryptographic verification
 - Complete action history
 - FDA-ready documentation
 
 ### For Executives
+
 - Reduced compliance risk
 - Faster FDA inspections
 - Legal protection

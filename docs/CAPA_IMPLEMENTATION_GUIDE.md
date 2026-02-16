@@ -15,6 +15,7 @@
 ## 🏗️ Systems Architecture
 
 ### Core Technology Stack
+
 - **Framework:** Next.js 14 (App Router)
 - **Language:** TypeScript (Strict Mode)
 - **Database:** PostgreSQL with Prisma ORM
@@ -23,7 +24,9 @@
 - **UI:** React 18 with Tailwind CSS
 
 ### Database Models Added
+
 20 new models across 18 systems:
+
 1. `CustomerImpact` - Customer impact tracking
 2. `CustomerNotification` - Notification logs
 3. `FinancialImpact` - Cost analysis
@@ -53,6 +56,7 @@
 ## 📊 All 18 Systems Overview
 
 ### System 1: CAPA Dashboard & Metrics
+
 - **Route:** `/capa/dashboard`
 - **Investment:** $67K → **Savings:** $580K → **ROI:** 866%
 - **Features:**
@@ -64,6 +68,7 @@
   - Executive summary reports
 
 ### System 2: Customer Impact Tracking
+
 - **Route:** `/capa/customer-impact`
 - **Investment:** $43K → **Savings:** $450K → **ROI:** 1,046%
 - **Features:**
@@ -75,6 +80,7 @@
   - Multi-customer support
 
 ### System 3: Financial Impact Tracking
+
 - **Route:** `/capa/financial-impact`
 - **Investment:** $56K → **Savings:** $620K → **ROI:** 1,107%
 - **Features:**
@@ -86,6 +92,7 @@
   - Financial approval workflows
 
 ### System 4: Root Cause Validation (5 Whys)
+
 - **Route:** `/capa/root-cause`
 - **Investment:** $38K → **Savings:** $320K → **ROI:** 842%
 - **Features:**
@@ -97,6 +104,7 @@
   - Best practice recommendations
 
 ### System 5: Repeat Defect Detection
+
 - **Route:** `/capa/repeat-defects`
 - **Investment:** $72K → **Savings:** $780K → **ROI:** 1,083%
 - **Features:**
@@ -108,6 +116,7 @@
   - Historical trend analysis
 
 ### System 6: Supplier Performance CAPA Tracking
+
 - **Route:** `/capa/supplier`
 - **Investment:** $89K → **Savings:** $1.2M → **ROI:** 1,348%
 - **Features:**
@@ -119,6 +128,7 @@
   - Supplier comparison dashboards
 
 ### System 7: AI Root Cause Suggestions
+
 - **Route:** `/capa/ai-suggestions`
 - **Investment:** $134K → **Savings:** $890K → **ROI:** 664%
 - **Features:**
@@ -130,6 +140,7 @@
   - Accuracy tracking
 
 ### System 8: Action Accountability & Reminders
+
 - **Route:** `/capa/accountability`
 - **Investment:** $45K → **Savings:** $380K → **ROI:** 844%
 - **Features:**
@@ -141,6 +152,7 @@
   - Automated follow-ups
 
 ### System 9: Trend Analysis & Pareto Charts
+
 - **Route:** `/capa/trends`
 - **Investment:** $78K → **Savings:** $670K → **ROI:** 859%
 - **Features:**
@@ -152,6 +164,7 @@
   - Custom date ranges
 
 ### System 10: Training Requirements Integration
+
 - **Route:** `/capa/training`
 - **Investment:** $91K → **Savings:** $2.8M → **ROI:** 3,077%
 - **Features:**
@@ -163,6 +176,7 @@
   - Skill gap analysis
 
 ### System 11: Document Management Integration
+
 - **Route:** `/capa/documents`
 - **Investment:** $54K → **Savings:** $420K → **ROI:** 778%
 - **Features:**
@@ -174,6 +188,7 @@
   - Bulk upload
 
 ### System 12: Effectiveness Verification
+
 - **Route:** `/capa/effectiveness`
 - **Investment:** $103K → **Savings:** $3.2M → **ROI:** 3,106%
 - **Features:**
@@ -185,6 +200,7 @@
   - Re-verification workflows
 
 ### System 13: CAPA Risk Scoring (RPN)
+
 - **Route:** `/capa/risk-scoring`
 - **Investment:** $52K → **Savings:** $275K → **ROI:** 529%
 - **Features:**
@@ -196,6 +212,7 @@
   - Interactive RPN calculator
 
 ### System 14: Mobile CAPA App
+
 - **Route:** `/capa/mobile`
 - **Investment:** $87K → **Savings:** $340K → **ROI:** 391%
 - **Features:**
@@ -207,6 +224,7 @@
   - Quick status updates (one-tap)
 
 ### System 15: Gamification & Leaderboards
+
 - **Route:** `/capa/gamification`
 - **Investment:** $34K → **Savings:** $185K → **ROI:** 544%
 - **Features:**
@@ -218,6 +236,7 @@
   - Real-time ranking
 
 ### System 16: Automated Closure Verification
+
 - **Route:** `/capa/closure-verification`
 - **Investment:** $67K → **Savings:** $290K → **ROI:** 433%
 - **Features:**
@@ -229,6 +248,7 @@
   - Prevents premature closure
 
 ### System 17: Multi-Language Support
+
 - **Route:** `/capa/i18n`
 - **Investment:** $76K → **Savings:** $210K → **ROI:** 276%
 - **Features:**
@@ -240,6 +260,7 @@
   - User language preferences
 
 ### System 18: No-Code Workflow Automation
+
 - **Route:** `/capa/workflow-builder`
 - **Investment:** $124K → **Savings:** $450K → **ROI:** 363%
 - **Features:**
@@ -255,6 +276,7 @@
 ## 🚀 Deployment Steps
 
 ### 1. Database Migration
+
 ```bash
 # Generate Prisma client (already done)
 npx prisma generate
@@ -267,7 +289,9 @@ npx prisma migrate deploy
 ```
 
 ### 2. Environment Variables
+
 Ensure these are set:
+
 ```env
 DATABASE_URL=your_postgresql_connection_string
 NEXTAUTH_SECRET=your_secret_key
@@ -275,6 +299,7 @@ NEXTAUTH_URL=your_app_url
 ```
 
 ### 3. Build & Deploy
+
 ```bash
 # Install dependencies
 npm install
@@ -287,6 +312,7 @@ npm start
 ```
 
 ### 4. Post-Deployment Verification
+
 - [ ] All 18 routes accessible
 - [ ] Database models created
 - [ ] Zero console errors
@@ -299,14 +325,18 @@ npm start
 ## 📱 Navigation & Access
 
 ### Hub Dashboard
+
 **Central access point:** `/capa/hub`
+
 - Visual grid of all 18 systems
 - Search and filter by category
 - ROI and investment metrics
 - Quick links to each system
 
 ### Direct Routes
+
 All systems accessible via `/capa/{system-name}`:
+
 - `/capa/dashboard` - Main dashboard
 - `/capa/customer-impact` - Customer tracking
 - `/capa/financial-impact` - Financial analysis
@@ -331,6 +361,7 @@ All systems accessible via `/capa/{system-name}`:
 ## 🔒 Security & Compliance
 
 ### FDA Compliance
+
 - All systems meet 21 CFR 820.100 requirements
 - Audit trails on all changes
 - Electronic signatures support
@@ -338,6 +369,7 @@ All systems accessible via `/capa/{system-name}`:
 - Training record integration
 
 ### Data Security
+
 - Role-based access control (RBAC)
 - NextAuth.js authentication
 - Prisma ORM (SQL injection prevention)
@@ -345,6 +377,7 @@ All systems accessible via `/capa/{system-name}`:
 - Secure API endpoints
 
 ### Audit Requirements
+
 - All CAPA changes logged
 - User action tracking
 - Timestamp on all records
@@ -356,6 +389,7 @@ All systems accessible via `/capa/{system-name}`:
 ## 📊 Success Metrics
 
 ### Key Performance Indicators
+
 - **CAPA Cycle Time:** Target 30-day average
 - **First-Time Closure Rate:** Target >85%
 - **Repeat Defect Rate:** Target <10%
@@ -364,6 +398,7 @@ All systems accessible via `/capa/{system-name}`:
 - **Financial Savings Validation:** Target 80% verified
 
 ### System Adoption Metrics
+
 - **User Engagement:** Daily active users
 - **Mobile Usage:** % of field CAPAs
 - **Gamification:** Points awarded, badges earned
@@ -375,16 +410,19 @@ All systems accessible via `/capa/{system-name}`:
 ## 🎓 Training & Rollout
 
 ### Phase 1: Core Team (Week 1)
+
 - QC Managers: Systems 1-4, 12-13, 16
 - Finance Team: System 3
 - Training Coordinators: System 10
 
 ### Phase 2: Extended Team (Week 2)
+
 - Supervisors: Systems 5, 8, 9
 - Supplier Quality: System 6
 - Mobile Users: System 14
 
 ### Phase 3: Organization-Wide (Week 3)
+
 - All Users: Systems 15, 17
 - Process Owners: System 18
 - Administrators: System 11
@@ -394,12 +432,14 @@ All systems accessible via `/capa/{system-name}`:
 ## 🛠️ Maintenance & Support
 
 ### Regular Tasks
+
 - **Daily:** Monitor system health, check error logs
 - **Weekly:** Review metrics, update AI models
 - **Monthly:** Generate executive reports, validate savings
 - **Quarterly:** System performance review, user feedback
 
 ### Continuous Improvement
+
 - User feedback collection
 - AI model retraining
 - Workflow template updates
@@ -411,11 +451,13 @@ All systems accessible via `/capa/{system-name}`:
 ## 📞 Support Contacts
 
 ### Technical Issues
+
 - **System Errors:** Check browser console, verify API endpoints
 - **Database Issues:** Verify Prisma connection, check migrations
 - **Performance:** Monitor server resources, optimize queries
 
 ### Business Questions
+
 - **ROI Validation:** Finance team review
 - **Compliance Questions:** Quality director approval
 - **Training Needs:** HR/Training coordinator
@@ -452,4 +494,4 @@ All systems are fully functional, error-free, and ready for immediate deployment
 
 ---
 
-*This guide was automatically generated on January 8, 2026*
+_This guide was automatically generated on January 8, 2026_

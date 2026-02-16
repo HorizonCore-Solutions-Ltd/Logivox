@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function WorkflowBuilderPage() {
   const [templates, setTemplates] = useState<any[]>([]);
@@ -22,8 +22,8 @@ export default function WorkflowBuilderPage() {
     setLoading(true);
     try {
       const [templatesRes, instancesRes] = await Promise.all([
-        fetch('/api/receiving/workflow-builder?action=templates'),
-        fetch('/api/receiving/workflow-builder?action=instances'),
+        fetch("/api/receiving/workflow-builder?action=templates"),
+        fetch("/api/receiving/workflow-builder?action=instances"),
       ]);
 
       const templatesData = await templatesRes.json();
@@ -33,69 +33,69 @@ export default function WorkflowBuilderPage() {
       setInstances(instancesData.instances || []);
       setStats(templatesData.stats);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     }
     setLoading(false);
   };
 
   const getCategoryBadge = (category: string) => {
     const badges: Record<string, string> = {
-      STANDARD: 'bg-blue-100 text-blue-800',
-      HAZMAT: 'bg-red-100 text-red-800',
-      REFRIGERATED: 'bg-cyan-100 text-cyan-800',
-      FRAGILE: 'bg-orange-100 text-orange-800',
-      HIGH_VALUE: 'bg-purple-100 text-purple-800',
-      OVERSIZED: 'bg-yellow-100 text-yellow-800',
-      CROSS_DOCK: 'bg-green-100 text-green-800',
-      RETURNS: 'bg-gray-100 text-gray-800',
+      STANDARD: "bg-blue-100 text-blue-800",
+      HAZMAT: "bg-red-100 text-red-800",
+      REFRIGERATED: "bg-cyan-100 text-cyan-800",
+      FRAGILE: "bg-orange-100 text-orange-800",
+      HIGH_VALUE: "bg-purple-100 text-purple-800",
+      OVERSIZED: "bg-yellow-100 text-yellow-800",
+      CROSS_DOCK: "bg-green-100 text-green-800",
+      RETURNS: "bg-gray-100 text-gray-800",
     };
-    return badges[category] || 'bg-gray-100 text-gray-800';
+    return badges[category] || "bg-gray-100 text-gray-800";
   };
 
   const getCategoryIcon = (category: string) => {
     const icons: Record<string, string> = {
-      STANDARD: '📦',
-      HAZMAT: '⚠️',
-      REFRIGERATED: '❄️',
-      FRAGILE: '🔍',
-      HIGH_VALUE: '💎',
-      OVERSIZED: '📏',
-      CROSS_DOCK: '🚚',
-      RETURNS: '↩️',
+      STANDARD: "📦",
+      HAZMAT: "⚠️",
+      REFRIGERATED: "❄️",
+      FRAGILE: "🔍",
+      HIGH_VALUE: "💎",
+      OVERSIZED: "📏",
+      CROSS_DOCK: "🚚",
+      RETURNS: "↩️",
     };
-    return icons[category] || '📋';
+    return icons[category] || "📋";
   };
 
   const getStatusBadge = (status: string) => {
     const badges: Record<string, string> = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      IN_PROGRESS: 'bg-blue-100 text-blue-800',
-      COMPLETED: 'bg-green-100 text-green-800',
-      CANCELLED: 'bg-red-100 text-red-800',
-      FAILED: 'bg-red-100 text-red-800',
+      PENDING: "bg-yellow-100 text-yellow-800",
+      IN_PROGRESS: "bg-blue-100 text-blue-800",
+      COMPLETED: "bg-green-100 text-green-800",
+      CANCELLED: "bg-red-100 text-red-800",
+      FAILED: "bg-red-100 text-red-800",
     };
-    return badges[status] || 'bg-gray-100 text-gray-800';
+    return badges[status] || "bg-gray-100 text-gray-800";
   };
 
   const getNodeTypeIcon = (type: string) => {
     const icons: Record<string, string> = {
-      START: '▶️',
-      SCAN_RECEIPT: '📱',
-      QUALITY_CHECK: '✅',
-      DIMENSION_MEASURE: '📏',
-      WEIGHT_CHECK: '⚖️',
-      PHOTO_CAPTURE: '📸',
-      DAMAGE_INSPECT: '🔍',
-      COUNT_VERIFY: '🔢',
-      LABEL_PRINT: '🏷️',
-      LOCATION_ASSIGN: '📍',
-      PUTAWAY: '📦',
-      APPROVAL: '👍',
-      NOTIFICATION: '📧',
-      CONDITION: '🔀',
-      END: '⏹️',
+      START: "▶️",
+      SCAN_RECEIPT: "📱",
+      QUALITY_CHECK: "✅",
+      DIMENSION_MEASURE: "📏",
+      WEIGHT_CHECK: "⚖️",
+      PHOTO_CAPTURE: "📸",
+      DAMAGE_INSPECT: "🔍",
+      COUNT_VERIFY: "🔢",
+      LABEL_PRINT: "🏷️",
+      LOCATION_ASSIGN: "📍",
+      PUTAWAY: "📦",
+      APPROVAL: "👍",
+      NOTIFICATION: "📧",
+      CONDITION: "🔀",
+      END: "⏹️",
     };
-    return icons[type] || '•';
+    return icons[type] || "•";
   };
 
   if (loading) {
@@ -143,7 +143,7 @@ export default function WorkflowBuilderPage() {
         <Card className="p-4">
           <div className="text-sm text-gray-600">Active Instances</div>
           <div className="text-2xl font-bold text-blue-600 mt-1">
-            {instances.filter((i) => i.status === 'IN_PROGRESS').length}
+            {instances.filter((i) => i.status === "IN_PROGRESS").length}
           </div>
           <div className="text-xs text-gray-500 mt-1">currently running</div>
         </Card>
@@ -151,7 +151,7 @@ export default function WorkflowBuilderPage() {
         <Card className="p-4">
           <div className="text-sm text-gray-600">Most Used</div>
           <div className="text-2xl font-bold text-purple-600 mt-1">
-            {stats?.mostUsed?.[0]?.name?.substring(0, 12) || 'N/A'}
+            {stats?.mostUsed?.[0]?.name?.substring(0, 12) || "N/A"}
           </div>
           <div className="text-xs text-gray-500 mt-1">
             {stats?.mostUsed?.[0]?.usageCount || 0} uses
@@ -217,7 +217,7 @@ export default function WorkflowBuilderPage() {
                       <span>
                         {template.estimatedDuration
                           ? `~${template.estimatedDuration} min`
-                          : 'No estimate'}
+                          : "No estimate"}
                       </span>
                     </div>
 
@@ -244,21 +244,27 @@ export default function WorkflowBuilderPage() {
 
           {/* Category Summary */}
           <Card className="p-6">
-            <h3 className="font-semibold text-lg mb-4">Templates by Category</h3>
+            <h3 className="font-semibold text-lg mb-4">
+              Templates by Category
+            </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {stats?.byCategory &&
-                Object.entries(stats.byCategory).map(([category, count]: any) => (
-                  <div
-                    key={category}
-                    className="text-center p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="text-2xl mb-1">
-                      {getCategoryIcon(category)}
+                Object.entries(stats.byCategory).map(
+                  ([category, count]: any) => (
+                    <div
+                      key={category}
+                      className="text-center p-3 bg-gray-50 rounded-lg"
+                    >
+                      <div className="text-2xl mb-1">
+                        {getCategoryIcon(category)}
+                      </div>
+                      <div className="text-sm font-medium">{category}</div>
+                      <div className="text-xs text-gray-500">
+                        {count} templates
+                      </div>
                     </div>
-                    <div className="text-sm font-medium">{category}</div>
-                    <div className="text-xs text-gray-500">{count} templates</div>
-                  </div>
-                ))}
+                  ),
+                )}
             </div>
           </Card>
         </TabsContent>
@@ -304,7 +310,7 @@ export default function WorkflowBuilderPage() {
                       <tr key={instance.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="font-medium">
-                            {instance.template?.name || 'Unknown'}
+                            {instance.template?.name || "Unknown"}
                           </div>
                           <div className="text-xs text-gray-500">
                             ID: {instance.id.substring(0, 8)}
@@ -313,10 +319,10 @@ export default function WorkflowBuilderPage() {
                         <td className="px-4 py-3">
                           <Badge
                             className={getCategoryBadge(
-                              instance.template?.category
+                              instance.template?.category,
                             )}
                           >
-                            {getCategoryIcon(instance.template?.category)}{' '}
+                            {getCategoryIcon(instance.template?.category)}{" "}
                             {instance.template?.category}
                           </Badge>
                         </td>
@@ -332,7 +338,7 @@ export default function WorkflowBuilderPage() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-sm">
-                            {instance.assignedToUser?.name || 'Unassigned'}
+                            {instance.assignedToUser?.name || "Unassigned"}
                           </div>
                         </td>
                         <td className="px-4 py-3 text-sm">
@@ -343,7 +349,7 @@ export default function WorkflowBuilderPage() {
                             <Button size="sm" variant="outline">
                               View
                             </Button>
-                            {instance.status === 'IN_PROGRESS' && (
+                            {instance.status === "IN_PROGRESS" && (
                               <Button size="sm" variant="outline">
                                 Continue
                               </Button>
@@ -362,38 +368,38 @@ export default function WorkflowBuilderPage() {
         {/* Visual Builder Tab */}
         <TabsContent value="builder" className="space-y-4">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Visual Workflow Builder</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Visual Workflow Builder
+            </h2>
 
             {/* Node Types Reference */}
             <div className="mb-6">
               <h3 className="font-medium mb-3">Available Node Types</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 {[
-                  'START',
-                  'SCAN_RECEIPT',
-                  'QUALITY_CHECK',
-                  'DIMENSION_MEASURE',
-                  'WEIGHT_CHECK',
-                  'PHOTO_CAPTURE',
-                  'DAMAGE_INSPECT',
-                  'COUNT_VERIFY',
-                  'LABEL_PRINT',
-                  'LOCATION_ASSIGN',
-                  'PUTAWAY',
-                  'APPROVAL',
-                  'NOTIFICATION',
-                  'CONDITION',
-                  'END',
+                  "START",
+                  "SCAN_RECEIPT",
+                  "QUALITY_CHECK",
+                  "DIMENSION_MEASURE",
+                  "WEIGHT_CHECK",
+                  "PHOTO_CAPTURE",
+                  "DAMAGE_INSPECT",
+                  "COUNT_VERIFY",
+                  "LABEL_PRINT",
+                  "LOCATION_ASSIGN",
+                  "PUTAWAY",
+                  "APPROVAL",
+                  "NOTIFICATION",
+                  "CONDITION",
+                  "END",
                 ].map((nodeType) => (
                   <div
                     key={nodeType}
                     className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors border border-gray-200"
                   >
-                    <span className="text-xl">
-                      {getNodeTypeIcon(nodeType)}
-                    </span>
+                    <span className="text-xl">{getNodeTypeIcon(nodeType)}</span>
                     <span className="text-xs font-medium">
-                      {nodeType.replace('_', ' ')}
+                      {nodeType.replace("_", " ")}
                     </span>
                   </div>
                 ))}
@@ -407,7 +413,9 @@ export default function WorkflowBuilderPage() {
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold">Standard Receiving</h4>
-                    <Badge className="bg-blue-100 text-blue-800">STANDARD</Badge>
+                    <Badge className="bg-blue-100 text-blue-800">
+                      STANDARD
+                    </Badge>
                   </div>
                   <div className="text-sm text-gray-600 mb-3">
                     Basic receiving workflow for standard items
@@ -525,7 +533,9 @@ export default function WorkflowBuilderPage() {
               <div className="space-y-1 text-sm text-gray-600">
                 <div>• $58K/year: Eliminate manual workflow management</div>
                 <div>• $34K/year: 50% reduction in process errors</div>
-                <div>• $18K/year: 60% faster training with visual workflows</div>
+                <div>
+                  • $18K/year: 60% faster training with visual workflows
+                </div>
                 <div>• $15K/year: Improved audit compliance</div>
               </div>
             </div>

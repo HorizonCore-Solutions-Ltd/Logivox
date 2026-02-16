@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/prisma'
-import { z } from 'zod'
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================
 // CAPA SYSTEM 17: MULTI-LANGUAGE SUPPORT (i18n)
@@ -15,10 +15,10 @@ import { z } from 'zod'
 // Translation Request Schema
 const translationRequestSchema = z.object({
   text: z.string(),
-  sourceLanguage: z.string().default('en'),
+  sourceLanguage: z.string().default("en"),
   targetLanguage: z.string(),
   context: z.string().optional(), // CAPA, NCR, Training, etc.
-})
+});
 
 // Translation Save Schema
 const saveTranslationSchema = z.object({
@@ -26,28 +26,44 @@ const saveTranslationSchema = z.object({
   language: z.string(),
   value: z.string(),
   category: z.string().optional(),
-})
+});
 
 // ============================================
 // SUPPORTED LANGUAGES
 // ============================================
 
 const SUPPORTED_LANGUAGES = {
-  en: { name: 'English', nativeName: 'English', flag: '🇺🇸', region: 'Americas' },
-  es: { name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', region: 'Europe' },
-  fr: { name: 'French', nativeName: 'Français', flag: '🇫🇷', region: 'Europe' },
-  de: { name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', region: 'Europe' },
-  it: { name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', region: 'Europe' },
-  pt: { name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹', region: 'Europe' },
-  zh: { name: 'Chinese', nativeName: '中文', flag: '🇨🇳', region: 'Asia' },
-  ja: { name: 'Japanese', nativeName: '日本語', flag: '🇯🇵', region: 'Asia' },
-  ko: { name: 'Korean', nativeName: '한국어', flag: '🇰🇷', region: 'Asia' },
-  ru: { name: 'Russian', nativeName: 'Русский', flag: '🇷🇺', region: 'Europe' },
-  ar: { name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦', region: 'Middle East', rtl: true },
-  hi: { name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳', region: 'Asia' },
-  pl: { name: 'Polish', nativeName: 'Polski', flag: '🇵🇱', region: 'Europe' },
-  nl: { name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱', region: 'Europe' },
-}
+  en: {
+    name: "English",
+    nativeName: "English",
+    flag: "🇺🇸",
+    region: "Americas",
+  },
+  es: { name: "Spanish", nativeName: "Español", flag: "🇪🇸", region: "Europe" },
+  fr: { name: "French", nativeName: "Français", flag: "🇫🇷", region: "Europe" },
+  de: { name: "German", nativeName: "Deutsch", flag: "🇩🇪", region: "Europe" },
+  it: { name: "Italian", nativeName: "Italiano", flag: "🇮🇹", region: "Europe" },
+  pt: {
+    name: "Portuguese",
+    nativeName: "Português",
+    flag: "🇵🇹",
+    region: "Europe",
+  },
+  zh: { name: "Chinese", nativeName: "中文", flag: "🇨🇳", region: "Asia" },
+  ja: { name: "Japanese", nativeName: "日本語", flag: "🇯🇵", region: "Asia" },
+  ko: { name: "Korean", nativeName: "한국어", flag: "🇰🇷", region: "Asia" },
+  ru: { name: "Russian", nativeName: "Русский", flag: "🇷🇺", region: "Europe" },
+  ar: {
+    name: "Arabic",
+    nativeName: "العربية",
+    flag: "🇸🇦",
+    region: "Middle East",
+    rtl: true,
+  },
+  hi: { name: "Hindi", nativeName: "हिन्दी", flag: "🇮🇳", region: "Asia" },
+  pl: { name: "Polish", nativeName: "Polski", flag: "🇵🇱", region: "Europe" },
+  nl: { name: "Dutch", nativeName: "Nederlands", flag: "🇳🇱", region: "Europe" },
+};
 
 // ============================================
 // REGIONAL COMPLIANCE REQUIREMENTS
@@ -55,142 +71,147 @@ const SUPPORTED_LANGUAGES = {
 
 const REGIONAL_COMPLIANCE = {
   FDA: {
-    region: 'United States',
-    agency: 'FDA (Food and Drug Administration)',
-    regulation: '21 CFR 820.100',
-    languages: ['en', 'es'],
+    region: "United States",
+    agency: "FDA (Food and Drug Administration)",
+    regulation: "21 CFR 820.100",
+    languages: ["en", "es"],
     requiredFields: [
-      'rootCauseAnalysis',
-      'correctiveActions',
-      'effectivenessVerification',
-      'managementApproval',
+      "rootCauseAnalysis",
+      "correctiveActions",
+      "effectivenessVerification",
+      "managementApproval",
     ],
-    closureTimeframe: '30 days',
-    documentationRequirements: 'Full documentation in English required. Spanish translations optional for bilingual facilities.',
+    closureTimeframe: "30 days",
+    documentationRequirements:
+      "Full documentation in English required. Spanish translations optional for bilingual facilities.",
   },
   EMA: {
-    region: 'European Union',
-    agency: 'EMA (European Medicines Agency)',
-    regulation: 'EU GMP Annex 1',
-    languages: ['en', 'de', 'fr', 'it', 'es', 'pl', 'nl'],
+    region: "European Union",
+    agency: "EMA (European Medicines Agency)",
+    regulation: "EU GMP Annex 1",
+    languages: ["en", "de", "fr", "it", "es", "pl", "nl"],
     requiredFields: [
-      'rootCauseAnalysis',
-      'correctiveActions',
-      'preventiveActions',
-      'riskAssessment',
-      'effectivenessVerification',
+      "rootCauseAnalysis",
+      "correctiveActions",
+      "preventiveActions",
+      "riskAssessment",
+      "effectivenessVerification",
     ],
-    closureTimeframe: '45 days',
-    documentationRequirements: 'Documentation in local language required. English version recommended for international audits.',
+    closureTimeframe: "45 days",
+    documentationRequirements:
+      "Documentation in local language required. English version recommended for international audits.",
   },
   PMDA: {
-    region: 'Japan',
-    agency: 'PMDA (Pharmaceuticals and Medical Devices Agency)',
-    regulation: 'J-GMP Guidelines',
-    languages: ['ja', 'en'],
+    region: "Japan",
+    agency: "PMDA (Pharmaceuticals and Medical Devices Agency)",
+    regulation: "J-GMP Guidelines",
+    languages: ["ja", "en"],
     requiredFields: [
-      'rootCauseAnalysis',
-      'correctiveActions',
-      'preventiveActions',
-      'riskAssessment',
-      'effectivenessVerification',
-      'trainingRecords',
+      "rootCauseAnalysis",
+      "correctiveActions",
+      "preventiveActions",
+      "riskAssessment",
+      "effectivenessVerification",
+      "trainingRecords",
     ],
-    closureTimeframe: '60 days',
-    documentationRequirements: 'Primary documentation must be in Japanese. English translation required for international submissions.',
+    closureTimeframe: "60 days",
+    documentationRequirements:
+      "Primary documentation must be in Japanese. English translation required for international submissions.",
   },
   MHRA: {
-    region: 'United Kingdom',
-    agency: 'MHRA (Medicines and Healthcare products Regulatory Agency)',
-    regulation: 'UK GMP',
-    languages: ['en'],
+    region: "United Kingdom",
+    agency: "MHRA (Medicines and Healthcare products Regulatory Agency)",
+    regulation: "UK GMP",
+    languages: ["en"],
     requiredFields: [
-      'rootCauseAnalysis',
-      'correctiveActions',
-      'preventiveActions',
-      'effectivenessVerification',
+      "rootCauseAnalysis",
+      "correctiveActions",
+      "preventiveActions",
+      "effectivenessVerification",
     ],
-    closureTimeframe: '30 days',
-    documentationRequirements: 'Documentation in English. Welsh translations required for Wales-based facilities.',
+    closureTimeframe: "30 days",
+    documentationRequirements:
+      "Documentation in English. Welsh translations required for Wales-based facilities.",
   },
   CFDA: {
-    region: 'China',
-    agency: 'NMPA (National Medical Products Administration)',
-    regulation: 'China GMP',
-    languages: ['zh', 'en'],
+    region: "China",
+    agency: "NMPA (National Medical Products Administration)",
+    regulation: "China GMP",
+    languages: ["zh", "en"],
     requiredFields: [
-      'rootCauseAnalysis',
-      'correctiveActions',
-      'preventiveActions',
-      'riskAssessment',
-      'effectivenessVerification',
-      'supplierNotification',
+      "rootCauseAnalysis",
+      "correctiveActions",
+      "preventiveActions",
+      "riskAssessment",
+      "effectivenessVerification",
+      "supplierNotification",
     ],
-    closureTimeframe: '45 days',
-    documentationRequirements: 'Primary documentation in Chinese (Simplified). English translation for export products.',
+    closureTimeframe: "45 days",
+    documentationRequirements:
+      "Primary documentation in Chinese (Simplified). English translation for export products.",
   },
-}
+};
 
 // ============================================
 // TRANSLATION DICTIONARIES (Common CAPA Terms)
 // ============================================
 
 const CAPA_TERMINOLOGY: Record<string, Record<string, string>> = {
-  'CAPA': {
-    en: 'CAPA',
-    es: 'CAPA',
-    fr: 'CAPA',
-    de: 'CAPA',
-    zh: 'CAPA',
-    ja: 'CAPA',
-    pt: 'CAPA',
+  CAPA: {
+    en: "CAPA",
+    es: "CAPA",
+    fr: "CAPA",
+    de: "CAPA",
+    zh: "CAPA",
+    ja: "CAPA",
+    pt: "CAPA",
   },
-  'Root Cause': {
-    en: 'Root Cause',
-    es: 'Causa Raíz',
-    fr: 'Cause Racine',
-    de: 'Grundursache',
-    zh: '根本原因',
-    ja: '根本原因',
-    pt: 'Causa Raiz',
+  "Root Cause": {
+    en: "Root Cause",
+    es: "Causa Raíz",
+    fr: "Cause Racine",
+    de: "Grundursache",
+    zh: "根本原因",
+    ja: "根本原因",
+    pt: "Causa Raiz",
   },
-  'Corrective Action': {
-    en: 'Corrective Action',
-    es: 'Acción Correctiva',
-    fr: 'Action Corrective',
-    de: 'Korrekturmaßnahme',
-    zh: '纠正措施',
-    ja: '是正処置',
-    pt: 'Ação Corretiva',
+  "Corrective Action": {
+    en: "Corrective Action",
+    es: "Acción Correctiva",
+    fr: "Action Corrective",
+    de: "Korrekturmaßnahme",
+    zh: "纠正措施",
+    ja: "是正処置",
+    pt: "Ação Corretiva",
   },
-  'Preventive Action': {
-    en: 'Preventive Action',
-    es: 'Acción Preventiva',
-    fr: 'Action Préventive',
-    de: 'Vorbeugungsmaßnahme',
-    zh: '预防措施',
-    ja: '予防処置',
-    pt: 'Ação Preventiva',
+  "Preventive Action": {
+    en: "Preventive Action",
+    es: "Acción Preventiva",
+    fr: "Action Préventive",
+    de: "Vorbeugungsmaßnahme",
+    zh: "预防措施",
+    ja: "予防処置",
+    pt: "Ação Preventiva",
   },
-  'Effectiveness': {
-    en: 'Effectiveness',
-    es: 'Efectividad',
-    fr: 'Efficacité',
-    de: 'Wirksamkeit',
-    zh: '有效性',
-    ja: '有効性',
-    pt: 'Eficácia',
+  Effectiveness: {
+    en: "Effectiveness",
+    es: "Efectividad",
+    fr: "Efficacité",
+    de: "Wirksamkeit",
+    zh: "有效性",
+    ja: "有効性",
+    pt: "Eficácia",
   },
-  'Non-Conformance': {
-    en: 'Non-Conformance',
-    es: 'No Conformidad',
-    fr: 'Non-Conformité',
-    de: 'Nichtkonformität',
-    zh: '不符合项',
-    ja: '不適合',
-    pt: 'Não Conformidade',
+  "Non-Conformance": {
+    en: "Non-Conformance",
+    es: "No Conformidad",
+    fr: "Non-Conformité",
+    de: "Nichtkonformität",
+    zh: "不符合项",
+    ja: "不適合",
+    pt: "Não Conformidade",
   },
-}
+};
 
 // ============================================
 // GET: Retrieve translations and language data
@@ -198,43 +219,47 @@ const CAPA_TERMINOLOGY: Record<string, Record<string, string>> = {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url)
-    const language = searchParams.get('language')
-    const category = searchParams.get('category')
-    const key = searchParams.get('key')
-    const action = searchParams.get('action')
+    const { searchParams } = new URL(request.url);
+    const language = searchParams.get("language");
+    const category = searchParams.get("category");
+    const key = searchParams.get("key");
+    const action = searchParams.get("action");
 
     // Get supported languages list
-    if (action === 'languages') {
+    if (action === "languages") {
       return NextResponse.json({
         languages: SUPPORTED_LANGUAGES,
         totalLanguages: Object.keys(SUPPORTED_LANGUAGES).length,
-      })
+      });
     }
 
     // Get regional compliance info
-    if (action === 'compliance') {
-      const region = searchParams.get('region')
-      if (region && REGIONAL_COMPLIANCE[region as keyof typeof REGIONAL_COMPLIANCE]) {
+    if (action === "compliance") {
+      const region = searchParams.get("region");
+      if (
+        region &&
+        REGIONAL_COMPLIANCE[region as keyof typeof REGIONAL_COMPLIANCE]
+      ) {
         return NextResponse.json({
-          compliance: REGIONAL_COMPLIANCE[region as keyof typeof REGIONAL_COMPLIANCE],
-        })
+          compliance:
+            REGIONAL_COMPLIANCE[region as keyof typeof REGIONAL_COMPLIANCE],
+        });
       }
       return NextResponse.json({
         allCompliance: REGIONAL_COMPLIANCE,
-      })
+      });
     }
 
     // Get CAPA terminology
-    if (action === 'terminology') {
+    if (action === "terminology") {
       return NextResponse.json({
         terminology: CAPA_TERMINOLOGY,
-      })
+      });
     }
 
     // Get specific translation
@@ -244,59 +269,61 @@ export async function GET(request: NextRequest) {
           organizationId: session.user.organizationId,
           key,
           language,
-        }
-      })
+        },
+      });
 
-      return NextResponse.json({ translation })
+      return NextResponse.json({ translation });
     }
 
     // Get all translations for a language
     const where: any = {
       organizationId: session.user.organizationId,
-    }
+    };
 
     if (language) {
-      where.language = language
+      where.language = language;
     }
 
     if (category) {
-      where.category = category
+      where.category = category;
     }
 
     const translations = await prisma.translation.findMany({
       where,
-      orderBy: { key: 'asc' },
-    })
+      orderBy: { key: "asc" },
+    });
 
     // Group by language
-    const byLanguage: Record<string, any[]> = {}
-    translations.forEach(t => {
+    const byLanguage: Record<string, any[]> = {};
+    translations.forEach((t) => {
       if (!byLanguage[t.language]) {
-        byLanguage[t.language] = []
+        byLanguage[t.language] = [];
       }
-      byLanguage[t.language].push(t)
-    })
+      byLanguage[t.language].push(t);
+    });
 
     // Statistics
     const stats = {
       totalTranslations: translations.length,
       languageCount: Object.keys(byLanguage).length,
-      categoryCount: new Set(translations.map(t => t.category).filter(Boolean)).size,
+      categoryCount: new Set(
+        translations.map((t) => t.category).filter(Boolean),
+      ).size,
       coverageByLanguage: Object.entries(byLanguage).map(([lang, items]) => ({
         language: lang,
-        languageName: SUPPORTED_LANGUAGES[lang as keyof typeof SUPPORTED_LANGUAGES]?.name,
+        languageName:
+          SUPPORTED_LANGUAGES[lang as keyof typeof SUPPORTED_LANGUAGES]?.name,
         translationCount: items.length,
       })),
-    }
+    };
 
-    return NextResponse.json({ translations, byLanguage, stats })
-
+    return NextResponse.json({ translations, byLanguage, stats });
   } catch (error) {
-    console.error('i18n GET error:', error)
+    console.error("i18n GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve translation data' },
-      { status: 500 }
-    )
+      { error: "Failed to retrieve translation data" },
+      { status: 500 },
+    );
   }
 }
 
@@ -306,29 +333,30 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await request.json()
-    const { action } = body
+    const body = await request.json();
+    const { action } = body;
 
     // ==========================================
     // ACTION: TRANSLATE_TEXT
     // ==========================================
-    if (action === 'TRANSLATE_TEXT') {
-      const data = translationRequestSchema.parse(body)
+    if (action === "TRANSLATE_TEXT") {
+      const data = translationRequestSchema.parse(body);
 
       // Check if translation exists in CAPA terminology
-      const termTranslation = CAPA_TERMINOLOGY[data.text]?.[data.targetLanguage]
+      const termTranslation =
+        CAPA_TERMINOLOGY[data.text]?.[data.targetLanguage];
       if (termTranslation) {
         return NextResponse.json({
           success: true,
           translatedText: termTranslation,
-          source: 'terminology',
+          source: "terminology",
           cached: true,
-        })
+        });
       }
 
       // Check if translation exists in database
@@ -337,21 +365,21 @@ export async function POST(request: NextRequest) {
           organizationId: session.user.organizationId,
           key: data.text,
           language: data.targetLanguage,
-        }
-      })
+        },
+      });
 
       if (existingTranslation) {
         return NextResponse.json({
           success: true,
           translatedText: existingTranslation.value,
-          source: 'database',
+          source: "database",
           cached: true,
-        })
+        });
       }
 
       // In production, this would call Google Translate API or similar
       // For now, return mock translation
-      const mockTranslation = `[${data.targetLanguage.toUpperCase()}] ${data.text}`
+      const mockTranslation = `[${data.targetLanguage.toUpperCase()}] ${data.text}`;
 
       // Save translation to database for future use
       await prisma.translation.create({
@@ -360,26 +388,26 @@ export async function POST(request: NextRequest) {
           key: data.text,
           language: data.targetLanguage,
           value: mockTranslation,
-          category: data.context || 'GENERAL',
+          category: data.context || "GENERAL",
           translatedBy: session.user.id,
           translatedAt: new Date(),
-        }
-      })
+        },
+      });
 
       return NextResponse.json({
         success: true,
         translatedText: mockTranslation,
-        source: 'api',
+        source: "api",
         cached: false,
-        message: 'Translation generated and cached for future use',
-      })
+        message: "Translation generated and cached for future use",
+      });
     }
 
     // ==========================================
     // ACTION: SAVE_TRANSLATION
     // ==========================================
-    if (action === 'SAVE_TRANSLATION') {
-      const data = saveTranslationSchema.parse(body)
+    if (action === "SAVE_TRANSLATION") {
+      const data = saveTranslationSchema.parse(body);
 
       // Check if exists
       const existing = await prisma.translation.findFirst({
@@ -387,10 +415,10 @@ export async function POST(request: NextRequest) {
           organizationId: session.user.organizationId,
           key: data.key,
           language: data.language,
-        }
-      })
+        },
+      });
 
-      let translation
+      let translation;
       if (existing) {
         translation = await prisma.translation.update({
           where: { id: existing.id },
@@ -399,8 +427,8 @@ export async function POST(request: NextRequest) {
             category: data.category,
             translatedBy: session.user.id,
             translatedAt: new Date(),
-          }
-        })
+          },
+        });
       } else {
         translation = await prisma.translation.create({
           data: {
@@ -411,28 +439,28 @@ export async function POST(request: NextRequest) {
             category: data.category,
             translatedBy: session.user.id,
             translatedAt: new Date(),
-          }
-        })
+          },
+        });
       }
 
       return NextResponse.json({
         success: true,
         translation,
-        message: 'Translation saved successfully',
-      })
+        message: "Translation saved successfully",
+      });
     }
 
     // ==========================================
     // ACTION: TRANSLATE_CAPA_REPORT
     // ==========================================
-    if (action === 'TRANSLATE_CAPA_REPORT') {
-      const { capaId, targetLanguage } = body
+    if (action === "TRANSLATE_CAPA_REPORT") {
+      const { capaId, targetLanguage } = body;
 
       if (!capaId || !targetLanguage) {
         return NextResponse.json(
-          { error: 'Missing capaId or targetLanguage' },
-          { status: 400 }
-        )
+          { error: "Missing capaId or targetLanguage" },
+          { status: 400 },
+        );
       }
 
       // Get CAPA
@@ -440,11 +468,11 @@ export async function POST(request: NextRequest) {
         where: {
           id: capaId,
           organizationId: session.user.organizationId,
-        }
-      })
+        },
+      });
 
       if (!capa) {
-        return NextResponse.json({ error: 'CAPA not found' }, { status: 404 })
+        return NextResponse.json({ error: "CAPA not found" }, { status: 404 });
       }
 
       // Translate key fields
@@ -453,12 +481,13 @@ export async function POST(request: NextRequest) {
         problemStatement: `[${targetLanguage.toUpperCase()}] ${capa.problemStatement}`,
         rootCause: `[${targetLanguage.toUpperCase()}] ${capa.rootCause}`,
         status: CAPA_TERMINOLOGY[capa.status]?.[targetLanguage] || capa.status,
-        priority: CAPA_TERMINOLOGY[capa.priority]?.[targetLanguage] || capa.priority,
+        priority:
+          CAPA_TERMINOLOGY[capa.priority]?.[targetLanguage] || capa.priority,
         capaType: capa.capaType,
         actionCategory: capa.actionCategory,
         language: targetLanguage,
         generatedAt: new Date().toISOString(),
-      }
+      };
 
       // Save translated report
       const reportRecord = await prisma.translatedReport.create({
@@ -468,61 +497,57 @@ export async function POST(request: NextRequest) {
           reportData: translatedReport,
           generatedBy: session.user.id,
           generatedAt: new Date(),
-        }
-      })
+        },
+      });
 
       return NextResponse.json({
         success: true,
         translatedReport,
         reportRecord,
         message: `CAPA report translated to ${SUPPORTED_LANGUAGES[targetLanguage as keyof typeof SUPPORTED_LANGUAGES]?.name}`,
-      })
+      });
     }
 
     // ==========================================
     // ACTION: SET_USER_LANGUAGE
     // ==========================================
-    if (action === 'SET_USER_LANGUAGE') {
-      const { language } = body
+    if (action === "SET_USER_LANGUAGE") {
+      const { language } = body;
 
       if (!SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES]) {
         return NextResponse.json(
-          { error: 'Unsupported language' },
-          { status: 400 }
-        )
+          { error: "Unsupported language" },
+          { status: 400 },
+        );
       }
 
       // Update user language preference
       // @ts-ignore - preferredLanguage field exists in schema but TS needs restart
       await prisma.user.update({
         where: { id: session.user.id },
-        data: { preferredLanguage: language }
-      })
+        data: { preferredLanguage: language },
+      });
 
       return NextResponse.json({
         success: true,
         language,
         message: `Language preference updated to ${SUPPORTED_LANGUAGES[language as keyof typeof SUPPORTED_LANGUAGES].name}`,
-      })
+      });
     }
 
-    return NextResponse.json(
-      { error: 'Invalid action' },
-      { status: 400 }
-    )
-
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
-      )
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
 
-    console.error('i18n POST error:', error)
+    console.error("i18n POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process translation request' },
-      { status: 500 }
-    )
+      { error: "Failed to process translation request" },
+      { status: 500 },
+    );
   }
 }

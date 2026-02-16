@@ -3,10 +3,10 @@
 /**
  * MULTI-WAREHOUSE INVENTORY BALANCING DASHBOARD
  * ==============================================
- * 
+ *
  * System 12 - Outstanding ROI (692% ROI)
  * Investment: $24K → Savings: $166K/year
- * 
+ *
  * Features:
  * - Network-wide inventory visibility
  * - Automatic rebalancing recommendations
@@ -76,7 +76,9 @@ export default function MultiWarehouseBalancingPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "network" | "transfers">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "network" | "transfers"
+  >("overview");
 
   useEffect(() => {
     loadStats();
@@ -85,7 +87,9 @@ export default function MultiWarehouseBalancingPage() {
   async function loadStats() {
     setLoading(true);
     try {
-      const res = await fetch("/api/optimization/multi-warehouse-balancing?action=stats");
+      const res = await fetch(
+        "/api/optimization/multi-warehouse-balancing?action=stats",
+      );
       const data = await res.json();
       setStats(data.stats);
     } catch (error) {
@@ -98,7 +102,9 @@ export default function MultiWarehouseBalancingPage() {
   async function analyzeNetwork() {
     setLoading(true);
     try {
-      const res = await fetch("/api/optimization/multi-warehouse-balancing?action=analyzeNetwork");
+      const res = await fetch(
+        "/api/optimization/multi-warehouse-balancing?action=analyzeNetwork",
+      );
       const data = await res.json();
       setAnalysis(data);
       setActiveTab("network");
@@ -111,7 +117,11 @@ export default function MultiWarehouseBalancingPage() {
   }
 
   async function executeTransfer(rec: TransferRecommendation) {
-    if (!confirm(`Execute transfer of ${rec.quantity} units from ${rec.sourceWarehouse} to ${rec.targetWarehouse}?`)) {
+    if (
+      !confirm(
+        `Execute transfer of ${rec.quantity} units from ${rec.sourceWarehouse} to ${rec.targetWarehouse}?`,
+      )
+    ) {
       return;
     }
 
@@ -230,7 +240,9 @@ export default function MultiWarehouseBalancingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Transfers</p>
-                <p className="text-2xl font-bold">{stats?.activeTransfers || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.activeTransfers || 0}
+                </p>
               </div>
               <TruckIcon className="h-8 w-8 text-blue-500" />
             </div>
@@ -242,7 +254,9 @@ export default function MultiWarehouseBalancingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Completed (Month)</p>
-                <p className="text-2xl font-bold">{stats?.completedThisMonth || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.completedThisMonth || 0}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -254,7 +268,9 @@ export default function MultiWarehouseBalancingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Transfers</p>
-                <p className="text-2xl font-bold">{stats?.totalTransfers || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.totalTransfers || 0}
+                </p>
               </div>
               <Package className="h-8 w-8 text-purple-500" />
             </div>
@@ -375,19 +391,27 @@ export default function MultiWarehouseBalancingPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
                         <span className="text-sm font-medium">Overstock</span>
-                        <span className="text-xs text-gray-600">&gt;150% of optimal</span>
+                        <span className="text-xs text-gray-600">
+                          &gt;150% of optimal
+                        </span>
                       </div>
                       <div className="flex items-center justify-between p-2 bg-green-50 rounded">
                         <span className="text-sm font-medium">Optimal</span>
-                        <span className="text-xs text-gray-600">50-150% of optimal</span>
+                        <span className="text-xs text-gray-600">
+                          50-150% of optimal
+                        </span>
                       </div>
                       <div className="flex items-center justify-between p-2 bg-red-50 rounded">
                         <span className="text-sm font-medium">Understock</span>
-                        <span className="text-xs text-gray-600">&lt;50% of optimal</span>
+                        <span className="text-xs text-gray-600">
+                          &lt;50% of optimal
+                        </span>
                       </div>
                       <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                         <span className="text-sm font-medium">Deadstock</span>
-                        <span className="text-xs text-gray-600">No sales 90+ days</span>
+                        <span className="text-xs text-gray-600">
+                          No sales 90+ days
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -526,12 +550,18 @@ export default function MultiWarehouseBalancingPage() {
                         {rec.priority}
                       </Badge>
                       <span className="font-medium">{rec.sku}</span>
-                      <Badge variant="outline">ROI: {rec.roi.toFixed(0)}%</Badge>
+                      <Badge variant="outline">
+                        ROI: {rec.roi.toFixed(0)}%
+                      </Badge>
                     </div>
                     <div className="flex items-center gap-3 text-sm mb-2">
-                      <span className="text-gray-600">{rec.sourceWarehouse}</span>
+                      <span className="text-gray-600">
+                        {rec.sourceWarehouse}
+                      </span>
                       <ArrowRight className="h-4 w-4 text-gray-400" />
-                      <span className="text-gray-600">{rec.targetWarehouse}</span>
+                      <span className="text-gray-600">
+                        {rec.targetWarehouse}
+                      </span>
                       <span className="text-gray-400">•</span>
                       <span className="text-gray-600">
                         {rec.quantity} units • {rec.distance} mi

@@ -1,10 +1,10 @@
 /**
  * WAREHOUSE TRAFFIC CONTROL API
  * ==============================
- * 
+ *
  * System 2 - High Impact (737% ROI)
  * Investment: $12K → Savings: $88K/year
- * 
+ *
  * Features:
  * - Real-time vehicle tracking
  * - Collision detection & prevention
@@ -26,7 +26,14 @@ import { z } from "zod";
 const trafficZoneSchema = z.object({
   id: z.string(),
   name: z.string(),
-  type: z.enum(["AISLE", "INTERSECTION", "STAGING", "DOCK", "RECEIVING", "SHIPPING"]),
+  type: z.enum([
+    "AISLE",
+    "INTERSECTION",
+    "STAGING",
+    "DOCK",
+    "RECEIVING",
+    "SHIPPING",
+  ]),
   capacity: z.number(),
   currentVehicles: z.number(),
   congestionLevel: z.enum(["CLEAR", "LIGHT", "MODERATE", "HEAVY", "CRITICAL"]),
@@ -37,7 +44,13 @@ const trafficZoneSchema = z.object({
 const vehiclePositionSchema = z.object({
   id: z.string(),
   vehicleId: z.string(),
-  vehicleType: z.enum(["FORKLIFT", "PALLET_JACK", "PICKER", "REACH_TRUCK", "ORDER_PICKER"]),
+  vehicleType: z.enum([
+    "FORKLIFT",
+    "PALLET_JACK",
+    "PICKER",
+    "REACH_TRUCK",
+    "ORDER_PICKER",
+  ]),
   operatorId: z.string(),
   operatorName: z.string(),
   currentZone: z.string(),
@@ -139,7 +152,7 @@ interface TrafficMetrics {
  */
 function calculateCongestionLevel(
   currentVehicles: number,
-  capacity: number
+  capacity: number,
 ): "CLEAR" | "LIGHT" | "MODERATE" | "HEAVY" | "CRITICAL" {
   const utilization = currentVehicles / capacity;
 
@@ -156,7 +169,7 @@ function calculateCongestionLevel(
 function calculateSafetyRating(
   zone: TrafficZone,
   recentIncidents: number,
-  nearMisses: number
+  nearMisses: number,
 ): number {
   // Base rating
   let rating = 100;
@@ -169,7 +182,9 @@ function calculateSafetyRating(
     HEAVY: 20,
     CRITICAL: 40,
   };
-  rating -= congestionPenalty[zone.congestionLevel as keyof typeof congestionPenalty] || 0;
+  rating -=
+    congestionPenalty[zone.congestionLevel as keyof typeof congestionPenalty] ||
+    0;
 
   // Deduct for incidents
   rating -= recentIncidents * 15;
@@ -188,7 +203,7 @@ function calculateSafetyRating(
  */
 function detectCollisions(
   vehicles: VehiclePosition[],
-  zones: TrafficZone[]
+  zones: TrafficZone[],
 ): CollisionAlert[] {
   const alerts: CollisionAlert[] = [];
   const zoneMap = new Map(zones.map((z) => [z.id, z]));
@@ -212,9 +227,13 @@ function detectCollisions(
         // Generate alert if collision risk
         if (timeToCollision < 10 && distance < 15) {
           const severity =
-            timeToCollision < 3 ? "CRITICAL" :
-            timeToCollision < 5 ? "HIGH" :
-            timeToCollision < 7 ? "MEDIUM" : "LOW";
+            timeToCollision < 3
+              ? "CRITICAL"
+              : timeToCollision < 5
+                ? "HIGH"
+                : timeToCollision < 7
+                  ? "MEDIUM"
+                  : "LOW";
 
           alerts.push({
             id: `ALERT-${Date.now()}-${i}-${j}`,
@@ -242,14 +261,16 @@ function optimizeRoute(
   origin: string,
   destination: string,
   zones: TrafficZone[],
-  priority: number
+  priority: number,
 ): RouteOptimization {
   // Build zone graph (simplified)
   const zoneMap = new Map(zones.map((z) => [z.id, z]));
 
   // Identify congested zones to avoid
   const avoidZones = zones
-    .filter((z) => z.congestionLevel === "HEAVY" || z.congestionLevel === "CRITICAL")
+    .filter(
+      (z) => z.congestionLevel === "HEAVY" || z.congestionLevel === "CRITICAL",
+    )
     .map((z) => z.id);
 
   // Calculate route (simplified pathfinding)
@@ -264,7 +285,7 @@ function optimizeRoute(
     // Pick next zone based on proximity and congestion
     // In production, use A* or Dijkstra's algorithm
     const nextOptions = zones.filter(
-      (z) => !route.includes(z.id) && !avoidZones.includes(z.id)
+      (z) => !route.includes(z.id) && !avoidZones.includes(z.id),
     );
 
     if (nextOptions.length === 0) {
@@ -315,7 +336,8 @@ function optimizeRoute(
     return (
       total +
       baseTravelTime +
-      (congestionDelay[zone.congestionLevel as keyof typeof congestionDelay] || 0)
+      (congestionDelay[zone.congestionLevel as keyof typeof congestionDelay] ||
+        0)
     );
   }, 0);
 
@@ -338,18 +360,20 @@ function optimizeRoute(
 function calculateTrafficMetrics(
   vehicles: VehiclePosition[],
   zones: TrafficZone[],
-  alerts: CollisionAlert[]
+  alerts: CollisionAlert[],
 ): TrafficMetrics {
   const activeVehicles = vehicles.filter((v) => v.speed > 0).length;
   const idleVehicles = vehicles.length - activeVehicles;
-  const avgSpeed = vehicles.reduce((sum, v) => sum + v.speed, 0) / vehicles.length || 0;
+  const avgSpeed =
+    vehicles.reduce((sum, v) => sum + v.speed, 0) / vehicles.length || 0;
   const congestionZones = zones.filter(
-    (z) => z.congestionLevel === "HEAVY" || z.congestionLevel === "CRITICAL"
+    (z) => z.congestionLevel === "HEAVY" || z.congestionLevel === "CRITICAL",
   ).length;
   const activeAlerts = alerts.filter((a) => a.status === "ACTIVE").length;
 
   // Calculate safety score (0-100)
-  const safetyScore = zones.reduce((sum, z) => sum + z.safetyRating, 0) / zones.length || 0;
+  const safetyScore =
+    zones.reduce((sum, z) => sum + z.safetyRating, 0) / zones.length || 0;
 
   // Calculate throughput (vehicles per hour through key zones)
   const throughput = activeVehicles * 4; // Simplified: avg 4 trips/hour
@@ -379,14 +403,70 @@ function calculateTrafficMetrics(
 
 function getMockTrafficZones(): TrafficZone[] {
   const zones = [
-    { id: "ZONE-A1", name: "Aisle A1", type: "AISLE", capacity: 3, current: 2, speedLimit: 8 },
-    { id: "ZONE-A2", name: "Aisle A2", type: "AISLE", capacity: 3, current: 3, speedLimit: 8 },
-    { id: "ZONE-INT1", name: "Intersection 1", type: "INTERSECTION", capacity: 2, current: 1, speedLimit: 5 },
-    { id: "ZONE-STAGE", name: "Staging Area", type: "STAGING", capacity: 8, current: 5, speedLimit: 10 },
-    { id: "ZONE-DOCK1", name: "Dock 1", type: "DOCK", capacity: 4, current: 3, speedLimit: 5 },
-    { id: "ZONE-B1", name: "Aisle B1", type: "AISLE", capacity: 3, current: 1, speedLimit: 8 },
-    { id: "ZONE-RCV", name: "Receiving", type: "RECEIVING", capacity: 6, current: 4, speedLimit: 6 },
-    { id: "ZONE-SHIP", name: "Shipping", type: "SHIPPING", capacity: 6, current: 6, speedLimit: 6 },
+    {
+      id: "ZONE-A1",
+      name: "Aisle A1",
+      type: "AISLE",
+      capacity: 3,
+      current: 2,
+      speedLimit: 8,
+    },
+    {
+      id: "ZONE-A2",
+      name: "Aisle A2",
+      type: "AISLE",
+      capacity: 3,
+      current: 3,
+      speedLimit: 8,
+    },
+    {
+      id: "ZONE-INT1",
+      name: "Intersection 1",
+      type: "INTERSECTION",
+      capacity: 2,
+      current: 1,
+      speedLimit: 5,
+    },
+    {
+      id: "ZONE-STAGE",
+      name: "Staging Area",
+      type: "STAGING",
+      capacity: 8,
+      current: 5,
+      speedLimit: 10,
+    },
+    {
+      id: "ZONE-DOCK1",
+      name: "Dock 1",
+      type: "DOCK",
+      capacity: 4,
+      current: 3,
+      speedLimit: 5,
+    },
+    {
+      id: "ZONE-B1",
+      name: "Aisle B1",
+      type: "AISLE",
+      capacity: 3,
+      current: 1,
+      speedLimit: 8,
+    },
+    {
+      id: "ZONE-RCV",
+      name: "Receiving",
+      type: "RECEIVING",
+      capacity: 6,
+      current: 4,
+      speedLimit: 6,
+    },
+    {
+      id: "ZONE-SHIP",
+      name: "Shipping",
+      type: "SHIPPING",
+      capacity: 6,
+      current: 6,
+      speedLimit: 6,
+    },
   ];
 
   return zones.map((z) => ({
@@ -409,7 +489,7 @@ function getMockTrafficZones(): TrafficZone[] {
         safetyRating: 0,
       },
       0,
-      z.current > z.capacity ? 2 : 0
+      z.current > z.capacity ? 2 : 0,
     ),
   }));
 }
@@ -418,7 +498,13 @@ function getMockVehiclePositions(): VehiclePosition[] {
   const zones = getMockTrafficZones();
   const vehicles: VehiclePosition[] = [];
 
-  const vehicleTypes = ["FORKLIFT", "PALLET_JACK", "PICKER", "REACH_TRUCK", "ORDER_PICKER"];
+  const vehicleTypes = [
+    "FORKLIFT",
+    "PALLET_JACK",
+    "PICKER",
+    "REACH_TRUCK",
+    "ORDER_PICKER",
+  ];
   const operators = [
     { id: "OP-001", name: "John Smith" },
     { id: "OP-002", name: "Sarah Johnson" },
@@ -526,7 +612,7 @@ export async function GET(req: NextRequest) {
     console.error("Traffic control API error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -596,16 +682,13 @@ export async function POST(req: NextRequest) {
         });
 
       default:
-        return NextResponse.json(
-          { error: "Invalid action" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     console.error("Traffic control POST error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

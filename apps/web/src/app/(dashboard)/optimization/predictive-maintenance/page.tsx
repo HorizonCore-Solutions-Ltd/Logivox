@@ -3,10 +3,10 @@
 /**
  * PREDICTIVE EQUIPMENT MAINTENANCE DASHBOARD
  * ===========================================
- * 
+ *
  * System 1 - Outstanding ROI (315% ROI)
  * Investment: $45K → Savings: $141K/year
- * 
+ *
  * Features:
  * - AI-powered failure prediction
  * - Equipment health monitoring
@@ -57,7 +57,9 @@ export default function PredictiveMaintenancePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "equipment" | "schedule">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "equipment" | "schedule"
+  >("overview");
   const [selectedWarehouse, setSelectedWarehouse] = useState<string>("WH-001");
 
   useEffect(() => {
@@ -67,7 +69,9 @@ export default function PredictiveMaintenancePage() {
   async function loadData() {
     setLoading(true);
     try {
-      const res = await fetch("/api/optimization/predictive-maintenance?action=stats");
+      const res = await fetch(
+        "/api/optimization/predictive-maintenance?action=stats",
+      );
       const data = await res.json();
       setStats(data.stats);
     } catch (error) {
@@ -81,7 +85,7 @@ export default function PredictiveMaintenancePage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/optimization/predictive-maintenance?action=analyzeAll&warehouseId=${selectedWarehouse}`
+        `/api/optimization/predictive-maintenance?action=analyzeAll&warehouseId=${selectedWarehouse}`,
       );
       const data = await res.json();
       setAnalysis(data);
@@ -99,8 +103,8 @@ export default function PredictiveMaintenancePage() {
       equipment.healthScore < 30
         ? "URGENT"
         : equipment.healthScore < 50
-        ? "HIGH"
-        : "MEDIUM";
+          ? "HIGH"
+          : "MEDIUM";
 
     try {
       const res = await fetch("/api/optimization/predictive-maintenance", {
@@ -110,9 +114,11 @@ export default function PredictiveMaintenancePage() {
           action: "scheduleMaintenance",
           data: {
             equipmentId: equipment.equipmentId,
-            maintenanceType: equipment.healthScore < 30 ? "EMERGENCY" : "PREDICTIVE",
+            maintenanceType:
+              equipment.healthScore < 30 ? "EMERGENCY" : "PREDICTIVE",
             scheduledDate: new Date(
-              Date.now() + (equipment.daysUntilFailure || 7) * 24 * 60 * 60 * 1000
+              Date.now() +
+                (equipment.daysUntilFailure || 7) * 24 * 60 * 60 * 1000,
             ).toISOString(),
             priority,
             estimatedDuration: 4,
@@ -157,7 +163,8 @@ export default function PredictiveMaintenancePage() {
 
   const getHealthIcon = (score: number) => {
     if (score < 30) return <AlertTriangle className="h-5 w-5 text-red-500" />;
-    if (score < 50) return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+    if (score < 50)
+      return <AlertTriangle className="h-5 w-5 text-orange-500" />;
     if (score < 80) return <Activity className="h-5 w-5 text-yellow-500" />;
     return <CheckCircle className="h-5 w-5 text-green-500" />;
   };
@@ -204,7 +211,9 @@ export default function PredictiveMaintenancePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Scheduled</p>
-                <p className="text-2xl font-bold">{stats?.scheduledMaintenance || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.scheduledMaintenance || 0}
+                </p>
               </div>
               <Calendar className="h-8 w-8 text-blue-500" />
             </div>
@@ -216,7 +225,9 @@ export default function PredictiveMaintenancePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Completed (Month)</p>
-                <p className="text-2xl font-bold">{stats?.completedThisMonth || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.completedThisMonth || 0}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -228,7 +239,9 @@ export default function PredictiveMaintenancePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Maintenance</p>
-                <p className="text-2xl font-bold">{stats?.totalMaintenance || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.totalMaintenance || 0}
+                </p>
               </div>
               <Wrench className="h-8 w-8 text-purple-500" />
             </div>
@@ -254,7 +267,9 @@ export default function PredictiveMaintenancePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Prevented Downtime</p>
-                <p className="text-2xl font-bold">{stats?.preventedDowntime || 0}h</p>
+                <p className="text-2xl font-bold">
+                  {stats?.preventedDowntime || 0}h
+                </p>
               </div>
               <Clock className="h-8 w-8 text-orange-500" />
             </div>
@@ -429,7 +444,9 @@ export default function PredictiveMaintenancePage() {
                         {getHealthIcon(eq.healthScore)}
                         <div>
                           <h3 className="font-semibold">{eq.equipmentName}</h3>
-                          <p className="text-sm text-gray-600">{eq.equipmentId} • {eq.type}</p>
+                          <p className="text-sm text-gray-600">
+                            {eq.equipmentId} • {eq.type}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -445,11 +462,15 @@ export default function PredictiveMaintenancePage() {
                     <div className="grid grid-cols-4 gap-4 mb-3 text-sm">
                       <div>
                         <span className="text-gray-600">Hours Operated:</span>
-                        <span className="ml-2 font-medium">{eq.hoursOperated}h</span>
+                        <span className="ml-2 font-medium">
+                          {eq.hoursOperated}h
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Error Count:</span>
-                        <span className="ml-2 font-medium">{eq.errorCount}</span>
+                        <span className="ml-2 font-medium">
+                          {eq.errorCount}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Failure Risk:</span>
@@ -460,7 +481,9 @@ export default function PredictiveMaintenancePage() {
                       <div>
                         <span className="text-gray-600">Days to Failure:</span>
                         <span className="ml-2 font-medium">
-                          {eq.daysUntilFailure ? `${eq.daysUntilFailure} days` : "N/A"}
+                          {eq.daysUntilFailure
+                            ? `${eq.daysUntilFailure} days`
+                            : "N/A"}
                         </span>
                       </div>
                     </div>

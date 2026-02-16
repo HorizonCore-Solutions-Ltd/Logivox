@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface BOL {
   id: string;
@@ -75,8 +75,8 @@ export default function BOLManagement() {
     try {
       setLoading(true);
       const [bolsRes, metricsRes] = await Promise.all([
-        fetch('/api/dock/bol?action=recent_bols&limit=15'),
-        fetch('/api/dock/bol?action=bol_metrics'),
+        fetch("/api/dock/bol?action=recent_bols&limit=15"),
+        fetch("/api/dock/bol?action=bol_metrics"),
       ]);
 
       const bolsData = await bolsRes.json();
@@ -85,7 +85,7 @@ export default function BOLManagement() {
       setBOLs(bolsData.bols || []);
       setMetrics(metricsData.metrics);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -93,12 +93,18 @@ export default function BOLManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'DRAFT': return 'bg-gray-100 text-gray-800';
-      case 'PENDING_CARRIER_SIGNATURE': return 'bg-yellow-100 text-yellow-800';
-      case 'SIGNED': return 'bg-green-100 text-green-800';
-      case 'DELIVERED': return 'bg-blue-100 text-blue-800';
-      case 'VOIDED': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "DRAFT":
+        return "bg-gray-100 text-gray-800";
+      case "PENDING_CARRIER_SIGNATURE":
+        return "bg-yellow-100 text-yellow-800";
+      case "SIGNED":
+        return "bg-green-100 text-green-800";
+      case "DELIVERED":
+        return "bg-blue-100 text-blue-800";
+      case "VOIDED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -117,8 +123,8 @@ export default function BOLManagement() {
     );
   }
 
-  const pendingBOLs = bols.filter(b => 
-    b.status === 'PENDING_CARRIER_SIGNATURE' || b.status === 'DRAFT'
+  const pendingBOLs = bols.filter(
+    (b) => b.status === "PENDING_CARRIER_SIGNATURE" || b.status === "DRAFT",
   );
 
   return (
@@ -139,7 +145,8 @@ export default function BOLManagement() {
         <Card className="border-yellow-300 bg-yellow-50">
           <CardHeader>
             <CardTitle className="text-yellow-800 flex items-center gap-2">
-              ✍️ {pendingBOLs.length} BOL{pendingBOLs.length !== 1 ? 's' : ''} Pending Signature
+              ✍️ {pendingBOLs.length} BOL{pendingBOLs.length !== 1 ? "s" : ""}{" "}
+              Pending Signature
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -233,9 +240,15 @@ export default function BOLManagement() {
         <TabsContent value="bols" className="space-y-4">
           <div className="space-y-3">
             {bols.map((bol) => {
-              const shipperSigned = bol.signatures.some(s => s.signerRole === 'SHIPPER');
-              const carrierSigned = bol.signatures.some(s => s.signerRole === 'CARRIER');
-              const consigneeSigned = bol.signatures.some(s => s.signerRole === 'CONSIGNEE');
+              const shipperSigned = bol.signatures.some(
+                (s) => s.signerRole === "SHIPPER",
+              );
+              const carrierSigned = bol.signatures.some(
+                (s) => s.signerRole === "CARRIER",
+              );
+              const consigneeSigned = bol.signatures.some(
+                (s) => s.signerRole === "CONSIGNEE",
+              );
 
               return (
                 <Card key={bol.id}>
@@ -243,8 +256,10 @@ export default function BOLManagement() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <span className={`text-xs px-2 py-1 rounded ${getStatusColor(bol.status)}`}>
-                            {bol.status.replace(/_/g, ' ')}
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${getStatusColor(bol.status)}`}
+                          >
+                            {bol.status.replace(/_/g, " ")}
                           </span>
                           {bol.declaredValue && (
                             <span className="text-xs px-2 py-1 rounded bg-purple-100 text-purple-800">
@@ -262,63 +277,116 @@ export default function BOLManagement() {
 
                         <div className="grid grid-cols-2 gap-4 mb-3">
                           <div className="p-2 bg-gray-50 rounded">
-                            <div className="text-xs text-gray-600 mb-1">Shipper</div>
-                            <div className="font-medium text-sm">{bol.shipperInfo.name}</div>
+                            <div className="text-xs text-gray-600 mb-1">
+                              Shipper
+                            </div>
+                            <div className="font-medium text-sm">
+                              {bol.shipperInfo.name}
+                            </div>
                             <div className="text-xs text-gray-600">
                               {bol.shipperInfo.city}, {bol.shipperInfo.state}
                             </div>
                           </div>
                           <div className="p-2 bg-gray-50 rounded">
-                            <div className="text-xs text-gray-600 mb-1">Consignee</div>
-                            <div className="font-medium text-sm">{bol.consigneeInfo.name}</div>
+                            <div className="text-xs text-gray-600 mb-1">
+                              Consignee
+                            </div>
+                            <div className="font-medium text-sm">
+                              {bol.consigneeInfo.name}
+                            </div>
                             <div className="text-xs text-gray-600">
-                              {bol.consigneeInfo.city}, {bol.consigneeInfo.state}
+                              {bol.consigneeInfo.city},{" "}
+                              {bol.consigneeInfo.state}
                             </div>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-4 gap-4 text-sm mb-3">
                           <div>
-                            <span className="text-gray-600">Items:</span>{' '}
-                            <span className="font-medium">{bol.items.length}</span>
+                            <span className="text-gray-600">Items:</span>{" "}
+                            <span className="font-medium">
+                              {bol.items.length}
+                            </span>
                           </div>
                           <div>
-                            <span className="text-gray-600">Pieces:</span>{' '}
-                            <span className="font-medium">{bol.totalPieces}</span>
+                            <span className="text-gray-600">Pieces:</span>{" "}
+                            <span className="font-medium">
+                              {bol.totalPieces}
+                            </span>
                           </div>
                           <div>
-                            <span className="text-gray-600">Weight:</span>{' '}
-                            <span className="font-medium">{bol.totalWeight.toFixed(1)} lbs</span>
+                            <span className="text-gray-600">Weight:</span>{" "}
+                            <span className="font-medium">
+                              {bol.totalWeight.toFixed(1)} lbs
+                            </span>
                           </div>
                           <div>
-                            <span className="text-gray-600">Charges:</span>{' '}
-                            <span className="font-medium">{bol.freightCharges}</span>
+                            <span className="text-gray-600">Charges:</span>{" "}
+                            <span className="font-medium">
+                              {bol.freightCharges}
+                            </span>
                           </div>
                         </div>
 
                         {/* Signature Status */}
                         <div className="flex gap-4 text-sm">
                           <div className="flex items-center gap-1">
-                            <span className={shipperSigned ? 'text-green-600' : 'text-gray-400'}>
-                              {shipperSigned ? '✓' : '○'}
+                            <span
+                              className={
+                                shipperSigned
+                                  ? "text-green-600"
+                                  : "text-gray-400"
+                              }
+                            >
+                              {shipperSigned ? "✓" : "○"}
                             </span>
-                            <span className={shipperSigned ? 'text-green-600' : 'text-gray-600'}>
+                            <span
+                              className={
+                                shipperSigned
+                                  ? "text-green-600"
+                                  : "text-gray-600"
+                              }
+                            >
                               Shipper
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <span className={carrierSigned ? 'text-green-600' : 'text-gray-400'}>
-                              {carrierSigned ? '✓' : '○'}
+                            <span
+                              className={
+                                carrierSigned
+                                  ? "text-green-600"
+                                  : "text-gray-400"
+                              }
+                            >
+                              {carrierSigned ? "✓" : "○"}
                             </span>
-                            <span className={carrierSigned ? 'text-green-600' : 'text-gray-600'}>
+                            <span
+                              className={
+                                carrierSigned
+                                  ? "text-green-600"
+                                  : "text-gray-600"
+                              }
+                            >
                               Carrier
                             </span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <span className={consigneeSigned ? 'text-green-600' : 'text-gray-400'}>
-                              {consigneeSigned ? '✓' : '○'}
+                            <span
+                              className={
+                                consigneeSigned
+                                  ? "text-green-600"
+                                  : "text-gray-400"
+                              }
+                            >
+                              {consigneeSigned ? "✓" : "○"}
                             </span>
-                            <span className={consigneeSigned ? 'text-green-600' : 'text-gray-600'}>
+                            <span
+                              className={
+                                consigneeSigned
+                                  ? "text-green-600"
+                                  : "text-gray-600"
+                              }
+                            >
                               Consignee
                             </span>
                           </div>
@@ -326,23 +394,27 @@ export default function BOLManagement() {
 
                         {bol.attachedDocuments.length > 0 && (
                           <div className="mt-3 p-2 bg-blue-50 rounded text-sm">
-                            📎 {bol.attachedDocuments.length} document{bol.attachedDocuments.length !== 1 ? 's' : ''} attached
+                            📎 {bol.attachedDocuments.length} document
+                            {bol.attachedDocuments.length !== 1 ? "s" : ""}{" "}
+                            attached
                           </div>
                         )}
 
                         {bol.specialInstructions && (
                           <div className="mt-3 p-2 bg-yellow-50 rounded text-sm">
-                            <div className="font-medium text-yellow-800">Special Instructions:</div>
-                            <div className="text-gray-700">{bol.specialInstructions}</div>
+                            <div className="font-medium text-yellow-800">
+                              Special Instructions:
+                            </div>
+                            <div className="text-gray-700">
+                              {bol.specialInstructions}
+                            </div>
                           </div>
                         )}
                       </div>
 
                       <div className="ml-4 flex flex-col gap-2">
                         {bol.pdfUrl && (
-                          <Button size="sm">
-                            📄 Download PDF
-                          </Button>
+                          <Button size="sm">📄 Download PDF</Button>
                         )}
                         <Button size="sm" variant="outline">
                           👁️ View Details
@@ -352,7 +424,7 @@ export default function BOLManagement() {
                             ✍️ Sign (Carrier)
                           </Button>
                         )}
-                        {bol.status === 'DRAFT' && (
+                        {bol.status === "DRAFT" && (
                           <Button size="sm" variant="destructive">
                             ❌ Void
                           </Button>
@@ -421,17 +493,19 @@ export default function BOLManagement() {
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
                 {[
-                  { name: 'Packing List', required: true },
-                  { name: 'Commercial Invoice', required: true },
-                  { name: 'Certificate of Origin', required: false },
-                  { name: 'Inspection Report', required: false },
-                  { name: 'Customs Forms', required: false },
-                  { name: 'Insurance Certificate', required: false },
+                  { name: "Packing List", required: true },
+                  { name: "Commercial Invoice", required: true },
+                  { name: "Certificate of Origin", required: false },
+                  { name: "Inspection Report", required: false },
+                  { name: "Customs Forms", required: false },
+                  { name: "Insurance Certificate", required: false },
                 ].map((doc) => (
                   <div key={doc.name} className="p-3 bg-gray-50 rounded">
                     <div className="font-medium text-sm mb-1">{doc.name}</div>
-                    <div className={`text-xs ${doc.required ? 'text-red-600' : 'text-gray-600'}`}>
-                      {doc.required ? 'Required' : 'Optional'}
+                    <div
+                      className={`text-xs ${doc.required ? "text-red-600" : "text-gray-600"}`}
+                    >
+                      {doc.required ? "Required" : "Optional"}
                     </div>
                   </div>
                 ))}
@@ -452,7 +526,9 @@ export default function BOLManagement() {
                   {metrics?.bolsByCarrier?.map((carrier) => (
                     <div key={carrier.carrier}>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium">{carrier.carrier}</span>
+                        <span className="text-sm font-medium">
+                          {carrier.carrier}
+                        </span>
                         <span className="text-sm text-gray-600">
                           {carrier.count} ({carrier.percentage.toFixed(1)}%)
                         </span>
@@ -476,8 +552,13 @@ export default function BOLManagement() {
               <CardContent>
                 <div className="space-y-3">
                   {metrics?.documentTypes?.map((doc) => (
-                    <div key={doc.type} className="flex justify-between items-center">
-                      <span className="text-sm">{doc.type.replace(/_/g, ' ')}</span>
+                    <div
+                      key={doc.type}
+                      className="flex justify-between items-center"
+                    >
+                      <span className="text-sm">
+                        {doc.type.replace(/_/g, " ")}
+                      </span>
                       <span className="text-sm font-medium">{doc.count}</span>
                     </div>
                   ))}
@@ -544,7 +625,9 @@ export default function BOLManagement() {
                   </div>
                   <div className="flex justify-between py-3 bg-green-50 -mx-4 px-4">
                     <span className="font-bold">Total Annual Savings</span>
-                    <span className="font-bold text-lg text-green-600">$230,000</span>
+                    <span className="font-bold text-lg text-green-600">
+                      $230,000
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -563,7 +646,9 @@ export default function BOLManagement() {
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded">
                   <div className="text-3xl font-bold text-blue-600">2.7</div>
-                  <div className="text-sm text-gray-600 mt-1">Payback (months)</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Payback (months)
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded">
                   <div className="text-3xl font-bold text-purple-600">100%</div>
@@ -571,7 +656,9 @@ export default function BOLManagement() {
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
                   <div className="text-3xl font-bold text-orange-600">90%</div>
-                  <div className="text-sm text-gray-600 mt-1">Faster processing</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Faster processing
+                  </div>
                 </div>
               </div>
 
@@ -580,19 +667,31 @@ export default function BOLManagement() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>100% paperless BOLs</strong> - Complete digital transformation</span>
+                    <span>
+                      <strong>100% paperless BOLs</strong> - Complete digital
+                      transformation
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>90% faster processing</strong> - E-signatures eliminate delays</span>
+                    <span>
+                      <strong>90% faster processing</strong> - E-signatures
+                      eliminate delays
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>100% compliance tracking</strong> - Automated document verification</span>
+                    <span>
+                      <strong>100% compliance tracking</strong> - Automated
+                      document verification
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>95% error reduction</strong> - Standardized templates and validation</span>
+                    <span>
+                      <strong>95% error reduction</strong> - Standardized
+                      templates and validation
+                    </span>
                   </li>
                 </ul>
               </div>

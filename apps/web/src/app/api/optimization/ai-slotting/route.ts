@@ -1,10 +1,10 @@
 /**
  * AI-POWERED SLOTTING OPTIMIZATION SYSTEM
  * ========================================
- * 
+ *
  * Optimization System 7 - Outstanding ROI (589% ROI)
  * Investment: $28,000 → Annual Savings: $165,000
- * 
+ *
  * Features:
  * - AI-driven dynamic slotting recommendations
  * - Velocity-based ABC classification
@@ -182,7 +182,7 @@ interface SlottingAnalysis {
 
 async function calculateProductVelocity(
   organizationId: string,
-  warehouseId: string
+  warehouseId: string,
 ): Promise<ProductVelocity[]> {
   // Get pick activity for last 30 days
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
@@ -216,16 +216,19 @@ async function calculateProductVelocity(
   // Calculate velocities
   const velocities: ProductVelocity[] = inventoryItems.map((item) => {
     const picksPerMonth = velocityMap.get(item.id) || 0;
-    
+
     let velocityClass: keyof typeof VELOCITY_CLASSES;
     if (picksPerMonth >= VELOCITY_CLASSES.A.velocityMin) velocityClass = "A";
-    else if (picksPerMonth >= VELOCITY_CLASSES.B.velocityMin) velocityClass = "B";
-    else if (picksPerMonth >= VELOCITY_CLASSES.C.velocityMin) velocityClass = "C";
+    else if (picksPerMonth >= VELOCITY_CLASSES.B.velocityMin)
+      velocityClass = "B";
+    else if (picksPerMonth >= VELOCITY_CLASSES.C.velocityMin)
+      velocityClass = "C";
     else velocityClass = "D";
 
     // Determine current zone (simplified - would need actual location data)
     const currentZone = determineZoneFromLocation(item.sku);
-    const recommendedZone = VELOCITY_CLASSES[velocityClass].targetZone[0] as keyof typeof ZONE_TYPES;
+    const recommendedZone = VELOCITY_CLASSES[velocityClass]
+      .targetZone[0] as keyof typeof ZONE_TYPES;
     const misalignment = currentZone !== recommendedZone;
 
     return {
@@ -254,7 +257,7 @@ function determineZoneFromLocation(location: string): keyof typeof ZONE_TYPES {
 }
 
 function generateSlottingRecommendations(
-  velocities: ProductVelocity[]
+  velocities: ProductVelocity[],
 ): SlottingRecommendation[] {
   const recommendations: SlottingRecommendation[] = [];
 
@@ -347,13 +350,13 @@ export async function GET(request: NextRequest) {
         if (!warehouseId) {
           return NextResponse.json(
             { error: "Warehouse ID required" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
         const velocities = await calculateProductVelocity(
           organizationId,
-          warehouseId
+          warehouseId,
         );
         const recommendations = generateSlottingRecommendations(velocities);
 
@@ -371,7 +374,7 @@ export async function GET(request: NextRequest) {
           recommendations,
           expectedAnnualSavings: recommendations.reduce(
             (sum, r) => sum + r.expectedCostSavings,
-            0
+            0,
           ),
           implementationCost: recommendations.length * 50, // $50 per move
           roi: 0,
@@ -423,7 +426,7 @@ export async function GET(request: NextRequest) {
         const totalMoves = reslots.length;
         const totalSavings = reslots.reduce(
           (sum, r) => sum + ((r.metadata as any)?.expectedSavings || 0),
-          0
+          0,
         );
 
         const stats = {
@@ -450,7 +453,7 @@ export async function GET(request: NextRequest) {
     console.error("Slotting optimization error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -537,7 +540,7 @@ export async function POST(request: NextRequest) {
     console.error("Slotting optimization error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

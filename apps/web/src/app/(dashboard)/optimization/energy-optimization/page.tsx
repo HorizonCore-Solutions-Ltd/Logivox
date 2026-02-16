@@ -3,10 +3,10 @@
 /**
  * ENERGY OPTIMIZATION DASHBOARD
  * ==============================
- * 
+ *
  * System 9 - Outstanding ROI (918%)
  * Investment: $4K → Savings: $37K/year
- * 
+ *
  * Features:
  * - Real-time energy monitoring
  * - Peak/off-peak optimization
@@ -15,7 +15,13 @@
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -110,7 +116,9 @@ export default function EnergyOptimizationDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
   const [consumption, setConsumption] = useState<EnergyConsumption[]>([]);
-  const [recommendations, setRecommendations] = useState<OptimizationRecommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<
+    OptimizationRecommendation[]
+  >([]);
   const [hourlyData, setHourlyData] = useState<HourlyData[]>([]);
 
   // ============================================
@@ -125,19 +133,21 @@ export default function EnergyOptimizationDashboard() {
     try {
       setLoading(true);
 
-      const [statsRes, consumptionRes, recommendationsRes, hourlyRes] = await Promise.all([
-        fetch("/api/optimization/energy-optimization?action=stats"),
-        fetch("/api/optimization/energy-optimization?action=consumption"),
-        fetch("/api/optimization/energy-optimization?action=recommendations"),
-        fetch("/api/optimization/energy-optimization?action=hourly"),
-      ]);
+      const [statsRes, consumptionRes, recommendationsRes, hourlyRes] =
+        await Promise.all([
+          fetch("/api/optimization/energy-optimization?action=stats"),
+          fetch("/api/optimization/energy-optimization?action=consumption"),
+          fetch("/api/optimization/energy-optimization?action=recommendations"),
+          fetch("/api/optimization/energy-optimization?action=hourly"),
+        ]);
 
-      const [statsData, consumptionData, recommendationsData, hourlyDataRes] = await Promise.all([
-        statsRes.json(),
-        consumptionRes.json(),
-        recommendationsRes.json(),
-        hourlyRes.json(),
-      ]);
+      const [statsData, consumptionData, recommendationsData, hourlyDataRes] =
+        await Promise.all([
+          statsRes.json(),
+          consumptionRes.json(),
+          recommendationsRes.json(),
+          hourlyRes.json(),
+        ]);
 
       setStats(statsData);
       setConsumption(consumptionData.consumption || []);
@@ -201,7 +211,9 @@ export default function EnergyOptimizationDashboard() {
       CRITICAL: "bg-red-500 text-white",
     };
 
-    return <Badge className={colors[status as keyof typeof colors]}>{status}</Badge>;
+    return (
+      <Badge className={colors[status as keyof typeof colors]}>{status}</Badge>
+    );
   }
 
   function getRateColor(rateType: string) {
@@ -232,7 +244,9 @@ export default function EnergyOptimizationDashboard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Energy Optimization Dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Loading Energy Optimization Dashboard...
+          </p>
         </div>
       </div>
     );
@@ -308,7 +322,9 @@ export default function EnergyOptimizationDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Annual Savings</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Annual Savings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -334,7 +350,9 @@ export default function EnergyOptimizationDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Equipment Energy Consumption</CardTitle>
-              <CardDescription>Real-time monitoring of all warehouse equipment</CardDescription>
+              <CardDescription>
+                Real-time monitoring of all warehouse equipment
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -352,19 +370,26 @@ export default function EnergyOptimizationDashboard() {
                 <TableBody>
                   {consumption.map((equip) => (
                     <TableRow key={equip.equipmentId}>
-                      <TableCell className="font-medium">{equip.equipmentName}</TableCell>
+                      <TableCell className="font-medium">
+                        {equip.equipmentName}
+                      </TableCell>
                       <TableCell>
                         <Badge variant="outline">{equip.equipmentType}</Badge>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{equip.currentPower} kW</div>
+                          <div className="font-medium">
+                            {equip.currentPower} kW
+                          </div>
                           <div className="text-xs text-gray-500">
-                            Avg: {equip.avgPower} kW | Peak: {equip.peakPower} kW
+                            Avg: {equip.avgPower} kW | Peak: {equip.peakPower}{" "}
+                            kW
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{equip.dailyConsumption.toLocaleString()} kWh</TableCell>
+                      <TableCell>
+                        {equip.dailyConsumption.toLocaleString()} kWh
+                      </TableCell>
                       <TableCell className="font-medium">
                         {formatCurrency(equip.monthlyCost)}
                       </TableCell>
@@ -409,8 +434,12 @@ export default function EnergyOptimizationDashboard() {
                 <TableBody>
                   {recommendations.map((rec) => (
                     <TableRow key={rec.id}>
-                      <TableCell className="font-medium">{rec.equipmentName}</TableCell>
-                      <TableCell className="text-sm">{rec.currentSchedule}</TableCell>
+                      <TableCell className="font-medium">
+                        {rec.equipmentName}
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {rec.currentSchedule}
+                      </TableCell>
                       <TableCell className="text-sm text-green-600">
                         {rec.recommendedSchedule}
                       </TableCell>
@@ -430,13 +459,18 @@ export default function EnergyOptimizationDashboard() {
                       </TableCell>
                       <TableCell>
                         <Badge
-                          variant={rec.priority === "HIGH" ? "destructive" : "default"}
+                          variant={
+                            rec.priority === "HIGH" ? "destructive" : "default"
+                          }
                         >
                           {rec.priority}
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <Button size="sm" onClick={() => applyRecommendation(rec)}>
+                        <Button
+                          size="sm"
+                          onClick={() => applyRecommendation(rec)}
+                        >
                           <CheckCircle2 className="w-3 h-3 mr-1" />
                           Apply
                         </Button>
@@ -469,7 +503,9 @@ export default function EnergyOptimizationDashboard() {
                       {hour.hour.toString().padStart(2, "0")}:00
                     </div>
                     <div className="text-lg font-bold mt-1">${hour.rate}</div>
-                    <div className="text-xs mt-1">{hour.consumption.toFixed(0)} kWh</div>
+                    <div className="text-xs mt-1">
+                      {hour.consumption.toFixed(0)} kWh
+                    </div>
                     <Badge variant="secondary" className="text-xs mt-2">
                       {hour.rateType.replace("_", " ")}
                     </Badge>
@@ -493,7 +529,9 @@ export default function EnergyOptimizationDashboard() {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm">Current Efficiency</span>
-                        <span className="font-bold">{stats.efficiency.current}%</span>
+                        <span className="font-bold">
+                          {stats.efficiency.current}%
+                        </span>
                       </div>
                       <Progress value={stats.efficiency.current} />
                     </div>
@@ -504,11 +542,16 @@ export default function EnergyOptimizationDashboard() {
                           {stats.efficiency.target}%
                         </span>
                       </div>
-                      <Progress value={stats.efficiency.target} className="bg-green-200" />
+                      <Progress
+                        value={stats.efficiency.target}
+                        className="bg-green-200"
+                      />
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t">
                       <span className="text-sm">Improvement Potential</span>
-                      <Badge variant="default">{stats.efficiency.improvement}%</Badge>
+                      <Badge variant="default">
+                        {stats.efficiency.improvement}%
+                      </Badge>
                     </div>
                   </div>
                 )}

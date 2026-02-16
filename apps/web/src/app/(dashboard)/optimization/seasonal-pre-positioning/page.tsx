@@ -3,10 +3,10 @@
 /**
  * SEASONAL PRE-POSITIONING DASHBOARD
  * ===================================
- * 
+ *
  * System 10 - Exceptional ROI (1,556%)
  * Investment: $8K → Savings: $125K/year
- * 
+ *
  * Features:
  * - Seasonal demand forecasting
  * - Pre-positioning recommendations
@@ -15,7 +15,13 @@
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -111,7 +117,9 @@ export default function SeasonalPrePositioningDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
   const [forecasts, setForecasts] = useState<SeasonalForecast[]>([]);
-  const [recommendations, setRecommendations] = useState<PrePositionRecommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<
+    PrePositionRecommendation[]
+  >([]);
 
   // ============================================
   // DATA FETCHING
@@ -128,14 +136,14 @@ export default function SeasonalPrePositioningDashboard() {
       const [statsRes, forecastsRes, recommendationsRes] = await Promise.all([
         fetch("/api/optimization/seasonal-pre-positioning?action=stats"),
         fetch("/api/optimization/seasonal-pre-positioning?action=forecasts"),
-        fetch("/api/optimization/seasonal-pre-positioning?action=recommendations"),
+        fetch(
+          "/api/optimization/seasonal-pre-positioning?action=recommendations",
+        ),
       ]);
 
-      const [statsData, forecastsData, recommendationsData] = await Promise.all([
-        statsRes.json(),
-        forecastsRes.json(),
-        recommendationsRes.json(),
-      ]);
+      const [statsData, forecastsData, recommendationsData] = await Promise.all(
+        [statsRes.json(), forecastsRes.json(), recommendationsRes.json()],
+      );
 
       setStats(statsData);
       setForecasts(forecastsData.forecasts || []);
@@ -214,7 +222,11 @@ export default function SeasonalPrePositioningDashboard() {
       CRITICAL: "bg-red-500 text-white",
     };
 
-    return <Badge className={colors[priority as keyof typeof colors]}>{priority}</Badge>;
+    return (
+      <Badge className={colors[priority as keyof typeof colors]}>
+        {priority}
+      </Badge>
+    );
   }
 
   function getTrendIcon(trend: string) {
@@ -252,7 +264,9 @@ export default function SeasonalPrePositioningDashboard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Seasonal Pre-Positioning Dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Loading Seasonal Pre-Positioning Dashboard...
+          </p>
         </div>
       </div>
     );
@@ -289,7 +303,8 @@ export default function SeasonalPrePositioningDashboard() {
             <CardContent>
               <div className="text-2xl font-bold">{stats.activeForecasts}</div>
               <p className="text-xs text-gray-500 mt-1">
-                Tracking {stats.trackedProducts} of {stats.totalProducts} products
+                Tracking {stats.trackedProducts} of {stats.totalProducts}{" "}
+                products
               </p>
             </CardContent>
           </Card>
@@ -310,19 +325,26 @@ export default function SeasonalPrePositioningDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Next Event</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Next Event
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg font-bold">{stats.nextSeasonalEvent.name}</div>
+              <div className="text-lg font-bold">
+                {stats.nextSeasonalEvent.name}
+              </div>
               <p className="text-xs text-gray-500 mt-1">
-                {stats.nextSeasonalEvent.daysUntil} days ({stats.nextSeasonalEvent.productsAffected} products)
+                {stats.nextSeasonalEvent.daysUntil} days (
+                {stats.nextSeasonalEvent.productsAffected} products)
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Annual Savings</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Annual Savings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -350,7 +372,8 @@ export default function SeasonalPrePositioningDashboard() {
             <CardHeader>
               <CardTitle>Pre-Positioning Recommendations</CardTitle>
               <CardDescription>
-                Optimized transfer recommendations to reduce expedited shipping costs
+                Optimized transfer recommendations to reduce expedited shipping
+                costs
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -373,7 +396,9 @@ export default function SeasonalPrePositioningDashboard() {
                       <TableCell>
                         <div>
                           <div className="font-medium">{rec.productSku}</div>
-                          <div className="text-xs text-gray-500">{rec.productName}</div>
+                          <div className="text-xs text-gray-500">
+                            {rec.productName}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -389,7 +414,9 @@ export default function SeasonalPrePositioningDashboard() {
                             {rec.recommendedTransfer.toLocaleString()} units
                           </div>
                           <div className="text-xs text-gray-500">
-                            Source: {rec.currentQuantitySource.toLocaleString()} → Target: {rec.currentQuantityTarget.toLocaleString()}
+                            Source: {rec.currentQuantitySource.toLocaleString()}{" "}
+                            → Target:{" "}
+                            {rec.currentQuantityTarget.toLocaleString()}
                           </div>
                         </div>
                       </TableCell>
@@ -417,7 +444,10 @@ export default function SeasonalPrePositioningDashboard() {
                       </TableCell>
                       <TableCell>{getPriorityBadge(rec.priority)}</TableCell>
                       <TableCell>
-                        <Button size="sm" onClick={() => approveRecommendation(rec)}>
+                        <Button
+                          size="sm"
+                          onClick={() => approveRecommendation(rec)}
+                        >
                           <CheckCircle2 className="w-3 h-3 mr-1" />
                           Approve
                         </Button>
@@ -455,11 +485,17 @@ export default function SeasonalPrePositioningDashboard() {
                 </TableHeader>
                 <TableBody>
                   {forecasts.map((forecast) => (
-                    <TableRow key={`${forecast.productId}-${forecast.warehouseId}`}>
+                    <TableRow
+                      key={`${forecast.productId}-${forecast.warehouseId}`}
+                    >
                       <TableCell>
                         <div>
-                          <div className="font-medium">{forecast.productSku}</div>
-                          <div className="text-xs text-gray-500">{forecast.productName}</div>
+                          <div className="font-medium">
+                            {forecast.productSku}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {forecast.productName}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>{forecast.warehouseName}</TableCell>
@@ -469,7 +505,9 @@ export default function SeasonalPrePositioningDashboard() {
                           <span>{forecast.season}</span>
                         </div>
                       </TableCell>
-                      <TableCell>{forecast.currentStock.toLocaleString()}</TableCell>
+                      <TableCell>
+                        {forecast.currentStock.toLocaleString()}
+                      </TableCell>
                       <TableCell className="font-medium">
                         {forecast.predictedDemand.toLocaleString()}
                       </TableCell>
@@ -494,8 +532,13 @@ export default function SeasonalPrePositioningDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={forecast.confidence} className="w-16" />
-                          <span className="text-sm">{forecast.confidence}%</span>
+                          <Progress
+                            value={forecast.confidence}
+                            className="w-16"
+                          />
+                          <span className="text-sm">
+                            {forecast.confidence}%
+                          </span>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -518,15 +561,21 @@ export default function SeasonalPrePositioningDashboard() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Implemented Transfers</span>
-                      <Badge variant="default">{stats.implementedTransfers}</Badge>
+                      <Badge variant="default">
+                        {stats.implementedTransfers}
+                      </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Expedited Shipments Saved</span>
-                      <Badge variant="default">{stats.expeditedShipmentsSaved}</Badge>
+                      <Badge variant="default">
+                        {stats.expeditedShipmentsSaved}
+                      </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Total Units Saved</span>
-                      <Badge variant="default">{stats.totalUnitsSaved.toLocaleString()}</Badge>
+                      <Badge variant="default">
+                        {stats.totalUnitsSaved.toLocaleString()}
+                      </Badge>
                     </div>
                   </div>
                 )}

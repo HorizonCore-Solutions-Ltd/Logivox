@@ -174,7 +174,10 @@ export default function DockSchedulingDashboard() {
     });
   };
 
-  const calculateDwellTime = (arrival: string | null, departure: string | null) => {
+  const calculateDwellTime = (
+    arrival: string | null,
+    departure: string | null,
+  ) => {
     if (!arrival) return "N/A";
     const start = new Date(arrival);
     const end = departure ? new Date(departure) : new Date();
@@ -250,9 +253,7 @@ export default function DockSchedulingDashboard() {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {stats.todaysAppointments}
-            </div>
+            <div className="text-2xl font-bold">{stats.todaysAppointments}</div>
             <p className="text-xs text-muted-foreground">
               {stats.inProgress} in progress
             </p>
@@ -330,13 +331,15 @@ export default function DockSchedulingDashboard() {
                           <div className="flex items-center gap-2">
                             <Truck className="h-4 w-4 text-gray-500" />
                             <span className="font-medium">
-                              {dock.currentAppointment.carrierName || "Unknown Carrier"}
+                              {dock.currentAppointment.carrierName ||
+                                "Unknown Carrier"}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
                             <Users className="h-4 w-4 text-gray-500" />
                             <span>
-                              {dock.currentAppointment.driverName || "Unknown Driver"}
+                              {dock.currentAppointment.driverName ||
+                                "Unknown Driver"}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -345,13 +348,13 @@ export default function DockSchedulingDashboard() {
                               Dwell:{" "}
                               {calculateDwellTime(
                                 dock.currentAppointment.actualArrival,
-                                dock.currentAppointment.actualDeparture
+                                dock.currentAppointment.actualDeparture,
                               )}
                             </span>
                           </div>
                           <Badge
                             className={getStatusColor(
-                              dock.currentAppointment.status
+                              dock.currentAppointment.status,
                             )}
                           >
                             {dock.currentAppointment.status}
@@ -413,8 +416,7 @@ export default function DockSchedulingDashboard() {
                   {appointments
                     .filter(
                       (appt) =>
-                        statusFilter === "all" ||
-                        appt.status === statusFilter
+                        statusFilter === "all" || appt.status === statusFilter,
                     )
                     .map((appointment) => (
                       <TableRow key={appointment.id}>
@@ -430,7 +432,8 @@ export default function DockSchedulingDashboard() {
                           {appointment.carrierName || "N/A"}
                         </TableCell>
                         <TableCell>
-                          {appointment.yardLocation?.locationName || "Unassigned"}
+                          {appointment.yardLocation?.locationName ||
+                            "Unassigned"}
                         </TableCell>
                         <TableCell>
                           <div>

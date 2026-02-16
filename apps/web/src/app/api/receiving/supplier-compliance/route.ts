@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // SUPPLIER COMPLIANCE SCORING API
@@ -33,62 +33,62 @@ import { z } from 'zod';
 
 // Score categories
 type ScoreCategory =
-  | 'ASN_ACCURACY'           // ASN vs actual accuracy
-  | 'ON_TIME_DELIVERY'       // Appointment compliance
-  | 'DAMAGE_RATE'            // Damaged goods frequency
-  | 'QUALITY_DEFECTS'        // Quality inspection failures
-  | 'DOCUMENTATION'          // Complete/correct paperwork
-  | 'RESPONSIVENESS';        // Issue resolution speed
+  | "ASN_ACCURACY" // ASN vs actual accuracy
+  | "ON_TIME_DELIVERY" // Appointment compliance
+  | "DAMAGE_RATE" // Damaged goods frequency
+  | "QUALITY_DEFECTS" // Quality inspection failures
+  | "DOCUMENTATION" // Complete/correct paperwork
+  | "RESPONSIVENESS"; // Issue resolution speed
 
 // Performance tiers
-type PerformanceTier = 'PLATINUM' | 'GOLD' | 'SILVER' | 'BRONZE' | 'PROBATION';
+type PerformanceTier = "PLATINUM" | "GOLD" | "SILVER" | "BRONZE" | "PROBATION";
 
 // Alert severity
-type AlertSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+type AlertSeverity = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 // Validation schemas
 const updateScoreSchema = z.object({
-  action: z.literal('update_score'),
+  action: z.literal("update_score"),
   supplierId: z.string().uuid(),
   category: z.enum([
-    'ASN_ACCURACY',
-    'ON_TIME_DELIVERY',
-    'DAMAGE_RATE',
-    'QUALITY_DEFECTS',
-    'DOCUMENTATION',
-    'RESPONSIVENESS'
+    "ASN_ACCURACY",
+    "ON_TIME_DELIVERY",
+    "DAMAGE_RATE",
+    "QUALITY_DEFECTS",
+    "DOCUMENTATION",
+    "RESPONSIVENESS",
   ]),
   score: z.number().min(0).max(100),
   notes: z.string().optional(),
 });
 
 const calculateScoreSchema = z.object({
-  action: z.literal('calculate_score'),
+  action: z.literal("calculate_score"),
   supplierId: z.string().uuid(),
 });
 
 const generateScorecardSchema = z.object({
-  action: z.literal('generate_scorecard'),
+  action: z.literal("generate_scorecard"),
   supplierId: z.string().uuid(),
-  period: z.enum(['MONTHLY', 'QUARTERLY', 'ANNUAL']),
+  period: z.enum(["MONTHLY", "QUARTERLY", "ANNUAL"]),
 });
 
 const createAlertSchema = z.object({
-  action: z.literal('create_alert'),
+  action: z.literal("create_alert"),
   supplierId: z.string().uuid(),
   category: z.enum([
-    'ASN_ACCURACY',
-    'ON_TIME_DELIVERY',
-    'DAMAGE_RATE',
-    'QUALITY_DEFECTS',
-    'DOCUMENTATION',
-    'RESPONSIVENESS'
+    "ASN_ACCURACY",
+    "ON_TIME_DELIVERY",
+    "DAMAGE_RATE",
+    "QUALITY_DEFECTS",
+    "DOCUMENTATION",
+    "RESPONSIVENESS",
   ]),
-  severity: z.enum(['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']),
+  severity: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]),
   message: z.string(),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   updateScoreSchema,
   calculateScoreSchema,
   generateScorecardSchema,
@@ -99,9 +99,9 @@ const requestSchema = z.discriminatedUnion('action', [
 async function calculateASNAccuracy(
   organizationId: string,
   supplierId: string,
-  days: number = 30
+  days: number = 30,
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COUNT(*)::int as "totalASNs",
       COUNT(CASE 
@@ -114,7 +114,7 @@ async function calculateASNAccuracy(
       AND a."supplierId" = ${supplierId}::uuid
       AND a."createdAt" >= NOW() - INTERVAL '${days} days'
       AND r.status = 'COMPLETED'
-  ` as any[];
+  `) as any[];
 
   const { totalASNs, accurateASNs } = result[0];
   return totalASNs > 0 ? (accurateASNs / totalASNs) * 100 : 100;
@@ -124,9 +124,9 @@ async function calculateASNAccuracy(
 async function calculateOnTimeDelivery(
   organizationId: string,
   supplierId: string,
-  days: number = 30
+  days: number = 30,
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COUNT(*)::int as "totalDeliveries",
       COUNT(CASE 
@@ -140,7 +140,7 @@ async function calculateOnTimeDelivery(
       AND status = 'COMPLETED'
       AND "appointmentTime" IS NOT NULL
       AND "actualArrival" IS NOT NULL
-  ` as any[];
+  `) as any[];
 
   const { totalDeliveries, onTimeDeliveries } = result[0];
   return totalDeliveries > 0 ? (onTimeDeliveries / totalDeliveries) * 100 : 100;
@@ -150,9 +150,9 @@ async function calculateOnTimeDelivery(
 async function calculateDamageRate(
   organizationId: string,
   supplierId: string,
-  days: number = 30
+  days: number = 30,
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COALESCE(SUM(r.quantity), 0)::int as "totalUnits",
       COALESCE(SUM(dr."affectedQuantity"), 0)::int as "damagedUnits"
@@ -163,23 +163,23 @@ async function calculateDamageRate(
       AND r."supplierId" = ${supplierId}::uuid
       AND r."createdAt" >= NOW() - INTERVAL '${days} days'
       AND r.status = 'COMPLETED'
-  ` as any[];
+  `) as any[];
 
   const { totalUnits, damagedUnits } = result[0];
   if (totalUnits === 0) return 100;
-  
+
   const damagePercentage = (damagedUnits / totalUnits) * 100;
   // Convert to score (0% damage = 100 score, 10% damage = 0 score)
-  return Math.max(0, 100 - (damagePercentage * 10));
+  return Math.max(0, 100 - damagePercentage * 10);
 }
 
 // Calculate quality defects score
 async function calculateQualityDefects(
   organizationId: string,
   supplierId: string,
-  days: number = 30
+  days: number = 30,
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COUNT(*)::int as "totalInspections",
       COUNT(CASE WHEN status = 'PASSED' THEN 1 END)::int as "passedInspections"
@@ -188,19 +188,21 @@ async function calculateQualityDefects(
       AND "supplierId" = ${supplierId}::uuid
       AND "createdAt" >= NOW() - INTERVAL '${days} days'
       AND status IN ('PASSED', 'FAILED')
-  ` as any[];
+  `) as any[];
 
   const { totalInspections, passedInspections } = result[0];
-  return totalInspections > 0 ? (passedInspections / totalInspections) * 100 : 100;
+  return totalInspections > 0
+    ? (passedInspections / totalInspections) * 100
+    : 100;
 }
 
 // Calculate documentation score
 async function calculateDocumentation(
   organizationId: string,
   supplierId: string,
-  days: number = 30
+  days: number = 30,
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COUNT(*)::int as "totalReceivings",
       COUNT(CASE 
@@ -213,25 +215,27 @@ async function calculateDocumentation(
       AND "supplierId" = ${supplierId}::uuid
       AND "createdAt" >= NOW() - INTERVAL '${days} days'
       AND status = 'COMPLETED'
-  ` as any[];
+  `) as any[];
 
   const { totalReceivings, completeDocumentation } = result[0];
-  return totalReceivings > 0 ? (completeDocumentation / totalReceivings) * 100 : 100;
+  return totalReceivings > 0
+    ? (completeDocumentation / totalReceivings) * 100
+    : 100;
 }
 
 // Determine performance tier based on overall score
 function determinePerformanceTier(overallScore: number): PerformanceTier {
-  if (overallScore >= 95) return 'PLATINUM';
-  if (overallScore >= 85) return 'GOLD';
-  if (overallScore >= 75) return 'SILVER';
-  if (overallScore >= 65) return 'BRONZE';
-  return 'PROBATION';
+  if (overallScore >= 95) return "PLATINUM";
+  if (overallScore >= 85) return "GOLD";
+  if (overallScore >= 75) return "SILVER";
+  if (overallScore >= 65) return "BRONZE";
+  return "PROBATION";
 }
 
 // Update score
 async function updateScore(
   session: any,
-  data: z.infer<typeof updateScoreSchema>
+  data: z.infer<typeof updateScoreSchema>,
 ) {
   const score = await prisma.supplierComplianceScore.create({
     data: {
@@ -254,9 +258,10 @@ async function updateScore(
         organizationId: session.user.organizationId,
         supplierId: data.supplierId,
         category: data.category,
-        severity: data.score < 50 ? 'CRITICAL' : data.score < 60 ? 'HIGH' : 'MEDIUM',
+        severity:
+          data.score < 50 ? "CRITICAL" : data.score < 60 ? "HIGH" : "MEDIUM",
         message: `${data.category} score dropped to ${data.score}%`,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
     });
   }
@@ -266,8 +271,8 @@ async function updateScore(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'SUPPLIER_SCORE_UPDATED',
-      entityType: 'SUPPLIER_COMPLIANCE',
+      action: "SUPPLIER_SCORE_UPDATED",
+      entityType: "SUPPLIER_COMPLIANCE",
       entityId: score.id,
       metadata: {
         supplierId: data.supplierId,
@@ -280,14 +285,14 @@ async function updateScore(
   return {
     success: true,
     score,
-    message: 'Score updated',
+    message: "Score updated",
   };
 }
 
 // Calculate comprehensive score
 async function calculateOverallScore(
   organizationId: string,
-  supplierId: string
+  supplierId: string,
 ): Promise<any> {
   // Calculate all category scores
   const [
@@ -308,9 +313,9 @@ async function calculateOverallScore(
   const weights = {
     ASN_ACCURACY: 0.25,
     ON_TIME_DELIVERY: 0.25,
-    DAMAGE_RATE: 0.20,
-    QUALITY_DEFECTS: 0.20,
-    DOCUMENTATION: 0.10,
+    DAMAGE_RATE: 0.2,
+    QUALITY_DEFECTS: 0.2,
+    DOCUMENTATION: 0.1,
   };
 
   const overallScore =
@@ -370,31 +375,31 @@ async function calculateOverallScore(
 // Calculate score
 async function calculateScore(
   session: any,
-  data: z.infer<typeof calculateScoreSchema>
+  data: z.infer<typeof calculateScoreSchema>,
 ) {
   const result = await calculateOverallScore(
     session.user.organizationId,
-    data.supplierId
+    data.supplierId,
   );
 
   return {
     success: true,
     ...result,
-    message: 'Score calculated',
+    message: "Score calculated",
   };
 }
 
 // Generate scorecard
 async function generateScorecard(
   session: any,
-  data: z.infer<typeof generateScorecardSchema>
+  data: z.infer<typeof generateScorecardSchema>,
 ) {
   const supplier = await prisma.supplier.findUnique({
     where: { id: data.supplierId },
   });
 
   if (!supplier) {
-    throw new Error('Supplier not found');
+    throw new Error("Supplier not found");
   }
 
   // Get current performance summary
@@ -413,7 +418,7 @@ async function generateScorecard(
       organizationId: session.user.organizationId,
       supplierId: data.supplierId,
     },
-    orderBy: { recordedAt: 'desc' },
+    orderBy: { recordedAt: "desc" },
     take: 100,
   });
 
@@ -424,7 +429,7 @@ async function generateScorecard(
       supplierId: data.supplierId,
       period: data.period,
       overallScore: summary?.overallScore || 0,
-      tier: summary?.tier || 'BRONZE',
+      tier: summary?.tier || "BRONZE",
       categoryBreakdown: {
         asnAccuracy: summary?.asnAccuracy || 0,
         onTimeDelivery: summary?.onTimeDelivery || 0,
@@ -441,8 +446,8 @@ async function generateScorecard(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'SUPPLIER_SCORECARD_GENERATED',
-      entityType: 'SUPPLIER_SCORECARD',
+      action: "SUPPLIER_SCORECARD_GENERATED",
+      entityType: "SUPPLIER_SCORECARD",
       entityId: scorecard.id,
       metadata: {
         supplierId: data.supplierId,
@@ -457,14 +462,14 @@ async function generateScorecard(
     scorecard,
     supplier,
     summary,
-    message: 'Scorecard generated',
+    message: "Scorecard generated",
   };
 }
 
 // Create alert
 async function createAlert(
   session: any,
-  data: z.infer<typeof createAlertSchema>
+  data: z.infer<typeof createAlertSchema>,
 ) {
   const alert = await prisma.supplierAlert.create({
     data: {
@@ -473,7 +478,7 @@ async function createAlert(
       category: data.category,
       severity: data.severity,
       message: data.message,
-      status: 'ACTIVE',
+      status: "ACTIVE",
     },
   });
 
@@ -482,8 +487,8 @@ async function createAlert(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'SUPPLIER_ALERT_CREATED',
-      entityType: 'SUPPLIER_ALERT',
+      action: "SUPPLIER_ALERT_CREATED",
+      entityType: "SUPPLIER_ALERT",
       entityId: alert.id,
       metadata: {
         supplierId: data.supplierId,
@@ -496,7 +501,7 @@ async function createAlert(
   return {
     success: true,
     alert,
-    message: 'Alert created',
+    message: "Alert created",
   };
 }
 
@@ -505,15 +510,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get statistics
-    if (action === 'stats') {
-      const stats = await prisma.$queryRaw`
+    if (action === "stats") {
+      const stats = (await prisma.$queryRaw`
         SELECT 
           COUNT(DISTINCT "supplierId")::int as "totalSuppliers",
           COUNT(CASE WHEN tier = 'PLATINUM' THEN 1 END)::int as "platinumSuppliers",
@@ -522,16 +527,16 @@ export async function GET(request: NextRequest) {
           COALESCE(AVG("overallScore"), 0)::numeric(10,1) as "avgScore"
         FROM "SupplierPerformanceSummary"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
-      ` as any[];
+      `) as any[];
 
-      const alertStats = await prisma.$queryRaw`
+      const alertStats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "activeAlerts",
           COUNT(CASE WHEN severity = 'CRITICAL' THEN 1 END)::int as "criticalAlerts"
         FROM "SupplierAlert"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND status = 'ACTIVE'
-      ` as any[];
+      `) as any[];
 
       const monthlySavings = 6833; // Based on ROI calculation
 
@@ -546,7 +551,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get supplier rankings
-    if (action === 'rankings') {
+    if (action === "rankings") {
       const rankings = await prisma.supplierPerformanceSummary.findMany({
         where: {
           organizationId: session.user.organizationId,
@@ -554,7 +559,7 @@ export async function GET(request: NextRequest) {
         include: {
           supplier: true,
         },
-        orderBy: { overallScore: 'desc' },
+        orderBy: { overallScore: "desc" },
         take: 50,
       });
 
@@ -562,31 +567,28 @@ export async function GET(request: NextRequest) {
     }
 
     // Get active alerts
-    if (action === 'active-alerts') {
+    if (action === "active-alerts") {
       const alerts = await prisma.supplierAlert.findMany({
         where: {
           organizationId: session.user.organizationId,
-          status: 'ACTIVE',
+          status: "ACTIVE",
         },
         include: {
           supplier: true,
         },
-        orderBy: [
-          { severity: 'desc' },
-          { createdAt: 'desc' },
-        ],
+        orderBy: [{ severity: "desc" }, { createdAt: "desc" }],
         take: 50,
       });
 
       return NextResponse.json({ alerts });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Supplier compliance GET error:', error);
+    console.error("Supplier compliance GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve compliance data' },
-      { status: 500 }
+      { error: "Failed to retrieve compliance data" },
+      { status: 500 },
     );
   }
 }
@@ -596,40 +598,40 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'update_score':
+      case "update_score":
         return NextResponse.json(await updateScore(session, data));
 
-      case 'calculate_score':
+      case "calculate_score":
         return NextResponse.json(await calculateScore(session, data));
 
-      case 'generate_scorecard':
+      case "generate_scorecard":
         return NextResponse.json(await generateScorecard(session, data));
 
-      case 'create_alert':
+      case "create_alert":
         return NextResponse.json(await createAlert(session, data));
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Supplier compliance POST error:', error);
+    console.error("Supplier compliance POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process compliance request' },
-      { status: 500 }
+      { error: "Failed to process compliance request" },
+      { status: 500 },
     );
   }
 }

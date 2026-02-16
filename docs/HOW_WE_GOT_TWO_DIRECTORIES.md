@@ -9,6 +9,7 @@
 You didn't intentionally build in two directories. Here's the timeline:
 
 ### Phase 1: Started as Standard Next.js App (Dec 2025 - Early Jan 2026)
+
 **Location**: `/app/` directory  
 **Structure**: Standard Next.js 14 App Router
 
@@ -30,6 +31,7 @@ You didn't intentionally build in two directories. Here's the timeline:
 ```
 
 **Evidence**:
+
 - `/app/` modified: **January 8, 2026** (recent work)
 - Files like `/app/dock/dashboard/page.tsx` dated **Jan 8 09:47**
 - 284 API files in `/app/api/`
@@ -38,6 +40,7 @@ You didn't intentionally build in two directories. Here's the timeline:
 ---
 
 ### Phase 2: Migrated to Turbo Monorepo (January 1, 2026)
+
 **Location**: `/apps/web/` workspace  
 **Structure**: Turbo monorepo with workspaces
 
@@ -61,6 +64,7 @@ You didn't intentionally build in two directories. Here's the timeline:
 ```
 
 **Evidence**:
+
 - `/apps/` created: **January 1, 2026 16:14** (earlier)
 - `package.json` has `"workspaces": ["apps/*", "packages/*"]`
 - `turbo.json` exists (monorepo orchestration)
@@ -104,6 +108,7 @@ You didn't intentionally build in two directories. Here's the timeline:
 **Next.js only serves ONE app directory at a time.**
 
 When you run `npm run dev`:
+
 - Turbo runs `/apps/web/` (because of workspace config)
 - `/apps/web/src/app/` becomes the active app directory
 - `/app/` in the root is **COMPLETELY IGNORED**
@@ -113,7 +118,7 @@ When you run `npm run dev`:
 ```bash
 # These work (in /apps/web/src/app/api/)
 ✅ GET /api/inventory
-✅ GET /api/rmas  
+✅ GET /api/rmas
 ✅ GET /api/grn
 
 # These return 404 (in /app/api/ - not served!)
@@ -128,6 +133,7 @@ When you run `npm run dev`:
 ## 📊 Current State
 
 ### Active Code (Works):
+
 - **Location**: `/apps/web/src/app/api/`
 - **Files**: 201 API routes
 - **Status**: ✅ WORKING
@@ -140,6 +146,7 @@ When you run `npm run dev`:
   - And more...
 
 ### Dead Code (Doesn't Work):
+
 - **Location**: `/app/api/`
 - **Files**: 284 API routes
 - **Status**: ❌ RETURNS 404
@@ -152,6 +159,7 @@ When you run `npm run dev`:
   - And more...
 
 ### Also Dead (Pages That Won't Work):
+
 - **Location**: `/app/dashboard/qc/`, `/app/qc/`, `/app/capa/`
 - **Files**: 54+ page files
 - **Problem**: These pages call APIs in `/app/api/` which don't work
@@ -162,7 +170,7 @@ When you run `npm run dev`:
 ## 💡 Why You Didn't Notice
 
 1. **No Errors**: Next.js doesn't throw errors for unused directories
-2. **Files Still Modified**: You kept editing `/app/` files successfully  
+2. **Files Still Modified**: You kept editing `/app/` files successfully
 3. **No Tests**: APIs weren't tested with actual HTTP requests
 4. **Documentation First**: You documented features as "complete" based on file existence
 5. **Trust in Code**: Assumed if files exist and compile, they work
@@ -172,6 +180,7 @@ When you run `npm run dev`:
 ## 🔧 What Needs to Happen
 
 ### Option A: Complete the Migration (Recommended)
+
 **Effort**: 2-3 weeks  
 **Result**: Unified, clean codebase
 
@@ -186,6 +195,7 @@ When you run `npm run dev`:
 9. **Delete** `/app/` directory entirely
 
 ### Option B: Accept Reality & Update Marketing (Fastest)
+
 **Effort**: 1 day  
 **Result**: Honest advertising, no false claims
 
@@ -195,6 +205,7 @@ When you run `npm run dev`:
 4. **Document** accurately what actually works
 
 ### Option C: Abandon Monorepo, Use Old Code
+
 **Effort**: 1 week  
 **Result**: Back to simple structure
 
@@ -220,12 +231,14 @@ When you run `npm run dev`:
 ## ✅ Recommendation
 
 **Do Option A** (Complete Migration):
+
 - You already started the migration
 - Monorepo structure is better for growth
 - Clean separation of concerns
 - Professional codebase
 
 **Steps This Week**:
+
 1. Today: Update marketing to be honest (Option B)
 2. This week: Start migrating QC APIs
 3. Next week: Complete CAPA migration

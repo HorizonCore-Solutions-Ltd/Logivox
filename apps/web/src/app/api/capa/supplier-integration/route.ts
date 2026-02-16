@@ -6,12 +6,12 @@ import { z } from "zod";
 
 /**
  * CAPA SYSTEM 7: SUPPLIER ERP INTEGRATION
- * 
+ *
  * Automated two-way integration with supplier ERP systems (SAP, Oracle, NetSuite)
  * for real-time CAPA sharing, status tracking, and supplier performance scorecards.
- * 
+ *
  * Investment: $142,000 | Annual Savings: $1,800,000 | ROI: 1,268%
- * 
+ *
  * Features:
  * - Automatic CAPA creation in supplier's ERP system
  * - Real-time status synchronization
@@ -24,12 +24,14 @@ const supplierCapaRequestSchema = z.object({
   capaId: z.string(),
   supplierId: z.string(),
   severity: z.enum(["CRITICAL", "HIGH", "MEDIUM", "LOW"]),
-  requestedActions: z.array(z.object({
-    action: z.string(),
-    dueDate: z.string(),
-    priority: z.enum(["IMMEDIATE", "URGENT", "NORMAL"]),
-    requiresEvidence: z.boolean().default(true),
-  })),
+  requestedActions: z.array(
+    z.object({
+      action: z.string(),
+      dueDate: z.string(),
+      priority: z.enum(["IMMEDIATE", "URGENT", "NORMAL"]),
+      requiresEvidence: z.boolean().default(true),
+    }),
+  ),
   description: z.string(),
   affectedProducts: z.array(z.string()).optional(),
   rootCause: z.string().optional(),
@@ -39,7 +41,13 @@ const supplierCapaRequestSchema = z.object({
 const supplierResponseSchema = z.object({
   supplierCapaId: z.string(),
   externalCapaId: z.string().optional(), // CAPA ID in supplier's system
-  status: z.enum(["ACKNOWLEDGED", "IN_PROGRESS", "ACTIONS_COMPLETED", "EVIDENCE_SUBMITTED", "REJECTED"]),
+  status: z.enum([
+    "ACKNOWLEDGED",
+    "IN_PROGRESS",
+    "ACTIONS_COMPLETED",
+    "EVIDENCE_SUBMITTED",
+    "REJECTED",
+  ]),
   completedActions: z.array(z.string()).optional(),
   evidenceUrls: z.array(z.string()).optional(),
   estimatedCompletion: z.string().optional(),
@@ -49,7 +57,9 @@ const supplierResponseSchema = z.object({
 // Simulate ERP API clients (in production, use actual SDK/APIs)
 interface ERPClient {
   type: "SAP" | "ORACLE" | "NETSUITE" | "CUSTOM";
-  createSupplierCAPA(data: any): Promise<{ externalId: string; success: boolean }>;
+  createSupplierCAPA(
+    data: any,
+  ): Promise<{ externalId: string; success: boolean }>;
   getStatus(externalId: string): Promise<{ status: string; progress: number }>;
   sendNotification(externalId: string, message: string): Promise<boolean>;
 }
@@ -74,11 +84,13 @@ function getERPClient(erpType: string): ERPClient {
     },
     async sendNotification(externalId: string, message: string) {
       // In production: Send notification through supplier's ERP
-      console.log(`[${erpType}] Notification sent for ${externalId}: ${message}`);
+      console.log(
+        `[${erpType}] Notification sent for ${externalId}: ${message}`,
+      );
       return true;
     },
   };
-  
+
   return mockClient;
 }
 
@@ -144,10 +156,20 @@ export async function GET(req: NextRequest) {
     // Calculate statistics
     const stats = {
       totalRequests: supplierCapas.length,
-      acknowledged: supplierCapas.filter(c => c.status === "ACKNOWLEDGED").length,
-      inProgress: supplierCapas.filter(c => c.status === "IN_PROGRESS").length,
-      completed: supplierCapas.filter(c => c.status === "ACTIONS_COMPLETED" || c.status === "EVIDENCE_SUBMITTED").length,
-      overdue: supplierCapas.filter(c => c.dueDate && new Date(c.dueDate) < new Date() && c.status !== "ACTIONS_COMPLETED").length,
+      acknowledged: supplierCapas.filter((c) => c.status === "ACKNOWLEDGED")
+        .length,
+      inProgress: supplierCapas.filter((c) => c.status === "IN_PROGRESS")
+        .length,
+      completed: supplierCapas.filter(
+        (c) =>
+          c.status === "ACTIONS_COMPLETED" || c.status === "EVIDENCE_SUBMITTED",
+      ).length,
+      overdue: supplierCapas.filter(
+        (c) =>
+          c.dueDate &&
+          new Date(c.dueDate) < new Date() &&
+          c.status !== "ACTIONS_COMPLETED",
+      ).length,
       avgResponseTime: calculateAvgResponseTime(supplierCapas),
     };
 
@@ -157,12 +179,11 @@ export async function GET(req: NextRequest) {
       stats,
       scorecard,
     });
-
   } catch (error: any) {
     console.error("[SupplierIntegration] GET error:", error);
     return NextResponse.json(
       { error: "Failed to retrieve supplier CAPAs", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -196,7 +217,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (!supplier) {
-        return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Supplier not found" },
+          { status: 404 },
+        );
       }
 
       // Get CAPA details
@@ -212,7 +236,12 @@ export async function POST(req: NextRequest) {
       }
 
       // Calculate due date (default: 14 days for HIGH/CRITICAL, 30 days for others)
-      const daysToComplete = validated.severity === "CRITICAL" ? 7 : validated.severity === "HIGH" ? 14 : 30;
+      const daysToComplete =
+        validated.severity === "CRITICAL"
+          ? 7
+          : validated.severity === "HIGH"
+            ? 14
+            : 30;
       const dueDate = new Date();
       dueDate.setDate(dueDate.getDate() + daysToComplete);
 
@@ -296,7 +325,6 @@ export async function POST(req: NextRequest) {
         erpSync: erpSyncResult,
         message: `Supplier CAPA request created and sent to ${supplier.name}`,
       });
-
     } else if (body.action === "UPDATE_STATUS") {
       // Supplier or internal user updating status
       const validated = supplierResponseSchema.parse(body);
@@ -313,7 +341,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (!supplierCapa) {
-        return NextResponse.json({ error: "Supplier CAPA request not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Supplier CAPA request not found" },
+          { status: 404 },
+        );
       }
 
       // Create response record
@@ -323,7 +354,9 @@ export async function POST(req: NextRequest) {
           status: validated.status,
           completedActions: validated.completedActions || [],
           evidenceUrls: validated.evidenceUrls || [],
-          estimatedCompletion: validated.estimatedCompletion ? new Date(validated.estimatedCompletion) : null,
+          estimatedCompletion: validated.estimatedCompletion
+            ? new Date(validated.estimatedCompletion)
+            : null,
           responseNotes: validated.responseNotes,
           respondedAt: new Date(),
         },
@@ -334,17 +367,28 @@ export async function POST(req: NextRequest) {
         where: { id: supplierCapa.id },
         data: {
           status: validated.status,
-          externalCapaId: validated.externalCapaId || supplierCapa.externalCapaId,
+          externalCapaId:
+            validated.externalCapaId || supplierCapa.externalCapaId,
           lastResponseAt: new Date(),
         },
       });
 
       // Calculate response metrics
-      const responseTime = calculateResponseTime(supplierCapa.requestedAt, new Date());
+      const responseTime = calculateResponseTime(
+        supplierCapa.requestedAt,
+        new Date(),
+      );
 
       // Update supplier quality score if actions completed
-      if (validated.status === "ACTIONS_COMPLETED" || validated.status === "EVIDENCE_SUBMITTED") {
-        await updateSupplierQualityScore(supplierCapa.supplierId, responseTime, validated.status);
+      if (
+        validated.status === "ACTIONS_COMPLETED" ||
+        validated.status === "EVIDENCE_SUBMITTED"
+      ) {
+        await updateSupplierQualityScore(
+          supplierCapa.supplierId,
+          responseTime,
+          validated.status,
+        );
       }
 
       // Log activity
@@ -366,7 +410,6 @@ export async function POST(req: NextRequest) {
         responseTime,
         message: "Supplier CAPA status updated successfully",
       });
-
     } else if (body.action === "SYNC_STATUS") {
       // Manually trigger ERP sync to get latest status
       const { supplierCapaId } = body;
@@ -382,7 +425,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (!supplierCapa || !supplierCapa.externalCapaId) {
-        return NextResponse.json({ error: "Cannot sync - no external CAPA ID" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Cannot sync - no external CAPA ID" },
+          { status: 400 },
+        );
       }
 
       const erpClient = getERPClient(supplierCapa.supplier.erpType);
@@ -402,24 +448,25 @@ export async function POST(req: NextRequest) {
         data: status,
         message: "ERP status synchronized",
       });
-
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
-
   } catch (error: any) {
     console.error("[SupplierIntegration] POST error:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
-      { error: "Failed to process supplier CAPA request", details: error.message },
-      { status: 500 }
+      {
+        error: "Failed to process supplier CAPA request",
+        details: error.message,
+      },
+      { status: 500 },
     );
   }
 }
@@ -427,7 +474,10 @@ export async function POST(req: NextRequest) {
 /**
  * Helper: Generate supplier scorecard
  */
-async function generateSupplierScorecard(supplierId: string, organizationId: string) {
+async function generateSupplierScorecard(
+  supplierId: string,
+  organizationId: string,
+) {
   const requests = await prisma.supplierCAPARequest.findMany({
     where: {
       supplierId,
@@ -438,45 +488,54 @@ async function generateSupplierScorecard(supplierId: string, organizationId: str
     },
   });
 
-  const completed = requests.filter(r => r.status === "ACTIONS_COMPLETED" || r.status === "EVIDENCE_SUBMITTED");
-  const overdue = requests.filter(r => r.dueDate && new Date(r.dueDate) < new Date() && r.status !== "ACTIONS_COMPLETED");
+  const completed = requests.filter(
+    (r) =>
+      r.status === "ACTIONS_COMPLETED" || r.status === "EVIDENCE_SUBMITTED",
+  );
+  const overdue = requests.filter(
+    (r) =>
+      r.dueDate &&
+      new Date(r.dueDate) < new Date() &&
+      r.status !== "ACTIONS_COMPLETED",
+  );
 
   // Calculate average response time (hours)
   const responseTimes = requests
-    .filter(r => r.lastResponseAt)
-    .map(r => calculateResponseTime(r.requestedAt, r.lastResponseAt!));
-  
-  const avgResponseTime = responseTimes.length > 0
-    ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
-    : 0;
+    .filter((r) => r.lastResponseAt)
+    .map((r) => calculateResponseTime(r.requestedAt, r.lastResponseAt!));
+
+  const avgResponseTime =
+    responseTimes.length > 0
+      ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
+      : 0;
 
   // Calculate completion rate
-  const completionRate = requests.length > 0
-    ? (completed.length / requests.length) * 100
-    : 0;
+  const completionRate =
+    requests.length > 0 ? (completed.length / requests.length) * 100 : 0;
 
   // Calculate on-time rate
-  const onTimeCompletions = completed.filter(r => 
-    r.lastResponseAt && r.dueDate && new Date(r.lastResponseAt) <= new Date(r.dueDate)
+  const onTimeCompletions = completed.filter(
+    (r) =>
+      r.lastResponseAt &&
+      r.dueDate &&
+      new Date(r.lastResponseAt) <= new Date(r.dueDate),
   ).length;
-  
-  const onTimeRate = completed.length > 0
-    ? (onTimeCompletions / completed.length) * 100
-    : 0;
+
+  const onTimeRate =
+    completed.length > 0 ? (onTimeCompletions / completed.length) * 100 : 0;
 
   // Quality score (weighted average)
-  const qualityScore = (
+  const qualityScore =
     completionRate * 0.4 +
     onTimeRate * 0.4 +
-    Math.max(0, 100 - (avgResponseTime / 24)) * 0.2 // Penalize slow response
-  );
+    Math.max(0, 100 - avgResponseTime / 24) * 0.2; // Penalize slow response
 
   return {
     supplierId,
     totalRequests: requests.length,
     completed: completed.length,
     overdue: overdue.length,
-    inProgress: requests.filter(r => r.status === "IN_PROGRESS").length,
+    inProgress: requests.filter((r) => r.status === "IN_PROGRESS").length,
     avgResponseTimeHours: Math.round(avgResponseTime * 10) / 10,
     completionRate: Math.round(completionRate * 10) / 10,
     onTimeRate: Math.round(onTimeRate * 10) / 10,
@@ -499,12 +558,13 @@ function calculateResponseTime(requestedAt: Date, respondedAt: Date): number {
  */
 function calculateAvgResponseTime(capas: any[]): number {
   const responseTimes = capas
-    .filter(c => c.lastResponseAt)
-    .map(c => calculateResponseTime(c.requestedAt, c.lastResponseAt));
-  
+    .filter((c) => c.lastResponseAt)
+    .map((c) => calculateResponseTime(c.requestedAt, c.lastResponseAt));
+
   if (responseTimes.length === 0) return 0;
-  
-  const avgHours = responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
+
+  const avgHours =
+    responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length;
   return Math.round(avgHours * 10) / 10;
 }
 
@@ -514,15 +574,16 @@ function calculateAvgResponseTime(capas: any[]): number {
 async function updateSupplierQualityScore(
   supplierId: string,
   responseTimeHours: number,
-  status: string
+  status: string,
 ) {
   // Simple scoring: Fast response + completion = higher score
   let scoreAdjustment = 0;
-  
+
   if (status === "ACTIONS_COMPLETED" || status === "EVIDENCE_SUBMITTED") {
     scoreAdjustment += 5; // Bonus for completion
-    
-    if (responseTimeHours < 48) scoreAdjustment += 3; // Very fast
+
+    if (responseTimeHours < 48)
+      scoreAdjustment += 3; // Very fast
     else if (responseTimeHours < 168) scoreAdjustment += 1; // Within a week
   }
 
@@ -558,7 +619,7 @@ function getQualityGrade(score: number): string {
 async function sendSupplierNotification(
   supplier: any,
   capa: any,
-  supplierCapa: any
+  supplierCapa: any,
 ) {
   // In production: Use email service (SendGrid, SES, etc.)
   console.log(`

@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // BARCODE/RFID RECEIVING SYSTEM API
 // ============================================================================
-// Purpose: Automated receiving with barcode and RFID scanning to eliminate 
+// Purpose: Automated receiving with barcode and RFID scanning to eliminate
 //          manual data entry and improve accuracy
 //
 // Investment: $45,000
@@ -35,119 +35,168 @@ import { z } from 'zod';
 
 // Barcode format types
 const BARCODE_FORMATS = {
-  UPC_A: { name: 'UPC-A', length: 12, pattern: /^\d{12}$/ },
-  UPC_E: { name: 'UPC-E', length: 8, pattern: /^\d{8}$/ },
-  EAN_13: { name: 'EAN-13', length: 13, pattern: /^\d{13}$/ },
-  EAN_8: { name: 'EAN-8', length: 8, pattern: /^\d{8}$/ },
-  CODE_128: { name: 'Code 128', minLength: 1, maxLength: 128, pattern: /^[\x00-\x7F]+$/ },
-  CODE_39: { name: 'Code 39', minLength: 1, maxLength: 43, pattern: /^[0-9A-Z\-. $\/+%]+$/ },
-  QR_CODE: { name: 'QR Code', minLength: 1, maxLength: 2953, pattern: /^.+$/ },
-  DATA_MATRIX: { name: 'Data Matrix', minLength: 1, maxLength: 2335, pattern: /^.+$/ }
+  UPC_A: { name: "UPC-A", length: 12, pattern: /^\d{12}$/ },
+  UPC_E: { name: "UPC-E", length: 8, pattern: /^\d{8}$/ },
+  EAN_13: { name: "EAN-13", length: 13, pattern: /^\d{13}$/ },
+  EAN_8: { name: "EAN-8", length: 8, pattern: /^\d{8}$/ },
+  CODE_128: {
+    name: "Code 128",
+    minLength: 1,
+    maxLength: 128,
+    pattern: /^[\x00-\x7F]+$/,
+  },
+  CODE_39: {
+    name: "Code 39",
+    minLength: 1,
+    maxLength: 43,
+    pattern: /^[0-9A-Z\-. $\/+%]+$/,
+  },
+  QR_CODE: { name: "QR Code", minLength: 1, maxLength: 2953, pattern: /^.+$/ },
+  DATA_MATRIX: {
+    name: "Data Matrix",
+    minLength: 1,
+    maxLength: 2335,
+    pattern: /^.+$/,
+  },
 } as const;
 
 // RFID tag types
 const RFID_TAG_TYPES = {
-  EPC_GEN2: { name: 'EPC Gen2', frequency: '902-928 MHz', range: 'up to 40 feet' },
-  ISO_15693: { name: 'ISO 15693', frequency: '13.56 MHz', range: 'up to 3 feet' },
-  ISO_14443: { name: 'ISO 14443', frequency: '13.56 MHz', range: 'up to 4 inches' },
-  NFC: { name: 'NFC', frequency: '13.56 MHz', range: 'up to 4 inches' }
+  EPC_GEN2: {
+    name: "EPC Gen2",
+    frequency: "902-928 MHz",
+    range: "up to 40 feet",
+  },
+  ISO_15693: {
+    name: "ISO 15693",
+    frequency: "13.56 MHz",
+    range: "up to 3 feet",
+  },
+  ISO_14443: {
+    name: "ISO 14443",
+    frequency: "13.56 MHz",
+    range: "up to 4 inches",
+  },
+  NFC: { name: "NFC", frequency: "13.56 MHz", range: "up to 4 inches" },
 } as const;
 
 // Receiving status codes
 const RECEIVING_STATUS = {
-  PENDING: 'Awaiting Receiving',
-  IN_PROGRESS: 'Receiving In Progress',
-  PARTIAL: 'Partially Received',
-  COMPLETE: 'Fully Received',
-  DISCREPANCY: 'Discrepancy Detected',
-  REJECTED: 'Rejected',
-  ON_HOLD: 'On Hold'
+  PENDING: "Awaiting Receiving",
+  IN_PROGRESS: "Receiving In Progress",
+  PARTIAL: "Partially Received",
+  COMPLETE: "Fully Received",
+  DISCREPANCY: "Discrepancy Detected",
+  REJECTED: "Rejected",
+  ON_HOLD: "On Hold",
 } as const;
 
 // Discrepancy types
 const DISCREPANCY_TYPES = {
-  QUANTITY_SHORT: 'Quantity Short',
-  QUANTITY_OVER: 'Quantity Over',
-  DAMAGED_GOODS: 'Damaged Goods',
-  WRONG_PRODUCT: 'Wrong Product',
-  MISSING_DOCUMENTATION: 'Missing Documentation',
-  QUALITY_ISSUE: 'Quality Issue',
-  EXPIRED_PRODUCT: 'Expired Product',
-  WRONG_LOT: 'Wrong Lot Number'
+  QUANTITY_SHORT: "Quantity Short",
+  QUANTITY_OVER: "Quantity Over",
+  DAMAGED_GOODS: "Damaged Goods",
+  WRONG_PRODUCT: "Wrong Product",
+  MISSING_DOCUMENTATION: "Missing Documentation",
+  QUALITY_ISSUE: "Quality Issue",
+  EXPIRED_PRODUCT: "Expired Product",
+  WRONG_LOT: "Wrong Lot Number",
 } as const;
 
 // Validation schemas
 const ScanBarcodeSchema = z.object({
-  action: z.literal('scan_barcode'),
+  action: z.literal("scan_barcode"),
   barcode: z.string().min(1),
-  format: z.enum(['UPC_A', 'UPC_E', 'EAN_13', 'EAN_8', 'CODE_128', 'CODE_39', 'QR_CODE', 'DATA_MATRIX']).optional(),
+  format: z
+    .enum([
+      "UPC_A",
+      "UPC_E",
+      "EAN_13",
+      "EAN_8",
+      "CODE_128",
+      "CODE_39",
+      "QR_CODE",
+      "DATA_MATRIX",
+    ])
+    .optional(),
   receivingId: z.string().optional(),
   quantity: z.number().positive().optional(),
-  userId: z.string()
+  userId: z.string(),
 });
 
 const ScanRFIDSchema = z.object({
-  action: z.literal('scan_rfid'),
+  action: z.literal("scan_rfid"),
   tags: z.array(z.string()),
-  tagType: z.enum(['EPC_GEN2', 'ISO_15693', 'ISO_14443', 'NFC']),
+  tagType: z.enum(["EPC_GEN2", "ISO_15693", "ISO_14443", "NFC"]),
   receivingId: z.string().optional(),
-  userId: z.string()
+  userId: z.string(),
 });
 
 const StartReceivingSchema = z.object({
-  action: z.literal('start_receiving'),
+  action: z.literal("start_receiving"),
   purchaseOrderId: z.string().optional(),
   asnId: z.string().optional(),
   supplierId: z.string(),
-  expectedItems: z.array(z.object({
-    sku: z.string(),
-    quantity: z.number().positive(),
-    lotNumber: z.string().optional()
-  }))
+  expectedItems: z.array(
+    z.object({
+      sku: z.string(),
+      quantity: z.number().positive(),
+      lotNumber: z.string().optional(),
+    }),
+  ),
 });
 
 const CompleteReceivingSchema = z.object({
-  action: z.literal('complete_receiving'),
+  action: z.literal("complete_receiving"),
   receivingId: z.string(),
-  notes: z.string().optional()
+  notes: z.string().optional(),
 });
 
 const ReportDiscrepancySchema = z.object({
-  action: z.literal('report_discrepancy'),
+  action: z.literal("report_discrepancy"),
   receivingId: z.string(),
   discrepancyType: z.enum([
-    'QUANTITY_SHORT', 'QUANTITY_OVER', 'DAMAGED_GOODS', 'WRONG_PRODUCT',
-    'MISSING_DOCUMENTATION', 'QUALITY_ISSUE', 'EXPIRED_PRODUCT', 'WRONG_LOT'
+    "QUANTITY_SHORT",
+    "QUANTITY_OVER",
+    "DAMAGED_GOODS",
+    "WRONG_PRODUCT",
+    "MISSING_DOCUMENTATION",
+    "QUALITY_ISSUE",
+    "EXPIRED_PRODUCT",
+    "WRONG_LOT",
   ]),
   sku: z.string(),
   expectedQuantity: z.number(),
   actualQuantity: z.number(),
   description: z.string(),
-  images: z.array(z.string()).optional()
+  images: z.array(z.string()).optional(),
 });
 
-const ExecuteActionSchema = z.discriminatedUnion('action', [
+const ExecuteActionSchema = z.discriminatedUnion("action", [
   ScanBarcodeSchema,
   ScanRFIDSchema,
   StartReceivingSchema,
   CompleteReceivingSchema,
-  ReportDiscrepancySchema
+  ReportDiscrepancySchema,
 ]);
 
 // Validate barcode format
 function validateBarcodeFormat(
   barcode: string,
-  format?: keyof typeof BARCODE_FORMATS
-): { valid: boolean; detectedFormat: keyof typeof BARCODE_FORMATS | null; error?: string } {
-  
+  format?: keyof typeof BARCODE_FORMATS,
+): {
+  valid: boolean;
+  detectedFormat: keyof typeof BARCODE_FORMATS | null;
+  error?: string;
+} {
   if (format) {
     // Validate against specific format
     const formatSpec = BARCODE_FORMATS[format];
     if (!formatSpec.pattern.test(barcode)) {
-      return { 
-        valid: false, 
-        detectedFormat: null, 
-        error: `Invalid ${formatSpec.name} format` 
+      return {
+        valid: false,
+        detectedFormat: null,
+        error: `Invalid ${formatSpec.name} format`,
       };
     }
     return { valid: true, detectedFormat: format };
@@ -157,28 +206,31 @@ function validateBarcodeFormat(
   for (const [key, spec] of Object.entries(BARCODE_FORMATS)) {
     if (spec.pattern.test(barcode)) {
       const formatKey = key as keyof typeof BARCODE_FORMATS;
-      if ('length' in spec && barcode.length === spec.length) {
+      if ("length" in spec && barcode.length === spec.length) {
         return { valid: true, detectedFormat: formatKey };
       }
-      if ('minLength' in spec && 'maxLength' in spec) {
-        if (barcode.length >= spec.minLength && barcode.length <= spec.maxLength) {
+      if ("minLength" in spec && "maxLength" in spec) {
+        if (
+          barcode.length >= spec.minLength &&
+          barcode.length <= spec.maxLength
+        ) {
           return { valid: true, detectedFormat: formatKey };
         }
       }
     }
   }
 
-  return { 
-    valid: false, 
-    detectedFormat: null, 
-    error: 'Unrecognized barcode format' 
+  return {
+    valid: false,
+    detectedFormat: null,
+    error: "Unrecognized barcode format",
   };
 }
 
 // Calculate receiving accuracy percentage
 function calculateReceivingAccuracy(
   expected: { sku: string; quantity: number }[],
-  received: { sku: string; quantity: number }[]
+  received: { sku: string; quantity: number }[],
 ): number {
   if (expected.length === 0) return 100;
 
@@ -188,7 +240,7 @@ function calculateReceivingAccuracy(
 
   for (const exp of expected) {
     totalExpectedQty += exp.quantity;
-    const rec = received.find(r => r.sku === exp.sku);
+    const rec = received.find((r) => r.sku === exp.sku);
     if (rec) {
       totalReceivedQty += rec.quantity;
       if (rec.quantity === exp.quantity) {
@@ -199,11 +251,12 @@ function calculateReceivingAccuracy(
 
   // Weighted accuracy: item match + quantity match
   const itemAccuracy = (correctItems / expected.length) * 100;
-  const qtyAccuracy = totalExpectedQty > 0 
-    ? (Math.min(totalReceivedQty, totalExpectedQty) / totalExpectedQty) * 100 
-    : 0;
+  const qtyAccuracy =
+    totalExpectedQty > 0
+      ? (Math.min(totalReceivedQty, totalExpectedQty) / totalExpectedQty) * 100
+      : 0;
 
-  return (itemAccuracy * 0.6) + (qtyAccuracy * 0.4);
+  return itemAccuracy * 0.6 + qtyAccuracy * 0.4;
 }
 
 // GET handler - Retrieve receiving stats and sessions
@@ -211,58 +264,55 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action') || 'stats';
-    const organizationId = session.user.organizationId || 'default-org';
+    const action = searchParams.get("action") || "stats";
+    const organizationId = session.user.organizationId || "default-org";
 
-    if (action === 'stats') {
+    if (action === "stats") {
       // Get receiving statistics
-      const [
-        receivingLogs,
-        discrepancyLogs,
-        recentSessions
-      ] = await Promise.all([
-        // Barcode/RFID scan logs
-        prisma.activityLog.findMany({
-          where: {
-            organizationId,
-            action: {
-              in: ['BARCODE_SCANNED', 'RFID_SCANNED', 'RECEIVING_COMPLETED']
+      const [receivingLogs, discrepancyLogs, recentSessions] =
+        await Promise.all([
+          // Barcode/RFID scan logs
+          prisma.activityLog.findMany({
+            where: {
+              organizationId,
+              action: {
+                in: ["BARCODE_SCANNED", "RFID_SCANNED", "RECEIVING_COMPLETED"],
+              },
+              createdAt: {
+                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              },
             },
-            createdAt: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        }),
+            orderBy: { createdAt: "desc" },
+          }),
 
-        // Discrepancy reports
-        prisma.activityLog.findMany({
-          where: {
-            organizationId,
-            action: 'DISCREPANCY_REPORTED',
-            createdAt: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-            }
-          }
-        }),
+          // Discrepancy reports
+          prisma.activityLog.findMany({
+            where: {
+              organizationId,
+              action: "DISCREPANCY_REPORTED",
+              createdAt: {
+                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              },
+            },
+          }),
 
-        // Recent receiving sessions
-        prisma.activityLog.findMany({
-          where: {
-            organizationId,
-            action: 'RECEIVING_STARTED',
-            createdAt: {
-              gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-            }
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 20
-        })
-      ]);
+          // Recent receiving sessions
+          prisma.activityLog.findMany({
+            where: {
+              organizationId,
+              action: "RECEIVING_STARTED",
+              createdAt: {
+                gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+              },
+            },
+            orderBy: { createdAt: "desc" },
+            take: 20,
+          }),
+        ]);
 
       // Calculate metrics
       let totalScans = 0;
@@ -274,36 +324,37 @@ export async function GET(request: NextRequest) {
 
       for (const log of receivingLogs) {
         const metadata = log.metadata as any;
-        
-        if (log.action === 'BARCODE_SCANNED') {
+
+        if (log.action === "BARCODE_SCANNED") {
           barcodeScans++;
           totalScans++;
           totalItemsReceived += metadata?.quantity || 1;
-        } else if (log.action === 'RFID_SCANNED') {
+        } else if (log.action === "RFID_SCANNED") {
           rfidScans++;
           const tagCount = metadata?.tagCount || 0;
           totalScans += tagCount;
           totalItemsReceived += tagCount;
-        } else if (log.action === 'RECEIVING_COMPLETED') {
+        } else if (log.action === "RECEIVING_COMPLETED") {
           completedSessions++;
           totalReceivingTime += metadata?.durationMinutes || 0;
         }
       }
 
-      const averageReceivingTime = completedSessions > 0 
-        ? Math.round(totalReceivingTime / completedSessions) 
-        : 0;
+      const averageReceivingTime =
+        completedSessions > 0
+          ? Math.round(totalReceivingTime / completedSessions)
+          : 0;
 
-      const discrepancyRate = totalScans > 0 
-        ? (discrepancyLogs.length / totalScans) * 100 
-        : 0;
+      const discrepancyRate =
+        totalScans > 0 ? (discrepancyLogs.length / totalScans) * 100 : 0;
 
       const accuracy = 100 - discrepancyRate;
 
       // Calculate savings
       const manualEntryTime = 2; // minutes per item manually
       const scanTime = 0.1; // minutes per scan
-      const timeSaved = (totalItemsReceived * manualEntryTime) - (totalScans * scanTime);
+      const timeSaved =
+        totalItemsReceived * manualEntryTime - totalScans * scanTime;
       const laborCost = 25; // dollars per hour
       const monthlySavings = (timeSaved / 60) * laborCost;
 
@@ -320,31 +371,31 @@ export async function GET(request: NextRequest) {
           discrepancies: discrepancyLogs.length,
           discrepancyRate: Math.round(discrepancyRate * 100) / 100,
           monthlySavings: Math.round(monthlySavings * 100) / 100,
-          activeSessions: recentSessions.filter(s => {
+          activeSessions: recentSessions.filter((s) => {
             const metadata = s.metadata as any;
-            return metadata?.status !== 'COMPLETE';
+            return metadata?.status !== "COMPLETE";
           }).length,
-          lastUpdated: new Date().toISOString()
-        }
+          lastUpdated: new Date().toISOString(),
+        },
       });
     }
 
-    if (action === 'active-sessions') {
+    if (action === "active-sessions") {
       // Get active receiving sessions
       const activeSessions = await prisma.activityLog.findMany({
         where: {
           organizationId,
-          action: 'RECEIVING_STARTED',
+          action: "RECEIVING_STARTED",
           createdAt: {
-            gte: new Date(Date.now() - 24 * 60 * 60 * 1000)
-          }
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
+          },
         },
-        orderBy: { createdAt: 'desc' }
+        orderBy: { createdAt: "desc" },
       });
 
       return NextResponse.json({
         success: true,
-        sessions: activeSessions.map(session => ({
+        sessions: activeSessions.map((session) => ({
           id: session.id,
           receivingId: (session.metadata as any)?.receivingId,
           supplier: (session.metadata as any)?.supplier,
@@ -352,25 +403,25 @@ export async function GET(request: NextRequest) {
           expectedItems: (session.metadata as any)?.expectedItems,
           receivedItems: (session.metadata as any)?.receivedItems || [],
           startedAt: session.createdAt,
-          userId: session.userId
-        }))
+          userId: session.userId,
+        })),
       });
     }
 
-    if (action === 'recent-discrepancies') {
+    if (action === "recent-discrepancies") {
       // Get recent discrepancy reports
       const discrepancies = await prisma.activityLog.findMany({
         where: {
           organizationId,
-          action: 'DISCREPANCY_REPORTED'
+          action: "DISCREPANCY_REPORTED",
         },
-        orderBy: { createdAt: 'desc' },
-        take: 50
+        orderBy: { createdAt: "desc" },
+        take: 50,
       });
 
       return NextResponse.json({
         success: true,
-        discrepancies: discrepancies.map(disc => ({
+        discrepancies: discrepancies.map((disc) => ({
           id: disc.id,
           receivingId: (disc.metadata as any)?.receivingId,
           type: (disc.metadata as any)?.discrepancyType,
@@ -379,21 +430,20 @@ export async function GET(request: NextRequest) {
           actual: (disc.metadata as any)?.actualQuantity,
           description: (disc.metadata as any)?.description,
           reportedAt: disc.createdAt,
-          userId: disc.userId
-        }))
+          userId: disc.userId,
+        })),
       });
     }
 
     return NextResponse.json(
-      { error: 'Invalid action parameter' },
-      { status: 400 }
+      { error: "Invalid action parameter" },
+      { status: 400 },
     );
-
   } catch (error) {
-    console.error('Barcode/RFID receiving API error:', error);
+    console.error("Barcode/RFID receiving API error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
@@ -403,25 +453,25 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const validatedData = ExecuteActionSchema.parse(body);
-    const organizationId = session.user.organizationId || 'default-org';
+    const organizationId = session.user.organizationId || "default-org";
 
     switch (validatedData.action) {
-      case 'scan_barcode': {
+      case "scan_barcode": {
         // Validate barcode format
         const validation = validateBarcodeFormat(
           validatedData.barcode,
-          validatedData.format
+          validatedData.format,
         );
 
         if (!validation.valid) {
           return NextResponse.json(
-            { error: validation.error || 'Invalid barcode' },
-            { status: 400 }
+            { error: validation.error || "Invalid barcode" },
+            { status: 400 },
           );
         }
 
@@ -429,14 +479,14 @@ export async function POST(request: NextRequest) {
         const inventoryItem = await prisma.inventoryItem.findFirst({
           where: {
             organizationId,
-            sku: validatedData.barcode
-          }
+            sku: validatedData.barcode,
+          },
         });
 
         if (!inventoryItem) {
           return NextResponse.json(
-            { error: 'Product not found', barcode: validatedData.barcode },
-            { status: 404 }
+            { error: "Product not found", barcode: validatedData.barcode },
+            { status: 404 },
           );
         }
 
@@ -445,14 +495,14 @@ export async function POST(request: NextRequest) {
         // Update inventory
         await prisma.inventoryItem.update({
           where: {
-            id: inventoryItem.id
+            id: inventoryItem.id,
           },
           data: {
             quantity: {
-              increment: quantity
+              increment: quantity,
             },
-            status: 'ACTIVE'
-          }
+            status: "ACTIVE",
+          },
         });
 
         // Log the scan
@@ -460,8 +510,8 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'BARCODE_SCANNED',
-            entityType: 'PRODUCT',
+            action: "BARCODE_SCANNED",
+            entityType: "PRODUCT",
             entityId: inventoryItem.id,
             metadata: {
               barcode: validatedData.barcode,
@@ -469,9 +519,9 @@ export async function POST(request: NextRequest) {
               sku: inventoryItem.sku,
               quantity,
               receivingId: validatedData.receivingId,
-              timestamp: new Date().toISOString()
-            }
-          }
+              timestamp: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -483,15 +533,15 @@ export async function POST(request: NextRequest) {
               id: inventoryItem.id,
               sku: inventoryItem.sku,
               name: inventoryItem.name,
-              description: inventoryItem.description || ''
+              description: inventoryItem.description || "",
             },
             quantity,
-            receivingId: validatedData.receivingId
-          }
+            receivingId: validatedData.receivingId,
+          },
         });
       }
 
-      case 'scan_rfid': {
+      case "scan_rfid": {
         // Process RFID tag scan (bulk scanning)
         const products: any[] = [];
         let successCount = 0;
@@ -503,22 +553,22 @@ export async function POST(request: NextRequest) {
             const inventoryItem = await prisma.inventoryItem.findFirst({
               where: {
                 organizationId,
-                sku: tag // Use SKU field for RFID lookup
-              }
+                sku: tag, // Use SKU field for RFID lookup
+              },
             });
 
             if (inventoryItem) {
               // Update inventory
               await prisma.inventoryItem.update({
                 where: {
-                  id: inventoryItem.id
+                  id: inventoryItem.id,
                 },
                 data: {
                   quantity: {
-                    increment: 1
+                    increment: 1,
                   },
-                  status: 'ACTIVE'
-                }
+                  status: "ACTIVE",
+                },
               });
 
               products.push({
@@ -526,8 +576,8 @@ export async function POST(request: NextRequest) {
                 product: {
                   id: inventoryItem.id,
                   sku: inventoryItem.sku,
-                  name: inventoryItem.name
-                }
+                  name: inventoryItem.name,
+                },
               });
               successCount++;
             } else {
@@ -543,18 +593,18 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'RFID_SCANNED',
-            entityType: 'INVENTORY',
-            entityId: validatedData.receivingId || 'rfid-scan',
+            action: "RFID_SCANNED",
+            entityType: "INVENTORY",
+            entityId: validatedData.receivingId || "rfid-scan",
             metadata: {
               tagType: validatedData.tagType,
               tagCount: validatedData.tags.length,
               successCount,
               errorCount,
               receivingId: validatedData.receivingId,
-              timestamp: new Date().toISOString()
-            }
-          }
+              timestamp: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -565,12 +615,12 @@ export async function POST(request: NextRequest) {
             successCount,
             errorCount,
             products,
-            receivingId: validatedData.receivingId
-          }
+            receivingId: validatedData.receivingId,
+          },
         });
       }
 
-      case 'start_receiving': {
+      case "start_receiving": {
         // Create new receiving session
         const receivingId = `RCV-${Date.now()}`;
 
@@ -578,8 +628,8 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'RECEIVING_STARTED',
-            entityType: 'RECEIVING',
+            action: "RECEIVING_STARTED",
+            entityType: "RECEIVING",
             entityId: receivingId,
             metadata: {
               receivingId,
@@ -587,79 +637,81 @@ export async function POST(request: NextRequest) {
               asnId: validatedData.asnId,
               supplierId: validatedData.supplierId,
               expectedItems: validatedData.expectedItems,
-              status: 'IN_PROGRESS',
-              startedAt: new Date().toISOString()
-            }
-          }
+              status: "IN_PROGRESS",
+              startedAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
           success: true,
           receivingSession: {
             id: receivingId,
-            status: 'IN_PROGRESS',
+            status: "IN_PROGRESS",
             expectedItems: validatedData.expectedItems,
             receivedItems: [],
-            startedAt: new Date().toISOString()
-          }
+            startedAt: new Date().toISOString(),
+          },
         });
       }
 
-      case 'complete_receiving': {
+      case "complete_receiving": {
         // Complete receiving session
         const startLog = await prisma.activityLog.findFirst({
           where: {
             organizationId,
-            action: 'RECEIVING_STARTED',
-            entityId: validatedData.receivingId
-          }
+            action: "RECEIVING_STARTED",
+            entityId: validatedData.receivingId,
+          },
         });
 
         if (!startLog) {
           return NextResponse.json(
-            { error: 'Receiving session not found' },
-            { status: 404 }
+            { error: "Receiving session not found" },
+            { status: 404 },
           );
         }
 
         const startMetadata = startLog.metadata as any;
         const startTime = new Date(startMetadata.startedAt);
         const endTime = new Date();
-        const durationMinutes = Math.round((endTime.getTime() - startTime.getTime()) / 60000);
+        const durationMinutes = Math.round(
+          (endTime.getTime() - startTime.getTime()) / 60000,
+        );
 
         // Get all scans for this session
         const scans = await prisma.activityLog.findMany({
           where: {
             organizationId,
             action: {
-              in: ['BARCODE_SCANNED', 'RFID_SCANNED']
+              in: ["BARCODE_SCANNED", "RFID_SCANNED"],
             },
             metadata: {
-              path: ['receivingId'],
-              equals: validatedData.receivingId
-            }
-          }
+              path: ["receivingId"],
+              equals: validatedData.receivingId,
+            },
+          },
         });
 
-        const receivedItems = scans.map(scan => {
+        const receivedItems = scans.map((scan) => {
           const metadata = scan.metadata as any;
           return {
             sku: metadata.sku,
-            quantity: metadata.quantity || 1
+            quantity: metadata.quantity || 1,
           };
         });
 
         const accuracy = calculateReceivingAccuracy(
           startMetadata.expectedItems,
-          receivedItems
+          receivedItems,
         );
 
         await prisma.activityLog.create({
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'RECEIVING_COMPLETED',
-            entityType: 'RECEIVING',
+            action: "RECEIVING_COMPLETED",
+            entityType: "RECEIVING",
             entityId: validatedData.receivingId,
             metadata: {
               receivingId: validatedData.receivingId,
@@ -668,9 +720,9 @@ export async function POST(request: NextRequest) {
               accuracy,
               durationMinutes,
               notes: validatedData.notes,
-              completedAt: new Date().toISOString()
-            }
-          }
+              completedAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -681,19 +733,19 @@ export async function POST(request: NextRequest) {
             receivedItems: receivedItems.length,
             accuracy,
             durationMinutes,
-            completedAt: new Date().toISOString()
-          }
+            completedAt: new Date().toISOString(),
+          },
         });
       }
 
-      case 'report_discrepancy': {
+      case "report_discrepancy": {
         // Report receiving discrepancy
         await prisma.activityLog.create({
           data: {
             organizationId,
             userId: session.user.id,
-            action: 'DISCREPANCY_REPORTED',
-            entityType: 'RECEIVING',
+            action: "DISCREPANCY_REPORTED",
+            entityType: "RECEIVING",
             entityId: validatedData.receivingId,
             metadata: {
               receivingId: validatedData.receivingId,
@@ -701,12 +753,13 @@ export async function POST(request: NextRequest) {
               sku: validatedData.sku,
               expectedQuantity: validatedData.expectedQuantity,
               actualQuantity: validatedData.actualQuantity,
-              variance: validatedData.actualQuantity - validatedData.expectedQuantity,
+              variance:
+                validatedData.actualQuantity - validatedData.expectedQuantity,
               description: validatedData.description,
               images: validatedData.images,
-              reportedAt: new Date().toISOString()
-            }
-          }
+              reportedAt: new Date().toISOString(),
+            },
+          },
         });
 
         return NextResponse.json({
@@ -718,31 +771,28 @@ export async function POST(request: NextRequest) {
             sku: validatedData.sku,
             expected: validatedData.expectedQuantity,
             actual: validatedData.actualQuantity,
-            variance: validatedData.actualQuantity - validatedData.expectedQuantity,
-            reportedAt: new Date().toISOString()
-          }
+            variance:
+              validatedData.actualQuantity - validatedData.expectedQuantity,
+            reportedAt: new Date().toISOString(),
+          },
         });
       }
 
       default:
-        return NextResponse.json(
-          { error: 'Invalid action' },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.errors },
-        { status: 400 }
+        { error: "Invalid request data", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Barcode/RFID receiving API error:', error);
+    console.error("Barcode/RFID receiving API error:", error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }

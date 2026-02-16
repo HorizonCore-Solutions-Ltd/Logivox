@@ -73,7 +73,7 @@ export async function GET(request: NextRequest) {
     for (const capa of closedCAPAs) {
       const metrics = await analyzeEffectiveness(
         session.user.organizationId,
-        capa
+        capa,
       );
       effectivenessData.push(metrics);
     }
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     console.error("Error monitoring CAPA effectiveness:", error);
     return NextResponse.json(
       { error: "Failed to monitor effectiveness" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -127,12 +127,15 @@ export async function POST(request: NextRequest) {
     });
 
     // If verification failed, trigger re-CAPA
-    if (!validatedData.verificationPassed || validatedData.effectivenessScore < 70) {
+    if (
+      !validatedData.verificationPassed ||
+      validatedData.effectivenessScore < 70
+    ) {
       await triggerReCAPA(
         session.user.organizationId,
         capa,
         session.user.id,
-        validatedData.effectivenessNotes || "Original CAPA ineffective"
+        validatedData.effectivenessNotes || "Original CAPA ineffective",
       );
     }
 
@@ -163,13 +166,13 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error verifying effectiveness:", error);
     return NextResponse.json(
       { error: "Failed to record verification" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -179,12 +182,12 @@ export async function POST(request: NextRequest) {
  */
 async function analyzeEffectiveness(
   organizationId: string,
-  capa: any
+  capa: any,
 ): Promise<EffectivenessMetrics> {
   const now = new Date();
   const closedDate = new Date(capa.closedDate || capa.createdAt);
   const monitoringDays = Math.floor(
-    (now.getTime() - closedDate.getTime()) / (1000 * 60 * 60 * 24)
+    (now.getTime() - closedDate.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   // Check for recurrence: Look for similar NCRs after CAPA closure
@@ -228,7 +231,7 @@ async function analyzeEffectiveness(
     effectivenessScore = calculateEffectivenessScore(
       recurrenceDetected,
       relatedNCRs,
-      monitoringDays
+      monitoringDays,
     );
   }
 
@@ -237,7 +240,7 @@ async function analyzeEffectiveness(
     recurrenceDetected,
     effectivenessScore,
     verificationStatus,
-    monitoringDays
+    monitoringDays,
   );
 
   return {
@@ -259,7 +262,7 @@ async function analyzeEffectiveness(
 function calculateEffectivenessScore(
   recurrenceDetected: boolean,
   relatedIncidents: number,
-  monitoringDays: number
+  monitoringDays: number,
 ): number {
   let score = 100;
 
@@ -284,7 +287,7 @@ function generateRecommendation(
   recurrenceDetected: boolean,
   effectivenessScore: number,
   verificationStatus: string,
-  monitoringDays: number
+  monitoringDays: number,
 ): string {
   if (recurrenceDetected) {
     return "⚠️ Issue recurrence detected - Re-CAPA required";
@@ -316,7 +319,7 @@ async function triggerReCAPA(
   organizationId: string,
   originalCAPA: any,
   userId: string,
-  reason: string
+  reason: string,
 ) {
   // Generate new CAPA number
   const lastCAPA = await prisma.correctivePreventiveAction.findFirst({

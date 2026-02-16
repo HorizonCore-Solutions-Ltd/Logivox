@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // QUALITY INSPECTION WORKFLOWS API
@@ -31,54 +31,56 @@ import { z } from 'zod';
 
 // Inspection types
 type InspectionType =
-  | 'FULL_INSPECTION'      // 100% of items inspected
-  | 'SAMPLE_BASED'         // Statistical sampling
-  | 'VISUAL_ONLY'          // Quick visual check
-  | 'COMPUTER_VISION'      // AI-powered image analysis
-  | 'CRITICAL_DIMENSIONS'  // Measurement verification
-  | 'FUNCTIONAL_TEST';     // Operational testing
+  | "FULL_INSPECTION" // 100% of items inspected
+  | "SAMPLE_BASED" // Statistical sampling
+  | "VISUAL_ONLY" // Quick visual check
+  | "COMPUTER_VISION" // AI-powered image analysis
+  | "CRITICAL_DIMENSIONS" // Measurement verification
+  | "FUNCTIONAL_TEST"; // Operational testing
 
 // Inspection status
 type InspectionStatus =
-  | 'PENDING'      // Awaiting inspection
-  | 'IN_PROGRESS'  // Currently inspecting
-  | 'PASSED'       // Approved for receipt
-  | 'FAILED'       // Rejected
-  | 'ON_HOLD'      // Pending decision
-  | 'CONDITIONAL'  // Passed with notes
-  | 'ESCALATED';   // Requires management review
+  | "PENDING" // Awaiting inspection
+  | "IN_PROGRESS" // Currently inspecting
+  | "PASSED" // Approved for receipt
+  | "FAILED" // Rejected
+  | "ON_HOLD" // Pending decision
+  | "CONDITIONAL" // Passed with notes
+  | "ESCALATED"; // Requires management review
 
 // Defect severity
-type DefectSeverity = 'CRITICAL' | 'MAJOR' | 'MINOR' | 'COSMETIC';
+type DefectSeverity = "CRITICAL" | "MAJOR" | "MINOR" | "COSMETIC";
 
 // Risk levels for inspection routing
-type RiskLevel = 'HIGH' | 'MEDIUM' | 'LOW';
+type RiskLevel = "HIGH" | "MEDIUM" | "LOW";
 
 // Validation schemas
 const createInspectionSchema = z.object({
-  action: z.literal('create_inspection'),
+  action: z.literal("create_inspection"),
   receivingId: z.string().uuid(),
   inspectionType: z.enum([
-    'FULL_INSPECTION',
-    'SAMPLE_BASED',
-    'VISUAL_ONLY',
-    'COMPUTER_VISION',
-    'CRITICAL_DIMENSIONS',
-    'FUNCTIONAL_TEST'
+    "FULL_INSPECTION",
+    "SAMPLE_BASED",
+    "VISUAL_ONLY",
+    "COMPUTER_VISION",
+    "CRITICAL_DIMENSIONS",
+    "FUNCTIONAL_TEST",
   ]),
-  priority: z.enum(['CRITICAL', 'HIGH', 'NORMAL', 'LOW']),
-  items: z.array(z.object({
-    sku: z.string(),
-    quantity: z.number().positive(),
-    supplierLotNumber: z.string().optional(),
-  })),
+  priority: z.enum(["CRITICAL", "HIGH", "NORMAL", "LOW"]),
+  items: z.array(
+    z.object({
+      sku: z.string(),
+      quantity: z.number().positive(),
+      supplierLotNumber: z.string().optional(),
+    }),
+  ),
 });
 
 const recordDefectSchema = z.object({
-  action: z.literal('record_defect'),
+  action: z.literal("record_defect"),
   inspectionId: z.string().uuid(),
   defectType: z.string(),
-  severity: z.enum(['CRITICAL', 'MAJOR', 'MINOR', 'COSMETIC']),
+  severity: z.enum(["CRITICAL", "MAJOR", "MINOR", "COSMETIC"]),
   quantity: z.number().positive(),
   description: z.string(),
   imageUrls: z.array(z.string()).optional(),
@@ -86,9 +88,9 @@ const recordDefectSchema = z.object({
 });
 
 const completeInspectionSchema = z.object({
-  action: z.literal('complete_inspection'),
+  action: z.literal("complete_inspection"),
   inspectionId: z.string().uuid(),
-  status: z.enum(['PASSED', 'FAILED', 'CONDITIONAL']),
+  status: z.enum(["PASSED", "FAILED", "CONDITIONAL"]),
   inspectorId: z.string(),
   notes: z.string().optional(),
   sampleSize: z.number().optional(),
@@ -97,28 +99,28 @@ const completeInspectionSchema = z.object({
 });
 
 const escalateInspectionSchema = z.object({
-  action: z.literal('escalate_inspection'),
+  action: z.literal("escalate_inspection"),
   inspectionId: z.string().uuid(),
   reason: z.string(),
   escalatedTo: z.string(),
-  urgency: z.enum(['CRITICAL', 'HIGH', 'NORMAL']),
+  urgency: z.enum(["CRITICAL", "HIGH", "NORMAL"]),
 });
 
 const releaseHoldSchema = z.object({
-  action: z.literal('release_hold'),
+  action: z.literal("release_hold"),
   inspectionId: z.string().uuid(),
   disposition: z.enum([
-    'ACCEPT_AS_IS',
-    'ACCEPT_WITH_CONCESSION',
-    'REWORK',
-    'RETURN_TO_SUPPLIER',
-    'SCRAP'
+    "ACCEPT_AS_IS",
+    "ACCEPT_WITH_CONCESSION",
+    "REWORK",
+    "RETURN_TO_SUPPLIER",
+    "SCRAP",
   ]),
   authorizedBy: z.string(),
   notes: z.string(),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   createInspectionSchema,
   recordDefectSchema,
   completeInspectionSchema,
@@ -131,7 +133,7 @@ function determineInspectionType(
   supplierQualityScore: number,
   itemCriticality: string,
   orderValue: number,
-  defectHistory: number
+  defectHistory: number,
 ): { inspectionType: InspectionType; riskLevel: RiskLevel; reason: string } {
   let riskScore = 0;
   let reasons: string[] = [];
@@ -139,24 +141,24 @@ function determineInspectionType(
   // Supplier quality scoring (0-100)
   if (supplierQualityScore < 70) {
     riskScore += 40;
-    reasons.push('Low supplier quality score');
+    reasons.push("Low supplier quality score");
   } else if (supplierQualityScore < 85) {
     riskScore += 20;
-    reasons.push('Moderate supplier score');
+    reasons.push("Moderate supplier score");
   }
 
   // Item criticality
-  if (itemCriticality === 'CRITICAL') {
+  if (itemCriticality === "CRITICAL") {
     riskScore += 30;
-    reasons.push('Critical item classification');
-  } else if (itemCriticality === 'HIGH') {
+    reasons.push("Critical item classification");
+  } else if (itemCriticality === "HIGH") {
     riskScore += 15;
   }
 
   // Order value threshold
   if (orderValue > 50000) {
     riskScore += 20;
-    reasons.push('High order value');
+    reasons.push("High order value");
   } else if (orderValue > 25000) {
     riskScore += 10;
   }
@@ -164,7 +166,7 @@ function determineInspectionType(
   // Defect history (past 90 days)
   if (defectHistory > 5) {
     riskScore += 25;
-    reasons.push('High defect history');
+    reasons.push("High defect history");
   } else if (defectHistory > 2) {
     riskScore += 10;
   }
@@ -174,30 +176,33 @@ function determineInspectionType(
   let inspectionType: InspectionType;
 
   if (riskScore >= 70) {
-    riskLevel = 'HIGH';
-    inspectionType = 'FULL_INSPECTION';
+    riskLevel = "HIGH";
+    inspectionType = "FULL_INSPECTION";
   } else if (riskScore >= 40) {
-    riskLevel = 'MEDIUM';
-    inspectionType = 'SAMPLE_BASED';
+    riskLevel = "MEDIUM";
+    inspectionType = "SAMPLE_BASED";
   } else {
-    riskLevel = 'LOW';
-    inspectionType = 'VISUAL_ONLY';
+    riskLevel = "LOW";
+    inspectionType = "VISUAL_ONLY";
   }
 
   // Override for critical items (always full inspection)
-  if (itemCriticality === 'CRITICAL') {
-    inspectionType = 'FULL_INSPECTION';
+  if (itemCriticality === "CRITICAL") {
+    inspectionType = "FULL_INSPECTION";
   }
 
   return {
     inspectionType,
     riskLevel,
-    reason: reasons.join(', ') || 'Standard risk assessment',
+    reason: reasons.join(", ") || "Standard risk assessment",
   };
 }
 
 // Calculate sample size for sampling inspection (AQL-based)
-function calculateSampleSize(totalQuantity: number, aqlLevel: number = 2.5): number {
+function calculateSampleSize(
+  totalQuantity: number,
+  aqlLevel: number = 2.5,
+): number {
   // Simplified AQL table (single sampling plan)
   if (totalQuantity <= 50) return Math.min(5, totalQuantity);
   if (totalQuantity <= 150) return 13;
@@ -212,7 +217,7 @@ function calculateSampleSize(totalQuantity: number, aqlLevel: number = 2.5): num
 // Create inspection
 async function createInspection(
   session: any,
-  data: z.infer<typeof createInspectionSchema>
+  data: z.infer<typeof createInspectionSchema>,
 ) {
   // Get receiving record and supplier info
   const receiving = await prisma.receiving.findUnique({
@@ -227,21 +232,25 @@ async function createInspection(
   });
 
   if (!receiving) {
-    throw new Error('Receiving record not found');
+    throw new Error("Receiving record not found");
   }
 
   // Calculate total quantity
-  const totalQuantity = data.items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalQuantity = data.items.reduce(
+    (sum, item) => sum + item.quantity,
+    0,
+  );
 
   // Determine sample size if sample-based
-  const sampleSize = data.inspectionType === 'SAMPLE_BASED'
-    ? calculateSampleSize(totalQuantity)
-    : totalQuantity;
+  const sampleSize =
+    data.inspectionType === "SAMPLE_BASED"
+      ? calculateSampleSize(totalQuantity)
+      : totalQuantity;
 
   // Get supplier quality score
   const supplierScore = await getSupplierQualityScore(
     session.user.organizationId,
-    receiving.supplierId
+    receiving.supplierId,
   );
 
   // Get defect history
@@ -259,9 +268,9 @@ async function createInspection(
   const orderValue = receiving.purchaseOrder?.totalValue || 0;
   const riskAssessment = determineInspectionType(
     supplierScore,
-    data.priority === 'CRITICAL' ? 'CRITICAL' : 'STANDARD',
+    data.priority === "CRITICAL" ? "CRITICAL" : "STANDARD",
     orderValue,
-    defectHistory
+    defectHistory,
   );
 
   // Create inspection record
@@ -271,7 +280,7 @@ async function createInspection(
       receivingId: data.receivingId,
       supplierId: receiving.supplierId,
       inspectionType: data.inspectionType,
-      status: 'PENDING',
+      status: "PENDING",
       priority: data.priority,
       riskLevel: riskAssessment.riskLevel,
       riskReason: riskAssessment.reason,
@@ -283,7 +292,7 @@ async function createInspection(
 
   // Create inspection items
   await Promise.all(
-    data.items.map(item =>
+    data.items.map((item) =>
       prisma.qualityInspectionItem.create({
         data: {
           organizationId: session.user.organizationId,
@@ -292,8 +301,8 @@ async function createInspection(
           quantity: item.quantity,
           supplierLotNumber: item.supplierLotNumber,
         },
-      })
-    )
+      }),
+    ),
   );
 
   // Log activity
@@ -301,8 +310,8 @@ async function createInspection(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUALITY_INSPECTION_CREATED',
-      entityType: 'QUALITY_INSPECTION',
+      action: "QUALITY_INSPECTION_CREATED",
+      entityType: "QUALITY_INSPECTION",
       entityId: inspection.id,
       metadata: {
         receivingId: data.receivingId,
@@ -320,16 +329,16 @@ async function createInspection(
       supplierName: receiving.supplier.name,
       recommendedInspectionType: riskAssessment.inspectionType,
     },
-    message: 'Inspection created successfully',
+    message: "Inspection created successfully",
   };
 }
 
 // Get supplier quality score
 async function getSupplierQualityScore(
   organizationId: string,
-  supplierId: string
+  supplierId: string,
 ): Promise<number> {
-  const stats = await prisma.$queryRaw`
+  const stats = (await prisma.$queryRaw`
     SELECT 
       COUNT(CASE WHEN qi.status = 'PASSED' THEN 1 END)::int as passed,
       COUNT(CASE WHEN qi.status = 'FAILED' THEN 1 END)::int as failed,
@@ -338,14 +347,14 @@ async function getSupplierQualityScore(
     WHERE qi."organizationId" = ${organizationId}::uuid
       AND qi."supplierId" = ${supplierId}::uuid
       AND qi."createdAt" >= NOW() - INTERVAL '180 days'
-  ` as any[];
+  `) as any[];
 
   if (stats[0].total === 0) return 85; // Default score for new suppliers
 
   const passRate = (stats[0].passed / stats[0].total) * 100;
-  
+
   // Adjust for defect severity
-  const defectWeight = await prisma.$queryRaw`
+  const defectWeight = (await prisma.$queryRaw`
     SELECT 
       COUNT(CASE WHEN severity = 'CRITICAL' THEN 1 END)::int as critical,
       COUNT(CASE WHEN severity = 'MAJOR' THEN 1 END)::int as major
@@ -354,11 +363,11 @@ async function getSupplierQualityScore(
     WHERE qi."organizationId" = ${organizationId}::uuid
       AND qi."supplierId" = ${supplierId}::uuid
       AND qd."createdAt" >= NOW() - INTERVAL '180 days'
-  ` as any[];
+  `) as any[];
 
   let score = passRate;
   score -= defectWeight[0].critical * 5; // -5 points per critical defect
-  score -= defectWeight[0].major * 2;    // -2 points per major defect
+  score -= defectWeight[0].major * 2; // -2 points per major defect
 
   return Math.max(0, Math.min(100, score));
 }
@@ -366,7 +375,7 @@ async function getSupplierQualityScore(
 // Record defect
 async function recordDefect(
   session: any,
-  data: z.infer<typeof recordDefectSchema>
+  data: z.infer<typeof recordDefectSchema>,
 ) {
   const inspection = await prisma.qualityInspection.findUnique({
     where: {
@@ -376,14 +385,14 @@ async function recordDefect(
   });
 
   if (!inspection) {
-    throw new Error('Inspection not found');
+    throw new Error("Inspection not found");
   }
 
   // Update inspection status
   await prisma.qualityInspection.update({
     where: { id: data.inspectionId },
     data: {
-      status: data.severity === 'CRITICAL' ? 'ON_HOLD' : 'IN_PROGRESS',
+      status: data.severity === "CRITICAL" ? "ON_HOLD" : "IN_PROGRESS",
     },
   });
 
@@ -403,15 +412,15 @@ async function recordDefect(
   });
 
   // Auto-escalate critical defects
-  if (data.severity === 'CRITICAL') {
+  if (data.severity === "CRITICAL") {
     await prisma.qualityEscalation.create({
       data: {
         organizationId: session.user.organizationId,
         inspectionId: data.inspectionId,
         defectId: defect.id,
-        reason: 'Critical defect detected',
-        urgency: 'CRITICAL',
-        status: 'PENDING',
+        reason: "Critical defect detected",
+        urgency: "CRITICAL",
+        status: "PENDING",
       },
     });
   }
@@ -421,8 +430,8 @@ async function recordDefect(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUALITY_DEFECT_RECORDED',
-      entityType: 'QUALITY_DEFECT',
+      action: "QUALITY_DEFECT_RECORDED",
+      entityType: "QUALITY_DEFECT",
       entityId: defect.id,
       metadata: {
         inspectionId: data.inspectionId,
@@ -443,7 +452,7 @@ async function recordDefect(
 // Complete inspection
 async function completeInspection(
   session: any,
-  data: z.infer<typeof completeInspectionSchema>
+  data: z.infer<typeof completeInspectionSchema>,
 ) {
   const inspection = await prisma.qualityInspection.update({
     where: {
@@ -463,31 +472,32 @@ async function completeInspection(
 
   // Calculate inspection duration
   const durationMinutes = Math.round(
-    (new Date().getTime() - inspection.createdAt.getTime()) / (1000 * 60)
+    (new Date().getTime() - inspection.createdAt.getTime()) / (1000 * 60),
   );
 
   // Update receiving status based on inspection result
-  if (data.status === 'PASSED' || data.status === 'CONDITIONAL') {
+  if (data.status === "PASSED" || data.status === "CONDITIONAL") {
     await prisma.receiving.update({
       where: { id: inspection.receivingId },
       data: {
-        status: 'QUALITY_APPROVED',
+        status: "QUALITY_APPROVED",
         qualityApprovedAt: new Date(),
       },
     });
-  } else if (data.status === 'FAILED') {
+  } else if (data.status === "FAILED") {
     await prisma.receiving.update({
       where: { id: inspection.receivingId },
       data: {
-        status: 'QUALITY_HOLD',
+        status: "QUALITY_HOLD",
       },
     });
   }
 
   // Calculate defect rate
-  const defectRate = data.failedCount && data.sampleSize
-    ? (data.failedCount / data.sampleSize) * 100
-    : 0;
+  const defectRate =
+    data.failedCount && data.sampleSize
+      ? (data.failedCount / data.sampleSize) * 100
+      : 0;
 
   // Update metrics
   await prisma.qualityMetrics.create({
@@ -506,8 +516,8 @@ async function completeInspection(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUALITY_INSPECTION_COMPLETED',
-      entityType: 'QUALITY_INSPECTION',
+      action: "QUALITY_INSPECTION_COMPLETED",
+      entityType: "QUALITY_INSPECTION",
       entityId: data.inspectionId,
       metadata: {
         status: data.status,
@@ -531,7 +541,7 @@ async function completeInspection(
 // Escalate inspection
 async function escalateInspection(
   session: any,
-  data: z.infer<typeof escalateInspectionSchema>
+  data: z.infer<typeof escalateInspectionSchema>,
 ) {
   await prisma.qualityInspection.update({
     where: {
@@ -539,7 +549,7 @@ async function escalateInspection(
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'ESCALATED',
+      status: "ESCALATED",
     },
   });
 
@@ -550,7 +560,7 @@ async function escalateInspection(
       reason: data.reason,
       escalatedTo: data.escalatedTo,
       urgency: data.urgency,
-      status: 'PENDING',
+      status: "PENDING",
     },
   });
 
@@ -559,8 +569,8 @@ async function escalateInspection(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUALITY_INSPECTION_ESCALATED',
-      entityType: 'QUALITY_ESCALATION',
+      action: "QUALITY_INSPECTION_ESCALATED",
+      entityType: "QUALITY_ESCALATION",
       entityId: escalation.id,
       metadata: {
         inspectionId: data.inspectionId,
@@ -573,14 +583,14 @@ async function escalateInspection(
   return {
     success: true,
     escalation,
-    message: 'Inspection escalated',
+    message: "Inspection escalated",
   };
 }
 
 // Release hold
 async function releaseHold(
   session: any,
-  data: z.infer<typeof releaseHoldSchema>
+  data: z.infer<typeof releaseHoldSchema>,
 ) {
   const inspection = await prisma.qualityInspection.update({
     where: {
@@ -588,7 +598,7 @@ async function releaseHold(
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'CONDITIONAL',
+      status: "CONDITIONAL",
       disposition: data.disposition,
       dispositionNotes: data.notes,
       dispositionAuthorizedBy: data.authorizedBy,
@@ -597,19 +607,22 @@ async function releaseHold(
   });
 
   // Update receiving based on disposition
-  if (data.disposition === 'ACCEPT_AS_IS' || data.disposition === 'ACCEPT_WITH_CONCESSION') {
+  if (
+    data.disposition === "ACCEPT_AS_IS" ||
+    data.disposition === "ACCEPT_WITH_CONCESSION"
+  ) {
     await prisma.receiving.update({
       where: { id: inspection.receivingId },
       data: {
-        status: 'QUALITY_APPROVED',
+        status: "QUALITY_APPROVED",
         qualityApprovedAt: new Date(),
       },
     });
-  } else if (data.disposition === 'RETURN_TO_SUPPLIER') {
+  } else if (data.disposition === "RETURN_TO_SUPPLIER") {
     await prisma.receiving.update({
       where: { id: inspection.receivingId },
       data: {
-        status: 'RETURN_IN_PROGRESS',
+        status: "RETURN_IN_PROGRESS",
       },
     });
   }
@@ -619,8 +632,8 @@ async function releaseHold(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUALITY_HOLD_RELEASED',
-      entityType: 'QUALITY_INSPECTION',
+      action: "QUALITY_HOLD_RELEASED",
+      entityType: "QUALITY_INSPECTION",
       entityId: data.inspectionId,
       metadata: {
         disposition: data.disposition,
@@ -641,15 +654,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get statistics
-    if (action === 'stats') {
-      const stats = await prisma.$queryRaw`
+    if (action === "stats") {
+      const stats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalInspections",
           COUNT(CASE WHEN status = 'PASSED' THEN 1 END)::int as "passedInspections",
@@ -662,9 +675,9 @@ export async function GET(request: NextRequest) {
         FROM "QualityInspection"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const defectStats = await prisma.$queryRaw`
+      const defectStats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalDefects",
           COUNT(CASE WHEN severity = 'CRITICAL' THEN 1 END)::int as "criticalDefects",
@@ -672,11 +685,12 @@ export async function GET(request: NextRequest) {
         FROM "QualityDefect"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const passRate = stats[0].totalInspections > 0
-        ? (stats[0].passedInspections / stats[0].totalInspections) * 100
-        : 0;
+      const passRate =
+        stats[0].totalInspections > 0
+          ? (stats[0].passedInspections / stats[0].totalInspections) * 100
+          : 0;
 
       const monthlySavings = 15583; // Based on ROI calculation
 
@@ -693,12 +707,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Get pending inspections
-    if (action === 'pending-inspections') {
+    if (action === "pending-inspections") {
       const inspections = await prisma.qualityInspection.findMany({
         where: {
           organizationId: session.user.organizationId,
           status: {
-            in: ['PENDING', 'IN_PROGRESS', 'ON_HOLD'],
+            in: ["PENDING", "IN_PROGRESS", "ON_HOLD"],
           },
         },
         include: {
@@ -709,10 +723,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: [
-          { priority: 'asc' },
-          { scheduledDate: 'asc' },
-        ],
+        orderBy: [{ priority: "asc" }, { scheduledDate: "asc" }],
         take: 50,
       });
 
@@ -720,7 +731,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent defects
-    if (action === 'recent-defects') {
+    if (action === "recent-defects") {
       const defects = await prisma.qualityDefect.findMany({
         where: {
           organizationId: session.user.organizationId,
@@ -732,19 +743,19 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 20,
       });
 
       return NextResponse.json({ defects });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Quality inspection GET error:', error);
+    console.error("Quality inspection GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve quality data' },
-      { status: 500 }
+      { error: "Failed to retrieve quality data" },
+      { status: 500 },
     );
   }
 }
@@ -754,43 +765,43 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'create_inspection':
+      case "create_inspection":
         return NextResponse.json(await createInspection(session, data));
 
-      case 'record_defect':
+      case "record_defect":
         return NextResponse.json(await recordDefect(session, data));
 
-      case 'complete_inspection':
+      case "complete_inspection":
         return NextResponse.json(await completeInspection(session, data));
 
-      case 'escalate_inspection':
+      case "escalate_inspection":
         return NextResponse.json(await escalateInspection(session, data));
 
-      case 'release_hold':
+      case "release_hold":
         return NextResponse.json(await releaseHold(session, data));
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Quality inspection POST error:', error);
+    console.error("Quality inspection POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process quality inspection' },
-      { status: 500 }
+      { error: "Failed to process quality inspection" },
+      { status: 500 },
     );
   }
 }

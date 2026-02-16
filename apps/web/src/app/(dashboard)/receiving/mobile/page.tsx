@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Task {
   id: string;
@@ -31,7 +31,7 @@ export default function ReceivingMobile() {
   const [stats, setStats] = useState<QuickStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [scanMode, setScanMode] = useState(false);
-  const [scanInput, setScanInput] = useState('');
+  const [scanInput, setScanInput] = useState("");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   useEffect(() => {
@@ -42,8 +42,8 @@ export default function ReceivingMobile() {
     try {
       setLoading(true);
       const [tasksRes, statsRes] = await Promise.all([
-        fetch('/api/receiving/mobile?action=my_tasks'),
-        fetch('/api/receiving/mobile?action=quick_stats'),
+        fetch("/api/receiving/mobile?action=my_tasks"),
+        fetch("/api/receiving/mobile?action=quick_stats"),
       ]);
 
       const tasksData = await tasksRes.json();
@@ -52,7 +52,7 @@ export default function ReceivingMobile() {
       setTasks(tasksData.tasks || []);
       setStats(statsData.stats);
     } catch (error) {
-      console.error('Failed to fetch mobile data:', error);
+      console.error("Failed to fetch mobile data:", error);
     } finally {
       setLoading(false);
     }
@@ -62,13 +62,13 @@ export default function ReceivingMobile() {
     if (!scanInput.trim()) return;
 
     try {
-      const response = await fetch('/api/receiving/mobile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/mobile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'scan_barcode',
+          action: "scan_barcode",
           barcode: scanInput,
-          scanType: 'RECEIPT',
+          scanType: "RECEIPT",
         }),
       });
 
@@ -76,26 +76,26 @@ export default function ReceivingMobile() {
       if (data.success && data.result) {
         // Navigate to task detail
         alert(`Shipment found: ${data.result.shipmentNumber}`);
-        setScanInput('');
+        setScanInput("");
         setScanMode(false);
       } else {
-        alert('No shipment found with this barcode');
+        alert("No shipment found with this barcode");
       }
     } catch (error) {
-      console.error('Scan failed:', error);
-      alert('Scan failed. Please try again.');
+      console.error("Scan failed:", error);
+      alert("Scan failed. Please try again.");
     }
   };
 
   const handleQuickReceive = async (taskId: string) => {
-    if (!confirm('Complete this task with quick receive?')) return;
+    if (!confirm("Complete this task with quick receive?")) return;
 
     try {
-      const response = await fetch('/api/receiving/mobile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/mobile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'quick_receive',
+          action: "quick_receive",
           shipmentId: taskId,
           items: [], // Would collect actual items
         }),
@@ -103,52 +103,52 @@ export default function ReceivingMobile() {
 
       const data = await response.json();
       if (data.success) {
-        alert('Quick receive completed!');
+        alert("Quick receive completed!");
         fetchMobileData();
       }
     } catch (error) {
-      console.error('Quick receive failed:', error);
-      alert('Failed to complete quick receive');
+      console.error("Quick receive failed:", error);
+      alert("Failed to complete quick receive");
     }
   };
 
   const handleReportIssue = async (taskId: string) => {
-    const description = prompt('Describe the issue:');
+    const description = prompt("Describe the issue:");
     if (!description) return;
 
     try {
-      const response = await fetch('/api/receiving/mobile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/mobile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'report_issue',
+          action: "report_issue",
           shipmentId: taskId,
-          issueType: 'OTHER',
-          severity: 'MEDIUM',
+          issueType: "OTHER",
+          severity: "MEDIUM",
           description,
         }),
       });
 
       const data = await response.json();
       if (data.success) {
-        alert('Issue reported successfully!');
+        alert("Issue reported successfully!");
       }
     } catch (error) {
-      console.error('Report issue failed:', error);
-      alert('Failed to report issue');
+      console.error("Report issue failed:", error);
+      alert("Failed to report issue");
     }
   };
 
   const getPriorityColor = (priority: number) => {
-    if (priority >= 8) return 'bg-red-100 text-red-800 border-red-300';
-    if (priority >= 5) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-    return 'bg-green-100 text-green-800 border-green-300';
+    if (priority >= 8) return "bg-red-100 text-red-800 border-red-300";
+    if (priority >= 5) return "bg-yellow-100 text-yellow-800 border-yellow-300";
+    return "bg-green-100 text-green-800 border-green-300";
   };
 
   const getPriorityLabel = (priority: number) => {
-    if (priority >= 8) return 'URGENT';
-    if (priority >= 5) return 'HIGH';
-    return 'NORMAL';
+    if (priority >= 8) return "URGENT";
+    if (priority >= 5) return "HIGH";
+    return "NORMAL";
   };
 
   if (loading) {
@@ -173,7 +173,7 @@ export default function ReceivingMobile() {
           <div>
             <h1 className="text-xl font-bold">📱 Mobile Receiving</h1>
             <p className="text-sm text-blue-100">
-              {stats?.userName || 'Worker'}
+              {stats?.userName || "Worker"}
             </p>
           </div>
           <Button
@@ -181,7 +181,7 @@ export default function ReceivingMobile() {
             size="sm"
             onClick={() => setScanMode(!scanMode)}
           >
-            {scanMode ? '✕ Cancel' : '📷 Scan'}
+            {scanMode ? "✕ Cancel" : "📷 Scan"}
           </Button>
         </div>
 
@@ -220,7 +220,7 @@ export default function ReceivingMobile() {
                   placeholder="Enter or scan barcode..."
                   value={scanInput}
                   onChange={(e) => setScanInput(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+                  onKeyDown={(e) => e.key === "Enter" && handleScan()}
                   autoFocus
                   className="text-lg"
                 />
@@ -232,7 +232,7 @@ export default function ReceivingMobile() {
                     variant="outline"
                     onClick={() => {
                       setScanMode(false);
-                      setScanInput('');
+                      setScanInput("");
                     }}
                   >
                     Cancel
@@ -250,9 +250,7 @@ export default function ReceivingMobile() {
 
         <Tabs defaultValue="tasks" className="space-y-4">
           <TabsList className="grid grid-cols-3 w-full">
-            <TabsTrigger value="tasks">
-              📋 Tasks ({tasks.length})
-            </TabsTrigger>
+            <TabsTrigger value="tasks">📋 Tasks ({tasks.length})</TabsTrigger>
             <TabsTrigger value="quick">⚡ Quick</TabsTrigger>
             <TabsTrigger value="tools">🛠️ Tools</TabsTrigger>
           </TabsList>
@@ -288,7 +286,7 @@ export default function ReceivingMobile() {
                       </div>
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium border ${getPriorityColor(
-                          task.priority
+                          task.priority,
                         )}`}
                       >
                         {getPriorityLabel(task.priority)}
@@ -297,26 +295,26 @@ export default function ReceivingMobile() {
 
                     <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                       <div>
-                        <span className="text-gray-600">PO:</span>{' '}
+                        <span className="text-gray-600">PO:</span>{" "}
                         <span className="font-medium">{task.poNumber}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">Items:</span>{' '}
+                        <span className="text-gray-600">Items:</span>{" "}
                         <span className="font-medium">{task.itemCount}</span>
                       </div>
                       {task.dockNumber && (
                         <div>
-                          <span className="text-gray-600">Dock:</span>{' '}
+                          <span className="text-gray-600">Dock:</span>{" "}
                           <span className="font-medium">{task.dockNumber}</span>
                         </div>
                       )}
                       {task.appointmentTime && (
                         <div>
-                          <span className="text-gray-600">Time:</span>{' '}
+                          <span className="text-gray-600">Time:</span>{" "}
                           <span className="font-medium">
                             {new Date(task.appointmentTime).toLocaleTimeString(
                               [],
-                              { hour: '2-digit', minute: '2-digit' }
+                              { hour: "2-digit", minute: "2-digit" },
                             )}
                           </span>
                         </div>
@@ -367,21 +365,21 @@ export default function ReceivingMobile() {
                 <Button
                   className="w-full h-16 text-lg"
                   variant="outline"
-                  onClick={() => alert('Photo capture feature')}
+                  onClick={() => alert("Photo capture feature")}
                 >
                   📸 Take Photo
                 </Button>
                 <Button
                   className="w-full h-16 text-lg"
                   variant="outline"
-                  onClick={() => alert('Voice note feature')}
+                  onClick={() => alert("Voice note feature")}
                 >
                   🎤 Voice Note
                 </Button>
                 <Button
                   className="w-full h-16 text-lg"
                   variant="outline"
-                  onClick={() => alert('Report issue feature')}
+                  onClick={() => alert("Report issue feature")}
                 >
                   ⚠️ Report Issue
                 </Button>
@@ -420,19 +418,31 @@ export default function ReceivingMobile() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
-                  <Button variant="outline" className="h-20 flex flex-col gap-1">
+                  <Button
+                    variant="outline"
+                    className="h-20 flex flex-col gap-1"
+                  >
                     <span className="text-2xl">📊</span>
                     <span className="text-xs">My Stats</span>
                   </Button>
-                  <Button variant="outline" className="h-20 flex flex-col gap-1">
+                  <Button
+                    variant="outline"
+                    className="h-20 flex flex-col gap-1"
+                  >
                     <span className="text-2xl">🔔</span>
                     <span className="text-xs">Alerts</span>
                   </Button>
-                  <Button variant="outline" className="h-20 flex flex-col gap-1">
+                  <Button
+                    variant="outline"
+                    className="h-20 flex flex-col gap-1"
+                  >
                     <span className="text-2xl">🗺️</span>
                     <span className="text-xs">Location</span>
                   </Button>
-                  <Button variant="outline" className="h-20 flex flex-col gap-1">
+                  <Button
+                    variant="outline"
+                    className="h-20 flex flex-col gap-1"
+                  >
                     <span className="text-2xl">⚙️</span>
                     <span className="text-xs">Settings</span>
                   </Button>

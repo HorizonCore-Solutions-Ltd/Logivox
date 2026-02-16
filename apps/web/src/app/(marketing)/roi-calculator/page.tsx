@@ -11,17 +11,17 @@ import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { Navigation } from "@/components/landing";
 import { Footer } from "@/components/layout/footer";
-import { 
+import {
   Calculator,
-  TrendingUp, 
-  DollarSign, 
+  TrendingUp,
+  DollarSign,
   Clock,
   Users,
   Package,
   ArrowRight,
   CheckCircle,
   AlertTriangle,
-  Zap
+  Zap,
 } from "lucide-react";
 
 // Can't use metadata in client component, so we'll handle it in layout
@@ -63,20 +63,23 @@ export default function ROICalculatorPage() {
     const annualOrders = ordersPerDay * 365;
     const currentErrorCost = annualOrders * (errorRate / 100) * avgOrderValue;
     const pickingTimePerOrder = 8; // minutes average
-    const currentLaborCost = (annualOrders * pickingTimePerOrder / 60) * hourlyWage;
-    const totalCurrentCosts = currentErrorCost + currentLaborCost + currentWMSCost * 12;
+    const currentLaborCost =
+      ((annualOrders * pickingTimePerOrder) / 60) * hourlyWage;
+    const totalCurrentCosts =
+      currentErrorCost + currentLaborCost + currentWMSCost * 12;
 
     // LogiVox benefits
     const errorReduction = 95; // 95% error reduction
     const timeReduction = 60; // 60% time reduction
     const newErrorCost = currentErrorCost * (1 - errorReduction / 100);
     const newLaborCost = currentLaborCost * (1 - timeReduction / 100);
-    
+
     // LogiVox pricing (simplified - $99/user/month for Professional)
     const monthlyLogiVoxCost = employees * 99;
     const annualLogiVoxCost = monthlyLogiVoxCost * 12;
 
-    const annualSavings = (currentErrorCost - newErrorCost) + (currentLaborCost - newLaborCost);
+    const annualSavings =
+      currentErrorCost - newErrorCost + (currentLaborCost - newLaborCost);
     const netSavings = annualSavings - annualLogiVoxCost + currentWMSCost * 12;
     const roi = netSavings > 0 ? (netSavings / annualLogiVoxCost) * 100 : 0;
     const paybackMonths = annualLogiVoxCost / (annualSavings / 12);
@@ -91,7 +94,14 @@ export default function ROICalculatorPage() {
       timeReduction: currentLaborCost - newLaborCost,
       laborSavings: currentLaborCost - newLaborCost,
     });
-  }, [employees, ordersPerDay, errorRate, avgOrderValue, hourlyWage, currentWMSCost]);
+  }, [
+    employees,
+    ordersPerDay,
+    errorRate,
+    avgOrderValue,
+    hourlyWage,
+    currentWMSCost,
+  ]);
 
   return (
     <>
@@ -111,8 +121,9 @@ export default function ROICalculatorPage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                See exactly how much LogiVox will save your warehouse. Real numbers based on 
-                500+ customer implementations and proven industry benchmarks.
+                See exactly how much LogiVox will save your warehouse. Real
+                numbers based on 500+ customer implementations and proven
+                industry benchmarks.
               </p>
             </div>
 
@@ -185,7 +196,10 @@ export default function ROICalculatorPage() {
 
                   {/* Average Order Value */}
                   <div className="space-y-2">
-                    <Label htmlFor="orderValue" className="text-base font-semibold">
+                    <Label
+                      htmlFor="orderValue"
+                      className="text-base font-semibold"
+                    >
                       Average Order Value ($)
                     </Label>
                     <Input
@@ -213,14 +227,19 @@ export default function ROICalculatorPage() {
 
                   {/* Current WMS Cost */}
                   <div className="space-y-2">
-                    <Label htmlFor="wmsCost" className="text-base font-semibold">
+                    <Label
+                      htmlFor="wmsCost"
+                      className="text-base font-semibold"
+                    >
                       Current WMS Cost ($/month)
                     </Label>
                     <Input
                       id="wmsCost"
                       type="number"
                       value={currentWMSCost}
-                      onChange={(e) => setCurrentWMSCost(Number(e.target.value))}
+                      onChange={(e) =>
+                        setCurrentWMSCost(Number(e.target.value))
+                      }
                       className="text-lg"
                       placeholder="0 (if using spreadsheets)"
                     />
@@ -262,7 +281,10 @@ export default function ROICalculatorPage() {
                         <span className="font-medium">Error Reduction</span>
                       </div>
                       <div className="font-bold text-green-600">
-                        ${Math.round(results.pickingErrorReduction).toLocaleString()}
+                        $
+                        {Math.round(
+                          results.pickingErrorReduction,
+                        ).toLocaleString()}
                       </div>
                     </div>
 
@@ -290,7 +312,12 @@ export default function ROICalculatorPage() {
                       <div className="flex items-center justify-between text-lg font-bold">
                         <span>Net Annual Savings</span>
                         <span className="text-green-600">
-                          ${Math.round(results.annualSavings - results.logiVoxCost + currentWMSCost * 12).toLocaleString()}
+                          $
+                          {Math.round(
+                            results.annualSavings -
+                              results.logiVoxCost +
+                              currentWMSCost * 12,
+                          ).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -308,15 +335,21 @@ export default function ROICalculatorPage() {
                   <CardContent className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <span className="text-sm">95% reduction in picking errors</span>
+                      <span className="text-sm">
+                        95% reduction in picking errors
+                      </span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <span className="text-sm">60% faster order fulfillment</span>
+                      <span className="text-sm">
+                        60% faster order fulfillment
+                      </span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                      <span className="text-sm">Real-time inventory visibility</span>
+                      <span className="text-sm">
+                        Real-time inventory visibility
+                      </span>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
@@ -337,8 +370,8 @@ export default function ROICalculatorPage() {
                 Ready to Achieve These Results?
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Start your 30-day free trial today and see these savings in action. 
-                No credit card required, full access to all features.
+                Start your 30-day free trial today and see these savings in
+                action. No credit card required, full access to all features.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild>

@@ -1,51 +1,51 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
+import crypto from "crypto";
 
 // Validation schemas
-const integrationActionSchema = z.discriminatedUnion('action', [
+const integrationActionSchema = z.discriminatedUnion("action", [
   z.object({
-    action: z.literal('create_integration'),
-    integrationType: z.enum(['WMS', 'ERP', 'TMS', 'SUPPLIER_PORTAL', 'CUSTOM']),
+    action: z.literal("create_integration"),
+    integrationType: z.enum(["WMS", "ERP", "TMS", "SUPPLIER_PORTAL", "CUSTOM"]),
     name: z.string(),
     config: z.object({
       endpoint: z.string().url(),
-      authType: z.enum(['API_KEY', 'OAUTH', 'BASIC', 'BEARER']),
+      authType: z.enum(["API_KEY", "OAUTH", "BASIC", "BEARER"]),
       credentials: z.record(z.string()),
       syncInterval: z.number().optional(),
     }),
   }),
   z.object({
-    action: z.literal('test_connection'),
+    action: z.literal("test_connection"),
     integrationId: z.string(),
   }),
   z.object({
-    action: z.literal('sync_data'),
+    action: z.literal("sync_data"),
     integrationId: z.string(),
-    direction: z.enum(['INBOUND', 'OUTBOUND', 'BIDIRECTIONAL']),
+    direction: z.enum(["INBOUND", "OUTBOUND", "BIDIRECTIONAL"]),
   }),
   z.object({
-    action: z.literal('configure_webhook'),
+    action: z.literal("configure_webhook"),
     integrationId: z.string(),
     webhookUrl: z.string().url(),
     events: z.array(z.string()),
     secret: z.string().optional(),
   }),
   z.object({
-    action: z.literal('send_shipment_notification'),
+    action: z.literal("send_shipment_notification"),
     integrationId: z.string(),
     shipmentId: z.string(),
     notificationType: z.enum([
-      'ARRIVAL',
-      'RECEIPT_COMPLETE',
-      'QUALITY_ISSUE',
-      'PUTAWAY_COMPLETE',
+      "ARRIVAL",
+      "RECEIPT_COMPLETE",
+      "QUALITY_ISSUE",
+      "PUTAWAY_COMPLETE",
     ]),
   }),
   z.object({
-    action: z.literal('import_asn'),
+    action: z.literal("import_asn"),
     integrationId: z.string(),
     asnData: z.object({
       asnNumber: z.string(),
@@ -56,35 +56,35 @@ const integrationActionSchema = z.discriminatedUnion('action', [
           sku: z.string(),
           quantity: z.number(),
           uom: z.string().optional(),
-        })
+        }),
       ),
     }),
   }),
   z.object({
-    action: z.literal('export_receipt_data'),
+    action: z.literal("export_receipt_data"),
     shipmentId: z.string(),
-    format: z.enum(['JSON', 'XML', 'CSV', 'EDI']),
+    format: z.enum(["JSON", "XML", "CSV", "EDI"]),
   }),
 ]);
 
 // Integration helpers
 async function generateApiKey(): Promise<string> {
-  return `fsk_${crypto.randomBytes(32).toString('hex')}`;
+  return `fsk_${crypto.randomBytes(32).toString("hex")}`;
 }
 
 async function generateWebhookSecret(): Promise<string> {
-  return crypto.randomBytes(32).toString('hex');
+  return crypto.randomBytes(32).toString("hex");
 }
 
 function signWebhookPayload(payload: any, secret: string): string {
-  const hmac = crypto.createHmac('sha256', secret);
+  const hmac = crypto.createHmac("sha256", secret);
   hmac.update(JSON.stringify(payload));
-  return hmac.digest('hex');
+  return hmac.digest("hex");
 }
 
 async function testIntegrationConnection(
   integrationType: string,
-  config: any
+  config: any,
 ): Promise<{ success: boolean; message: string; latency?: number }> {
   const startTime = Date.now();
 
@@ -111,7 +111,7 @@ async function testIntegrationConnection(
 async function syncIntegrationData(
   organizationId: string,
   integrationId: string,
-  direction: string
+  direction: string,
 ) {
   // Fetch integration config
   // In production, perform actual data sync based on direction
@@ -119,7 +119,7 @@ async function syncIntegrationData(
 
   return {
     syncId: `sync_${Date.now()}`,
-    status: 'COMPLETED',
+    status: "COMPLETED",
     recordsProcessed: 0,
     errors: [],
   };
@@ -128,16 +128,16 @@ async function syncIntegrationData(
 async function sendWebhook(
   webhookUrl: string,
   payload: any,
-  secret?: string
+  secret?: string,
 ): Promise<{ success: boolean; statusCode?: number }> {
   try {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Flowstock-Webhook/1.0',
+      "Content-Type": "application/json",
+      "User-Agent": "Flowstock-Webhook/1.0",
     };
 
     if (secret) {
-      headers['X-Webhook-Signature'] = signWebhookPayload(payload, secret);
+      headers["X-Webhook-Signature"] = signWebhookPayload(payload, secret);
     }
 
     // In production, make actual HTTP request
@@ -160,7 +160,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -169,27 +169,27 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action') || 'list_integrations';
+    const action = searchParams.get("action") || "list_integrations";
 
-    if (action === 'list_integrations') {
+    if (action === "list_integrations") {
       // In production, fetch from integrations table
       const integrations = [
         {
-          id: 'int_1',
-          name: 'NetSuite ERP',
-          type: 'ERP',
-          status: 'ACTIVE',
+          id: "int_1",
+          name: "NetSuite ERP",
+          type: "ERP",
+          status: "ACTIVE",
           lastSync: new Date(),
         },
         {
-          id: 'int_2',
-          name: 'Supplier Portal',
-          type: 'SUPPLIER_PORTAL',
-          status: 'ACTIVE',
+          id: "int_2",
+          name: "Supplier Portal",
+          type: "SUPPLIER_PORTAL",
+          status: "ACTIVE",
           lastSync: new Date(),
         },
       ];
@@ -197,8 +197,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ integrations });
     }
 
-    if (action === 'integration_stats') {
-      const integrationId = searchParams.get('integrationId');
+    if (action === "integration_stats") {
+      const integrationId = searchParams.get("integrationId");
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -216,23 +216,23 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ stats });
     }
 
-    if (action === 'webhook_logs') {
-      const integrationId = searchParams.get('integrationId');
+    if (action === "webhook_logs") {
+      const integrationId = searchParams.get("integrationId");
 
       // In production, fetch from webhook logs table
       const logs = [
         {
-          id: 'log_1',
-          event: 'RECEIPT_COMPLETE',
-          status: 'DELIVERED',
+          id: "log_1",
+          event: "RECEIPT_COMPLETE",
+          status: "DELIVERED",
           timestamp: new Date(),
           attempts: 1,
           responseCode: 200,
         },
         {
-          id: 'log_2',
-          event: 'QUALITY_ISSUE',
-          status: 'DELIVERED',
+          id: "log_2",
+          event: "QUALITY_ISSUE",
+          status: "DELIVERED",
           timestamp: new Date(),
           attempts: 1,
           responseCode: 200,
@@ -242,22 +242,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ logs });
     }
 
-    if (action === 'generate_api_key') {
+    if (action === "generate_api_key") {
       const apiKey = await generateApiKey();
 
       // In production, store hashed version in database
       return NextResponse.json({
         apiKey,
-        message: 'Save this key securely - it will not be shown again',
+        message: "Save this key securely - it will not be shown again",
       });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('GET /api/receiving/integration error:', error);
+    console.error("GET /api/receiving/integration error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch integration data' },
-      { status: 500 }
+      { error: "Failed to fetch integration data" },
+      { status: 500 },
     );
   }
 }
@@ -267,7 +267,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -276,14 +276,14 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await request.json();
     const validated = integrationActionSchema.parse(body);
 
     switch (validated.action) {
-      case 'create_integration': {
+      case "create_integration": {
         // In production, create integration record
         const integration = {
           id: `int_${Date.now()}`,
@@ -291,7 +291,7 @@ export async function POST(request: NextRequest) {
           type: validated.integrationType,
           name: validated.name,
           config: validated.config,
-          status: 'PENDING',
+          status: "PENDING",
           createdAt: new Date(),
         };
 
@@ -302,16 +302,13 @@ export async function POST(request: NextRequest) {
           success: true,
           integration,
           apiKey,
-          message: 'Integration created successfully',
+          message: "Integration created successfully",
         });
       }
 
-      case 'test_connection': {
+      case "test_connection": {
         // Test connection to integration endpoint
-        const testResult = await testIntegrationConnection(
-          'INTEGRATION',
-          {}
-        );
+        const testResult = await testIntegrationConnection("INTEGRATION", {});
 
         return NextResponse.json({
           success: testResult.success,
@@ -319,12 +316,12 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      case 'sync_data': {
+      case "sync_data": {
         // Trigger data sync
         const syncResult = await syncIntegrationData(
           user.organizationId,
           validated.integrationId,
-          validated.direction
+          validated.direction,
         );
 
         return NextResponse.json({
@@ -333,7 +330,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      case 'configure_webhook': {
+      case "configure_webhook": {
         // Configure webhook for integration
         const secret = validated.secret || (await generateWebhookSecret());
 
@@ -343,17 +340,17 @@ export async function POST(request: NextRequest) {
           url: validated.webhookUrl,
           events: validated.events,
           secret,
-          status: 'ACTIVE',
+          status: "ACTIVE",
         };
 
         return NextResponse.json({
           success: true,
           webhook: webhookConfig,
-          message: 'Webhook configured successfully',
+          message: "Webhook configured successfully",
         });
       }
 
-      case 'send_shipment_notification': {
+      case "send_shipment_notification": {
         // Send webhook notification
         const shipment = await prisma.receivingRecord.findFirst({
           where: {
@@ -368,8 +365,8 @@ export async function POST(request: NextRequest) {
 
         if (!shipment) {
           return NextResponse.json(
-            { error: 'Shipment not found' },
-            { status: 404 }
+            { error: "Shipment not found" },
+            { status: 404 },
           );
         }
 
@@ -387,17 +384,17 @@ export async function POST(request: NextRequest) {
 
         // In production, send to actual webhook URL
         const webhookResult = await sendWebhook(
-          'https://example.com/webhook',
-          payload
+          "https://example.com/webhook",
+          payload,
         );
 
         return NextResponse.json({
           success: webhookResult.success,
-          message: 'Notification sent',
+          message: "Notification sent",
         });
       }
 
-      case 'import_asn': {
+      case "import_asn": {
         // Import ASN (Advanced Shipment Notice)
         const asn = validated.asnData;
 
@@ -411,8 +408,8 @@ export async function POST(request: NextRequest) {
 
         if (!supplier) {
           return NextResponse.json(
-            { error: 'Supplier not found' },
-            { status: 404 }
+            { error: "Supplier not found" },
+            { status: 404 },
           );
         }
 
@@ -422,7 +419,7 @@ export async function POST(request: NextRequest) {
             organizationId: user.organizationId,
             supplierId: supplier.id,
             shipmentNumber: asn.asnNumber,
-            status: 'PENDING',
+            status: "PENDING",
             appointmentTime: new Date(asn.expectedDate),
             priority: 5,
           },
@@ -433,8 +430,8 @@ export async function POST(request: NextRequest) {
           data: {
             organizationId: user.organizationId,
             userId: user.id,
-            action: 'ASN_IMPORT',
-            entityType: 'RECEIVING_RECORD',
+            action: "ASN_IMPORT",
+            entityType: "RECEIVING_RECORD",
             entityId: receivingRecord.id,
             changes: {
               asnNumber: asn.asnNumber,
@@ -447,11 +444,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           receivingRecord,
-          message: 'ASN imported successfully',
+          message: "ASN imported successfully",
         });
       }
 
-      case 'export_receipt_data': {
+      case "export_receipt_data": {
         // Export receipt data in requested format
         const shipment = await prisma.receivingRecord.findFirst({
           where: {
@@ -474,21 +471,21 @@ export async function POST(request: NextRequest) {
 
         if (!shipment) {
           return NextResponse.json(
-            { error: 'Shipment not found' },
-            { status: 404 }
+            { error: "Shipment not found" },
+            { status: 404 },
           );
         }
 
         let exportData: any;
 
-        if (validated.format === 'JSON') {
+        if (validated.format === "JSON") {
           exportData = shipment;
-        } else if (validated.format === 'XML') {
-          exportData = '<receipt>...</receipt>'; // Would convert to XML
-        } else if (validated.format === 'CSV') {
-          exportData = 'shipmentNumber,supplier,status\n...'; // Would convert to CSV
-        } else if (validated.format === 'EDI') {
-          exportData = 'EDI 856 format...'; // Would convert to EDI 856
+        } else if (validated.format === "XML") {
+          exportData = "<receipt>...</receipt>"; // Would convert to XML
+        } else if (validated.format === "CSV") {
+          exportData = "shipmentNumber,supplier,status\n..."; // Would convert to CSV
+        } else if (validated.format === "EDI") {
+          exportData = "EDI 856 format..."; // Would convert to EDI 856
         }
 
         return NextResponse.json({
@@ -499,20 +496,20 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('POST /api/receiving/integration error:', error);
+    console.error("POST /api/receiving/integration error:", error);
     return NextResponse.json(
-      { error: 'Failed to process integration request' },
-      { status: 500 }
+      { error: "Failed to process integration request" },
+      { status: 500 },
     );
   }
 }
@@ -537,9 +534,9 @@ export const API_INTEGRATION_ROI = {
   roi: 321, // 321% ROI
   paybackMonths: 3.7,
   impact: {
-    automatedDataFlow: '100% automated',
-    dataAccuracy: '99.5% accurate',
-    syncTime: 'Real-time',
-    vendorSatisfaction: '95% satisfaction',
+    automatedDataFlow: "100% automated",
+    dataAccuracy: "99.5% accurate",
+    syncTime: "Real-time",
+    vendorSatisfaction: "95% satisfaction",
   },
 };

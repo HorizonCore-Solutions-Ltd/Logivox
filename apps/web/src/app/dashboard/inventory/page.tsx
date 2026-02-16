@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Plus, Search, Filter, MoreHorizontal, Package, AlertTriangle } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Filter,
+  MoreHorizontal,
+  Package,
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -53,27 +60,31 @@ export default function InventoryPage() {
   const [loading, setLoading] = React.useState(true);
   const [search, setSearch] = React.useState("");
   // Get current user's organization from session
-  const { data: session } = useSession()
-  const [selectedOrg, setSelectedOrg] = React.useState(session?.user?.organizationId || "")
+  const { data: session } = useSession();
+  const [selectedOrg, setSelectedOrg] = React.useState(
+    session?.user?.organizationId || "",
+  );
 
   // Mock data - in production this would come from API
   React.useEffect(() => {
     const fetchInventoryData = async () => {
-      if (!selectedOrg) return
-      
+      if (!selectedOrg) return;
+
       try {
-        setLoading(true)
-        
+        setLoading(true);
+
         // Fetch real inventory data from API
-        const response = await fetch(`/api/inventory?organizationId=${selectedOrg}`)
+        const response = await fetch(
+          `/api/inventory?organizationId=${selectedOrg}`,
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch inventory data')
+          throw new Error("Failed to fetch inventory data");
         }
-        
-        const data = await response.json()
-        setItems(data.items || [])
+
+        const data = await response.json();
+        setItems(data.items || []);
       } catch (error) {
-        console.error('Error fetching inventory:', error)
+        console.error("Error fetching inventory:", error);
         // Fallback to mock data for development
         const mockData: InventoryItem[] = [
           {
@@ -88,7 +99,7 @@ export default function InventoryPage() {
             createdAt: "2024-01-15T10:30:00Z",
           },
           {
-            id: "item_2", 
+            id: "item_2",
             name: "High-Vis Vest Large",
             sku: "VEST-L-001",
             quantity: 25,
@@ -101,7 +112,7 @@ export default function InventoryPage() {
           {
             id: "item_3",
             name: "Steel Toe Boots Size 10",
-            sku: "BOOT-10-001", 
+            sku: "BOOT-10-001",
             quantity: 0,
             minStockLevel: 15,
             status: "OUT_OF_STOCK",
@@ -120,34 +131,40 @@ export default function InventoryPage() {
             category: { name: "Medical Supplies" },
             createdAt: "2024-01-12T16:45:00Z",
           },
-        ]
-        setItems(mockData)
+        ];
+        setItems(mockData);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchInventoryData()
-  }, [selectedOrg])
+    fetchInventoryData();
+  }, [selectedOrg]);
 
-  const filteredItems = items.filter(item =>
-    item.name.toLowerCase().includes(search.toLowerCase()) ||
-    item.sku.toLowerCase().includes(search.toLowerCase())
+  const filteredItems = items.filter(
+    (item) =>
+      item.name.toLowerCase().includes(search.toLowerCase()) ||
+      item.sku.toLowerCase().includes(search.toLowerCase()),
   );
 
   const stats = {
     totalItems: items.length,
-    lowStock: items.filter(item => item.quantity <= item.minStockLevel).length,
-    outOfStock: items.filter(item => item.status === "OUT_OF_STOCK").length,
+    lowStock: items.filter((item) => item.quantity <= item.minStockLevel)
+      .length,
+    outOfStock: items.filter((item) => item.status === "OUT_OF_STOCK").length,
     totalValue: 2847392, // Mock total value
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "ACTIVE": return "bg-green-100 text-green-800";
-      case "OUT_OF_STOCK": return "bg-red-100 text-red-800";
-      case "INACTIVE": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "ACTIVE":
+        return "bg-green-100 text-green-800";
+      case "OUT_OF_STOCK":
+        return "bg-red-100 text-red-800";
+      case "INACTIVE":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -159,7 +176,9 @@ export default function InventoryPage() {
     return (
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Inventory Management</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Inventory Management
+          </h2>
         </div>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
@@ -182,7 +201,9 @@ export default function InventoryPage() {
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Inventory Management</h2>
+        <h2 className="text-3xl font-bold tracking-tight">
+          Inventory Management
+        </h2>
         <Button onClick={handleCreateItem}>
           <Plus className="mr-2 h-4 w-4" />
           Add Item
@@ -198,7 +219,9 @@ export default function InventoryPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalItems}</div>
-            <p className="text-xs text-muted-foreground">across all warehouses</p>
+            <p className="text-xs text-muted-foreground">
+              across all warehouses
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -207,8 +230,12 @@ export default function InventoryPage() {
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{stats.lowStock}</div>
-            <p className="text-xs text-muted-foreground">items need reordering</p>
+            <div className="text-2xl font-bold text-yellow-600">
+              {stats.lowStock}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              items need reordering
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -217,7 +244,9 @@ export default function InventoryPage() {
             <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">{stats.outOfStock}</div>
+            <div className="text-2xl font-bold text-red-600">
+              {stats.outOfStock}
+            </div>
             <p className="text-xs text-muted-foreground">items unavailable</p>
           </CardContent>
         </Card>
@@ -227,8 +256,12 @@ export default function InventoryPage() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.totalValue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">current inventory value</p>
+            <div className="text-2xl font-bold">
+              ${stats.totalValue.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              current inventory value
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -281,11 +314,19 @@ export default function InventoryPage() {
                   <TableCell>{item.category.name}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className={item.quantity <= item.minStockLevel ? "text-yellow-600 font-medium" : ""}>
+                      <span
+                        className={
+                          item.quantity <= item.minStockLevel
+                            ? "text-yellow-600 font-medium"
+                            : ""
+                        }
+                      >
                         {item.quantity}
                       </span>
                       {item.quantity <= item.minStockLevel && (
-                        <span className="text-xs text-yellow-600">Min: {item.minStockLevel}</span>
+                        <span className="text-xs text-yellow-600">
+                          Min: {item.minStockLevel}
+                        </span>
                       )}
                     </div>
                   </TableCell>
@@ -304,12 +345,16 @@ export default function InventoryPage() {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
-                          onClick={() => router.push(`/dashboard/inventory/${item.id}`)}
+                          onClick={() =>
+                            router.push(`/dashboard/inventory/${item.id}`)
+                          }
                         >
                           View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => router.push(`/dashboard/inventory/${item.id}/edit`)}
+                          onClick={() =>
+                            router.push(`/dashboard/inventory/${item.id}/edit`)
+                          }
                         >
                           Edit Item
                         </DropdownMenuItem>

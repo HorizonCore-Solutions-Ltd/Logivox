@@ -3,10 +3,10 @@
 /**
  * VIP CUSTOMER PRIORITY DASHBOARD
  * ================================
- * 
+ *
  * System 4 - Highest ROI Optimization (3,088%)
  * Investment: $8K → Savings: $247K/year
- * 
+ *
  * Features:
  * - Customer tier management (Bronze → Platinum)
  * - Real-time priority queue visualization
@@ -17,7 +17,13 @@
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,7 +53,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowUp, Crown, Star, AlertTriangle, Clock, DollarSign, TrendingUp } from "lucide-react";
+import {
+  ArrowUp,
+  Crown,
+  Star,
+  AlertTriangle,
+  Clock,
+  DollarSign,
+  TrendingUp,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // ============================================
@@ -262,7 +276,11 @@ export default function VIPPriorityDashboard() {
       BREACHED: "bg-red-500 text-white",
     };
 
-    return <Badge className={colors[status as keyof typeof colors] || ""}>{status}</Badge>;
+    return (
+      <Badge className={colors[status as keyof typeof colors] || ""}>
+        {status}
+      </Badge>
+    );
   }
 
   function formatCurrency(amount: number) {
@@ -283,7 +301,9 @@ export default function VIPPriorityDashboard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading VIP Priority Dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Loading VIP Priority Dashboard...
+          </p>
         </div>
       </div>
     );
@@ -313,19 +333,29 @@ export default function VIPPriorityDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Total Customers</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Total Customers
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.totalCustomers.toLocaleString()}</div>
+              <div className="text-2xl font-bold">
+                {stats.totalCustomers.toLocaleString()}
+              </div>
               <p className="text-xs text-gray-500 mt-1">
-                {stats.tieredCustomers} with VIP tiers ({((stats.tieredCustomers / stats.totalCustomers) * 100).toFixed(1)}%)
+                {stats.tieredCustomers} with VIP tiers (
+                {((stats.tieredCustomers / stats.totalCustomers) * 100).toFixed(
+                  1,
+                )}
+                %)
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Active Orders</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Active Orders
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.activeOrders}</div>
@@ -337,10 +367,14 @@ export default function VIPPriorityDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">SLA Compliance</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                SLA Compliance
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{stats.slaCompliance}%</div>
+              <div className="text-2xl font-bold text-green-600">
+                {stats.slaCompliance}%
+              </div>
               <p className="text-xs text-gray-500 mt-1">
                 Avg fulfillment: {stats.avgFulfillmentTime}h
               </p>
@@ -349,7 +383,9 @@ export default function VIPPriorityDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Annual Savings</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Annual Savings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -377,7 +413,8 @@ export default function VIPPriorityDashboard() {
             <CardHeader>
               <CardTitle>Live Priority Queue</CardTitle>
               <CardDescription>
-                Orders ranked by dynamic priority score (tier × base + time + value + custom)
+                Orders ranked by dynamic priority score (tier × base + time +
+                value + custom)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -396,20 +433,29 @@ export default function VIPPriorityDashboard() {
                 </TableHeader>
                 <TableBody>
                   {queue.map((order) => (
-                    <TableRow key={order.id} className={order.isEscalated ? "bg-red-50" : ""}>
+                    <TableRow
+                      key={order.id}
+                      className={order.isEscalated ? "bg-red-50" : ""}
+                    >
                       <TableCell>
                         <Badge variant="outline" className="font-mono">
                           #{order.rank}
                         </Badge>
                       </TableCell>
-                      <TableCell className="font-medium">{order.orderNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {order.orderNumber}
+                      </TableCell>
                       <TableCell>{order.customerName}</TableCell>
                       <TableCell>{getTierBadge(order.tier)}</TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <div className="font-bold text-lg">{order.finalScore.toFixed(0)}</div>
+                          <div className="font-bold text-lg">
+                            {order.finalScore.toFixed(0)}
+                          </div>
                           <div className="text-xs text-gray-500">
-                            Base: {order.basePriority} × {order.tierMultiplier}x + Time: {order.timeBoost} + Value: {order.valueBoost}
+                            Base: {order.basePriority} × {order.tierMultiplier}x
+                            + Time: {order.timeBoost} + Value:{" "}
+                            {order.valueBoost}
                           </div>
                         </div>
                       </TableCell>
@@ -424,7 +470,9 @@ export default function VIPPriorityDashboard() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => escalateOrder(order.id, "Manual escalation")}
+                            onClick={() =>
+                              escalateOrder(order.id, "Manual escalation")
+                            }
                           >
                             <ArrowUp className="w-3 h-3 mr-1" />
                             Escalate
@@ -453,7 +501,8 @@ export default function VIPPriorityDashboard() {
                 <div>
                   <CardTitle>Customer Tier Management</CardTitle>
                   <CardDescription>
-                    Assign priority multipliers: Bronze (1x), Silver (2x), Gold (5x), Platinum (10x)
+                    Assign priority multipliers: Bronze (1x), Silver (2x), Gold
+                    (5x), Platinum (10x)
                   </CardDescription>
                 </div>
                 <Dialog>
@@ -481,7 +530,10 @@ export default function VIPPriorityDashboard() {
                       </div>
                       <div>
                         <Label>Tier</Label>
-                        <Select value={selectedTier} onValueChange={(v) => setSelectedTier(v as TierType)}>
+                        <Select
+                          value={selectedTier}
+                          onValueChange={(v) => setSelectedTier(v as TierType)}
+                        >
                           <SelectTrigger>
                             <SelectValue />
                           </SelectTrigger>
@@ -489,13 +541,20 @@ export default function VIPPriorityDashboard() {
                             <SelectItem value="BRONZE">Bronze (1x)</SelectItem>
                             <SelectItem value="SILVER">Silver (2x)</SelectItem>
                             <SelectItem value="GOLD">Gold (5x)</SelectItem>
-                            <SelectItem value="PLATINUM">Platinum (10x)</SelectItem>
+                            <SelectItem value="PLATINUM">
+                              Platinum (10x)
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
                     <DialogFooter>
-                      <Button onClick={() => selectedCustomer && setCustomerTier(selectedCustomer, selectedTier)}>
+                      <Button
+                        onClick={() =>
+                          selectedCustomer &&
+                          setCustomerTier(selectedCustomer, selectedTier)
+                        }
+                      >
                         Assign Tier
                       </Button>
                     </DialogFooter>
@@ -519,16 +578,24 @@ export default function VIPPriorityDashboard() {
                 <TableBody>
                   {tiers.map((tier) => (
                     <TableRow key={tier.id}>
-                      <TableCell className="font-medium">{tier.customerName}</TableCell>
+                      <TableCell className="font-medium">
+                        {tier.customerName}
+                      </TableCell>
                       <TableCell>{getTierBadge(tier.tier)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline">{tier.priorityMultiplier}x</Badge>
+                        <Badge variant="outline">
+                          {tier.priorityMultiplier}x
+                        </Badge>
                       </TableCell>
                       <TableCell>{formatCurrency(tier.annualSpend)}</TableCell>
                       <TableCell>{tier.orderCount.toLocaleString()}</TableCell>
-                      <TableCell>{formatCurrency(tier.avgOrderValue)}</TableCell>
                       <TableCell>
-                        <Badge variant={tier.isActive ? "default" : "secondary"}>
+                        {formatCurrency(tier.avgOrderValue)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={tier.isActive ? "default" : "secondary"}
+                        >
                           {tier.isActive ? "Active" : "Inactive"}
                         </Badge>
                       </TableCell>
@@ -546,7 +613,8 @@ export default function VIPPriorityDashboard() {
             <CardHeader>
               <CardTitle>Priority Rules Engine</CardTitle>
               <CardDescription>
-                Define custom priority rules for automatic escalation and scoring
+                Define custom priority rules for automatic escalation and
+                scoring
               </CardDescription>
             </CardHeader>
             <CardContent>

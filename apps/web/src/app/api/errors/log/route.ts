@@ -59,6 +59,9 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error("Failed to log error:", error);
     // Don't fail the request if logging fails
-    return NextResponse.json({ success: false, logged: false }, { status: 500 });
+    return NextResponse.json(
+      { success: false, logged: false },
+      { status: 500 },
+    );
   }
 }

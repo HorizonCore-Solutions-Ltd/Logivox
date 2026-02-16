@@ -23,7 +23,11 @@ export function HeroSection() {
 
   const stats = [
     { value: "100%", label: "Automation", sublabel: "Eliminate Manual Work" },
-    { value: "44+", label: "Powerful Features", sublabel: "Everything You Need" },
+    {
+      value: "44+",
+      label: "Powerful Features",
+      sublabel: "Everything You Need",
+    },
     { value: "99.99%", label: "Reliability", sublabel: "Always Available" },
     { value: "Zero", label: "IT Headaches", sublabel: "We Handle Everything" },
   ];
@@ -47,7 +51,8 @@ export function HeroSection() {
             role="status"
             aria-label="Product features announcement"
           >
-            🚀 Trusted by 500+ Warehouses • Voice-Enabled • AI-Powered • SOC 2 Certified
+            🚀 Trusted by 500+ Warehouses • Voice-Enabled • AI-Powered • SOC 2
+            Certified
           </Badge>
 
           {/* Hero headline */}
@@ -59,9 +64,10 @@ export function HeroSection() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-              Join 500+ warehouses that eliminated picking errors and tripled fulfillment speed.
-              Complete warehouse management with voice commands, AI optimization, and real-time visibility
-              —proven by enterprises saving $52M+ annually.
+              Join 500+ warehouses that eliminated picking errors and tripled
+              fulfillment speed. Complete warehouse management with voice
+              commands, AI optimization, and real-time visibility —proven by
+              enterprises saving $52M+ annually.
             </p>
           </div>
 

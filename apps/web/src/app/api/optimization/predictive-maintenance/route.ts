@@ -1,10 +1,10 @@
 /**
  * PREDICTIVE EQUIPMENT MAINTENANCE API
  * =====================================
- * 
+ *
  * System 1 - Outstanding ROI (315% ROI)
  * Investment: $45K → Savings: $141K/year
- * 
+ *
  * Capabilities:
  * - AI-powered failure prediction
  * - Preventive maintenance scheduling
@@ -12,13 +12,13 @@
  * - Downtime cost calculation
  * - Maintenance history tracking
  * - Parts inventory optimization
- * 
+ *
  * Key Metrics:
  * - 40% reduction in unplanned downtime
  * - 25% lower maintenance costs
  * - 30% longer equipment lifespan
  * - 50% reduction in emergency repairs
- * 
+ *
  * @version 1.0.0
  * @author Flowstock Platform
  * @date January 8, 2026
@@ -39,31 +39,35 @@ const MAINTENANCE_CONFIG = {
   EQUIPMENT_TYPES: {
     FORKLIFT: { interval: 250, criticalFailureCost: 2500, avgRepairCost: 800 },
     CONVEYOR: { interval: 500, criticalFailureCost: 5000, avgRepairCost: 1200 },
-    PALLET_JACK: { interval: 300, criticalFailureCost: 1500, avgRepairCost: 500 },
+    PALLET_JACK: {
+      interval: 300,
+      criticalFailureCost: 1500,
+      avgRepairCost: 500,
+    },
     SORTER: { interval: 400, criticalFailureCost: 8000, avgRepairCost: 2000 },
     ROBOT: { interval: 200, criticalFailureCost: 10000, avgRepairCost: 3000 },
     CRANE: { interval: 350, criticalFailureCost: 12000, avgRepairCost: 4000 },
     SCANNER: { interval: 600, criticalFailureCost: 500, avgRepairCost: 200 },
     PRINTER: { interval: 1000, criticalFailureCost: 300, avgRepairCost: 150 },
   },
-  
+
   // Health score thresholds
   HEALTH_THRESHOLDS: {
-    CRITICAL: 30,    // <30% = immediate attention
-    WARNING: 50,     // 30-50% = schedule soon
-    GOOD: 80,        // 50-80% = normal monitoring
-    EXCELLENT: 100,  // 80-100% = optimal
+    CRITICAL: 30, // <30% = immediate attention
+    WARNING: 50, // 30-50% = schedule soon
+    GOOD: 80, // 50-80% = normal monitoring
+    EXCELLENT: 100, // 80-100% = optimal
   },
-  
+
   // Failure prediction factors
   FAILURE_FACTORS: {
     AGE_WEIGHT: 0.25,
-    USAGE_WEIGHT: 0.30,
-    MAINTENANCE_HISTORY_WEIGHT: 0.20,
+    USAGE_WEIGHT: 0.3,
+    MAINTENANCE_HISTORY_WEIGHT: 0.2,
     ERROR_RATE_WEIGHT: 0.15,
-    VIBRATION_WEIGHT: 0.10,
+    VIBRATION_WEIGHT: 0.1,
   },
-  
+
   // Alert levels
   ALERT_LEVELS: {
     CRITICAL: { daysUntilFailure: 3, priority: "URGENT" },
@@ -86,7 +90,12 @@ const ScheduleMaintenanceSchema = z.object({
   action: z.literal("scheduleMaintenance"),
   data: z.object({
     equipmentId: z.string(),
-    maintenanceType: z.enum(["PREVENTIVE", "CORRECTIVE", "PREDICTIVE", "EMERGENCY"]),
+    maintenanceType: z.enum([
+      "PREVENTIVE",
+      "CORRECTIVE",
+      "PREDICTIVE",
+      "EMERGENCY",
+    ]),
     scheduledDate: z.string(),
     priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
     estimatedDuration: z.number(),
@@ -99,7 +108,12 @@ const RecordMaintenanceSchema = z.object({
   action: z.literal("recordMaintenance"),
   data: z.object({
     equipmentId: z.string(),
-    maintenanceType: z.enum(["PREVENTIVE", "CORRECTIVE", "PREDICTIVE", "EMERGENCY"]),
+    maintenanceType: z.enum([
+      "PREVENTIVE",
+      "CORRECTIVE",
+      "PREDICTIVE",
+      "EMERGENCY",
+    ]),
     performedDate: z.string(),
     duration: z.number(),
     cost: z.number(),
@@ -142,13 +156,15 @@ function calculateHealthScore(equipment: {
   failureProbability: number;
   predictedDaysUntilFailure: number | null;
 } {
-  const config = MAINTENANCE_CONFIG.EQUIPMENT_TYPES[
-    equipment.type as keyof typeof MAINTENANCE_CONFIG.EQUIPMENT_TYPES
-  ] || MAINTENANCE_CONFIG.EQUIPMENT_TYPES.FORKLIFT;
+  const config =
+    MAINTENANCE_CONFIG.EQUIPMENT_TYPES[
+      equipment.type as keyof typeof MAINTENANCE_CONFIG.EQUIPMENT_TYPES
+    ] || MAINTENANCE_CONFIG.EQUIPMENT_TYPES.FORKLIFT;
 
   // Age factor (0-100, lower is worse)
   const ageInYears =
-    (Date.now() - equipment.installDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+    (Date.now() - equipment.installDate.getTime()) /
+    (1000 * 60 * 60 * 24 * 365);
   const ageFactor = Math.max(0, 100 - ageInYears * 10);
 
   // Usage factor (0-100, based on hours vs. recommended interval)
@@ -159,14 +175,14 @@ function calculateHealthScore(equipment: {
     : equipment.hoursOperated;
   const usageFactor = Math.max(
     0,
-    100 - (hoursSinceLastMaintenance / config.interval) * 100
+    100 - (hoursSinceLastMaintenance / config.interval) * 100,
   );
 
   // Maintenance history factor (0-100, based on overdue status)
   const daysOverdue = equipment.lastMaintenanceDate
     ? (Date.now() - equipment.lastMaintenanceDate.getTime()) /
-      (1000 * 60 * 60 * 24) -
-      (config.interval / 24)
+        (1000 * 60 * 60 * 24) -
+      config.interval / 24
     : 0;
   const maintenanceFactor = Math.max(0, 100 - daysOverdue * 2);
 
@@ -211,48 +227,50 @@ function generateRecommendations(
   healthScore: number,
   failureProbability: number,
   daysUntilFailure: number | null,
-  equipment: any
+  equipment: any,
 ): string[] {
   const recommendations: string[] = [];
 
   if (healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.CRITICAL) {
     recommendations.push(
-      "CRITICAL: Schedule emergency maintenance immediately to prevent failure"
+      "CRITICAL: Schedule emergency maintenance immediately to prevent failure",
     );
     recommendations.push(
-      "Consider taking equipment offline until maintenance is performed"
+      "Consider taking equipment offline until maintenance is performed",
     );
   } else if (healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.WARNING) {
     recommendations.push(
-      "WARNING: Schedule preventive maintenance within the next 3-7 days"
+      "WARNING: Schedule preventive maintenance within the next 3-7 days",
     );
     recommendations.push("Increase monitoring frequency to daily checks");
   } else if (healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.GOOD) {
     recommendations.push(
-      "Schedule routine maintenance within the next 2 weeks"
+      "Schedule routine maintenance within the next 2 weeks",
     );
   }
 
   if (failureProbability > 70) {
     recommendations.push(
-      "High failure probability detected - order replacement parts in advance"
+      "High failure probability detected - order replacement parts in advance",
     );
   }
 
   if (daysUntilFailure && daysUntilFailure < 7) {
     recommendations.push(
-      `Predicted failure in ${daysUntilFailure} days - prioritize maintenance scheduling`
+      `Predicted failure in ${daysUntilFailure} days - prioritize maintenance scheduling`,
     );
   }
 
   if (equipment.errorCount > 5) {
     recommendations.push(
-      "Elevated error count - investigate root cause before next maintenance"
+      "Elevated error count - investigate root cause before next maintenance",
     );
   }
 
   if (recommendations.length === 0) {
-    recommendations.push("Equipment is in good condition - maintain regular schedule");
+    recommendations.push(
+      "Equipment is in good condition - maintain regular schedule",
+    );
   }
 
   return recommendations;
@@ -264,11 +282,12 @@ function generateRecommendations(
 function calculateDowntimeCost(
   equipmentType: string,
   hoursDown: number,
-  isPlanned: boolean
+  isPlanned: boolean,
 ): number {
-  const config = MAINTENANCE_CONFIG.EQUIPMENT_TYPES[
-    equipmentType as keyof typeof MAINTENANCE_CONFIG.EQUIPMENT_TYPES
-  ] || MAINTENANCE_CONFIG.EQUIPMENT_TYPES.FORKLIFT;
+  const config =
+    MAINTENANCE_CONFIG.EQUIPMENT_TYPES[
+      equipmentType as keyof typeof MAINTENANCE_CONFIG.EQUIPMENT_TYPES
+    ] || MAINTENANCE_CONFIG.EQUIPMENT_TYPES.FORKLIFT;
 
   const hourlyProductivityLoss = 150; // $150/hour average
   const emergencyMultiplier = isPlanned ? 1.0 : 2.5;
@@ -314,11 +333,11 @@ export async function GET(request: NextRequest) {
       const completedThisMonth = maintenanceRecords.filter(
         (r) =>
           new Date(r.createdAt) >= thisMonth &&
-          (r.metadata as any)?.status === "COMPLETED"
+          (r.metadata as any)?.status === "COMPLETED",
       ).length;
 
       const scheduled = maintenanceRecords.filter(
-        (r) => (r.metadata as any)?.status === "SCHEDULED"
+        (r) => (r.metadata as any)?.status === "SCHEDULED",
       ).length;
 
       const totalCost = maintenanceRecords.reduce((sum, r) => {
@@ -405,15 +424,25 @@ export async function GET(request: NextRequest) {
           health.healthScore,
           health.failureProbability,
           health.predictedDaysUntilFailure,
-          eq
+          eq,
         );
 
-        let maintenanceStatus: "OVERDUE" | "DUE_SOON" | "SCHEDULED" | "UP_TO_DATE";
-        if (health.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.CRITICAL) {
+        let maintenanceStatus:
+          | "OVERDUE"
+          | "DUE_SOON"
+          | "SCHEDULED"
+          | "UP_TO_DATE";
+        if (
+          health.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.CRITICAL
+        ) {
           maintenanceStatus = "OVERDUE";
-        } else if (health.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.WARNING) {
+        } else if (
+          health.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.WARNING
+        ) {
           maintenanceStatus = "DUE_SOON";
-        } else if (health.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.GOOD) {
+        } else if (
+          health.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.GOOD
+        ) {
           maintenanceStatus = "SCHEDULED";
         } else {
           maintenanceStatus = "UP_TO_DATE";
@@ -426,7 +455,8 @@ export async function GET(request: NextRequest) {
           healthScore: health.healthScore,
           predictedFailureDate: health.predictedDaysUntilFailure
             ? new Date(
-                Date.now() + health.predictedDaysUntilFailure * 24 * 60 * 60 * 1000
+                Date.now() +
+                  health.predictedDaysUntilFailure * 24 * 60 * 60 * 1000,
               )
             : null,
           daysUntilFailure: health.predictedDaysUntilFailure,
@@ -443,20 +473,20 @@ export async function GET(request: NextRequest) {
       const summary = {
         totalEquipment: equipmentHealth.length,
         critical: equipmentHealth.filter(
-          (e) => e.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.CRITICAL
+          (e) => e.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.CRITICAL,
         ).length,
         warning: equipmentHealth.filter(
           (e) =>
             e.healthScore >= MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.CRITICAL &&
-            e.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.WARNING
+            e.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.WARNING,
         ).length,
         good: equipmentHealth.filter(
           (e) =>
             e.healthScore >= MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.WARNING &&
-            e.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.GOOD
+            e.healthScore < MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.GOOD,
         ).length,
         excellent: equipmentHealth.filter(
-          (e) => e.healthScore >= MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.GOOD
+          (e) => e.healthScore >= MAINTENANCE_CONFIG.HEALTH_THRESHOLDS.GOOD,
         ).length,
         avgHealthScore:
           equipmentHealth.reduce((sum, e) => sum + e.healthScore, 0) /
@@ -475,7 +505,7 @@ export async function GET(request: NextRequest) {
     console.error("Error in predictive maintenance GET:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -556,14 +586,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error in predictive maintenance POST:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // RECEIVING PERFORMANCE METRICS API
@@ -32,60 +32,60 @@ import { z } from 'zod';
 
 // Metric types
 type MetricType =
-  | 'RECEIVING_VELOCITY'     // Units per hour
-  | 'DOCK_UTILIZATION'       // % of dock doors in use
-  | 'WORKER_PRODUCTIVITY'    // Units per worker-hour
-  | 'CYCLE_TIME'             // Minutes per shipment
-  | 'SLA_COMPLIANCE'         // % meeting target times
-  | 'QUALITY_RATE'           // % passing inspection
-  | 'DAMAGE_RATE';           // % damaged units
+  | "RECEIVING_VELOCITY" // Units per hour
+  | "DOCK_UTILIZATION" // % of dock doors in use
+  | "WORKER_PRODUCTIVITY" // Units per worker-hour
+  | "CYCLE_TIME" // Minutes per shipment
+  | "SLA_COMPLIANCE" // % meeting target times
+  | "QUALITY_RATE" // % passing inspection
+  | "DAMAGE_RATE"; // % damaged units
 
 // Time granularity
-type TimeGranularity = 'HOURLY' | 'DAILY' | 'WEEKLY' | 'MONTHLY';
+type TimeGranularity = "HOURLY" | "DAILY" | "WEEKLY" | "MONTHLY";
 
 // Shift types
-type ShiftType = 'DAY' | 'EVENING' | 'NIGHT' | 'WEEKEND';
+type ShiftType = "DAY" | "EVENING" | "NIGHT" | "WEEKEND";
 
 // Validation schemas
 const recordMetricSchema = z.object({
-  action: z.literal('record_metric'),
+  action: z.literal("record_metric"),
   metricType: z.enum([
-    'RECEIVING_VELOCITY',
-    'DOCK_UTILIZATION',
-    'WORKER_PRODUCTIVITY',
-    'CYCLE_TIME',
-    'SLA_COMPLIANCE',
-    'QUALITY_RATE',
-    'DAMAGE_RATE'
+    "RECEIVING_VELOCITY",
+    "DOCK_UTILIZATION",
+    "WORKER_PRODUCTIVITY",
+    "CYCLE_TIME",
+    "SLA_COMPLIANCE",
+    "QUALITY_RATE",
+    "DAMAGE_RATE",
   ]),
   value: z.number(),
-  shift: z.enum(['DAY', 'EVENING', 'NIGHT', 'WEEKEND']).optional(),
+  shift: z.enum(["DAY", "EVENING", "NIGHT", "WEEKEND"]).optional(),
   dockDoor: z.string().optional(),
   workerId: z.string().optional(),
 });
 
 const getTrendsSchema = z.object({
-  action: z.literal('get_trends'),
+  action: z.literal("get_trends"),
   metricType: z.enum([
-    'RECEIVING_VELOCITY',
-    'DOCK_UTILIZATION',
-    'WORKER_PRODUCTIVITY',
-    'CYCLE_TIME',
-    'SLA_COMPLIANCE',
-    'QUALITY_RATE',
-    'DAMAGE_RATE'
+    "RECEIVING_VELOCITY",
+    "DOCK_UTILIZATION",
+    "WORKER_PRODUCTIVITY",
+    "CYCLE_TIME",
+    "SLA_COMPLIANCE",
+    "QUALITY_RATE",
+    "DAMAGE_RATE",
   ]),
-  granularity: z.enum(['HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY']),
+  granularity: z.enum(["HOURLY", "DAILY", "WEEKLY", "MONTHLY"]),
   startDate: z.string(),
   endDate: z.string(),
 });
 
 const getBottlenecksSchema = z.object({
-  action: z.literal('get_bottlenecks'),
-  timeRange: z.enum(['TODAY', 'THIS_WEEK', 'THIS_MONTH']),
+  action: z.literal("get_bottlenecks"),
+  timeRange: z.enum(["TODAY", "THIS_WEEK", "THIS_MONTH"]),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   recordMetricSchema,
   getTrendsSchema,
   getBottlenecksSchema,
@@ -94,9 +94,9 @@ const requestSchema = z.discriminatedUnion('action', [
 // Calculate receiving velocity (units per hour)
 async function calculateReceivingVelocity(
   organizationId: string,
-  timeRange: { start: Date; end: Date }
+  timeRange: { start: Date; end: Date },
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COALESCE(SUM(quantity), 0)::int as "totalUnits",
       EXTRACT(EPOCH FROM (${timeRange.end} - ${timeRange.start})) / 3600 as "hours"
@@ -105,7 +105,7 @@ async function calculateReceivingVelocity(
       AND "createdAt" >= ${timeRange.start}
       AND "createdAt" <= ${timeRange.end}
       AND status IN ('COMPLETED', 'IN_PROGRESS')
-  ` as any[];
+  `) as any[];
 
   const { totalUnits, hours } = result[0];
   return hours > 0 ? totalUnits / hours : 0;
@@ -114,13 +114,13 @@ async function calculateReceivingVelocity(
 // Calculate dock door utilization
 async function calculateDockUtilization(
   organizationId: string,
-  timeRange: { start: Date; end: Date }
+  timeRange: { start: Date; end: Date },
 ): Promise<number> {
   // Get total dock doors (would come from org settings)
   const totalDocks = 10; // Example: 10 dock doors
 
   // Get average active docks during time range
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COUNT(DISTINCT "dockDoor")::int as "activeDocks"
     FROM "Receiving"
@@ -129,7 +129,7 @@ async function calculateDockUtilization(
       AND "createdAt" <= ${timeRange.end}
       AND "dockDoor" IS NOT NULL
       AND status IN ('IN_PROGRESS', 'COMPLETED')
-  ` as any[];
+  `) as any[];
 
   const { activeDocks } = result[0];
   return (activeDocks / totalDocks) * 100;
@@ -138,9 +138,9 @@ async function calculateDockUtilization(
 // Calculate worker productivity
 async function calculateWorkerProductivity(
   organizationId: string,
-  timeRange: { start: Date; end: Date }
+  timeRange: { start: Date; end: Date },
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COALESCE(SUM(r.quantity), 0)::int as "totalUnits",
       COUNT(DISTINCT r."receivedBy")::int as "workerCount",
@@ -151,7 +151,7 @@ async function calculateWorkerProductivity(
       AND r."createdAt" <= ${timeRange.end}
       AND r.status = 'COMPLETED'
       AND r."receivedBy" IS NOT NULL
-  ` as any[];
+  `) as any[];
 
   const { totalUnits, workerCount, hours } = result[0];
   const workerHours = workerCount * hours;
@@ -161,9 +161,9 @@ async function calculateWorkerProductivity(
 // Calculate average cycle time (minutes per shipment)
 async function calculateCycleTime(
   organizationId: string,
-  timeRange: { start: Date; end: Date }
+  timeRange: { start: Date; end: Date },
 ): Promise<number> {
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COALESCE(
         AVG(
@@ -178,7 +178,7 @@ async function calculateCycleTime(
       AND status = 'COMPLETED'
       AND "startedAt" IS NOT NULL
       AND "completedAt" IS NOT NULL
-  ` as any[];
+  `) as any[];
 
   return parseFloat(result[0].avgCycleTime);
 }
@@ -186,12 +186,12 @@ async function calculateCycleTime(
 // Calculate SLA compliance rate
 async function calculateSLACompliance(
   organizationId: string,
-  timeRange: { start: Date; end: Date }
+  timeRange: { start: Date; end: Date },
 ): Promise<number> {
   // Target: Complete within 2 hours of appointment time
   const targetMinutes = 120;
 
-  const result = await prisma.$queryRaw`
+  const result = (await prisma.$queryRaw`
     SELECT 
       COUNT(*)::int as "totalReceivings",
       COUNT(CASE 
@@ -205,7 +205,7 @@ async function calculateSLACompliance(
       AND status = 'COMPLETED'
       AND "appointmentTime" IS NOT NULL
       AND "completedAt" IS NOT NULL
-  ` as any[];
+  `) as any[];
 
   const { totalReceivings, onTimeReceivings } = result[0];
   return totalReceivings > 0 ? (onTimeReceivings / totalReceivings) * 100 : 0;
@@ -214,36 +214,42 @@ async function calculateSLACompliance(
 // Identify bottlenecks
 async function identifyBottlenecks(
   organizationId: string,
-  timeRange: { start: Date; end: Date }
+  timeRange: { start: Date; end: Date },
 ): Promise<any[]> {
   const bottlenecks: any[] = [];
 
   // Check dock door bottlenecks (utilization > 95%)
-  const dockUtilization = await calculateDockUtilization(organizationId, timeRange);
+  const dockUtilization = await calculateDockUtilization(
+    organizationId,
+    timeRange,
+  );
   if (dockUtilization > 95) {
     bottlenecks.push({
-      type: 'DOCK_CAPACITY',
-      severity: 'HIGH',
-      metric: 'Dock Utilization',
+      type: "DOCK_CAPACITY",
+      severity: "HIGH",
+      metric: "Dock Utilization",
       value: dockUtilization,
       threshold: 95,
-      impact: 'Dock scheduling conflicts causing delays',
-      recommendation: 'Add dock doors or extend operating hours',
+      impact: "Dock scheduling conflicts causing delays",
+      recommendation: "Add dock doors or extend operating hours",
     });
   }
 
   // Check worker productivity (below 80% of target)
-  const productivity = await calculateWorkerProductivity(organizationId, timeRange);
+  const productivity = await calculateWorkerProductivity(
+    organizationId,
+    timeRange,
+  );
   const targetProductivity = 50; // 50 units per worker-hour target
   if (productivity < targetProductivity * 0.8) {
     bottlenecks.push({
-      type: 'WORKER_PRODUCTIVITY',
-      severity: 'MEDIUM',
-      metric: 'Worker Productivity',
+      type: "WORKER_PRODUCTIVITY",
+      severity: "MEDIUM",
+      metric: "Worker Productivity",
       value: productivity,
       threshold: targetProductivity * 0.8,
-      impact: 'Lower than expected throughput per worker',
-      recommendation: 'Review training, tools, or workload distribution',
+      impact: "Lower than expected throughput per worker",
+      recommendation: "Review training, tools, or workload distribution",
     });
   }
 
@@ -252,13 +258,13 @@ async function identifyBottlenecks(
   const targetCycleTime = 45; // 45 minutes target
   if (cycleTime > targetCycleTime * 1.9) {
     bottlenecks.push({
-      type: 'CYCLE_TIME',
-      severity: 'HIGH',
-      metric: 'Cycle Time',
+      type: "CYCLE_TIME",
+      severity: "HIGH",
+      metric: "Cycle Time",
       value: cycleTime,
       threshold: targetCycleTime,
-      impact: 'Receiving taking longer than expected',
-      recommendation: 'Analyze workflow steps for inefficiencies',
+      impact: "Receiving taking longer than expected",
+      recommendation: "Analyze workflow steps for inefficiencies",
     });
   }
 
@@ -266,13 +272,13 @@ async function identifyBottlenecks(
   const slaCompliance = await calculateSLACompliance(organizationId, timeRange);
   if (slaCompliance < 90) {
     bottlenecks.push({
-      type: 'SLA_COMPLIANCE',
-      severity: 'HIGH',
-      metric: 'SLA Compliance',
+      type: "SLA_COMPLIANCE",
+      severity: "HIGH",
+      metric: "SLA Compliance",
       value: slaCompliance,
       threshold: 90,
-      impact: 'Missing service level targets',
-      recommendation: 'Review scheduling and resource allocation',
+      impact: "Missing service level targets",
+      recommendation: "Review scheduling and resource allocation",
     });
   }
 
@@ -282,7 +288,7 @@ async function identifyBottlenecks(
 // Record metric
 async function recordMetric(
   session: any,
-  data: z.infer<typeof recordMetricSchema>
+  data: z.infer<typeof recordMetricSchema>,
 ) {
   const metric = await prisma.receivingMetric.create({
     data: {
@@ -299,35 +305,33 @@ async function recordMetric(
   return {
     success: true,
     metric,
-    message: 'Metric recorded',
+    message: "Metric recorded",
   };
 }
 
 // Get trends
-async function getTrends(
-  session: any,
-  data: z.infer<typeof getTrendsSchema>
-) {
+async function getTrends(session: any, data: z.infer<typeof getTrendsSchema>) {
   const startDate = new Date(data.startDate);
   const endDate = new Date(data.endDate);
 
   let groupByClause: string;
   switch (data.granularity) {
-    case 'HOURLY':
+    case "HOURLY":
       groupByClause = "DATE_TRUNC('hour', \"recordedAt\")";
       break;
-    case 'DAILY':
+    case "DAILY":
       groupByClause = "DATE_TRUNC('day', \"recordedAt\")";
       break;
-    case 'WEEKLY':
+    case "WEEKLY":
       groupByClause = "DATE_TRUNC('week', \"recordedAt\")";
       break;
-    case 'MONTHLY':
+    case "MONTHLY":
       groupByClause = "DATE_TRUNC('month', \"recordedAt\")";
       break;
   }
 
-  const trends = await prisma.$queryRawUnsafe(`
+  const trends = (await prisma.$queryRawUnsafe(
+    `
     SELECT 
       ${groupByClause} as "period",
       COALESCE(AVG(value), 0)::numeric(10,2) as "avgValue",
@@ -341,7 +345,12 @@ async function getTrends(
       AND "recordedAt" <= $4
     GROUP BY ${groupByClause}
     ORDER BY ${groupByClause}
-  `, session.user.organizationId, data.metricType, startDate, endDate) as any[];
+  `,
+    session.user.organizationId,
+    data.metricType,
+    startDate,
+    endDate,
+  )) as any[];
 
   return {
     success: true,
@@ -354,19 +363,19 @@ async function getTrends(
 // Get bottlenecks
 async function getBottlenecks(
   session: any,
-  data: z.infer<typeof getBottlenecksSchema>
+  data: z.infer<typeof getBottlenecksSchema>,
 ) {
   let timeRange: { start: Date; end: Date };
   const now = new Date();
 
   switch (data.timeRange) {
-    case 'TODAY':
+    case "TODAY":
       timeRange = {
         start: new Date(now.setHours(0, 0, 0, 0)),
         end: new Date(now.setHours(23, 59, 59, 999)),
       };
       break;
-    case 'THIS_WEEK':
+    case "THIS_WEEK":
       const startOfWeek = new Date(now);
       startOfWeek.setDate(now.getDate() - now.getDay());
       timeRange = {
@@ -374,7 +383,7 @@ async function getBottlenecks(
         end: now,
       };
       break;
-    case 'THIS_MONTH':
+    case "THIS_MONTH":
       timeRange = {
         start: new Date(now.getFullYear(), now.getMonth(), 1),
         end: now,
@@ -384,7 +393,7 @@ async function getBottlenecks(
 
   const bottlenecks = await identifyBottlenecks(
     session.user.organizationId,
-    timeRange
+    timeRange,
   );
 
   return {
@@ -400,14 +409,14 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get real-time dashboard
-    if (action === 'dashboard') {
+    if (action === "dashboard") {
       const now = new Date();
       const startOfToday = new Date(now.setHours(0, 0, 0, 0));
       const endOfToday = new Date(now.setHours(23, 59, 59, 999));
@@ -444,8 +453,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Get shift comparison
-    if (action === 'shift-comparison') {
-      const result = await prisma.$queryRaw`
+    if (action === "shift-comparison") {
+      const result = (await prisma.$queryRaw`
         SELECT 
           shift,
           COUNT(*)::int as "dataPoints",
@@ -457,14 +466,14 @@ export async function GET(request: NextRequest) {
           AND shift IS NOT NULL
         GROUP BY shift
         ORDER BY "avgProductivity" DESC
-      ` as any[];
+      `) as any[];
 
       return NextResponse.json({ shifts: result });
     }
 
     // Get top performers
-    if (action === 'top-performers') {
-      const result = await prisma.$queryRaw`
+    if (action === "top-performers") {
+      const result = (await prisma.$queryRaw`
         SELECT 
           "workerId",
           COUNT(*)::int as "dataPoints",
@@ -478,17 +487,17 @@ export async function GET(request: NextRequest) {
         GROUP BY "workerId"
         ORDER BY "avgProductivity" DESC
         LIMIT 10
-      ` as any[];
+      `) as any[];
 
       return NextResponse.json({ topPerformers: result });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Receiving metrics GET error:', error);
+    console.error("Receiving metrics GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve metrics' },
-      { status: 500 }
+      { error: "Failed to retrieve metrics" },
+      { status: 500 },
     );
   }
 }
@@ -498,37 +507,37 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'record_metric':
+      case "record_metric":
         return NextResponse.json(await recordMetric(session, data));
 
-      case 'get_trends':
+      case "get_trends":
         return NextResponse.json(await getTrends(session, data));
 
-      case 'get_bottlenecks':
+      case "get_bottlenecks":
         return NextResponse.json(await getBottlenecks(session, data));
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Receiving metrics POST error:', error);
+    console.error("Receiving metrics POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process metrics request' },
-      { status: 500 }
+      { error: "Failed to process metrics request" },
+      { status: 500 },
     );
   }
 }

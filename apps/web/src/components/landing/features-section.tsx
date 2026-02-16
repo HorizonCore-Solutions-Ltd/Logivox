@@ -130,7 +130,11 @@ export function FeaturesSection() {
       description:
         "Hands-free warehouse operations with voice commands. Natural language processing, multi-language support, and real-time voice guidance.",
       icon: Users,
-      highlights: ["Hands-free picking", "Voice-directed tasks", "Multi-language"],
+      highlights: [
+        "Hands-free picking",
+        "Voice-directed tasks",
+        "Multi-language",
+      ],
     },
     {
       title: "Digital Twin & Computer Vision",
@@ -144,7 +148,11 @@ export function FeaturesSection() {
       description:
         "Advanced wave management. Multiple picking modes (single, batch, zone, cluster), route optimization, and workload balancing.",
       icon: Package,
-      highlights: ["4 picking modes", "Route optimization", "Workload balancing"],
+      highlights: [
+        "4 picking modes",
+        "Route optimization",
+        "Workload balancing",
+      ],
     },
     {
       title: "Assembly & Kitting",
@@ -190,13 +198,20 @@ export function FeaturesSection() {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Replace 5+ different tools with one complete platform. Voice operations, AI optimization,
-            quality management, and security training—competitors charge $500-2,000+ extra for these.
+            Replace 5+ different tools with one complete platform. Voice
+            operations, AI optimization, quality management, and security
+            training—competitors charge $500-2,000+ extra for these.
           </p>
           <div className="mt-6 flex justify-center items-center gap-8 text-sm font-medium">
-            <div className="text-green-600">✅ Voice Commands (Usually $200/month)</div>
-            <div className="text-green-600">✅ Label Designer (Usually $150/month)</div>
-            <div className="text-green-600">✅ Security Training (Usually $40/user/month)</div>
+            <div className="text-green-600">
+              ✅ Voice Commands (Usually $200/month)
+            </div>
+            <div className="text-green-600">
+              ✅ Label Designer (Usually $150/month)
+            </div>
+            <div className="text-green-600">
+              ✅ Security Training (Usually $40/user/month)
+            </div>
           </div>
         </div>
 
@@ -369,8 +384,8 @@ export function FeaturesSection() {
             Integrates with Everything
           </h3>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Connect LogiVox to your existing systems through our comprehensive API
-            and pre-built integrations
+            Connect LogiVox to your existing systems through our comprehensive
+            API and pre-built integrations
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

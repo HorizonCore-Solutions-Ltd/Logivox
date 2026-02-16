@@ -3,10 +3,10 @@
 /**
  * WORKER FATIGUE MONITORING & WELLNESS DASHBOARD
  * ===============================================
- * 
+ *
  * System 2 - Outstanding ROI (370% ROI)
  * Investment: $40K → Savings: $148K/year
- * 
+ *
  * Features:
  * - Real-time fatigue monitoring
  * - Intelligent break scheduling
@@ -61,7 +61,9 @@ export default function WorkerFatiguePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "workers" | "analytics">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "workers" | "analytics"
+  >("overview");
 
   useEffect(() => {
     loadStats();
@@ -83,7 +85,9 @@ export default function WorkerFatiguePage() {
   async function monitorWorkers() {
     setLoading(true);
     try {
-      const res = await fetch("/api/optimization/worker-fatigue?action=monitorAll&warehouseId=WH-001");
+      const res = await fetch(
+        "/api/optimization/worker-fatigue?action=monitorAll&warehouseId=WH-001",
+      );
       const data = await res.json();
       setAnalysis(data);
       setActiveTab("workers");
@@ -106,7 +110,10 @@ export default function WorkerFatiguePage() {
           action: "recordBreak",
           data: {
             workerId: worker.workerId,
-            breakType: worker.breakRecommendation.urgency === "URGENT" ? "EMERGENCY_REST" : "SHORT_BREAK",
+            breakType:
+              worker.breakRecommendation.urgency === "URGENT"
+                ? "EMERGENCY_REST"
+                : "SHORT_BREAK",
             duration: worker.breakRecommendation.duration,
             wasScheduled: true,
           },
@@ -173,7 +180,8 @@ export default function WorkerFatiguePage() {
 
   const getFatigueIcon = (score: number) => {
     if (score >= 80) return <AlertTriangle className="h-5 w-5 text-red-500" />;
-    if (score >= 65) return <AlertTriangle className="h-5 w-5 text-orange-500" />;
+    if (score >= 65)
+      return <AlertTriangle className="h-5 w-5 text-orange-500" />;
     if (score >= 45) return <Activity className="h-5 w-5 text-yellow-500" />;
     return <Heart className="h-5 w-5 text-green-500" />;
   };
@@ -220,7 +228,9 @@ export default function WorkerFatiguePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Critical Alerts</p>
-                <p className="text-2xl font-bold">{stats?.criticalAlerts || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.criticalAlerts || 0}
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
@@ -232,7 +242,9 @@ export default function WorkerFatiguePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Breaks Scheduled</p>
-                <p className="text-2xl font-bold">{stats?.breaksScheduled || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.breaksScheduled || 0}
+                </p>
               </div>
               <Coffee className="h-8 w-8 text-blue-500" />
             </div>
@@ -244,7 +256,9 @@ export default function WorkerFatiguePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Workers</p>
-                <p className="text-2xl font-bold">{stats?.activeWorkers || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.activeWorkers || 0}
+                </p>
               </div>
               <Users className="h-8 w-8 text-purple-500" />
             </div>
@@ -256,7 +270,9 @@ export default function WorkerFatiguePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Avg Fatigue Score</p>
-                <p className="text-2xl font-bold">{stats?.avgFatigueScore || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.avgFatigueScore || 0}
+                </p>
               </div>
               <Activity className="h-8 w-8 text-orange-500" />
             </div>
@@ -268,7 +284,9 @@ export default function WorkerFatiguePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">High Risk Workers</p>
-                <p className="text-2xl font-bold">{stats?.highRiskWorkers || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.highRiskWorkers || 0}
+                </p>
               </div>
               <Shield className="h-8 w-8 text-red-500" />
             </div>
@@ -280,7 +298,9 @@ export default function WorkerFatiguePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Compliance Rate</p>
-                <p className="text-2xl font-bold">{stats?.complianceRate || 0}%</p>
+                <p className="text-2xl font-bold">
+                  {stats?.complianceRate || 0}%
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-green-500" />
             </div>
@@ -358,23 +378,33 @@ export default function WorkerFatiguePage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between p-2 bg-green-50 rounded">
                       <span className="text-sm font-medium">Minimal</span>
-                      <span className="text-xs text-gray-600">0-30 (Optimal)</span>
+                      <span className="text-xs text-gray-600">
+                        0-30 (Optimal)
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-2 bg-blue-50 rounded">
                       <span className="text-sm font-medium">Low</span>
-                      <span className="text-xs text-gray-600">30-45 (Normal)</span>
+                      <span className="text-xs text-gray-600">
+                        30-45 (Normal)
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-2 bg-yellow-50 rounded">
                       <span className="text-sm font-medium">Moderate</span>
-                      <span className="text-xs text-gray-600">45-65 (Monitor)</span>
+                      <span className="text-xs text-gray-600">
+                        45-65 (Monitor)
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-2 bg-orange-50 rounded">
                       <span className="text-sm font-medium">High</span>
-                      <span className="text-xs text-gray-600">65-80 (Break Soon)</span>
+                      <span className="text-xs text-gray-600">
+                        65-80 (Break Soon)
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-2 bg-red-50 rounded">
                       <span className="text-sm font-medium">Critical</span>
-                      <span className="text-xs text-gray-600">&gt;80 (Immediate Break)</span>
+                      <span className="text-xs text-gray-600">
+                        &gt;80 (Immediate Break)
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -451,11 +481,15 @@ export default function WorkerFatiguePage() {
                         {getFatigueIcon(worker.currentFatigueScore)}
                         <div>
                           <h3 className="font-semibold">{worker.workerName}</h3>
-                          <p className="text-sm text-gray-600">{worker.workerId}</p>
+                          <p className="text-sm text-gray-600">
+                            {worker.workerId}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className={getFatigueLevelColor(worker.fatigueLevel)}>
+                        <Badge
+                          className={getFatigueLevelColor(worker.fatigueLevel)}
+                        >
                           {worker.fatigueLevel}
                         </Badge>
                         <Badge className={getRiskColor(worker.injuryRisk)}>
@@ -467,11 +501,15 @@ export default function WorkerFatiguePage() {
                     <div className="grid grid-cols-4 gap-4 mb-3 text-sm">
                       <div>
                         <span className="text-gray-600">Fatigue Score:</span>
-                        <span className="ml-2 font-medium">{worker.currentFatigueScore}</span>
+                        <span className="ml-2 font-medium">
+                          {worker.currentFatigueScore}
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Hours Worked:</span>
-                        <span className="ml-2 font-medium">{worker.hoursWorkedToday.toFixed(1)}h</span>
+                        <span className="ml-2 font-medium">
+                          {worker.hoursWorkedToday.toFixed(1)}h
+                        </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Since Last Break:</span>
@@ -481,7 +519,9 @@ export default function WorkerFatiguePage() {
                       </div>
                       <div>
                         <span className="text-gray-600">Productivity:</span>
-                        <span className="ml-2 font-medium">{worker.productivityScore}%</span>
+                        <span className="ml-2 font-medium">
+                          {worker.productivityScore}%
+                        </span>
                       </div>
                     </div>
 
@@ -492,7 +532,11 @@ export default function WorkerFatiguePage() {
                             <Coffee className="h-4 w-4" />
                             Break Recommended
                           </span>
-                          <Badge className={getUrgencyColor(worker.breakRecommendation.urgency)}>
+                          <Badge
+                            className={getUrgencyColor(
+                              worker.breakRecommendation.urgency,
+                            )}
+                          >
                             {worker.breakRecommendation.urgency}
                           </Badge>
                         </div>
@@ -500,7 +544,8 @@ export default function WorkerFatiguePage() {
                           {worker.breakRecommendation.reason}
                         </p>
                         <p className="text-xs font-medium">
-                          Duration: {worker.breakRecommendation.duration} minutes
+                          Duration: {worker.breakRecommendation.duration}{" "}
+                          minutes
                         </p>
                       </div>
                     )}
@@ -523,7 +568,9 @@ export default function WorkerFatiguePage() {
                         onClick={() => scheduleBreak(worker)}
                         size="sm"
                         variant={
-                          worker.fatigueLevel === "CRITICAL" ? "default" : "outline"
+                          worker.fatigueLevel === "CRITICAL"
+                            ? "default"
+                            : "outline"
                         }
                       >
                         <Clock className="h-4 w-4 mr-2" />

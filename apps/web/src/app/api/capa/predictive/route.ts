@@ -48,13 +48,13 @@ export async function GET(request: NextRequest) {
     // Analyze current quality metrics
     const riskIndicators = await analyzeQualityTrends(
       session.user.organizationId,
-      category
+      category,
     );
 
     // Generate predictive alerts
     const alerts = await generatePredictiveAlerts(
       session.user.organizationId,
-      riskIndicators
+      riskIndicators,
     );
 
     // Calculate prevention opportunities
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
     console.error("Error generating predictive CAPA:", error);
     return NextResponse.json(
       { error: "Failed to generate predictions" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -122,9 +122,7 @@ export async function POST(request: NextRequest) {
         correctiveActions: [],
         preventiveActions: [],
         responsiblePerson: assignedTo || session.user.id,
-        targetCompletionDate: new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000
-        ), // 30 days
+        targetCompletionDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
         priority: "MEDIUM",
         status: "OPEN",
         createdBy: session.user.id,
@@ -155,7 +153,7 @@ export async function POST(request: NextRequest) {
     console.error("Error creating predictive CAPA:", error);
     return NextResponse.json(
       { error: "Failed to create predictive CAPA" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -165,7 +163,7 @@ export async function POST(request: NextRequest) {
  */
 async function analyzeQualityTrends(
   organizationId: string,
-  category?: string | null
+  category?: string | null,
 ): Promise<RiskIndicator[]> {
   const indicators: RiskIndicator[] = [];
 
@@ -188,7 +186,7 @@ async function analyzeQualityTrends(
  * Analyze Non-Conformance Report trends
  */
 async function analyzeNCRTrends(
-  organizationId: string
+  organizationId: string,
 ): Promise<RiskIndicator[]> {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const sixtyDaysAgo = new Date(Date.now() - 60 * 24 * 60 * 60 * 1000);
@@ -212,17 +210,17 @@ async function analyzeNCRTrends(
     recentNCRs > previousNCRs * 1.2
       ? "INCREASING"
       : recentNCRs < previousNCRs * 0.8
-      ? "DECREASING"
-      : "STABLE";
+        ? "DECREASING"
+        : "STABLE";
 
   const riskLevel =
     recentNCRs > 20
       ? "CRITICAL"
       : recentNCRs > 10
-      ? "HIGH"
-      : recentNCRs > 5
-      ? "MEDIUM"
-      : "LOW";
+        ? "HIGH"
+        : recentNCRs > 5
+          ? "MEDIUM"
+          : "LOW";
 
   return [
     {
@@ -243,7 +241,7 @@ async function analyzeNCRTrends(
  * Analyze defect rates
  */
 async function analyzeDefectRates(
-  organizationId: string
+  organizationId: string,
 ): Promise<RiskIndicator[]> {
   // Placeholder - in production would analyze actual defect data
   return [
@@ -262,7 +260,7 @@ async function analyzeDefectRates(
  * Analyze supplier quality
  */
 async function analyzeSupplierQuality(
-  organizationId: string
+  organizationId: string,
 ): Promise<RiskIndicator[]> {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
@@ -298,15 +296,12 @@ async function analyzeSupplierQuality(
  */
 async function generatePredictiveAlerts(
   organizationId: string,
-  riskIndicators: RiskIndicator[]
+  riskIndicators: RiskIndicator[],
 ): Promise<PredictiveCAPAAlert[]> {
   const alerts: PredictiveCAPAAlert[] = [];
 
   for (const indicator of riskIndicators) {
-    if (
-      indicator.riskLevel === "HIGH" ||
-      indicator.riskLevel === "CRITICAL"
-    ) {
+    if (indicator.riskLevel === "HIGH" || indicator.riskLevel === "CRITICAL") {
       alerts.push({
         alertId: `ALERT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         severity: indicator.riskLevel,
@@ -314,7 +309,7 @@ async function generatePredictiveAlerts(
         predictedIssue: `${indicator.metric} trending ${indicator.trend.toLowerCase()} - potential quality event`,
         probabilityScore: Math.min(
           70 + (indicator.currentValue / indicator.threshold) * 20,
-          95
+          95,
         ),
         timeToImpact: "7-14 days",
         affectedAreas: ["Quality Control", "Production", "Shipping"],
@@ -338,9 +333,7 @@ async function generatePredictiveAlerts(
 /**
  * Calculate prevention opportunities score
  */
-function calculatePreventionScore(
-  alerts: PredictiveCAPAAlert[]
-): {
+function calculatePreventionScore(alerts: PredictiveCAPAAlert[]): {
   totalAlerts: number;
   preventableIssues: number;
   estimatedSavings: number;

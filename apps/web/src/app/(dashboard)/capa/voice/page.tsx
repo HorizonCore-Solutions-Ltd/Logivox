@@ -193,7 +193,10 @@ export default function VoiceDirectedCAPAPage() {
       SEARCH_CAPA: { label: "Search", color: "bg-gray-100 text-gray-800" },
     };
 
-    const badge = badges[cmd] || { label: cmd, color: "bg-gray-100 text-gray-800" };
+    const badge = badges[cmd] || {
+      label: cmd,
+      color: "bg-gray-100 text-gray-800",
+    };
     return <Badge className={badge.color}>{badge.label}</Badge>;
   };
 
@@ -246,8 +249,8 @@ export default function VoiceDirectedCAPAPage() {
                   isListening
                     ? "bg-red-500 hover:bg-red-600 animate-pulse"
                     : isProcessing
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-500 hover:bg-blue-600"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-500 hover:bg-blue-600"
                 }`}
               >
                 {isProcessing ? (
@@ -263,8 +266,8 @@ export default function VoiceDirectedCAPAPage() {
                 {isProcessing
                   ? "Processing..."
                   : isListening
-                  ? "Listening... Speak now"
-                  : "Click to start voice command"}
+                    ? "Listening... Speak now"
+                    : "Click to start voice command"}
               </p>
             </div>
 

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function LicensePlateGenerationPage() {
   const [stats, setStats] = useState<any>(null);
@@ -20,9 +20,9 @@ export default function LicensePlateGenerationPage() {
     setLoading(true);
     try {
       const [statsRes, pendingRes, recentRes] = await Promise.all([
-        fetch('/api/receiving/license-plate-generation?action=stats'),
-        fetch('/api/receiving/license-plate-generation?action=pending-labels'),
-        fetch('/api/receiving/license-plate-generation?action=recent-labels'),
+        fetch("/api/receiving/license-plate-generation?action=stats"),
+        fetch("/api/receiving/license-plate-generation?action=pending-labels"),
+        fetch("/api/receiving/license-plate-generation?action=recent-labels"),
       ]);
 
       const statsData = await statsRes.json();
@@ -33,49 +33,49 @@ export default function LicensePlateGenerationPage() {
       setPendingLabels(pendingData.labels || []);
       setRecentLabels(recentData.labels || []);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     }
     setLoading(false);
   };
 
   const getFormatBadge = (format: string) => {
     const colors: Record<string, string> = {
-      SSCC: 'bg-purple-100 text-purple-800',
-      LPN: 'bg-blue-100 text-blue-800',
-      PALLET_LPN: 'bg-green-100 text-green-800',
-      CASE_LPN: 'bg-yellow-100 text-yellow-800',
-      ITEM_SERIAL: 'bg-orange-100 text-orange-800',
+      SSCC: "bg-purple-100 text-purple-800",
+      LPN: "bg-blue-100 text-blue-800",
+      PALLET_LPN: "bg-green-100 text-green-800",
+      CASE_LPN: "bg-yellow-100 text-yellow-800",
+      ITEM_SERIAL: "bg-orange-100 text-orange-800",
     };
-    return colors[format] || 'bg-gray-100 text-gray-800';
+    return colors[format] || "bg-gray-100 text-gray-800";
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'PRINTED':
-        return 'bg-blue-100 text-blue-800';
-      case 'APPLIED':
-        return 'bg-green-100 text-green-800';
-      case 'VOIDED':
-        return 'bg-red-100 text-red-800';
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800";
+      case "PRINTED":
+        return "bg-blue-100 text-blue-800";
+      case "APPLIED":
+        return "bg-green-100 text-green-800";
+      case "VOIDED":
+        return "bg-red-100 text-red-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getPriorityIcon = (priority: string) => {
     switch (priority) {
-      case 'URGENT':
-        return '🔴';
-      case 'HIGH':
-        return '🟠';
-      case 'NORMAL':
-        return '🟢';
-      case 'LOW':
-        return '⚪';
+      case "URGENT":
+        return "🔴";
+      case "HIGH":
+        return "🟠";
+      case "NORMAL":
+        return "🟢";
+      case "LOW":
+        return "⚪";
       default:
-        return '⚪';
+        return "⚪";
     }
   };
 
@@ -147,7 +147,9 @@ export default function LicensePlateGenerationPage() {
       {/* Tabs */}
       <Tabs defaultValue="pending" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="pending">Print Queue ({pendingLabels.length})</TabsTrigger>
+          <TabsTrigger value="pending">
+            Print Queue ({pendingLabels.length})
+          </TabsTrigger>
           <TabsTrigger value="recent">Recent Labels</TabsTrigger>
           <TabsTrigger value="formats">Label Formats</TabsTrigger>
         </TabsList>
@@ -157,9 +159,7 @@ export default function LicensePlateGenerationPage() {
           <Card className="p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">Print Queue</h2>
-              <Button size="sm">
-                Print All ({pendingLabels.length})
-              </Button>
+              <Button size="sm">Print All ({pendingLabels.length})</Button>
             </div>
             {pendingLabels.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
@@ -175,7 +175,9 @@ export default function LicensePlateGenerationPage() {
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="text-lg">{getPriorityIcon(label.priority)}</span>
+                          <span className="text-lg">
+                            {getPriorityIcon(label.priority)}
+                          </span>
                           <div className="font-mono font-semibold text-lg">
                             {label.labelNumber}
                           </div>
@@ -196,26 +198,26 @@ export default function LicensePlateGenerationPage() {
                       <div>
                         <span className="text-gray-600">Supplier:</span>
                         <span className="font-medium ml-2">
-                          {label.receiving?.supplier?.name || 'N/A'}
+                          {label.receiving?.supplier?.name || "N/A"}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Item SKU:</span>
                         <span className="font-medium ml-2">
-                          {label.metadata?.itemSKU || 'N/A'}
+                          {label.metadata?.itemSKU || "N/A"}
                         </span>
                       </div>
                       <div>
                         <span className="text-gray-600">Quantity:</span>
                         <span className="font-medium ml-2">
-                          {label.metadata?.quantity || 'N/A'}
+                          {label.metadata?.quantity || "N/A"}
                         </span>
                       </div>
                     </div>
 
                     <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
-                      Generated: {new Date(label.createdAt).toLocaleString()} • Serial: #
-                      {label.serialNumber}
+                      Generated: {new Date(label.createdAt).toLocaleString()} •
+                      Serial: #{label.serialNumber}
                     </div>
                   </div>
                 ))}
@@ -229,7 +231,9 @@ export default function LicensePlateGenerationPage() {
           <Card className="p-6">
             <h2 className="text-xl font-semibold mb-4">Recent Labels</h2>
             {recentLabels.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">No labels found</div>
+              <div className="text-center py-8 text-gray-500">
+                No labels found
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
@@ -283,10 +287,10 @@ export default function LicensePlateGenerationPage() {
                           </Badge>
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          {label.receiving?.supplier?.name || 'N/A'}
+                          {label.receiving?.supplier?.name || "N/A"}
                         </td>
                         <td className="px-4 py-3 text-sm">
-                          {label.metadata?.itemSKU || 'N/A'}
+                          {label.metadata?.itemSKU || "N/A"}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           {label.location || (
@@ -317,21 +321,25 @@ export default function LicensePlateGenerationPage() {
               <div className="text-2xl mb-3">📦</div>
               <h3 className="font-semibold text-lg mb-2">SSCC (GS1-128)</h3>
               <p className="text-sm text-gray-600">
-                Serial Shipping Container Code - 18-digit GS1 standard for logistics units.
-                Globally unique, includes company prefix and check digit.
+                Serial Shipping Container Code - 18-digit GS1 standard for
+                logistics units. Globally unique, includes company prefix and
+                check digit.
               </p>
               <div className="mt-4 p-3 bg-purple-50 rounded">
-                <div className="text-xs text-purple-700 font-medium">Format</div>
+                <div className="text-xs text-purple-700 font-medium">
+                  Format
+                </div>
                 <div className="font-mono text-sm text-purple-900 mt-1">
                   (00) 0 1234567 12345678 9
                 </div>
                 <div className="text-xs text-purple-700 mt-2">
-                  Extension (1) + Company Prefix (7-9) + Serial (7-9) + Check (1)
+                  Extension (1) + Company Prefix (7-9) + Serial (7-9) + Check
+                  (1)
                 </div>
               </div>
               <div className="mt-3 text-xs text-gray-600">
-                <strong>Use Case:</strong> International shipments, EDI integration, supplier
-                compliance
+                <strong>Use Case:</strong> International shipments, EDI
+                integration, supplier compliance
               </div>
             </Card>
 
@@ -339,8 +347,8 @@ export default function LicensePlateGenerationPage() {
               <div className="text-2xl mb-3">🏷️</div>
               <h3 className="font-semibold text-lg mb-2">Internal LPN</h3>
               <p className="text-sm text-gray-600">
-                Customizable License Plate Number for internal tracking. Includes org code,
-                date, and unique serial number.
+                Customizable License Plate Number for internal tracking.
+                Includes org code, date, and unique serial number.
               </p>
               <div className="mt-4 p-3 bg-blue-50 rounded">
                 <div className="text-xs text-blue-700 font-medium">Format</div>
@@ -352,7 +360,8 @@ export default function LicensePlateGenerationPage() {
                 </div>
               </div>
               <div className="mt-3 text-xs text-gray-600">
-                <strong>Use Case:</strong> Internal warehouse operations, flexible format
+                <strong>Use Case:</strong> Internal warehouse operations,
+                flexible format
               </div>
             </Card>
 
@@ -360,8 +369,8 @@ export default function LicensePlateGenerationPage() {
               <div className="text-2xl mb-3">📚</div>
               <h3 className="font-semibold text-lg mb-2">Pallet LPN</h3>
               <p className="text-sm text-gray-600">
-                Pallet-level tracking for mixed SKU pallets. Links multiple items to single
-                handling unit.
+                Pallet-level tracking for mixed SKU pallets. Links multiple
+                items to single handling unit.
               </p>
               <div className="mt-4 p-3 bg-green-50 rounded">
                 <div className="text-xs text-green-700 font-medium">Format</div>
@@ -381,11 +390,13 @@ export default function LicensePlateGenerationPage() {
               <div className="text-2xl mb-3">📦</div>
               <h3 className="font-semibold text-lg mb-2">Case LPN</h3>
               <p className="text-sm text-gray-600">
-                Case-level tracking for individual cartons. Enables granular inventory
-                visibility and lot traceability.
+                Case-level tracking for individual cartons. Enables granular
+                inventory visibility and lot traceability.
               </p>
               <div className="mt-4 p-3 bg-yellow-50 rounded">
-                <div className="text-xs text-yellow-700 font-medium">Format</div>
+                <div className="text-xs text-yellow-700 font-medium">
+                  Format
+                </div>
                 <div className="font-mono text-sm text-yellow-900 mt-1">
                   CSE-ABC123-20260108-000001
                 </div>
@@ -402,11 +413,13 @@ export default function LicensePlateGenerationPage() {
               <div className="text-2xl mb-3">🔢</div>
               <h3 className="font-semibold text-lg mb-2">Item Serialization</h3>
               <p className="text-sm text-gray-600">
-                Individual item-level serialization for high-value or regulated products.
-                Unique ID per unit.
+                Individual item-level serialization for high-value or regulated
+                products. Unique ID per unit.
               </p>
               <div className="mt-4 p-3 bg-orange-50 rounded">
-                <div className="text-xs text-orange-700 font-medium">Format</div>
+                <div className="text-xs text-orange-700 font-medium">
+                  Format
+                </div>
                 <div className="font-mono text-sm text-orange-900 mt-1">
                   SN-ABC123-20260108-000001
                 </div>
@@ -415,7 +428,8 @@ export default function LicensePlateGenerationPage() {
                 </div>
               </div>
               <div className="mt-3 text-xs text-gray-600">
-                <strong>Use Case:</strong> High-value items, warranty tracking, recalls
+                <strong>Use Case:</strong> High-value items, warranty tracking,
+                recalls
               </div>
             </Card>
 
@@ -423,11 +437,13 @@ export default function LicensePlateGenerationPage() {
               <div className="text-2xl mb-3">🖨️</div>
               <h3 className="font-semibold text-lg mb-2">Print Technology</h3>
               <p className="text-sm text-gray-600">
-                ZPL II format for Zebra thermal printers. Supports CODE128, GS1-128, and
-                custom layouts.
+                ZPL II format for Zebra thermal printers. Supports CODE128,
+                GS1-128, and custom layouts.
               </p>
               <div className="mt-4 p-3 bg-gray-50 rounded">
-                <div className="text-xs text-gray-700 font-medium">Features</div>
+                <div className="text-xs text-gray-700 font-medium">
+                  Features
+                </div>
                 <ul className="text-xs text-gray-600 mt-1 space-y-1">
                   <li>• Automatic barcode generation</li>
                   <li>• Human-readable text overlay</li>
@@ -436,7 +452,8 @@ export default function LicensePlateGenerationPage() {
                 </ul>
               </div>
               <div className="mt-3 text-xs text-gray-600">
-                <strong>Compatible:</strong> Zebra ZT410, ZT411, ZT510, ZT610, and more
+                <strong>Compatible:</strong> Zebra ZT410, ZT411, ZT510, ZT610,
+                and more
               </div>
             </Card>
           </div>
@@ -459,7 +476,9 @@ export default function LicensePlateGenerationPage() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">Payback</div>
-                <div className="text-2xl font-bold text-purple-600">3.8 months</div>
+                <div className="text-2xl font-bold text-purple-600">
+                  3.8 months
+                </div>
               </div>
             </div>
 

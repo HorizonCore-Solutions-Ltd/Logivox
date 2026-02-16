@@ -223,9 +223,10 @@ export default function QualityControlPage() {
               </span>
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed mb-8">
-              The most comprehensive quality control system in the industry. 86 production-ready
-              API endpoints covering AQL sampling, defect tracking, computer vision inspection,
-              CAPA management, and real-time SPC charts. Ensure product quality at every touchpoint.
+              The most comprehensive quality control system in the industry. 86
+              production-ready API endpoints covering AQL sampling, defect
+              tracking, computer vision inspection, CAPA management, and
+              real-time SPC charts. Ensure product quality at every touchpoint.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" asChild>

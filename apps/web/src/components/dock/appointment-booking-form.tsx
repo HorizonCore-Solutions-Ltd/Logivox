@@ -87,10 +87,7 @@ export function AppointmentBookingForm({
     if (start && duration) {
       const startDate = new Date(start);
       const endDate = new Date(startDate.getTime() + duration * 60000);
-      setValue(
-        "scheduledEnd",
-        endDate.toISOString().slice(0, 16)
-      );
+      setValue("scheduledEnd", endDate.toISOString().slice(0, 16));
     }
   };
 
@@ -110,7 +107,7 @@ export function AppointmentBookingForm({
 
       const result = await response.json();
       toast.success(
-        `Appointment ${result.appointment.appointmentNumber} created successfully`
+        `Appointment ${result.appointment.appointmentNumber} created successfully`,
       );
       reset();
       onOpenChange(false);
@@ -118,7 +115,7 @@ export function AppointmentBookingForm({
     } catch (error) {
       console.error("Error creating appointment:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to create appointment"
+        error instanceof Error ? error.message : "Failed to create appointment",
       );
     } finally {
       setIsSubmitting(false);

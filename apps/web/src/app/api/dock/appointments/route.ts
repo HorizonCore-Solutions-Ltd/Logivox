@@ -5,7 +5,13 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const appointmentSchema = z.object({
-  appointmentType: z.enum(["INBOUND", "OUTBOUND", "CROSS_DOCK", "MAINTENANCE", "OTHER"]),
+  appointmentType: z.enum([
+    "INBOUND",
+    "OUTBOUND",
+    "CROSS_DOCK",
+    "MAINTENANCE",
+    "OTHER",
+  ]),
   warehouseId: z.string().optional(),
   yardLocationId: z.string().optional(),
   scheduledDate: z.string().datetime(),
@@ -50,7 +56,8 @@ export async function GET(request: NextRequest) {
 
     if (appointmentType) where.appointmentType = appointmentType;
     if (status) where.status = status;
-    if (carrierName) where.carrierName = { contains: carrierName, mode: "insensitive" };
+    if (carrierName)
+      where.carrierName = { contains: carrierName, mode: "insensitive" };
     if (yardLocationId) where.yardLocationId = yardLocationId;
 
     if (startDate || endDate) {
@@ -103,7 +110,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching appointments:", error);
     return NextResponse.json(
       { error: "Failed to fetch appointments" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -142,13 +149,21 @@ export async function POST(request: NextRequest) {
           OR: [
             {
               AND: [
-                { scheduledStart: { lte: new Date(validatedData.scheduledStart) } },
-                { scheduledEnd: { gte: new Date(validatedData.scheduledStart) } },
+                {
+                  scheduledStart: {
+                    lte: new Date(validatedData.scheduledStart),
+                  },
+                },
+                {
+                  scheduledEnd: { gte: new Date(validatedData.scheduledStart) },
+                },
               ],
             },
             {
               AND: [
-                { scheduledStart: { lte: new Date(validatedData.scheduledEnd) } },
+                {
+                  scheduledStart: { lte: new Date(validatedData.scheduledEnd) },
+                },
                 { scheduledEnd: { gte: new Date(validatedData.scheduledEnd) } },
               ],
             },
@@ -163,7 +178,7 @@ export async function POST(request: NextRequest) {
             message: "Another appointment is scheduled during this time slot",
             conflicts,
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
     }
@@ -206,20 +221,20 @@ export async function POST(request: NextRequest) {
         appointment,
         message: "Dock appointment created successfully",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error creating appointment:", error);
     return NextResponse.json(
       { error: "Failed to create appointment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 
 interface CarrierCheckIn {
   id: string;
@@ -70,8 +70,8 @@ export default function CarrierManagement() {
     try {
       setLoading(true);
       const [checkInsRes, metricsRes] = await Promise.all([
-        fetch('/api/dock/carrier-management?action=active_check_ins'),
-        fetch('/api/dock/carrier-management?action=carrier_metrics'),
+        fetch("/api/dock/carrier-management?action=active_check_ins"),
+        fetch("/api/dock/carrier-management?action=carrier_metrics"),
       ]);
 
       const checkInsData = await checkInsRes.json();
@@ -80,7 +80,7 @@ export default function CarrierManagement() {
       setActiveCheckIns(checkInsData.checkIns || []);
       setMetrics(metricsData.metrics);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -88,20 +88,26 @@ export default function CarrierManagement() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'CHECKED_IN': return 'bg-blue-100 text-blue-800';
-      case 'WAITING': return 'bg-yellow-100 text-yellow-800';
-      case 'LOADING': return 'bg-purple-100 text-purple-800';
-      case 'READY': return 'bg-green-100 text-green-800';
-      case 'CHECKED_OUT': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "CHECKED_IN":
+        return "bg-blue-100 text-blue-800";
+      case "WAITING":
+        return "bg-yellow-100 text-yellow-800";
+      case "LOADING":
+        return "bg-purple-100 text-purple-800";
+      case "READY":
+        return "bg-green-100 text-green-800";
+      case "CHECKED_OUT":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getRatingColor = (rating: number) => {
-    if (rating >= 4.5) return 'text-green-600';
-    if (rating >= 3.5) return 'text-blue-600';
-    if (rating >= 2.5) return 'text-yellow-600';
-    return 'text-red-600';
+    if (rating >= 4.5) return "text-green-600";
+    if (rating >= 3.5) return "text-blue-600";
+    if (rating >= 2.5) return "text-yellow-600";
+    return "text-red-600";
   };
 
   const formatDuration = (minutes: number) => {
@@ -128,7 +134,9 @@ export default function CarrierManagement() {
     );
   }
 
-  const detentionAlerts = activeCheckIns.filter(c => (c.currentDetention || 0) > 60);
+  const detentionAlerts = activeCheckIns.filter(
+    (c) => (c.currentDetention || 0) > 60,
+  );
 
   return (
     <div className="p-6 space-y-6">
@@ -150,7 +158,8 @@ export default function CarrierManagement() {
         <Card className="border-orange-300 bg-orange-50">
           <CardHeader>
             <CardTitle className="text-orange-800 flex items-center gap-2">
-              ⏰ {detentionAlerts.length} Driver{detentionAlerts.length !== 1 ? 's' : ''} in Detention
+              ⏰ {detentionAlerts.length} Driver
+              {detentionAlerts.length !== 1 ? "s" : ""} in Detention
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -160,14 +169,17 @@ export default function CarrierManagement() {
                   <div className="flex justify-between">
                     <div>
                       <span className="font-medium">{checkIn.driverName}</span>
-                      <span className="text-gray-600"> ({checkIn.carrierName})</span>
+                      <span className="text-gray-600">
+                        {" "}
+                        ({checkIn.carrierName})
+                      </span>
                     </div>
                     <div className="font-medium text-orange-600">
                       {formatDuration(checkIn.currentDetention || 0)} detention
                     </div>
                   </div>
                   <div className="text-gray-600">
-                    Cost: ${checkIn.detentionCost?.toFixed(2) || '0.00'}
+                    Cost: ${checkIn.detentionCost?.toFixed(2) || "0.00"}
                   </div>
                 </div>
               ))}
@@ -188,9 +200,7 @@ export default function CarrierManagement() {
             <div className="text-3xl font-bold text-blue-600">
               {metrics?.activeDrivers || 0}
             </div>
-            <div className="text-sm text-gray-600 mt-1">
-              on-site now
-            </div>
+            <div className="text-sm text-gray-600 mt-1">on-site now</div>
           </CardContent>
         </Card>
 
@@ -204,9 +214,7 @@ export default function CarrierManagement() {
             <div className="text-3xl font-bold text-green-600">
               {metrics?.onTimePercentage?.toFixed(0) || 0}%
             </div>
-            <div className="text-sm text-gray-600 mt-1">
-              within 15 minutes
-            </div>
+            <div className="text-sm text-gray-600 mt-1">within 15 minutes</div>
           </CardContent>
         </Card>
 
@@ -220,9 +228,7 @@ export default function CarrierManagement() {
             <div className="text-3xl font-bold text-orange-600">
               {metrics?.avgDetentionTime?.toFixed(0) || 0}m
             </div>
-            <div className="text-sm text-gray-600 mt-1">
-              per visit
-            </div>
+            <div className="text-sm text-gray-600 mt-1">per visit</div>
           </CardContent>
         </Card>
 
@@ -236,9 +242,7 @@ export default function CarrierManagement() {
             <div className="text-3xl font-bold text-red-600">
               ${(metrics?.totalDetentionCost || 0).toLocaleString()}
             </div>
-            <div className="text-sm text-gray-600 mt-1">
-              total incurred
-            </div>
+            <div className="text-sm text-gray-600 mt-1">total incurred</div>
           </CardContent>
         </Card>
       </div>
@@ -263,14 +267,19 @@ export default function CarrierManagement() {
             <div className="space-y-3">
               {activeCheckIns.map((checkIn) => {
                 const isDetention = (checkIn.currentDetention || 0) > 120;
-                
+
                 return (
-                  <Card key={checkIn.id} className={isDetention ? 'border-orange-300' : ''}>
+                  <Card
+                    key={checkIn.id}
+                    className={isDetention ? "border-orange-300" : ""}
+                  >
                     <CardContent className="pt-6">
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className={`text-xs px-2 py-1 rounded ${getStatusColor(checkIn.status)}`}>
+                            <span
+                              className={`text-xs px-2 py-1 rounded ${getStatusColor(checkIn.status)}`}
+                            >
                               {checkIn.status}
                             </span>
                             {isDetention && (
@@ -289,45 +298,59 @@ export default function CarrierManagement() {
 
                           <div className="grid grid-cols-4 gap-4 text-sm">
                             <div>
-                              <span className="text-gray-600">Tractor:</span>{' '}
-                              <span className="font-medium">{checkIn.tractorNumber}</span>
+                              <span className="text-gray-600">Tractor:</span>{" "}
+                              <span className="font-medium">
+                                {checkIn.tractorNumber}
+                              </span>
                             </div>
                             <div>
-                              <span className="text-gray-600">Trailer:</span>{' '}
-                              <span className="font-medium">{checkIn.trailerNumber}</span>
+                              <span className="text-gray-600">Trailer:</span>{" "}
+                              <span className="font-medium">
+                                {checkIn.trailerNumber}
+                              </span>
                             </div>
                             <div>
-                              <span className="text-gray-600">Dock:</span>{' '}
-                              <span className="font-medium">{checkIn.dockId}</span>
+                              <span className="text-gray-600">Dock:</span>{" "}
+                              <span className="font-medium">
+                                {checkIn.dockId}
+                              </span>
                             </div>
                             <div>
-                              <span className="text-gray-600">Seal:</span>{' '}
-                              <span className="font-medium">{checkIn.sealNumber || 'N/A'}</span>
+                              <span className="text-gray-600">Seal:</span>{" "}
+                              <span className="font-medium">
+                                {checkIn.sealNumber || "N/A"}
+                              </span>
                             </div>
                           </div>
 
                           <div className="grid grid-cols-3 gap-4 mt-3 text-sm">
                             <div>
-                              <span className="text-gray-600">Scheduled:</span>{' '}
+                              <span className="text-gray-600">Scheduled:</span>{" "}
                               <span className="font-medium">
-                                {new Date(checkIn.scheduledTime).toLocaleTimeString('en-US', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
+                                {new Date(
+                                  checkIn.scheduledTime,
+                                ).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
                                 })}
                               </span>
                             </div>
                             <div>
-                              <span className="text-gray-600">Checked In:</span>{' '}
+                              <span className="text-gray-600">Checked In:</span>{" "}
                               <span className="font-medium">
-                                {new Date(checkIn.checkInTime).toLocaleTimeString('en-US', {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
+                                {new Date(
+                                  checkIn.checkInTime,
+                                ).toLocaleTimeString("en-US", {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
                                 })}
                               </span>
                             </div>
                             <div>
-                              <span className="text-gray-600">Phone:</span>{' '}
-                              <span className="font-medium">{checkIn.driverPhone}</span>
+                              <span className="text-gray-600">Phone:</span>{" "}
+                              <span className="font-medium">
+                                {checkIn.driverPhone}
+                              </span>
                             </div>
                           </div>
 
@@ -335,15 +358,20 @@ export default function CarrierManagement() {
                             <div className="mt-3 p-2 bg-orange-50 rounded text-sm">
                               <div className="flex justify-between">
                                 <span className="text-orange-800">
-                                  ⏰ Detention: {formatDuration(checkIn.currentDetention || 0)}
+                                  ⏰ Detention:{" "}
+                                  {formatDuration(
+                                    checkIn.currentDetention || 0,
+                                  )}
                                 </span>
                                 <span className="text-orange-600 font-medium">
-                                  Cost: ${checkIn.detentionCost?.toFixed(2) || '0.00'}
+                                  Cost: $
+                                  {checkIn.detentionCost?.toFixed(2) || "0.00"}
                                 </span>
                               </div>
                               {checkIn.detentionReason && (
                                 <div className="text-gray-600 mt-1">
-                                  Reason: {checkIn.detentionReason.replace(/_/g, ' ')}
+                                  Reason:{" "}
+                                  {checkIn.detentionReason.replace(/_/g, " ")}
                                 </div>
                               )}
                             </div>
@@ -351,15 +379,13 @@ export default function CarrierManagement() {
                         </div>
 
                         <div className="ml-4 flex flex-col gap-2">
-                          {checkIn.status === 'READY' && (
+                          {checkIn.status === "READY" && (
                             <Button size="sm" className="bg-green-600">
                               Check Out
                             </Button>
                           )}
-                          {checkIn.status === 'WAITING' && (
-                            <Button size="sm">
-                              Assign Dock
-                            </Button>
+                          {checkIn.status === "WAITING" && (
+                            <Button size="sm">Assign Dock</Button>
                           )}
                           <Button size="sm" variant="outline">
                             Details
@@ -382,12 +408,18 @@ export default function CarrierManagement() {
                 <CardContent className="pt-6">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className={`text-2xl font-bold ${getRatingColor(carrier.rating)}`}>
+                      <div
+                        className={`text-2xl font-bold ${getRatingColor(carrier.rating)}`}
+                      >
                         #{index + 1}
                       </div>
                       <div>
-                        <div className="font-medium text-lg">{carrier.carrierName}</div>
-                        <div className="text-sm text-gray-600">{carrier.carrierId}</div>
+                        <div className="font-medium text-lg">
+                          {carrier.carrierName}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {carrier.carrierId}
+                        </div>
                       </div>
                     </div>
 
@@ -400,36 +432,52 @@ export default function CarrierManagement() {
                       </div>
 
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${
-                          carrier.onTimePercentage >= 90 ? 'text-green-600' :
-                          carrier.onTimePercentage >= 75 ? 'text-yellow-600' :
-                          'text-red-600'
-                        }`}>
+                        <div
+                          className={`text-2xl font-bold ${
+                            carrier.onTimePercentage >= 90
+                              ? "text-green-600"
+                              : carrier.onTimePercentage >= 75
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                          }`}
+                        >
                           {carrier.onTimePercentage.toFixed(0)}%
                         </div>
                         <div className="text-xs text-gray-600">On-Time</div>
                       </div>
 
                       <div className="text-center">
-                        <div className={`text-2xl font-bold ${
-                          carrier.avgDetentionTime <= 30 ? 'text-green-600' :
-                          carrier.avgDetentionTime <= 60 ? 'text-yellow-600' :
-                          'text-red-600'
-                        }`}>
+                        <div
+                          className={`text-2xl font-bold ${
+                            carrier.avgDetentionTime <= 30
+                              ? "text-green-600"
+                              : carrier.avgDetentionTime <= 60
+                                ? "text-yellow-600"
+                                : "text-red-600"
+                          }`}
+                        >
                           {carrier.avgDetentionTime}m
                         </div>
-                        <div className="text-xs text-gray-600">Avg Detention</div>
+                        <div className="text-xs text-gray-600">
+                          Avg Detention
+                        </div>
                       </div>
 
                       <div className="text-center">
-                        <div className={`text-3xl font-bold ${getRatingColor(carrier.rating)}`}>
+                        <div
+                          className={`text-3xl font-bold ${getRatingColor(carrier.rating)}`}
+                        >
                           {carrier.rating.toFixed(1)}
                         </div>
                         <div className="flex gap-1 mt-1">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <span
                               key={star}
-                              className={star <= carrier.rating ? 'text-yellow-500' : 'text-gray-300'}
+                              className={
+                                star <= carrier.rating
+                                  ? "text-yellow-500"
+                                  : "text-gray-300"
+                              }
                             >
                               ★
                             </span>
@@ -457,21 +505,23 @@ export default function CarrierManagement() {
                     <div key={reason.reason}>
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-sm font-medium">
-                          {reason.reason.replace(/_/g, ' ')}
+                          {reason.reason.replace(/_/g, " ")}
                         </span>
                         <span className="text-sm text-gray-600">
                           {reason.count} events
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-600 mb-2">
-                        <span>Total: {formatDuration(reason.totalMinutes)}</span>
+                        <span>
+                          Total: {formatDuration(reason.totalMinutes)}
+                        </span>
                         <span>Avg: {formatDuration(reason.avgMinutes)}</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
                           className="bg-orange-500 h-2 rounded-full"
-                          style={{ 
-                            width: `${Math.min(100, (reason.avgMinutes / 120) * 100)}%` 
+                          style={{
+                            width: `${Math.min(100, (reason.avgMinutes / 120) * 100)}%`,
                           }}
                         />
                       </div>
@@ -491,14 +541,18 @@ export default function CarrierManagement() {
                     <div className="text-3xl font-bold text-red-600">
                       ${(metrics?.totalDetentionCost || 0).toLocaleString()}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">Total Detention Cost</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Total Detention Cost
+                    </div>
                   </div>
 
                   <div className="p-4 bg-orange-50 rounded text-center">
                     <div className="text-3xl font-bold text-orange-600">
                       {metrics?.avgDetentionTime?.toFixed(0) || 0}m
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">Average per Visit</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Average per Visit
+                    </div>
                   </div>
 
                   <div className="p-4 bg-gray-50 rounded">
@@ -572,7 +626,9 @@ export default function CarrierManagement() {
                   </div>
                   <div className="flex justify-between py-3 bg-green-50 -mx-4 px-4">
                     <span className="font-bold">Total Annual Savings</span>
-                    <span className="font-bold text-lg text-green-600">$273,000</span>
+                    <span className="font-bold text-lg text-green-600">
+                      $273,000
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -591,15 +647,21 @@ export default function CarrierManagement() {
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded">
                   <div className="text-3xl font-bold text-blue-600">2.5</div>
-                  <div className="text-sm text-gray-600 mt-1">Payback (months)</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Payback (months)
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded">
                   <div className="text-3xl font-bold text-purple-600">70%</div>
-                  <div className="text-sm text-gray-600 mt-1">Faster check-in</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Faster check-in
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
                   <div className="text-3xl font-bold text-orange-600">85%</div>
-                  <div className="text-sm text-gray-600 mt-1">Detention recovery</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Detention recovery
+                  </div>
                 </div>
               </div>
 
@@ -608,19 +670,31 @@ export default function CarrierManagement() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>70% faster check-in process</strong> - Self-service kiosk eliminates delays</span>
+                    <span>
+                      <strong>70% faster check-in process</strong> -
+                      Self-service kiosk eliminates delays
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>85% detention cost recovery</strong> - Automated tracking and billing</span>
+                    <span>
+                      <strong>85% detention cost recovery</strong> - Automated
+                      tracking and billing
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>100% carrier visibility</strong> - Real-time status tracking</span>
+                    <span>
+                      <strong>100% carrier visibility</strong> - Real-time
+                      status tracking
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>90% on-time compliance</strong> - Better carrier performance management</span>
+                    <span>
+                      <strong>90% on-time compliance</strong> - Better carrier
+                      performance management
+                    </span>
                   </li>
                 </ul>
               </div>

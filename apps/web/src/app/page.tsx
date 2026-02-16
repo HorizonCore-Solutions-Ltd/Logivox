@@ -10,8 +10,10 @@ import { Footer } from "@/components/layout/footer";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "LogiVox - Voice-Enabled Warehouse Management System | Cut Picking Errors 95%",
-  description: "Complete warehouse management with voice commands, AI optimization & real-time tracking. Reduce picking errors by 95%, increase fulfillment speed 3x. 30-day free trial.",
+  title:
+    "LogiVox - Voice-Enabled Warehouse Management System | Cut Picking Errors 95%",
+  description:
+    "Complete warehouse management with voice commands, AI optimization & real-time tracking. Reduce picking errors by 95%, increase fulfillment speed 3x. 30-day free trial.",
   keywords: [
     "warehouse management system",
     "voice-enabled WMS",
@@ -23,7 +25,8 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: "LogiVox - Voice-Enabled Warehouse Management",
-    description: "Complete warehouse management with voice commands. Reduce errors by 95%, speed up fulfillment 3x.",
+    description:
+      "Complete warehouse management with voice commands. Reduce errors by 95%, speed up fulfillment 3x.",
     url: "https://logivox.com",
     siteName: "LogiVox",
     locale: "en_US",

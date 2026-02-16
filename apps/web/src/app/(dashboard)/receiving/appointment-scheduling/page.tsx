@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Calendar,
   Clock,
@@ -13,8 +19,8 @@ import {
   AlertTriangle,
   DollarSign,
   BarChart3,
-  MapPin
-} from 'lucide-react';
+  MapPin,
+} from "lucide-react";
 
 // ============================================================================
 // APPOINTMENT SCHEDULING DASHBOARD
@@ -69,9 +75,11 @@ interface Appointment {
 export default function AppointmentSchedulingPage() {
   const [stats, setStats] = useState<AppointmentStats | null>(null);
   const [todaySchedule, setTodaySchedule] = useState<Appointment[]>([]);
-  const [upcomingAppointments, setUpcomingAppointments] = useState<Appointment[]>([]);
+  const [upcomingAppointments, setUpcomingAppointments] = useState<
+    Appointment[]
+  >([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch data
   useEffect(() => {
@@ -83,9 +91,11 @@ export default function AppointmentSchedulingPage() {
   const fetchData = async () => {
     try {
       const [statsRes, scheduleRes, upcomingRes] = await Promise.all([
-        fetch('/api/receiving/appointment-scheduling?action=stats'),
-        fetch('/api/receiving/appointment-scheduling?action=today-schedule'),
-        fetch('/api/receiving/appointment-scheduling?action=upcoming-appointments')
+        fetch("/api/receiving/appointment-scheduling?action=stats"),
+        fetch("/api/receiving/appointment-scheduling?action=today-schedule"),
+        fetch(
+          "/api/receiving/appointment-scheduling?action=upcoming-appointments",
+        ),
       ]);
 
       if (statsRes.ok) {
@@ -103,7 +113,7 @@ export default function AppointmentSchedulingPage() {
         setUpcomingAppointments(data.appointments || []);
       }
     } catch (error) {
-      console.error('Failed to fetch appointment data:', error);
+      console.error("Failed to fetch appointment data:", error);
     } finally {
       setLoading(false);
     }
@@ -111,32 +121,46 @@ export default function AppointmentSchedulingPage() {
 
   const getStatusColor = (status: string): string => {
     switch (status) {
-      case 'COMPLETED': return 'text-green-600';
-      case 'CONFIRMED': return 'text-blue-600';
-      case 'CHECKED_IN': return 'text-purple-600';
-      case 'IN_PROGRESS': return 'text-yellow-600';
-      case 'CANCELLED': return 'text-red-600';
-      case 'NO_SHOW': return 'text-red-600';
-      default: return 'text-gray-600';
+      case "COMPLETED":
+        return "text-green-600";
+      case "CONFIRMED":
+        return "text-blue-600";
+      case "CHECKED_IN":
+        return "text-purple-600";
+      case "IN_PROGRESS":
+        return "text-yellow-600";
+      case "CANCELLED":
+        return "text-red-600";
+      case "NO_SHOW":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
     }
   };
 
-  const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getStatusBadgeVariant = (
+    status: string,
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
-      case 'COMPLETED': return 'default';
-      case 'CONFIRMED': return 'secondary';
-      case 'CHECKED_IN': return 'outline';
-      case 'CANCELLED':
-      case 'NO_SHOW': return 'destructive';
-      default: return 'outline';
+      case "COMPLETED":
+        return "default";
+      case "CONFIRMED":
+        return "secondary";
+      case "CHECKED_IN":
+        return "outline";
+      case "CANCELLED":
+      case "NO_SHOW":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
   const getUtilizationColor = (utilization: number): string => {
-    if (utilization >= 85) return 'text-green-600';
-    if (utilization >= 70) return 'text-blue-600';
-    if (utilization >= 50) return 'text-yellow-600';
-    return 'text-red-600';
+    if (utilization >= 85) return "text-green-600";
+    if (utilization >= 70) return "text-blue-600";
+    if (utilization >= 50) return "text-yellow-600";
+    return "text-red-600";
   };
 
   if (loading) {
@@ -163,9 +187,7 @@ export default function AppointmentSchedulingPage() {
             Automated dock appointment booking and capacity management
           </p>
         </div>
-        <Button onClick={fetchData}>
-          Refresh Data
-        </Button>
+        <Button onClick={fetchData}>Refresh Data</Button>
       </div>
 
       {/* Key Metrics */}
@@ -173,7 +195,9 @@ export default function AppointmentSchedulingPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">On-Time Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                On-Time Rate
+              </CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -191,11 +215,15 @@ export default function AppointmentSchedulingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Dock Utilization</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Dock Utilization
+              </CardTitle>
               <BarChart3 className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
-              <div className={`text-2xl font-bold ${getUtilizationColor(stats.dockUtilization)}`}>
+              <div
+                className={`text-2xl font-bold ${getUtilizationColor(stats.dockUtilization)}`}
+              >
                 {stats.dockUtilization.toFixed(1)}%
               </div>
               <p className="text-xs text-muted-foreground mt-1">
@@ -209,7 +237,9 @@ export default function AppointmentSchedulingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Wait Time</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Wait Time
+              </CardTitle>
               <Clock className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -227,7 +257,9 @@ export default function AppointmentSchedulingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Monthly Savings
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -293,16 +325,21 @@ export default function AppointmentSchedulingPage() {
                     <div className="pt-4 border-t space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Total Appointments:</span>
-                        <span className="font-medium">{stats.totalAppointments}</span>
+                        <span className="font-medium">
+                          {stats.totalAppointments}
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Completed:</span>
-                        <span className="font-medium text-green-600">{stats.completedAppointments}</span>
+                        <span className="font-medium text-green-600">
+                          {stats.completedAppointments}
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Cancelled:</span>
                         <span className="font-medium text-red-600">
-                          {stats.cancelledAppointments} ({stats.cancellationRate.toFixed(1)}%)
+                          {stats.cancelledAppointments} (
+                          {stats.cancellationRate.toFixed(1)}%)
                         </span>
                       </div>
                       <div className="flex justify-between text-sm">
@@ -465,7 +502,9 @@ export default function AppointmentSchedulingPage() {
                     <div className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
                       <div>
-                        <div className="font-medium">Real-Time Availability</div>
+                        <div className="font-medium">
+                          Real-Time Availability
+                        </div>
                         <div className="text-sm text-muted-foreground">
                           Live slot availability display
                         </div>
@@ -496,7 +535,7 @@ export default function AppointmentSchedulingPage() {
                   </div>
                 ) : (
                   todaySchedule.map((apt) => (
-                    <div 
+                    <div
                       key={apt.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
@@ -518,10 +557,14 @@ export default function AppointmentSchedulingPage() {
                       <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
                           <span className="text-muted-foreground">Time:</span>
-                          <div className="font-medium">{apt.appointmentTime}</div>
+                          <div className="font-medium">
+                            {apt.appointmentTime}
+                          </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Dock Door:</span>
+                          <span className="text-muted-foreground">
+                            Dock Door:
+                          </span>
                           <div className="font-medium">Door {apt.dockDoor}</div>
                         </div>
                         <div>
@@ -529,8 +572,12 @@ export default function AppointmentSchedulingPage() {
                           <div className="font-medium">{apt.shipmentType}</div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Duration:</span>
-                          <div className="font-medium">{apt.expectedDuration} min</div>
+                          <span className="text-muted-foreground">
+                            Duration:
+                          </span>
+                          <div className="font-medium">
+                            {apt.expectedDuration} min
+                          </div>
                         </div>
                       </div>
 
@@ -557,7 +604,8 @@ export default function AppointmentSchedulingPage() {
             <CardHeader>
               <CardTitle>Upcoming Appointments</CardTitle>
               <CardDescription>
-                Next 7 days schedule ({upcomingAppointments.length} appointments)
+                Next 7 days schedule ({upcomingAppointments.length}{" "}
+                appointments)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -569,7 +617,7 @@ export default function AppointmentSchedulingPage() {
                   </div>
                 ) : (
                   upcomingAppointments.slice(0, 20).map((apt: any) => (
-                    <div 
+                    <div
                       key={apt.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
@@ -594,11 +642,15 @@ export default function AppointmentSchedulingPage() {
                         </div>
                         <div>
                           <span className="text-muted-foreground">Time:</span>
-                          <div className="font-medium">{apt.appointmentTime}</div>
+                          <div className="font-medium">
+                            {apt.appointmentTime}
+                          </div>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Dock:</span>
-                          <div className="font-medium">Door {apt.dockDoor} ({apt.dockDoorType})</div>
+                          <div className="font-medium">
+                            Door {apt.dockDoor} ({apt.dockDoorType})
+                          </div>
                         </div>
                       </div>
                     </div>

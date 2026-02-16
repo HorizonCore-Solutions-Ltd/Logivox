@@ -1,27 +1,27 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // Validation schemas
 const nodeSchema = z.object({
   id: z.string(),
   type: z.enum([
-    'START',
-    'SCAN_RECEIPT',
-    'QUALITY_CHECK',
-    'DIMENSION_MEASURE',
-    'WEIGHT_CHECK',
-    'PHOTO_CAPTURE',
-    'DAMAGE_INSPECT',
-    'COUNT_VERIFY',
-    'LABEL_PRINT',
-    'LOCATION_ASSIGN',
-    'PUTAWAY',
-    'APPROVAL',
-    'NOTIFICATION',
-    'CONDITION',
-    'END',
+    "START",
+    "SCAN_RECEIPT",
+    "QUALITY_CHECK",
+    "DIMENSION_MEASURE",
+    "WEIGHT_CHECK",
+    "PHOTO_CAPTURE",
+    "DAMAGE_INSPECT",
+    "COUNT_VERIFY",
+    "LABEL_PRINT",
+    "LOCATION_ASSIGN",
+    "PUTAWAY",
+    "APPROVAL",
+    "NOTIFICATION",
+    "CONDITION",
+    "END",
   ]),
   config: z.record(z.any()).optional(),
   position: z.object({
@@ -41,16 +41,16 @@ const workflowTemplateSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
   category: z.enum([
-    'STANDARD',
-    'HAZMAT',
-    'REFRIGERATED',
-    'FRAGILE',
-    'HIGH_VALUE',
-    'OVERSIZED',
-    'CROSS_DOCK',
-    'RETURNS',
+    "STANDARD",
+    "HAZMAT",
+    "REFRIGERATED",
+    "FRAGILE",
+    "HIGH_VALUE",
+    "OVERSIZED",
+    "CROSS_DOCK",
+    "RETURNS",
   ]),
-  priority: z.enum(['LOW', 'NORMAL', 'HIGH', 'URGENT']).default('NORMAL'),
+  priority: z.enum(["LOW", "NORMAL", "HIGH", "URGENT"]).default("NORMAL"),
   nodes: z.array(nodeSchema),
   connections: z.array(connectionSchema),
   autoStart: z.boolean().default(false),
@@ -63,42 +63,42 @@ const workflowInstanceSchema = z.object({
   assignedTo: z.string().optional(),
 });
 
-const actionSchema = z.discriminatedUnion('action', [
+const actionSchema = z.discriminatedUnion("action", [
   z.object({
-    action: z.literal('create_template'),
+    action: z.literal("create_template"),
     template: workflowTemplateSchema,
   }),
   z.object({
-    action: z.literal('update_template'),
+    action: z.literal("update_template"),
     templateId: z.string(),
     updates: workflowTemplateSchema.partial(),
   }),
   z.object({
-    action: z.literal('delete_template'),
+    action: z.literal("delete_template"),
     templateId: z.string(),
   }),
   z.object({
-    action: z.literal('clone_template'),
+    action: z.literal("clone_template"),
     templateId: z.string(),
     newName: z.string(),
   }),
   z.object({
-    action: z.literal('start_workflow'),
+    action: z.literal("start_workflow"),
     instance: workflowInstanceSchema,
   }),
   z.object({
-    action: z.literal('complete_step'),
+    action: z.literal("complete_step"),
     instanceId: z.string(),
     nodeId: z.string(),
     data: z.record(z.any()).optional(),
   }),
   z.object({
-    action: z.literal('cancel_workflow'),
+    action: z.literal("cancel_workflow"),
     instanceId: z.string(),
     reason: z.string(),
   }),
   z.object({
-    action: z.literal('validate_workflow'),
+    action: z.literal("validate_workflow"),
     template: workflowTemplateSchema,
   }),
 ]);
@@ -108,53 +108,54 @@ class WorkflowEngine {
   static async executeNode(
     nodeType: string,
     config: any,
-    data: any
+    data: any,
   ): Promise<{ success: boolean; output?: any; error?: string }> {
     try {
       switch (nodeType) {
-        case 'START':
+        case "START":
           return { success: true, output: { started: true } };
 
-        case 'SCAN_RECEIPT':
+        case "SCAN_RECEIPT":
           // Simulate barcode scanning
           if (!data.barcode) {
-            return { success: false, error: 'Barcode required' };
+            return { success: false, error: "Barcode required" };
           }
           return {
             success: true,
             output: { scanned: data.barcode, timestamp: new Date() },
           };
 
-        case 'QUALITY_CHECK':
+        case "QUALITY_CHECK":
           // Quality inspection node
-          const requiredChecks = config.checks || ['visual', 'packaging'];
+          const requiredChecks = config.checks || ["visual", "packaging"];
           const passedChecks = data.checks || [];
           const allPassed = requiredChecks.every((check: string) =>
-            passedChecks.includes(check)
+            passedChecks.includes(check),
           );
           return {
             success: allPassed,
             output: { checks: passedChecks, passed: allPassed },
-            error: allPassed ? undefined : 'Quality checks failed',
+            error: allPassed ? undefined : "Quality checks failed",
           };
 
-        case 'DIMENSION_MEASURE':
+        case "DIMENSION_MEASURE":
           // Dimension measurement
           if (!data.length || !data.width || !data.height) {
-            return { success: false, error: 'Dimensions required' };
+            return { success: false, error: "Dimensions required" };
           }
           const volume = data.length * data.width * data.height;
           return {
             success: true,
-            output: { dimensions: data, volume, unit: 'cubic_inches' },
+            output: { dimensions: data, volume, unit: "cubic_inches" },
           };
 
-        case 'WEIGHT_CHECK':
+        case "WEIGHT_CHECK":
           // Weight verification
           const expectedWeight = config.expectedWeight;
           const actualWeight = data.weight;
           const tolerance = config.tolerance || 0.05; // 5% default
-          const variance = Math.abs(actualWeight - expectedWeight) / expectedWeight;
+          const variance =
+            Math.abs(actualWeight - expectedWeight) / expectedWeight;
           const withinTolerance = variance <= tolerance;
           return {
             success: withinTolerance,
@@ -164,10 +165,10 @@ class WorkflowEngine {
               variance: variance * 100,
               withinTolerance,
             },
-            error: withinTolerance ? undefined : 'Weight outside tolerance',
+            error: withinTolerance ? undefined : "Weight outside tolerance",
           };
 
-        case 'PHOTO_CAPTURE':
+        case "PHOTO_CAPTURE":
           // Photo capture node
           const minPhotos = config.minPhotos || 1;
           const photos = data.photos || [];
@@ -175,15 +176,18 @@ class WorkflowEngine {
           return {
             success: enoughPhotos,
             output: { photos, count: photos.length },
-            error: enoughPhotos ? undefined : `Minimum ${minPhotos} photos required`,
+            error: enoughPhotos
+              ? undefined
+              : `Minimum ${minPhotos} photos required`,
           };
 
-        case 'DAMAGE_INSPECT':
+        case "DAMAGE_INSPECT":
           // Damage inspection
           const hasDamage = data.hasDamage || false;
           const damageType = data.damageType;
-          const severity = data.severity || 'NONE';
-          const requiresApproval = severity === 'SEVERE' || severity === 'CRITICAL';
+          const severity = data.severity || "NONE";
+          const requiresApproval =
+            severity === "SEVERE" || severity === "CRITICAL";
           return {
             success: true,
             output: {
@@ -194,7 +198,7 @@ class WorkflowEngine {
             },
           };
 
-        case 'COUNT_VERIFY':
+        case "COUNT_VERIFY":
           // Count verification
           const expected = config.expectedQuantity;
           const actual = data.actualQuantity;
@@ -209,12 +213,12 @@ class WorkflowEngine {
               variance: countVariance,
               accurate: countAccurate,
             },
-            error: countAccurate ? undefined : 'Count discrepancy detected',
+            error: countAccurate ? undefined : "Count discrepancy detected",
           };
 
-        case 'LABEL_PRINT':
+        case "LABEL_PRINT":
           // Label printing
-          const labelType = config.labelType || 'LPN';
+          const labelType = config.labelType || "LPN";
           const labelData = data.labelData || {};
           return {
             success: true,
@@ -226,9 +230,9 @@ class WorkflowEngine {
             },
           };
 
-        case 'LOCATION_ASSIGN':
+        case "LOCATION_ASSIGN":
           // Location assignment
-          const zone = config.zone || 'GENERAL';
+          const zone = config.zone || "GENERAL";
           const location = data.location || this.suggestLocation(zone);
           return {
             success: true,
@@ -239,7 +243,7 @@ class WorkflowEngine {
             },
           };
 
-        case 'PUTAWAY':
+        case "PUTAWAY":
           // Putaway task creation
           const putawayLocation = data.location;
           const putawayUser = data.userId;
@@ -248,11 +252,11 @@ class WorkflowEngine {
             output: {
               location: putawayLocation,
               assignedTo: putawayUser,
-              status: 'PENDING',
+              status: "PENDING",
             },
           };
 
-        case 'APPROVAL':
+        case "APPROVAL":
           // Approval gate
           const approvalRequired = config.required || true;
           const approved = data.approved || false;
@@ -263,13 +267,13 @@ class WorkflowEngine {
               approvedBy: data.approvedBy,
               timestamp: new Date(),
             },
-            error: approved ? undefined : 'Approval required',
+            error: approved ? undefined : "Approval required",
           };
 
-        case 'NOTIFICATION':
+        case "NOTIFICATION":
           // Send notification
           const recipients = config.recipients || [];
-          const message = config.message || 'Workflow notification';
+          const message = config.message || "Workflow notification";
           return {
             success: true,
             output: {
@@ -280,7 +284,7 @@ class WorkflowEngine {
             },
           };
 
-        case 'CONDITION':
+        case "CONDITION":
           // Conditional branching
           const condition = config.condition;
           const result = this.evaluateCondition(condition, data);
@@ -289,11 +293,11 @@ class WorkflowEngine {
             output: {
               condition,
               result,
-              branch: result ? 'true' : 'false',
+              branch: result ? "true" : "false",
             },
           };
 
-        case 'END':
+        case "END":
           return { success: true, output: { completed: true } };
 
         default:
@@ -302,29 +306,29 @@ class WorkflowEngine {
     } catch (error) {
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Node execution failed',
+        error: error instanceof Error ? error.message : "Node execution failed",
       };
     }
   }
 
   static suggestLocation(zone: string): string {
     const zoneMap: Record<string, string> = {
-      GENERAL: 'A-01-01',
-      FAST_PICK: 'FP-01-01',
-      BULK: 'BLK-01-01',
-      CROSS_DOCK: 'XD-01',
-      RETURNS: 'RET-01-01',
-      QUARANTINE: 'QTN-01-01',
+      GENERAL: "A-01-01",
+      FAST_PICK: "FP-01-01",
+      BULK: "BLK-01-01",
+      CROSS_DOCK: "XD-01",
+      RETURNS: "RET-01-01",
+      QUARANTINE: "QTN-01-01",
     };
-    return zoneMap[zone] || 'A-01-01';
+    return zoneMap[zone] || "A-01-01";
   }
 
   static evaluateCondition(condition: string, data: any): boolean {
     try {
       // Simple condition evaluation (in production, use a safe expression evaluator)
       // Examples: "weight > 100", "hasDamage === true", "quantity < 10"
-      const operators = ['===', '!==', '>=', '<=', '>', '<'];
-      
+      const operators = ["===", "!==", ">=", "<=", ">", "<"];
+
       for (const op of operators) {
         if (condition.includes(op)) {
           const [left, right] = condition.split(op).map((s) => s.trim());
@@ -332,17 +336,17 @@ class WorkflowEngine {
           const rightValue = this.resolveValue(right, data);
 
           switch (op) {
-            case '===':
+            case "===":
               return leftValue === rightValue;
-            case '!==':
+            case "!==":
               return leftValue !== rightValue;
-            case '>':
+            case ">":
               return leftValue > rightValue;
-            case '<':
+            case "<":
               return leftValue < rightValue;
-            case '>=':
+            case ">=":
               return leftValue >= rightValue;
-            case '<=':
+            case "<=":
               return leftValue <= rightValue;
           }
         }
@@ -356,9 +360,9 @@ class WorkflowEngine {
 
   static resolveValue(value: string, data: any): any {
     // Check if it's a data reference
-    if (value.startsWith('data.')) {
+    if (value.startsWith("data.")) {
       const path = value.substring(5);
-      return path.split('.').reduce((obj, key) => obj?.[key], data);
+      return path.split(".").reduce((obj, key) => obj?.[key], data);
     }
 
     // Check if it's a number
@@ -367,11 +371,11 @@ class WorkflowEngine {
     }
 
     // Check if it's a boolean
-    if (value === 'true') return true;
-    if (value === 'false') return false;
+    if (value === "true") return true;
+    if (value === "false") return false;
 
     // Return as string
-    return value.replace(/['"]/g, '');
+    return value.replace(/['"]/g, "");
   }
 
   static validateWorkflow(template: any): {
@@ -381,25 +385,29 @@ class WorkflowEngine {
     const errors: string[] = [];
 
     // Check for START node
-    const hasStart = template.nodes.some((n: any) => n.type === 'START');
+    const hasStart = template.nodes.some((n: any) => n.type === "START");
     if (!hasStart) {
-      errors.push('Workflow must have a START node');
+      errors.push("Workflow must have a START node");
     }
 
     // Check for END node
-    const hasEnd = template.nodes.some((n: any) => n.type === 'END');
+    const hasEnd = template.nodes.some((n: any) => n.type === "END");
     if (!hasEnd) {
-      errors.push('Workflow must have an END node');
+      errors.push("Workflow must have an END node");
     }
 
     // Check all connections reference valid nodes
     const nodeIds = new Set(template.nodes.map((n: any) => n.id));
     template.connections.forEach((conn: any) => {
       if (!nodeIds.has(conn.source)) {
-        errors.push(`Connection references invalid source node: ${conn.source}`);
+        errors.push(
+          `Connection references invalid source node: ${conn.source}`,
+        );
       }
       if (!nodeIds.has(conn.target)) {
-        errors.push(`Connection references invalid target node: ${conn.target}`);
+        errors.push(
+          `Connection references invalid target node: ${conn.target}`,
+        );
       }
     });
 
@@ -411,7 +419,7 @@ class WorkflowEngine {
     });
 
     template.nodes.forEach((node: any) => {
-      if (node.type !== 'START' && !connectedNodes.has(node.id)) {
+      if (node.type !== "START" && !connectedNodes.has(node.id)) {
         errors.push(`Orphaned node detected: ${node.id} (${node.type})`);
       }
     });
@@ -428,7 +436,7 @@ class WorkflowEngine {
       path.add(nodeId);
 
       const outgoing = template.connections.filter(
-        (c: any) => c.source === nodeId
+        (c: any) => c.source === nodeId,
       );
       for (const conn of outgoing) {
         if (hasCycle(conn.target)) return true;
@@ -438,9 +446,9 @@ class WorkflowEngine {
       return false;
     };
 
-    const startNode = template.nodes.find((n: any) => n.type === 'START');
+    const startNode = template.nodes.find((n: any) => n.type === "START");
     if (startNode && hasCycle(startNode.id)) {
-      errors.push('Workflow contains cycles');
+      errors.push("Workflow contains cycles");
     }
 
     return {
@@ -455,7 +463,7 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -464,14 +472,14 @@ export async function GET(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action') || 'templates';
+    const action = searchParams.get("action") || "templates";
 
-    if (action === 'templates') {
-      const category = searchParams.get('category');
+    if (action === "templates") {
+      const category = searchParams.get("category");
 
       const templates = await prisma.receivingWorkflowTemplate.findMany({
         where: {
@@ -483,7 +491,7 @@ export async function GET(request: NextRequest) {
             select: { instances: true },
           },
         },
-        orderBy: { name: 'asc' },
+        orderBy: { name: "asc" },
       });
 
       const stats = {
@@ -506,9 +514,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ templates, stats });
     }
 
-    if (action === 'instances') {
-      const status = searchParams.get('status');
-      const templateId = searchParams.get('templateId');
+    if (action === "instances") {
+      const status = searchParams.get("status");
+      const templateId = searchParams.get("templateId");
 
       const instances = await prisma.receivingWorkflowInstance.findMany({
         where: {
@@ -524,7 +532,7 @@ export async function GET(request: NextRequest) {
             select: { name: true, email: true },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 50,
       });
 
@@ -540,12 +548,12 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ instances, stats });
     }
 
-    if (action === 'template-detail') {
-      const templateId = searchParams.get('templateId');
+    if (action === "template-detail") {
+      const templateId = searchParams.get("templateId");
       if (!templateId) {
         return NextResponse.json(
-          { error: 'Template ID required' },
-          { status: 400 }
+          { error: "Template ID required" },
+          { status: 400 },
         );
       }
 
@@ -560,7 +568,7 @@ export async function GET(request: NextRequest) {
           },
           instances: {
             take: 10,
-            orderBy: { createdAt: 'desc' },
+            orderBy: { createdAt: "desc" },
             include: {
               assignedToUser: {
                 select: { name: true },
@@ -571,18 +579,21 @@ export async function GET(request: NextRequest) {
       });
 
       if (!template) {
-        return NextResponse.json({ error: 'Template not found' }, { status: 404 });
+        return NextResponse.json(
+          { error: "Template not found" },
+          { status: 404 },
+        );
       }
 
       return NextResponse.json({ template });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('GET /api/receiving/workflow-builder error:', error);
+    console.error("GET /api/receiving/workflow-builder error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch workflow data' },
-      { status: 500 }
+      { error: "Failed to fetch workflow data" },
+      { status: 500 },
     );
   }
 }
@@ -590,7 +601,7 @@ export async function GET(request: NextRequest) {
 // Helper function for avg completion time
 function calculateAvgCompletionTime(instances: any[]): number {
   const completed = instances.filter(
-    (i) => i.status === 'COMPLETED' && i.completedAt
+    (i) => i.status === "COMPLETED" && i.completedAt,
   );
   if (completed.length === 0) return 0;
 
@@ -610,7 +621,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.email) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const user = await prisma.user.findUnique({
@@ -619,20 +630,20 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user?.organizationId) {
-      return NextResponse.json({ error: 'No organization' }, { status: 403 });
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await request.json();
     const validated = actionSchema.parse(body);
 
     switch (validated.action) {
-      case 'create_template': {
+      case "create_template": {
         // Validate workflow structure
         const validation = WorkflowEngine.validateWorkflow(validated.template);
         if (!validation.valid) {
           return NextResponse.json(
-            { error: 'Invalid workflow', details: validation.errors },
-            { status: 400 }
+            { error: "Invalid workflow", details: validation.errors },
+            { status: 400 },
           );
         }
 
@@ -654,11 +665,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           template,
-          message: 'Workflow template created successfully',
+          message: "Workflow template created successfully",
         });
       }
 
-      case 'update_template': {
+      case "update_template": {
         if (validated.updates.nodes && validated.updates.connections) {
           const validation = WorkflowEngine.validateWorkflow({
             nodes: validated.updates.nodes,
@@ -666,8 +677,8 @@ export async function POST(request: NextRequest) {
           });
           if (!validation.valid) {
             return NextResponse.json(
-              { error: 'Invalid workflow', details: validation.errors },
-              { status: 400 }
+              { error: "Invalid workflow", details: validation.errors },
+              { status: 400 },
             );
           }
         }
@@ -683,16 +694,16 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           template,
-          message: 'Template updated successfully',
+          message: "Template updated successfully",
         });
       }
 
-      case 'delete_template': {
+      case "delete_template": {
         // Check if template has active instances
         const activeInstances = await prisma.receivingWorkflowInstance.count({
           where: {
             templateId: validated.templateId,
-            status: { in: ['PENDING', 'IN_PROGRESS'] },
+            status: { in: ["PENDING", "IN_PROGRESS"] },
           },
         });
 
@@ -701,7 +712,7 @@ export async function POST(request: NextRequest) {
             {
               error: `Cannot delete template with ${activeInstances} active instances`,
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -714,11 +725,11 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
           success: true,
-          message: 'Template deleted successfully',
+          message: "Template deleted successfully",
         });
       }
 
-      case 'clone_template': {
+      case "clone_template": {
         const original = await prisma.receivingWorkflowTemplate.findFirst({
           where: {
             id: validated.templateId,
@@ -728,8 +739,8 @@ export async function POST(request: NextRequest) {
 
         if (!original) {
           return NextResponse.json(
-            { error: 'Template not found' },
-            { status: 404 }
+            { error: "Template not found" },
+            { status: 404 },
           );
         }
 
@@ -751,11 +762,11 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           template: cloned,
-          message: 'Template cloned successfully',
+          message: "Template cloned successfully",
         });
       }
 
-      case 'start_workflow': {
+      case "start_workflow": {
         const template = await prisma.receivingWorkflowTemplate.findFirst({
           where: {
             id: validated.instance.templateId,
@@ -766,8 +777,8 @@ export async function POST(request: NextRequest) {
 
         if (!template) {
           return NextResponse.json(
-            { error: 'Template not found or inactive' },
-            { status: 404 }
+            { error: "Template not found or inactive" },
+            { status: 404 },
           );
         }
 
@@ -777,7 +788,7 @@ export async function POST(request: NextRequest) {
             templateId: template.id,
             receivingRecordId: validated.instance.receivingRecordId,
             assignedTo: validated.instance.assignedTo || user.id,
-            status: 'IN_PROGRESS',
+            status: "IN_PROGRESS",
             currentStep: 0,
             stepData: {},
           },
@@ -787,11 +798,11 @@ export async function POST(request: NextRequest) {
           success: true,
           instance,
           nextNode: template.nodes[0],
-          message: 'Workflow started successfully',
+          message: "Workflow started successfully",
         });
       }
 
-      case 'complete_step': {
+      case "complete_step": {
         const instance = await prisma.receivingWorkflowInstance.findFirst({
           where: {
             id: validated.instanceId,
@@ -804,33 +815,36 @@ export async function POST(request: NextRequest) {
 
         if (!instance) {
           return NextResponse.json(
-            { error: 'Workflow instance not found' },
-            { status: 404 }
+            { error: "Workflow instance not found" },
+            { status: 404 },
           );
         }
 
         // Find the node
         const node = (instance.template.nodes as any[]).find(
-          (n) => n.id === validated.nodeId
+          (n) => n.id === validated.nodeId,
         );
         if (!node) {
-          return NextResponse.json({ error: 'Node not found' }, { status: 404 });
+          return NextResponse.json(
+            { error: "Node not found" },
+            { status: 404 },
+          );
         }
 
         // Execute the node
         const result = await WorkflowEngine.executeNode(
           node.type,
           node.config,
-          validated.data
+          validated.data,
         );
 
         if (!result.success) {
           return NextResponse.json(
             {
-              error: 'Step execution failed',
+              error: "Step execution failed",
               details: result.error,
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -842,16 +856,20 @@ export async function POST(request: NextRequest) {
 
         // Find next node
         const connections = instance.template.connections as any[];
-        let nextConnection = connections.find((c) => c.source === validated.nodeId);
+        let nextConnection = connections.find(
+          (c) => c.source === validated.nodeId,
+        );
 
         // Handle conditional branching
-        if (node.type === 'CONDITION' && result.output?.branch) {
+        if (node.type === "CONDITION" && result.output?.branch) {
           nextConnection = connections.find(
-            (c) => c.source === validated.nodeId && c.condition === result.output.branch
+            (c) =>
+              c.source === validated.nodeId &&
+              c.condition === result.output.branch,
           );
         }
 
-        const isComplete = !nextConnection || node.type === 'END';
+        const isComplete = !nextConnection || node.type === "END";
 
         const updated = await prisma.receivingWorkflowInstance.update({
           where: { id: instance.id },
@@ -859,7 +877,7 @@ export async function POST(request: NextRequest) {
             currentStep: instance.currentStep + 1,
             stepData: updatedStepData,
             ...(isComplete && {
-              status: 'COMPLETED',
+              status: "COMPLETED",
               completedAt: new Date(),
             }),
           },
@@ -867,7 +885,7 @@ export async function POST(request: NextRequest) {
 
         const nextNode = nextConnection
           ? (instance.template.nodes as any[]).find(
-              (n) => n.id === nextConnection.target
+              (n) => n.id === nextConnection.target,
             )
           : null;
 
@@ -878,19 +896,19 @@ export async function POST(request: NextRequest) {
           nextNode,
           isComplete,
           message: isComplete
-            ? 'Workflow completed successfully'
-            : 'Step completed, proceed to next',
+            ? "Workflow completed successfully"
+            : "Step completed, proceed to next",
         });
       }
 
-      case 'cancel_workflow': {
+      case "cancel_workflow": {
         const instance = await prisma.receivingWorkflowInstance.update({
           where: {
             id: validated.instanceId,
             organizationId: user.organizationId,
           },
           data: {
-            status: 'CANCELLED',
+            status: "CANCELLED",
             completedAt: new Date(),
             stepData: {
               ...(instance as any)?.stepData,
@@ -902,37 +920,37 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: true,
           instance,
-          message: 'Workflow cancelled',
+          message: "Workflow cancelled",
         });
       }
 
-      case 'validate_workflow': {
+      case "validate_workflow": {
         const validation = WorkflowEngine.validateWorkflow(validated.template);
 
         return NextResponse.json({
           success: true,
           validation,
           message: validation.valid
-            ? 'Workflow is valid'
-            : 'Workflow has validation errors',
+            ? "Workflow is valid"
+            : "Workflow has validation errors",
         });
       }
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('POST /api/receiving/workflow-builder error:', error);
+    console.error("POST /api/receiving/workflow-builder error:", error);
     return NextResponse.json(
-      { error: 'Failed to process workflow action' },
-      { status: 500 }
+      { error: "Failed to process workflow action" },
+      { status: 500 },
     );
   }
 }
@@ -955,9 +973,9 @@ export const WORKFLOW_BUILDER_ROI = {
   roi: 338, // 338% ROI
   paybackMonths: 3.6,
   impact: {
-    workflowCreationTime: '75% faster', // Visual builder vs manual
-    processCompliance: '95% adherence',
-    errorRate: '50% reduction',
-    onboardingTime: '60% faster',
+    workflowCreationTime: "75% faster", // Visual builder vs manual
+    processCompliance: "95% adherence",
+    errorRate: "50% reduction",
+    onboardingTime: "60% faster",
   },
 };

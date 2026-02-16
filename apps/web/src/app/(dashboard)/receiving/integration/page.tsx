@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface Integration {
   id: string;
@@ -49,9 +49,9 @@ export default function ReceivingIntegration() {
     try {
       setLoading(true);
       const [integrationsRes, statsRes, logsRes] = await Promise.all([
-        fetch('/api/receiving/integration?action=list_integrations'),
-        fetch('/api/receiving/integration?action=integration_stats'),
-        fetch('/api/receiving/integration?action=webhook_logs'),
+        fetch("/api/receiving/integration?action=list_integrations"),
+        fetch("/api/receiving/integration?action=integration_stats"),
+        fetch("/api/receiving/integration?action=webhook_logs"),
       ]);
 
       const integrationsData = await integrationsRes.json();
@@ -62,7 +62,7 @@ export default function ReceivingIntegration() {
       setStats(statsData.stats);
       setWebhookLogs(logsData.logs || []);
     } catch (error) {
-      console.error('Failed to fetch integration data:', error);
+      console.error("Failed to fetch integration data:", error);
     } finally {
       setLoading(false);
     }
@@ -70,11 +70,11 @@ export default function ReceivingIntegration() {
 
   const handleTestConnection = async (integrationId: string) => {
     try {
-      const response = await fetch('/api/receiving/integration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/integration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'test_connection',
+          action: "test_connection",
           integrationId,
         }),
       });
@@ -86,70 +86,72 @@ export default function ReceivingIntegration() {
         alert(`Connection failed: ${data.result.message}`);
       }
     } catch (error) {
-      alert('Test failed');
+      alert("Test failed");
     }
   };
 
   const handleSyncNow = async (integrationId: string) => {
     try {
-      const response = await fetch('/api/receiving/integration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/integration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'sync_data',
+          action: "sync_data",
           integrationId,
-          direction: 'BIDIRECTIONAL',
+          direction: "BIDIRECTIONAL",
         }),
       });
 
       const data = await response.json();
       if (data.success) {
-        alert('Sync completed successfully!');
+        alert("Sync completed successfully!");
         fetchData();
       }
     } catch (error) {
-      alert('Sync failed');
+      alert("Sync failed");
     }
   };
 
   const handleGenerateApiKey = async () => {
     try {
-      const response = await fetch('/api/receiving/integration?action=generate_api_key');
+      const response = await fetch(
+        "/api/receiving/integration?action=generate_api_key",
+      );
       const data = await response.json();
-      
+
       if (data.apiKey) {
-        prompt('Your API Key (save it securely):', data.apiKey);
+        prompt("Your API Key (save it securely):", data.apiKey);
       }
     } catch (error) {
-      alert('Failed to generate API key');
+      alert("Failed to generate API key");
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ACTIVE':
-        return 'bg-green-100 text-green-800 border-green-300';
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'ERROR':
-        return 'bg-red-100 text-red-800 border-red-300';
+      case "ACTIVE":
+        return "bg-green-100 text-green-800 border-green-300";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "ERROR":
+        return "bg-red-100 text-red-800 border-red-300";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return "bg-gray-100 text-gray-800 border-gray-300";
     }
   };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'ERP':
-        return '🏢';
-      case 'WMS':
-        return '📦';
-      case 'TMS':
-        return '🚚';
-      case 'SUPPLIER_PORTAL':
-        return '🤝';
+      case "ERP":
+        return "🏢";
+      case "WMS":
+        return "📦";
+      case "TMS":
+        return "🚚";
+      case "SUPPLIER_PORTAL":
+        return "🤝";
       default:
-        return '🔌';
+        return "🔌";
     }
   };
 
@@ -301,7 +303,7 @@ export default function ReceivingIntegration() {
                   <CardContent>
                     <div className="space-y-3">
                       <div className="text-sm text-gray-600">
-                        Last sync:{' '}
+                        Last sync:{" "}
                         {new Date(integration.lastSync).toLocaleString()}
                       </div>
 
@@ -415,12 +417,12 @@ export default function ReceivingIntegration() {
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     {[
-                      'RECEIPT_STARTED',
-                      'RECEIPT_COMPLETED',
-                      'QUALITY_INSPECTION',
-                      'DAMAGE_FOUND',
-                      'PUTAWAY_COMPLETE',
-                      'DOCUMENT_UPLOADED',
+                      "RECEIPT_STARTED",
+                      "RECEIPT_COMPLETED",
+                      "QUALITY_INSPECTION",
+                      "DAMAGE_FOUND",
+                      "PUTAWAY_COMPLETE",
+                      "DOCUMENT_UPLOADED",
                     ].map((event) => (
                       <label key={event} className="flex items-center gap-2">
                         <input type="checkbox" />
@@ -444,11 +446,21 @@ export default function ReceivingIntegration() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-2 text-sm font-medium">Event</th>
-                      <th className="text-left p-2 text-sm font-medium">Status</th>
-                      <th className="text-left p-2 text-sm font-medium">Time</th>
-                      <th className="text-left p-2 text-sm font-medium">Response</th>
-                      <th className="text-left p-2 text-sm font-medium">Attempts</th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Event
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Status
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Time
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Response
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Attempts
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -458,9 +470,9 @@ export default function ReceivingIntegration() {
                         <td className="p-2">
                           <Badge
                             className={
-                              log.status === 'DELIVERED'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
+                              log.status === "DELIVERED"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-red-100 text-red-800"
                             }
                           >
                             {log.status}
@@ -518,7 +530,7 @@ export default function ReceivingIntegration() {
                 <div>
                   <div className="font-medium mb-2">Sample Request</div>
                   <pre className="p-4 bg-gray-900 text-gray-100 rounded overflow-x-auto text-xs">
-{`curl -X POST https://api.flowstock.com/v1/receiving/shipments \\
+                    {`curl -X POST https://api.flowstock.com/v1/receiving/shipments \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -545,12 +557,36 @@ export default function ReceivingIntegration() {
             <CardContent>
               <div className="space-y-2 text-sm">
                 {[
-                  { method: 'GET', path: '/receiving/shipments', desc: 'List shipments' },
-                  { method: 'POST', path: '/receiving/shipments', desc: 'Create shipment' },
-                  { method: 'GET', path: '/receiving/shipments/:id', desc: 'Get shipment details' },
-                  { method: 'PUT', path: '/receiving/shipments/:id', desc: 'Update shipment' },
-                  { method: 'POST', path: '/receiving/asn', desc: 'Import ASN' },
-                  { method: 'GET', path: '/receiving/stats', desc: 'Get statistics' },
+                  {
+                    method: "GET",
+                    path: "/receiving/shipments",
+                    desc: "List shipments",
+                  },
+                  {
+                    method: "POST",
+                    path: "/receiving/shipments",
+                    desc: "Create shipment",
+                  },
+                  {
+                    method: "GET",
+                    path: "/receiving/shipments/:id",
+                    desc: "Get shipment details",
+                  },
+                  {
+                    method: "PUT",
+                    path: "/receiving/shipments/:id",
+                    desc: "Update shipment",
+                  },
+                  {
+                    method: "POST",
+                    path: "/receiving/asn",
+                    desc: "Import ASN",
+                  },
+                  {
+                    method: "GET",
+                    path: "/receiving/stats",
+                    desc: "Get statistics",
+                  },
                 ].map((endpoint, idx) => (
                   <div
                     key={idx}
@@ -558,17 +594,19 @@ export default function ReceivingIntegration() {
                   >
                     <Badge
                       className={
-                        endpoint.method === 'GET'
-                          ? 'bg-green-100 text-green-800'
-                          : endpoint.method === 'POST'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-yellow-100 text-yellow-800'
+                        endpoint.method === "GET"
+                          ? "bg-green-100 text-green-800"
+                          : endpoint.method === "POST"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-yellow-100 text-yellow-800"
                       }
                     >
                       {endpoint.method}
                     </Badge>
                     <code className="font-mono">{endpoint.path}</code>
-                    <span className="text-gray-600 ml-auto">{endpoint.desc}</span>
+                    <span className="text-gray-600 ml-auto">
+                      {endpoint.desc}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -587,39 +625,53 @@ export default function ReceivingIntegration() {
                 <div>
                   <h3 className="font-medium mb-2">📖 Getting Started</h3>
                   <p className="text-sm text-gray-700">
-                    Learn how to integrate your systems with Flowstock's receiving
-                    platform. Our RESTful API provides comprehensive access to all
-                    receiving operations.
+                    Learn how to integrate your systems with Flowstock's
+                    receiving platform. Our RESTful API provides comprehensive
+                    access to all receiving operations.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <Button variant="outline" className="h-24 flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col gap-2"
+                  >
                     <span className="text-2xl">📘</span>
                     <span>API Reference</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col gap-2"
+                  >
                     <span className="text-2xl">🔌</span>
                     <span>Integration Guide</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col gap-2"
+                  >
                     <span className="text-2xl">💡</span>
                     <span>Code Examples</span>
                   </Button>
-                  <Button variant="outline" className="h-24 flex flex-col gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-24 flex flex-col gap-2"
+                  >
                     <span className="text-2xl">🔐</span>
                     <span>Authentication</span>
                   </Button>
                 </div>
 
                 <div className="mt-6 p-4 bg-gray-50 rounded">
-                  <h4 className="font-medium mb-3">Common Integration Patterns</h4>
+                  <h4 className="font-medium mb-3">
+                    Common Integration Patterns
+                  </h4>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600">•</span>
                       <span>
-                        <strong>ASN Import:</strong> Automatically import advance
-                        shipment notices from suppliers or TMS
+                        <strong>ASN Import:</strong> Automatically import
+                        advance shipment notices from suppliers or TMS
                       </span>
                     </li>
                     <li className="flex items-start gap-2">
@@ -639,8 +691,8 @@ export default function ReceivingIntegration() {
                     <li className="flex items-start gap-2">
                       <span className="text-blue-600">•</span>
                       <span>
-                        <strong>Inventory Updates:</strong> Sync inventory levels
-                        with WMS after putaway completion
+                        <strong>Inventory Updates:</strong> Sync inventory
+                        levels with WMS after putaway completion
                       </span>
                     </li>
                   </ul>
@@ -743,8 +795,12 @@ export default function ReceivingIntegration() {
                   </div>
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
-                  <div className="text-3xl font-bold text-orange-600">99.5%</div>
-                  <div className="text-sm text-gray-600 mt-1">Data accuracy</div>
+                  <div className="text-3xl font-bold text-orange-600">
+                    99.5%
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Data accuracy
+                  </div>
                 </div>
               </div>
 
@@ -754,8 +810,8 @@ export default function ReceivingIntegration() {
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
                     <span>
-                      <strong>100% automated data flow</strong> - Zero manual data
-                      entry between systems
+                      <strong>100% automated data flow</strong> - Zero manual
+                      data entry between systems
                     </span>
                   </li>
                   <li className="flex items-start gap-2">

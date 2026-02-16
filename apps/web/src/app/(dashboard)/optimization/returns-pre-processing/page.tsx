@@ -3,10 +3,10 @@
 /**
  * RETURNS PRE-PROCESSING DASHBOARD
  * =================================
- * 
+ *
  * System 8 - Excellent ROI (713%)
  * Investment: $6K → Savings: $43K/year
- * 
+ *
  * Features:
  * - AI-powered return classification
  * - Automated disposition routing
@@ -15,7 +15,13 @@
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -110,7 +116,9 @@ export default function ReturnsPreProcessingDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
   const [pendingReturns, setPendingReturns] = useState<PendingReturn[]>([]);
-  const [recommendations, setRecommendations] = useState<DispositionRecommendation[]>([]);
+  const [recommendations, setRecommendations] = useState<
+    DispositionRecommendation[]
+  >([]);
 
   // ============================================
   // DATA FETCHING
@@ -127,7 +135,9 @@ export default function ReturnsPreProcessingDashboard() {
       const [statsRes, pendingRes, recommendationsRes] = await Promise.all([
         fetch("/api/optimization/returns-pre-processing?action=stats"),
         fetch("/api/optimization/returns-pre-processing?action=pending"),
-        fetch("/api/optimization/returns-pre-processing?action=recommendations"),
+        fetch(
+          "/api/optimization/returns-pre-processing?action=recommendations",
+        ),
       ]);
 
       const [statsData, pendingData, recommendationsData] = await Promise.all([
@@ -205,7 +215,11 @@ export default function ReturnsPreProcessingDashboard() {
       SCRAP: "bg-red-500 text-white",
     };
 
-    return <Badge className={colors[disposition] || ""}>{disposition.replace("_", " ")}</Badge>;
+    return (
+      <Badge className={colors[disposition] || ""}>
+        {disposition.replace("_", " ")}
+      </Badge>
+    );
   }
 
   function getStatusBadge(status: string) {
@@ -215,7 +229,9 @@ export default function ReturnsPreProcessingDashboard() {
       PENDING_DISPOSITION: "bg-orange-500 text-white",
     };
 
-    return <Badge className={colors[status] || ""}>{status.replace("_", " ")}</Badge>;
+    return (
+      <Badge className={colors[status] || ""}>{status.replace("_", " ")}</Badge>
+    );
   }
 
   function getPriorityBadge(priority: string) {
@@ -256,7 +272,9 @@ export default function ReturnsPreProcessingDashboard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Returns Pre-Processing Dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Loading Returns Pre-Processing Dashboard...
+          </p>
         </div>
       </div>
     );
@@ -305,12 +323,16 @@ export default function ReturnsPreProcessingDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stats.avgProcessingTime} min</div>
+              <div className="text-2xl font-bold">
+                {stats.avgProcessingTime} min
+              </div>
               <p className="text-xs text-gray-500 mt-1">
                 Target: {stats.targetProcessingTime} min
               </p>
               <Progress
-                value={(stats.targetProcessingTime / stats.avgProcessingTime) * 100}
+                value={
+                  (stats.targetProcessingTime / stats.avgProcessingTime) * 100
+                }
                 className="mt-2"
               />
             </CardContent>
@@ -327,14 +349,17 @@ export default function ReturnsPreProcessingDashboard() {
                 {stats.recoveryMetrics.avgRecoveryRate}%
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                {formatCurrency(stats.recoveryMetrics.totalValueRecovered)} recovered
+                {formatCurrency(stats.recoveryMetrics.totalValueRecovered)}{" "}
+                recovered
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Annual Savings</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Annual Savings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -359,7 +384,9 @@ export default function ReturnsPreProcessingDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Pending Returns Queue</CardTitle>
-              <CardDescription>Returns awaiting processing and disposition</CardDescription>
+              <CardDescription>
+                Returns awaiting processing and disposition
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -378,7 +405,9 @@ export default function ReturnsPreProcessingDashboard() {
                 <TableBody>
                   {pendingReturns.map((ret) => (
                     <TableRow key={ret.id}>
-                      <TableCell className="font-medium">{ret.orderNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {ret.orderNumber}
+                      </TableCell>
                       <TableCell>{ret.customerName}</TableCell>
                       <TableCell>
                         <Badge variant="outline">{ret.itemCount} items</Badge>
@@ -429,26 +458,39 @@ export default function ReturnsPreProcessingDashboard() {
                 <TableBody>
                   {recommendations.map((rec) => (
                     <TableRow key={rec.id}>
-                      <TableCell className="font-medium">{rec.orderNumber}</TableCell>
+                      <TableCell className="font-medium">
+                        {rec.orderNumber}
+                      </TableCell>
                       <TableCell>
                         <div>
                           <div className="font-medium">{rec.productSku}</div>
-                          <div className="text-xs text-gray-500">{rec.productName}</div>
+                          <div className="text-xs text-gray-500">
+                            {rec.productName}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="text-sm">{rec.returnReason.replace("_", " ")}</div>
+                          <div className="text-sm">
+                            {rec.returnReason.replace("_", " ")}
+                          </div>
                           <Badge variant="secondary" className="text-xs mt-1">
                             {rec.condition}
                           </Badge>
                         </div>
                       </TableCell>
-                      <TableCell>{getDispositionBadge(rec.recommendedDisposition)}</TableCell>
+                      <TableCell>
+                        {getDispositionBadge(rec.recommendedDisposition)}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={rec.estimatedRecovery} className="w-16" />
-                          <span className="text-sm font-medium">{rec.estimatedRecovery}%</span>
+                          <Progress
+                            value={rec.estimatedRecovery}
+                            className="w-16"
+                          />
+                          <span className="text-sm font-medium">
+                            {rec.estimatedRecovery}%
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>{rec.processingTime} min</TableCell>
@@ -482,18 +524,25 @@ export default function ReturnsPreProcessingDashboard() {
               <CardContent>
                 {stats && (
                   <div className="space-y-3">
-                    {Object.entries(stats.dispositionBreakdown).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between">
-                        <span className="text-sm capitalize">{key.replace("_", " ")}</span>
-                        <div className="flex items-center gap-2">
-                          <Progress
-                            value={(value / stats.totalReturns) * 100}
-                            className="w-24"
-                          />
-                          <Badge variant="outline">{value}</Badge>
+                    {Object.entries(stats.dispositionBreakdown).map(
+                      ([key, value]) => (
+                        <div
+                          key={key}
+                          className="flex items-center justify-between"
+                        >
+                          <span className="text-sm capitalize">
+                            {key.replace("_", " ")}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <Progress
+                              value={(value / stats.totalReturns) * 100}
+                              className="w-24"
+                            />
+                            <Badge variant="outline">{value}</Badge>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ),
+                    )}
                   </div>
                 )}
               </CardContent>
@@ -509,13 +558,15 @@ export default function ReturnsPreProcessingDashboard() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Manual Processing</span>
                       <span className="font-medium">
-                        {Math.round(stats.timesSavings.manualProcessingTime)} min
+                        {Math.round(stats.timesSavings.manualProcessingTime)}{" "}
+                        min
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Automated Processing</span>
                       <span className="font-medium text-green-600">
-                        {Math.round(stats.timesSavings.automatedProcessingTime)} min
+                        {Math.round(stats.timesSavings.automatedProcessingTime)}{" "}
+                        min
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t">
@@ -526,7 +577,9 @@ export default function ReturnsPreProcessingDashboard() {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Auto-Process Rate</span>
-                      <Badge variant="default">{stats.autoProcessedRate}%</Badge>
+                      <Badge variant="default">
+                        {stats.autoProcessedRate}%
+                      </Badge>
                     </div>
                   </div>
                 )}
@@ -549,12 +602,16 @@ export default function ReturnsPreProcessingDashboard() {
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Value Recovered</span>
                       <span className="font-medium text-green-600">
-                        {formatCurrency(stats.recoveryMetrics.totalValueRecovered)}
+                        {formatCurrency(
+                          stats.recoveryMetrics.totalValueRecovered,
+                        )}
                       </span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t">
                       <span className="text-sm">Recovery Rate</span>
-                      <Badge variant="default">{stats.recoveryMetrics.avgRecoveryRate}%</Badge>
+                      <Badge variant="default">
+                        {stats.recoveryMetrics.avgRecoveryRate}%
+                      </Badge>
                     </div>
                   </div>
                 )}

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ShippingLabel {
   id: string;
@@ -73,9 +73,9 @@ export default function LabelGeneration() {
     try {
       setLoading(true);
       const [labelsRes, carriersRes, metricsRes] = await Promise.all([
-        fetch('/api/dock/label-generation?action=recent_labels&limit=20'),
-        fetch('/api/dock/label-generation?action=carriers'),
-        fetch('/api/dock/label-generation?action=label_metrics'),
+        fetch("/api/dock/label-generation?action=recent_labels&limit=20"),
+        fetch("/api/dock/label-generation?action=carriers"),
+        fetch("/api/dock/label-generation?action=label_metrics"),
       ]);
 
       const labelsData = await labelsRes.json();
@@ -86,7 +86,7 @@ export default function LabelGeneration() {
       setCarriers(carriersData.carriers || []);
       setMetrics(metricsData.metrics);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -94,19 +94,27 @@ export default function LabelGeneration() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ACTIVE': return 'bg-green-100 text-green-800';
-      case 'VOIDED': return 'bg-red-100 text-red-800';
-      case 'PENDING': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "ACTIVE":
+        return "bg-green-100 text-green-800";
+      case "VOIDED":
+        return "bg-red-100 text-red-800";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getCarrierColor = (carrierName: string) => {
     switch (carrierName.toUpperCase()) {
-      case 'UPS': return 'bg-yellow-100 text-yellow-800';
-      case 'FEDEX': return 'bg-purple-100 text-purple-800';
-      case 'USPS': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "UPS":
+        return "bg-yellow-100 text-yellow-800";
+      case "FEDEX":
+        return "bg-purple-100 text-purple-800";
+      case "USPS":
+        return "bg-blue-100 text-blue-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -167,7 +175,7 @@ export default function LabelGeneration() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-green-600">
-              ${metrics?.avgCostPerLabel?.toFixed(2) || '0.00'}
+              ${metrics?.avgCostPerLabel?.toFixed(2) || "0.00"}
             </div>
             <div className="text-sm text-gray-600 mt-1">per label</div>
           </CardContent>
@@ -181,7 +189,7 @@ export default function LabelGeneration() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-purple-600">
-              ${metrics?.totalShippingCost?.toLocaleString() || '0'}
+              ${metrics?.totalShippingCost?.toLocaleString() || "0"}
             </div>
             <div className="text-sm text-gray-600 mt-1">shipping spend</div>
           </CardContent>
@@ -195,7 +203,7 @@ export default function LabelGeneration() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-orange-600">
-              {carriers.filter(c => c.status === 'ACTIVE').length}
+              {carriers.filter((c) => c.status === "ACTIVE").length}
             </div>
             <div className="text-sm text-gray-600 mt-1">integrated</div>
           </CardContent>
@@ -219,10 +227,14 @@ export default function LabelGeneration() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`text-xs px-2 py-1 rounded ${getCarrierColor(label.carrierName)}`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${getCarrierColor(label.carrierName)}`}
+                        >
                           {label.carrierName}
                         </span>
-                        <span className={`text-xs px-2 py-1 rounded ${getStatusColor(label.status)}`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${getStatusColor(label.status)}`}
+                        >
                           {label.status}
                         </span>
                         <span className="text-xs px-2 py-1 rounded bg-gray-100 text-gray-800">
@@ -239,30 +251,38 @@ export default function LabelGeneration() {
 
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600">From:</span>{' '}
-                          <span className="font-medium">{label.fromAddress}</span>
+                          <span className="text-gray-600">From:</span>{" "}
+                          <span className="font-medium">
+                            {label.fromAddress}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600">To:</span>{' '}
+                          <span className="text-gray-600">To:</span>{" "}
                           <span className="font-medium">{label.toAddress}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Weight:</span>{' '}
-                          <span className="font-medium">{label.weight} lbs</span>
+                          <span className="text-gray-600">Weight:</span>{" "}
+                          <span className="font-medium">
+                            {label.weight} lbs
+                          </span>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-3 gap-4 mt-2 text-sm">
                         <div>
-                          <span className="text-gray-600">Dimensions:</span>{' '}
-                          <span className="font-medium">{label.dimensions}"</span>
+                          <span className="text-gray-600">Dimensions:</span>{" "}
+                          <span className="font-medium">
+                            {label.dimensions}"
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Cost:</span>{' '}
-                          <span className="font-medium text-green-600">${label.cost.toFixed(2)}</span>
+                          <span className="text-gray-600">Cost:</span>{" "}
+                          <span className="font-medium text-green-600">
+                            ${label.cost.toFixed(2)}
+                          </span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Generated:</span>{' '}
+                          <span className="text-gray-600">Generated:</span>{" "}
                           <span className="font-medium">
                             {new Date(label.generatedAt).toLocaleDateString()}
                           </span>
@@ -271,12 +291,14 @@ export default function LabelGeneration() {
 
                       {label.estimatedDelivery && (
                         <div className="mt-3 p-2 bg-blue-50 rounded text-sm">
-                          📅 Estimated Delivery:{' '}
+                          📅 Estimated Delivery:{" "}
                           <span className="font-medium">
-                            {new Date(label.estimatedDelivery).toLocaleDateString('en-US', {
-                              weekday: 'short',
-                              month: 'short',
-                              day: 'numeric',
+                            {new Date(
+                              label.estimatedDelivery,
+                            ).toLocaleDateString("en-US", {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
                             })}
                           </span>
                         </div>
@@ -284,13 +306,11 @@ export default function LabelGeneration() {
                     </div>
 
                     <div className="ml-4 flex flex-col gap-2">
-                      <Button size="sm">
-                        📄 Download
-                      </Button>
+                      <Button size="sm">📄 Download</Button>
                       <Button size="sm" variant="outline">
                         🔍 Track
                       </Button>
-                      {label.status === 'ACTIVE' && (
+                      {label.status === "ACTIVE" && (
                         <Button size="sm" variant="destructive">
                           ❌ Void
                         </Button>
@@ -312,23 +332,36 @@ export default function LabelGeneration() {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle className="text-xl">{carrier.name}</CardTitle>
-                      <div className="text-sm text-gray-600 mt-1">{carrier.code}</div>
+                      <div className="text-sm text-gray-600 mt-1">
+                        {carrier.code}
+                      </div>
                     </div>
-                    <div className={`w-3 h-3 rounded-full ${
-                      carrier.status === 'ACTIVE' ? 'bg-green-500' : 'bg-gray-300'
-                    }`} />
+                    <div
+                      className={`w-3 h-3 rounded-full ${
+                        carrier.status === "ACTIVE"
+                          ? "bg-green-500"
+                          : "bg-gray-300"
+                      }`}
+                    />
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div>
-                      <div className="text-sm font-medium mb-2">Available Services</div>
+                      <div className="text-sm font-medium mb-2">
+                        Available Services
+                      </div>
                       <div className="space-y-2">
                         {carrier.services.map((service) => (
-                          <div key={service.id} className="p-2 bg-gray-50 rounded">
+                          <div
+                            key={service.id}
+                            className="p-2 bg-gray-50 rounded"
+                          >
                             <div className="flex justify-between items-start">
                               <div>
-                                <div className="font-medium text-sm">{service.name}</div>
+                                <div className="font-medium text-sm">
+                                  {service.name}
+                                </div>
                                 <div className="text-xs text-gray-600">
                                   {service.transitDays} business days
                                 </div>
@@ -367,17 +400,22 @@ export default function LabelGeneration() {
                   {metrics?.carrierBreakdown?.map((carrier) => (
                     <div key={carrier.carrierId}>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium">{carrier.carrierName}</span>
+                        <span className="text-sm font-medium">
+                          {carrier.carrierName}
+                        </span>
                         <span className="text-sm text-gray-600">
-                          {carrier.labelCount} labels ({carrier.percentage.toFixed(1)}%)
+                          {carrier.labelCount} labels (
+                          {carrier.percentage.toFixed(1)}%)
                         </span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
                         <div
                           className={`h-2 rounded-full ${
-                            carrier.carrierName === 'UPS' ? 'bg-yellow-500' :
-                            carrier.carrierName === 'FedEx' ? 'bg-purple-500' :
-                            'bg-blue-500'
+                            carrier.carrierName === "UPS"
+                              ? "bg-yellow-500"
+                              : carrier.carrierName === "FedEx"
+                                ? "bg-purple-500"
+                                : "bg-blue-500"
                           }`}
                           style={{ width: `${carrier.percentage}%` }}
                         />
@@ -401,7 +439,9 @@ export default function LabelGeneration() {
                   {metrics?.serviceBreakdown?.map((service) => (
                     <div key={service.service}>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-sm font-medium">{service.service}</span>
+                        <span className="text-sm font-medium">
+                          {service.service}
+                        </span>
                         <span className="text-sm text-gray-600">
                           {service.count} ({service.percentage.toFixed(1)}%)
                         </span>
@@ -425,12 +465,19 @@ export default function LabelGeneration() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
-                {Object.entries(metrics?.labelsByFormat || {}).map(([format, count]) => (
-                  <div key={format} className="text-center p-4 bg-gray-50 rounded">
-                    <div className="text-3xl font-bold text-blue-600">{count}</div>
-                    <div className="text-sm text-gray-600 mt-1">{format}</div>
-                  </div>
-                ))}
+                {Object.entries(metrics?.labelsByFormat || {}).map(
+                  ([format, count]) => (
+                    <div
+                      key={format}
+                      className="text-center p-4 bg-gray-50 rounded"
+                    >
+                      <div className="text-3xl font-bold text-blue-600">
+                        {count}
+                      </div>
+                      <div className="text-sm text-gray-600 mt-1">{format}</div>
+                    </div>
+                  ),
+                )}
               </div>
             </CardContent>
           </Card>
@@ -493,7 +540,9 @@ export default function LabelGeneration() {
                   </div>
                   <div className="flex justify-between py-3 bg-green-50 -mx-4 px-4">
                     <span className="font-bold">Total Annual Savings</span>
-                    <span className="font-bold text-lg text-green-600">$373,000</span>
+                    <span className="font-bold text-lg text-green-600">
+                      $373,000
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -512,15 +561,21 @@ export default function LabelGeneration() {
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded">
                   <div className="text-3xl font-bold text-blue-600">2.6</div>
-                  <div className="text-sm text-gray-600 mt-1">Payback (months)</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Payback (months)
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded">
                   <div className="text-3xl font-bold text-purple-600">22%</div>
-                  <div className="text-sm text-gray-600 mt-1">Shipping savings</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Shipping savings
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
                   <div className="text-3xl font-bold text-orange-600">85%</div>
-                  <div className="text-sm text-gray-600 mt-1">Automation rate</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Automation rate
+                  </div>
                 </div>
               </div>
 
@@ -529,19 +584,31 @@ export default function LabelGeneration() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>22% shipping cost reduction</strong> - Multi-carrier rate shopping</span>
+                    <span>
+                      <strong>22% shipping cost reduction</strong> -
+                      Multi-carrier rate shopping
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>85% label automation</strong> - Batch generation capabilities</span>
+                    <span>
+                      <strong>85% label automation</strong> - Batch generation
+                      capabilities
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>95% address accuracy</strong> - Validation reduces errors</span>
+                    <span>
+                      <strong>95% address accuracy</strong> - Validation reduces
+                      errors
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>100% tracking visibility</strong> - Real-time status updates</span>
+                    <span>
+                      <strong>100% tracking visibility</strong> - Real-time
+                      status updates
+                    </span>
                   </li>
                 </ul>
               </div>

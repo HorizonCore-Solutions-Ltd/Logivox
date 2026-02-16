@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // PUTAWAY OPTIMIZATION API
@@ -30,63 +30,65 @@ import { z } from 'zod';
 // ============================================================================
 
 // Location types
-type LocationType = 
-  | 'FLOOR'          // Floor storage
-  | 'RACK_LOW'       // Rack level 1-2
-  | 'RACK_MID'       // Rack level 3-4
-  | 'RACK_HIGH'      // Rack level 5+
-  | 'BULK'           // Bulk storage
-  | 'OVERFLOW'       // Overflow area
-  | 'SEASONAL';      // Seasonal storage
+type LocationType =
+  | "FLOOR" // Floor storage
+  | "RACK_LOW" // Rack level 1-2
+  | "RACK_MID" // Rack level 3-4
+  | "RACK_HIGH" // Rack level 5+
+  | "BULK" // Bulk storage
+  | "OVERFLOW" // Overflow area
+  | "SEASONAL"; // Seasonal storage
 
 // ABC velocity classification
-type VelocityClass = 'A' | 'B' | 'C' | 'D';
+type VelocityClass = "A" | "B" | "C" | "D";
 
 // Zone types
-type ZoneType = 
-  | 'FAST_PICK'      // High-velocity items
-  | 'RESERVE'        // Replenishment storage
-  | 'BULK_STORAGE'   // Palletized bulk
-  | 'CROSS_DOCK'     // Cross-dock staging
-  | 'RETURNS'        // Returns processing
-  | 'QUARANTINE';    // Quality hold
+type ZoneType =
+  | "FAST_PICK" // High-velocity items
+  | "RESERVE" // Replenishment storage
+  | "BULK_STORAGE" // Palletized bulk
+  | "CROSS_DOCK" // Cross-dock staging
+  | "RETURNS" // Returns processing
+  | "QUARANTINE"; // Quality hold
 
 // Putaway status
 type PutawayStatus =
-  | 'PENDING'        // Awaiting assignment
-  | 'ASSIGNED'       // Location assigned
-  | 'IN_PROGRESS'    // Worker en route
-  | 'COMPLETED'      // Putaway complete
-  | 'CANCELLED';     // Cancelled
+  | "PENDING" // Awaiting assignment
+  | "ASSIGNED" // Location assigned
+  | "IN_PROGRESS" // Worker en route
+  | "COMPLETED" // Putaway complete
+  | "CANCELLED"; // Cancelled
 
 // Validation schemas
 const generatePutawaySchema = z.object({
-  action: z.literal('generate_putaway'),
+  action: z.literal("generate_putaway"),
   receivingId: z.string().uuid(),
-  items: z.array(z.object({
-    sku: z.string(),
-    quantity: z.number().int().positive(),
-    weight: z.number().positive(),
-    dimensions: z.object({
-      length: z.number().positive(),
-      width: z.number().positive(),
-      height: z.number().positive(),
+  items: z.array(
+    z.object({
+      sku: z.string(),
+      quantity: z.number().int().positive(),
+      weight: z.number().positive(),
+      dimensions: z.object({
+        length: z.number().positive(),
+        width: z.number().positive(),
+        height: z.number().positive(),
+      }),
+      palletized: z.boolean(),
+      requiresRefrigeration: z.boolean().optional(),
+      stackable: z.boolean(),
     }),
-    palletized: z.boolean(),
-    requiresRefrigeration: z.boolean().optional(),
-    stackable: z.boolean(),
-  })),
+  ),
 });
 
 const assignLocationSchema = z.object({
-  action: z.literal('assign_location'),
+  action: z.literal("assign_location"),
   putawayId: z.string().uuid(),
   locationId: z.string(),
   workerId: z.string().optional(),
 });
 
 const completePutawaySchema = z.object({
-  action: z.literal('complete_putaway'),
+  action: z.literal("complete_putaway"),
   putawayId: z.string().uuid(),
   actualLocation: z.string(),
   travelTime: z.number().positive(),
@@ -94,12 +96,12 @@ const completePutawaySchema = z.object({
 });
 
 const optimizeSlottingSchema = z.object({
-  action: z.literal('optimize_slotting'),
+  action: z.literal("optimize_slotting"),
   zoneId: z.string().optional(),
   forceReallocation: z.boolean().default(false),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   generatePutawaySchema,
   assignLocationSchema,
   completePutawaySchema,
@@ -109,32 +111,32 @@ const requestSchema = z.discriminatedUnion('action', [
 // Calculate ABC velocity class based on pick frequency
 function calculateVelocityClass(
   pickFrequency: number, // picks per month
-  orderCount: number     // orders per month
+  orderCount: number, // orders per month
 ): VelocityClass {
   // A items: Top 20% by volume (80% of activity)
   // B items: Next 30% by volume (15% of activity)
   // C items: Next 40% by volume (4% of activity)
   // D items: Bottom 10% by volume (1% of activity)
-  
+
   const velocityScore = pickFrequency * 0.7 + orderCount * 0.3;
 
-  if (velocityScore >= 100) return 'A';
-  if (velocityScore >= 50) return 'B';
-  if (velocityScore >= 10) return 'C';
-  return 'D';
+  if (velocityScore >= 100) return "A";
+  if (velocityScore >= 50) return "B";
+  if (velocityScore >= 10) return "C";
+  return "D";
 }
 
 // Determine optimal zone for item
 function determineOptimalZone(
   velocityClass: VelocityClass,
   palletized: boolean,
-  requiresRefrigeration: boolean
+  requiresRefrigeration: boolean,
 ): ZoneType {
-  if (requiresRefrigeration) return 'BULK_STORAGE'; // Refrigerated section
-  if (velocityClass === 'A') return 'FAST_PICK';
-  if (palletized) return 'BULK_STORAGE';
-  if (velocityClass === 'D') return 'RESERVE';
-  return 'RESERVE';
+  if (requiresRefrigeration) return "BULK_STORAGE"; // Refrigerated section
+  if (velocityClass === "A") return "FAST_PICK";
+  if (palletized) return "BULK_STORAGE";
+  if (velocityClass === "D") return "RESERVE";
+  return "RESERVE";
 }
 
 // Find optimal location using AI algorithm
@@ -148,7 +150,7 @@ async function findOptimalLocation(
     palletized: boolean;
     requiresRefrigeration?: boolean;
     stackable: boolean;
-  }
+  },
 ): Promise<{
   locationId: string;
   locationType: LocationType;
@@ -157,7 +159,9 @@ async function findOptimalLocation(
   reason: string;
 }> {
   // Get item velocity
-  const itemStats = await prisma.$queryRaw<Array<{ pickFrequency: number; orderCount: number }>>`
+  const itemStats = await prisma.$queryRaw<
+    Array<{ pickFrequency: number; orderCount: number }>
+  >`
     SELECT 
       COUNT(*)::int as "pickFrequency",
       COUNT(DISTINCT "orderId")::int as "orderCount"
@@ -169,56 +173,58 @@ async function findOptimalLocation(
 
   const velocityClass = calculateVelocityClass(
     itemStats[0]?.pickFrequency || 0,
-    itemStats[0]?.orderCount || 0
+    itemStats[0]?.orderCount || 0,
   );
 
   const optimalZone = determineOptimalZone(
     velocityClass,
     item.palletized,
-    item.requiresRefrigeration || false
+    item.requiresRefrigeration || false,
   );
 
   // Mock available locations (warehouseLocation model doesn't exist)
   const mockLocations = [
-    { 
-      id: 'LOC-A1', 
-      zone: optimalZone, 
-      locationType: 'PALLET_RACK', 
-      distance: 10, 
-      capacity: 100, 
+    {
+      id: "LOC-A1",
+      zone: optimalZone,
+      locationType: "PALLET_RACK",
+      distance: 10,
+      capacity: 100,
       score: 95,
       distanceFromShipping: 10,
       currentCapacity: 70,
       maxCapacity: 100,
-      primarySKUPrefix: item.sku.substring(0, 3)
+      primarySKUPrefix: item.sku.substring(0, 3),
     },
-    { 
-      id: 'LOC-A2', 
-      zone: optimalZone, 
-      locationType: 'FLOOR', 
-      distance: 15, 
-      capacity: 200, 
+    {
+      id: "LOC-A2",
+      zone: optimalZone,
+      locationType: "FLOOR",
+      distance: 15,
+      capacity: 200,
       score: 90,
       distanceFromShipping: 15,
       currentCapacity: 120,
       maxCapacity: 200,
-      primarySKUPrefix: item.sku.substring(0, 3)
+      primarySKUPrefix: item.sku.substring(0, 3),
     },
-    { 
-      id: 'LOC-B1', 
-      zone: 'BULK' as ZoneType, 
-      locationType: 'PALLET_RACK', 
-      distance: 20, 
-      capacity: 150, 
+    {
+      id: "LOC-B1",
+      zone: "BULK" as ZoneType,
+      locationType: "PALLET_RACK",
+      distance: 20,
+      capacity: 150,
       score: 85,
       distanceFromShipping: 20,
       currentCapacity: 100,
       maxCapacity: 150,
-      primarySKUPrefix: ''
+      primarySKUPrefix: "",
     },
   ];
 
-  const availableLocations = mockLocations.filter(loc => loc.zone === optimalZone || loc.zone === 'BULK');
+  const availableLocations = mockLocations.filter(
+    (loc) => loc.zone === optimalZone || loc.zone === "BULK",
+  );
 
   if (availableLocations.length === 0) {
     // Fallback to first mock location
@@ -229,36 +235,37 @@ async function findOptimalLocation(
       locationType: fallback.locationType as LocationType,
       zone: fallback.zone as ZoneType,
       score: 50,
-      reason: 'Fallback - optimal zones full',
+      reason: "Fallback - optimal zones full",
     };
   }
 
   // Score each location
-  const scoredLocations = availableLocations.map(loc => {
+  const scoredLocations = availableLocations.map((loc) => {
     let score = 100;
 
     // Prefer locations near shipping for A items
-    if (velocityClass === 'A' && loc.distanceFromShipping) {
+    if (velocityClass === "A" && loc.distanceFromShipping) {
       score -= loc.distanceFromShipping * 2;
     }
 
     // Prefer floor locations for heavy items
-    if (item.weight > 100 && loc.locationType === 'FLOOR') {
+    if (item.weight > 100 && loc.locationType === "FLOOR") {
       score += 20;
-    } else if (item.weight > 100 && loc.locationType.includes('RACK_HIGH')) {
+    } else if (item.weight > 100 && loc.locationType.includes("RACK_HIGH")) {
       score -= 30;
     }
 
     // Prefer low racks for non-stackable items
-    if (!item.stackable && loc.locationType === 'RACK_LOW') {
+    if (!item.stackable && loc.locationType === "RACK_LOW") {
       score += 15;
     }
 
     // Check capacity utilization
-    const utilizationPercent = loc.currentCapacity && loc.maxCapacity
-      ? (loc.currentCapacity / loc.maxCapacity) * 100
-      : 0;
-    
+    const utilizationPercent =
+      loc.currentCapacity && loc.maxCapacity
+        ? (loc.currentCapacity / loc.maxCapacity) * 100
+        : 0;
+
     // Prefer 60-80% utilization (sweet spot)
     if (utilizationPercent >= 60 && utilizationPercent <= 80) {
       score += 10;
@@ -294,13 +301,16 @@ async function findOptimalLocation(
 // Generate putaway tasks
 async function generatePutaway(
   session: any,
-  data: z.infer<typeof generatePutawaySchema>
+  data: z.infer<typeof generatePutawaySchema>,
 ) {
   const putawayTasks = [];
 
   for (const item of data.items) {
     // Find optimal location
-    const location = await findOptimalLocation(session.user.organizationId, item);
+    const location = await findOptimalLocation(
+      session.user.organizationId,
+      item,
+    );
 
     // Create putaway task
     const putaway = await prisma.putawayTask.create({
@@ -309,13 +319,13 @@ async function generatePutaway(
         receivingId: data.receivingId,
         sku: item.sku,
         quantity: item.quantity,
-        status: 'PENDING',
+        status: "PENDING",
         recommendedLocationId: location.locationId,
         recommendedZone: location.zone,
         recommendedLocationType: location.locationType,
         optimizationScore: location.score,
         optimizationReason: location.reason,
-        priority: location.zone === 'FAST_PICK' ? 'HIGH' : 'NORMAL',
+        priority: location.zone === "FAST_PICK" ? "HIGH" : "NORMAL",
       },
     });
 
@@ -330,8 +340,8 @@ async function generatePutaway(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'PUTAWAY_TASKS_GENERATED',
-      entityType: 'PUTAWAY',
+      action: "PUTAWAY_TASKS_GENERATED",
+      entityType: "PUTAWAY",
       metadata: {
         receivingId: data.receivingId,
         taskCount: putawayTasks.length,
@@ -349,7 +359,7 @@ async function generatePutaway(
 // Assign location to putaway
 async function assignLocation(
   session: any,
-  data: z.infer<typeof assignLocationSchema>
+  data: z.infer<typeof assignLocationSchema>,
 ) {
   const putaway = await prisma.putawayTask.update({
     where: {
@@ -357,7 +367,7 @@ async function assignLocation(
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'ASSIGNED',
+      status: "ASSIGNED",
       assignedLocationId: data.locationId,
       assignedWorkerId: data.workerId,
       assignedAt: new Date(),
@@ -379,8 +389,8 @@ async function assignLocation(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'PUTAWAY_LOCATION_ASSIGNED',
-      entityType: 'PUTAWAY',
+      action: "PUTAWAY_LOCATION_ASSIGNED",
+      entityType: "PUTAWAY",
       entityId: data.putawayId,
       metadata: {
         locationId: data.locationId,
@@ -392,14 +402,14 @@ async function assignLocation(
   return {
     success: true,
     putaway,
-    message: 'Location assigned',
+    message: "Location assigned",
   };
 }
 
 // Complete putaway
 async function completePutaway(
   session: any,
-  data: z.infer<typeof completePutawaySchema>
+  data: z.infer<typeof completePutawaySchema>,
 ) {
   const putaway = await prisma.putawayTask.update({
     where: {
@@ -407,7 +417,7 @@ async function completePutaway(
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'COMPLETED',
+      status: "COMPLETED",
       actualLocationId: data.actualLocation,
       actualTravelTime: data.travelTime,
       completedAt: new Date(),
@@ -463,8 +473,8 @@ async function completePutaway(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'PUTAWAY_COMPLETED',
-      entityType: 'PUTAWAY',
+      action: "PUTAWAY_COMPLETED",
+      entityType: "PUTAWAY",
       entityId: data.putawayId,
       metadata: {
         travelTime: data.travelTime,
@@ -488,15 +498,17 @@ async function completePutaway(
 // Optimize slotting (reallocation)
 async function optimizeSlotting(
   session: any,
-  data: z.infer<typeof optimizeSlottingSchema>
+  data: z.infer<typeof optimizeSlottingSchema>,
 ) {
   // Get all items with velocity analysis
-  const items = await prisma.$queryRaw<Array<{
-    sku: string;
-    currentZone: string;
-    pickFrequency: number;
-    optimalZone: string;
-  }>>`
+  const items = await prisma.$queryRaw<
+    Array<{
+      sku: string;
+      currentZone: string;
+      pickFrequency: number;
+      optimalZone: string;
+    }>
+  >`
     SELECT 
       i.sku,
       wl.zone as "currentZone",
@@ -535,8 +547,8 @@ async function optimizeSlotting(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'SLOTTING_OPTIMIZATION_ANALYZED',
-      entityType: 'PUTAWAY',
+      action: "SLOTTING_OPTIMIZATION_ANALYZED",
+      entityType: "PUTAWAY",
       metadata: {
         itemsAnalyzed: items.length,
         reallocationsNeeded: reallocations.length,
@@ -556,15 +568,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get statistics
-    if (action === 'stats') {
-      const stats = await prisma.$queryRaw`
+    if (action === "stats") {
+      const stats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalTasks",
           COUNT(CASE WHEN status = 'COMPLETED' THEN 1 END)::int as "completedTasks",
@@ -574,24 +586,24 @@ export async function GET(request: NextRequest) {
         FROM "PutawayTask"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const metricsStats = await prisma.$queryRaw`
+      const metricsStats = (await prisma.$queryRaw`
         SELECT 
           COALESCE(AVG("totalTime"), 0)::numeric(10,1) as "avgTotalTime",
           COALESCE(AVG("locationAccuracy"), 0)::numeric(5,1) as "avgLocationAccuracy"
         FROM "PutawayMetrics"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const utilizationStats = await prisma.$queryRaw`
+      const utilizationStats = (await prisma.$queryRaw`
         SELECT 
           COALESCE(AVG(("currentCapacity"::numeric / NULLIF("maxCapacity", 0)) * 100), 0)::numeric(5,1) as "avgUtilization"
         FROM "WarehouseLocation"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "maxCapacity" > 0
-      ` as any[];
+      `) as any[];
 
       const monthlySavings = 13000; // Based on ROI calculation
 
@@ -607,22 +619,19 @@ export async function GET(request: NextRequest) {
     }
 
     // Get pending tasks
-    if (action === 'pending-tasks') {
+    if (action === "pending-tasks") {
       const tasks = await prisma.putawayTask.findMany({
         where: {
           organizationId: session.user.organizationId,
           status: {
-            in: ['PENDING', 'ASSIGNED', 'IN_PROGRESS'],
+            in: ["PENDING", "ASSIGNED", "IN_PROGRESS"],
           },
         },
         include: {
           recommendedLocation: true,
           assignedWorker: true,
         },
-        orderBy: [
-          { priority: 'asc' },
-          { createdAt: 'asc' },
-        ],
+        orderBy: [{ priority: "asc" }, { createdAt: "asc" }],
         take: 50,
       });
 
@@ -630,28 +639,28 @@ export async function GET(request: NextRequest) {
     }
 
     // Get completed tasks
-    if (action === 'completed-tasks') {
+    if (action === "completed-tasks") {
       const tasks = await prisma.putawayTask.findMany({
         where: {
           organizationId: session.user.organizationId,
-          status: 'COMPLETED',
+          status: "COMPLETED",
         },
         include: {
           metrics: true,
         },
-        orderBy: { completedAt: 'desc' },
+        orderBy: { completedAt: "desc" },
         take: 20,
       });
 
       return NextResponse.json({ tasks });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Putaway GET error:', error);
+    console.error("Putaway GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve putaway data' },
-      { status: 500 }
+      { error: "Failed to retrieve putaway data" },
+      { status: 500 },
     );
   }
 }
@@ -661,40 +670,40 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'generate_putaway':
+      case "generate_putaway":
         return NextResponse.json(await generatePutaway(session, data));
 
-      case 'assign_location':
+      case "assign_location":
         return NextResponse.json(await assignLocation(session, data));
 
-      case 'complete_putaway':
+      case "complete_putaway":
         return NextResponse.json(await completePutaway(session, data));
 
-      case 'optimize_slotting':
+      case "optimize_slotting":
         return NextResponse.json(await optimizeSlotting(session, data));
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Putaway POST error:', error);
+    console.error("Putaway POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process putaway action' },
-      { status: 500 }
+      { error: "Failed to process putaway action" },
+      { status: 500 },
     );
   }
 }

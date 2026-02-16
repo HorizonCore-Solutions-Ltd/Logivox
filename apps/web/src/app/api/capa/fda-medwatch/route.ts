@@ -6,12 +6,12 @@ import { z } from "zod";
 
 /**
  * CAPA SYSTEM 8: FDA MEDWATCH INTEGRATION
- * 
+ *
  * Automated FDA adverse event reporting for medical device and pharmaceutical CAPAs.
  * Electronic submission to FDA FAERS (FDA Adverse Event Reporting System) via MedWatch Form 3500A.
- * 
+ *
  * Investment: $89,000 | Annual Savings: $950,000 | ROI: 1,067%
- * 
+ *
  * Features:
  * - Auto-detect CAPAs requiring FDA notification
  * - MedWatch Form 3500A auto-generation
@@ -27,7 +27,15 @@ const medwatchSubmissionSchema = z.object({
   adverseEvent: z.object({
     eventDescription: z.string(),
     eventDate: z.string(),
-    patientOutcome: z.enum(["DEATH", "LIFE_THREATENING", "HOSPITALIZATION", "DISABILITY", "CONGENITAL_ANOMALY", "REQUIRED_INTERVENTION", "OTHER"]),
+    patientOutcome: z.enum([
+      "DEATH",
+      "LIFE_THREATENING",
+      "HOSPITALIZATION",
+      "DISABILITY",
+      "CONGENITAL_ANOMALY",
+      "REQUIRED_INTERVENTION",
+      "OTHER",
+    ]),
     seriousness: z.enum(["SERIOUS", "NON_SERIOUS"]),
   }),
   product: z.object({
@@ -46,13 +54,15 @@ const medwatchSubmissionSchema = z.object({
     phone: z.string(),
     email: z.string(),
   }),
-  patient: z.object({
-    age: z.number().optional(),
-    ageUnit: z.enum(["YEARS", "MONTHS", "DAYS"]).optional(),
-    gender: z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional(),
-    weight: z.number().optional(),
-    weightUnit: z.enum(["KG", "LBS"]).optional(),
-  }).optional(),
+  patient: z
+    .object({
+      age: z.number().optional(),
+      ageUnit: z.enum(["YEARS", "MONTHS", "DAYS"]).optional(),
+      gender: z.enum(["MALE", "FEMALE", "UNKNOWN"]).optional(),
+      weight: z.number().optional(),
+      weightUnit: z.enum(["KG", "LBS"]).optional(),
+    })
+    .optional(),
   initialReportDate: z.string().optional(),
 });
 
@@ -72,14 +82,14 @@ async function submitToFDAFAERS(data: any): Promise<FDASubmissionResult> {
   // Simulate FDA API call
   // In production: Use FDA ESG API with proper authentication
   console.log("[FDA FAERS] Submitting MedWatch Form 3500A:", data);
-  
+
   // Simulate processing delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
   // Mock successful submission
   const fdaCaseNumber = `FDA-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
   const confirmationNumber = `CONF-${Date.now()}`;
-  
+
   return {
     success: true,
     fdaCaseNumber,
@@ -95,7 +105,7 @@ function generateMedWatchForm3500A(capa: any, submission: any) {
   return {
     formType: "3500A",
     formVersion: "2024.1",
-    
+
     // A. Patient Information
     patientInfo: {
       patientIdentifier: "REDACTED", // Privacy protection
@@ -105,16 +115,18 @@ function generateMedWatchForm3500A(capa: any, submission: any) {
       weight: submission.patient?.weight,
       weightUnit: submission.patient?.weightUnit,
     },
-    
+
     // B. Adverse Event or Product Problem
     adverseEvent: {
       description: submission.adverseEvent.eventDescription,
       eventDate: submission.adverseEvent.eventDate,
       outcomes: [submission.adverseEvent.patientOutcome],
       seriousness: submission.adverseEvent.seriousness,
-      relevantTests: capa.rootCauseAnalysis?.investigationResults || "See attached CAPA report",
+      relevantTests:
+        capa.rootCauseAnalysis?.investigationResults ||
+        "See attached CAPA report",
     },
-    
+
     // C. Suspect Product(s)
     suspectProduct: {
       productName: submission.product.productName,
@@ -124,10 +136,12 @@ function generateMedWatchForm3500A(capa: any, submission: any) {
       modelNumber: submission.product.modelNumber,
       manufacturerName: submission.product.manufacturerName,
       deviceProblems: submission.product.deviceProblem,
-      deviceOperatorProblem: capa.rootCause?.includes("operator") ? "OPERATOR_ERROR" : null,
+      deviceOperatorProblem: capa.rootCause?.includes("operator")
+        ? "OPERATOR_ERROR"
+        : null,
       deviceAvailability: "RETURNED_TO_MANUFACTURER",
     },
-    
+
     // D. Suspect Medical Device
     deviceInfo: {
       brandName: submission.product.productName,
@@ -139,7 +153,7 @@ function generateMedWatchForm3500A(capa: any, submission: any) {
       labeledFor: "SINGLE_USE",
       deviceReportNumber: capa.capaNumber,
     },
-    
+
     // E. Initial Reporter
     reporter: {
       name: submission.reporter.name,
@@ -150,7 +164,7 @@ function generateMedWatchForm3500A(capa: any, submission: any) {
       email: submission.reporter.email,
       reportDate: submission.initialReportDate || new Date().toISOString(),
     },
-    
+
     // F. Manufacturer Information
     manufacturer: {
       reportDate: new Date().toISOString(),
@@ -159,18 +173,20 @@ function generateMedWatchForm3500A(capa: any, submission: any) {
       deviceManufactured: "YES",
       deviceDistributed: "YES",
     },
-    
+
     // G. Device Manufacturing Information
     manufacturingInfo: {
       dateManufactured: null, // From production records
       deviceFamiliarToReporter: "YES",
       deviceEvaluated: capa.status === "CLOSED" ? "YES" : "NO",
       correctiveActionTaken: capa.correctiveActions?.length > 0 ? "YES" : "NO",
-      correctiveActions: Array.isArray(capa.correctiveActions) 
-        ? capa.correctiveActions.map((action: any) => action.description || action).join("; ")
+      correctiveActions: Array.isArray(capa.correctiveActions)
+        ? capa.correctiveActions
+            .map((action: any) => action.description || action)
+            .join("; ")
         : capa.correctiveActions,
     },
-    
+
     // H. Attachments
     attachments: [
       {
@@ -190,38 +206,66 @@ function generateMedWatchForm3500A(capa: any, submission: any) {
 /**
  * Check if CAPA requires FDA reporting
  */
-function requiresFDAReporting(capa: any): { required: boolean; reason: string } {
+function requiresFDAReporting(capa: any): {
+  required: boolean;
+  reason: string;
+} {
   // FDA reporting required for:
   // 1. Deaths
   // 2. Serious injuries
   // 3. Malfunctions that could lead to death or serious injury
   // 4. Medical device adverse events
-  
+
   const keywords = {
     death: ["death", "died", "fatal", "mortality"],
-    seriousInjury: ["hospitalization", "surgery", "disability", "life-threatening", "permanent"],
-    malfunction: ["failure", "malfunction", "defect", "broke", "stopped working"],
+    seriousInjury: [
+      "hospitalization",
+      "surgery",
+      "disability",
+      "life-threatening",
+      "permanent",
+    ],
+    malfunction: [
+      "failure",
+      "malfunction",
+      "defect",
+      "broke",
+      "stopped working",
+    ],
   };
-  
+
   const description = (capa.problemStatement || "").toLowerCase();
   const rootCause = (capa.rootCause || "").toLowerCase();
   const combinedText = `${description} ${rootCause}`;
-  
+
   // Check for death
-  if (keywords.death.some(kw => combinedText.includes(kw))) {
-    return { required: true, reason: "DEATH - Immediate FDA reporting required (24 hours)" };
+  if (keywords.death.some((kw) => combinedText.includes(kw))) {
+    return {
+      required: true,
+      reason: "DEATH - Immediate FDA reporting required (24 hours)",
+    };
   }
-  
+
   // Check for serious injury
-  if (keywords.seriousInjury.some(kw => combinedText.includes(kw))) {
-    return { required: true, reason: "SERIOUS_INJURY - FDA reporting required (30 days)" };
+  if (keywords.seriousInjury.some((kw) => combinedText.includes(kw))) {
+    return {
+      required: true,
+      reason: "SERIOUS_INJURY - FDA reporting required (30 days)",
+    };
   }
-  
+
   // Check for malfunction (reportable within 30 days)
-  if (keywords.malfunction.some(kw => combinedText.includes(kw)) && capa.problemSeverity === "CRITICAL") {
-    return { required: true, reason: "MALFUNCTION - FDA reporting required if could cause death/injury (30 days)" };
+  if (
+    keywords.malfunction.some((kw) => combinedText.includes(kw)) &&
+    capa.problemSeverity === "CRITICAL"
+  ) {
+    return {
+      required: true,
+      reason:
+        "MALFUNCTION - FDA reporting required if could cause death/injury (30 days)",
+    };
   }
-  
+
   return { required: false, reason: "No FDA reporting criteria met" };
 }
 
@@ -230,18 +274,21 @@ function requiresFDAReporting(capa: any): { required: boolean; reason: string } 
  */
 function calculateFDADeadline(reportReason: string): Date {
   const deadline = new Date();
-  
+
   if (reportReason.includes("DEATH")) {
     // Deaths: 24 hours for phone notification, 5 days for written report
     deadline.setDate(deadline.getDate() + 5);
-  } else if (reportReason.includes("SERIOUS_INJURY") || reportReason.includes("MALFUNCTION")) {
+  } else if (
+    reportReason.includes("SERIOUS_INJURY") ||
+    reportReason.includes("MALFUNCTION")
+  ) {
     // Serious injuries/malfunctions: 30 days
     deadline.setDate(deadline.getDate() + 30);
   } else {
     // Default: 30 days
     deadline.setDate(deadline.getDate() + 30);
   }
-  
+
   return deadline;
 }
 
@@ -274,34 +321,48 @@ export async function GET(req: NextRequest) {
         take: 100,
       });
 
-      const complianceStatus = capas.map(capa => {
-        const fdaCheck = requiresFDAReporting(capa);
-        const deadline = fdaCheck.required ? calculateFDADeadline(fdaCheck.reason) : null;
-        const daysUntilDeadline = deadline 
-          ? Math.ceil((deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
-          : null;
+      const complianceStatus = capas
+        .map((capa) => {
+          const fdaCheck = requiresFDAReporting(capa);
+          const deadline = fdaCheck.required
+            ? calculateFDADeadline(fdaCheck.reason)
+            : null;
+          const daysUntilDeadline = deadline
+            ? Math.ceil(
+                (deadline.getTime() - new Date().getTime()) /
+                  (1000 * 60 * 60 * 24),
+              )
+            : null;
 
-        return {
-          capaId: capa.id,
-          capaNumber: capa.capaNumber,
-          requiresFDAReporting: fdaCheck.required,
-          reportingReason: fdaCheck.reason,
-          deadline,
-          daysUntilDeadline,
-          isOverdue: daysUntilDeadline !== null && daysUntilDeadline < 0,
-          urgency: daysUntilDeadline !== null && daysUntilDeadline <= 5 ? "CRITICAL" : 
-                   daysUntilDeadline !== null && daysUntilDeadline <= 15 ? "HIGH" : "MEDIUM",
-        };
-      }).filter(c => !pendingOnly || c.requiresFDAReporting);
+          return {
+            capaId: capa.id,
+            capaNumber: capa.capaNumber,
+            requiresFDAReporting: fdaCheck.required,
+            reportingReason: fdaCheck.reason,
+            deadline,
+            daysUntilDeadline,
+            isOverdue: daysUntilDeadline !== null && daysUntilDeadline < 0,
+            urgency:
+              daysUntilDeadline !== null && daysUntilDeadline <= 5
+                ? "CRITICAL"
+                : daysUntilDeadline !== null && daysUntilDeadline <= 15
+                  ? "HIGH"
+                  : "MEDIUM",
+          };
+        })
+        .filter((c) => !pendingOnly || c.requiresFDAReporting);
 
       return NextResponse.json({
         success: true,
         complianceStatus,
         summary: {
           total: complianceStatus.length,
-          requiresReporting: complianceStatus.filter(c => c.requiresFDAReporting).length,
-          overdue: complianceStatus.filter(c => c.isOverdue).length,
-          critical: complianceStatus.filter(c => c.urgency === "CRITICAL").length,
+          requiresReporting: complianceStatus.filter(
+            (c) => c.requiresFDAReporting,
+          ).length,
+          overdue: complianceStatus.filter((c) => c.isOverdue).length,
+          critical: complianceStatus.filter((c) => c.urgency === "CRITICAL")
+            .length,
         },
       });
     }
@@ -333,12 +394,11 @@ export async function GET(req: NextRequest) {
       data: submissions,
       total: submissions.length,
     });
-
   } catch (error: any) {
     console.error("[FDA MedWatch] GET error:", error);
     return NextResponse.json(
       { error: "Failed to retrieve FDA submissions", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -372,7 +432,9 @@ export async function POST(req: NextRequest) {
       }
 
       const fdaCheck = requiresFDAReporting(capa);
-      const deadline = fdaCheck.required ? calculateFDADeadline(fdaCheck.reason) : null;
+      const deadline = fdaCheck.required
+        ? calculateFDADeadline(fdaCheck.reason)
+        : null;
 
       return NextResponse.json({
         success: true,
@@ -381,11 +443,13 @@ export async function POST(req: NextRequest) {
         requiresFDAReporting: fdaCheck.required,
         reportingReason: fdaCheck.reason,
         deadline,
-        daysUntilDeadline: deadline 
-          ? Math.ceil((deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+        daysUntilDeadline: deadline
+          ? Math.ceil(
+              (deadline.getTime() - new Date().getTime()) /
+                (1000 * 60 * 60 * 24),
+            )
           : null,
       });
-
     } else if (body.action === "SUBMIT") {
       // Validate submission
       const validated = medwatchSubmissionSchema.parse(body);
@@ -411,7 +475,7 @@ export async function POST(req: NextRequest) {
       if (!fdaResult.success) {
         return NextResponse.json(
           { error: "FDA submission failed", details: fdaResult.errors },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -465,7 +529,6 @@ export async function POST(req: NextRequest) {
         confirmationNumber: fdaResult.confirmationNumber,
         message: `FDA MedWatch Form 3500A submitted successfully. Case #: ${fdaResult.fdaCaseNumber}`,
       });
-
     } else if (body.action === "UPDATE_STATUS") {
       // Update FDA case status (follow-up)
       const { submissionId, fdaStatus, fdaResponse } = body;
@@ -478,7 +541,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (!submission) {
-        return NextResponse.json({ error: "Submission not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Submission not found" },
+          { status: 404 },
+        );
       }
 
       const updated = await prisma.fDAMedWatchSubmission.update({
@@ -495,24 +561,22 @@ export async function POST(req: NextRequest) {
         data: updated,
         message: "FDA submission status updated",
       });
-
     } else {
       return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
-
   } catch (error: any) {
     console.error("[FDA MedWatch] POST error:", error);
-    
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to process FDA submission", details: error.message },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

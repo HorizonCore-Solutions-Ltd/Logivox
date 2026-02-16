@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 
 interface YardMetrics {
   trucksInYard: number;
@@ -69,8 +69,8 @@ export default function YardManagement() {
     try {
       setLoading(true);
       const [overviewRes, detentionRes] = await Promise.all([
-        fetch('/api/receiving/yard-management?action=yard_overview'),
-        fetch('/api/receiving/yard-management?action=detention_events'),
+        fetch("/api/receiving/yard-management?action=yard_overview"),
+        fetch("/api/receiving/yard-management?action=detention_events"),
       ]);
 
       const overviewData = await overviewRes.json();
@@ -81,7 +81,7 @@ export default function YardManagement() {
       setTrucksInYard(overviewData.trucksInYard || []);
       setDetentionEvents(detentionData.events || []);
     } catch (error) {
-      console.error('Failed to fetch yard data:', error);
+      console.error("Failed to fetch yard data:", error);
     } finally {
       setLoading(false);
     }
@@ -89,14 +89,14 @@ export default function YardManagement() {
 
   const handleCallToDock = async (truckId: string, dockNumber: number) => {
     try {
-      const response = await fetch('/api/receiving/yard-management', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/yard-management", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'call_to_dock',
+          action: "call_to_dock",
           truckId,
           dockNumber,
-          priority: 'NORMAL',
+          priority: "NORMAL",
         }),
       });
 
@@ -106,72 +106,72 @@ export default function YardManagement() {
         fetchYardData();
       }
     } catch (error) {
-      alert('Failed to call truck to dock');
+      alert("Failed to call truck to dock");
     }
   };
 
   const handleCheckOut = async (truckId: string) => {
     try {
-      const response = await fetch('/api/receiving/yard-management', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/yard-management", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'check_out_truck',
+          action: "check_out_truck",
           truckId,
         }),
       });
 
       const data = await response.json();
       if (data.success) {
-        alert('Truck checked out successfully');
+        alert("Truck checked out successfully");
         fetchYardData();
       }
     } catch (error) {
-      alert('Failed to check out truck');
+      alert("Failed to check out truck");
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'CHECKED_IN':
-      case 'WAITING':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'CALLED_TO_DOCK':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
-      case 'AT_DOCK':
-      case 'UNLOADING':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
-      case 'COMPLETED':
-        return 'bg-green-100 text-green-800 border-green-300';
+      case "CHECKED_IN":
+      case "WAITING":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "CALLED_TO_DOCK":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      case "AT_DOCK":
+      case "UNLOADING":
+        return "bg-purple-100 text-purple-800 border-purple-300";
+      case "COMPLETED":
+        return "bg-green-100 text-green-800 border-green-300";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return "bg-gray-100 text-gray-800 border-gray-300";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'URGENT':
-        return 'bg-red-100 text-red-800';
-      case 'HIGH':
-        return 'bg-orange-100 text-orange-800';
-      case 'NORMAL':
-        return 'bg-blue-100 text-blue-800';
-      case 'LOW':
-        return 'bg-gray-100 text-gray-800';
+      case "URGENT":
+        return "bg-red-100 text-red-800";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800";
+      case "NORMAL":
+        return "bg-blue-100 text-blue-800";
+      case "LOW":
+        return "bg-gray-100 text-gray-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getSpotColor = (status: string) => {
-    return status === 'OCCUPIED'
-      ? 'bg-red-50 border-red-300'
-      : 'bg-green-50 border-green-300';
+    return status === "OCCUPIED"
+      ? "bg-red-50 border-red-300"
+      : "bg-green-50 border-green-300";
   };
 
   const formatDuration = (startTime: string) => {
     const minutes = Math.floor(
-      (Date.now() - new Date(startTime).getTime()) / 1000 / 60
+      (Date.now() - new Date(startTime).getTime()) / 1000 / 60,
     );
     if (minutes < 60) return `${minutes}m`;
     const hours = Math.floor(minutes / 60);
@@ -218,7 +218,7 @@ export default function YardManagement() {
           </p>
         </div>
         <Button onClick={() => setShowCheckIn(!showCheckIn)}>
-          {showCheckIn ? '✕ Cancel' : '➕ Check In Truck'}
+          {showCheckIn ? "✕ Cancel" : "➕ Check In Truck"}
         </Button>
       </div>
 
@@ -367,8 +367,12 @@ export default function YardManagement() {
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <div className="font-bold text-lg">{truck.truckNumber}</div>
-                      <div className="text-sm text-gray-600">{truck.carrier}</div>
+                      <div className="font-bold text-lg">
+                        {truck.truckNumber}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {truck.carrier}
+                      </div>
                     </div>
                     <div className="flex gap-2">
                       <Badge className={getPriorityColor(truck.priority)}>
@@ -382,31 +386,31 @@ export default function YardManagement() {
 
                   <div className="grid grid-cols-3 gap-3 text-sm mb-3">
                     <div>
-                      <span className="text-gray-600">Driver:</span>{' '}
+                      <span className="text-gray-600">Driver:</span>{" "}
                       <span className="font-medium">{truck.driverName}</span>
                     </div>
                     <div>
-                      <span className="text-gray-600">Wait Time:</span>{' '}
+                      <span className="text-gray-600">Wait Time:</span>{" "}
                       <span className="font-medium">
                         {formatDuration(truck.checkInTime)}
                       </span>
                     </div>
                     {truck.parkingSpot && (
                       <div>
-                        <span className="text-gray-600">Spot:</span>{' '}
+                        <span className="text-gray-600">Spot:</span>{" "}
                         <span className="font-medium">{truck.parkingSpot}</span>
                       </div>
                     )}
                     {truck.dockNumber && (
                       <div>
-                        <span className="text-gray-600">Dock:</span>{' '}
+                        <span className="text-gray-600">Dock:</span>{" "}
                         <span className="font-medium">{truck.dockNumber}</span>
                       </div>
                     )}
                   </div>
 
                   <div className="flex gap-2">
-                    {truck.status === 'WAITING' && (
+                    {truck.status === "WAITING" && (
                       <Button
                         size="sm"
                         onClick={() => handleCallToDock(truck.id, 5)}
@@ -414,7 +418,7 @@ export default function YardManagement() {
                         📢 Call to Dock
                       </Button>
                     )}
-                    {truck.status === 'COMPLETED' && (
+                    {truck.status === "COMPLETED" && (
                       <Button
                         size="sm"
                         variant="outline"
@@ -436,10 +440,10 @@ export default function YardManagement() {
         {/* Parking Tab */}
         <TabsContent value="parking" className="space-y-4">
           <div className="grid grid-cols-4 gap-4">
-            {['WAITING', 'LIVE_LOAD', 'DROP_TRAILER', 'STAGING'].map((type) => (
+            {["WAITING", "LIVE_LOAD", "DROP_TRAILER", "STAGING"].map((type) => (
               <div key={type}>
                 <h3 className="font-medium mb-2 text-sm">
-                  {type.replace('_', ' ')}
+                  {type.replace("_", " ")}
                 </h3>
                 <div className="space-y-2">
                   {parkingSpots
@@ -451,7 +455,7 @@ export default function YardManagement() {
                       >
                         <CardContent className="p-3">
                           <div className="font-bold">{spot.spotNumber}</div>
-                          {spot.status === 'OCCUPIED' ? (
+                          {spot.status === "OCCUPIED" ? (
                             <>
                               <div className="text-xs text-gray-700 mt-1">
                                 {spot.truckNumber}
@@ -513,7 +517,10 @@ export default function YardManagement() {
                     </thead>
                     <tbody>
                       {detentionEvents.map((event) => (
-                        <tr key={event.id} className="border-b hover:bg-gray-50">
+                        <tr
+                          key={event.id}
+                          className="border-b hover:bg-gray-50"
+                        >
                           <td className="p-2 text-sm">{event.truckNumber}</td>
                           <td className="p-2 text-sm">{event.carrier}</td>
                           <td className="p-2 text-sm">
@@ -524,15 +531,15 @@ export default function YardManagement() {
                             <Badge
                               className={
                                 event.chargeable
-                                  ? 'bg-red-100 text-red-800'
-                                  : 'bg-green-100 text-green-800'
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-green-100 text-green-800"
                               }
                             >
-                              {event.chargeable ? 'Yes' : 'No'}
+                              {event.chargeable ? "Yes" : "No"}
                             </Badge>
                           </td>
                           <td className="p-2 text-sm font-medium">
-                            {event.cost > 0 ? `$${event.cost}` : '-'}
+                            {event.cost > 0 ? `$${event.cost}` : "-"}
                           </td>
                         </tr>
                       ))}

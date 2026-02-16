@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   TruckIcon,
   ArrowRight,
@@ -13,8 +19,8 @@ import {
   AlertTriangle,
   DollarSign,
   Package,
-  Zap
-} from 'lucide-react';
+  Zap,
+} from "lucide-react";
 
 // ============================================================================
 // CROSS-DOCK COORDINATION DASHBOARD
@@ -71,10 +77,12 @@ interface CrossDockOpportunity {
 
 export default function CrossDockPage() {
   const [stats, setStats] = useState<CrossDockStats | null>(null);
-  const [activeOpportunities, setActiveOpportunities] = useState<CrossDockOpportunity[]>([]);
+  const [activeOpportunities, setActiveOpportunities] = useState<
+    CrossDockOpportunity[]
+  >([]);
   const [recentTransfers, setRecentTransfers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch data
   useEffect(() => {
@@ -86,9 +94,9 @@ export default function CrossDockPage() {
   const fetchData = async () => {
     try {
       const [statsRes, opportunitiesRes, transfersRes] = await Promise.all([
-        fetch('/api/receiving/cross-dock?action=stats'),
-        fetch('/api/receiving/cross-dock?action=active-opportunities'),
-        fetch('/api/receiving/cross-dock?action=recent-transfers')
+        fetch("/api/receiving/cross-dock?action=stats"),
+        fetch("/api/receiving/cross-dock?action=active-opportunities"),
+        fetch("/api/receiving/cross-dock?action=recent-transfers"),
       ]);
 
       if (statsRes.ok) {
@@ -106,7 +114,7 @@ export default function CrossDockPage() {
         setRecentTransfers(data.transfers || []);
       }
     } catch (error) {
-      console.error('Failed to fetch cross-dock data:', error);
+      console.error("Failed to fetch cross-dock data:", error);
     } finally {
       setLoading(false);
     }
@@ -114,40 +122,63 @@ export default function CrossDockPage() {
 
   const getTypeColor = (type: string): string => {
     switch (type) {
-      case 'FULL_ORDER_MATCH': return 'text-green-600';
-      case 'PARTIAL_CONSOLIDATION': return 'text-blue-600';
-      case 'DIRECT_TRANSFER': return 'text-purple-600';
-      case 'LOAD_CONSOLIDATION': return 'text-yellow-600';
-      case 'STORE_REPLENISHMENT': return 'text-orange-600';
-      default: return 'text-gray-600';
+      case "FULL_ORDER_MATCH":
+        return "text-green-600";
+      case "PARTIAL_CONSOLIDATION":
+        return "text-blue-600";
+      case "DIRECT_TRANSFER":
+        return "text-purple-600";
+      case "LOAD_CONSOLIDATION":
+        return "text-yellow-600";
+      case "STORE_REPLENISHMENT":
+        return "text-orange-600";
+      default:
+        return "text-gray-600";
     }
   };
 
-  const getTypeBadgeVariant = (type: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getTypeBadgeVariant = (
+    type: string,
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (type) {
-      case 'FULL_ORDER_MATCH': return 'default';
-      case 'PARTIAL_CONSOLIDATION': return 'secondary';
-      default: return 'outline';
+      case "FULL_ORDER_MATCH":
+        return "default";
+      case "PARTIAL_CONSOLIDATION":
+        return "secondary";
+      default:
+        return "outline";
     }
   };
 
   const getPriorityColor = (priority: string): string => {
     switch (priority) {
-      case 'CRITICAL': return 'text-red-600';
-      case 'HIGH': return 'text-orange-600';
-      case 'NORMAL': return 'text-blue-600';
-      case 'LOW': return 'text-gray-600';
-      default: return 'text-gray-600';
+      case "CRITICAL":
+        return "text-red-600";
+      case "HIGH":
+        return "text-orange-600";
+      case "NORMAL":
+        return "text-blue-600";
+      case "LOW":
+        return "text-gray-600";
+      default:
+        return "text-gray-600";
     }
   };
 
-  const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getStatusBadgeVariant = (
+    status: string,
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
-      case 'SHIPPED': return 'default';
-      case 'IN_TRANSFER': return 'secondary';
-      case 'STAGED': return 'outline';
-      case 'BYPASSED': return 'destructive';
-      default: return 'outline';
+      case "SHIPPED":
+        return "default";
+      case "IN_TRANSFER":
+        return "secondary";
+      case "STAGED":
+        return "outline";
+      case "BYPASSED":
+        return "destructive";
+      default:
+        return "outline";
     }
   };
 
@@ -175,9 +206,7 @@ export default function CrossDockPage() {
             Direct receiving-to-shipping transfers without warehouse storage
           </p>
         </div>
-        <Button onClick={fetchData}>
-          Refresh Data
-        </Button>
+        <Button onClick={fetchData}>Refresh Data</Button>
       </div>
 
       {/* Key Metrics */}
@@ -185,7 +214,9 @@ export default function CrossDockPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Completion Rate
+              </CardTitle>
               <CheckCircle className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -193,7 +224,8 @@ export default function CrossDockPage() {
                 {stats.completionRate.toFixed(1)}%
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                {stats.completedTransfers} of {stats.totalOpportunities} completed
+                {stats.completedTransfers} of {stats.totalOpportunities}{" "}
+                completed
               </p>
               <div className="text-xs text-muted-foreground mt-2">
                 {stats.fullMatches} full order matches
@@ -203,7 +235,9 @@ export default function CrossDockPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Cycle Time</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Cycle Time
+              </CardTitle>
               <Clock className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
@@ -239,7 +273,9 @@ export default function CrossDockPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Monthly Savings
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -341,15 +377,15 @@ export default function CrossDockPage() {
                   <AlertTriangle className="h-5 w-5" />
                   Priority Scoring
                 </CardTitle>
-                <CardDescription>
-                  Transfer urgency calculation
-                </CardDescription>
+                <CardDescription>Transfer urgency calculation</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="p-3 bg-red-50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-red-700">CRITICAL (80+)</span>
+                      <span className="font-medium text-red-700">
+                        CRITICAL (80+)
+                      </span>
                       <Badge variant="destructive">Immediate</Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -359,7 +395,9 @@ export default function CrossDockPage() {
 
                   <div className="p-3 bg-orange-50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-orange-700">HIGH (50-79)</span>
+                      <span className="font-medium text-orange-700">
+                        HIGH (50-79)
+                      </span>
                       <Badge variant="outline">Priority</Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -369,7 +407,9 @@ export default function CrossDockPage() {
 
                   <div className="p-3 bg-blue-50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-blue-700">NORMAL (25-49)</span>
+                      <span className="font-medium text-blue-700">
+                        NORMAL (25-49)
+                      </span>
                       <Badge variant="secondary">Standard</Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -379,7 +419,9 @@ export default function CrossDockPage() {
 
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-gray-700">LOW (&lt;25)</span>
+                      <span className="font-medium text-gray-700">
+                        LOW (&lt;25)
+                      </span>
                       <Badge variant="outline">Backlog</Badge>
                     </div>
                     <div className="text-sm text-muted-foreground">
@@ -491,7 +533,8 @@ export default function CrossDockPage() {
             <CardHeader>
               <CardTitle>Active Cross-Dock Opportunities</CardTitle>
               <CardDescription>
-                Current transfer candidates ({activeOpportunities.length} opportunities)
+                Current transfer candidates ({activeOpportunities.length}{" "}
+                opportunities)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -503,7 +546,7 @@ export default function CrossDockPage() {
                   </div>
                 ) : (
                   activeOpportunities.map((opp) => (
-                    <div 
+                    <div
                       key={opp.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
@@ -518,8 +561,10 @@ export default function CrossDockPage() {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Badge variant={getTypeBadgeVariant(opp.opportunityType)}>
-                            {opp.opportunityType.replace(/_/g, ' ')}
+                          <Badge
+                            variant={getTypeBadgeVariant(opp.opportunityType)}
+                          >
+                            {opp.opportunityType.replace(/_/g, " ")}
                           </Badge>
                           <Badge variant={getStatusBadgeVariant(opp.status)}>
                             {opp.status}
@@ -529,23 +574,33 @@ export default function CrossDockPage() {
 
                       <div className="grid grid-cols-4 gap-4 text-sm mb-3">
                         <div>
-                          <span className="text-muted-foreground">Priority:</span>
-                          <div className={`font-medium ${getPriorityColor(opp.priority)}`}>
+                          <span className="text-muted-foreground">
+                            Priority:
+                          </span>
+                          <div
+                            className={`font-medium ${getPriorityColor(opp.priority)}`}
+                          >
                             {opp.priority} ({opp.priorityScore})
                           </div>
                         </div>
                         <div>
                           <span className="text-muted-foreground">Match:</span>
-                          <div className="font-medium">{opp.matchPercentage.toFixed(0)}%</div>
+                          <div className="font-medium">
+                            {opp.matchPercentage.toFixed(0)}%
+                          </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Ship By:</span>
+                          <span className="text-muted-foreground">
+                            Ship By:
+                          </span>
                           <div className="font-medium">
                             {new Date(opp.targetShipDate).toLocaleDateString()}
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Savings:</span>
+                          <span className="text-muted-foreground">
+                            Savings:
+                          </span>
                           <div className="font-medium text-green-600">
                             ${opp.estimatedSavings.toFixed(2)}
                           </div>
@@ -581,7 +636,8 @@ export default function CrossDockPage() {
             <CardHeader>
               <CardTitle>Recent Transfers</CardTitle>
               <CardDescription>
-                Completed cross-dock operations ({recentTransfers.length} transfers)
+                Completed cross-dock operations ({recentTransfers.length}{" "}
+                transfers)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -593,13 +649,15 @@ export default function CrossDockPage() {
                   </div>
                 ) : (
                   recentTransfers.slice(0, 20).map((transfer: any) => (
-                    <div 
+                    <div
                       key={transfer.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <div className="font-medium">{transfer.order.orderNumber}</div>
+                          <div className="font-medium">
+                            {transfer.order.orderNumber}
+                          </div>
                           <div className="text-sm text-muted-foreground">
                             {transfer.order.customer.name}
                           </div>
@@ -611,15 +669,21 @@ export default function CrossDockPage() {
                         <div>
                           <span className="text-muted-foreground">Type:</span>
                           <div className="font-medium">
-                            {transfer.opportunityType.replace(/_/g, ' ')}
+                            {transfer.opportunityType.replace(/_/g, " ")}
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Tracking:</span>
-                          <div className="font-medium">{transfer.trackingNumber}</div>
+                          <span className="text-muted-foreground">
+                            Tracking:
+                          </span>
+                          <div className="font-medium">
+                            {transfer.trackingNumber}
+                          </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Savings:</span>
+                          <span className="text-muted-foreground">
+                            Savings:
+                          </span>
                           <div className="font-medium text-green-600">
                             ${transfer.estimatedSavings.toFixed(2)}
                           </div>

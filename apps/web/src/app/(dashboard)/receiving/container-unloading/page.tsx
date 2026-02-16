@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   TruckIcon,
   Clock,
@@ -13,8 +19,8 @@ import {
   CheckCircle,
   AlertTriangle,
   DollarSign,
-  Activity
-} from 'lucide-react';
+  Activity,
+} from "lucide-react";
 
 // ============================================================================
 // CONTAINER UNLOADING OPTIMIZATION DASHBOARD
@@ -64,7 +70,7 @@ export default function ContainerUnloadingPage() {
   const [activeUnloadings, setActiveUnloadings] = useState<Unloading[]>([]);
   const [recentCompletions, setRecentCompletions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
     fetchData();
@@ -75,9 +81,9 @@ export default function ContainerUnloadingPage() {
   const fetchData = async () => {
     try {
       const [statsRes, activeRes, completionsRes] = await Promise.all([
-        fetch('/api/receiving/container-unloading?action=stats'),
-        fetch('/api/receiving/container-unloading?action=active-unloadings'),
-        fetch('/api/receiving/container-unloading?action=recent-completions')
+        fetch("/api/receiving/container-unloading?action=stats"),
+        fetch("/api/receiving/container-unloading?action=active-unloadings"),
+        fetch("/api/receiving/container-unloading?action=recent-completions"),
       ]);
 
       if (statsRes.ok) {
@@ -95,7 +101,7 @@ export default function ContainerUnloadingPage() {
         setRecentCompletions(data.completions || []);
       }
     } catch (error) {
-      console.error('Failed to fetch unloading data:', error);
+      console.error("Failed to fetch unloading data:", error);
     } finally {
       setLoading(false);
     }
@@ -103,20 +109,31 @@ export default function ContainerUnloadingPage() {
 
   const getPriorityColor = (priority: string): string => {
     switch (priority) {
-      case 'CRITICAL': return 'text-red-600';
-      case 'HIGH': return 'text-orange-600';
-      case 'NORMAL': return 'text-blue-600';
-      case 'LOW': return 'text-gray-600';
-      default: return 'text-gray-600';
+      case "CRITICAL":
+        return "text-red-600";
+      case "HIGH":
+        return "text-orange-600";
+      case "NORMAL":
+        return "text-blue-600";
+      case "LOW":
+        return "text-gray-600";
+      default:
+        return "text-gray-600";
     }
   };
 
-  const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getStatusBadgeVariant = (
+    status: string,
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
-      case 'COMPLETED': return 'default';
-      case 'IN_PROGRESS': return 'secondary';
-      case 'SCHEDULED': return 'outline';
-      default: return 'outline';
+      case "COMPLETED":
+        return "default";
+      case "IN_PROGRESS":
+        return "secondary";
+      case "SCHEDULED":
+        return "outline";
+      default:
+        return "outline";
     }
   };
 
@@ -144,9 +161,7 @@ export default function ContainerUnloadingPage() {
             AI-powered labor allocation and efficiency tracking
           </p>
         </div>
-        <Button onClick={fetchData}>
-          Refresh Data
-        </Button>
+        <Button onClick={fetchData}>Refresh Data</Button>
       </div>
 
       {/* Key Metrics */}
@@ -154,7 +169,9 @@ export default function ContainerUnloadingPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Efficiency</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Efficiency
+              </CardTitle>
               <Activity className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -172,7 +189,9 @@ export default function ContainerUnloadingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Avg Unload Time</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Avg Unload Time
+              </CardTitle>
               <Clock className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
@@ -208,7 +227,9 @@ export default function ContainerUnloadingPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Monthly Savings
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -321,7 +342,8 @@ export default function ContainerUnloadingPage() {
                     <div>
                       <div className="font-medium">Time Prediction</div>
                       <div className="text-sm text-muted-foreground">
-                        AI estimates based on container type, team size, equipment
+                        AI estimates based on container type, team size,
+                        equipment
                       </div>
                     </div>
                   </div>
@@ -399,7 +421,7 @@ export default function ContainerUnloadingPage() {
                   </div>
                 ) : (
                   activeUnloadings.map((unloading) => (
-                    <div 
+                    <div
                       key={unloading.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
@@ -410,14 +432,18 @@ export default function ContainerUnloadingPage() {
                             Container {unloading.containerId}
                           </div>
                           <div className="text-sm text-muted-foreground">
-                            {unloading.containerType.replace(/_/g, ' ')}
+                            {unloading.containerType.replace(/_/g, " ")}
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Badge variant={getStatusBadgeVariant(unloading.status)}>
+                          <Badge
+                            variant={getStatusBadgeVariant(unloading.status)}
+                          >
                             {unloading.status}
                           </Badge>
-                          <Badge className={getPriorityColor(unloading.priority)}>
+                          <Badge
+                            className={getPriorityColor(unloading.priority)}
+                          >
                             {unloading.priority}
                           </Badge>
                         </div>
@@ -425,33 +451,48 @@ export default function ContainerUnloadingPage() {
 
                       <div className="grid grid-cols-4 gap-4 text-sm mb-3">
                         <div>
-                          <span className="text-muted-foreground">Dock Door:</span>
-                          <div className="font-medium">Door {unloading.dockDoor || 'TBD'}</div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Team Size:</span>
-                          <div className="font-medium">{unloading.teamMembers?.length || 0} workers</div>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">Progress:</span>
+                          <span className="text-muted-foreground">
+                            Dock Door:
+                          </span>
                           <div className="font-medium">
-                            {unloading._count.pallets} / {unloading.estimatedPalletCount} pallets
+                            Door {unloading.dockDoor || "TBD"}
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Est. Time:</span>
-                          <div className="font-medium">{unloading.estimatedDuration} min</div>
+                          <span className="text-muted-foreground">
+                            Team Size:
+                          </span>
+                          <div className="font-medium">
+                            {unloading.teamMembers?.length || 0} workers
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            Progress:
+                          </span>
+                          <div className="font-medium">
+                            {unloading._count.pallets} /{" "}
+                            {unloading.estimatedPalletCount} pallets
+                          </div>
+                        </div>
+                        <div>
+                          <span className="text-muted-foreground">
+                            Est. Time:
+                          </span>
+                          <div className="font-medium">
+                            {unloading.estimatedDuration} min
+                          </div>
                         </div>
                       </div>
 
-                      {unloading.status === 'IN_PROGRESS' && (
+                      {unloading.status === "IN_PROGRESS" && (
                         <div className="mb-3">
                           <div className="flex justify-between text-sm mb-1">
                             <span>Progress</span>
                             <span>{unloading.progress?.toFixed(0) || 0}%</span>
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div 
+                            <div
                               className="bg-blue-600 h-2 rounded-full transition-all"
                               style={{ width: `${unloading.progress || 0}%` }}
                             />
@@ -494,15 +535,17 @@ export default function ContainerUnloadingPage() {
                   </div>
                 ) : (
                   recentCompletions.slice(0, 20).map((completion: any) => (
-                    <div 
+                    <div
                       key={completion.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex items-start justify-between mb-2">
                         <div>
-                          <div className="font-medium">Container {completion.containerId}</div>
+                          <div className="font-medium">
+                            Container {completion.containerId}
+                          </div>
                           <div className="text-sm text-muted-foreground">
-                            {completion.containerType.replace(/_/g, ' ')}
+                            {completion.containerType.replace(/_/g, " ")}
                           </div>
                         </div>
                         <Badge variant="default">COMPLETED</Badge>
@@ -510,20 +553,29 @@ export default function ContainerUnloadingPage() {
 
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div>
-                          <span className="text-muted-foreground">Duration:</span>
+                          <span className="text-muted-foreground">
+                            Duration:
+                          </span>
                           <div className="font-medium">
-                            {completion.metrics?.[0]?.actualDuration || 'N/A'} min
+                            {completion.metrics?.[0]?.actualDuration || "N/A"}{" "}
+                            min
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Efficiency:</span>
+                          <span className="text-muted-foreground">
+                            Efficiency:
+                          </span>
                           <div className="font-medium text-green-600">
-                            {completion.metrics?.[0]?.efficiency || 'N/A'}%
+                            {completion.metrics?.[0]?.efficiency || "N/A"}%
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Pallets:</span>
-                          <div className="font-medium">{completion.actualPalletCount} units</div>
+                          <span className="text-muted-foreground">
+                            Pallets:
+                          </span>
+                          <div className="font-medium">
+                            {completion.actualPalletCount} units
+                          </div>
                         </div>
                       </div>
                     </div>

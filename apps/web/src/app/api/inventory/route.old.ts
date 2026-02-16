@@ -30,16 +30,19 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    
+
     // Input validation for query parameters
     const organizationId = searchParams.get("organizationId");
     const warehouseId = searchParams.get("warehouseId");
     const categoryId = searchParams.get("categoryId");
     const status = searchParams.get("status");
     const search = searchParams.get("search");
-    
+
     // Validate organization access
-    if (organizationId && !user.organizations?.some(org => org.id === organizationId)) {
+    if (
+      organizationId &&
+      !user.organizations?.some((org) => org.id === organizationId)
+    ) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -50,10 +53,10 @@ export async function GET(request: NextRequest) {
         members: {
           some: {
             userId: user.id,
-            isActive: true
-          }
-        }
-      }
+            isActive: true,
+          },
+        },
+      },
     };
 
     if (organizationId) {
@@ -68,11 +71,12 @@ export async function GET(request: NextRequest) {
       where.categoryId = categoryId;
     }
 
-    if (status && ['ACTIVE', 'INACTIVE', 'DISCONTINUED'].includes(status)) {
+    if (status && ["ACTIVE", "INACTIVE", "DISCONTINUED"].includes(status)) {
       where.status = status;
     }
 
-    if (search && search.length <= 100) { // Limit search length
+    if (search && search.length <= 100) {
+      // Limit search length
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
         { sku: { contains: search, mode: "insensitive" } },
@@ -84,13 +88,13 @@ export async function GET(request: NextRequest) {
       where,
       include: {
         warehouse: {
-          select: { id: true, name: true, code: true }
+          select: { id: true, name: true, code: true },
         },
         category: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
         organization: {
-          select: { id: true, name: true }
+          select: { id: true, name: true },
         },
       },
       orderBy: {
@@ -106,15 +110,21 @@ export async function GET(request: NextRequest) {
         userId: user.id,
         metadata: {
           itemCount: items.length,
-          filters: { organizationId, warehouseId, categoryId, status, search: !!search }
-        }
-      }
+          filters: {
+            organizationId,
+            warehouseId,
+            categoryId,
+            status,
+            search: !!search,
+          },
+        },
+      },
     });
 
     return NextResponse.json(items);
   } catch (error: any) {
     console.error("Error fetching inventory items:", error);
-    
+
     // Security: Don't expose internal errors
     return NextResponse.json(
       { error: "Internal server error" },

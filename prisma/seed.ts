@@ -7,19 +7,22 @@ const prisma = new PrismaClient();
 const getSecurePassword = (envVar: string, fallback?: string) => {
   const password = process.env[envVar];
   if (password) return password;
-  
-  if (process.env.NODE_ENV === 'production') {
+
+  if (process.env.NODE_ENV === "production") {
     throw new Error(`${envVar} environment variable is required in production`);
   }
-  
-  return fallback || Math.random().toString(36).slice(-12) + 'A1!';
+
+  return fallback || Math.random().toString(36).slice(-12) + "A1!";
 };
 
 async function main() {
   console.log("🌱 Starting database seed...");
 
   // Create Super Admin User with secure password
-  const adminPassword = getSecurePassword('SEED_ADMIN_PASSWORD', 'TempAdmin123!');
+  const adminPassword = getSecurePassword(
+    "SEED_ADMIN_PASSWORD",
+    "TempAdmin123!",
+  );
   const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
   const admin = await prisma.user.upsert({
@@ -97,7 +100,10 @@ async function main() {
   console.log("✅ Added Admin as Organization Owner");
 
   // Create Demo Manager User with secure password
-  const managerPasswordPlain = getSecurePassword('SEED_MANAGER_PASSWORD', 'TempManager123!');
+  const managerPasswordPlain = getSecurePassword(
+    "SEED_MANAGER_PASSWORD",
+    "TempManager123!",
+  );
   const managerPassword = await bcrypt.hash(managerPasswordPlain, 12);
   const manager = await prisma.user.upsert({
     where: { email: "manager@demo-company.com" },
@@ -382,19 +388,25 @@ async function main() {
   console.log("✅ Logged Activity");
 
   console.log("\n🎉 Database seeded successfully!");
-  
-  if (process.env.NODE_ENV !== 'production') {
+
+  if (process.env.NODE_ENV !== "production") {
     console.log("\n📝 Development Credentials:");
     console.log("━".repeat(50));
     console.log("Super Admin:");
     console.log("  Email: admin@logivox.ai");
-    console.log("  Password: [Check SEED_ADMIN_PASSWORD env var or use fallback]");
+    console.log(
+      "  Password: [Check SEED_ADMIN_PASSWORD env var or use fallback]",
+    );
     console.log("\nManager:");
     console.log("  Email: manager@demo-company.com");
-    console.log("  Password: [Check SEED_MANAGER_PASSWORD env var or use fallback]");
+    console.log(
+      "  Password: [Check SEED_MANAGER_PASSWORD env var or use fallback]",
+    );
     console.log("━".repeat(50));
   } else {
-    console.log("\n🔐 Production seed completed - credentials set via environment variables");
+    console.log(
+      "\n🔐 Production seed completed - credentials set via environment variables",
+    );
   }
 }
 

@@ -74,7 +74,7 @@ export default function EffectivenessMonitoringPage() {
     setIsLoading(true);
     try {
       const response = await fetch(
-        `/api/capa/effectiveness?status=${filterStatus}&daysBack=${daysBack}`
+        `/api/capa/effectiveness?status=${filterStatus}&daysBack=${daysBack}`,
       );
       if (!response.ok) throw new Error("Failed to fetch data");
 
@@ -311,7 +311,9 @@ export default function EffectivenessMonitoringPage() {
                         {getStatusBadge(capa.verificationStatus)}
                       </div>
                     </TableCell>
-                    <TableCell>{getScoreBadge(capa.effectivenessScore)}</TableCell>
+                    <TableCell>
+                      {getScoreBadge(capa.effectivenessScore)}
+                    </TableCell>
                     <TableCell>
                       {capa.recurrenceDetected ? (
                         <div className="flex items-center gap-1 text-red-600">
@@ -330,10 +332,7 @@ export default function EffectivenessMonitoringPage() {
                     <TableCell>
                       {capa.verificationStatus === "PENDING" &&
                         capa.monitoringDays >= 30 && (
-                          <Button
-                            size="sm"
-                            onClick={() => handleVerify(capa)}
-                          >
+                          <Button size="sm" onClick={() => handleVerify(capa)}>
                             Verify
                           </Button>
                         )}

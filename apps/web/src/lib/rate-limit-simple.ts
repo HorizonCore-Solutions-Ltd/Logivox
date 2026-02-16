@@ -58,7 +58,7 @@ class SimpleCache {
 export default function rateLimit(options?: Options) {
   const tokenCache = new SimpleCache(
     options?.uniqueTokenPerInterval || 500,
-    options?.interval || 60000
+    options?.interval || 60000,
   );
 
   // Cleanup expired entries periodically
@@ -72,14 +72,14 @@ export default function rateLimit(options?: Options) {
         const tokenIdentifier = token || getIP(request) || "anonymous";
         const now = Date.now();
         const windowDuration = options?.interval || 60000;
-        
+
         let tokenData = tokenCache.get(tokenIdentifier);
-        
+
         if (!tokenData || now > tokenData.resetTime) {
           // Reset or initialize
           tokenData = {
             count: 1,
-            resetTime: now + windowDuration
+            resetTime: now + windowDuration,
           };
           tokenCache.set(tokenIdentifier, tokenData);
           resolve();
@@ -87,7 +87,7 @@ export default function rateLimit(options?: Options) {
         }
 
         tokenData.count += 1;
-        
+
         if (tokenData.count > limit) {
           reject(new Error("Rate limit exceeded"));
         } else {

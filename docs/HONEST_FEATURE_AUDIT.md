@@ -9,12 +9,13 @@
 
 Your codebase has **TWO SEPARATE API DIRECTORIES**:
 
-1. **`/app/api/`** (OLD) - 284 API files including QC, CAPA, etc.  
+1. **`/app/api/`** (OLD) - 284 API files including QC, CAPA, etc.
 2. **`/apps/web/src/app/api/`** (NEW) - 201 API files for Inventory, RMA, etc.
 
 **ONLY `/apps/web/` is running.** The old `/app/api/` directory is **DEAD CODE**.
 
 ### Proof:
+
 ```bash
 curl http://localhost:3000/api/qc/inspections  # Returns 404
 curl http://localhost:3000/api/capa            # Returns 404
@@ -26,14 +27,16 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ## 📋 LANDING PAGE ADVERTISED FEATURES
 
 ### Core Modules (6 advertised):
+
 1. ✅ **Inventory Management** - VERIFIED WORKING
 2. ⚠️ **Quality Control & Inspection** - CODE EXISTS BUT NOT ACCESSIBLE
-3. ⚠️ **Quality Management (CAPA)** - CODE EXISTS BUT NOT ACCESSIBLE  
+3. ⚠️ **Quality Management (CAPA)** - CODE EXISTS BUT NOT ACCESSIBLE
 4. ✅ **Returns Processing** - VERIFIED WORKING (RMA APIs)
 5. ✅ **Receiving & Putaway** - VERIFIED WORKING (GRN APIs)
 6. ❓ **Smart Optimization** - NEED TO VERIFY
 
 ### Advanced Capabilities (7 advertised):
+
 1. ❓ **Voice Operations** - NEED TO VERIFY
 2. ❓ **Digital Twin & Computer Vision** - NEED TO VERIFY
 3. ❓ **Wave & Batch Picking** - NEED TO VERIFY
@@ -47,12 +50,13 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ## ✅ FEATURES THAT ACTUALLY WORK (VERIFIED)
 
 ### 1. Inventory Management ✅ **100% VERIFIED**
+
 **Location**: `/apps/web/src/app/api/inventory/`  
 **Status**: FULLY FUNCTIONAL
 
 - ✅ `/api/inventory` - List, Create inventory
 - ✅ `/api/inventory/[id]` - Get, Update, Delete
-- ✅ `/api/inventory/[id]/adjust` - Stock adjustments  
+- ✅ `/api/inventory/[id]/adjust` - Stock adjustments
 - ✅ `/api/inventory/import` - Bulk import
 - ✅ `/api/inventory/export` - Export data
 - ✅ `/api/cycle-counts` - Cycle counting (5 endpoints)
@@ -71,6 +75,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ---
 
 ### 2. Returns Processing (RMA) ✅ **VERIFIED**
+
 **Location**: `/apps/web/src/app/api/rmas/`  
 **Status**: FUNCTIONAL
 
@@ -87,6 +92,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ---
 
 ### 3. Receiving & Putaway (GRN) ✅ **VERIFIED**
+
 **Location**: `/apps/web/src/app/api/grn/`  
 **Status**: FUNCTIONAL
 
@@ -100,16 +106,19 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ---
 
 ### 4. Transportation & Shipping ✅ **VERIFIED**
+
 **Location**: `/apps/web/src/app/api/`  
 **Status**: FUNCTIONAL
 
 **Carriers**:
+
 - ✅ `/api/carriers` - List, Create carriers
 - ✅ `/api/carriers/[id]` - Get carrier details
 - ✅ `/api/carriers/rates` - Get shipping rates
 - ✅ `/api/carriers/track/[trackingNumber]` - Track shipment
 
 **Shipments**:
+
 - ✅ `/api/shipments` - List, Create shipments
 - ✅ `/api/shipments/[id]` - Get shipment
 - ✅ `/api/shipments/[id]/label` - Generate label
@@ -121,10 +130,12 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ---
 
 ### 5. Order Management ✅ **VERIFIED**
+
 **Location**: `/apps/web/src/app/api/`  
 **Status**: FUNCTIONAL
 
 **Purchase Orders**:
+
 - ✅ `/api/purchase-orders` - List, Create POs
 - ✅ `/api/purchase-orders/[id]` - Get, Update PO
 - ✅ `/api/purchase-orders/[id]/approve` - Approve PO
@@ -132,6 +143,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 - ✅ `/api/purchase-orders/[id]/send` - Send to supplier
 
 **Sales Orders**:
+
 - ✅ `/api/sales-orders` - List, Create orders
 - ✅ `/api/sales-orders/[id]` - Get, Update order
 - ✅ `/api/sales-orders/[id]/approve` - Approve order
@@ -139,6 +151,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 - ✅ `/api/sales-orders/[id]/create-pick-list` - Generate pick list
 
 **Picking**:
+
 - ✅ `/api/pick-lists` - List, Create pick lists
 - ✅ `/api/pick-lists/[id]` - Get pick list
 - ✅ `/api/pick-lists/[id]/start` - Start picking
@@ -151,10 +164,12 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ## ⚠️ FEATURES WITH CODE BUT NOT ACCESSIBLE
 
 ### 1. Quality Control (QC) ⚠️ **CODE EXISTS, NOT ACCESSIBLE**
+
 **Location**: `/app/api/qc/` (OLD DIRECTORY - NOT RUNNING)  
 **Status**: 34 subdirectories, ~100+ files, **404 when accessed**
 
 **What exists**:
+
 - Inspections, Audits, CAPA integration
 - Statistical Process Control (SPC)
 - Calibration management
@@ -173,10 +188,12 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ---
 
 ### 2. CAPA System ⚠️ **CODE EXISTS, NOT ACCESSIBLE**
+
 **Location**: `/app/api/capa/` (OLD DIRECTORY - NOT RUNNING)  
 **Status**: 19 subdirectories, 50+ files, **404 when accessed**
 
 **What exists**:
+
 - AI-powered RCA (Root Cause Analysis)
 - Effectiveness verification
 - Workflow builder
@@ -195,6 +212,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ---
 
 ### 3. UI Pages for QC/CAPA ⚠️ **EXIST BUT MAY NOT WORK**
+
 **Location**: `/app/dashboard/qc/` and `/app/qc/` (OLD DIRECTORY)  
 **Status**: 54+ page files exist
 
@@ -205,37 +223,45 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ## ❓ FEATURES NEEDING VERIFICATION
 
 ### 1. Voice Operations ❓
+
 **Advertised**: "Hands-free picking, voice-directed tasks, multi-language"  
-**Need to check**: 
+**Need to check**:
+
 - `/apps/web/src/app/api/` for voice APIs
 - `/lib/voice/` for voice processing code
 - Test if any voice functionality works
 
 ### 2. Digital Twin & Computer Vision ❓
+
 **Advertised**: "Real-time digital twin, computer vision QC"  
 **Found in old directory**: `/app/api/computer-vision/`, `/app/api/digital-twin/`  
 **Status**: Likely NOT accessible (404)
 
 ### 3. Wave & Batch Picking ❓
+
 **Advertised**: "4 picking modes, route optimization"  
 **Need to verify**: Pick list APIs (found but need to test)
 
 ### 4. Assembly & Kitting ❓
+
 **Advertised**: "BOM management, assembly tracking"  
 **Found in old directory**: `/app/api/assembly-orders/`, `/app/api/boms/`  
 **Status**: Likely NOT accessible (404)
 
 ### 5. Smart Optimization ❓
+
 **Advertised**: "Load optimization, smart slotting, route planning"  
 **Found**: `/apps/web/src/app/api/load-planning/optimize`  
 **Found in old**: `/app/api/optimization/` (extensive)  
 **Need**: Test which works
 
 ### 6. Sustainability Tracking ❓
+
 **Advertised**: "Carbon tracking, waste analytics, ESG reporting"  
 **Need to check**: APIs for sustainability features
 
 ### 7. Labor Management ❓
+
 **Advertised**: "Time tracking, performance metrics, gamification"  
 **Found**: `/apps/web/src/app/api/labor/employees/`  
 **Need**: Verify functionality
@@ -245,6 +271,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ## 📊 HONEST FEATURE COUNT
 
 ### VERIFIED WORKING:
+
 - ✅ **Inventory Management** - 37 endpoints
 - ✅ **Returns Processing** - 7 endpoints
 - ✅ **Receiving (GRN)** - 4 endpoints
@@ -271,6 +298,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 **Total Working**: ~158 API endpoints in `/apps/web/src/app/api/`
 
 ### CODE EXISTS BUT NOT ACCESSIBLE:
+
 - ⚠️ **Quality Control** - ~100 endpoints (in `/app/api/qc/`)
 - ⚠️ **CAPA System** - ~50 endpoints (in `/app/api/capa/`)
 - ⚠️ **Computer Vision** - ~15 endpoints (in `/app/api/computer-vision/`)
@@ -282,6 +310,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 **Total Inaccessible**: ~265 endpoints
 
 ### UNVERIFIED (Need Testing):
+
 - ❓ Voice Operations
 - ❓ Wave picking (pages exist, need API test)
 - ❓ Assembly/Kitting (in old directory)
@@ -294,21 +323,21 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 
 ### Immediate Actions:
 
-1. **Stop Advertising QC/CAPA as "Complete"**  
+1. **Stop Advertising QC/CAPA as "Complete"**
    - Marketing says "Complete System" and "Industry-Leading"
    - Reality: APIs return 404, code is inaccessible
    - **Fix**: Remove from landing page OR migrate to `/apps/web/`
 
-2. **Consolidate Codebase**  
+2. **Consolidate Codebase**
    - EITHER: Migrate `/app/api/` to `/apps/web/src/app/api/`
    - OR: Delete `/app/` directory entirely (dead code)
    - Current state causes confusion and false documentation
 
-3. **Update Marketing Immediately**  
+3. **Update Marketing Immediately**
    - Only advertise features in `/apps/web/src/app/api/`
    - Change "Complete System" badges to "Coming Soon" for inaccessible features
 
-4. **Verify Remaining Features**  
+4. **Verify Remaining Features**
    - Test all "advanced capabilities" one by one
    - Create working verification for each
    - Update docs with truth
@@ -318,6 +347,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ## 💡 TWO PATHS FORWARD
 
 ### Option A: Migrate Old APIs (RECOMMENDED)
+
 **Effort**: High (2-3 weeks)  
 **Benefit**: Keep all features, unified codebase
 
@@ -329,6 +359,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 6. Delete `/app/` directory
 
 ### Option B: Update Marketing (FASTEST)
+
 **Effort**: Low (1 day)  
 **Benefit**: Honest representation
 
@@ -342,6 +373,7 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 ## 📝 CURRENT STATE SUMMARY
 
 **What You CAN Advertise** (Verified Working):
+
 - ✅ Complete inventory management with cycle counting
 - ✅ Returns processing (RMA) with inspection workflow
 - ✅ Receiving operations with quality checks (GRN)
@@ -359,12 +391,14 @@ curl http://localhost:3000/api/inventory       # Returns 401 (works, needs auth)
 - ✅ Real-time analytics and reporting
 
 **What You SHOULD NOT Advertise** (Code exists but 404):
+
 - ⚠️ QC inspections and statistical process control
 - ⚠️ CAPA system with 8D methodology
 - ⚠️ Computer vision quality inspection
 - ⚠️ Digital twin warehouse simulation
 
 **What Needs Testing** (Unknown status):
+
 - ❓ Voice operations functionality
 - ❓ Wave picking optimization
 - ❓ Assembly and kitting operations

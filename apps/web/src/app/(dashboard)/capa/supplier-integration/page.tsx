@@ -5,11 +5,11 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Building2, 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle, 
+import {
+  Building2,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
   TrendingUp,
   TrendingDown,
   Minus,
@@ -21,10 +21,10 @@ import {
 
 /**
  * CAPA SYSTEM 7: SUPPLIER ERP INTEGRATION
- * 
+ *
  * Dashboard for managing supplier CAPA requests and viewing quality scorecards.
  * Integrates with SAP, Oracle, NetSuite, and custom ERP systems.
- * 
+ *
  * Investment: $142,000 | Annual Savings: $1,800,000 | ROI: 1,268%
  */
 
@@ -35,7 +35,13 @@ interface SupplierCapa {
   requestedAt: string;
   dueDate: string;
   severity: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
-  status: "PENDING" | "ACKNOWLEDGED" | "IN_PROGRESS" | "ACTIONS_COMPLETED" | "EVIDENCE_SUBMITTED" | "REJECTED";
+  status:
+    | "PENDING"
+    | "ACKNOWLEDGED"
+    | "IN_PROGRESS"
+    | "ACTIONS_COMPLETED"
+    | "EVIDENCE_SUBMITTED"
+    | "REJECTED";
   description: string;
   externalCapaId?: string;
   erpSyncStatus?: "SYNCED" | "FAILED" | "PENDING";
@@ -134,23 +140,35 @@ export default function SupplierIntegrationPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "PENDING": return "bg-gray-100 text-gray-800";
-      case "ACKNOWLEDGED": return "bg-blue-100 text-blue-800";
-      case "IN_PROGRESS": return "bg-yellow-100 text-yellow-800";
-      case "ACTIONS_COMPLETED": return "bg-green-100 text-green-800";
-      case "EVIDENCE_SUBMITTED": return "bg-emerald-100 text-emerald-800";
-      case "REJECTED": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "PENDING":
+        return "bg-gray-100 text-gray-800";
+      case "ACKNOWLEDGED":
+        return "bg-blue-100 text-blue-800";
+      case "IN_PROGRESS":
+        return "bg-yellow-100 text-yellow-800";
+      case "ACTIONS_COMPLETED":
+        return "bg-green-100 text-green-800";
+      case "EVIDENCE_SUBMITTED":
+        return "bg-emerald-100 text-emerald-800";
+      case "REJECTED":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case "CRITICAL": return "bg-red-100 text-red-800 border-red-300";
-      case "HIGH": return "bg-orange-100 text-orange-800 border-orange-300";
-      case "MEDIUM": return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      case "LOW": return "bg-blue-100 text-blue-800 border-blue-300";
-      default: return "bg-gray-100 text-gray-800 border-gray-300";
+      case "CRITICAL":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800 border-orange-300";
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "LOW":
+        return "bg-blue-100 text-blue-800 border-blue-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
     }
   };
 
@@ -164,24 +182,34 @@ export default function SupplierIntegrationPage() {
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case "IMPROVING": return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case "DECLINING": return <TrendingDown className="h-4 w-4 text-red-600" />;
-      default: return <Minus className="h-4 w-4 text-gray-600" />;
+      case "IMPROVING":
+        return <TrendingUp className="h-4 w-4 text-green-600" />;
+      case "DECLINING":
+        return <TrendingDown className="h-4 w-4 text-red-600" />;
+      default:
+        return <Minus className="h-4 w-4 text-gray-600" />;
     }
   };
 
   const isOverdue = (dueDate: string, status: string) => {
-    return new Date(dueDate) < new Date() && status !== "ACTIONS_COMPLETED" && status !== "EVIDENCE_SUBMITTED";
+    return (
+      new Date(dueDate) < new Date() &&
+      status !== "ACTIONS_COMPLETED" &&
+      status !== "EVIDENCE_SUBMITTED"
+    );
   };
 
   const getDaysRemaining = (dueDate: string) => {
-    const days = Math.ceil((new Date(dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
+    const days = Math.ceil(
+      (new Date(dueDate).getTime() - new Date().getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
     return days;
   };
 
   // Get unique suppliers from data
   const suppliers = Array.from(
-    new Map(supplierCapas.map(c => [c.supplier.id, c.supplier])).values()
+    new Map(supplierCapas.map((c) => [c.supplier.id, c.supplier])).values(),
   );
 
   if (loading && supplierCapas.length === 0) {
@@ -201,7 +229,9 @@ export default function SupplierIntegrationPage() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Supplier ERP Integration</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Supplier ERP Integration
+            </h1>
             <p className="text-gray-600 mt-1">
               Manage supplier CAPA requests and quality scorecards
             </p>
@@ -218,8 +248,12 @@ export default function SupplierIntegrationPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Requests</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stats.totalRequests}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total Requests
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    {stats.totalRequests}
+                  </p>
                 </div>
                 <FileText className="h-8 w-8 text-blue-600" />
               </div>
@@ -228,8 +262,12 @@ export default function SupplierIntegrationPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Acknowledged</p>
-                  <p className="text-2xl font-bold text-blue-900 mt-1">{stats.acknowledged}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Acknowledged
+                  </p>
+                  <p className="text-2xl font-bold text-blue-900 mt-1">
+                    {stats.acknowledged}
+                  </p>
                 </div>
                 <CheckCircle2 className="h-8 w-8 text-blue-600" />
               </div>
@@ -238,8 +276,12 @@ export default function SupplierIntegrationPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">In Progress</p>
-                  <p className="text-2xl font-bold text-yellow-900 mt-1">{stats.inProgress}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    In Progress
+                  </p>
+                  <p className="text-2xl font-bold text-yellow-900 mt-1">
+                    {stats.inProgress}
+                  </p>
                 </div>
                 <Clock className="h-8 w-8 text-yellow-600" />
               </div>
@@ -249,7 +291,9 @@ export default function SupplierIntegrationPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-green-900 mt-1">{stats.completed}</p>
+                  <p className="text-2xl font-bold text-green-900 mt-1">
+                    {stats.completed}
+                  </p>
                 </div>
                 <CheckCircle2 className="h-8 w-8 text-green-600" />
               </div>
@@ -259,7 +303,9 @@ export default function SupplierIntegrationPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Overdue</p>
-                  <p className="text-2xl font-bold text-red-900 mt-1">{stats.overdue}</p>
+                  <p className="text-2xl font-bold text-red-900 mt-1">
+                    {stats.overdue}
+                  </p>
                 </div>
                 <AlertCircle className="h-8 w-8 text-red-600" />
               </div>
@@ -268,8 +314,12 @@ export default function SupplierIntegrationPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Avg Response</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{stats.avgResponseTime}h</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Avg Response
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    {stats.avgResponseTime}h
+                  </p>
                 </div>
                 <BarChart3 className="h-8 w-8 text-purple-600" />
               </div>
@@ -280,7 +330,9 @@ export default function SupplierIntegrationPage() {
         {/* Supplier Filter */}
         <Card className="p-4">
           <div className="flex items-center gap-4 flex-wrap">
-            <span className="text-sm font-medium text-gray-700">Filter by Supplier:</span>
+            <span className="text-sm font-medium text-gray-700">
+              Filter by Supplier:
+            </span>
             <Button
               variant={selectedSupplier === null ? "default" : "outline"}
               size="sm"
@@ -291,7 +343,9 @@ export default function SupplierIntegrationPage() {
             {suppliers.map((supplier) => (
               <Button
                 key={supplier.id}
-                variant={selectedSupplier === supplier.id ? "default" : "outline"}
+                variant={
+                  selectedSupplier === supplier.id ? "default" : "outline"
+                }
                 size="sm"
                 onClick={() => setSelectedSupplier(supplier.id)}
               >
@@ -306,9 +360,13 @@ export default function SupplierIntegrationPage() {
         {scorecard && (
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Supplier Quality Scorecard</h2>
+              <h2 className="text-xl font-bold text-gray-900">
+                Supplier Quality Scorecard
+              </h2>
               <div className="flex items-center gap-2">
-                <span className={`text-3xl font-bold ${getGradeColor(scorecard.grade)}`}>
+                <span
+                  className={`text-3xl font-bold ${getGradeColor(scorecard.grade)}`}
+                >
                   {scorecard.grade}
                 </span>
                 {getTrendIcon(scorecard.trend)}
@@ -348,15 +406,21 @@ export default function SupplierIntegrationPage() {
             <div className="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
               <div>
                 <p className="text-gray-600">Total Requests</p>
-                <p className="font-semibold text-gray-900 mt-1">{scorecard.totalRequests}</p>
+                <p className="font-semibold text-gray-900 mt-1">
+                  {scorecard.totalRequests}
+                </p>
               </div>
               <div>
                 <p className="text-gray-600">In Progress</p>
-                <p className="font-semibold text-yellow-900 mt-1">{scorecard.inProgress}</p>
+                <p className="font-semibold text-yellow-900 mt-1">
+                  {scorecard.inProgress}
+                </p>
               </div>
               <div>
                 <p className="text-gray-600">Overdue</p>
-                <p className="font-semibold text-red-900 mt-1">{scorecard.overdue}</p>
+                <p className="font-semibold text-red-900 mt-1">
+                  {scorecard.overdue}
+                </p>
               </div>
             </div>
           </Card>
@@ -364,7 +428,9 @@ export default function SupplierIntegrationPage() {
 
         {/* Supplier CAPA Requests Table */}
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Supplier CAPA Requests</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Supplier CAPA Requests
+          </h2>
 
           {supplierCapas.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
@@ -413,7 +479,9 @@ export default function SupplierIntegrationPage() {
                           <div className="text-sm font-medium text-blue-600">
                             {capa.capa.capaNumber}
                           </div>
-                          <div className="text-xs text-gray-500">{capa.capa.title}</div>
+                          <div className="text-xs text-gray-500">
+                            {capa.capa.title}
+                          </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="flex items-center">
@@ -422,12 +490,16 @@ export default function SupplierIntegrationPage() {
                               <div className="text-sm font-medium text-gray-900">
                                 {capa.supplier.name}
                               </div>
-                              <div className="text-xs text-gray-500">{capa.supplier.erpType}</div>
+                              <div className="text-xs text-gray-500">
+                                {capa.supplier.erpType}
+                              </div>
                             </div>
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <Badge className={`${getSeverityColor(capa.severity)} border`}>
+                          <Badge
+                            className={`${getSeverityColor(capa.severity)} border`}
+                          >
                             {capa.severity}
                           </Badge>
                         </td>
@@ -439,11 +511,13 @@ export default function SupplierIntegrationPage() {
                         <td className="px-4 py-4 whitespace-nowrap">
                           {capa.externalCapaId ? (
                             <div>
-                              <Badge className={
-                                capa.erpSyncStatus === "SYNCED" 
-                                  ? "bg-green-100 text-green-800"
-                                  : "bg-red-100 text-red-800"
-                              }>
+                              <Badge
+                                className={
+                                  capa.erpSyncStatus === "SYNCED"
+                                    ? "bg-green-100 text-green-800"
+                                    : "bg-red-100 text-red-800"
+                                }
+                              >
                                 {capa.erpSyncStatus}
                               </Badge>
                               <div className="text-xs text-gray-500 mt-1">
@@ -451,11 +525,17 @@ export default function SupplierIntegrationPage() {
                               </div>
                             </div>
                           ) : (
-                            <span className="text-xs text-gray-400">No ERP sync</span>
+                            <span className="text-xs text-gray-400">
+                              No ERP sync
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <div className={overdue ? "text-red-600" : "text-gray-900"}>
+                          <div
+                            className={
+                              overdue ? "text-red-600" : "text-gray-900"
+                            }
+                          >
                             <div className="text-sm font-medium">
                               {new Date(capa.dueDate).toLocaleDateString()}
                             </div>
@@ -482,7 +562,9 @@ export default function SupplierIntegrationPage() {
                             variant="outline"
                             size="sm"
                             onClick={() => syncERPStatus(capa.id)}
-                            disabled={!capa.externalCapaId || syncing === capa.id}
+                            disabled={
+                              !capa.externalCapaId || syncing === capa.id
+                            }
                           >
                             {syncing === capa.id ? (
                               <RefreshCw className="h-4 w-4 animate-spin" />

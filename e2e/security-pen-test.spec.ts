@@ -7,7 +7,9 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Security & Penetration Testing", () => {
   test.describe("Rate Limiting & DDoS Protection", () => {
-    test("should block excessive requests from same IP", async ({ request }) => {
+    test("should block excessive requests from same IP", async ({
+      request,
+    }) => {
       const endpoint = "/api/public/test";
       const requests = [];
 
@@ -59,7 +61,7 @@ test.describe("Security & Penetration Testing", () => {
       for (const attack of attacks) {
         const response = await request.get(
           `/api/products?search=${encodeURIComponent(attack)}`,
-          { failOnStatusCode: false }
+          { failOnStatusCode: false },
         );
 
         // Should either block (400) or sanitize (200 with no results)
@@ -104,8 +106,7 @@ test.describe("Security & Penetration Testing", () => {
     });
 
     test("should block XSS in URL parameters", async ({ page }) => {
-      const xssUrl =
-        '/products?q=<img src=x onerror="alert(\'XSS\')">';
+      const xssUrl = "/products?q=<img src=x onerror=\"alert('XSS')\">";
       await page.goto(xssUrl);
 
       // Script should not execute
@@ -166,7 +167,10 @@ test.describe("Security & Penetration Testing", () => {
       expect(response.status()).toBe(401);
     });
 
-    test("should prevent privilege escalation", async ({ request, context }) => {
+    test("should prevent privilege escalation", async ({
+      request,
+      context,
+    }) => {
       // Login as regular user
       await context.addCookies([
         {
@@ -240,7 +244,9 @@ test.describe("Security & Penetration Testing", () => {
       await page.goto("/");
 
       const xFrameOptions = await page.evaluate(() => {
-        const meta = document.querySelector('meta[http-equiv="X-Frame-Options"]');
+        const meta = document.querySelector(
+          'meta[http-equiv="X-Frame-Options"]',
+        );
         return meta?.getAttribute("content");
       });
 
@@ -344,7 +350,7 @@ test.describe("Security & Penetration Testing", () => {
       await page.goto("/");
       const initialCookies = await context.cookies();
       const initialSession = initialCookies.find(
-        (c) => c.name === "next-auth.session-token"
+        (c) => c.name === "next-auth.session-token",
       );
 
       // Login
@@ -354,7 +360,7 @@ test.describe("Security & Penetration Testing", () => {
       // Get post-login session token
       const postLoginCookies = await context.cookies();
       const postLoginSession = postLoginCookies.find(
-        (c) => c.name === "next-auth.session-token"
+        (c) => c.name === "next-auth.session-token",
       );
 
       // Session token should have changed

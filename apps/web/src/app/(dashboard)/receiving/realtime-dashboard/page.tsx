@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function RealtimeDashboardPage() {
   const [dashboard, setDashboard] = useState<any>(null);
@@ -32,12 +32,12 @@ export default function RealtimeDashboardPage() {
         equipmentRes,
         alertsRes,
       ] = await Promise.all([
-        fetch('/api/receiving/realtime-dashboard?action=get_live_dashboard'),
-        fetch('/api/receiving/realtime-dashboard?action=get_dock_status'),
-        fetch('/api/receiving/realtime-dashboard?action=get_active_shipments'),
-        fetch('/api/receiving/realtime-dashboard?action=get_worker_activity'),
-        fetch('/api/receiving/realtime-dashboard?action=get_equipment_status'),
-        fetch('/api/receiving/realtime-dashboard?action=get_alerts'),
+        fetch("/api/receiving/realtime-dashboard?action=get_live_dashboard"),
+        fetch("/api/receiving/realtime-dashboard?action=get_dock_status"),
+        fetch("/api/receiving/realtime-dashboard?action=get_active_shipments"),
+        fetch("/api/receiving/realtime-dashboard?action=get_worker_activity"),
+        fetch("/api/receiving/realtime-dashboard?action=get_equipment_status"),
+        fetch("/api/receiving/realtime-dashboard?action=get_alerts"),
       ]);
 
       const dashboardData = await dashboardRes.json();
@@ -56,48 +56,48 @@ export default function RealtimeDashboardPage() {
       setLastUpdated(new Date());
       setLoading(false);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
       setLoading(false);
     }
   };
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      PENDING: 'bg-yellow-100 text-yellow-800',
-      IN_PROGRESS: 'bg-blue-100 text-blue-800',
-      RECEIVING: 'bg-blue-100 text-blue-800',
-      COMPLETED: 'bg-green-100 text-green-800',
-      CANCELLED: 'bg-red-100 text-red-800',
+      PENDING: "bg-yellow-100 text-yellow-800",
+      IN_PROGRESS: "bg-blue-100 text-blue-800",
+      RECEIVING: "bg-blue-100 text-blue-800",
+      COMPLETED: "bg-green-100 text-green-800",
+      CANCELLED: "bg-red-100 text-red-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
   };
 
   const getPriorityBadge = (priority: string) => {
     const badges: Record<string, string> = {
-      URGENT: 'bg-red-100 text-red-800',
-      HIGH: 'bg-orange-100 text-orange-800',
-      NORMAL: 'bg-blue-100 text-blue-800',
-      LOW: 'bg-gray-100 text-gray-800',
+      URGENT: "bg-red-100 text-red-800",
+      HIGH: "bg-orange-100 text-orange-800",
+      NORMAL: "bg-blue-100 text-blue-800",
+      LOW: "bg-gray-100 text-gray-800",
     };
-    return badges[priority] || 'bg-gray-100 text-gray-800';
+    return badges[priority] || "bg-gray-100 text-gray-800";
   };
 
   const getSeverityBadge = (severity: string) => {
     const badges: Record<string, string> = {
-      CRITICAL: 'bg-red-100 text-red-800',
-      HIGH: 'bg-orange-100 text-orange-800',
-      MEDIUM: 'bg-yellow-100 text-yellow-800',
-      LOW: 'bg-blue-100 text-blue-800',
+      CRITICAL: "bg-red-100 text-red-800",
+      HIGH: "bg-orange-100 text-orange-800",
+      MEDIUM: "bg-yellow-100 text-yellow-800",
+      LOW: "bg-blue-100 text-blue-800",
     };
-    return badges[severity] || 'bg-gray-100 text-gray-800';
+    return badges[severity] || "bg-gray-100 text-gray-800";
   };
 
   const getEquipmentStatusColor = (status: string) => {
-    return status === 'IN_USE'
-      ? 'text-green-600'
-      : status === 'AVAILABLE'
-      ? 'text-blue-600'
-      : 'text-gray-600';
+    return status === "IN_USE"
+      ? "text-green-600"
+      : status === "AVAILABLE"
+        ? "text-blue-600"
+        : "text-gray-600";
   };
 
   if (loading) {
@@ -130,8 +130,8 @@ export default function RealtimeDashboardPage() {
                 <span>Live</span>
               </div>
               <div className="text-xs">
-                Updated {Math.round((Date.now() - lastUpdated.getTime()) / 1000)}s
-                ago
+                Updated{" "}
+                {Math.round((Date.now() - lastUpdated.getTime()) / 1000)}s ago
               </div>
             </div>
             <Button onClick={fetchData} size="sm" variant="outline">
@@ -148,7 +148,9 @@ export default function RealtimeDashboardPage() {
           <div className="text-3xl font-bold text-blue-600 mt-1">
             {dashboard?.activeReceiving || 0}
           </div>
-          <div className="text-xs text-gray-500 mt-1">shipments in progress</div>
+          <div className="text-xs text-gray-500 mt-1">
+            shipments in progress
+          </div>
         </Card>
 
         <Card className="p-4">
@@ -223,14 +225,17 @@ export default function RealtimeDashboardPage() {
       <Tabs defaultValue="docks" className="space-y-4">
         <TabsList>
           <TabsTrigger value="docks">
-            Dock Status ({dockStatus?.occupied || 0}/{dockStatus?.totalDocks || 0})
+            Dock Status ({dockStatus?.occupied || 0}/
+            {dockStatus?.totalDocks || 0})
           </TabsTrigger>
           <TabsTrigger value="shipments">
             Active Shipments ({shipments.length})
           </TabsTrigger>
           <TabsTrigger value="workers">Workers ({workers.length})</TabsTrigger>
           <TabsTrigger value="equipment">Equipment</TabsTrigger>
-          <TabsTrigger value="alerts">Alerts ({alerts?.summary.total || 0})</TabsTrigger>
+          <TabsTrigger value="alerts">
+            Alerts ({alerts?.summary.total || 0})
+          </TabsTrigger>
         </TabsList>
 
         {/* Dock Status Tab */}
@@ -242,18 +247,20 @@ export default function RealtimeDashboardPage() {
                 <div
                   key={dock.dockNumber}
                   className={`p-4 rounded-lg border-2 ${
-                    dock.status === 'OCCUPIED'
-                      ? 'bg-blue-50 border-blue-300'
-                      : 'bg-gray-50 border-gray-200'
+                    dock.status === "OCCUPIED"
+                      ? "bg-blue-50 border-blue-300"
+                      : "bg-gray-50 border-gray-200"
                   }`}
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <div className="text-lg font-bold">Dock {dock.dockNumber}</div>
+                    <div className="text-lg font-bold">
+                      Dock {dock.dockNumber}
+                    </div>
                     <Badge
                       className={
-                        dock.status === 'OCCUPIED'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-300 text-gray-700'
+                        dock.status === "OCCUPIED"
+                          ? "bg-blue-600 text-white"
+                          : "bg-gray-300 text-gray-700"
                       }
                     >
                       {dock.status}
@@ -275,7 +282,9 @@ export default function RealtimeDashboardPage() {
                         {dock.shipment.assignedTo}
                       </div>
                       <div className="flex items-center gap-2 mt-2">
-                        <Badge className={getPriorityBadge(dock.shipment.priority)}>
+                        <Badge
+                          className={getPriorityBadge(dock.shipment.priority)}
+                        >
                           {dock.shipment.priority}
                         </Badge>
                         {dock.shipment.isLate && (
@@ -349,7 +358,9 @@ export default function RealtimeDashboardPage() {
                           </Badge>
                         </td>
                         <td className="px-4 py-3">
-                          <Badge className={getPriorityBadge(shipment.priority)}>
+                          <Badge
+                            className={getPriorityBadge(shipment.priority)}
+                          >
                             {shipment.priority}
                           </Badge>
                         </td>
@@ -506,16 +517,18 @@ export default function RealtimeDashboardPage() {
                   <div className="flex items-center gap-4">
                     {item.batteryLevel !== null && (
                       <div className="text-sm">
-                        <div className="text-xs text-gray-600 mb-1">Battery</div>
+                        <div className="text-xs text-gray-600 mb-1">
+                          Battery
+                        </div>
                         <div className="flex items-center gap-2">
                           <div className="w-16 bg-gray-200 rounded-full h-2">
                             <div
                               className={`h-2 rounded-full ${
                                 item.batteryLevel < 20
-                                  ? 'bg-red-500'
+                                  ? "bg-red-500"
                                   : item.batteryLevel < 50
-                                  ? 'bg-yellow-500'
-                                  : 'bg-green-500'
+                                    ? "bg-yellow-500"
+                                    : "bg-green-500"
                               }`}
                               style={{ width: `${item.batteryLevel}%` }}
                             />
@@ -527,9 +540,9 @@ export default function RealtimeDashboardPage() {
 
                     <Badge
                       className={`${
-                        item.status === 'IN_USE'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-blue-100 text-blue-800'
+                        item.status === "IN_USE"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-blue-100 text-blue-800"
                       }`}
                     >
                       {item.status}

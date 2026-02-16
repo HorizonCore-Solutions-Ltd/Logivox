@@ -1,10 +1,10 @@
 /**
  * CROSS-WAREHOUSE EMERGENCY BORROWING API
  * ========================================
- * 
+ *
  * System 6 - High Impact (708% ROI)
  * Investment: $18K → Savings: $127K/year
- * 
+ *
  * Features:
  * - Network inventory visibility across warehouses
  * - Emergency stock transfer requests
@@ -39,7 +39,14 @@ const transferRequestSchema = z.object({
 const courierDispatchSchema = z.object({
   transferId: z.string(),
   courierId: z.string().optional(),
-  courierService: z.enum(["UBER_FREIGHT", "ROADIE", "INTERNAL", "FEDEX", "UPS", "OTHER"]),
+  courierService: z.enum([
+    "UBER_FREIGHT",
+    "ROADIE",
+    "INTERNAL",
+    "FEDEX",
+    "UPS",
+    "OTHER",
+  ]),
   estimatedPickupTime: z.string().datetime(),
   estimatedDeliveryTime: z.string().datetime(),
   actualCost: z.number().positive(),
@@ -81,7 +88,7 @@ function calculateDistance(
   lat1: number,
   lon1: number,
   lat2: number,
-  lon2: number
+  lon2: number,
 ): number {
   const R = 6371; // Earth's radius in km
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -98,12 +105,15 @@ function calculateDistance(
 
 function estimateCourierCost(distance: number, urgency: string): number {
   const baseRate = 2.5; // $/km
-  const urgencyMultiplier = {
-    LOW: 1.0,
-    MEDIUM: 1.3,
-    HIGH: 1.7,
-    CRITICAL: 2.5,
-  }[urgency] || 1.0 || 1.0;
+  const urgencyMultiplier =
+    {
+      LOW: 1.0,
+      MEDIUM: 1.3,
+      HIGH: 1.7,
+      CRITICAL: 2.5,
+    }[urgency] ||
+    1.0 ||
+    1.0;
 
   let cost = distance * baseRate * urgencyMultiplier;
 
@@ -124,7 +134,7 @@ async function analyzeNetworkInventory(
   productId: string,
   quantityNeeded: number,
   targetLat: number,
-  targetLon: number
+  targetLon: number,
 ): Promise<TransferAnalysis> {
   // Get all warehouses in the network with the product
   const warehouses = await prisma.warehouse.findMany({
@@ -162,12 +172,7 @@ async function analyzeNetworkInventory(
     if (available < quantityNeeded) continue;
 
     // Use default coordinates since latitude/longitude not in schema
-    const distance = calculateDistance(
-      targetLat,
-      targetLon,
-      0,
-      0
-    );
+    const distance = calculateDistance(targetLat, targetLon, 0, 0);
 
     const cost = estimateCourierCost(distance, "MEDIUM");
     const transitTime = estimateTransitTime(distance, "MEDIUM");
@@ -288,7 +293,7 @@ export async function GET(request: NextRequest) {
         if (!productId || !warehouseId) {
           return NextResponse.json(
             { error: "Missing required parameters" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -297,7 +302,10 @@ export async function GET(request: NextRequest) {
         });
 
         if (!warehouse) {
-          return NextResponse.json({ error: "Warehouse not found" }, { status: 404 });
+          return NextResponse.json(
+            { error: "Warehouse not found" },
+            { status: 404 },
+          );
         }
 
         const analysis = await analyzeNetworkInventory(
@@ -306,7 +314,7 @@ export async function GET(request: NextRequest) {
           productId,
           quantity,
           0,
-          0
+          0,
         );
 
         return NextResponse.json({ analysis });
@@ -327,13 +335,13 @@ export async function GET(request: NextRequest) {
 
         const stats = {
           totalTransfers: transfers.length,
-          successfulTransfers: transfers.filter((t) =>
-            (t.metadata as any)?.status === "COMPLETED"
+          successfulTransfers: transfers.filter(
+            (t) => (t.metadata as any)?.status === "COMPLETED",
           ).length,
           averageTransitTime: 4.2, // hours (calculated)
           totalSavings: transfers.reduce(
             (sum, t) => sum + ((t.metadata as any)?.savings || 0),
-            0
+            0,
           ),
           costAvoidance: transfers.length * 150, // avg order value
         };
@@ -348,7 +356,7 @@ export async function GET(request: NextRequest) {
     console.error("Cross-warehouse borrowing error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -377,10 +385,13 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        if (!sourceInventory || sourceInventory.quantity < validated.quantityRequested) {
+        if (
+          !sourceInventory ||
+          sourceInventory.quantity < validated.quantityRequested
+        ) {
           return NextResponse.json(
             { error: "Insufficient stock at source warehouse" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -467,7 +478,7 @@ export async function POST(request: NextRequest) {
     console.error("Cross-warehouse borrowing error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

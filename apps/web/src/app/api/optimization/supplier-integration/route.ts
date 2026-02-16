@@ -1,10 +1,10 @@
 /**
  * SUPPLIER INTEGRATION PLATFORM API
  * ==================================
- * 
+ *
  * System 4 - Outstanding ROI (275% ROI)
  * Investment: $60K → Savings: $165K/year
- * 
+ *
  * Capabilities:
  * - EDI/API integration with supplier systems
  * - Automated purchase order management
@@ -12,13 +12,13 @@
  * - Supplier portal for collaboration
  * - Quality metrics and scorecarding
  * - Automated reordering based on demand
- * 
+ *
  * Key Metrics:
  * - 80% reduction in manual data entry
  * - 50% faster order processing
  * - 95% order accuracy
  * - 30% reduction in stockouts
- * 
+ *
  * @version 1.0.0
  * @author Flowstock Platform
  * @date January 8, 2026
@@ -43,7 +43,7 @@ const INTEGRATION_CONFIG = {
     EMAIL: { protocol: "Email", cost: 0, realtime: false },
     FTP: { protocol: "File Transfer", cost: 0, realtime: false },
   },
-  
+
   // Order processing automation
   AUTOMATION_RULES: {
     AUTO_APPROVE_THRESHOLD: 10000, // Orders <$10K auto-approved
@@ -51,7 +51,7 @@ const INTEGRATION_CONFIG = {
     REORDER_POINT_MULTIPLIER: 1.5, // 1.5x lead time demand
     LEAD_TIME_BUFFER_DAYS: 3,
   },
-  
+
   // Supplier performance metrics
   PERFORMANCE_METRICS: {
     ON_TIME_DELIVERY: { weight: 0.3, target: 95 },
@@ -60,7 +60,7 @@ const INTEGRATION_CONFIG = {
     RESPONSE_TIME: { weight: 0.1, target: 24 }, // hours
     PRICE_COMPETITIVENESS: { weight: 0.1, target: 100 },
   },
-  
+
   // Supplier tiers
   SUPPLIER_TIERS: {
     PLATINUM: { minScore: 95, discount: 0.05, prioritySupport: true },
@@ -98,7 +98,7 @@ const CreatePurchaseOrderSchema = z.object({
         sku: z.string(),
         quantity: z.number().positive(),
         unitPrice: z.number().positive(),
-      })
+      }),
     ),
     deliveryDate: z.string(),
     warehouseId: z.string(),
@@ -160,7 +160,7 @@ interface PurchaseOrder {
   poNumber: string;
   supplierId: string;
   supplierName: string;
-  status: typeof ORDER_STATUSES[number];
+  status: (typeof ORDER_STATUSES)[number];
   totalAmount: number;
   itemCount: number;
   createdDate: Date;
@@ -188,29 +188,35 @@ function calculateSupplierScore(metrics: {
   priceCompetitiveness: number;
 }): number {
   const config = INTEGRATION_CONFIG.PERFORMANCE_METRICS;
-  
-  const onTimeScore = (metrics.onTimeDelivery / config.ON_TIME_DELIVERY.target) * 100;
-  const qualityScore = (metrics.qualityScore / config.QUALITY_SCORE.target) * 100;
-  const accuracyScore = (metrics.orderAccuracy / config.ORDER_ACCURACY.target) * 100;
-  const responseScore = (config.RESPONSE_TIME.target / Math.max(metrics.avgResponseTime, 1)) * 100;
+
+  const onTimeScore =
+    (metrics.onTimeDelivery / config.ON_TIME_DELIVERY.target) * 100;
+  const qualityScore =
+    (metrics.qualityScore / config.QUALITY_SCORE.target) * 100;
+  const accuracyScore =
+    (metrics.orderAccuracy / config.ORDER_ACCURACY.target) * 100;
+  const responseScore =
+    (config.RESPONSE_TIME.target / Math.max(metrics.avgResponseTime, 1)) * 100;
   const priceScore = metrics.priceCompetitiveness;
-  
+
   const weightedScore =
     onTimeScore * config.ON_TIME_DELIVERY.weight +
     qualityScore * config.QUALITY_SCORE.weight +
     accuracyScore * config.ORDER_ACCURACY.weight +
     responseScore * config.RESPONSE_TIME.weight +
     priceScore * config.PRICE_COMPETITIVENESS.weight;
-  
+
   return Math.min(100, Math.max(0, Math.round(weightedScore)));
 }
 
 /**
  * Determine supplier tier from performance score
  */
-function getSupplierTier(score: number): keyof typeof INTEGRATION_CONFIG.SUPPLIER_TIERS {
+function getSupplierTier(
+  score: number,
+): keyof typeof INTEGRATION_CONFIG.SUPPLIER_TIERS {
   const tiers = INTEGRATION_CONFIG.SUPPLIER_TIERS;
-  
+
   if (score >= tiers.PLATINUM.minScore) return "PLATINUM";
   if (score >= tiers.GOLD.minScore) return "GOLD";
   if (score >= tiers.SILVER.minScore) return "SILVER";
@@ -223,13 +229,16 @@ function getSupplierTier(score: number): keyof typeof INTEGRATION_CONFIG.SUPPLIE
  */
 function calculateReorderPoint(
   avgDailySales: number,
-  leadTimeDays: number
+  leadTimeDays: number,
 ): number {
   const leadTimeDemand = avgDailySales * leadTimeDays;
-  const bufferStock = avgDailySales * INTEGRATION_CONFIG.AUTOMATION_RULES.LEAD_TIME_BUFFER_DAYS;
-  
+  const bufferStock =
+    avgDailySales * INTEGRATION_CONFIG.AUTOMATION_RULES.LEAD_TIME_BUFFER_DAYS;
+
   return Math.ceil(
-    leadTimeDemand * INTEGRATION_CONFIG.AUTOMATION_RULES.REORDER_POINT_MULTIPLIER + bufferStock
+    leadTimeDemand *
+      INTEGRATION_CONFIG.AUTOMATION_RULES.REORDER_POINT_MULTIPLIER +
+      bufferStock,
   );
 }
 
@@ -245,7 +254,7 @@ function generatePORecommendations(
     supplierId: string;
     supplierLeadTime: number;
     unitCost: number;
-  }>
+  }>,
 ): Array<{
   productId: string;
   sku: string;
@@ -256,26 +265,27 @@ function generatePORecommendations(
   estimatedCost: number;
 }> {
   const recommendations = [];
-  
+
   for (const item of inventory) {
     const reorderPoint = calculateReorderPoint(
       item.avgDailySales,
-      item.supplierLeadTime
+      item.supplierLeadTime,
     );
-    
+
     if (item.quantity <= reorderPoint) {
-      const daysOfStock = item.avgDailySales > 0 ? item.quantity / item.avgDailySales : 999;
-      
+      const daysOfStock =
+        item.avgDailySales > 0 ? item.quantity / item.avgDailySales : 999;
+
       let urgency: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
       if (daysOfStock < 3) urgency = "CRITICAL";
       else if (daysOfStock < 7) urgency = "HIGH";
       else if (daysOfStock < 14) urgency = "MEDIUM";
       else urgency = "LOW";
-      
+
       const recommendedQty = Math.ceil(
-        item.avgDailySales * (item.supplierLeadTime + 30) // Order for lead time + 30 days
+        item.avgDailySales * (item.supplierLeadTime + 30), // Order for lead time + 30 days
       );
-      
+
       recommendations.push({
         productId: item.productId,
         sku: item.sku,
@@ -287,7 +297,7 @@ function generatePORecommendations(
       });
     }
   }
-  
+
   return recommendations.sort((a, b) => {
     const urgencyOrder = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
     return urgencyOrder[a.urgency] - urgencyOrder[b.urgency];
@@ -325,15 +335,18 @@ export async function GET(request: NextRequest) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const activeOrders = orders.filter(
-        (o) =>
-          ["APPROVED", "SENT_TO_SUPPLIER", "ACKNOWLEDGED", "IN_PRODUCTION", "SHIPPED"].includes(
-            (o.metadata as any)?.status
-          )
+      const activeOrders = orders.filter((o) =>
+        [
+          "APPROVED",
+          "SENT_TO_SUPPLIER",
+          "ACKNOWLEDGED",
+          "IN_PRODUCTION",
+          "SHIPPED",
+        ].includes((o.metadata as any)?.status),
       ).length;
 
       const pendingApproval = orders.filter(
-        (o) => (o.metadata as any)?.status === "PENDING_APPROVAL"
+        (o) => (o.metadata as any)?.status === "PENDING_APPROVAL",
       ).length;
 
       const totalSpend = orders.reduce((sum, o) => {
@@ -474,9 +487,13 @@ export async function GET(request: NextRequest) {
         recommendations,
         summary: {
           total: recommendations.length,
-          critical: recommendations.filter((r) => r.urgency === "CRITICAL").length,
+          critical: recommendations.filter((r) => r.urgency === "CRITICAL")
+            .length,
           high: recommendations.filter((r) => r.urgency === "HIGH").length,
-          estimatedTotalCost: recommendations.reduce((sum, r) => sum + r.estimatedCost, 0),
+          estimatedTotalCost: recommendations.reduce(
+            (sum, r) => sum + r.estimatedCost,
+            0,
+          ),
         },
       });
     }
@@ -486,7 +503,7 @@ export async function GET(request: NextRequest) {
     console.error("Error in supplier integration GET:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -511,7 +528,7 @@ export async function POST(request: NextRequest) {
 
       const totalAmount = data.items.reduce(
         (sum, item) => sum + item.quantity * item.unitPrice,
-        0
+        0,
       );
 
       const poNumber = `PO-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
@@ -532,9 +549,11 @@ export async function POST(request: NextRequest) {
             deliveryDate: data.deliveryDate,
             warehouseId: data.warehouseId,
             notes: data.notes,
-            status: totalAmount < INTEGRATION_CONFIG.AUTOMATION_RULES.AUTO_APPROVE_THRESHOLD
-              ? "APPROVED"
-              : "PENDING_APPROVAL",
+            status:
+              totalAmount <
+              INTEGRATION_CONFIG.AUTOMATION_RULES.AUTO_APPROVE_THRESHOLD
+                ? "APPROVED"
+                : "PENDING_APPROVAL",
             createdAt: new Date().toISOString(),
           },
         },
@@ -610,14 +629,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error in supplier integration POST:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

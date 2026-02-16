@@ -1,6 +1,6 @@
 /**
  * Shared Business Types
- * 
+ *
  * Centralized type definitions for core business entities
  * to prevent duplication across the application
  */
@@ -25,12 +25,12 @@ export interface OrganizationEntity extends BaseEntity {
 // USER & ORGANIZATION TYPES
 // ============================================================================
 
-export type UserRole = 
-  | "SUPER_ADMIN" 
-  | "ORG_ADMIN" 
-  | "MANAGER" 
-  | "SUPERVISOR" 
-  | "WORKER" 
+export type UserRole =
+  | "SUPER_ADMIN"
+  | "ORG_ADMIN"
+  | "MANAGER"
+  | "SUPERVISOR"
+  | "WORKER"
   | "USER";
 
 export interface User extends BaseEntity {
@@ -55,11 +55,11 @@ export interface Organization extends BaseEntity {
 // INVENTORY TYPES
 // ============================================================================
 
-export type InventoryStatus = 
-  | "ACTIVE" 
-  | "INACTIVE" 
-  | "LOW_STOCK" 
-  | "OUT_OF_STOCK" 
+export type InventoryStatus =
+  | "ACTIVE"
+  | "INACTIVE"
+  | "LOW_STOCK"
+  | "OUT_OF_STOCK"
   | "DISCONTINUED";
 
 export interface InventoryItem extends OrganizationEntity {
@@ -125,13 +125,13 @@ export interface Warehouse extends OrganizationEntity {
 // ORDER TYPES
 // ============================================================================
 
-export type OrderStatus = 
-  | "DRAFT" 
-  | "PENDING" 
-  | "CONFIRMED" 
-  | "IN_PROGRESS" 
-  | "SHIPPED" 
-  | "DELIVERED" 
+export type OrderStatus =
+  | "DRAFT"
+  | "PENDING"
+  | "CONFIRMED"
+  | "IN_PROGRESS"
+  | "SHIPPED"
+  | "DELIVERED"
   | "CANCELLED";
 
 export interface BaseOrder extends OrganizationEntity {

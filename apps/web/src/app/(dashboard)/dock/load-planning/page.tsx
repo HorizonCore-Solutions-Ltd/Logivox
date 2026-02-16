@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface LoadPlan {
   id: string;
@@ -37,8 +37,8 @@ export default function LoadPlanning() {
     try {
       setLoading(true);
       const [summaryRes, specsRes] = await Promise.all([
-        fetch('/api/dock/load-planning?action=load_summary'),
-        fetch('/api/dock/load-planning?action=truck_specs'),
+        fetch("/api/dock/load-planning?action=load_summary"),
+        fetch("/api/dock/load-planning?action=truck_specs"),
       ]);
 
       const summaryData = await summaryRes.json();
@@ -47,22 +47,22 @@ export default function LoadPlanning() {
       setSummary(summaryData.summary);
       setTruckSpecs(specsData.truckSpecs);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const getUtilizationColor = (percent: number) => {
-    if (percent >= 85) return 'text-green-600';
-    if (percent >= 70) return 'text-yellow-600';
-    return 'text-red-600';
+    if (percent >= 85) return "text-green-600";
+    if (percent >= 70) return "text-yellow-600";
+    return "text-red-600";
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 90) return 'bg-green-100 text-green-800';
-    if (score >= 75) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
+    if (score >= 90) return "bg-green-100 text-green-800";
+    if (score >= 75) return "bg-yellow-100 text-yellow-800";
+    return "bg-red-100 text-red-800";
   };
 
   if (loading) {
@@ -85,7 +85,9 @@ export default function LoadPlanning() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold">📦 Load Planning & Optimization</h1>
+          <h1 className="text-3xl font-bold">
+            📦 Load Planning & Optimization
+          </h1>
           <p className="text-gray-600">
             3D bin packing and weight distribution optimization
           </p>
@@ -116,7 +118,9 @@ export default function LoadPlanning() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-3xl font-bold ${getUtilizationColor(summary?.avgCubeUtilization || 0)}`}>
+            <div
+              className={`text-3xl font-bold ${getUtilizationColor(summary?.avgCubeUtilization || 0)}`}
+            >
               {summary?.avgCubeUtilization?.toFixed(1) || 0}%
             </div>
             <div className="text-sm text-gray-600 mt-1">Truck space used</div>
@@ -130,7 +134,9 @@ export default function LoadPlanning() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-3xl font-bold ${getUtilizationColor(summary?.avgWeightUtilization || 0)}`}>
+            <div
+              className={`text-3xl font-bold ${getUtilizationColor(summary?.avgWeightUtilization || 0)}`}
+            >
               {summary?.avgWeightUtilization?.toFixed(1) || 0}%
             </div>
             <div className="text-sm text-gray-600 mt-1">Weight capacity</div>
@@ -173,26 +179,31 @@ export default function LoadPlanning() {
               <CardContent>
                 <div className="space-y-3">
                   {summary?.topPerformers?.map((plan: any, index: number) => (
-                    <div key={plan.id} className="border rounded p-3 hover:bg-gray-50">
+                    <div
+                      key={plan.id}
+                      className="border rounded p-3 hover:bg-gray-50"
+                    >
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="font-medium">{plan.shipmentId}</div>
                           <div className="text-sm text-gray-600">{plan.id}</div>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}
+                        >
                           Score: {plan.score}
                         </span>
                       </div>
-                      
+
                       <div className="flex gap-4 text-sm">
                         <div>
-                          <span className="text-gray-600">Cube:</span>{' '}
+                          <span className="text-gray-600">Cube:</span>{" "}
                           <span className="font-medium text-green-600">
                             {plan.cubeUtilization.toFixed(1)}%
                           </span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Rank:</span>{' '}
+                          <span className="text-gray-600">Rank:</span>{" "}
                           <span className="font-medium">#{index + 1}</span>
                         </div>
                       </div>
@@ -212,22 +223,29 @@ export default function LoadPlanning() {
               <CardContent>
                 <div className="space-y-3">
                   {summary?.needsOptimization?.map((plan: any) => (
-                    <div key={plan.id} className="border rounded p-3 bg-yellow-50">
+                    <div
+                      key={plan.id}
+                      className="border rounded p-3 bg-yellow-50"
+                    >
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="font-medium">{plan.shipmentId}</div>
                           <div className="text-sm text-gray-600">{plan.id}</div>
                         </div>
-                        <span className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}>
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${getScoreColor(plan.score)}`}
+                        >
                           Score: {plan.score}
                         </span>
                       </div>
-                      
+
                       <div className="text-sm">
-                        <span className="text-gray-600">Issue:</span>{' '}
-                        <span className="font-medium text-orange-600">{plan.issue}</span>
+                        <span className="text-gray-600">Issue:</span>{" "}
+                        <span className="font-medium text-orange-600">
+                          {plan.issue}
+                        </span>
                       </div>
-                      
+
                       <div className="mt-2">
                         <Button size="sm" variant="outline" className="w-full">
                           ⚡ Optimize Load
@@ -248,35 +266,72 @@ export default function LoadPlanning() {
             <CardContent>
               <div className="space-y-4">
                 {[
-                  { name: 'Load Plan #1', front: 20, middle: 60, rear: 20, status: 'Optimal' },
-                  { name: 'Load Plan #2', front: 25, middle: 55, rear: 20, status: 'Good' },
-                  { name: 'Load Plan #3', front: 35, middle: 45, rear: 20, status: 'Front Heavy' },
+                  {
+                    name: "Load Plan #1",
+                    front: 20,
+                    middle: 60,
+                    rear: 20,
+                    status: "Optimal",
+                  },
+                  {
+                    name: "Load Plan #2",
+                    front: 25,
+                    middle: 55,
+                    rear: 20,
+                    status: "Good",
+                  },
+                  {
+                    name: "Load Plan #3",
+                    front: 35,
+                    middle: 45,
+                    rear: 20,
+                    status: "Front Heavy",
+                  },
                 ].map((plan) => (
                   <div key={plan.name} className="border rounded p-4">
                     <div className="flex justify-between items-center mb-2">
                       <div className="font-medium">{plan.name}</div>
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        plan.status === 'Optimal' ? 'bg-green-100 text-green-800' :
-                        plan.status === 'Good' ? 'bg-blue-100 text-blue-800' :
-                        'bg-orange-100 text-orange-800'
-                      }`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded ${
+                          plan.status === "Optimal"
+                            ? "bg-green-100 text-green-800"
+                            : plan.status === "Good"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-orange-100 text-orange-800"
+                        }`}
+                      >
                         {plan.status}
                       </span>
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex gap-2">
                         <div className="flex-1">
-                          <div className="text-xs text-gray-600 mb-1">Front: {plan.front}%</div>
-                          <div className="h-6 bg-blue-200 rounded" style={{ width: `${plan.front}%` }} />
+                          <div className="text-xs text-gray-600 mb-1">
+                            Front: {plan.front}%
+                          </div>
+                          <div
+                            className="h-6 bg-blue-200 rounded"
+                            style={{ width: `${plan.front}%` }}
+                          />
                         </div>
                         <div className="flex-1">
-                          <div className="text-xs text-gray-600 mb-1">Middle: {plan.middle}%</div>
-                          <div className="h-6 bg-green-200 rounded" style={{ width: `${plan.middle}%` }} />
+                          <div className="text-xs text-gray-600 mb-1">
+                            Middle: {plan.middle}%
+                          </div>
+                          <div
+                            className="h-6 bg-green-200 rounded"
+                            style={{ width: `${plan.middle}%` }}
+                          />
                         </div>
                         <div className="flex-1">
-                          <div className="text-xs text-gray-600 mb-1">Rear: {plan.rear}%</div>
-                          <div className="h-6 bg-purple-200 rounded" style={{ width: `${plan.rear}%` }} />
+                          <div className="text-xs text-gray-600 mb-1">
+                            Rear: {plan.rear}%
+                          </div>
+                          <div
+                            className="h-6 bg-purple-200 rounded"
+                            style={{ width: `${plan.rear}%` }}
+                          />
                         </div>
                       </div>
                     </div>
@@ -290,40 +345,51 @@ export default function LoadPlanning() {
         {/* Truck Specs Tab */}
         <TabsContent value="trucks" className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {truckSpecs && Object.entries(truckSpecs).map(([key, spec]: [string, any]) => (
-              <Card key={key}>
-                <CardHeader>
-                  <CardTitle>{spec.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div className="p-2 bg-blue-50 rounded">
-                        <div className="text-gray-600">Length</div>
-                        <div className="font-medium">{spec.length}" ({(spec.length / 12).toFixed(0)}ft)</div>
+            {truckSpecs &&
+              Object.entries(truckSpecs).map(([key, spec]: [string, any]) => (
+                <Card key={key}>
+                  <CardHeader>
+                    <CardTitle>{spec.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div className="p-2 bg-blue-50 rounded">
+                          <div className="text-gray-600">Length</div>
+                          <div className="font-medium">
+                            {spec.length}" ({(spec.length / 12).toFixed(0)}ft)
+                          </div>
+                        </div>
+                        <div className="p-2 bg-green-50 rounded">
+                          <div className="text-gray-600">Width</div>
+                          <div className="font-medium">
+                            {spec.width}" ({(spec.width / 12).toFixed(1)}ft)
+                          </div>
+                        </div>
+                        <div className="p-2 bg-purple-50 rounded">
+                          <div className="text-gray-600">Height</div>
+                          <div className="font-medium">
+                            {spec.height}" ({(spec.height / 12).toFixed(1)}ft)
+                          </div>
+                        </div>
+                        <div className="p-2 bg-orange-50 rounded">
+                          <div className="text-gray-600">Max Weight</div>
+                          <div className="font-medium">
+                            {spec.maxWeight.toLocaleString()} lbs
+                          </div>
+                        </div>
                       </div>
-                      <div className="p-2 bg-green-50 rounded">
-                        <div className="text-gray-600">Width</div>
-                        <div className="font-medium">{spec.width}" ({(spec.width / 12).toFixed(1)}ft)</div>
-                      </div>
-                      <div className="p-2 bg-purple-50 rounded">
-                        <div className="text-gray-600">Height</div>
-                        <div className="font-medium">{spec.height}" ({(spec.height / 12).toFixed(1)}ft)</div>
-                      </div>
-                      <div className="p-2 bg-orange-50 rounded">
-                        <div className="text-gray-600">Max Weight</div>
-                        <div className="font-medium">{spec.maxWeight.toLocaleString()} lbs</div>
+
+                      <div className="mt-3 p-3 bg-gray-50 rounded">
+                        <div className="text-gray-600 text-sm">Max Cube</div>
+                        <div className="font-bold text-lg">
+                          {spec.maxCube.toLocaleString()} ft³
+                        </div>
                       </div>
                     </div>
-                    
-                    <div className="mt-3 p-3 bg-gray-50 rounded">
-                      <div className="text-gray-600 text-sm">Max Cube</div>
-                      <div className="font-bold text-lg">{spec.maxCube.toLocaleString()} ft³</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              ))}
           </div>
         </TabsContent>
 
@@ -337,7 +403,9 @@ export default function LoadPlanning() {
               <div className="h-96 flex items-center justify-center bg-gray-50 rounded border-2 border-dashed">
                 <div className="text-center">
                   <div className="text-6xl mb-4">📦</div>
-                  <div className="text-lg font-medium text-gray-700">3D Load Viewer</div>
+                  <div className="text-lg font-medium text-gray-700">
+                    3D Load Viewer
+                  </div>
                   <div className="text-sm text-gray-500 mt-2">
                     Interactive 3D visualization of items in truck
                   </div>
@@ -359,19 +427,27 @@ export default function LoadPlanning() {
               <CardContent>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded bg-blue-500 text-white flex items-center justify-center text-xs">1</div>
+                    <div className="w-6 h-6 rounded bg-blue-500 text-white flex items-center justify-center text-xs">
+                      1
+                    </div>
                     <span>Heavy pallets (floor)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded bg-green-500 text-white flex items-center justify-center text-xs">2</div>
+                    <div className="w-6 h-6 rounded bg-green-500 text-white flex items-center justify-center text-xs">
+                      2
+                    </div>
                     <span>Medium boxes (layer 2)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded bg-yellow-500 text-white flex items-center justify-center text-xs">3</div>
+                    <div className="w-6 h-6 rounded bg-yellow-500 text-white flex items-center justify-center text-xs">
+                      3
+                    </div>
                     <span>Light items (top)</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded bg-red-500 text-white flex items-center justify-center text-xs">4</div>
+                    <div className="w-6 h-6 rounded bg-red-500 text-white flex items-center justify-center text-xs">
+                      4
+                    </div>
                     <span>Fragile (last)</span>
                   </div>
                 </div>
@@ -384,16 +460,32 @@ export default function LoadPlanning() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <Button size="sm" variant="outline" className="w-full text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-xs"
+                  >
                     📊 Maximize Cube
                   </Button>
-                  <Button size="sm" variant="outline" className="w-full text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-xs"
+                  >
                     ⚖️ Balance Weight
                   </Button>
-                  <Button size="sm" variant="outline" className="w-full text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-xs"
+                  >
                     ⚡ Fastest Load
                   </Button>
-                  <Button size="sm" variant="outline" className="w-full text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full text-xs"
+                  >
                     🛡️ Minimize Damage
                   </Button>
                 </div>
@@ -485,7 +577,9 @@ export default function LoadPlanning() {
                   </div>
                   <div className="flex justify-between py-3 bg-green-50 -mx-4 px-4">
                     <span className="font-bold">Total Annual Savings</span>
-                    <span className="font-bold text-lg text-green-600">$393,000</span>
+                    <span className="font-bold text-lg text-green-600">
+                      $393,000
+                    </span>
                   </div>
                 </div>
               </CardContent>
@@ -504,15 +598,21 @@ export default function LoadPlanning() {
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded">
                   <div className="text-3xl font-bold text-blue-600">2.4</div>
-                  <div className="text-sm text-gray-600 mt-1">Payback (months)</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Payback (months)
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded">
                   <div className="text-3xl font-bold text-purple-600">87%</div>
-                  <div className="text-sm text-gray-600 mt-1">Avg cube utilization</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Avg cube utilization
+                  </div>
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
                   <div className="text-3xl font-bold text-orange-600">18%</div>
-                  <div className="text-sm text-gray-600 mt-1">Trucks eliminated</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Trucks eliminated
+                  </div>
                 </div>
               </div>
 
@@ -521,19 +621,31 @@ export default function LoadPlanning() {
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>87% average cube utilization</strong> - Industry-leading space efficiency</span>
+                    <span>
+                      <strong>87% average cube utilization</strong> -
+                      Industry-leading space efficiency
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>18% reduction in trucks needed</strong> - Lower freight costs and emissions</span>
+                    <span>
+                      <strong>18% reduction in trucks needed</strong> - Lower
+                      freight costs and emissions
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>35% reduction in loading time</strong> - Optimized load sequence</span>
+                    <span>
+                      <strong>35% reduction in loading time</strong> - Optimized
+                      load sequence
+                    </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-green-600">✓</span>
-                    <span><strong>40% less product damage</strong> - Weight-balanced loading</span>
+                    <span>
+                      <strong>40% less product damage</strong> - Weight-balanced
+                      loading
+                    </span>
                   </li>
                 </ul>
               </div>

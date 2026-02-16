@@ -52,17 +52,26 @@ export const authOptions: NextAuthOptions = {
 
         if (!user || !user.password) {
           // Prevent timing attacks
-          await bcrypt.compare("dummy", "$2a$12$dummy.hash.to.prevent.timing.attacks");
+          await bcrypt.compare(
+            "dummy",
+            "$2a$12$dummy.hash.to.prevent.timing.attacks",
+          );
           throw new Error("Invalid credentials");
         }
 
         // Check if account is locked
-        if (user.securityProfile?.lockedUntil && user.securityProfile.lockedUntil > new Date()) {
+        if (
+          user.securityProfile?.lockedUntil &&
+          user.securityProfile.lockedUntil > new Date()
+        ) {
           throw new Error("Account temporarily locked due to security");
         }
 
         // Verify password
-        const isValidPassword = await bcrypt.compare(credentials.password, user.password);
+        const isValidPassword = await bcrypt.compare(
+          credentials.password,
+          user.password,
+        );
 
         if (!isValidPassword) {
           // Track failed attempts
@@ -163,7 +172,10 @@ export const authOptions: NextAuthOptions = {
       }
 
       // Auto-logout after inactivity (6 hours)
-      if (token.lastActivity && Date.now() - (token.lastActivity as number) > 6 * 60 * 60 * 1000) {
+      if (
+        token.lastActivity &&
+        Date.now() - (token.lastActivity as number) > 6 * 60 * 60 * 1000
+      ) {
         return null;
       }
 
@@ -216,7 +228,10 @@ async function trackFailedLogin(userId: string) {
       where: { userId },
     });
 
-    if (profile && profile.failedLoginAttempts >= ACCOUNT_LOCKOUT.MAX_FAILED_ATTEMPTS) {
+    if (
+      profile &&
+      profile.failedLoginAttempts >= ACCOUNT_LOCKOUT.MAX_FAILED_ATTEMPTS
+    ) {
       await prisma.securityProfile.update({
         where: { userId },
         data: {
@@ -225,7 +240,7 @@ async function trackFailedLogin(userId: string) {
       });
     }
   } catch (error) {
-    console.error('Failed to track login attempt:', error);
+    console.error("Failed to track login attempt:", error);
   }
 }
 
@@ -240,7 +255,7 @@ async function resetFailedAttempts(userId: string) {
       },
     });
   } catch (error) {
-    console.error('Failed to reset failed attempts:', error);
+    console.error("Failed to reset failed attempts:", error);
   }
 }
 
@@ -249,7 +264,7 @@ async function verifyMFACode(userId: string, code: string): Promise<boolean> {
     // Get user's MFA secret from database
     const securityProfile = await prisma.securityProfile.findUnique({
       where: { userId },
-      select: { mfaSecret: true, mfaEnabled: true }
+      select: { mfaSecret: true, mfaEnabled: true },
     });
 
     if (!securityProfile?.mfaEnabled || !securityProfile.mfaSecret) {
@@ -269,12 +284,12 @@ async function verifyMFACode(userId: string, code: string): Promise<boolean> {
     //   token: code,
     //   window: 2
     // });
-    
+
     // Temporary: Accept any 6-digit code for demo
     // Replace with actual TOTP verification in production
     return code.length === 6 && /^\d+$/.test(code);
   } catch (error) {
-    console.error('MFA verification error:', error);
+    console.error("MFA verification error:", error);
     return false;
   }
 }
@@ -288,9 +303,9 @@ async function checkSuspiciousActivity(email: string): Promise<boolean> {
     const recentAttempts = await prisma.securityLog.count({
       where: {
         user: { email },
-        event: 'LOGIN_ATTEMPT',
-        timestamp: { gte: fiveMinutesAgo }
-      }
+        event: "LOGIN_ATTEMPT",
+        timestamp: { gte: fiveMinutesAgo },
+      },
     });
 
     // Flag as suspicious if more than 10 attempts in 5 minutes
@@ -303,15 +318,15 @@ async function checkSuspiciousActivity(email: string): Promise<boolean> {
     const failedAttempts = await prisma.securityLog.count({
       where: {
         user: { email },
-        event: 'LOGIN_FAILED',
-        timestamp: { gte: oneHourAgo }
-      }
+        event: "LOGIN_FAILED",
+        timestamp: { gte: oneHourAgo },
+      },
     });
 
     // Flag as suspicious if more than 20 failed attempts in 1 hour
     return failedAttempts > 20;
   } catch (error) {
-    console.error('Error checking suspicious activity:', error);
+    console.error("Error checking suspicious activity:", error);
     // Err on the side of caution - don't block if we can't check
     return false;
   }

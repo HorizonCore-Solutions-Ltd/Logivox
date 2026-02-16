@@ -1,10 +1,10 @@
 /**
  * TEMPERATURE-SENSITIVE ROUTING SYSTEM
  * =====================================
- * 
+ *
  * Optimization System 5 - High Impact (336% ROI)
  * Investment: $28,000 → Annual Savings: $94,000
- * 
+ *
  * Features:
  * - Smart pick sequencing for frozen/perishable goods
  * - Thaw time monitoring and prevention
@@ -27,19 +27,28 @@ import { z } from "zod";
 const temperatureRouteSchema = z.object({
   orderId: z.string(),
   pickerId: z.string().optional(),
-  items: z.array(z.object({
-    itemId: z.string(),
-    sku: z.string(),
-    location: z.string(),
-    temperatureZone: z.enum(["FROZEN", "REFRIGERATED", "COOL", "AMBIENT"]),
-    maxThawMinutes: z.number().int().positive(),
-    priority: z.number().int().min(1).max(10).default(5),
-  })),
-  optimizationGoal: z.enum(["MINIMIZE_THAW", "MINIMIZE_DISTANCE", "BALANCED"]).default("MINIMIZE_THAW"),
+  items: z.array(
+    z.object({
+      itemId: z.string(),
+      sku: z.string(),
+      location: z.string(),
+      temperatureZone: z.enum(["FROZEN", "REFRIGERATED", "COOL", "AMBIENT"]),
+      maxThawMinutes: z.number().int().positive(),
+      priority: z.number().int().min(1).max(10).default(5),
+    }),
+  ),
+  optimizationGoal: z
+    .enum(["MINIMIZE_THAW", "MINIMIZE_DISTANCE", "BALANCED"])
+    .default("MINIMIZE_THAW"),
 });
 
 const temperatureAlertSchema = z.object({
-  type: z.enum(["THAW_RISK", "TEMPERATURE_BREACH", "COLD_CHAIN_BREAK", "SPOILAGE_DETECTED"]),
+  type: z.enum([
+    "THAW_RISK",
+    "TEMPERATURE_BREACH",
+    "COLD_CHAIN_BREAK",
+    "SPOILAGE_DETECTED",
+  ]),
   severity: z.enum(["INFO", "WARNING", "CRITICAL"]),
   orderId: z.string().optional(),
   itemId: z.string().optional(),
@@ -134,13 +143,13 @@ function calculateOptimalSequence(
     maxThawMinutes: number;
     priority: number;
   }>,
-  goal: "MINIMIZE_THAW" | "MINIMIZE_DISTANCE" | "BALANCED"
+  goal: "MINIMIZE_THAW" | "MINIMIZE_DISTANCE" | "BALANCED",
 ): OptimizationResult {
   // Sort items by temperature sensitivity
   const sortedItems = [...items].sort((a, b) => {
     const zoneA = TEMPERATURE_ZONES[a.temperatureZone];
     const zoneB = TEMPERATURE_ZONES[b.temperatureZone];
-    
+
     if (goal === "MINIMIZE_THAW") {
       // Pick coldest items first
       return zoneA.pickPriority - zoneB.pickPriority;
@@ -205,7 +214,7 @@ function calculateOptimalSequence(
   });
 
   const avgSpoilageRisk = (totalSpoilageRisk / items.length) * 100;
-  
+
   let complianceStatus: "COMPLIANT" | "AT_RISK" | "NON_COMPLIANT";
   if (avgSpoilageRisk < 5) complianceStatus = "COMPLIANT";
   else if (avgSpoilageRisk < 15) complianceStatus = "AT_RISK";
@@ -215,8 +224,8 @@ function calculateOptimalSequence(
     complianceStatus === "COMPLIANT"
       ? "Route is optimized for cold chain compliance"
       : complianceStatus === "AT_RISK"
-      ? "Consider splitting into multiple picks to reduce thaw risk"
-      : "CRITICAL: Route exceeds safe thaw times. Immediate action required.";
+        ? "Consider splitting into multiple picks to reduce thaw risk"
+        : "CRITICAL: Route exceeds safe thaw times. Immediate action required.";
 
   return {
     pickSequence,
@@ -230,14 +239,14 @@ function calculateOptimalSequence(
 
 function calculateThawRisk(
   temperatureZone: keyof typeof TEMPERATURE_ZONES,
-  timeOutOfZone: number // minutes
+  timeOutOfZone: number, // minutes
 ): {
   risk: number; // 0-100%
   spoilageCost: number;
   recommendation: string;
 } {
   const zone = TEMPERATURE_ZONES[temperatureZone];
-  
+
   if (timeOutOfZone <= zone.maxThawTime) {
     return {
       risk: (timeOutOfZone / zone.maxThawTime) * 50,
@@ -295,7 +304,7 @@ export async function GET(request: NextRequest) {
       case "routes": {
         // Get active temperature-sensitive routes
         const status = searchParams.get("status");
-        
+
         const routes = await prisma.activityLog.findMany({
           where: {
             organizationId,
@@ -317,12 +326,14 @@ export async function GET(request: NextRequest) {
       case "alerts": {
         // Get temperature alerts
         const severity = searchParams.get("severity");
-        
+
         const alerts = await prisma.activityLog.findMany({
           where: {
             organizationId,
             action: "TEMP_ALERT",
-            ...(severity && { metadata: { path: ["severity"], equals: severity } }),
+            ...(severity && {
+              metadata: { path: ["severity"], equals: severity },
+            }),
             createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
           },
           orderBy: { createdAt: "desc" },
@@ -353,22 +364,23 @@ export async function GET(request: NextRequest) {
         });
 
         const criticalAlerts = alerts.filter(
-          (a) => (a.metadata as any)?.severity === "CRITICAL"
+          (a) => (a.metadata as any)?.severity === "CRITICAL",
         ).length;
 
         const compliantRoutes = routes.filter(
-          (r) => (r.metadata as any)?.complianceStatus === "COMPLIANT"
+          (r) => (r.metadata as any)?.complianceStatus === "COMPLIANT",
         ).length;
 
         const totalSpoilageReduction = routes.reduce(
           (sum, r) => sum + ((r.metadata as any)?.spoilageReduction || 0),
-          0
+          0,
         );
 
         const stats = {
           totalRoutes: routes.length,
           compliantRoutes,
-          complianceRate: routes.length > 0 ? (compliantRoutes / routes.length) * 100 : 0,
+          complianceRate:
+            routes.length > 0 ? (compliantRoutes / routes.length) * 100 : 0,
           totalAlerts: alerts.length,
           criticalAlerts,
           spoilageReduction: totalSpoilageReduction,
@@ -381,10 +393,17 @@ export async function GET(request: NextRequest) {
       case "analyze": {
         // Analyze a potential route
         const items = JSON.parse(searchParams.get("items") || "[]");
-        const goal = searchParams.get("goal") as "MINIMIZE_THAW" | "MINIMIZE_DISTANCE" | "BALANCED" || "MINIMIZE_THAW";
+        const goal =
+          (searchParams.get("goal") as
+            | "MINIMIZE_THAW"
+            | "MINIMIZE_DISTANCE"
+            | "BALANCED") || "MINIMIZE_THAW";
 
         if (!items || items.length === 0) {
-          return NextResponse.json({ error: "No items provided" }, { status: 400 });
+          return NextResponse.json(
+            { error: "No items provided" },
+            { status: 400 },
+          );
         }
 
         const analysis = calculateOptimalSequence(items, goal);
@@ -398,7 +417,7 @@ export async function GET(request: NextRequest) {
     console.error("Temperature routing error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -422,7 +441,7 @@ export async function POST(request: NextRequest) {
         // Calculate optimal sequence
         const optimization = calculateOptimalSequence(
           validated.items,
-          validated.optimizationGoal
+          validated.optimizationGoal,
         );
 
         // Create route record
@@ -437,7 +456,9 @@ export async function POST(request: NextRequest) {
               orderId: validated.orderId,
               pickerId: validated.pickerId,
               itemCount: validated.items.length,
-              pickSequence: JSON.parse(JSON.stringify(optimization.pickSequence)),
+              pickSequence: JSON.parse(
+                JSON.stringify(optimization.pickSequence),
+              ),
               totalPickTime: optimization.totalPickTime,
               maxThawTime: optimization.maxThawTime,
               spoilageRisk: optimization.spoilageRisk,
@@ -459,7 +480,10 @@ export async function POST(request: NextRequest) {
               entityId: validated.orderId,
               metadata: {
                 type: "THAW_RISK",
-                severity: optimization.complianceStatus === "NON_COMPLIANT" ? "CRITICAL" : "WARNING",
+                severity:
+                  optimization.complianceStatus === "NON_COMPLIANT"
+                    ? "CRITICAL"
+                    : "WARNING",
                 orderId: validated.orderId,
                 spoilageRisk: optimization.spoilageRisk,
                 recommendation: optimization.recommendation,
@@ -503,7 +527,7 @@ export async function POST(request: NextRequest) {
         if (!temperatureZone || timeOutOfZone === undefined) {
           return NextResponse.json(
             { error: "Missing required parameters" },
-            { status: 400 }
+            { status: 400 },
           );
         }
 
@@ -547,7 +571,7 @@ export async function POST(request: NextRequest) {
     console.error("Temperature routing error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

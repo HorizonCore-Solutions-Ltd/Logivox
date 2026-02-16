@@ -19,12 +19,14 @@ import { z } from "zod";
 const rcaRequestSchema = z.object({
   capaId: z.string().optional(),
   problemStatement: z.string().min(10, "Problem statement required"),
-  problemContext: z.object({
-    department: z.string().optional(),
-    product: z.string().optional(),
-    process: z.string().optional(),
-    dateOccurred: z.string().optional(),
-  }).optional(),
+  problemContext: z
+    .object({
+      department: z.string().optional(),
+      product: z.string().optional(),
+      process: z.string().optional(),
+      dateOccurred: z.string().optional(),
+    })
+    .optional(),
 });
 
 interface WhyStep {
@@ -58,34 +60,34 @@ export async function POST(request: NextRequest) {
     // Step 1: Search historical CAPAs for similar issues
     const similarCAPAs = await findSimilarCAPAs(
       session.user.organizationId,
-      validatedData.problemStatement
+      validatedData.problemStatement,
     );
 
     // Step 2: Generate 5 Whys analysis
     const fiveWhys = await generate5Whys(
       validatedData.problemStatement,
       similarCAPAs,
-      validatedData.problemContext
+      validatedData.problemContext,
     );
 
     // Step 3: Generate Fishbone diagram
     const fishbone = generateFishboneDiagram(
       fiveWhys,
-      validatedData.problemContext
+      validatedData.problemContext,
     );
 
     // Step 4: Generate recommended actions
     const recommendations = generateRecommendations(
       fiveWhys,
       fishbone,
-      similarCAPAs
+      similarCAPAs,
     );
 
     // Step 5: Calculate confidence score
     const confidenceScore = calculateConfidenceScore(
       similarCAPAs.length,
       fiveWhys.length,
-      fishbone.length
+      fishbone.length,
     );
 
     // Step 6: Identify root cause
@@ -103,7 +105,7 @@ export async function POST(request: NextRequest) {
           rootCauseAnalysis: {
             fiveWhys,
             fishbone,
-            similarCAPAs: similarCAPAs.map(c => c.capaNumber),
+            similarCAPAs: similarCAPAs.map((c) => c.capaNumber),
             confidenceScore,
             generatedAt: new Date().toISOString(),
           } as any,
@@ -140,7 +142,7 @@ export async function POST(request: NextRequest) {
           rootCause: capa.rootCause,
           similarity: calculateSimilarityScore(
             validatedData.problemStatement,
-            capa.problemStatement
+            capa.problemStatement,
           ),
         })),
         confidenceScore,
@@ -151,13 +153,13 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
     console.error("Error generating AI RCA:", error);
     return NextResponse.json(
       { error: "Failed to generate RCA" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -167,7 +169,7 @@ export async function POST(request: NextRequest) {
  */
 async function findSimilarCAPAs(
   organizationId: string,
-  problemStatement: string
+  problemStatement: string,
 ) {
   // Extract keywords from problem statement
   const keywords = problemStatement
@@ -215,11 +217,11 @@ async function findSimilarCAPAs(
 async function generate5Whys(
   problemStatement: string,
   similarCAPAs: any[],
-  context?: any
+  context?: any,
 ): Promise<WhyStep[]> {
   // Simulate AI-powered 5 Whys generation
   // In production, this would call OpenAI/Claude API
-  
+
   const whys: WhyStep[] = [
     {
       question: "Why did this problem occur?",
@@ -231,7 +233,7 @@ async function generate5Whys(
   // Generate subsequent whys based on similar CAPAs
   if (similarCAPAs.length > 0) {
     const commonPatterns = extractCommonPatterns(similarCAPAs);
-    
+
     whys.push({
       question: "Why was this allowed to happen?",
       answer: commonPatterns.systemicIssue || "Process gap identified",
@@ -265,7 +267,7 @@ async function generate5Whys(
  */
 function generateFishboneDiagram(
   fiveWhys: WhyStep[],
-  context?: any
+  context?: any,
 ): FishboneCategory[] {
   return [
     {
@@ -331,7 +333,7 @@ function generateFishboneDiagram(
 function generateRecommendations(
   fiveWhys: WhyStep[],
   fishbone: FishboneCategory[],
-  similarCAPAs: any[]
+  similarCAPAs: any[],
 ): RecommendedAction[] {
   const recommendations: RecommendedAction[] = [];
 
@@ -404,7 +406,7 @@ function generateRecommendations(
 function calculateConfidenceScore(
   similarCAPAsCount: number,
   whySteps: number,
-  fishboneCategories: number
+  fishboneCategories: number,
 ): number {
   let score = 50; // Base score
 
@@ -425,7 +427,7 @@ function calculateConfidenceScore(
  */
 function identifyRootCause(
   fiveWhys: WhyStep[],
-  fishbone: FishboneCategory[]
+  fishbone: FishboneCategory[],
 ): string {
   // The last "Why" typically reveals the root cause
   const lastWhy = fiveWhys[fiveWhys.length - 1];
@@ -437,13 +439,19 @@ function identifyRootCause(
  */
 function calculateSimilarityScore(
   statement1: string,
-  statement2: string
+  statement2: string,
 ): number {
   const words1 = new Set(
-    statement1.toLowerCase().split(/\s+/).filter((w) => w.length > 3)
+    statement1
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((w) => w.length > 3),
   );
   const words2 = new Set(
-    statement2.toLowerCase().split(/\s+/).filter((w) => w.length > 3)
+    statement2
+      .toLowerCase()
+      .split(/\s+/)
+      .filter((w) => w.length > 3),
   );
 
   const intersection = new Set([...words1].filter((x) => words2.has(x)));

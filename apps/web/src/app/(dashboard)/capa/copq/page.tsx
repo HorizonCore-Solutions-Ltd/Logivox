@@ -5,9 +5,9 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  DollarSign, 
-  TrendingDown, 
+import {
+  DollarSign,
+  TrendingDown,
   TrendingUp,
   Shield,
   AlertTriangle,
@@ -20,10 +20,10 @@ import {
 
 /**
  * CAPA SYSTEM 9: COST OF QUALITY (COPQ) DASHBOARD
- * 
+ *
  * Comprehensive financial tracking of quality costs across 4 categories.
  * Provides executive visibility into quality investment vs. failure costs.
- * 
+ *
  * Investment: $76,000 | Annual Savings: $1,200,000 | ROI: 1,579%
  */
 
@@ -62,8 +62,10 @@ export default function COPQDashboardPage() {
   const [entries, setEntries] = useState<COPQEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1)).toISOString().split('T')[0],
-    endDate: new Date().toISOString().split('T')[0],
+    startDate: new Date(new Date().setMonth(new Date().getMonth() - 1))
+      .toISOString()
+      .split("T")[0],
+    endDate: new Date().toISOString().split("T")[0],
   });
 
   useEffect(() => {
@@ -97,28 +99,38 @@ export default function COPQDashboardPage() {
 
   const getCategoryColor = (category: string) => {
     switch (category) {
-      case "PREVENTION": return "bg-blue-500";
-      case "APPRAISAL": return "bg-green-500";
-      case "INTERNAL_FAILURE": return "bg-orange-500";
-      case "EXTERNAL_FAILURE": return "bg-red-500";
-      default: return "bg-gray-500";
+      case "PREVENTION":
+        return "bg-blue-500";
+      case "APPRAISAL":
+        return "bg-green-500";
+      case "INTERNAL_FAILURE":
+        return "bg-orange-500";
+      case "EXTERNAL_FAILURE":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
     }
   };
 
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case "PREVENTION": return <Shield className="h-5 w-5 text-blue-600" />;
-      case "APPRAISAL": return <CheckCircle2 className="h-5 w-5 text-green-600" />;
-      case "INTERNAL_FAILURE": return <AlertTriangle className="h-5 w-5 text-orange-600" />;
-      case "EXTERNAL_FAILURE": return <AlertTriangle className="h-5 w-5 text-red-600" />;
-      default: return <DollarSign className="h-5 w-5 text-gray-600" />;
+      case "PREVENTION":
+        return <Shield className="h-5 w-5 text-blue-600" />;
+      case "APPRAISAL":
+        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
+      case "INTERNAL_FAILURE":
+        return <AlertTriangle className="h-5 w-5 text-orange-600" />;
+      case "EXTERNAL_FAILURE":
+        return <AlertTriangle className="h-5 w-5 text-red-600" />;
+      default:
+        return <DollarSign className="h-5 w-5 text-gray-600" />;
     }
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
@@ -141,7 +153,9 @@ export default function COPQDashboardPage() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Cost of Quality Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Cost of Quality Dashboard
+            </h1>
             <p className="text-gray-600 mt-1">
               Financial visibility into prevention, appraisal, and failure costs
             </p>
@@ -152,14 +166,21 @@ export default function COPQDashboardPage() {
               <input
                 type="date"
                 value={dateRange.startDate}
-                onChange={(e) => setDateRange(prev => ({ ...prev, startDate: e.target.value }))}
+                onChange={(e) =>
+                  setDateRange((prev) => ({
+                    ...prev,
+                    startDate: e.target.value,
+                  }))
+                }
                 className="border rounded px-3 py-2 text-sm"
               />
               <span className="text-gray-500">to</span>
               <input
                 type="date"
                 value={dateRange.endDate}
-                onChange={(e) => setDateRange(prev => ({ ...prev, endDate: e.target.value }))}
+                onChange={(e) =>
+                  setDateRange((prev) => ({ ...prev, endDate: e.target.value }))
+                }
                 className="border rounded px-3 py-2 text-sm"
               />
             </div>
@@ -175,8 +196,12 @@ export default function COPQDashboardPage() {
           <Card className="p-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-blue-100 text-sm font-medium mb-2">Total Cost of Quality</p>
-                <p className="text-5xl font-bold">{formatCurrency(breakdown.total)}</p>
+                <p className="text-blue-100 text-sm font-medium mb-2">
+                  Total Cost of Quality
+                </p>
+                <p className="text-5xl font-bold">
+                  {formatCurrency(breakdown.total)}
+                </p>
                 {trend && (
                   <div className="flex items-center gap-2 mt-4">
                     {trend.direction === "DECREASING" ? (
@@ -184,17 +209,24 @@ export default function COPQDashboardPage() {
                     ) : trend.direction === "INCREASING" ? (
                       <TrendingUp className="h-5 w-5 text-red-300" />
                     ) : null}
-                    <span className={`text-sm ${
-                      trend.direction === "DECREASING" ? "text-green-300" : "text-red-300"
-                    }`}>
-                      {Math.abs(trend.changePercent).toFixed(1)}% {trend.direction.toLowerCase()} vs. previous period
+                    <span
+                      className={`text-sm ${
+                        trend.direction === "DECREASING"
+                          ? "text-green-300"
+                          : "text-red-300"
+                      }`}
+                    >
+                      {Math.abs(trend.changePercent).toFixed(1)}%{" "}
+                      {trend.direction.toLowerCase()} vs. previous period
                     </span>
                   </div>
                 )}
               </div>
               <div className="text-right">
                 <BarChart3 className="h-16 w-16 text-blue-300 mb-4" />
-                <p className="text-blue-100 text-sm">Period: {dateRange.startDate} to {dateRange.endDate}</p>
+                <p className="text-blue-100 text-sm">
+                  Period: {dateRange.startDate} to {dateRange.endDate}
+                </p>
               </div>
             </div>
           </Card>
@@ -209,22 +241,32 @@ export default function COPQDashboardPage() {
                 <div className="flex items-center gap-3">
                   {getCategoryIcon("PREVENTION")}
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Prevention</p>
-                    <p className="text-xs text-gray-500">{breakdown.prevention.items} items</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      Prevention
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {breakdown.prevention.items} items
+                    </p>
                   </div>
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(breakdown.prevention.cost)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(breakdown.prevention.cost)}
+              </p>
               <div className="mt-4">
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className={`${getCategoryColor("PREVENTION")} h-2 rounded-full`}
                     style={{ width: `${breakdown.prevention.percentage}%` }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{breakdown.prevention.percentage.toFixed(1)}% of total</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {breakdown.prevention.percentage.toFixed(1)}% of total
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-3">Training, quality planning, process improvement</p>
+              <p className="text-xs text-gray-500 mt-3">
+                Training, quality planning, process improvement
+              </p>
             </Card>
 
             {/* Appraisal Costs */}
@@ -233,22 +275,32 @@ export default function COPQDashboardPage() {
                 <div className="flex items-center gap-3">
                   {getCategoryIcon("APPRAISAL")}
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Appraisal</p>
-                    <p className="text-xs text-gray-500">{breakdown.appraisal.items} items</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      Appraisal
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {breakdown.appraisal.items} items
+                    </p>
                   </div>
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(breakdown.appraisal.cost)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(breakdown.appraisal.cost)}
+              </p>
               <div className="mt-4">
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className={`${getCategoryColor("APPRAISAL")} h-2 rounded-full`}
                     style={{ width: `${breakdown.appraisal.percentage}%` }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{breakdown.appraisal.percentage.toFixed(1)}% of total</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {breakdown.appraisal.percentage.toFixed(1)}% of total
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-3">Inspections, testing, quality audits</p>
+              <p className="text-xs text-gray-500 mt-3">
+                Inspections, testing, quality audits
+              </p>
             </Card>
 
             {/* Internal Failure Costs */}
@@ -257,22 +309,34 @@ export default function COPQDashboardPage() {
                 <div className="flex items-center gap-3">
                   {getCategoryIcon("INTERNAL_FAILURE")}
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Internal Failure</p>
-                    <p className="text-xs text-gray-500">{breakdown.internalFailure.items} items</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      Internal Failure
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {breakdown.internalFailure.items} items
+                    </p>
                   </div>
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(breakdown.internalFailure.cost)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(breakdown.internalFailure.cost)}
+              </p>
               <div className="mt-4">
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className={`${getCategoryColor("INTERNAL_FAILURE")} h-2 rounded-full`}
-                    style={{ width: `${breakdown.internalFailure.percentage}%` }}
+                    style={{
+                      width: `${breakdown.internalFailure.percentage}%`,
+                    }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{breakdown.internalFailure.percentage.toFixed(1)}% of total</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {breakdown.internalFailure.percentage.toFixed(1)}% of total
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-3">Scrap, rework, reinspection (before customer)</p>
+              <p className="text-xs text-gray-500 mt-3">
+                Scrap, rework, reinspection (before customer)
+              </p>
             </Card>
 
             {/* External Failure Costs */}
@@ -281,22 +345,34 @@ export default function COPQDashboardPage() {
                 <div className="flex items-center gap-3">
                   {getCategoryIcon("EXTERNAL_FAILURE")}
                   <div>
-                    <p className="text-sm font-medium text-gray-600">External Failure</p>
-                    <p className="text-xs text-gray-500">{breakdown.externalFailure.items} items</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      External Failure
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {breakdown.externalFailure.items} items
+                    </p>
                   </div>
                 </div>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(breakdown.externalFailure.cost)}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(breakdown.externalFailure.cost)}
+              </p>
               <div className="mt-4">
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className={`${getCategoryColor("EXTERNAL_FAILURE")} h-2 rounded-full`}
-                    style={{ width: `${breakdown.externalFailure.percentage}%` }}
+                    style={{
+                      width: `${breakdown.externalFailure.percentage}%`,
+                    }}
                   />
                 </div>
-                <p className="text-xs text-gray-500 mt-1">{breakdown.externalFailure.percentage.toFixed(1)}% of total</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {breakdown.externalFailure.percentage.toFixed(1)}% of total
+                </p>
               </div>
-              <p className="text-xs text-gray-500 mt-3">Returns, warranty, complaints (customer found)</p>
+              <p className="text-xs text-gray-500 mt-3">
+                Returns, warranty, complaints (customer found)
+              </p>
             </Card>
           </div>
         )}
@@ -304,16 +380,22 @@ export default function COPQDashboardPage() {
         {/* ROI Analysis */}
         {roiAnalysis && (
           <Card className="p-6 bg-green-50">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Quality Investment ROI</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-4">
+              Quality Investment ROI
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Investment in Prevention</p>
+                <p className="text-sm text-gray-600 mb-1">
+                  Investment in Prevention
+                </p>
                 <p className="text-2xl font-bold text-blue-900">
                   {formatCurrency(roiAnalysis.investmentInPrevention)}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Failure Costs Saved</p>
+                <p className="text-sm text-gray-600 mb-1">
+                  Failure Costs Saved
+                </p>
                 <p className="text-2xl font-bold text-green-900">
                   {formatCurrency(roiAnalysis.failureCostsSaved)}
                 </p>
@@ -333,8 +415,9 @@ export default function COPQDashboardPage() {
             </div>
             <div className="mt-4 pt-4 border-t border-green-200">
               <p className="text-sm text-gray-600">
-                Based on {roiAnalysis.totalCapas} CAPAs ({roiAnalysis.completedCapas} completed) 
-                with {roiAnalysis.avgCapaEffectiveness}% average effectiveness
+                Based on {roiAnalysis.totalCapas} CAPAs (
+                {roiAnalysis.completedCapas} completed) with{" "}
+                {roiAnalysis.avgCapaEffectiveness}% average effectiveness
               </p>
             </div>
           </Card>
@@ -342,8 +425,10 @@ export default function COPQDashboardPage() {
 
         {/* Recent COPQ Entries */}
         <Card className="p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Recent Quality Costs</h2>
-          
+          <h2 className="text-xl font-bold text-gray-900 mb-4">
+            Recent Quality Costs
+          </h2>
+
           {entries.length === 0 ? (
             <div className="text-center py-12 text-gray-500">
               <DollarSign className="h-12 w-12 mx-auto mb-4 text-gray-400" />
@@ -417,13 +502,30 @@ export default function COPQDashboardPage() {
           <div className="flex items-start gap-4">
             <PieChart className="h-6 w-6 text-blue-600 mt-1" />
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">COPQ Best Practices</h3>
+              <h3 className="font-semibold text-blue-900 mb-2">
+                COPQ Best Practices
+              </h3>
               <ul className="text-sm text-blue-800 space-y-1">
-                <li>• <strong>Target COPQ:</strong> Less than 2-3% of revenue is world-class</li>
-                <li>• <strong>Optimal Mix:</strong> 70% Prevention/Appraisal, 30% Failure costs</li>
-                <li>• <strong>ROI Focus:</strong> $1 in prevention saves $10 in failure costs</li>
-                <li>• <strong>Trend Goal:</strong> Decreasing total COPQ year-over-year</li>
-                <li>• <strong>Prevention Priority:</strong> Shift from failure detection to failure prevention</li>
+                <li>
+                  • <strong>Target COPQ:</strong> Less than 2-3% of revenue is
+                  world-class
+                </li>
+                <li>
+                  • <strong>Optimal Mix:</strong> 70% Prevention/Appraisal, 30%
+                  Failure costs
+                </li>
+                <li>
+                  • <strong>ROI Focus:</strong> $1 in prevention saves $10 in
+                  failure costs
+                </li>
+                <li>
+                  • <strong>Trend Goal:</strong> Decreasing total COPQ
+                  year-over-year
+                </li>
+                <li>
+                  • <strong>Prevention Priority:</strong> Shift from failure
+                  detection to failure prevention
+                </li>
               </ul>
             </div>
           </div>

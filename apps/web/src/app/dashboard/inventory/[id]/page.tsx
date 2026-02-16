@@ -2,7 +2,16 @@
 
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Edit, Trash2, Package, MapPin, AlertCircle, TrendingUp, History } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit,
+  Trash2,
+  Package,
+  MapPin,
+  AlertCircle,
+  TrendingUp,
+  History,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -77,7 +86,8 @@ export default function InventoryItemDetailPage() {
       id: itemId,
       name: "Industrial Safety Helmet",
       sku: "HELM-001",
-      description: "High-impact ABS construction safety helmet with adjustable suspension system. Meets ANSI Z89.1 standards. Available in multiple colors.",
+      description:
+        "High-impact ABS construction safety helmet with adjustable suspension system. Meets ANSI Z89.1 standards. Available in multiple colors.",
       quantity: 150,
       minStockLevel: 50,
       reorderPoint: 75,
@@ -87,16 +97,16 @@ export default function InventoryItemDetailPage() {
         id: "wh_1",
         name: "Main Warehouse",
         code: "MW001",
-        location: "Section A, Bay 15, Shelf 3"
+        location: "Section A, Bay 15, Shelf 3",
       },
       category: {
         id: "cat_1",
-        name: "Safety Equipment"
+        name: "Safety Equipment",
       },
       supplier: {
         id: "sup_1",
         name: "SafeWork Industries",
-        contact: "orders@safework.com"
+        contact: "orders@safework.com",
       },
       costPrice: 45.99,
       sellingPrice: 89.99,
@@ -104,8 +114,8 @@ export default function InventoryItemDetailPage() {
       updatedAt: "2024-01-20T14:15:00Z",
       createdBy: {
         name: "John Smith",
-        email: "john.smith@company.com"
-      }
+        email: "john.smith@company.com",
+      },
     };
 
     const mockMovements: MovementHistory[] = [
@@ -116,16 +126,16 @@ export default function InventoryItemDetailPage() {
         reason: "Purchase Order PO-2024-001",
         timestamp: "2024-01-20T14:15:00Z",
         user: { name: "Sarah Johnson" },
-        reference: "PO-2024-001"
+        reference: "PO-2024-001",
       },
       {
-        id: "mov_2", 
+        id: "mov_2",
         type: "OUT",
         quantity: -25,
         reason: "Sales Order SO-2024-125",
         timestamp: "2024-01-18T09:30:00Z",
         user: { name: "Mike Wilson" },
-        reference: "SO-2024-125"
+        reference: "SO-2024-125",
       },
       {
         id: "mov_3",
@@ -134,8 +144,8 @@ export default function InventoryItemDetailPage() {
         reason: "Damage - returned to supplier",
         timestamp: "2024-01-16T16:45:00Z",
         user: { name: "Lisa Brown" },
-        reference: "RMA-001"
-      }
+        reference: "RMA-001",
+      },
     ];
 
     setTimeout(() => {
@@ -147,19 +157,27 @@ export default function InventoryItemDetailPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "ACTIVE": return "bg-green-100 text-green-800";
-      case "OUT_OF_STOCK": return "bg-red-100 text-red-800";
-      case "INACTIVE": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "ACTIVE":
+        return "bg-green-100 text-green-800";
+      case "OUT_OF_STOCK":
+        return "bg-red-100 text-red-800";
+      case "INACTIVE":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getMovementIcon = (type: string) => {
     switch (type) {
-      case "IN": return <TrendingUp className="h-4 w-4 text-green-600" />;
-      case "OUT": return <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />;
-      case "ADJUSTMENT": return <History className="h-4 w-4 text-blue-600" />;
-      default: return <History className="h-4 w-4" />;
+      case "IN":
+        return <TrendingUp className="h-4 w-4 text-green-600" />;
+      case "OUT":
+        return <TrendingUp className="h-4 w-4 text-red-600 rotate-180" />;
+      case "ADJUSTMENT":
+        return <History className="h-4 w-4 text-blue-600" />;
+      default:
+        return <History className="h-4 w-4" />;
     }
   };
 
@@ -246,7 +264,9 @@ export default function InventoryItemDetailPage() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Status</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Status
+                  </label>
                   <div className="mt-1">
                     <Badge className={getStatusColor(item.status)}>
                       {item.status.replace("_", " ")}
@@ -254,15 +274,21 @@ export default function InventoryItemDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Category</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Category
+                  </label>
                   <div className="mt-1 font-medium">{item.category.name}</div>
                 </div>
               </div>
-              
+
               {item.description && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Description</label>
-                  <p className="mt-1 text-sm leading-relaxed">{item.description}</p>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Description
+                  </label>
+                  <p className="mt-1 text-sm leading-relaxed">
+                    {item.description}
+                  </p>
                 </div>
               )}
 
@@ -270,16 +296,26 @@ export default function InventoryItemDetailPage() {
 
               <div className="grid gap-4 md:grid-cols-3">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Current Stock</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Current Stock
+                  </label>
                   <div className="mt-1 text-2xl font-bold">{item.quantity}</div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Min Level</label>
-                  <div className="mt-1 text-lg font-semibold text-orange-600">{item.minStockLevel}</div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Min Level
+                  </label>
+                  <div className="mt-1 text-lg font-semibold text-orange-600">
+                    {item.minStockLevel}
+                  </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Reorder Point</label>
-                  <div className="mt-1 text-lg font-semibold text-blue-600">{item.reorderPoint}</div>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Reorder Point
+                  </label>
+                  <div className="mt-1 text-lg font-semibold text-blue-600">
+                    {item.reorderPoint}
+                  </div>
                 </div>
               </div>
 
@@ -305,21 +341,31 @@ export default function InventoryItemDetailPage() {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Warehouse</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Warehouse
+                  </label>
                   <div className="mt-1 font-medium">{item.warehouse.name}</div>
-                  <div className="text-sm text-muted-foreground">{item.warehouse.location}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {item.warehouse.location}
+                  </div>
                 </div>
                 {item.supplier && (
                   <div>
-                    <label className="text-sm font-medium text-muted-foreground">Supplier</label>
+                    <label className="text-sm font-medium text-muted-foreground">
+                      Supplier
+                    </label>
                     <div className="mt-1 font-medium">{item.supplier.name}</div>
-                    <div className="text-sm text-muted-foreground">{item.supplier.contact}</div>
+                    <div className="text-sm text-muted-foreground">
+                      {item.supplier.contact}
+                    </div>
                   </div>
                 )}
               </div>
               {item.barcode && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Barcode</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Barcode
+                  </label>
                   <div className="mt-1 font-mono text-sm bg-gray-100 px-2 py-1 rounded">
                     {item.barcode}
                   </div>
@@ -338,23 +384,41 @@ export default function InventoryItemDetailPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Cost Price</span>
-                <span className="font-medium">${item.costPrice.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Selling Price</span>
-                <span className="font-medium">${item.sellingPrice.toFixed(2)}</span>
-              </div>
-              <Separator />
-              <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Gross Margin</span>
-                <span className="font-medium text-green-600">
-                  {(((item.sellingPrice - item.costPrice) / item.sellingPrice) * 100).toFixed(1)}%
+                <span className="text-sm text-muted-foreground">
+                  Cost Price
+                </span>
+                <span className="font-medium">
+                  ${item.costPrice.toFixed(2)}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-muted-foreground">Total Value</span>
-                <span className="font-bold">${(item.quantity * item.costPrice).toLocaleString()}</span>
+                <span className="text-sm text-muted-foreground">
+                  Selling Price
+                </span>
+                <span className="font-medium">
+                  ${item.sellingPrice.toFixed(2)}
+                </span>
+              </div>
+              <Separator />
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Gross Margin
+                </span>
+                <span className="font-medium text-green-600">
+                  {(
+                    ((item.sellingPrice - item.costPrice) / item.sellingPrice) *
+                    100
+                  ).toFixed(1)}
+                  %
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Total Value
+                </span>
+                <span className="font-bold">
+                  ${(item.quantity * item.costPrice).toLocaleString()}
+                </span>
               </div>
             </CardContent>
           </Card>
@@ -370,10 +434,15 @@ export default function InventoryItemDetailPage() {
                   {getMovementIcon(movement.type)}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center space-x-2">
-                      <span className={`text-sm font-medium ${
-                        movement.quantity > 0 ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {movement.quantity > 0 ? '+' : ''}{movement.quantity}
+                      <span
+                        className={`text-sm font-medium ${
+                          movement.quantity > 0
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {movement.quantity > 0 ? "+" : ""}
+                        {movement.quantity}
                       </span>
                       <Badge variant="outline" className="text-xs">
                         {movement.type}
@@ -383,7 +452,8 @@ export default function InventoryItemDetailPage() {
                       {movement.reason}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {new Date(movement.timestamp).toLocaleDateString()} by {movement.user.name}
+                      {new Date(movement.timestamp).toLocaleDateString()} by{" "}
+                      {movement.user.name}
                     </p>
                   </div>
                 </div>
@@ -405,7 +475,9 @@ export default function InventoryItemDetailPage() {
               <div>
                 <span className="text-muted-foreground">Created:</span>
                 <div>{new Date(item.createdAt).toLocaleDateString()}</div>
-                <div className="text-muted-foreground">by {item.createdBy.name}</div>
+                <div className="text-muted-foreground">
+                  by {item.createdBy.name}
+                </div>
               </div>
               <div>
                 <span className="text-muted-foreground">Last Updated:</span>

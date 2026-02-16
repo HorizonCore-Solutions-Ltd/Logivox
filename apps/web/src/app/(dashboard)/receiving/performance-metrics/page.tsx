@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function ReceivingPerformanceMetricsPage() {
   const [dashboard, setDashboard] = useState<any>(null);
@@ -23,9 +23,9 @@ export default function ReceivingPerformanceMetricsPage() {
     setLoading(true);
     try {
       const [dashboardRes, shiftsRes, performersRes] = await Promise.all([
-        fetch('/api/receiving/performance-metrics?action=dashboard'),
-        fetch('/api/receiving/performance-metrics?action=shift-comparison'),
-        fetch('/api/receiving/performance-metrics?action=top-performers'),
+        fetch("/api/receiving/performance-metrics?action=dashboard"),
+        fetch("/api/receiving/performance-metrics?action=shift-comparison"),
+        fetch("/api/receiving/performance-metrics?action=top-performers"),
       ]);
 
       const dashboardData = await dashboardRes.json();
@@ -36,7 +36,7 @@ export default function ReceivingPerformanceMetricsPage() {
       setShifts(shiftsData.shifts || []);
       setTopPerformers(performersData.topPerformers || []);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     }
     setLoading(false);
   };
@@ -52,33 +52,33 @@ export default function ReceivingPerformanceMetricsPage() {
     };
 
     const threshold = thresholds[metric];
-    if (!threshold) return 'text-gray-900';
+    if (!threshold) return "text-gray-900";
 
     // For cycle time, lower is better
-    if (metric === 'cycleTime') {
-      if (value <= threshold.good) return 'text-green-600';
-      if (value <= threshold.warning) return 'text-yellow-600';
-      return 'text-red-600';
+    if (metric === "cycleTime") {
+      if (value <= threshold.good) return "text-green-600";
+      if (value <= threshold.warning) return "text-yellow-600";
+      return "text-red-600";
     }
 
     // For others, higher is better
-    if (value >= threshold.good) return 'text-green-600';
-    if (value >= threshold.warning) return 'text-yellow-600';
-    return 'text-red-600';
+    if (value >= threshold.good) return "text-green-600";
+    if (value >= threshold.warning) return "text-yellow-600";
+    return "text-red-600";
   };
 
   const getShiftBadgeColor = (shift: string) => {
     switch (shift) {
-      case 'DAY':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'EVENING':
-        return 'bg-orange-100 text-orange-800';
-      case 'NIGHT':
-        return 'bg-blue-100 text-blue-800';
-      case 'WEEKEND':
-        return 'bg-purple-100 text-purple-800';
+      case "DAY":
+        return "bg-yellow-100 text-yellow-800";
+      case "EVENING":
+        return "bg-orange-100 text-orange-800";
+      case "NIGHT":
+        return "bg-blue-100 text-blue-800";
+      case "WEEKEND":
+        return "bg-purple-100 text-purple-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -100,7 +100,9 @@ export default function ReceivingPerformanceMetricsPage() {
           <h1 className="text-3xl font-bold text-gray-900">
             Receiving Performance Metrics
           </h1>
-          <p className="text-gray-600 mt-2">Real-time KPIs and performance tracking</p>
+          <p className="text-gray-600 mt-2">
+            Real-time KPIs and performance tracking
+          </p>
         </div>
         <Button onClick={fetchData} variant="outline">
           Refresh
@@ -114,7 +116,7 @@ export default function ReceivingPerformanceMetricsPage() {
           <div
             className={`text-2xl font-bold mt-1 ${getPerformanceColor(
               dashboard?.velocity || 0,
-              'velocity'
+              "velocity",
             )}`}
           >
             {dashboard?.velocity?.toFixed(1) || 0}
@@ -135,7 +137,7 @@ export default function ReceivingPerformanceMetricsPage() {
           <div
             className={`text-2xl font-bold mt-1 ${getPerformanceColor(
               dashboard?.dockUtilization || 0,
-              'dockUtilization'
+              "dockUtilization",
             )}`}
           >
             {dashboard?.dockUtilization?.toFixed(1) || 0}%
@@ -154,7 +156,7 @@ export default function ReceivingPerformanceMetricsPage() {
           <div
             className={`text-2xl font-bold mt-1 ${getPerformanceColor(
               dashboard?.productivity || 0,
-              'productivity'
+              "productivity",
             )}`}
           >
             {dashboard?.productivity?.toFixed(1) || 0}
@@ -175,7 +177,7 @@ export default function ReceivingPerformanceMetricsPage() {
           <div
             className={`text-2xl font-bold mt-1 ${getPerformanceColor(
               dashboard?.cycleTime || 0,
-              'cycleTime'
+              "cycleTime",
             )}`}
           >
             {dashboard?.cycleTime?.toFixed(0) || 0}
@@ -196,7 +198,7 @@ export default function ReceivingPerformanceMetricsPage() {
           <div
             className={`text-2xl font-bold mt-1 ${getPerformanceColor(
               dashboard?.slaCompliance || 0,
-              'slaCompliance'
+              "slaCompliance",
             )}`}
           >
             {dashboard?.slaCompliance?.toFixed(1) || 0}%
@@ -223,20 +225,24 @@ export default function ReceivingPerformanceMetricsPage() {
         <TabsContent value="overview" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Performance Targets</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Performance Targets
+              </h2>
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <div>
                     <div className="font-medium">Receiving Velocity</div>
-                    <div className="text-sm text-gray-600">Target: 40 units/hour</div>
+                    <div className="text-sm text-gray-600">
+                      Target: 40 units/hour
+                    </div>
                   </div>
                   <div
                     className={`text-2xl font-bold ${getPerformanceColor(
                       dashboard?.velocity || 0,
-                      'velocity'
+                      "velocity",
                     )}`}
                   >
-                    {dashboard?.velocity >= 40 ? '✓' : '○'}
+                    {dashboard?.velocity >= 40 ? "✓" : "○"}
                   </div>
                 </div>
 
@@ -248,10 +254,10 @@ export default function ReceivingPerformanceMetricsPage() {
                   <div
                     className={`text-2xl font-bold ${getPerformanceColor(
                       dashboard?.dockUtilization || 0,
-                      'dockUtilization'
+                      "dockUtilization",
                     )}`}
                   >
-                    {dashboard?.dockUtilization >= 80 ? '✓' : '○'}
+                    {dashboard?.dockUtilization >= 80 ? "✓" : "○"}
                   </div>
                 </div>
 
@@ -265,10 +271,10 @@ export default function ReceivingPerformanceMetricsPage() {
                   <div
                     className={`text-2xl font-bold ${getPerformanceColor(
                       dashboard?.productivity || 0,
-                      'productivity'
+                      "productivity",
                     )}`}
                   >
-                    {dashboard?.productivity >= 40 ? '✓' : '○'}
+                    {dashboard?.productivity >= 40 ? "✓" : "○"}
                   </div>
                 </div>
 
@@ -282,10 +288,10 @@ export default function ReceivingPerformanceMetricsPage() {
                   <div
                     className={`text-2xl font-bold ${getPerformanceColor(
                       dashboard?.cycleTime || 0,
-                      'cycleTime'
+                      "cycleTime",
                     )}`}
                   >
-                    {dashboard?.cycleTime <= 45 ? '✓' : '○'}
+                    {dashboard?.cycleTime <= 45 ? "✓" : "○"}
                   </div>
                 </div>
 
@@ -297,10 +303,10 @@ export default function ReceivingPerformanceMetricsPage() {
                   <div
                     className={`text-2xl font-bold ${getPerformanceColor(
                       dashboard?.slaCompliance || 0,
-                      'slaCompliance'
+                      "slaCompliance",
                     )}`}
                   >
-                    {dashboard?.slaCompliance >= 95 ? '✓' : '○'}
+                    {dashboard?.slaCompliance >= 95 ? "✓" : "○"}
                   </div>
                 </div>
               </div>
@@ -315,8 +321,8 @@ export default function ReceivingPerformanceMetricsPage() {
                   </div>
                   <div className="text-sm text-blue-800">
                     {dashboard?.velocity >= 40
-                      ? 'Exceeding target. Excellent throughput performance.'
-                      : 'Below target. Consider optimizing workflows or adding resources.'}
+                      ? "Exceeding target. Excellent throughput performance."
+                      : "Below target. Consider optimizing workflows or adding resources."}
                   </div>
                 </div>
 
@@ -326,10 +332,10 @@ export default function ReceivingPerformanceMetricsPage() {
                   </div>
                   <div className="text-sm text-green-800">
                     {dashboard?.dockUtilization >= 95
-                      ? 'Near capacity. Consider expanding dock doors or extending hours.'
+                      ? "Near capacity. Consider expanding dock doors or extending hours."
                       : dashboard?.dockUtilization >= 80
-                      ? 'Good utilization. Operating efficiently.'
-                      : 'Underutilized. Opportunity for more appointments.'}
+                        ? "Good utilization. Operating efficiently."
+                        : "Underutilized. Opportunity for more appointments."}
                   </div>
                 </div>
 
@@ -339,17 +345,19 @@ export default function ReceivingPerformanceMetricsPage() {
                   </div>
                   <div className="text-sm text-purple-800">
                     {dashboard?.productivity >= 40
-                      ? 'High productivity. Workers performing well.'
-                      : 'Productivity opportunity. Review training or tools.'}
+                      ? "High productivity. Workers performing well."
+                      : "Productivity opportunity. Review training or tools."}
                   </div>
                 </div>
 
                 <div className="p-4 bg-yellow-50 rounded-lg">
-                  <div className="font-medium text-yellow-900 mb-1">⏱️ Speed</div>
+                  <div className="font-medium text-yellow-900 mb-1">
+                    ⏱️ Speed
+                  </div>
                   <div className="text-sm text-yellow-800">
                     {dashboard?.cycleTime <= 45
-                      ? 'Meeting cycle time targets. Fast processing.'
-                      : 'Slower than target. Identify bottlenecks.'}
+                      ? "Meeting cycle time targets. Fast processing."
+                      : "Slower than target. Identify bottlenecks."}
                   </div>
                 </div>
               </div>
@@ -402,7 +410,8 @@ export default function ReceivingPerformanceMetricsPage() {
                         </Badge>
                         <div>
                           <div className="font-semibold">
-                            {shift.avgProductivity?.toFixed(1)} units/worker-hour
+                            {shift.avgProductivity?.toFixed(1)}{" "}
+                            units/worker-hour
                           </div>
                           <div className="text-sm text-gray-600">
                             Average productivity
@@ -433,7 +442,9 @@ export default function ReceivingPerformanceMetricsPage() {
         {/* Top Performers Tab */}
         <TabsContent value="performers" className="space-y-4">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-4">Top Performers (7 Days)</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Top Performers (7 Days)
+            </h2>
             {topPerformers.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 No performance data available
@@ -465,11 +476,19 @@ export default function ReceivingPerformanceMetricsPage() {
                       <tr key={performer.workerId} className="hover:bg-gray-50">
                         <td className="px-4 py-3">
                           <div className="text-2xl">
-                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                            {index === 0
+                              ? "🥇"
+                              : index === 1
+                                ? "🥈"
+                                : index === 2
+                                  ? "🥉"
+                                  : `#${index + 1}`}
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <div className="font-medium">{performer.workerId}</div>
+                          <div className="font-medium">
+                            {performer.workerId}
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="font-semibold text-green-600">
@@ -496,7 +515,11 @@ export default function ReceivingPerformanceMetricsPage() {
 
       {/* Last Updated */}
       <div className="mt-6 text-center text-xs text-gray-500">
-        Last updated: {dashboard?.lastUpdated ? new Date(dashboard.lastUpdated).toLocaleString() : 'N/A'} • Auto-refresh every 30s
+        Last updated:{" "}
+        {dashboard?.lastUpdated
+          ? new Date(dashboard.lastUpdated).toLocaleString()
+          : "N/A"}{" "}
+        • Auto-refresh every 30s
       </div>
     </div>
   );

@@ -64,7 +64,7 @@ export default function CreateInventoryPage() {
   ];
 
   const handleChange = (field: keyof FormData, value: string | number) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
@@ -87,7 +87,7 @@ export default function CreateInventoryPage() {
 
       if (!formData.sku.trim()) {
         toast({
-          title: "Validation Error", 
+          title: "Validation Error",
           description: "SKU is required",
           variant: "destructive",
         });
@@ -106,15 +106,15 @@ export default function CreateInventoryPage() {
       if (!formData.categoryId) {
         toast({
           title: "Validation Error",
-          description: "Category is required", 
+          description: "Category is required",
           variant: "destructive",
         });
         return;
       }
 
       // Mock API call - in production this would call the actual API
-      const response = await new Promise(resolve => 
-        setTimeout(() => resolve({ ok: true }), 1500)
+      const response = await new Promise((resolve) =>
+        setTimeout(() => resolve({ ok: true }), 1500),
       );
 
       toast({
@@ -124,7 +124,6 @@ export default function CreateInventoryPage() {
 
       // Redirect back to inventory list
       router.push("/dashboard/inventory");
-
     } catch (error) {
       console.error("Error creating inventory item:", error);
       toast({
@@ -149,8 +148,12 @@ export default function CreateInventoryPage() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Create Inventory Item</h2>
-          <p className="text-muted-foreground">Add a new item to your inventory</p>
+          <h2 className="text-3xl font-bold tracking-tight">
+            Create Inventory Item
+          </h2>
+          <p className="text-muted-foreground">
+            Add a new item to your inventory
+          </p>
         </div>
       </div>
 
@@ -185,7 +188,9 @@ export default function CreateInventoryPage() {
                     <Input
                       id="sku"
                       value={formData.sku}
-                      onChange={(e) => handleChange("sku", e.target.value.toUpperCase())}
+                      onChange={(e) =>
+                        handleChange("sku", e.target.value.toUpperCase())
+                      }
                       placeholder="e.g., HELM-001"
                       required
                     />
@@ -197,7 +202,9 @@ export default function CreateInventoryPage() {
                   <Textarea
                     id="description"
                     value={formData.description}
-                    onChange={(e) => handleChange("description", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("description", e.target.value)
+                    }
                     placeholder="Enter item description..."
                     rows={3}
                   />
@@ -206,9 +213,11 @@ export default function CreateInventoryPage() {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="warehouse">Warehouse *</Label>
-                    <Select 
+                    <Select
                       value={formData.warehouseId}
-                      onValueChange={(value) => handleChange("warehouseId", value)}
+                      onValueChange={(value) =>
+                        handleChange("warehouseId", value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select warehouse" />
@@ -226,7 +235,9 @@ export default function CreateInventoryPage() {
                     <Label htmlFor="category">Category *</Label>
                     <Select
                       value={formData.categoryId}
-                      onValueChange={(value) => handleChange("categoryId", value)}
+                      onValueChange={(value) =>
+                        handleChange("categoryId", value)
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Select category" />
@@ -249,7 +260,9 @@ export default function CreateInventoryPage() {
                       id="quantity"
                       type="number"
                       value={formData.quantity}
-                      onChange={(e) => handleChange("quantity", parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleChange("quantity", parseInt(e.target.value) || 0)
+                      }
                       min="0"
                     />
                   </div>
@@ -259,7 +272,12 @@ export default function CreateInventoryPage() {
                       id="minStock"
                       type="number"
                       value={formData.minStockLevel}
-                      onChange={(e) => handleChange("minStockLevel", parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleChange(
+                          "minStockLevel",
+                          parseInt(e.target.value) || 0,
+                        )
+                      }
                       min="0"
                     />
                   </div>
@@ -300,13 +318,16 @@ export default function CreateInventoryPage() {
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div>
-                <strong>SKU:</strong> Use a unique identifier for each item. Consider including category and size codes.
+                <strong>SKU:</strong> Use a unique identifier for each item.
+                Consider including category and size codes.
               </div>
               <div>
-                <strong>Min Stock:</strong> Set appropriate reorder levels to avoid stockouts.
+                <strong>Min Stock:</strong> Set appropriate reorder levels to
+                avoid stockouts.
               </div>
               <div>
-                <strong>Barcode:</strong> Add barcodes for faster scanning and inventory management.
+                <strong>Barcode:</strong> Add barcodes for faster scanning and
+                inventory management.
               </div>
             </CardContent>
           </Card>

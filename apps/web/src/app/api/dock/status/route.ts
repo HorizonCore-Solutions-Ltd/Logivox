@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     // Calculate dock statistics
     const totalDocks = dockLocations.length;
     const occupiedDocks = dockLocations.filter(
-      (dock) => dock.appointments.length > 0
+      (dock) => dock.appointments.length > 0,
     ).length;
     const availableDocks = totalDocks - occupiedDocks;
 
@@ -129,9 +129,13 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    const avgDwellTime = completedToday.length > 0
-      ? completedToday.reduce((sum, apt) => sum + (apt.actualDuration || 0), 0) / completedToday.length
-      : 0;
+    const avgDwellTime =
+      completedToday.length > 0
+        ? completedToday.reduce(
+            (sum, apt) => sum + (apt.actualDuration || 0),
+            0,
+          ) / completedToday.length
+        : 0;
 
     return NextResponse.json({
       dockLocations,
@@ -139,7 +143,8 @@ export async function GET(request: NextRequest) {
         totalDocks,
         occupiedDocks,
         availableDocks,
-        utilizationRate: totalDocks > 0 ? (occupiedDocks / totalDocks) * 100 : 0,
+        utilizationRate:
+          totalDocks > 0 ? (occupiedDocks / totalDocks) * 100 : 0,
         todaysAppointments,
         inProgress,
         overdue,
@@ -150,7 +155,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching dock status:", error);
     return NextResponse.json(
       { error: "Failed to fetch dock status" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

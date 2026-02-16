@@ -68,7 +68,8 @@ export default function DockSchedulingPage() {
     {
       metric: "65%",
       label: "Reduction in Wait Times",
-      description: "Trucks arrive at pre-scheduled times, eliminating congestion",
+      description:
+        "Trucks arrive at pre-scheduled times, eliminating congestion",
     },
     {
       metric: "40%",
@@ -100,7 +101,8 @@ export default function DockSchedulingPage() {
     },
     {
       step: "3. Dock Assignment",
-      description: "System assigns optimal dock door based on cargo and schedule",
+      description:
+        "System assigns optimal dock door based on cargo and schedule",
       icon: MapPin,
     },
     {
@@ -161,8 +163,9 @@ export default function DockSchedulingPage() {
             <span className="text-primary">Smart Scheduling</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            Eliminate truck congestion, reduce wait times, and maximize dock utilization with 
-            our intelligent appointment-based scheduling system.
+            Eliminate truck congestion, reduce wait times, and maximize dock
+            utilization with our intelligent appointment-based scheduling
+            system.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" asChild>
@@ -311,10 +314,12 @@ export default function DockSchedulingPage() {
                 <CardTitle>Looking for Full Yard Management?</CardTitle>
               </div>
               <CardDescription>
-                Our Dock Scheduling solution focuses on appointment-based dock door coordination 
-                for receiving and shipping operations. For comprehensive yard management including 
-                GPS tracking, autonomous spotters, trailer parking, and security patrols, please 
-                contact us about our Enterprise Yard Management System available as a separate solution.
+                Our Dock Scheduling solution focuses on appointment-based dock
+                door coordination for receiving and shipping operations. For
+                comprehensive yard management including GPS tracking, autonomous
+                spotters, trailer parking, and security patrols, please contact
+                us about our Enterprise Yard Management System available as a
+                separate solution.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -336,8 +341,8 @@ export default function DockSchedulingPage() {
             Ready to Optimize Your Dock Operations?
           </h2>
           <p className="text-xl text-muted-foreground">
-            Join hundreds of warehouses reducing wait times and improving efficiency 
-            with smart dock scheduling.
+            Join hundreds of warehouses reducing wait times and improving
+            efficiency with smart dock scheduling.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button size="lg" asChild>

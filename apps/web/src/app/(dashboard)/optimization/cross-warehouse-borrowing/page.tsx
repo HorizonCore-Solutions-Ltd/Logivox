@@ -3,10 +3,10 @@
 /**
  * CROSS-WAREHOUSE EMERGENCY BORROWING DASHBOARD
  * ==============================================
- * 
+ *
  * System 6 - High Impact (708% ROI)
  * Investment: $18K → Savings: $127K/year
- * 
+ *
  * Features:
  * - Network inventory visibility
  * - Emergency transfer requests
@@ -71,18 +71,24 @@ interface WarehouseInfo {
 
 export default function CrossWarehouseBorrowingPage() {
   const [networkStats, setNetworkStats] = useState<NetworkStats | null>(null);
-  const [transferStats, setTransferStats] = useState<TransferStats | null>(null);
+  const [transferStats, setTransferStats] = useState<TransferStats | null>(
+    null,
+  );
   const [warehouses, setWarehouses] = useState<WarehouseInfo[]>([]);
   const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"network" | "transfers" | "create">("network");
+  const [activeTab, setActiveTab] = useState<
+    "network" | "transfers" | "create"
+  >("network");
 
   // Form states
   const [sourceWarehouse, setSourceWarehouse] = useState("");
   const [targetWarehouse, setTargetWarehouse] = useState("");
   const [productId, setProductId] = useState("");
   const [quantity, setQuantity] = useState(1);
-  const [urgency, setUrgency] = useState<"LOW" | "MEDIUM" | "HIGH" | "CRITICAL">("MEDIUM");
+  const [urgency, setUrgency] = useState<
+    "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
+  >("MEDIUM");
   const [reason, setReason] = useState("");
 
   useEffect(() => {
@@ -127,7 +133,9 @@ export default function CrossWarehouseBorrowingPage() {
             quantityRequested: quantity,
             urgency,
             reason,
-            requiredByDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+            requiredByDate: new Date(
+              Date.now() + 24 * 60 * 60 * 1000,
+            ).toISOString(),
           },
         }),
       });
@@ -212,7 +220,9 @@ export default function CrossWarehouseBorrowingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Network Warehouses</p>
-                <p className="text-2xl font-bold">{networkStats?.totalWarehouses || 0}</p>
+                <p className="text-2xl font-bold">
+                  {networkStats?.totalWarehouses || 0}
+                </p>
               </div>
               <Warehouse className="h-8 w-8 text-blue-500" />
             </div>
@@ -224,7 +234,9 @@ export default function CrossWarehouseBorrowingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Products</p>
-                <p className="text-2xl font-bold">{networkStats?.totalProducts || 0}</p>
+                <p className="text-2xl font-bold">
+                  {networkStats?.totalProducts || 0}
+                </p>
               </div>
               <PackageCheck className="h-8 w-8 text-green-500" />
             </div>
@@ -236,7 +248,9 @@ export default function CrossWarehouseBorrowingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Transfers</p>
-                <p className="text-2xl font-bold">{networkStats?.activeTransfers || 0}</p>
+                <p className="text-2xl font-bold">
+                  {networkStats?.activeTransfers || 0}
+                </p>
               </div>
               <TruckIcon className="h-8 w-8 text-orange-500 animate-pulse" />
             </div>
@@ -331,11 +345,15 @@ export default function CrossWarehouseBorrowingPage() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <PackageCheck className="h-4 w-4 text-gray-400" />
-                    <span>{warehouse._count.inventoryItems} inventory items</span>
+                    <span>
+                      {warehouse._count.inventoryItems} inventory items
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Badge
-                      variant={warehouse.status === "ACTIVE" ? "default" : "secondary"}
+                      variant={
+                        warehouse.status === "ACTIVE" ? "default" : "secondary"
+                      }
                     >
                       {warehouse.status}
                     </Badge>
@@ -356,7 +374,9 @@ export default function CrossWarehouseBorrowingPage() {
           <CardContent>
             <div className="space-y-4">
               {transfers.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No transfers yet</p>
+                <p className="text-center text-gray-500 py-8">
+                  No transfers yet
+                </p>
               ) : (
                 transfers.map((transfer) => (
                   <div
@@ -375,12 +395,17 @@ export default function CrossWarehouseBorrowingPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {transfer.metadata?.urgency && (
-                        <Badge className={getUrgencyColor(transfer.metadata.urgency)}>
+                        <Badge
+                          className={getUrgencyColor(transfer.metadata.urgency)}
+                        >
                           {transfer.metadata.urgency}
                         </Badge>
                       )}
                       {transfer.metadata?.savings && (
-                        <Badge variant="outline" className="bg-green-50 text-green-700">
+                        <Badge
+                          variant="outline"
+                          className="bg-green-50 text-green-700"
+                        >
                           Saved ${transfer.metadata.savings.toFixed(0)}
                         </Badge>
                       )}
@@ -440,7 +465,9 @@ export default function CrossWarehouseBorrowingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Product ID</label>
+                <label className="block text-sm font-medium mb-2">
+                  Product ID
+                </label>
                 <input
                   type="text"
                   value={productId}
@@ -452,7 +479,9 @@ export default function CrossWarehouseBorrowingPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Quantity</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Quantity
+                  </label>
                   <input
                     type="number"
                     value={quantity}
@@ -463,11 +492,19 @@ export default function CrossWarehouseBorrowingPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Urgency</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Urgency
+                  </label>
                   <select
                     value={urgency}
                     onChange={(e) =>
-                      setUrgency(e.target.value as "LOW" | "MEDIUM" | "HIGH" | "CRITICAL")
+                      setUrgency(
+                        e.target.value as
+                          | "LOW"
+                          | "MEDIUM"
+                          | "HIGH"
+                          | "CRITICAL",
+                      )
                     }
                     className="w-full px-3 py-2 border rounded-lg"
                   >
@@ -526,7 +563,8 @@ export default function CrossWarehouseBorrowingPage() {
               <div className="text-center">
                 <p className="text-3xl font-bold text-green-600">
                   {(
-                    (transferStats.successfulTransfers / transferStats.totalTransfers) *
+                    (transferStats.successfulTransfers /
+                      transferStats.totalTransfers) *
                     100
                   ).toFixed(1)}
                   %

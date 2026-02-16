@@ -1,10 +1,10 @@
 /**
  * WORKER FATIGUE MONITORING & WELLNESS API
  * =========================================
- * 
+ *
  * System 2 - Outstanding ROI (370% ROI)
  * Investment: $40K → Savings: $148K/year
- * 
+ *
  * Capabilities:
  * - Real-time fatigue detection and monitoring
  * - Intelligent break scheduling and optimization
@@ -12,13 +12,13 @@
  * - Ergonomic risk assessment
  * - Injury prevention and safety alerts
  * - Shift rotation optimization
- * 
+ *
  * Key Metrics:
  * - 30% reduction in workplace injuries
  * - 15% improvement in productivity
  * - 40% reduction in worker turnover
  * - 25% fewer safety incidents
- * 
+ *
  * @version 1.0.0
  * @author Flowstock Platform
  * @date January 8, 2026
@@ -37,22 +37,22 @@ import { z } from "zod";
 const FATIGUE_CONFIG = {
   // Fatigue thresholds (0-100 scale)
   THRESHOLDS: {
-    CRITICAL: 80,    // >80 = mandatory break
-    HIGH: 65,        // 65-80 = recommend break
-    MODERATE: 45,    // 45-65 = monitor closely
-    LOW: 30,         // 30-45 = normal monitoring
-    MINIMAL: 0,      // 0-30 = optimal condition
+    CRITICAL: 80, // >80 = mandatory break
+    HIGH: 65, // 65-80 = recommend break
+    MODERATE: 45, // 45-65 = monitor closely
+    LOW: 30, // 30-45 = normal monitoring
+    MINIMAL: 0, // 0-30 = optimal condition
   },
-  
+
   // Shift configurations (hours)
   SHIFT_LIMITS: {
-    MAX_CONTINUOUS_WORK: 4,     // Max hours without break
-    MIN_BREAK_DURATION: 0.25,   // 15 minutes minimum
-    RECOMMENDED_BREAK: 0.5,     // 30 minutes recommended
-    MAX_DAILY_HOURS: 10,        // Max hours per day
-    MAX_WEEKLY_HOURS: 50,       // Max hours per week
+    MAX_CONTINUOUS_WORK: 4, // Max hours without break
+    MIN_BREAK_DURATION: 0.25, // 15 minutes minimum
+    RECOMMENDED_BREAK: 0.5, // 30 minutes recommended
+    MAX_DAILY_HOURS: 10, // Max hours per day
+    MAX_WEEKLY_HOURS: 50, // Max hours per week
   },
-  
+
   // Task intensity factors
   TASK_INTENSITY: {
     HEAVY_LIFTING: { factor: 1.5, description: "Heavy physical labor" },
@@ -62,21 +62,21 @@ const FATIGUE_CONFIG = {
     DRIVING: { factor: 1.1, description: "Operating equipment" },
     NORMAL: { factor: 1.0, description: "Standard warehouse tasks" },
   },
-  
+
   // Environmental factors
   ENVIRONMENTAL: {
-    HOT: { factor: 1.3, temp: 30 },        // >30°C
-    COLD: { factor: 1.2, temp: 5 },        // <5°C
-    NOISE: { factor: 1.1, decibels: 85 },  // >85dB
+    HOT: { factor: 1.3, temp: 30 }, // >30°C
+    COLD: { factor: 1.2, temp: 5 }, // <5°C
+    NOISE: { factor: 1.1, decibels: 85 }, // >85dB
     POOR_LIGHTING: { factor: 1.1 },
   },
-  
+
   // Recovery rates (fatigue reduction per hour of rest)
   RECOVERY_RATES: {
-    SHORT_BREAK: 15,      // 15 points per 15-min break
-    LUNCH_BREAK: 35,      // 35 points per lunch break
-    BETWEEN_SHIFTS: 50,   // 50 points per 8-hour rest
-    WEEKEND: 100,         // Full recovery over weekend
+    SHORT_BREAK: 15, // 15 points per 15-min break
+    LUNCH_BREAK: 35, // 35 points per lunch break
+    BETWEEN_SHIFTS: 50, // 50 points per 8-hour rest
+    WEEKEND: 100, // Full recovery over weekend
   },
 };
 
@@ -88,7 +88,7 @@ const WELLNESS_METRICS = {
     POOR: { min: 50, color: "orange" },
     CRITICAL: { min: 0, color: "red" },
   },
-  
+
   INJURY_RISK: {
     LOW: { max: 30, action: "Continue monitoring" },
     MODERATE: { max: 60, action: "Increase break frequency" },
@@ -110,15 +110,24 @@ const LogWorkActivitySchema = z.object({
   action: z.literal("logActivity"),
   data: z.object({
     workerId: z.string(),
-    taskType: z.enum(["HEAVY_LIFTING", "REPETITIVE", "STANDING", "REACHING", "DRIVING", "NORMAL"]),
+    taskType: z.enum([
+      "HEAVY_LIFTING",
+      "REPETITIVE",
+      "STANDING",
+      "REACHING",
+      "DRIVING",
+      "NORMAL",
+    ]),
     duration: z.number().positive(),
     weight: z.number().optional(),
     repetitions: z.number().optional(),
-    environmentalConditions: z.object({
-      temperature: z.number().optional(),
-      noiseLevel: z.number().optional(),
-      lighting: z.enum(["GOOD", "POOR"]).optional(),
-    }).optional(),
+    environmentalConditions: z
+      .object({
+        temperature: z.number().optional(),
+        noiseLevel: z.number().optional(),
+        lighting: z.enum(["GOOD", "POOR"]).optional(),
+      })
+      .optional(),
   }),
 });
 
@@ -169,30 +178,36 @@ function calculateFatigueScore(
   timeSinceLastBreak: number,
   taskIntensity: number,
   environmentalFactor: number,
-  baselineScore: number = 0
+  baselineScore: number = 0,
 ): number {
   // Base fatigue from continuous work (exponential growth)
   const workFatigue = Math.pow(hoursWorked * 15, 1.2);
-  
+
   // Fatigue from time since last break
   const breakFatigue = timeSinceLastBreak * 8;
-  
+
   // Apply task intensity multiplier
   const taskAdjustedFatigue = (workFatigue + breakFatigue) * taskIntensity;
-  
+
   // Apply environmental factors
-  const environmentalAdjustedFatigue = taskAdjustedFatigue * environmentalFactor;
-  
+  const environmentalAdjustedFatigue =
+    taskAdjustedFatigue * environmentalFactor;
+
   // Add to baseline and cap at 100
-  const totalFatigue = Math.min(100, baselineScore + environmentalAdjustedFatigue);
-  
+  const totalFatigue = Math.min(
+    100,
+    baselineScore + environmentalAdjustedFatigue,
+  );
+
   return Math.round(totalFatigue);
 }
 
 /**
  * Determine fatigue level from score
  */
-function getFatigueLevel(score: number): "MINIMAL" | "LOW" | "MODERATE" | "HIGH" | "CRITICAL" {
+function getFatigueLevel(
+  score: number,
+): "MINIMAL" | "LOW" | "MODERATE" | "HIGH" | "CRITICAL" {
   if (score >= FATIGUE_CONFIG.THRESHOLDS.CRITICAL) return "CRITICAL";
   if (score >= FATIGUE_CONFIG.THRESHOLDS.HIGH) return "HIGH";
   if (score >= FATIGUE_CONFIG.THRESHOLDS.MODERATE) return "MODERATE";
@@ -207,20 +222,24 @@ function calculateProductivityScore(
   fatigueScore: number,
   tasksCompleted: number,
   targetTasks: number,
-  errorCount: number
+  errorCount: number,
 ): number {
   // Base productivity from completion rate
-  const completionRate = targetTasks > 0 ? (tasksCompleted / targetTasks) * 100 : 100;
-  
+  const completionRate =
+    targetTasks > 0 ? (tasksCompleted / targetTasks) * 100 : 100;
+
   // Fatigue penalty (higher fatigue = lower productivity)
   const fatiguePenalty = fatigueScore * 0.5;
-  
+
   // Error penalty
   const errorPenalty = errorCount * 5;
-  
+
   // Calculate final score
-  const productivity = Math.max(0, completionRate - fatiguePenalty - errorPenalty);
-  
+  const productivity = Math.max(
+    0,
+    completionRate - fatiguePenalty - errorPenalty,
+  );
+
   return Math.round(productivity);
 }
 
@@ -230,25 +249,25 @@ function calculateProductivityScore(
 function assessInjuryRisk(
   fatigueScore: number,
   taskIntensity: number,
-  recentInjuries: number
+  recentInjuries: number,
 ): { risk: "LOW" | "MODERATE" | "HIGH" | "CRITICAL"; score: number } {
   // Base risk from fatigue
   const fatigueRisk = fatigueScore * 0.6;
-  
+
   // Task intensity risk
   const taskRisk = (taskIntensity - 1.0) * 30;
-  
+
   // Injury history risk
   const historyRisk = recentInjuries * 15;
-  
+
   const totalRisk = Math.min(100, fatigueRisk + taskRisk + historyRisk);
-  
+
   let risk: "LOW" | "MODERATE" | "HIGH" | "CRITICAL";
   if (totalRisk >= 80) risk = "CRITICAL";
   else if (totalRisk >= 60) risk = "HIGH";
   else if (totalRisk >= 30) risk = "MODERATE";
   else risk = "LOW";
-  
+
   return { risk, score: Math.round(totalRisk) };
 }
 
@@ -258,7 +277,7 @@ function assessInjuryRisk(
 function generateBreakRecommendation(
   fatigueScore: number,
   timeSinceLastBreak: number,
-  hoursWorked: number
+  hoursWorked: number,
 ): {
   urgency: "LOW" | "MEDIUM" | "HIGH" | "URGENT";
   duration: number;
@@ -271,23 +290,29 @@ function generateBreakRecommendation(
       reason: "Critical fatigue level - mandatory rest period required",
     };
   }
-  
-  if (fatigueScore >= FATIGUE_CONFIG.THRESHOLDS.HIGH || timeSinceLastBreak >= 4) {
+
+  if (
+    fatigueScore >= FATIGUE_CONFIG.THRESHOLDS.HIGH ||
+    timeSinceLastBreak >= 4
+  ) {
     return {
       urgency: "HIGH",
       duration: 20,
       reason: "High fatigue detected - break strongly recommended",
     };
   }
-  
-  if (fatigueScore >= FATIGUE_CONFIG.THRESHOLDS.MODERATE || timeSinceLastBreak >= 3) {
+
+  if (
+    fatigueScore >= FATIGUE_CONFIG.THRESHOLDS.MODERATE ||
+    timeSinceLastBreak >= 3
+  ) {
     return {
       urgency: "MEDIUM",
       duration: 15,
       reason: "Moderate fatigue - break recommended to maintain productivity",
     };
   }
-  
+
   if (hoursWorked >= FATIGUE_CONFIG.SHIFT_LIMITS.MAX_CONTINUOUS_WORK) {
     return {
       urgency: "LOW",
@@ -295,7 +320,7 @@ function generateBreakRecommendation(
       reason: "Maximum continuous work time reached - break recommended",
     };
   }
-  
+
   return null;
 }
 
@@ -306,37 +331,49 @@ function generateWellnessRecommendations(
   fatigueScore: number,
   injuryRisk: string,
   productivityScore: number,
-  timeSinceLastBreak: number
+  timeSinceLastBreak: number,
 ): string[] {
   const recommendations: string[] = [];
-  
+
   if (fatigueScore >= FATIGUE_CONFIG.THRESHOLDS.CRITICAL) {
-    recommendations.push("CRITICAL: Stop work immediately and take mandatory 30-minute break");
+    recommendations.push(
+      "CRITICAL: Stop work immediately and take mandatory 30-minute break",
+    );
     recommendations.push("Consider rotating to lighter tasks after break");
   } else if (fatigueScore >= FATIGUE_CONFIG.THRESHOLDS.HIGH) {
-    recommendations.push("Take a 20-minute break to prevent injury and maintain productivity");
+    recommendations.push(
+      "Take a 20-minute break to prevent injury and maintain productivity",
+    );
     recommendations.push("Hydrate and stretch during break");
   } else if (fatigueScore >= FATIGUE_CONFIG.THRESHOLDS.MODERATE) {
     recommendations.push("Schedule a 15-minute break within the next hour");
   }
-  
+
   if (injuryRisk === "CRITICAL" || injuryRisk === "HIGH") {
     recommendations.push("High injury risk detected - reduce task intensity");
-    recommendations.push("Review ergonomic practices and proper lifting techniques");
+    recommendations.push(
+      "Review ergonomic practices and proper lifting techniques",
+    );
   }
-  
+
   if (productivityScore < 70) {
-    recommendations.push("Productivity below target - consider break or task rotation");
+    recommendations.push(
+      "Productivity below target - consider break or task rotation",
+    );
   }
-  
+
   if (timeSinceLastBreak >= 4) {
-    recommendations.push("No break taken for 4+ hours - regulatory compliance issue");
+    recommendations.push(
+      "No break taken for 4+ hours - regulatory compliance issue",
+    );
   }
-  
+
   if (recommendations.length === 0) {
-    recommendations.push("Worker is in good condition - maintain current schedule");
+    recommendations.push(
+      "Worker is in good condition - maintain current schedule",
+    );
   }
-  
+
   return recommendations;
 }
 
@@ -375,24 +412,29 @@ export async function GET(request: NextRequest) {
         (a) =>
           new Date(a.createdAt) >= today &&
           a.action === "WORKER_FATIGUE_MONITOR" &&
-          (a.metadata as any)?.fatigueLevel === "CRITICAL"
+          (a.metadata as any)?.fatigueLevel === "CRITICAL",
       ).length;
 
       const breaksScheduled = activities.filter(
         (a) =>
           new Date(a.createdAt) >= today &&
           a.action === "WORKER_BREAK" &&
-          (a.metadata as any)?.wasScheduled === true
+          (a.metadata as any)?.wasScheduled === true,
       ).length;
 
       const avgFatigueScore =
         activities
           .filter((a) => a.action === "WORKER_FATIGUE_MONITOR")
           .slice(0, 20)
-          .reduce((sum, a) => sum + ((a.metadata as any)?.fatigueScore || 0), 0) / 20 || 0;
+          .reduce(
+            (sum, a) => sum + ((a.metadata as any)?.fatigueScore || 0),
+            0,
+          ) / 20 || 0;
 
       const injuries = activities.filter(
-        (a) => (a.metadata as any)?.injuryRisk === "HIGH" || (a.metadata as any)?.injuryRisk === "CRITICAL"
+        (a) =>
+          (a.metadata as any)?.injuryRisk === "HIGH" ||
+          (a.metadata as any)?.injuryRisk === "CRITICAL",
       ).length;
 
       return NextResponse.json({
@@ -469,7 +511,7 @@ export async function GET(request: NextRequest) {
           worker.hoursWorked,
           timeSinceBreak,
           worker.taskIntensity,
-          1.0 // Normal environmental conditions
+          1.0, // Normal environmental conditions
         );
 
         const fatigueLevel = getFatigueLevel(fatigueScore);
@@ -478,26 +520,26 @@ export async function GET(request: NextRequest) {
           fatigueScore,
           worker.tasksCompleted,
           worker.targetTasks,
-          worker.errorCount
+          worker.errorCount,
         );
 
         const injuryRiskAssessment = assessInjuryRisk(
           fatigueScore,
           worker.taskIntensity,
-          worker.recentInjuries
+          worker.recentInjuries,
         );
 
         const breakRecommendation = generateBreakRecommendation(
           fatigueScore,
           timeSinceBreak,
-          worker.hoursWorked
+          worker.hoursWorked,
         );
 
         const recommendations = generateWellnessRecommendations(
           fatigueScore,
           injuryRiskAssessment.risk,
           productivityScore,
-          timeSinceBreak
+          timeSinceBreak,
         );
 
         workerProfiles.push({
@@ -519,11 +561,14 @@ export async function GET(request: NextRequest) {
       // Calculate summary
       const summary = {
         totalWorkers: workerProfiles.length,
-        critical: workerProfiles.filter((w) => w.fatigueLevel === "CRITICAL").length,
-        high: workerProfiles.filter((w) => w.fatigueLevel === "HIGH").length,
-        moderate: workerProfiles.filter((w) => w.fatigueLevel === "MODERATE").length,
-        good: workerProfiles.filter((w) => w.fatigueLevel === "LOW" || w.fatigueLevel === "MINIMAL")
+        critical: workerProfiles.filter((w) => w.fatigueLevel === "CRITICAL")
           .length,
+        high: workerProfiles.filter((w) => w.fatigueLevel === "HIGH").length,
+        moderate: workerProfiles.filter((w) => w.fatigueLevel === "MODERATE")
+          .length,
+        good: workerProfiles.filter(
+          (w) => w.fatigueLevel === "LOW" || w.fatigueLevel === "MINIMAL",
+        ).length,
         avgFatigueScore:
           workerProfiles.reduce((sum, w) => sum + w.currentFatigueScore, 0) /
           workerProfiles.length,
@@ -532,7 +577,7 @@ export async function GET(request: NextRequest) {
           workerProfiles.length,
         needBreak: workerProfiles.filter((w) => w.needsBreak).length,
         highRisk: workerProfiles.filter(
-          (w) => w.injuryRisk === "HIGH" || w.injuryRisk === "CRITICAL"
+          (w) => w.injuryRisk === "HIGH" || w.injuryRisk === "CRITICAL",
         ).length,
       };
 
@@ -548,7 +593,7 @@ export async function GET(request: NextRequest) {
     console.error("Error in worker fatigue monitoring GET:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -627,14 +672,14 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid request data", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error in worker fatigue monitoring POST:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

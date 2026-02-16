@@ -1,10 +1,10 @@
 /**
  * SEASONAL PRE-POSITIONING SYSTEM
  * =================================
- * 
+ *
  * Optimization System 10 - Exceptional ROI (1,556%)
  * Investment: $8,000 → Annual Savings: $125,000
- * 
+ *
  * Features:
  * - Predictive seasonal demand modeling
  * - Automated pre-positioning recommendations
@@ -118,13 +118,14 @@ interface SeasonalForecast {
 function calculateSeasonalDemand(
   historicalData: HistoricalData[],
   seasonMultiplier: number,
-  trend: number = 1.0
+  trend: number = 1.0,
 ): number {
   if (historicalData.length === 0) return 0;
 
   // Calculate average baseline demand
   const avgDemand =
-    historicalData.reduce((sum, d) => sum + d.avgDailyDemand, 0) / historicalData.length;
+    historicalData.reduce((sum, d) => sum + d.avgDailyDemand, 0) /
+    historicalData.length;
 
   // Apply seasonal multiplier and trend
   return Math.round(avgDemand * seasonMultiplier * trend);
@@ -154,7 +155,7 @@ interface PrePositionRecommendation {
 }
 
 function generatePrePositionRecommendations(
-  forecasts: SeasonalForecast[]
+  forecasts: SeasonalForecast[],
 ): PrePositionRecommendation[] {
   // Group forecasts by product
   const productForecasts = new Map<string, SeasonalForecast[]>();
@@ -194,9 +195,16 @@ function generatePrePositionRecommendations(
               currentQuantitySource: source.currentStock,
               currentQuantityTarget: target.currentStock,
               recommendedTransfer: transferQty,
-              targetDate: new Date(target.seasonStart.getTime() - 14 * 24 * 60 * 60 * 1000), // 2 weeks before season
+              targetDate: new Date(
+                target.seasonStart.getTime() - 14 * 24 * 60 * 60 * 1000,
+              ), // 2 weeks before season
               reason: `Pre-position for ${target.season} - predicted ${target.predictedDemand} unit demand`,
-              priority: target.gap > 500 ? "CRITICAL" : target.gap > 200 ? "HIGH" : "MEDIUM",
+              priority:
+                target.gap > 500
+                  ? "CRITICAL"
+                  : target.gap > 200
+                    ? "HIGH"
+                    : "MEDIUM",
               estimatedCostSavings: estimatedSavings,
               estimatedFreightCost: freightCost,
               netSavings,
@@ -231,7 +239,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -310,10 +321,14 @@ export async function GET(req: NextRequest) {
         forecasts: filtered,
         total: filtered.length,
         summary: {
-          totalPredictedDemand: filtered.reduce((sum, f) => sum + f.predictedDemand, 0),
+          totalPredictedDemand: filtered.reduce(
+            (sum, f) => sum + f.predictedDemand,
+            0,
+          ),
           totalGap: filtered.reduce((sum, f) => sum + Math.abs(f.gap), 0),
           avgConfidence:
-            filtered.reduce((sum, f) => sum + f.confidence, 0) / filtered.length,
+            filtered.reduce((sum, f) => sum + f.confidence, 0) /
+            filtered.length,
         },
       });
     }
@@ -371,7 +386,8 @@ export async function GET(req: NextRequest) {
           currentQuantityTarget: 580,
           recommendedTransfer: 600,
           targetDate: new Date("2026-07-01"),
-          reason: "Pre-position for BACK_TO_SCHOOL - predicted 1200 unit demand",
+          reason:
+            "Pre-position for BACK_TO_SCHOOL - predicted 1200 unit demand",
           priority: "HIGH",
           estimatedCostSavings: 15000,
           estimatedFreightCost: 3000,
@@ -389,9 +405,13 @@ export async function GET(req: NextRequest) {
         total: filtered.length,
         summary: {
           totalNetSavings: filtered.reduce((sum, r) => sum + r.netSavings, 0),
-          totalUnitsToTransfer: filtered.reduce((sum, r) => sum + r.recommendedTransfer, 0),
+          totalUnitsToTransfer: filtered.reduce(
+            (sum, r) => sum + r.recommendedTransfer,
+            0,
+          ),
           avgConfidence:
-            filtered.reduce((sum, r) => sum + r.confidence, 0) / filtered.length,
+            filtered.reduce((sum, r) => sum + r.confidence, 0) /
+            filtered.length,
         },
       });
     }
@@ -419,10 +439,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ error: "Invalid action parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid action parameter" },
+      { status: 400 },
+    );
   } catch (error: any) {
     console.error("Seasonal Pre-Positioning GET error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -445,7 +471,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -459,7 +488,7 @@ export async function POST(req: NextRequest) {
       if (!productId || !warehouseId || !season) {
         return NextResponse.json(
           { error: "productId, warehouseId, and season required" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -478,7 +507,10 @@ export async function POST(req: NextRequest) {
       const { recommendationId } = body;
 
       if (!recommendationId) {
-        return NextResponse.json({ error: "recommendationId required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "recommendationId required" },
+          { status: 400 },
+        );
       }
 
       // TODO: Create transfer order in system
@@ -515,11 +547,14 @@ export async function POST(req: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 

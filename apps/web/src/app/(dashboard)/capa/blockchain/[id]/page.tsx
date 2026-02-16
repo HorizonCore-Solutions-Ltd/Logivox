@@ -152,7 +152,11 @@ export default function BlockchainAuditTrailPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleVerify} disabled={isVerifying}>
+          <Button
+            variant="outline"
+            onClick={handleVerify}
+            disabled={isVerifying}
+          >
             {isVerifying ? (
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
             ) : (
@@ -332,7 +336,7 @@ export default function BlockchainAuditTrailPage() {
                       {key.replace(/([A-Z])/g, " $1").trim()}
                     </div>
                   </div>
-                )
+                ),
               )}
             </div>
           </CardContent>
@@ -415,7 +419,9 @@ export default function BlockchainAuditTrailPage() {
                         {index > 0 && (
                           <div className="col-span-2 flex items-center gap-2">
                             <LinkIcon className="h-3 w-3 text-gray-400" />
-                            <span className="text-gray-600">Previous:</span>{" "}
+                            <span className="text-gray-600">
+                              Previous:
+                            </span>{" "}
                             <code className="text-xs bg-gray-100 px-2 py-1 rounded">
                               {block.previousHash.substring(0, 32)}...
                             </code>

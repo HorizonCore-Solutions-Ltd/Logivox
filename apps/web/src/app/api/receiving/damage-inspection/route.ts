@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // DAMAGE INSPECTION (COMPUTER VISION) API
@@ -31,36 +31,36 @@ import { z } from 'zod';
 
 // Damage types
 type DamageType =
-  | 'COSMETIC'        // Minor scratches, scuffs
-  | 'PACKAGING'       // Damaged box/wrapping
-  | 'STRUCTURAL'      // Dents, cracks
-  | 'FUNCTIONAL'      // Not operational
-  | 'CONTAMINATION'   // Dirt, moisture, mold
-  | 'MISSING_PARTS'   // Incomplete
-  | 'WRONG_ITEM';     // Incorrect product
+  | "COSMETIC" // Minor scratches, scuffs
+  | "PACKAGING" // Damaged box/wrapping
+  | "STRUCTURAL" // Dents, cracks
+  | "FUNCTIONAL" // Not operational
+  | "CONTAMINATION" // Dirt, moisture, mold
+  | "MISSING_PARTS" // Incomplete
+  | "WRONG_ITEM"; // Incorrect product
 
 // Damage severity
-type DamageSeverity = 'MINOR' | 'MODERATE' | 'SEVERE' | 'CRITICAL';
+type DamageSeverity = "MINOR" | "MODERATE" | "SEVERE" | "CRITICAL";
 
 // Inspection status
 type InspectionStatus =
-  | 'PENDING'         // Awaiting inspection
-  | 'IN_PROGRESS'     // Inspecting now
-  | 'PASSED'          // No damage found
-  | 'DAMAGED'         // Damage detected
-  | 'ESCALATED';      // Requires management review
+  | "PENDING" // Awaiting inspection
+  | "IN_PROGRESS" // Inspecting now
+  | "PASSED" // No damage found
+  | "DAMAGED" // Damage detected
+  | "ESCALATED"; // Requires management review
 
 // Disposition options
 type DamageDisposition =
-  | 'ACCEPT_AS_IS'    // Minor damage, accept
-  | 'DISCOUNT'        // Accept with price adjustment
-  | 'RETURN'          // Return to supplier
-  | 'SCRAP'           // Dispose/destroy
-  | 'REWORK';         // Repair/refurbish
+  | "ACCEPT_AS_IS" // Minor damage, accept
+  | "DISCOUNT" // Accept with price adjustment
+  | "RETURN" // Return to supplier
+  | "SCRAP" // Dispose/destroy
+  | "REWORK"; // Repair/refurbish
 
 // Validation schemas
 const startInspectionSchema = z.object({
-  action: z.literal('start_inspection'),
+  action: z.literal("start_inspection"),
   receivingId: z.string().uuid(),
   itemSKU: z.string(),
   quantity: z.number().int().positive(),
@@ -68,34 +68,36 @@ const startInspectionSchema = z.object({
 });
 
 const detectDamageSchema = z.object({
-  action: z.literal('detect_damage'),
+  action: z.literal("detect_damage"),
   inspectionId: z.string().uuid(),
   imageUrl: z.string().url(),
-  damageType: z.enum([
-    'COSMETIC',
-    'PACKAGING',
-    'STRUCTURAL',
-    'FUNCTIONAL',
-    'CONTAMINATION',
-    'MISSING_PARTS',
-    'WRONG_ITEM'
-  ]).optional(),
+  damageType: z
+    .enum([
+      "COSMETIC",
+      "PACKAGING",
+      "STRUCTURAL",
+      "FUNCTIONAL",
+      "CONTAMINATION",
+      "MISSING_PARTS",
+      "WRONG_ITEM",
+    ])
+    .optional(),
   aiConfidence: z.number().min(0).max(100).optional(),
 });
 
 const recordDamageSchema = z.object({
-  action: z.literal('record_damage'),
+  action: z.literal("record_damage"),
   inspectionId: z.string().uuid(),
   damageType: z.enum([
-    'COSMETIC',
-    'PACKAGING',
-    'STRUCTURAL',
-    'FUNCTIONAL',
-    'CONTAMINATION',
-    'MISSING_PARTS',
-    'WRONG_ITEM'
+    "COSMETIC",
+    "PACKAGING",
+    "STRUCTURAL",
+    "FUNCTIONAL",
+    "CONTAMINATION",
+    "MISSING_PARTS",
+    "WRONG_ITEM",
   ]),
-  severity: z.enum(['MINOR', 'MODERATE', 'SEVERE', 'CRITICAL']),
+  severity: z.enum(["MINOR", "MODERATE", "SEVERE", "CRITICAL"]),
   affectedQuantity: z.number().int().positive(),
   description: z.string(),
   imageUrls: z.array(z.string().url()),
@@ -103,28 +105,24 @@ const recordDamageSchema = z.object({
 });
 
 const completeInspectionSchema = z.object({
-  action: z.literal('complete_inspection'),
+  action: z.literal("complete_inspection"),
   inspectionId: z.string().uuid(),
-  status: z.enum(['PASSED', 'DAMAGED']),
-  disposition: z.enum([
-    'ACCEPT_AS_IS',
-    'DISCOUNT',
-    'RETURN',
-    'SCRAP',
-    'REWORK'
-  ]).optional(),
+  status: z.enum(["PASSED", "DAMAGED"]),
+  disposition: z
+    .enum(["ACCEPT_AS_IS", "DISCOUNT", "RETURN", "SCRAP", "REWORK"])
+    .optional(),
   notes: z.string().optional(),
 });
 
 const generateClaimSchema = z.object({
-  action: z.literal('generate_claim'),
+  action: z.literal("generate_claim"),
   inspectionId: z.string().uuid(),
   damageIds: z.array(z.string().uuid()),
   claimAmount: z.number().positive(),
   contactPerson: z.string(),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   startInspectionSchema,
   detectDamageSchema,
   recordDamageSchema,
@@ -146,10 +144,10 @@ async function analyzeDamageWithAI(imageUrl: string): Promise<{
   // - Google Cloud Vision API
   // - Azure Computer Vision
   // - Custom TensorFlow/PyTorch model
-  
+
   // Simulation logic based on image URL patterns for demo
   const hasDefect = Math.random() > 0.7; // 30% defect rate for demo
-  
+
   if (!hasDefect) {
     return {
       damageDetected: false,
@@ -157,24 +155,31 @@ async function analyzeDamageWithAI(imageUrl: string): Promise<{
       severity: null,
       confidence: 92 + Math.random() * 7, // 92-99% confidence
       boundingBoxes: [],
-      description: 'No damage detected',
+      description: "No damage detected",
     };
   }
 
   // Simulate detected damage
   const damageTypes: DamageType[] = [
-    'COSMETIC',
-    'PACKAGING',
-    'STRUCTURAL',
-    'FUNCTIONAL',
-    'CONTAMINATION',
+    "COSMETIC",
+    "PACKAGING",
+    "STRUCTURAL",
+    "FUNCTIONAL",
+    "CONTAMINATION",
   ];
-  
-  const severities: DamageSeverity[] = ['MINOR', 'MODERATE', 'SEVERE', 'CRITICAL'];
-  
-  const detectedType = damageTypes[Math.floor(Math.random() * damageTypes.length)];
-  const detectedSeverity = severities[Math.floor(Math.random() * severities.length)];
-  
+
+  const severities: DamageSeverity[] = [
+    "MINOR",
+    "MODERATE",
+    "SEVERE",
+    "CRITICAL",
+  ];
+
+  const detectedType =
+    damageTypes[Math.floor(Math.random() * damageTypes.length)];
+  const detectedSeverity =
+    severities[Math.floor(Math.random() * severities.length)];
+
   return {
     damageDetected: true,
     damageType: detectedType,
@@ -188,7 +193,7 @@ async function analyzeDamageWithAI(imageUrl: string): Promise<{
         height: 50 + Math.random() * 100,
       },
     ],
-    description: `Detected ${detectedType.toLowerCase().replace('_', ' ')} - ${detectedSeverity.toLowerCase()} severity`,
+    description: `Detected ${detectedType.toLowerCase().replace("_", " ")} - ${detectedSeverity.toLowerCase()} severity`,
   };
 }
 
@@ -196,42 +201,42 @@ async function analyzeDamageWithAI(imageUrl: string): Promise<{
 function calculateSeverity(
   damageType: DamageType,
   affectedPercentage: number,
-  functionalityImpaired: boolean
+  functionalityImpaired: boolean,
 ): DamageSeverity {
-  if (functionalityImpaired || damageType === 'FUNCTIONAL') {
-    return 'CRITICAL';
+  if (functionalityImpaired || damageType === "FUNCTIONAL") {
+    return "CRITICAL";
   }
 
-  if (damageType === 'COSMETIC') {
-    if (affectedPercentage < 5) return 'MINOR';
-    if (affectedPercentage < 15) return 'MODERATE';
-    return 'SEVERE';
+  if (damageType === "COSMETIC") {
+    if (affectedPercentage < 5) return "MINOR";
+    if (affectedPercentage < 15) return "MODERATE";
+    return "SEVERE";
   }
 
-  if (damageType === 'PACKAGING') {
-    if (affectedPercentage < 10) return 'MINOR';
-    if (affectedPercentage < 30) return 'MODERATE';
-    return 'SEVERE';
+  if (damageType === "PACKAGING") {
+    if (affectedPercentage < 10) return "MINOR";
+    if (affectedPercentage < 30) return "MODERATE";
+    return "SEVERE";
   }
 
-  if (damageType === 'STRUCTURAL') {
-    if (affectedPercentage < 10) return 'MODERATE';
-    if (affectedPercentage < 25) return 'SEVERE';
-    return 'CRITICAL';
+  if (damageType === "STRUCTURAL") {
+    if (affectedPercentage < 10) return "MODERATE";
+    if (affectedPercentage < 25) return "SEVERE";
+    return "CRITICAL";
   }
 
-  if (damageType === 'CONTAMINATION') {
-    if (affectedPercentage < 5) return 'MODERATE';
-    return 'SEVERE';
+  if (damageType === "CONTAMINATION") {
+    if (affectedPercentage < 5) return "MODERATE";
+    return "SEVERE";
   }
 
-  return 'MODERATE';
+  return "MODERATE";
 }
 
 // Start inspection
 async function startInspection(
   session: any,
-  data: z.infer<typeof startInspectionSchema>
+  data: z.infer<typeof startInspectionSchema>,
 ) {
   const inspection = await prisma.damageInspection.create({
     data: {
@@ -239,7 +244,7 @@ async function startInspection(
       receivingId: data.receivingId,
       itemSKU: data.itemSKU,
       quantity: data.quantity,
-      status: 'IN_PROGRESS',
+      status: "IN_PROGRESS",
       inspectorId: data.inspectorId,
       startedAt: new Date(),
     },
@@ -250,8 +255,8 @@ async function startInspection(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'DAMAGE_INSPECTION_STARTED',
-      entityType: 'DAMAGE_INSPECTION',
+      action: "DAMAGE_INSPECTION_STARTED",
+      entityType: "DAMAGE_INSPECTION",
       entityId: inspection.id,
       metadata: {
         receivingId: data.receivingId,
@@ -264,14 +269,14 @@ async function startInspection(
   return {
     success: true,
     inspection,
-    message: 'Inspection started',
+    message: "Inspection started",
   };
 }
 
 // Detect damage using computer vision
 async function detectDamage(
   session: any,
-  data: z.infer<typeof detectDamageSchema>
+  data: z.infer<typeof detectDamageSchema>,
 ) {
   // Run AI analysis
   const analysis = await analyzeDamageWithAI(data.imageUrl);
@@ -296,7 +301,7 @@ async function detectDamage(
     await prisma.damageInspection.update({
       where: { id: data.inspectionId },
       data: {
-        status: 'DAMAGED',
+        status: "DAMAGED",
         aiDamageDetected: true,
       },
     });
@@ -307,8 +312,8 @@ async function detectDamage(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'DAMAGE_AI_ANALYSIS_COMPLETED',
-      entityType: 'DAMAGE_INSPECTION',
+      action: "DAMAGE_AI_ANALYSIS_COMPLETED",
+      entityType: "DAMAGE_INSPECTION",
       entityId: data.inspectionId,
       metadata: {
         damageDetected: analysis.damageDetected,
@@ -323,19 +328,19 @@ async function detectDamage(
     analysis: {
       ...aiResult,
       recommendation: analysis.damageDetected
-        ? 'Manual verification recommended'
-        : 'Item appears undamaged',
+        ? "Manual verification recommended"
+        : "Item appears undamaged",
     },
     message: analysis.damageDetected
       ? `Damage detected: ${analysis.damageType} (${analysis.confidence.toFixed(0)}% confidence)`
-      : 'No damage detected',
+      : "No damage detected",
   };
 }
 
 // Record damage (manual or AI-confirmed)
 async function recordDamage(
   session: any,
-  data: z.infer<typeof recordDamageSchema>
+  data: z.infer<typeof recordDamageSchema>,
 ) {
   const inspection = await prisma.damageInspection.findUnique({
     where: { id: data.inspectionId },
@@ -349,7 +354,7 @@ async function recordDamage(
   });
 
   if (!inspection) {
-    throw new Error('Inspection not found');
+    throw new Error("Inspection not found");
   }
 
   // Create damage record
@@ -372,7 +377,7 @@ async function recordDamage(
   await prisma.damageInspection.update({
     where: { id: data.inspectionId },
     data: {
-      status: 'DAMAGED',
+      status: "DAMAGED",
       totalDamageValue: {
         increment: data.estimatedValue,
       },
@@ -406,15 +411,16 @@ async function recordDamage(
   });
 
   // Auto-escalate critical damage
-  if (data.severity === 'CRITICAL' || data.estimatedValue > 5000) {
+  if (data.severity === "CRITICAL" || data.estimatedValue > 5000) {
     await prisma.damageEscalation.create({
       data: {
         organizationId: session.user.organizationId,
         damageId: damage.id,
-        reason: data.severity === 'CRITICAL' 
-          ? 'Critical damage severity'
-          : 'High estimated value',
-        status: 'PENDING',
+        reason:
+          data.severity === "CRITICAL"
+            ? "Critical damage severity"
+            : "High estimated value",
+        status: "PENDING",
         escalatedAt: new Date(),
       },
     });
@@ -425,8 +431,8 @@ async function recordDamage(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'DAMAGE_RECORDED',
-      entityType: 'DAMAGE_RECORD',
+      action: "DAMAGE_RECORDED",
+      entityType: "DAMAGE_RECORD",
       entityId: damage.id,
       metadata: {
         damageType: data.damageType,
@@ -447,7 +453,7 @@ async function recordDamage(
 // Complete inspection
 async function completeInspection(
   session: any,
-  data: z.infer<typeof completeInspectionSchema>
+  data: z.infer<typeof completeInspectionSchema>,
 ) {
   const inspection = await prisma.damageInspection.update({
     where: {
@@ -467,7 +473,9 @@ async function completeInspection(
 
   // Calculate inspection duration
   const durationMinutes = inspection.startedAt
-    ? Math.round((new Date().getTime() - inspection.startedAt.getTime()) / (1000 * 60))
+    ? Math.round(
+        (new Date().getTime() - inspection.startedAt.getTime()) / (1000 * 60),
+      )
     : 0;
 
   // Update metrics
@@ -488,8 +496,8 @@ async function completeInspection(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'DAMAGE_INSPECTION_COMPLETED',
-      entityType: 'DAMAGE_INSPECTION',
+      action: "DAMAGE_INSPECTION_COMPLETED",
+      entityType: "DAMAGE_INSPECTION",
       entityId: data.inspectionId,
       metadata: {
         status: data.status,
@@ -513,7 +521,7 @@ async function completeInspection(
 // Generate supplier claim
 async function generateClaim(
   session: any,
-  data: z.infer<typeof generateClaimSchema>
+  data: z.infer<typeof generateClaimSchema>,
 ) {
   const inspection = await prisma.damageInspection.findUnique({
     where: { id: data.inspectionId },
@@ -534,7 +542,7 @@ async function generateClaim(
   });
 
   if (!inspection) {
-    throw new Error('Inspection not found');
+    throw new Error("Inspection not found");
   }
 
   // Create claim
@@ -544,10 +552,10 @@ async function generateClaim(
       supplierId: inspection.receiving.supplierId,
       inspectionId: data.inspectionId,
       claimAmount: data.claimAmount,
-      claimStatus: 'SUBMITTED',
+      claimStatus: "SUBMITTED",
       contactPerson: data.contactPerson,
       submittedAt: new Date(),
-      documentationUrls: inspection.damages.flatMap(d => d.imageUrls),
+      documentationUrls: inspection.damages.flatMap((d) => d.imageUrls),
     },
   });
 
@@ -568,8 +576,8 @@ async function generateClaim(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'SUPPLIER_CLAIM_GENERATED',
-      entityType: 'SUPPLIER_CLAIM',
+      action: "SUPPLIER_CLAIM_GENERATED",
+      entityType: "SUPPLIER_CLAIM",
       entityId: claim.id,
       metadata: {
         supplierId: inspection.receiving.supplierId,
@@ -591,15 +599,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get statistics
-    if (action === 'stats') {
-      const stats = await prisma.$queryRaw`
+    if (action === "stats") {
+      const stats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalInspections",
           COUNT(CASE WHEN status = 'PASSED' THEN 1 END)::int as "passedInspections",
@@ -609,19 +617,20 @@ export async function GET(request: NextRequest) {
         FROM "DamageInspection"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const metricsStats = await prisma.$queryRaw`
+      const metricsStats = (await prisma.$queryRaw`
         SELECT 
           COALESCE(AVG("durationMinutes"), 0)::numeric(10,1) as "avgInspectionTime"
         FROM "DamageInspectionMetrics"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const aiAccuracy = stats[0].aiDetections > 0
-        ? (stats[0].aiDetections / stats[0].totalInspections) * 100
-        : 95;
+      const aiAccuracy =
+        stats[0].aiDetections > 0
+          ? (stats[0].aiDetections / stats[0].totalInspections) * 100
+          : 95;
 
       const monthlySavings = 14083; // Based on ROI calculation
 
@@ -637,12 +646,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Get active inspections
-    if (action === 'active-inspections') {
+    if (action === "active-inspections") {
       const inspections = await prisma.damageInspection.findMany({
         where: {
           organizationId: session.user.organizationId,
           status: {
-            in: ['PENDING', 'IN_PROGRESS'],
+            in: ["PENDING", "IN_PROGRESS"],
           },
         },
         include: {
@@ -653,7 +662,7 @@ export async function GET(request: NextRequest) {
           },
           inspector: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 50,
       });
 
@@ -661,7 +670,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent damages
-    if (action === 'recent-damages') {
+    if (action === "recent-damages") {
       const damages = await prisma.damageRecord.findMany({
         where: {
           organizationId: session.user.organizationId,
@@ -677,19 +686,19 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: { recordedAt: 'desc' },
+        orderBy: { recordedAt: "desc" },
         take: 20,
       });
 
       return NextResponse.json({ damages });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Damage inspection GET error:', error);
+    console.error("Damage inspection GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve inspection data' },
-      { status: 500 }
+      { error: "Failed to retrieve inspection data" },
+      { status: 500 },
     );
   }
 }
@@ -699,43 +708,43 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'start_inspection':
+      case "start_inspection":
         return NextResponse.json(await startInspection(session, data));
 
-      case 'detect_damage':
+      case "detect_damage":
         return NextResponse.json(await detectDamage(session, data));
 
-      case 'record_damage':
+      case "record_damage":
         return NextResponse.json(await recordDamage(session, data));
 
-      case 'complete_inspection':
+      case "complete_inspection":
         return NextResponse.json(await completeInspection(session, data));
 
-      case 'generate_claim':
+      case "generate_claim":
         return NextResponse.json(await generateClaim(session, data));
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Damage inspection POST error:', error);
+    console.error("Damage inspection POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process inspection' },
-      { status: 500 }
+      { error: "Failed to process inspection" },
+      { status: 500 },
     );
   }
 }

@@ -5,23 +5,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Navigation } from "@/components/landing";
 import { Footer } from "@/components/layout/footer";
-import { 
-  ArrowRight, 
-  Shield, 
-  Zap, 
-  Users, 
-  Building2, 
+import {
+  ArrowRight,
+  Shield,
+  Zap,
+  Users,
+  Building2,
   Award,
   Globe,
   Heart,
   Target,
-  Lightbulb
+  Lightbulb,
 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "About LogiVox - Leading Voice-Enabled Warehouse Management",
-  description: "Founded to eliminate warehouse chaos through voice technology and AI. Trusted by 500+ warehouses, reducing errors 95% and saving $52M+ annually.",
-  keywords: ["warehouse management company", "logistics software", "inventory management"],
+  description:
+    "Founded to eliminate warehouse chaos through voice technology and AI. Trusted by 500+ warehouses, reducing errors 95% and saving $52M+ annually.",
+  keywords: [
+    "warehouse management company",
+    "logistics software",
+    "inventory management",
+  ],
 };
 
 const stats = [
@@ -35,22 +40,26 @@ const timeline = [
   {
     year: "2023",
     title: "Founded with a Mission",
-    description: "Started by warehouse operations veterans frustrated with outdated, error-prone systems.",
+    description:
+      "Started by warehouse operations veterans frustrated with outdated, error-prone systems.",
   },
   {
-    year: "2024", 
+    year: "2024",
     title: "Voice Technology Breakthrough",
-    description: "Launched industry-first voice-enabled warehouse operations with natural language processing.",
+    description:
+      "Launched industry-first voice-enabled warehouse operations with natural language processing.",
   },
   {
     year: "2025",
     title: "AI-Powered Optimization",
-    description: "Introduced predictive analytics and machine learning for demand forecasting and labor optimization.",
+    description:
+      "Introduced predictive analytics and machine learning for demand forecasting and labor optimization.",
   },
   {
     year: "2026",
     title: "Enterprise Scale",
-    description: "Now serving 500+ warehouses across healthcare, manufacturing, and retail with proven $52M+ in savings.",
+    description:
+      "Now serving 500+ warehouses across healthcare, manufacturing, and retail with proven $52M+ in savings.",
   },
 ];
 
@@ -58,22 +67,26 @@ const values = [
   {
     icon: Users,
     title: "Customer First",
-    description: "Every decision starts with how it helps our customers succeed. We measure our success by yours.",
+    description:
+      "Every decision starts with how it helps our customers succeed. We measure our success by yours.",
   },
   {
     icon: Lightbulb,
     title: "Innovation Drive",
-    description: "We push boundaries with voice AI, computer vision, and predictive analytics to solve real problems.",
+    description:
+      "We push boundaries with voice AI, computer vision, and predictive analytics to solve real problems.",
   },
   {
     icon: Shield,
     title: "Security & Trust",
-    description: "Enterprise-grade security isn't optional. SOC 2, ISO 27001, and HIPAA compliance built in.",
+    description:
+      "Enterprise-grade security isn't optional. SOC 2, ISO 27001, and HIPAA compliance built in.",
   },
   {
     icon: Globe,
     title: "Global Impact",
-    description: "Making warehouse operations efficient worldwide, from small businesses to Fortune 500.",
+    description:
+      "Making warehouse operations efficient worldwide, from small businesses to Fortune 500.",
   },
 ];
 
@@ -81,19 +94,21 @@ const team = [
   {
     name: "Sarah Johnson",
     role: "CEO & Co-Founder",
-    background: "Former VP Operations at Amazon, 15+ years warehouse management",
+    background:
+      "Former VP Operations at Amazon, 15+ years warehouse management",
     image: "SJ",
   },
   {
     name: "Michael Chen",
-    role: "CTO & Co-Founder", 
+    role: "CTO & Co-Founder",
     background: "Ex-Microsoft AI engineer, voice technology patent holder",
     image: "MC",
   },
   {
     name: "David Rodriguez",
     role: "VP Customer Success",
-    background: "20+ years logistics consulting, supply chain optimization expert",
+    background:
+      "20+ years logistics consulting, supply chain optimization expert",
     image: "DR",
   },
 ];
@@ -117,19 +132,27 @@ export default function AboutPage() {
                 </span>
               </h1>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Founded by warehouse operations veterans who were tired of outdated systems 
-                causing errors, delays, and frustration. Today, 500+ warehouses trust LogiVox 
-                to eliminate chaos and drive results.
+                Founded by warehouse operations veterans who were tired of
+                outdated systems causing errors, delays, and frustration. Today,
+                500+ warehouses trust LogiVox to eliminate chaos and drive
+                results.
               </p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
               {stats.map((stat) => (
-                <Card key={stat.label} className="text-center p-6 hover:shadow-lg transition-all">
+                <Card
+                  key={stat.label}
+                  className="text-center p-6 hover:shadow-lg transition-all"
+                >
                   <stat.icon className="h-8 w-8 text-primary mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-primary mb-1">{stat.value}</div>
-                  <div className="text-sm text-muted-foreground">{stat.label}</div>
+                  <div className="text-3xl font-bold text-primary mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
                 </Card>
               ))}
             </div>
@@ -146,14 +169,16 @@ export default function AboutPage() {
                   Transform Every Warehouse Into a Precision Operation
                 </h2>
                 <p className="text-lg text-muted-foreground">
-                  We believe warehouse workers shouldn't fight with complicated software. 
-                  Technology should adapt to humans, not the other way around. That's why 
-                  we built the first warehouse system you can control with your voice.
+                  We believe warehouse workers shouldn't fight with complicated
+                  software. Technology should adapt to humans, not the other way
+                  around. That's why we built the first warehouse system you can
+                  control with your voice.
                 </p>
                 <p className="text-muted-foreground">
-                  Our AI-powered platform eliminates picking errors, speeds up fulfillment, 
-                  and gives you real-time visibility—all while being incredibly easy to use. 
-                  No complex training. No steep learning curves. Just results.
+                  Our AI-powered platform eliminates picking errors, speeds up
+                  fulfillment, and gives you real-time visibility—all while
+                  being incredibly easy to use. No complex training. No steep
+                  learning curves. Just results.
                 </p>
               </div>
               <Card className="p-8">
@@ -161,15 +186,21 @@ export default function AboutPage() {
                 <div className="space-y-4">
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-sm">95% reduction in picking errors, guaranteed</span>
+                    <span className="text-sm">
+                      95% reduction in picking errors, guaranteed
+                    </span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-sm">30-day implementation, not 6+ months</span>
+                    <span className="text-sm">
+                      30-day implementation, not 6+ months
+                    </span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    <span className="text-sm">24/7 support that actually helps</span>
+                    <span className="text-sm">
+                      24/7 support that actually helps
+                    </span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -190,35 +221,44 @@ export default function AboutPage() {
                 From Startup to Industry Leader
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Four years of relentless focus on solving real warehouse problems
+                Four years of relentless focus on solving real warehouse
+                problems
               </p>
             </div>
 
             <div className="relative">
               {/* Timeline line */}
               <div className="absolute left-1/2 transform -translate-x-px h-full w-0.5 bg-border"></div>
-              
+
               <div className="space-y-12">
                 {timeline.map((item, index) => (
                   <div key={item.year} className="relative flex items-center">
                     <div className="flex-1 pr-8 text-right">
                       {index % 2 === 0 && (
                         <Card className="p-6">
-                          <div className="text-2xl font-bold text-primary mb-2">{item.year}</div>
+                          <div className="text-2xl font-bold text-primary mb-2">
+                            {item.year}
+                          </div>
                           <h3 className="font-bold mb-2">{item.title}</h3>
-                          <p className="text-sm text-muted-foreground">{item.description}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {item.description}
+                          </p>
                         </Card>
                       )}
                     </div>
-                    
+
                     <div className="w-4 h-4 bg-primary rounded-full relative z-10"></div>
-                    
+
                     <div className="flex-1 pl-8">
                       {index % 2 === 1 && (
                         <Card className="p-6">
-                          <div className="text-2xl font-bold text-primary mb-2">{item.year}</div>
+                          <div className="text-2xl font-bold text-primary mb-2">
+                            {item.year}
+                          </div>
                           <h3 className="font-bold mb-2">{item.title}</h3>
-                          <p className="text-sm text-muted-foreground">{item.description}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {item.description}
+                          </p>
                         </Card>
                       )}
                     </div>
@@ -241,10 +281,15 @@ export default function AboutPage() {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {values.map((value) => (
-                <Card key={value.title} className="p-6 text-center hover:shadow-lg transition-all">
+                <Card
+                  key={value.title}
+                  className="p-6 text-center hover:shadow-lg transition-all"
+                >
                   <value.icon className="h-8 w-8 text-primary mx-auto mb-4" />
                   <h3 className="font-bold mb-2">{value.title}</h3>
-                  <p className="text-sm text-muted-foreground">{value.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {value.description}
+                  </p>
                 </Card>
               ))}
             </div>
@@ -260,20 +305,27 @@ export default function AboutPage() {
                 Warehouse Veterans Building the Future
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Our team combines decades of warehouse operations experience with 
-                cutting-edge AI and voice technology expertise.
+                Our team combines decades of warehouse operations experience
+                with cutting-edge AI and voice technology expertise.
               </p>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8">
               {team.map((member) => (
-                <Card key={member.name} className="p-6 text-center hover:shadow-lg transition-all">
+                <Card
+                  key={member.name}
+                  className="p-6 text-center hover:shadow-lg transition-all"
+                >
                   <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-xl font-bold text-primary">{member.image}</span>
+                    <span className="text-xl font-bold text-primary">
+                      {member.image}
+                    </span>
                   </div>
                   <h3 className="font-bold mb-1">{member.name}</h3>
                   <p className="text-primary font-medium mb-3">{member.role}</p>
-                  <p className="text-sm text-muted-foreground">{member.background}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {member.background}
+                  </p>
                 </Card>
               ))}
             </div>
@@ -287,7 +339,7 @@ export default function AboutPage() {
               Ready to Eliminate Warehouse Chaos?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Join 500+ warehouses that trust LogiVox to reduce errors by 95% 
+              Join 500+ warehouses that trust LogiVox to reduce errors by 95%
               and triple fulfillment speed. Start your free trial today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

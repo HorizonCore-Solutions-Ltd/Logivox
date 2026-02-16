@@ -3,10 +3,10 @@
 /**
  * TEMPERATURE-SENSITIVE ROUTING DASHBOARD
  * ========================================
- * 
+ *
  * System 5 - High Impact (336% ROI)
  * Investment: $28K → Savings: $94K/year
- * 
+ *
  * Features:
  * - Smart pick sequencing for frozen/perishable goods
  * - Thaw time monitoring
@@ -63,12 +63,16 @@ export default function TemperatureRoutingPage() {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [zones, setZones] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "routes" | "alerts" | "create">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "routes" | "alerts" | "create"
+  >("overview");
 
   // Form states for creating route
   const [orderId, setOrderId] = useState("");
   const [items, setItems] = useState<any[]>([]);
-  const [optimizationGoal, setOptimizationGoal] = useState<"MINIMIZE_THAW" | "MINIMIZE_DISTANCE" | "BALANCED">("MINIMIZE_THAW");
+  const [optimizationGoal, setOptimizationGoal] = useState<
+    "MINIMIZE_THAW" | "MINIMIZE_DISTANCE" | "BALANCED"
+  >("MINIMIZE_THAW");
 
   useEffect(() => {
     loadData();
@@ -122,7 +126,9 @@ export default function TemperatureRoutingPage() {
 
       if (res.ok) {
         const result = await res.json();
-        alert(`Route created! Compliance: ${result.optimization.complianceStatus}`);
+        alert(
+          `Route created! Compliance: ${result.optimization.complianceStatus}`,
+        );
         loadData();
         setActiveTab("routes");
       } else {
@@ -207,7 +213,9 @@ export default function TemperatureRoutingPage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading temperature routing data...</p>
+          <p className="mt-4 text-gray-600">
+            Loading temperature routing data...
+          </p>
         </div>
       </div>
     );
@@ -264,7 +272,9 @@ export default function TemperatureRoutingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Critical Alerts</p>
-                <p className="text-2xl font-bold">{stats?.criticalAlerts || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.criticalAlerts || 0}
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
@@ -356,7 +366,9 @@ export default function TemperatureRoutingPage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Max Thaw:</span>
-                        <span className="font-medium">{zone.maxThawTime} min</span>
+                        <span className="font-medium">
+                          {zone.maxThawTime} min
+                        </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Priority:</span>
@@ -383,7 +395,9 @@ export default function TemperatureRoutingPage() {
                       {stats?.spoilageReduction || 0}
                     </p>
                   </div>
-                  <p className="text-sm text-gray-600">Items Saved from Spoilage</p>
+                  <p className="text-sm text-gray-600">
+                    Items Saved from Spoilage
+                  </p>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
@@ -428,7 +442,9 @@ export default function TemperatureRoutingPage() {
                     <div className="flex items-center gap-4">
                       {getComplianceIcon(route.metadata?.complianceStatus)}
                       <div>
-                        <p className="font-medium">Order {route.metadata?.orderId}</p>
+                        <p className="font-medium">
+                          Order {route.metadata?.orderId}
+                        </p>
                         <p className="text-sm text-gray-600">
                           {route.metadata?.itemCount} items •{" "}
                           {route.metadata?.totalPickTime} min pick time
@@ -445,8 +461,8 @@ export default function TemperatureRoutingPage() {
                           route.metadata?.complianceStatus === "COMPLIANT"
                             ? "bg-green-100 text-green-800"
                             : route.metadata?.complianceStatus === "AT_RISK"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-red-100 text-red-800"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-red-100 text-red-800"
                         }
                       >
                         {route.metadata?.complianceStatus}
@@ -481,8 +497,8 @@ export default function TemperatureRoutingPage() {
                       alert.metadata?.severity === "CRITICAL"
                         ? "border-red-500 bg-red-50"
                         : alert.metadata?.severity === "WARNING"
-                        ? "border-yellow-500 bg-yellow-50"
-                        : "border-blue-500 bg-blue-50"
+                          ? "border-yellow-500 bg-yellow-50"
+                          : "border-blue-500 bg-blue-50"
                     }`}
                   >
                     <div className="flex items-start justify-between">
@@ -500,8 +516,8 @@ export default function TemperatureRoutingPage() {
                           alert.metadata?.severity === "CRITICAL"
                             ? "bg-red-100 text-red-800"
                             : alert.metadata?.severity === "WARNING"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-blue-100 text-blue-800"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : "bg-blue-100 text-blue-800"
                         }
                       >
                         {alert.metadata?.severity}
@@ -524,7 +540,9 @@ export default function TemperatureRoutingPage() {
           <CardContent>
             <div className="space-y-4 max-w-4xl">
               <div>
-                <label className="block text-sm font-medium mb-2">Order ID</label>
+                <label className="block text-sm font-medium mb-2">
+                  Order ID
+                </label>
                 <input
                   type="text"
                   value={orderId}
@@ -535,18 +553,27 @@ export default function TemperatureRoutingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Optimization Goal</label>
+                <label className="block text-sm font-medium mb-2">
+                  Optimization Goal
+                </label>
                 <select
                   value={optimizationGoal}
                   onChange={(e) =>
                     setOptimizationGoal(
-                      e.target.value as "MINIMIZE_THAW" | "MINIMIZE_DISTANCE" | "BALANCED"
+                      e.target.value as
+                        | "MINIMIZE_THAW"
+                        | "MINIMIZE_DISTANCE"
+                        | "BALANCED",
                     )
                   }
                   className="w-full px-3 py-2 border rounded-lg"
                 >
-                  <option value="MINIMIZE_THAW">Minimize Thaw Time (Recommended)</option>
-                  <option value="MINIMIZE_DISTANCE">Minimize Travel Distance</option>
+                  <option value="MINIMIZE_THAW">
+                    Minimize Thaw Time (Recommended)
+                  </option>
+                  <option value="MINIMIZE_DISTANCE">
+                    Minimize Travel Distance
+                  </option>
                   <option value="BALANCED">Balanced Approach</option>
                 </select>
               </div>
@@ -567,19 +594,25 @@ export default function TemperatureRoutingPage() {
                           type="text"
                           placeholder="SKU"
                           value={item.sku}
-                          onChange={(e) => updateItem(index, "sku", e.target.value)}
+                          onChange={(e) =>
+                            updateItem(index, "sku", e.target.value)
+                          }
                           className="px-3 py-2 border rounded"
                         />
                         <input
                           type="text"
                           placeholder="Location"
                           value={item.location}
-                          onChange={(e) => updateItem(index, "location", e.target.value)}
+                          onChange={(e) =>
+                            updateItem(index, "location", e.target.value)
+                          }
                           className="px-3 py-2 border rounded"
                         />
                         <select
                           value={item.temperatureZone}
-                          onChange={(e) => updateItem(index, "temperatureZone", e.target.value)}
+                          onChange={(e) =>
+                            updateItem(index, "temperatureZone", e.target.value)
+                          }
                           className="px-3 py-2 border rounded"
                         >
                           <option value="FROZEN">Frozen</option>
@@ -592,7 +625,11 @@ export default function TemperatureRoutingPage() {
                           placeholder="Max thaw (min)"
                           value={item.maxThawMinutes}
                           onChange={(e) =>
-                            updateItem(index, "maxThawMinutes", parseInt(e.target.value))
+                            updateItem(
+                              index,
+                              "maxThawMinutes",
+                              parseInt(e.target.value),
+                            )
                           }
                           className="px-3 py-2 border rounded"
                         />

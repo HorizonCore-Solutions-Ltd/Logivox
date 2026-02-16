@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CheckCircle,
   XCircle,
@@ -13,8 +19,8 @@ import {
   DollarSign,
   ShieldCheck,
   TrendingUp,
-  Eye
-} from 'lucide-react';
+  Eye,
+} from "lucide-react";
 
 // ============================================================================
 // QUALITY INSPECTION WORKFLOWS DASHBOARD
@@ -73,10 +79,12 @@ interface Inspection {
 
 export default function QualityInspectionPage() {
   const [stats, setStats] = useState<QualityStats | null>(null);
-  const [pendingInspections, setPendingInspections] = useState<Inspection[]>([]);
+  const [pendingInspections, setPendingInspections] = useState<Inspection[]>(
+    [],
+  );
   const [recentDefects, setRecentDefects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState("overview");
 
   // Fetch data
   useEffect(() => {
@@ -88,9 +96,9 @@ export default function QualityInspectionPage() {
   const fetchData = async () => {
     try {
       const [statsRes, inspectionsRes, defectsRes] = await Promise.all([
-        fetch('/api/receiving/quality-inspection?action=stats'),
-        fetch('/api/receiving/quality-inspection?action=pending-inspections'),
-        fetch('/api/receiving/quality-inspection?action=recent-defects')
+        fetch("/api/receiving/quality-inspection?action=stats"),
+        fetch("/api/receiving/quality-inspection?action=pending-inspections"),
+        fetch("/api/receiving/quality-inspection?action=recent-defects"),
       ]);
 
       if (statsRes.ok) {
@@ -108,7 +116,7 @@ export default function QualityInspectionPage() {
         setRecentDefects(data.defects || []);
       }
     } catch (error) {
-      console.error('Failed to fetch quality data:', error);
+      console.error("Failed to fetch quality data:", error);
     } finally {
       setLoading(false);
     }
@@ -116,39 +124,61 @@ export default function QualityInspectionPage() {
 
   const getRiskColor = (risk: string): string => {
     switch (risk) {
-      case 'HIGH': return 'text-red-600';
-      case 'MEDIUM': return 'text-yellow-600';
-      case 'LOW': return 'text-green-600';
-      default: return 'text-gray-600';
+      case "HIGH":
+        return "text-red-600";
+      case "MEDIUM":
+        return "text-yellow-600";
+      case "LOW":
+        return "text-green-600";
+      default:
+        return "text-gray-600";
     }
   };
 
-  const getRiskBadgeVariant = (risk: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getRiskBadgeVariant = (
+    risk: string,
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (risk) {
-      case 'HIGH': return 'destructive';
-      case 'MEDIUM': return 'outline';
-      case 'LOW': return 'secondary';
-      default: return 'outline';
+      case "HIGH":
+        return "destructive";
+      case "MEDIUM":
+        return "outline";
+      case "LOW":
+        return "secondary";
+      default:
+        return "outline";
     }
   };
 
-  const getStatusBadgeVariant = (status: string): 'default' | 'secondary' | 'destructive' | 'outline' => {
+  const getStatusBadgeVariant = (
+    status: string,
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
-      case 'PASSED': return 'default';
-      case 'FAILED': return 'destructive';
-      case 'IN_PROGRESS': return 'secondary';
-      case 'ON_HOLD': return 'outline';
-      default: return 'outline';
+      case "PASSED":
+        return "default";
+      case "FAILED":
+        return "destructive";
+      case "IN_PROGRESS":
+        return "secondary";
+      case "ON_HOLD":
+        return "outline";
+      default:
+        return "outline";
     }
   };
 
   const getSeverityColor = (severity: string): string => {
     switch (severity) {
-      case 'CRITICAL': return 'text-red-600';
-      case 'MAJOR': return 'text-orange-600';
-      case 'MINOR': return 'text-yellow-600';
-      case 'COSMETIC': return 'text-blue-600';
-      default: return 'text-gray-600';
+      case "CRITICAL":
+        return "text-red-600";
+      case "MAJOR":
+        return "text-orange-600";
+      case "MINOR":
+        return "text-yellow-600";
+      case "COSMETIC":
+        return "text-blue-600";
+      default:
+        return "text-gray-600";
     }
   };
 
@@ -176,9 +206,7 @@ export default function QualityInspectionPage() {
             Automated quality control and defect tracking
           </p>
         </div>
-        <Button onClick={fetchData}>
-          Refresh Data
-        </Button>
+        <Button onClick={fetchData}>Refresh Data</Button>
       </div>
 
       {/* Key Metrics */}
@@ -204,7 +232,9 @@ export default function QualityInspectionPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Inspection Time</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Inspection Time
+              </CardTitle>
               <Clock className="h-4 w-4 text-blue-600" />
             </CardHeader>
             <CardContent>
@@ -222,7 +252,9 @@ export default function QualityInspectionPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Defects</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Active Defects
+              </CardTitle>
               <AlertTriangle className="h-4 w-4 text-red-600" />
             </CardHeader>
             <CardContent>
@@ -240,7 +272,9 @@ export default function QualityInspectionPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Savings</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Monthly Savings
+              </CardTitle>
               <DollarSign className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
@@ -276,9 +310,7 @@ export default function QualityInspectionPage() {
                   <Eye className="h-5 w-5" />
                   Inspection Types
                 </CardTitle>
-                <CardDescription>
-                  Available inspection methods
-                </CardDescription>
+                <CardDescription>Available inspection methods</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
@@ -360,7 +392,9 @@ export default function QualityInspectionPage() {
                 <div className="space-y-4">
                   <div className="p-3 bg-red-50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-red-700">HIGH RISK (70+)</span>
+                      <span className="font-medium text-red-700">
+                        HIGH RISK (70+)
+                      </span>
                       <Badge variant="destructive">Full Inspection</Badge>
                     </div>
                     <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
@@ -373,7 +407,9 @@ export default function QualityInspectionPage() {
 
                   <div className="p-3 bg-yellow-50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-yellow-700">MEDIUM RISK (40-69)</span>
+                      <span className="font-medium text-yellow-700">
+                        MEDIUM RISK (40-69)
+                      </span>
                       <Badge variant="outline">Sample-Based</Badge>
                     </div>
                     <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
@@ -386,7 +422,9 @@ export default function QualityInspectionPage() {
 
                   <div className="p-3 bg-green-50 rounded-lg">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="font-medium text-green-700">LOW RISK (&lt;40)</span>
+                      <span className="font-medium text-green-700">
+                        LOW RISK (&lt;40)
+                      </span>
                       <Badge variant="secondary">Visual Only</Badge>
                     </div>
                     <ul className="text-sm text-muted-foreground space-y-1 ml-4 list-disc">
@@ -501,7 +539,8 @@ export default function QualityInspectionPage() {
             <CardHeader>
               <CardTitle>Pending Inspections</CardTitle>
               <CardDescription>
-                Inspections requiring action ({pendingInspections.length} pending)
+                Inspections requiring action ({pendingInspections.length}{" "}
+                pending)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -513,7 +552,7 @@ export default function QualityInspectionPage() {
                   </div>
                 ) : (
                   pendingInspections.map((inspection) => (
-                    <div 
+                    <div
                       key={inspection.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
@@ -527,10 +566,14 @@ export default function QualityInspectionPage() {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Badge variant={getRiskBadgeVariant(inspection.riskLevel)}>
+                          <Badge
+                            variant={getRiskBadgeVariant(inspection.riskLevel)}
+                          >
                             {inspection.riskLevel} RISK
                           </Badge>
-                          <Badge variant={getStatusBadgeVariant(inspection.status)}>
+                          <Badge
+                            variant={getStatusBadgeVariant(inspection.status)}
+                          >
                             {inspection.status}
                           </Badge>
                         </div>
@@ -540,20 +583,32 @@ export default function QualityInspectionPage() {
                         <div>
                           <span className="text-muted-foreground">Type:</span>
                           <div className="font-medium">
-                            {inspection.inspectionType.replace(/_/g, ' ')}
+                            {inspection.inspectionType.replace(/_/g, " ")}
                           </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Priority:</span>
-                          <div className="font-medium">{inspection.priority}</div>
+                          <span className="text-muted-foreground">
+                            Priority:
+                          </span>
+                          <div className="font-medium">
+                            {inspection.priority}
+                          </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Quantity:</span>
-                          <div className="font-medium">{inspection.totalQuantity}</div>
+                          <span className="text-muted-foreground">
+                            Quantity:
+                          </span>
+                          <div className="font-medium">
+                            {inspection.totalQuantity}
+                          </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Sample Size:</span>
-                          <div className="font-medium">{inspection.sampleSize}</div>
+                          <span className="text-muted-foreground">
+                            Sample Size:
+                          </span>
+                          <div className="font-medium">
+                            {inspection.sampleSize}
+                          </div>
                         </div>
                       </div>
 
@@ -592,7 +647,7 @@ export default function QualityInspectionPage() {
                   </div>
                 ) : (
                   recentDefects.slice(0, 20).map((defect: any) => (
-                    <div 
+                    <div
                       key={defect.id}
                       className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
                     >
@@ -603,8 +658,12 @@ export default function QualityInspectionPage() {
                             {defect.inspection.supplier.name}
                           </div>
                         </div>
-                        <Badge 
-                          variant={defect.severity === 'CRITICAL' ? 'destructive' : 'outline'}
+                        <Badge
+                          variant={
+                            defect.severity === "CRITICAL"
+                              ? "destructive"
+                              : "outline"
+                          }
                           className={getSeverityColor(defect.severity)}
                         >
                           {defect.severity}
@@ -617,11 +676,17 @@ export default function QualityInspectionPage() {
 
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="text-muted-foreground">Quantity Affected:</span>
-                          <div className="font-medium">{defect.quantity} units</div>
+                          <span className="text-muted-foreground">
+                            Quantity Affected:
+                          </span>
+                          <div className="font-medium">
+                            {defect.quantity} units
+                          </div>
                         </div>
                         <div>
-                          <span className="text-muted-foreground">Reported:</span>
+                          <span className="text-muted-foreground">
+                            Reported:
+                          </span>
                           <div className="font-medium">
                             {new Date(defect.createdAt).toLocaleDateString()}
                           </div>

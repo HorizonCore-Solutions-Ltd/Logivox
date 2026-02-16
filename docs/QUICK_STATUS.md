@@ -24,6 +24,7 @@ Your LogiVox WMS is **~95% complete with 283 functional API endpoints** across 4
 ## ⏳ **WHAT'S LEFT**
 
 ### **Critical (5-10 hours):**
+
 1. Configure production database (1 hour)
 2. Set up environment variables (1 hour)
 3. Deploy to hosting platform (1-2 hours)
@@ -31,6 +32,7 @@ Your LogiVox WMS is **~95% complete with 283 functional API endpoints** across 4
 5. Train users (3-5 hours)
 
 ### **Optional (Post-launch):**
+
 - PDF generation for some reports (4-6 hours)
 - Webhook security hardening (2-3 hours)
 - Performance optimizations (20-30 hours)

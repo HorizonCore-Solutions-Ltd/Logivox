@@ -5,11 +5,11 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  FileText, 
-  AlertTriangle, 
-  CheckCircle2, 
-  Clock, 
+import {
+  FileText,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
   Send,
   RefreshCw,
   ExternalLink,
@@ -19,10 +19,10 @@ import {
 
 /**
  * CAPA SYSTEM 8: FDA MEDWATCH INTEGRATION
- * 
+ *
  * Dashboard for FDA adverse event reporting compliance monitoring.
  * Tracks CAPAs requiring FDA notification and submission status.
- * 
+ *
  * Investment: $89,000 | Annual Savings: $950,000 | ROI: 1,067%
  */
 
@@ -58,11 +58,15 @@ interface FDASubmission {
 
 export default function FDAMedWatchPage() {
   const { data: session } = useSession();
-  const [complianceStatus, setComplianceStatus] = useState<ComplianceItem[]>([]);
+  const [complianceStatus, setComplianceStatus] = useState<ComplianceItem[]>(
+    [],
+  );
   const [submissions, setSubmissions] = useState<FDASubmission[]>([]);
   const [summary, setSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"compliance" | "submissions">("compliance");
+  const [activeTab, setActiveTab] = useState<"compliance" | "submissions">(
+    "compliance",
+  );
 
   useEffect(() => {
     loadData();
@@ -72,9 +76,11 @@ export default function FDAMedWatchPage() {
     setLoading(true);
     try {
       if (activeTab === "compliance") {
-        const response = await fetch("/api/capa/fda-medwatch?compliance=true&pending=true");
+        const response = await fetch(
+          "/api/capa/fda-medwatch?compliance=true&pending=true",
+        );
         const result = await response.json();
-        
+
         if (result.success) {
           setComplianceStatus(result.complianceStatus);
           setSummary(result.summary);
@@ -82,7 +88,7 @@ export default function FDAMedWatchPage() {
       } else {
         const response = await fetch("/api/capa/fda-medwatch");
         const result = await response.json();
-        
+
         if (result.success) {
           setSubmissions(result.data);
         }
@@ -96,21 +102,31 @@ export default function FDAMedWatchPage() {
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case "CRITICAL": return "bg-red-100 text-red-800 border-red-300";
-      case "HIGH": return "bg-orange-100 text-orange-800 border-orange-300";
-      case "MEDIUM": return "bg-yellow-100 text-yellow-800 border-yellow-300";
-      default: return "bg-gray-100 text-gray-800 border-gray-300";
+      case "CRITICAL":
+        return "bg-red-100 text-red-800 border-red-300";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800 border-orange-300";
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      default:
+        return "bg-gray-100 text-gray-800 border-gray-300";
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "SUBMITTED": return "bg-green-100 text-green-800";
-      case "PENDING": return "bg-yellow-100 text-yellow-800";
-      case "ACKNOWLEDGED": return "bg-blue-100 text-blue-800";
-      case "UNDER_REVIEW": return "bg-purple-100 text-purple-800";
-      case "CLOSED": return "bg-gray-100 text-gray-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "SUBMITTED":
+        return "bg-green-100 text-green-800";
+      case "PENDING":
+        return "bg-yellow-100 text-yellow-800";
+      case "ACKNOWLEDGED":
+        return "bg-blue-100 text-blue-800";
+      case "UNDER_REVIEW":
+        return "bg-purple-100 text-purple-800";
+      case "CLOSED":
+        return "bg-gray-100 text-gray-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -131,7 +147,9 @@ export default function FDAMedWatchPage() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">FDA MedWatch Integration</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              FDA MedWatch Integration
+            </h1>
             <p className="text-gray-600 mt-1">
               Automated adverse event reporting and compliance monitoring
             </p>
@@ -148,8 +166,12 @@ export default function FDAMedWatchPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total CAPAs Reviewed</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-1">{summary.total}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Total CAPAs Reviewed
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    {summary.total}
+                  </p>
                 </div>
                 <FileText className="h-8 w-8 text-blue-600" />
               </div>
@@ -158,8 +180,12 @@ export default function FDAMedWatchPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Requires FDA Reporting</p>
-                  <p className="text-2xl font-bold text-orange-900 mt-1">{summary.requiresReporting}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Requires FDA Reporting
+                  </p>
+                  <p className="text-2xl font-bold text-orange-900 mt-1">
+                    {summary.requiresReporting}
+                  </p>
                 </div>
                 <AlertTriangle className="h-8 w-8 text-orange-600" />
               </div>
@@ -168,8 +194,12 @@ export default function FDAMedWatchPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Overdue Reports</p>
-                  <p className="text-2xl font-bold text-red-900 mt-1">{summary.overdue}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Overdue Reports
+                  </p>
+                  <p className="text-2xl font-bold text-red-900 mt-1">
+                    {summary.overdue}
+                  </p>
                 </div>
                 <Clock className="h-8 w-8 text-red-600" />
               </div>
@@ -178,8 +208,12 @@ export default function FDAMedWatchPage() {
             <Card className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Critical (≤5 days)</p>
-                  <p className="text-2xl font-bold text-red-900 mt-1">{summary.critical}</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Critical (≤5 days)
+                  </p>
+                  <p className="text-2xl font-bold text-red-900 mt-1">
+                    {summary.critical}
+                  </p>
                 </div>
                 <Shield className="h-8 w-8 text-red-600" />
               </div>
@@ -218,7 +252,9 @@ export default function FDAMedWatchPage() {
               <div className="text-center py-12 text-gray-500">
                 <CheckCircle2 className="h-12 w-12 mx-auto mb-4 text-green-500" />
                 <p>No CAPAs currently require FDA reporting</p>
-                <p className="text-sm mt-2">All adverse event reporting is up to date</p>
+                <p className="text-sm mt-2">
+                  All adverse event reporting is up to date
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto">
@@ -247,7 +283,12 @@ export default function FDAMedWatchPage() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {complianceStatus.map((item) => (
-                      <tr key={item.capaId} className={item.isOverdue ? "bg-red-50" : "hover:bg-gray-50"}>
+                      <tr
+                        key={item.capaId}
+                        className={
+                          item.isOverdue ? "bg-red-50" : "hover:bg-gray-50"
+                        }
+                      >
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-blue-600">
                             {item.capaNumber}
@@ -259,30 +300,35 @@ export default function FDAMedWatchPage() {
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <Badge className={`${getUrgencyColor(item.urgency)} border`}>
+                          <Badge
+                            className={`${getUrgencyColor(item.urgency)} border`}
+                          >
                             {item.urgency}
                           </Badge>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="flex items-center text-sm text-gray-900">
                             <Calendar className="h-4 w-4 mr-2 text-gray-400" />
-                            {item.deadline ? new Date(item.deadline).toLocaleDateString() : "N/A"}
+                            {item.deadline
+                              ? new Date(item.deadline).toLocaleDateString()
+                              : "N/A"}
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <div className={`text-sm font-semibold ${
-                            item.isOverdue 
-                              ? "text-red-600" 
-                              : item.daysUntilDeadline! <= 5 
-                                ? "text-orange-600" 
-                                : "text-gray-900"
-                          }`}>
-                            {item.isOverdue 
+                          <div
+                            className={`text-sm font-semibold ${
+                              item.isOverdue
+                                ? "text-red-600"
+                                : item.daysUntilDeadline! <= 5
+                                  ? "text-orange-600"
+                                  : "text-gray-900"
+                            }`}
+                          >
+                            {item.isOverdue
                               ? `Overdue by ${Math.abs(item.daysUntilDeadline!)} days`
                               : item.daysUntilDeadline !== null
                                 ? `${item.daysUntilDeadline} days`
-                                : "N/A"
-                            }
+                                : "N/A"}
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-right">
@@ -370,16 +416,24 @@ export default function FDAMedWatchPage() {
                           </Badge>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <Badge className={getStatusColor(submission.submissionStatus)}>
+                          <Badge
+                            className={getStatusColor(
+                              submission.submissionStatus,
+                            )}
+                          >
                             {submission.submissionStatus}
                           </Badge>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {new Date(submission.submittedAt).toLocaleDateString()}
+                            {new Date(
+                              submission.submittedAt,
+                            ).toLocaleDateString()}
                           </div>
                           <div className="text-xs text-gray-500">
-                            {new Date(submission.submittedAt).toLocaleTimeString()}
+                            {new Date(
+                              submission.submittedAt,
+                            ).toLocaleTimeString()}
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-right">
@@ -402,12 +456,24 @@ export default function FDAMedWatchPage() {
           <div className="flex items-start gap-4">
             <Shield className="h-6 w-6 text-blue-600 mt-1" />
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">FDA MedWatch Resources</h3>
+              <h3 className="font-semibold text-blue-900 mb-2">
+                FDA MedWatch Resources
+              </h3>
               <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Deaths must be reported within <strong>24 hours</strong> (phone) and <strong>5 days</strong> (written)</li>
-                <li>• Serious injuries and malfunctions: <strong>30 days</strong></li>
-                <li>• Form 3500A used for mandatory reporting by manufacturers</li>
-                <li>• Electronic submissions via FDA ESG (Electronic Submissions Gateway)</li>
+                <li>
+                  • Deaths must be reported within <strong>24 hours</strong>{" "}
+                  (phone) and <strong>5 days</strong> (written)
+                </li>
+                <li>
+                  • Serious injuries and malfunctions: <strong>30 days</strong>
+                </li>
+                <li>
+                  • Form 3500A used for mandatory reporting by manufacturers
+                </li>
+                <li>
+                  • Electronic submissions via FDA ESG (Electronic Submissions
+                  Gateway)
+                </li>
                 <li>• FAERS database: FDA Adverse Event Reporting System</li>
               </ul>
             </div>

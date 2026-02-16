@@ -15,7 +15,7 @@ const checkInSchema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -39,14 +39,18 @@ export async function POST(
     if (!appointment) {
       return NextResponse.json(
         { error: "Appointment not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    if (appointment.status === "CHECKED_IN" || appointment.status === "IN_PROGRESS" || appointment.status === "COMPLETED") {
+    if (
+      appointment.status === "CHECKED_IN" ||
+      appointment.status === "IN_PROGRESS" ||
+      appointment.status === "COMPLETED"
+    ) {
       return NextResponse.json(
         { error: "Appointment already checked in" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -55,7 +59,9 @@ export async function POST(
       where: { id: params.id },
       data: {
         status: "CHECKED_IN",
-        actualArrival: validatedData.actualArrival ? new Date(validatedData.actualArrival) : now,
+        actualArrival: validatedData.actualArrival
+          ? new Date(validatedData.actualArrival)
+          : now,
         checkedInAt: now,
         checkedInBy: session.user.id,
         driverName: validatedData.driverName || appointment.driverName,
@@ -94,14 +100,14 @@ export async function POST(
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     console.error("Error checking in appointment:", error);
     return NextResponse.json(
       { error: "Failed to check in appointment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

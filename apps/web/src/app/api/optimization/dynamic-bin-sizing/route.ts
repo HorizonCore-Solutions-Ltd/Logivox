@@ -1,10 +1,10 @@
 /**
  * DYNAMIC BIN SIZING OPTIMIZATION SYSTEM
  * =======================================
- * 
+ *
  * Optimization System 14 - Ultra High ROI (1,350%)
  * Investment: $5,000 → Annual Savings: $68,000
- * 
+ *
  * Features:
  * - Real-time bin size recommendations based on product velocity
  * - Automatic bin reallocation based on demand patterns
@@ -159,11 +159,12 @@ function calculatePriority(
   currentSize: BinSize,
   recommendedSize: BinSize,
   savings: number,
-  utilization: number
+  utilization: number,
 ): "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" {
   // Critical if drastically oversized or undersized
   const sizeGap = Math.abs(
-    Object.keys(BIN_SIZES).indexOf(currentSize) - Object.keys(BIN_SIZES).indexOf(recommendedSize)
+    Object.keys(BIN_SIZES).indexOf(currentSize) -
+      Object.keys(BIN_SIZES).indexOf(recommendedSize),
   );
 
   if (sizeGap >= 2 && savings > 300) {
@@ -204,7 +205,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -263,7 +267,8 @@ export async function GET(req: NextRequest) {
           monthlySavings: -30,
           yearlySavings: -360,
           priority: "CRITICAL",
-          reason: "Velocity increased 400% - undersized by 2 levels causing stockouts",
+          reason:
+            "Velocity increased 400% - undersized by 2 levels causing stockouts",
           metrics: {
             dailyPicks: 28.5,
             weeklyPicks: 199,
@@ -334,18 +339,25 @@ export async function GET(req: NextRequest) {
           : mockRecommendations.filter((r) => r.priority === priority);
 
       // Calculate totals
-      const totalSavings = filtered.reduce((sum, r) => sum + r.yearlySavings, 0);
+      const totalSavings = filtered.reduce(
+        (sum, r) => sum + r.yearlySavings,
+        0,
+      );
       const avgUtilizationImprovement =
-        filtered.reduce((sum, r) => sum + (r.utilizationProjected - r.utilizationCurrent), 0) /
-        filtered.length;
+        filtered.reduce(
+          (sum, r) => sum + (r.utilizationProjected - r.utilizationCurrent),
+          0,
+        ) / filtered.length;
 
       return NextResponse.json({
         recommendations: filtered,
         total: filtered.length,
         summary: {
-          critical: mockRecommendations.filter((r) => r.priority === "CRITICAL").length,
+          critical: mockRecommendations.filter((r) => r.priority === "CRITICAL")
+            .length,
           high: mockRecommendations.filter((r) => r.priority === "HIGH").length,
-          medium: mockRecommendations.filter((r) => r.priority === "MEDIUM").length,
+          medium: mockRecommendations.filter((r) => r.priority === "MEDIUM")
+            .length,
           low: mockRecommendations.filter((r) => r.priority === "LOW").length,
           totalYearlySavings: totalSavings,
           avgUtilizationImprovement,
@@ -413,10 +425,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ error: "Invalid action parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid action parameter" },
+      { status: 400 },
+    );
   } catch (error: any) {
     console.error("Dynamic Bin Sizing GET error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -439,7 +457,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -453,7 +474,7 @@ export async function POST(req: NextRequest) {
       if (!locationId || !productId || !newBinSize) {
         return NextResponse.json(
           { error: "locationId, productId, and newBinSize required" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -489,7 +510,10 @@ export async function POST(req: NextRequest) {
       const { metrics } = body;
 
       if (!metrics) {
-        return NextResponse.json({ error: "metrics required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "metrics required" },
+          { status: 400 },
+        );
       }
 
       const recommendation = calculateOptimalBinSize(metrics);
@@ -505,7 +529,10 @@ export async function POST(req: NextRequest) {
       const { locationIds } = body;
 
       if (!Array.isArray(locationIds) || locationIds.length === 0) {
-        return NextResponse.json({ error: "locationIds array required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "locationIds array required" },
+          { status: 400 },
+        );
       }
 
       // TODO: Run optimization algorithm on all specified locations
@@ -526,11 +553,14 @@ export async function POST(req: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -574,7 +604,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error: any) {
     console.error("Dynamic Bin Sizing PUT error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -594,7 +627,10 @@ export async function DELETE(req: NextRequest) {
     const type = searchParams.get("type");
 
     if (!id || !type) {
-      return NextResponse.json({ error: "ID and type required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "ID and type required" },
+        { status: 400 },
+      );
     }
 
     // DELETE RECOMMENDATION
@@ -622,6 +658,9 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   } catch (error: any) {
     console.error("Dynamic Bin Sizing DELETE error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }

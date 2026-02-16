@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // CONTAINER UNLOADING OPTIMIZATION API
@@ -31,50 +31,64 @@ import { z } from 'zod';
 
 // Container types with specifications
 const CONTAINER_SPECS = {
-  '20FT_STANDARD': { length: 19.4, width: 7.7, height: 7.9, maxWeight: 28000 },
-  '40FT_STANDARD': { length: 39.5, width: 7.7, height: 7.9, maxWeight: 28600 },
-  '40FT_HC': { length: 39.5, width: 7.7, height: 8.9, maxWeight: 28600 },
-  '45FT_HC': { length: 44.6, width: 7.7, height: 8.9, maxWeight: 29500 },
-  '20FT_REFRIGERATED': { length: 17.9, width: 7.5, height: 7.5, maxWeight: 27400 },
-  '40FT_REFRIGERATED': { length: 37.8, width: 7.5, height: 7.5, maxWeight: 29500 },
+  "20FT_STANDARD": { length: 19.4, width: 7.7, height: 7.9, maxWeight: 28000 },
+  "40FT_STANDARD": { length: 39.5, width: 7.7, height: 7.9, maxWeight: 28600 },
+  "40FT_HC": { length: 39.5, width: 7.7, height: 8.9, maxWeight: 28600 },
+  "45FT_HC": { length: 44.6, width: 7.7, height: 8.9, maxWeight: 29500 },
+  "20FT_REFRIGERATED": {
+    length: 17.9,
+    width: 7.5,
+    height: 7.5,
+    maxWeight: 27400,
+  },
+  "40FT_REFRIGERATED": {
+    length: 37.8,
+    width: 7.5,
+    height: 7.5,
+    maxWeight: 29500,
+  },
 } as const;
 
 type ContainerType = keyof typeof CONTAINER_SPECS;
 
 // Unloading status
 type UnloadingStatus =
-  | 'SCHEDULED'     // Scheduled for unloading
-  | 'IN_PROGRESS'   // Currently unloading
-  | 'PAUSED'        // Temporarily paused
-  | 'COMPLETED'     // Unloading finished
-  | 'CANCELLED';    // Cancelled
+  | "SCHEDULED" // Scheduled for unloading
+  | "IN_PROGRESS" // Currently unloading
+  | "PAUSED" // Temporarily paused
+  | "COMPLETED" // Unloading finished
+  | "CANCELLED"; // Cancelled
 
 // Pallet configuration
-type PalletType = 'STANDARD' | 'EURO' | 'HALF' | 'OVERSIZED';
+type PalletType = "STANDARD" | "EURO" | "HALF" | "OVERSIZED";
 
 // Equipment types
-type EquipmentType = 'FORKLIFT' | 'PALLET_JACK' | 'REACH_TRUCK' | 'ORDER_PICKER';
+type EquipmentType =
+  | "FORKLIFT"
+  | "PALLET_JACK"
+  | "REACH_TRUCK"
+  | "ORDER_PICKER";
 
 // Validation schemas
 const scheduleUnloadingSchema = z.object({
-  action: z.literal('schedule_unloading'),
+  action: z.literal("schedule_unloading"),
   containerId: z.string(),
   containerType: z.enum([
-    '20FT_STANDARD',
-    '40FT_STANDARD',
-    '40FT_HC',
-    '45FT_HC',
-    '20FT_REFRIGERATED',
-    '40FT_REFRIGERATED'
+    "20FT_STANDARD",
+    "40FT_STANDARD",
+    "40FT_HC",
+    "45FT_HC",
+    "20FT_REFRIGERATED",
+    "40FT_REFRIGERATED",
   ]),
   arrivalTime: z.string().datetime(),
   estimatedPalletCount: z.number().int().positive(),
-  priority: z.enum(['CRITICAL', 'HIGH', 'NORMAL', 'LOW']),
+  priority: z.enum(["CRITICAL", "HIGH", "NORMAL", "LOW"]),
   specialHandling: z.array(z.string()).optional(),
 });
 
 const startUnloadingSchema = z.object({
-  action: z.literal('start_unloading'),
+  action: z.literal("start_unloading"),
   unloadingId: z.string().uuid(),
   teamMembers: z.array(z.string()),
   equipmentIds: z.array(z.string()),
@@ -82,18 +96,18 @@ const startUnloadingSchema = z.object({
 });
 
 const recordPalletSchema = z.object({
-  action: z.literal('record_pallet'),
+  action: z.literal("record_pallet"),
   unloadingId: z.string().uuid(),
   palletNumber: z.number().int().positive(),
-  palletType: z.enum(['STANDARD', 'EURO', 'HALF', 'OVERSIZED']),
+  palletType: z.enum(["STANDARD", "EURO", "HALF", "OVERSIZED"]),
   weight: z.number().positive(),
   stackHeight: z.number().int().positive(),
-  condition: z.enum(['EXCELLENT', 'GOOD', 'FAIR', 'DAMAGED']),
+  condition: z.enum(["EXCELLENT", "GOOD", "FAIR", "DAMAGED"]),
   recordedBy: z.string(),
 });
 
 const completeUnloadingSchema = z.object({
-  action: z.literal('complete_unloading'),
+  action: z.literal("complete_unloading"),
   unloadingId: z.string().uuid(),
   totalPalletsUnloaded: z.number().int().positive(),
   damagedItems: z.number().int().min(0),
@@ -102,18 +116,20 @@ const completeUnloadingSchema = z.object({
 });
 
 const optimizeStackingSchema = z.object({
-  action: z.literal('optimize_stacking'),
-  pallets: z.array(z.object({
-    id: z.string(),
-    weight: z.number().positive(),
-    stackable: z.boolean(),
-    fragile: z.boolean(),
-    height: z.number().positive(),
-  })),
+  action: z.literal("optimize_stacking"),
+  pallets: z.array(
+    z.object({
+      id: z.string(),
+      weight: z.number().positive(),
+      stackable: z.boolean(),
+      fragile: z.boolean(),
+      height: z.number().positive(),
+    }),
+  ),
   maxStackHeight: z.number().positive().default(8),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   scheduleUnloadingSchema,
   startUnloadingSchema,
   recordPalletSchema,
@@ -130,7 +146,7 @@ function optimizePalletStacking(
     fragile: boolean;
     height: number;
   }>,
-  maxStackHeight: number
+  maxStackHeight: number,
 ): Array<{
   stackId: number;
   pallets: string[];
@@ -198,7 +214,12 @@ function optimizePalletStacking(
 // Calculate safety score for a stack
 function calculateSafetyScore(
   stack: { pallets: string[]; totalWeight: number; totalHeight: number },
-  allPallets: Array<{ id: string; weight: number; fragile: boolean; height: number }>
+  allPallets: Array<{
+    id: string;
+    weight: number;
+    fragile: boolean;
+    height: number;
+  }>,
 ): number {
   let score = 100;
 
@@ -213,17 +234,21 @@ function calculateSafetyScore(
 
   // Check weight distribution (heavier on bottom)
   for (let i = 0; i < stack.pallets.length - 1; i++) {
-    const currentPallet = allPallets.find(p => p.id === stack.pallets[i]);
-    const nextPallet = allPallets.find(p => p.id === stack.pallets[i + 1]);
+    const currentPallet = allPallets.find((p) => p.id === stack.pallets[i]);
+    const nextPallet = allPallets.find((p) => p.id === stack.pallets[i + 1]);
 
-    if (currentPallet && nextPallet && currentPallet.weight < nextPallet.weight) {
+    if (
+      currentPallet &&
+      nextPallet &&
+      currentPallet.weight < nextPallet.weight
+    ) {
       score -= 15; // Penalty for lighter pallet below heavier one
     }
   }
 
   // Deduct points if fragile items in stack
-  const hasFragile = stack.pallets.some(id => 
-    allPallets.find(p => p.id === id)?.fragile
+  const hasFragile = stack.pallets.some(
+    (id) => allPallets.find((p) => p.id === id)?.fragile,
   );
   if (hasFragile) score -= 25;
 
@@ -235,18 +260,18 @@ function predictUnloadingTime(
   containerType: ContainerType,
   palletCount: number,
   teamSize: number,
-  equipmentCount: number
+  equipmentCount: number,
 ): { estimatedMinutes: number; confidence: number } {
   const baseMinutesPerPallet = 3.5; // Base time per pallet
   const specs = CONTAINER_SPECS[containerType];
 
   // Adjust for container size
   let sizeMultiplier = 1.0;
-  if (containerType.includes('45FT')) sizeMultiplier = 1.2;
-  else if (containerType.includes('40FT')) sizeMultiplier = 1.1;
+  if (containerType.includes("45FT")) sizeMultiplier = 1.2;
+  else if (containerType.includes("40FT")) sizeMultiplier = 1.1;
 
   // Adjust for refrigerated (more careful handling)
-  if (containerType.includes('REFRIGERATED')) sizeMultiplier *= 1.15;
+  if (containerType.includes("REFRIGERATED")) sizeMultiplier *= 1.15;
 
   // Calculate base time
   let totalMinutes = palletCount * baseMinutesPerPallet * sizeMultiplier;
@@ -258,7 +283,7 @@ function predictUnloadingTime(
   } else if (teamSize > optimalTeamSize) {
     // Diminishing returns with larger teams
     const extraWorkers = teamSize - optimalTeamSize;
-    totalMinutes *= (1 - (extraWorkers * 0.05));
+    totalMinutes *= 1 - extraWorkers * 0.05;
   }
 
   // Equipment availability factor
@@ -285,14 +310,14 @@ function predictUnloadingTime(
 // Schedule container unloading
 async function scheduleUnloading(
   session: any,
-  data: z.infer<typeof scheduleUnloadingSchema>
+  data: z.infer<typeof scheduleUnloadingSchema>,
 ) {
   // Predict unloading time (assume average team)
   const prediction = predictUnloadingTime(
     data.containerType,
     data.estimatedPalletCount,
     3, // Average team size
-    2  // Average equipment count
+    2, // Average equipment count
   );
 
   // Create unloading record
@@ -301,7 +326,7 @@ async function scheduleUnloading(
       organizationId: session.user.organizationId,
       containerId: data.containerId,
       containerType: data.containerType,
-      status: 'SCHEDULED',
+      status: "SCHEDULED",
       scheduledTime: new Date(data.arrivalTime),
       estimatedPalletCount: data.estimatedPalletCount,
       estimatedDuration: prediction.estimatedMinutes,
@@ -315,8 +340,8 @@ async function scheduleUnloading(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'CONTAINER_UNLOADING_SCHEDULED',
-      entityType: 'CONTAINER_UNLOADING',
+      action: "CONTAINER_UNLOADING_SCHEDULED",
+      entityType: "CONTAINER_UNLOADING",
       entityId: unloading.id,
       metadata: {
         containerId: data.containerId,
@@ -339,7 +364,7 @@ async function scheduleUnloading(
 // Start unloading
 async function startUnloading(
   session: any,
-  data: z.infer<typeof startUnloadingSchema>
+  data: z.infer<typeof startUnloadingSchema>,
 ) {
   const unloading = await prisma.containerUnloading.update({
     where: {
@@ -347,7 +372,7 @@ async function startUnloading(
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'IN_PROGRESS',
+      status: "IN_PROGRESS",
       actualStartTime: new Date(),
       teamMembers: data.teamMembers,
       equipmentIds: data.equipmentIds,
@@ -361,7 +386,7 @@ async function startUnloading(
       data: {
         organizationId: session.user.organizationId,
         workerId: memberId,
-        taskType: 'CONTAINER_UNLOADING',
+        taskType: "CONTAINER_UNLOADING",
         taskId: data.unloadingId,
         startTime: new Date(),
       },
@@ -373,8 +398,8 @@ async function startUnloading(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'CONTAINER_UNLOADING_STARTED',
-      entityType: 'CONTAINER_UNLOADING',
+      action: "CONTAINER_UNLOADING_STARTED",
+      entityType: "CONTAINER_UNLOADING",
       entityId: data.unloadingId,
       metadata: {
         teamSize: data.teamMembers.length,
@@ -387,14 +412,14 @@ async function startUnloading(
   return {
     success: true,
     unloading,
-    message: 'Container unloading started',
+    message: "Container unloading started",
   };
 }
 
 // Record pallet during unloading
 async function recordPallet(
   session: any,
-  data: z.infer<typeof recordPalletSchema>
+  data: z.infer<typeof recordPalletSchema>,
 ) {
   const pallet = await prisma.unloadedPallet.create({
     data: {
@@ -421,8 +446,9 @@ async function recordPallet(
   });
 
   if (unloading) {
-    const progress = (unloading._count.pallets / unloading.estimatedPalletCount) * 100;
-    
+    const progress =
+      (unloading._count.pallets / unloading.estimatedPalletCount) * 100;
+
     await prisma.containerUnloading.update({
       where: { id: data.unloadingId },
       data: {
@@ -441,7 +467,7 @@ async function recordPallet(
 // Complete unloading
 async function completeUnloading(
   session: any,
-  data: z.infer<typeof completeUnloadingSchema>
+  data: z.infer<typeof completeUnloadingSchema>,
 ) {
   const unloading = await prisma.containerUnloading.update({
     where: {
@@ -449,7 +475,7 @@ async function completeUnloading(
       organizationId: session.user.organizationId,
     },
     data: {
-      status: 'COMPLETED',
+      status: "COMPLETED",
       actualEndTime: new Date(),
       actualPalletCount: data.totalPalletsUnloaded,
       damagedItems: data.damagedItems,
@@ -460,13 +486,17 @@ async function completeUnloading(
 
   // Calculate actual duration
   const durationMinutes = unloading.actualStartTime
-    ? Math.round((new Date().getTime() - unloading.actualStartTime.getTime()) / (1000 * 60))
+    ? Math.round(
+        (new Date().getTime() - unloading.actualStartTime.getTime()) /
+          (1000 * 60),
+      )
     : 0;
 
   // Calculate efficiency
-  const efficiency = unloading.estimatedDuration > 0
-    ? (unloading.estimatedDuration / durationMinutes) * 100
-    : 100;
+  const efficiency =
+    unloading.estimatedDuration > 0
+      ? (unloading.estimatedDuration / durationMinutes) * 100
+      : 100;
 
   // Update metrics
   await prisma.unloadingMetrics.create({
@@ -476,7 +506,9 @@ async function completeUnloading(
       actualDuration: durationMinutes,
       estimatedDuration: unloading.estimatedDuration,
       efficiency: Math.round(efficiency),
-      palletsPerHour: Math.round((data.totalPalletsUnloaded / durationMinutes) * 60),
+      palletsPerHour: Math.round(
+        (data.totalPalletsUnloaded / durationMinutes) * 60,
+      ),
       damageRate: (data.damagedItems / data.totalPalletsUnloaded) * 100,
     },
   });
@@ -485,7 +517,7 @@ async function completeUnloading(
   await prisma.workerAssignment.updateMany({
     where: {
       taskId: data.unloadingId,
-      taskType: 'CONTAINER_UNLOADING',
+      taskType: "CONTAINER_UNLOADING",
     },
     data: {
       endTime: new Date(),
@@ -497,8 +529,8 @@ async function completeUnloading(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'CONTAINER_UNLOADING_COMPLETED',
-      entityType: 'CONTAINER_UNLOADING',
+      action: "CONTAINER_UNLOADING_COMPLETED",
+      entityType: "CONTAINER_UNLOADING",
       entityId: data.unloadingId,
       metadata: {
         duration: durationMinutes,
@@ -525,15 +557,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get statistics
-    if (action === 'stats') {
-      const stats = await prisma.$queryRaw`
+    if (action === "stats") {
+      const stats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalUnloadings",
           COUNT(CASE WHEN status = 'COMPLETED' THEN 1 END)::int as "completedUnloadings",
@@ -545,9 +577,9 @@ export async function GET(request: NextRequest) {
         FROM "ContainerUnloading"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const metricsStats = await prisma.$queryRaw`
+      const metricsStats = (await prisma.$queryRaw`
         SELECT 
           COALESCE(AVG(efficiency), 0)::numeric(5,1) as "avgEfficiency",
           COALESCE(AVG("palletsPerHour"), 0)::numeric(10,1) as "avgPalletsPerHour",
@@ -555,7 +587,7 @@ export async function GET(request: NextRequest) {
         FROM "UnloadingMetrics"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
       const monthlySavings = 13167; // Based on ROI calculation
 
@@ -570,12 +602,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Get active unloadings
-    if (action === 'active-unloadings') {
+    if (action === "active-unloadings") {
       const unloadings = await prisma.containerUnloading.findMany({
         where: {
           organizationId: session.user.organizationId,
           status: {
-            in: ['SCHEDULED', 'IN_PROGRESS'],
+            in: ["SCHEDULED", "IN_PROGRESS"],
           },
         },
         include: {
@@ -583,10 +615,7 @@ export async function GET(request: NextRequest) {
             select: { pallets: true },
           },
         },
-        orderBy: [
-          { priority: 'asc' },
-          { scheduledTime: 'asc' },
-        ],
+        orderBy: [{ priority: "asc" }, { scheduledTime: "asc" }],
         take: 50,
       });
 
@@ -594,28 +623,28 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent completions
-    if (action === 'recent-completions') {
+    if (action === "recent-completions") {
       const completions = await prisma.containerUnloading.findMany({
         where: {
           organizationId: session.user.organizationId,
-          status: 'COMPLETED',
+          status: "COMPLETED",
         },
         include: {
           metrics: true,
         },
-        orderBy: { actualEndTime: 'desc' },
+        orderBy: { actualEndTime: "desc" },
         take: 20,
       });
 
       return NextResponse.json({ completions });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Container unloading GET error:', error);
+    console.error("Container unloading GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve unloading data' },
-      { status: 500 }
+      { error: "Failed to retrieve unloading data" },
+      { status: 500 },
     );
   }
 }
@@ -625,44 +654,47 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'schedule_unloading':
+      case "schedule_unloading":
         return NextResponse.json(await scheduleUnloading(session, data));
 
-      case 'start_unloading':
+      case "start_unloading":
         return NextResponse.json(await startUnloading(session, data));
 
-      case 'record_pallet':
+      case "record_pallet":
         return NextResponse.json(await recordPallet(session, data));
 
-      case 'complete_unloading':
+      case "complete_unloading":
         return NextResponse.json(await completeUnloading(session, data));
 
-      case 'optimize_stacking':
-        const stacks = optimizePalletStacking(data.pallets, data.maxStackHeight);
+      case "optimize_stacking":
+        const stacks = optimizePalletStacking(
+          data.pallets,
+          data.maxStackHeight,
+        );
         return NextResponse.json({ success: true, stacks });
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Container unloading POST error:', error);
+    console.error("Container unloading POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process unloading action' },
-      { status: 500 }
+      { error: "Failed to process unloading action" },
+      { status: 500 },
     );
   }
 }

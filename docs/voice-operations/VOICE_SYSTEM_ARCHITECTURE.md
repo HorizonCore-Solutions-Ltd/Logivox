@@ -1,4 +1,5 @@
 # Logivox Voice System Architecture
+
 ## How It Works vs. Voxware
 
 **Date:** January 7, 2026  
@@ -12,17 +13,17 @@ Logivox voice system operates differently from Voxware, with a **unified platfor
 
 ### Key Differences from Voxware
 
-| Feature | Voxware | Logivox |
-|---------|---------|---------|
-| **Architecture** | 2 separate logins (Console + Worker) | Single unified platform with role-based access |
-| **Admin Interface** | Dedicated console | Admin dashboard + voice operations page |
-| **Picker Interface** | Basic voice terminal | Full mobile app + web interface + voice |
-| **Voice Technology** | Proprietary hardware-dependent | OpenAI Whisper + GPT-4 (cloud-based, device-agnostic) |
-| **Training** | Extensive voice template training required | Zero-training AI (learns from usage) |
-| **Languages** | Limited, requires templates per language | 20+ languages, automatic dialect adaptation |
-| **Integration** | Bolt-on to existing WMS | Native, fully integrated WMS with voice |
-| **Task Assignment** | Manual console assignment | AI-powered automatic + manual override |
-| **Real-time Monitoring** | Console-only view | Multi-device dashboards, mobile, web |
+| Feature                  | Voxware                                    | Logivox                                               |
+| ------------------------ | ------------------------------------------ | ----------------------------------------------------- |
+| **Architecture**         | 2 separate logins (Console + Worker)       | Single unified platform with role-based access        |
+| **Admin Interface**      | Dedicated console                          | Admin dashboard + voice operations page               |
+| **Picker Interface**     | Basic voice terminal                       | Full mobile app + web interface + voice               |
+| **Voice Technology**     | Proprietary hardware-dependent             | OpenAI Whisper + GPT-4 (cloud-based, device-agnostic) |
+| **Training**             | Extensive voice template training required | Zero-training AI (learns from usage)                  |
+| **Languages**            | Limited, requires templates per language   | 20+ languages, automatic dialect adaptation           |
+| **Integration**          | Bolt-on to existing WMS                    | Native, fully integrated WMS with voice               |
+| **Task Assignment**      | Manual console assignment                  | AI-powered automatic + manual override                |
+| **Real-time Monitoring** | Console-only view                          | Multi-device dashboards, mobile, web                  |
 
 ---
 
@@ -35,7 +36,7 @@ Logivox uses a **single-sign-on** system with role-based permissions:
 ```typescript
 User Roles:
 ├── SUPER_ADMIN       // Platform administrator
-├── ADMIN             // Organization administrator  
+├── ADMIN             // Organization administrator
 ├── MANAGER           // Warehouse/Department manager
 ├── WAREHOUSE_MANAGER // Full warehouse control
 ├── WAREHOUSE_OPERATOR// Standard operations
@@ -50,6 +51,7 @@ User Roles:
 #### Login Process
 
 **All users log in to same application:**
+
 - URL: `https://logivox.ai/login` or mobile app
 - Single credentials, role determines interface
 - Session management with voice profile linkage
@@ -76,6 +78,7 @@ Voice session can start immediately
 #### Admin Capabilities
 
 **🎯 Real-Time Monitoring**
+
 ```
 Active Sessions Dashboard:
 ├── Live picker status (listening, speaking, working)
@@ -86,6 +89,7 @@ Active Sessions Dashboard:
 ```
 
 **📊 Performance Analytics**
+
 ```
 Analytics View:
 ├── Tasks per hour trends
@@ -98,6 +102,7 @@ Analytics View:
 ```
 
 **👥 User Management**
+
 ```
 Worker Management:
 ├── Assign tasks to specific pickers
@@ -109,6 +114,7 @@ Worker Management:
 ```
 
 **⚙️ Voice Settings & Configuration**
+
 ```
 Admin Controls:
 ├── Enable/disable voice for organization
@@ -131,7 +137,7 @@ Admin Tabs:
    - Active worker list
    - Current task display
    - Transcript monitoring
-   
+
 2. Active Sessions Table
    - Session ID
    - Worker name
@@ -141,13 +147,13 @@ Admin Tabs:
    - Language
    - Duration
    - Status (Active/Paused/Ended)
-   
+
 3. Analytics Dashboard
    - Hourly task completion chart
    - Task type distribution
    - Language usage pie chart
    - Performance trends
-   
+
 4. Settings Panel
    - Organization-wide voice settings
    - Language preferences
@@ -158,6 +164,7 @@ Admin Tabs:
 #### Admin Actions
 
 **Task Management:**
+
 ```typescript
 // Admins can:
 ✓ View all active tasks
@@ -171,6 +178,7 @@ Admin Tabs:
 ```
 
 **Picker Management:**
+
 ```typescript
 // Admins can:
 ✓ See all active pickers
@@ -184,6 +192,7 @@ Admin Tabs:
 ```
 
 **Monitoring Capabilities:**
+
 ```typescript
 // Real-time visibility:
 ✓ Live transcript of all voice commands
@@ -200,7 +209,8 @@ Admin Tabs:
 
 ### 3. **Picker Interface** (Equivalent to Voxware Worker Terminal)
 
-**Access:** 
+**Access:**
+
 - Mobile app: `PickerMobile.tsx`
 - Web interface: `/dashboard/voice-operations`
 - Role: PICKER
@@ -335,13 +345,14 @@ Supported Intents:
 ```
 
 **Natural Language Examples:**
+
 ```
 User can say:
   "I picked five"
   "Five units picked"
   "Picked 5"
   "5"
-  
+
 All understood as: REPORT_QUANTITY (quantity: 5)
 ```
 
@@ -365,6 +376,7 @@ Voice Profile System:
 #### How Tasks Are Assigned
 
 **Automatic Assignment (Default):**
+
 ```typescript
 Wave Picking Service:
 1. Wave created by manager/admin
@@ -385,6 +397,7 @@ Wave Picking Service:
 ```
 
 **Manual Override (Admin):**
+
 ```typescript
 Admin can:
 1. View unassigned task pool
@@ -398,6 +411,7 @@ Admin can:
 #### Task Status Tracking
 
 **Admin View:**
+
 ```
 Task Dashboard:
 ├── All Tasks (filterable)
@@ -422,6 +436,7 @@ Task Dashboard:
 ```
 
 **Picker View:**
+
 ```
 My Tasks:
 ├── Current Task (what I'm doing now)
@@ -473,6 +488,7 @@ Order Dashboard Features:
 #### Picker Order View
 
 **Limited to assigned tasks:**
+
 ```typescript
 Picker sees:
 ✓ Current order number (e.g., ORD-12345)
@@ -491,6 +507,7 @@ Picker sees:
 #### Starting a Voice Session
 
 **Picker:**
+
 ```typescript
 // From mobile app or web interface
 1. Click "Start Voice Session"
@@ -502,6 +519,7 @@ Picker sees:
 ```
 
 **System Creates:**
+
 ```typescript
 VoiceSession {
   id: "VS-20260107-001"
@@ -517,6 +535,7 @@ VoiceSession {
 #### Admin Monitoring Sessions
 
 **Real-time Session View:**
+
 ```
 Active Sessions Table:
 ┌──────────┬──────────────┬──────────┬───────────┬──────────┬──────────┐
@@ -534,12 +553,14 @@ Admin Actions:
 #### Ending a Voice Session
 
 **Picker:**
+
 ```
 Say: "End session" or "I'm done"
 System: "Session ended. Great work today!"
 ```
 
 **Admin:**
+
 ```
 Click [End Session] button
 Confirmation: "End John's session? He has 2 tasks in progress."
@@ -553,6 +574,7 @@ Confirmation: "End John's session? He has 2 tasks in progress."
 #### Admin View - Full Visibility
 
 **Voice Command Log:**
+
 ```typescript
 Command History Table:
 ├── Timestamp
@@ -579,6 +601,7 @@ Example:
 #### Picker View - Limited History
 
 **Personal Command History (last 10 commands):**
+
 ```
 My Recent Commands:
 ├── 08:23:42 - "5 picked" → Confirmed
@@ -594,12 +617,14 @@ My Recent Commands:
 #### Help Requests
 
 **Picker:**
+
 ```
 Says: "Help" or "I need assistance"
 System: "Help request sent. A supervisor will assist you."
 ```
 
 **Admin Console:**
+
 ```
 🔔 ALERT: Help Request
 Worker: John Smith
@@ -639,6 +664,7 @@ Admin can:
 #### Zero-Training Voice (Unlike Voxware)
 
 **Voxware Approach:**
+
 ```
 1. Record voice templates
 2. Train specific commands
@@ -648,6 +674,7 @@ Admin can:
 ```
 
 **Logivox Approach:**
+
 ```
 1. Worker logs in
 2. Starts speaking naturally
@@ -708,6 +735,7 @@ Available Languages:
 #### Language Selection
 
 **Admin:**
+
 ```
 Can set:
 ✓ Default language per warehouse
@@ -717,6 +745,7 @@ Can set:
 ```
 
 **Picker:**
+
 ```
 Can select:
 ✓ Personal preferred language
@@ -731,6 +760,7 @@ Can select:
 #### Admin Analytics Dashboard
 
 **Key Metrics:**
+
 ```typescript
 Voice Operations KPIs:
 ├── Active Sessions (real-time)
@@ -761,6 +791,7 @@ Voice Operations KPIs:
 ```
 
 **Charts & Visualizations:**
+
 ```
 - Hourly task completion trends
 - Task type distribution (pie chart)
@@ -773,6 +804,7 @@ Voice Operations KPIs:
 #### Individual Worker Analytics
 
 **Admin View:**
+
 ```typescript
 Worker Performance Detail:
 ├── John Smith (Picker)
@@ -797,6 +829,7 @@ Worker Performance Detail:
 ```
 
 **Picker View:**
+
 ```
 My Performance:
 ├── Today: 42 tasks ✓
@@ -826,6 +859,7 @@ Mobile Features:
 ```
 
 **Optimizations:**
+
 ```
 - Large touch targets
 - Voice-first design
@@ -839,6 +873,7 @@ Mobile Features:
 #### Desktop/Tablet (Admin/Manager Interface)
 
 **Admin Dashboard:**
+
 ```typescript
 Desktop Features:
 ├── Multi-panel layout
@@ -858,6 +893,7 @@ Desktop Features:
 #### Voice Processing API
 
 **POST `/api/voice/process`**
+
 ```typescript
 // Process voice command
 Request:
@@ -889,6 +925,7 @@ Response:
 #### Session Management API
 
 **POST `/api/voice/session`**
+
 ```typescript
 // Start voice session
 Request:
@@ -918,6 +955,7 @@ Response:
 #### Voice-Related Tables
 
 **VoiceProfile:**
+
 ```prisma
 model VoiceProfile {
   id               String   @id
@@ -932,7 +970,7 @@ model VoiceProfile {
   autoLearn        Boolean
   feedbackLevel    String
   lastTrainedAt    DateTime
-  
+
   user             User     @relation
   sessions         VoiceSession[]
   commands         VoiceCommand[]
@@ -940,6 +978,7 @@ model VoiceProfile {
 ```
 
 **VoiceSession:**
+
 ```prisma
 model VoiceSession {
   id              String   @id
@@ -954,13 +993,14 @@ model VoiceSession {
   accuracy        Float?
   warehouseId     String?
   taskType        String?
-  
+
   voiceProfile    VoiceProfile @relation
   commands        VoiceCommand[]
 }
 ```
 
 **VoiceCommand:**
+
 ```prisma
 model VoiceCommand {
   id              String   @id
@@ -977,7 +1017,7 @@ model VoiceCommand {
   commandType     String
   metadata        Json
   createdAt       DateTime
-  
+
   voiceProfile    VoiceProfile @relation
   session         VoiceSession? @relation
 }

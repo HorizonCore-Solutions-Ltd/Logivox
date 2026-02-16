@@ -83,7 +83,7 @@ export function CarrierCheckInForm({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -92,7 +92,7 @@ export function CarrierCheckInForm({
       }
 
       toast.success(
-        `Checked in appointment ${appointment.appointmentNumber} successfully`
+        `Checked in appointment ${appointment.appointmentNumber} successfully`,
       );
       reset();
       onOpenChange(false);
@@ -100,7 +100,7 @@ export function CarrierCheckInForm({
     } catch (error) {
       console.error("Error checking in:", error);
       toast.error(
-        error instanceof Error ? error.message : "Failed to check in"
+        error instanceof Error ? error.message : "Failed to check in",
       );
     } finally {
       setIsSubmitting(false);

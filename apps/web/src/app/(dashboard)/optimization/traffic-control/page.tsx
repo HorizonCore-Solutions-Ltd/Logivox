@@ -3,10 +3,10 @@
 /**
  * WAREHOUSE TRAFFIC CONTROL DASHBOARD
  * ====================================
- * 
+ *
  * System 2 - High Impact (737% ROI)
  * Investment: $12K → Savings: $88K/year
- * 
+ *
  * Features:
  * - Real-time zone monitoring
  * - Live vehicle tracking
@@ -16,7 +16,13 @@
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -246,7 +252,9 @@ export default function TrafficControlDashboard() {
       CRITICAL: "bg-red-500 text-white animate-pulse",
     };
 
-    return <Badge className={colors[severity] || "bg-gray-500"}>{severity}</Badge>;
+    return (
+      <Badge className={colors[severity] || "bg-gray-500"}>{severity}</Badge>
+    );
   }
 
   function formatCurrency(amount: number) {
@@ -263,7 +271,9 @@ export default function TrafficControlDashboard() {
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Traffic Control Dashboard...</p>
+          <p className="mt-4 text-gray-600">
+            Loading Traffic Control Dashboard...
+          </p>
         </div>
       </div>
     );
@@ -335,7 +345,9 @@ export default function TrafficControlDashboard() {
 
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-600">Annual Savings</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-600">
+                Annual Savings
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-green-600">
@@ -355,9 +367,12 @@ export default function TrafficControlDashboard() {
               <AlertTriangle className="w-6 h-6 text-red-600 animate-pulse" />
               <div>
                 <div className="font-bold text-red-900">
-                  {alerts.filter((a) => a.status === "ACTIVE").length} Active Collision Alerts
+                  {alerts.filter((a) => a.status === "ACTIVE").length} Active
+                  Collision Alerts
                 </div>
-                <div className="text-sm text-red-700">Immediate attention required</div>
+                <div className="text-sm text-red-700">
+                  Immediate attention required
+                </div>
               </div>
             </div>
           </CardContent>
@@ -378,7 +393,9 @@ export default function TrafficControlDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Traffic Zone Status</CardTitle>
-              <CardDescription>Real-time zone congestion and safety monitoring</CardDescription>
+              <CardDescription>
+                Real-time zone congestion and safety monitoring
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
@@ -414,7 +431,9 @@ export default function TrafficControlDashboard() {
                           />
                         </div>
                       </TableCell>
-                      <TableCell>{getCongestionBadge(zone.congestionLevel)}</TableCell>
+                      <TableCell>
+                        {getCongestionBadge(zone.congestionLevel)}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <Gauge className="w-4 h-4 text-gray-400" />
@@ -423,8 +442,13 @@ export default function TrafficControlDashboard() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Progress value={zone.safetyRating} className="w-16" />
-                          <span className="text-sm">{zone.safetyRating.toFixed(0)}%</span>
+                          <Progress
+                            value={zone.safetyRating}
+                            className="w-16"
+                          />
+                          <span className="text-sm">
+                            {zone.safetyRating.toFixed(0)}%
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -434,7 +458,9 @@ export default function TrafficControlDashboard() {
                             Safe
                           </Badge>
                         ) : zone.safetyRating >= 60 ? (
-                          <Badge className="bg-yellow-500 text-white">Caution</Badge>
+                          <Badge className="bg-yellow-500 text-white">
+                            Caution
+                          </Badge>
                         ) : (
                           <Badge className="bg-red-500 text-white">
                             <AlertTriangle className="w-3 h-3 mr-1" />
@@ -483,14 +509,19 @@ export default function TrafficControlDashboard() {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{vehicle.operatorName}</div>
-                          <div className="text-xs text-gray-500">{vehicle.operatorId}</div>
+                          <div className="font-medium">
+                            {vehicle.operatorName}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {vehicle.operatorId}
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
                           <MapPin className="w-4 h-4 text-gray-400" />
-                          {zones.find((z) => z.id === vehicle.currentZone)?.name || vehicle.currentZone}
+                          {zones.find((z) => z.id === vehicle.currentZone)
+                            ?.name || vehicle.currentZone}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -503,14 +534,18 @@ export default function TrafficControlDashboard() {
                         <div className="flex items-center gap-2">
                           <Navigation
                             className="w-4 h-4 text-gray-400"
-                            style={{ transform: `rotate(${vehicle.heading}deg)` }}
+                            style={{
+                              transform: `rotate(${vehicle.heading}deg)`,
+                            }}
                           />
                           {vehicle.heading}°
                         </div>
                       </TableCell>
                       <TableCell>
                         {vehicle.speed > 0 ? (
-                          <Badge className="bg-green-500 text-white">Moving</Badge>
+                          <Badge className="bg-green-500 text-white">
+                            Moving
+                          </Badge>
                         ) : (
                           <Badge variant="secondary">Idle</Badge>
                         )}
@@ -528,14 +563,20 @@ export default function TrafficControlDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Collision Prevention Alerts</CardTitle>
-              <CardDescription>AI-powered collision detection and prevention</CardDescription>
+              <CardDescription>
+                AI-powered collision detection and prevention
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {alerts.length === 0 ? (
                 <div className="text-center py-12">
                   <Shield className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                  <div className="text-lg font-medium text-green-600">All Clear</div>
-                  <div className="text-sm text-gray-500">No collision alerts at this time</div>
+                  <div className="text-lg font-medium text-green-600">
+                    All Clear
+                  </div>
+                  <div className="text-sm text-gray-500">
+                    No collision alerts at this time
+                  </div>
                 </div>
               ) : (
                 <Table>
@@ -553,7 +594,9 @@ export default function TrafficControlDashboard() {
                   <TableBody>
                     {alerts.map((alert) => (
                       <TableRow key={alert.id}>
-                        <TableCell>{getSeverityBadge(alert.severity)}</TableCell>
+                        <TableCell>
+                          {getSeverityBadge(alert.severity)}
+                        </TableCell>
                         <TableCell>
                           <div className="font-medium">
                             {alert.vehicle1Id} & {alert.vehicle2Id}
@@ -561,7 +604,9 @@ export default function TrafficControlDashboard() {
                         </TableCell>
                         <TableCell>{alert.zone}</TableCell>
                         <TableCell>
-                          <div className="font-medium">{alert.distance.toFixed(1)}m</div>
+                          <div className="font-medium">
+                            {alert.distance.toFixed(1)}m
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div
@@ -576,17 +621,26 @@ export default function TrafficControlDashboard() {
                         </TableCell>
                         <TableCell>
                           {alert.status === "ACTIVE" ? (
-                            <Badge className="bg-red-500 text-white">ACTIVE</Badge>
+                            <Badge className="bg-red-500 text-white">
+                              ACTIVE
+                            </Badge>
                           ) : alert.status === "ACKNOWLEDGED" ? (
-                            <Badge className="bg-yellow-500 text-white">ACKNOWLEDGED</Badge>
+                            <Badge className="bg-yellow-500 text-white">
+                              ACKNOWLEDGED
+                            </Badge>
                           ) : (
-                            <Badge className="bg-green-500 text-white">RESOLVED</Badge>
+                            <Badge className="bg-green-500 text-white">
+                              RESOLVED
+                            </Badge>
                           )}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             {alert.status === "ACTIVE" && (
-                              <Button size="sm" onClick={() => acknowledgeAlert(alert.id)}>
+                              <Button
+                                size="sm"
+                                onClick={() => acknowledgeAlert(alert.id)}
+                              >
                                 Acknowledge
                               </Button>
                             )}
@@ -622,12 +676,20 @@ export default function TrafficControlDashboard() {
                 {stats && (
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Collisions Avoided (Today)</span>
-                      <Badge variant="default">{stats.collisionsAvoidedToday}</Badge>
+                      <span className="text-sm">
+                        Collisions Avoided (Today)
+                      </span>
+                      <Badge variant="default">
+                        {stats.collisionsAvoidedToday}
+                      </Badge>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Collisions Avoided (Month)</span>
-                      <Badge variant="default">{stats.collisionsAvoidedMonth}</Badge>
+                      <span className="text-sm">
+                        Collisions Avoided (Month)
+                      </span>
+                      <Badge variant="default">
+                        {stats.collisionsAvoidedMonth}
+                      </Badge>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm">Avg Response Time</span>
@@ -688,11 +750,15 @@ export default function TrafficControlDashboard() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
                     <div className="text-sm text-gray-600">Avg Speed</div>
-                    <div className="text-2xl font-bold">{metrics.avgSpeed.toFixed(1)} km/h</div>
+                    <div className="text-2xl font-bold">
+                      {metrics.avgSpeed.toFixed(1)} km/h
+                    </div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-600">Throughput</div>
-                    <div className="text-2xl font-bold">{metrics.throughput} veh/hr</div>
+                    <div className="text-2xl font-bold">
+                      {metrics.throughput} veh/hr
+                    </div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-600">Efficiency</div>
@@ -701,7 +767,9 @@ export default function TrafficControlDashboard() {
                     </div>
                   </div>
                   <div>
-                    <div className="text-sm text-gray-600">Congestion Zones</div>
+                    <div className="text-sm text-gray-600">
+                      Congestion Zones
+                    </div>
                     <div className="text-2xl font-bold">
                       {metrics.congestionZones} / {zones.length}
                     </div>

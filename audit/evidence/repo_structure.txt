@@ -1,0 +1,511 @@
+.
+├── ACTUAL_APP_STATUS.md
+├── COMPLIANCE.md
+├── DEPLOYMENT.md
+├── DEPLOYMENT_COMPLETE.md
+├── DEPLOYMENT_READINESS_CHECKLIST.md
+├── Dockerfile
+├── MIGRATION_MAP.md
+├── QUICK_START.md
+├── README.md
+├── REQUIREMENTS_SPECIFICATION.md
+├── TURNKEY_VERIFICATION_COMPLETE.md
+├── __mocks__
+│   ├── fileMock.js
+│   └── styleMock.js
+├── __tests__
+│   ├── api
+│   │   ├── inventory.test.ts
+│   │   ├── locations.test.ts
+│   │   ├── mobile-barcode-scan.test.ts
+│   │   ├── mobile-sync.test.ts
+│   │   ├── mobile-tasks.test.ts
+│   │   ├── orders-purchase.test.ts
+│   │   ├── orders-sales.test.ts
+│   │   ├── stock-adjustments.test.ts
+│   │   └── waves.test.ts
+│   ├── auth.test.ts
+│   ├── components
+│   │   ├── BarcodeScanner.test.tsx
+│   │   ├── InventoryList.test.tsx
+│   │   ├── MobileTaskList.test.tsx
+│   │   ├── SalesOrderForm.test.tsx
+│   │   └── ui.test.tsx
+│   ├── critical
+│   │   ├── auth-flow.test.ts
+│   │   ├── inventory-management.test.ts
+│   │   └── order-fulfillment-flow.test.ts
+│   ├── integration
+│   │   ├── api.test.ts
+│   │   ├── billing-invoicing.test.ts
+│   │   ├── compliance-tracking.test.ts
+│   │   ├── iot-devices.test.ts
+│   │   ├── labor-management.test.ts
+│   │   └── order-fulfillment.test.tsx
+│   ├── inventory.test.ts
+│   ├── order-fulfillment.test.ts
+│   ├── security.test.ts
+│   ├── services
+│   │   ├── barcode.service.test.ts
+│   │   ├── offline-sync.service.test.ts
+│   │   └── service-integration.test.ts
+│   └── utils
+│       ├── auto-numbering.test.ts
+│       ├── export.test.ts
+│       ├── formatting.test.ts
+│       ├── permissions.test.ts
+│       └── validation.test.ts
+├── apps
+│   └── web
+│       ├── components.json
+│       ├── coverage
+│       ├── e2e
+│       ├── jest.config.js
+│       ├── jest.setup.ts
+│       ├── next-env.d.ts
+│       ├── next.config.js
+│       ├── package.json
+│       ├── playwright-report
+│       ├── playwright.config.ts
+│       ├── postcss.config.js
+│       ├── public
+│       ├── src
+│       ├── tailwind.config.js
+│       ├── tsconfig.json
+│       └── tsconfig.tsbuildinfo
+├── audit
+│   ├── compliance
+│   ├── evidence
+│   │   └── repo_structure.txt
+│   ├── logs
+│   ├── remediation
+│   └── reports
+├── docker-compose.prod.yml
+├── docker-compose.yml
+├── docker-entrypoint.sh
+├── docs
+│   ├── ACTUAL_COMPLETION_STATUS.md
+│   ├── CAPA_COMPLETION_STATUS.md
+│   ├── CAPA_IMPLEMENTATION_GUIDE.md
+│   ├── CAPA_QUICK_REFERENCE.md
+│   ├── DEPLOYMENT_CHECKLIST.md
+│   ├── DOCUMENTATION_REORGANIZATION_SUMMARY.md
+│   ├── EXECUTIVE_SUMMARY.md
+│   ├── HONEST_FEATURE_AUDIT.md
+│   ├── HOW_WE_GOT_TWO_DIRECTORIES.md
+│   ├── INVENTORY_SYSTEM_COMPLETE.md
+│   ├── MARKETING_UPDATES_COMPLETE.md
+│   ├── MASTER_BUILD_TRACKER.md
+│   ├── MASTER_ENHANCEMENTS_STATUS.md
+│   ├── MIGRATION_SUCCESS.md
+│   ├── OLD_DIRECTORIES_REMOVAL_PLAN.md
+│   ├── OPTIMIZATION_SYSTEMS_STATUS.md
+│   ├── PROJECT_COMPLETION_SUMMARY.md
+│   ├── QUICK_STATUS.md
+│   ├── README.md
+│   ├── README_OLD.md
+│   ├── REMAINING_ENHANCEMENTS.md
+│   ├── SECURITY_IMPLEMENTATION_COMPLETE.md
+│   ├── ULTRA_SECURE_INVENTORY_API_IMPLEMENTATION.md
+│   ├── WHATS_LEFT_TO_COMPLETE.md
+│   ├── architecture
+│   │   ├── CURRENT_STRUCTURE.md
+│   │   ├── PROJECT_STRUCTURE.md
+│   │   ├── README.md
+│   │   ├── SYSTEM_ARCHITECTURE.md
+│   │   └── TECHNICAL_DESIGN.md
+│   ├── archive
+│   │   ├── 100_PERCENT_COMPLETE.md
+│   │   ├── BUILD_COMPLETE.md
+│   │   ├── BUILD_COMPLETE_SUMMARY.md
+│   │   ├── BUILD_SESSION_JAN_3_2026.md
+│   │   ├── BUILD_STATUS.md
+│   │   ├── BUILD_STATUS_REPORT.md
+│   │   ├── COMPLETE_BUILD_FINAL_SUMMARY.md
+│   │   ├── COMPLETE_COVERAGE_ANALYSIS.md
+│   │   ├── CROSS_DOCK_VERIFICATION_REPORT.md
+│   │   ├── DOCUMENTATION_SUMMARY.md
+│   │   ├── ENHANCED_PLAN_SUMMARY.md
+│   │   ├── ENTERPRISE_PROGRESS.md
+│   │   ├── ENTERPRISE_QA_SYSTEM_COMPLETE.md
+│   │   ├── ENTERPRISE_QMS_COMPLETE.md
+│   │   ├── ERROR_REDUCTION_SUMMARY.md
+│   │   ├── FEATURE_VERIFICATION_CHECKLIST.md
+│   │   ├── IMPLEMENTATION_CHECKLIST.md
+│   │   ├── IMPLEMENTATION_COMPLETE.md
+│   │   ├── INTEGRATION_COMPLETE.md
+│   │   ├── INVENTORY_BUILD_COMPLETE_PHASE_1_2_3.md
+│   │   ├── LOGIVOX_BUILD_COMPLETE.md
+│   │   ├── MISSION_ACCOMPLISHED.md
+│   │   ├── MODULE_VERIFICATION_REPORT.md
+│   │   ├── ORACLE_EBS_MODULES_COMPLETE.md
+│   │   ├── ORACLE_FUSION_BUILD_STATUS.md
+│   │   ├── ORACLE_FUSION_COMPLETE_BUILD_SUMMARY.md
+│   │   ├── PATH_TO_100_PERCENT.md
+│   │   ├── PHASE_22_LABEL_PRINTING_GUIDE.md
+│   │   ├── PHASE_22_QUICK_START.md
+│   │   ├── PHASE_6_DAY_1_PROGRESS.md
+│   │   ├── PRIORITY_4_COMPLETE.md
+│   │   ├── PRIORITY_5_COMPLETE.md
+│   │   ├── QC_MODULE_VERIFICATION_REPORT.md
+│   │   ├── README.md
+│   │   ├── RECEIVING_MODULE_VERIFICATION_REPORT.md
+│   │   ├── RETURNS_DEPLOYMENT_READY.md
+│   │   ├── RETURNS_IMPLEMENTATION_CHECKLIST.md
+│   │   ├── RETURNS_IMPLEMENTATION_STATUS.md
+│   │   ├── RETURNS_MANAGEMENT_VERIFICATION_REPORT.md
+│   │   ├── RETURNS_STATUS_FINAL.md
+│   │   ├── RETURNS_SYSTEM_COMPLETE.md
+│   │   ├── SESSION_20_COMPLETE_REPORT.md
+│   │   ├── SESSION_20_SUMMARY.md
+│   │   ├── TS_CONFIG_FIXES_PROGRESS.md
+│   │   ├── TURNKEY_SOLUTION_COMPLETE.md
+│   │   ├── TYPE_FIXES_PROGRESS.md
+│   │   └── WAVE_PICKING_VERIFICATION_REPORT.md
+│   ├── business
+│   │   ├── ACQUISITION_TARGETS.md
+│   │   ├── EXIT_STRATEGY.md
+│   │   ├── PATENT_STRATEGY.md
+│   │   ├── PITCH_DECK_CONTENT.md
+│   │   ├── README.md
+│   │   └── VALUATION_ANALYSIS.md
+│   ├── business-operations
+│   │   └── presentations
+│   ├── business-planning
+│   │   ├── BEYOND_ORACLE_INNOVATION_SUMMARY.md
+│   │   ├── COMPETITIVE_ANALYSIS.md
+│   │   ├── COMPETITIVE_MARKET_ANALYSIS_2026.md
+│   │   ├── COMPREHENSIVE_WMS_COMPETITIVE_ANALYSIS.md
+│   │   ├── IP_SALE_PREPARATION_PLAN.md
+│   │   ├── LOGIVOX_PLATFORM_OVERVIEW.md
+│   │   ├── ORACLE_FUSION_COMPETITIVE_STRATEGY.md
+│   │   └── README.md
+│   ├── completion-summaries
+│   │   ├── 100_PERCENT_COMPLETION_SUMMARY.md
+│   │   ├── CAPA_AI_SYSTEMS_PHASE1_COMPLETE.md
+│   │   ├── CAPA_SYSTEMS_4-5_COMPLETE.md
+│   │   ├── CAPA_SYSTEM_6_BLOCKCHAIN_COMPLETE.md
+│   │   ├── CAPA_SYSTEM_7_SUPPLIER_ERP_COMPLETE.md
+│   │   ├── CAPA_SYSTEM_9_COPQ_COMPLETE.md
+│   │   ├── DOCK_SCHEDULING_PHASE1_COMPLETE.md
+│   │   ├── ENTERPRISE_VERIFICATION_SUMMARY.md
+│   │   ├── GIT_PUSH_SUMMARY.md
+│   │   ├── NAVIGATION_COMPLETE.md
+│   │   ├── README.md
+│   │   ├── REBRAND_COMPLETE.md
+│   │   ├── SESSION_JAN_8_2026_50_PERCENT_MILESTONE.md
+│   │   ├── SESSION_JAN_8_2026_OPTIMIZATION_PHASE1.md
+│   │   ├── SESSION_JAN_8_2026_PHASE2_OPTIMIZATION.md
+│   │   ├── TODAYS_BUILD_SUMMARY_JAN_2_2026.md
+│   │   └── TURNKEY_SOLUTION_COMPLETE.md
+│   ├── deployment
+│   │   ├── DATABASE_MIGRATION_GUIDE.md
+│   │   ├── DATABASE_QUICKSTART.md
+│   │   ├── DEPLOYMENT.md
+│   │   ├── DEPLOYMENT_GUIDE.md
+│   │   ├── DEPLOYMENT_READINESS_CHECKLIST.md
+│   │   ├── DEPLOYMENT_RUNBOOK.md
+│   │   ├── ENVIRONMENT_VARIABLES.md
+│   │   ├── PWA_SETUP.md
+│   │   ├── README.md
+│   │   ├── database-setup.md
+│   │   └── database.md
+│   ├── features
+│   │   ├── ADVANCED_INVENTORY_MANAGEMENT_SYSTEM.md
+│   │   ├── ADVANCED_INVENTORY_STATUS.md
+│   │   ├── ADVANCED_REPORTING.md
+│   │   ├── ADVANCED_RETURNS_SYSTEM.md
+│   │   ├── AI_CUSTOMER_EXPERIENCE.md
+│   │   ├── AI_FORECASTING.md
+│   │   ├── AUTHENTICATION.md
+│   │   ├── CARRIER_INTEGRATIONS_API.md
+│   │   ├── COMPLIANCE_AND_BC.md
+│   │   ├── CROSS_DOCKING_MODULE.md
+│   │   ├── CUSTOMER_PORTAL_IMPLEMENTATION.md
+│   │   ├── CUSTOMER_PORTAL_VERIFICATION.md
+│   │   ├── ERP_INTEGRATIONS.md
+│   │   ├── GATE_SECURITY_API.md
+│   │   ├── GATE_SECURITY_COMPLETE.md
+│   │   ├── GLOBAL_VISITOR_FLEXIBILITY.md
+│   │   ├── GOVERNANCE_FRAMEWORK.md
+│   │   ├── GUARD_MANAGEMENT_API.md
+│   │   ├── GUARD_MANAGEMENT_COMPLETE.md
+│   │   ├── LOAD_OPTIMIZATION_MODULE_COMPLETE.md
+│   │   ├── README.md
+│   │   ├── SCREEN_READER_OPTIMIZATION.md
+│   │   ├── UI_COMPONENTS.md
+│   │   ├── UI_DASHBOARDS_BUILD_COMPLETE.md
+│   │   ├── VEHICLE_SYSTEM_SIMPLIFIED.md
+│   │   ├── VEHICLE_TYPES_LIBRARY.md
+│   │   ├── VISITOR_SYSTEM_EXAMPLES.md
+│   │   ├── VISUAL_ACCESSIBILITY.md
+│   │   └── VISUAL_PROGRESS.md
+│   ├── hr
+│   │   └── templates
+│   ├── investors
+│   │   ├── FINANCIAL_MODEL.md
+│   │   ├── INVESTOR_ONE_PAGER.md
+│   │   ├── INVESTOR_PACKAGE.md
+│   │   ├── INVESTOR_PACKAGE_SUMMARY.md
+│   │   ├── INVESTOR_PITCH_CHECKLIST.md
+│   │   ├── README.md
+│   │   └── STRATEGIC_ACTION_PLAN.md
+│   ├── legacy-planning
+│   │   ├── LANDING_PAGE_UPDATES.md
+│   │   ├── QUICK_START_VOICE_WMS.md
+│   │   ├── README.md
+│   │   ├── REBRAND_TO_LOGIVOX.md
+│   │   ├── VOICE_CAPABILITIES_COMPLETE_ANALYSIS.md
+│   │   ├── VOICE_ENABLED_WMS_TRANSFORMATION_PLAN.md
+│   │   ├── VOICE_WMS_EXECUTION_ROADMAP.md
+│   │   └── VOICE_WMS_EXECUTIVE_SUMMARY.md
+│   ├── marketing
+│   │   ├── COMPETITIVE_ADVANTAGES.md
+│   │   ├── CONTENT_STRATEGY.md
+│   │   ├── MARKETING_MASTER_PLAN.md
+│   │   └── MARKETING_PAGES_COMPLETE.md
+│   ├── modules
+│   │   ├── 3PL_MULTI_CLIENT_MODULE_PART1.md
+│   │   ├── 3PL_MULTI_CLIENT_MODULE_PART2.md
+│   │   ├── ADVANCED_INVENTORY_MANAGEMENT_MODULE_PART1.md
+│   │   ├── ADVANCED_INVENTORY_MANAGEMENT_MODULE_PART2.md
+│   │   ├── ADVANCED_WAVE_MANAGEMENT_MODULE.md
+│   │   ├── ADVANCED_YARD_MANAGEMENT_MODULE.md
+│   │   ├── AI_ML_INTELLIGENCE_LAYER_MODULE_PART1.md
+│   │   ├── AI_ML_INTELLIGENCE_LAYER_MODULE_PART2.md
+│   │   ├── APPOINTMENT_SCHEDULING_MODULE_PART1.md
+│   │   ├── APPOINTMENT_SCHEDULING_MODULE_PART2.md
+│   │   ├── COMPUTER_VISION_INTEGRATION_MODULE_PART1.md
+│   │   ├── COMPUTER_VISION_INTEGRATION_MODULE_PART2.md
+│   │   ├── CROSS_DOCKING_OPERATIONS_MODULE_PART1.md
+│   │   ├── CROSS_DOCKING_OPERATIONS_MODULE_PART2.md
+│   │   ├── ENHANCED_VOICE_SYSTEM_MODULE_PART1.md
+│   │   ├── ENHANCED_VOICE_SYSTEM_MODULE_PART2.md
+│   │   ├── HAZMAT_COMPLIANCE_MODULE.md
+│   │   ├── IOT_SENSOR_NETWORK_MODULE_PART1.md
+│   │   ├── IOT_SENSOR_NETWORK_MODULE_PART2.md
+│   │   ├── KITTING_ASSEMBLY_MODULE.md
+│   │   ├── LABOR_MANAGEMENT_SYSTEM_MODULE.md
+│   │   ├── QUALITY_CONTROL_COMPLIANCE_MODULE_PART1.md
+│   │   ├── QUALITY_CONTROL_COMPLIANCE_MODULE_PART2.md
+│   │   ├── RETURNS_IMPLEMENTATION_COMPLETE.md
+│   │   ├── RETURNS_MANAGEMENT_COMPLETE.md
+│   │   ├── RETURNS_MANAGEMENT_MODULE_PART1.md
+│   │   ├── RETURNS_MANAGEMENT_MODULE_PART2.md
+│   │   ├── ROBOTICS_AUTOMATION_MODULE_PART1.md
+│   │   ├── ROBOTICS_AUTOMATION_MODULE_PART2.md
+│   │   ├── SECURITY_ACCESS_CONTROL_MODULE.md
+│   │   ├── TASK_INTERLEAVING_MODULE.md
+│   │   ├── VALUE_ADDED_SERVICES_MODULE.md
+│   │   ├── WAREHOUSE_LAYOUT_MANAGEMENT_MODULE_PART1.md
+│   │   └── WAREHOUSE_LAYOUT_MANAGEMENT_MODULE_PART2.md
+│   ├── modules-completed
+│   │   ├── 01-database-layer-prisma-schema.md
+│   │   ├── 02-environment-configuration.md
+│   │   ├── 03-type-definitions.md
+│   │   └── 04-prisma-client.md
+│   ├── production-readiness
+│   │   └── interim-forensic-audit-status.md
+│   ├── production-reports
+│   │   ├── HONEST_PRODUCTION_ASSESSMENT.md
+│   │   ├── PRODUCTION_CODE_VERIFICATION_REPORT.md
+│   │   ├── PRODUCTION_COMPLETION_REPORT.md
+│   │   ├── PRODUCTION_READINESS_PLAN.md
+│   │   ├── PRODUCTION_READINESS_REPORT.md
+│   │   └── README.md
+│   ├── project-management
+│   │   ├── AI_ASSISTANT_PROMPTS.md
+│   │   ├── EXECUTION_PLAN.md
+│   │   ├── LAUNCH_CHECKLIST.md
+│   │   ├── NEXT_STEPS.md
+│   │   ├── PROGRESS.md
+│   │   ├── PROJECT_ROADMAP.md
+│   │   ├── PROJECT_STATUS.md
+│   │   ├── PROJECT_SUMMARY.md
+│   │   ├── README.md
+│   │   └── WORKSPACE_CONTEXT.md
+│   ├── quality-assurance
+│   │   ├── API_REFERENCE.md
+│   │   ├── BUILD_COMPLETE_FINAL.md
+│   │   ├── CAPA_MODULE.md
+│   │   ├── DEPLOYMENT_READY.md
+│   │   ├── MEASUREMENTS_MODULE.md
+│   │   ├── NCR_MODULE.md
+│   │   ├── PHASE_2_BUILD_COMPLETION_REPORT.md
+│   │   ├── PHASE_2_ROADMAP.md
+│   │   ├── QA_DEVELOPER_REFERENCE.md
+│   │   ├── QC_ENVIRONMENT_CONFIG.md
+│   │   ├── QC_MODULE_DOCUMENTATION.md
+│   │   ├── QUALITY_HOLDS_MODULE.md
+│   │   ├── QUICK_START_PHASE2.md
+│   │   ├── README.md
+│   │   ├── REPORTS_MODULE.md
+│   │   ├── RETURNS_QUICK_START.md
+│   │   └── SAMPLING_PLANS_MODULE.md
+│   ├── startup
+│   │   ├── compliance
+│   │   └── requirements
+│   ├── technical
+│   │   ├── API_DOCUMENTATION.md
+│   │   ├── BUSINESS_OWNER_WISHLIST.md
+│   │   ├── CODE_DOCUMENTATION_STANDARDS.md
+│   │   ├── COMPLETE_FEATURE_CATALOG.md
+│   │   ├── COMPLETE_FEATURE_MATRIX.md
+│   │   ├── COMPLETE_SYSTEM_DOCUMENTATION.md
+│   │   ├── COMPLETE_WMS_ROADMAP.md
+│   │   ├── DEVELOPMENT_STANDARDS.md
+│   │   ├── DOCS_README.md
+│   │   ├── ENTERPRISE_WMS_MASTER_INDEX.md
+│   │   ├── EXECUTION_ROADMAP.md
+│   │   ├── FEATURE_MATRIX.md
+│   │   ├── LOGIVOX_PLATFORM_OVERVIEW.md
+│   │   ├── ORACLE_FUSION_QUICK_REFERENCE.md
+│   │   ├── PERFORMANCE.md
+│   │   ├── README.md
+│   │   ├── SYSTEM_ARCHITECTURE.md
+│   │   ├── TYPES_REFERENCE.md
+│   │   └── api.md
+│   ├── testing
+│   │   ├── LOAD_TESTING.md
+│   │   ├── README.md
+│   │   ├── SECURITY_TESTING.md
+│   │   ├── START_HERE_TESTING.md
+│   │   ├── TESTING.md
+│   │   ├── TESTING_QUICK_REF.md
+│   │   ├── TESTING_SECURITY_GUIDE.md
+│   │   └── TESTING_STRATEGY.md
+│   ├── training
+│   │   ├── ADMIN_GUIDE.md
+│   │   ├── FLOWSTOCK_ACADEMY_TRAINING_SYSTEM.md
+│   │   ├── MOBILE_APP_GUIDE.md
+│   │   ├── ONBOARDING_MATERIALS.md
+│   │   ├── QUICK_REFERENCE.md
+│   │   ├── README.md
+│   │   ├── SUPER_ADMIN_FAQ.md
+│   │   ├── TROUBLESHOOTING_GUIDE.md
+│   │   ├── USER_MANUAL.md
+│   │   ├── VIDEO_TUTORIAL_SCRIPTS.md
+│   │   └── getting-started.md
+│   └── voice-operations
+│       ├── ADVANCED_OPTIMIZATIONS_ADDENDUM.md
+│       ├── CAPA_MODULE_ENHANCEMENTS.md
+│       ├── GOODS_IN_RECEIVING_ENHANCEMENTS.md
+│       ├── README.md
+│       ├── README_MODULE_ENHANCEMENTS.md
+│       ├── README_OPTIMIZATION_SYSTEMS.md
+│       ├── VOICE_ADVANCED_LOADSHEETS.md
+│       ├── VOICE_AUTOMATION_GAPS_ANALYSIS.md
+│       ├── VOICE_COLLABORATION_BREAKTHROUGH.md
+│       ├── VOICE_COMPETITIVE_ANALYSIS.md
+│       ├── VOICE_COMPLETE_FEATURE_CATALOG.md
+│       ├── VOICE_COMPLETE_VISION.md
+│       ├── VOICE_DOCK_STAGING_SYSTEM.md
+│       ├── VOICE_EXECUTIVE_SUMMARY.md
+│       ├── VOICE_FEATURE_SUMMARY.md
+│       ├── VOICE_LOADSHEET_DISTRIBUTION_SUMMARY.md
+│       ├── VOICE_ONE_PAGE_SUMMARY.md
+│       ├── VOICE_QUICK_START.md
+│       ├── VOICE_README.md
+│       ├── VOICE_REALTIME_LOADSHEET_AUTOMATION.md
+│       ├── VOICE_SHORT_PICK_MANAGEMENT.md
+│       ├── VOICE_SYSTEM_ARCHITECTURE.md
+│       ├── VOICE_SYSTEM_COMPLETE_GUIDE.md
+│       ├── VOICE_SYSTEM_FLEXIBILITY_FRAMEWORK.md
+│       ├── VOICE_SYSTEM_IMPLEMENTATION.md
+│       └── VOICE_UPDATE_SUMMARY.md
+├── e2e
+│   ├── auth.setup.ts
+│   ├── auth.spec.ts
+│   ├── global-setup.ts
+│   ├── global-teardown.ts
+│   ├── inventory.spec.ts
+│   ├── load-testing.spec.ts
+│   ├── production-validation.spec.ts
+│   ├── security-pen-test.spec.ts
+│   ├── smoke.spec.ts
+│   └── test-utils.ts
+├── examples
+│   └── vehicle-type-integration.tsx
+├── jest.config.js
+├── jest.setup.js
+├── k8s
+│   ├── configmap.yaml
+│   ├── deployment.yaml
+│   ├── ingress.yaml
+│   ├── monitoring
+│   │   ├── alertmanager-config.yaml
+│   │   ├── grafana-config.yaml
+│   │   └── prometheus-config.yaml
+│   ├── secrets.yaml
+│   └── storage.yaml
+├── lib
+│   ├── env-validation.ts
+│   └── rate-limit.ts
+├── middleware-production.ts
+├── middleware.old.ts
+├── middleware.ts
+├── next.config.js
+├── old_directories_backup_20260109_163139.tar.gz
+├── package-lock.json
+├── package.json
+├── packages
+│   └── config
+│       └── typescript
+├── playwright.config.ts
+├── prisma
+│   ├── audit-log-schema.txt
+│   ├── indexes-schema.txt
+│   ├── integration-schema-extension.prisma
+│   ├── migrations
+│   │   ├── 20260103004057_init
+│   │   ├── 20260103014029_add_labor_slotting_load_3pl_yard_iot_features
+│   │   ├── 20260103015421_add_security_module
+│   │   ├── 20260103025053_add_security_automation_features
+│   │   ├── 20260103031900_add_security_settings
+│   │   ├── 20260103034714_add_advanced_gate_features
+│   │   ├── 20260103044608_add_guard_management_features
+│   │   ├── 20260103194453_add_customer_portal_role
+│   │   ├── 20260104160354_add_advanced_returns_management_system
+│   │   ├── 20260105170907_add_enterprise_qa_system
+│   │   ├── 20260105200616_add_phase2_qos_models
+│   │   ├── 20260105210114_add_supplier_performance_review
+│   │   ├── 20260105212416_add_root_cause_analysis_model
+│   │   ├── add_advanced_returns.sql
+│   │   └── migration_lock.toml
+│   ├── schema-extensions
+│   │   └── system-settings.prisma
+│   ├── schema-load-optimization.prisma
+│   ├── schema.prisma
+│   └── seed.ts
+├── schema.graphql
+├── scripts
+│   ├── backup-cron.txt
+│   ├── backup-db.sh
+│   ├── backup.sh
+│   ├── data-validation.js
+│   ├── health-monitor.js
+│   ├── migrate-data.js
+│   ├── performance-benchmark.js
+│   ├── production-cleanup.sh
+│   ├── restore-db.sh
+│   ├── restore.sh
+│   ├── security-test.sh
+│   ├── seed-phase2-test-data.ts
+│   ├── setup-database.ps1
+│   ├── setup-dev-db.sh
+│   ├── setup-monitoring.js
+│   ├── setup-production-db.sh
+│   ├── verify-phase2-integration.ts
+│   └── verify-phase2-schema.ts
+├── server.js
+├── tsconfig.json
+├── tsconfig.tsbuildinfo
+├── turbo.json
+├── types
+│   ├── business.ts
+│   ├── load-optimization.ts
+│   ├── next-auth.d.ts
+│   └── vehicle-fleet.ts
+└── vercel.json
+
+76 directories, 433 files

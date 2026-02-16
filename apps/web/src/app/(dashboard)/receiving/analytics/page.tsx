@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ExecutiveDashboard {
   period: { startDate: string; endDate: string; days: number };
@@ -44,11 +44,11 @@ export default function ReceivingAnalytics() {
   const fetchDashboard = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/receiving/analytics', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/receiving/analytics", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: 'executive_dashboard',
+          action: "executive_dashboard",
         }),
       });
 
@@ -57,35 +57,35 @@ export default function ReceivingAnalytics() {
         setDashboard(data.dashboard);
       }
     } catch (error) {
-      console.error('Failed to fetch dashboard:', error);
+      console.error("Failed to fetch dashboard:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const getTrendColor = (value: number) => {
-    if (value > 0) return 'text-green-600';
-    if (value < 0) return 'text-red-600';
-    return 'text-gray-600';
+    if (value > 0) return "text-green-600";
+    if (value < 0) return "text-red-600";
+    return "text-gray-600";
   };
 
   const getTrendIcon = (value: number) => {
-    if (value > 0) return '↑';
-    if (value < 0) return '↓';
-    return '→';
+    if (value > 0) return "↑";
+    if (value < 0) return "↓";
+    return "→";
   };
 
   const getPerformanceColor = (value: number, metric: string) => {
-    if (metric === 'damageRate') {
+    if (metric === "damageRate") {
       // Lower is better
-      if (value < 2) return 'text-green-600 bg-green-50';
-      if (value < 5) return 'text-yellow-600 bg-yellow-50';
-      return 'text-red-600 bg-red-50';
+      if (value < 2) return "text-green-600 bg-green-50";
+      if (value < 5) return "text-yellow-600 bg-yellow-50";
+      return "text-red-600 bg-red-50";
     }
     // Higher is better
-    if (value >= 95) return 'text-green-600 bg-green-50';
-    if (value >= 85) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+    if (value >= 95) return "text-green-600 bg-green-50";
+    if (value >= 85) return "text-yellow-600 bg-yellow-50";
+    return "text-red-600 bg-red-50";
   };
 
   if (loading) {
@@ -123,25 +123,25 @@ export default function ReceivingAnalytics() {
         <div>
           <h1 className="text-3xl font-bold">Receiving Analytics & BI</h1>
           <p className="text-gray-600">
-            Last {dashboard.period.days} days • Updated{' '}
+            Last {dashboard.period.days} days • Updated{" "}
             {new Date().toLocaleString()}
           </p>
         </div>
         <div className="flex gap-2">
           <Button
-            variant={dateRange.days === 7 ? 'default' : 'outline'}
+            variant={dateRange.days === 7 ? "default" : "outline"}
             onClick={() => setDateRange({ days: 7 })}
           >
             7 Days
           </Button>
           <Button
-            variant={dateRange.days === 30 ? 'default' : 'outline'}
+            variant={dateRange.days === 30 ? "default" : "outline"}
             onClick={() => setDateRange({ days: 30 })}
           >
             30 Days
           </Button>
           <Button
-            variant={dateRange.days === 90 ? 'default' : 'outline'}
+            variant={dateRange.days === 90 ? "default" : "outline"}
             onClick={() => setDateRange({ days: 90 })}
           >
             90 Days
@@ -161,9 +161,12 @@ export default function ReceivingAnalytics() {
             <div className="text-3xl font-bold">
               {dashboard.volume.totalShipments.toLocaleString()}
             </div>
-            <div className={`text-sm mt-1 ${getTrendColor(dashboard.volume.volumeTrend)}`}>
-              {getTrendIcon(dashboard.volume.volumeTrend)}{' '}
-              {Math.abs(dashboard.volume.volumeTrend).toFixed(1)}% vs prev period
+            <div
+              className={`text-sm mt-1 ${getTrendColor(dashboard.volume.volumeTrend)}`}
+            >
+              {getTrendIcon(dashboard.volume.volumeTrend)}{" "}
+              {Math.abs(dashboard.volume.volumeTrend).toFixed(1)}% vs prev
+              period
             </div>
           </CardContent>
         </Card>
@@ -183,7 +186,7 @@ export default function ReceivingAnalytics() {
                 ? Math.round(
                     (dashboard.volume.completedShipments /
                       dashboard.volume.totalShipments) *
-                      100
+                      100,
                   )
                 : 0}
               % completion rate
@@ -262,7 +265,7 @@ export default function ReceivingAnalytics() {
                     <div
                       className={`text-2xl font-bold px-3 py-1 rounded ${getPerformanceColor(
                         dashboard.performance.qualityPassRate,
-                        'qualityPassRate'
+                        "qualityPassRate",
                       )}`}
                     >
                       {dashboard.performance.qualityPassRate}%
@@ -279,7 +282,7 @@ export default function ReceivingAnalytics() {
                     <div
                       className={`text-2xl font-bold px-3 py-1 rounded ${getPerformanceColor(
                         dashboard.performance.damageRate,
-                        'damageRate'
+                        "damageRate",
                       )}`}
                     >
                       {dashboard.performance.damageRate}%
@@ -296,7 +299,7 @@ export default function ReceivingAnalytics() {
                     <div
                       className={`text-2xl font-bold px-3 py-1 rounded ${getPerformanceColor(
                         dashboard.performance.onTimeRate,
-                        'onTimeRate'
+                        "onTimeRate",
                       )}`}
                     >
                       {dashboard.performance.onTimeRate}%

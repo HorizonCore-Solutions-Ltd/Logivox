@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
+import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { prisma } from "@/lib/prisma";
+import { z } from "zod";
 
 // ============================================================================
 // QUANTITY VERIFICATION API
@@ -31,62 +31,62 @@ import { z } from 'zod';
 
 // Verification methods
 type VerificationMethod =
-  | 'MANUAL_COUNT'      // Physical count by hand
-  | 'BARCODE_SCAN'      // Scan each unit
-  | 'SCALE_WEIGHT'      // Weight-based calculation
-  | 'STATISTICAL_SAMPLE' // Sample + extrapolate
-  | 'VISUAL_ESTIMATE';   // Quick visual check
+  | "MANUAL_COUNT" // Physical count by hand
+  | "BARCODE_SCAN" // Scan each unit
+  | "SCALE_WEIGHT" // Weight-based calculation
+  | "STATISTICAL_SAMPLE" // Sample + extrapolate
+  | "VISUAL_ESTIMATE"; // Quick visual check
 
 // Verification status
 type VerificationStatus =
-  | 'PENDING'           // Not started
-  | 'IN_PROGRESS'       // Counting now
-  | 'MATCH'             // Actual = Expected
-  | 'VARIANCE'          // Discrepancy found
-  | 'RESOLVED';         // Discrepancy handled
+  | "PENDING" // Not started
+  | "IN_PROGRESS" // Counting now
+  | "MATCH" // Actual = Expected
+  | "VARIANCE" // Discrepancy found
+  | "RESOLVED"; // Discrepancy handled
 
 // Discrepancy types
 type DiscrepancyType =
-  | 'SHORTAGE'          // Received less than expected
-  | 'OVERAGE'           // Received more than expected
-  | 'MISMATCH'          // Wrong item/SKU
-  | 'DAMAGED';          // Count affected by damage
+  | "SHORTAGE" // Received less than expected
+  | "OVERAGE" // Received more than expected
+  | "MISMATCH" // Wrong item/SKU
+  | "DAMAGED"; // Count affected by damage
 
 // Resolution actions
 type ResolutionAction =
-  | 'RECOUNT'           // Count again
-  | 'ACCEPT_VARIANCE'   // Accept difference
-  | 'ADJUST_INVENTORY'  // Update system
-  | 'REJECT_SHIPMENT'   // Return to supplier
-  | 'PARTIAL_ACCEPT'    // Accept partial quantity
-  | 'SUPPLIER_CLAIM';   // File claim
+  | "RECOUNT" // Count again
+  | "ACCEPT_VARIANCE" // Accept difference
+  | "ADJUST_INVENTORY" // Update system
+  | "REJECT_SHIPMENT" // Return to supplier
+  | "PARTIAL_ACCEPT" // Accept partial quantity
+  | "SUPPLIER_CLAIM"; // File claim
 
 // Validation schemas
 const startVerificationSchema = z.object({
-  action: z.literal('start_verification'),
+  action: z.literal("start_verification"),
   receivingId: z.string().uuid(),
   itemSKU: z.string(),
   expectedQuantity: z.number().int().positive(),
   method: z.enum([
-    'MANUAL_COUNT',
-    'BARCODE_SCAN',
-    'SCALE_WEIGHT',
-    'STATISTICAL_SAMPLE',
-    'VISUAL_ESTIMATE'
+    "MANUAL_COUNT",
+    "BARCODE_SCAN",
+    "SCALE_WEIGHT",
+    "STATISTICAL_SAMPLE",
+    "VISUAL_ESTIMATE",
   ]),
   countedBy: z.string(),
 });
 
 const recordCountSchema = z.object({
-  action: z.literal('record_count'),
+  action: z.literal("record_count"),
   verificationId: z.string().uuid(),
   actualQuantity: z.number().int().nonnegative(),
   method: z.enum([
-    'MANUAL_COUNT',
-    'BARCODE_SCAN',
-    'SCALE_WEIGHT',
-    'STATISTICAL_SAMPLE',
-    'VISUAL_ESTIMATE'
+    "MANUAL_COUNT",
+    "BARCODE_SCAN",
+    "SCALE_WEIGHT",
+    "STATISTICAL_SAMPLE",
+    "VISUAL_ESTIMATE",
   ]),
   notes: z.string().optional(),
   sampleSize: z.number().int().positive().optional(), // For statistical sampling
@@ -94,36 +94,36 @@ const recordCountSchema = z.object({
 });
 
 const detectDiscrepancySchema = z.object({
-  action: z.literal('detect_discrepancy'),
+  action: z.literal("detect_discrepancy"),
   verificationId: z.string().uuid(),
-  discrepancyType: z.enum(['SHORTAGE', 'OVERAGE', 'MISMATCH', 'DAMAGED']),
+  discrepancyType: z.enum(["SHORTAGE", "OVERAGE", "MISMATCH", "DAMAGED"]),
   varianceQuantity: z.number().int(),
   description: z.string(),
 });
 
 const resolveDiscrepancySchema = z.object({
-  action: z.literal('resolve_discrepancy'),
+  action: z.literal("resolve_discrepancy"),
   discrepancyId: z.string().uuid(),
   resolutionAction: z.enum([
-    'RECOUNT',
-    'ACCEPT_VARIANCE',
-    'ADJUST_INVENTORY',
-    'REJECT_SHIPMENT',
-    'PARTIAL_ACCEPT',
-    'SUPPLIER_CLAIM'
+    "RECOUNT",
+    "ACCEPT_VARIANCE",
+    "ADJUST_INVENTORY",
+    "REJECT_SHIPMENT",
+    "PARTIAL_ACCEPT",
+    "SUPPLIER_CLAIM",
   ]),
   notes: z.string(),
   resolvedQuantity: z.number().int().nonnegative().optional(),
 });
 
 const completeVerificationSchema = z.object({
-  action: z.literal('complete_verification'),
+  action: z.literal("complete_verification"),
   verificationId: z.string().uuid(),
   finalQuantity: z.number().int().nonnegative(),
-  status: z.enum(['MATCH', 'VARIANCE', 'RESOLVED']),
+  status: z.enum(["MATCH", "VARIANCE", "RESOLVED"]),
 });
 
-const requestSchema = z.discriminatedUnion('action', [
+const requestSchema = z.discriminatedUnion("action", [
   startVerificationSchema,
   recordCountSchema,
   detectDiscrepancySchema,
@@ -136,7 +136,7 @@ function determineVerificationMethod(
   quantity: number,
   itemType: string,
   hasBarcode: boolean,
-  supplierAccuracy: number
+  supplierAccuracy: number,
 ): {
   recommendedMethod: VerificationMethod;
   sampleSize: number | null;
@@ -145,27 +145,27 @@ function determineVerificationMethod(
   // High-accuracy suppliers with small quantities
   if (supplierAccuracy > 98 && quantity < 50) {
     return {
-      recommendedMethod: 'VISUAL_ESTIMATE',
+      recommendedMethod: "VISUAL_ESTIMATE",
       sampleSize: null,
-      reasoning: 'Trusted supplier, small quantity - visual check sufficient',
+      reasoning: "Trusted supplier, small quantity - visual check sufficient",
     };
   }
 
   // Barcode scanning for medium quantities with barcodes
   if (hasBarcode && quantity <= 200) {
     return {
-      recommendedMethod: 'BARCODE_SCAN',
+      recommendedMethod: "BARCODE_SCAN",
       sampleSize: null,
-      reasoning: 'Barcoded items, manageable quantity - scan each unit',
+      reasoning: "Barcoded items, manageable quantity - scan each unit",
     };
   }
 
   // Scale weight for uniform items (fasteners, small parts)
-  if (itemType === 'BULK' || itemType === 'SMALL_PARTS') {
+  if (itemType === "BULK" || itemType === "SMALL_PARTS") {
     return {
-      recommendedMethod: 'SCALE_WEIGHT',
+      recommendedMethod: "SCALE_WEIGHT",
       sampleSize: null,
-      reasoning: 'Uniform items - weight-based counting is fastest',
+      reasoning: "Uniform items - weight-based counting is fastest",
     };
   }
 
@@ -181,7 +181,7 @@ function determineVerificationMethod(
     else sampleSize = 315;
 
     return {
-      recommendedMethod: 'STATISTICAL_SAMPLE',
+      recommendedMethod: "STATISTICAL_SAMPLE",
       sampleSize,
       reasoning: `Large quantity (${quantity}) - statistical sampling reduces time by 80%`,
     };
@@ -189,9 +189,9 @@ function determineVerificationMethod(
 
   // Default to manual count for everything else
   return {
-    recommendedMethod: 'MANUAL_COUNT',
+    recommendedMethod: "MANUAL_COUNT",
     sampleSize: null,
-    reasoning: 'Standard manual count for accuracy',
+    reasoning: "Standard manual count for accuracy",
   };
 }
 
@@ -200,7 +200,7 @@ function calculateSampleConfidence(
   sampleSize: number,
   totalPopulation: number,
   sampledCount: number,
-  expectedCount: number
+  expectedCount: number,
 ): {
   projectedTotal: number;
   confidence: number;
@@ -214,14 +214,15 @@ function calculateSampleConfidence(
   // Higher sample size = higher confidence
   const samplePercentage = (sampleSize / totalPopulation) * 100;
   let confidence: number;
-  
+
   if (samplePercentage >= 20) confidence = 99;
   else if (samplePercentage >= 10) confidence = 95;
   else if (samplePercentage >= 5) confidence = 90;
   else confidence = 85;
 
   // Margin of error (as % of total)
-  const marginOfError = Math.sqrt((1 / sampleSize) * (1 - sampleSize / totalPopulation)) * 100;
+  const marginOfError =
+    Math.sqrt((1 / sampleSize) * (1 - sampleSize / totalPopulation)) * 100;
 
   return {
     projectedTotal,
@@ -233,7 +234,7 @@ function calculateSampleConfidence(
 // Start verification
 async function startVerification(
   session: any,
-  data: z.infer<typeof startVerificationSchema>
+  data: z.infer<typeof startVerificationSchema>,
 ) {
   // Get supplier accuracy score for method recommendation
   const receiving = await prisma.receiving.findUnique({
@@ -244,7 +245,7 @@ async function startVerification(
   });
 
   if (!receiving) {
-    throw new Error('Receiving record not found');
+    throw new Error("Receiving record not found");
   }
 
   // Get supplier accuracy history
@@ -262,9 +263,9 @@ async function startVerification(
   // Determine optimal method
   const methodRecommendation = determineVerificationMethod(
     data.expectedQuantity,
-    'STANDARD', // Would come from item master
+    "STANDARD", // Would come from item master
     true, // hasBarcode - would come from item master
-    supplierAccuracy
+    supplierAccuracy,
   );
 
   const verification = await prisma.quantityVerification.create({
@@ -276,7 +277,7 @@ async function startVerification(
       method: data.method,
       recommendedMethod: methodRecommendation.recommendedMethod,
       sampleSize: methodRecommendation.sampleSize,
-      status: 'IN_PROGRESS',
+      status: "IN_PROGRESS",
       countedBy: data.countedBy,
       startedAt: new Date(),
     },
@@ -287,8 +288,8 @@ async function startVerification(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUANTITY_VERIFICATION_STARTED',
-      entityType: 'QUANTITY_VERIFICATION',
+      action: "QUANTITY_VERIFICATION_STARTED",
+      entityType: "QUANTITY_VERIFICATION",
       entityId: verification.id,
       metadata: {
         itemSKU: data.itemSKU,
@@ -302,14 +303,14 @@ async function startVerification(
     success: true,
     verification,
     recommendation: methodRecommendation,
-    message: 'Verification started',
+    message: "Verification started",
   };
 }
 
 // Record count
 async function recordCount(
   session: any,
-  data: z.infer<typeof recordCountSchema>
+  data: z.infer<typeof recordCountSchema>,
 ) {
   const verification = await prisma.quantityVerification.findUnique({
     where: {
@@ -319,7 +320,7 @@ async function recordCount(
   });
 
   if (!verification) {
-    throw new Error('Verification not found');
+    throw new Error("Verification not found");
   }
 
   let finalQuantity = data.actualQuantity;
@@ -327,14 +328,18 @@ async function recordCount(
   let marginOfError = 0;
 
   // For statistical sampling, calculate projections
-  if (data.method === 'STATISTICAL_SAMPLE' && data.sampleSize && data.totalPopulation) {
+  if (
+    data.method === "STATISTICAL_SAMPLE" &&
+    data.sampleSize &&
+    data.totalPopulation
+  ) {
     const stats = calculateSampleConfidence(
       data.sampleSize,
       data.totalPopulation,
       data.actualQuantity,
-      verification.expectedQuantity
+      verification.expectedQuantity,
     );
-    
+
     finalQuantity = stats.projectedTotal;
     confidence = stats.confidence;
     marginOfError = stats.marginOfError;
@@ -355,7 +360,7 @@ async function recordCount(
       actualQuantity: finalQuantity,
       variance,
       variancePercentage,
-      status: variance === 0 ? 'MATCH' : 'VARIANCE',
+      status: variance === 0 ? "MATCH" : "VARIANCE",
       isWithinTolerance,
       confidence,
       marginOfError,
@@ -370,10 +375,10 @@ async function recordCount(
       data: {
         organizationId: session.user.organizationId,
         verificationId: data.verificationId,
-        type: variance < 0 ? 'SHORTAGE' : 'OVERAGE',
+        type: variance < 0 ? "SHORTAGE" : "OVERAGE",
         varianceQuantity: Math.abs(variance),
-        description: `${Math.abs(variance)} unit ${variance < 0 ? 'shortage' : 'overage'} detected`,
-        status: 'PENDING',
+        description: `${Math.abs(variance)} unit ${variance < 0 ? "shortage" : "overage"} detected`,
+        status: "PENDING",
       },
     });
   }
@@ -383,8 +388,8 @@ async function recordCount(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUANTITY_COUNT_RECORDED',
-      entityType: 'QUANTITY_VERIFICATION',
+      action: "QUANTITY_COUNT_RECORDED",
+      entityType: "QUANTITY_VERIFICATION",
       entityId: data.verificationId,
       metadata: {
         actualQuantity: finalQuantity,
@@ -401,18 +406,19 @@ async function recordCount(
     variance,
     variancePercentage: Math.round(variancePercentage * 10) / 10,
     isWithinTolerance,
-    message: variance === 0
-      ? 'Count matches expected quantity'
-      : isWithinTolerance
-      ? 'Variance within acceptable tolerance'
-      : `Discrepancy detected: ${Math.abs(variance)} units`,
+    message:
+      variance === 0
+        ? "Count matches expected quantity"
+        : isWithinTolerance
+          ? "Variance within acceptable tolerance"
+          : `Discrepancy detected: ${Math.abs(variance)} units`,
   };
 }
 
 // Detect/record discrepancy
 async function detectDiscrepancy(
   session: any,
-  data: z.infer<typeof detectDiscrepancySchema>
+  data: z.infer<typeof detectDiscrepancySchema>,
 ) {
   const discrepancy = await prisma.quantityDiscrepancy.create({
     data: {
@@ -421,7 +427,7 @@ async function detectDiscrepancy(
       type: data.discrepancyType,
       varianceQuantity: data.varianceQuantity,
       description: data.description,
-      status: 'PENDING',
+      status: "PENDING",
       detectedAt: new Date(),
     },
   });
@@ -430,7 +436,7 @@ async function detectDiscrepancy(
   await prisma.quantityVerification.update({
     where: { id: data.verificationId },
     data: {
-      status: 'VARIANCE',
+      status: "VARIANCE",
     },
   });
 
@@ -439,8 +445,8 @@ async function detectDiscrepancy(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUANTITY_DISCREPANCY_DETECTED',
-      entityType: 'QUANTITY_DISCREPANCY',
+      action: "QUANTITY_DISCREPANCY_DETECTED",
+      entityType: "QUANTITY_DISCREPANCY",
       entityId: discrepancy.id,
       metadata: {
         type: data.discrepancyType,
@@ -459,7 +465,7 @@ async function detectDiscrepancy(
 // Resolve discrepancy
 async function resolveDiscrepancy(
   session: any,
-  data: z.infer<typeof resolveDiscrepancySchema>
+  data: z.infer<typeof resolveDiscrepancySchema>,
 ) {
   const discrepancy = await prisma.quantityDiscrepancy.update({
     where: {
@@ -470,7 +476,7 @@ async function resolveDiscrepancy(
       resolutionAction: data.resolutionAction,
       resolutionNotes: data.notes,
       resolvedQuantity: data.resolvedQuantity,
-      status: 'RESOLVED',
+      status: "RESOLVED",
       resolvedAt: new Date(),
     },
     include: {
@@ -482,8 +488,9 @@ async function resolveDiscrepancy(
   await prisma.quantityVerification.update({
     where: { id: discrepancy.verificationId },
     data: {
-      status: 'RESOLVED',
-      finalQuantity: data.resolvedQuantity || discrepancy.verification.actualQuantity,
+      status: "RESOLVED",
+      finalQuantity:
+        data.resolvedQuantity || discrepancy.verification.actualQuantity,
     },
   });
 
@@ -507,9 +514,9 @@ async function resolveDiscrepancy(
         organizationId: session.user.organizationId,
         supplierId: verification.receiving.supplierId,
         totalVerifications: 1,
-        accurateCount: data.resolutionAction === 'ACCEPT_VARIANCE' ? 1 : 0,
+        accurateCount: data.resolutionAction === "ACCEPT_VARIANCE" ? 1 : 0,
         discrepancyCount: 1,
-        accuracyScore: data.resolutionAction === 'ACCEPT_VARIANCE' ? 100 : 0,
+        accuracyScore: data.resolutionAction === "ACCEPT_VARIANCE" ? 100 : 0,
       },
       update: {
         totalVerifications: {
@@ -531,8 +538,8 @@ async function resolveDiscrepancy(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUANTITY_DISCREPANCY_RESOLVED',
-      entityType: 'QUANTITY_DISCREPANCY',
+      action: "QUANTITY_DISCREPANCY_RESOLVED",
+      entityType: "QUANTITY_DISCREPANCY",
       entityId: data.discrepancyId,
       metadata: {
         resolutionAction: data.resolutionAction,
@@ -551,7 +558,7 @@ async function resolveDiscrepancy(
 // Complete verification
 async function completeVerification(
   session: any,
-  data: z.infer<typeof completeVerificationSchema>
+  data: z.infer<typeof completeVerificationSchema>,
 ) {
   const verification = await prisma.quantityVerification.update({
     where: {
@@ -567,7 +574,9 @@ async function completeVerification(
 
   // Calculate duration
   const durationMinutes = verification.startedAt
-    ? Math.round((new Date().getTime() - verification.startedAt.getTime()) / (1000 * 60))
+    ? Math.round(
+        (new Date().getTime() - verification.startedAt.getTime()) / (1000 * 60),
+      )
     : 0;
 
   // Store metrics
@@ -576,8 +585,12 @@ async function completeVerification(
       organizationId: session.user.organizationId,
       verificationId: data.verificationId,
       durationMinutes,
-      accuracy: data.status === 'MATCH' ? 100 : 
-        verification.isWithinTolerance ? 98 : 85,
+      accuracy:
+        data.status === "MATCH"
+          ? 100
+          : verification.isWithinTolerance
+            ? 98
+            : 85,
       method: verification.method,
     },
   });
@@ -587,8 +600,8 @@ async function completeVerification(
     data: {
       organizationId: session.user.organizationId,
       userId: session.user.id,
-      action: 'QUANTITY_VERIFICATION_COMPLETED',
-      entityType: 'QUANTITY_VERIFICATION',
+      action: "QUANTITY_VERIFICATION_COMPLETED",
+      entityType: "QUANTITY_VERIFICATION",
       entityId: data.verificationId,
       metadata: {
         status: data.status,
@@ -613,15 +626,15 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);
-    const action = searchParams.get('action');
+    const action = searchParams.get("action");
 
     // Get statistics
-    if (action === 'stats') {
-      const stats = await prisma.$queryRaw`
+    if (action === "stats") {
+      const stats = (await prisma.$queryRaw`
         SELECT 
           COUNT(*)::int as "totalVerifications",
           COUNT(CASE WHEN status = 'MATCH' THEN 1 END)::int as "matches",
@@ -631,20 +644,23 @@ export async function GET(request: NextRequest) {
         FROM "QuantityVerification"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const metricsStats = await prisma.$queryRaw`
+      const metricsStats = (await prisma.$queryRaw`
         SELECT 
           COALESCE(AVG(accuracy), 0)::numeric(10,1) as "avgAccuracy",
           COALESCE(AVG("durationMinutes"), 0)::numeric(10,1) as "avgDuration"
         FROM "QuantityVerificationMetrics"
         WHERE "organizationId" = ${session.user.organizationId}::uuid
           AND "createdAt" >= NOW() - INTERVAL '30 days'
-      ` as any[];
+      `) as any[];
 
-      const accuracy = stats[0].totalVerifications > 0
-        ? ((stats[0].matches + stats[0].withinTolerance) / stats[0].totalVerifications) * 100
-        : 99.8;
+      const accuracy =
+        stats[0].totalVerifications > 0
+          ? ((stats[0].matches + stats[0].withinTolerance) /
+              stats[0].totalVerifications) *
+            100
+          : 99.8;
 
       const monthlySavings = 10417; // Based on ROI calculation
 
@@ -660,12 +676,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Get active verifications
-    if (action === 'active-verifications') {
+    if (action === "active-verifications") {
       const verifications = await prisma.quantityVerification.findMany({
         where: {
           organizationId: session.user.organizationId,
           status: {
-            in: ['PENDING', 'IN_PROGRESS', 'VARIANCE'],
+            in: ["PENDING", "IN_PROGRESS", "VARIANCE"],
           },
         },
         include: {
@@ -676,7 +692,7 @@ export async function GET(request: NextRequest) {
           },
           discrepancies: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: 50,
       });
 
@@ -684,7 +700,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get recent discrepancies
-    if (action === 'recent-discrepancies') {
+    if (action === "recent-discrepancies") {
       const discrepancies = await prisma.quantityDiscrepancy.findMany({
         where: {
           organizationId: session.user.organizationId,
@@ -700,19 +716,19 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: { detectedAt: 'desc' },
+        orderBy: { detectedAt: "desc" },
         take: 20,
       });
 
       return NextResponse.json({ discrepancies });
     }
 
-    return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
-    console.error('Quantity verification GET error:', error);
+    console.error("Quantity verification GET error:", error);
     return NextResponse.json(
-      { error: 'Failed to retrieve verification data' },
-      { status: 500 }
+      { error: "Failed to retrieve verification data" },
+      { status: 500 },
     );
   }
 }
@@ -722,43 +738,43 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user?.organizationId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
     const data = requestSchema.parse(body);
 
     switch (data.action) {
-      case 'start_verification':
+      case "start_verification":
         return NextResponse.json(await startVerification(session, data));
 
-      case 'record_count':
+      case "record_count":
         return NextResponse.json(await recordCount(session, data));
 
-      case 'detect_discrepancy':
+      case "detect_discrepancy":
         return NextResponse.json(await detectDiscrepancy(session, data));
 
-      case 'resolve_discrepancy':
+      case "resolve_discrepancy":
         return NextResponse.json(await resolveDiscrepancy(session, data));
 
-      case 'complete_verification':
+      case "complete_verification":
         return NextResponse.json(await completeVerification(session, data));
 
       default:
-        return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
-        { status: 400 }
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
       );
     }
 
-    console.error('Quantity verification POST error:', error);
+    console.error("Quantity verification POST error:", error);
     return NextResponse.json(
-      { error: 'Failed to process verification' },
-      { status: 500 }
+      { error: "Failed to process verification" },
+      { status: 500 },
     );
   }
 }

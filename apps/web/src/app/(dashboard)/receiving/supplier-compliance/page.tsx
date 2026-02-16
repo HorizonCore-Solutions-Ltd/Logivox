@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function SupplierCompliancePage() {
   const [stats, setStats] = useState<any>(null);
@@ -20,9 +20,9 @@ export default function SupplierCompliancePage() {
     setLoading(true);
     try {
       const [statsRes, rankingsRes, alertsRes] = await Promise.all([
-        fetch('/api/receiving/supplier-compliance?action=stats'),
-        fetch('/api/receiving/supplier-compliance?action=rankings'),
-        fetch('/api/receiving/supplier-compliance?action=active-alerts'),
+        fetch("/api/receiving/supplier-compliance?action=stats"),
+        fetch("/api/receiving/supplier-compliance?action=rankings"),
+        fetch("/api/receiving/supplier-compliance?action=active-alerts"),
       ]);
 
       const statsData = await statsRes.json();
@@ -33,66 +33,66 @@ export default function SupplierCompliancePage() {
       setRankings(rankingsData.rankings || []);
       setAlerts(alertsData.alerts || []);
     } catch (error) {
-      console.error('Failed to fetch data:', error);
+      console.error("Failed to fetch data:", error);
     }
     setLoading(false);
   };
 
   const getTierBadge = (tier: string) => {
     switch (tier) {
-      case 'PLATINUM':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
-      case 'GOLD':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-      case 'SILVER':
-        return 'bg-gray-100 text-gray-800 border-gray-300';
-      case 'BRONZE':
-        return 'bg-orange-100 text-orange-800 border-orange-300';
-      case 'PROBATION':
-        return 'bg-red-100 text-red-800 border-red-300';
+      case "PLATINUM":
+        return "bg-purple-100 text-purple-800 border-purple-300";
+      case "GOLD":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300";
+      case "SILVER":
+        return "bg-gray-100 text-gray-800 border-gray-300";
+      case "BRONZE":
+        return "bg-orange-100 text-orange-800 border-orange-300";
+      case "PROBATION":
+        return "bg-red-100 text-red-800 border-red-300";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getTierEmoji = (tier: string) => {
     switch (tier) {
-      case 'PLATINUM':
-        return '💎';
-      case 'GOLD':
-        return '🥇';
-      case 'SILVER':
-        return '🥈';
-      case 'BRONZE':
-        return '🥉';
-      case 'PROBATION':
-        return '⚠️';
+      case "PLATINUM":
+        return "💎";
+      case "GOLD":
+        return "🥇";
+      case "SILVER":
+        return "🥈";
+      case "BRONZE":
+        return "🥉";
+      case "PROBATION":
+        return "⚠️";
       default:
-        return '📊';
+        return "📊";
     }
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'CRITICAL':
-        return 'bg-red-100 text-red-800';
-      case 'HIGH':
-        return 'bg-orange-100 text-orange-800';
-      case 'MEDIUM':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'LOW':
-        return 'bg-blue-100 text-blue-800';
+      case "CRITICAL":
+        return "bg-red-100 text-red-800";
+      case "HIGH":
+        return "bg-orange-100 text-orange-800";
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-800";
+      case "LOW":
+        return "bg-blue-100 text-blue-800";
       default:
-        return 'bg-gray-100 text-gray-800';
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 95) return 'text-purple-600';
-    if (score >= 85) return 'text-yellow-600';
-    if (score >= 75) return 'text-gray-600';
-    if (score >= 65) return 'text-orange-600';
-    return 'text-red-600';
+    if (score >= 95) return "text-purple-600";
+    if (score >= 85) return "text-yellow-600";
+    if (score >= 75) return "text-gray-600";
+    if (score >= 65) return "text-orange-600";
+    return "text-red-600";
   };
 
   if (loading) {
@@ -100,7 +100,9 @@ export default function SupplierCompliancePage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading supplier compliance data...</p>
+          <p className="mt-4 text-gray-600">
+            Loading supplier compliance data...
+          </p>
         </div>
       </div>
     );
@@ -172,7 +174,9 @@ export default function SupplierCompliancePage() {
       <Tabs defaultValue="rankings" className="space-y-4">
         <TabsList>
           <TabsTrigger value="rankings">Supplier Rankings</TabsTrigger>
-          <TabsTrigger value="alerts">Active Alerts ({alerts.length})</TabsTrigger>
+          <TabsTrigger value="alerts">
+            Active Alerts ({alerts.length})
+          </TabsTrigger>
           <TabsTrigger value="scoring">Scoring System</TabsTrigger>
         </TabsList>
 
@@ -225,7 +229,7 @@ export default function SupplierCompliancePage() {
                         </td>
                         <td className="px-4 py-3">
                           <div className="font-medium">
-                            {ranking.supplier?.name || 'N/A'}
+                            {ranking.supplier?.name || "N/A"}
                           </div>
                           <div className="text-xs text-gray-500">
                             ID: {ranking.supplierId.substring(0, 8)}
@@ -234,7 +238,7 @@ export default function SupplierCompliancePage() {
                         <td className="px-4 py-3">
                           <div
                             className={`text-xl font-bold ${getScoreColor(
-                              ranking.overallScore
+                              ranking.overallScore,
                             )}`}
                           >
                             {ranking.overallScore?.toFixed(1)}
@@ -254,7 +258,7 @@ export default function SupplierCompliancePage() {
                         <td className="px-4 py-3 text-center">
                           <div
                             className={`font-medium ${getScoreColor(
-                              ranking.asnAccuracy
+                              ranking.asnAccuracy,
                             )}`}
                           >
                             {ranking.asnAccuracy?.toFixed(0)}%
@@ -263,7 +267,7 @@ export default function SupplierCompliancePage() {
                         <td className="px-4 py-3 text-center">
                           <div
                             className={`font-medium ${getScoreColor(
-                              ranking.onTimeDelivery
+                              ranking.onTimeDelivery,
                             )}`}
                           >
                             {ranking.onTimeDelivery?.toFixed(0)}%
@@ -272,7 +276,7 @@ export default function SupplierCompliancePage() {
                         <td className="px-4 py-3 text-center">
                           <div
                             className={`font-medium ${getScoreColor(
-                              ranking.qualityDefects
+                              ranking.qualityDefects,
                             )}`}
                           >
                             {ranking.qualityDefects?.toFixed(0)}%
@@ -314,14 +318,14 @@ export default function SupplierCompliancePage() {
                             {alert.severity}
                           </Badge>
                           <span className="font-semibold">
-                            {alert.supplier?.name || 'Unknown Supplier'}
+                            {alert.supplier?.name || "Unknown Supplier"}
                           </span>
                         </div>
                         <div className="text-sm text-gray-700 mt-1">
                           {alert.message}
                         </div>
                         <div className="text-xs text-gray-500 mt-2">
-                          Category: {alert.category.replace('_', ' ')} •{' '}
+                          Category: {alert.category.replace("_", " ")} •{" "}
                           {new Date(alert.createdAt).toLocaleString()}
                         </div>
                       </div>
@@ -348,11 +352,13 @@ export default function SupplierCompliancePage() {
               <div className="text-2xl mb-3">📊</div>
               <h3 className="font-semibold text-lg mb-2">ASN Accuracy</h3>
               <p className="text-sm text-gray-600">
-                Measures accuracy of Advanced Shipping Notices vs actual received
-                quantities. Tolerance: ±2%
+                Measures accuracy of Advanced Shipping Notices vs actual
+                received quantities. Tolerance: ±2%
               </p>
               <div className="mt-4 p-3 bg-blue-50 rounded">
-                <div className="text-xs text-blue-700 font-medium">Weight: 25%</div>
+                <div className="text-xs text-blue-700 font-medium">
+                  Weight: 25%
+                </div>
                 <div className="text-sm text-blue-900 mt-1">
                   Critical for planning and dock scheduling
                 </div>
@@ -367,7 +373,9 @@ export default function SupplierCompliancePage() {
                 appointment time.
               </p>
               <div className="mt-4 p-3 bg-blue-50 rounded">
-                <div className="text-xs text-blue-700 font-medium">Weight: 25%</div>
+                <div className="text-xs text-blue-700 font-medium">
+                  Weight: 25%
+                </div>
                 <div className="text-sm text-blue-900 mt-1">
                   Impacts dock utilization and labor planning
                 </div>
@@ -378,11 +386,13 @@ export default function SupplierCompliancePage() {
               <div className="text-2xl mb-3">📦</div>
               <h3 className="font-semibold text-lg mb-2">Damage Rate</h3>
               <p className="text-sm text-gray-600">
-                Inverted score based on percentage of damaged units. 0% damage = 100
-                score, 10% damage = 0 score.
+                Inverted score based on percentage of damaged units. 0% damage =
+                100 score, 10% damage = 0 score.
               </p>
               <div className="mt-4 p-3 bg-blue-50 rounded">
-                <div className="text-xs text-blue-700 font-medium">Weight: 20%</div>
+                <div className="text-xs text-blue-700 font-medium">
+                  Weight: 20%
+                </div>
                 <div className="text-sm text-blue-900 mt-1">
                   Affects inventory quality and customer satisfaction
                 </div>
@@ -393,11 +403,13 @@ export default function SupplierCompliancePage() {
               <div className="text-2xl mb-3">✅</div>
               <h3 className="font-semibold text-lg mb-2">Quality Defects</h3>
               <p className="text-sm text-gray-600">
-                Percentage of shipments passing quality inspection. Includes visual,
-                functional, and specification checks.
+                Percentage of shipments passing quality inspection. Includes
+                visual, functional, and specification checks.
               </p>
               <div className="mt-4 p-3 bg-blue-50 rounded">
-                <div className="text-xs text-blue-700 font-medium">Weight: 20%</div>
+                <div className="text-xs text-blue-700 font-medium">
+                  Weight: 20%
+                </div>
                 <div className="text-sm text-blue-900 mt-1">
                   Key indicator of supplier manufacturing quality
                 </div>
@@ -408,11 +420,13 @@ export default function SupplierCompliancePage() {
               <div className="text-2xl mb-3">📄</div>
               <h3 className="font-semibold text-lg mb-2">Documentation</h3>
               <p className="text-sm text-gray-600">
-                Completeness of required paperwork (PO number, packing slip, COAs,
-                certifications).
+                Completeness of required paperwork (PO number, packing slip,
+                COAs, certifications).
               </p>
               <div className="mt-4 p-3 bg-blue-50 rounded">
-                <div className="text-xs text-blue-700 font-medium">Weight: 10%</div>
+                <div className="text-xs text-blue-700 font-medium">
+                  Weight: 10%
+                </div>
                 <div className="text-sm text-blue-900 mt-1">
                   Essential for compliance and traceability
                 </div>
@@ -465,7 +479,9 @@ export default function SupplierCompliancePage() {
               </div>
               <div>
                 <div className="text-sm text-gray-600">Payback</div>
-                <div className="text-2xl font-bold text-purple-600">4.2 months</div>
+                <div className="text-2xl font-bold text-purple-600">
+                  4.2 months
+                </div>
               </div>
             </div>
 
@@ -475,7 +491,9 @@ export default function SupplierCompliancePage() {
               </div>
               <div className="space-y-1 text-sm text-gray-600">
                 <div>• $45K/year: Reduced supplier-related issues</div>
-                <div>• $25K/year: Improved supplier selection & negotiation</div>
+                <div>
+                  • $25K/year: Improved supplier selection & negotiation
+                </div>
                 <div>• $12K/year: Faster issue resolution (60% faster)</div>
               </div>
             </div>

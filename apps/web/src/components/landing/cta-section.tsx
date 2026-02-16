@@ -26,13 +26,14 @@ export function CTASection() {
               Transform Your Warehouse in 30 Days
             </h2>
             <p className="text-xl text-muted-foreground">
-              Join 500+ warehouses that eliminated picking errors, tripled fulfillment speed,
-              and saved $52M+ annually with LogiVox.
+              Join 500+ warehouses that eliminated picking errors, tripled
+              fulfillment speed, and saved $52M+ annually with LogiVox.
             </p>
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-2xl mx-auto mt-6">
               <p className="text-sm font-semibold text-yellow-800 flex items-center gap-2">
                 <span className="animate-pulse">⚡</span>
-                <strong>Limited Time:</strong> Setup bonus worth $2,500 for new customers this month
+                <strong>Limited Time:</strong> Setup bonus worth $2,500 for new
+                customers this month
               </p>
             </div>
           </div>
@@ -77,14 +78,18 @@ export function CTASection() {
           {/* Trust line */}
           <div className="pt-6 space-y-3">
             <p className="text-sm text-muted-foreground">
-              <strong>Questions?</strong> Our warehouse experts respond in under 2 hours
+              <strong>Questions?</strong> Our warehouse experts respond in under
+              2 hours
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 text-sm">
               <span className="font-semibold text-foreground flex items-center gap-1">
                 <Phone className="h-4 w-4" />
                 (555) 847-2639
               </span>
-              <Link href="/contact" className="text-primary hover:underline flex items-center gap-1">
+              <Link
+                href="/contact"
+                className="text-primary hover:underline flex items-center gap-1"
+              >
                 <Mail className="h-4 w-4" />
                 Live chat available
               </Link>

@@ -1,10 +1,10 @@
 /**
  * ENERGY OPTIMIZATION SYSTEM
  * ===========================
- * 
+ *
  * Optimization System 9 - Outstanding ROI (918%)
  * Investment: $4,000 → Annual Savings: $37,000
- * 
+ *
  * Features:
  * - Real-time energy consumption monitoring
  * - Peak/off-peak scheduling optimization
@@ -43,7 +43,12 @@ const energyScheduleSchema = z.object({
 });
 
 const energyAlertSchema = z.object({
-  type: z.enum(["PEAK_USAGE", "INEFFICIENCY", "EQUIPMENT_FAULT", "GOAL_EXCEEDED"]),
+  type: z.enum([
+    "PEAK_USAGE",
+    "INEFFICIENCY",
+    "EQUIPMENT_FAULT",
+    "GOAL_EXCEEDED",
+  ]),
   severity: z.enum(["INFO", "WARNING", "CRITICAL"]),
   message: z.string(),
   equipmentId: z.string().optional(),
@@ -167,12 +172,15 @@ function getCurrentRateType(): keyof typeof ENERGY_RATES {
   return "PEAK";
 }
 
-function calculateEnergyCost(consumption: number, rateType: keyof typeof ENERGY_RATES): number {
+function calculateEnergyCost(
+  consumption: number,
+  rateType: keyof typeof ENERGY_RATES,
+): number {
   return consumption * ENERGY_RATES[rateType].rate;
 }
 
 function generateOptimizationRecommendations(
-  consumptions: EnergyConsumption[]
+  consumptions: EnergyConsumption[],
 ): OptimizationRecommendation[] {
   const recommendations: OptimizationRecommendation[] = [];
 
@@ -222,7 +230,12 @@ function generateOptimizationRecommendations(
         projectedCost: currentCost - monthlySavings,
         savings: monthlySavings,
         savingsPercentage: (monthlySavings / currentCost) * 100,
-        priority: monthlySavings > 500 ? "HIGH" : monthlySavings > 200 ? "MEDIUM" : "LOW",
+        priority:
+          monthlySavings > 500
+            ? "HIGH"
+            : monthlySavings > 200
+              ? "MEDIUM"
+              : "LOW",
         reason: `Shifting ${equip.equipmentType} usage to off-peak hours can save ${monthlySavings.toFixed(0)}$/month`,
         implementation: profile.optimalUsage,
       });
@@ -251,7 +264,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -344,11 +360,20 @@ export async function GET(req: NextRequest) {
         consumption: mockConsumption,
         total: mockConsumption.length,
         summary: {
-          totalDailyConsumption: mockConsumption.reduce((sum, c) => sum + c.dailyConsumption, 0),
-          totalMonthlyCost: mockConsumption.reduce((sum, c) => sum + c.monthlyCost, 0),
+          totalDailyConsumption: mockConsumption.reduce(
+            (sum, c) => sum + c.dailyConsumption,
+            0,
+          ),
+          totalMonthlyCost: mockConsumption.reduce(
+            (sum, c) => sum + c.monthlyCost,
+            0,
+          ),
           avgEfficiency:
-            mockConsumption.reduce((sum, c) => sum + c.efficiency, 0) / mockConsumption.length,
-          inefficientEquipment: mockConsumption.filter((c) => c.status === "INEFFICIENT").length,
+            mockConsumption.reduce((sum, c) => sum + c.efficiency, 0) /
+            mockConsumption.length,
+          inefficientEquipment: mockConsumption.filter(
+            (c) => c.status === "INEFFICIENT",
+          ).length,
         },
       });
     }
@@ -383,13 +408,17 @@ export async function GET(req: NextRequest) {
         },
       ];
 
-      const recommendations = generateOptimizationRecommendations(mockConsumption);
+      const recommendations =
+        generateOptimizationRecommendations(mockConsumption);
 
       return NextResponse.json({
         recommendations,
         total: recommendations.length,
         summary: {
-          totalPotentialSavings: recommendations.reduce((sum, r) => r.savings + sum, 0),
+          totalPotentialSavings: recommendations.reduce(
+            (sum, r) => r.savings + sum,
+            0,
+          ),
           avgSavingsPercentage:
             recommendations.reduce((sum, r) => r.savingsPercentage + sum, 0) /
             recommendations.length,
@@ -425,15 +454,20 @@ export async function GET(req: NextRequest) {
     if (action === "hourly") {
       const hourlyData = Array.from({ length: 24 }, (_, hour) => {
         let rateType: keyof typeof ENERGY_RATES;
-        if (ENERGY_RATES.SUPER_OFF_PEAK.hours.includes(hour)) rateType = "SUPER_OFF_PEAK";
-        else if (ENERGY_RATES.OFF_PEAK.hours.includes(hour)) rateType = "OFF_PEAK";
+        if (ENERGY_RATES.SUPER_OFF_PEAK.hours.includes(hour))
+          rateType = "SUPER_OFF_PEAK";
+        else if (ENERGY_RATES.OFF_PEAK.hours.includes(hour))
+          rateType = "OFF_PEAK";
         else rateType = "PEAK";
 
         return {
           hour,
           rateType,
           rate: ENERGY_RATES[rateType].rate,
-          consumption: hour >= 6 && hour <= 22 ? 120 + Math.random() * 80 : 40 + Math.random() * 30,
+          consumption:
+            hour >= 6 && hour <= 22
+              ? 120 + Math.random() * 80
+              : 40 + Math.random() * 30,
           cost: 0, // Will be calculated
         };
       });
@@ -449,10 +483,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ error: "Invalid action parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid action parameter" },
+      { status: 400 },
+    );
   } catch (error: any) {
     console.error("Energy Optimization GET error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -475,7 +515,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -501,7 +544,10 @@ export async function POST(req: NextRequest) {
       const { recommendationId } = body;
 
       if (!recommendationId) {
-        return NextResponse.json({ error: "recommendationId required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "recommendationId required" },
+          { status: 400 },
+        );
       }
 
       // TODO: Implement recommendation
@@ -533,10 +579,13 @@ export async function POST(req: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }

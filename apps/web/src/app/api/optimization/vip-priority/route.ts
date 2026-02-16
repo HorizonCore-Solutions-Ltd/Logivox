@@ -1,10 +1,10 @@
 /**
  * VIP CUSTOMER PRIORITY OVERRIDE SYSTEM
  * ======================================
- * 
+ *
  * Optimization System 4 - Highest ROI (3,088%)
  * Investment: $8,000 → Annual Savings: $247,000
- * 
+ *
  * Features:
  * - Customer tier management (Bronze, Silver, Gold, Platinum)
  * - Dynamic priority scoring with multipliers (1x → 10x)
@@ -75,7 +75,11 @@ const TIER_CONFIG = {
     multiplier: 2.0,
     name: "Silver",
     color: "#C0C0C0",
-    benefits: ["Priority processing", "Phone support", "Dedicated account manager"],
+    benefits: [
+      "Priority processing",
+      "Phone support",
+      "Dedicated account manager",
+    ],
     slaHours: 48,
   },
   GOLD: {
@@ -127,7 +131,8 @@ function calculatePriority(params: {
   orderValue: number;
   customBoost: number;
 }): PriorityCalculation {
-  const { basePriority, tierMultiplier, orderAge, orderValue, customBoost } = params;
+  const { basePriority, tierMultiplier, orderAge, orderValue, customBoost } =
+    params;
 
   // Time boost: +1 point per hour (max 100)
   const timeBoost = Math.min(orderAge, 100);
@@ -136,7 +141,8 @@ function calculatePriority(params: {
   const valueBoost = Math.min(Math.floor(orderValue / 100), 50);
 
   // Final score calculation
-  const finalScore = basePriority * tierMultiplier + timeBoost + valueBoost + customBoost;
+  const finalScore =
+    basePriority * tierMultiplier + timeBoost + valueBoost + customBoost;
 
   return {
     basePriority,
@@ -152,7 +158,10 @@ function calculatePriority(params: {
 // SLA TRACKING
 // ============================================
 
-function checkSLAStatus(targetShipTime: Date, currentTime: Date = new Date()): {
+function checkSLAStatus(
+  targetShipTime: Date,
+  currentTime: Date = new Date(),
+): {
   status: "ON_TIME" | "AT_RISK" | "BREACHED";
   hoursRemaining: number;
 } {
@@ -190,7 +199,10 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -338,10 +350,16 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ error: "Invalid action parameter" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Invalid action parameter" },
+      { status: 400 },
+    );
   } catch (error: any) {
     console.error("VIP Priority GET error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -364,7 +382,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user?.organizationMemberships?.[0]) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const organizationId = user.organizationMemberships[0].organizationId;
@@ -385,7 +406,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (!customer) {
-        return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Customer not found" },
+          { status: 404 },
+        );
       }
 
       // TODO: Once models are migrated, use actual Prisma queries
@@ -401,14 +425,22 @@ export async function POST(req: NextRequest) {
         tier: {
           ...validated,
           tierConfig,
-          priorityMultiplier: validated.priorityMultiplier || tierConfig.multiplier,
+          priorityMultiplier:
+            validated.priorityMultiplier || tierConfig.multiplier,
         },
       });
     }
 
     // CALCULATE PRIORITY SCORE
     if (action === "CALCULATE_PRIORITY") {
-      const { orderId, orderValue, orderAge, tierMultiplier, basePriority, customBoost } = body;
+      const {
+        orderId,
+        orderValue,
+        orderAge,
+        tierMultiplier,
+        basePriority,
+        customBoost,
+      } = body;
 
       const calculation = calculatePriority({
         basePriority: basePriority || 100,
@@ -422,7 +454,8 @@ export async function POST(req: NextRequest) {
         success: true,
         calculation,
         explanation: {
-          formula: "(basePriority × tierMultiplier) + timeBoost + valueBoost + customBoost",
+          formula:
+            "(basePriority × tierMultiplier) + timeBoost + valueBoost + customBoost",
           breakdown: `(${calculation.basePriority} × ${calculation.tierMultiplier}) + ${calculation.timeBoost} + ${calculation.valueBoost} + ${calculation.customBoost} = ${calculation.finalScore}`,
         },
       });
@@ -449,7 +482,10 @@ export async function POST(req: NextRequest) {
       const { orderId, reason } = body;
 
       if (!orderId) {
-        return NextResponse.json({ error: "orderId required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "orderId required" },
+          { status: 400 },
+        );
       }
 
       // TODO: Once models are migrated
@@ -477,7 +513,10 @@ export async function POST(req: NextRequest) {
       const { updates } = body;
 
       if (!Array.isArray(updates)) {
-        return NextResponse.json({ error: "updates must be an array" }, { status: 400 });
+        return NextResponse.json(
+          { error: "updates must be an array" },
+          { status: 400 },
+        );
       }
 
       // TODO: Once models are migrated
@@ -505,11 +544,14 @@ export async function POST(req: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -566,7 +608,10 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error: any) {
     console.error("VIP Priority PUT error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -586,7 +631,10 @@ export async function DELETE(req: NextRequest) {
     const type = searchParams.get("type");
 
     if (!id || !type) {
-      return NextResponse.json({ error: "ID and type required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "ID and type required" },
+        { status: 400 },
+      );
     }
 
     // DELETE TIER
@@ -614,6 +662,9 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: "Invalid type" }, { status: 400 });
   } catch (error: any) {
     console.error("VIP Priority DELETE error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal server error" },
+      { status: 500 },
+    );
   }
 }

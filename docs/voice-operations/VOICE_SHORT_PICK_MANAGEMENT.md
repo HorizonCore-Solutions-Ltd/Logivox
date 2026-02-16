@@ -2,13 +2,14 @@
 
 ## Executive Summary
 
-**Critical Question:** *"The item is not available in the warehouse - it's not been picked. The WMS needs to invoice and close the orders. The nil stock item needs to be cut off the order to allow the system to close automatically and manually. How do you remove that item?"*
+**Critical Question:** _"The item is not available in the warehouse - it's not been picked. The WMS needs to invoice and close the orders. The nil stock item needs to be cut off the order to allow the system to close automatically and manually. How do you remove that item?"_
 
 This document explains how Logivox handles **short picks**, **nil stock**, and **partial order fulfillment** through both voice commands and admin controls.
 
 ### 📖 Related Documentation
 
 **⭐ NEW:** See companion document [ADVANCED_OPTIMIZATIONS_ADDENDUM.md](ADVANCED_OPTIMIZATIONS_ADDENDUM.md) for 15 cutting-edge systems that eliminate time loss:
+
 - VIP Customer Priority (10× multiplier for high-value customers)
 - Temperature-Sensitive Routing (reduces spoilage 5-10%)
 - Cross-Warehouse Emergency Borrowing (Uber-style transfers)
@@ -42,6 +43,7 @@ Problem:
 ```
 
 **Business Impact:**
+
 - Customer gets partial shipment immediately (better service)
 - Order can be invoiced and shipped (cashflow)
 - Back-order for Item C created separately
@@ -70,6 +72,7 @@ model WavePickLine {
 ```
 
 **Key Features:**
+
 - `shortQuantity` field automatically calculated
 - `SHORT` status indicates item not found
 - Quantity discrepancies tracked per line
@@ -119,6 +122,7 @@ static async recordPick(params: {
 ```
 
 **What This Does:**
+
 - Automatically calculates shortage when `pickedQuantity < orderedQuantity`
 - Sets status to `SHORT` when zero units picked
 - Sets status to `PICKED` for partial picks
@@ -131,12 +135,14 @@ static async recordPick(params: {
 
 **What's Missing:**
 Pickers cannot say:
+
 - "Item not found"
 - "Zero pick" / "Short pick"
 - "Skip this item"
 - "Cannot locate [item]"
 
 **What's Needed:**
+
 ```typescript
 // Enhanced voice intents needed:
 - ITEM_NOT_FOUND: Item location empty/not there
@@ -153,6 +159,7 @@ No UI/API to remove a line item from an order after it's been created.
 **Required Admin Actions:**
 
 #### **Option A: Cancel Single Line Item** (Recommended)
+
 ```typescript
 // MISSING API: /api/sales-orders/[id]/items/[itemId]/cancel
 POST /api/sales-orders/12345/items/item-789/cancel
@@ -179,6 +186,7 @@ Response:
 ```
 
 #### **Option B: Mark Line as Short Pick**
+
 ```typescript
 // MISSING API: /api/sales-orders/[id]/items/[itemId]/short-pick
 POST /api/sales-orders/12345/items/item-789/short-pick
@@ -193,12 +201,14 @@ POST /api/sales-orders/12345/items/item-789/short-pick
 
 **What's Missing:**
 No automated workflow for:
+
 - Identifying orders with short picks
 - Admin review/approval of partial shipments
 - Automatic invoice adjustment
 - Customer notification of partial fulfillment
 
 **Required Workflow:**
+
 ```
 1. Picker reports "Item not found" via voice
    ↓
@@ -315,7 +325,7 @@ Picker: "Yes, checked"
 System: "Would you like me to request a cycle count verification?"
 Picker: "Yes"
 
-System: "Cycle count requested. Continue to next item. 
+System: "Cycle count requested. Continue to next item.
          Supervisor John will verify location A5-12."
 
 [AUTOMATIC ACTIONS]
@@ -356,7 +366,7 @@ async function verifyZeroPick(context: {
 
   // 2. Voice-guided verification
   const steps: LocationVerificationStep[] = [];
-  
+
   for (const loc of locations) {
     if (loc.location.code !== context.primaryLocation) {
       // Ask picker to check this location
@@ -511,16 +521,16 @@ If still unresolved:
 interface ShortPickEscalationConfig {
   tier1_timeout: number; // minutes (default: 30)
   tier1_recipients: string[]; // User IDs
-  
+
   tier2_timeout: number; // minutes (default: 60)
   tier2_recipients: string[];
-  
+
   tier3_timeout: number; // minutes (default: 120)
   tier3_action: "AUTO_REMOVE" | "AUTO_CANCEL" | "REQUIRE_OVERRIDE";
-  
+
   tier4_timeout: number; // minutes (default: 240)
   tier4_recipients: string[]; // Executive team
-  
+
   // Business rules
   high_priority_threshold: number; // dollars (e.g., $5,000)
   no_partial_customers: string[]; // Customer IDs who don't accept partial
@@ -555,7 +565,7 @@ Subject: "Order #SO-12345 - Important Update"
 
 Dear [Customer Name],
 
-We're preparing your order #SO-12345 for shipment and wanted 
+We're preparing your order #SO-12345 for shipment and wanted
 to inform you of a change:
 
 ITEMS SHIPPING TODAY (3 items):
@@ -597,7 +607,7 @@ Status: PARTIALLY SHIPPED 🚚
 
 Shipping Today (3 items)
 ✓ Widget Pro
-✓ Blue Widget  
+✓ Blue Widget
 ✓ Green Widget
 Tracking: [1Z999AA10123456784]
 
@@ -608,8 +618,8 @@ Backordered (1 item)
 
 STEP 5: SMS Notification (Optional)
 ────────────────────────────────────
-"Order SO-12345 update: Shipping 3/4 items today. 
-Red Widget backordered (arrives Jan 12). 
+"Order SO-12345 update: Shipping 3/4 items today.
+Red Widget backordered (arrives Jan 12).
 Track: bit.ly/track-SO12345"
 ```
 
@@ -868,7 +878,9 @@ async function findAlternativeInventory(
       inventoryItemId: itemId,
       purchaseOrder: {
         status: { in: ["APPROVED", "SENT"] },
-        expectedDelivery: { lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
+        expectedDelivery: {
+          lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
       },
     },
     include: { purchaseOrder: true },
@@ -1054,7 +1066,7 @@ async function updateFinancialSystems(
   // 2. Issue Credit Memo (if prepaid)
   if (order.paymentStatus === "PAID") {
     const creditAmount = removedItem.lineTotal;
-    
+
     await prisma.creditMemo.create({
       data: {
         customerId: order.customerId,
@@ -1431,7 +1443,7 @@ Subject: "Order SO-12345 - Multiple Items Unavailable"
 
 Dear ABC Corp,
 
-We're preparing your order SO-12345 and have encountered 
+We're preparing your order SO-12345 and have encountered
 a stock availability issue:
 
 AVAILABLE TODAY (2 items - $539.82):
@@ -1448,16 +1460,16 @@ YOUR OPTIONS:
 1️⃣ CANCEL ENTIRE ORDER
    - Full refund
    - Reorder when items available (estimated Jan 12)
-   
+
 2️⃣ SHIP AVAILABLE ITEMS
    - Charge: $539.82
    - Backorder remaining 3 items
    - No additional shipping charge for backorder
-   
+
 3️⃣ WAIT FOR COMPLETE ORDER
    - Estimated ready date: January 12, 2026
    - Ship all 5 items together
-   
+
 4️⃣ SUBSTITUTE SIMILAR ITEMS
    - We can suggest alternatives in stock
 
@@ -1493,9 +1505,10 @@ Based on Voxware's complete product portfolio (VoiceLink, VoiceConsole, VoicePic
 ---
 
 ### VOICE OPERATIONS INDEX:
+
 1. ✅ Voice-Directed Picking (Core - documented above)
 2. ⭐ Voice-Directed Receiving/Put-Away (NEW - below)
-3. ⭐ Voice-Directed Replenishment (NEW - below) 
+3. ⭐ Voice-Directed Replenishment (NEW - below)
 4. ⭐ Voice-Directed Loading/Shipping (NEW - below)
 5. ⭐ Voice-Directed Cycle Counting (NEW - below)
 6. ⭐ Voice-Directed Inventory Transfers (NEW - below)
@@ -1578,13 +1591,13 @@ STEP 5: Voice-Guided Replenishment
 ───────────────────────────────────
 Sarah's headset activates:
 
-System: "Sarah, urgent replenishment task. 
+System: "Sarah, urgent replenishment task.
          Picker John is waiting at Alpha 5 12.
          Go to reserve location Romeo 05 Alpha."
 
 Sarah (driving reach truck): "On my way"
 
-System: "You're at Romeo 05 Alpha. 
+System: "You're at Romeo 05 Alpha.
          Pick 50 units of Red Widget, SKU Romeo Whiskey 200."
 
 Sarah: "Confirmed, picking 50"
@@ -1770,7 +1783,7 @@ Driver: "Skip task"
 System: "Cannot skip. Urgent task - picker waiting. Please accept."
 
 Driver: "Break time"
-System: "Understood. Pausing task assignment. 
+System: "Understood. Pausing task assignment.
          Current task will be reassigned if urgent. 15 minute break started."
 
 LOCATION NAVIGATION:
@@ -1823,7 +1836,7 @@ System: "Location Romeo 08 Delta, level 5. Sending driver with taller reach truc
          ETA 5 minutes. Stand by."
 
 Driver: "Item too heavy"
-System: "Location Alpha 5 12, Red Widget pallet. 
+System: "Location Alpha 5 12, Red Widget pallet.
          Sending second driver to assist. Mike arriving in 2 minutes."
 ```
 
@@ -1843,38 +1856,38 @@ model WarehouseEquipment {
   serialNumber      String
   status            String   @default("AVAILABLE")
                             // "AVAILABLE" | "IN_USE" | "MAINTENANCE" | "OUT_OF_SERVICE"
-  
+
   // Technical specs
   maxLiftHeight     Int?     // inches
   maxWeight         Int?     // lbs
   batteryType       String?  // "ELECTRIC" | "PROPANE" | "DIESEL"
   batteryLevel      Int?     // percentage (0-100)
   lastCharged       DateTime?
-  
+
   // Location tracking
   currentLocation   String?  // GPS or zone
   lastSeen          DateTime @default(now())
-  
+
   // Maintenance
   lastMaintenance   DateTime?
   nextMaintenance   DateTime?
   maintenanceHours  Int      @default(0)
   totalOperatingHrs Int      @default(0)
-  
+
   // Assignment
   assignedTo        String?  // User ID of current operator
   assignedAt        DateTime?
-  
+
   // Organization
   warehouseId       String
   organizationId    String
-  
+
   // Relations
   warehouse         Warehouse @relation(fields: [warehouseId])
   operator          User? @relation(fields: [assignedTo])
   maintenanceLog    EquipmentMaintenance[]
   usageLog          EquipmentUsage[]
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -1885,25 +1898,25 @@ model EquipmentUsage {
   operatorId        String
   shiftStart        DateTime
   shiftEnd          DateTime?
-  
+
   // Performance metrics
   tasksCompleted    Int      @default(0)
   distanceTraveled  Decimal? // feet or meters
   itemsMoved        Int      @default(0)
   averageTaskTime   Int?     // seconds
-  
+
   // Battery tracking (for electric)
   startBattery      Int?     // percentage
   endBattery        Int?     // percentage
   chargeEvents      Int      @default(0)
-  
+
   // Issues
   issuesReported    Int      @default(0)
   downtime          Int      @default(0) // minutes
-  
+
   equipment         WarehouseEquipment @relation(fields: [equipmentId])
   operator          User @relation(fields: [operatorId])
-  
+
   createdAt         DateTime @default(now())
 }
 
@@ -1914,21 +1927,21 @@ model EquipmentMaintenance {
   priority          String   // "ROUTINE" | "URGENT" | "CRITICAL"
   status            String   @default("SCHEDULED")
                             // "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
-  
+
   scheduledDate     DateTime
   completedDate     DateTime?
-  
+
   description       String
   technicianId      String?
   technicianNotes   String?
-  
+
   partsReplaced     Json?    // Array of parts
   laborHours        Decimal?
   cost              Decimal?
-  
+
   equipment         WarehouseEquipment @relation(fields: [equipmentId])
   technician        User? @relation(fields: [technicianId])
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
@@ -1939,43 +1952,43 @@ model ReplenishmentTask {
   priority          Int      // 1-10 (10 = critical)
   status            String   @default("PENDING")
                             // "PENDING" | "ASSIGNED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED"
-  
+
   // Source and destination
   fromLocationId    String
   toLocationId      String
   fromLocation      Location @relation("FromLocation", fields: [fromLocationId])
   toLocation        Location @relation("ToLocation", fields: [toLocationId])
-  
+
   // Item details
   inventoryItemId   String
   quantity          Int
   inventoryItem     InventoryItem @relation(fields: [inventoryItemId])
-  
+
   // Trigger
   triggeredBy       String   // "SHORT_PICK" | "MIN_MAX" | "MANUAL" | "RETURNS" | "GOODS_IN"
   triggerDetails    Json?    // Related entities (pickLineId, orderId, etc.)
-  
+
   // Assignment
   assignedTo        String?  // Driver user ID
   assignedAt        DateTime?
   equipmentUsed     String?  // Equipment ID
-  
+
   // Timing
   createdAt         DateTime @default(now())
   dueAt             DateTime // SLA deadline
   startedAt         DateTime?
   completedAt       DateTime?
-  
+
   // Performance
   estimatedTime     Int      // seconds
   actualTime        Int?     // seconds
-  
+
   // Voice interaction
   voiceCommands     VoiceCommand[]
-  
+
   warehouseId       String
   organizationId    String
-  
+
   warehouse         Warehouse @relation(fields: [warehouseId])
   assignedDriver    User? @relation(fields: [assignedTo])
   equipment         WarehouseEquipment? @relation(fields: [equipmentUsed])
@@ -1986,24 +1999,24 @@ model OrganizationTransfer {
   id                  String   @id @default(cuid())
   transferNumber      String   @unique  // "ORG-TRF-5841"
   status              String   @default("PENDING")
-                              // "PENDING" | "APPROVED" | "PICKING" | "SHIPPED" | 
+                              // "PENDING" | "APPROVED" | "PICKING" | "SHIPPED" |
                               // "IN_TRANSIT" | "DELIVERED" | "COMPLETED" | "CANCELLED"
-  
+
   // Organizations
   fromOrgId           String
   toOrgId             String
   fromOrganization    Organization @relation("TransfersOut", fields: [fromOrgId])
   toOrganization      Organization @relation("TransfersIn", fields: [toOrgId])
-  
+
   // Warehouses
   fromWarehouseId     String
   toWarehouseId       String
   fromWarehouse       Warehouse @relation("TransferSource", fields: [fromWarehouseId])
   toWarehouse         Warehouse @relation("TransferDestination", fields: [toWarehouseId])
-  
+
   // Transfer type
   transferType        String   // "SALE" | "CONSIGNMENT" | "LOAN" | "RETURN"
-  
+
   // Financial
   totalAmount         Decimal? // Sale price (if type = SALE)
   taxAmount           Decimal?
@@ -2011,41 +2024,41 @@ model OrganizationTransfer {
   paymentTerms        String?  // "NET_30" | "NET_60" | "COD" | "PREPAID"
   invoiceNumber       String?
   poNumber            String?
-  
+
   // Consignment specific
   consignmentAgreementId String?
   revenueSharePercent    Decimal? // Consignor's share (e.g., 70.00)
-  
+
   // Items
   items               OrgTransferItem[]
-  
+
   // Approval workflow
   requestedBy         String   // User ID
   requestedAt         DateTime @default(now())
   approvedBy          String?  // User ID at destination org
   approvedAt          DateTime?
   rejectedReason      String?
-  
+
   // Shipping
   carrier             String?
   trackingNumber      String?
   shippedAt           DateTime?
   expectedDelivery    DateTime?
   deliveredAt         DateTime?
-  
+
   // Documents
   commercialInvoice   String?  // URL
   packingList         String?  // URL
   certificateOfOrigin String?  // URL
   billOfLading        String?  // URL
-  
+
   // Signatures
   senderSignature     String?  // Base64 image or URL
   receiverSignature   String?  // Base64 image or URL
-  
+
   // Voice tracking
   voiceCommands       VoiceCommand[]
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2054,47 +2067,47 @@ model OrgTransferItem {
   id                  String   @id @default(cuid())
   transferId          String
   transfer            OrganizationTransfer @relation(fields: [transferId])
-  
+
   // Source item
   sourceItemId        String
   sourceSKU           String
   sourceItem          InventoryItem @relation("SourceItem", fields: [sourceItemId])
-  
+
   // Destination mapping (may be different SKU)
   destItemId          String?
   destSKU             String?
   destItem            InventoryItem? @relation("DestItem", fields: [destItemId])
-  
+
   // Quantities
   quantityOrdered     Int
   quantityShipped     Int?
   quantityReceived    Int?
   quantityAccepted    Int?     // After QC
   quantityRejected    Int?
-  
+
   // Pricing
   unitCost            Decimal  // Source org's cost
   unitPrice           Decimal  // Transfer price
   lineTotal           Decimal  // quantity × unitPrice
-  
+
   // Tracking
   pickedAt            DateTime?
   shippedAt           DateTime?
   receivedAt          DateTime?
-  
+
   createdAt           DateTime @default(now())
 }
 
 model ConsignmentAgreement {
   id                  String   @id @default(cuid())
   agreementNumber     String   @unique
-  
+
   // Parties
   consignorOrgId      String   // Owner of goods
   consigneeOrgId      String   // Sells on behalf
   consignor           Organization @relation("Consignor", fields: [consignorOrgId])
   consignee           Organization @relation("Consignee", fields: [consigneeOrgId])
-  
+
   // Terms
   status              String   @default("ACTIVE")
                               // "DRAFT" | "ACTIVE" | "SUSPENDED" | "TERMINATED"
@@ -2102,16 +2115,16 @@ model ConsignmentAgreement {
   consignmentDays     Int      // Days before unsold goods return (e.g., 60)
   paymentTerms        String   // "WEEKLY" | "MONTHLY" | "PER_SALE"
   minimumPayment      Decimal?
-  
+
   // Dates
   startDate           DateTime
   endDate             DateTime?
-  
+
   // Financial
   totalInventoryValue Decimal  @default(0) // Current value on consignment
   totalSold           Decimal  @default(0) // Lifetime sales
   totalOwed           Decimal  @default(0) // Current amount owed
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2120,35 +2133,35 @@ model ConsignmentInventory {
   id                  String   @id @default(cuid())
   agreementId         String
   agreement           ConsignmentAgreement @relation(fields: [agreementId])
-  
+
   // Item
   itemId              String
   item                InventoryItem @relation(fields: [itemId])
-  
+
   // Location (at consignee)
   warehouseId         String
   locationId          String
   warehouse           Warehouse @relation(fields: [warehouseId])
   location            Location @relation(fields: [locationId])
-  
+
   // Quantities
   quantityConsigned   Int      // Original quantity sent
   quantitySold        Int      @default(0)
   quantityRemaining   Int      // Unsold
-  
+
   // Pricing
   costBasis           Decimal  // Consignor's cost
   retailPrice         Decimal  // Selling price
   revenueShareAmount  Decimal  // What consignor gets per unit
-  
+
   // Aging
   consignedAt         DateTime @default(now())
   dueBackDate         DateTime // When to return unsold
-  
+
   // Sales tracking
   lastSaleAt          DateTime?
   totalRevenue        Decimal  @default(0)
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2158,53 +2171,53 @@ model DeliveryRoute {
   id                  String   @id @default(cuid())
   routeNumber         String   @unique  // "ROUTE-001-20260107"
   status              String   @default("PLANNED")
-                              // "PLANNED" | "LOADING" | "IN_PROGRESS" | 
+                              // "PLANNED" | "LOADING" | "IN_PROGRESS" |
                               // "COMPLETED" | "CANCELLED"
-  
+
   // Assignment
   driverId            String
   vehicleId           String?
   driver              User @relation(fields: [driverId])
   vehicle             Vehicle? @relation(fields: [vehicleId])
-  
+
   // Route details
   routeType           String   // "DELIVERY" | "PICKUP" | "MIXED"
   startWarehouseId    String
   warehouse           Warehouse @relation(fields: [startWarehouseId])
-  
+
   // Optimization
   optimizedBy         String   // "AI" | "MANUAL"
   optimizationScore   Decimal? // 0-100 (fuel efficiency, time, etc.)
-  
+
   // Planned metrics
   plannedStops        Int
   plannedMiles        Decimal
   plannedDuration     Int      // minutes
   plannedFuelCost     Decimal?
-  
+
   // Actual metrics
   actualStops         Int      @default(0)
   actualMiles         Decimal?
   actualDuration      Int?     // minutes
   actualFuelCost      Decimal?
-  
+
   // Timing
   scheduledStart      DateTime
   scheduledEnd        DateTime
   actualStart         DateTime?
   actualEnd           DateTime?
-  
+
   // Stops
   stops               RouteStop[]
-  
+
   // Performance
   onTimeDeliveries    Int      @default(0)
   lateDeliveries      Int      @default(0)
   customerRating      Decimal? // Average rating
-  
+
   // Financial
   driverBonus         Decimal  @default(0)
-  
+
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -2214,66 +2227,66 @@ model RouteStop {
   id                  String   @id @default(cuid())
   routeId             String
   route               DeliveryRoute @relation(fields: [routeId])
-  
+
   // Sequence
   stopNumber          Int      // 1, 2, 3...
-  
+
   // Location
   customerId          String
   customer            Customer @relation(fields: [customerId])
   deliveryAddress     Json     // Full address object
   gpsCoordinates      Json?    // {lat, lng}
-  
+
   // Type
   stopType            String   // "DELIVERY" | "PICKUP" | "BOTH"
-  
+
   // Orders (for delivery)
   orders              Order[]  // Orders being delivered
   containerCount      Int      @default(0)
   cartonCount         Int      @default(0)
   weight              Decimal? // lbs
-  
+
   // Returns (for pickup)
   returns             Return[] // Returns being picked up
-  
+
   // Time windows
   timeWindowStart     DateTime?
   timeWindowEnd       DateTime?
-  
+
   // Planning
   plannedArrival      DateTime
   plannedDuration     Int      // minutes
   plannedDeparture    DateTime
-  
+
   // Actual
   actualArrival       DateTime?
   actualDuration      Int?     // minutes
   actualDeparture     DateTime?
-  
+
   // Constraints
   requiresLiftgate    Boolean  @default(false)
   requiresAppointment Boolean  @default(false)
   dockNumber          String?
   accessNotes         String?  // "No trucks 7-9 AM", "Rear entrance only"
-  
+
   // Execution
   status              String   @default("PENDING")
-                              // "PENDING" | "EN_ROUTE" | "ARRIVED" | 
+                              // "PENDING" | "EN_ROUTE" | "ARRIVED" |
                               // "IN_PROGRESS" | "COMPLETED" | "FAILED"
   signature           String?  // Base64 or URL
   signedBy            String?  // Name
   photos              Json?    // Array of photo URLs
   notes               String?
-  
+
   // Issues
   failureReason       String?  // "Customer not available", "Wrong address", etc.
-  
+
   // Voice commands
   voiceCommands       VoiceCommand[]
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@unique([routeId, stopNumber])
 }
 
@@ -2281,47 +2294,47 @@ model Vehicle {
   id                  String   @id @default(cuid())
   vehicleNumber       String   @unique  // "TRUCK-01", "VAN-05"
   type                String   // "BOX_TRUCK" | "SEMI" | "CARGO_VAN" | "SPRINTER"
-  
+
   // Details
   make                String
   model               String
   year                Int
   licensePlate        String
   vin                 String?
-  
+
   // Capacity
   maxWeight           Int      // lbs
   maxVolume           Int?     // cubic feet
   maxPallets          Int?
-  
+
   // Features
   hasLiftgate         Boolean  @default(false)
   hasRefrigeration    Boolean  @default(false)
   hasTailgate         Boolean  @default(false)
-  
+
   // Status
   status              String   @default("AVAILABLE")
                               // "AVAILABLE" | "IN_USE" | "MAINTENANCE" | "OUT_OF_SERVICE"
   currentLocation     String?  // GPS or address
   currentMileage      Int?
-  
+
   // Maintenance
   lastMaintenance     DateTime?
   nextMaintenance     DateTime?
   lastInspection      DateTime?
   nextInspection      DateTime?
-  
+
   // Assignment
   primaryDriverId     String?
   primaryDriver       User? @relation(fields: [primaryDriverId])
-  
+
   // Relations
   routes              DeliveryRoute[]
-  
+
   warehouseId         String
   organizationId      String
   warehouse           Warehouse @relation(fields: [warehouseId])
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2329,39 +2342,39 @@ model Vehicle {
 model RouteOptimizationLog {
   id                  String   @id @default(cuid())
   routeDate           DateTime
-  
+
   // Input
   totalOrders         Int
   totalStops          Int
   totalWeight         Decimal
   totalVolume         Decimal?
-  
+
   // Constraints
   timeWindows         Int      // Number of stops with time windows
   accessRestrictions  Int
   specialRequirements Json?
-  
+
   // Manual vs AI
   manualPlan          Json?    // Routes if done manually
   manualMiles         Decimal?
   manualTime          Int?     // minutes
   manualFuelCost      Decimal?
-  
+
   aiPlan              Json     // AI-optimized routes
   aiMiles             Decimal
   aiTime              Int      // minutes
   aiFuelCost          Decimal
-  
+
   // Savings
   milesSaved          Decimal
   timeSaved           Int      // minutes
   fuelSaved           Decimal  // dollars
   co2Reduced          Decimal  // tons
-  
+
   // Performance
   optimizationTime    Int      // milliseconds
   algorithmVersion    String
-  
+
   organizationId      String
   createdAt           DateTime @default(now())
 }
@@ -2371,29 +2384,29 @@ model SecurityCheckpoint {
   id                  String   @id @default(cuid())
   checkpointType      String   // "GATE" | "DOCK" | "INTERIOR" | "EXIT"
   name                String   // "Main Gate", "Dock 3", etc.
-  
+
   // Location
   warehouseId         String
   warehouse           Warehouse @relation(fields: [warehouseId])
   gpsCoordinates      Json?
-  
+
   // Equipment
   hasCameraSystem     Boolean  @default(false)
   hasScaleSystem      Boolean  @default(false)
   hasRFIDReader       Boolean  @default(false)
   hasLicensePlateReader Boolean @default(false)
-  
+
   // Status
   status              String   @default("ACTIVE")
                               // "ACTIVE" | "MAINTENANCE" | "CLOSED"
-  
+
   // Staff
   assignedGuardId     String?
   assignedGuard       User? @relation(fields: [assignedGuardId])
-  
+
   // Relations
   checkIns            SecurityCheckIn[]
-  
+
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -2403,55 +2416,55 @@ model SecurityCheckIn {
   id                  String   @id @default(cuid())
   checkpointId        String
   checkpoint          SecurityCheckpoint @relation(fields: [checkpointId])
-  
+
   // Vehicle/Carrier info
   carrierName         String
   vehicleNumber       String
   vehicleType         String   // "SEMI" | "BOX_TRUCK" | "CARGO_VAN"
   licensePlate        String?
-  
+
   // Driver info
   driverName          String
   driverId            String?  // ID number
   driverIdVerified    Boolean  @default(false)
   driverPhoto         String?  // URL
-  
+
   // Shipment info
   sealNumber          String?
   sealVerified        Boolean  @default(false)
   sealPhoto           String?
-  
+
   // Related documents
   poNumbers           Json?    // Array of PO numbers
   invoiceNumbers      Json?
   billOfLading        String?
-  
+
   // Timing
   arrivedAt           DateTime @default(now())
   approvedAt          DateTime?
   departedAt          DateTime?
   dockDoorAssigned    String?
-  
+
   // Status
   status              String   @default("AT_GATE")
-                              // "AT_GATE" | "APPROVED" | "AT_DOCK" | 
+                              // "AT_GATE" | "APPROVED" | "AT_DOCK" |
                               // "UNLOADING" | "DEPARTED" | "REJECTED"
   rejectionReason     String?
-  
+
   // Weight
   weightIn            Decimal? // lbs (if scale available)
   weightOut           Decimal? // lbs (for verification)
   weightVariance      Decimal? // Difference
-  
+
   // Security
   guardId             String
   guard               User @relation(fields: [guardId])
   videoRecordingUrl   String?
   notes               String?
-  
+
   // Automatic notifications sent
   notificationsSent   Json?    // Array of {recipient, timestamp, type}
-  
+
   warehouseId         String
   organizationId      String
   createdAt           DateTime @default(now())
@@ -2463,39 +2476,39 @@ model SystemEvent {
   id                  String   @id @default(cuid())
   eventId             String   @unique
   eventType           String   // EventType enum as string
-  
+
   // Timing
   timestamp           DateTime @default(now())
   processedAt         DateTime?
-  
+
   // Context
   warehouseId         String
   organizationId      String
   warehouse           Warehouse @relation(fields: [warehouseId])
-  
+
   // Priority
   priority            String   // "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
   requiresAction      Boolean  @default(false)
-  
+
   // Data payload
   data                Json     // Event-specific data
   metadata            Json?    // Additional context
-  
+
   // Related entities
   relatedOrderId      String?
   relatedPoId         String?
   relatedUserId       String?
   relatedItemId       String?
-  
+
   // Notifications
   notifications       EventNotification[]
-  
+
   // Processing
   status              String   @default("PENDING")
                               // "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED"
   errorMessage        String?
   retryCount          Int      @default(0)
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2504,40 +2517,40 @@ model EventNotification {
   id                  String   @id @default(cuid())
   eventId             String
   event               SystemEvent @relation(fields: [eventId])
-  
+
   // Recipient
   recipientType       String   // "USER" | "TEAM" | "SYSTEM" | "WEBHOOK"
   recipientId         String   // User ID, team name, system name, webhook URL
-  
+
   // Delivery method
   deliveryMethod      String   // "VOICE" | "EMAIL" | "SMS" | "MOBILE_PUSH" | "WEBHOOK" | "DASHBOARD"
-  
+
   // Content
   title               String
   message             String
   actionUrl           String?
   actionLabel         String?
-  
+
   // Status
   status              String   @default("PENDING")
                               // "PENDING" | "SENT" | "DELIVERED" | "READ" | "FAILED"
   sentAt              DateTime?
   deliveredAt         DateTime?
   readAt              DateTime?
-  
+
   // Webhook specific
   webhookResponse     Json?
   webhookStatusCode   Int?
-  
+
   // Voice specific
   voiceCommandId      String?
   voiceAcknowledged   Boolean  @default(false)
-  
+
   // Retry
   retryCount          Int      @default(0)
   maxRetries          Int      @default(3)
   lastError           String?
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2546,28 +2559,28 @@ model EventNotification {
 model CAPA {
   id                  String   @id @default(cuid())
   capaNumber          String   @unique  // "CAPA-2847"
-  
+
   // Type & Severity
   type                String   // "CORRECTIVE" | "PREVENTIVE" | "OBSERVATION"
-  category            String   // "SUPPLIER_QUALITY" | "PROCESS" | "EQUIPMENT" | 
+  category            String   // "SUPPLIER_QUALITY" | "PROCESS" | "EQUIPMENT" |
                               // "INVENTORY" | "SAFETY" | "CUSTOMER_COMPLAINT"
   severity            String   // "CRITICAL" | "MAJOR" | "MINOR"
-  
+
   // Description
   title               String
   description         String
   rootCause           String?
   impact              String?
-  
+
   // Financial
   costImpact          Decimal  @default(0)
   currency            String   @default("USD")
-  
+
   // Status
   status              String   @default("OPEN")
-                              // "OPEN" | "INVESTIGATING" | "ACTION_PLAN" | 
+                              // "OPEN" | "INVESTIGATING" | "ACTION_PLAN" |
                               // "IMPLEMENTING" | "VERIFICATION" | "CLOSED"
-  
+
   // People
   reportedBy          String   // User ID
   reporter            User @relation("CAPAReporter", fields: [reportedBy])
@@ -2575,42 +2588,42 @@ model CAPA {
   investigator        User? @relation("CAPAInvestigator", fields: [assignedTo])
   approvedBy          String?
   approver            User? @relation("CAPAApprover", fields: [approvedBy])
-  
+
   // Dates
   reportedAt          DateTime @default(now())
   investigationDue    DateTime
   resolutionDue       DateTime
   closedAt            DateTime?
-  
+
   // Related entities
   relatedPoId         String?
   relatedOrderId      String?
   relatedSupplierId   String?
   relatedItemId       String?
   relatedEquipmentId  String?
-  
+
   // Evidence
   photos              Json?    // Array of photo URLs
   documents           Json?    // Array of document URLs
-  
+
   // Actions
   correctiveActions   CAPAAction[]
   preventiveActions   CAPAAction[]
-  
+
   // Verification
   verificationMethod  String?
   verificationResult  String?
   verifiedAt          DateTime?
   verifiedBy          String?
-  
+
   // Recurrence prevention
   similarIncidents    Int      @default(0)
   trendAnalysis       Json?
-  
+
   warehouseId         String
   organizationId      String
   warehouse           Warehouse @relation(fields: [warehouseId])
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2619,24 +2632,24 @@ model CAPAAction {
   id                  String   @id @default(cuid())
   capaId              String
   capa                CAPA @relation(fields: [capaId])
-  
+
   actionType          String   // "CORRECTIVE" | "PREVENTIVE"
-  
+
   // Description
   action              String   // What to do
   responsibility      String   // Who does it
   targetDate          DateTime // When it's due
-  
+
   // Status
   status              String   @default("PENDING")
                               // "PENDING" | "IN_PROGRESS" | "COMPLETED" | "VERIFIED"
   completedAt         DateTime?
   verifiedAt          DateTime?
-  
+
   // Evidence
   evidence            String?  // URL or description
   notes               String?
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 }
@@ -2644,44 +2657,44 @@ model CAPAAction {
 model SupplierQualityScore {
   id                  String   @id @default(cuid())
   supplierId          String   // Supplier entity ID
-  
+
   // Score components
   overallScore        Decimal  // 0-100
   qualityScore        Decimal  // 0-100
   deliveryScore       Decimal  // 0-100
   communicationScore  Decimal  // 0-100
-  
+
   // Metrics
   totalShipments      Int      @default(0)
   defectiveShipments  Int      @default(0)
   defectRate          Decimal  @default(0) // Percentage
-  
+
   onTimeDeliveries    Int      @default(0)
   lateDeliveries      Int      @default(0)
   onTimeRate          Decimal  @default(0) // Percentage
-  
+
   capaCount           Int      @default(0)
   criticalCapaCount   Int      @default(0)
-  
+
   // Financial
   totalPurchases      Decimal  @default(0)
   rejectCost          Decimal  @default(0)
   rejectCostPercent   Decimal  @default(0)
-  
+
   // Status
   supplierStatus      String   @default("APPROVED")
                               // "APPROVED" | "CONDITIONAL" | "ENHANCED_QC" | "SUSPENDED"
   lastReviewDate      DateTime?
   nextReviewDate      DateTime?
-  
+
   // Trends
   trend               String?  // "IMPROVING" | "DECLINING" | "STABLE"
   notes               String?
-  
+
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@unique([supplierId, organizationId])
 }
 
@@ -2690,29 +2703,29 @@ model WebhookEndpoint {
   id                  String   @id @default(cuid())
   name                String
   url                 String
-  
+
   // Authentication
   authType            String   // "NONE" | "BASIC" | "BEARER" | "HMAC_SHA256" | "API_KEY"
   authCredentials     String?  // Encrypted
-  
+
   // Event subscriptions
   subscribedEvents    Json     // Array of EventType strings
-  
+
   // Configuration
   isActive            Boolean  @default(true)
   retryPolicy         Json     // {maxRetries, backoff, timeout}
-  
+
   // Status
   lastSuccess         DateTime?
   lastFailure         DateTime?
   consecutiveFailures Int      @default(0)
-  
+
   // Stats
   totalRequests       Int      @default(0)
   successfulRequests  Int      @default(0)
   failedRequests      Int      @default(0)
   avgResponseTime     Int?     // milliseconds
-  
+
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -2722,75 +2735,75 @@ model WebhookEndpoint {
 model Location {
   id                  String   @id @default(cuid())
   locationCode        String   @unique  // "A-05-12", "Q-02-05", "DOCK-3"
-  
+
   // Physical details
   aisle               String?  // "A", "B", "R" (Romeo)
   bay                 String?  // "05", "12"
   level               String?  // "A", "B", "C" (shelf level)
   zone                String?  // "PICKING", "RESERVE", "STAGING", "QUARANTINE"
-  
+
   // Type
-  locationType        String   // "PICK_FACE" | "RESERVE" | "STAGING" | "QUARANTINE" | 
+  locationType        String   // "PICK_FACE" | "RESERVE" | "STAGING" | "QUARANTINE" |
                               // "DOCK" | "RETURNS" | "DAMAGE" | "CONSIGNMENT" | "RESTRICTED"
-  
+
   // Capacity
   maxUnits            Int?     // Max units this location can hold
   maxWeight           Decimal? // Max weight (lbs)
   maxVolume           Decimal? // Max volume (cubic feet)
   currentUnits        Int      @default(0)
   currentWeight       Decimal  @default(0)
-  
+
   // Equipment requirements
   requiresReachTruck  Boolean  @default(false)
   requiresForklift    Boolean  @default(false)
   requiresOrderPicker Boolean  @default(false)
   heightFeet          Int?     // Height above ground
-  
+
   // ACCESS CONTROL (NEW)
   accessLevel         String   @default("STANDARD")
-                              // "PUBLIC" | "STANDARD" | "RESTRICTED" | "ADMIN_ONLY" | 
+                              // "PUBLIC" | "STANDARD" | "RESTRICTED" | "ADMIN_ONLY" |
                               // "CUSTOMER_HIDDEN" | "INTERNAL_ONLY"
-  
-  restrictedReason    String?  // "DAMAGED_GOODS" | "QUARANTINE" | "INVESTIGATION" | 
+
+  restrictedReason    String?  // "DAMAGED_GOODS" | "QUARANTINE" | "INVESTIGATION" |
                               // "CUSTOMER_SHORTAGE_HIDE" | "AUDIT" | "SECURITY"
-  
+
   // Customer visibility
   customerVisible     Boolean  @default(true)  // FALSE = hidden from customer portal
   hideFromCustomers   Boolean  @default(false) // TRUE = show zero stock to customers
-  
+
   // Permission requirements
   requiresPermission  String?  // "ADMIN" | "STOCK_TEAM" | "MANAGER" | "QC"
-  
+
   // Location change restrictions
   allowPickerAccess   Boolean  @default(true)
   allowReplenAccess   Boolean  @default(true)
   allowReturnsAccess  Boolean  @default(false) // Returns need explicit routing
   allowPutawayAccess  Boolean  @default(true)
-  
+
   // Who can modify this location
   canBeModifiedBy     Json     // Array of roles: ["ADMIN", "STOCK_TEAM", "INVENTORY_MANAGER"]
-  
+
   // Status
   status              String   @default("ACTIVE")
                               // "ACTIVE" | "DISABLED" | "MAINTENANCE" | "AUDIT" | "BLOCKED"
   blockedReason       String?
   blockedUntil        DateTime?
-  
+
   // Inventory tracking
   items               InventoryItem[]
-  
+
   // Audit trail
   lastModifiedBy      String?  // User ID
   lastModifiedAt      DateTime?
   locationChanges     LocationChangeLog[]
-  
+
   warehouseId         String
   organizationId      String
   warehouse           Warehouse @relation(fields: [warehouseId])
-  
+
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([zone, locationType])
   @@index([customerVisible])
 }
@@ -2799,76 +2812,76 @@ model LocationChangeLog {
   id                  String   @id @default(cuid())
   locationId          String
   location            Location @relation(fields: [locationId])
-  
+
   // Change details
-  changeType          String   // "ITEM_ADDED" | "ITEM_REMOVED" | "LOCATION_MOVED" | 
+  changeType          String   // "ITEM_ADDED" | "ITEM_REMOVED" | "LOCATION_MOVED" |
                               // "ACCESS_CHANGED" | "STATUS_CHANGED" | "PROPERTIES_UPDATED"
-  
+
   // What changed
   itemId              String?
   oldValue            Json?    // Previous state
   newValue            Json?    // New state
   quantity            Int?
-  
+
   // Who made the change
   userId              String
   userRole            String   // "ADMIN" | "STOCK_TEAM" | "PICKER" | "DRIVER"
   userName            String
-  
+
   // Authorization
   wasAuthorized       Boolean  @default(true)
   authorizationLevel  String   // Permission level used
-  
+
   // Context
   reason              String?
   relatedTaskId       String?  // Replen task, pick task, etc.
   voiceCommandId      String?
-  
+
   // Validation
   validationPassed    Boolean  @default(true)
   validationErrors    Json?
-  
+
   timestamp           DateTime @default(now())
-  
+
   @@index([locationId, timestamp])
   @@index([userId])
 }
 
 model ItemLocationValidation {
   id                  String   @id @default(cuid())
-  
+
   // Item and location
   itemId              String
   itemSKU             String
   locationId          String
   locationCode        String
-  
+
   // Validation attempt
   attemptedBy         String   // User ID
   attemptedByRole     String   // "PICKER" | "DRIVER" | "RETURNS_OPERATOR" | "STOCK_TEAM"
   attemptedAction     String   // "PICK" | "PUTAWAY" | "REPLENISH" | "MOVE" | "RETURN"
-  
+
   // Result
   validationResult    String   // "APPROVED" | "REJECTED" | "OVERRIDE_REQUIRED"
   rejectionReason     String?
-  
+
   // Details
   expectedLocation    String?  // Where system expected item
   attemptedLocation   String   // Where user tried to put/pick
   quantityAttempted   Int
-  
+
   // Override (if admin approved)
   overrideBy          String?  // Admin user ID
   overrideReason      String?
   overrideAt          DateTime?
-  
+
   // Voice interaction
   voiceTranscript     String?
   systemResponse      String?
-  
+
   organizationId      String
   timestamp           DateTime @default(now())
-  
+
   @@index([attemptedBy, timestamp])
   @@index([itemId, locationId])
 }
@@ -2877,61 +2890,61 @@ model UserPermissions {
   id                  String   @id @default(cuid())
   userId              String   @unique
   user                User @relation(fields: [userId])
-  
+
   // Role-based permissions (ENHANCED WITH MANAGEMENT HIERARCHY)
   role                String   // PRIMARY ROLES:
-                              // "PICKER" | "DRIVER" | "RETURNS_OPERATOR" | 
-                              // "STOCK_TEAM" | "INVENTORY_MANAGER" | "ADMIN" | 
-                              // "QC" | "SUPERVISOR" | 
+                              // "PICKER" | "DRIVER" | "RETURNS_OPERATOR" |
+                              // "STOCK_TEAM" | "INVENTORY_MANAGER" | "ADMIN" |
+                              // "QC" | "SUPERVISOR" |
                               // MANAGEMENT ROLES:
-                              // "WAREHOUSE_MANAGER" | "OPERATIONS_MANAGER" | 
-                              // "DEPARTMENT_MANAGER" | "SHIFT_MANAGER" | 
+                              // "WAREHOUSE_MANAGER" | "OPERATIONS_MANAGER" |
+                              // "DEPARTMENT_MANAGER" | "SHIFT_MANAGER" |
                               // "TEAM_LEADER" | "GENERAL_MANAGER"
-  
+
   // Management hierarchy
   managementLevel     Int?     // 1=Team Lead, 2=Supervisor, 3=Manager, 4=Director, 5=Executive
   reportsTo           String?  // Manager's user ID
   managesTeam         Boolean  @default(false)
   teamMembers         Json?    // Array of user IDs they manage
   department          String?  // "RECEIVING" | "PICKING" | "SHIPPING" | "RETURNS" | "QC"
-  
+
   // Responsibility-based access (NEW)
-  responsibilities    Json     // Array of: ["INVENTORY_ACCURACY", "SAFETY", 
-                              // "QUALITY", "PRODUCTIVITY", "COST_CONTROL", 
+  responsibilities    Json     // Array of: ["INVENTORY_ACCURACY", "SAFETY",
+                              // "QUALITY", "PRODUCTIVITY", "COST_CONTROL",
                               // "CUSTOMER_SATISFACTION", "TEAM_DEVELOPMENT"]
-  
+
   accountableFor      Json?    // KPIs they're responsible for
-  canApprove          Json?    // What they can approve: ["OVERTIME", "EQUIPMENT_PURCHASE", 
+  canApprove          Json?    // What they can approve: ["OVERTIME", "EQUIPMENT_PURCHASE",
                               // "LOCATION_CHANGES", "INVENTORY_ADJUSTMENTS", "CAPA_CLOSURE"]
   approvalLimit       Decimal? // Financial approval limit (USD)
-  
+
   // Location permissions
   canAccessAllLocations       Boolean @default(false)
   canAccessRestrictedLocations Boolean @default(false)
   canModifyLocations          Boolean @default(false)  // ADMIN, STOCK_TEAM, MANAGERS
   canCreateLocations          Boolean @default(false)  // ADMIN, WAREHOUSE_MANAGER, STOCK_TEAM
   canDeleteLocations          Boolean @default(false)  // ADMIN only
-  
+
   // Item permissions
   canMoveItems                Boolean @default(true)
   canChangeItemLocation       Boolean @default(false)  // ADMIN, STOCK_TEAM, MANAGERS
   canOverrideValidation       Boolean @default(false)  // ADMIN, SUPERVISOR, MANAGERS
   canAccessQuarantine         Boolean @default(false)  // QC, ADMIN, MANAGERS
   canAccessDamaged            Boolean @default(false)  // STOCK_TEAM, ADMIN, MANAGERS
-  
+
   // Inventory permissions
   canAdjustInventory          Boolean @default(false)  // ADMIN, STOCK_TEAM, INVENTORY_MANAGER
   canCycleCount               Boolean @default(false)
   canReceiveGoods             Boolean @default(false)
   canShipGoods                Boolean @default(false)
   canPerformAudit             Boolean @default(false)  // MANAGERS, ADMIN
-  
+
   // Financial permissions
   canViewCosts                Boolean @default(false)  // MANAGERS and above
   canApproveInvoices          Boolean @default(false)  // MANAGERS and above
   canIssueRefunds             Boolean @default(false)  // MANAGERS, CUSTOMER_SERVICE
   canWriteOffInventory        Boolean @default(false)  // MANAGERS and above
-  
+
   // HR & Team management permissions
   canManageSchedules          Boolean @default(false)  // MANAGERS, SUPERVISORS
   canApproveOvertime          Boolean @default(false)  // MANAGERS, SUPERVISORS
@@ -2939,28 +2952,28 @@ model UserPermissions {
   canViewTeamPerformance      Boolean @default(false)  // MANAGERS, SUPERVISORS, TEAM_LEADERS
   canIssueWarnings            Boolean @default(false)  // MANAGERS, SUPERVISORS
   canTerminate                Boolean @default(false)  // MANAGERS and above
-  
+
   // System administration
   canModifySystemSettings     Boolean @default(false)  // ADMIN only
   canManageUsers              Boolean @default(false)  // ADMIN, HR, MANAGERS
   canViewAllReports           Boolean @default(false)  // MANAGERS and above
   canExportData               Boolean @default(false)  // MANAGERS and above
-  
+
   // Special zones
   allowedZones                Json?    // Array of zone names if restricted
   restrictedZones             Json?    // Zones explicitly blocked
-  
+
   // Override capabilities
   canOverrideShortPick        Boolean @default(false)  // SUPERVISORS, MANAGERS
   canOverrideLocationFull     Boolean @default(false)  // STOCK_TEAM, MANAGERS
   canForceItemMove            Boolean @default(false)  // ADMIN, MANAGERS
   canOverrideSafety           Boolean @default(false)  // ADMIN, SAFETY_MANAGER only
-  
+
   // Emergency powers
   canDeclareEmergency         Boolean @default(false)  // MANAGERS and above
   canEvacuateWarehouse        Boolean @default(false)  // MANAGERS and above
   canShutdownOperations       Boolean @default(false)  // MANAGERS and above
-  
+
   organizationId              String
   createdAt                   DateTime @default(now())
   updatedAt                   DateTime @updatedAt
@@ -2970,40 +2983,40 @@ model StockTeamActivity {
   id                  String   @id @default(cuid())
   userId              String
   user                User @relation(fields: [userId])
-  
+
   // Activity
-  activityType        String   // "LOCATION_CHANGE" | "INVENTORY_ADJUSTMENT" | 
-                              // "ITEM_RELOCATION" | "ZONE_REORGANIZATION" | 
+  activityType        String   // "LOCATION_CHANGE" | "INVENTORY_ADJUSTMENT" |
+                              // "ITEM_RELOCATION" | "ZONE_REORGANIZATION" |
                               // "LOCATION_CREATED" | "LOCATION_DISABLED"
-  
+
   // Details
   fromLocation        String?
   toLocation          String?
   itemId              String?
   itemSKU             String?
   quantity            Int?
-  
+
   // Reason
-  reason              String   // "REORGANIZATION" | "DAMAGE" | "EXPIRY" | 
+  reason              String   // "REORGANIZATION" | "DAMAGE" | "EXPIRY" |
                               // "OPTIMIZE_PICKING" | "CREATE_SPACE" | "AUDIT_ADJUSTMENT"
   notes               String?
-  
+
   // Authorization
   authorizedBy        String?  // Supervisor who approved
   requiresApproval    Boolean  @default(false)
   approvalStatus      String?  // "PENDING" | "APPROVED" | "REJECTED"
-  
+
   // Impact
   affectedOrders      Int      @default(0)
   affectedPickers     Json?    // Array of picker IDs notified
-  
+
   // Voice interaction
   voiceCommandId      String?
-  
+
   warehouseId         String
   organizationId      String
   timestamp           DateTime @default(now())
-  
+
   @@index([userId, timestamp])
   @@index([activityType])
 }
@@ -3014,51 +3027,51 @@ model StockTeamActivity {
 // SHIFT HANDOVER & COMMUNICATION
 model ShiftHandover {
   id                  String   @id @default(cuid())
-  
+
   // Shift details
   shiftDate           DateTime
   shiftType           String   // "MORNING" | "AFTERNOON" | "NIGHT" | "WEEKEND"
-  
+
   // Handover participants
   outgoingShiftLead   String   // User ID
   incomingShiftLead   String   // User ID
   outgoingLead        User @relation("OutgoingLead", fields: [outgoingShiftLead])
   incomingLead        User @relation("IncomingLead", fields: [incomingShiftLead])
-  
+
   // Status
   status              String   @default("IN_PROGRESS")
                               // "IN_PROGRESS" | "COMPLETED" | "ESCALATED"
-  
+
   // Critical information
   openIssues          Json     // Array of issues: safety, equipment, inventory
   urgentTasks         Json     // Tasks requiring immediate attention
   equipmentStatus     Json     // Equipment down/maintenance needed
   inventoryAlerts     Json     // Low stock, quarantine items
   staffingIssues      Json?    // Absences, overtime, concerns
-  
+
   // Performance summary
   ordersCompleted     Int?
   pickAccuracy        Decimal?
   safetyIncidents     Int      @default(0)
   equipmentFailures   Int      @default(0)
-  
+
   // Voice notes
   voiceNotes          String?  // Voice-to-text transcription
   voiceRecordingUrl   String?
-  
+
   // Acknowledgment
   acknowledgedAt      DateTime?
   acknowledgedBy      String?
-  
+
   // Follow-up actions
   actionItems         Json?    // Tasks for incoming shift
   escalations         Json?    // Issues escalated to management
-  
+
   warehouseId         String
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([shiftDate, warehouseId])
 }
 
@@ -3066,49 +3079,49 @@ model ShiftHandover {
 model InventoryLot {
   id                  String   @id @default(cuid())
   lotNumber           String   @unique
-  
+
   // Item details
   itemId              String
   item                InventoryItem @relation(fields: [itemId])
   itemSKU             String
-  
+
   // Lot info
   productionDate      DateTime?
   expiryDate          DateTime?
   bestBeforeDate      DateTime?
-  
+
   // Received info
   receivedDate        DateTime @default(now())
   poNumber            String?
   supplierId          String?
-  
+
   // Location
   locationId          String
   locationCode        String
   quantity            Int
-  
+
   // Status
   status              String   @default("ACTIVE")
-                              // "ACTIVE" | "NEAR_EXPIRY" | "EXPIRED" | 
+                              // "ACTIVE" | "NEAR_EXPIRY" | "EXPIRED" |
                               // "QUARANTINE" | "RECALLED" | "DISPOSED"
-  
+
   // FEFO priority
   pickPriority        Int      // Auto-calculated based on expiry (1=pick first)
   daysToExpiry        Int?     // Auto-calculated
-  
+
   // Alerts
   expiryAlertSent     Boolean  @default(false)
   expiryAlertDate     DateTime?
-  
+
   // Traceability
   certificateOfAnalysis String? // URL
   batchTestResults     Json?
-  
+
   warehouseId         String
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([expiryDate, status])
   @@index([itemId, pickPriority])
 }
@@ -3118,40 +3131,40 @@ model TemperatureZone {
   id                  String   @id @default(cuid())
   zoneName            String   // "FREEZER-A", "COOLER-1", "AMBIENT-MAIN"
   zoneCode            String   @unique
-  
+
   // Temperature requirements
   zoneType            String   // "FROZEN" | "REFRIGERATED" | "COOL" | "AMBIENT"
   targetTemp          Decimal  // Fahrenheit
   minTemp             Decimal  // Alarm if below
   maxTemp             Decimal  // Alarm if above
-  
+
   // Current status
   currentTemp         Decimal?
   humidity            Decimal? // Percentage
   lastReading         DateTime?
-  
+
   // Monitoring
   sensorId            String?
   alertsEnabled       Boolean  @default(true)
-  
+
   // Alarm status
   alarmActive         Boolean  @default(false)
   alarmReason         String?  // "TOO_HOT" | "TOO_COLD" | "SENSOR_FAILURE"
   alarmSince          DateTime?
-  
+
   // Compliance
   requiresCertification Boolean @default(false)
   fda Compliant       Boolean  @default(false)
   usda Compliant      Boolean  @default(false)
-  
+
   // Locations in this zone
   locations           Json     // Array of location codes
   items               Json?    // Items stored here
-  
+
   // Access restrictions
   requiresTraining    Boolean  @default(false)
   maxTimeInZone       Int?     // Minutes (safety limit for workers)
-  
+
   warehouseId         String
   organizationId      String
   createdAt           DateTime @default(now())
@@ -3162,20 +3175,20 @@ model TemperatureLog {
   id                  String   @id @default(cuid())
   zoneId              String
   zone                TemperatureZone @relation(fields: [zoneId])
-  
+
   temperature         Decimal
   humidity            Decimal?
   timestamp           DateTime @default(now())
-  
+
   // Alarm
   withinRange         Boolean  @default(true)
   alarmTriggered      Boolean  @default(false)
-  
+
   // Response
   respondedBy         String?  // User who acknowledged alarm
   respondedAt         DateTime?
   actionTaken         String?
-  
+
   @@index([zoneId, timestamp])
 }
 
@@ -3184,37 +3197,37 @@ model HazardousMaterial {
   id                  String   @id @default(cuid())
   itemId              String
   item                InventoryItem @relation(fields: [itemId])
-  
+
   // Hazard classification
   hazardClass         String   // UN hazard class: "3" (flammable), "8" (corrosive), etc.
   unNumber            String?  // UN identification number
   hazardType          String   // "FLAMMABLE" | "CORROSIVE" | "TOXIC" | "OXIDIZER"
-  
+
   // Safety requirements
   requiresPPE         Boolean  @default(true)
   requiredPPE         Json     // ["GLOVES", "GOGGLES", "RESPIRATOR", "APRON"]
-  
+
   requiresCertification Boolean @default(true)
   certificationNeeded  String? // "HAZMAT_HANDLER" | "FORKLIFT_HAZMAT"
-  
+
   // Storage requirements
   segregationRequired  Boolean @default(false)
   incompatibleWith     Json?   // Array of item IDs or hazard classes
   maximumQuantity      Int?    // Max units per location
-  
+
   // Handling requirements
   specialHandling      String?
   disposalProcedure    String?
   spillResponse        String?
-  
+
   // Documentation
   sdsUrl               String?  // Safety Data Sheet URL
   handlingInstructions String?
-  
+
   // Restrictions
   cannotShipWith       Json?    // Items that can't be on same truck
   carrierRestrictions  Json?    // Carriers that won't transport
-  
+
   organizationId       String
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
@@ -3224,54 +3237,54 @@ model HazardousMaterial {
 model ProductRecall {
   id                  String   @id @default(cuid())
   recallNumber        String   @unique
-  
+
   // Recall details
   recallType          String   // "VOLUNTARY" | "MANDATORY" | "MARKET_WITHDRAWAL"
   severity            String   // "CLASS_I" (dangerous) | "CLASS_II" (temp health) | "CLASS_III" (minor)
   reason              String   // "CONTAMINATION" | "MISLABELING" | "UNDECLARED_ALLERGEN"
-  
+
   // Items affected
   itemId              String
   item                InventoryItem @relation(fields: [itemId])
   lotNumbers          Json     // Array of affected lot numbers
   dateRange           Json?    // {start, end} production dates
-  
+
   // Scope
   quantityAffected    Int      // Units in warehouse
   quantitySold        Int      // Already shipped to customers
   quantityRecovered   Int      @default(0)
-  
+
   // Status
   status              String   @default("ACTIVE")
                               // "ACTIVE" | "IN_PROGRESS" | "COMPLETED"
-  
+
   // Actions
   recallStarted       DateTime @default(now())
   recallCompleted     DateTime?
-  
+
   customerNotified    Boolean  @default(false)
   customersAffected   Int?
-  
+
   supplierNotified    Boolean  @default(false)
   authoritiesNotified Boolean  @default(false)
-  
+
   // Inventory actions
   inventoryBlocked    Boolean  @default(false)
   inventoryQuarantined Boolean @default(false)
   inventoryDisposed    Boolean  @default(false)
-  
+
   // Financial
   costImpact          Decimal?
   refundsIssued       Decimal  @default(0)
-  
+
   // Documentation
   recallNotice        String?  // URL
   fda ReportNumber    String?
-  
+
   // Management
   recallCoordinator   String   // User ID
   coordinator         User @relation(fields: [recallCoordinator])
-  
+
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
@@ -3282,41 +3295,41 @@ model WorkerTraining {
   id                  String   @id @default(cuid())
   userId              String
   user                User @relation(fields: [userId])
-  
+
   // Training type
-  trainingType        String   // "FORKLIFT" | "REACH_TRUCK" | "HAZMAT" | 
+  trainingType        String   // "FORKLIFT" | "REACH_TRUCK" | "HAZMAT" |
                               // "SAFETY" | "QUALITY" | "SYSTEM" | "VOICE_PICKING"
-  
+
   // Certification
   certificationNumber String?
   certifiedBy         String?  // Trainer user ID
   certificationDate   DateTime?
   expiryDate          DateTime?
-  
+
   // Status
   status              String   @default("IN_PROGRESS")
                               // "IN_PROGRESS" | "COMPLETED" | "CERTIFIED" | "EXPIRED"
-  
+
   // Training details
   hoursCompleted      Decimal  @default(0)
   hoursRequired       Decimal
   testScore           Decimal? // Percentage
   passingScore        Decimal  @default(80)
   passed              Boolean  @default(false)
-  
+
   // Equipment authorization
   authorizedEquipment Json?    // Array of equipment types user can operate
   restrictions        Json?    // Any limitations on use
-  
+
   // Renewal
   requiresRenewal     Boolean  @default(false)
   renewalDue          DateTime?
   renewalReminder     Boolean  @default(false)
-  
+
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([userId, status])
   @@index([expiryDate])
 }
@@ -3325,63 +3338,63 @@ model WorkerTraining {
 model SafetyIncident {
   id                  String   @id @default(cuid())
   incidentNumber      String   @unique
-  
+
   // Incident details
-  incidentType        String   // "INJURY" | "NEAR_MISS" | "PROPERTY_DAMAGE" | 
+  incidentType        String   // "INJURY" | "NEAR_MISS" | "PROPERTY_DAMAGE" |
                               // "SPILL" | "EQUIPMENT_FAILURE" | "FIRE" | "SECURITY"
   severity            String   // "MINOR" | "MODERATE" | "SERIOUS" | "FATAL"
-  
+
   // When and where
   incidentDate        DateTime
   locationCode        String?
   areaDescription     String
-  
+
   // People involved
   reportedBy          String   // User ID
   reporter            User @relation("IncidentReporter", fields: [reportedBy])
   injuredPerson       String?  // User ID if injury
   witnessIds          Json?    // Array of witness user IDs
-  
+
   // Description
   description         String
   immediateCause      String?
   rootCause           String?
-  
+
   // Response
   immediateAction     String   // What was done immediately
   medicalAttention    Boolean  @default(false)
   emergencyServices   Boolean  @default(false)
-  
+
   // Investigation
   investigatorId      String?  // Manager investigating
   investigator        User? @relation("IncidentInvestigator", fields: [investigatorId])
   investigationStatus String   @default("PENDING")
                               // "PENDING" | "IN_PROGRESS" | "COMPLETED"
   investigationNotes  String?
-  
+
   // Prevention
   correctiveActions   Json?    // Actions to prevent recurrence
   capaNumber          String?  // Linked CAPA if created
-  
+
   // Compliance
   oshaRecordable      Boolean  @default(false)
   daysLostWork        Int      @default(0)
-  
+
   // Photos/evidence
   photos              Json?    // Array of photo URLs
   documents           Json?    // Supporting documents
-  
+
   // Status
   status              String   @default("OPEN")
                               // "OPEN" | "INVESTIGATING" | "RESOLVED" | "CLOSED"
   closedAt            DateTime?
   closedBy            String?
-  
+
   warehouseId         String
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([incidentDate, severity])
   @@index([status])
 }
@@ -3391,42 +3404,42 @@ model WorkerShift {
   id                  String   @id @default(cuid())
   userId              String
   user                User @relation(fields: [userId])
-  
+
   // Shift details
   shiftDate           DateTime
   shiftType           String   // "MORNING" | "AFTERNOON" | "NIGHT" | "OVERTIME"
-  
+
   // Time tracking
   clockIn             DateTime?
   clockOut            DateTime?
   hoursWorked         Decimal?
   regularHours        Decimal  @default(0)
   overtimeHours       Decimal  @default(0)
-  
+
   // Break compliance
   breaksRequired      Int      // Number of breaks required by law
   breaksTaken         Int      @default(0)
   breakRecords        WorkerBreak[]
-  
+
   // Status
   status              String   @default("SCHEDULED")
-                              // "SCHEDULED" | "CLOCKED_IN" | "ON_BREAK" | 
+                              // "SCHEDULED" | "CLOCKED_IN" | "ON_BREAK" |
                               // "CLOCKED_OUT" | "NO_SHOW" | "SICK"
-  
+
   // Performance
   tasksCompleted      Int      @default(0)
   unitsProcessed      Int      @default(0)
   accuracy            Decimal? // Percentage
   productivity        Decimal? // Units per hour
-  
+
   // Equipment used
   equipmentUsed       Json?    // Array of equipment IDs
-  
+
   warehouseId         String
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([userId, shiftDate])
 }
 
@@ -3434,21 +3447,21 @@ model WorkerBreak {
   id                  String   @id @default(cuid())
   shiftId             String
   shift               WorkerShift @relation(fields: [shiftId])
-  
+
   breakType           String   // "REST" | "MEAL" | "EMERGENCY"
   startTime           DateTime
   endTime             DateTime?
   durationMinutes     Int?
-  
+
   // Compliance
   requiredDuration    Int      // Minutes required by law
   compliant           Boolean  @default(true)
-  
+
   // Location (if needed for compliance)
   breakLocation       String?  // "BREAK_ROOM" | "OUTSIDE" | "WORKSTATION"
-  
+
   voiceCommandId      String?  // If initiated via voice
-  
+
   createdAt           DateTime @default(now())
 }
 
@@ -3456,43 +3469,43 @@ model WorkerBreak {
 model Pallet {
   id                  String   @id @default(cuid())
   palletId            String   @unique  // Barcode/RFID
-  
+
   // Type
   palletType          String   // "STANDARD" | "EURO" | "BLOCK" | "CUSTOM"
   material            String   // "WOOD" | "PLASTIC" | "METAL"
-  
+
   // Ownership
   ownership           String   // "OWNED" | "RENTAL" | "CUSTOMER" | "SUPPLIER"
   ownerOrg            String?  // If customer/supplier pallet
-  
+
   // Status
   status              String   @default("AVAILABLE")
                               // "AVAILABLE" | "IN_USE" | "DAMAGED" | "LOST" | "RETURNED"
-  
+
   // Current usage
   currentLocation     String?
   currentContents     Json?    // Array of items on pallet
   weight              Decimal? // Current weight (lbs)
-  
+
   // Condition
   condition           String   @default("GOOD")
                               // "GOOD" | "FAIR" | "POOR" | "DAMAGED"
   lastInspection      DateTime?
-  
+
   // Tracking
   assignedToOrder     String?  // Order ID if in use
   assignedToRoute     String?  // Route ID if in delivery
-  
+
   // Rental tracking (if rental)
   rentalStartDate     DateTime?
   rentalCost          Decimal?
   daysInPossession    Int      @default(0)
-  
+
   warehouseId         String
   organizationId      String
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
-  
+
   @@index([status])
   @@index([ownership])
 }
@@ -3544,7 +3557,7 @@ DURING SHIFT - BATTERY MONITORING:
 ───────────────────────────────────
 
 [After 2 hours of work]
-System (automatic alert): 
+System (automatic alert):
 "Sarah, battery at 40%. Plan to charge after current task."
 
 Driver: "Acknowledged"
@@ -3571,7 +3584,7 @@ Driver: "End shift"
 
 System: "Ending shift for Sarah Johnson.
          Let me summarize your day:
-         
+
          SHIFT SUMMARY:
          - Duration: 8 hours 15 minutes
          - Tasks completed: 47 replenishment tasks
@@ -3580,7 +3593,7 @@ System: "Ending shift for Sarah Johnson.
          - Battery usage: 68% → 45% (charged once)
          - Average task time: 6.2 minutes
          - Performance rating: ⭐⭐⭐⭐⭐ Excellent
-         
+
          Any equipment issues to report before sign-off?"
 
 Driver: "Forklift hydraulics feel a bit slow"
@@ -3588,19 +3601,19 @@ Driver: "Forklift hydraulics feel a bit slow"
 System: "Noted. Maintenance ticket MT-8472 created.
          Priority: Routine inspection.
          Mechanic will check tomorrow morning.
-         
+
          RT-07 status?"
-         
+
 Driver: "Ready for next shift"
 
 System: "Perfect. Parking RT-07?"
 Driver: "Charging station 3"
 System: "Confirmed. RT-07 parked at charging station 3.
          Battery 45%, charging overnight.
-         
+
          Thank you for your work today, Sarah!
          Great performance. See you tomorrow at 8 AM.
-         
+
          Shift ended: 4:15 PM."
 
 [SYSTEM AUTOMATICALLY LOGS]:
@@ -4049,25 +4062,25 @@ MANAGER DASHBOARD:
 ──────────────────
 Manager: "Show ABC summary"
 System: "ABC ANALYSIS (This Month)
-         
+
          CLASS A (42 SKUs):
          - Service level: 99.2% ✓
          - Stockouts: 0
          - Replenishments: 127 (avg 3 per SKU)
          - Fill rate: 99.8%
-         
+
          CLASS B (68 SKUs):
          - Service level: 96.1% ✓
          - Stockouts: 2 (minor)
          - Replenishments: 94 (avg 1.4 per SKU)
          - Fill rate: 97.3%
-         
+
          CLASS C (190 SKUs):
          - Service level: 91.8% ✓
          - Stockouts: 14 (acceptable)
          - Replenishments: 102 (avg 0.5 per SKU)
          - Fill rate: 92.1%
-         
+
          Overall performance: Excellent ✓"
 ```
 
@@ -4134,12 +4147,12 @@ VOICE-GUIDED WAVE EXECUTION:
 Sarah's headset at 10:00 PM:
 "Sarah, wave replenishment RP-20260107-1 starting.
  You have 22 tasks, estimated 2.5 hours.
- 
+
  First task: Alpha 5 12
  Item: Red Widget (Class A - Critical)
  From: Romeo 03 Charlie
  Quantity: 50 units
- 
+
  Ready to begin?"
 
 Sarah: "Ready"
@@ -4149,12 +4162,12 @@ System: "Excellent. Navigate to Romeo 03 Charlie.
 
 [Sarah completes task]
 System: "Task 1 complete. 21 remaining.
-         
+
          Next: Alpha 7 15
          Item: Pro Widget (Class A - Critical)
          From: Romeo 05 Alpha
          Quantity: 30 units
-         
+
          Distance from current location: 45 feet
          Turn right, proceed straight."
 
@@ -4237,12 +4250,12 @@ Instead of empty trip to B-08-15:
 VOICE INTERLEAVING:
 ───────────────────
 System: "Sarah, task complete at Alpha 5 12.
-         
+
          SMART ROUTING: Returns pallet ready 50 feet away.
-         
+
          NEW TASK: Pick from returns area, put to Alpha 8 03.
          This is ON YOUR WAY to next scheduled task.
-         
+
          Saves 3 minutes. Accept interleaved task?"
 
 Sarah: "Accept"
@@ -4289,27 +4302,27 @@ MANAGER VIEW - OPTIMIZATION METRICS:
 Manager: "Show task optimization stats"
 
 System: "TASK INTERLEAVING (This Month)
-         
+
          Total tasks: 2,847
          Interleaved tasks: 847 (30%)
-         
+
          EFFICIENCY GAINS:
          - Distance saved: 24,512 feet (4.6 miles)
          - Time saved: 18.4 hours
          - Labor cost saved: $458
          - Tasks completed: +847 (no extra labor)
-         
+
          TOP OPPORTUNITIES:
          1. Put-away + Replen: 412 tasks (49%)
          2. Multi-replen: 267 tasks (32%)
          3. Cycle count + Replen: 168 tasks (20%)
-         
+
          Driver performance:
          - Sarah: 247 interleaved (best!)
          - Mike: 198 interleaved
          - Tom: 187 interleaved
          - Lisa: 215 interleaved
-         
+
          System intelligence improving monthly ✓"
 ```
 
@@ -4354,14 +4367,14 @@ OPPORTUNITIES DETECTED:
 SMART ROUTING:
 ──────────────
 System: "Sarah, before returning to reserve:
-         
+
          BACKHAUL OPPORTUNITY:
          Location Alpha 12 05 has overstock (30 units Blue Widget).
          Pick up and deliver to reserve Romeo 05 Alpha.
-         
+
          This is ON YOUR RETURN PATH.
          Zero extra distance. Pure productivity gain!
-         
+
          Accept backhaul task?"
 
 Sarah: "Accept"
@@ -4515,7 +4528,7 @@ MANAGER OVERRIDE OPTIONS:
 Manager: "Disable auto-replenishment for Green Widget"
 System: "Green Widget removed from auto-approval.
          All Green Widget replenishments now require manual approval.
-         
+
          Reason?"
 Manager: "Discontinuing product, want to control remaining stock"
 System: "Noted. Green Widget tasks will await your approval."
@@ -4525,7 +4538,7 @@ OR
 Manager: "Enable full auto mode for ALL Class C items"
 System: "⚠️ WARNING: This removes manual control for 190 SKUs.
          Class C items will auto-replenish with NO approval.
-         
+
          Confirm?"
 Manager: "Confirm"
 System: "✓ Full auto mode enabled for Class C items.
@@ -4545,7 +4558,7 @@ Even in full auto mode:
 System: "Location A-05-12 safety-flagged.
          Cannot auto-deploy replenishment.
          Manager approval required.
-         
+
          Alternate: A-05-15 has 25 units Red Widget.
          Routing picker to A-05-15 instead."
 
@@ -4554,34 +4567,34 @@ AUTOMATION SUCCESS METRICS:
 Manager: "Show automation stats this month"
 
 System: "REPLENISHMENT AUTOMATION (January 2026)
-         
+
          TOTAL TASKS: 1,847
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Auto-approved: 1,672 (90.5%) ✓
          Manual approval: 175 (9.5%)
-         
+
          AUTO-APPROVAL BREAKDOWN:
          - Class A: 547 tasks (100% auto) ✓
          - Class B: 489 tasks (98% auto) ✓
          - Class C: 636 tasks (82% auto) ✓
-         
+
          MANUAL APPROVAL REASONS:
          - No reserve stock: 89 tasks (51%)
          - Safety flags: 42 tasks (24%)
          - After-hours: 28 tasks (16%)
          - High-value transfers: 16 tasks (9%)
-         
+
          EFFICIENCY GAINS:
          - Avg auto-approval time: 0.8 seconds
          - Avg manual approval time: 18 minutes
          - Time saved: 502 hours this month ✓
          - Labor cost saved: $12,548
-         
+
          RESPONSE TIME IMPROVEMENT:
          - Before automation: 35-60 minutes
          - With automation: 4-5 minutes
          - Improvement: 12x faster ✓
-         
+
          Overall automation rate: 90.5% ✓ EXCELLENT"
 ```
 
@@ -4631,24 +4644,24 @@ REAL-TIME EXPERIENCE:
 Sarah: "Task complete"
 
 System: "✓ RT-2847 complete. Excellent work!
-         
+
          NEXT TASK READY: RT-2848
          Location: Bravo 8 15
          Item: Blue Widget, 30 units
          From: Romeo 05 Alpha
          Distance from current location: 180 feet
          Priority: HIGH
-         
+
          Starting navigation..."
 
 NO WAIT TIME! Task instructions flowing immediately.
 
 10:19:02 AM - Sarah already moving to next task:
 System: "Turn right, proceed to Romeo 05 Alpha.
-         
+
          UPCOMING: After this task, you have RT-2849.
          Preview: Charlie 12 20, Pro Widget, 25 units.
-         
+
          Estimated completion all tasks: 10:35 AM
          Then break time if you want."
 
@@ -4691,12 +4704,12 @@ FUTURE TASK: RT-2849 (pushed back)
 VOICE ALERT TO SARAH:
 ─────────────────────
 System: "Sarah, priority change.
-         
+
          After current task, URGENT task inserted:
          Alpha 3 08, Red Widget, picker waiting.
-         
+
          Your original next task moved to 3rd position.
-         
+
          New route optimized. Continue current task."
 
 Sarah: "Got it, I'll do the urgent one next"
@@ -4708,12 +4721,12 @@ BREAK TIME MANAGEMENT:
 Sarah: "I need a break"
 
 System: "✓ Understood. You've completed 3 tasks (47 minutes).
-         
+
          Your queue is PAUSED.
          Remaining tasks reassigned to other drivers.
-         
+
          Take your break. Resume when ready.
-         
+
          Say 'Resume tasks' when you return."
 
 [Sarah takes 15-minute break]
@@ -4722,14 +4735,14 @@ System: "✓ Understood. You've completed 3 tasks (47 minutes).
 Sarah: "Resume tasks"
 
 System: "Welcome back Sarah!
-         
+
          NEW QUEUE READY:
          - 4 tasks assigned
          - Estimated 1 hour 20 minutes
          - First task: B-05-12, 60 feet away
-         
+
          Battery check: RT-07 at 52% (good for 4 hours)
-         
+
          Ready to start?"
 
 Sarah: "Ready"
@@ -4742,38 +4755,38 @@ QUEUE PERFORMANCE METRICS:
 Manager: "Show queue efficiency"
 
 System: "CONTINUOUS QUEUE SYSTEM (This Month)
-         
+
          DRIVER UTILIZATION:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Sarah: 94.7% (industry-leading!)
          Mike: 92.3%
          Tom: 91.8%
          Lisa: 93.1%
-         
+
          Team average: 93.0% vs. 65% industry average
          Improvement: +28 percentage points ✓
-         
+
          IDLE TIME ANALYSIS:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Traditional system: 35% idle time
          Logivox system: 7% idle time
          Reduction: 80% less idle time ✓
-         
+
          IDLE TIME BREAKDOWN (7%):
          - Break time: 4.2% (lunch, breaks)
          - Equipment issues: 1.8% (battery swaps, maintenance)
          - End of shift: 1.0% (clock out time)
          - Task gaps: 0% ✓ ELIMINATED!
-         
+
          PRODUCTIVITY GAINS:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Tasks per driver per day:
          - Before: 32 tasks (8 hours, 15 min/task)
          - After: 58 tasks (8 hours, 8.3 min/task)
          - Improvement: +81% more tasks ✓
-         
+
          Same labor cost, 81% more output!
-         
+
          ROI: 847% on automation investment"
 ```
 
@@ -4823,16 +4836,16 @@ DECISION: Reroute Sarah ✓
 VOICE RE-ROUTING:
 ─────────────────
 System: "Sarah, URGENT re-route.
-         
+
          Critical short pick at Alpha 9 12 (40 feet left).
          This is MORE URGENT than your current destination.
-         
+
          NEW PLAN:
          1. Deliver to Alpha 9 12 FIRST (urgent!)
          2. Then continue to Bravo 8 15 (original)
-         
+
          Adds 30 seconds, saves picker 3 minutes wait.
-         
+
          Accept re-route?"
 
 Sarah: "Accept"
@@ -4879,15 +4892,15 @@ Total distance:
 VOICE UPDATE TO MIKE:
 ─────────────────────
 System: "Mike, route optimized!
-         
+
          Your tasks reordered for efficiency:
          1. Alpha 3 8 (now first)
          2. Charlie 5 12 (now second)
          3. Delta 8 15 (now third)
-         
+
          New route saves 200 feet, 3 minutes.
          Same tasks, smarter order!
-         
+
          Proceed to Alpha 3 8?"
 
 Mike: "Yes, going to Alpha 3 8"
@@ -4910,15 +4923,15 @@ VOICE ALERT TO MIKE:
 ────────────────────
 System: "🚨 EMERGENCY: Aisle Delta blocked - chemical spill.
          Safety team on site.
-         
+
          Your task D-08-15 CANCELLED.
          Stay clear of Aisle Delta.
-         
+
          Alternate task assigned: E-05-10
          Same item, different location.
-         
+
          Continue with A-03-08, then C-05-12, then E-05-10.
-         
+
          Safety first!"
 
 Mike: "Understood, avoiding Delta"
@@ -4988,16 +5001,16 @@ Truck arrives with transfer.
 
 LA Receiving: "Receive transfer TO-2847"
 System: "Scanning... 400 units Red Widget confirmed.
-         
+
          URGENT PUT-AWAY:
          LA pick face Alpha 3 08 is at 127 units (2 days supply).
-         
+
          Direct 200 units to Alpha 3 08 (immediate availability).
          Reserve 200 units to Romeo 02 Bravo (backup stock).
-         
+
          Total LA stock: 127 → 527 units
          Days of supply: 2.4 → 10.1 days ✓
-         
+
          Stockout risk eliminated. Great work!"
 
 CROSS-WAREHOUSE VISIBILITY:
@@ -5005,29 +5018,29 @@ CROSS-WAREHOUSE VISIBILITY:
 Manager (any warehouse): "Show Red Widget global inventory"
 
 System: "RED WIDGET - GLOBAL VIEW
-         
+
          NYC WAREHOUSE:
          - Stock: 2,447 units (32 days supply) ✓
          - Status: Optimal
-         
+
          LA WAREHOUSE:
          - Stock: 527 units (10 days supply) ✓
          - Status: Good (was critical)
-         
+
          CHICAGO WAREHOUSE:
          - Stock: 892 units (15 days supply) ✓
          - Status: Optimal
-         
+
          MIAMI WAREHOUSE:
          - Stock: 478 units (12 days supply) ✓
          - Status: Optimal
-         
+
          TOTAL NETWORK:
          - Combined stock: 4,344 units
          - Network days supply: 17.2 days
          - Balance: Excellent ✓
          - No transfers needed
-         
+
          AI monitoring: Active
          Next review: Tomorrow at midnight"
 ```
@@ -5131,27 +5144,27 @@ DEAD STOCK DASHBOARD:
 Manager: "Show dead stock summary"
 
 System: "DEAD STOCK ANALYSIS (Current)
-         
+
          TOTAL DEAD STOCK:
          - 23 SKUs
          - 4,847 units
          - Value: $147,250
          - Carrying cost: $3,681/month
          - Space: 67 pallet positions
-         
+
          STATUS BREAKDOWN:
          - Clearance active: 8 SKUs (selling well)
          - Liquidation pending: 4 SKUs
          - Donation scheduled: 6 SKUs
          - Review needed: 5 SKUs
-         
+
          RECOVERY THIS QUARTER:
          - Clearance sales: $42,580
          - Liquidation: $12,400
          - Donations (tax): $18,700
          - Space freed: 42 positions
          - Monthly savings: $2,847
-         
+
          ROI on dead stock program: 287% ✓"
 ```
 
@@ -5290,30 +5303,30 @@ MONTHLY AUTO-PO REPORT:
 Manager: "Show auto-PO stats this month"
 
 System: "AUTOMATED PURCHASE ORDERS (January 2026)
-         
+
          Total POs generated: 47
          Auto-approved: 42 (89%)
          Manual approval required: 5 (11%)
-         
+
          Total value: $287,450
          Average PO value: $6,116
-         
+
          SUPPLIER PERFORMANCE:
          - Acme Supplies: 12 POs, 100% on-time ✓
          - Widget Corp: 8 POs, 87% on-time
          - Parts R Us: 7 POs, 100% on-time ✓
-         
+
          STOCKOUT PREVENTION:
          - Projected stockouts without auto-PO: 23
          - Actual stockouts: 0 ✓
          - Prevention rate: 100%
-         
+
          TIME SAVINGS:
          - Manual PO time: ~30 min/PO
          - Auto-PO time: 2 minutes
          - Time saved: 22 hours this month
          - Cost saved: $550 (labor)
-         
+
          ROI on auto-PO system: 847% ✓"
 ```
 
@@ -5329,7 +5342,7 @@ Manager: "Show replenishment dashboard"
 
 System: "REPLENISHMENT PERFORMANCE DASHBOARD
          Period: Last 30 days
-         
+
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          OVERALL METRICS:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -5337,11 +5350,11 @@ System: "REPLENISHMENT PERFORMANCE DASHBOARD
          Success rate: 99.2% ✓
          Average time: 8.4 minutes
          Target: <15 minutes ✓
-         
+
          Urgent replenishments: 247 (13%)
          Urgent avg time: 4.2 minutes ✓
          Target: <5 minutes ✓
-         
+
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          STOCKOUT PREVENTION:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -5349,17 +5362,17 @@ System: "REPLENISHMENT PERFORMANCE DASHBOARD
          Prevented: 89 (100%) ✓
          Orders saved: 284
          Revenue protected: $487,240
-         
+
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          AI OPTIMIZATION:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Reorder points optimized: 127 SKUs
          Min/Max levels adjusted: 89 SKUs
          Purchase orders auto-generated: 47
-         
+
          Forecast accuracy: 94.2% ✓
          Safety stock optimization: +$12,400 saved
-         
+
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          TEAM PERFORMANCE:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -5367,7 +5380,7 @@ System: "REPLENISHMENT PERFORMANCE DASHBOARD
          Mike: 489 tasks, 5.8 min avg ⭐⭐⭐⭐
          Tom: 423 tasks, 6.1 min avg ⭐⭐⭐⭐
          Lisa: 388 tasks, 7.4 min avg ⭐⭐⭐
-         
+
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          EFFICIENCY GAINS:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -5375,7 +5388,7 @@ System: "REPLENISHMENT PERFORMANCE DASHBOARD
          Task interleaving: +847 tasks completed
          Travel distance saved: 4.6 miles
          Labor cost saved: $458
-         
+
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          TOP REPLENISHED ITEMS:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -5384,7 +5397,7 @@ System: "REPLENISHMENT PERFORMANCE DASHBOARD
          3. Blue Widget: 67 replenishments (Class B)
          4. Super Widget: 54 replenishments (Class A)
          5. Green Widget: 12 replenishments (Class C)
-         
+
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          ALERTS & ISSUES:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -5393,7 +5406,7 @@ System: "REPLENISHMENT PERFORMANCE DASHBOARD
          ✓ No critical alerts
          ✓ System health: Excellent
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         
+
          Overall rating: ⭐⭐⭐⭐⭐ EXCELLENT"
 ```
 
@@ -5407,58 +5420,58 @@ model ReplenishmentTask {
   taskNumber        String   @unique
   organizationId    String
   warehouseId       String
-  
+
   // Item
   sku               String
   description       String
   quantity          Int
-  
+
   // Locations
   fromLocation      String
   toLocation        String
   fromLocationType  String   // RESERVE, BULK, OVERFLOW, RETURNS, STAGING
   toLocationType    String   // PICK_FACE, PRIMARY, SECONDARY
-  
+
   // Priority
   priority          String   // URGENT, HIGH, STANDARD, LOW
   urgencyReason     String?  // PICKER_WAITING, SHORT_PICK, LOW_STOCK, SCHEDULED
-  
+
   // Classification
   abcClass          String?  // A, B, C
   velocityCategory  String?  // FAST, MEDIUM, SLOW
-  
+
   // Assignment
   assignedTo        String?
   assignedAt        DateTime?
   equipment         String?  // RT-07, FLT-12
-  
+
   // Status
   status            String   @default("PENDING")
                             // PENDING, ASSIGNED, IN_PROGRESS, COMPLETED, CANCELLED
-  
+
   // Timing
   createdAt         DateTime @default(now())
   startedAt         DateTime?
   completedAt       DateTime?
   dueAt             DateTime?
-  
+
   // Performance
   estimatedTime     Int?     // minutes
   actualTime        Int?     // minutes
   distanceTraveled  Int?     // feet
-  
+
   // Wave
   waveId            String?
   batchId           String?
-  
+
   // Trigger
   triggeredBy       String?  // SYSTEM, USER, SHORT_PICK, MIN_MAX, WAVE
   triggerReason     String?  @db.Text
-  
+
   // Completion
   completedBy       String?
   completionNotes   String?  @db.Text
-  
+
   @@map("replenishment_tasks")
 }
 
@@ -5467,36 +5480,36 @@ model ReplenishmentWave {
   waveNumber        String   @unique
   organizationId    String
   warehouseId       String
-  
+
   // Schedule
   scheduledStart    DateTime
   scheduledEnd      DateTime
   actualStart       DateTime?
   actualEnd         DateTime?
-  
+
   // Tasks
   totalTasks        Int
   completedTasks    Int      @default(0)
   failedTasks       Int      @default(0)
-  
+
   // Optimization
   optimizationScore Float?   // 0-100
   totalDistance     Int?     // feet
   totalTime         Int?     // minutes
-  
+
   // Assignment
   assignedDrivers   Json     // Array of driver IDs
-  
+
   // Status
   status            String   @default("SCHEDULED")
                             // SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
-  
+
   // Performance
   efficiencyRating  Float?   // vs. estimated
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   @@map("replenishment_waves")
 }
 
@@ -5505,40 +5518,40 @@ model MinMaxLevel {
   organizationId    String
   warehouseId       String
   sku               String
-  
+
   // Current settings
   minLevel          Int
   maxLevel          Int
   reorderPoint      Int
   orderQuantity     Int
   safetyStock       Int
-  
+
   // Calculation factors
   avgDailyDemand    Float
   maxDailyDemand    Float
   leadTimeDays      Int
   serviceLevel      Float    // 0.90, 0.95, 0.99
-  
+
   // ABC Classification
   abcClass          String   // A, B, C
   velocityCategory  String   // FAST, MEDIUM, SLOW
-  
+
   // Status
   currentStock      Int?
   daysOfSupply      Float?
   needsReorder      Boolean  @default(false)
-  
+
   // Optimization
   lastOptimized     DateTime @default(now())
   optimizedBy       String   // SYSTEM, MANUAL
-  
+
   // Alerts
   alertEnabled      Boolean  @default(true)
   alertThreshold    Float    @default(1.0) // Multiplier of reorder point
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   @@unique([organizationId, warehouseId, sku])
   @@map("min_max_levels")
 }
@@ -5548,30 +5561,30 @@ model DemandForecast {
   organizationId    String
   warehouseId       String
   sku               String
-  
+
   // Forecast period
   forecastDate      DateTime
   horizon           Int      // Days ahead
-  
+
   // Prediction
   predictedDemand   Float
   confidence        Float    // 0-1
-  
+
   // Historical
   actualDemand      Float?
   accuracy          Float?   // vs actual
-  
+
   // Factors
   seasonalityFactor Float?
   trendFactor       Float?
   promotionImpact   Float?
-  
+
   // Model
   modelVersion      String
   modelConfidence   Float
-  
+
   createdAt         DateTime @default(now())
-  
+
   @@map("demand_forecasts")
 }
 
@@ -5581,38 +5594,38 @@ model DeadStockAlert {
   warehouseId       String
   sku               String
   description       String
-  
+
   // Status
   status            String   // FLAGGED, UNDER_REVIEW, ACTION_TAKEN, RESOLVED
   severity          String   // LOW, MEDIUM, HIGH, CRITICAL
-  
+
   // Metrics
   currentStock      Int
   stockValue        Decimal  @db.Decimal(10, 2)
   lastSaleDate      DateTime?
   daysSinceLastSale Int
-  
+
   // Costs
   carryingCost      Decimal  @db.Decimal(10, 2)
   spaceOccupied     Int      // pallet positions
-  
+
   // Recommendations
   recommendedAction String   // CLEARANCE, LIQUIDATION, DONATION, DISPOSAL
   expectedRecovery  Decimal? @db.Decimal(10, 2)
-  
+
   // Actions taken
   actionTaken       String?
   actionDate        DateTime?
   actualRecovery    Decimal? @db.Decimal(10, 2)
-  
+
   // Resolution
   resolvedDate      DateTime?
   resolvedBy        String?
   resolutionNotes   String?  @db.Text
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   @@map("dead_stock_alerts")
 }
 
@@ -5620,41 +5633,41 @@ model InventoryTransfer {
   id                String   @id @default(cuid())
   transferNumber    String   @unique
   organizationId    String
-  
+
   // Warehouses
   fromWarehouseId   String
   toWarehouseId     String
-  
+
   // Item
   sku               String
   description       String
   quantity          Int
-  
+
   // Reason
   transferReason    String   // BALANCING, SHORTAGE, EXCESS, SEASONAL, CLOSURE
   aiRecommended     Boolean  @default(false)
-  
+
   // Status
   status            String   @default("PENDING")
                             // PENDING, APPROVED, SHIPPED, IN_TRANSIT, RECEIVED, CANCELLED
-  
+
   // Logistics
   carrier           String?
   trackingNumber    String?
   shippedDate       DateTime?
   expectedDate      DateTime?
   receivedDate      DateTime?
-  
+
   // Financial
   transferCost      Decimal? @db.Decimal(10, 2)
   expectedSavings   Decimal? @db.Decimal(10, 2)
-  
+
   // Performance
   transitTime       Int?     // days
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   @@map("inventory_transfers")
 }
 ```
@@ -5718,20 +5731,20 @@ Associate: "Yes"
 STEP 5: Smart Put-Away Routing
 ────────────────────────────────
 System: "Receipt complete. Calculating optimal put-away...
-         
+
          URGENT: Location A5-12 (Red Widget pick face) is EMPTY!
          Zero pick reported 15 minutes ago.
-         
+
          Smart routing:
          - 50 units Red Widget → A5-12 (EXPRESS to pick face)
          - 150 units Red Widget → R-05-A (reserve)
          - 30 units Blue Widget → A3-08 (pick face)
          - 120 units Blue Widget → R-03-B (reserve)
          - 75 units Green Widget → R-07-C (reserve)
-         
+
          Express task PA-1847 dispatched to nearest driver.
          ETA to pick face: 8 minutes.
-         
+
          Receipt RCV-2026-00189 complete!"
 ```
 
@@ -5800,7 +5813,7 @@ System: "T1234 loaded?"
 Loader: "Loaded"
 [Scans dock door]
 System: "Dock 8 confirmed. T1234 loaded 10:47 AM.
-         
+
          Next: T1235, staging S-13.
          45 cartons, 680 lbs, position 4 right side..."
 
@@ -5861,9 +5874,9 @@ STEP 1: Route Planning (AI-Optimized)
 Dispatcher: "Plan routes for today's deliveries"
 System: "Analyzing 47 orders, 15 customer locations.
          Total: 124 containers, 12,400 lbs.
-         
+
          AI Route Optimization Complete:
-         
+
          🚚 ROUTE 1 (Driver: John)
          └─ 8 stops, 85 miles, est. 4.2 hours
          └─ Containers: 32 (4,200 lbs)
@@ -5872,13 +5885,13 @@ System: "Analyzing 47 orders, 15 customer locations.
             • Traffic patterns (avoid rush hour)
             • Dock access (XYZ needs truck, not van)
             • Fuel efficiency (minimal backtracking)
-         
+
          🚚 ROUTE 2 (Driver: Sarah)
          └─ 7 stops, 67 miles, est. 3.8 hours
          └─ Containers: 28 (3,900 lbs)
-         
+
          Total savings vs manual: 47 miles, 2.1 hours.
-         
+
          Approve routes?"
 Dispatcher: "Approve"
 System: "Routes locked. Loading sequences generated.
@@ -5889,11 +5902,11 @@ STEP 2: Load Staging (Route-Optimized)
 System: "Route 1 loading. Load in REVERSE delivery order.
          Last delivery loads first (front of truck).
          First delivery loads last (back of truck).
-         
+
          Start: Metro Store (stop 8, last delivery)
          Load containers: T1001, T1002, T1003
          Position: Front of truck, right side."
-         
+
 Loader: "Loading Metro containers"
 [Scans containers]
 System: "3 containers staged. Weight: 850 lbs.
@@ -5941,7 +5954,7 @@ John: "Signature captured"
 System: "ABC Corp delivery complete. POD uploaded.
          Customer notification sent.
          Invoice updated: Delivered 8:56 AM.
-         
+
          Next stop: XYZ Industries, 4.7 miles.
          8 containers. ETA 9:15 AM."
 
@@ -5956,7 +5969,7 @@ John: "Accept urgent"
 System: "Route updated. MediSupply now stop 3.
          Loading dock notified. Container ready at dock.
          Return to facility for pickup.
-         
+
          Updated route: 9 stops, adds 12 minutes total.
          All time windows maintained."
 
@@ -5971,7 +5984,7 @@ STEP 6: Delivery Completion & Analytics
 ────────────────────────────────────────
 [End of day]
 System: "Route 1 complete. 9 stops (8 planned + 1 urgent).
-         
+
          📊 ROUTE PERFORMANCE:
          ├─ Miles driven: 92 (vs 85 planned)
          ├─ Time: 4.8 hours (vs 4.2 planned)
@@ -5980,9 +5993,9 @@ System: "Route 1 complete. 9 stops (8 planned + 1 urgent).
          ├─ Signatures: 9/9 captured
          ├─ Customer ratings: 4.8/5 avg
          └─ Savings vs manual route: $47 fuel, 1.8 hours
-         
+
          Outstanding John! $65 daily bonus earned."
-         
+
 John: "End route"
 System: "Route 1 closed. Vehicle inspection?"
 John: "No issues"
@@ -6033,10 +6046,10 @@ System: "Optimal route calculated. Meets ALL constraints:
          ✓ Customer preferences honored
          ✓ Fuel efficiency: 23% better than manual
          ✓ Driver safety score: 98/100
-         
+
          Manual planning time: 45 minutes
          AI planning time: 1.7 seconds
-         
+
          Better route. Zero effort. Load truck?"
 ```
 
@@ -6052,29 +6065,29 @@ Dispatcher: "Optimize routes for next week"
 System: "Analyzing 342 orders, 87 unique customers.
          Geographic clustering... Traffic patterns...
          Driver schedules... Vehicle capacity...
-         
+
          WEEK OPTIMIZATION (Jan 13-17):
-         
+
          MONDAY (High Volume):
          ├─ Route 1: John, 12 stops, 8.2 hours
          ├─ Route 2: Sarah, 11 stops, 7.8 hours
          ├─ Route 3: Mike, 10 stops, 7.1 hours
          └─ Total: 33 deliveries, 417 miles
-         
+
          TUESDAY (Medium Volume):
          ├─ Route 1: John, 8 stops, 5.5 hours
          ├─ Route 2: Sarah, 9 stops, 6.2 hours
          └─ Total: 17 deliveries, 285 miles
-         
+
          [... Wednesday through Friday]
-         
+
          WEEKLY SAVINGS:
          ├─ Miles: 1,847 (vs 2,341 manual) = 494 saved
          ├─ Time: 184 hours (vs 216 manual) = 32 hours saved
          ├─ Fuel: $718 (vs $912 manual) = $194 saved
          ├─ Overtime: $0 (all under 8 hours)
          └─ Carbon: 0.8 tons CO₂ reduced
-         
+
          Approve weekly plan?"
 Dispatcher: "Approve"
 System: "Week locked. Drivers notified.
@@ -6103,13 +6116,13 @@ Driver: "Loading returns"
 System: "RMA-8847 confirmed. 3 cartons. Damaged units.
          Place in return zone (front right).
          QC inspection required upon return."
-         
+
 [Return to warehouse]
 System: "3 returns collected today:
          - ABC Corp: RMA-8847 (defective)
          - XYZ: RMA-8851 (wrong item)
          - Big Box: RMA-8854 (customer return)
-         
+
          Unload at Returns Dock, door 9.
          QC team standing by."
 ```
@@ -6308,7 +6321,7 @@ System: "Accepted. Financial update:
          - XYZ inventory increased: 500 units @ $15/unit
          - XYZ A/P created: $8,100 (due Feb 6)
          - XYZ asset value: +$7,500
-         
+
          Map ABC SKU to XYZ SKU?"
 XYZ Receiver: "Yes, map to XYZ-WIDGET-RED"
 System: "500 units added as XYZ-WIDGET-RED.
@@ -6531,11 +6544,11 @@ CUSTOMER INITIATES RETURN (NO PRINTER NEEDED):
 
 Customer: "I don't have a printer"
 System: "No problem! QR code return available.
-         
+
          1. Bring items to any UPS/FedEx location
          2. Show QR code on your phone
          3. They'll pack and ship for you
-         
+
          QR code generated: [Display on screen]
          Also sent to email/text message."
 
@@ -6576,7 +6589,7 @@ System: "Package identified: RMA-8472
          Expected items:
          - 5x Red Widget (SKU-RW200) - Reason: Wrong size
          - 2x Blue Widget (SKU-BW100) - Reason: Damaged
-         
+
          Open package and scan items."
 
 STEP 2: AI-POWERED INSPECTION
@@ -6589,19 +6602,19 @@ Tom: "Good condition"
 
 AI ANALYSIS RUNNING...
 System: "Analyzing Red Widget...
-         
+
          ✓ Expected: Good/resellable condition
          ✓ Visual: No visible damage
          ✓ Return reason: Wrong size (not product defect)
          ✓ Original order: 12 days ago
-         
+
          AI RECOMMENDATION: RESTOCK
-         
+
          Location check: A-05-12 is SHORT (only 8 units, need 50)
-         
+
          SMART ROUTING: Direct to pick face A-05-12
          Skip reserve storage! Immediate availability.
-         
+
          Confirm disposition?"
 Tom: "Confirmed, direct to pick face"
 
@@ -6610,7 +6623,7 @@ System: "Perfect! Creating express putaway:
          ✓ Priority: HIGH (short pick location)
          ✓ Driver notified: Mike (ETA 3 minutes)
          ✓ Refund approved: $149.95
-         
+
          Next item: Blue Widget..."
 
 [Tom scans damaged Blue Widget]
@@ -6622,75 +6635,75 @@ Tom: "Water damaged"
 AI DAMAGE ASSESSMENT:
 System: "Water damage detected.
          Taking photo for records... [CLICK]
-         
+
          Analyzing damage severity...
-         
+
          AI ASSESSMENT:
          - Packaging: Compromised
          - Product: Water stains visible
          - Functionality: Unknown
          - Resale value: $0 (unsellable)
-         
+
          DISPOSITION OPTIONS:
          1. ❌ SCRAP ($59.98 loss)
          2. 🔧 REFURBISH (cost $15, resale $45)
          3. 📦 RETURN TO VENDOR (may recover cost)
-         
+
          AI RECOMMENDATION: RETURN TO VENDOR
          Reason: Within vendor warranty (30 days)
          Vendor: Acme Supplies
          Policy: Full credit for carrier damage
          Success rate: 95%
-         
+
          Create vendor RMA?"
 Tom: "Yes, create vendor RMA"
 
 AUTOMATED VENDOR CHARGEBACK:
 ────────────────────────────
 System: "Creating vendor return authorization...
-         
+
          ✓ Checking vendor policy... Eligible ✓
          ✓ Generating RTV-V8472
          ✓ Emailing vendor with photos
          ✓ Vendor responded: Auto-approved (AI approval)
          ✓ Vendor return label generated
          ✓ Expected credit: $59.98
-         
+
          Instructions:
          1. Place items in vendor return bin VR-05
          2. Print vendor label [PRINTING...]
          3. Ship today for fastest credit
-         
+
          Vendor credit expected: 5-7 business days"
 
 STEP 3: AUTOMATIC REFUND PROCESSING
 ────────────────────────────────────
 System: "Return RMA-8472 complete.
-         
+
          FINANCIAL SUMMARY:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Customer refund:
          - Red Widget (5): $149.95 ✓ RESTOCKED
          - Blue Widget (2): $59.98  ✓ VENDOR RMA
          Total refund: $209.93
-         
+
          Restocking fee: $0 (within policy)
-         
+
          ISSUING REFUND...
          ✓ Credit memo CM-8472 created
          ✓ Refund to Visa ****1234: $209.93
          ✓ Customer notification sent
          ✓ Refund will appear in 2-3 business days
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         
+
          INVENTORY UPDATES:
          ✓ A-05-12: 8 → 13 units Red Widget
          ✓ SHORT PICK RESOLVED!
          ✓ Picker John notified: 'Continue SO-12345'
-         
+
          VENDOR CLAIM:
          ✓ RTV-V8472 pending ($59.98 recovery)
-         
+
          Total processing time: 4 minutes 23 seconds
          Excellent work Tom!"
 
@@ -6725,7 +6738,7 @@ Returns Associate: "Return for RMA-9981"
 System: "RMA-9981: Customer XYZ Corp
          1x Pro Laptop ($2,499.00)
          Reason: 'Defective - won't turn on'
-         
+
          ⚠️ HIGH VALUE ALERT
          Serial number verification required."
 
@@ -6736,24 +6749,24 @@ Associate: "Reading serial... SN-ABC-12345"
 FRAUD DETECTION RUNNING...
 ═══════════════════════════
 System: "Validating serial SN-ABC-12345...
-         
+
          ❌ FRAUD ALERT!
-         
+
          Serial SN-ABC-12345:
          - NOT found in original order SO-55555
          - Original order serial: SN-ABC-99999
          - This serial sold to: Different Customer (DEF Corp)
          - Original sale date: 6 months ago
-         
+
          🚨 SUSPECTED FRAUD:
          Customer is returning DIFFERENT laptop than purchased!
-         
+
          ACTIONS REQUIRED:
          1. Quarantine laptop → Q-FRAUD-01
          2. Flag RMA for investigation
          3. Notify manager
          4. Contact customer for clarification
-         
+
          Place in fraud quarantine now?"
 Associate: "Yes, quarantining"
 
@@ -6762,7 +6775,7 @@ System: "Laptop quarantined to Q-FRAUD-01.
          ✓ Manager Sarah notified
          ✓ Investigation case INV-9981 created
          ✓ Customer email: 'Return under review'
-         
+
          DO NOT ISSUE REFUND until cleared."
 
 MANAGER INVESTIGATION:
@@ -6773,12 +6786,12 @@ System: "Laptop serial mismatch.
          1. Accidentally sent wrong unit
          2. Attempting return fraud
          3. Honest mistake (swapped units)
-         
+
          Options:
          1. Contact customer (request correct serial)
          2. Reject return (fraud confirmed)
          3. Accept different serial (if policy allows)
-         
+
          Customer phone: (555) 123-4567"
 
 Sarah calls customer...
@@ -6802,29 +6815,29 @@ Returns Associate: "RMA-7733"
 System: "RMA-7733: 10x Office Chair
          Original order: 60 days ago
          Return policy: 30 days
-         
+
          ⚠️ OUTSIDE RETURN WINDOW
-         
+
          Restocking fee applies: 25%
          Item value: $1,200.00
          Restocking fee: $300.00
          Customer refund: $900.00
-         
+
          Proceed with return?"
 Associate: "Check condition first"
 
 [Scans items]
 System: "Chairs in good condition. Resellable.
-         
+
          DISPOSITION: RESTOCK with fee
-         
+
          REFUND CALCULATION:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Item value:           $1,200.00
          Restocking fee (25%):  - $300.00
          Customer refund:       $  900.00
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         
+
          Approve refund with fee?"
 Associate: "Approved"
 
@@ -6851,29 +6864,29 @@ Associate: "Minor scratch on surface, otherwise perfect"
 AI DISPOSITION ENGINE:
 ──────────────────────
 System: "Analyzing...
-         
+
          DAMAGE: Minor cosmetic (scratch)
          FUNCTIONALITY: 100%
          NEW PRICE: $599.00
          REFURBISH COST: $40 (sand + refinish)
          RESALE VALUE: $479.00 (80% of new)
-         
+
          RECOMMENDATION: REFURBISH
          ROI: $439 profit vs. $0 scrap
-         
+
          Create refurbishment work order?"
 Associate: "Yes"
 
 AUTOMATED WORK ORDER CREATION:
 ──────────────────────────────
 System: "Refurbishment work order RWO-6644 created.
-         
+
          WORK ORDER DETAILS:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Item: Deluxe Desk
          Issue: Surface scratch (3 inches)
          Location: REFURB-ZONE-A
-         
+
          TASKS:
          1. ✓ Transport to refurb area
          2. ⏳ Sand scratch area (20 min)
@@ -6882,17 +6895,17 @@ System: "Refurbishment work order RWO-6644 created.
          5. ⏳ Dry time (60 min)
          6. ⏳ QC inspection
          7. ⏳ Move to 'refurbished' inventory
-         
+
          Assigned to: Refurbishment Team
          Due date: Today 5:00 PM
          Cost budget: $40
          Expected resale: $479
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         
+
          ✓ Team notified
          ✓ Parts reserved (stain, finish)
          ✓ Equipment reserved (sander)
-         
+
          Move desk to REFURB-ZONE-A now."
 
 Associate: "Moved to refurb zone"
@@ -6932,11 +6945,11 @@ System: "✓ QC APPROVED
          ✓ Price: $479.00 (save $120 vs. new!)
          ✓ Auto-publishing to website
          ✓ Cost tracking: $42 actual vs. $40 budget
-         
+
          WORK ORDER COMPLETE!
          Profit: $437 vs. $0 scrap
          Total time: 2 hours 15 minutes
-         
+
          Great work team!"
 ```
 
@@ -6955,33 +6968,33 @@ AI CROSS-BORDER ROUTING:
 System: "International return detected.
          Customer location: Toronto, Canada
          Warehouse: New York, USA
-         
+
          Analyzing routing options...
-         
+
          OPTION 1: Ship to USA warehouse
          - Customs clearance required
          - Duty/tax refund: $45
          - Shipping cost: $28
          - Time: 7-10 days
          - Customer responsibility: Customs forms
-         
+
          OPTION 2: Ship to Canada return center
          - No customs (stays in Canada)
          - Partnership: Returns.ca
          - Cost: $12
          - Time: 2-3 days
          - Easier for customer
-         
+
          AI RECOMMENDATION: Option 2
          (Faster, cheaper, better experience)
-         
+
          Generating return label to Canada center.
          Items will be:
          1. Received in Canada
          2. Inspected there
          3. Refund issued immediately
          4. Restocked in USA warehouse (bulk shipment)
-         
+
          Label sent to customer."
 ```
 
@@ -7003,17 +7016,17 @@ System: "Customer: Premium Corp
          Return rate: 2.1% (excellent)
          Fraud risk: 0.01% (trusted)
          Payment history: Perfect (never late)
-         
+
          INSTANT REFUND ELIGIBLE ✓
-         
+
          Policy: Refund before receiving items
-         
+
          Issuing immediate refund: $1,245.00
          Return label generated.
          Items can arrive anytime (30 days).
-         
+
          Customer notified: 'Refund processed'
-         
+
          Notes: If items not returned in 30 days,
                 auto-charge original payment method."
 
@@ -7045,7 +7058,7 @@ System: "RMA-4411: Retail Store #42
          Returning: 50 items
          Total value: $12,450
          Reason: Overstock
-         
+
          Voice-guided processing activated.
          Scan items one by one, I'll guide you."
 
@@ -7072,7 +7085,7 @@ System: "✓ Blue Widget disposition: RESTOCK as 'Open Box'
 [Takes 18 minutes total]
 
 System: "All 50 items processed!
-         
+
          SUMMARY:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          ✓ Restocked: 42 items ($10,100)
@@ -7080,11 +7093,11 @@ System: "All 50 items processed!
          ✓ Damaged: 2 items ($400 - refurb)
          ✓ Defective: 1 item ($100 - RTV)
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         
+
          Store credit: $11,450 (includes restocking fee)
          Processing time: 18 minutes (2.2 items/min)
          Accuracy: 100%
-         
+
          Credit memo issued to Store #42.
          Excellent processing speed!"
 ```
@@ -7099,7 +7112,7 @@ MANAGER DASHBOARD - RETURNS INSIGHTS:
 
 Manager: "Show returns analytics"
 System: "Returns Performance Dashboard
-         
+
          THIS MONTH:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          Total returns: 847 (↓ 12% vs. last month)
@@ -7107,39 +7120,39 @@ System: "Returns Performance Dashboard
          Avg processing time: 4.1 minutes
          Auto-approval rate: 78%
          Fraud detected: 12 cases (1.4%)
-         
+
          TOP RETURN REASONS:
          1. Wrong size: 34%
          2. Damaged in transit: 22%
          3. Changed mind: 18%
          4. Defective: 15%
          5. Other: 11%
-         
+
          TOP RETURNED PRODUCTS:
          1. Red Widget: 125 returns
             → ACTION: Check product description
          2. Blue Widget: 89 returns
             → ACTION: Review packaging
          3. Green Widget: 67 returns
-         
+
          DISPOSITION BREAKDOWN:
          - Restocked: 76%
          - Refurbished: 12%
          - RTV: 8%
          - Scrapped: 4%
-         
+
          FINANCIAL IMPACT:
          - Total refunds: $124,500
          - Restocking fees: $8,200
          - Vendor recoveries: $12,400
          - Net cost: $103,900
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-         
+
          AI PREDICTIONS:
          ⚠️ Red Widget returns trending UP
          Recommendation: Review sizing chart
          Expected savings: $15K/month
-         
+
          ✓ Overall returns trending DOWN
          Great job team!"
 ```
@@ -7154,53 +7167,53 @@ model RMA {
   rmaNumber       String   @unique
   organizationId  String
   customerId      String?
-  
+
   // Source
   orderId         String?
   channel         String   // CUSTOMER, 3PL_CLIENT, RETAIL, MARKETPLACE, INTERNAL
-  
+
   // Status
   status          String   // DRAFT, REQUESTED, APPROVED, REJECTED, RECEIVED, DISPOSITIONED, CLOSED
   returnType      String   // UNWANTED, DAMAGED, DEFECTIVE, WRONG_ITEM, EXPIRED, RECALL, WARRANTY
   reasonCode      String
   customerNotes   String?  @db.Text
-  
+
   // Logistics
   returnMethod    String?  // MAIL, PICKUP, DROP_OFF, IN_STORE
   labelType       String?  // PREPAID, CUSTOMER_PAID, CARRIER_COLLECT, NONE
   trackingNumber  String?
   carrier         String?
-  
+
   // Eligibility
   eligible        Boolean  @default(false)
   eligibilityNotes String? @db.Text
   autoApproved    Boolean  @default(false)
-  
+
   // Fraud detection
   fraudRiskScore  Float?   @default(0)
   fraudFlags      Json?    // Array of fraud indicators
   serialValidated Boolean  @default(false)
-  
+
   // Timing
   requestedDate   DateTime @default(now())
   approvedDate    DateTime?
   receivedDate    DateTime?
   completedDate   DateTime?
-  
+
   // Financial
   totalValue      Decimal  @db.Decimal(10, 2)
   refundAmount    Decimal? @db.Decimal(10, 2)
   restockingFee   Decimal? @db.Decimal(10, 2)
-  
+
   // Items
   items           RMAItem[]
-  
+
   // Tracking
   events          RMAEvent[]
-  
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   @@map("rmas")
 }
 
@@ -7208,39 +7221,39 @@ model RMAItem {
   id              String   @id @default(cuid())
   rmaId           String
   rma             RMA      @relation(fields: [rmaId], references: [id])
-  
+
   // Item details
   sku             String
   description     String?
   quantity        Int
-  
+
   // Traceability
   lot             String?
   serials         Json?    // Array of serial numbers
-  
+
   // Inspection
   conditionGrade  String?  // NEW, GOOD, FAIR, DAMAGED, DEFECTIVE
   inspectionNotes String?  @db.Text
   photoUrls       Json?    // Array of photo URLs
-  
+
   // Disposition
   disposition     String?  // RESTOCK, REFURBISH, SCRAP, RTV, QUARANTINE, DONATE, RESALE
   dispositionDate DateTime?
   destinationLocation String?
-  
+
   // Financial
   unitPrice       Decimal  @db.Decimal(10, 2)
   refundAmount    Decimal? @db.Decimal(10, 2)
-  
+
   // Refurbishment
   refurbWorkOrderId String?
-  
+
   // Vendor return
   vendorRmaId     String?
-  
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   @@map("rma_items")
 }
 
@@ -7248,15 +7261,15 @@ model RMAEvent {
   id              String   @id @default(cuid())
   rmaId           String
   rma             RMA      @relation(fields: [rmaId], references: [id])
-  
+
   eventType       String   // CREATED, APPROVED, LABEL_GENERATED, IN_TRANSIT, RECEIVED, INSPECTED, etc.
   description     String?  @db.Text
   performedBy     String?
-  
+
   metadata        Json?    // Additional event data
-  
+
   timestamp       DateTime @default(now())
-  
+
   @@map("rma_events")
 }
 
@@ -7264,53 +7277,53 @@ model RefurbishmentWorkOrder {
   id              String   @id @default(cuid())
   workOrderNumber String   @unique
   organizationId  String
-  
+
   // Source
   rmaItemId       String?
   sourceType      String   // RETURN, DAMAGED_GOODS, OVERSTOCK, REPAIR
-  
+
   // Item
   sku             String
   description     String
   quantity        Int      @default(1)
-  
+
   // Issue
   issue           String   @db.Text
   severity        String   // MINOR, MODERATE, MAJOR
-  
+
   // Work details
   status          String   // PENDING, IN_PROGRESS, QC_REVIEW, COMPLETED, REJECTED
   assignedTo      String?
-  
+
   // Steps
   tasks           Json     // Array of refurbishment tasks
   completedSteps  Int      @default(0)
   totalSteps      Int
-  
+
   // Costs
   estimatedCost   Decimal  @db.Decimal(10, 2)
   actualCost      Decimal? @db.Decimal(10, 2)
-  
+
   // Resale
   originalPrice   Decimal  @db.Decimal(10, 2)
   resalePrice     Decimal? @db.Decimal(10, 2)
   discount        Int?     // Percentage
-  
+
   // QC
   qcPassed        Boolean  @default(false)
   qcNotes         String?  @db.Text
   qcPerformedBy   String?
   qcDate          DateTime?
-  
+
   // Timing
   createdDate     DateTime @default(now())
   startDate       DateTime?
   completedDate   DateTime?
   dueDate         DateTime?
-  
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   @@map("refurbishment_work_orders")
 }
 
@@ -7319,43 +7332,43 @@ model VendorReturnAuthorization {
   rtvNumber       String   @unique
   organizationId  String
   vendorId        String
-  
+
   // Source
   rmaItemIds      Json     // Array of RMA item IDs being returned to vendor
   purchaseOrderId String?
-  
+
   // Status
   status          String   // REQUESTED, APPROVED, REJECTED, SHIPPED, CREDITED
-  
+
   // Items
   totalItems      Int
   totalValue      Decimal  @db.Decimal(10, 2)
-  
+
   // Vendor authorization
   vendorRmaNumber String?
   vendorApprovalDate DateTime?
-  
+
   // Shipping
   trackingNumber  String?
   carrier         String?
   shippedDate     DateTime?
-  
+
   // Credit
   creditExpected  Decimal  @db.Decimal(10, 2)
   creditReceived  Decimal? @db.Decimal(10, 2)
   creditDate      DateTime?
   creditMemoNumber String?
-  
+
   // Notes
   reason          String   @db.Text
   notes           String?  @db.Text
-  
+
   createdDate     DateTime @default(now())
   createdBy       String
-  
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   @@map("vendor_return_authorizations")
 }
 
@@ -7363,33 +7376,33 @@ model ReturnFraudCase {
   id              String   @id @default(cuid())
   caseNumber      String   @unique
   organizationId  String
-  
+
   // Associated return
   rmaId           String
   customerId      String
-  
+
   // Fraud indicators
   fraudType       String   // SERIAL_MISMATCH, DUPLICATE_RETURN, EXCESSIVE_RETURNS, STOLEN_CARD, OTHER
   riskScore       Float    // 0-100
   indicators      Json     // Array of fraud signals
-  
+
   // Investigation
   status          String   // FLAGGED, UNDER_INVESTIGATION, RESOLVED_FRAUD, RESOLVED_LEGITIMATE
   investigatedBy  String?
   resolution      String?  @db.Text
-  
+
   // Actions taken
   refundBlocked   Boolean  @default(false)
   customerBanned  Boolean  @default(false)
   lawEnforcement  Boolean  @default(false)
-  
+
   // Timing
   flaggedDate     DateTime @default(now())
   resolvedDate    DateTime?
-  
+
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
+
   @@map("return_fraud_cases")
 }
 ```
@@ -7418,7 +7431,7 @@ System: "Creating restricted location H-TEMP-01.
          - Reason: Customer shortage hide
          - Who can access: Pickers, Stock Team, Admin
          - Restricted from: Customer portal, public API
-         
+
          How many units Red Widget to hide?"
 Admin: "50 units from Alpha 5 12"
 System: "Authorization required. You are admin. Proceed?"
@@ -7426,16 +7439,16 @@ Admin: "Proceed"
 System: "Moving 50 units Red Widget:
          FROM: A-05-12 (customer-visible location)
          TO: H-TEMP-01 (hidden from customers)
-         
+
          CUSTOMER VIEW:
          - Red Widget: Shows 0 units available
          - Orders: Will show as 'temporarily unavailable'
-         
+
          INTERNAL VIEW:
          - Red Widget: 50 units at H-TEMP-01
          - Available for internal orders only
          - Pickers CAN pick from H-TEMP-01
-         
+
          Stock team notified. Location active."
 
 CUSTOMER PORTAL VIEW (Customer sees):
@@ -7489,16 +7502,16 @@ DRIVER TRIES TO CHANGE DESTINATION (BLOCKED):
 ──────────────────────────────────────────────
 Sarah: "Actually, put them in Alpha 3 08 instead"
 System: "❌ LOCATION CHANGE REJECTED.
-         
+
          Reason: Drivers cannot change item locations.
          Task specifies: Alpha 5 12
-         
+
          Only ADMIN or STOCK TEAM can change locations.
-         
+
          Options:
          1. Complete task to Alpha 5 12 as assigned
          2. Cancel task and request stock team review
-         
+
          Choose option?"
 Sarah: "Why can't I change it?"
 System: "Safety protocol. Location changes affect:
@@ -7506,7 +7519,7 @@ System: "Safety protocol. Location changes affect:
          - Picker efficiency (they expect items at A-5-12)
          - Customer orders (may be waiting for this location)
          - Cycle count accuracy
-         
+
          Changing locations requires authorization.
          Request stock team override?"
 Sarah: "No, I'll follow the task to A-5-12"
@@ -7527,7 +7540,7 @@ System: "Perfect. Inventory updated.
 
 ### **C. Returns Operator Location Validation**
 
-```
+````
 SCENARIO: Returns operator puts item in WRONG location (REJECTED)
 ═════════════════════════════════════════════════════════════════
 
@@ -7544,22 +7557,22 @@ OPERATOR SCANS WRONG LOCATION (BLOCKED):
 ─────────────────────────────────────────
 [Tom scans location B-03-15]
 System: "🚫 LOCATION ERROR!
-         
+
          Scanned: B-03-15 (Blue Widget location)
          Expected: A-05-12 (Red Widget location)
-         
+
          ❌ PUTAWAY REJECTED.
-         
+
          Reason: B-03-15 contains Blue Widget.
          You have Red Widget.
-         
+
          Mixing items in same location causes:
          - Picking errors
          - Inventory inaccuracy
          - Customer wrong items
-         
+
          Correct location: Alpha 5 12
-         
+
          Navigate there now?"
 Tom: "Yes, going to A-5-12"
 System: "Good. Follow directions."
@@ -7570,25 +7583,25 @@ DOUBLE-CHECK AT CORRECT LOCATION:
 System: "Alpha 5 12. Scan location label to verify."
 [Scans A-05-12]
 System: "✓ Location A-05-12 verified.
-         
+
          Current contents: Red Widget (42 units)
          Your return: Red Widget (5 units)
          ✓ MATCH! Correct location.
-         
+
          Scan Red Widget barcode to confirm item."
 [Scans Red Widget]
 System: "✓ Red Widget confirmed.
          ✓ Location A-05-12 confirmed.
          ✓ Match verified.
-         
+
          Place 5 units in location A-05-12."
 Tom: "Placed"
 System: "Excellent Tom! Inventory updated:
          A-05-12: 42 → 47 units
-         
+
          SHORT PICK RESOLVED!
          Picker Mike notified: 'Short pick cleared, continue SO-12345'
-         
+
          Perfect putaway. Zero errors. Great job!"
 
 VALIDATION LOG CREATED:
@@ -7598,19 +7611,20 @@ INSERT INTO ItemLocationValidation VALUES (
   attemptedBy: 'tom.jones',
   attemptedByRole: 'RETURNS_OPERATOR',
   attemptedAction: 'RETURN',
-  
+
   -- First attempt (rejected)
   attemptedLocation: 'B-03-15',
   expectedLocation: 'A-05-12',
   validationResult: 'REJECTED',
   rejectionReason: 'Item mismatch: Blue Widget location, Red Widget item',
-  
+
   -- Second attempt (approved)
   attemptedLocation: 'A-05-12',
   validationResult: 'APPROVED',
   quantityAttempted: 5
 );
-```
+````
+
 ```
 
 ---
@@ -7618,6 +7632,7 @@ INSERT INTO ItemLocationValidation VALUES (
 ### **D. Only Admin/Stock Team Can Change Locations**
 
 ```
+
 SCENARIO: Stock team reorganizes warehouse
 ═══════════════════════════════════════════
 
@@ -7625,81 +7640,84 @@ STOCK TEAM MEMBER (Lisa):
 ─────────────────────────
 Lisa: "Stock team, relocate Red Widget"
 System: "Hello Lisa. Role: STOCK_TEAM confirmed.
-         You have location change permissions ✓
-         
+You have location change permissions ✓
+
          Current Red Widget locations:
          - A-05-12: 47 units (pick face)
          - R-03-C: 200 units (reserve)
          - H-TEMP-01: 50 units (customer-hidden)
-         
+
          What change do you need?"
+
 Lisa: "Move 100 units from reserve to create new pick face A-08-15"
 System: "Authorization check...
-         ✓ You are STOCK_TEAM
-         ✓ Location change permission: GRANTED
-         ✓ Can create new locations: GRANTED
-         
+✓ You are STOCK_TEAM
+✓ Location change permission: GRANTED
+✓ Can create new locations: GRANTED
+
          Create A-08-15 as new pick face?"
+
 Lisa: "Yes, create"
 System: "Location A-08-15 created.
-         Type: PICK_FACE
-         Access: STANDARD
-         Customer visible: TRUE
-         
+Type: PICK_FACE
+Access: STANDARD
+Customer visible: TRUE
+
          Move 100 units Red Widget:
          FROM: R-03-C (reserve)
          TO: A-08-15 (new pick face)
-         
+
          Reason for move?"
+
 Lisa: "Optimize picking, reduce travel time"
-System: "Reason logged. This will affect:
-         - 3 active pickers (notified)
-         - 12 pending orders (updated)
-         - Pick routes (recalculated)
-         
+System: "Reason logged. This will affect: - 3 active pickers (notified) - 12 pending orders (updated) - Pick routes (recalculated)
+
          Proceed?"
+
 Lisa: "Proceed"
 System: "MOVING INVENTORY...
-         ✓ Reserved 100 units at R-03-C
-         ✓ Location A-08-15 prepared
-         ✓ Generate move task for driver
-         
+✓ Reserved 100 units at R-03-C
+✓ Location A-08-15 prepared
+✓ Generate move task for driver
+
          Driver Mike assigned. ETA 10 minutes.
-         
+
          NOTIFICATIONS SENT:
          ✓ Mike: 'Move 100 Red Widget R-03-C → A-08-15'
          ✓ Pickers (3): 'Red Widget now at A-08-15'
          ✓ Orders (12): Pick locations updated
          ✓ Admin: Stock team reorganization logged
-         
+
          Activity recorded in audit log."
 
 PICKER NOTIFICATION:
 ────────────────────
 System to Picker Sarah: "⚠️ LOCATION UPDATE:
-                         Red Widget moved to NEW location A-08-15.
-                         Faster picking, 30% shorter walk.
-                         Next Red Widget order: Use A-08-15."
+Red Widget moved to NEW location A-08-15.
+Faster picking, 30% shorter walk.
+Next Red Widget order: Use A-08-15."
 Sarah: "Got it, thanks!"
 
 CONTRAST: PICKER TRIES SAME CHANGE (BLOCKED):
 ──────────────────────────────────────────────
 Picker John: "Move Red Widget to A-08-15"
 System: "❌ PERMISSION DENIED.
-         
+
          You are: PICKER
          Required role: ADMIN or STOCK_TEAM
-         
+
          Pickers cannot change item locations.
-         
+
          To request location change:
          1. Contact stock team
          2. Submit location change request
          3. Stock team will evaluate and implement
-         
+
          Contact stock team now?"
+
 John: "No, I'll pick from current location"
 System: "Correct. Pick from A-05-12 as directed."
+
 ```
 
 ---
@@ -7707,6 +7725,7 @@ System: "Correct. Pick from A-05-12 as directed."
 ### **E. Admin Override for Emergency Situations**
 
 ```
+
 EMERGENCY SCENARIO: Aisle A blocked due to spill
 ═════════════════════════════════════════════════
 
@@ -7714,10 +7733,10 @@ PICKER REPORTS:
 ───────────────
 Picker Tom: "Chemical spill in aisle A, cannot access A-05-12"
 System: "🚨 EMERGENCY: Aisle A unsafe.
-         
+
          Blocking ALL access to aisle A locations.
          Safety team dispatched.
-         
+
          Notifying admin..."
 
 ADMIN EMERGENCY RESPONSE:
@@ -7726,43 +7745,45 @@ Admin received alert: "Aisle A blocked - spill"
 
 Admin: "Emergency location change, Red Widget"
 System: "Admin override activated.
-         What action?"
+What action?"
 Admin: "Temporarily reassign Red Widget picks to R-03-C reserve location"
 System: "EMERGENCY OVERRIDE:
-         ✓ Admin authorization confirmed
-         ✓ Bypassing normal approval process
-         
+✓ Admin authorization confirmed
+✓ Bypassing normal approval process
+
          Temporarily routing Red Widget picks:
          FROM: A-05-12 (BLOCKED - spill)
          TO: R-03-C (temporary pick location)
-         
+
          This is TEMPORARY override.
          Affects: 8 active pick tasks
-         
+
          All pickers notified:
          'Aisle A blocked. Pick Red Widget from R-03-C until cleared.'
-         
+
          Override duration?"
+
 Admin: "Until I manually clear it"
 System: "Override active. Normal location change rules SUSPENDED.
-         
+
          When aisle A is safe:
          1. Clear override
          2. Move items back to A-05-12
          3. Resume normal operations
-         
+
          Safety first ✓"
 
 PICKER IMMEDIATELY NOTIFIED:
 ────────────────────────────
 System to ALL pickers: "🚨 AISLE A BLOCKED - CHEMICAL SPILL
-                        Stay clear of aisle A.
-                        Safety team on site.
-                        
+Stay clear of aisle A.
+Safety team on site.
+
                         Red Widget picks: Use R-03-C temporarily.
                         Reach truck required (16 ft height).
-                        
+
                         Stay safe team!"
+
 ```
 
 ---
@@ -7770,6 +7791,7 @@ System to ALL pickers: "🚨 AISLE A BLOCKED - CHEMICAL SPILL
 ### **F. Restricted Location Access (Quarantine, Damaged Goods)**
 
 ```
+
 QUARANTINE LOCATION ACCESS:
 ═══════════════════════════
 
@@ -7777,21 +7799,22 @@ PICKER TRIES TO ACCESS QUARANTINE (BLOCKED):
 ─────────────────────────────────────────────
 Picker Mike: "Order SO-12345, pick from Q-02-05"
 System: "❌ ACCESS DENIED.
-         
+
          Location Q-02-05 is QUARANTINE.
-         
+
          Your role: PICKER
          Required role: QC or ADMIN
-         
+
          Quarantine items are:
          - Under investigation
          - Not approved for sale
          - Require QC clearance
-         
+
          This order should not pick from quarantine.
          ERROR in order. Supervisor notified.
-         
+
          Skip this item?"
+
 Mike: "Yes, skip"
 System: "Item skipped. Admin investigating."
 
@@ -7799,36 +7822,39 @@ QC INSPECTOR ACCESS (ALLOWED):
 ───────────────────────────────
 QC Inspector Lisa: "Inspect quarantine Q-02-05"
 System: "Hello Lisa. Role: QC confirmed ✓
-         Access to Q-02-05: GRANTED ✓
-         
+Access to Q-02-05: GRANTED ✓
+
          Q-02-05 contains:
          - 15 units Red Widget (damage suspected)
          - 8 units Blue Widget (quality hold)
          - 3 units Green Widget (customer complaint)
-         
+
          Which to inspect?"
+
 Lisa: "Red Widget"
 System: "Checking 15 Red Widget units.
-         Original quarantine reason: Water damage suspected.
-         Photo evidence attached."
+Original quarantine reason: Water damage suspected.
+Photo evidence attached."
 Lisa: "10 units OK, 5 units water damaged"
 System: "Release 10 units to inventory?"
 Lisa: "Yes, release to A-05-12"
 System: "✓ QC approval recorded
-         ✓ 10 units released
-         ✓ Moving to A-05-12
-         ✓ 5 damaged units remain in Q-02-05
-         
+✓ 10 units released
+✓ Moving to A-05-12
+✓ 5 damaged units remain in Q-02-05
+
          Action for 5 damaged units?"
+
 Lisa: "Disposal"
 System: "✓ 5 units marked for disposal
-         ✓ Moved to disposal bin D-01
-         ✓ Inventory adjusted
-         ✓ Financial impact: $75 shrinkage
-         
+✓ Moved to disposal bin D-01
+✓ Inventory adjusted
+✓ Financial impact: $75 shrinkage
+
          Quarantine Q-02-05 now has:
          - 8 units Blue Widget (still hold)
          - 3 units Green Widget (still hold)"
+
 ```
 
 ---
@@ -7836,6 +7862,7 @@ System: "✓ 5 units marked for disposal
 ### **G. Location Change Approval Workflow**
 
 ```
+
 LOCATION CHANGE REQUEST SYSTEM:
 ═══════════════════════════════
 
@@ -7847,7 +7874,7 @@ Sarah: "Red Widget should be in A-03-08, not A-05-12. Closer to Blue Widget."
 System: "Reason?"
 Sarah: "Frequently picked together. Save picker walk time."
 System: "Good thinking! Creating change request CR-8472.
-         
+
          REQUEST DETAILS:
          Item: Red Widget
          Current: A-05-12
@@ -7855,16 +7882,16 @@ System: "Good thinking! Creating change request CR-8472.
          Reason: Co-location optimization
          Requested by: Sarah (DRIVER)
          Potential impact: 25% faster pick for 40% of orders
-         
+
          Submitting to stock team..."
 
 STOCK TEAM RECEIVES REQUEST:
 ────────────────────────────
 Stock Team Lisa: "Check pending requests"
 System: "1 pending: CR-8472 from Sarah.
-         Move Red Widget A-05-12 → A-03-08.
-         Reason: Co-location with Blue Widget.
-         
+Move Red Widget A-05-12 → A-03-08.
+Reason: Co-location with Blue Widget.
+
          ANALYSIS:
          ✓ A-03-08 has capacity
          ✓ 127 orders/week contain both Red + Blue Widget
@@ -7872,24 +7899,27 @@ System: "1 pending: CR-8472 from Sarah.
          ✓ Proposed avg walk: 12 feet
          ✓ Time savings: 18 seconds per order
          ✓ Weekly savings: 42 minutes
-         
+
          Recommendation: APPROVE ✅"
+
 Lisa: "Approve request"
 System: "CR-8472 APPROVED by Lisa.
-         
+
          Creating move task MT-8472:
          - Move 47 units Red Widget
          - From A-05-12 to A-03-08
          - Assign driver for move
-         
+
          Sarah, you suggested this. Want to execute it?"
+
 Sarah: "Yes!"
 System: "Task MT-8472 assigned to Sarah.
-         Great idea, great execution!
-         Move 47 units when ready."
+Great idea, great execution!
+Move 47 units when ready."
 
 AUDIT TRAIL RECORDED:
 ─────────────────────
+
 ```sql
 INSERT INTO LocationChangeLog VALUES (
   changeType: 'LOCATION_MOVED',
@@ -7905,6 +7935,7 @@ INSERT INTO LocationChangeLog VALUES (
   relatedTaskId: 'MT-8472'
 );
 ```
+
 ```
 
 ---
@@ -7912,11 +7943,12 @@ INSERT INTO LocationChangeLog VALUES (
 ## 8. 📦 Voice-Directed Order Verification/QC
 
 ```
+
 QUALITY CHECK WORKFLOW:
 ═══════════════════════════
 
 System: "QC check. Order SO-12345, 5 items, packed by John.
-         Verify before shipping?"
+Verify before shipping?"
 QC: "Yes"
 
 [Scans container T1234]
@@ -7930,19 +7962,20 @@ System: "Blue Widget 5 units ✓"
 
 [Discrepancy]
 System: "⚠️ Green Widget scanned. NOT on order SO-12345!
-         Wrong item. Remove?"
+Wrong item. Remove?"
 QC: "Removed"
 System: "Correct item: Yellow Widget, 3 units. Scan Yellow."
 [Scans correct item]
 System: "Yellow Widget confirmed ✓
-         
+
          Error logged for picker John. Training alert sent."
 
 [Completion]
 System: "All 5 items verified. 1 correction made. Seal container?"
 QC: "Sealed"
 System: "QC passed. Approved by Lisa 2:47 PM.
-         Ready for shipping. Moving to dock 8."
+Ready for shipping. Moving to dock 8."
+
 ```
 
 ---
@@ -7950,6 +7983,7 @@ System: "QC passed. Approved by Lisa 2:47 PM.
 ## 9. 🚨 Voice-Directed Exception Management
 
 ```
+
 EXCEPTION SCENARIOS:
 ═══════════════════
 
@@ -7963,11 +7997,11 @@ Picker: "Red Widget, 3 units, crushed boxes"
 System: "Severity?"
 Picker: "Severe"
 System: "3 units marked damaged. Move to quarantine Q-02-05.
-         QC notified. Supervisor alerted.
-         Remaining units?"
+QC notified. Supervisor alerted.
+Remaining units?"
 Picker: "17 good units"
 System: "Inventory updated: 17 available, 3 damaged.
-         Continue picking?"
+Continue picking?"
 
 WRONG ITEM IN LOCATION:
 ───────────────────────
@@ -7979,10 +8013,10 @@ Picker: "Blue Widget"
 System: "Blue Widget in Red Widget location. Scan it."
 [Scans]
 System: "Confirmed Blue Widget. Belongs in Alpha 3 08.
-         Photo?"
+Photo?"
 [Takes photo]
 System: "Photo recorded. Inventory team notified.
-         Correction task created."
+Correction task created."
 
 EQUIPMENT FAILURE:
 ──────────────────
@@ -7992,13 +8026,15 @@ Driver: "Yes, lowered"
 System: "Location?"
 Driver: "Aisle Romeo 05"
 System: "🚨 SAFETY ALERT: RT-07 disabled aisle R-05.
-         All operators avoid R-05.
-         
+All operators avoid R-05.
+
          Mike, park safely. Maintenance ETA 8 minutes.
          Task reassigned to Sarah.
          Take break or use backup equipment?"
+
 Driver: "Break"
 System: "Break logged. Will notify when RT-07 repaired."
+
 ```
 
 ---
@@ -8008,6 +8044,7 @@ System: "Break logged. Will notify when RT-07 repaired."
 ### **A. Security Gate Integration (Goods Arriving)**
 
 ```
+
 INBOUND DELIVERY - SECURITY CHECKPOINT:
 ═══════════════════════════════════════
 
@@ -8019,33 +8056,35 @@ Security: "Truck arrived"
 System: "Carrier and truck number?"
 Security: "FedEx Freight, truck 847392"
 System: "Checking schedule... Found expected delivery:
-         PO-5841 from ABC Suppliers.
-         200 Red Widgets, 15 pallets.
-         Expected arrival: 10:00 AM.
-         Current time: 9:52 AM ✓
-         
+PO-5841 from ABC Suppliers.
+200 Red Widgets, 15 pallets.
+Expected arrival: 10:00 AM.
+Current time: 9:52 AM ✓
+
          Driver name?"
+
 Security: "John Smith"
 System: "ID verified?"
 Security: "Yes, ID matches"
 System: "Seal number?"
 Security: "Seal 99428"
 System: "Perfect. Checking seal database...
-         Seal 99428 matches PO-5841 ✓
-         
+Seal 99428 matches PO-5841 ✓
+
          📢 REAL-TIME NOTIFICATIONS SENT:
          ✓ Receiving team: Truck at gate, ETA dock 5 min
          ✓ Putaway team: Prepare for 15 pallets
          ✓ QC team: Inspection required (new supplier)
          ✓ Purchasing: Shipment arrived on time
          ✓ Inventory system: Update status 'IN_TRANSIT → ARRIVING'
-         
+
          Direct to dock door?"
+
 Security: "Dock door 3"
 System: "Gate opened. Dock 3 assigned.
-         Receiving team Sarah notified.
-         Dock door opening remotely.
-         
+Receiving team Sarah notified.
+Dock door opening remotely.
+
          Drive time to dock: 2 minutes.
          Arrival recorded: 9:52 AM."
 
@@ -8055,37 +8094,38 @@ STEP 2: Automatic Cascade Notifications
 
 **Receiving Team (Sarah - Voice Headset):**
 System: "Sarah, FedEx truck 847392 arriving dock 3 in 2 minutes.
-         PO-5841, 200 Red Widgets, 15 pallets.
-         QC inspection required. Ready?"
+PO-5841, 200 Red Widgets, 15 pallets.
+QC inspection required. Ready?"
 Sarah: "Ready"
 
 **Putaway Team (Mike - Voice Headset):**
 System: "Mike, 15 pallets incoming to dock 3.
-         Estimated unload: 10:05 AM.
-         Suggest staging zone S-12 through S-18.
-         Reach truck RT-05 available. Stand by."
+Estimated unload: 10:05 AM.
+Suggest staging zone S-12 through S-18.
+Reach truck RT-05 available. Stand by."
 
 **QC Inspector (Lisa - Mobile App):**
 📱 NOTIFICATION: "QC inspection required - PO-5841
-    Location: Dock 3
-    ETA: 10:00 AM
-    Reason: New supplier validation
-    Items: Red Widgets (200 units)
-    [Accept] [Reassign]"
+Location: Dock 3
+ETA: 10:00 AM
+Reason: New supplier validation
+Items: Red Widgets (200 units)
+[Accept] [Reassign]"
 
 **Purchasing Manager (Email + Dashboard):**
 📧 "PO-5841 arrived on time at 9:52 AM
-    Carrier: FedEx Freight
-    Seal intact: 99428 ✓
-    Expected delivery: 10:00 AM
-    Status: Early by 8 minutes
-    
+Carrier: FedEx Freight
+Seal intact: 99428 ✓
+Expected delivery: 10:00 AM
+Status: Early by 8 minutes
+
     Track live: [View Dashboard]"
 
 **Inventory System (Automatic Update):**
+
 ```sql
-UPDATE PurchaseOrder 
-SET status = 'RECEIVING', 
+UPDATE PurchaseOrder
+SET status = 'RECEIVING',
     arrivedAt = '2026-01-07 09:52:00',
     dockDoor = 'DOCK-3',
     receivingUser = 'sarah.johnson'
@@ -8115,8 +8155,9 @@ System detects truck backed in (proximity sensor)
 ✓ Video recording: Started (security)
 
 System to Sarah: "Truck docked at 9:54 AM.
-                  Safe to open trailer. Begin unload?"
+Safe to open trailer. Begin unload?"
 Sarah: "Beginning unload"
+
 ```
 
 ---
@@ -8124,6 +8165,7 @@ Sarah: "Beginning unload"
 ### **B. Real-Time Event Notification System**
 
 ```
+
 EVENT-DRIVEN ARCHITECTURE:
 ══════════════════════════
 
@@ -8203,6 +8245,7 @@ TRIGGER EVENTS → WHO GETS NOTIFIED → HOW → WHEN
     ├─ Receiving → Voice: "Enhanced inspection for Supplier XYZ"
     ├─ Purchasing → System: Flag supplier performance
     └─ Leadership → Email: Weekly CAPA summary
+
 ```
 
 ---
@@ -8210,6 +8253,7 @@ TRIGGER EVENTS → WHO GETS NOTIFIED → HOW → WHEN
 ### **C. CAPA (Corrective & Preventive Action) Integration**
 
 ```
+
 CAPA SYSTEM INTEGRATION:
 ════════════════════════
 
@@ -8227,21 +8271,22 @@ System: "Take photos of damaged units."
 System: "Photos uploaded. Root cause?"
 Inspector: "Poor packaging by supplier"
 System: "Supplier: ABC Corp. Creating CAPA report.
-         
+
          🔴 CAPA-2847 OPENED:
          Type: Supplier Quality
          Severity: Minor
          Items affected: 5/200 (2.5%)
          Cost impact: $75
-         
+
          Actions taken:
          ✓ Damaged units to quarantine Q-02-05
          ✓ Supplier notified (email sent)
          ✓ Receiving inspection enhanced (next 3 shipments)
          ✓ Quality manager alerted
          ✓ Investigation deadline: Jan 14, 2026
-         
+
          Continue receiving remaining 195 units?"
+
 Inspector: "Yes, continue"
 
 STEP 2: Automatic Escalation
@@ -8249,6 +8294,7 @@ STEP 2: Automatic Escalation
 [System analyzes historical data]
 
 System discovers:
+
 - ABC Corp: 3 quality issues in last 30 days
 - Damage rate: 4.2% (threshold: 2%)
 - Cost impact: $247 (cumulative)
@@ -8257,32 +8303,34 @@ System discovers:
 
 **To Quality Manager:**
 "CAPA-2847 opened. ABC Corp third issue this month.
- Damage rate 4.2% exceeds 2% threshold.
- Recommend supplier review meeting.
- [View CAPA] [Schedule Meeting] [Change Supplier Status]"
+Damage rate 4.2% exceeds 2% threshold.
+Recommend supplier review meeting.
+[View CAPA] [Schedule Meeting] [Change Supplier Status]"
 
 **To Purchasing Manager:**
 "Supplier ABC Corp quality declining.
- Options:
- 1. Enhanced QC (cost: +$50/shipment)
- 2. Require supplier improvement plan
- 3. Source alternate supplier
- [View Details]"
+Options:
+
+1.  Enhanced QC (cost: +$50/shipment)
+2.  Require supplier improvement plan
+3.  Source alternate supplier
+    [View Details]"
 
 **To Supplier (ABC Corp):**
 "PO-5841 receiving complete with quality concerns.
- Issue: Damaged packaging (5 units, 2.5% reject rate)
- This is your 3rd quality issue this month.
- 
- REQUIRED ACTIONS:
- 1. Submit root cause analysis (due Jan 10)
- 2. Corrective action plan (due Jan 12)
- 3. Next 3 shipments: Enhanced packaging required
- 
- Failure to comply may result in supplier suspension.
- 
- Contact: John Smith, Quality Manager
- Reference: CAPA-2847"
+Issue: Damaged packaging (5 units, 2.5% reject rate)
+This is your 3rd quality issue this month.
+
+REQUIRED ACTIONS:
+
+1.  Submit root cause analysis (due Jan 10)
+2.  Corrective action plan (due Jan 12)
+3.  Next 3 shipments: Enhanced packaging required
+
+Failure to comply may result in supplier suspension.
+
+Contact: John Smith, Quality Manager
+Reference: CAPA-2847"
 
 STEP 3: Preventive Actions (Automatic)
 ───────────────────────────────────────
@@ -8296,14 +8344,15 @@ System implements immediate changes:
 
 **Voice Alert (Next ABC Delivery):**
 System to receiver: "⚠️ ABC Corp shipment. Enhanced QC required.
-                     Recent quality issues. Inspect packaging carefully.
-                     Take photos of ALL units before accepting."
+Recent quality issues. Inspect packaging carefully.
+Take photos of ALL units before accepting."
 
 STEP 4: Corrective Actions (Supplier Response)
 ───────────────────────────────────────────────
 [Supplier submits response]
 
 Supplier uploads:
+
 - Root cause: Packaging material supplier changed
 - Corrective action: Reverted to original supplier
 - Preventive action: Added packaging QC at their facility
@@ -8311,18 +8360,18 @@ Supplier uploads:
 
 System to Quality Manager:
 "ABC Corp responded to CAPA-2847.
- Root cause: Material change (reverted)
- Corrective actions: Implemented ✓
- Evidence: Attached
- 
- Recommendation: Accept response?
- [Accept] [Request More Info] [Reject]"
+Root cause: Material change (reverted)
+Corrective actions: Implemented ✓
+Evidence: Attached
+
+Recommendation: Accept response?
+[Accept] [Request More Info] [Reject]"
 
 Quality Manager: "Accept"
 
 System: "CAPA-2847 closed. ABC Corp back to normal inspection.
-         Monitoring period: 60 days.
-         Next review: March 7, 2026."
+Monitoring period: 60 days.
+Next review: March 7, 2026."
 
 STEP 5: Trend Analysis (Ongoing)
 ─────────────────────────────────
@@ -8330,20 +8379,21 @@ System continuously monitors:
 
 📊 CAPA DASHBOARD (Real-Time):
 ┌─────────────────────────────────────────────────┐
-│ OPEN CAPAS: 7                                   │
-│ ├─ Critical: 1 (Equipment safety)              │
-│ ├─ Major: 2 (Inventory accuracy)               │
-│ └─ Minor: 4 (Supplier quality)                 │
-│                                                  │
-│ TRENDING ISSUES:                                │
-│ ⚠️ Supplier quality (3 issues this week)       │
-│ ⚠️ Receiving damage rate (3.1% vs 2% target)   │
-│ ✓ Picking accuracy (99.8%, excellent)          │
-│                                                  │
-│ ACTIONS REQUIRED:                               │
-│ 🔴 CAPA-2840: Investigation due today          │
-│ 🟡 CAPA-2845: Supplier response overdue        │
+│ OPEN CAPAS: 7 │
+│ ├─ Critical: 1 (Equipment safety) │
+│ ├─ Major: 2 (Inventory accuracy) │
+│ └─ Minor: 4 (Supplier quality) │
+│ │
+│ TRENDING ISSUES: │
+│ ⚠️ Supplier quality (3 issues this week) │
+│ ⚠️ Receiving damage rate (3.1% vs 2% target) │
+│ ✓ Picking accuracy (99.8%, excellent) │
+│ │
+│ ACTIONS REQUIRED: │
+│ 🔴 CAPA-2840: Investigation due today │
+│ 🟡 CAPA-2845: Supplier response overdue │
 └─────────────────────────────────────────────────┘
+
 ```
 
 ---
@@ -8351,6 +8401,7 @@ System continuously monitors:
 ### **D. Cross-Department Visibility Dashboard**
 
 ```
+
 WAREHOUSE OPERATIONS COMMAND CENTER:
 ════════════════════════════════════
 
@@ -8358,119 +8409,120 @@ REAL-TIME UNIFIED VIEW (All Departments)
 ────────────────────────────────────────
 
 ┌─────────────────────────────────────────────────────────────────┐
-│  🏭 LOGIVOX OPERATIONS CENTER - LIVE VIEW                        │
-│  Tuesday, January 7, 2026 | 10:47 AM                           │
+│ 🏭 LOGIVOX OPERATIONS CENTER - LIVE VIEW │
+│ Tuesday, January 7, 2026 | 10:47 AM │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌──────────────── INBOUND (Receiving) ────────────────┐
-│ 🚚 TRUCKS AT FACILITY: 4                            │
-│ ├─ Dock 3: FedEx (PO-5841) ⏱️ Unloading (12 min)   │
+│ 🚚 TRUCKS AT FACILITY: 4 │
+│ ├─ Dock 3: FedEx (PO-5841) ⏱️ Unloading (12 min) │
 │ ├─ Dock 5: UPS (PO-5842) ✓ Complete, QC in progress│
-│ ├─ Gate: Carrier X ⏳ Waiting (ETA dock: 3 min)    │
-│ └─ En Route: 2 trucks (ETA: 2:00 PM, 4:15 PM)      │
-│                                                      │
-│ TODAY'S RECEIVING:                                   │
-│ ├─ Completed: 12 POs (847 units)                   │
-│ ├─ In Progress: 3 POs (420 units)                  │
-│ ├─ Scheduled: 8 POs (1,240 units)                  │
-│ └─ QC Pass Rate: 98.2% ✓                           │
+│ ├─ Gate: Carrier X ⏳ Waiting (ETA dock: 3 min) │
+│ └─ En Route: 2 trucks (ETA: 2:00 PM, 4:15 PM) │
+│ │
+│ TODAY'S RECEIVING: │
+│ ├─ Completed: 12 POs (847 units) │
+│ ├─ In Progress: 3 POs (420 units) │
+│ ├─ Scheduled: 8 POs (1,240 units) │
+│ └─ QC Pass Rate: 98.2% ✓ │
 └──────────────────────────────────────────────────────┘
 
 ┌──────────────── INVENTORY STATUS ───────────────────┐
-│ 📦 CURRENT INVENTORY: 47,582 units                  │
-│ ├─ Available: 44,120 units (92.7%)                 │
-│ ├─ Reserved: 2,847 units (orders)                  │
-│ ├─ In Transit: 420 units (receiving now)           │
-│ ├─ Quarantine: 95 units (QC hold)                  │
-│ └─ On Consignment: 100 units (Big Box Retail)      │
-│                                                      │
-│ ⚠️ ALERTS:                                          │
-│ ├─ 3 items below minimum (replen triggered)        │
-│ ├─ 1 item overstocked (47% above max)              │
-│ └─ 2 items expiring soon (within 30 days)          │
+│ 📦 CURRENT INVENTORY: 47,582 units │
+│ ├─ Available: 44,120 units (92.7%) │
+│ ├─ Reserved: 2,847 units (orders) │
+│ ├─ In Transit: 420 units (receiving now) │
+│ ├─ Quarantine: 95 units (QC hold) │
+│ └─ On Consignment: 100 units (Big Box Retail) │
+│ │
+│ ⚠️ ALERTS: │
+│ ├─ 3 items below minimum (replen triggered) │
+│ ├─ 1 item overstocked (47% above max) │
+│ └─ 2 items expiring soon (within 30 days) │
 └──────────────────────────────────────────────────────┘
 
 ┌──────────────── PICKING OPERATIONS ─────────────────┐
-│ 👷 ACTIVE PICKERS: 12                                │
-│ ├─ Mike: Order SO-12847 (15/20 items) 🟢          │
-│ ├─ Sarah: Order SO-12848 (Complete) ✓             │
-│ ├─ Tom: SHORT PICK (replen en route) ⏱️           │
-│ └─ [View All Pickers]                              │
-│                                                      │
-│ TODAY'S PERFORMANCE:                                 │
-│ ├─ Orders picked: 248 / 312 target (79%)           │
-│ ├─ Items picked: 4,847 units                       │
-│ ├─ Accuracy: 99.7% ✅                               │
-│ ├─ Short picks: 8 (all resolved <5 min)            │
-│ └─ Avg pick time: 42 seconds/item                  │
+│ 👷 ACTIVE PICKERS: 12 │
+│ ├─ Mike: Order SO-12847 (15/20 items) 🟢 │
+│ ├─ Sarah: Order SO-12848 (Complete) ✓ │
+│ ├─ Tom: SHORT PICK (replen en route) ⏱️ │
+│ └─ [View All Pickers] │
+│ │
+│ TODAY'S PERFORMANCE: │
+│ ├─ Orders picked: 248 / 312 target (79%) │
+│ ├─ Items picked: 4,847 units │
+│ ├─ Accuracy: 99.7% ✅ │
+│ ├─ Short picks: 8 (all resolved <5 min) │
+│ └─ Avg pick time: 42 seconds/item │
 └──────────────────────────────────────────────────────┘
 
 ┌──────────────── REPLENISHMENT ──────────────────────┐
-│ 🏗️ ACTIVE TASKS: 5                                  │
-│ ├─ RT-2847: High priority (Tom's short pick) 90%   │
-│ ├─ RT-2848: Medium priority, 45%                   │
-│ ├─ RT-2849: Scheduled, pending                     │
-│ └─ [View All Tasks]                                │
-│                                                      │
-│ DRIVERS ACTIVE: 3                                    │
-│ ├─ Mike (RT-05): Task RT-2847, ETA 2 min          │
-│ ├─ Lisa (RT-07): Break, battery charging          │
-│ └─ Jake (FLT-12): Task RT-2848, 15 min            │
+│ 🏗️ ACTIVE TASKS: 5 │
+│ ├─ RT-2847: High priority (Tom's short pick) 90% │
+│ ├─ RT-2848: Medium priority, 45% │
+│ ├─ RT-2849: Scheduled, pending │
+│ └─ [View All Tasks] │
+│ │
+│ DRIVERS ACTIVE: 3 │
+│ ├─ Mike (RT-05): Task RT-2847, ETA 2 min │
+│ ├─ Lisa (RT-07): Break, battery charging │
+│ └─ Jake (FLT-12): Task RT-2848, 15 min │
 └──────────────────────────────────────────────────────┘
 
 ┌──────────────── DISPATCH (Outbound) ────────────────┐
-│ 🚛 LOADING IN PROGRESS: 2 trucks                    │
-│ ├─ Route 1 (John): 12/15 stops loaded (80%)       │
-│ ├─ Route 2 (Sarah): Complete, ready to depart ✓   │
-│ └─ Route 3: Scheduled 2:00 PM                      │
-│                                                      │
-│ TODAY'S SHIPMENTS:                                   │
-│ ├─ Dispatched: 8 routes (124 stops)                │
-│ ├─ In Transit: 8 routes                            │
-│ ├─ Delivered: 97 stops (94 on-time, 3 late)       │
-│ └─ On-time rate: 97% ✅                             │
+│ 🚛 LOADING IN PROGRESS: 2 trucks │
+│ ├─ Route 1 (John): 12/15 stops loaded (80%) │
+│ ├─ Route 2 (Sarah): Complete, ready to depart ✓ │
+│ └─ Route 3: Scheduled 2:00 PM │
+│ │
+│ TODAY'S SHIPMENTS: │
+│ ├─ Dispatched: 8 routes (124 stops) │
+│ ├─ In Transit: 8 routes │
+│ ├─ Delivered: 97 stops (94 on-time, 3 late) │
+│ └─ On-time rate: 97% ✅ │
 └──────────────────────────────────────────────────────┘
 
 ┌──────────────── RETURNS PROCESSING ─────────────────┐
-│ 📥 RETURNS TODAY: 12 received                        │
-│ ├─ QC Complete: 8 (6 resalable, 2 damaged)         │
-│ ├─ QC In Progress: 2                               │
-│ ├─ Pending: 2 (arrived 10:30 AM)                   │
-│ └─ Routed to short picks: 3 (smart routing) 🎯    │
-│                                                      │
-│ FINANCIAL IMPACT:                                    │
-│ ├─ Refunds issued: $847.94 (8 returns)            │
-│ ├─ Restocked value: $624.50                        │
-│ └─ Shrinkage: $223.44                              │
+│ 📥 RETURNS TODAY: 12 received │
+│ ├─ QC Complete: 8 (6 resalable, 2 damaged) │
+│ ├─ QC In Progress: 2 │
+│ ├─ Pending: 2 (arrived 10:30 AM) │
+│ └─ Routed to short picks: 3 (smart routing) 🎯 │
+│ │
+│ FINANCIAL IMPACT: │
+│ ├─ Refunds issued: $847.94 (8 returns) │
+│ ├─ Restocked value: $624.50 │
+│ └─ Shrinkage: $223.44 │
 └──────────────────────────────────────────────────────┘
 
 ┌──────────────── QUALITY & CAPA ─────────────────────┐
-│ 📋 OPEN CAPAS: 7                                     │
-│ ├─ 🔴 Critical: 1 (Equipment safety - RT-07)       │
-│ ├─ 🟡 Major: 2 (Inventory accuracy)                │
-│ └─ 🟢 Minor: 4 (Supplier quality)                  │
-│                                                      │
-│ QC INSPECTIONS TODAY:                                │
-│ ├─ Completed: 15 (14 passed, 1 failed)            │
-│ ├─ In Progress: 2                                  │
-│ └─ Scheduled: 5                                     │
+│ 📋 OPEN CAPAS: 7 │
+│ ├─ 🔴 Critical: 1 (Equipment safety - RT-07) │
+│ ├─ 🟡 Major: 2 (Inventory accuracy) │
+│ └─ 🟢 Minor: 4 (Supplier quality) │
+│ │
+│ QC INSPECTIONS TODAY: │
+│ ├─ Completed: 15 (14 passed, 1 failed) │
+│ ├─ In Progress: 2 │
+│ └─ Scheduled: 5 │
 └──────────────────────────────────────────────────────┘
 
 ┌──────────────── ALERTS & ACTIONS ───────────────────┐
-│ 🔴 URGENT (1):                                       │
-│ └─ RT-07 maintenance overdue - Safety risk          │
-│                                                      │
-│ 🟡 ATTENTION (3):                                    │
-│ ├─ ABC Corp shipment arriving (enhanced QC req'd)  │
-│ ├─ Order SO-12899 on hold (awaiting PO-5841)       │
-│ └─ Route 1 behind schedule (traffic delay)         │
-│                                                      │
-│ 🟢 INFO (5):                                         │
-│ ├─ Pick rate 15% above target (great job team!)    │
-│ ├─ 3 returns resolved via smart routing            │
-│ └─ [View All]                                       │
+│ 🔴 URGENT (1): │
+│ └─ RT-07 maintenance overdue - Safety risk │
+│ │
+│ 🟡 ATTENTION (3): │
+│ ├─ ABC Corp shipment arriving (enhanced QC req'd) │
+│ ├─ Order SO-12899 on hold (awaiting PO-5841) │
+│ └─ Route 1 behind schedule (traffic delay) │
+│ │
+│ 🟢 INFO (5): │
+│ ├─ Pick rate 15% above target (great job team!) │
+│ ├─ 3 returns resolved via smart routing │
+│ └─ [View All] │
 └──────────────────────────────────────────────────────┘
-```
+
+````
 
 ---
 
@@ -8496,43 +8548,43 @@ enum EventType {
   TRUCK_AT_DOCK = 'truck.arrived.dock',
   UNLOAD_STARTED = 'receiving.unload.started',
   UNLOAD_COMPLETE = 'receiving.unload.complete',
-  
+
   // QC & Quality
   QC_INSPECTION_STARTED = 'qc.inspection.started',
   QC_INSPECTION_COMPLETE = 'qc.inspection.complete',
   QC_FAILED = 'qc.inspection.failed',
   CAPA_OPENED = 'capa.opened',
   CAPA_ESCALATED = 'capa.escalated',
-  
+
   // Inventory
   PUTAWAY_COMPLETE = 'inventory.putaway.complete',
   INVENTORY_UPDATED = 'inventory.quantity.updated',
   STOCK_LOW = 'inventory.stock.low',
   STOCK_OUT = 'inventory.stock.out',
-  
+
   // Picking
   SHORT_PICK = 'picking.short_pick.detected',
   SHORT_PICK_RESOLVED = 'picking.short_pick.resolved',
   PICK_COMPLETE = 'picking.order.complete',
-  
+
   // Replenishment
   REPLEN_TASK_CREATED = 'replenishment.task.created',
   REPLEN_TASK_COMPLETE = 'replenishment.task.complete',
-  
+
   // Dispatch
   LOADING_COMPLETE = 'dispatch.loading.complete',
   TRUCK_DEPARTED = 'dispatch.truck.departed',
   DELIVERY_COMPLETE = 'dispatch.delivery.complete',
-  
+
   // Returns
   RETURN_RECEIVED = 'returns.received',
   RETURN_INSPECTED = 'returns.qc.complete',
   RETURN_RESTOCKED = 'returns.restocked',
-  
+
   // Equipment
   EQUIPMENT_FAILURE = 'equipment.failure',
   EQUIPMENT_MAINTENANCE = 'equipment.maintenance.required',
-  
+
   // Organization Transfers
   ORG_TRANSFER_REQUESTED = 'org_transfer.requested',
   ORG_TRANSFER_APPROVED = 'org_transfer.approved',
@@ -8597,7 +8649,7 @@ const subscribers = [
 ];
 
 // ALL SYSTEMS UPDATED IN <1 SECOND
-```
+````
 
 ---
 
@@ -8669,7 +8721,7 @@ System: "Shift ending in 15 minutes. Start handover?"
 Outgoing Lead (Mike): "Yes, start handover"
 System: "Shift handover SH-2026-01-07-PM initiated.
          Incoming lead: Sarah Johnson.
-         
+
          SHIFT SUMMARY AUTO-GENERATED:
          ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
          📦 Orders: 248 completed / 312 planned (79%)
@@ -8677,50 +8729,50 @@ System: "Shift handover SH-2026-01-07-PM initiated.
          ⚠️ Short picks: 8 (all resolved)
          🚨 Safety incidents: 0
          🔧 Equipment: RT-07 down (motor repair)
-         
+
          Review details?"
 Mike: "Yes"
 
 System: "OPEN ISSUES (3):
-         
+
          🔴 URGENT:
          1. Reach truck RT-07 motor failure
             - Location: Aisle R-05
             - Maintenance ETA: Tomorrow 8 AM
             - Backup: RT-05 assigned
-         
+
          🟡 ATTENTION:
          2. ABC Corp shipment arriving 6:15 PM
             - Enhanced QC required (quality issues)
             - QC inspector needed
-         
+
          3. Low stock: Red Widget (47 units)
             - Replen scheduled tomorrow AM
             - VIP order waiting
-         
+
          Add voice notes?"
-Mike: "Yes. Sarah, watch RT-07 area, it's blocked off.  
+Mike: "Yes. Sarah, watch RT-07 area, it's blocked off.
         The ABC shipment needs Lisa for QC, she's trained on their issues.
         VIP customer called twice about Red Widget, prioritize that replen."
 System: "Voice notes recorded and transcribed.
-         
+
          URGENT TASKS FOR INCOMING SHIFT (5):
          1. QC ABC Corp shipment (6:15 PM arrival)
          2. Monitor RT-07 repair area safety
          3. Prioritize Red Widget replen (VIP customer)
          4. Complete 64 pending orders
          5. Cycle count aisle A (scheduled)
-         
+
          EQUIPMENT STATUS:
          ✓ 7 reach trucks operational
          ✗ RT-07 down (motor)
          ⚠️ RT-02 battery at 42% (charge soon)
-         
+
          STAFFING:
          ✓ Full crew arriving (12 pickers)
          ✓ QC: Lisa available
          ✗ Driver Tom called in sick (backup: Jake)
-         
+
          Send to Sarah?"
 Mike: "Send"
 System: "Handover SH-2026-01-07-PM sent to Sarah.
@@ -8733,25 +8785,25 @@ System to Sarah: "Good evening Sarah. Shift starting in 10 minutes.
                   Mike's handover ready. Review?"
 Sarah: "Yes, review"
 System: "Handover from Mike (afternoon shift):
-         
+
          🔴 3 URGENT ITEMS:
          1. RT-07 down in R-05 (blocked)
          2. ABC Corp QC needed 6:15 PM (Lisa assigned)
          3. VIP Red Widget priority
-         
+
          Mike's voice note:
          [Plays Mike's voice message]
-         
+
          64 orders pending, 99.7% accuracy target.
          12 pickers arriving.
-         
+
          Questions?"
 Sarah: "Where's Tom?"
 System: "Tom called in sick. Jake covering as backup driver."
 Sarah: "OK, acknowledged"
 System: "Handover acknowledged by Sarah 5:52 PM.
          Mike notified. Shift officially transferred.
-         
+
          Good luck tonight Sarah!"
 ```
 
@@ -8771,26 +8823,26 @@ System: "Order SO-12345. Pick 10 units Organic Milk.
          Go to COOLER-1, location C-05-12."
 Picker Tom: "At C-05-12"
 System: "⚠️ ATTENTION: Multiple lots present.
-         
+
          LOT ANALYSIS:
          • Lot A284: Expires Jan 15 (8 days) - PICK THIS ✓
          • Lot A291: Expires Jan 22 (15 days)
          • Lot A297: Expires Jan 29 (22 days)
-         
+
          FEFO RULE: Pick lot A284 first (expires soonest).
-         
+
          Scan lot A284 barcode."
 Tom: [Scans wrong lot A291]
 System: "❌ WRONG LOT!
-         
+
          You scanned: Lot A291 (expires Jan 22)
          Must pick: Lot A284 (expires Jan 15)
-         
+
          FEFO violation. This ensures:
          - Customers get freshest product possible
          - Minimize waste from expiry
          - Regulatory compliance
-         
+
          Scan lot A284."
 Tom: [Scans lot A284]
 System: "✓ Correct lot A284.
@@ -8800,7 +8852,7 @@ System: "✓ Correct lot A284.
 Tom: "Picked 10"
 System: "Perfect! FEFO compliance maintained.
          Lot A284 now has 40 units remaining.
-         
+
          Next pick..."
 
 AUTOMATIC EXPIRY ALERTS:
@@ -8808,17 +8860,17 @@ AUTOMATIC EXPIRY ALERTS:
 [System monitors expiry dates automatically]
 
 System to Warehouse Manager: "📧 EXPIRY ALERT:
-                              
+
                               5 items expiring within 7 days:
                               1. Organic Milk Lot A284: 50 units (Jan 15)
                               2. Greek Yogurt Lot B142: 30 units (Jan 14)
                               3. Fresh Berries Lot F082: 20 units (Jan 12) ⚠️
-                              
+
                               ACTIONS RECOMMENDED:
                               ✓ Discount pricing (50% off)
                               ✓ Promote to customers
                               ✓ Donate if unsold
-                              
+
                               Estimated waste: $847 if not sold."
 
 Manager: "Approve 50% discount on all three"
@@ -8826,7 +8878,7 @@ System: "✓ Pricing updated in system
          ✓ Customer email blast sent
          ✓ Sales team notified
          ✓ Picking priority increased
-         
+
          Monitoring sales..."
 ```
 
@@ -8844,12 +8896,12 @@ PICKER ENTERS FREEZER ZONE:
 System: "Freezer Zone FREEZER-A.
          Current temp: -10°F ✓
          Safe to enter.
-         
+
          SAFETY REMINDER:
          • Max time: 20 minutes
          • Emergency exit: Follow lights
          • Buddy system: Required for tasks >10 min
-         
+
          Timer started. Pick task?"
 Tom: "Pick order SO-67890"
 System: "Frozen Pizza, 50 units, F-03-08."
@@ -8872,16 +8924,16 @@ TEMPERATURE ALARM:
 ──────────────────
 [Temperature sensor detects issue]
 System URGENT to ALL: "🚨 TEMPERATURE ALARM!
-                       
+
                        FREEZER-A: -10°F → +5°F (RISING)
                        Cause: Door left open / Equipment failure
-                       
+
                        IMMEDIATE ACTIONS:
                        ✓ Maintenance dispatched
                        ✓ All pickers: DO NOT ENTER FREEZER-A
                        ✓ Inventory at risk: $125K
                        ✓ Transfer to backup freezer if not resolved in 30 min
-                       
+
                        Manager Mark notified."
 
 Manager Mark: "Status?"
@@ -8889,17 +8941,17 @@ System: "Alarm active 8 minutes.
          Temp now: +2°F (still rising).
          Cause: Compressor failure confirmed.
          Backup freezer FREEZER-B has capacity.
-         
+
          Transfer inventory?"
 Mark: "Yes, emergency transfer"
 System: "🚨 EMERGENCY INVENTORY TRANSFER INITIATED:
-         
+
          Assigning all available drivers:
          ✓ Mike, Sarah, Tom, Lisa - report to FREEZER-A
          ✓ Move ALL inventory to FREEZER-B
          ✓ Priority: Highest value items first
          ✓ ETA: 45 minutes
-         
+
          Compressor repair called.
          Insurance notified.
          Inventory value protected."
@@ -8923,23 +8975,23 @@ System: "✓ John Smith - HAZMAT certified
          ✓ Cert expires: Jun 15, 2026
          ✓ PPE training: Current
          ✓ Authorized ✓
-         
+
          REQUIRED PPE:
          • Chemical-resistant gloves
          • Safety goggles
          • Respirator (if splash risk)
          • Apron
-         
+
          PPE on?"
 John: "PPE on"
 System: "Confirmed. Go to HAZMAT-ZONE-1, location H-02-05.
-         
+
          ⚠️ HAZMAT WARNINGS:
          • Corrosive liquid (Class 8)
          • Avoid skin contact
          • Do not store near food items
          • Spill kit at H-EXIT
-         
+
          At location?"
 John: "At H-02-05"
 System: "Scan item barcode for verification."
@@ -8947,49 +8999,49 @@ System: "Scan item barcode for verification."
 System: "✓ Cleaning Solution confirmed.
          UN Number: 1760
          Hazard Class: 8 (Corrosive)
-         
+
          Pick 5 units. Handle carefully."
 John: "Picked 5"
 System: "Good. Place in HAZMAT container RED-H47.
-         
+
          SEGREGATION CHECK:
          This order also has food items.
          ❌ CANNOT pack together.
          Ship in separate container.
-         
+
          Pack in RED-H47 (hazmat only).
          Label: CORROSIVE ✓
-         
+
          Task complete?"
 John: "Complete"
 System: "✓ HAZMAT handling: Compliant
          ✓ PPE used: Yes
          ✓ Segregation: Correct
          ✓ Labeling: Applied
-         
+
          Excellent safety John! Remove PPE safely."
 
 HAZMAT SPILL EMERGENCY:
 ───────────────────────
 John: "Spill! Small bottle broke!"
 System: "🚨 HAZMAT SPILL ALERT!
-         
+
          Location: H-02-05
          Material: Cleaning Solution (Corrosive)
          Size: Small (reported)
-         
+
          IMMEDIATE ACTIONS:
          ✓ Area evacuated (all workers notified)
          ✓ Hazmat team dispatched
          ✓ Safety manager alerted
          ✓ Spill kit at H-EXIT
-         
+
          John: Are you injured?"
 John: "No injury, small spill"
 System: "Good. Step back from spill area.
          Hazmat team ETA: 3 minutes.
          Do NOT attempt cleanup.
-         
+
          Area H-02 blocked until cleared."
 ```
 
@@ -9004,44 +9056,44 @@ URGENT RECALL INITIATED:
 SYSTEM ALERT (Automatic):
 ──────────────────────────
 System to ALL managers: "🚨 PRODUCT RECALL ALERT
-                         
+
                          FDA RECALL: Class I (Serious Health Hazard)
-                         
+
                          Item: Organic Baby Food, Lot B-4721
                          Reason: Undeclared peanut allergen
                          Units in warehouse: 247
                          Units sold (last 30 days): 89
-                         
+
                          IMMEDIATE ACTIONS REQUIRED:
                          1. Block all inventory (automatic)
                          2. Quarantine affected lots
                          3. Notify customers who purchased
                          4. Arrange returns/refunds
                          5. Notify FDA (mandatory)
-                         
+
                          Recall coordinator: Assign?"
 
 Manager assigns: "Lisa as recall coordinator"
 
 System to Lisa: "Recall RECALL-2026-001 assigned to you.
-                 
+
                  INVENTORY STATUS:
                  ✓ All 247 units BLOCKED (cannot be picked)
                  ✓ Locations: C-08-12 (200 units), C-08-13 (47 units)
                  ✓ Moving to quarantine Q-RECALL-01
-                 
+
                  CUSTOMER NOTIFICATIONS:
                  ✓ 89 customers purchased
                  ✓ Email template ready
                  ✓ Refund offers prepared
-                 
+
                  Send notifications?"
 Lisa: "Send notifications"
 System: "✓ 89 customer emails sent
          ✓ Return labels generated
          ✓ Full refunds authorized
          ✓ FDA notification filed
-         
+
          QUARANTINE TRANSFER:
          Creating urgent move task for stock team.
          All 247 units to Q-RECALL-01."
@@ -9050,15 +9102,15 @@ PICKER TRIES TO PICK RECALLED ITEM (BLOCKED):
 ──────────────────────────────────────────────
 Picker Mike: "Order SO-54321, Organic Baby Food"
 System: "❌ PICKING BLOCKED!
-         
+
          Item: Organic Baby Food Lot B-4721
          Status: RECALLED (FDA Class I)
          Reason: Undeclared allergen
-         
+
          This item cannot be shipped.
          Order SO-54321 removed from system.
          Customer refunded automatically.
-         
+
          Skip to next order."
 Mike: "Acknowledged"
 ```
@@ -9077,32 +9129,32 @@ LEGAL BREAK ENFORCEMENT:
 
 System: "John, you've worked 3 hours 30 minutes.
          California law: Break required by 4 hours.
-         
+
          Take 10-minute rest break now?"
 John: "After this pick"
 System: "Acknowledged. Reminder in 15 minutes."
 
 [15 minutes later - 4 hours worked]
 System: "⚠️ MANDATORY BREAK REQUIRED.
-         
+
          John, you MUST take break now.
          Legal compliance issue if delayed.
-         
+
          Current task: Pausing and reassigning.
          Go to break room."
 John: "Starting break"
 System: "Break started 10:47 AM.
          Duration: 10 minutes (required).
          Timer running.
-         
+
          Your current task reassigned to Sarah.
-         
+
          Relax! I'll notify you when break ends."
 
 [10 minutes later]
 System: "Break complete. 10 minutes taken ✓
          Compliant with California labor law ✓
-         
+
          Ready to resume?"
 John: "Ready"
 System: "Welcome back! Next task ready..."
@@ -9114,7 +9166,7 @@ MEAL BREAK (LONGER):
 System: "Sarah, meal break required.
          You've worked 5 hours 30 minutes.
          30-minute meal break mandatory.
-         
+
          Current task complete?"
 Sarah: "Complete"
 System: "Perfect. Clock out for meal break."
@@ -9122,7 +9174,7 @@ Sarah: "Meal break"
 System: "Meal break started 12:02 PM.
          You must take at least 30 minutes ✓
          Full clock-out (unpaid).
-         
+
          Next shift starts 12:32 PM.
          Enjoy your meal!"
 ```
@@ -9139,34 +9191,34 @@ INVENTORY WRITE-OFF (High Value):
 ──────────────────────────────────
 Stock Team Lisa: "Write off 47 damaged units, Red Widget"
 System: "Write-off value: $1,175
-         
+
          Your approval limit: $500
          Exceeds limit by $675.
-         
+
          Manager approval required.
          Request approval from warehouse manager?"
 Lisa: "Yes, request approval"
 System: "Approval request sent to Mark (Warehouse Manager).
-         
+
          Details:
          • Item: Red Widget
          • Quantity: 47 units
          • Value: $1,175
          • Reason: Water damage (spill incident SI-2847)
          • Photos attached
-         
+
          Pending manager review..."
 
 Manager Mark receives: "📱 APPROVAL REQUEST:
-                        
+
                         Lisa requests: Write off $1,175 (Red Widget damaged)
                         Your approval limit: $5,000 ✓
-                        
+
                         Evidence:
                         • Incident report SI-2847
                         • Photos showing water damage
                         • QC confirmed unsaleable
-                        
+
                         Approve?"
 Mark: "Approve write-off"
 System: "✓ Write-off APPROVED by Mark
@@ -9174,7 +9226,7 @@ System: "✓ Write-off APPROVED by Mark
          ✓ Financial entry: $1,175 shrinkage
          ✓ Lisa notified
          ✓ Disposal process initiated
-         
+
          Audit trail complete."
 
 LOCATION CHANGE BY MANAGER:
@@ -9187,21 +9239,21 @@ Sarah: "Temporarily block A-05-12, route picks to R-03-C"
 System: "Reason?"
 Sarah: "Suspected pest activity, investigating"
 System: "🚨 PEST ALERT LOGGED
-         
+
          EMERGENCY OVERRIDE ACTIVE:
          ✓ Location A-05-12: BLOCKED
          ✓ All picks rerouted to R-03-C
          ✓ Pest control contacted
          ✓ All pickers notified
          ✓ QC notified for inspection
-         
+
          Duration of block?"
 Sarah: "Until I clear it manually"
 System: "Understood. Manual clearance required.
-         
+
          Manager emergency override logged.
          Expires: Manual clearance only.
-         
+
          Pest control ETA: 45 minutes."
 ```
 
@@ -9209,30 +9261,31 @@ System: "Understood. Manual clearance required.
 
 ## 📊 Complete Feature Matrix: Logivox vs Voxware
 
-| Voice Operation | **Voxware** | **Logivox** | **Winner** |
-|----------------|-------------|-------------|------------|
-| **Picking** | ✅ Template | ✅ AI Natural | 🏆 Logivox |
-| **Receiving/Put-Away** | ✅ Template | ✅ AI + Smart Route | 🏆 Logivox |
-| **Replenishment** | ⚠️ Basic | ✅ Auto-Trigger + AI | 🏆 Logivox |
-| **Loading/Shipping** | ⚠️ Basic | ✅ Complete + QC | 🏆 Logivox |
-| **Cycle Counting** | ✅ Template | ✅ AI + Photos | 🏆 Logivox |
-| **Transfers** | ⚠️ Limited | ✅ Complete | 🏆 Logivox |
-| **Kitting** | ⚠️ Limited | ✅ Complete | 🏆 Logivox |
-| **Returns** | ⚠️ Basic | ✅ Smart Routing | 🏆 Logivox |
-| **QC/Verification** | ❌ No | ✅ Full Workflow | 🏆 Logivox |
-| **Exceptions** | ❌ Manual | ✅ Voice-Guided | 🏆 Logivox |
-| **Cross-Department** | ❌ Siloed | ✅ Fully Integrated | 🏆 Logivox |
-| **Training Time** | 2-4 hours | Zero | 🏆 Logivox |
-| **Languages** | Pre-config | 20+ Auto | 🏆 Logivox |
-| **Natural Language** | ❌ No | ✅ GPT-4 | 🏆 Logivox |
-| **Setup Time** | 2-4 weeks | 1 week | 🏆 Logivox |
-| **Cost** | $500K-$1M | $200K | 🏆 Logivox |
+| Voice Operation        | **Voxware** | **Logivox**          | **Winner** |
+| ---------------------- | ----------- | -------------------- | ---------- |
+| **Picking**            | ✅ Template | ✅ AI Natural        | 🏆 Logivox |
+| **Receiving/Put-Away** | ✅ Template | ✅ AI + Smart Route  | 🏆 Logivox |
+| **Replenishment**      | ⚠️ Basic    | ✅ Auto-Trigger + AI | 🏆 Logivox |
+| **Loading/Shipping**   | ⚠️ Basic    | ✅ Complete + QC     | 🏆 Logivox |
+| **Cycle Counting**     | ✅ Template | ✅ AI + Photos       | 🏆 Logivox |
+| **Transfers**          | ⚠️ Limited  | ✅ Complete          | 🏆 Logivox |
+| **Kitting**            | ⚠️ Limited  | ✅ Complete          | 🏆 Logivox |
+| **Returns**            | ⚠️ Basic    | ✅ Smart Routing     | 🏆 Logivox |
+| **QC/Verification**    | ❌ No       | ✅ Full Workflow     | 🏆 Logivox |
+| **Exceptions**         | ❌ Manual   | ✅ Voice-Guided      | 🏆 Logivox |
+| **Cross-Department**   | ❌ Siloed   | ✅ Fully Integrated  | 🏆 Logivox |
+| **Training Time**      | 2-4 hours   | Zero                 | 🏆 Logivox |
+| **Languages**          | Pre-config  | 20+ Auto             | 🏆 Logivox |
+| **Natural Language**   | ❌ No       | ✅ GPT-4             | 🏆 Logivox |
+| **Setup Time**         | 2-4 weeks   | 1 week               | 🏆 Logivox |
+| **Cost**               | $500K-$1M   | $200K                | 🏆 Logivox |
 
 **RESULT: Logivox wins 16/16 categories**
 
 ### What Voxware Can't Do (and we can):
+
 1. ✅ Auto-replenishment from short picks
-2. ✅ Natural language AI understanding  
+2. ✅ Natural language AI understanding
 3. ✅ Cross-department task orchestration
 4. ✅ Zero training deployment
 5. ✅ Real-time customer communication
@@ -9251,6 +9304,7 @@ System: "Understood. Manual clearance required.
 ### Competitive Landscape Overview
 
 **Major Players Analyzed:**
+
 1. **Voxware** (Voice specialist)
 2. **Manhattan Associates** (SCALE WMS + voice)
 3. **SAP Extended Warehouse Management** (EWM)
@@ -9266,43 +9320,44 @@ System: "Understood. Manual clearance required.
 
 ### 📊 Comprehensive Feature Matrix: Logivox vs All Competitors
 
-| Feature | **Logivox** | **Manhattan** | **SAP EWM** | **Oracle WMS** | **Blue Yonder** | **Honeywell** | **Lucas** |
-|---------|-------------|---------------|-------------|----------------|-----------------|---------------|-----------|
-| **VOICE OPERATIONS** |||||||
-| Natural Language AI | ✅ GPT-4 | ❌ Template | ❌ Template | ❌ Template | ❌ Template | ❌ Template | ⚠️ Basic |
-| Zero Training | ✅ Yes | ❌ 8-16 hrs | ❌ 16-40 hrs | ❌ 12-24 hrs | ❌ 8-16 hrs | ❌ 4-8 hrs | ❌ 4-8 hrs |
-| Languages (auto-detect) | ✅ 20+ | ⚠️ 10 pre-config | ⚠️ 15 pre-config | ⚠️ 12 pre-config | ⚠️ 10 pre-config | ⚠️ 15 pre-config | ⚠️ 8 pre-config |
-| Voice Picking | ✅ AI | ✅ Template | ✅ Template | ✅ Template | ✅ Template | ✅ Template | ✅ Template |
-| Voice Receiving | ✅ AI + Smart | ✅ Basic | ✅ Basic | ✅ Basic | ✅ Basic | ✅ Basic | ⚠️ Limited |
-| Voice Replenishment | ✅ Auto-trigger | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual | ⚠️ Manual | ⚠️ Basic | ⚠️ Basic |
-| Voice Loading | ✅ Complete | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ⚠️ Limited |
-| Voice Cycle Count | ✅ AI + Photo | ✅ Template | ✅ Template | ✅ Template | ✅ Template | ✅ Template | ✅ Template |
-| Voice QC/Verification | ✅ Complete | ❌ Separate | ❌ Separate | ❌ Separate | ❌ Separate | ❌ No | ❌ No |
-| Voice Returns | ✅ Smart Route | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ❌ Limited |
-| Voice Kitting | ✅ Complete | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited | ❌ No | ❌ No |
-| Voice Exceptions | ✅ Guided | ❌ Manual | ❌ Manual | ❌ Manual | ❌ Manual | ❌ Manual | ❌ Manual |
-| **AUTOMATION** |||||||
-| Auto Short Pick Resolution | ✅ Full | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No | ❌ No |
-| Cross-Dept Orchestration | ✅ AI | ❌ Manual | ⚠️ Workflow | ⚠️ Workflow | ⚠️ Workflow | ❌ No | ❌ No |
-| Smart Inventory Routing | ✅ AI | ⚠️ Rules | ⚠️ Rules | ⚠️ Rules | ⚠️ Rules | ❌ No | ❌ No |
-| Customer Communication | ✅ Full Auto | ❌ Manual | ❌ Manual | ⚠️ Limited | ❌ Manual | ❌ No | ❌ No |
-| Financial Integration | ✅ Real-time | ⚠️ Batch | ⚠️ Batch | ⚠️ API | ⚠️ Batch | ❌ No | ❌ No |
-| Exception Automation | ✅ AI | ❌ Manual | ⚠️ Alerts | ⚠️ Alerts | ⚠️ Alerts | ❌ Manual | ❌ Manual |
-| Equipment Management | ✅ Voice + GPS | ⚠️ RFID | ⚠️ SAP MM | ⚠️ IoT | ⚠️ Separate | ⚠️ Separate | ❌ No |
-| Root Cause Analysis | ✅ AI | ⚠️ Reports | ⚠️ Reports | ⚠️ Reports | ⚠️ Analytics | ❌ No | ❌ No |
-| Predictive Analytics | ✅ ML | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic | ✅ Advanced | ❌ No | ❌ No |
-| **IMPLEMENTATION** |||||||
-| Setup Time | ✅ 1 week | ⚠️ 8-12 weeks | ⚠️ 12-16 weeks | ⚠️ 8-12 weeks | ⚠️ 10-14 weeks | ⚠️ 2-4 weeks | ⚠️ 2-4 weeks |
-| Cloud Native | ✅ Yes | ⚠️ Hybrid | ⚠️ Hybrid | ✅ Yes | ⚠️ Hybrid | ❌ On-prem | ⚠️ Hybrid |
-| Hardware Required | ✅ BYOD/Standard | ⚠️ Specialized | ⚠️ Specialized | ⚠️ Specialized | ⚠️ Specialized | ⚠️ Vocollect | ⚠️ Specialized |
-| Cost | ✅ $200K | ⚠️ $1M-$3M | ⚠️ $2M-$5M | ⚠️ $1M-$3M | ⚠️ $1.5M-$4M | ⚠️ $500K-$1M | ⚠️ $300K-$800K |
-| **MOBILE/MODERN** |||||||
-| Mobile-First Design | ✅ Yes | ⚠️ Responsive | ⚠️ Native Apps | ⚠️ Responsive | ⚠️ Native Apps | ❌ Desktop | ⚠️ Apps |
-| Supervisor Mobile | ✅ Full-featured | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited | ⚠️ Limited | ❌ No | ⚠️ Basic |
-| Real-time GPS | ✅ Yes | ❌ No | ⚠️ RFID only | ⚠️ IoT | ⚠️ RFID | ❌ No | ❌ No |
-| Modern UI/UX | ✅ React/Next.js | ⚠️ Legacy | ⚠️ SAP Fiori | ⚠️ Modern | ⚠️ Modern | ⚠️ Legacy | ⚠️ Legacy |
+| Feature                    | **Logivox**      | **Manhattan**    | **SAP EWM**      | **Oracle WMS**   | **Blue Yonder**  | **Honeywell**    | **Lucas**       |
+| -------------------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- | --------------- |
+| **VOICE OPERATIONS**       |                  |                  |                  |                  |                  |                  |
+| Natural Language AI        | ✅ GPT-4         | ❌ Template      | ❌ Template      | ❌ Template      | ❌ Template      | ❌ Template      | ⚠️ Basic        |
+| Zero Training              | ✅ Yes           | ❌ 8-16 hrs      | ❌ 16-40 hrs     | ❌ 12-24 hrs     | ❌ 8-16 hrs      | ❌ 4-8 hrs       | ❌ 4-8 hrs      |
+| Languages (auto-detect)    | ✅ 20+           | ⚠️ 10 pre-config | ⚠️ 15 pre-config | ⚠️ 12 pre-config | ⚠️ 10 pre-config | ⚠️ 15 pre-config | ⚠️ 8 pre-config |
+| Voice Picking              | ✅ AI            | ✅ Template      | ✅ Template      | ✅ Template      | ✅ Template      | ✅ Template      | ✅ Template     |
+| Voice Receiving            | ✅ AI + Smart    | ✅ Basic         | ✅ Basic         | ✅ Basic         | ✅ Basic         | ✅ Basic         | ⚠️ Limited      |
+| Voice Replenishment        | ✅ Auto-trigger  | ⚠️ Manual        | ⚠️ Manual        | ⚠️ Manual        | ⚠️ Manual        | ⚠️ Basic         | ⚠️ Basic        |
+| Voice Loading              | ✅ Complete      | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Limited      |
+| Voice Cycle Count          | ✅ AI + Photo    | ✅ Template      | ✅ Template      | ✅ Template      | ✅ Template      | ✅ Template      | ✅ Template     |
+| Voice QC/Verification      | ✅ Complete      | ❌ Separate      | ❌ Separate      | ❌ Separate      | ❌ Separate      | ❌ No            | ❌ No           |
+| Voice Returns              | ✅ Smart Route   | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Basic         | ❌ Limited      |
+| Voice Kitting              | ✅ Complete      | ⚠️ Limited       | ⚠️ Limited       | ⚠️ Limited       | ⚠️ Limited       | ❌ No            | ❌ No           |
+| Voice Exceptions           | ✅ Guided        | ❌ Manual        | ❌ Manual        | ❌ Manual        | ❌ Manual        | ❌ Manual        | ❌ Manual       |
+| **AUTOMATION**             |                  |                  |                  |                  |                  |                  |
+| Auto Short Pick Resolution | ✅ Full          | ❌ No            | ❌ No            | ❌ No            | ❌ No            | ❌ No            | ❌ No           |
+| Cross-Dept Orchestration   | ✅ AI            | ❌ Manual        | ⚠️ Workflow      | ⚠️ Workflow      | ⚠️ Workflow      | ❌ No            | ❌ No           |
+| Smart Inventory Routing    | ✅ AI            | ⚠️ Rules         | ⚠️ Rules         | ⚠️ Rules         | ⚠️ Rules         | ❌ No            | ❌ No           |
+| Customer Communication     | ✅ Full Auto     | ❌ Manual        | ❌ Manual        | ⚠️ Limited       | ❌ Manual        | ❌ No            | ❌ No           |
+| Financial Integration      | ✅ Real-time     | ⚠️ Batch         | ⚠️ Batch         | ⚠️ API           | ⚠️ Batch         | ❌ No            | ❌ No           |
+| Exception Automation       | ✅ AI            | ❌ Manual        | ⚠️ Alerts        | ⚠️ Alerts        | ⚠️ Alerts        | ❌ Manual        | ❌ Manual       |
+| Equipment Management       | ✅ Voice + GPS   | ⚠️ RFID          | ⚠️ SAP MM        | ⚠️ IoT           | ⚠️ Separate      | ⚠️ Separate      | ❌ No           |
+| Root Cause Analysis        | ✅ AI            | ⚠️ Reports       | ⚠️ Reports       | ⚠️ Reports       | ⚠️ Analytics     | ❌ No            | ❌ No           |
+| Predictive Analytics       | ✅ ML            | ⚠️ Basic         | ⚠️ Basic         | ⚠️ Basic         | ✅ Advanced      | ❌ No            | ❌ No           |
+| **IMPLEMENTATION**         |                  |                  |                  |                  |                  |                  |
+| Setup Time                 | ✅ 1 week        | ⚠️ 8-12 weeks    | ⚠️ 12-16 weeks   | ⚠️ 8-12 weeks    | ⚠️ 10-14 weeks   | ⚠️ 2-4 weeks     | ⚠️ 2-4 weeks    |
+| Cloud Native               | ✅ Yes           | ⚠️ Hybrid        | ⚠️ Hybrid        | ✅ Yes           | ⚠️ Hybrid        | ❌ On-prem       | ⚠️ Hybrid       |
+| Hardware Required          | ✅ BYOD/Standard | ⚠️ Specialized   | ⚠️ Specialized   | ⚠️ Specialized   | ⚠️ Specialized   | ⚠️ Vocollect     | ⚠️ Specialized  |
+| Cost                       | ✅ $200K         | ⚠️ $1M-$3M       | ⚠️ $2M-$5M       | ⚠️ $1M-$3M       | ⚠️ $1.5M-$4M     | ⚠️ $500K-$1M     | ⚠️ $300K-$800K  |
+| **MOBILE/MODERN**          |                  |                  |                  |                  |                  |                  |
+| Mobile-First Design        | ✅ Yes           | ⚠️ Responsive    | ⚠️ Native Apps   | ⚠️ Responsive    | ⚠️ Native Apps   | ❌ Desktop       | ⚠️ Apps         |
+| Supervisor Mobile          | ✅ Full-featured | ⚠️ Limited       | ⚠️ Limited       | ⚠️ Limited       | ⚠️ Limited       | ❌ No            | ⚠️ Basic        |
+| Real-time GPS              | ✅ Yes           | ❌ No            | ⚠️ RFID only     | ⚠️ IoT           | ⚠️ RFID          | ❌ No            | ❌ No           |
+| Modern UI/UX               | ✅ React/Next.js | ⚠️ Legacy        | ⚠️ SAP Fiori     | ⚠️ Modern        | ⚠️ Modern        | ⚠️ Legacy        | ⚠️ Legacy       |
 
 ### **SCORING SUMMARY:**
+
 - **Full Support (✅):** Logivox: 32 | Others: 0-8
 - **Partial Support (⚠️):** Logivox: 0 | Others: 15-25
 - **Not Supported (❌):** Logivox: 0 | Others: 10-25
@@ -9311,8 +9366,10 @@ System: "Understood. Manual clearance required.
 
 ## 🚀 Unique Logivox Innovations (NO Competitor Has These)
 
-### **1. Conversational AI Short Pick Resolution** 
+### **1. Conversational AI Short Pick Resolution**
+
 **What it is:** When picker says "item not available," AI automatically:
+
 - Verifies with multi-step questions
 - Checks all alternative locations system-wide
 - Creates cycle count task
@@ -9328,7 +9385,9 @@ System: "Understood. Manual clearance required.
 ---
 
 ### **2. Intelligent Inventory Routing Engine**
+
 **What it is:** AI knows about operational needs in real-time:
+
 - Fresh inventory arriving → Routes to empty pick faces FIRST (from short picks)
 - Customer returns → Direct to short locations (skip reserve)
 - Inter-warehouse transfers → Prioritize urgent needs
@@ -9341,12 +9400,14 @@ System: "Understood. Manual clearance required.
 ---
 
 ### **3. Zero-Touch Cross-Department Orchestration**
+
 **What it is:** Voice command triggers automated workflows across ALL departments:
+
 ```
-Picker: "Item short" 
+Picker: "Item short"
   ↓ (automatic chain reaction)
 → Cycle count team
-→ Replenishment drivers  
+→ Replenishment drivers
 → Customer service (email)
 → Financial systems (AR update)
 → Purchasing (reorder trigger)
@@ -9360,7 +9421,9 @@ Picker: "Item short"
 ---
 
 ### **4. Equipment Intelligence System**
+
 **What it is:** Voice-activated equipment management:
+
 - Check-in/out via voice (no paper logs)
 - Battery auto-monitoring with proactive alerts
 - Maintenance requests via voice
@@ -9375,7 +9438,9 @@ Picker: "Item short"
 ---
 
 ### **5. AI-Powered Quality Control**
+
 **What it is:** Voice-guided random QC checks with:
+
 - Weight verification
 - Item-by-item scanning
 - AI error detection (wrong item alerts)
@@ -9390,7 +9455,9 @@ Picker: "Item short"
 ---
 
 ### **6. Customer Experience Automation**
+
 **What it is:** Automatic customer journey:
+
 - Short pick detected → Email with options within 15 minutes
 - SMS notifications
 - Customer portal updates (real-time tracking)
@@ -9404,7 +9471,9 @@ Picker: "Item short"
 ---
 
 ### **7. Financial Reconciliation Automation**
+
 **What it is:** Real-time financial updates:
+
 - AR adjustments (partial shipments)
 - Sales tax recalculation
 - Credit memo generation
@@ -9419,7 +9488,9 @@ Picker: "Item short"
 ---
 
 ### **8. Visual Documentation System**
-**What it is:** 
+
+**What it is:**
+
 - Major cycle count variances → Photo required
 - Damaged goods → Photo evidence
 - Exception handling → Visual proof
@@ -9433,7 +9504,9 @@ Picker: "Item short"
 ---
 
 ### **9. Natural Language Understanding (No Training)**
-**What it is:** 
+
+**What it is:**
+
 - "325" = "three twenty-five" = "three two five" = "three hundred twenty-five" (all understood)
 - "Item not found" = "Can't find it" = "Not here" = "Zero pick" (all same intent)
 - Works in 20+ languages automatically
@@ -9446,7 +9519,9 @@ Picker: "Item short"
 ---
 
 ### **10. Predictive Assistance & Proactive Help**
+
 **What it is:**
+
 - AI detects struggle (picker taking too long)
 - Offers help before asked: "Need directions to location?"
 - Suggests alternatives: "Item short here, but available in location B7-03"
@@ -9462,7 +9537,9 @@ Picker: "Item short"
 ## 🎯 What Each Competitor Does Well (And What They're Missing)
 
 ### **Manhattan Associates (SCALE)**
+
 **Strengths:**
+
 - ✅ Mature WMS (30+ years)
 - ✅ Large enterprise clients
 - ✅ Wave management
@@ -9470,6 +9547,7 @@ Picker: "Item short"
 - ✅ Labor management
 
 **Weaknesses vs Logivox:**
+
 - ❌ Template-based voice (not AI)
 - ❌ Long implementation (8-12 weeks)
 - ❌ Expensive ($1M-$3M)
@@ -9483,7 +9561,9 @@ Picker: "Item short"
 ---
 
 ### **SAP Extended Warehouse Management (EWM)**
+
 **Strengths:**
+
 - ✅ Deep ERP integration
 - ✅ Enterprise scale
 - ✅ Manufacturing integration
@@ -9491,6 +9571,7 @@ Picker: "Item short"
 - ✅ Strong analytics
 
 **Weaknesses vs Logivox:**
+
 - ❌ Complex (16-40 hours training)
 - ❌ Very expensive ($2M-$5M)
 - ❌ Long implementation (12-16 weeks)
@@ -9504,7 +9585,9 @@ Picker: "Item short"
 ---
 
 ### **Oracle Warehouse Management Cloud**
+
 **Strengths:**
+
 - ✅ Cloud-native architecture
 - ✅ Oracle ecosystem integration
 - ✅ Modern UI
@@ -9512,6 +9595,7 @@ Picker: "Item short"
 - ✅ Mobile apps
 
 **Weaknesses vs Logivox:**
+
 - ❌ Template voice (no AI)
 - ❌ Expensive ($1M-$3M)
 - ❌ Long setup (8-12 weeks)
@@ -9525,7 +9609,9 @@ Picker: "Item short"
 ---
 
 ### **Blue Yonder (JDA)**
+
 **Strengths:**
+
 - ✅ Advanced analytics
 - ✅ Supply chain planning
 - ✅ Machine learning (forecasting)
@@ -9533,6 +9619,7 @@ Picker: "Item short"
 - ✅ Micro-fulfillment
 
 **Weaknesses vs Logivox:**
+
 - ❌ Template voice
 - ❌ Complex implementation (10-14 weeks)
 - ❌ Expensive ($1.5M-$4M)
@@ -9546,7 +9633,9 @@ Picker: "Item short"
 ---
 
 ### **Honeywell Voice (Vocollect)**
+
 **Strengths:**
+
 - ✅ Voice pioneer (25+ years)
 - ✅ Reliable hardware
 - ✅ Proven in harsh environments
@@ -9554,6 +9643,7 @@ Picker: "Item short"
 - ✅ Strong support
 
 **Weaknesses vs Logivox:**
+
 - ❌ Template-based only (no AI)
 - ❌ Proprietary hardware ($500K-$1M)
 - ❌ Training required (4-8 hours)
@@ -9568,7 +9658,9 @@ Picker: "Item short"
 ---
 
 ### **Lucas Systems (Jennifer Voice)**
+
 **Strengths:**
+
 - ✅ User-friendly voice
 - ✅ Gamification features
 - ✅ Labor optimization
@@ -9576,6 +9668,7 @@ Picker: "Item short"
 - ✅ Quick deployment (2-4 weeks)
 
 **Weaknesses vs Logivox:**
+
 - ❌ Template voice (basic AI only)
 - ❌ Limited to picking/replen
 - ❌ No QC workflow
@@ -9592,9 +9685,11 @@ Picker: "Item short"
 ## 💡 Market Gaps We Fill (That NO Competitor Addresses)
 
 ### **Gap 1: The "Last Mile" Problem Inside the Warehouse**
+
 **Industry Problem:** Warehouses optimize picking but lose efficiency in handoffs between departments
 
 **Logivox Solution:** Eliminate handoffs with AI orchestration
+
 - Picker → Replenishment (automatic)
 - Receiving → Pick face (direct routing)
 - Returns → Circulation (immediate)
@@ -9605,9 +9700,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 2: The Customer Visibility Gap**
+
 **Industry Problem:** Customers blindsided by partial shipments or delays
 
 **Logivox Solution:** Real-time customer communication
+
 - Short pick → Notification within 15 minutes
 - Options offered (partial vs wait)
 - Portal updates (real-time status)
@@ -9618,9 +9715,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 3: The Training Time Barrier**
+
 **Industry Problem:** High turnover workforce requires constant retraining (4-8 hours per person × turnover rate)
 
 **Logivox Solution:** Zero training required
+
 - Natural language AI (no templates)
 - System adapts to worker (not vice versa)
 - Works in any language automatically
@@ -9630,9 +9729,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 4: The Equipment Black Hole**
+
 **Industry Problem:** Equipment underutilized, maintenance reactive, operators unaccountable
 
 **Logivox Solution:** Complete equipment intelligence
+
 - Voice check-in/out
 - GPS tracking
 - Battery monitoring
@@ -9644,9 +9745,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 5: The Exception Handling Nightmare**
+
 **Industry Problem:** Exceptions (damage, wrong items, equipment failure) break workflows and require supervisor intervention
 
 **Logivox Solution:** Voice-guided exception workflows
+
 - Every exception type has voice protocol
 - AI routes to right person automatically
 - Photo documentation
@@ -9657,9 +9760,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 6: The Financial Reconciliation Headache**
+
 **Industry Problem:** Warehouse and financial systems out of sync, end-of-day reconciliation, errors common
 
 **Logivox Solution:** Real-time financial integration
+
 - Every transaction updates financials immediately
 - AR, tax, credit memos automatic
 - Zero manual reconciliation
@@ -9669,9 +9774,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 7: The Quality Control Blind Spot**
+
 **Industry Problem:** QC done on small sample (if at all), errors reach customers
 
 **Logivox Solution:** Voice-guided random QC
+
 - Weight verification
 - Item scanning
 - AI error detection
@@ -9683,9 +9790,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 8: The Root Cause Invisibility**
+
 **Industry Problem:** Same issues repeat (short picks on same items), no systematic investigation
 
 **Logivox Solution:** AI-powered root cause analysis
+
 - Pattern detection (3+ occurrences)
 - Automatic investigation trigger
 - Corrective action tracking
@@ -9696,9 +9805,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 9: The Integration Complexity**
+
 **Industry Problem:** WMS + Voice + Labor + Equipment + QC = 5-10 separate systems
 
 **Logivox Solution:** Single unified platform
+
 - One system for everything
 - Native integration (not bolt-ons)
 - Consistent interface
@@ -9708,9 +9819,11 @@ Picker: "Item short"
 ---
 
 ### **Gap 10: The Deployment Time Barrier**
+
 **Industry Problem:** WMS implementations take 8-16 weeks (many fail or go over budget/time)
 
 **Logivox Solution:** 1-week deployment
+
 - Cloud-native (no hardware to install)
 - AI adapts to existing processes
 - Minimal configuration required
@@ -9728,27 +9841,29 @@ Picker: "Item short"
 
 ### **Market Position:**
 
-| Dimension | **Logivox** | **Legacy WMS + Voice** | **Modern WMS (Cloud)** |
-|-----------|-------------|------------------------|------------------------|
-| **Architecture** | AI-Native | Bolt-On Voice | Cloud, Template Voice |
-| **Deployment** | 1 week | 8-16 weeks | 6-12 weeks |
-| **Training** | Zero | 4-40 hours | 8-24 hours |
-| **Cost** | $200K | $500K-$5M | $300K-$3M |
-| **Voice Coverage** | All operations | Picking focus | Picking + limited |
-| **Automation** | AI orchestration | Rule-based | Workflow-based |
-| **Customer Impact** | Direct automation | None | Limited |
-| **Innovation Rate** | Continuous (AI learns) | Quarterly updates | Bi-annual releases |
+| Dimension           | **Logivox**            | **Legacy WMS + Voice** | **Modern WMS (Cloud)** |
+| ------------------- | ---------------------- | ---------------------- | ---------------------- |
+| **Architecture**    | AI-Native              | Bolt-On Voice          | Cloud, Template Voice  |
+| **Deployment**      | 1 week                 | 8-16 weeks             | 6-12 weeks             |
+| **Training**        | Zero                   | 4-40 hours             | 8-24 hours             |
+| **Cost**            | $200K                  | $500K-$5M              | $300K-$3M              |
+| **Voice Coverage**  | All operations         | Picking focus          | Picking + limited      |
+| **Automation**      | AI orchestration       | Rule-based             | Workflow-based         |
+| **Customer Impact** | Direct automation      | None                   | Limited                |
+| **Innovation Rate** | Continuous (AI learns) | Quarterly updates      | Bi-annual releases     |
 
 ### **Differentiation Matrix:**
 
 **vs Manhattan/SAP/Oracle (Enterprise WMS):**
+
 - ✅ 10X faster deployment
-- ✅ 5-10X lower cost  
+- ✅ 5-10X lower cost
 - ✅ Zero training vs 16-40 hours
 - ✅ AI vs templates
 - ✅ Complete automation vs manual
 
 **vs Voxware/Honeywell (Voice Specialists):**
+
 - ✅ AI vs templates
 - ✅ All operations vs picking focus
 - ✅ Customer communication (they have none)
@@ -9756,6 +9871,7 @@ Picker: "Item short"
 - ✅ Equipment management (they have none)
 
 **vs Lucas Systems (Voice + Labor):**
+
 - ✅ GPT-4 AI vs basic templates
 - ✅ QC/verification (they don't have)
 - ✅ Kitting (limited for them)
@@ -9768,18 +9884,19 @@ Picker: "Item short"
 
 ### **200 Orders/Day Warehouse:**
 
-| Cost Category | **Logivox** | **Manhattan + Voice** | **SAP EWM** | **Voxware** |
-|---------------|-------------|---------------------|-------------|-------------|
-| **Implementation** | $200K | $1.5M | $2.5M | $600K |
-| **Hardware** | $50K (BYOD) | $300K | $400K | $250K (Vocollect) |
-| **Software License (5yr)** | $500K | $1.2M | $2M | $800K |
-| **Training** | $0 | $150K | $250K | $80K |
-| **Integration** | $50K | $400K | $600K | $200K |
-| **Maintenance (5yr)** | $100K | $400K | $600K | $300K |
-| **Updates** | Included | $200K | $300K | $100K |
-| **TOTAL 5-YEAR TCO** | **$900K** | **$4.15M** | **$6.65M** | **$2.33M** |
+| Cost Category              | **Logivox** | **Manhattan + Voice** | **SAP EWM** | **Voxware**       |
+| -------------------------- | ----------- | --------------------- | ----------- | ----------------- |
+| **Implementation**         | $200K       | $1.5M                 | $2.5M       | $600K             |
+| **Hardware**               | $50K (BYOD) | $300K                 | $400K       | $250K (Vocollect) |
+| **Software License (5yr)** | $500K       | $1.2M                 | $2M         | $800K             |
+| **Training**               | $0          | $150K                 | $250K       | $80K              |
+| **Integration**            | $50K        | $400K                 | $600K       | $200K             |
+| **Maintenance (5yr)**      | $100K       | $400K                 | $600K       | $300K             |
+| **Updates**                | Included    | $200K                 | $300K       | $100K             |
+| **TOTAL 5-YEAR TCO**       | **$900K**   | **$4.15M**            | **$6.65M**  | **$2.33M**        |
 
 **Logivox Savings:**
+
 - vs Manhattan: **$3.25M (78% savings)**
 - vs SAP: **$5.75M (87% savings)**
 - vs Voxware: **$1.43M (61% savings)**
@@ -9790,18 +9907,19 @@ Picker: "Item short"
 
 ### **Annual Benefits - 200 Orders/Day Warehouse:**
 
-| Benefit Category | **Logivox** | **Manhattan** | **SAP EWM** | **Voxware** |
-|-----------------|-------------|---------------|-------------|-------------|
-| **Labor Efficiency** | $4.2M | $3.1M | $2.8M | $3.5M |
-| **Short Pick Resolution** | $7.6M | $1.2M | $1.0M | $1.5M |
-| **Equipment Optimization** | $850K | $400K | $300K | $0 |
-| **Quality Improvements** | $900K | $500K | $400K | $600K |
-| **Customer Retention** | $1.4M | $0 | $0 | $0 |
-| **Financial Accuracy** | $500K | $200K | $300K | $0 |
-| **Faster Deployment Benefit** | $400K | $0 | $0 | $0 |
-| **TOTAL ANNUAL BENEFIT** | **$15.85M** | **$5.4M** | **$4.8M** | **$5.6M** |
+| Benefit Category              | **Logivox** | **Manhattan** | **SAP EWM** | **Voxware** |
+| ----------------------------- | ----------- | ------------- | ----------- | ----------- |
+| **Labor Efficiency**          | $4.2M       | $3.1M         | $2.8M       | $3.5M       |
+| **Short Pick Resolution**     | $7.6M       | $1.2M         | $1.0M       | $1.5M       |
+| **Equipment Optimization**    | $850K       | $400K         | $300K       | $0          |
+| **Quality Improvements**      | $900K       | $500K         | $400K       | $600K       |
+| **Customer Retention**        | $1.4M       | $0            | $0          | $0          |
+| **Financial Accuracy**        | $500K       | $200K         | $300K       | $0          |
+| **Faster Deployment Benefit** | $400K       | $0            | $0          | $0          |
+| **TOTAL ANNUAL BENEFIT**      | **$15.85M** | **$5.4M**     | **$4.8M**   | **$5.6M**   |
 
 **Year 1 ROI:**
+
 - **Logivox:** 7,925% ($15.85M benefit / $200K cost)
 - **Manhattan:** 360% ($5.4M / $1.5M)
 - **SAP:** 192% ($4.8M / $2.5M)
@@ -9816,8 +9934,10 @@ Picker: "Item short"
 ### **For Different Warehouse Segments:**
 
 #### **Small-Medium Warehouses (50-200 orders/day):**
+
 **Best Fit:** Logivox
-**Why:** 
+**Why:**
+
 - Can't afford $1M+ systems
 - Need fast deployment (can't wait 3 months)
 - Small team (can't do 40 hours training per person)
@@ -9828,8 +9948,10 @@ Picker: "Item short"
 ---
 
 #### **Large Warehouses (200-1000 orders/day):**
+
 **Best Fit:** Logivox
 **Why:**
+
 - ROI massive at scale ($15.85M/year)
 - Cross-department coordination critical
 - Customer experience matters
@@ -9840,14 +9962,17 @@ Picker: "Item short"
 ---
 
 #### **Enterprise Multi-Site (1000+ orders/day, multiple warehouses):**
+
 **Best Fit:** Logivox OR Manhattan/SAP (depends on existing ERP)
 **Why Logivox:**
+
 - If greenfield or ERP-agnostic
 - Want best-in-class voice/automation
 - Fast deployment across sites
 - Lower TCO
 
 **Why Manhattan/SAP:**
+
 - If heavily invested in SAP/Oracle ERP
 - Need deep manufacturing integration
 - Existing infrastructure
@@ -9869,7 +9994,7 @@ model ShortPickEscalation {
   resolvedAt      DateTime?
   resolutionTime  Int?     // minutes
   autoResolved    Boolean  @default(false)
-  
+
   pickLine        WavePickLine @relation(fields: [pickLineId])
 }
 
@@ -9886,7 +10011,7 @@ model CycleCountRequest {
   countedAt         DateTime?
   status            String   // "PENDING" | "ASSIGNED" | "COMPLETED"
   relatedPickLineId String?
-  
+
   inventoryItem     InventoryItem @relation(fields: [inventoryItemId])
   location          Location @relation(fields: [locationId])
 }
@@ -9902,7 +10027,7 @@ model CustomerNotification {
   actionRequired  Boolean  @default(false)
   actionTaken     Boolean  @default(false)
   responseData    Json?
-  
+
   customer        Customer @relation(fields: [customerId])
   order           SalesOrder? @relation(fields: [orderId])
 }
@@ -9918,7 +10043,7 @@ model ShortPickMetrics {
   partialPickCount  Int
   resolutionTimeAvg Int      // minutes
   revenueImpact     Decimal
-  
+
   warehouse         Warehouse @relation(fields: [warehouseId])
 }
 
@@ -9933,7 +10058,7 @@ model RootCauseAnalysis {
   dueDate           DateTime
   status            String   // "OPEN" | "IN_PROGRESS" | "RESOLVED"
   followUpDate      DateTime?
-  
+
   item              InventoryItem @relation(fields: [itemId])
 }
 ```
@@ -9943,23 +10068,27 @@ model RootCauseAnalysis {
 ## 🚀 Implementation Priority
 
 ### Week 1: Critical (Must Have)
+
 1. ✅ Picker verification steps
 2. ✅ Cycle count integration
 3. ✅ Exception escalation
 4. ✅ Customer communication
 
 ### Week 2: High Priority
+
 5. ✅ Alternative location check
 6. ✅ Financial integration
 7. ✅ Replenishment triggers
 8. ✅ Multi-line strategy
 
 ### Week 3: Value-Add
+
 9. ✅ Supervisor mobile dashboard
 10. ✅ Performance metrics
 11. ✅ Root cause analysis
 
 ### Week 4: Advanced
+
 12. ✅ AI substitute suggestions
 13. ✅ Predictive analytics
 14. ✅ Customer self-service portal
@@ -9992,7 +10121,11 @@ Around line 268 in `simpleIntentMatch()`:
 
 ```typescript
 // Item not found
-if (/\b(not found|can't find|cannot locate|not there|empty|zero pick|no stock)\b/i.test(lowerText)) {
+if (
+  /\b(not found|can't find|cannot locate|not there|empty|zero pick|no stock)\b/i.test(
+    lowerText,
+  )
+) {
   return {
     intent: "ITEM_NOT_FOUND",
     confidence: 0.9,
@@ -10007,9 +10140,9 @@ if (/\b(short pick|only found|partial|less than|shortage)\b/i.test(lowerText)) {
   return {
     intent: "SHORT_PICK",
     confidence: 0.85,
-    entities: { 
+    entities: {
       partialPick: true,
-      quantity: quantityMatch ? parseInt(quantityMatch[1]) : 0
+      quantity: quantityMatch ? parseInt(quantityMatch[1]) : 0,
     },
     reasoning: "Partial quantity pick detected",
   };
@@ -10052,7 +10185,7 @@ case "ITEM_NOT_FOUND":
 
     return {
       type: "ZERO_PICK_RECORDED",
-      data: { 
+      data: {
         lineId: input.context.pickLineId,
         status: "SHORT",
         alertCreated: true
@@ -10066,7 +10199,7 @@ case "SHORT_PICK":
   if (input.context?.pickLineId && entities.quantity) {
     const pickedQty = entities.quantity;
     const orderedQty = input.context.orderedQuantity || 0;
-    
+
     await prisma.wavePickLine.update({
       where: { id: input.context.pickLineId },
       data: {
@@ -10079,7 +10212,7 @@ case "SHORT_PICK":
 
     return {
       type: "SHORT_PICK_RECORDED",
-      data: { 
+      data: {
         lineId: input.context.pickLineId,
         pickedQuantity: pickedQty,
         shortQuantity: orderedQty - pickedQty
@@ -10182,9 +10315,7 @@ export async function POST(
     }
 
     // Find the line item to cancel
-    const lineItem = salesOrder.items.find(
-      (item) => item.id === params.itemId,
-    );
+    const lineItem = salesOrder.items.find((item) => item.id === params.itemId);
 
     if (!lineItem) {
       return NextResponse.json(
@@ -10249,7 +10380,7 @@ export async function POST(
         let backorder = null;
         if (validatedData.createBackorder) {
           const boNumber = `BO-${salesOrder.soNumber}-${Date.now()}`;
-          
+
           backorder = await tx.salesOrder.create({
             data: {
               organizationId,
@@ -10658,9 +10789,7 @@ export function ShortPickManagement({
               </div>
 
               <div>
-                <label className="text-sm font-medium">
-                  Notes (Optional)
-                </label>
+                <label className="text-sm font-medium">Notes (Optional)</label>
                 <Textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
@@ -10881,6 +11010,7 @@ SHORT PICKS TAB:
 ### Admin Actions
 
 **Option 1: Remove Line** (Most Common)
+
 - Click [Remove Line]
 - Add optional notes
 - System removes item from order
@@ -10888,12 +11018,14 @@ SHORT PICKS TAB:
 - Order can now be invoiced and shipped (partial)
 
 **Option 2: Create Backorder**
+
 - Click [Backorder]
 - System creates new order (BO-12345-01)
 - Original order closes without missing item
 - Backorder waits for inventory replenishment
 
 **Option 3: Cancel Entire Order**
+
 - Click [Cancel Order]
 - Only if customer requests full cancellation
 - Releases all reserved inventory
@@ -10986,28 +11118,31 @@ RESULT:
 
 ### Operational Improvements
 
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| **Order Closure Time** | 2-3 days (waiting for unavailable items) | Same day (partial ship) | **70% faster** |
-| **Invoice Processing** | Delayed until complete | Immediate for available items | **100% faster** |
-| **Customer Satisfaction** | Low (full delay) | High (partial shipment) | **+40%** |
-| **Inventory Accuracy** | Manual counts delayed | Real-time discrepancy alerts | **+95% accuracy** |
-| **Admin Time per Short Pick** | 15 minutes (manual process) | 2 minutes (voice + click) | **87% reduction** |
+| Metric                        | Before                                   | After                         | Improvement       |
+| ----------------------------- | ---------------------------------------- | ----------------------------- | ----------------- |
+| **Order Closure Time**        | 2-3 days (waiting for unavailable items) | Same day (partial ship)       | **70% faster**    |
+| **Invoice Processing**        | Delayed until complete                   | Immediate for available items | **100% faster**   |
+| **Customer Satisfaction**     | Low (full delay)                         | High (partial shipment)       | **+40%**          |
+| **Inventory Accuracy**        | Manual counts delayed                    | Real-time discrepancy alerts  | **+95% accuracy** |
+| **Admin Time per Short Pick** | 15 minutes (manual process)              | 2 minutes (voice + click)     | **87% reduction** |
 
 ### Financial Impact
 
 **Example Calculation:**
+
 - Average order value: $1,200
 - Orders with 1 unavailable item: 8% (industry average)
 - Orders per day: 200
 - Short pick orders per day: 16
 
 **Before:**
+
 - 16 orders delayed 2-3 days waiting for item
 - Cash flow impact: $19,200/day delayed
 - Customer service calls: 16 calls @ 10 min each = 2.7 hours/day
 
 **After:**
+
 - 16 orders ship partially same day
 - Cash flow impact: $0 delay (invoice immediately)
 - Customer service calls: Reduced to 4 calls @ 5 min = 20 minutes/day
@@ -11019,32 +11154,36 @@ RESULT:
 
 ### Voxware Comparison
 
-| Feature | **Logivox Voice** | **Voxware** |
-|---------|-------------------|-------------|
-| **Zero Pick Reporting** | "Item not found" (natural speech) | Template: "Zero confirm zero" |
-| **Admin Response Time** | Real-time alert + 1-click action | Manual review in separate console |
-| **Order Line Removal** | Automated with voice trigger | Manual in ERP system |
-| **Partial Ship Processing** | Auto-recalculates totals | Manual adjustment required |
-| **Backorder Creation** | 1-click from voice alert | Manual order entry |
-| **Training Required** | Zero (AI understands variations) | 2-4 hours (template memorization) |
-| **Language Support** | 20+ languages | Limited to pre-configured |
+| Feature                     | **Logivox Voice**                 | **Voxware**                       |
+| --------------------------- | --------------------------------- | --------------------------------- |
+| **Zero Pick Reporting**     | "Item not found" (natural speech) | Template: "Zero confirm zero"     |
+| **Admin Response Time**     | Real-time alert + 1-click action  | Manual review in separate console |
+| **Order Line Removal**      | Automated with voice trigger      | Manual in ERP system              |
+| **Partial Ship Processing** | Auto-recalculates totals          | Manual adjustment required        |
+| **Backorder Creation**      | 1-click from voice alert          | Manual order entry                |
+| **Training Required**       | Zero (AI understands variations)  | 2-4 hours (template memorization) |
+| **Language Support**        | 20+ languages                     | Limited to pre-configured         |
 
 ### Key Differentiators
 
 **1. Natural Language**
+
 - Picker can say: "Item not found", "Can't find it", "Zero pick", "Nothing here"
 - AI understands intent regardless of wording
 - Voxware requires exact phrase: "Zero confirm zero"
 
 **2. Integrated Admin Console**
+
 - Voice alert → Admin action → Order update (all in one system)
 - Voxware requires switching between voice console and ERP
 
 **3. Automated Workflows**
+
 - Voice command triggers entire workflow automatically
 - Reduces admin intervention by 85%
 
 **4. Real-Time Inventory Accuracy**
+
 - Every zero pick creates immediate inventory alert
 - Warehouse knows about stock discrepancies within seconds
 - Enables rapid cycle counts and reordering
@@ -11058,6 +11197,7 @@ RESULT:
 **What to Say When Item is Not Available:**
 
 ✅ **Acceptable voice commands:**
+
 - "Item not found"
 - "Can't find it"
 - "Zero pick"
@@ -11066,11 +11206,13 @@ RESULT:
 - "No stock"
 
 ❌ **What NOT to do:**
+
 - Don't skip without reporting
 - Don't guess quantities
 - Don't move to different location without asking
 
 **If Partial Quantity Found:**
+
 - Say: "Only found [number]"
 - Example: "Only found 15" (when 20 ordered)
 - System records partial pick automatically
@@ -11091,6 +11233,7 @@ RESULT:
      - Cancel order (if customer requests)
 
 **Best Practices:**
+
 - Review short picks every 30 minutes during peak hours
 - Add notes for reporting (why item was unavailable)
 - Trigger cycle count for high-value short picks
@@ -11144,7 +11287,7 @@ VoiceCommand {
 ### Technical Acceptance - Core
 
 - ✅ Picker can report zero pick via voice
-- ✅ System records short pick automatically  
+- ✅ System records short pick automatically
 - ✅ Admin sees alert in Voice Operations Console
 - ✅ Admin can remove line item with 1 click
 - ✅ Order totals recalculate automatically
@@ -11185,9 +11328,11 @@ VoiceCommand {
 ## 📈 Enhanced Rollout Plan
 
 ### Phase 1: Core Voice + Verification (Week 1)
+
 **Focus:** Basic zero pick reporting with verification steps
 
 **Deliverables:**
+
 - ✅ Enhanced voice intents (ITEM_NOT_FOUND, VERIFY_LOCATION)
 - ✅ Multi-step picker verification workflow
 - ✅ Cycle count integration and triggers
@@ -11195,14 +11340,17 @@ VoiceCommand {
 - ✅ Test with 2-3 pickers in controlled environment
 
 **Success Metrics:**
+
 - False zero picks < 5%
 - Verification completion rate > 95%
 - Picker compliance with verification steps
 
 ### Phase 2: Admin Tools + Customer Communication (Week 2)
+
 **Focus:** Admin console and customer outreach
 
 **Deliverables:**
+
 - ✅ Cancel line item API endpoint
 - ✅ Short picks fetch API endpoint
 - ✅ Admin dashboard Short Picks tab
@@ -11212,14 +11360,17 @@ VoiceCommand {
 - ✅ Test with sample orders end-to-end
 
 **Success Metrics:**
+
 - Admin resolution time < 30 min
 - Customer notification within 15 min
 - Zero manual financial errors
 
 ### Phase 3: Financial + Escalation (Week 3)
+
 **Focus:** Financial integration and exception handling
 
 **Deliverables:**
+
 - ✅ Financial system integration (AR, tax, credit memos)
 - ✅ Exception escalation workflow (4-tier)
 - ✅ Multi-line short pick strategy
@@ -11228,14 +11379,17 @@ VoiceCommand {
 - ✅ Train 5 admins/managers
 
 **Success Metrics:**
+
 - No escalations past Tier 2
 - Financial reconciliation 100% accurate
 - Replenishment orders auto-created
 
 ### Phase 4: Advanced Analytics + AI (Week 4)
+
 **Focus:** Intelligence and continuous improvement
 
 **Deliverables:**
+
 - ✅ Root cause analysis engine
 - ✅ AI substitute suggestions
 - ✅ Supervisor mobile dashboard (full features)
@@ -11245,14 +11399,17 @@ VoiceCommand {
 - ✅ Full production rollout
 
 **Success Metrics:**
+
 - Repeat short picks reduced 60%
 - AI substitute acceptance rate > 40%
 - SLA compliance > 90%
 
 ### Phase 5: Optimization + Scale (Week 5+)
+
 **Focus:** Fine-tuning and expansion
 
 **Deliverables:**
+
 - ✅ Monitor and optimize workflows
 - ✅ Gather feedback from all stakeholders
 - ✅ Implement improvements based on data
@@ -11260,6 +11417,7 @@ VoiceCommand {
 - ✅ Advanced reporting and forecasting
 
 **Success Metrics:**
+
 - Short pick rate < 2% (industry leading)
 - Customer satisfaction > 4.5/5.0
 - Zero revenue leakage from delayed orders
@@ -11271,6 +11429,7 @@ VoiceCommand {
 ### The Problem (Expanded)
 
 **Traditional Warehouse Challenge:**
+
 - Orders stuck waiting for unavailable items
 - Manual intervention required across multiple systems
 - Poor customer communication
@@ -11281,6 +11440,7 @@ VoiceCommand {
 - False zero picks from incomplete verification
 
 **Business Impact:**
+
 - $19K+ daily cash flow delays (per 200 orders)
 - Customer dissatisfaction (surprised by partial shipments)
 - Admin overhead (15+ minutes per short pick)
@@ -11293,6 +11453,7 @@ VoiceCommand {
 **Voice-Triggered, AI-Powered, Enterprise-Grade Short Pick Management System**
 
 #### **1. Intelligent Voice Capture**
+
 ```
 Picker: "Item not found"
   ↓
@@ -11304,6 +11465,7 @@ Multi-step verification begins
 ```
 
 #### **2. Smart Verification**
+
 ```
 Verification checklist:
 ✓ Primary location checked
@@ -11315,6 +11477,7 @@ Reduces false zero picks by 90%
 ```
 
 #### **3. Real-Time Admin Console**
+
 ```
 Voice Operations Dashboard:
 - Live short pick alerts
@@ -11326,6 +11489,7 @@ Resolution time: <30 minutes (vs 2-3 days)
 ```
 
 #### **4. Automated Customer Communication**
+
 ```
 Line removed → Automatic notifications:
 - Email with options
@@ -11337,6 +11501,7 @@ Customer satisfaction: +40%
 ```
 
 #### **5. Financial Integration**
+
 ```
 System automatically:
 - Updates accounts receivable
@@ -11348,6 +11513,7 @@ Zero manual errors, immediate processing
 ```
 
 #### **6. Intelligent Inventory Management**
+
 ```
 Zero pick confirmed →
 - Cycle count verification
@@ -11360,6 +11526,7 @@ Inventory accuracy: 99.5%+
 ```
 
 #### **7. Supervisor Mobile Command**
+
 ```
 Real-time floor view:
 - GPS-tracked picker locations
@@ -11371,6 +11538,7 @@ Response time: <5 minutes
 ```
 
 #### **8. Continuous Improvement**
+
 ```
 Root Cause Analysis:
 - Pattern detection (3+ shorts = investigation)
@@ -11383,26 +11551,27 @@ Repeat issues: -60%
 
 ### Key Advantages Over Competition
 
-| Feature | **Logivox** | **Voxware** | **Manhattan** | **SAP WMS** |
-|---------|-------------|-------------|---------------|-------------|
-| **Voice Recognition** | Natural AI (GPT-4) | Template-based | Template-based | Template-based |
-| **Verification Steps** | Multi-location auto | Manual | Manual | Manual |
-| **Customer Notification** | Automatic | Manual | Manual | Manual |
-| **Financial Integration** | Real-time auto | Batch/manual | Batch | Manual |
-| **Supervisor Mobile** | Full-featured | Limited | Desktop only | Desktop only |
-| **Root Cause Analysis** | AI-powered | None | Basic reports | Basic reports |
-| **Alternative Location** | System-wide search | Manual | Manual | Manual |
-| **AI Substitutes** | Intelligent suggestions | None | None | None |
-| **Escalation** | 4-tier automatic | Manual | Manual | Manual |
-| **Languages** | 20+ (no training) | Pre-configured | Pre-configured | Pre-configured |
-| **Training Time** | Zero (AI adapts) | 2-4 hours | 4-8 hours | 8+ hours |
-| **Setup Cost** | $0 (cloud) | $50K+ (hardware) | $100K+ | $200K+ |
+| Feature                   | **Logivox**             | **Voxware**      | **Manhattan**  | **SAP WMS**    |
+| ------------------------- | ----------------------- | ---------------- | -------------- | -------------- |
+| **Voice Recognition**     | Natural AI (GPT-4)      | Template-based   | Template-based | Template-based |
+| **Verification Steps**    | Multi-location auto     | Manual           | Manual         | Manual         |
+| **Customer Notification** | Automatic               | Manual           | Manual         | Manual         |
+| **Financial Integration** | Real-time auto          | Batch/manual     | Batch          | Manual         |
+| **Supervisor Mobile**     | Full-featured           | Limited          | Desktop only   | Desktop only   |
+| **Root Cause Analysis**   | AI-powered              | None             | Basic reports  | Basic reports  |
+| **Alternative Location**  | System-wide search      | Manual           | Manual         | Manual         |
+| **AI Substitutes**        | Intelligent suggestions | None             | None           | None           |
+| **Escalation**            | 4-tier automatic        | Manual           | Manual         | Manual         |
+| **Languages**             | 20+ (no training)       | Pre-configured   | Pre-configured | Pre-configured |
+| **Training Time**         | Zero (AI adapts)        | 2-4 hours        | 4-8 hours      | 8+ hours       |
+| **Setup Cost**            | $0 (cloud)              | $50K+ (hardware) | $100K+         | $200K+         |
 
 ### Business Value Calculation
 
 **Example: 200 Orders/Day Warehouse**
 
 #### **Cost Savings:**
+
 ```
 Short picks per day: 16 (8% rate - industry avg)
 
@@ -11426,6 +11595,7 @@ ANNUAL SAVINGS: $7,092,800
 ```
 
 #### **Revenue Impact:**
+
 ```
 Prevented order cancellations: 2/day @ $600 avg = $438,000/year
 Improved inventory accuracy: $50K/year (reduced shrink)
@@ -11435,6 +11605,7 @@ TOTAL ANNUAL BENEFIT: $7,680,800
 ```
 
 #### **ROI:**
+
 ```
 Logivox implementation cost: $150,000 (one-time)
 Annual benefit: $7,680,800
@@ -11480,9 +11651,10 @@ Payback period: 7 days
 **Week 2:** Admin tools + customer communication  
 **Week 3:** Financial integration + escalation  
 **Week 4:** Advanced analytics + AI features  
-**Week 5+:** Optimization and scale  
+**Week 5+:** Optimization and scale
 
 **Team Required:**
+
 - 2 backend developers
 - 1 frontend developer
 - 1 voice/AI specialist
@@ -11490,6 +11662,7 @@ Payback period: 7 days
 - 1 project manager
 
 **Dependencies:**
+
 - OpenAI API access (GPT-4 + Whisper)
 - Mobile device GPS access
 - Email/SMS service (SendGrid/Twilio)
@@ -11510,6 +11683,7 @@ This section covers **15 advanced optimization systems** that eliminate every po
 ### The Problem: Unexpected Equipment Failures Cost 2-4 Hours Downtime
 
 **Traditional System:**
+
 - Equipment breaks mid-shift
 - Production stops
 - Wait for mechanic (30-60 minutes)
@@ -11676,13 +11850,13 @@ System: "Perfect! Vibration eliminated. Record test results:
          - Lift time: 4.0 seconds (back to baseline) ✓
          - Vibration: 0.5g (normal) ✓
          - Pressure: 2,900 PSI (excellent) ✓
-         
+
          Maintenance complete in 18 minutes!
          Actual: Air in line (predicted 78% - correct!)
          Cost: $15 (fluid only)
          SAVED: $2,400 potential breakdown
          ROI: 16,000%!
-         
+
          Update: RT-07 operational. Sarah notified.
          Great diagnostic work John!"
 
@@ -11706,44 +11880,44 @@ AI BATTERY HEALTH DASHBOARD:
 Manager: "Show battery health"
 
 System: "BATTERY FLEET STATUS (8 Reach Trucks)
-         
+
          🔋 RT-01: 89% health, 1,847 cycles, 12 months old
             └─ Status: Good ✓
             └─ Replacement: 8 months
-         
+
          🔋 RT-02: 76% health, 2,247 cycles, 18 months old
             └─ Status: Acceptable ⚠️
             └─ Replacement: 3 months
-         
+
          🔋 RT-03: 92% health, 1,445 cycles, 9 months old
             └─ Status: Excellent ✓
             └─ Replacement: 11 months
-         
+
          🔋 RT-04: 64% health, 2,689 cycles, 22 months old ⚠️
             └─ Status: DEGRADED - ACTION NEEDED
             └─ Replacement: RECOMMEND NOW
             └─ Cost: $3,200
             └─ Impact: -18% runtime, +45 min charging
-         
+
          🔋 RT-05: 88% health, 1,689 cycles, 13 months old
             └─ Status: Good ✓
             └─ Replacement: 9 months
-         
+
          [Continue for RT-06, RT-07, RT-08...]
-         
+
          📊 REPLACEMENT SCHEDULE:
          ├─ January 2026: RT-04 (urgent)
          ├─ April 2026: RT-02
          ├─ August 2026: RT-07
          ├─ December 2026: RT-06
          └─ Budget needed: $12,800 for 2026
-         
+
          💰 COST-BENEFIT:
          ├─ Proactive replacement: $3,200/battery
          ├─ Emergency replacement: $4,500/battery (rush + downtime)
          ├─ Savings per battery: $1,300
          └─ Annual savings: $5,200 (4 batteries)
-         
+
          [Order RT-04 Battery Now] [Schedule Replacement]"
 
 Manager clicks [Order RT-04 Battery Now]:
@@ -11753,7 +11927,7 @@ System: "Purchase order generated: PO-2026-BATT-04
          Cost: $3,200
          Delivery: 5-7 days
          Installation scheduled: January 14, 2026 (after shift)
-         
+
          RT-04 will continue operating until replacement.
          Backup plan: RT-09 available if RT-04 fails early."
 ```
@@ -11769,34 +11943,34 @@ MAINTENANCE PERFORMANCE DASHBOARD:
 Manager: "Show maintenance analytics this quarter"
 
 System: "MAINTENANCE PERFORMANCE (Q1 2026)
-         
+
          📊 PREDICTIVE VS REACTIVE:
          ├─ Total maintenance events: 47
          ├─ Predictive (scheduled): 42 (89%) ✓
          ├─ Reactive (breakdowns): 5 (11%)
          └─ Target: >85% predictive ✓ ACHIEVED
-         
+
          ⏱️ DOWNTIME PREVENTION:
          ├─ Predicted failures: 42
          ├─ Prevented: 42 (100%) ✓
          ├─ Estimated downtime avoided: 127 hours
          ├─ Production value protected: $38,100
          └─ ROI on predictive system: 1,847%
-         
+
          💰 COST ANALYSIS:
          ├─ Preventive maintenance: $8,450
          ├─ Emergency repairs: $2,200 (5 events)
          ├─ Total: $10,650
          ├─ Without predictive: $47,200 (estimated)
          └─ Savings: $36,550 (77% reduction!)
-         
+
          🔧 TOP ISSUES DETECTED:
          1. Hydraulic air: 12 events (all prevented)
          2. Battery degradation: 8 replacements (planned)
          3. Brake wear: 6 replacements (scheduled)
          4. Chain tension: 5 adjustments (routine)
          5. Wheel wear: 4 replacements (planned)
-         
+
          ⭐ EQUIPMENT RELIABILITY:
          ├─ RT-01: 99.2% uptime (excellent)
          ├─ RT-02: 97.8% uptime (good)
@@ -11804,7 +11978,7 @@ System: "MAINTENANCE PERFORMANCE (Q1 2026)
          ├─ RT-04: 94.1% uptime (acceptable, battery aging)
          ├─ RT-05: 98.9% uptime (excellent)
          └─ Fleet average: 98.1% uptime ✓
-         
+
          🎯 NEXT QUARTER FORECAST:
          ├─ Predicted maintenance events: 38
          ├─ Major replacements: 2 (RT-04 battery, RT-02 pump)
@@ -11821,7 +11995,7 @@ model EquipmentHealthLog {
   id                String   @id @default(cuid())
   equipmentId       String
   timestamp         DateTime @default(now())
-  
+
   // Battery metrics
   batteryVoltage    Float?
   batteryAmperage   Float?
@@ -11829,7 +12003,7 @@ model EquipmentHealthLog {
   batteryLevel      Int?     // Percentage
   chargeCycles      Int?
   cellBalance       Float?   // Percentage
-  
+
   // Hydraulic metrics
   hydraulicPressure Float?   // PSI
   hydraulicTemp     Float?   // Fahrenheit
@@ -11837,7 +12011,7 @@ model EquipmentHealthLog {
   liftCycleTime     Float?   // Seconds
   vibrationLevel    Float?   // g-force
   fluidLevel        Float?   // Percentage
-  
+
   // Mechanical metrics
   mastTiltAngle     Float?
   forkAlignment     Float?   // Degrees
@@ -11845,21 +12019,21 @@ model EquipmentHealthLog {
   brakePadWear      Float?   // Percentage remaining
   chainTension      String?  // NORMAL, LOOSE, TIGHT
   bearingTemp       Float?   // Fahrenheit
-  
+
   // Operational
   operatingHours    Float
   distanceTraveled  Float?   // Feet
   tasksCompleted    Int?
-  
+
   // AI Analysis
   anomalyDetected   Boolean  @default(false)
   anomalyType       String?
   anomalySeverity   String?  // LOW, MEDIUM, HIGH, CRITICAL
   predictedFailure  DateTime?
   confidence        Float?   // 0-1
-  
+
   equipment         WarehouseEquipment @relation(fields: [equipmentId])
-  
+
   @@index([equipmentId, timestamp])
   @@map("equipment_health_logs")
 }
@@ -11868,48 +12042,48 @@ model PredictiveMaintenanceAlert {
   id                String   @id @default(cuid())
   alertNumber       String   @unique
   equipmentId       String
-  
+
   // Detection
   detectedAt        DateTime @default(now())
   anomalyType       String
   severity          String   // LOW, MEDIUM, HIGH, CRITICAL
   confidence        Float    // 0-1
-  
+
   // Prediction
   predictedFailure  DateTime
   daysUntilFailure  Float
   likelyCause       String
   causeProbability  Float    // 0-1
-  
+
   // Impact
   estimatedDowntime Int?     // Hours
   preventiveCost    Decimal? @db.Decimal(10, 2)
   failureCost       Decimal? @db.Decimal(10, 2)
   potentialSavings  Decimal? @db.Decimal(10, 2)
-  
+
   // Status
   status            String   @default("OPEN")
                             // OPEN, ACKNOWLEDGED, SCHEDULED, COMPLETED, IGNORED
-  
+
   // Action
   actionTaken       String?
   scheduledDate     DateTime?
   completedDate     DateTime?
   actualCause       String?
   actualCost        Decimal? @db.Decimal(10, 2)
-  
+
   // Notes
   technicianNotes   String?  @db.Text
   resolutionNotes   String?  @db.Text
-  
+
   equipment         WarehouseEquipment @relation(fields: [equipmentId])
-  
+
   organizationId    String
   warehouseId       String
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   @@map("predictive_maintenance_alerts")
 }
 
@@ -11917,42 +12091,42 @@ model BatteryLifecycle {
   id                String   @id @default(cuid())
   equipmentId       String
   batterySerial     String   @unique
-  
+
   // Installation
   installedDate     DateTime
   initialCycles     Int      @default(0)
   ratedCycles       Int      // Manufacturer rating (e.g., 2000)
   ratedCapacity     Int      // Ah (e.g., 1000)
-  
+
   // Current status
   currentHealth     Float    // Percentage (0-100)
   currentCycles     Int
   currentCapacity   Float    // Ah
   degradationRate   Float    // % per month
-  
+
   // Performance
   avgChargeTime     Float?   // Hours
   avgRuntime        Float?   // Hours
   temperatureAvg    Float?   // Fahrenheit
-  
+
   // Predictions
   predictedEOL      DateTime? // End of life
   replacementDue    DateTime?
-  
+
   // Replacement
   replacedDate      DateTime?
   replacementReason String?
   finalCycles       Int?
   finalHealth       Float?
-  
+
   equipment         WarehouseEquipment @relation(fields: [equipmentId])
-  
+
   status            String   @default("ACTIVE")
                             // ACTIVE, DEGRADED, SCHEDULED_REPLACEMENT, REPLACED
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   @@map("battery_lifecycles")
 }
 ```
@@ -11964,6 +12138,7 @@ model BatteryLifecycle {
 ### The Problem: Aisle Congestion & Collisions Waste 15-20% of Travel Time
 
 **Traditional System:**
+
 - Drivers encounter each other in narrow aisles
 - One driver must back up (wasted time)
 - Near-miss collisions (safety risk)
@@ -11984,10 +12159,10 @@ WAREHOUSE GPS TRACKING:
 ─────────────────────────────────────────
 
 SYSTEM OVERHEAD VIEW (Real-time):
-                    
+
          WAREHOUSE FLOOR MAP
          ═══════════════════════════════
-         
+
          AISLE A  AISLE B  AISLE C  AISLE D
          ┃      ┃  ┃      ┃  ┃      ┃  ┃      ┃
          ┃  🚜  ┃  ┃      ┃  ┃      ┃  ┃  🚜  ┃
@@ -11996,30 +12171,30 @@ SYSTEM OVERHEAD VIEW (Real-time):
          ┃      ┃  ┃  🚜  ┃  ┃      ┃  ┃      ┃
          ┃      ┃  ┃  →   ┃  ┃      ┃  ┃      ┃
          ┗━━━━━━┛  ┗━━━━━━┛  ┗━━━━━━┛  ┗━━━━━━┛
-         
+
          RT-01 (Sarah): Aisle A, moving south
          RT-02 (Mike):  Aisle B, moving east (crossing)
          RT-03 (Tom):   Aisle C, moving south
          RT-04 (Lisa):  Aisle D, moving north
-         
+
          ⚠️ COLLISION RISK DETECTED!
          Sarah (Aisle A) heading to cross-aisle
          Mike (Aisle B) approaching same intersection
          ETA collision: 12 seconds
-         
+
          AI INTERVENTION:
          ─────────────────
          System (to Mike): "Mike, hold at current position 5 seconds.
                             RT-01 crossing ahead."
          Mike: "Holding"
-         
+
          System (to Sarah): "Sarah, intersection clear. Proceed."
          Sarah: "Proceeding"
-         
+
          [5 seconds later]
          System (to Mike): "Clear to proceed. Continue to Romeo 03 Charlie."
          Mike: "Proceeding"
-         
+
          COLLISION PREVENTED ✓
          Time lost: 5 seconds (vs. 45 seconds if collision occurred)
          Savings: 40 seconds = 89% time saved
@@ -12042,11 +12217,11 @@ Collision near-misses: 3 in last hour
 AI AUTOMATIC INTERVENTION:
 ──────────────────────────
 System: "HIGH TRAFFIC MODE ACTIVATED (11:00 AM - 1:00 PM)
-         
+
          Implementing one-way aisle flow:
          ✓ Aisles A, C, E: SOUTH-BOUND ONLY
          ✓ Aisles B, D, F: NORTH-BOUND ONLY
-         
+
          All drivers notified. Routing adjusted."
 
 DRIVER EXPERIENCE:
@@ -12054,7 +12229,7 @@ DRIVER EXPERIENCE:
 Sarah's headset: "Traffic mode active. Aisle A is now ONE-WAY south.
                   Your route adjusted automatically. No action needed."
 
-Sarah (trying to go north in Aisle A): 
+Sarah (trying to go north in Aisle A):
          "Navigate to Alpha 3 15"
 
 System: "Alpha 3 15 requires north travel in Aisle A.
@@ -12062,7 +12237,7 @@ System: "Alpha 3 15 requires north travel in Aisle A.
          Current location → Cross to Aisle B (east 20 ft)
          → North in Aisle B → Cross back to Aisle A (west 20 ft)
          → Destination Alpha 3 15
-         
+
          Alternate route adds 8 seconds but prevents congestion.
          Proceed?"
 Sarah: "Proceed"
@@ -12084,14 +12259,14 @@ Manager dashboard:
 System: "Peak traffic period ended 1:00 PM.
          Traffic control MODE OFF.
          All aisles now TWO-WAY (normal operations).
-         
+
          Peak performance:
          ✓ 127 tasks completed
          ✓ Zero collisions
          ✓ Zero backing-up delays
          ✓ 18% efficiency gain vs. no traffic control
          ✓ Time saved: 24 minutes total
-         
+
          Excellent coordination!"
 ```
 
@@ -12111,7 +12286,7 @@ AI DETECTS CONFLICT:
 
 Truck positions:
 - RT-01 (Sarah): 45 feet away, ETA 15 seconds
-- RT-03 (Tom):   60 feet away, ETA 18 seconds  
+- RT-03 (Tom):   60 feet away, ETA 18 seconds
 - RT-05 (Lisa):  50 feet away, ETA 16 seconds
 
 AI PRIORITY ALGORITHM:
@@ -12172,7 +12347,7 @@ System detects: Reach truck + pedestrian in same aisle
 
 Tom's headset:  "⚠️ PEDESTRIAN ALERT. Picker ahead in Aisle C.
                  Slow to 2 MPH. Sound horn when approaching."
-                 
+
 Tom: "Slowing down, horn sounded"
 
 John's smart badge (vibrates + beeps):
@@ -12198,18 +12373,18 @@ SAFETY STATISTICS:
 Manager: "Show pedestrian safety stats"
 
 System: "PEDESTRIAN SAFETY (This Month)
-         
+
          Total pedestrian alerts: 1,847
          Collisions prevented: 1,847 (100%)
          Near-misses: 0
          Injuries: 0
-         
+
          Average alert distance: 65 feet (excellent warning time)
          Pedestrian compliance: 99.2% (step aside when alerted)
          Driver compliance: 100% (slow down when alerted)
-         
+
          SAFETY SCORE: ⭐⭐⭐⭐⭐ 100/100 (PERFECT)
-         
+
          OSHA recordable incidents: 0
          Insurance premiums: Reduced 18% (excellent safety record)"
 ```
@@ -12223,29 +12398,29 @@ model EquipmentLocation {
   id                String   @id @default(cuid())
   equipmentId       String
   timestamp         DateTime @default(now())
-  
+
   // GPS Position
   latitude          Float?
   longitude         Float?
-  
+
   // Warehouse coordinates (more accurate)
   aisleNumber       String?  // "A", "B", "C"
   sectionNumber     String?  // "05", "12"
   xCoordinate       Float?   // Feet from origin
   yCoordinate       Float?   // Feet from origin
   floor             Int      @default(1)
-  
+
   // Movement
   heading           Float?   // Degrees (0-360)
   speed             Float?   // MPH
   direction         String?  // NORTH, SOUTH, EAST, WEST, STATIONARY
-  
+
   // Status
   isMoving          Boolean  @default(false)
   loadStatus        String?  // EMPTY, LOADED, PARTIAL
-  
+
   equipment         WarehouseEquipment @relation(fields: [equipmentId])
-  
+
   @@index([equipmentId, timestamp])
   @@index([aisleNumber, sectionNumber])
   @@map("equipment_locations")
@@ -12255,69 +12430,69 @@ model TrafficAlert {
   id                String   @id @default(cuid())
   alertType         String   // COLLISION_RISK, PEDESTRIAN, CONGESTION, ONE_WAY_VIOLATION
   severity          String   // LOW, MEDIUM, HIGH, CRITICAL
-  
+
   // Location
   aisleNumber       String?
   sectionNumber     String?
   xCoordinate       Float?
   yCoordinate       Float?
-  
+
   // Involved parties
   equipment1Id      String?
   equipment2Id      String?
   pedestrianId      String?
-  
+
   // Timing
   detectedAt        DateTime @default(now())
   estimatedCollision DateTime?
   warningTime       Float?   // Seconds
-  
+
   // Resolution
   status            String   @default("ACTIVE")
                             // ACTIVE, RESOLVED, COLLISION_AVOIDED, FALSE_POSITIVE
   resolvedAt        DateTime?
   outcomeNotes      String?  @db.Text
-  
+
   // Metrics
   distanceBetween   Float?   // Feet
   relativeSpeed     Float?   // MPH
   timeToCollision   Float?   // Seconds
-  
+
   organizationId    String
   warehouseId       String
-  
+
   @@map("traffic_alerts")
 }
 
 model TrafficControlMode {
   id                String   @id @default(cuid())
   warehouseId       String
-  
+
   mode              String   // NORMAL, PEAK_TRAFFIC, ONE_WAY, EMERGENCY
   startTime         DateTime
   endTime           DateTime?
-  
+
   // Configuration
   oneWayAisles      Json?    // {"A": "SOUTH", "B": "NORTH", ...}
   speedLimit        Float?   // MPH
   restrictions      Json?    // Custom rules
-  
+
   // Reason
   trigger           String   // SCHEDULED, AUTO_HIGH_TRAFFIC, MANUAL, EMERGENCY
   triggerDetails    String?  @db.Text
-  
+
   // Metrics
   tasksCompleted    Int?
   avgTravelTime     Float?   // Minutes
   collisionsPrevented Int?
   efficiencyGain    Float?   // Percentage
-  
+
   status            String   @default("ACTIVE")
                             // ACTIVE, ENDED
-  
+
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  
+
   @@map("traffic_control_modes")
 }
 
@@ -12325,27 +12500,27 @@ model PedestrianLocation {
   id                String   @id @default(cuid())
   userId            String
   timestamp         DateTime @default(now())
-  
+
   // Position
   aisleNumber       String?
   sectionNumber     String?
   xCoordinate       Float?
   yCoordinate       Float?
-  
+
   // Smart badge data
   badgeId           String
   batteryLevel      Int?     // Percentage
-  
+
   // Status
   isMoving          Boolean  @default(true)
   lastMovement      DateTime @default(now())
-  
+
   // Safety
   nearbyEquipment   Json?    // Array of equipment IDs within 50 feet
   alertsSent        Int      @default(0)
-  
+
   user              User @relation(fields: [userId])
-  
+
   @@index([userId, timestamp])
   @@index([aisleNumber, sectionNumber])
   @@map("pedestrian_locations")
@@ -12359,6 +12534,7 @@ model PedestrianLocation {
 ### The Problem: Fatigued Workers are 30% Less Productive + 300% More Injury Risk
 
 **Traditional System:**
+
 - Workers push through fatigue
 - Productivity drops unnoticed
 - Injury risk increases
@@ -12538,28 +12714,28 @@ Personalized AI breaks:
 Manager: "Show break optimization stats"
 
 System: "BREAK OPTIMIZATION (This Month)
-         
+
          Total breaks: 1,847
          Average frequency: 3.2 hours/worker
          Average duration: 9.7 minutes
-         
+
          PRODUCTIVITY IMPACT:
          ├─ Pre-break productivity: 71% avg
          ├─ Post-break productivity: 96% avg
          ├─ Productivity gain: +25% avg
          └─ Time cost: 9.7 min × 1,847 breaks = 298 hours
-         
+
          VALUE GENERATED:
          ├─ Productivity hours gained: 447 hours
          ├─ Net gain: 149 hours ($2,980 value)
          └─ ROI: 150%!
-         
+
          SAFETY IMPACT:
          ├─ Injuries before system: 12/month (historical)
          ├─ Injuries after system: 4/month
          ├─ Reduction: 67%
          └─ Workers' comp savings: $18,400/month
-         
+
          WORKER SATISFACTION:
          ├─ "Breaks at right time": 94% agree
          ├─ "Feel less fatigued": 88% agree
@@ -12648,16 +12824,16 @@ Email: "🔴 Heat stress intervention: John
         Heat index: 104°F (dangerous).
         John had not hydrated in 3.5 hours.
         Intervention successful. John recovered.
-        
+
         Warehouse environmental conditions:
         Temp: 92°F, Humidity: 68%, Heat index: 104°F
-        
+
         RECOMMENDATION: Consider additional cooling:
         - Portable fans in hot aisles
         - Extended break room hours
         - Reduce shift length during heat warnings
         - Mandatory hydration every 90 minutes
-        
+
         Safety first!"
 ```
 
@@ -12691,14 +12867,14 @@ Mike's headset: "⚠️ STOP! Improper lifting technique detected.
 Mike: "Box down"
 
 System: "Good. Lifting 48 lbs requires proper form.
-         
+
          STEP 1: Stand close to box (6 inches).
          STEP 2: Bend knees deeply (squat position).
          STEP 3: Keep back straight (vertical).
          STEP 4: Grip box firmly both hands.
          STEP 5: Lift with legs (not back).
          STEP 6: No twisting! Turn feet, not torso.
-         
+
          Ready to try again with proper form?"
 
 Mike: "Ready"
@@ -12720,30 +12896,30 @@ INJURY PREVENTION DASHBOARD:
 Manager: "Show ergonomics stats"
 
 System: "INJURY PREVENTION (This Month)
-         
+
          Total lifts monitored: 8,847
          Improper lifts detected: 127 (1.4%)
          Real-time corrections: 127 (100%)
          Injuries prevented: ~8 (estimated)
-         
+
          MOST COMMON ERRORS:
          1. Back angle too high (bent over): 47 incidents
          2. Twisting while lifting: 38 incidents
          3. Lifting too fast: 24 incidents
          4. Inadequate knee bend: 18 incidents
-         
+
          TRAINING EFFECTIVENESS:
          ├─ Month 1: 1.4% improper lifts
          ├─ Month 2: 0.9% improper lifts (35% improvement!)
          ├─ Month 3: 0.6% improper lifts (57% improvement!)
          └─ Workers learning proper technique ✓
-         
+
          INJURY RATES:
          ├─ Before system: 12 injuries/year (back strain)
          ├─ After system: 2 injuries/year
          ├─ Reduction: 83%
          └─ Workers' comp savings: $94,000/year
-         
+
          ROI on wellness system: 847%!"
 ```
 
@@ -12756,35 +12932,35 @@ model WorkerFatigueLog {
   id                String   @id @default(cuid())
   userId            String
   timestamp         DateTime @default(now())
-  
+
   // Voice analysis
   speechRate        Float?   // Words per minute
   responseTime      Float?   // Seconds
   voiceEnergy       Float?   // 0-100
   clarityScore      Float?   // 0-100
   errorRate         Float?   // Percentage
-  
+
   // Fatigue metrics
   fatigueScore      Float    // 0-100 (0=fresh, 100=exhausted)
   confidence        Float    // 0-1
   hoursWorked       Float
   lastBreakMinutes  Int?     // Minutes since last break
-  
+
   // Environmental
   temperature       Float?   // Fahrenheit
   humidity          Float?   // Percentage
   heatIndex         Float?   // Calculated
-  
+
   // Hydration
   lastHydration     DateTime?
   hydrationInterval Int?     // Minutes
-  
+
   // Assessment
   riskLevel         String   // LOW, MODERATE, HIGH, CRITICAL
   actionTaken       String?  // BREAK_RECOMMENDED, BREAK_MANDATORY, NONE
-  
+
   user              User @relation(fields: [userId])
-  
+
   @@index([userId, timestamp])
   @@map("worker_fatigue_logs")
 }
@@ -12792,28 +12968,28 @@ model WorkerFatigueLog {
 model BreakEvent {
   id                String   @id @default(cuid())
   userId            String
-  
+
   // Timing
   breakStart        DateTime
   breakEnd          DateTime?
   duration          Int?     // Minutes
-  
+
   // Trigger
   triggerType       String   // FATIGUE, HEAT_STRESS, SCHEDULED, MANUAL, INJURY_PREVENTION
   fatigueScoreBefore Float?
   fatigueScoreAfter Float?
-  
+
   // Recovery
   productivityBefore Float?  // Percentage
   productivityAfter  Float?  // Percentage
   recoveryGain       Float?  // Percentage
-  
+
   // Break type
   breakType         String   // REST, HYDRATION, COOLING, MEAL
   location          String?  // BREAK_ROOM, HYDRATION_STATION, etc.
-  
+
   user              User @relation(fields: [userId])
-  
+
   @@map("break_events")
 }
 
@@ -12821,29 +12997,29 @@ model ErgonomicsEvent {
   id                String   @id @default(cuid())
   userId            String
   timestamp         DateTime @default(now())
-  
+
   // Activity
   activityType      String   // LIFTING, REACHING, TWISTING, REPETITIVE
   objectWeight      Float?   // Lbs
-  
+
   // Technique analysis
   backAngle         Float?   // Degrees
   kneeBend          String?  // NONE, PARTIAL, DEEP_SQUAT
   liftSpeed         String?  // SLOW, NORMAL, FAST
   twistDetected     Boolean?
-  
+
   // Assessment
   technique         String   // PROPER, IMPROPER, DANGEROUS
   riskLevel         String   // LOW, MODERATE, HIGH
   correctionGiven   Boolean  @default(false)
   correctionDetails String?  @db.Text
-  
+
   // Outcome
   techniqueCorrected Boolean @default(false)
   injuryPrevented   Boolean @default(false)
-  
+
   user              User @relation(fields: [userId])
-  
+
   @@map("ergonomics_events")
 }
 
@@ -12851,65 +13027,65 @@ model HydrationEvent {
   id                String   @id @default(cuid())
   userId            String
   timestamp         DateTime @default(now())
-  
+
   // Hydration
   amountOz          Float    // Ounces
   beverage          String   @default("WATER") // WATER, SPORTS_DRINK, OTHER
-  
+
   // Context
   temperature       Float?   // Fahrenheit
   heatIndex         Float?
   hoursSinceLastHydration Float?
-  
+
   // Trigger
   triggerType       String   // SCHEDULED, MANUAL, HEAT_ALERT, FATIGUE
-  
+
   // Location
   station           String?  // Hydration station ID
-  
+
   user              User @relation(fields: [userId])
-  
+
   @@map("hydration_events")
 }
 
 model WorkerWellnessProfile {
   id                String   @id @default(cuid())
   userId            String   @unique
-  
+
   // Baseline metrics
   baselineSpeechRate Float
   baselineResponseTime Float
   baselineVoiceEnergy Float
-  
+
   // Fatigue patterns
   avgFatigueOnset   Float    // Hours until fatigue
   optimalBreakInterval Float // Hours
   optimalBreakDuration Int    // Minutes
   recoveryRate      Float    // How fast they recover (0-1)
-  
+
   // Environmental sensitivity
   heatSensitivity   String   // LOW, MODERATE, HIGH
   humidityTolerance String   // LOW, MODERATE, HIGH
   optimalTemp       Float?   // Preferred temperature
-  
+
   // Hydration needs
   hydrationInterval Int      // Minutes between drinks
   avgWaterIntake    Float    // Oz per day
-  
+
   // Ergonomics
   liftingTechnique  String   // EXCELLENT, GOOD, NEEDS_IMPROVEMENT
   injuryHistory     Json?    // Previous injuries
   restrictions      Json?    // Weight limits, etc.
-  
+
   // Performance
   avgProductivity   Float    // Percentage
   peakHours         Json?    // Best performance times
   declineHours      Json?    // Low energy times
-  
+
   user              User @relation(fields: [userId])
-  
+
   updatedAt         DateTime @updatedAt
-  
+
   @@map("worker_wellness_profiles")
 }
 ```
@@ -12919,6 +13095,7 @@ model WorkerWellnessProfile {
 ## �📚 Documentation & Training
 
 ### Documentation Provided:
+
 - ✅ This complete specification (60+ pages)
 - ✅ API documentation (all endpoints)
 - ✅ Database schema changes
@@ -12930,6 +13107,7 @@ model WorkerWellnessProfile {
 - ✅ Troubleshooting guide
 
 ### Training Materials:
+
 - ✅ Picker training (5 minutes): Voice commands
 - ✅ Admin training (20 minutes): Dashboard + resolution
 - ✅ Supervisor training (15 minutes): Mobile app + floor management
@@ -12941,6 +13119,7 @@ model WorkerWellnessProfile {
 ## 🚀 Next Steps
 
 ### Immediate Actions:
+
 1. ✅ Review and approve this specification
 2. ✅ Assemble implementation team
 3. ✅ Set up development environment
@@ -12948,6 +13127,7 @@ model WorkerWellnessProfile {
 5. ✅ Begin Week 1 development (voice + verification)
 
 ### Success Tracking:
+
 - Daily standups during development
 - Weekly stakeholder demos
 - Bi-weekly metrics review
@@ -12960,7 +13140,7 @@ model WorkerWellnessProfile {
 **Estimated Development Time:** 4-5 weeks  
 **Priority:** **CRITICAL** (directly impacts revenue and customer satisfaction)  
 **Business Value:** **$7.6M+ annual benefit** (200 orders/day warehouse)  
-**Competitive Advantage:** **EXTREME** (no competitor has this level of automation)  
+**Competitive Advantage:** **EXTREME** (no competitor has this level of automation)
 
 **Last Updated:** January 7, 2026  
 **Document Version:** 3.0 (Complete Ecosystem - Replenishment Automation Added)  
@@ -13033,12 +13213,14 @@ PROBLEM DETECTION → AUTO-RESOLUTION → CONTINUOUS IMPROVEMENT
 #### **The Logivox Difference:**
 
 **Traditional WMS:**
+
 ```
 Picker → Manual note → Supervisor → Email → Replen coordinator
 → Manual assignment → Driver → Manual update → Hours later
 ```
 
 **Logivox Voice System:**
+
 ```
 Picker: "Item not available" (1 second)
      ↓ (AI processing - 2 seconds)
@@ -13054,6 +13236,7 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 #### **Business Impact: Full Ecosystem**
 
 **Before Logivox:**
+
 - Short pick delays: 2-3 hours (manual coordination)
 - Order completion: Next day
 - Customer notifications: Manual (if at all)
@@ -13062,6 +13245,7 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 - Replen efficiency: 60-70%
 
 **After Logivox:**
+
 - Short pick resolution: <5 minutes (automated)
 - Order completion: Same day
 - Customer notifications: Immediate + automated
@@ -13070,6 +13254,7 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 - Replen efficiency: 95%+
 
 **ROI (200 orders/day warehouse):**
+
 - Short pick automation: $7.6M/year
 - Replenishment efficiency: +$2.1M/year
 - Equipment optimization: +$850K/year
@@ -13084,20 +13269,20 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 
 ### Logivox vs Everyone Else
 
-| Capability | **Logivox** | **Voxware** | **Manhattan** | **SAP** | **Oracle** |
-|-----------|-------------|-------------|---------------|---------|------------|
-| **Voice Picking** | ✅ AI (GPT-4) | ✅ Template | ✅ Template | ✅ Template | ✅ Template |
-| **Auto Replenishment** | ✅ Full | ❌ Separate | ⚠️ Basic | ⚠️ Basic | ⚠️ Basic |
-| **Voice Replenishment** | ✅ Complete | ❌ No | ❌ No | ❌ No | ❌ No |
-| **Equipment Tracking** | ✅ Real-time | ⚠️ Manual | ⚠️ Manual | ⚠️ RFID only | ⚠️ RFID only |
-| **Cross-Dept Integration** | ✅ Automatic | ❌ Manual | ⚠️ Partial | ⚠️ Partial | ⚠️ Partial |
-| **Customer Automation** | ✅ Full | ❌ No | ❌ No | ❌ No | ❌ No |
-| **Financial Integration** | ✅ Real-time | ❌ Batch | ⚠️ Batch | ⚠️ Batch | ⚠️ API |
-| **Mobile Supervisor** | ✅ Full-featured | ❌ Desktop only | ❌ Desktop only | ⚠️ Limited | ⚠️ Limited |
-| **AI/ML** | ✅ GPT-4, Claude | ❌ No | ❌ No | ⚠️ Basic | ⚠️ Basic |
-| **Setup Time** | 1 day | 2-4 weeks | 8-12 weeks | 12-16 weeks | 16-24 weeks |
-| **Training Time** | Zero | 2-4 hours | 8-16 hours | 16-40 hours | 40-80 hours |
-| **Cost** | $200K | $500K-$1M | $1M-$3M | $2M-$5M | $3M-$8M |
+| Capability                 | **Logivox**      | **Voxware**     | **Manhattan**   | **SAP**      | **Oracle**   |
+| -------------------------- | ---------------- | --------------- | --------------- | ------------ | ------------ |
+| **Voice Picking**          | ✅ AI (GPT-4)    | ✅ Template     | ✅ Template     | ✅ Template  | ✅ Template  |
+| **Auto Replenishment**     | ✅ Full          | ❌ Separate     | ⚠️ Basic        | ⚠️ Basic     | ⚠️ Basic     |
+| **Voice Replenishment**    | ✅ Complete      | ❌ No           | ❌ No           | ❌ No        | ❌ No        |
+| **Equipment Tracking**     | ✅ Real-time     | ⚠️ Manual       | ⚠️ Manual       | ⚠️ RFID only | ⚠️ RFID only |
+| **Cross-Dept Integration** | ✅ Automatic     | ❌ Manual       | ⚠️ Partial      | ⚠️ Partial   | ⚠️ Partial   |
+| **Customer Automation**    | ✅ Full          | ❌ No           | ❌ No           | ❌ No        | ❌ No        |
+| **Financial Integration**  | ✅ Real-time     | ❌ Batch        | ⚠️ Batch        | ⚠️ Batch     | ⚠️ API       |
+| **Mobile Supervisor**      | ✅ Full-featured | ❌ Desktop only | ❌ Desktop only | ⚠️ Limited   | ⚠️ Limited   |
+| **AI/ML**                  | ✅ GPT-4, Claude | ❌ No           | ❌ No           | ⚠️ Basic     | ⚠️ Basic     |
+| **Setup Time**             | 1 day            | 2-4 weeks       | 8-12 weeks      | 12-16 weeks  | 16-24 weeks  |
+| **Training Time**          | Zero             | 2-4 hours       | 8-16 hours      | 16-40 hours  | 40-80 hours  |
+| **Cost**                   | $200K            | $500K-$1M       | $1M-$3M         | $2M-$5M      | $3M-$8M      |
 
 ### **Key Differentiators:**
 
@@ -13122,30 +13307,35 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ### **Positioning by Competitor Displacement:**
 
 #### **1. "Voxware Refugees" Campaign**
+
 **Target:** Companies frustrated with Voxware's template limitations  
 **Message:** "Switch to AI. Zero training. Same-day deployment."  
 **Offer:** Free Voxware template translation to AI commands  
 **ROI:** 3X better automation at half the cost
 
 #### **2. "Manhattan Modern" Campaign**
+
 **Target:** Manhattan WMS customers wanting better voice  
 **Message:** "Keep your Manhattan WMS. Add Logivox AI voice layer."  
 **Offer:** API integration package (connects to Manhattan)  
 **ROI:** Add AI voice without ripping out existing WMS
 
 #### **3. "SAP Simplification" Campaign**
+
 **Target:** SAP EWM customers drowning in complexity  
 **Message:** "SAP for backend. Logivox for warehouse floor."  
 **Offer:** SAP EWM connector (bi-directional sync)  
 **ROI:** Simplify operations while keeping SAP investment
 
 #### **4. "Oracle Cloud Companion" Campaign**
+
 **Target:** Oracle WMS Cloud customers  
 **Message:** "Oracle handles data. Logivox handles workers."  
 **Offer:** Oracle integration via REST APIs  
 **ROI:** Add AI voice to Oracle infrastructure
 
 #### **5. "Honeywell Hardware Refresh" Campaign**
+
 **Target:** Honeywell Vocollect customers with aging hardware  
 **Message:** "Your headsets work with Logivox. Ditch the templates."  
 **Offer:** BYOD program (use any voice device)  
@@ -13158,10 +13348,12 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ### **Sales Battle Cards:**
 
 #### **vs Manhattan Associates**
+
 **When They Lead With:** "Mature WMS, proven at scale"  
 **Our Response:** "Great foundation. We make it 10X smarter with AI voice. Integrate in 1 week."
 
 **Key Differentiators:**
+
 - ✅ 1 week vs 12 weeks deployment
 - ✅ AI voice vs templates
 - ✅ $200K vs $1.5M cost
@@ -13173,10 +13365,12 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **vs SAP EWM**
+
 **When They Lead With:** "Deep ERP integration, enterprise scale"  
 **Our Response:** "Perfect for ERP. Wrong tool for warehouse floor. Use SAP for planning, Logivox for execution."
 
 **Key Differentiators:**
+
 - ✅ Zero training vs 40 hours
 - ✅ AI understands workers (not other way around)
 - ✅ 1 week vs 16 weeks deployment
@@ -13188,10 +13382,12 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **vs Voxware**
+
 **When They Lead With:** "Voice specialist, 25 years experience"  
 **Our Response:** "Yes, 25 years of templates. We're the first AI-native voice system."
 
 **Key Differentiators:**
+
 - ✅ GPT-4 AI vs templates
 - ✅ Zero training vs 4 hours
 - ✅ All operations vs picking focus
@@ -13203,10 +13399,12 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **vs Honeywell Voice**
+
 **When They Lead With:** "Proven hardware, reliable in harsh environments"  
 **Our Response:** "Great hardware. Works with our AI too. But why pay for proprietary devices?"
 
 **Key Differentiators:**
+
 - ✅ BYOD (use any device) vs $250K proprietary hardware
 - ✅ AI voice vs templates
 - ✅ Cloud-native vs on-premise
@@ -13218,10 +13416,12 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **vs Lucas Systems**
+
 **When They Lead With:** "User-friendly, gamification, quick deployment"  
 **Our Response:** "Good stepping stone. We're the destination."
 
 **Key Differentiators:**
+
 - ✅ Full GPT-4 AI vs basic NLU
 - ✅ All operations (QC, kitting, etc.) vs picking/replen
 - ✅ Cross-department automation vs standalone
@@ -13237,15 +13437,18 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ### **Demo Scenarios That Win Deals:**
 
 #### **1. The "Template vs AI" Demo**
+
 **Setup:** Side-by-side comparison
 
 **Voxware/Honeywell:**
+
 - Operator: "Three two five" ✅
 - Operator: "Three twenty-five" ❌ (not recognized)
 - Operator: "325" ❌ (not recognized)
 - Training required: 4 hours to learn exact phrases
 
 **Logivox:**
+
 - Operator: "Three two five" ✅
 - Operator: "Three twenty-five" ✅
 - Operator: "325" ✅
@@ -13257,9 +13460,11 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **2. The "Short Pick Magic" Demo**
+
 **Setup:** Simulate short pick scenario
 
 **Competitor Process:**
+
 1. Picker reports to supervisor (5 min)
 2. Supervisor creates ticket (5 min)
 3. Replen coordinator assigns task (10 min)
@@ -13271,6 +13476,7 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 **Total: 60+ minutes, 6 people involved**
 
 **Logivox Process:**
+
 1. Picker: "Item not available" (voice)
 2. System does everything automatically
 
@@ -13281,15 +13487,18 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **3. The "New Worker" Demo**
+
 **Setup:** Bring in person who's never used the system
 
 **Competitor:**
+
 - 4-8 hours classroom training
 - Template memorization required
 - Practice runs needed
 - Mistakes common first week
 
 **Logivox:**
+
 - Hand them headset
 - "Go pick order 12345"
 - AI guides them naturally
@@ -13300,9 +13509,11 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **4. The "Return to Circulation" Demo**
+
 **Setup:** Customer return arrives
 
 **Competitor Process:**
+
 - Receiving desk processes (10 min)
 - Put to reserve storage (20 min)
 - Waits for next replenishment cycle (2-4 hours)
@@ -13311,6 +13522,7 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 **Total: 2.5-4.5 hours**
 
 **Logivox Process:**
+
 - System detects location A5-12 is SHORT
 - Routes return directly to pick face
 - Available for picking in 10 minutes
@@ -13322,14 +13534,17 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ---
 
 #### **5. The "Customer Experience" Demo**
+
 **Setup:** Short pick occurs
 
 **Competitor:**
+
 - Customer finds out when delivery incomplete
 - Surprises lead to complaints
 - No communication until problem already occurred
 
 **Logivox:**
+
 - Customer email within 15 minutes
 - Options presented (partial, wait, substitute)
 - Portal tracking updated
@@ -13342,6 +13557,7 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ## 💎 Unique Selling Propositions (USPs)
 
 ### **Primary USP:**
+
 **"The only AI-native warehouse operating system that eliminates manual coordination across all departments while requiring zero training."**
 
 ### **Supporting USPs:**
@@ -13394,6 +13610,7 @@ TOTAL TIME: <5 minutes (vs 2-3 hours traditional)
 ### **The Verdict:**
 
 **Against ALL Competitors Combined:**
+
 - ✅ **Better Technology:** AI vs templates (first mover advantage)
 - ✅ **Better Coverage:** 10/10 operations vs 3-6/10
 - ✅ **Better Automation:** AI orchestration vs manual/rules
@@ -13433,21 +13650,27 @@ TECHNOLOGY SOPHISTICATION (Y-Axis: AI → Rules)
 ## 📢 Key Messages by Audience
 
 ### **For CFOs:**
+
 "$200K investment, $15.85M annual return. Payback in 4.6 days. 7,925% ROI. Zero risk."
 
 ### **For COOs:**
+
 "Eliminate manual coordination between departments. 30-40% efficiency gains. Deployed in 1 week."
 
 ### **For Warehouse Managers:**
+
 "Your team productive immediately. No training needed. Voice understands them, not other way around."
 
 ### **For IT Directors:**
+
 "Cloud-native. API-first. Integrates with existing systems. Deployed in 1 week, not 3 months."
 
 ### **For Customer Service Leaders:**
+
 "Turn warehouse issues into service wins. Automatic customer communication. 70% fewer complaints."
 
 ### **For Procurement:**
+
 "10X cheaper than Manhattan/SAP. 2-3X cheaper than Voxware. Better technology at fraction of cost."
 
 ---
@@ -13507,7 +13730,7 @@ TECHNOLOGY SOPHISTICATION (Y-Axis: AI → Rules)
    - Maintenance automation
    - Performance analytics
 
-4. **API Documentation** (10 pages)
+7. **API Documentation** (10 pages)
    - All endpoints
    - Request/response examples
    - Database schemas
@@ -13524,7 +13747,7 @@ TECHNOLOGY SOPHISTICATION (Y-Axis: AI → Rules)
 ✅ ROI calculations  
 ✅ Competitive analysis (10 competitors)  
 ✅ Sales enablement materials  
-✅ Implementation timeline  
+✅ Implementation timeline
 
 ### Key Statistics:
 
@@ -13553,4 +13776,3 @@ TECHNOLOGY SOPHISTICATION (Y-Axis: AI → Rules)
 ---
 
 **🎯 BOTTOM LINE: This is not just a voice picking system. This is the first AI-native warehouse operating system that eliminates manual coordination across all departments, automates customer communication, and delivers ROI 2-40X better than any competitor. Nothing like this exists in the market. Period.**
-

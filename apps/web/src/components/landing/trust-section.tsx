@@ -47,17 +47,20 @@ export function TrustSection() {
   const guarantees = [
     {
       title: "Bank-Level Security",
-      description: "Your data is protected with the same security banks use. SOC 2 and ISO 27001 certified with automatic threat protection.",
+      description:
+        "Your data is protected with the same security banks use. SOC 2 and ISO 27001 certified with automatic threat protection.",
       icon: Shield,
     },
     {
       title: "30-Day Free Trial",
-      description: "Try everything with no commitments. No credit card required. Get full access to all features from day one.",
+      description:
+        "Try everything with no commitments. No credit card required. Get full access to all features from day one.",
       icon: CheckCircle,
     },
     {
       title: "Setup in Hours, Not Months",
-      description: "Start using LogiVox the same day. Pre-built workflows and smart setup get you running fast.",
+      description:
+        "Start using LogiVox the same day. Pre-built workflows and smart setup get you running fast.",
       icon: Clock,
     },
   ];
@@ -78,7 +81,8 @@ export function TrustSection() {
               </span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              500+ warehouses across healthcare, manufacturing & retail trust LogiVox
+              500+ warehouses across healthcare, manufacturing & retail trust
+              LogiVox
             </p>
             <div className="mt-4 flex justify-center items-center gap-6 text-sm text-muted-foreground">
               <span>🏥 Healthcare: 180+ facilities</span>
@@ -122,7 +126,8 @@ export function TrustSection() {
               Enterprise-Grade Guarantees
             </h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Built for mission-critical operations with zero compromises on security, performance, or reliability
+              Built for mission-critical operations with zero compromises on
+              security, performance, or reliability
             </p>
           </div>
 
@@ -153,18 +158,28 @@ export function TrustSection() {
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <div className="text-3xl font-bold mb-2">Complete</div>
-              <div className="text-sm font-semibold mb-1">Everything Included</div>
-              <div className="text-xs text-muted-foreground">From receiving to shipping</div>
+              <div className="text-sm font-semibold mb-1">
+                Everything Included
+              </div>
+              <div className="text-xs text-muted-foreground">
+                From receiving to shipping
+              </div>
             </div>
             <div>
               <div className="text-3xl font-bold mb-2">44+</div>
-              <div className="text-sm font-semibold mb-1">Powerful Features</div>
-              <div className="text-xs text-muted-foreground">Quality, returns, optimization & more</div>
+              <div className="text-sm font-semibold mb-1">
+                Powerful Features
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Quality, returns, optimization & more
+              </div>
             </div>
             <div>
               <div className="text-3xl font-bold mb-2">Instant</div>
               <div className="text-sm font-semibold mb-1">Lightning Fast</div>
-              <div className="text-xs text-muted-foreground">Global performance, no lag</div>
+              <div className="text-xs text-muted-foreground">
+                Global performance, no lag
+              </div>
             </div>
           </div>
         </div>
@@ -181,11 +196,15 @@ export function TrustSection() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-3 italic">
-                    "LogiVox reduced our picking errors by 94% and cut fulfillment time from 2 days to 4 hours. The voice commands are game-changing for our busy warehouse floor."
+                    "LogiVox reduced our picking errors by 94% and cut
+                    fulfillment time from 2 days to 4 hours. The voice commands
+                    are game-changing for our busy warehouse floor."
                   </p>
                   <div>
                     <p className="font-semibold text-sm">Michael Harrison</p>
-                    <p className="text-xs text-muted-foreground">Operations Director, MedSupply Corp</p>
+                    <p className="text-xs text-muted-foreground">
+                      Operations Director, MedSupply Corp
+                    </p>
                   </div>
                 </div>
               </div>
@@ -199,11 +218,14 @@ export function TrustSection() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground mb-3 italic">
-                    "We eliminated $2.3M in inventory shrinkage with LogiVox's real-time tracking. ROI was 890% in first year alone."
+                    "We eliminated $2.3M in inventory shrinkage with LogiVox's
+                    real-time tracking. ROI was 890% in first year alone."
                   </p>
                   <div>
                     <p className="font-semibold text-sm">Sarah Lopez</p>
-                    <p className="text-xs text-muted-foreground">VP Operations, TechFlow Manufacturing</p>
+                    <p className="text-xs text-muted-foreground">
+                      VP Operations, TechFlow Manufacturing
+                    </p>
                   </div>
                 </div>
               </div>
@@ -217,12 +239,18 @@ export function TrustSection() {
             Enterprise-grade security trusted by Fortune 500 companies
           </p>
           <div className="flex flex-wrap justify-center items-center gap-8">
-            {["SOC 2 Type II", "ISO 27001", "GDPR", "HIPAA", "CCPA"].map((cert) => (
-              <Badge key={cert} variant="outline" className="px-4 py-2 text-sm">
-                <Shield className="h-3 w-3 mr-2 inline" />
-                {cert}
-              </Badge>
-            ))}
+            {["SOC 2 Type II", "ISO 27001", "GDPR", "HIPAA", "CCPA"].map(
+              (cert) => (
+                <Badge
+                  key={cert}
+                  variant="outline"
+                  className="px-4 py-2 text-sm"
+                >
+                  <Shield className="h-3 w-3 mr-2 inline" />
+                  {cert}
+                </Badge>
+              ),
+            )}
           </div>
         </div>
       </div>

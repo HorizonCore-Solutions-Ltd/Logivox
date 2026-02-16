@@ -3,10 +3,10 @@
 /**
  * AI-POWERED SLOTTING OPTIMIZATION DASHBOARD
  * ===========================================
- * 
+ *
  * System 7 - Outstanding ROI (589% ROI)
  * Investment: $28K → Savings: $165K/year
- * 
+ *
  * Features:
  * - AI-driven dynamic slotting recommendations
  * - Velocity-based ABC classification
@@ -59,7 +59,9 @@ export default function AISlottingPage() {
   const [analysis, setAnalysis] = useState<any>(null);
   const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"overview" | "analysis" | "recommendations">("overview");
+  const [activeTab, setActiveTab] = useState<
+    "overview" | "analysis" | "recommendations"
+  >("overview");
   const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
 
   useEffect(() => {
@@ -95,7 +97,7 @@ export default function AISlottingPage() {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/optimization/ai-slotting?action=analyze&warehouseId=${selectedWarehouse}`
+        `/api/optimization/ai-slotting?action=analyze&warehouseId=${selectedWarehouse}`,
       );
       const data = await res.json();
       setAnalysis(data.analysis);
@@ -202,7 +204,9 @@ export default function AISlottingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Active Recommendations</p>
-                <p className="text-2xl font-bold">{stats?.activerecommendations || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.activerecommendations || 0}
+                </p>
               </div>
               <AlertCircle className="h-8 w-8 text-orange-500" />
             </div>
@@ -214,7 +218,9 @@ export default function AISlottingPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Completed This Month</p>
-                <p className="text-2xl font-bold">{stats?.completedThisMonth || 0}</p>
+                <p className="text-2xl font-bold">
+                  {stats?.completedThisMonth || 0}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -306,28 +312,38 @@ export default function AISlottingPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.entries(config.zones).map(([key, zone]: [string, any]) => (
-                  <div
-                    key={key}
-                    className="p-4 border rounded-lg bg-gradient-to-br from-white to-gray-50"
-                  >
-                    <div className="flex items-center justify-between mb-3">
-                      <h3 className="font-semibold">{zone.name}</h3>
-                      <Badge variant="outline">Priority {zone.priority}</Badge>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Pick Time:</span>
-                        <span className="font-medium">{zone.pickTimeMultiplier}x</span>
+                {Object.entries(config.zones).map(
+                  ([key, zone]: [string, any]) => (
+                    <div
+                      key={key}
+                      className="p-4 border rounded-lg bg-gradient-to-br from-white to-gray-50"
+                    >
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="font-semibold">{zone.name}</h3>
+                        <Badge variant="outline">
+                          Priority {zone.priority}
+                        </Badge>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Ergonomic:</span>
-                        <span className="font-medium">{zone.ergonomicScore}/100</span>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Pick Time:</span>
+                          <span className="font-medium">
+                            {zone.pickTimeMultiplier}x
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Ergonomic:</span>
+                          <span className="font-medium">
+                            {zone.ergonomicScore}/100
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                          {zone.description}
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2">{zone.description}</p>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </CardContent>
           </Card>
@@ -339,27 +355,35 @@ export default function AISlottingPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.entries(config.velocityClasses).map(([key, vc]: [string, any]) => (
-                  <div key={key} className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Badge className={getVelocityColor(key)}>{key}-Class</Badge>
-                      <h3 className="font-semibold">{vc.name}</h3>
-                    </div>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Min Velocity:</span>
-                        <span className="font-medium">{vc.velocityMin} picks/month</span>
+                {Object.entries(config.velocityClasses).map(
+                  ([key, vc]: [string, any]) => (
+                    <div key={key} className="p-4 border rounded-lg">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Badge className={getVelocityColor(key)}>
+                          {key}-Class
+                        </Badge>
+                        <h3 className="font-semibold">{vc.name}</h3>
                       </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Frequency:</span>
-                        <span className="font-medium">{vc.pickFrequency}</span>
+                      <div className="space-y-2 text-sm">
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Min Velocity:</span>
+                          <span className="font-medium">
+                            {vc.velocityMin} picks/month
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Frequency:</span>
+                          <span className="font-medium">
+                            {vc.pickFrequency}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2 italic">
+                          {vc.recommendation}
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-500 mt-2 italic">
-                        {vc.recommendation}
-                      </p>
                     </div>
-                  </div>
-                ))}
+                  ),
+                )}
               </div>
             </CardContent>
           </Card>
@@ -416,7 +440,9 @@ export default function AISlottingPage() {
                       <p className="text-3xl font-bold text-blue-600">
                         {analysis.totalProducts}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">Total Products</p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Total Products
+                      </p>
                     </div>
                     <div className="text-center p-4 bg-orange-50 rounded-lg">
                       <p className="text-3xl font-bold text-orange-600">
@@ -428,7 +454,9 @@ export default function AISlottingPage() {
                       <p className="text-3xl font-bold text-green-600">
                         ${(analysis.expectedAnnualSavings / 1000).toFixed(1)}K
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">Expected Savings</p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        Expected Savings
+                      </p>
                     </div>
                     <div className="text-center p-4 bg-purple-50 rounded-lg">
                       <p className="text-3xl font-bold text-purple-600">
@@ -440,16 +468,23 @@ export default function AISlottingPage() {
 
                   {/* Velocity Distribution */}
                   <div>
-                    <h3 className="font-semibold mb-3">Velocity Distribution</h3>
+                    <h3 className="font-semibold mb-3">
+                      Velocity Distribution
+                    </h3>
                     <div className="grid grid-cols-4 gap-2">
                       {Object.entries(analysis.velocityDistribution).map(
                         ([key, value]: [string, any]) => (
-                          <div key={key} className="text-center p-3 bg-gray-50 rounded">
-                            <Badge className={getVelocityColor(key)}>{key}</Badge>
+                          <div
+                            key={key}
+                            className="text-center p-3 bg-gray-50 rounded"
+                          >
+                            <Badge className={getVelocityColor(key)}>
+                              {key}
+                            </Badge>
                             <p className="text-2xl font-bold mt-2">{value}</p>
                             <p className="text-xs text-gray-600">products</p>
                           </div>
-                        )
+                        ),
                       )}
                     </div>
                   </div>
@@ -460,42 +495,50 @@ export default function AISlottingPage() {
                       Top Recommendations ({analysis.recommendations.length})
                     </h3>
                     <div className="space-y-3">
-                      {analysis.recommendations.slice(0, 10).map((rec: Recommendation) => (
-                        <div
-                          key={rec.id}
-                          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
-                        >
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge className={getVelocityColor(rec.velocityClass)}>
-                                {rec.velocityClass}
-                              </Badge>
-                              <span className="font-medium">{rec.sku}</span>
-                              <Badge className={getPriorityColor(rec.priority)}>
-                                {rec.priority}
-                              </Badge>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <span>{rec.currentLocation}</span>
-                              <ArrowRight className="h-4 w-4" />
-                              <span className="font-medium text-green-600">
-                                {rec.recommendedLocation}
-                              </span>
-                            </div>
-                            <p className="text-xs text-gray-500 mt-1">
-                              {rec.picksPerMonth} picks/month • Save $
-                              {rec.expectedCostSavings.toFixed(0)}/year
-                            </p>
-                          </div>
-                          <Button
-                            onClick={() => executeReslot(rec)}
-                            size="sm"
-                            variant="outline"
+                      {analysis.recommendations
+                        .slice(0, 10)
+                        .map((rec: Recommendation) => (
+                          <div
+                            key={rec.id}
+                            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
                           >
-                            Execute
-                          </Button>
-                        </div>
-                      ))}
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge
+                                  className={getVelocityColor(
+                                    rec.velocityClass,
+                                  )}
+                                >
+                                  {rec.velocityClass}
+                                </Badge>
+                                <span className="font-medium">{rec.sku}</span>
+                                <Badge
+                                  className={getPriorityColor(rec.priority)}
+                                >
+                                  {rec.priority}
+                                </Badge>
+                              </div>
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <span>{rec.currentLocation}</span>
+                                <ArrowRight className="h-4 w-4" />
+                                <span className="font-medium text-green-600">
+                                  {rec.recommendedLocation}
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-1">
+                                {rec.picksPerMonth} picks/month • Save $
+                                {rec.expectedCostSavings.toFixed(0)}/year
+                              </p>
+                            </div>
+                            <Button
+                              onClick={() => executeReslot(rec)}
+                              size="sm"
+                              variant="outline"
+                            >
+                              Execute
+                            </Button>
+                          </div>
+                        ))}
                     </div>
                   </div>
                 </div>

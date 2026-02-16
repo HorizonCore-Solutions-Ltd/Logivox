@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface CostSummary {
   shipments: number;
@@ -35,8 +35,8 @@ export default function CostTracking() {
     try {
       setLoading(true);
       const [summaryRes, ratesRes] = await Promise.all([
-        fetch('/api/receiving/cost-tracking?action=cost_summary'),
-        fetch('/api/receiving/cost-tracking?action=labor_rates'),
+        fetch("/api/receiving/cost-tracking?action=cost_summary"),
+        fetch("/api/receiving/cost-tracking?action=labor_rates"),
       ]);
 
       const summaryData = await summaryRes.json();
@@ -45,16 +45,16 @@ export default function CostTracking() {
       setSummary(summaryData.summary?.monthToDate);
       setLaborRates(ratesData.rates);
     } catch (error) {
-      console.error('Failed to fetch cost data:', error);
+      console.error("Failed to fetch cost data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const getVarianceColor = (variance: number) => {
-    if (variance < 0) return 'text-green-600'; // Under budget is good
-    if (variance > 0) return 'text-red-600'; // Over budget is bad
-    return 'text-gray-600';
+    if (variance < 0) return "text-green-600"; // Under budget is good
+    if (variance > 0) return "text-red-600"; // Over budget is bad
+    return "text-gray-600";
   };
 
   if (loading) {
@@ -153,13 +153,17 @@ export default function CostTracking() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={`text-3xl font-bold ${getVarianceColor(summary.variance)}`}>
+            <div
+              className={`text-3xl font-bold ${getVarianceColor(summary.variance)}`}
+            >
               ${Math.abs(summary.variance).toLocaleString()}
             </div>
-            <div className={`text-sm mt-1 ${getVarianceColor(summary.variance)}`}>
-              {summary.variance < 0 ? '↓' : '↑'}{' '}
-              {Math.abs(summary.variancePercentage)}%{' '}
-              {summary.variance < 0 ? 'under' : 'over'}
+            <div
+              className={`text-sm mt-1 ${getVarianceColor(summary.variance)}`}
+            >
+              {summary.variance < 0 ? "↓" : "↑"}{" "}
+              {Math.abs(summary.variancePercentage)}%{" "}
+              {summary.variance < 0 ? "under" : "over"}
             </div>
           </CardContent>
         </Card>
@@ -185,7 +189,9 @@ export default function CostTracking() {
                   <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
                     <div>
                       <div className="font-medium">Labor</div>
-                      <div className="text-sm text-gray-600">Regular + overtime</div>
+                      <div className="text-sm text-gray-600">
+                        Regular + overtime
+                      </div>
                     </div>
                     <div className="text-xl font-bold text-blue-600">
                       ${(summary.totalCost * 0.45).toLocaleString()}
@@ -258,26 +264,63 @@ export default function CostTracking() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b">
-                      <th className="text-left p-2 text-sm font-medium">Shipment</th>
-                      <th className="text-left p-2 text-sm font-medium">Units</th>
-                      <th className="text-left p-2 text-sm font-medium">Labor</th>
-                      <th className="text-left p-2 text-sm font-medium">Equipment</th>
-                      <th className="text-left p-2 text-sm font-medium">Materials</th>
-                      <th className="text-left p-2 text-sm font-medium">Total Cost</th>
-                      <th className="text-left p-2 text-sm font-medium">$/Unit</th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Shipment
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Units
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Labor
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Equipment
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Materials
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        Total Cost
+                      </th>
+                      <th className="text-left p-2 text-sm font-medium">
+                        $/Unit
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {[
-                      { shipment: 'SHP-2024-101', units: 1200, costPerUnit: 0.72 },
-                      { shipment: 'SHP-2024-102', units: 850, costPerUnit: 0.81 },
-                      { shipment: 'SHP-2024-103', units: 2100, costPerUnit: 0.68 },
-                      { shipment: 'SHP-2024-104', units: 950, costPerUnit: 0.85 },
-                      { shipment: 'SHP-2024-105', units: 1500, costPerUnit: 0.74 },
+                      {
+                        shipment: "SHP-2024-101",
+                        units: 1200,
+                        costPerUnit: 0.72,
+                      },
+                      {
+                        shipment: "SHP-2024-102",
+                        units: 850,
+                        costPerUnit: 0.81,
+                      },
+                      {
+                        shipment: "SHP-2024-103",
+                        units: 2100,
+                        costPerUnit: 0.68,
+                      },
+                      {
+                        shipment: "SHP-2024-104",
+                        units: 950,
+                        costPerUnit: 0.85,
+                      },
+                      {
+                        shipment: "SHP-2024-105",
+                        units: 1500,
+                        costPerUnit: 0.74,
+                      },
                     ].map((item) => {
                       const total = item.units * item.costPerUnit;
                       return (
-                        <tr key={item.shipment} className="border-b hover:bg-gray-50">
+                        <tr
+                          key={item.shipment}
+                          className="border-b hover:bg-gray-50"
+                        >
                           <td className="p-2 text-sm font-medium">
                             {item.shipment}
                           </td>
@@ -417,9 +460,9 @@ export default function CostTracking() {
               <CardContent>
                 <div className="space-y-3">
                   {[
-                    { name: 'Supplier A', units: 12500, costPerUnit: 0.72 },
-                    { name: 'Supplier B', units: 9800, costPerUnit: 0.81 },
-                    { name: 'Supplier C', units: 7200, costPerUnit: 0.85 },
+                    { name: "Supplier A", units: 12500, costPerUnit: 0.72 },
+                    { name: "Supplier B", units: 9800, costPerUnit: 0.81 },
+                    { name: "Supplier C", units: 7200, costPerUnit: 0.85 },
                   ].map((supplier) => (
                     <div key={supplier.name} className="border rounded p-3">
                       <div className="flex justify-between items-center mb-2">
@@ -433,7 +476,10 @@ export default function CostTracking() {
                           ${supplier.costPerUnit}/unit
                         </div>
                         <div className="text-sm text-gray-600">
-                          ${(supplier.units * supplier.costPerUnit).toLocaleString()}{' '}
+                          $
+                          {(
+                            supplier.units * supplier.costPerUnit
+                          ).toLocaleString()}{" "}
                           total
                         </div>
                       </div>
@@ -450,9 +496,13 @@ export default function CostTracking() {
               <CardContent>
                 <div className="space-y-3">
                   {[
-                    { name: 'Day Shift', percentage: 50, costPerUnit: 0.74 },
-                    { name: 'Evening Shift', percentage: 35, costPerUnit: 0.79 },
-                    { name: 'Night Shift', percentage: 15, costPerUnit: 0.91 },
+                    { name: "Day Shift", percentage: 50, costPerUnit: 0.74 },
+                    {
+                      name: "Evening Shift",
+                      percentage: 35,
+                      costPerUnit: 0.79,
+                    },
+                    { name: "Night Shift", percentage: 15, costPerUnit: 0.91 },
                   ].map((shift) => (
                     <div key={shift.name} className="border rounded p-3">
                       <div className="flex justify-between items-center mb-2">
@@ -468,17 +518,17 @@ export default function CostTracking() {
                         <div
                           className={`text-sm ${
                             shift.costPerUnit < 0.8
-                              ? 'text-green-600'
+                              ? "text-green-600"
                               : shift.costPerUnit < 0.85
-                              ? 'text-yellow-600'
-                              : 'text-red-600'
+                                ? "text-yellow-600"
+                                : "text-red-600"
                           }`}
                         >
                           {shift.costPerUnit < 0.8
-                            ? '✓ Below target'
+                            ? "✓ Below target"
                             : shift.costPerUnit < 0.85
-                            ? '⚠ At target'
-                            : '⚠ Above target'}
+                              ? "⚠ At target"
+                              : "⚠ Above target"}
                         </div>
                       </div>
                     </div>
@@ -527,8 +577,8 @@ export default function CostTracking() {
                       Optimize Equipment Usage
                     </div>
                     <div className="text-sm text-purple-700 mt-1">
-                      Increase equipment utilization from 72% to 85%.
-                      Potential savings: $18K/year in equipment costs.
+                      Increase equipment utilization from 72% to 85%. Potential
+                      savings: $18K/year in equipment costs.
                     </div>
                   </div>
                 </div>
@@ -555,7 +605,9 @@ export default function CostTracking() {
                     <span className="font-medium">$8,000</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
-                    <span className="text-gray-600">Accounting Integration</span>
+                    <span className="text-gray-600">
+                      Accounting Integration
+                    </span>
                     <span className="font-medium">$6,000</span>
                   </div>
                   <div className="flex justify-between py-2 border-b">
@@ -631,7 +683,9 @@ export default function CostTracking() {
                 </div>
                 <div className="text-center p-4 bg-orange-50 rounded">
                   <div className="text-3xl font-bold text-orange-600">12%</div>
-                  <div className="text-sm text-gray-600 mt-1">Cost reduction</div>
+                  <div className="text-sm text-gray-600 mt-1">
+                    Cost reduction
+                  </div>
                 </div>
               </div>
 

@@ -55,7 +55,7 @@ export default function WarehousesPage() {
         },
       },
       {
-        id: "wh_2", 
+        id: "wh_2",
         name: "East Distribution Center",
         code: "EDC001",
         address: "5678 Commerce St, East City, State 67890",
@@ -72,7 +72,7 @@ export default function WarehousesPage() {
       {
         id: "wh_3",
         name: "West Regional Hub",
-        code: "WRH001", 
+        code: "WRH001",
         address: "9012 Logistics Ave, West City, State 34567",
         isActive: false,
         itemCount: 0,
@@ -92,14 +92,15 @@ export default function WarehousesPage() {
     }, 800);
   }, []);
 
-  const filteredWarehouses = warehouses.filter(warehouse =>
-    warehouse.name.toLowerCase().includes(search.toLowerCase()) ||
-    warehouse.code.toLowerCase().includes(search.toLowerCase())
+  const filteredWarehouses = warehouses.filter(
+    (warehouse) =>
+      warehouse.name.toLowerCase().includes(search.toLowerCase()) ||
+      warehouse.code.toLowerCase().includes(search.toLowerCase()),
   );
 
   const stats = {
     total: warehouses.length,
-    active: warehouses.filter(w => w.isActive).length,
+    active: warehouses.filter((w) => w.isActive).length,
     totalItems: warehouses.reduce((sum, w) => sum + w.itemCount, 0),
     totalStaff: warehouses.reduce((sum, w) => sum + w.staffCount, 0),
   };
@@ -148,7 +149,9 @@ export default function WarehousesPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Warehouses</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Warehouses
+            </CardTitle>
             <MapPin className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -164,8 +167,12 @@ export default function WarehousesPage() {
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.totalItems.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">across all warehouses</p>
+            <div className="text-2xl font-bold">
+              {stats.totalItems.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              across all warehouses
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -180,14 +187,22 @@ export default function WarehousesPage() {
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Avg Utilization</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg Utilization
+            </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {Math.round(warehouses.reduce((sum, w) => sum + w.utilizationRate, 0) / warehouses.length)}%
+              {Math.round(
+                warehouses.reduce((sum, w) => sum + w.utilizationRate, 0) /
+                  warehouses.length,
+              )}
+              %
             </div>
-            <p className="text-xs text-muted-foreground">capacity utilization</p>
+            <p className="text-xs text-muted-foreground">
+              capacity utilization
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -208,9 +223,9 @@ export default function WarehousesPage() {
       {/* Warehouses Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredWarehouses.map((warehouse) => (
-          <Card 
-            key={warehouse.id} 
-            className={`cursor-pointer transition-colors hover:bg-muted/50 ${!warehouse.isActive ? 'opacity-60' : ''}`}
+          <Card
+            key={warehouse.id}
+            className={`cursor-pointer transition-colors hover:bg-muted/50 ${!warehouse.isActive ? "opacity-60" : ""}`}
             onClick={() => router.push(`/dashboard/warehouses/${warehouse.id}`)}
           >
             <CardHeader className="flex flex-row items-start justify-between space-y-0">
@@ -227,10 +242,12 @@ export default function WarehousesPage() {
                 <MapPin className="inline h-3 w-3 mr-1" />
                 {warehouse.address}
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <div className="font-medium">{warehouse.itemCount.toLocaleString()}</div>
+                  <div className="font-medium">
+                    {warehouse.itemCount.toLocaleString()}
+                  </div>
                   <div className="text-muted-foreground">Items</div>
                 </div>
                 <div>
@@ -242,13 +259,15 @@ export default function WarehousesPage() {
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Capacity</span>
-                  <Badge className={getUtilizationColor(warehouse.utilizationRate)}>
+                  <Badge
+                    className={getUtilizationColor(warehouse.utilizationRate)}
+                  >
                     {warehouse.utilizationRate}%
                   </Badge>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full" 
+                  <div
+                    className="bg-blue-600 h-2 rounded-full"
                     style={{ width: `${warehouse.utilizationRate}%` }}
                   />
                 </div>
@@ -256,7 +275,9 @@ export default function WarehousesPage() {
 
               <div className="text-sm">
                 <div className="font-medium">Manager</div>
-                <div className="text-muted-foreground">{warehouse.manager.name}</div>
+                <div className="text-muted-foreground">
+                  {warehouse.manager.name}
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -269,10 +290,14 @@ export default function WarehousesPage() {
             <MapPin className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-lg font-medium mb-2">No warehouses found</p>
             <p className="text-muted-foreground text-center mb-4">
-              {search ? `No warehouses match "${search}"` : "Get started by adding your first warehouse"}
+              {search
+                ? `No warehouses match "${search}"`
+                : "Get started by adding your first warehouse"}
             </p>
             {!search && (
-              <Button onClick={() => router.push("/dashboard/warehouses/create")}>
+              <Button
+                onClick={() => router.push("/dashboard/warehouses/create")}
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Add Warehouse
               </Button>
