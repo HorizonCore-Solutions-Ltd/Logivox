@@ -64,65 +64,33 @@
     ]
   },
   "configuration_files": {
-    "build": [
-      "turbo.json",
-      "next.config.js", 
-      "tsconfig.json"
-    ],
-    "linting": [
-      ".eslintrc.security.js"
-    ],
-    "testing": [
-      "jest.config.js",
-      "jest.setup.js", 
-      "playwright.config.ts"
-    ],
+    "build": ["turbo.json", "next.config.js", "tsconfig.json"],
+    "linting": [".eslintrc.security.js"],
+    "testing": ["jest.config.js", "jest.setup.js", "playwright.config.ts"],
     "containerization": [
       "Dockerfile",
       "docker-compose.yml",
       "docker-compose.prod.yml",
       ".dockerignore"
     ],
-    "databases": [
-      "prisma/schema.prisma",
-      "prisma/migrations/"
-    ],
+    "databases": ["prisma/schema.prisma", "prisma/migrations/"],
     "dependency_locks": [
       "package-lock.json",
       "prisma/migrations/migration_lock.toml"
     ]
   },
   "key_directories": {
-    "source": [
-      "apps/web/src/",
-      "lib/",
-      "types/",
-      "prisma/"
-    ],
-    "testing": [
-      "__tests__/",
-      "e2e/",
-      "apps/web/coverage/"
-    ],
-    "documentation": [
-      "docs/",
-      "README.md",
-      "REQUIREMENTS_SPECIFICATION.md"
-    ],
-    "scripts": [
-      "scripts/",
-      "docker-entrypoint.sh"
-    ],
-    "infrastructure": [
-      "k8s/",
-      ".github/workflows/"
-    ]
+    "source": ["apps/web/src/", "lib/", "types/", "prisma/"],
+    "testing": ["__tests__/", "e2e/", "apps/web/coverage/"],
+    "documentation": ["docs/", "README.md", "REQUIREMENTS_SPECIFICATION.md"],
+    "scripts": ["scripts/", "docker-entrypoint.sh"],
+    "infrastructure": ["k8s/", ".github/workflows/"]
   },
   "dependency_summary": {
     "total_dependencies": "calculated_from_package_json",
     "security_critical": [
       "bcryptjs",
-      "next-auth", 
+      "next-auth",
       "prisma",
       "stripe",
       "twilio"

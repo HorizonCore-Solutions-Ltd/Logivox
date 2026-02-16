@@ -9,6 +9,7 @@
 ## ARCHITECTURAL OVERVIEW
 
 ### Technology Stack Analysis
+
 - **Frontend:** Next.js 14 with App Router (✅ Modern)
 - **UI:** Radix UI + shadcn/ui + Tailwind CSS (✅ Production-ready)
 - **State:** Zustand + TanStack Query (✅ Appropriate)
@@ -17,6 +18,7 @@
 - **Testing:** Jest + Playwright + Testing Library (✅ Comprehensive)
 
 ### Workspace Structure Assessment
+
 ```
 ✅ GOOD: Monorepo with clear app/package separation
 ✅ GOOD: Consistent tooling (TurboRepo, TypeScript, ESLint)
@@ -31,6 +33,7 @@
 ### 🟢 STRENGTHS - Well-Structured Layers
 
 #### 1. Presentation Layer (UI)
+
 - **Location:** `/apps/web/src/components/`
 - **Structure:** Domain-organized components
 - **Assessment:** ✅ EXCELLENT
@@ -38,6 +41,7 @@
 - **Accessibility:** ✅ Dedicated accessibility layer with ARIA support
 
 #### 2. Application Layer (API Routes)
+
 - **Location:** `/apps/web/src/app/api/`
 - **Structure:** RESTful API with proper validation
 - **Assessment:** ✅ GOOD
@@ -45,12 +49,14 @@
 - **Security:** ✅ Input validation, authentication checks
 
 #### 3. Business Logic Layer (Services)
+
 - **Location:** `/apps/web/src/lib/services/`
 - **Structure:** Service-oriented architecture
 - **Assessment:** ✅ GOOD (QC services well-organized)
 - **Evidence:** Comprehensive QC services (25+ service modules)
 
 #### 4. Data Access Layer
+
 - **Location:** `/prisma/` + `/apps/web/src/lib/prisma.ts`
 - **Assessment:** ⚠️ MONOLITHIC
 - **Evidence:** Single schema with 196 models
@@ -64,10 +70,11 @@
 **Problem:** Single Prisma schema with 196 models violates DDD bounded contexts
 
 **Evidence:**
+
 ```prisma
 // All domains mixed in single schema file:
 model User             // Authentication domain
-model InventoryItem    // Inventory domain  
+model InventoryItem    // Inventory domain
 model QualityControl   // Quality domain
 model Shipment        // Logistics domain
 model CarrierConfig   // Integration domain
@@ -76,6 +83,7 @@ model Report          // Analytics domain
 ```
 
 **Risk Assessment:**
+
 - **Coupling:** High cross-domain coupling
 - **Ownership:** Unclear domain ownership
 - **Scaling:** Difficult to scale teams
@@ -85,6 +93,7 @@ model Report          // Analytics domain
 ### Missing Domain Boundaries
 
 **Expected DDD Structure:**
+
 ```
 domains/
 ├── authentication/     # Users, Sessions, Auth
@@ -98,6 +107,7 @@ domains/
 ```
 
 **Current Reality:**
+
 ```
 ✅ Components organized by domain
 ✅ Services partially organized (QC domain)
@@ -111,16 +121,19 @@ domains/
 ## IMPORT DEPENDENCY ANALYSIS
 
 ### 🟡 Component Layer Dependencies
+
 - **Status:** Mostly compliant
 - **Pattern:** UI components properly isolated
 - **Issues:** Some business logic in UI components
 
-### 🔴 Data Model Dependencies  
+### 🔴 Data Model Dependencies
+
 - **Status:** Major violations
 - **Pattern:** All domains share single schema
 - **Impact:** Cannot enforce bounded contexts
 
 ### 🟡 Service Layer Dependencies
+
 - **Status:** Partially organized
 - **Evidence:** QC services well-structured, others mixed
 
@@ -129,11 +142,13 @@ domains/
 ## COMPLIANCE IMPLICATIONS
 
 ### Domain Isolation for Compliance
+
 - **GDPR:** Mixed customer/employee data in single schema
 - **SOC 2:** No clear data processing boundaries
 - **ISO 27001:** Difficult access control granularity
 
 ### Multi-Tenancy Concerns
+
 - **Current:** Row-level security via organization_id
 - **Risk:** No schema-level isolation
 - **Impact:** Compliance audit complexity
@@ -143,12 +158,14 @@ domains/
 ## PERFORMANCE & SCALABILITY ISSUES
 
 ### Database Architecture Problems
+
 1. **Single DB Connection Pool** for all domains
 2. **Massive Schema** with 196 models
 3. **Complex Joins** across domain boundaries
 4. **No Read/Write Separation** by domain
 
 ### Team Scaling Issues
+
 1. **Single Prisma Schema** = bottleneck for development
 2. **No Clear Ownership** = merge conflicts
 3. **Testing Complexity** = slow CI/CD
@@ -158,13 +175,15 @@ domains/
 ## MICROSERVICE READINESS ASSESSMENT
 
 ### 🔴 NOT READY for Service Extraction
+
 - **Reason:** Shared data model across all domains
 - **Effort:** 3-6 months to properly separate
 - **Dependencies:** Requires data model refactoring
 
 ### Decomposition Strategy Required:
+
 1. **Phase 1:** Extract bounded contexts
-2. **Phase 2:** Separate database schemas  
+2. **Phase 2:** Separate database schemas
 3. **Phase 3:** API boundary definition
 4. **Phase 4:** Service extraction
 
@@ -175,6 +194,7 @@ domains/
 ### 🔴 IMMEDIATE (Critical)
 
 #### 1. Domain Boundary Definition
+
 ```bash
 # Create domain packages
 mkdir -p packages/{auth,inventory,quality,logistics,customer,warehouse}
@@ -182,10 +202,11 @@ mkdir -p packages/{auth,inventory,quality,logistics,customer,warehouse}
 ```
 
 #### 2. Prisma Schema Decomposition
+
 ```prisma
 // Split into domain-specific schemas
 ├── packages/auth/prisma/schema.prisma
-├── packages/inventory/prisma/schema.prisma  
+├── packages/inventory/prisma/schema.prisma
 ├── packages/quality/prisma/schema.prisma
 └── packages/shared/prisma/schema.prisma
 ```
@@ -193,6 +214,7 @@ mkdir -p packages/{auth,inventory,quality,logistics,customer,warehouse}
 ### 🟠 HIGH PRIORITY
 
 #### 3. Dependency Rules Enforcement
+
 ```json
 // .dependency-cruiser.js
 {
@@ -207,6 +229,7 @@ mkdir -p packages/{auth,inventory,quality,logistics,customer,warehouse}
 ```
 
 #### 4. API Gateway Pattern
+
 - Implement domain-specific API boundaries
 - Add inter-domain communication protocols
 - Establish event-driven architecture
@@ -214,6 +237,7 @@ mkdir -p packages/{auth,inventory,quality,logistics,customer,warehouse}
 ### 🟡 MEDIUM PRIORITY
 
 #### 5. Extract Shared Kernel
+
 - Common types and utilities
 - Shared authentication mechanisms
 - Cross-cutting concerns (logging, metrics)
@@ -223,11 +247,13 @@ mkdir -p packages/{auth,inventory,quality,logistics,customer,warehouse}
 ## ENFORCEMENT RECOMMENDATIONS
 
 ### CI/CD Gates
+
 1. **Dependency Analysis:** Block cross-domain imports
 2. **Schema Validation:** Prevent model leakage
 3. **API Contract Tests:** Enforce boundary contracts
 
 ### Development Standards
+
 1. **Domain Teams:** Assign clear ownership
 2. **Code Reviews:** Cross-domain review requirements
 3. **Architecture Decision Records:** Document boundary decisions
@@ -239,11 +265,13 @@ mkdir -p packages/{auth,inventory,quality,logistics,customer,warehouse}
 **Overall Assessment:** 🟡 PARTIALLY COMPLIANT
 
 **Strengths:**
+
 - Well-structured presentation layer
 - Good service organization (QC domain)
 - Strong technical foundation
 
 **Critical Issues:**
+
 - Monolithic data model (196 models in single schema)
 - No domain boundary enforcement
 - High coupling across business domains

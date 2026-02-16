@@ -3,7 +3,7 @@
  * Production-ready secrets management for LogiVox
  */
 
-import { SecretsManager } from '@aws-sdk/client-secrets-manager';
+import { SecretsManager } from "@aws-sdk/client-secrets-manager";
 
 interface SecretConfig {
   region: string;
@@ -45,7 +45,7 @@ class SecretsService {
       }
 
       const secretValue = JSON.parse(response.SecretString);
-      
+
       // Cache the result
       this.cache.set(secretName, {
         value: secretValue,
@@ -54,11 +54,11 @@ class SecretsService {
 
       return secretValue;
     } catch (error) {
-      if (this.config.localFallback && process.env.NODE_ENV === 'development') {
+      if (this.config.localFallback && process.env.NODE_ENV === "development") {
         console.warn(`⚠️ Falling back to local env for secret: ${secretName}`);
         return this.getLocalFallback(secretName);
       }
-      
+
       console.error(`❌ Failed to retrieve secret ${secretName}:`, error);
       throw new Error(`Failed to retrieve secret: ${secretName}`);
     }
@@ -68,26 +68,31 @@ class SecretsService {
    * Get database configuration from secrets manager
    */
   async getDatabaseConfig(): Promise<string> {
-    const secrets = await this.getSecret('logivox/database');
+    const secrets = await this.getSecret("logivox/database");
     const { username, password, host, port, database } = secrets;
     return `postgresql://${username}:${password}@${host}:${port}/${database}?sslmode=require`;
   }
 
   /**
-   * Get NextAuth configuration from secrets manager  
+   * Get NextAuth configuration from secrets manager
    */
   async getAuthConfig(): Promise<{ secret: string; url: string }> {
-    const secrets = await this.getSecret('logivox/auth');
+    const secrets = await this.getSecret("logivox/auth");
     return {
       secret: secrets.nextauth_secret,
-      url: secrets.nextauth_url || process.env.NEXTAUTH_URL || 'http://localhost:3000',
+      url:
+        secrets.nextauth_url ||
+        process.env.NEXTAUTH_URL ||
+        "http://localhost:3000",
     };
   }
 
   /**
    * Get third-party service credentials
    */
-  async getServiceCredentials(service: 'sendgrid' | 'twilio' | 'stripe'): Promise<Record<string, string>> {
+  async getServiceCredentials(
+    service: "sendgrid" | "twilio" | "stripe",
+  ): Promise<Record<string, string>> {
     return this.getSecret(`logivox/services/${service}`);
   }
 
@@ -96,21 +101,22 @@ class SecretsService {
    */
   private getLocalFallback(secretName: string): Record<string, any> {
     switch (secretName) {
-      case 'logivox/database':
+      case "logivox/database":
         return {
-          username: process.env.DB_USERNAME || 'postgres',
-          password: process.env.DB_PASSWORD || 'postgres',
-          host: process.env.DB_HOST || 'localhost',
-          port: process.env.DB_PORT || '5432',
-          database: process.env.DB_NAME || 'logivox_dev',
+          username: process.env.DB_USERNAME || "postgres",
+          password: process.env.DB_PASSWORD || "postgres",
+          host: process.env.DB_HOST || "localhost",
+          port: process.env.DB_PORT || "5432",
+          database: process.env.DB_NAME || "logivox_dev",
         };
-        
-      case 'logivox/auth':
+
+      case "logivox/auth":
         return {
-          nextauth_secret: process.env.NEXTAUTH_SECRET || 'dev-secret-change-me',
-          nextauth_url: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+          nextauth_secret:
+            process.env.NEXTAUTH_SECRET || "dev-secret-change-me",
+          nextauth_url: process.env.NEXTAUTH_URL || "http://localhost:3000",
         };
-        
+
       default:
         throw new Error(`No local fallback for secret: ${secretName}`);
     }
@@ -129,15 +135,15 @@ let secretsService: SecretsService | null = null;
 
 export function getSecretsService(): SecretsService {
   if (!secretsService) {
-    const region = process.env.AWS_REGION || 'us-east-1';
-    const localFallback = process.env.NODE_ENV === 'development';
-    
+    const region = process.env.AWS_REGION || "us-east-1";
+    const localFallback = process.env.NODE_ENV === "development";
+
     secretsService = new SecretsService({
       region,
       localFallback,
     });
   }
-  
+
   return secretsService;
 }
 
@@ -145,10 +151,10 @@ export function getSecretsService(): SecretsService {
  * Utility function to get database URL from secrets
  */
 export async function getDatabaseUrl(): Promise<string> {
-  if (process.env.NODE_ENV === 'development' && process.env.DATABASE_URL) {
+  if (process.env.NODE_ENV === "development" && process.env.DATABASE_URL) {
     return process.env.DATABASE_URL;
   }
-  
+
   const secretsService = getSecretsService();
   return secretsService.getDatabaseConfig();
 }
@@ -157,13 +163,13 @@ export async function getDatabaseUrl(): Promise<string> {
  * Utility function to get NextAuth configuration
  */
 export async function getNextAuthConfig() {
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     return {
-      secret: process.env.NEXTAUTH_SECRET || 'dev-secret-change-me',
-      url: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+      secret: process.env.NEXTAUTH_SECRET || "dev-secret-change-me",
+      url: process.env.NEXTAUTH_URL || "http://localhost:3000",
     };
   }
-  
+
   const secretsService = getSecretsService();
   return secretsService.getAuthConfig();
 }

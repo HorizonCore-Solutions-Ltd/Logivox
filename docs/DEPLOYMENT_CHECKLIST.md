@@ -1,6 +1,6 @@
 # ✅ PRE-LAUNCH CHECKLIST - LOGIVOX WMS
 
-**Target Go-Live Date:** ******\_******  
+**Target Go-Live Date:** **\*\***\_**\*\***  
 **Estimated Time:** 5-10 hours total
 
 ---
@@ -458,11 +458,11 @@ Support Email: support@...
 
 ## ✅ **SIGN-OFF**
 
-**Deployment Completed By:** ******\_\_\_******  
-**Date:** ******\_\_\_******  
-**Sign-off:** ******\_\_\_******
+**Deployment Completed By:** **\*\***\_\_\_**\*\***  
+**Date:** **\*\***\_\_\_**\*\***  
+**Sign-off:** **\*\***\_\_\_**\*\***
 
-**Post-Launch Review Scheduled:** ******\_\_\_******
+**Post-Launch Review Scheduled:** **\*\***\_\_\_**\*\***
 
 ---
 

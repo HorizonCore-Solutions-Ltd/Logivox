@@ -402,7 +402,9 @@ export default function LoadVerification() {
                           {verification.discrepancies > 0 && (
                             <div className="mt-3 p-2 bg-yellow-50 rounded text-sm text-yellow-800">
                               ⚠️ {verification.discrepancies} discrepanc
-                              {verification.discrepancies !== 1 ? "ies" : "y"}{" "}
+                              {verification.discrepancies !== 1
+                                ? "ies"
+                                : "y"}{" "}
                               detected
                             </div>
                           )}
