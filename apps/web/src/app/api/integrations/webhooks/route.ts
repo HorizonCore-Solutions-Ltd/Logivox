@@ -60,6 +60,13 @@ export async function GET(request: Request) {
     const event = searchParams.get("event");
     const status = searchParams.get("status");
     const isActive = searchParams.get("isActive");
+    const webhookId = searchParams.get("webhookId");
+    const includeDeliveries = searchParams.get("includeDeliveries") === "true";
+    const page = Math.max(parseInt(searchParams.get("page") || "1", 10), 1);
+    const pageSize = Math.min(
+      Math.max(parseInt(searchParams.get("pageSize") || "20", 10), 1),
+      100,
+    );
 
     // Build where clause
     const where: any = {
@@ -95,7 +102,27 @@ export async function GET(request: Request) {
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(webhooks);
+    if (includeDeliveries && webhookId) {
+      const [deliveries, totalDeliveries] = await Promise.all([
+        prisma.webhookDelivery.findMany({
+          where: { webhookId },
+          orderBy: { createdAt: "desc" },
+          skip: (page - 1) * pageSize,
+          take: pageSize,
+        }),
+        prisma.webhookDelivery.count({ where: { webhookId } }),
+      ]);
+
+      return NextResponse.json({
+        webhooks,
+        deliveries,
+        deliveriesPage: page,
+        deliveriesPageSize: pageSize,
+        deliveriesTotal: totalDeliveries,
+      });
+    }
+
+    return NextResponse.json({ webhooks });
   } catch (error) {
     console.error("Error fetching webhooks:", error);
     return NextResponse.json(
@@ -112,6 +139,9 @@ export async function POST(request: Request) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const { searchParams } = new URL(request.url);
+    const action = searchParams.get("action") || "create";
 
     // Get user's organization
     const user = await prisma.user.findUnique({
@@ -134,6 +164,64 @@ export async function POST(request: Request) {
     const organizationId = user.organizationMemberships[0].organizationId;
 
     const body = await request.json();
+
+    if (action === "test") {
+      const webhookId = body.webhookId as string;
+      if (!webhookId) {
+        return NextResponse.json(
+          { error: "webhookId is required for test" },
+          { status: 400 },
+        );
+      }
+
+      const webhook = await prisma.integrationWebhook.findUnique({
+        where: { id: webhookId },
+      });
+
+      if (!webhook || webhook.organizationId !== organizationId) {
+        return NextResponse.json(
+          { error: "Webhook not found" },
+          { status: 404 },
+        );
+      }
+
+      const payload = {
+        event: webhook.event || "integration.test",
+        timestamp: new Date().toISOString(),
+        data: {
+          message: "Test webhook event",
+          integrationId: webhook.integrationId,
+        },
+      };
+
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (webhook.secret) {
+        const signature = crypto
+          .createHmac("sha256", webhook.secret)
+          .update(JSON.stringify(payload))
+          .digest("hex");
+        headers[webhook.signatureHeader || "X-Webhook-Signature"] =
+          `sha256=${signature}`;
+      }
+
+      const response = await fetch(webhook.url, {
+        method: webhook.method || "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
+
+      return NextResponse.json({
+        success: response.ok,
+        status: response.status,
+        message: response.ok
+          ? "Webhook test successful"
+          : "Webhook test failed",
+      });
+    }
+
     const validatedData = createWebhookSchema.parse(body);
 
     // Verify integration exists

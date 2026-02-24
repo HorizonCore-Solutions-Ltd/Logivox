@@ -95,6 +95,98 @@ export interface VoiceState {
 // ==========================================
 
 export const VOICE_COMMANDS: VoiceCommand[] = [
+  // Marketing & Public Navigation
+  {
+    patterns: ["go to homepage", "open home", "show landing", "go to marketing"],
+    description: "Navigate to the LogiVox homepage",
+    action: () => {
+      window.location.href = "/";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: ["show features", "go to features", "open features"],
+    description: "Jump to the features section",
+    action: () => {
+      window.location.href = "/#features";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: ["show pricing", "open pricing", "go to pricing"],
+    description: "Jump to pricing on the marketing page",
+    action: () => {
+      window.location.href = "/#pricing";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: ["show proof", "open trust", "customer proof", "show trust"],
+    description: "Jump to the trust and proof section",
+    action: () => {
+      window.location.href = "/#trust";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: [
+      "start free trial",
+      "get started",
+      "start now",
+      "open call to action",
+    ],
+    description: "Jump to the get started call-to-action",
+    action: () => {
+      window.location.href = "/#get-started";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: ["login", "log in", "sign in"],
+    description: "Open the sign-in page",
+    action: () => {
+      window.location.href = "/sign-in";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: ["sign up", "create account", "register"],
+    description: "Open the sign-up page",
+    action: () => {
+      window.location.href = "/sign-up";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: ["open docs", "documentation", "api docs"],
+    description: "Open the documentation portal",
+    action: () => {
+      window.location.href = "/docs";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: ["contact support", "open support", "talk to support"],
+    description: "Navigate to the support page",
+    action: () => {
+      window.location.href = "/services/support";
+    },
+    category: "navigation",
+  },
+  {
+    patterns: [
+      "open voice guide",
+      "voice help",
+      "voice cheat sheet",
+      "voice support",
+    ],
+    description: "Open the voice browser guide and cheat sheet",
+    action: () => {
+      window.location.href = "/voice-browser";
+    },
+    category: "navigation",
+  },
+
   // Navigation Commands
   {
     patterns: [

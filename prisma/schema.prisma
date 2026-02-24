@@ -2622,11 +2622,29 @@ model IntegrationWebhook {
   createdBy          User                @relation("WebhookCreator", fields: [createdById], references: [id])
   integration        ExternalIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
   organization       Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries         WebhookDelivery[]
 
   @@index([organizationId, integrationId])
   @@index([event])
   @@index([status])
   @@index([isActive])
+}
+
+model WebhookDelivery {
+  id          String   @id @default(cuid())
+  webhookId   String
+  event       String
+  payload     Json
+  statusCode  Int
+  responseBody String? @db.Text
+  durationMs  Int
+  success     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  webhook IntegrationWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+
+  @@index([webhookId])
+  @@index([event])
 }
 
 model WavePick {

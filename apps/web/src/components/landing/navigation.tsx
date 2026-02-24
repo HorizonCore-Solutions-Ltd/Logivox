@@ -1,5 +1,7 @@
 "use client";
 
+// Navigation: marketing header with mega menus and conversion-focused CTAs (Pricing, Demo, Trial) for desktop and mobile.
+
 import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -418,7 +420,10 @@ export function Navigation() {
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
             <Button variant="ghost" asChild>
-              <Link href="/sign-in">Sign In</Link>
+              <Link href="/pricing">Pricing</Link>
+            </Button>
+            <Button variant="ghost" asChild>
+              <Link href="/demo">Book Demo</Link>
             </Button>
             <Button asChild>
               <Link href="/sign-up">Start Free Trial</Link>
@@ -544,6 +549,13 @@ export function Navigation() {
                   >
                     Pricing
                   </Link>
+                   <Link
+                     href="/demo"
+                     onClick={() => setMobileOpen(false)}
+                     className="block p-2 rounded-md hover:bg-accent transition-colors font-medium text-sm"
+                   >
+                     Book Demo
+                   </Link>
                   <Link
                     href="/contact"
                     onClick={() => setMobileOpen(false)}

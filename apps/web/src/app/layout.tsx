@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { AuthProvider } from "@/components/providers/auth-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { VoiceControl, VoiceControlAnnouncer } from "@/components/voice-control";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { CookieBanner } from "@/components/cookie-banner";
@@ -135,6 +136,8 @@ export default function RootLayout({
             <AuthProvider>
               {children}
               <Toaster />
+              <VoiceControl />
+              <VoiceControlAnnouncer />
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>

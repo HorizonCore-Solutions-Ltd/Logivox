@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-// import PDFDocument from 'pdfkit'; // TODO: Install pdfkit package
+import PDFDocument from "pdfkit";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
@@ -10,6 +10,7 @@ export async function GET(
     const { id } = params;
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "ncr";
+    const format = (searchParams.get("format") || "pdf").toLowerCase();
 
     let data: any;
     let title: string;
@@ -48,7 +49,6 @@ export async function GET(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    // Return JSON export (PDF generation requires pdfkit installation)
     const exportData = {
       type,
       title,
@@ -56,9 +56,22 @@ export async function GET(
       exportedAt: new Date().toISOString(),
     };
 
-    return NextResponse.json(exportData, {
+    if (format === "json") {
+      return NextResponse.json(exportData, {
+        headers: {
+          "Content-Disposition": `attachment; filename="${title}.json"`,
+        },
+      });
+    }
+
+    const pdf = await generatePdf(title, exportData);
+
+    return new NextResponse(pdf, {
+      status: 200,
       headers: {
-        "Content-Disposition": `attachment; filename="${title}.json"`,
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${title}.pdf"`,
+        "Content-Length": pdf.length.toString(),
       },
     });
   } catch (error) {
@@ -70,5 +83,37 @@ export async function GET(
   }
 }
 
-// TODO: Implement PDF generation when pdfkit is installed
-// async function generatePDF(type: string, data: any, title: string): Promise<Buffer> { ... }
+async function generatePdf(title: string, payload: any): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new PDFDocument({ margin: 50 });
+      const buffers: Buffer[] = [];
+
+      doc.on("data", (chunk) => buffers.push(chunk as Buffer));
+      doc.on("end", () => resolve(Buffer.concat(buffers)));
+      doc.on("error", reject);
+
+      doc.fontSize(18).text(title, { underline: true });
+      doc.moveDown();
+      doc.fontSize(10).fillColor("gray").text(`Generated: ${new Date().toISOString()}`);
+      doc.moveDown();
+
+      doc.fillColor("black").fontSize(12).text("Summary", { underline: true });
+      doc.moveDown(0.5);
+      doc.fontSize(10).text(`Type: ${payload.type}`);
+      doc.text(`Title: ${payload.title}`);
+      doc.text(`Exported At: ${payload.exportedAt}`);
+      doc.moveDown();
+
+      doc.fontSize(12).text("Data", { underline: true });
+      doc.moveDown(0.5);
+      doc.fontSize(10).text(JSON.stringify(payload.data, null, 2), {
+        width: 500,
+      });
+
+      doc.end();
+    } catch (err) {
+      reject(err);
+    }
+  });
+}

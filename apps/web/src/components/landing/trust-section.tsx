@@ -1,5 +1,7 @@
 "use client";
 
+// TrustSection: social proof, ROI stats, guarantees, and testimonial cues to reduce buyer risk perception.
+
 import * as React from "react";
 import {
   Shield,
@@ -66,8 +68,20 @@ export function TrustSection() {
   ];
 
   return (
-    <section className="py-20 md:py-28 border-y bg-gradient-to-br from-muted/30 to-muted/10">
+    <section
+      id="trust"
+      className="py-20 md:py-28 border-y bg-gradient-to-br from-muted/30 to-muted/10"
+    >
       <div className="container-enterprise">
+        {/* Logo band */}
+        <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm text-muted-foreground">
+          <span className="font-semibold text-foreground/80">Trusted by</span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">Aurora Logistics</span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">NorthPeak Retail</span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">MedChain Health</span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">Titan Manufacturing</span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">Swift 3PL</span>
+        </div>
         {/* Stats Grid */}
         <div className="mb-20">
           <div className="text-center mb-12">

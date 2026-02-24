@@ -443,15 +443,77 @@ export class ReorderAlertEngine {
     message: string,
     analysis: StockAnalysis,
   ): Promise<void> {
-    // TODO: Integrate with Twilio
-    console.log(`[ReorderAlertEngine] SMS ALERT:\n${message}`);
+    const recipientsEnv = process.env.SMS_ALERT_RECIPIENTS;
+    if (!recipientsEnv) {
+      console.warn("[ReorderAlertEngine] SMS skipped: SMS_ALERT_RECIPIENTS not set");
+      return;
+    }
 
-    // Example implementation:
-    // await twilioClient.messages.create({
-    //   to: '+1234567890',
-    //   from: process.env.TWILIO_PHONE_NUMBER,
-    //   body: message,
-    // });
+    const recipients = recipientsEnv
+      .split(",")
+      .map((r) => r.trim())
+      .filter(Boolean);
+
+    if (recipients.length === 0) {
+      console.warn("[ReorderAlertEngine] SMS skipped: no recipients configured");
+      return;
+    }
+
+    const provider = (process.env.SMS_PROVIDER || "messagebird").toLowerCase();
+
+    if (provider === "messagebird") {
+      const apiKey = process.env.MESSAGEBIRD_API_KEY;
+      const originator = process.env.SMS_FROM_NUMBER;
+      if (!apiKey || !originator) {
+        console.warn("[ReorderAlertEngine] MessageBird missing config; falling back to Twilio");
+      } else {
+        const body = new URLSearchParams({
+          originator,
+          body: message,
+          recipients: recipients.join(","),
+        });
+
+        const response = await fetch("https://rest.messagebird.com/messages", {
+          method: "POST",
+          headers: {
+            Authorization: `AccessKey ${apiKey}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body,
+        });
+
+        if (response.ok) return;
+
+        console.warn(
+          "[ReorderAlertEngine] MessageBird send failed, falling back to Twilio",
+          await response.text().catch(() => ""),
+        );
+      }
+    }
+
+    // Plan B: Twilio
+    const twilioSid = process.env.TWILIO_ACCOUNT_SID;
+    const twilioToken = process.env.TWILIO_AUTH_TOKEN;
+    const twilioFrom = process.env.TWILIO_PHONE_NUMBER;
+
+    if (!twilioSid || !twilioToken || !twilioFrom) {
+      console.error("[ReorderAlertEngine] Twilio config missing; SMS not sent");
+      return;
+    }
+
+    // Lazy load to avoid impacting builds when Twilio is unused
+    const twilio = (await import("twilio")).default;
+    const client = twilio(twilioSid, twilioToken);
+
+    await Promise.all(
+      recipients.map((to) =>
+        client.messages.create({
+          to,
+          from: twilioFrom,
+          body: message,
+        }),
+      ),
+    );
   }
 
   /**

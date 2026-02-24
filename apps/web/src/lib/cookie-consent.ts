@@ -76,6 +76,7 @@ export class CookieConsentManager {
   private static instance: CookieConsentManager;
   private consent: CookieConsent | null = null;
   private listeners: ((consent: CookieConsent) => void)[] = [];
+  private functionalInitCallbacks: Array<() => void> = [];
 
   static getInstance(): CookieConsentManager {
     if (!CookieConsentManager.instance) {
@@ -83,6 +84,8 @@ export class CookieConsentManager {
     }
     return CookieConsentManager.instance;
   }
+
+  private loadedScripts = new Set<string>();
 
   constructor() {
     if (typeof window !== "undefined") {
@@ -192,6 +195,10 @@ export class CookieConsentManager {
     // Delete all non-essential cookies
     this.deleteNonEssentialCookies();
 
+    // Tear down trackers
+    this.disableAnalytics();
+    this.disableMarketing();
+
     // Notify listeners
     this.listeners.forEach((listener) =>
       listener({
@@ -249,39 +256,124 @@ export class CookieConsentManager {
   }
 
   private initializeAnalytics(): void {
-    // TODO: Initialize Google Analytics
-    console.log("[CookieConsent] Analytics enabled");
+    const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+    if (!measurementId || typeof window === "undefined") return;
 
-    // Example: Google Analytics 4
-    // gtag('config', 'GA_MEASUREMENT_ID');
+    // Avoid duplicate injection
+    if (!this.loadedScripts.has("ga")) {
+      this.injectScript(
+        `https://www.googletagmanager.com/gtag/js?id=${measurementId}`,
+        "ga-script",
+      );
+      this.loadedScripts.add("ga");
+    }
+
+    // Initialize gtag
+    window.dataLayer = window.dataLayer || [];
+    function gtag(...args: any[]) {
+      window.dataLayer.push(args);
+    }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.gtag = window.gtag || gtag;
+    gtag("js", new Date());
+    gtag("config", measurementId, { send_page_view: true });
+    (window as any)[`ga-disable-${measurementId}`] = false;
   }
 
   private disableAnalytics(): void {
-    console.log("[CookieConsent] Analytics disabled");
-
-    // Example: Disable Google Analytics
-    // gtag('config', 'GA_MEASUREMENT_ID', { send_page_view: false });
+    const measurementId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+    if (typeof window === "undefined") return;
+    if (measurementId) {
+      (window as any)[`ga-disable-${measurementId}`] = true;
+    }
+    this.removeCookies(["_ga", "_gid", "_gat", "_gcl_au"]);
   }
 
   private initializeMarketing(): void {
-    console.log("[CookieConsent] Marketing enabled");
+    if (typeof window === "undefined") return;
+    const pixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID;
+    if (!pixelId) return;
 
-    // TODO: Initialize marketing pixels
-    // Facebook Pixel, Google Ads, etc.
+    if (!this.loadedScripts.has("fbq")) {
+      // Basic Facebook Pixel bootstrap
+      const fbq = function fbqFn(this: any, ...args: any[]) {
+        (fbqFn as any).callMethod
+          ? (fbqFn as any).callMethod.apply(fbqFn, args)
+          : (fbqFn as any).queue.push(args);
+      } as any;
+      (fbq as any).queue = [];
+      (fbq as any).loaded = true;
+      (fbq as any).version = "2.0";
+      (fbq as any).push = fbq;
+      (window as any).fbq = fbq;
+
+      this.injectScript("https://connect.facebook.net/en_US/fbevents.js", "fb-pixel");
+      this.loadedScripts.add("fbq");
+      fbq("init", pixelId);
+    }
+
+    (window as any).fbq?.("consent", "grant");
+    (window as any).fbq?.("track", "PageView");
   }
 
   private disableMarketing(): void {
-    console.log("[CookieConsent] Marketing disabled");
+    if (typeof window === "undefined") return;
+    (window as any).fbq?.("consent", "revoke");
+    this.removeCookies(["_fbp", "_fbc"]);
   }
 
   private initializeFunctional(): void {
-    console.log("[CookieConsent] Functional enabled");
+    // Hook for functional scripts (e.g., chat widgets). Expect downstream init to check this flag.
+    (window as any).__flowstockFunctionalAllowed = true;
 
-    // TODO: Initialize chat widgets, etc.
+    this.functionalInitCallbacks.forEach((cb) => {
+      try {
+        cb();
+      } catch (error) {
+        console.error("[CookieConsent] Functional init failed", error);
+      }
+    });
   }
 
   private disableFunctional(): void {
-    console.log("[CookieConsent] Functional disabled");
+    (window as any).__flowstockFunctionalAllowed = false;
+  }
+
+  public onFunctionalReady(callback: () => void): void {
+    this.functionalInitCallbacks.push(callback);
+    if (this.consent?.functional && typeof window !== "undefined") {
+      callback();
+    }
+  }
+
+  private injectScript(src: string, id: string): void {
+    if (typeof document === "undefined") return;
+    if (document.getElementById(id)) return;
+    const script = document.createElement("script");
+    script.id = id;
+    script.async = true;
+    script.src = src;
+    document.head.appendChild(script);
+  }
+
+  private removeCookies(names: string[]): void {
+    if (typeof document === "undefined") return;
+    const domain = window.location.hostname;
+    const cookies = document.cookie.split(";");
+
+    cookies.forEach((cookie) => {
+      const [name] = cookie.trim().split("=");
+      if (!name) return;
+      const shouldDelete = names.some(
+        (target) => name === target || name.startsWith(`${target}_`),
+      );
+      if (shouldDelete) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${domain};`;
+      }
+    });
   }
 
   /**

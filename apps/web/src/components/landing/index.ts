@@ -4,3 +4,5 @@ export { PricingSection } from "./pricing-section";
 export { Navigation } from "./navigation";
 export { TrustSection } from "./trust-section";
 export { CTASection } from "./cta-section";
+export { ModernOfferingsSection } from "./modern-offerings-section";
+export { FAQSection } from "./faq-section";

@@ -5,6 +5,8 @@ import {
   TrustSection,
   CTASection,
   PricingSection,
+  ModernOfferingsSection,
+  FAQSection,
 } from "@/components/landing";
 import { Footer } from "@/components/layout/footer";
 import type { Metadata } from "next";
@@ -88,7 +90,9 @@ export default function HomePage() {
         <HeroSection />
         <TrustSection />
         <FeaturesSection />
+        <ModernOfferingsSection />
         <PricingSection />
+        <FAQSection />
         <CTASection />
       </main>
       <Footer />

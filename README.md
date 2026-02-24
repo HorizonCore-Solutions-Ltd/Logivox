@@ -260,10 +260,10 @@ npm run db:generate
 npm run db:migrate
 npm run db:seed
 
-# Start development servers
+# Start development servers (local only)
 npm run dev
 
-# Access applications
+# Access applications (local dev)
 # Web App: http://localhost:3000
 # API: http://localhost:3001
 # Mobile: Use Expo CLI
@@ -273,7 +273,7 @@ npm run dev
 
 ```bash
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/logivox"
+	DATABASE_URL="postgresql://flowstock:flowstock_dev@localhost:5432/flowstock?schema=public&sslmode=disable"
 SUPABASE_URL="your-supabase-url"
 SUPABASE_ANON_KEY="your-supabase-anon-key"
 

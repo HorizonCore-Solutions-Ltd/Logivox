@@ -61,6 +61,50 @@ export default function BlogPage() {
       featured: true,
     },
     {
+      slug: "predictive-ops-anomaly-defense",
+      title: "Predictive Ops: Anomaly Defense for Pick/Pack/Ship",
+      excerpt:
+        "How to catch bad signals before they become outages: burn-rate alerts, rollback guardrails, and SLOs for warehouse ops.",
+      author: "Reliability Engineering",
+      date: "2026-02-23",
+      readTime: "9 min read",
+      category: "Operations",
+      trending: true,
+    },
+    {
+      slug: "offline-voice-edge-warehouses",
+      title: "Offline Voice at the Edge: Keep Picking When Wi‑Fi Drops",
+      excerpt:
+        "Designing resilient voice + scanning that work on the floor without network, with smart sync when you’re back online.",
+      author: "Product & Edge Team",
+      date: "2026-02-23",
+      readTime: "8 min read",
+      category: "Technology",
+      trending: true,
+    },
+    {
+      slug: "copilot-sops-rag",
+      title: "Copilot Over Your SOPs: In-Line Guidance That Teams Trust",
+      excerpt:
+        "A tenant-aware copilot that surfaces your SOPs and work instructions at the exact moment of work—no more tab hunting.",
+      author: "AI Systems",
+      date: "2026-02-23",
+      readTime: "7 min read",
+      category: "AI & ML",
+      trending: true,
+    },
+    {
+      slug: "zero-trust-warehouse-security",
+      title: "Zero-Trust Everywhere: Scopes, Audits, and Reliable Webhooks",
+      excerpt:
+        "Per-warehouse scopes, audit streaming, and resilient webhooks with retries and dead letters for modern WMS security.",
+      author: "Security Team",
+      date: "2026-02-23",
+      readTime: "10 min read",
+      category: "Security",
+      trending: true,
+    },
+    {
       slug: "multi-tenant-architecture-best-practices",
       title: "Multi-Tenant Architecture: Best Practices for SaaS Platforms",
       excerpt:

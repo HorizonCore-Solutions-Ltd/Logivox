@@ -185,7 +185,10 @@ export function FeaturesSection() {
   ];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-muted/30 to-background">
+    <section
+      id="features"
+      className="py-24 bg-gradient-to-b from-muted/30 to-background"
+    >
       <div className="container-enterprise">
         <div className="text-center mb-16 space-y-4">
           <Badge variant="secondary" className="mb-4">
@@ -273,6 +276,20 @@ export function FeaturesSection() {
                 className="hover:shadow-lg transition-all hover:scale-[1.02]"
               >
                 <CardHeader>
+          {
+            title: "Predictive Ops & Anomaly Defense",
+            description:
+              "Real-time anomaly detection on pick/pack/ship signals with auto-alerts and blast-radius rollback to keep SLAs safe.",
+            icon: Shield,
+            highlights: ["Auto-alerts", "Rollback guardrails", "SLO health"],
+          },
+          {
+            title: "Offline & Edge Resilience",
+            description:
+              "Voice + scanning that keep working on the floor when Wi‑Fi drops, with smart sync once connectivity returns.",
+            icon: Zap,
+            highlights: ["Offline picks", "Edge sync", "Low-latency"],
+          },
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 mb-3">
                     <capability.icon className="h-5 w-5 text-primary" />
                   </div>
@@ -280,6 +297,13 @@ export function FeaturesSection() {
                   <CardDescription className="text-sm">
                     {capability.description}
                   </CardDescription>
+          {
+            title: "Copilot for SOPs & Training",
+            description:
+              "Tenant-aware copilot that pulls your SOPs and work instructions inline so teams execute perfectly, first time.",
+            icon: BarChart3,
+            highlights: ["RAG over SOPs", "In-line help", "Fewer errors"],
+          },
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-1.5">
@@ -291,6 +315,20 @@ export function FeaturesSection() {
                         <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0" />
                         <span className="font-medium">{highlight}</span>
                       </div>
+          {
+            title: "Zero-Trust Everywhere",
+            description:
+              "Per-warehouse and per-integration scopes, auditable access, and hardened webhooks with retries and dead-letter capture.",
+            icon: Shield,
+            highlights: ["Fine-grain scopes", "Audit trails", "Reliable webhooks"],
+          },
+          {
+            title: "SLOs & Chaos-Tested Reliability",
+            description:
+              "Burn-rate alerts, chaos-tested queues, and SLO dashboards so ops know when to act before users feel pain.",
+            icon: BarChart3,
+            highlights: ["SLO dashboards", "Burn alerts", "Chaos testing"],
+          },
                     ))}
                   </div>
                 </CardContent>

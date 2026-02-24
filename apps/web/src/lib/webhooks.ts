@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/prisma";
 import crypto from "crypto";
+import { prisma } from "@/lib/prisma";
 
 export interface WebhookPayload {
   event: string;
@@ -15,13 +15,12 @@ export async function triggerWebhook(
 ) {
   try {
     // Find all active webhooks subscribed to this event
-    const webhooks = await prisma.webhook.findMany({
+    const webhooks = await prisma.integrationWebhook.findMany({
       where: {
         organizationId,
         isActive: true,
-        events: {
-          has: event,
-        },
+        status: "ACTIVE",
+        event,
       },
     });
 
@@ -71,26 +70,24 @@ async function deliverWebhook(
       headers["X-Webhook-Signature"] = `sha256=${signature}`;
     }
 
-    // Send webhook
     const response = await fetch(webhook.url, {
       method: "POST",
       headers,
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(30000), // 30 second timeout
+      signal: AbortSignal.timeout(30000),
     });
 
     const duration = Date.now() - startTime;
     const responseBody = await response.text().catch(() => "");
 
-    // Log delivery
     await prisma.webhookDelivery.create({
       data: {
         webhookId: webhook.id,
         event: payload.event,
-        payload: JSON.stringify(payload),
+        payload,
         statusCode: response.status,
-        responseBody: responseBody.substring(0, 10000), // Limit response size
-        duration,
+        responseBody: responseBody.substring(0, 10000),
+        durationMs: duration,
         success: response.ok,
       },
     });
@@ -101,15 +98,14 @@ async function deliverWebhook(
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
 
-    // Log failed delivery
     await prisma.webhookDelivery.create({
       data: {
         webhookId: webhook.id,
         event: payload.event,
-        payload: JSON.stringify(payload),
+        payload,
         statusCode: 0,
         responseBody: errorMessage,
-        duration,
+        durationMs: duration,
         success: false,
       },
     });

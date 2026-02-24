@@ -13,7 +13,10 @@ export function CTASection() {
   ];
 
   return (
-    <section className="py-20 md:py-28 relative overflow-hidden">
+    <section
+      id="get-started"
+      className="py-20 md:py-28 relative overflow-hidden"
+    >
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-background" />
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />

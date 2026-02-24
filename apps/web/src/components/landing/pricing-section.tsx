@@ -356,7 +356,7 @@ export function PricingSection() {
   ];
 
   return (
-    <section className="py-24">
+    <section id="pricing" className="py-24">
       <div className="container-enterprise">
         {/* Section header */}
         <div className="text-center space-y-4 mb-12">

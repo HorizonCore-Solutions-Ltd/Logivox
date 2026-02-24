@@ -20,6 +20,9 @@ DATABASE_URL="postgresql://user:pass@host:5432/logivox_prod"
 DATABASE_DIRECT_URL="postgresql://user:pass@host:5432/logivox_prod"
 ```
 
+- **Reminder:** Finalize the production `DATABASE_URL` from Neon or AWS RDS before deploy. Use TLS (e.g., `sslmode=require`, `channel_binding=require` for Neon, `pgbouncer=true` for pooled endpoints).
+- After secrets are in place, run `npx prisma migrate deploy` against production to apply `20260223_add_webhook_delivery` and prior migrations.
+
 #### ☐ **1.2 Generate Secrets**
 
 ```bash
@@ -487,3 +490,13 @@ Support Email: support@...
 **Remember:** The application is already production-ready. This checklist is just deployment and training!
 
 **Good luck with your launch!** 🚀
+
+---
+
+## 📌 Production To-Do (must complete before go-live)
+
+- Set production `DATABASE_URL` (Neon/AWS) with TLS (`sslmode=require`, channel binding if Neon, `pgbouncer=true` if using pooled endpoint). Rerun `npx prisma migrate deploy` to apply `20260223_add_webhook_delivery`.
+- Move Prisma config off `package.json#prisma` (done: `prisma.config.ts`). Remove deprecated block from package.json when convenient.
+- Populate production secrets: webhook signing secret, MessageBird/Twilio SMS keys and recipients, NEXTAUTH_URL/NEXTAUTH_SECRET, analytics IDs, NEXT_PUBLIC_APP_URL.
+- Verify PWA/service worker on the production domain (install prompt/offline), and consent banner loading GA/FB only with consent.
+- Confirm voice support baseline (Chrome/Edge) is acceptable; unsupported browsers gracefully fall back.

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { encryptSecret } from "@/lib/crypto";
 import { z } from "zod";
 
 // Validation schema for creating a connection
@@ -158,8 +159,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // TODO: Encrypt sensitive data before storing (accessToken, apiKey, password, etc.)
-    // For now, we'll store them as-is. In production, use proper encryption.
+    const encryptedAccessToken = validatedData.accessToken
+      ? encryptSecret(validatedData.accessToken)
+      : undefined;
+    const encryptedRefreshToken = validatedData.refreshToken
+      ? encryptSecret(validatedData.refreshToken)
+      : undefined;
+    const encryptedApiKey = validatedData.apiKey
+      ? encryptSecret(validatedData.apiKey)
+      : undefined;
+    const encryptedApiSecret = validatedData.apiSecret
+      ? encryptSecret(validatedData.apiSecret)
+      : undefined;
+    const encryptedPassword = validatedData.password
+      ? encryptSecret(validatedData.password)
+      : undefined;
 
     const connection = await prisma.integrationConnection.create({
       data: {
@@ -171,6 +185,11 @@ export async function POST(request: Request) {
           : null,
         status: "CONNECTED",
         connectedAt: new Date(),
+        accessToken: encryptedAccessToken,
+        refreshToken: encryptedRefreshToken,
+        apiKey: encryptedApiKey,
+        apiSecret: encryptedApiSecret,
+        password: encryptedPassword,
       },
       include: {
         integration: {
@@ -203,6 +222,15 @@ export async function POST(request: Request) {
 
     return NextResponse.json(sanitizedConnection, { status: 201 });
   } catch (error) {
+    if (error instanceof Error && error.message.includes("API_KEY_ENCRYPTION_SECRET")) {
+      return NextResponse.json(
+        {
+          error:
+            "Missing API_KEY_ENCRYPTION_SECRET. Set a 32+ char secret in your environment to store credentials securely.",
+        },
+        { status: 500 },
+      );
+    }
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },

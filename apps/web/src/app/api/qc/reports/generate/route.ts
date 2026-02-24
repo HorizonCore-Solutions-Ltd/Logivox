@@ -1,24 +1,47 @@
 import { NextRequest, NextResponse } from "next/server";
-// import PDFDocument from 'pdfkit'; // Removed - pdfkit not installed
+import { getServerSession } from "next-auth";
+import { z } from "zod";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+const reportSchema = z.object({
+  type: z.string(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+  includeCharts: z.boolean().optional(),
+  includeDetails: z.boolean().optional(),
+  format: z.enum(["PDF", "JSON"]).optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const orgId = session.user.organizations?.[0]?.id;
+    if (!orgId) {
+      return NextResponse.json(
+        { error: "No active organization found for user" },
+        { status: 400 },
+      );
+    }
+
     const { type, startDate, endDate, includeCharts, includeDetails, format } =
-      body;
+      reportSchema.parse(await request.json());
 
     // Create report record
     const report = await prisma.qualityReport.create({
       data: {
         reportNumber: `REP-${Date.now()}`,
-        organizationId: "default", // TODO: Get from auth
+        organizationId: orgId,
         reportType: "CUSTOM",
         reportCategory: type,
         periodStart: new Date(startDate),
         periodEnd: new Date(endDate),
         // generatedBy removed - not in schema
-        createdBy: "SYSTEM",
+        createdBy: session.user.id,
         metrics: {
           startDate,
           endDate,
@@ -59,9 +82,16 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate PDF if requested
-    let downloadUrl = "";
-    if (format === "PDF") {
-      downloadUrl = await generatePDF(report.id, type, reportData);
+    const downloadUrl =
+      format === "PDF"
+        ? `/api/qc/export/${report.id}?type=report&format=pdf`
+        : undefined;
+
+    if (downloadUrl) {
+      await prisma.qualityReport.update({
+        where: { id: report.id },
+        data: { pdfUrl: downloadUrl },
+      });
     }
 
     return NextResponse.json({
@@ -70,6 +100,12 @@ export async function POST(request: NextRequest) {
       data: reportData,
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Validation failed", details: error.errors },
+        { status: 400 },
+      );
+    }
     console.error("Report generation error:", error);
     return NextResponse.json(
       { error: "Failed to generate report" },
@@ -347,14 +383,4 @@ async function generateCostImpact(startDate: Date, endDate: Date) {
   };
 
   return summary;
-}
-
-async function generatePDF(
-  reportId: string,
-  type: string,
-  data: any,
-): Promise<string> {
-  // TODO: Implement PDF generation with pdfkit
-  // For now, return a placeholder URL
-  return `/api/reports/${reportId}/download`;
 }

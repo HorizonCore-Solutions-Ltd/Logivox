@@ -1,5 +1,7 @@
 "use client";
 
+// HeroSection: top-of-funnel hero with proof, benefit stats, and guided paths for Ops, IT/Security, and Finance buyers.
+
 import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -19,6 +21,7 @@ export function HeroSection() {
     { label: "3x Faster Order Fulfillment" },
     { label: "$52M+ Avg Annual Savings" },
     { label: "936% ROI in First Year" },
+    { label: "Predictive Ops & Zero-Trust Built-In" },
   ];
 
   const stats = [
@@ -33,7 +36,10 @@ export function HeroSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-background via-background to-muted/10">
+    <section
+      id="home"
+      className="relative overflow-hidden bg-gradient-to-b from-background via-background to-muted/10"
+    >
       {/* Background elements */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
@@ -69,6 +75,9 @@ export function HeroSection() {
               commands, AI optimization, and real-time visibility —proven by
               enterprises saving $52M+ annually.
             </p>
+            <div className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed font-semibold">
+              Built for Ops leaders, IT/Security, and Finance: safer launches, faster onboarding, and measurable ROI in week one.
+            </div>
           </div>
 
           {/* Platform stats */}
@@ -148,6 +157,36 @@ export function HeroSection() {
               <Target className="h-4 w-4 text-primary" />
               <span className="font-medium">No long-term contracts</span>
             </div>
+          </div>
+
+          {/* Guided paths */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-5xl pt-6">
+            {[
+              {
+                title: "Operations Leader",
+                desc: "Improve pick/pack/ship SLAs and reduce errors",
+                href: "/demo",
+              },
+              {
+                title: "IT / Security",
+                desc: "Review zero-trust scopes, signing, and audits",
+                href: "/platform/security",
+              },
+              {
+                title: "Finance / ROI",
+                desc: "See pricing, savings model, and fast payback",
+                href: "/pricing",
+              },
+            ].map((item) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="flex flex-col items-start gap-1 rounded-xl border border-primary/20 bg-card/70 px-4 py-3 hover:border-primary/50 hover:shadow-md transition"
+              >
+                <span className="text-sm font-semibold text-primary">{item.title}</span>
+                <span className="text-sm text-foreground">{item.desc}</span>
+              </Link>
+            ))}
           </div>
 
           {/* Social proof */}

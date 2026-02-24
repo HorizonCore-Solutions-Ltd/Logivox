@@ -222,8 +222,50 @@ export async function POST(request: Request) {
 
     // If order IDs provided, create wave lines
     if (validatedData.orderIds && validatedData.orderIds.length > 0) {
-      // TODO: Implement logic to add orders to wave
-      // This would involve creating WavePickLine records
+      const salesOrders = await prisma.salesOrder.findMany({
+        where: {
+          id: { in: validatedData.orderIds },
+          organizationId: session.user.organizationId,
+        },
+        include: {
+          items: true,
+        },
+      });
+
+      const missing = validatedData.orderIds.filter(
+        (id) => !salesOrders.find((order) => order.id === id),
+      );
+
+      if (missing.length > 0) {
+        return NextResponse.json(
+          { error: `Orders not found in organization: ${missing.join(", ")}` },
+          { status: 404 },
+        );
+      }
+
+      let lineNumber = 1;
+      const lines = salesOrders.flatMap((order) =>
+        order.items.map((item) => {
+          const currentLineNumber = lineNumber++;
+          return {
+            organizationId: session.user.organizationId,
+            wavePickId: wave.id,
+            lineNumber: currentLineNumber,
+            pickSequence: currentLineNumber,
+            salesOrderId: order.id,
+            inventoryItemId: item.inventoryItemId,
+            orderedQuantity: item.quantity,
+            priority: order.priority ?? 0,
+            pickListId: null,
+            locationId: null,
+            notes: null,
+          };
+        }),
+      );
+
+      if (lines.length > 0) {
+        await prisma.wavePickLine.createMany({ data: lines });
+      }
     }
 
     return NextResponse.json(wave, { status: 201 });

@@ -41,12 +41,19 @@ export default function IntegrationDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [integration, setIntegration] = useState<Integration | null>(null);
+  const [webhooks, setWebhooks] = useState<any[]>([]);
+  const [selectedWebhookId, setSelectedWebhookId] = useState<string>("");
+  const [deliveries, setDeliveries] = useState<any[]>([]);
+  const [deliveryPage, setDeliveryPage] = useState(1);
+  const [deliveryTotal, setDeliveryTotal] = useState(0);
+  const deliveryPageSize = 20;
   const [activeTab, setActiveTab] = useState("overview");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (params.id) {
       fetchIntegration();
+      fetchWebhooks();
     }
   }, [params.id]);
 
@@ -61,6 +68,39 @@ export default function IntegrationDetailPage() {
       console.error("Error fetching integration:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchWebhooks = async (webhookId?: string, page = deliveryPage) => {
+    try {
+      const paramsSearch = new URLSearchParams({ integrationId: params.id as string });
+      if (webhookId) {
+        paramsSearch.set("webhookId", webhookId);
+        paramsSearch.set("includeDeliveries", "true");
+        paramsSearch.set("page", String(page));
+        paramsSearch.set("pageSize", String(deliveryPageSize));
+      }
+
+      const response = await fetch(`/api/integrations/webhooks?${paramsSearch.toString()}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Failed to fetch webhooks");
+
+      setWebhooks(data.webhooks || []);
+      if (webhookId && data.deliveries) {
+        setDeliveries(data.deliveries);
+        setDeliveryPage(data.deliveriesPage || page);
+        setDeliveryTotal(data.deliveriesTotal || 0);
+      } else {
+        setDeliveries([]);
+        setDeliveryPage(1);
+        setDeliveryTotal(0);
+      }
+
+      if (!selectedWebhookId && (data.webhooks?.length || 0) > 0) {
+        setSelectedWebhookId(data.webhooks[0].id);
+      }
+    } catch (error) {
+      console.error("Error fetching webhooks", error);
     }
   };
 
@@ -89,8 +129,34 @@ export default function IntegrationDetailPage() {
   };
 
   const handleTestConnection = async () => {
-    alert("Testing connection...");
-    // TODO: Implement connection test
+    if (!selectedWebhookId) {
+      alert("Select a webhook to test.");
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await fetch("/api/integrations/webhooks?action=test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ webhookId: selectedWebhookId }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        throw new Error(result.error || "Test failed");
+      }
+
+      alert(
+        result.message ||
+          `Webhook test ${result.success ? "succeeded" : "failed"} (status ${result.status})`,
+      );
+
+      await fetchWebhooks(selectedWebhookId);
+    } catch (error: any) {
+      alert(error.message || "Failed to test connection");
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -210,6 +276,94 @@ export default function IntegrationDetailPage() {
           </div>
         </div>
 
+        {/* Webhook Deliveries */}
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Recent Webhook Deliveries</h3>
+              <p className="text-sm text-gray-600">Latest attempts for the selected webhook</p>
+            </div>
+            <button
+              onClick={() => fetchWebhooks(selectedWebhookId, deliveryPage)}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              Refresh
+            </button>
+          </div>
+
+          {selectedWebhookId === "" && (
+            <div className="text-sm text-gray-600">Select a webhook to view deliveries.</div>
+          )}
+
+          {selectedWebhookId !== "" && deliveries.length === 0 && (
+            <div className="text-sm text-gray-600">No deliveries recorded yet.</div>
+          )}
+
+          {selectedWebhookId !== "" && deliveries.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-gray-700">
+                    <th className="py-2 pr-4">Time</th>
+                    <th className="py-2 pr-4">Status</th>
+                    <th className="py-2 pr-4">Code</th>
+                    <th className="py-2 pr-4">Duration</th>
+                    <th className="py-2 pr-4">Response</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deliveries.map((d) => (
+                    <tr key={d.id} className="border-b last:border-b-0">
+                      <td className="py-2 pr-4 text-gray-700">
+                        {new Date(d.createdAt).toLocaleString()}
+                      </td>
+                      <td className={`py-2 pr-4 ${d.success ? "text-green-600" : "text-red-600"}`}>
+                        {d.success ? "Success" : "Failed"}
+                      </td>
+                      <td className="py-2 pr-4 text-gray-700">{d.statusCode}</td>
+                      <td className="py-2 pr-4 text-gray-700">{d.durationMs} ms</td>
+                      <td className="py-2 pr-4 text-gray-700 truncate max-w-xs">
+                        {d.responseBody || "-"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="flex items-center justify-between mt-3 text-sm text-gray-700">
+                <span>
+                  Page {deliveryPage} · {deliveries.length} of {deliveryTotal} deliveries
+                </span>
+                <div className="space-x-2">
+                  <button
+                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    onClick={() => {
+                      const nextPage = Math.max(deliveryPage - 1, 1);
+                      setDeliveryPage(nextPage);
+                      fetchWebhooks(selectedWebhookId, nextPage);
+                    }}
+                    disabled={deliveryPage <= 1}
+                  >
+                    Prev
+                  </button>
+                  <button
+                    className="px-3 py-1 border rounded disabled:opacity-50"
+                    onClick={() => {
+                      const maxPage = Math.max(1, Math.ceil(deliveryTotal / deliveryPageSize));
+                      const nextPage = Math.min(deliveryPage + 1, maxPage);
+                      setDeliveryPage(nextPage);
+                      fetchWebhooks(selectedWebhookId, nextPage);
+                    }}
+                    disabled={deliveryPage * deliveryPageSize >= deliveryTotal}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="border-b border-gray-200">
@@ -261,6 +415,25 @@ export default function IntegrationDetailPage() {
               ))}
             </nav>
           </div>
+              <div>
+                <label className="block text-xs text-gray-500">Webhook</label>
+                <select
+                  className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+                  value={selectedWebhookId}
+                  onChange={(e) => {
+                    setSelectedWebhookId(e.target.value);
+                    setDeliveryPage(1);
+                    fetchWebhooks(e.target.value, 1);
+                  }}
+                >
+                  <option value="">Select webhook</option>
+                  {webhooks.map((wh) => (
+                    <option key={wh.id} value={wh.id}>
+                      {wh.name || wh.event} ({wh.url})
+                    </option>
+                  ))}
+                </select>
+              </div>
 
           {/* Tab Content */}
           <div className="p-6">

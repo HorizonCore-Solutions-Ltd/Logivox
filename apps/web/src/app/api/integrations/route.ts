@@ -7,51 +7,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
-// GET - List webhooks
-export async function GET(req: NextRequest) {
+const WEBHOOK_DEPRECATION = {
+  message: "Webhook management moved to /api/integrations/webhooks",
+  hint: "Use the dedicated webhook endpoint for create, test, and delivery logs.",
+};
+
+// GET - deprecated webhook listing
+export async function GET(_req: NextRequest) {
   try {
     const session = await getServerSession();
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(req.url);
-    const webhookId = searchParams.get("webhookId");
-
-    if (webhookId) {
-      const webhook = await prisma.webhook.findUnique({
-        where: { id: webhookId },
-      });
-
-      if (!webhook) {
-        return NextResponse.json(
-          { error: "Webhook not found" },
-          { status: 404 },
-        );
-      }
-
-      return NextResponse.json({ webhook });
-    }
-
-    // List all webhooks
-    const webhooks = await prisma.webhook.findMany({
-      orderBy: { createdAt: "desc" },
-    });
-
-    return NextResponse.json({
-      webhooks,
-      total: webhooks.length,
-    });
+    return NextResponse.json(WEBHOOK_DEPRECATION, { status: 410 });
   } catch (error) {
-    console.error("Webhook GET error:", error);
+    console.error("Integration GET error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch webhooks" },
+      { error: "Failed to process integration" },
       { status: 500 },
     );
   }
 }
 
-// POST - Create webhook or trigger integration
+// POST - ERP and carrier actions (webhook creation moved)
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
@@ -60,92 +39,28 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { action, url, events, integrationType, config } = body;
+    const { action } = body;
 
-    if (action === "createWebhook") {
-      // Create new webhook subscription
-      if (!url || !events) {
+    if (action === "createWebhook" || action === "testWebhook") {
+      return NextResponse.json(WEBHOOK_DEPRECATION, { status: 410 });
+    }
+
+    if (action === "syncToERP") {
+      const { loadSheetId, erpSystem } = body;
+
+      if (!loadSheetId || !erpSystem) {
         return NextResponse.json(
-          { error: "URL and events are required" },
+          { error: "loadSheetId and erpSystem are required" },
           { status: 400 },
         );
       }
-
-      const webhook = await prisma.webhook.create({
-        data: {
-          url,
-          events: events as string[],
-          status: "ACTIVE",
-          organizationId: session.user.organizationId,
-        },
-      });
-
-      return NextResponse.json({
-        success: true,
-        webhook,
-        message: "Webhook created successfully",
-      });
-    } else if (action === "testWebhook") {
-      // Test webhook with sample data
-      const { webhookId } = body;
-
-      const webhook = await prisma.webhook.findUnique({
-        where: { id: webhookId },
-      });
-
-      if (!webhook) {
-        return NextResponse.json(
-          { error: "Webhook not found" },
-          { status: 404 },
-        );
-      }
-
-      const testPayload = {
-        event: "loadsheet.test",
-        timestamp: new Date().toISOString(),
-        data: {
-          loadSheetNumber: "LS-2026-TEST",
-          status: "CONFIRMED",
-          message: "This is a test webhook event",
-        },
-      };
-
-      try {
-        const response = await fetch(webhook.url, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Webhook-Signature": "test-signature",
-          },
-          body: JSON.stringify(testPayload),
-        });
-
-        return NextResponse.json({
-          success: response.ok,
-          status: response.status,
-          message: response.ok
-            ? "Webhook test successful"
-            : "Webhook test failed",
-        });
-      } catch (error) {
-        return NextResponse.json({
-          success: false,
-          message: "Failed to reach webhook URL",
-          error: String(error),
-        });
-      }
-    } else if (action === "syncToERP") {
-      // Sync load sheet to ERP system
-      const { loadSheetId, erpSystem } = body;
 
       const loadSheet = await prisma.loadSheet.findUnique({
         where: { id: loadSheetId },
         include: {
           customer: true,
           containers: {
-            include: {
-              containerItems: true,
-            },
+            include: { containerItems: true },
           },
         },
       });
@@ -157,7 +72,6 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Call ERP integration
       const result = await syncToERP(loadSheet, erpSystem);
 
       return NextResponse.json({
@@ -165,15 +79,21 @@ export async function POST(req: NextRequest) {
         message: result.message,
         erpReference: result.erpReference,
       });
-    } else if (action === "dispatchCarrier") {
-      // Dispatch to carrier API
+    }
+
+    if (action === "dispatchCarrier") {
       const { loadSheetId, carrierCode } = body;
+
+      if (!loadSheetId || !carrierCode) {
+        return NextResponse.json(
+          { error: "loadSheetId and carrierCode are required" },
+          { status: 400 },
+        );
+      }
 
       const loadSheet = await prisma.loadSheet.findUnique({
         where: { id: loadSheetId },
-        include: {
-          customer: true,
-        },
+        include: { customer: true },
       });
 
       if (!loadSheet) {
@@ -183,7 +103,6 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Call carrier API
       const result = await dispatchToCarrier(loadSheet, carrierCode);
 
       return NextResponse.json({

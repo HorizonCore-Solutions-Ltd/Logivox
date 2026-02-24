@@ -81,6 +81,7 @@ Welcome to the Logivox documentation. All documentation has been organized into 
 - Voice feature catalog and capabilities
 - Advanced loadsheet automation
 - Competitive analysis and positioning
+- Voice Browser Guide (public + authenticated navigation)
 - **Key Value:** 30-40% productivity gains, worth $1M-$2M alone
 
 #### [quality-assurance/](quality-assurance/) ✅
@@ -137,6 +138,7 @@ Welcome to the Logivox documentation. All documentation has been organized into 
 #### [marketing/](marketing/) 📢
 
 - Competitive advantages and content strategy
+- Modern offerings (predictive ops, offline voice, SOP copilot, zero-trust)
 
 #### [legacy-planning/](legacy-planning/) 📦
 
