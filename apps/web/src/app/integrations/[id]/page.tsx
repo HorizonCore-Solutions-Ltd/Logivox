@@ -73,7 +73,9 @@ export default function IntegrationDetailPage() {
 
   const fetchWebhooks = async (webhookId?: string, page = deliveryPage) => {
     try {
-      const paramsSearch = new URLSearchParams({ integrationId: params.id as string });
+      const paramsSearch = new URLSearchParams({
+        integrationId: params.id as string,
+      });
       if (webhookId) {
         paramsSearch.set("webhookId", webhookId);
         paramsSearch.set("includeDeliveries", "true");
@@ -81,9 +83,12 @@ export default function IntegrationDetailPage() {
         paramsSearch.set("pageSize", String(deliveryPageSize));
       }
 
-      const response = await fetch(`/api/integrations/webhooks?${paramsSearch.toString()}`);
+      const response = await fetch(
+        `/api/integrations/webhooks?${paramsSearch.toString()}`,
+      );
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || "Failed to fetch webhooks");
+      if (!response.ok)
+        throw new Error(data.error || "Failed to fetch webhooks");
 
       setWebhooks(data.webhooks || []);
       if (webhookId && data.deliveries) {
@@ -280,8 +285,12 @@ export default function IntegrationDetailPage() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Recent Webhook Deliveries</h3>
-              <p className="text-sm text-gray-600">Latest attempts for the selected webhook</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Recent Webhook Deliveries
+              </h3>
+              <p className="text-sm text-gray-600">
+                Latest attempts for the selected webhook
+              </p>
             </div>
             <button
               onClick={() => fetchWebhooks(selectedWebhookId, deliveryPage)}
@@ -292,11 +301,15 @@ export default function IntegrationDetailPage() {
           </div>
 
           {selectedWebhookId === "" && (
-            <div className="text-sm text-gray-600">Select a webhook to view deliveries.</div>
+            <div className="text-sm text-gray-600">
+              Select a webhook to view deliveries.
+            </div>
           )}
 
           {selectedWebhookId !== "" && deliveries.length === 0 && (
-            <div className="text-sm text-gray-600">No deliveries recorded yet.</div>
+            <div className="text-sm text-gray-600">
+              No deliveries recorded yet.
+            </div>
           )}
 
           {selectedWebhookId !== "" && deliveries.length > 0 && (
@@ -317,11 +330,17 @@ export default function IntegrationDetailPage() {
                       <td className="py-2 pr-4 text-gray-700">
                         {new Date(d.createdAt).toLocaleString()}
                       </td>
-                      <td className={`py-2 pr-4 ${d.success ? "text-green-600" : "text-red-600"}`}>
+                      <td
+                        className={`py-2 pr-4 ${d.success ? "text-green-600" : "text-red-600"}`}
+                      >
                         {d.success ? "Success" : "Failed"}
                       </td>
-                      <td className="py-2 pr-4 text-gray-700">{d.statusCode}</td>
-                      <td className="py-2 pr-4 text-gray-700">{d.durationMs} ms</td>
+                      <td className="py-2 pr-4 text-gray-700">
+                        {d.statusCode}
+                      </td>
+                      <td className="py-2 pr-4 text-gray-700">
+                        {d.durationMs} ms
+                      </td>
                       <td className="py-2 pr-4 text-gray-700 truncate max-w-xs">
                         {d.responseBody || "-"}
                       </td>
@@ -332,7 +351,8 @@ export default function IntegrationDetailPage() {
 
               <div className="flex items-center justify-between mt-3 text-sm text-gray-700">
                 <span>
-                  Page {deliveryPage} · {deliveries.length} of {deliveryTotal} deliveries
+                  Page {deliveryPage} · {deliveries.length} of {deliveryTotal}{" "}
+                  deliveries
                 </span>
                 <div className="space-x-2">
                   <button
@@ -349,7 +369,10 @@ export default function IntegrationDetailPage() {
                   <button
                     className="px-3 py-1 border rounded disabled:opacity-50"
                     onClick={() => {
-                      const maxPage = Math.max(1, Math.ceil(deliveryTotal / deliveryPageSize));
+                      const maxPage = Math.max(
+                        1,
+                        Math.ceil(deliveryTotal / deliveryPageSize),
+                      );
                       const nextPage = Math.min(deliveryPage + 1, maxPage);
                       setDeliveryPage(nextPage);
                       fetchWebhooks(selectedWebhookId, nextPage);
@@ -415,25 +438,25 @@ export default function IntegrationDetailPage() {
               ))}
             </nav>
           </div>
-              <div>
-                <label className="block text-xs text-gray-500">Webhook</label>
-                <select
-                  className="border border-gray-300 rounded-md px-2 py-1 text-sm"
-                  value={selectedWebhookId}
-                  onChange={(e) => {
-                    setSelectedWebhookId(e.target.value);
-                    setDeliveryPage(1);
-                    fetchWebhooks(e.target.value, 1);
-                  }}
-                >
-                  <option value="">Select webhook</option>
-                  {webhooks.map((wh) => (
-                    <option key={wh.id} value={wh.id}>
-                      {wh.name || wh.event} ({wh.url})
-                    </option>
-                  ))}
-                </select>
-              </div>
+          <div>
+            <label className="block text-xs text-gray-500">Webhook</label>
+            <select
+              className="border border-gray-300 rounded-md px-2 py-1 text-sm"
+              value={selectedWebhookId}
+              onChange={(e) => {
+                setSelectedWebhookId(e.target.value);
+                setDeliveryPage(1);
+                fetchWebhooks(e.target.value, 1);
+              }}
+            >
+              <option value="">Select webhook</option>
+              {webhooks.map((wh) => (
+                <option key={wh.id} value={wh.id}>
+                  {wh.name || wh.event} ({wh.url})
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Tab Content */}
           <div className="p-6">

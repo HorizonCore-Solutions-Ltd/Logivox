@@ -76,7 +76,8 @@ export function HeroSection() {
               enterprises saving $52M+ annually.
             </p>
             <div className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed font-semibold">
-              Built for Ops leaders, IT/Security, and Finance: safer launches, faster onboarding, and measurable ROI in week one.
+              Built for Ops leaders, IT/Security, and Finance: safer launches,
+              faster onboarding, and measurable ROI in week one.
             </div>
           </div>
 
@@ -183,7 +184,9 @@ export function HeroSection() {
                 href={item.href}
                 className="flex flex-col items-start gap-1 rounded-xl border border-primary/20 bg-card/70 px-4 py-3 hover:border-primary/50 hover:shadow-md transition"
               >
-                <span className="text-sm font-semibold text-primary">{item.title}</span>
+                <span className="text-sm font-semibold text-primary">
+                  {item.title}
+                </span>
                 <span className="text-sm text-foreground">{item.desc}</span>
               </Link>
             ))}

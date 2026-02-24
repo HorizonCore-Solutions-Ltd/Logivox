@@ -101,14 +101,24 @@ export default function VoiceBrowserGuidePage() {
           <p className="inline-flex items-center rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
             Voice Navigation
           </p>
-          <h1 className="text-4xl font-bold tracking-tight">Voice Browser Guide & Cheat Sheet</h1>
+          <h1 className="text-4xl font-bold tracking-tight">
+            Voice Browser Guide & Cheat Sheet
+          </h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
-            Navigate LogiVox hands-free across marketing pages and the authenticated app. Allow microphone access, say a command, and the voice browser routes you where you need to go.
+            Navigate LogiVox hands-free across marketing pages and the
+            authenticated app. Allow microphone access, say a command, and the
+            voice browser routes you where you need to go.
           </p>
           <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-            <span className="rounded-full bg-muted px-3 py-1">Ctrl/Cmd + Shift + V — Toggle listening</span>
-            <span className="rounded-full bg-muted px-3 py-1">Ctrl/Cmd + Shift + H — Open help</span>
-            <span className="rounded-full bg-muted px-3 py-1">Works without login for marketing pages</span>
+            <span className="rounded-full bg-muted px-3 py-1">
+              Ctrl/Cmd + Shift + V — Toggle listening
+            </span>
+            <span className="rounded-full bg-muted px-3 py-1">
+              Ctrl/Cmd + Shift + H — Open help
+            </span>
+            <span className="rounded-full bg-muted px-3 py-1">
+              Works without login for marketing pages
+            </span>
           </div>
         </div>
 
@@ -116,31 +126,58 @@ export default function VoiceBrowserGuidePage() {
           <div className="rounded-2xl border bg-card/80 backdrop-blur p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-3">Quick start</h2>
             <ol className="list-decimal list-inside space-y-2 text-muted-foreground">
-              <li>Click the floating mic (bottom-right) and allow microphone access.</li>
-              <li>Say a navigation command like “Show pricing” or “Go to dashboard”.</li>
-              <li>Watch the transcript and confirmation in the panel; say another command or toggle listening off.</li>
+              <li>
+                Click the floating mic (bottom-right) and allow microphone
+                access.
+              </li>
+              <li>
+                Say a navigation command like “Show pricing” or “Go to
+                dashboard”.
+              </li>
+              <li>
+                Watch the transcript and confirmation in the panel; say another
+                command or toggle listening off.
+              </li>
             </ol>
-            <p className="mt-3 text-sm text-muted-foreground">Tip: Use a headset in noisy spaces for higher accuracy.</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Tip: Use a headset in noisy spaces for higher accuracy.
+            </p>
           </div>
 
           <div className="rounded-2xl border bg-card/80 backdrop-blur p-6 shadow-sm">
             <h2 className="text-xl font-semibold mb-3">Troubleshooting</h2>
             <ul className="space-y-2 text-muted-foreground text-sm">
-              <li><strong>Mic blocked:</strong> Check the browser address bar mic icon and allow access.</li>
-              <li><strong>No response:</strong> Verify the mic icon is pulsing. Toggle with Ctrl/Cmd + Shift + V.</li>
-              <li><strong>Wrong page:</strong> Say “Voice help” to reopen this guide and confirm commands.</li>
+              <li>
+                <strong>Mic blocked:</strong> Check the browser address bar mic
+                icon and allow access.
+              </li>
+              <li>
+                <strong>No response:</strong> Verify the mic icon is pulsing.
+                Toggle with Ctrl/Cmd + Shift + V.
+              </li>
+              <li>
+                <strong>Wrong page:</strong> Say “Voice help” to reopen this
+                guide and confirm commands.
+              </li>
             </ul>
           </div>
         </div>
 
         <div className="rounded-2xl border bg-card/90 backdrop-blur p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Commands for visitors (no login needed)</h2>
-            <span className="text-xs text-muted-foreground">Works on all marketing pages</span>
+            <h2 className="text-xl font-semibold">
+              Commands for visitors (no login needed)
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              Works on all marketing pages
+            </span>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {marketingCommands.map((item) => (
-              <div key={item.phrase} className="rounded-lg border bg-muted/40 px-4 py-3">
+              <div
+                key={item.phrase}
+                className="rounded-lg border bg-muted/40 px-4 py-3"
+              >
                 <p className="font-semibold">“{item.phrase}”</p>
                 <p className="text-sm text-muted-foreground">{item.action}</p>
               </div>
@@ -150,19 +187,27 @@ export default function VoiceBrowserGuidePage() {
 
         <div className="rounded-2xl border bg-card/90 backdrop-blur p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Commands for signed-in users</h2>
-            <span className="text-xs text-muted-foreground">Requires authentication</span>
+            <h2 className="text-xl font-semibold">
+              Commands for signed-in users
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              Requires authentication
+            </span>
           </div>
           <div className="grid sm:grid-cols-2 gap-3">
             {appCommands.map((item) => (
-              <div key={item.phrase} className="rounded-lg border bg-muted/40 px-4 py-3">
+              <div
+                key={item.phrase}
+                className="rounded-lg border bg-muted/40 px-4 py-3"
+              >
                 <p className="font-semibold">“{item.phrase}”</p>
                 <p className="text-sm text-muted-foreground">{item.action}</p>
               </div>
             ))}
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
-            Need more? Say “help” inside the voice panel to hear the full catalog of in-app commands.
+            Need more? Say “help” inside the voice panel to hear the full
+            catalog of in-app commands.
           </p>
         </div>
 
@@ -181,7 +226,9 @@ export default function VoiceBrowserGuidePage() {
         <div className="rounded-2xl border bg-primary/10 px-6 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
             <p className="text-sm font-semibold text-primary">Need a human?</p>
-            <p className="text-muted-foreground text-sm">Reach out to support or open the documentation for deeper dives.</p>
+            <p className="text-muted-foreground text-sm">
+              Reach out to support or open the documentation for deeper dives.
+            </p>
           </div>
           <div className="flex gap-3">
             <a

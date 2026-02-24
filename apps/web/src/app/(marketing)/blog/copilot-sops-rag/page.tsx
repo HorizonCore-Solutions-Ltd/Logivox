@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 const sections = [
   {
     heading: "The problem: tribal knowledge and tab-hunting",
-    body:
-      "Warehouse teams juggle SOP PDFs, tribal notes, and LMS modules. When pressure is on, people guess. A copilot that pulls the right step from your own SOPs—in the flow of work—cuts errors and training time.",
+    body: "Warehouse teams juggle SOP PDFs, tribal notes, and LMS modules. When pressure is on, people guess. A copilot that pulls the right step from your own SOPs—in the flow of work—cuts errors and training time.",
   },
   {
     heading: "What tenant-aware copilot means",
@@ -60,7 +59,8 @@ export default function BlogCopilotSOPsPage() {
             Copilot Over Your SOPs: In-Line Guidance That Teams Trust
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
-            A tenant-aware copilot that surfaces your SOPs and work instructions at the exact moment of work—no more tab hunting.
+            A tenant-aware copilot that surfaces your SOPs and work instructions
+            at the exact moment of work—no more tab hunting.
           </p>
           <div className="text-sm text-muted-foreground flex gap-4">
             <span>Published: Feb 23, 2026</span>
@@ -87,7 +87,8 @@ export default function BlogCopilotSOPsPage() {
         <div className="rounded-2xl border bg-card/80 backdrop-blur p-6 space-y-3">
           <h3 className="text-xl font-semibold">Pilot in your warehouse</h3>
           <p className="text-muted-foreground">
-            Pick one process, ingest the SOPs, and turn on inline guidance with citations. Track error reduction and ramp time.
+            Pick one process, ingest the SOPs, and turn on inline guidance with
+            citations. Track error reduction and ramp time.
           </p>
           <div className="flex gap-3">
             <Link

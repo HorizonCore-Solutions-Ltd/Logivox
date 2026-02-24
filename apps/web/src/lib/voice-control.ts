@@ -97,7 +97,12 @@ export interface VoiceState {
 export const VOICE_COMMANDS: VoiceCommand[] = [
   // Marketing & Public Navigation
   {
-    patterns: ["go to homepage", "open home", "show landing", "go to marketing"],
+    patterns: [
+      "go to homepage",
+      "open home",
+      "show landing",
+      "go to marketing",
+    ],
     description: "Navigate to the LogiVox homepage",
     action: () => {
       window.location.href = "/";

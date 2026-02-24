@@ -76,10 +76,18 @@ export function TrustSection() {
         {/* Logo band */}
         <div className="flex flex-wrap items-center justify-center gap-6 mb-12 text-sm text-muted-foreground">
           <span className="font-semibold text-foreground/80">Trusted by</span>
-          <span className="px-3 py-1 rounded-full bg-muted/80">Aurora Logistics</span>
-          <span className="px-3 py-1 rounded-full bg-muted/80">NorthPeak Retail</span>
-          <span className="px-3 py-1 rounded-full bg-muted/80">MedChain Health</span>
-          <span className="px-3 py-1 rounded-full bg-muted/80">Titan Manufacturing</span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">
+            Aurora Logistics
+          </span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">
+            NorthPeak Retail
+          </span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">
+            MedChain Health
+          </span>
+          <span className="px-3 py-1 rounded-full bg-muted/80">
+            Titan Manufacturing
+          </span>
           <span className="px-3 py-1 rounded-full bg-muted/80">Swift 3PL</span>
         </div>
         {/* Stats Grid */}

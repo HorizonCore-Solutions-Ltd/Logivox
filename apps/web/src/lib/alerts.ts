@@ -445,7 +445,9 @@ export class ReorderAlertEngine {
   ): Promise<void> {
     const recipientsEnv = process.env.SMS_ALERT_RECIPIENTS;
     if (!recipientsEnv) {
-      console.warn("[ReorderAlertEngine] SMS skipped: SMS_ALERT_RECIPIENTS not set");
+      console.warn(
+        "[ReorderAlertEngine] SMS skipped: SMS_ALERT_RECIPIENTS not set",
+      );
       return;
     }
 
@@ -455,7 +457,9 @@ export class ReorderAlertEngine {
       .filter(Boolean);
 
     if (recipients.length === 0) {
-      console.warn("[ReorderAlertEngine] SMS skipped: no recipients configured");
+      console.warn(
+        "[ReorderAlertEngine] SMS skipped: no recipients configured",
+      );
       return;
     }
 
@@ -465,7 +469,9 @@ export class ReorderAlertEngine {
       const apiKey = process.env.MESSAGEBIRD_API_KEY;
       const originator = process.env.SMS_FROM_NUMBER;
       if (!apiKey || !originator) {
-        console.warn("[ReorderAlertEngine] MessageBird missing config; falling back to Twilio");
+        console.warn(
+          "[ReorderAlertEngine] MessageBird missing config; falling back to Twilio",
+        );
       } else {
         const body = new URLSearchParams({
           originator,

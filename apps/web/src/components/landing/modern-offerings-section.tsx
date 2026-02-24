@@ -52,13 +52,17 @@ export function ModernOfferingsSection() {
             Modern Logistics Without the Risk
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Reliability, security, and speed baked into voice, automation, and integrations—ready for the floor and the boardroom.
+            Reliability, security, and speed baked into voice, automation, and
+            integrations—ready for the floor and the boardroom.
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
           {offerings.map((item) => (
-            <Card key={item.title} className="group h-full border-2 border-transparent hover:border-primary/40 transition">
+            <Card
+              key={item.title}
+              className="group h-full border-2 border-transparent hover:border-primary/40 transition"
+            >
               <CardHeader className="flex flex-row items-start justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <item.icon className="h-5 w-5 text-primary" />
@@ -71,7 +75,9 @@ export function ModernOfferingsSection() {
                 )}
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.description}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {item.description}
+                </p>
                 <div className="flex items-center gap-3 flex-wrap">
                   <Link
                     href={item.href}

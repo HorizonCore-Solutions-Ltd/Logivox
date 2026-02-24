@@ -95,7 +95,10 @@ async function generatePdf(title: string, payload: any): Promise<Buffer> {
 
       doc.fontSize(18).text(title, { underline: true });
       doc.moveDown();
-      doc.fontSize(10).fillColor("gray").text(`Generated: ${new Date().toISOString()}`);
+      doc
+        .fontSize(10)
+        .fillColor("gray")
+        .text(`Generated: ${new Date().toISOString()}`);
       doc.moveDown();
 
       doc.fillColor("black").fontSize(12).text("Summary", { underline: true });

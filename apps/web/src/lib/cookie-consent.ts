@@ -309,7 +309,10 @@ export class CookieConsentManager {
       (fbq as any).push = fbq;
       (window as any).fbq = fbq;
 
-      this.injectScript("https://connect.facebook.net/en_US/fbevents.js", "fb-pixel");
+      this.injectScript(
+        "https://connect.facebook.net/en_US/fbevents.js",
+        "fb-pixel",
+      );
       this.loadedScripts.add("fbq");
       fbq("init", pixelId);
     }

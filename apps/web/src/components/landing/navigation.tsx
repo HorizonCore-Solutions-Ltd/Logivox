@@ -549,13 +549,13 @@ export function Navigation() {
                   >
                     Pricing
                   </Link>
-                   <Link
-                     href="/demo"
-                     onClick={() => setMobileOpen(false)}
-                     className="block p-2 rounded-md hover:bg-accent transition-colors font-medium text-sm"
-                   >
-                     Book Demo
-                   </Link>
+                  <Link
+                    href="/demo"
+                    onClick={() => setMobileOpen(false)}
+                    className="block p-2 rounded-md hover:bg-accent transition-colors font-medium text-sm"
+                  >
+                    Book Demo
+                  </Link>
                   <Link
                     href="/contact"
                     onClick={() => setMobileOpen(false)}

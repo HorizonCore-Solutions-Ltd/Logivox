@@ -18,7 +18,10 @@ const loginSchema = z.object({
   fcmToken: z.string().optional(),
 });
 
-async function createToken(payload: Record<string, unknown>, expiresInSeconds: number) {
+async function createToken(
+  payload: Record<string, unknown>,
+  expiresInSeconds: number,
+) {
   const secret = process.env.NEXTAUTH_SECRET;
   if (!secret) {
     throw new Error("NEXTAUTH_SECRET is not configured");
@@ -45,7 +48,9 @@ async function trackFailedLogin(userId: string) {
     },
   });
 
-  const profile = await prisma.securityProfile.findUnique({ where: { userId } });
+  const profile = await prisma.securityProfile.findUnique({
+    where: { userId },
+  });
   if (
     profile &&
     profile.failedLoginAttempts >= ACCOUNT_LOCKOUT.MAX_FAILED_ATTEMPTS
@@ -74,7 +79,8 @@ async function resetFailedAttempts(userId: string) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { email, password, deviceId, deviceName, fcmToken } = loginSchema.parse(body);
+    const { email, password, deviceId, deviceName, fcmToken } =
+      loginSchema.parse(body);
 
     const user = await prisma.user.findUnique({
       where: { email },
@@ -89,21 +95,33 @@ export async function POST(request: Request) {
 
     if (!user || !user.password) {
       // Prevent timing attacks
-      await bcrypt.compare("invalid", "$2a$12$invalid.invalid.invalid.invalid.invalidinvalidinv");
+      await bcrypt.compare(
+        "invalid",
+        "$2a$12$invalid.invalid.invalid.invalid.invalidinvalidinv",
+      );
       return NextResponse.json(
         {
           success: false,
-          error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" },
+          error: {
+            code: "INVALID_CREDENTIALS",
+            message: "Invalid email or password",
+          },
         },
         { status: 401 },
       );
     }
 
-    if (user.securityProfile?.lockedUntil && user.securityProfile.lockedUntil > new Date()) {
+    if (
+      user.securityProfile?.lockedUntil &&
+      user.securityProfile.lockedUntil > new Date()
+    ) {
       return NextResponse.json(
         {
           success: false,
-          error: { code: "ACCOUNT_LOCKED", message: "Account temporarily locked. Try again later." },
+          error: {
+            code: "ACCOUNT_LOCKED",
+            message: "Account temporarily locked. Try again later.",
+          },
         },
         { status: 423 },
       );
@@ -115,7 +133,10 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           success: false,
-          error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password" },
+          error: {
+            code: "INVALID_CREDENTIALS",
+            message: "Invalid email or password",
+          },
         },
         { status: 401 },
       );
@@ -180,7 +201,10 @@ export async function POST(request: Request) {
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: { code: "INVALID_INPUT", details: error.errors } },
+        {
+          success: false,
+          error: { code: "INVALID_INPUT", details: error.errors },
+        },
         { status: 400 },
       );
     }

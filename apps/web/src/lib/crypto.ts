@@ -22,10 +22,17 @@ export function encryptSecret(value: string): string {
 
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, getKey(), iv);
-  const ciphertext = Buffer.concat([cipher.update(value, "utf8"), cipher.final()]);
+  const ciphertext = Buffer.concat([
+    cipher.update(value, "utf8"),
+    cipher.final(),
+  ]);
   const authTag = cipher.getAuthTag();
 
-  return [iv.toString("base64"), ciphertext.toString("base64"), authTag.toString("base64")].join(".");
+  return [
+    iv.toString("base64"),
+    ciphertext.toString("base64"),
+    authTag.toString("base64"),
+  ].join(".");
 }
 
 export function decryptSecret(value: string): string {
@@ -42,6 +49,9 @@ export function decryptSecret(value: string): string {
   const decipher = crypto.createDecipheriv(ALGORITHM, getKey(), iv);
   decipher.setAuthTag(authTag);
 
-  const plaintext = Buffer.concat([decipher.update(ciphertext), decipher.final()]);
+  const plaintext = Buffer.concat([
+    decipher.update(ciphertext),
+    decipher.final(),
+  ]);
   return plaintext.toString("utf8");
 }

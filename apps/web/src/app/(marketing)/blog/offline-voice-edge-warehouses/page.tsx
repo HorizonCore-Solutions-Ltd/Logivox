@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 const sections = [
   {
     heading: "Why offline voice matters",
-    body:
-      "Warehouses are noisy RF environments. If Wi‑Fi blinks during a pick, workers shouldn’t stall. Offline-capable voice and scanning keep teams moving and sync when connectivity returns.",
+    body: "Warehouses are noisy RF environments. If Wi‑Fi blinks during a pick, workers shouldn’t stall. Offline-capable voice and scanning keep teams moving and sync when connectivity returns.",
   },
   {
     heading: "Design pillars",
@@ -52,7 +51,8 @@ export default function BlogOfflineVoiceEdgePage() {
             Offline Voice at the Edge: Keep Picking When Wi-Fi Drops
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
-            Design resilient voice + scanning that keep working on the floor without network, and sync cleanly once you’re back online.
+            Design resilient voice + scanning that keep working on the floor
+            without network, and sync cleanly once you’re back online.
           </p>
           <div className="text-sm text-muted-foreground flex gap-4">
             <span>Published: Feb 23, 2026</span>
@@ -79,7 +79,8 @@ export default function BlogOfflineVoiceEdgePage() {
         <div className="rounded-2xl border bg-card/80 backdrop-blur p-6 space-y-3">
           <h3 className="text-xl font-semibold">Plan your pilot</h3>
           <p className="text-muted-foreground">
-            Start in one zone, measure continuity and conflicts, then expand. We’ll help you set up offline queues, retries, and training.
+            Start in one zone, measure continuity and conflicts, then expand.
+            We’ll help you set up offline queues, retries, and training.
           </p>
           <div className="flex gap-3">
             <Link

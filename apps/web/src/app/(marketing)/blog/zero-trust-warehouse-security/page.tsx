@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 const sections = [
   {
     heading: "Zero-trust for warehouse systems",
-    body:
-      "A modern WMS touches carriers, ERPs, e-commerce, and IoT. Each integration is an attack surface. Zero-trust means least privilege per warehouse, per integration, with auditable actions and reliable event delivery.",
+    body: "A modern WMS touches carriers, ERPs, e-commerce, and IoT. Each integration is an attack surface. Zero-trust means least privilege per warehouse, per integration, with auditable actions and reliable event delivery.",
   },
   {
     heading: "Scope everything",
@@ -59,7 +58,8 @@ export default function BlogZeroTrustSecurityPage() {
             Zero-Trust Everywhere: Scopes, Audits, and Reliable Webhooks
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
-            Per-warehouse scopes, audit streaming, and resilient webhooks with retries and dead letters for modern WMS security.
+            Per-warehouse scopes, audit streaming, and resilient webhooks with
+            retries and dead letters for modern WMS security.
           </p>
           <div className="text-sm text-muted-foreground flex gap-4">
             <span>Published: Feb 23, 2026</span>
@@ -86,7 +86,8 @@ export default function BlogZeroTrustSecurityPage() {
         <div className="rounded-2xl border bg-card/80 backdrop-blur p-6 space-y-3">
           <h3 className="text-xl font-semibold">Lock it down</h3>
           <p className="text-muted-foreground">
-            Define scopes, enable signing, and review delivery logs. Stream audits to your SIEM. Test retries and DLQs before you go live.
+            Define scopes, enable signing, and review delivery logs. Stream
+            audits to your SIEM. Test retries and DLQs before you go live.
           </p>
           <div className="flex gap-3">
             <Link

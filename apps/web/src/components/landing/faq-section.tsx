@@ -30,10 +30,13 @@ export function FAQSection() {
     <section className="py-16 bg-gradient-to-b from-muted/30 to-background">
       <div className="container-enterprise space-y-8">
         <div className="space-y-2 text-center">
-          <p className="text-sm font-semibold text-primary">Questions? We’ve got answers.</p>
+          <p className="text-sm font-semibold text-primary">
+            Questions? We’ve got answers.
+          </p>
           <h2 className="text-3xl md:text-4xl font-bold">FAQ</h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Top concerns from new customers about security, reliability, onboarding, and integrations.
+            Top concerns from new customers about security, reliability,
+            onboarding, and integrations.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
@@ -43,7 +46,9 @@ export function FAQSection() {
               className="rounded-xl border bg-card/80 backdrop-blur p-4 shadow-sm hover:shadow-md transition"
             >
               <p className="font-semibold text-foreground">{item.q}</p>
-              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">{item.a}</p>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
+                {item.a}
+              </p>
             </div>
           ))}
         </div>

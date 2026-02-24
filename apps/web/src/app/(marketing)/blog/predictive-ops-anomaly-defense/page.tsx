@@ -10,8 +10,7 @@ export const metadata: Metadata = {
 const sections = [
   {
     heading: "Why predictive ops matters",
-    body:
-      "Pick/pack/ship is unforgiving: a stalled wave or bad rate update can cascade to missed SLAs. Predictive ops adds early-warning signals, automated guardrails, and clear SLOs so teams act before customers feel pain.",
+    body: "Pick/pack/ship is unforgiving: a stalled wave or bad rate update can cascade to missed SLAs. Predictive ops adds early-warning signals, automated guardrails, and clear SLOs so teams act before customers feel pain.",
   },
   {
     heading: "Signals that matter",
@@ -52,7 +51,8 @@ export default function BlogPredictiveOpsPage() {
             Predictive Ops: Anomaly Defense for Pick/Pack/Ship
           </h1>
           <p className="text-lg text-muted-foreground max-w-3xl">
-            Catch bad signals before they become outages: burn-rate alerts, rollback guardrails, and SLOs tailored for warehouse ops.
+            Catch bad signals before they become outages: burn-rate alerts,
+            rollback guardrails, and SLOs tailored for warehouse ops.
           </p>
           <div className="text-sm text-muted-foreground flex gap-4">
             <span>Published: Feb 23, 2026</span>
@@ -79,7 +79,9 @@ export default function BlogPredictiveOpsPage() {
         <div className="rounded-2xl border bg-card/80 backdrop-blur p-6 space-y-3">
           <h3 className="text-xl font-semibold">What to do next</h3>
           <p className="text-muted-foreground">
-            Turn on delivery logging and retries for webhooks, set SLOs for your critical flows, and route burn-rate alerts to on-call. Need a hand? We’ll help you wire it up.
+            Turn on delivery logging and retries for webhooks, set SLOs for your
+            critical flows, and route burn-rate alerts to on-call. Need a hand?
+            We’ll help you wire it up.
           </p>
           <div className="flex gap-3">
             <Link

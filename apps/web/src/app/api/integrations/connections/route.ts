@@ -222,7 +222,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(sanitizedConnection, { status: 201 });
   } catch (error) {
-    if (error instanceof Error && error.message.includes("API_KEY_ENCRYPTION_SECRET")) {
+    if (
+      error instanceof Error &&
+      error.message.includes("API_KEY_ENCRYPTION_SECRET")
+    ) {
       return NextResponse.json(
         {
           error:
