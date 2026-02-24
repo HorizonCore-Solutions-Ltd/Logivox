@@ -126,61 +126,32 @@ export function FeaturesSection() {
 
   const advancedCapabilities = [
     {
-      title: "Voice Operations",
+      title: "Predictive Ops & Anomaly Defense",
       description:
-        "Hands-free warehouse operations with voice commands. Natural language processing, multi-language support, and real-time voice guidance.",
-      icon: Users,
-      highlights: [
-        "Hands-free picking",
-        "Voice-directed tasks",
-        "Multi-language",
-      ],
-    },
-    {
-      title: "Digital Twin & Computer Vision",
-      description:
-        "Real-time digital twin of your warehouse. Computer vision for quality control, space utilization, and predictive maintenance.",
-      icon: ScanBarcode,
-      highlights: ["Digital twin", "Computer vision", "Predictive analytics"],
-    },
-    {
-      title: "Wave & Batch Picking",
-      description:
-        "Advanced wave management. Multiple picking modes (single, batch, zone, cluster), route optimization, and workload balancing.",
-      icon: Package,
-      highlights: [
-        "4 picking modes",
-        "Route optimization",
-        "Workload balancing",
-      ],
-    },
-    {
-      title: "Assembly & Kitting",
-      description:
-        "Complete assembly operations. Bill of materials, component tracking, assembly instructions, and quality verification.",
-      icon: Boxes,
-      highlights: ["BOM management", "Assembly tracking", "Quality checks"],
-    },
-    {
-      title: "Transportation & Shipping",
-      description:
-        "Multi-carrier shipping with rate shopping. Load optimization, route planning, and real-time tracking integration.",
-      icon: Truck,
-      highlights: ["Multi-carrier", "Rate shopping", "Load optimization"],
-    },
-    {
-      title: "Sustainability Tracking",
-      description:
-        "Carbon footprint monitoring, waste reduction analytics, and ESG reporting for compliance and sustainability goals.",
+        "Real-time anomaly detection on pick/pack/ship signals with auto-alerts and blast-radius rollback to keep SLAs safe.",
       icon: BarChart3,
-      highlights: ["Carbon tracking", "Waste analytics", "ESG reporting"],
+      highlights: ["Auto-alerts", "Rollback guardrails", "SLO health"],
     },
     {
-      title: "Labor Management",
+      title: "Offline & Edge Resilience",
       description:
-        "Workforce optimization with time tracking, performance metrics, gamification, and automated task assignment.",
-      icon: Users,
-      highlights: ["Time tracking", "Performance metrics", "Gamification"],
+        "Voice + scanning that keep working on the floor when Wi‑Fi drops, with smart sync once connectivity returns.",
+      icon: Zap,
+      highlights: ["Offline picks", "Edge sync", "Low-latency"],
+    },
+    {
+      title: "Copilot for SOPs & Training",
+      description:
+        "Tenant-aware copilot that pulls your SOPs and work instructions inline so teams execute perfectly, first time.",
+      icon: CheckCircle,
+      highlights: ["RAG over SOPs", "In-line help", "Fewer errors"],
+    },
+    {
+      title: "Zero-Trust Everywhere",
+      description:
+        "Per-warehouse and per-integration scopes, auditable access, and hardened webhooks with retries and dead-letter capture.",
+      icon: Shield,
+      highlights: ["Fine-grain scopes", "Audit trails", "Reliable webhooks"],
     },
   ];
 
@@ -276,20 +247,6 @@ export function FeaturesSection() {
                 className="hover:shadow-lg transition-all hover:scale-[1.02]"
               >
                 <CardHeader>
-          {
-            title: "Predictive Ops & Anomaly Defense",
-            description:
-              "Real-time anomaly detection on pick/pack/ship signals with auto-alerts and blast-radius rollback to keep SLAs safe.",
-            icon: Shield,
-            highlights: ["Auto-alerts", "Rollback guardrails", "SLO health"],
-          },
-          {
-            title: "Offline & Edge Resilience",
-            description:
-              "Voice + scanning that keep working on the floor when Wi‑Fi drops, with smart sync once connectivity returns.",
-            icon: Zap,
-            highlights: ["Offline picks", "Edge sync", "Low-latency"],
-          },
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 mb-3">
                     <capability.icon className="h-5 w-5 text-primary" />
                   </div>
@@ -297,13 +254,6 @@ export function FeaturesSection() {
                   <CardDescription className="text-sm">
                     {capability.description}
                   </CardDescription>
-          {
-            title: "Copilot for SOPs & Training",
-            description:
-              "Tenant-aware copilot that pulls your SOPs and work instructions inline so teams execute perfectly, first time.",
-            icon: BarChart3,
-            highlights: ["RAG over SOPs", "In-line help", "Fewer errors"],
-          },
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-1.5">
@@ -315,20 +265,6 @@ export function FeaturesSection() {
                         <CheckCircle className="h-3 w-3 text-green-600 flex-shrink-0" />
                         <span className="font-medium">{highlight}</span>
                       </div>
-          {
-            title: "Zero-Trust Everywhere",
-            description:
-              "Per-warehouse and per-integration scopes, auditable access, and hardened webhooks with retries and dead-letter capture.",
-            icon: Shield,
-            highlights: ["Fine-grain scopes", "Audit trails", "Reliable webhooks"],
-          },
-          {
-            title: "SLOs & Chaos-Tested Reliability",
-            description:
-              "Burn-rate alerts, chaos-tested queues, and SLO dashboards so ops know when to act before users feel pain.",
-            icon: BarChart3,
-            highlights: ["SLO dashboards", "Burn alerts", "Chaos testing"],
-          },
                     ))}
                   </div>
                 </CardContent>
@@ -337,80 +273,74 @@ export function FeaturesSection() {
           </div>
         </div>
 
-        {/* PlBuilt for Your Success
-            </h3>
+        {/* Built for your success */}
+        <div className="mt-16 space-y-8">
+          <div className="text-center space-y-3">
+            <h3 className="text-2xl font-bold">Built for Your Success</h3>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Enterprise-grade reliability with bank-level security you can trust
+              Enterprise reliability with bank-level security and automation
+              that keeps every shift moving.
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">99.99%</div>
-              <div className="text-sm font-medium">Always Available</div>
-              <div className="text-xs text-muted-foreground">Round-the-clock</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">Instant</div>
-              <div className="text-sm font-medium">Lightning Fast</div>
-              <div className="text-xs text-muted-foreground">Global performance</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">Secure</div>
-              <div className="text-sm font-medium">Bank-Level</div>
-              <div className="text-xs text-muted-foreground">SOC 2 & ISO 27001</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary mb-2">24/7</div>
-              <div className="text-sm font-medium">Support</div>
-              <div className="text-xs text-muted-foreground">Always here to help</div>
-            </div>
+            {[
+              {
+                value: "99.99%",
+                label: "Always Available",
+                helper: "SLO-backed uptime",
+              },
+              {
+                value: "Instant",
+                label: "Lightning Fast",
+                helper: "Global performance",
+              },
+              {
+                value: "Secure",
+                label: "Bank-Level",
+                helper: "SOC 2 & ISO 27001",
+              },
+              {
+                value: "24/7",
+                label: "Support",
+                helper: "Always here to help",
+              },
+            ].map((item) => (
+              <div key={item.label} className="text-center">
+                <div className="text-3xl font-bold text-primary mb-2">
+                  {item.value}
+                </div>
+                <div className="text-sm font-medium">{item.label}</div>
+                <div className="text-xs text-muted-foreground">
+                  {item.helper}
+                </div>
+              </div>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-card/50 rounded-lg p-6">
               <Shield className="h-8 w-8 text-primary mb-3" />
               <h4 className="font-semibold mb-2">Bank-Level Security</h4>
               <p className="text-sm text-muted-foreground">
-                Your data is protected with the same security standards used by financial institutions.
-                Automatic threat detection keeps your warehouse safe 24/7.
+                Rate limiting, DDoS protection, SQL/XSS/CSRF prevention, IP
+                controls, and automated threat detection.
               </p>
             </div>
             <div className="bg-card/50 rounded-lg p-6">
               <BarChart3 className="h-8 w-8 text-primary mb-3" />
               <h4 className="font-semibold mb-2">Real-Time Insights</h4>
               <p className="text-sm text-muted-foreground">
-                See exactly what's happening in your warehouse right now. Live dashboards,
-                smart forecasting, and custom reports give you complete visibility.
+                Live dashboards, predictive forecasting, AI-powered insights,
+                and custom reporting across all modules.
               </p>
             </div>
             <div className="bg-card/50 rounded-lg p-6">
               <Zap className="h-8 w-8 text-primary mb-3" />
               <h4 className="font-semibold mb-2">Smart Automation</h4>
               <p className="text-sm text-muted-foreground">
-                Let AI handle the boring stuff. Automatic reordering, voice-guided picking,
-                smart route planning, and predictive maintenance keep everything running smoothly.
-              </p>primary mb-3" />
-              <h4 className="font-semibold mb-2">Military-Grade Security</h4>
-              <p className="text-sm text-muted-foreground">
-                Rate limiting, DDoS protection, SQL/XSS/CSRF prevention, IP blocklist,
-                and automated threat detection
-              </p>
-            </div>
-            <div className="bg-card/50 rounded-lg p-6">
-              <BarChart3 className="h-8 w-8 text-primary mb-3" />
-              <h4 className="font-semibold mb-2">Real-Time Analytics</h4>
-              <p className="text-sm text-muted-foreground">
-                Live dashboards, predictive forecasting, AI-powered insights,
-                and custom reporting across all modules
-              </p>
-            </div>
-            <div className="bg-card/50 rounded-lg p-6">
-              <Zap className="h-8 w-8 text-primary mb-3" />
-              <h4 className="font-semibold mb-2">AI & Automation</h4>
-              <p className="text-sm text-muted-foreground">
-                Autonomous reordering, predictive maintenance, voice operations,
-                computer vision, and machine learning optimization
+                Automatic reordering, voice-guided picking, smart route
+                planning, and predictive maintenance keep every shift on track.
               </p>
             </div>
           </div>

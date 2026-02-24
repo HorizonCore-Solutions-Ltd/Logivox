@@ -5,9 +5,8 @@ describe("HeroSection", () => {
   it("renders the hero headline", () => {
     render(<HeroSection />);
 
-    // Check for the complete headline text
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      /Enterprise.*Stock Booking.*Platform/i,
+      /Run Your Warehouse.*With Your Voice/i,
     );
   });
 
@@ -15,9 +14,11 @@ describe("HeroSection", () => {
     render(<HeroSection />);
 
     const startTrialButton = screen.getByRole("link", {
-      name: /start free trial/i,
+      name: /start your free 30-day trial/i,
     });
-    const demoButton = screen.getByRole("link", { name: /watch demo/i });
+    const demoButton = screen.getByRole("link", {
+      name: /schedule a personalized demo/i,
+    });
 
     expect(startTrialButton).toBeInTheDocument();
     expect(startTrialButton).toHaveAttribute("href", "/sign-up");
@@ -29,28 +30,37 @@ describe("HeroSection", () => {
   it("displays feature highlights", () => {
     render(<HeroSection />);
 
-    expect(screen.getByText("Zero-Trust Security")).toBeInTheDocument();
-    expect(screen.getByText("Real-time Sync")).toBeInTheDocument();
-    expect(screen.getByText("Multi-Tenant")).toBeInTheDocument();
-    expect(screen.getByText("Advanced Analytics")).toBeInTheDocument();
+    expect(
+      screen.getByText(/95% Reduction in Picking Errors/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/3x Faster Order Fulfillment/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/936% ROI in First Year/i)).toBeInTheDocument();
+    expect(screen.getByText(/Predictive Ops/)).toBeInTheDocument();
   });
 
   it("shows enterprise statistics", () => {
     render(<HeroSection />);
 
-    expect(screen.getByText("500+")).toBeInTheDocument();
-    expect(screen.getByText("Enterprise Customers")).toBeInTheDocument();
-    expect(screen.getByText("50M+")).toBeInTheDocument();
-    expect(screen.getByText("Stock Items Managed")).toBeInTheDocument();
-    expect(screen.getByText("99.9%")).toBeInTheDocument();
-    expect(screen.getByText("Uptime SLA")).toBeInTheDocument();
+    expect(screen.getByText("100%"));
+    expect(screen.getByText(/Automation/i)).toBeInTheDocument();
+    expect(screen.getByText(/44\+/)).toBeInTheDocument();
+    expect(screen.getByText(/99.99%/)).toBeInTheDocument();
+    expect(screen.getByText(/IT Headaches/i)).toBeInTheDocument();
   });
 
   it("displays trust indicators", () => {
     render(<HeroSection />);
 
-    expect(screen.getByText("Fortune 500")).toBeInTheDocument();
-    expect(screen.getByText("SOC 2 Compliant")).toBeInTheDocument();
-    expect(screen.getByText("24/7 Support")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Trusted by Fortune 500 companies/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/SOC 2 & ISO 27001 Certified/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/847 active warehouses today/i),
+    ).toBeInTheDocument();
   });
 });
