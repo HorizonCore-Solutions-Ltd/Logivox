@@ -243,15 +243,63 @@ async function analyzeNCRTrends(
 async function analyzeDefectRates(
   organizationId: string,
 ): Promise<RiskIndicator[]> {
-  // Placeholder - in production would analyze actual defect data
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+  const [ncrTotals, receivedTotals] = await Promise.all([
+    prisma.nonConformanceReport.aggregate({
+      where: {
+        organizationId,
+        reportDate: { gte: thirtyDaysAgo },
+      },
+      _sum: {
+        quantityAffected: true,
+      },
+      _count: {
+        id: true,
+      },
+    }),
+    prisma.receivingRecord.aggregate({
+      where: {
+        organizationId,
+        createdAt: { gte: thirtyDaysAgo },
+      },
+      _sum: {
+        quantityReceived: true,
+      },
+    }),
+  ]);
+
+  const affectedQty = ncrTotals._sum.quantityAffected || 0;
+  const receivedQty = receivedTotals._sum.quantityReceived || 0;
+  const defectRate = receivedQty > 0 ? (affectedQty / receivedQty) * 100 : 0;
+
+  const trend: "INCREASING" | "DECREASING" | "STABLE" =
+    ncrTotals._count.id > 10
+      ? "INCREASING"
+      : ncrTotals._count.id < 3
+        ? "DECREASING"
+        : "STABLE";
+
+  const riskLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL" =
+    defectRate >= 5
+      ? "CRITICAL"
+      : defectRate >= 3
+        ? "HIGH"
+        : defectRate >= 1.5
+          ? "MEDIUM"
+          : "LOW";
+
   return [
     {
       metric: "Defect Rate",
-      currentValue: 2.3,
+      currentValue: Number(defectRate.toFixed(2)),
       threshold: 3.0,
-      trend: "STABLE",
-      riskLevel: "LOW",
-      prediction: "Defect rate within acceptable limits",
+      trend,
+      riskLevel,
+      prediction:
+        defectRate > 3
+          ? "Defect rate exceeds target - preventive CAPA recommended"
+          : "Defect rate within acceptable limits",
     },
   ];
 }
@@ -303,7 +351,7 @@ async function generatePredictiveAlerts(
   for (const indicator of riskIndicators) {
     if (indicator.riskLevel === "HIGH" || indicator.riskLevel === "CRITICAL") {
       alerts.push({
-        alertId: `ALERT-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        alertId: `ALERT-${indicator.metric.replace(/\s+/g, "-").toUpperCase()}-${Date.now()}`,
         severity: indicator.riskLevel,
         category: indicator.metric,
         predictedIssue: `${indicator.metric} trending ${indicator.trend.toLowerCase()} - potential quality event`,

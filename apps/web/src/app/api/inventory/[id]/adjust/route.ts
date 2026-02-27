@@ -68,7 +68,7 @@ export async function POST(
     }
 
     // Calculate new available quantity
-    const newAvailableQuantity = newQuantity - item.reservedQuantity;
+    const newAvailableQuantity = newQuantity - item.reservedQty;
 
     // Determine new status
     let newStatus = item.status;
@@ -87,7 +87,7 @@ export async function POST(
         where: { id: params.id },
         data: {
           quantity: newQuantity,
-          availableQuantity: newAvailableQuantity,
+          availableQty: newAvailableQuantity,
           status: newStatus,
         },
         include: {

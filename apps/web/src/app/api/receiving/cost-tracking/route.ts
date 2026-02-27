@@ -61,6 +61,45 @@ const DEFAULT_LABOR_RATES: LaborRates = {
   equipmentHourly: 45, // $45/hour equipment (forklift, etc.)
 };
 
+function calculateShipmentCostFromRecord(
+  shipment: { createdAt: Date; completedAt: Date | null; quantityReceived: number | null },
+  rates: LaborRates,
+) {
+  const processingMinutes = shipment.completedAt
+    ? Math.max(
+        0,
+        Math.round(
+          (new Date(shipment.completedAt).getTime() -
+            new Date(shipment.createdAt).getTime()) /
+            1000 /
+            60,
+        ),
+      )
+    : 0;
+
+  const processingHours = processingMinutes / 60;
+  const unitsReceived = shipment.quantityReceived || 0;
+  const estimatedLaborHours = Math.max(0.5, unitsReceived / 100);
+
+  const laborCost = estimatedLaborHours * rates.regularHourly;
+  const equipmentCost = processingHours * 0.5 * rates.equipmentHourly;
+  const materialsCost = unitsReceived * 0.15;
+  const overheadCost = (laborCost + equipmentCost) * 0.25;
+  const totalCost = laborCost + equipmentCost + materialsCost + overheadCost;
+
+  return {
+    processingMinutes,
+    processingHours,
+    unitsReceived,
+    estimatedLaborHours,
+    laborCost,
+    equipmentCost,
+    materialsCost,
+    overheadCost,
+    totalCost,
+  };
+}
+
 async function calculateReceivingCost(
   organizationId: string,
   shipmentId: string,
@@ -87,29 +126,17 @@ async function calculateReceivingCost(
 
   const rates = DEFAULT_LABOR_RATES;
 
-  // Calculate processing time
-  const processingMinutes = shipment.completedAt
-    ? Math.round(
-        (new Date(shipment.completedAt).getTime() -
-          new Date(shipment.createdAt).getTime()) /
-          1000 /
-          60,
-      )
-    : 0;
-
-  const processingHours = processingMinutes / 60;
-
-  // Estimate labor requirements based on units
-  const unitsReceived = shipment.quantityReceived || 0;
-  const estimatedLaborHours = Math.max(0.5, unitsReceived / 100); // 100 units per hour baseline
-
-  // Cost components
-  const laborCost = estimatedLaborHours * rates.regularHourly;
-  const equipmentCost = processingHours * 0.5 * rates.equipmentHourly; // 50% equipment utilization
-  const materialsCost = unitsReceived * 0.15; // $0.15 per unit for materials (labels, tape, etc.)
-  const overheadCost = (laborCost + equipmentCost) * 0.25; // 25% overhead
-
-  const totalCost = laborCost + equipmentCost + materialsCost + overheadCost;
+  const {
+    processingMinutes,
+    processingHours,
+    unitsReceived,
+    estimatedLaborHours,
+    laborCost,
+    equipmentCost,
+    materialsCost,
+    overheadCost,
+    totalCost,
+  } = calculateShipmentCostFromRecord(shipment, rates);
   const costPerUnit = unitsReceived > 0 ? totalCost / unitsReceived : 0;
 
   const result: any = {
@@ -154,33 +181,32 @@ async function calculateBudgetVariance(
   startDate: Date,
   endDate: Date,
 ) {
-  // In production, fetch actual costs from database
-  // For now, calculate estimates
-
-  const shipments = await prisma.receivingRecord.count({
+  const shipments = await prisma.receivingRecord.findMany({
     where: {
       organizationId,
       completedAt: { gte: startDate, lte: endDate },
     },
-  });
-
-  const totalUnits = await prisma.receivingRecord.aggregate({
-    where: {
-      organizationId,
-      completedAt: { gte: startDate, lte: endDate },
+    select: {
+      createdAt: true,
+      completedAt: true,
+      quantityReceived: true,
     },
-    _sum: { quantityReceived: true },
   });
 
-  const units = totalUnits._sum.quantityReceived || 0;
+  const rates = DEFAULT_LABOR_RATES;
+  const costs = shipments.map((shipment) =>
+    calculateShipmentCostFromRecord(shipment, rates),
+  );
+  const units = costs.reduce((sum, item) => sum + item.unitsReceived, 0);
+  const actualTotal = costs.reduce((sum, item) => sum + item.totalCost, 0);
+  const actualCostPerUnit = units > 0 ? actualTotal / units : 0;
 
-  // Budget assumptions
-  const budgetedCostPerUnit = 0.85; // $0.85 per unit budgeted
+  const configuredBudgetRate = Number(
+    process.env.RECEIVING_BUDGET_COST_PER_UNIT || 0,
+  );
+  const budgetedCostPerUnit =
+    configuredBudgetRate > 0 ? configuredBudgetRate : actualCostPerUnit;
   const budgetedTotal = units * budgetedCostPerUnit;
-
-  // Actual cost estimation
-  const actualCostPerUnit = 0.78; // $0.78 actual (better than budget)
-  const actualTotal = units * actualCostPerUnit;
 
   const variance = actualTotal - budgetedTotal;
   const variancePercentage =
@@ -199,7 +225,7 @@ async function calculateBudgetVariance(
       totalCost: Math.round(actualTotal * 100) / 100,
       costPerUnit: actualCostPerUnit,
       unitsReceived: units,
-      shipments,
+      shipments: shipments.length,
     },
     variance: {
       amount: Math.round(variance * 100) / 100,
@@ -215,68 +241,59 @@ async function analyzeCostPerUnit(
   startDate: Date,
   endDate: Date,
 ) {
-  // In production, group actual costs from database
-  // For now, simulate analysis
-
-  const totalUnits = await prisma.receivingRecord.aggregate({
+  const shipments = await prisma.receivingRecord.findMany({
     where: {
       organizationId,
       completedAt: { gte: startDate, lte: endDate },
     },
-    _sum: { quantityReceived: true },
+    select: {
+      id: true,
+      createdAt: true,
+      completedAt: true,
+      quantityReceived: true,
+      supplier: {
+        select: {
+          name: true,
+        },
+      },
+    },
   });
 
-  const units = totalUnits._sum.quantityReceived || 0;
-  const avgCostPerUnit = 0.78;
+  const rates = DEFAULT_LABOR_RATES;
+  const aggregated = new Map<
+    string,
+    { name: string; units: number; totalCost: number }
+  >();
 
-  // Simulate different cost per unit by group
-  const groups: any[] = [];
+  for (const shipment of shipments) {
+    const cost = calculateShipmentCostFromRecord(shipment, rates);
+    let key = "Uncategorized";
 
-  if (groupBy === "SUPPLIER") {
-    groups.push(
-      { name: "Supplier A", units: Math.floor(units * 0.4), costPerUnit: 0.72 },
-      {
-        name: "Supplier B",
-        units: Math.floor(units * 0.35),
-        costPerUnit: 0.81,
-      },
-      {
-        name: "Supplier C",
-        units: Math.floor(units * 0.25),
-        costPerUnit: 0.85,
-      },
-    );
-  } else if (groupBy === "PRODUCT_CATEGORY") {
-    groups.push(
-      {
-        name: "Electronics",
-        units: Math.floor(units * 0.3),
-        costPerUnit: 0.92,
-      },
-      { name: "Apparel", units: Math.floor(units * 0.4), costPerUnit: 0.68 },
-      { name: "Food", units: Math.floor(units * 0.3), costPerUnit: 0.75 },
-    );
-  } else if (groupBy === "DOCK") {
-    groups.push(
-      { name: "Dock 1-4", units: Math.floor(units * 0.35), costPerUnit: 0.75 },
-      { name: "Dock 5-8", units: Math.floor(units * 0.4), costPerUnit: 0.78 },
-      { name: "Dock 9-12", units: Math.floor(units * 0.25), costPerUnit: 0.82 },
-    );
-  } else if (groupBy === "SHIFT") {
-    groups.push(
-      { name: "Day Shift", units: Math.floor(units * 0.5), costPerUnit: 0.74 },
-      {
-        name: "Evening Shift",
-        units: Math.floor(units * 0.35),
-        costPerUnit: 0.79,
-      },
-      {
-        name: "Night Shift",
-        units: Math.floor(units * 0.15),
-        costPerUnit: 0.91,
-      },
-    );
+    if (groupBy === "SUPPLIER") {
+      key = shipment.supplier?.name || "Unknown Supplier";
+    } else if (groupBy === "SHIFT") {
+      const hour = shipment.createdAt.getHours();
+      key = hour >= 6 && hour < 14
+        ? "Day Shift"
+        : hour >= 14 && hour < 22
+          ? "Evening Shift"
+          : "Night Shift";
+    } else if (groupBy === "DOCK") {
+      key = ((shipment as any).dockDoor as string | undefined) || "Unassigned Dock";
+    } else if (groupBy === "PRODUCT_CATEGORY") {
+      key = ((shipment as any).productCategory as string | undefined) || "Uncategorized";
+    }
+
+    const existing = aggregated.get(key) || { name: key, units: 0, totalCost: 0 };
+    existing.units += cost.unitsReceived;
+    existing.totalCost += cost.totalCost;
+    aggregated.set(key, existing);
   }
+
+  const groups = Array.from(aggregated.values());
+  const units = groups.reduce((sum, group) => sum + group.units, 0);
+  const totalCost = groups.reduce((sum, group) => sum + group.totalCost, 0);
+  const avgCostPerUnit = units > 0 ? totalCost / units : 0;
 
   return {
     groupBy,
@@ -284,9 +301,11 @@ async function analyzeCostPerUnit(
     totalUnits: units,
     avgCostPerUnit,
     groups: groups.map((g) => ({
-      ...g,
-      totalCost: Math.round(g.units * g.costPerUnit * 100) / 100,
-      percentageOfTotal: Math.round((g.units / units) * 100),
+      name: g.name,
+      units: g.units,
+      costPerUnit: g.units > 0 ? Math.round((g.totalCost / g.units) * 100) / 100 : 0,
+      totalCost: Math.round(g.totalCost * 100) / 100,
+      percentageOfTotal: units > 0 ? Math.round((g.units / units) * 100) : 0,
     })),
   };
 }
@@ -318,33 +337,46 @@ export async function GET(request: NextRequest) {
       monthStart.setDate(1);
 
       const [monthShipments, monthUnits] = await Promise.all([
-        prisma.receivingRecord.count({
+        prisma.receivingRecord.findMany({
           where: {
             organizationId: user.organizationId,
             completedAt: { gte: monthStart },
           },
-        }),
-        prisma.receivingRecord.aggregate({
-          where: {
-            organizationId: user.organizationId,
-            completedAt: { gte: monthStart },
+          select: {
+            createdAt: true,
+            completedAt: true,
+            quantityReceived: true,
           },
-          _sum: { quantityReceived: true },
         }),
       ]);
 
-      const units = monthUnits._sum.quantityReceived || 0;
-      const estimatedCost = units * 0.78; // $0.78 per unit
-      const budgetedCost = units * 0.85; // $0.85 per unit budget
+      const rates = DEFAULT_LABOR_RATES;
+      const monthCosts = monthShipments.map((shipment) =>
+        calculateShipmentCostFromRecord(shipment, rates),
+      );
+      const units = monthCosts.reduce((sum, item) => sum + item.unitsReceived, 0);
+      const estimatedCost = monthCosts.reduce(
+        (sum, item) => sum + item.totalCost,
+        0,
+      );
+      const estimatedCostPerUnit = units > 0 ? estimatedCost / units : 0;
+
+      const configuredBudgetRate = Number(
+        process.env.RECEIVING_BUDGET_COST_PER_UNIT || 0,
+      );
+      const budgetRate =
+        configuredBudgetRate > 0 ? configuredBudgetRate : estimatedCostPerUnit;
+      const budgetedCost = units * budgetRate;
       const variance = estimatedCost - budgetedCost;
 
       return NextResponse.json({
         summary: {
           monthToDate: {
             shipments: monthShipments,
+            shipments: monthShipments.length,
             units,
             totalCost: Math.round(estimatedCost * 100) / 100,
-            costPerUnit: 0.78,
+            costPerUnit: Math.round(estimatedCostPerUnit * 100) / 100,
             budget: Math.round(budgetedCost * 100) / 100,
             variance: Math.round(variance * 100) / 100,
             variancePercentage:
@@ -405,8 +437,20 @@ export async function POST(request: NextRequest) {
       }
 
       case "set_labor_rates": {
-        // In production, store rates in settings table
-        // For now, just acknowledge
+        await prisma.auditLog.create({
+          data: {
+            organizationId: user.organizationId,
+            userId: user.id,
+            action: "RECEIVING_LABOR_RATES_SET",
+            entityType: "RECEIVING_COST_CONFIG",
+            entityId: user.organizationId,
+            changes: {
+              rates: validated.rates,
+              timestamp: new Date().toISOString(),
+            },
+          },
+        });
+
         return NextResponse.json({
           success: true,
           rates: validated.rates,
@@ -415,7 +459,6 @@ export async function POST(request: NextRequest) {
       }
 
       case "track_actual_costs": {
-        // In production, create ReceivingCost record
         const rates = DEFAULT_LABOR_RATES;
 
         const laborCost =

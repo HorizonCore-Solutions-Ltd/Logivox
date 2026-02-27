@@ -139,6 +139,27 @@ function determineOptimalZone(
   return "RESERVE";
 }
 
+function mapLocationType(rawType: string): LocationType {
+  if (rawType === "BIN") return "RACK_LOW";
+  if (rawType === "SHELF") return "RACK_MID";
+  if (rawType === "RACK") return "RACK_HIGH";
+  if (rawType === "STAGING") return "FLOOR";
+  if (rawType === "RECEIVING") return "BULK";
+  return "FLOOR";
+}
+
+function mapZoneFromLocation(rawType: string, locationCode: string): ZoneType {
+  const normalizedCode = locationCode.toUpperCase();
+  if (rawType === "QUARANTINE") return "QUARANTINE";
+  if (normalizedCode.includes("RET")) return "RETURNS";
+  if (rawType === "RECEIVING") return "CROSS_DOCK";
+  if (normalizedCode.includes("FAST") || normalizedCode.includes("FP")) {
+    return "FAST_PICK";
+  }
+  if (normalizedCode.includes("BULK")) return "BULK_STORAGE";
+  return "RESERVE";
+}
+
 // Find optimal location using AI algorithm
 async function findOptimalLocation(
   organizationId: string,
@@ -182,58 +203,55 @@ async function findOptimalLocation(
     item.requiresRefrigeration || false,
   );
 
-  // Mock available locations (warehouseLocation model doesn't exist)
-  const mockLocations = [
-    {
-      id: "LOC-A1",
-      zone: optimalZone,
-      locationType: "PALLET_RACK",
-      distance: 10,
-      capacity: 100,
-      score: 95,
-      distanceFromShipping: 10,
-      currentCapacity: 70,
-      maxCapacity: 100,
-      primarySKUPrefix: item.sku.substring(0, 3),
+  const locations = await prisma.location.findMany({
+    where: {
+      organizationId,
+      isActive: true,
+      isPutaway: true,
+      type: { in: ["BIN", "SHELF", "RACK", "STAGING", "RECEIVING"] },
     },
-    {
-      id: "LOC-A2",
-      zone: optimalZone,
-      locationType: "FLOOR",
-      distance: 15,
-      capacity: 200,
-      score: 90,
-      distanceFromShipping: 15,
-      currentCapacity: 120,
-      maxCapacity: 200,
-      primarySKUPrefix: item.sku.substring(0, 3),
+    select: {
+      id: true,
+      locationCode: true,
+      type: true,
+      capacity: true,
+      metadata: true,
     },
-    {
-      id: "LOC-B1",
-      zone: "BULK" as ZoneType,
-      locationType: "PALLET_RACK",
-      distance: 20,
-      capacity: 150,
-      score: 85,
-      distanceFromShipping: 20,
-      currentCapacity: 100,
-      maxCapacity: 150,
-      primarySKUPrefix: "",
-    },
-  ];
+    take: 500,
+  });
 
-  const availableLocations = mockLocations.filter(
-    (loc) => loc.zone === optimalZone || loc.zone === "BULK",
-  );
+  const availableLocations = locations
+    .map((loc) => {
+      const metadata = (loc.metadata || {}) as Record<string, any>;
+      return {
+        id: loc.id,
+        zone: mapZoneFromLocation(loc.type, loc.locationCode),
+        locationType: mapLocationType(loc.type),
+        distanceFromShipping: Number(metadata.distanceFromShipping ?? 20),
+        currentCapacity: Number(metadata.currentCapacity ?? 0),
+        maxCapacity: Number(loc.capacity ?? metadata.maxCapacity ?? 100),
+        primarySKUPrefix: String(metadata.primarySKUPrefix ?? ""),
+      };
+    })
+    .filter((loc) => loc.zone === optimalZone || loc.zone === "BULK_STORAGE");
 
   if (availableLocations.length === 0) {
-    // Fallback to first mock location
-    const fallback = mockLocations[0];
+    const fallback = locations[0];
+
+    if (!fallback) {
+      return {
+        locationId: "UNASSIGNED",
+        locationType: "OVERFLOW",
+        zone: optimalZone,
+        score: 0,
+        reason: "No eligible putaway locations found",
+      };
+    }
 
     return {
       locationId: fallback.id,
-      locationType: fallback.locationType as LocationType,
-      zone: fallback.zone as ZoneType,
+      locationType: mapLocationType(fallback.type),
+      zone: mapZoneFromLocation(fallback.type, fallback.locationCode),
       score: 50,
       reason: "Fallback - optimal zones full",
     };

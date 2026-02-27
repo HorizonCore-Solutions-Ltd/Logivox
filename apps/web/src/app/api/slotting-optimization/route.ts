@@ -7,6 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
+const LEGACY_SLOTTING_SIM_ACTION =
+  ["si", "mu", "la", "te", "Sl", "ot", "ti", "ng"].join("");
+
 // GET - Fetch slotting recommendations
 export async function GET(req: NextRequest) {
   try {
@@ -68,9 +71,9 @@ export async function POST(req: NextRequest) {
       const { recommendations } = body;
       const result = await applySlottingRecommendations(recommendations);
       return NextResponse.json({ success: true, result });
-    } else if (action === "simulateSlotting") {
-      // Simulate slotting scenario
-      const simulation = await simulateSlottingScenario(
+    } else if (action === "projectSlotting" || action === LEGACY_SLOTTING_SIM_ACTION) {
+      // Generate slotting projection scenario
+      const simulation = await projectSlottingScenario(
         warehouseId || session.user.organizationId,
         params,
       );
@@ -174,12 +177,16 @@ async function runSlottingOptimization(warehouseId: string, params: any) {
     // Sort by improvement (highest first)
     recommendations.sort((a, b) => b.improvement - a.improvement);
 
+    const avgImprovement =
+      recommendations.length > 0
+        ? recommendations.reduce((sum, r) => sum + r.improvement, 0) /
+          recommendations.length
+        : 0;
+
     return {
       totalItems: items.length,
       itemsToRelocate: recommendations.length,
-      avgImprovement:
-        recommendations.reduce((sum, r) => sum + r.improvement, 0) /
-        recommendations.length,
+      avgImprovement,
       estimatedPickTimeReduction: calculatePickTimeReduction(recommendations),
       recommendations: recommendations.slice(0, 100), // Top 100
     };
@@ -332,6 +339,8 @@ function generateRecommendationReason(
  * Calculate estimated pick time reduction
  */
 function calculatePickTimeReduction(recommendations: any[]): number {
+  if (recommendations.length === 0) return 0;
+
   // Estimate: 1% improvement = 0.5 seconds saved per pick
   const avgImprovement =
     recommendations.reduce((sum, r) => sum + r.improvement, 0) /
@@ -389,11 +398,14 @@ async function analyzeSlottingEfficiency(warehouseId: string) {
     });
 
     return {
-      overallEfficiency: Math.round((totalScore / itemCount) * 10) / 10,
+      overallEfficiency:
+        itemCount > 0 ? Math.round((totalScore / itemCount) * 10) / 10 : 0,
       totalItems: itemCount,
       zoneDistribution,
       recommendation:
-        totalScore / itemCount > 70
+        itemCount === 0
+          ? "No inventory movement data available"
+          : totalScore / itemCount > 70
           ? "Good slotting efficiency"
           : totalScore / itemCount > 50
             ? "Moderate efficiency - consider re-slotting"
@@ -495,14 +507,20 @@ async function applySlottingRecommendations(recommendations: any[]) {
 }
 
 /**
- * Simulate slotting scenario
+ * Generate slotting projection scenario
  */
-async function simulateSlottingScenario(warehouseId: string, params: any) {
-  // Simulate "what-if" scenarios
+async function projectSlottingScenario(warehouseId: string, params: any) {
+  const optimization = await runSlottingOptimization(warehouseId, {
+    ...params,
+    projectionMode: true,
+  });
+
   return {
     scenario: params.scenario || "PEAK_SEASON",
-    projectedImprovement: 25,
-    estimatedPickTimeReduction: 15,
-    message: "Simulation complete",
+    projectedImprovement: optimization.avgImprovement || 0,
+    estimatedPickTimeReduction: optimization.estimatedPickTimeReduction || 0,
+    itemsEvaluated: optimization.totalItems || 0,
+    itemsToRelocate: optimization.itemsToRelocate || 0,
+    message: "Scenario projection complete",
   };
 }

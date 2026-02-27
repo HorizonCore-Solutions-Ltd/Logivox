@@ -168,22 +168,33 @@ async function optimizePickingRoutes(organizationId: string) {
       },
     });
 
-    // Simulate route optimization (in production, use genetic algorithm or A*)
     const routes = activeSessions.map((session) => {
-      // Generate optimized route
       const locations = generatePickingLocations(10); // Example: 10 pick locations
+      const baselinePath = [...locations];
       const optimizedPath = optimizePathGenetic(locations);
+      const baselineDistance = calculateDistance(baselinePath);
+      const optimizedDistance = calculateDistance(optimizedPath);
+      const improvementPercent =
+        baselineDistance > 0
+          ? Math.max(
+              0,
+              Math.round(
+                ((baselineDistance - optimizedDistance) / baselineDistance) *
+                  100,
+              ),
+            )
+          : 0;
 
       return {
         workerId: session.userId,
         workerName: session.user.name,
         currentLocation: locations[0],
         remainingPicks: optimizedPath.length,
-        estimatedDistance: calculateDistance(optimizedPath),
-        estimatedTime: Math.round(calculateDistance(optimizedPath) * 0.5), // 0.5 min per unit
+        estimatedDistance: optimizedDistance,
+        estimatedTime: Math.round(optimizedDistance * 0.5), // 0.5 min per unit
         path: optimizedPath,
         optimization: "GENETIC_ALGORITHM",
-        improvementPercent: Math.round(Math.random() * 20 + 10), // 10-30% improvement
+        improvementPercent,
       };
     });
 
@@ -380,9 +391,9 @@ async function detectAnomalies(organizationId: string) {
 function generatePickingLocations(count: number) {
   return Array.from({ length: count }, (_, i) => ({
     id: `LOC-${i + 1}`,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    zone: `ZONE-${Math.floor(Math.random() * 4) + 1}`,
+    x: (i % 5) * 20 + 10,
+    y: Math.floor(i / 5) * 20 + 10,
+    zone: `ZONE-${(i % 4) + 1}`,
   }));
 }
 
@@ -436,57 +447,92 @@ function calculateDistance(path: any[]) {
 }
 
 /**
- * Helper: Train ML model (placeholder)
+ * Helper: Train ML model
  */
 async function trainMLModel(
   organizationId: string,
   modelType: string,
   features: any,
 ) {
-  // In production, integrate with TensorFlow.js or call Python ML service
-  console.log(
-    `Training ${modelType} model for org ${organizationId} with features:`,
-    features,
-  );
+  const mlServiceUrl = process.env.ML_SERVICE_URL;
+  if (!mlServiceUrl) {
+    throw new Error("ML_SERVICE_URL is not configured");
+  }
 
-  return {
-    modelId: `MODEL-${Date.now()}`,
-    modelType,
-    accuracy: 0.89,
-    trainedAt: new Date().toISOString(),
-  };
+  const response = await fetch(`${mlServiceUrl.replace(/\/$/, "")}/train`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      organizationId,
+      modelType,
+      features,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`ML training failed with status ${response.status}`);
+  }
+
+  const result = await response.json();
+  if (!result?.modelId) {
+    throw new Error("ML service response missing modelId");
+  }
+
+  return result;
 }
 
 /**
  * Helper: Optimize warehouse layout
  */
 async function optimizeWarehouseLayout(organizationId: string) {
-  // Genetic algorithm for optimal bin placement
-  console.log(`Optimizing layout for org ${organizationId}`);
+  const optimizationServiceUrl = process.env.AI_OPTIMIZATION_SERVICE_URL;
+  if (!optimizationServiceUrl) {
+    throw new Error("AI_OPTIMIZATION_SERVICE_URL is not configured");
+  }
 
-  return {
-    zones: [
-      { id: "ZONE-A", type: "HIGH_VELOCITY", size: 500, locations: 100 },
-      { id: "ZONE-B", type: "MEDIUM_VELOCITY", size: 1000, locations: 200 },
-      { id: "ZONE-C", type: "LOW_VELOCITY", size: 1500, locations: 300 },
-    ],
-    improvement: "23% reduction in average pick time",
-  };
+  const response = await fetch(
+    `${optimizationServiceUrl.replace(/\/$/, "")}/layout`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ organizationId }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Layout optimization failed with status ${response.status}`);
+  }
+
+  return response.json();
 }
 
 /**
  * Helper: Optimize worker schedule
  */
 async function optimizeWorkerSchedule(organizationId: string) {
-  // Shift optimization based on historical demand
-  console.log(`Optimizing schedule for org ${organizationId}`);
+  const optimizationServiceUrl = process.env.AI_OPTIMIZATION_SERVICE_URL;
+  if (!optimizationServiceUrl) {
+    throw new Error("AI_OPTIMIZATION_SERVICE_URL is not configured");
+  }
 
-  return {
-    shifts: [
-      { shift: "MORNING", workers: 15, start: "06:00", end: "14:00" },
-      { shift: "AFTERNOON", workers: 12, start: "14:00", end: "22:00" },
-      { shift: "NIGHT", workers: 8, start: "22:00", end: "06:00" },
-    ],
-    optimization: "Balanced workload distribution",
-  };
+  const response = await fetch(
+    `${optimizationServiceUrl.replace(/\/$/, "")}/schedule`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ organizationId }),
+    },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Schedule optimization failed with status ${response.status}`);
+  }
+
+  return response.json();
 }

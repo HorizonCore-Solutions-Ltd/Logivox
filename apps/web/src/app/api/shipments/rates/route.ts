@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Mock rate calculation (in production, this would call actual carrier APIs)
+    // Rate calculation from configured carrier profiles
     const rates: ShippingRate[] = [];
 
     // Define service offerings per carrier
@@ -204,38 +204,14 @@ export async function POST(req: NextRequest) {
     // Sort by cost (lowest first)
     rates.sort((a, b) => a.cost - b.cost);
 
-    // If no carrier configs found, return mock data for demo
-    if (rates.length === 0) {
-      const mockCarriers = ["UPS", "FEDEX", "USPS"];
-      for (const carrier of mockCarriers) {
-        const carrierServices =
-          services[carrier as keyof typeof services] || [];
-        for (const service of carrierServices) {
-          const weightFactor = Math.ceil(chargeableWeight);
-          const cost = service.baseCost + weightFactor * 2;
-          const estimatedDelivery = new Date();
-          estimatedDelivery.setDate(estimatedDelivery.getDate() + service.days);
-
-          rates.push({
-            carrier:
-              carrier === "UPS"
-                ? "United Parcel Service"
-                : carrier === "FEDEX"
-                  ? "FedEx"
-                  : "United States Postal Service",
-            carrierCode: carrier,
-            service: service.name,
-            serviceCode: service.code,
-            deliveryDays: service.days,
-            estimatedDelivery:
-              estimatedDelivery.toISOString().split("T")[0] || "",
-            cost: parseFloat(cost.toFixed(2)),
-            currency: "USD",
-            available: true,
-          });
-        }
-      }
-      rates.sort((a, b) => a.cost - b.cost);
+    if (carrierConfigs.length === 0 || rates.length === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "No active carrier configuration available for rate lookup. Configure carrier profiles before requesting rates.",
+        },
+        { status: 503 },
+      );
     }
 
     return NextResponse.json({

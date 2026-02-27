@@ -420,9 +420,6 @@ export function Navigation() {
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
             <Button variant="ghost" asChild>
-              <Link href="/pricing">Pricing</Link>
-            </Button>
-            <Button variant="ghost" asChild>
               <Link href="/demo">Book Demo</Link>
             </Button>
             <Button asChild>

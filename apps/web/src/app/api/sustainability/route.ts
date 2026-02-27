@@ -7,18 +7,37 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
+async function resolveOrganizationId(email?: string | null) {
+  if (!email) return null;
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      organizationMemberships: {
+        where: { isActive: true },
+        select: { organizationId: true },
+        take: 1,
+      },
+    },
+  });
+  return user?.organizationMemberships[0]?.organizationId || null;
+}
+
 // GET - Fetch sustainability metrics
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
-    const warehouseId =
-      searchParams.get("warehouseId") || session.user.organizationId;
+    const warehouseId = searchParams.get("warehouseId") || organizationId;
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
 
@@ -66,8 +85,13 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await req.json();
@@ -87,7 +111,7 @@ export async function POST(req: NextRequest) {
       // Set sustainability targets
       const { targets } = body;
       const result = await setSustainabilityTargets(
-        warehouseId || session.user.organizationId,
+        warehouseId || organizationId,
         targets,
       );
       return NextResponse.json({ success: true, result });
@@ -95,7 +119,7 @@ export async function POST(req: NextRequest) {
       // Log waste event
       const { type, amount, recycled } = body;
       const result = await logWasteEvent(
-        warehouseId || session.user.organizationId,
+        warehouseId || organizationId,
         type,
         amount,
         recycled,
@@ -104,7 +128,7 @@ export async function POST(req: NextRequest) {
     } else if (action === "generate-report") {
       // Generate sustainability report
       const report = await generateSustainabilityReport(
-        warehouseId || session.user.organizationId,
+        warehouseId || organizationId,
         params,
       );
       return NextResponse.json({ success: true, report });
@@ -127,6 +151,7 @@ async function calculateCarbonFootprint(
   warehouseId: string,
   startDate?: string | null,
   endDate?: string | null,
+  includeTrend: boolean = true,
 ) {
   try {
     const start = startDate
@@ -175,18 +200,22 @@ async function calculateCarbonFootprint(
     // Calculate trends
     const previousStart = new Date(start);
     previousStart.setMonth(previousStart.getMonth() - 1);
-    const previousFootprint = await calculateCarbonFootprint(
-      warehouseId,
-      previousStart.toISOString(),
-      start.toISOString(),
-    );
+    let trend = 0;
+    if (includeTrend) {
+      const previousFootprint = await calculateCarbonFootprint(
+        warehouseId,
+        previousStart.toISOString(),
+        start.toISOString(),
+        false,
+      );
 
-    const trend =
-      previousFootprint.totalCarbonKg > 0
-        ? ((totalCarbonKg - previousFootprint.totalCarbonKg) /
-            previousFootprint.totalCarbonKg) *
-          100
-        : 0;
+      trend =
+        previousFootprint.totalCarbonKg > 0
+          ? ((totalCarbonKg - previousFootprint.totalCarbonKg) /
+              previousFootprint.totalCarbonKg) *
+            100
+          : 0;
+    }
 
     return {
       totalCarbonKg: Math.round(totalCarbonKg * 100) / 100,
@@ -225,22 +254,20 @@ async function calculateEnergyEmissions(
   end: Date,
 ): Promise<number> {
   try {
-    // Simulate energy consumption data
-    // In production, this would come from IoT sensors or utility bills
-
-    const days = Math.ceil(
-      (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+    const energy = await getEnergyConsumption(
+      warehouseId,
+      start.toISOString(),
+      end.toISOString(),
     );
+    const totalKwh = energy.totalKwh || 0;
 
-    // Average warehouse energy consumption: 10 kWh per sq meter per year
-    // Assuming 10,000 sq meter warehouse = 27.4 kWh per day
-    const dailyKwh = 274;
-    const totalKwh = dailyKwh * days;
-
-    // Carbon intensity: 0.5 kg CO2 per kWh (grid average)
+    const configuredIntensity = Number(
+      process.env.ENERGY_CARBON_INTENSITY_KG_PER_KWH || 0,
+    );
+    const carbonIntensity = configuredIntensity > 0 ? configuredIntensity : 0.5;
     const carbonKg = totalKwh * 0.5;
 
-    return carbonKg;
+    return totalKwh * carbonIntensity;
   } catch (error) {
     console.error("Energy emissions error:", error);
     return 0;
@@ -260,29 +287,33 @@ async function getEnergyConsumption(
       ? new Date(startDate)
       : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const end = endDate ? new Date(endDate) : new Date();
-    const days = Math.ceil(
-      (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const logs = await prisma.activityLog.findMany({
+      where: {
+        organizationId: warehouseId,
+        action: "SUSTAINABILITY_ENERGY_LOG",
+        createdAt: { gte: start, lte: end },
+      },
+      orderBy: { createdAt: "asc" },
+      take: 5000,
+    });
 
-    // Simulate daily energy data
-    const dailyData = [];
-    const baseConsumption = 274; // kWh per day
+    const byDate = new Map<string, { consumption: number; renewable: number }>();
+    logs.forEach((log) => {
+      const metadata = (log.metadata ?? {}) as any;
+      const date = new Date(log.createdAt).toISOString().split("T")[0];
+      const current = byDate.get(date) || { consumption: 0, renewable: 0 };
+      current.consumption += Number(metadata.kwh || 0);
+      current.renewable += Number(metadata.renewableKwh || 0);
+      byDate.set(date, current);
+    });
 
-    for (let i = 0; i < days; i++) {
-      const date = new Date(start);
-      date.setDate(date.getDate() + i);
-
-      // Add some variation (+/- 20%)
-      const variation = (Math.random() - 0.5) * 0.4;
-      const consumption = baseConsumption * (1 + variation);
-
-      dailyData.push({
-        date: date.toISOString().split("T")[0],
-        consumption: Math.round(consumption * 10) / 10,
-        cost: Math.round(consumption * 0.12 * 100) / 100, // $0.12 per kWh
-        renewable: Math.round(consumption * 0.15 * 10) / 10, // 15% renewable
-      });
-    }
+    const rate = Number(process.env.ENERGY_COST_PER_KWH || 0.12);
+    const dailyData = Array.from(byDate.entries()).map(([date, data]) => ({
+      date,
+      consumption: Math.round(data.consumption * 10) / 10,
+      cost: Math.round(data.consumption * rate * 100) / 100,
+      renewable: Math.round(data.renewable * 10) / 10,
+    }));
 
     const totalConsumption = dailyData.reduce(
       (sum, d) => sum + d.consumption,
@@ -291,10 +322,18 @@ async function getEnergyConsumption(
     const totalCost = dailyData.reduce((sum, d) => sum + d.cost, 0);
     const totalRenewable = dailyData.reduce((sum, d) => sum + d.renewable, 0);
 
+    const days = Math.max(
+      1,
+      Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)),
+    );
+
     return {
       totalKwh: Math.round(totalConsumption * 10) / 10,
       totalCost: Math.round(totalCost * 100) / 100,
-      renewablePercent: Math.round((totalRenewable / totalConsumption) * 100),
+      renewablePercent:
+        totalConsumption > 0
+          ? Math.round((totalRenewable / totalConsumption) * 100)
+          : 0,
       avgDailyKwh: Math.round((totalConsumption / days) * 10) / 10,
       dailyData,
       breakdown: {
@@ -324,23 +363,56 @@ async function getWasteMetrics(
   endDate?: string | null,
 ) {
   try {
-    // Simulate waste data
-    // In production, this would come from actual waste tracking
+    const start = startDate
+      ? new Date(startDate)
+      : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    const end = endDate ? new Date(endDate) : new Date();
+
+    const logs = await prisma.activityLog.findMany({
+      where: {
+        organizationId: warehouseId,
+        action: "SUSTAINABILITY_WASTE_LOG",
+        createdAt: { gte: start, lte: end },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 5000,
+    });
+
+    const breakdown: Record<string, number> = {
+      cardboard: 0,
+      plastic: 0,
+      metal: 0,
+      wood: 0,
+      general: 0,
+    };
+
+    let recycled = 0;
+    let landfill = 0;
+    logs.forEach((log) => {
+      const metadata = (log.metadata ?? {}) as any;
+      const type = String(metadata.type || "general").toLowerCase();
+      const amount = Number(metadata.amount || 0);
+      const normalizedType =
+        type in breakdown ? type : "general";
+      breakdown[normalizedType] += amount;
+      if (metadata.recycled) recycled += amount;
+      else landfill += amount;
+    });
+
+    const totalWaste = recycled + landfill;
+    const recyclingRate =
+      totalWaste > 0 ? Number(((recycled / totalWaste) * 100).toFixed(1)) : 0;
+    const costSavings = Math.round(recycled * 1.5 * 100) / 100;
+    const carbonAvoided = Math.round(recycled * 0.7 * 100) / 100;
 
     return {
-      totalWaste: 850, // kg
-      recycled: 650, // kg
-      landfill: 200, // kg
-      recyclingRate: 76.5, // %
-      breakdown: {
-        cardboard: 400,
-        plastic: 200,
-        metal: 50,
-        wood: 150,
-        general: 50,
-      },
-      costSavings: 1250, // $ from recycling
-      carbonAvoided: 450, // kg CO2 avoided from recycling
+      totalWaste,
+      recycled,
+      landfill,
+      recyclingRate,
+      breakdown,
+      costSavings,
+      carbonAvoided,
     };
   } catch (error) {
     console.error("Waste metrics error:", error);
@@ -370,35 +442,67 @@ async function generateESGReport(
     const energy = await getEnergyConsumption(warehouseId, startDate, endDate);
     const waste = await getWasteMetrics(warehouseId, startDate, endDate);
 
+    const [employeeCount, safetyIncidents, complianceEvents] = await Promise.all([
+      prisma.organizationMember.count({
+        where: {
+          organizationId: warehouseId,
+          isActive: true,
+        },
+      }),
+      prisma.activityLog.count({
+        where: {
+          organizationId: warehouseId,
+          action: "SAFETY_INCIDENT",
+          ...(startDate || endDate
+            ? {
+                createdAt: {
+                  ...(startDate ? { gte: new Date(startDate) } : {}),
+                  ...(endDate ? { lte: new Date(endDate) } : {}),
+                },
+              }
+            : {}),
+        },
+      }),
+      prisma.auditLog.count({
+        where: {
+          organizationId: warehouseId,
+          ...(startDate || endDate
+            ? {
+                timestamp: {
+                  ...(startDate ? { gte: new Date(startDate) } : {}),
+                  ...(endDate ? { lte: new Date(endDate) } : {}),
+                },
+              }
+            : {}),
+        },
+      }),
+    ]);
+
     return {
       environmental: {
         carbonFootprint: footprint,
         energyConsumption: energy,
         wasteManagement: waste,
         waterUsage: {
-          total: 15000, // liters
-          perEmployee: 500,
+          total: 0,
+          perEmployee: employeeCount > 0 ? 0 : 0,
         },
       },
       social: {
-        employees: 42,
-        safetyIncidents: 0,
-        trainingHours: 840,
-        diversityScore: 85,
+        employees: employeeCount,
+        safetyIncidents,
+        trainingHours: 0,
+        diversityScore: null,
       },
       governance: {
-        complianceRate: 100,
-        auditsPassed: 12,
-        certifications: ["ISO 14001", "LEED", "Green Business"],
+        complianceRate: complianceEvents > 0 ? 100 : 0,
+        auditsPassed: complianceEvents,
+        certifications: [],
       },
       summary: {
-        overallScore: 87,
-        grade: "A",
-        improvements: [
-          "Increase renewable energy to 25%",
-          "Reduce packaging waste by 10%",
-          "Implement electric forklift fleet",
-        ],
+        overallScore: null,
+        grade: null,
+        improvements: [],
       },
     };
   } catch (error) {
@@ -490,7 +594,29 @@ async function logShipmentCarbon(
     const factor = emissionFactors[mode] || 0.062;
     const carbon = (weight / 1000) * distance * factor;
 
-    // In production, save to database
+    const shipment = await prisma.shipment.findUnique({
+      where: { id: shipmentId },
+      select: { organizationId: true },
+    });
+
+    if (shipment?.organizationId) {
+      await prisma.activityLog.create({
+        data: {
+          organizationId: shipment.organizationId,
+          action: "SUSTAINABILITY_SHIPMENT_CARBON_LOG",
+          entityType: "Shipment",
+          entityId: shipmentId,
+          metadata: {
+            carbonKg: Math.round(carbon * 100) / 100,
+            distance,
+            mode,
+            weight,
+            timestamp: new Date().toISOString(),
+          },
+        },
+      });
+    }
+
     return {
       shipmentId,
       carbonKg: Math.round(carbon * 100) / 100,
@@ -509,7 +635,19 @@ async function logShipmentCarbon(
  * Set Sustainability Targets
  */
 async function setSustainabilityTargets(warehouseId: string, targets: any) {
-  // In production, save targets to database
+  await prisma.activityLog.create({
+    data: {
+      organizationId: warehouseId,
+      action: "SUSTAINABILITY_TARGETS_SET",
+      entityType: "SustainabilityTargets",
+      entityId: warehouseId,
+      metadata: {
+        targets,
+        setAt: new Date().toISOString(),
+      },
+    },
+  });
+
   return {
     warehouseId,
     targets,
@@ -526,7 +664,21 @@ async function logWasteEvent(
   amount: number,
   recycled: boolean,
 ) {
-  // In production, save to database
+  await prisma.activityLog.create({
+    data: {
+      organizationId: warehouseId,
+      action: "SUSTAINABILITY_WASTE_LOG",
+      entityType: "WasteEvent",
+      entityId: `${type}-${Date.now()}`,
+      metadata: {
+        type,
+        amount,
+        recycled,
+        timestamp: new Date().toISOString(),
+      },
+    },
+  });
+
   return {
     warehouseId,
     type,

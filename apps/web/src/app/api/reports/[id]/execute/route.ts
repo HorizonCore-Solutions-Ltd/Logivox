@@ -37,38 +37,114 @@ async function generateExecutionNumber(
   return `EXEC-${dateStr}-${sequence.toString().padStart(4, "0")}`;
 }
 
-// Helper function to execute report query
+// Helper function to execute report query against real data
 async function executeReportQuery(
   report: any,
   parameters: any = {},
   filters: any = {},
 ): Promise<any> {
-  const { dataSource, reportType, groupBy, sortBy, columns } = report;
+  const { dataSource, reportType, columns } = report;
 
-  // Merge report filters with runtime filters
+  // Merge stored filters with runtime filters
   const mergedFilters = { ...report.filters, ...filters };
+  const orgId = report.organizationId;
+  const takeLimit = parameters.limit ?? 1000;
 
-  // Simple implementation - in production, this would use a query builder
-  // For now, we'll return mock data
-  const mockData = {
-    data: [
-      { id: 1, name: "Sample Item 1", value: 100, category: "A" },
-      { id: 2, name: "Sample Item 2", value: 200, category: "B" },
-      { id: 3, name: "Sample Item 3", value: 300, category: "A" },
-    ],
-    count: 3,
-    aggregations:
-      reportType === "SUMMARY"
-        ? {
-            total: 600,
-            average: 200,
-            min: 100,
-            max: 300,
-          }
-        : undefined,
-  };
+  // Map common dataSource strings to real Prisma queries
+  const src = (dataSource as string).toLowerCase();
 
-  return mockData;
+  if (src.includes("inventory") || src === "inventory_items") {
+    const rows = await prisma.inventoryItem.findMany({
+      where: {
+        organizationId: orgId,
+        ...(mergedFilters.status ? { status: mergedFilters.status } : {}),
+        ...(mergedFilters.warehouseId ? { warehouseId: mergedFilters.warehouseId } : {}),
+      },
+      take: takeLimit,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, sku: true, name: true, category: true,
+        availableQty: true, reservedQty: true, totalQty: true,
+        unitCost: true, status: true, createdAt: true,
+      },
+    });
+    return {
+      data: rows,
+      count: rows.length,
+      aggregations: reportType === "SUMMARY" ? {
+        total: rows.length,
+        totalQty: rows.reduce((s: number, r: any) => s + (r.totalQty || 0), 0),
+      } : undefined,
+    };
+  }
+
+  if (src.includes("order") || src === "sales_orders") {
+    const rows = await prisma.salesOrder.findMany({
+      where: {
+        organizationId: orgId,
+        ...(mergedFilters.status ? { status: mergedFilters.status } : {}),
+      },
+      take: takeLimit,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, soNumber: true, status: true, orderDate: true,
+        customerId: true, warehouseId: true, createdAt: true,
+      },
+    });
+    return { data: rows, count: rows.length };
+  }
+
+  if (src.includes("grn") || src.includes("receipt") || src.includes("receiving")) {
+    const rows = await prisma.goodsReceiptNote.findMany({
+      where: {
+        organizationId: orgId,
+        ...(mergedFilters.status ? { status: mergedFilters.status } : {}),
+      },
+      take: takeLimit,
+      orderBy: { receivedDate: "desc" },
+      select: {
+        id: true, grnNumber: true, status: true, receivedDate: true,
+        putAwayCompleted: true, hasDiscrepancy: true, createdAt: true,
+      },
+    });
+    return { data: rows, count: rows.length };
+  }
+
+  if (src.includes("employee") || src.includes("labor")) {
+    const rows = await prisma.employee.findMany({
+      where: {
+        organizationId: orgId,
+        ...(mergedFilters.status ? { status: mergedFilters.status } : {}),
+      },
+      take: takeLimit,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, employeeNumber: true, firstName: true, lastName: true,
+        department: true, position: true, status: true, hireDate: true,
+      },
+    });
+    return { data: rows, count: rows.length };
+  }
+
+  if (src.includes("purchase") || src.includes("po")) {
+    const rows = await prisma.purchaseOrder.findMany({
+      where: {
+        organizationId: orgId,
+        ...(mergedFilters.status ? { status: mergedFilters.status } : {}),
+      },
+      take: takeLimit,
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, poNumber: true, status: true, orderDate: true,
+        totalAmount: true, currency: true, supplierId: true,
+      },
+    });
+    return { data: rows, count: rows.length };
+  }
+
+  // Unknown dataSource — return empty result set with a note
+  console.warn(`[reports] Unknown dataSource: ${dataSource} — returning empty result`);
+  return { data: [], count: 0, note: `No query handler registered for dataSource: ${dataSource}` };
 }
 
 // POST /api/reports/[id]/execute - Execute report

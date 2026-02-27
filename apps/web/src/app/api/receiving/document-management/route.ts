@@ -3,6 +3,30 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+async function sendDocumentRequestNotification(payload: Record<string, unknown>) {
+  const webhookUrl = process.env.RECEIVING_DOCUMENT_REQUEST_WEBHOOK_URL;
+  if (!webhookUrl) {
+    return { delivered: false, reason: "not_configured" };
+  }
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "RECEIVING_DOCUMENT_REQUESTED",
+        payload,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    return { delivered: response.ok, statusCode: response.status };
+  } catch (error) {
+    console.error("Document request notification error:", error);
+    return { delivered: false, reason: "request_failed" };
+  }
+}
+
 // Validation schemas
 const documentSchema = z.object({
   receivingRecordId: z.string(),
@@ -64,8 +88,8 @@ const actionSchema = z.discriminatedUnion("action", [
 
 // Document completeness checker
 function checkDocumentCompleteness(
-  documents: any[],
-  receivingRecord: any,
+  documents: Array<{ documentType: string }>,
+  receivingRecord: { itemType?: string | null },
 ): {
   complete: boolean;
   missing: string[];
@@ -223,7 +247,7 @@ export async function GET(request: NextRequest) {
             totalDocuments > 0
               ? Math.round((verifiedDocuments / totalDocuments) * 100)
               : 0,
-          byType: byType.reduce((acc: any, item) => {
+          byType: byType.reduce<Record<string, number>>((acc, item) => {
             acc[item.documentType] = item._count.id;
             return acc;
           }, {}),
@@ -418,11 +442,19 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        // TODO: Send notification to supplier/responsible party
+        const notification = await sendDocumentRequestNotification({
+          requestId: request.id,
+          receivingRecordId: validated.receivingRecordId,
+          documentType: validated.documentType,
+          urgency: validated.urgency,
+          notes: validated.notes,
+          requestedBy: user.id,
+        });
 
         return NextResponse.json({
           success: true,
           request,
+          notification,
           message: "Document request sent",
         });
       }

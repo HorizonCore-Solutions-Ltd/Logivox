@@ -36,28 +36,28 @@ export default function AIAssistantPage() {
       title: "Works Without Internet (Public Pages)",
       description:
         "Public-facing AI assistant available on all marketing pages without requiring internet connection. Instant responses for pre-sales questions.",
-      badge: "Public Access",
+      badge: "Available",
     },
     {
       icon: Users,
       title: "Tenant-Aware AI (Logged-In Users)",
       description:
-        "Intelligent AI assistant that understands your organization's data, workflows, and context. Provides personalized help based on your tenant.",
-      badge: "Enterprise",
+        "Intelligent AI assistant that understands your organization's data, workflows, and context. Provides personalized help based on your tenant. Requires LLM API configuration.",
+      badge: "Requires API Key",
     },
     {
       icon: Brain,
       title: "Context-Aware Intelligence",
       description:
-        "AI understands your inventory, orders, warehouse layouts, and operations to provide relevant, actionable insights.",
-      badge: "Smart",
+        "AI understands your inventory, orders, warehouse layouts, and operations to provide relevant, actionable insights. Activates once OPENAI_API_KEY is configured.",
+      badge: "Requires API Key",
     },
     {
       icon: Lock,
       title: "Secure & Private",
       description:
         "All AI interactions are encrypted and tenant-isolated. Your data never leaves your secure environment.",
-      badge: "Military-Grade",
+      badge: "Available",
     },
   ];
 
@@ -138,6 +138,24 @@ export default function AIAssistantPage() {
                 </Link>
               </Button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Configuration Requirement Banner */}
+      <section className="border-b bg-amber-50 dark:bg-amber-950/20 py-4">
+        <div className="container-enterprise">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm">
+            <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-400 shrink-0">
+              Setup Required
+            </Badge>
+            <p className="text-muted-foreground">
+              <strong className="text-foreground">Tenant-aware AI</strong> and{" "}
+              <strong className="text-foreground">context-aware intelligence</strong> require an LLM API
+              key (OpenAI or compatible) to be configured. Browser-based pre-sales assistant is
+              available immediately. Full warehouse AI activates once{" "}
+              <code className="bg-muted px-1 rounded text-xs">OPENAI_API_KEY</code> is set.
+            </p>
           </div>
         </div>
       </section>

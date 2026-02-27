@@ -28,6 +28,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 
 // ============================================================================
@@ -73,15 +74,14 @@ const INTEGRATION_CONFIG = {
 
 const ORDER_STATUSES = [
   "DRAFT",
-  "PENDING_APPROVAL",
+  "PENDING",
   "APPROVED",
-  "SENT_TO_SUPPLIER",
-  "ACKNOWLEDGED",
-  "IN_PRODUCTION",
-  "SHIPPED",
-  "DELIVERED",
+  "SENT",
+  "CONFIRMED",
+  "PARTIALLY_RECEIVED",
+  "RECEIVED",
   "CANCELLED",
-  "DISPUTED",
+  "CLOSED",
 ] as const;
 
 // ============================================================================
@@ -171,6 +171,12 @@ interface PurchaseOrder {
     unitPrice: number;
     total: number;
   }>;
+}
+
+function decimalToNumber(value: Prisma.Decimal | number | null | undefined) {
+  if (value == null) return 0;
+  if (typeof value === "number") return value;
+  return value.toNumber();
 }
 
 // ============================================================================
@@ -323,37 +329,42 @@ export async function GET(request: NextRequest) {
 
     // Get stats
     if (action === "stats") {
-      const orders = await prisma.activityLog.findMany({
-        where: {
-          organizationId: session.user.organizationId,
-          action: "PURCHASE_ORDER",
-        },
-        orderBy: { createdAt: "desc" },
-        take: 100,
-      });
+      const [orders, activeSuppliers] = await Promise.all([
+        prisma.purchaseOrder.findMany({
+          where: {
+            organizationId: session.user.organizationId,
+          },
+          select: {
+            id: true,
+            status: true,
+            totalAmount: true,
+          },
+          orderBy: { createdAt: "desc" },
+          take: 200,
+        }),
+        prisma.supplier.count({
+          where: {
+            organizationId: session.user.organizationId,
+            isActive: true,
+          },
+        }),
+      ]);
 
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const activeStatuses = new Set([
+        "APPROVED",
+        "SENT",
+        "CONFIRMED",
+        "PARTIALLY_RECEIVED",
+      ]);
 
-      const activeOrders = orders.filter((o) =>
-        [
-          "APPROVED",
-          "SENT_TO_SUPPLIER",
-          "ACKNOWLEDGED",
-          "IN_PRODUCTION",
-          "SHIPPED",
-        ].includes((o.metadata as any)?.status),
-      ).length;
-
-      const pendingApproval = orders.filter(
-        (o) => (o.metadata as any)?.status === "PENDING_APPROVAL",
-      ).length;
-
-      const totalSpend = orders.reduce((sum, o) => {
-        const meta = o.metadata as any;
-        return sum + (meta?.totalAmount || 0);
-      }, 0);
-
+      const activeOrders = orders.filter((o) => activeStatuses.has(o.status))
+        .length;
+      const pendingApproval = orders.filter((o) => o.status === "PENDING")
+        .length;
+      const totalSpend = orders.reduce(
+        (sum, o) => sum + decimalToNumber(o.totalAmount),
+        0,
+      );
       const avgOrderValue = orders.length > 0 ? totalSpend / orders.length : 0;
 
       return NextResponse.json({
@@ -363,81 +374,137 @@ export async function GET(request: NextRequest) {
           totalOrders: orders.length,
           totalSpend,
           avgOrderValue,
-          activeSuppliers: 12, // Simulated
+          activeSuppliers,
         },
       });
     }
 
     // Get all suppliers
     if (action === "suppliers") {
-      // Simulated supplier data (would come from Supplier table)
-      const suppliers = [
-        {
-          id: "SUP-001",
-          name: "Global Packaging Co",
-          integrationType: "API",
+      const suppliers = await prisma.supplier.findMany({
+        where: {
+          organizationId: session.user.organizationId,
           isActive: true,
-          metrics: {
-            onTimeDelivery: 96,
-            qualityScore: 98,
-            orderAccuracy: 99,
-            avgResponseTime: 18,
-            priceCompetitiveness: 95,
-          },
-          orders: { total: 145, active: 8, completed: 135, disputed: 2 },
-          spend: { last30Days: 45000, last90Days: 132000, yearToDate: 520000 },
         },
-        {
-          id: "SUP-002",
-          name: "FastShip Logistics",
-          integrationType: "EDI",
-          isActive: true,
-          metrics: {
-            onTimeDelivery: 88,
-            qualityScore: 95,
-            orderAccuracy: 97,
-            avgResponseTime: 24,
-            priceCompetitiveness: 90,
+        include: {
+          purchaseOrders: {
+            select: {
+              id: true,
+              status: true,
+              totalAmount: true,
+              expectedDate: true,
+              receivedDate: true,
+              orderDate: true,
+              metadata: true,
+            },
           },
-          orders: { total: 98, active: 5, completed: 90, disputed: 3 },
-          spend: { last30Days: 32000, last90Days: 89000, yearToDate: 345000 },
         },
-        {
-          id: "SUP-003",
-          name: "Quality Parts Inc",
-          integrationType: "PORTAL",
-          isActive: true,
-          metrics: {
-            onTimeDelivery: 92,
-            qualityScore: 99,
-            orderAccuracy: 98,
-            avgResponseTime: 12,
-            priceCompetitiveness: 88,
-          },
-          orders: { total: 67, active: 3, completed: 63, disputed: 1 },
-          spend: { last30Days: 28000, last90Days: 76000, yearToDate: 298000 },
-        },
-      ];
+        orderBy: { createdAt: "desc" },
+      });
 
       const supplierProfiles: SupplierProfile[] = suppliers.map((sup) => {
-        const performanceScore = calculateSupplierScore(sup.metrics);
+        const totalOrders = sup.purchaseOrders.length;
+        const activeOrders = sup.purchaseOrders.filter((po) =>
+          ["APPROVED", "SENT", "CONFIRMED", "PARTIALLY_RECEIVED"].includes(
+            po.status,
+          ),
+        ).length;
+        const completedOrders = sup.purchaseOrders.filter((po) =>
+          ["RECEIVED", "CLOSED"].includes(po.status),
+        ).length;
+        const disputedOrders = sup.purchaseOrders.filter(
+          (po) => po.status === "CANCELLED",
+        ).length;
+
+        const deliveredOrders = sup.purchaseOrders.filter((po) =>
+          ["RECEIVED", "CLOSED", "PARTIALLY_RECEIVED"].includes(po.status),
+        );
+        const onTimeDelivered = deliveredOrders.filter((po) => {
+          if (!po.receivedDate || !po.expectedDate) return true;
+          return po.receivedDate <= po.expectedDate;
+        }).length;
+
+        const onTimeDelivery =
+          deliveredOrders.length > 0
+            ? Math.round((onTimeDelivered / deliveredOrders.length) * 100)
+            : 100;
+        const qualityScore = Math.max(
+          0,
+          Math.round(100 - (disputedOrders / Math.max(totalOrders, 1)) * 100),
+        );
+        const orderAccuracy = Math.max(
+          0,
+          Math.round(
+            ((totalOrders - disputedOrders) / Math.max(totalOrders, 1)) * 100,
+          ),
+        );
+
+        const responseTimes = sup.purchaseOrders
+          .map((po) => {
+            const metadata = (po.metadata ?? {}) as Record<string, unknown>;
+            const value = metadata.responseTimeHours;
+            return typeof value === "number" && value > 0 ? value : null;
+          })
+          .filter((value): value is number => value !== null);
+
+        const avgResponseTime =
+          responseTimes.length > 0
+            ? responseTimes.reduce((sum, value) => sum + value, 0) /
+              responseTimes.length
+            : 24;
+
+        const now = new Date();
+        const days30 = new Date(now);
+        days30.setDate(days30.getDate() - 30);
+        const days90 = new Date(now);
+        days90.setDate(days90.getDate() - 90);
+        const yearStart = new Date(now.getFullYear(), 0, 1);
+
+        const spend30 = sup.purchaseOrders
+          .filter((po) => po.orderDate >= days30)
+          .reduce((sum, po) => sum + decimalToNumber(po.totalAmount), 0);
+        const spend90 = sup.purchaseOrders
+          .filter((po) => po.orderDate >= days90)
+          .reduce((sum, po) => sum + decimalToNumber(po.totalAmount), 0);
+        const spendYtd = sup.purchaseOrders
+          .filter((po) => po.orderDate >= yearStart)
+          .reduce((sum, po) => sum + decimalToNumber(po.totalAmount), 0);
+
+        const metrics = {
+          onTimeDelivery,
+          qualityScore,
+          orderAccuracy,
+          avgResponseTime,
+          priceCompetitiveness: 100,
+        };
+
+        const performanceScore = calculateSupplierScore(metrics);
         const tier = getSupplierTier(performanceScore);
 
         return {
           supplierId: sup.id,
           supplierName: sup.name,
-          integrationType: sup.integrationType as any,
+          integrationType: "PORTAL",
           isActive: sup.isActive,
           performanceScore,
           tier,
           metrics: {
-            onTimeDelivery: sup.metrics.onTimeDelivery,
-            qualityScore: sup.metrics.qualityScore,
-            orderAccuracy: sup.metrics.orderAccuracy,
-            avgResponseTime: sup.metrics.avgResponseTime,
+            onTimeDelivery,
+            qualityScore,
+            orderAccuracy,
+            avgResponseTime,
           },
-          orders: sup.orders,
-          spend: sup.spend,
+          orders: {
+            total: totalOrders,
+            active: activeOrders,
+            completed: completedOrders,
+            disputed: disputedOrders,
+          },
+          spend: {
+            last30Days: spend30,
+            last90Days: spend90,
+            yearToDate: spendYtd,
+          },
         };
       });
 
@@ -449,36 +516,58 @@ export async function GET(request: NextRequest) {
 
     // Generate PO recommendations
     if (action === "recommendations") {
-      // Simulated inventory data
-      const inventoryData = [
-        {
-          productId: "PROD-001",
-          sku: "PKG-BOX-001",
-          quantity: 450,
-          avgDailySales: 85,
-          supplierId: "SUP-001",
-          supplierLeadTime: 7,
-          unitCost: 2.5,
+      const windowStart = new Date();
+      windowStart.setDate(windowStart.getDate() - 30);
+
+      const [inventoryItems, recentSales] = await Promise.all([
+        prisma.inventoryItem.findMany({
+          where: {
+            organizationId: session.user.organizationId,
+            isActive: true,
+            supplierId: { not: null },
+          },
+          select: {
+            id: true,
+            sku: true,
+            quantity: true,
+            leadTimeDays: true,
+            costPrice: true,
+            supplierId: true,
+          },
+          take: 500,
+        }),
+        prisma.salesOrderItem.findMany({
+          where: {
+            salesOrder: {
+              organizationId: session.user.organizationId,
+              orderDate: { gte: windowStart },
+            },
+          },
+          select: {
+            inventoryItemId: true,
+            quantity: true,
+          },
+        }),
+      ]);
+
+      const salesByItem = recentSales.reduce(
+        (acc, item) => {
+          acc[item.inventoryItemId] = (acc[item.inventoryItemId] || 0) +
+            item.quantity;
+          return acc;
         },
-        {
-          productId: "PROD-002",
-          sku: "LBL-SHIP-002",
-          quantity: 1200,
-          avgDailySales: 250,
-          supplierId: "SUP-002",
-          supplierLeadTime: 5,
-          unitCost: 0.15,
-        },
-        {
-          productId: "PROD-003",
-          sku: "TAPE-HD-003",
-          quantity: 180,
-          avgDailySales: 120,
-          supplierId: "SUP-003",
-          supplierLeadTime: 3,
-          unitCost: 3.75,
-        },
-      ];
+        {} as Record<string, number>,
+      );
+
+      const inventoryData = inventoryItems.map((item) => ({
+        productId: item.id,
+        sku: item.sku,
+        quantity: item.quantity,
+        avgDailySales: (salesByItem[item.id] || 0) / 30,
+        supplierId: item.supplierId || "",
+        supplierLeadTime: item.leadTimeDays ?? 7,
+        unitCost: decimalToNumber(item.costPrice),
+      }));
 
       const recommendations = generatePORecommendations(inventoryData);
 
@@ -531,30 +620,84 @@ export async function POST(request: NextRequest) {
         0,
       );
 
-      const poNumber = `PO-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+      const poDate = new Date();
+      const poNumber = `PO-${poDate.toISOString().slice(0, 10).replace(/-/g, "")}-${poDate.getTime()}`;
 
-      const po = await prisma.activityLog.create({
+      const supplier = await prisma.supplier.findFirst({
+        where: {
+          id: data.supplierId,
+          organizationId: session.user.organizationId,
+        },
+        select: { id: true, name: true },
+      });
+
+      if (!supplier) {
+        return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+      }
+
+      const skus = data.items.map((item) => item.sku);
+      const inventoryLookup = await prisma.inventoryItem.findMany({
+        where: {
+          organizationId: session.user.organizationId,
+          sku: { in: skus },
+        },
+        select: {
+          id: true,
+          sku: true,
+          name: true,
+        },
+      });
+
+      const inventoryBySku = new Map(inventoryLookup.map((item) => [item.sku, item]));
+
+      const po = await prisma.purchaseOrder.create({
+        data: {
+          organizationId: session.user.organizationId,
+          supplierId: data.supplierId,
+          poNumber,
+          status:
+            totalAmount < INTEGRATION_CONFIG.AUTOMATION_RULES.AUTO_APPROVE_THRESHOLD
+              ? "APPROVED"
+              : "PENDING",
+          expectedDate: new Date(data.deliveryDate),
+          totalAmount: new Prisma.Decimal(totalAmount),
+          notes: data.notes,
+          metadata: {
+            warehouseId: data.warehouseId,
+          },
+          createdById: session.user.id,
+          items: {
+            create: data.items.map((item) => {
+              const inventory = inventoryBySku.get(item.sku);
+              return {
+                inventoryItemId: inventory?.id,
+                sku: item.sku,
+                description: inventory?.name || item.productId,
+                quantityOrdered: item.quantity,
+                unitPrice: new Prisma.Decimal(item.unitPrice),
+                totalPrice: new Prisma.Decimal(item.quantity * item.unitPrice),
+              };
+            }),
+          },
+        },
+      });
+
+      await prisma.activityLog.create({
         data: {
           organizationId: session.user.organizationId,
           userId: session.user.id,
           action: "PURCHASE_ORDER",
           entityType: "PurchaseOrder",
-          entityId: poNumber,
+          entityId: po.id,
           metadata: {
             poNumber,
-            supplierId: data.supplierId,
-            items: data.items,
+            supplierId: supplier.id,
+            supplierName: supplier.name,
             totalAmount,
             itemCount: data.items.length,
+            status: po.status,
             deliveryDate: data.deliveryDate,
             warehouseId: data.warehouseId,
-            notes: data.notes,
-            status:
-              totalAmount <
-              INTEGRATION_CONFIG.AUTOMATION_RULES.AUTO_APPROVE_THRESHOLD
-                ? "APPROVED"
-                : "PENDING_APPROVAL",
-            createdAt: new Date().toISOString(),
           },
         },
       });
@@ -564,7 +707,7 @@ export async function POST(request: NextRequest) {
         purchaseOrder: {
           id: po.id,
           poNumber,
-          status: (po.metadata as any).status,
+          status: po.status,
           totalAmount,
         },
       });
@@ -575,7 +718,31 @@ export async function POST(request: NextRequest) {
       const parsed = UpdateOrderStatusSchema.parse(body);
       const { data } = parsed;
 
-      const update = await prisma.activityLog.create({
+      const existingOrder = await prisma.purchaseOrder.findFirst({
+        where: {
+          id: data.orderId,
+          organizationId: session.user.organizationId,
+        },
+        select: { id: true, status: true },
+      });
+
+      if (!existingOrder) {
+        return NextResponse.json(
+          { error: "Purchase order not found" },
+          { status: 404 },
+        );
+      }
+
+      const updatedOrder = await prisma.purchaseOrder.update({
+        where: { id: data.orderId },
+        data: {
+          status: data.status,
+          internalNotes: data.notes || undefined,
+        },
+        select: { id: true, status: true },
+      });
+
+      await prisma.activityLog.create({
         data: {
           organizationId: session.user.organizationId,
           userId: session.user.id,
@@ -594,6 +761,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         message: "Order status updated successfully",
+        order: updatedOrder,
       });
     }
 

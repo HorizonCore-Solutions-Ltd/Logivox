@@ -37,20 +37,62 @@ export async function GET(req: NextRequest) {
     const recommendations = await prisma.slottingRecommendation.findMany({
       where: {
         organizationId,
-        ...(warehouseId && { warehouseId }),
         ...(status && { status: status as any }),
       },
       include: {
-        inventoryItem: { select: { sku: true, name: true } },
-        currentLocation: { select: { locationCode: true, name: true } },
-        recommendedLocation: { select: { locationCode: true, name: true } },
+        item: { select: { sku: true, name: true } },
         rule: { select: { name: true } },
-        warehouse: { select: { name: true, code: true } },
       },
-      orderBy: [{ priority: "desc" }, { createdAt: "desc" }],
+      orderBy: [{ priorityScore: "desc" }, { createdAt: "desc" }],
     });
 
-    return NextResponse.json(recommendations);
+    const locationIds = [
+      ...new Set(
+        recommendations
+          .flatMap((r) => [r.currentLocationId, r.recommendedLocationId])
+          .filter((id): id is string => Boolean(id)),
+      ),
+    ];
+
+    const locations = locationIds.length
+      ? await prisma.location.findMany({
+          where: { id: { in: locationIds }, organizationId },
+          select: { id: true, locationCode: true, name: true, warehouseId: true },
+        })
+      : [];
+
+    const locationMap = new Map(locations.map((loc) => [loc.id, loc]));
+
+    const response = recommendations
+      .map((rec) => {
+        const currentLocation = rec.currentLocationId
+          ? locationMap.get(rec.currentLocationId)
+          : null;
+        const recommendedLocation = locationMap.get(rec.recommendedLocationId) || null;
+
+        return {
+          ...rec,
+          inventoryItem: rec.item,
+          currentLocation: currentLocation
+            ? { locationCode: currentLocation.locationCode, name: currentLocation.name }
+            : null,
+          recommendedLocation: recommendedLocation
+            ? {
+                locationCode: recommendedLocation.locationCode,
+                name: recommendedLocation.name,
+              }
+            : null,
+          priority: rec.priorityScore,
+        };
+      })
+      .filter((rec) =>
+        warehouseId
+          ? (locationMap.get(rec.recommendedLocationId)?.warehouseId || null) ===
+            warehouseId
+          : true,
+      );
+
+    return NextResponse.json(response);
   } catch (error: any) {
     console.error("Error fetching recommendations:", error);
     return NextResponse.json(
@@ -95,7 +137,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const appliedCount = 0;
     const results: any[] = [];
 
     for (const recId of recommendationIds) {
@@ -117,23 +158,71 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        // Update inventory item location
-        await prisma.inventoryItem.update({
-          where: { id: recommendation.inventoryItemId },
-          data: { locationId: recommendation.recommendedLocationId },
+        const inventoryItem = await prisma.inventoryItem.findUnique({
+          where: { id: recommendation.itemId },
+          select: {
+            id: true,
+            quantity: true,
+            availableQty: true,
+            metadata: true,
+            warehouseId: true,
+          },
         });
+
+        if (!inventoryItem) {
+          results.push({
+            id: recId,
+            success: false,
+            error: "Inventory item not found",
+          });
+          continue;
+        }
+
+        const metadataObject =
+          inventoryItem.metadata && typeof inventoryItem.metadata === "object"
+            ? (inventoryItem.metadata as Record<string, unknown>)
+            : {};
+
+        await prisma.inventoryItem.update({
+          where: { id: inventoryItem.id },
+          data: {
+            metadata: {
+              ...metadataObject,
+              slotting: {
+                currentLocationId: recommendation.currentLocationId,
+                recommendedLocationId: recommendation.recommendedLocationId,
+                implementedAt: new Date().toISOString(),
+                implementedBy: session.user.id,
+              },
+            },
+          },
+        });
+
+        const [fromLocation, toLocation] = await Promise.all([
+          recommendation.currentLocationId
+            ? prisma.location.findUnique({
+                where: { id: recommendation.currentLocationId },
+                select: { warehouseId: true },
+              })
+            : Promise.resolve(null),
+          prisma.location.findUnique({
+            where: { id: recommendation.recommendedLocationId },
+            select: { warehouseId: true },
+          }),
+        ]);
 
         // Create movement record
         await prisma.inventoryMovement.create({
           data: {
-            organizationId,
-            inventoryItemId: recommendation.inventoryItemId,
-            fromLocationId: recommendation.currentLocationId,
-            toLocationId: recommendation.recommendedLocationId,
-            quantity: 1, // Placeholder - should be actual quantity
-            movementType: "SLOTTING",
+            inventoryItemId: recommendation.itemId,
+            fromWarehouse:
+              fromLocation?.warehouseId || inventoryItem.warehouseId || undefined,
+            toWarehouse:
+              toLocation?.warehouseId || inventoryItem.warehouseId || undefined,
+            quantity: Math.max(1, inventoryItem.availableQty || inventoryItem.quantity),
+            type: "TRANSFER",
             reason: recommendation.reason,
-            status: "COMPLETED",
+            notes: `Slotting move from ${recommendation.currentLocationId || "UNASSIGNED"} to ${recommendation.recommendedLocationId}`,
           },
         });
 
@@ -141,9 +230,10 @@ export async function POST(req: NextRequest) {
         await prisma.slottingRecommendation.update({
           where: { id: recId },
           data: {
-            status: "APPLIED",
-            appliedAt: new Date(),
-            appliedById: session.user.id,
+            status: "IMPLEMENTED",
+            implementedAt: new Date(),
+            approvedBy: session.user.id,
+            approvedAt: recommendation.approvedAt || new Date(),
           },
         });
 

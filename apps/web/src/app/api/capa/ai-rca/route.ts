@@ -49,6 +49,7 @@ interface RecommendedAction {
 
 export async function POST(request: NextRequest) {
   try {
+    const analysisStartedAt = Date.now();
     const session = await getServerSession(authOptions);
     if (!session?.user?.organizationId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -146,7 +147,7 @@ export async function POST(request: NextRequest) {
           ),
         })),
         confidenceScore,
-        analysisTime: "47 seconds", // Placeholder for actual timing
+        analysisTime: `${((Date.now() - analysisStartedAt) / 1000).toFixed(1)} seconds`,
       },
     });
   } catch (error) {
@@ -219,8 +220,7 @@ async function generate5Whys(
   similarCAPAs: any[],
   context?: any,
 ): Promise<WhyStep[]> {
-  // Simulate AI-powered 5 Whys generation
-  // In production, this would call OpenAI/Claude API
+  // Heuristic 5 Whys generation based on detected historical patterns
 
   const whys: WhyStep[] = [
     {

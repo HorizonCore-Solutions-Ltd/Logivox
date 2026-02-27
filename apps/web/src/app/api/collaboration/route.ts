@@ -7,6 +7,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
+async function emitCollaborationEvent(
+  eventType: string,
+  payload: Record<string, unknown>,
+) {
+  const webhookUrl = process.env.COLLABORATION_EVENTS_WEBHOOK_URL;
+  if (!webhookUrl) {
+    return { delivered: false, reason: "not_configured" };
+  }
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ eventType, payload, timestamp: new Date().toISOString() }),
+    });
+    return { delivered: response.ok, statusCode: response.status };
+  } catch (error) {
+    console.error("Collaboration webhook error:", error);
+    return { delivered: false, reason: "request_failed" };
+  }
+}
+
 // GET - List collaboration requests
 export async function GET(req: NextRequest) {
   try {
@@ -66,7 +88,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Build filters
-    const where: any = {};
+    const where: Record<string, unknown> = {};
 
     if (requestType) {
       where.requestType = requestType;
@@ -153,7 +175,7 @@ export async function POST(req: NextRequest) {
     const request = await prisma.collaborationRequest.create({
       data: {
         requesterId: session.user.id,
-        requestType: requestType as any,
+        requestType,
         taskType,
         priority: priority || "MEDIUM",
         status: "PENDING",
@@ -194,7 +216,14 @@ export async function POST(req: NextRequest) {
       await analyzePredictiveRequest(request.id);
     }
 
-    // TODO: Send real-time notification via WebSocket
+    await emitCollaborationEvent("COLLABORATION_REQUEST_CREATED", {
+      requestId: request.id,
+      requestType,
+      taskType,
+      priority,
+      requesterId: session.user.id,
+      assigneeId: request.assigneeId,
+    });
 
     return NextResponse.json({
       success: true,
@@ -299,12 +328,11 @@ async function autoAssignPeerWorker(requestId: string) {
 
     if (!request) return;
 
-    // Find available workers in same warehouse
-    // TODO: Implement worker availability tracking
-    // For now, just notify all workers
-
-    // TODO: Send notification via WebSocket
-    console.log("Notifying peer workers for H2H collaboration:", requestId);
+    await emitCollaborationEvent("COLLABORATION_PEER_ASSIGNMENT_REQUESTED", {
+      requestId,
+      requesterId: request.requesterId,
+      status: request.status,
+    });
   } catch (error) {
     console.error("Auto-assign peer worker error:", error);
   }
@@ -319,16 +347,12 @@ async function autoAssignRobot(requestId: string, taskType: string) {
 
     if (!request) return;
 
-    // Find available robots based on task type
-    // TODO: Integrate with robot fleet management system
-    // For now, log the request
-
-    console.log("Auto-assigning robot for H2R collaboration:", {
+    await emitCollaborationEvent("COLLABORATION_ROBOT_ASSIGNMENT_REQUESTED", {
       requestId,
       taskType,
+      requesterId: request.requesterId,
+      status: request.status,
     });
-
-    // TODO: Send dispatch command to robot
   } catch (error) {
     console.error("Auto-assign robot error:", error);
   }
@@ -343,13 +367,12 @@ async function analyzePredictiveRequest(requestId: string) {
 
     if (!request) return;
 
-    // TODO: Use AI/ML to predict collaboration needs
-    // Analyze patterns, workload, timing, etc.
-
-    console.log("Analyzing predictive collaboration request:", requestId);
-
-    // Auto-trigger assistance based on prediction
-    // For now, just log
+    await emitCollaborationEvent("COLLABORATION_PREDICTIVE_ANALYSIS_REQUESTED", {
+      requestId,
+      requesterId: request.requesterId,
+      status: request.status,
+      taskType: request.taskType,
+    });
   } catch (error) {
     console.error("Analyze predictive request error:", error);
   }

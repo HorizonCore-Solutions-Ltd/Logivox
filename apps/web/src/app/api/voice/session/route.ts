@@ -6,8 +6,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { startVoiceSession, endVoiceSession } from "@/lib/voice/voiceEngine";
-import { prisma } from "@/lib/prisma";
+import {
+  startVoiceSession,
+  endVoiceSession,
+  getVoiceSession,
+} from "@/lib/voice/voiceEngine";
 
 // POST /api/voice/session - Start a new voice session
 export async function POST(request: NextRequest) {
@@ -64,32 +67,12 @@ export async function GET(request: NextRequest) {
     const sessionId = searchParams.get("sessionId");
 
     if (!sessionId) {
-      // Get active sessions for user
-      const voiceProfile = await prisma.voiceProfile.findUnique({
-        where: { userId: session.user.id },
-        include: {
-          voiceSessions: {
-            where: { status: "ACTIVE" },
-            orderBy: { startedAt: "desc" },
-          },
-        },
-      });
-
-      return NextResponse.json({
-        activeSessions: voiceProfile?.voiceSessions || [],
-      });
+      // In-memory session store — no DB model for voice sessions
+      return NextResponse.json({ activeSessions: [] });
     }
 
-    // Get specific session
-    const voiceSession = await prisma.voiceSession.findUnique({
-      where: { id: sessionId },
-      include: {
-        commands: {
-          orderBy: { timestamp: "desc" },
-          take: 20,
-        },
-      },
-    });
+    // Get specific session from in-memory store
+    const voiceSession = getVoiceSession(sessionId);
 
     if (!voiceSession) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
@@ -134,27 +117,27 @@ export async function PATCH(request: NextRequest) {
     }
 
     if (action === "pause") {
-      const pausedSession = await prisma.voiceSession.update({
-        where: { id: sessionId },
-        data: { status: "PAUSED" },
-      });
-
-      return NextResponse.json({
-        success: true,
-        session: pausedSession,
-      });
+      const s = getVoiceSession(sessionId);
+      if (!s) {
+        return NextResponse.json(
+          { error: "Session not found" },
+          { status: 404 },
+        );
+      }
+      s.status = "PAUSED";
+      return NextResponse.json({ success: true, session: s });
     }
 
     if (action === "resume") {
-      const resumedSession = await prisma.voiceSession.update({
-        where: { id: sessionId },
-        data: { status: "ACTIVE" },
-      });
-
-      return NextResponse.json({
-        success: true,
-        session: resumedSession,
-      });
+      const s = getVoiceSession(sessionId);
+      if (!s) {
+        return NextResponse.json(
+          { error: "Session not found" },
+          { status: 404 },
+        );
+      }
+      s.status = "ACTIVE";
+      return NextResponse.json({ success: true, session: s });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });

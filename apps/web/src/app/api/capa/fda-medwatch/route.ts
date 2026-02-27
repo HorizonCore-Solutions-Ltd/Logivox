@@ -75,20 +75,52 @@ interface FDASubmissionResult {
 }
 
 /**
- * Mock FDA FAERS API Client
- * In production, integrate with actual FDA ESG (Electronic Submissions Gateway)
+ * FDA FAERS API Client
+ * Requires FDA_FAERS_API_URL and FDA_FAERS_API_KEY to be configured.
  */
 async function submitToFDAFAERS(data: any): Promise<FDASubmissionResult> {
-  // Simulate FDA API call
-  // In production: Use FDA ESG API with proper authentication
-  console.log("[FDA FAERS] Submitting MedWatch Form 3500A:", data);
+  const endpoint = process.env.FDA_FAERS_API_URL;
+  const apiKey = process.env.FDA_FAERS_API_KEY;
 
-  // Simulate processing delay
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  if (!endpoint || !apiKey) {
+    throw new Error(
+      "FDA FAERS integration not configured. Set FDA_FAERS_API_URL and FDA_FAERS_API_KEY.",
+    );
+  }
 
-  // Mock successful submission
-  const fdaCaseNumber = `FDA-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-  const confirmationNumber = `CONF-${Date.now()}`;
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    return {
+      success: false,
+      errors: [
+        payload?.error ||
+          `FDA FAERS submission failed with status ${response.status}`,
+      ],
+    };
+  }
+
+  const fdaCaseNumber = payload?.fdaCaseNumber || payload?.caseNumber;
+  const confirmationNumber =
+    payload?.confirmationNumber || payload?.confirmationId;
+
+  if (!fdaCaseNumber || !confirmationNumber) {
+    return {
+      success: false,
+      errors: [
+        "FDA FAERS response missing required identifiers (case number and confirmation number)",
+      ],
+    };
+  }
 
   return {
     success: true,
@@ -571,6 +603,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Validation failed", details: error.errors },
         { status: 400 },
+      );
+    }
+
+    if (error?.message?.includes("not configured")) {
+      return NextResponse.json(
+        { error: error.message },
+        { status: 503 },
       );
     }
 

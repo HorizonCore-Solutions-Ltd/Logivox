@@ -78,11 +78,20 @@ export async function GET(request: NextRequest) {
 }
 
 async function trackSearch(query: string, tenantId: string) {
-  // Store search query for analytics (simplified - could use a dedicated search log table)
+  // Store search query for analytics via activity logs
   try {
-    // You could create a SearchLog model in Prisma
-    // For now, we'll skip actual storage
-    console.log(`Search tracked: "${query}" for tenant ${tenantId}`);
+    await prisma.activityLog.create({
+      data: {
+        organizationId: tenantId,
+        action: "SEARCH_QUERY",
+        entityType: "Search",
+        entityId: null,
+        metadata: {
+          query,
+          trackedAt: new Date().toISOString(),
+        },
+      },
+    });
   } catch (error) {
     console.error("Error tracking search:", error);
   }

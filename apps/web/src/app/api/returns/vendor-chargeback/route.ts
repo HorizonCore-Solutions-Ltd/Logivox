@@ -64,11 +64,12 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // TODO: Implement database query
-    return NextResponse.json({
-      chargebacks: [],
-      message: "Database integration pending",
-    });
+    const chargebacks = await vendorChargebackService.list(
+      organizationId,
+      status ?? undefined,
+    );
+
+    return NextResponse.json({ chargebacks });
   } catch (error: any) {
     console.error("Get chargebacks error:", error);
     return NextResponse.json(

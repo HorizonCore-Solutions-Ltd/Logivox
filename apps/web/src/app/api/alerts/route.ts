@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { ReorderAlertEngine, getAlertStatistics } from "@/lib/alerts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+async function getOrganizationId(userId: string): Promise<string | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      organizationMemberships: { include: { organization: true }, take: 1 },
+    },
+  });
+  return user?.organizationMemberships?.[0]?.organization?.id ?? null;
+}
 
 /**
  * GET /api/alerts
@@ -11,14 +23,16 @@ export const dynamic = "force-dynamic";
  */
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // TODO: Get organizationId from session/user
-    const organizationId = "org_example"; // Replace with actual org ID from session
+    const organizationId = await getOrganizationId(session.user.id);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+    }
 
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get("status");
@@ -49,14 +63,16 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // TODO: Get organizationId from session/user
-    const organizationId = "org_example"; // Replace with actual org ID from session
+    const organizationId = await getOrganizationId(session.user.id);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+    }
 
     const engine = new ReorderAlertEngine({
       organizationId,

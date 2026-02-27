@@ -3,6 +3,23 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+async function resolveOrganizationId(email?: string | null) {
+  if (!email) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      organizationMemberships: {
+        where: { isActive: true },
+        select: { organizationId: true },
+        take: 1,
+      },
+    },
+  });
+
+  return user?.organizationMemberships[0]?.organizationId || null;
+}
+
 // Validation schemas
 const createLoadPlanSchema = z.object({
   action: z.literal("create_load_plan"),
@@ -360,8 +377,13 @@ function calculateLoadScore(
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -414,6 +436,16 @@ export async function POST(request: NextRequest) {
         score,
       };
 
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          action: "DOCK_LOAD_PLAN",
+          entityType: "LoadPlan",
+          entityId: loadPlan.id,
+          metadata: loadPlan,
+        },
+      });
+
       return NextResponse.json({
         success: true,
         loadPlan,
@@ -433,8 +465,7 @@ export async function POST(request: NextRequest) {
     if (action === "optimize_load") {
       const data = optimizeLoadSchema.parse(body);
 
-      // Simulate getting existing load plan
-      const existingPlan = await getLoadPlan(data.loadPlanId);
+      const existingPlan = await getLoadPlan(organizationId, data.loadPlanId);
       if (!existingPlan) {
         return NextResponse.json(
           { error: "Load plan not found" },
@@ -478,15 +509,27 @@ export async function POST(request: NextRequest) {
         scoreImprovement: newScore - existingPlan.score,
       };
 
+      const optimizedLoadPlan: LoadPlan = {
+        ...existingPlan,
+        placedItems: optimizedPlacement,
+        utilization: newUtilization,
+        weightDistribution: newWeightDist,
+        score: newScore,
+      };
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          action: "DOCK_LOAD_PLAN_OPTIMIZED",
+          entityType: "LoadPlan",
+          entityId: existingPlan.id,
+          metadata: optimizedLoadPlan,
+        },
+      });
+
       return NextResponse.json({
         success: true,
-        optimizedLoadPlan: {
-          ...existingPlan,
-          placedItems: optimizedPlacement,
-          utilization: newUtilization,
-          weightDistribution: newWeightDist,
-          score: newScore,
-        },
+        optimizedLoadPlan,
         improvement,
         optimizationGoal: data.optimizationGoal,
       });
@@ -496,7 +539,7 @@ export async function POST(request: NextRequest) {
     if (action === "calculate_utilization") {
       const data = calculateUtilizationSchema.parse(body);
 
-      const loadPlan = await getLoadPlan(data.loadPlanId);
+      const loadPlan = await getLoadPlan(organizationId, data.loadPlanId);
       if (!loadPlan) {
         return NextResponse.json(
           { error: "Load plan not found" },
@@ -552,8 +595,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -569,7 +617,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const loadPlan = await getLoadPlan(loadPlanId);
+      const loadPlan = await getLoadPlan(organizationId, loadPlanId);
       if (!loadPlan) {
         return NextResponse.json(
           { error: "Load plan not found" },
@@ -587,47 +635,77 @@ export async function GET(request: NextRequest) {
 
     // GET LOAD SUMMARY
     if (action === "load_summary") {
+      const logs = await prisma.activityLog.findMany({
+        where: {
+          organizationId,
+          action: { in: ["DOCK_LOAD_PLAN", "DOCK_LOAD_PLAN_OPTIMIZED"] },
+          entityType: "LoadPlan",
+        },
+        orderBy: { createdAt: "desc" },
+        take: 200,
+      });
+
+      const latestByPlan = new Map<string, LoadPlan>();
+      logs.forEach((log) => {
+        const metadata = log.metadata as any;
+        if (metadata?.id && metadata?.utilization) {
+          latestByPlan.set(log.entityId, metadata as LoadPlan);
+        }
+      });
+
+      const plans = Array.from(latestByPlan.values());
+      const totalPlans = plans.length;
+      const avgCubeUtilization =
+        totalPlans > 0
+          ? plans.reduce((sum, plan) => sum + plan.utilization.cubePercent, 0) /
+            totalPlans
+          : 0;
+      const avgWeightUtilization =
+        totalPlans > 0
+          ? plans.reduce((sum, plan) => sum + plan.utilization.weightPercent, 0) /
+            totalPlans
+          : 0;
+      const avgScore =
+        totalPlans > 0
+          ? plans.reduce((sum, plan) => sum + plan.score, 0) / totalPlans
+          : 0;
+
+      const topPerformers = [...plans]
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map((plan) => ({
+          id: plan.id,
+          shipmentId: plan.shipmentId,
+          score: plan.score,
+          cubeUtilization: Number(plan.utilization.cubePercent.toFixed(1)),
+        }));
+
+      const needsOptimization = plans
+        .filter(
+          (plan) =>
+            plan.score < 75 ||
+            plan.utilization.cubePercent < 75 ||
+            Math.abs(plan.weightDistribution.middle - 60) > 15,
+        )
+        .slice(0, 5)
+        .map((plan) => ({
+          id: plan.id,
+          shipmentId: plan.shipmentId,
+          score: plan.score,
+          cubeUtilization: Number(plan.utilization.cubePercent.toFixed(1)),
+          issue:
+            plan.utilization.cubePercent < 75
+              ? "Low cube utilization"
+              : "Poor weight balance",
+        }));
+
       const summary = {
-        totalPlans: 47,
-        avgCubeUtilization: 87.3,
-        avgWeightUtilization: 82.1,
-        avgScore: 88.5,
-        topPerformers: [
-          {
-            id: "LOAD-001",
-            shipmentId: "SHP-501",
-            score: 96,
-            cubeUtilization: 94.2,
-          },
-          {
-            id: "LOAD-002",
-            shipmentId: "SHP-502",
-            score: 94,
-            cubeUtilization: 91.8,
-          },
-          {
-            id: "LOAD-003",
-            shipmentId: "SHP-503",
-            score: 92,
-            cubeUtilization: 89.5,
-          },
-        ],
-        needsOptimization: [
-          {
-            id: "LOAD-044",
-            shipmentId: "SHP-544",
-            score: 68,
-            cubeUtilization: 72.1,
-            issue: "Low cube utilization",
-          },
-          {
-            id: "LOAD-045",
-            shipmentId: "SHP-545",
-            score: 71,
-            cubeUtilization: 83.2,
-            issue: "Poor weight balance",
-          },
-        ],
+        totalPlans,
+        avgCubeUtilization: Number(avgCubeUtilization.toFixed(1)),
+        avgWeightUtilization: Number(avgWeightUtilization.toFixed(1)),
+        avgScore: Number(avgScore.toFixed(1)),
+        topPerformers,
+        needsOptimization,
       };
 
       return NextResponse.json({ summary });
@@ -644,56 +722,25 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper functions
-async function getLoadPlan(loadPlanId: string): Promise<LoadPlan | null> {
-  // Simulated load plan
-  const truckType: keyof typeof TRUCK_SPECS = "DRY_VAN_53";
-  const items: LoadItem[] = [
-    {
-      id: "ITEM-001",
-      length: 48,
-      width: 40,
-      height: 48,
-      weight: 1200,
-      quantity: 15,
-      stackable: true,
-      volume: 26.67,
+async function getLoadPlan(
+  organizationId: string,
+  loadPlanId: string,
+): Promise<LoadPlan | null> {
+  const log = await prisma.activityLog.findFirst({
+    where: {
+      organizationId,
+      entityType: "LoadPlan",
+      entityId: loadPlanId,
+      action: { in: ["DOCK_LOAD_PLAN", "DOCK_LOAD_PLAN_OPTIMIZED"] },
     },
-    {
-      id: "ITEM-002",
-      length: 36,
-      width: 36,
-      height: 36,
-      weight: 800,
-      quantity: 20,
-      stackable: true,
-      volume: 16.88,
-    },
-  ];
+    orderBy: { createdAt: "desc" },
+  });
 
-  const truckSpec = TRUCK_SPECS[truckType];
-  const placedItems = packItems(items, truckSpec, "MAXIMIZE_CUBE");
-  const utilization = calculateUtilization(placedItems, items, truckSpec);
-  const weightDistribution = calculateWeightDistribution(
-    placedItems,
-    truckSpec.length,
-  );
-  const score = calculateLoadScore(
-    utilization,
-    weightDistribution,
-    placedItems.length,
-    items.reduce((sum, item) => sum + item.quantity, 0),
-  );
+  if (!log?.metadata) {
+    return null;
+  }
 
-  return {
-    id: loadPlanId,
-    shipmentId: "SHP-2024-501",
-    truckType,
-    items,
-    placedItems,
-    utilization,
-    weightDistribution,
-    score,
-  };
+  return log.metadata as unknown as LoadPlan;
 }
 
 function generateRecommendations(

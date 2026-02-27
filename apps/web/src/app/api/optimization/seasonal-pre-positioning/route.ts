@@ -161,8 +161,8 @@ function generatePrePositionRecommendations(
   const productForecasts = new Map<string, SeasonalForecast[]>();
 
   forecasts.forEach((forecast) => {
-    const existing = productForecasts.get(forecast.productId) || [];
-    productForecasts.set(forecast.productId, [...existing, forecast]);
+    const existing = productForecasts.get(forecast.productSku) || [];
+    productForecasts.set(forecast.productSku, [...existing, forecast]);
   });
 
   const recommendations: PrePositionRecommendation[] = [];
@@ -220,6 +220,178 @@ function generatePrePositionRecommendations(
   return recommendations.sort((a, b) => b.netSavings - a.netSavings);
 }
 
+function getSeasonDateRange(season: string): { start: Date; end: Date } {
+  const year = new Date().getFullYear();
+  if (season === "SPRING") {
+    return {
+      start: new Date(`${year}-03-01T00:00:00Z`),
+      end: new Date(`${year}-05-31T23:59:59Z`),
+    };
+  }
+  if (season === "SUMMER") {
+    return {
+      start: new Date(`${year}-06-01T00:00:00Z`),
+      end: new Date(`${year}-08-31T23:59:59Z`),
+    };
+  }
+  if (season === "FALL") {
+    return {
+      start: new Date(`${year}-09-01T00:00:00Z`),
+      end: new Date(`${year}-11-30T23:59:59Z`),
+    };
+  }
+  return {
+    start: new Date(`${year}-12-01T00:00:00Z`),
+    end: new Date(`${year + 1}-02-28T23:59:59Z`),
+  };
+}
+
+function getSeasonMultiplier(season: string): number {
+  const multipliers: Record<string, number> = {
+    SPRING: 1.4,
+    SUMMER: 1.8,
+    FALL: 1.5,
+    WINTER: 2.1,
+  };
+  return multipliers[season] ?? 1.0;
+}
+
+async function buildSeasonalForecasts(
+  organizationId: string,
+  season: string,
+): Promise<SeasonalForecast[]> {
+  const { start: seasonStart, end: seasonEnd } = getSeasonDateRange(season);
+  const seasonDays = Math.max(
+    1,
+    Math.ceil((seasonEnd.getTime() - seasonStart.getTime()) / (24 * 60 * 60 * 1000)),
+  );
+
+  const now = new Date();
+  const ninetyDaysAgo = new Date(now);
+  ninetyDaysAgo.setDate(now.getDate() - 90);
+  const thirtyDaysAgo = new Date(now);
+  thirtyDaysAgo.setDate(now.getDate() - 30);
+  const sixtyDaysAgo = new Date(now);
+  sixtyDaysAgo.setDate(now.getDate() - 60);
+
+  const [inventoryItems, demand90, demand30, demandPrev30] = await Promise.all([
+    prisma.inventoryItem.findMany({
+      where: {
+        organizationId,
+        isActive: true,
+      },
+      select: {
+        id: true,
+        sku: true,
+        name: true,
+        availableQty: true,
+        minStockLevel: true,
+        reorderPoint: true,
+        warehouseId: true,
+        warehouse: { select: { name: true } },
+      },
+      take: 2000,
+    }),
+    prisma.salesOrderItem.groupBy({
+      by: ["inventoryItemId"],
+      where: {
+        salesOrder: {
+          organizationId,
+          orderDate: { gte: ninetyDaysAgo },
+        },
+      },
+      _sum: { quantity: true },
+    }),
+    prisma.salesOrderItem.groupBy({
+      by: ["inventoryItemId"],
+      where: {
+        salesOrder: {
+          organizationId,
+          orderDate: { gte: thirtyDaysAgo },
+        },
+      },
+      _sum: { quantity: true },
+    }),
+    prisma.salesOrderItem.groupBy({
+      by: ["inventoryItemId"],
+      where: {
+        salesOrder: {
+          organizationId,
+          orderDate: {
+            gte: sixtyDaysAgo,
+            lt: thirtyDaysAgo,
+          },
+        },
+      },
+      _sum: { quantity: true },
+    }),
+  ]);
+
+  const demand90Map = new Map(demand90.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]));
+  const demand30Map = new Map(demand30.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]));
+  const demandPrev30Map = new Map(
+    demandPrev30.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]),
+  );
+
+  const multiplier = getSeasonMultiplier(season);
+
+  return inventoryItems
+    .map((item) => {
+      const qty90 = demand90Map.get(item.id) ?? 0;
+      const qty30 = demand30Map.get(item.id) ?? 0;
+      const qtyPrev30 = demandPrev30Map.get(item.id) ?? 0;
+
+      const avgDailyDemand = qty90 / 90;
+      const trendMultiplier =
+        qtyPrev30 > 0
+          ? Math.max(0.7, Math.min(1.5, qty30 / qtyPrev30))
+          : qty30 > 0
+            ? 1.1
+            : 1.0;
+
+      const predictedDaily = calculateSeasonalDemand(
+        [{ year: now.getFullYear(), month: now.getMonth() + 1, sales: qty90, avgDailyDemand }],
+        multiplier,
+        trendMultiplier,
+      );
+
+      const predictedDemand = predictedDaily * seasonDays;
+      const recommendedStock = Math.max(
+        item.minStockLevel,
+        item.reorderPoint ?? 0,
+        Math.round(predictedDemand * 1.15),
+      );
+      const gap = recommendedStock - item.availableQty;
+
+      let trend: "INCREASING" | "STABLE" | "DECREASING" = "STABLE";
+      if (trendMultiplier > 1.1) trend = "INCREASING";
+      if (trendMultiplier < 0.9) trend = "DECREASING";
+
+      const confidence = Math.max(
+        65,
+        Math.min(96, 70 + Math.min(20, qty90 / 25) + (trend === "STABLE" ? 5 : 0)),
+      );
+
+      return {
+        productId: item.id,
+        productSku: item.sku,
+        productName: item.name,
+        warehouseId: item.warehouseId,
+        warehouseName: item.warehouse.name,
+        season,
+        currentStock: item.availableQty,
+        predictedDemand,
+        recommendedStock,
+        gap,
+        confidence,
+        seasonStart,
+        seasonEnd,
+        trend,
+      } as SeasonalForecast;
+    })
+    .filter((forecast) => forecast.predictedDemand > 0 || forecast.currentStock > 0);
+}
+
 // ============================================
 // GET: RETRIEVE SEASONAL DATA
 // ============================================
@@ -259,63 +431,11 @@ export async function GET(req: NextRequest) {
 
     // GET FORECASTS
     if (action === "forecasts") {
-      const season = searchParams.get("season");
-
-      // Mock forecasts for demonstration
-      const mockForecasts: SeasonalForecast[] = [
-        {
-          productId: "prod-1",
-          productSku: "SNOW-SHOVEL-001",
-          productName: "Heavy Duty Snow Shovel",
-          warehouseId: "wh-1",
-          warehouseName: "Northeast Distribution Center",
-          season: "WINTER",
-          currentStock: 450,
-          predictedDemand: 2400,
-          recommendedStock: 2800,
-          gap: 2350, // Need 2350 more units
-          confidence: 94,
-          seasonStart: new Date("2026-11-15"),
-          seasonEnd: new Date("2026-12-31"),
-          trend: "INCREASING",
-        },
-        {
-          productId: "prod-1",
-          productSku: "SNOW-SHOVEL-001",
-          productName: "Heavy Duty Snow Shovel",
-          warehouseId: "wh-2",
-          warehouseName: "Southeast Distribution Center",
-          season: "WINTER",
-          currentStock: 3200,
-          predictedDemand: 180,
-          recommendedStock: 250,
-          gap: -2950, // Over-stocked by 2950
-          confidence: 92,
-          seasonStart: new Date("2026-11-15"),
-          seasonEnd: new Date("2026-12-31"),
-          trend: "STABLE",
-        },
-        {
-          productId: "prod-2",
-          productSku: "BBQ-GRILL-042",
-          productName: "Premium BBQ Grill",
-          warehouseId: "wh-3",
-          warehouseName: "Southwest Distribution Center",
-          season: "SUMMER",
-          currentStock: 240,
-          predictedDemand: 1850,
-          recommendedStock: 2100,
-          gap: 1860,
-          confidence: 89,
-          seasonStart: new Date("2026-05-15"),
-          seasonEnd: new Date("2026-08-31"),
-          trend: "INCREASING",
-        },
-      ];
-
-      const filtered = season
-        ? mockForecasts.filter((f) => f.season === season)
-        : mockForecasts;
+      const selectedSeason = searchParams.get("season") || getCurrentSeason();
+      const filtered = await buildSeasonalForecasts(
+        organizationId,
+        selectedSeason,
+      );
 
       return NextResponse.json({
         forecasts: filtered,
@@ -327,8 +447,10 @@ export async function GET(req: NextRequest) {
           ),
           totalGap: filtered.reduce((sum, f) => sum + Math.abs(f.gap), 0),
           avgConfidence:
-            filtered.reduce((sum, f) => sum + f.confidence, 0) /
-            filtered.length,
+            filtered.length > 0
+              ? filtered.reduce((sum, f) => sum + f.confidence, 0) /
+                filtered.length
+              : 0,
         },
       });
     }
@@ -336,69 +458,15 @@ export async function GET(req: NextRequest) {
     // GET RECOMMENDATIONS
     if (action === "recommendations") {
       const priority = searchParams.get("priority");
-
-      // Mock recommendations
-      const mockRecommendations: PrePositionRecommendation[] = [
-        {
-          id: "recom-1",
-          productId: "prod-1",
-          productSku: "SNOW-SHOVEL-001",
-          productName: "Heavy Duty Snow Shovel",
-          sourceWarehouse: "Southeast DC",
-          targetWarehouse: "Northeast DC",
-          currentQuantitySource: 3200,
-          currentQuantityTarget: 450,
-          recommendedTransfer: 1000,
-          targetDate: new Date("2026-11-01"),
-          reason: "Pre-position for WINTER - predicted 2400 unit demand",
-          priority: "CRITICAL",
-          estimatedCostSavings: 25000,
-          estimatedFreightCost: 5000,
-          netSavings: 20000,
-          confidence: 92,
-        },
-        {
-          id: "recom-2",
-          productId: "prod-2",
-          productSku: "BBQ-GRILL-042",
-          productName: "Premium BBQ Grill",
-          sourceWarehouse: "Northeast DC",
-          targetWarehouse: "Southwest DC",
-          currentQuantitySource: 1850,
-          currentQuantityTarget: 240,
-          recommendedTransfer: 800,
-          targetDate: new Date("2026-05-01"),
-          reason: "Pre-position for SUMMER - predicted 1850 unit demand",
-          priority: "HIGH",
-          estimatedCostSavings: 20000,
-          estimatedFreightCost: 4000,
-          netSavings: 16000,
-          confidence: 89,
-        },
-        {
-          id: "recom-3",
-          productId: "prod-3",
-          productSku: "SCHOOL-SUPPLIES-088",
-          productName: "Back-to-School Bundle",
-          sourceWarehouse: "Central DC",
-          targetWarehouse: "Northeast DC",
-          currentQuantitySource: 4200,
-          currentQuantityTarget: 580,
-          recommendedTransfer: 600,
-          targetDate: new Date("2026-07-01"),
-          reason:
-            "Pre-position for BACK_TO_SCHOOL - predicted 1200 unit demand",
-          priority: "HIGH",
-          estimatedCostSavings: 15000,
-          estimatedFreightCost: 3000,
-          netSavings: 12000,
-          confidence: 87,
-        },
-      ];
-
+      const selectedSeason = searchParams.get("season") || getCurrentSeason();
+      const forecasts = await buildSeasonalForecasts(
+        organizationId,
+        selectedSeason,
+      );
+      const recommendations = generatePrePositionRecommendations(forecasts);
       const filtered = priority
-        ? mockRecommendations.filter((r) => r.priority === priority)
-        : mockRecommendations;
+        ? recommendations.filter((r) => r.priority === priority)
+        : recommendations;
 
       return NextResponse.json({
         recommendations: filtered,
@@ -410,31 +478,94 @@ export async function GET(req: NextRequest) {
             0,
           ),
           avgConfidence:
-            filtered.reduce((sum, r) => sum + r.confidence, 0) /
-            filtered.length,
+            filtered.length > 0
+              ? filtered.reduce((sum, r) => sum + r.confidence, 0) /
+                filtered.length
+              : 0,
         },
       });
     }
 
     // GET STATISTICS
     if (action === "stats") {
+      const currentSeason = getCurrentSeason();
+      const forecasts = await buildSeasonalForecasts(organizationId, currentSeason);
+      const recommendations = generatePrePositionRecommendations(forecasts);
+
+      const [totalProducts, trackedProducts, implementedTransfers] =
+        await Promise.all([
+          prisma.inventoryItem.count({ where: { organizationId, isActive: true } }),
+          prisma.salesOrderItem
+            .groupBy({
+              by: ["inventoryItemId"],
+              where: {
+                salesOrder: {
+                  organizationId,
+                  orderDate: {
+                    gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+                  },
+                },
+              },
+            })
+            .then((rows) => rows.length),
+          prisma.activityLog.count({
+            where: {
+              organizationId,
+              action: "SEASONAL_RECOMMENDATION_APPROVED",
+            },
+          }),
+        ]);
+
+      const avgForecastAccuracy =
+        forecasts.length > 0
+          ? forecasts.reduce((sum, forecast) => sum + forecast.confidence, 0) /
+            forecasts.length
+          : 0;
+
+      const totalUnitsSaved = recommendations.reduce(
+        (sum, recommendation) => sum + recommendation.recommendedTransfer,
+        0,
+      );
+      const monthlySavings = recommendations.reduce(
+        (sum, recommendation) => sum + recommendation.netSavings,
+        0,
+      );
+      const yearlySavings = monthlySavings * 12;
+      const roi = Number(((yearlySavings / 8000) * 100).toFixed(1));
+
+      const seasons = ["SPRING", "SUMMER", "FALL", "WINTER"];
+      const today = new Date();
+      const nextSeason = seasons
+        .map((season) => {
+          const range = getSeasonDateRange(season);
+          return {
+            season,
+            date: range.start,
+            daysUntil: Math.ceil(
+              (range.start.getTime() - today.getTime()) / (24 * 60 * 60 * 1000),
+            ),
+          };
+        })
+        .filter((entry) => entry.daysUntil >= 0)
+        .sort((a, b) => a.daysUntil - b.daysUntil)[0];
+
       return NextResponse.json({
-        totalProducts: 2847,
-        trackedProducts: 1256,
-        activeForecasts: 847,
-        pendingRecommendations: 34,
-        implementedTransfers: 128,
-        avgForecastAccuracy: 91.4, // percentage
-        totalUnitsSaved: 18500,
-        expeditedShipmentsSaved: 247,
-        monthlySavings: 10417,
-        yearlySavings: 125000,
-        roi: 1556, // percentage
+        totalProducts,
+        trackedProducts,
+        activeForecasts: forecasts.length,
+        pendingRecommendations: recommendations.length,
+        implementedTransfers,
+        avgForecastAccuracy: Number(avgForecastAccuracy.toFixed(1)),
+        totalUnitsSaved,
+        expeditedShipmentsSaved: recommendations.length,
+        monthlySavings: Number(monthlySavings.toFixed(2)),
+        yearlySavings: Number(yearlySavings.toFixed(2)),
+        roi,
         nextSeasonalEvent: {
-          name: "Summer Season",
-          date: "2026-05-15",
-          daysUntil: 127,
-          productsAffected: 247,
+          name: nextSeason?.season || currentSeason,
+          date: (nextSeason?.date || new Date()).toISOString().split("T")[0],
+          daysUntil: nextSeason?.daysUntil ?? 0,
+          productsAffected: forecasts.filter((forecast) => forecast.gap > 0).length,
         },
       });
     }
@@ -492,13 +623,35 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Run ML forecasting algorithm
-      // For now, return success
+      const forecasts = await buildSeasonalForecasts(organizationId, season);
+      const forecast = forecasts.find(
+        (entry) => entry.productId === productId && entry.warehouseId === warehouseId,
+      );
+
+      if (!forecast) {
+        return NextResponse.json(
+          { error: "No forecastable data found for product/warehouse" },
+          { status: 404 },
+        );
+      }
+
+      const forecastId = `SEASONAL-FORECAST-${Date.now()}`;
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "SEASONAL_FORECAST_GENERATED",
+          entityType: "SeasonalForecast",
+          entityId: forecastId,
+          metadata: forecast,
+        },
+      });
 
       return NextResponse.json({
         success: true,
         message: "Forecast generated",
-        forecastId: `forecast-${Date.now()}`,
+        forecastId,
+        forecast,
       });
     }
 
@@ -513,8 +666,19 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Create transfer order in system
-      // Schedule pre-positioning movement
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "SEASONAL_RECOMMENDATION_APPROVED",
+          entityType: "SeasonalRecommendation",
+          entityId: recommendationId,
+          metadata: {
+            recommendationId,
+            approvedAt: new Date().toISOString(),
+          },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -531,12 +695,30 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "season required" }, { status: 400 });
       }
 
-      // TODO: Generate forecasts for all products/warehouses for the season
+      const allForecasts = await buildSeasonalForecasts(organizationId, season);
+      const filteredForecasts = Array.isArray(productIds) && productIds.length > 0
+        ? allForecasts.filter((forecast) => productIds.includes(forecast.productId))
+        : allForecasts;
+
+      const batchId = `SEASONAL-BULK-${Date.now()}`;
+      if (filteredForecasts.length > 0) {
+        await prisma.activityLog.createMany({
+          data: filteredForecasts.map((forecast) => ({
+            organizationId,
+            userId: session.user.id,
+            action: "SEASONAL_FORECAST_GENERATED",
+            entityType: "SeasonalForecast",
+            entityId: batchId,
+            metadata: forecast,
+          })),
+        });
+      }
 
       return NextResponse.json({
         success: true,
         message: `Forecasts generated for ${season}`,
-        count: productIds?.length || 0,
+        count: filteredForecasts.length,
+        batchId,
       });
     }
 

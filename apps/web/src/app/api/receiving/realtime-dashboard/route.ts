@@ -370,54 +370,35 @@ async function getWorkerActivity(organizationId: string) {
 }
 
 async function getEquipmentStatus(organizationId: string) {
-  // Simulated equipment status (in production, integrate with IoT sensors)
-  const equipment = [
-    {
-      id: "forklift-1",
-      name: "Forklift #1",
-      type: "FORKLIFT",
-      status: "IN_USE",
-      operator: "John Doe",
-      batteryLevel: 85,
-      location: "Dock 3",
+  const logs = await prisma.activityLog.findMany({
+    where: {
+      organizationId,
+      action: "EQUIPMENT_STATUS_UPDATE",
+      entityType: "Equipment",
     },
-    {
-      id: "forklift-2",
-      name: "Forklift #2",
-      type: "FORKLIFT",
-      status: "AVAILABLE",
-      operator: null,
-      batteryLevel: 100,
-      location: "Charging Station",
-    },
-    {
-      id: "pallet-jack-1",
-      name: "Pallet Jack #1",
-      type: "PALLET_JACK",
-      status: "IN_USE",
-      operator: "Jane Smith",
-      batteryLevel: 62,
-      location: "Dock 7",
-    },
-    {
-      id: "scanner-1",
-      name: "Handheld Scanner #1",
-      type: "SCANNER",
-      status: "IN_USE",
-      operator: "Bob Wilson",
-      batteryLevel: 45,
-      location: "Dock 5",
-    },
-    {
-      id: "scale-1",
-      name: "Floor Scale #1",
-      type: "SCALE",
-      status: "AVAILABLE",
-      operator: null,
-      batteryLevel: null,
-      location: "Dock 2",
-    },
-  ];
+    orderBy: { createdAt: "desc" },
+    take: 500,
+  });
+
+  const latestEquipment = new Map<string, any>();
+  for (const log of logs) {
+    if (!log.entityId || latestEquipment.has(log.entityId)) continue;
+    const metadata = (log.metadata ?? {}) as any;
+    latestEquipment.set(log.entityId, {
+      id: log.entityId,
+      name: metadata.name || log.entityId,
+      type: metadata.type || "UNKNOWN",
+      status: metadata.status || "UNKNOWN",
+      operator: metadata.operator || null,
+      batteryLevel:
+        typeof metadata.batteryLevel === "number"
+          ? metadata.batteryLevel
+          : null,
+      location: metadata.location || null,
+    });
+  }
+
+  const equipment = Array.from(latestEquipment.values());
 
   const summary = {
     total: equipment.length,

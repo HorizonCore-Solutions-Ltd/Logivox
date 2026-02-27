@@ -53,9 +53,13 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // This would be implemented with a new method in TrainingService
-    // For now, return empty array
-    return NextResponse.json([]);
+    return NextResponse.json(
+      {
+        error:
+          "QC training requirements listing is not configured for this deployment.",
+      },
+      { status: 501 },
+    );
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

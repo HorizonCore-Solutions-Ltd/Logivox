@@ -110,6 +110,136 @@ const TIER_CONFIG = {
   },
 } as const;
 
+function deriveTierFromAnnualSpend(annualSpend: number) {
+  if (annualSpend >= 2_000_000) return "PLATINUM" as const;
+  if (annualSpend >= 1_000_000) return "GOLD" as const;
+  if (annualSpend >= 250_000) return "SILVER" as const;
+  return "BRONZE" as const;
+}
+
+type TierName = keyof typeof TIER_CONFIG;
+
+interface TierOverride {
+  customerId: string;
+  tier: TierName;
+  priorityMultiplier: number;
+  targetShipHours?: number;
+  effectiveFrom?: Date;
+  effectiveUntil?: Date;
+  isActive: boolean;
+}
+
+function parseDate(value: unknown): Date | undefined {
+  if (typeof value !== "string") return undefined;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+async function getTierOverrides(organizationId: string) {
+  const logs = await prisma.activityLog.findMany({
+    where: {
+      organizationId,
+      action: {
+        in: ["VIP_TIER_SET", "VIP_TIER_UPDATED", "VIP_TIER_REMOVED"],
+      },
+      entityType: "Customer",
+    },
+    orderBy: { createdAt: "desc" },
+    take: 5000,
+  });
+
+  const overrides = new Map<string, TierOverride>();
+
+  for (const log of logs) {
+    const metadata =
+      log.metadata && typeof log.metadata === "object"
+        ? (log.metadata as Record<string, unknown>)
+        : null;
+    if (!metadata) continue;
+
+    const customerId =
+      typeof metadata.customerId === "string" && metadata.customerId.length > 0
+        ? metadata.customerId
+        : log.entityId;
+    if (!customerId || overrides.has(customerId)) continue;
+
+    const tier =
+      metadata.tier === "BRONZE" ||
+      metadata.tier === "SILVER" ||
+      metadata.tier === "GOLD" ||
+      metadata.tier === "PLATINUM"
+        ? (metadata.tier as TierName)
+        : undefined;
+
+    const isActive =
+      typeof metadata.isActive === "boolean"
+        ? metadata.isActive
+        : log.action !== "VIP_TIER_REMOVED";
+
+    if (!tier && isActive) continue;
+
+    overrides.set(customerId, {
+      customerId,
+      tier: (tier || "BRONZE") as TierName,
+      priorityMultiplier:
+        typeof metadata.priorityMultiplier === "number"
+          ? metadata.priorityMultiplier
+          : tier
+            ? TIER_CONFIG[tier].multiplier
+            : TIER_CONFIG.BRONZE.multiplier,
+      targetShipHours:
+        typeof metadata.targetShipHours === "number"
+          ? metadata.targetShipHours
+          : undefined,
+      effectiveFrom: parseDate(metadata.effectiveFrom),
+      effectiveUntil: parseDate(metadata.effectiveUntil),
+      isActive,
+    });
+  }
+
+  return overrides;
+}
+
+function resolveTier(
+  customerId: string,
+  annualSpend: number,
+  overrides: Map<string, TierOverride>,
+) {
+  const derivedTier = deriveTierFromAnnualSpend(annualSpend);
+  const now = new Date();
+  const override = overrides.get(customerId);
+
+  if (
+    override &&
+    override.isActive &&
+    (!override.effectiveFrom || override.effectiveFrom <= now) &&
+    (!override.effectiveUntil || override.effectiveUntil >= now)
+  ) {
+    return {
+      tier: override.tier,
+      priorityMultiplier: override.priorityMultiplier,
+      slaHours: override.targetShipHours || TIER_CONFIG[override.tier].slaHours,
+      source: "MANUAL_OVERRIDE" as const,
+    };
+  }
+
+  return {
+    tier: derivedTier,
+    priorityMultiplier: TIER_CONFIG[derivedTier].multiplier,
+    slaHours: TIER_CONFIG[derivedTier].slaHours,
+    source: "AUTO_DERIVED" as const,
+  };
+}
+
+function buildRuleCode(name: string) {
+  const normalized = name
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 40);
+  return `VIP_${normalized || "RULE"}`;
+}
+
 // ============================================
 // PRIORITY CALCULATION ENGINE
 // ============================================
@@ -219,42 +349,74 @@ export async function GET(req: NextRequest) {
 
     // GET ALL CUSTOMER TIERS
     if (action === "tiers") {
-      // NOTE: Will work once models are migrated
-      // For now, return mock data for testing
-      const mockTiers = [
-        {
-          id: "tier-1",
-          customerId: "cust-1",
-          customerName: "Acme Corp",
-          tier: "PLATINUM",
-          priorityMultiplier: 10.0,
-          annualSpend: 2500000,
-          orderCount: 847,
-          avgOrderValue: 2952,
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+      const [customers, yearlyOrders, tierOverrides] = await Promise.all([
+        prisma.customer.findMany({
+          where: { organizationId, isActive: true },
+          select: { id: true, name: true },
+          take: 500,
+        }),
+        prisma.salesOrder.findMany({
+          where: {
+            organizationId,
+            orderDate: { gte: oneYearAgo },
+          },
+          select: {
+            customerId: true,
+            total: true,
+          },
+        }),
+        getTierOverrides(organizationId),
+      ]);
+
+      const spendByCustomer = new Map<string, number>();
+      const countByCustomer = new Map<string, number>();
+
+      for (const order of yearlyOrders) {
+        const total = Number(order.total || 0);
+        spendByCustomer.set(
+          order.customerId,
+          (spendByCustomer.get(order.customerId) || 0) + total,
+        );
+        countByCustomer.set(
+          order.customerId,
+          (countByCustomer.get(order.customerId) || 0) + 1,
+        );
+      }
+
+      const tiers = customers.map((customer) => {
+        const annualSpend = spendByCustomer.get(customer.id) || 0;
+        const orderCount = countByCustomer.get(customer.id) || 0;
+        const avgOrderValue = orderCount > 0 ? annualSpend / orderCount : 0;
+        const resolvedTier = resolveTier(customer.id, annualSpend, tierOverrides);
+
+        return {
+          id: `${customer.id}-${resolvedTier.tier}`,
+          customerId: customer.id,
+          customerName: customer.name,
+          tier: resolvedTier.tier,
+          priorityMultiplier: resolvedTier.priorityMultiplier,
+          tierSource: resolvedTier.source,
+          annualSpend,
+          orderCount,
+          avgOrderValue,
           isActive: true,
-        },
-        {
-          id: "tier-2",
-          customerId: "cust-2",
-          customerName: "Global Industries",
-          tier: "GOLD",
-          priorityMultiplier: 5.0,
-          annualSpend: 1200000,
-          orderCount: 412,
-          avgOrderValue: 2913,
-          isActive: true,
-        },
-      ];
+        };
+      });
+
+      const summary = {
+        platinum: tiers.filter((t) => t.tier === "PLATINUM").length,
+        gold: tiers.filter((t) => t.tier === "GOLD").length,
+        silver: tiers.filter((t) => t.tier === "SILVER").length,
+        bronze: tiers.filter((t) => t.tier === "BRONZE").length,
+      };
 
       return NextResponse.json({
-        tiers: mockTiers,
-        total: mockTiers.length,
-        summary: {
-          platinum: 1,
-          gold: 1,
-          silver: 0,
-          bronze: 0,
-        },
+        tiers,
+        total: tiers.length,
+        summary,
       });
     }
 
@@ -262,91 +424,156 @@ export async function GET(req: NextRequest) {
     if (action === "queue") {
       const status = searchParams.get("status") || "QUEUED";
 
-      // Mock priority queue for demonstration
-      const mockQueue = [
-        {
-          id: "order-1",
-          orderNumber: "SO-20260108-001",
-          customerId: "cust-1",
-          customerName: "Acme Corp",
-          tier: "PLATINUM",
-          basePriority: 100,
-          tierMultiplier: 10.0,
-          timeBoost: 4,
-          valueBoost: 25,
-          customBoost: 0,
-          finalScore: 1029,
-          rank: 1,
-          targetShipTime: new Date(Date.now() + 12 * 60 * 60 * 1000),
-          slaStatus: "ON_TIME",
-          status: "QUEUED",
-          isEscalated: false,
-        },
-        {
-          id: "order-2",
-          orderNumber: "SO-20260108-002",
-          customerId: "cust-2",
-          customerName: "Global Industries",
-          tier: "GOLD",
-          basePriority: 100,
-          tierMultiplier: 5.0,
-          timeBoost: 12,
-          valueBoost: 18,
-          customBoost: 0,
-          finalScore: 530,
-          rank: 2,
-          targetShipTime: new Date(Date.now() + 24 * 60 * 60 * 1000),
-          slaStatus: "ON_TIME",
-          status: "QUEUED",
-          isEscalated: false,
-        },
-        {
-          id: "order-3",
-          orderNumber: "SO-20260108-003",
-          customerId: "cust-3",
-          customerName: "Standard Customer",
-          tier: "BRONZE",
-          basePriority: 100,
-          tierMultiplier: 1.0,
-          timeBoost: 48,
-          valueBoost: 8,
-          customBoost: 0,
-          finalScore: 156,
-          rank: 3,
-          targetShipTime: new Date(Date.now() + 72 * 60 * 60 * 1000),
-          slaStatus: "ON_TIME",
-          status: "QUEUED",
-          isEscalated: false,
-        },
-      ];
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+      const openStatuses = ["APPROVED", "PICKING", "PICKED", "PACKING"];
+      const [orders, spendByCustomer, tierOverrides] = await Promise.all([
+        prisma.salesOrder.findMany({
+          where: {
+            organizationId,
+            status: { in: openStatuses as any },
+          },
+          include: {
+            customer: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          take: 500,
+          orderBy: { createdAt: "asc" },
+        }),
+        prisma.salesOrder.groupBy({
+          by: ["customerId"],
+          where: {
+            organizationId,
+            orderDate: { gte: oneYearAgo },
+          },
+          _sum: { total: true },
+        }),
+        getTierOverrides(organizationId),
+      ]);
+      const spendMap = new Map(
+        spendByCustomer.map((s) => [s.customerId, Number(s._sum.total || 0)]),
+      );
+
+      const queue = orders
+        .map((order) => {
+          const annualSpend = spendMap.get(order.customerId) || 0;
+          const tierResolution = resolveTier(
+            order.customerId,
+            annualSpend,
+            tierOverrides,
+          );
+          const tier = tierResolution.tier;
+          const tierMultiplier = tierResolution.priorityMultiplier;
+          const orderAgeHours =
+            (Date.now() - order.createdAt.getTime()) / (1000 * 60 * 60);
+          const orderValue = Number(order.total || 0);
+          const priority = calculatePriority({
+            basePriority: 100,
+            tierMultiplier,
+            orderAge: orderAgeHours,
+            orderValue,
+            customBoost: 0,
+          });
+
+          const targetShipTime = new Date(
+            order.createdAt.getTime() + tierResolution.slaHours * 60 * 60 * 1000,
+          );
+          const sla = checkSLAStatus(targetShipTime);
+
+          return {
+            id: order.id,
+            orderNumber: order.soNumber,
+            customerId: order.customerId,
+            customerName: order.customer.name,
+            tier,
+            basePriority: priority.basePriority,
+            tierMultiplier: priority.tierMultiplier,
+            timeBoost: priority.timeBoost,
+            valueBoost: priority.valueBoost,
+            customBoost: priority.customBoost,
+            finalScore: priority.finalScore,
+            tierSource: tierResolution.source,
+            targetShipTime,
+            slaStatus: sla.status,
+            status,
+            isEscalated: sla.status === "AT_RISK" || sla.status === "BREACHED",
+          };
+        })
+        .sort((a, b) => b.finalScore - a.finalScore)
+        .map((item, idx) => ({ ...item, rank: idx + 1 }));
+
+      const summary = {
+        onTime: queue.filter((q) => q.slaStatus === "ON_TIME").length,
+        atRisk: queue.filter((q) => q.slaStatus === "AT_RISK").length,
+        breached: queue.filter((q) => q.slaStatus === "BREACHED").length,
+        escalated: queue.filter((q) => q.isEscalated).length,
+      };
 
       return NextResponse.json({
-        queue: mockQueue,
-        total: mockQueue.length,
-        summary: {
-          onTime: 3,
-          atRisk: 0,
-          breached: 0,
-          escalated: 0,
-        },
+        queue,
+        total: queue.length,
+        summary,
       });
     }
 
     // GET STATISTICS
     if (action === "stats") {
-      return NextResponse.json({
-        totalCustomers: 847,
-        tieredCustomers: 247,
-        activeOrders: 156,
-        avgPriorityScore: 387,
-        avgFulfillmentTime: 18.4, // hours
-        slaCompliance: 97.8, // percentage
-        vipRevenue: 8947200, // annual
-        savings: {
-          monthly: 20583,
-          yearly: 247000,
-          roi: 3088, // percentage
+      const oneYearAgo = new Date();
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+      const [customerCount, orderCount, avgOrderAgg, yearlyRevenueAgg] =
+        await Promise.all([
+          prisma.customer.count({ where: { organizationId, isActive: true } }),
+          prisma.salesOrder.count({
+            where: {
+              organizationId,
+              status: { in: ["APPROVED", "PICKING", "PICKED", "PACKING"] as any },
+            },
+          }),
+          prisma.salesOrder.aggregate({
+            where: { organizationId },
+            _avg: { total: true },
+          }),
+          prisma.salesOrder.aggregate({
+            where: {
+              organizationId,
+              orderDate: { gte: oneYearAgo },
+            },
+            _sum: { total: true },
+          }),
+        ]);
+
+      const annualRevenue = Number(yearlyRevenueAgg._sum.total || 0);
+      const tieredCustomers = await prisma.customer.count({
+        where: {
+          organizationId,
+          salesOrders: {
+            some: {
+              orderDate: { gte: oneYearAgo },
+              total: { gte: 250000 as any },
+            },
+          },
         },
+      });
+
+      return NextResponse.json({
+        totalCustomers: customerCount,
+        tieredCustomers,
+        activeOrders: orderCount,
+        avgPriorityScore: null,
+        avgFulfillmentTime: null,
+        slaCompliance: null,
+        vipRevenue: annualRevenue,
+        savings: {
+          monthly: null,
+          yearly: null,
+          roi: null,
+        },
+        averageOrderValue: Number(avgOrderAgg._avg.total || 0),
       });
     }
 
@@ -412,12 +639,29 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Once models are migrated, use actual Prisma queries
-      // const customerTier = await prisma.customerTier.upsert({
-      //   where: { customerId: validated.customerId },
-      //   update: { ...validated, updatedAt: new Date() },
-      //   create: { ...validated, organizationId, createdBy: session.user.id },
-      // });
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "VIP_TIER_SET",
+          entityType: "Customer",
+          entityId: customer.id,
+          metadata: {
+            customerId: validated.customerId,
+            tier: validated.tier,
+            priorityMultiplier:
+              validated.priorityMultiplier || tierConfig.multiplier,
+            targetShipHours: validated.targetShipHours || tierConfig.slaHours,
+            guaranteedNextDay: validated.guaranteedNextDay,
+            freeShipping: validated.freeShipping,
+            dedicatedPicker: validated.dedicatedPicker,
+            qualityInspection: validated.qualityInspection,
+            effectiveFrom: validated.effectiveFrom || null,
+            effectiveUntil: validated.effectiveUntil || null,
+            isActive: true,
+          },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -464,16 +708,43 @@ export async function POST(req: NextRequest) {
     // CREATE PRIORITY RULE
     if (action === "CREATE_RULE") {
       const validated = priorityRuleSchema.parse(body);
+      const code = `${buildRuleCode(validated.name)}_${Date.now()}`;
 
-      // TODO: Once models are migrated
-      // const rule = await prisma.priorityRule.create({
-      //   data: { ...validated, organizationId, createdBy: session.user.id },
-      // });
+      const rule = await prisma.alertRule.create({
+        data: {
+          organizationId,
+          name: validated.name,
+          description: validated.description,
+          code,
+          category: "PERFORMANCE",
+          alertType: "EVENT",
+          severity: "MEDIUM",
+          triggerEntity: "SALES_ORDER",
+          triggerConditions: validated.conditions,
+          triggerFrequency: "REALTIME",
+          notificationChannels: ["IN_APP"],
+          recipientType: "ROLE",
+          recipients: {
+            role: "MANAGER",
+            notifyManager: validated.notifyManager,
+          },
+          isActive: validated.isActive,
+          metadata: {
+            ruleType: validated.ruleType,
+            priorityBoost: validated.priorityBoost,
+            autoEscalate: validated.autoEscalate,
+            tierId: validated.tierId,
+            priority: validated.priority,
+            source: "VIP_PRIORITY",
+          },
+          createdById: session.user.id,
+        },
+      });
 
       return NextResponse.json({
         success: true,
         message: "Priority rule created",
-        rule: validated,
+        rule,
       });
     }
 
@@ -488,17 +759,48 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Once models are migrated
-      // await prisma.orderPriority.update({
-      //   where: { orderId_organizationId: { orderId, organizationId } },
-      //   data: {
-      //     isEscalated: true,
-      //     escalatedAt: new Date(),
-      //     escalatedBy: session.user.id,
-      //     escalationReason: reason,
-      //     customBoost: 500, // Huge boost for escalated orders
-      //   },
-      // });
+      const order = await prisma.salesOrder.findFirst({
+        where: {
+          id: orderId,
+          organizationId,
+        },
+      });
+
+      if (!order) {
+        return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      }
+
+      await prisma.salesOrder.update({
+        where: { id: order.id },
+        data: {
+          internalNotes: [
+            order.internalNotes,
+            `[VIP ESCALATION ${new Date().toISOString()}] ${reason || "No reason provided"}`,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        },
+      });
+
+      await prisma.alert.create({
+        data: {
+          organizationId,
+          alertNumber: `ALT-${Date.now()}`,
+          category: "PERFORMANCE",
+          alertType: "EVENT",
+          severity: "HIGH",
+          title: "VIP order escalated",
+          message: `Order ${order.soNumber} was escalated${reason ? `: ${reason}` : ""}`,
+          relatedEntityType: "SalesOrder",
+          relatedEntityId: order.id,
+          status: "ACTIVE",
+          metadata: {
+            orderId,
+            reason: reason || null,
+            escalatedBy: session.user.id,
+          },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -519,21 +821,41 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Once models are migrated
-      // const results = await Promise.all(
-      //   updates.map((update) =>
-      //     prisma.customerTier.upsert({
-      //       where: { customerId: update.customerId },
-      //       update: { tier: update.tier, priorityMultiplier: update.priorityMultiplier },
-      //       create: { ...update, organizationId, createdBy: session.user.id },
-      //     })
-      //   )
-      // );
+      const validRows = updates
+        .map((row: unknown) => customerTierSchema.safeParse(row))
+        .filter((result): result is { success: true; data: z.infer<typeof customerTierSchema> } => result.success)
+        .map((result) => result.data);
+
+      if (validRows.length === 0) {
+        return NextResponse.json(
+          { error: "No valid tier updates supplied" },
+          { status: 400 },
+        );
+      }
+
+      await prisma.activityLog.createMany({
+        data: validRows.map((row) => ({
+          organizationId,
+          userId: session.user.id,
+          action: "VIP_TIER_UPDATED",
+          entityType: "Customer",
+          entityId: row.customerId,
+          metadata: {
+            customerId: row.customerId,
+            tier: row.tier,
+            priorityMultiplier: row.priorityMultiplier,
+            targetShipHours: row.targetShipHours || TIER_CONFIG[row.tier].slaHours,
+            effectiveFrom: row.effectiveFrom || null,
+            effectiveUntil: row.effectiveUntil || null,
+            isActive: true,
+          },
+        })),
+      });
 
       return NextResponse.json({
         success: true,
-        message: `${updates.length} customer tiers updated`,
-        count: updates.length,
+        message: `${validRows.length} customer tiers updated`,
+        count: validRows.length,
       });
     }
 
@@ -573,15 +895,51 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "ID required" }, { status: 400 });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
+    });
+
+    if (!user?.organizationMemberships?.[0]) {
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
+    }
+
+    const organizationId = user.organizationMemberships[0].organizationId;
+
     // UPDATE TIER
     if (action === "UPDATE_TIER") {
       const updates = customerTierSchema.partial().parse(body);
 
-      // TODO: Once models are migrated
-      // const tier = await prisma.customerTier.update({
-      //   where: { id },
-      //   data: updates,
-      // });
+      const customer = await prisma.customer.findFirst({
+        where: {
+          id,
+          organizationId,
+        },
+      });
+
+      if (!customer) {
+        return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+      }
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "VIP_TIER_UPDATED",
+          entityType: "Customer",
+          entityId: id,
+          metadata: {
+            customerId: id,
+            ...updates,
+            isActive: true,
+          },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -593,11 +951,48 @@ export async function PUT(req: NextRequest) {
     if (action === "UPDATE_RULE") {
       const updates = priorityRuleSchema.partial().parse(body);
 
-      // TODO: Once models are migrated
-      // const rule = await prisma.priorityRule.update({
-      //   where: { id },
-      //   data: updates,
-      // });
+      const existing = await prisma.alertRule.findFirst({
+        where: {
+          id,
+          organizationId,
+        },
+      });
+
+      if (!existing) {
+        return NextResponse.json({ error: "Rule not found" }, { status: 404 });
+      }
+
+      const existingMetadata =
+        existing.metadata && typeof existing.metadata === "object"
+          ? (existing.metadata as Record<string, unknown>)
+          : {};
+
+      await prisma.alertRule.update({
+        where: { id: existing.id },
+        data: {
+          ...(updates.name && { name: updates.name }),
+          ...(updates.description !== undefined && {
+            description: updates.description,
+          }),
+          ...(updates.conditions && { triggerConditions: updates.conditions }),
+          ...(updates.isActive !== undefined && { isActive: updates.isActive }),
+          metadata: {
+            ...existingMetadata,
+            ...(updates.ruleType && { ruleType: updates.ruleType }),
+            ...(updates.priorityBoost !== undefined && {
+              priorityBoost: updates.priorityBoost,
+            }),
+            ...(updates.autoEscalate !== undefined && {
+              autoEscalate: updates.autoEscalate,
+            }),
+            ...(updates.notifyManager !== undefined && {
+              notifyManager: updates.notifyManager,
+            }),
+            ...(updates.tierId !== undefined && { tierId: updates.tierId }),
+            ...(updates.priority !== undefined && { priority: updates.priority }),
+          },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -630,6 +1025,22 @@ export async function DELETE(req: NextRequest) {
     const id = searchParams.get("id");
     const type = searchParams.get("type");
 
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
+    });
+
+    if (!user?.organizationMemberships?.[0]) {
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
+    }
+
+    const organizationId = user.organizationMemberships[0].organizationId;
+
     if (!id || !type) {
       return NextResponse.json(
         { error: "ID and type required" },
@@ -639,8 +1050,20 @@ export async function DELETE(req: NextRequest) {
 
     // DELETE TIER
     if (type === "tier") {
-      // TODO: Once models are migrated
-      // await prisma.customerTier.delete({ where: { id } });
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "VIP_TIER_REMOVED",
+          entityType: "Customer",
+          entityId: id,
+          metadata: {
+            customerId: id,
+            isActive: false,
+            effectiveUntil: new Date().toISOString(),
+          },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -650,8 +1073,18 @@ export async function DELETE(req: NextRequest) {
 
     // DELETE RULE
     if (type === "rule") {
-      // TODO: Once models are migrated
-      // await prisma.priorityRule.delete({ where: { id } });
+      const rule = await prisma.alertRule.findFirst({
+        where: {
+          id,
+          organizationId,
+        },
+      });
+
+      if (!rule) {
+        return NextResponse.json({ error: "Rule not found" }, { status: 404 });
+      }
+
+      await prisma.alertRule.delete({ where: { id: rule.id } });
 
       return NextResponse.json({
         success: true,

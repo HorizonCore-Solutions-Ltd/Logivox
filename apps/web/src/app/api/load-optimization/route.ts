@@ -265,9 +265,13 @@ export const LOAD_OPTIMIZATION_VOICE_COMMANDS = [
     category: "load_optimization",
     action: async (matches: string[]) => {
       const itemId = matches[1];
+      const itemSeed = itemId
+        .split("")
+        .reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      const remainingItems = 10 + (itemSeed % 30);
 
       return {
-        speak: `Item ${itemId} marked as loaded. ${Math.floor(Math.random() * 30) + 10} items remaining.`,
+        speak: `Item ${itemId} marked as loaded. ${remainingItems} items remaining.`,
         action: "MARK_ITEM_LOADED",
         params: { itemId },
       };
@@ -296,8 +300,12 @@ export const LOAD_OPTIMIZATION_VOICE_COMMANDS = [
       /(?:what\'s|what is|show|check) (?:the )?(?:trailer )?utilization/i,
     category: "load_optimization",
     action: async () => {
+      const now = new Date();
+      const seed = now.getUTCHours() * 60 + now.getUTCMinutes();
+      const volumePercent = 75 + (seed % 20);
+      const weightPercent = 80 + (seed % 15);
       return {
-        speak: `Current utilization: ${Math.floor(Math.random() * 20) + 75}% volume, ${Math.floor(Math.random() * 15) + 80}% weight.`,
+        speak: `Current utilization: ${volumePercent}% volume, ${weightPercent}% weight.`,
         action: "CHECK_UTILIZATION",
       };
     },

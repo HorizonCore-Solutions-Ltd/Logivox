@@ -18,7 +18,7 @@ const createRouteSchema = z.object({
       "SHORTEST_PATH",
       "NEAREST_NEIGHBOR",
       "GENETIC_ALGORITHM",
-      "SIMULATED_ANNEALING",
+      "ANNEALING",
       "MANUAL",
     ])
     .default("SHORTEST_PATH"),

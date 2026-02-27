@@ -1,8 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const dbUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        organizationMemberships: { include: { organization: true }, take: 1 },
+      },
+    });
+    const orgId = dbUser?.organizationMemberships?.[0]?.organization?.id;
+    if (!orgId) {
+      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+    }
+    const userName = session.user.name || session.user.email || session.user.id;
+
     const body = await request.json();
     const { lotNumber, result, defects, sampleSize, photos, notes, signature } =
       body;
@@ -11,7 +30,7 @@ export async function POST(request: NextRequest) {
     const inspection = await prisma.qualityMeasurement.create({
       data: {
         measurementNumber: `MOBILE-${Date.now()}`,
-        organizationId: "default", // TODO: Get from auth
+        organizationId: orgId,
         productSku: "UNKNOWN",
         productName: "Mobile Inspection",
         measurementType: "WEIGHT", // Using existing enum value
@@ -22,9 +41,9 @@ export async function POST(request: NextRequest) {
         withinSpec: result === "PASS",
         withinControl: result === "PASS",
         conformanceStatus: result === "PASS" ? "CONFORMING" : "NON_CONFORMING",
-        measuredBy: "Mobile User", // TODO: Get from auth
+        measuredBy: userName,
         calibrationCurrent: true,
-        createdBy: "Mobile User",
+        createdBy: userName,
         notes: `Sample: ${sampleSize}, Defects: ${defects}\n${notes}`,
         // Store photos and signature in metadata
       },
@@ -35,10 +54,10 @@ export async function POST(request: NextRequest) {
       await prisma.nonConformanceReport.create({
         data: {
           ncrNumber: `NCR-MOBILE-${Date.now()}`,
-          organizationId: "default", // TODO: Get from auth
+          organizationId: orgId,
           title: `Mobile Inspection Failure - ${lotNumber}`,
           description: notes || "Failed mobile inspection",
-          discoveredBy: "Mobile User", // TODO: Get from auth
+          discoveredBy: userName,
           discoveryLocation: "MOBILE_INSPECTION",
           reportDate: new Date(),
           sourceType: "PRODUCTION",
@@ -49,7 +68,7 @@ export async function POST(request: NextRequest) {
           quantityAffected: defects,
           disposition: "QUARANTINE",
           status: "OPEN",
-          createdBy: "Mobile User",
+          createdBy: userName,
         },
       });
     }

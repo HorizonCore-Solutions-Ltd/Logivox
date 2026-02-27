@@ -17,17 +17,23 @@ export async function GET(
     // Get user's organization
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: true },
+      include: {
+        organizationMemberships: {
+          where: { isActive: true },
+          include: { organization: true },
+          take: 1,
+        },
+      },
     });
 
-    if (!user?.organizations?.[0]?.id) {
+    const organizationId = user?.organizationMemberships?.[0]?.organizationId;
+
+    if (!organizationId) {
       return NextResponse.json(
         { message: "No organization found" },
         { status: 404 },
       );
     }
-
-    const organizationId = user.organizations[0].id;
 
     // Fetch booking
     const booking = await prisma.booking.findFirst({
@@ -80,17 +86,23 @@ export async function PATCH(
     // Get user's organization
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: { organizations: true },
+      include: {
+        organizationMemberships: {
+          where: { isActive: true },
+          include: { organization: true },
+          take: 1,
+        },
+      },
     });
 
-    if (!user?.organizations?.[0]?.id) {
+    const organizationId = user?.organizationMemberships?.[0]?.organizationId;
+
+    if (!organizationId) {
       return NextResponse.json(
         { message: "No organization found" },
         { status: 404 },
       );
     }
-
-    const organizationId = user.organizations[0].id;
 
     // Verify booking exists and belongs to organization
     const existingBooking = await prisma.booking.findFirst({
@@ -131,10 +143,10 @@ export async function PATCH(
         const inventoryItem = item.inventoryItem;
 
         // Check if enough stock available
-        if (inventoryItem.availableQuantity < item.quantity) {
+        if (inventoryItem.availableQty < item.quantityBooked) {
           return NextResponse.json(
             {
-              message: `Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.availableQuantity}, Required: ${item.quantity}`,
+              message: `Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.availableQty}, Required: ${item.quantityBooked}`,
             },
             { status: 400 },
           );
@@ -144,21 +156,18 @@ export async function PATCH(
         await prisma.inventoryItem.update({
           where: { id: inventoryItem.id },
           data: {
-            availableQuantity: inventoryItem.availableQuantity - item.quantity,
-            reservedQuantity: inventoryItem.reservedQuantity + item.quantity,
+            availableQty: inventoryItem.availableQty - item.quantityBooked,
+            reservedQty: inventoryItem.reservedQty + item.quantityBooked,
           },
         });
 
         // Create stock movement record
-        await prisma.stockMovement.create({
+        await prisma.inventoryMovement.create({
           data: {
             inventoryItemId: inventoryItem.id,
-            type: "RESERVATION",
-            quantity: -item.quantity,
-            previousQuantity: inventoryItem.quantity,
-            newQuantity: inventoryItem.quantity - item.quantity,
+            type: "BOOKING",
+            quantity: item.quantityBooked,
             reason: `Booking #${existingBooking.id.slice(0, 8)} fulfilled`,
-            performedById: session.user.id,
           },
         });
       }
@@ -184,11 +193,12 @@ export async function PATCH(
         action: "UPDATE",
         entityType: "booking",
         entityId: booking.id,
+        organizationId,
         userId: session.user.id,
-        details: JSON.stringify({
+        metadata: {
           status: booking.status,
           previousStatus: existingBooking.status,
-        }),
+        },
         ipAddress: request.headers.get("x-forwarded-for") || "unknown",
         userAgent: request.headers.get("user-agent") || "unknown",
       },

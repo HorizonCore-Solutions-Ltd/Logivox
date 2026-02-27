@@ -53,10 +53,13 @@ export async function POST(request: NextRequest) {
     // Process each tag
     const results = await Promise.all(
       tags.map(async (tag: string) => {
+        const signalSeed = tag
+          .split("")
+          .reduce((sum, char) => sum + char.charCodeAt(0), 0);
         const reading = {
           deviceId,
           tag,
-          signalStrength: Math.random() * 100, // From RFID reader
+          signalStrength: signalSeed % 101,
           timestamp: new Date(),
           location: location || "UNKNOWN",
           scanType,

@@ -28,6 +28,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 import { z } from "zod";
 
 // ============================================================================
@@ -322,7 +323,7 @@ function generateTransferRecommendations(
       }
 
       recommendations.push({
-        id: `TR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `TR-${Date.now()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
         productId: source.inventory.productId,
         sku: source.inventory.sku,
         sourceWarehouse: source.warehouseName,
@@ -373,7 +374,7 @@ function generateTransferRecommendations(
       if (netBenefit <= 0) continue;
 
       recommendations.push({
-        id: `TR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `TR-${Date.now()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
         productId: source.inventory.productId,
         sku: source.inventory.sku,
         sourceWarehouse: source.warehouseName,
@@ -492,11 +493,60 @@ export async function GET(request: NextRequest) {
         const warehouse = warehouseMap.get(inv.warehouseId);
         if (!warehouse) continue;
 
-        // Get sales data (last 90 days) - using mock data since Order model doesn't exist
-        const last30Days = Math.floor(Math.random() * 100) + 50; // Mock data
-        const last90Days = last30Days * 3;
+        const [sales30Days, sales90Days, latestSale] = await Promise.all([
+          prisma.salesOrderItem.aggregate({
+            where: {
+              inventoryItemId: inv.id,
+              salesOrder: {
+                organizationId: session.user.organizationId,
+                warehouseId: inv.warehouseId,
+                orderDate: {
+                  gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+                },
+              },
+            },
+            _sum: {
+              quantity: true,
+            },
+          }),
+          prisma.salesOrderItem.aggregate({
+            where: {
+              inventoryItemId: inv.id,
+              salesOrder: {
+                organizationId: session.user.organizationId,
+                warehouseId: inv.warehouseId,
+                orderDate: {
+                  gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
+                },
+              },
+            },
+            _sum: {
+              quantity: true,
+            },
+          }),
+          prisma.salesOrder.findFirst({
+            where: {
+              organizationId: session.user.organizationId,
+              warehouseId: inv.warehouseId,
+              items: {
+                some: {
+                  inventoryItemId: inv.id,
+                },
+              },
+            },
+            orderBy: {
+              orderDate: "desc",
+            },
+            select: {
+              orderDate: true,
+            },
+          }),
+        ]);
+
+        const last30Days = sales30Days._sum.quantity ?? 0;
+        const last90Days = sales90Days._sum.quantity ?? 0;
         const avgDailySales = last90Days / 90;
-        const lastSaleDate = new Date();
+        const lastSaleDate = latestSale?.orderDate ?? null;
 
         const health = analyzeInventoryHealth(
           inv.quantity,
@@ -532,7 +582,7 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      // Generate transfer recommendations (simplified for now)
+      // Generate transfer recommendations
       const recommendations: TransferRecommendation[] = [];
 
       // Calculate summary metrics

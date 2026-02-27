@@ -27,53 +27,79 @@ export async function GET(
     const limit = parseInt(searchParams.get("limit") || "10");
     const type = searchParams.get("type") || "all"; // all, user-based, item-based, trending, personalized
 
-    // Get tenant ID from first organization
-    const tenantId = session.user.organizations[0]?.id;
+    // Get tenant ID from session organizations or DB lookup
+    let tenantId = (session.user as any).organizations?.[0]?.id;
     if (!tenantId) {
-      return NextResponse.json(
-        { error: "No organization found" },
-        { status: 400 },
-      );
+      const dbUser = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+      });
+      tenantId = dbUser?.organizationMemberships?.[0]?.organization?.id;
+    }
+    if (!tenantId) {
+      return NextResponse.json({ error: "No organization found" }, { status: 400 });
     }
 
-    // Fetch products
-    const products = await prisma.product.findMany({
-      where: { tenantId },
+    // Fetch inventory items (InventoryItem is the product catalog)
+    const inventoryItems = await prisma.inventoryItem.findMany({
+      where: { organizationId: tenantId },
       select: {
-        id: true,
-        name: true,
-        description: true,
-        category: true,
-        stock: true,
-        unitPrice: true,
-        tags: true,
+        id: true, name: true, description: true, category: true,
+        totalQty: true, unitCost: true, tags: true,
       },
+      take: 500,
     });
 
     // Transform to expected format
-    const productList = products.map((p: (typeof products)[number]) => ({
+    const productList = inventoryItems.map((p) => ({
       id: p.id,
       name: p.name,
       category: p.category || "Uncategorized",
-      price: Number(p.unitPrice),
-      tags: p.tags || [],
+      price: Number(p.unitCost ?? 0),
+      tags: (p.tags as string[]) || [],
       description: p.description || "",
     }));
 
-    // Create dummy data for demo (in production, fetch real data)
+    // Build real user profile from sales order history
+    const recentOrders = await prisma.salesOrder.findMany({
+      where: { organizationId: tenantId, createdById: session.user.id },
+      include: { items: { select: { inventoryItemId: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    });
+    const purchasedItemIds = recentOrders
+      .flatMap((o) => o.items)
+      .map((i) => i.inventoryItemId)
+      .filter(Boolean) as string[];
+    const purchasedCategories = [
+      ...new Set(
+        inventoryItems
+          .filter((p) => purchasedItemIds.includes(p.id))
+          .map((p) => p.category || "Uncategorized"),
+      ),
+    ];
+
     const userProfile: UserProfile = {
       userId: session.user.id,
-      purchases: [],
+      purchases: purchasedItemIds.map((id) => ({ productId: id, quantity: 1, date: new Date() })),
       views: [],
-      categories: [],
+      categories: purchasedCategories,
       priceRange: { min: 0, max: 100000 },
     };
 
+    // Build purchase history pairs for item-based recommendations
+    const purchaseHistory: Array<{ productId: string; relatedProductId: string }> = [];
+    for (const order of recentOrders) {
+      const ids = order.items.map((i) => i.inventoryItemId).filter(Boolean) as string[];
+      for (let i = 0; i < ids.length; i++) {
+        for (let j = i + 1; j < ids.length; j++) {
+          purchaseHistory.push({ productId: ids[i], relatedProductId: ids[j] });
+          purchaseHistory.push({ productId: ids[j], relatedProductId: ids[i] });
+        }
+      }
+    }
+
     const allUsers: UserProfile[] = [userProfile];
-    const purchaseHistory: Array<{
-      productId: string;
-      relatedProductId: string;
-    }> = [];
 
     let recommendations: RecommendationResult[] = [];
 
@@ -96,8 +122,16 @@ export async function GET(
         );
         break;
 
-      case "trending":
-        const recentPurchases: Array<{ productId: string; date: Date }> = [];
+      case "trending": {
+        // Use real recent order data to compute trending products
+        const recentPurchases = recentOrders
+          .flatMap((o) =>
+            o.items.map((i) => ({
+              productId: i.inventoryItemId!,
+              date: o.createdAt,
+            })),
+          )
+          .filter((p) => p.productId);
         recommendations = await getTrendingProducts(
           recentPurchases,
           productList,
@@ -105,6 +139,7 @@ export async function GET(
           limit,
         );
         break;
+      }
 
       case "personalized":
         recommendations = await getPersonalizedRecommendations(
@@ -115,19 +150,30 @@ export async function GET(
         break;
 
       case "all":
-      default:
-        // For demo, just return trending products (most popular)
-        recommendations = productList
-          .slice(0, limit)
-          .map((p: (typeof productList)[number]) => ({
-            productId: p.id,
-            productName: p.name,
-            score: Math.random(),
-            reason: "Recommended for you",
-            category: p.category,
-            price: p.price,
-          }));
+      default: {
+        // Blend personalized + trending as a combined "all" result
+        const [personalized, trending] = await Promise.all([
+          getPersonalizedRecommendations(userProfile, productList, Math.ceil(limit / 2)),
+          getTrendingProducts(
+            recentOrders
+              .flatMap((o) =>
+                o.items.map((i) => ({ productId: i.inventoryItemId!, date: o.createdAt })),
+              )
+              .filter((p) => p.productId),
+            productList,
+            7,
+            Math.ceil(limit / 2),
+          ),
+        ]);
+        // Merge and de-duplicate
+        const seen = new Set<string>();
+        recommendations = [...personalized, ...trending].filter((r) => {
+          if (seen.has(r.productId)) return false;
+          seen.add(r.productId);
+          return true;
+        }).slice(0, limit);
         break;
+      }
     }
 
     return NextResponse.json({

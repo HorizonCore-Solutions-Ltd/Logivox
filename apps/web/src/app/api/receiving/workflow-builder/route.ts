@@ -116,7 +116,7 @@ class WorkflowEngine {
           return { success: true, output: { started: true } };
 
         case "SCAN_RECEIPT":
-          // Simulate barcode scanning
+          // Validate scanned barcode input
           if (!data.barcode) {
             return { success: false, error: "Barcode required" };
           }

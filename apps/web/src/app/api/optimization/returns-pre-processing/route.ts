@@ -103,6 +103,41 @@ type Disposition =
   | "VENDOR_RETURN"
   | "WARRANTY_CLAIM";
 
+function mapRmaReason(code?: string): ReturnReason {
+  const normalized = (code || "OTHER").toUpperCase();
+  if (
+    normalized === "DEFECTIVE" ||
+    normalized === "WRONG_ITEM" ||
+    normalized === "NOT_AS_DESCRIBED" ||
+    normalized === "DAMAGED_SHIPPING" ||
+    normalized === "NO_LONGER_NEEDED" ||
+    normalized === "BETTER_PRICE_FOUND" ||
+    normalized === "ARRIVED_TOO_LATE"
+  ) {
+    return normalized as ReturnReason;
+  }
+  return "OTHER";
+}
+
+function mapRmaCondition(condition?: string | null): Condition {
+  switch ((condition || "GOOD").toUpperCase()) {
+    case "NEW":
+      return "NEW";
+    case "GOOD":
+      return "GOOD";
+    case "FAIR":
+      return "ACCEPTABLE";
+    case "DAMAGED":
+      return "DAMAGED";
+    case "DEFECTIVE":
+      return "POOR";
+    case "DESTROYED":
+      return "DAMAGED";
+    default:
+      return "GOOD";
+  }
+}
+
 interface DispositionRule {
   disposition: Disposition;
   confidence: number;
@@ -353,143 +388,208 @@ export async function GET(req: NextRequest) {
 
     // GET PENDING RETURNS
     if (action === "pending") {
-      const mockReturns = [
-        {
-          id: "ret-1",
-          orderNumber: "SO-20260105-847",
-          customerName: "John Smith",
-          itemCount: 2,
-          totalValue: 284.99,
-          receivedDate: new Date("2026-01-07"),
-          status: "PENDING_INSPECTION",
-          priority: "HIGH",
-          estimatedProcessingTime: 25,
+      const rmas = await prisma.rMA.findMany({
+        where: {
+          organizationId,
+          status: { in: ["PENDING", "APPROVED", "RECEIVED", "INSPECTING"] },
         },
-        {
-          id: "ret-2",
-          orderNumber: "SO-20260103-392",
-          customerName: "Sarah Johnson",
-          itemCount: 1,
-          totalValue: 149.99,
-          receivedDate: new Date("2026-01-06"),
-          status: "AUTO_PROCESSED",
-          priority: "LOW",
-          estimatedProcessingTime: 8,
+        include: {
+          customer: { select: { name: true } },
+          items: { select: { id: true } },
         },
-        {
-          id: "ret-3",
-          orderNumber: "SO-20260102-156",
-          customerName: "Mike Davis",
-          itemCount: 3,
-          totalValue: 522.47,
-          receivedDate: new Date("2026-01-08"),
-          status: "PENDING_DISPOSITION",
-          priority: "CRITICAL",
-          estimatedProcessingTime: 45,
-        },
-      ];
+        orderBy: { createdAt: "desc" },
+        take: 200,
+      });
+
+      const returns = rmas.map((rma) => {
+        const totalValue = Number(rma.totalRefundAmount || 0);
+        const itemCount = rma.items.length;
+        const ageHours = (Date.now() - rma.createdAt.getTime()) / (1000 * 60 * 60);
+        const priority =
+          ageHours > 72 || totalValue > 500
+            ? "CRITICAL"
+            : ageHours > 48
+              ? "HIGH"
+              : ageHours > 24
+                ? "MEDIUM"
+                : "LOW";
+
+        return {
+          id: rma.id,
+          orderNumber: rma.rmaNumber,
+          customerName: rma.customer.name,
+          itemCount,
+          totalValue,
+          receivedDate: rma.receivedDate || rma.requestedDate,
+          status: rma.status,
+          priority,
+          estimatedProcessingTime: Math.max(5, itemCount * 12),
+        };
+      });
 
       return NextResponse.json({
-        returns: mockReturns,
-        total: mockReturns.length,
+        returns,
+        total: returns.length,
         summary: {
-          pending: 1,
-          autoProcessed: 1,
-          needsInspection: 1,
-          totalValue: mockReturns.reduce((sum, r) => sum + r.totalValue, 0),
+          pending: returns.filter((r) => r.status === "PENDING").length,
+          autoProcessed: returns.filter((r) => r.status === "COMPLETED").length,
+          needsInspection: returns.filter((r) => r.status === "INSPECTING").length,
+          totalValue: returns.reduce((sum, r) => sum + r.totalValue, 0),
         },
       });
     }
 
     // GET DISPOSITION RECOMMENDATIONS
     if (action === "recommendations") {
-      const mockRecommendations = [
-        {
-          id: "rec-1",
-          returnId: "ret-1",
-          orderNumber: "SO-20260105-847",
-          productSku: "WIDGET-001",
-          productName: "Premium Widget",
-          returnReason: "NO_LONGER_NEEDED",
-          condition: "LIKE_NEW",
-          recommendedDisposition: "RESTOCK",
-          confidence: 95,
-          estimatedRecovery: 100,
-          processingTime: 5,
-          requiresInspection: false,
+      const rmas = await prisma.rMA.findMany({
+        where: {
+          organizationId,
+          status: { in: ["PENDING", "APPROVED", "RECEIVED", "INSPECTING"] },
         },
-        {
-          id: "rec-2",
-          returnId: "ret-3",
-          orderNumber: "SO-20260102-156",
-          productSku: "GADGET-042",
-          productName: "Electronic Gadget",
-          returnReason: "DEFECTIVE",
-          condition: "GOOD",
-          recommendedDisposition: "WARRANTY_CLAIM",
-          confidence: 85,
-          estimatedRecovery: 80,
-          processingTime: 20,
-          requiresInspection: true,
+        include: {
+          returnReason: { select: { code: true } },
+          items: {
+            include: {
+              inventoryItem: { select: { sku: true, name: true, sellingPrice: true } },
+            },
+          },
         },
-        {
-          id: "rec-3",
-          returnId: "ret-3",
-          orderNumber: "SO-20260102-156",
-          productSku: "TOOL-128",
-          productName: "Power Tool",
-          returnReason: "DAMAGED_SHIPPING",
-          condition: "ACCEPTABLE",
-          recommendedDisposition: "REFURBISH",
-          confidence: 72,
-          estimatedRecovery: 65,
-          processingTime: 45,
-          requiresInspection: true,
-        },
-      ];
+        take: 200,
+      });
+
+      const recommendations = rmas.flatMap((rma) =>
+        rma.items.map((item) => {
+          const rule = determineDisposition(
+            mapRmaReason(rma.returnReason?.code),
+            mapRmaCondition(item.condition as string | null),
+            Number(item.inventoryItem.sellingPrice || item.refundAmount || item.unitPrice || 0),
+            Math.max(
+              1,
+              Math.floor(
+                (Date.now() - rma.requestedDate.getTime()) / (1000 * 60 * 60 * 24),
+              ),
+            ),
+          );
+
+          return {
+            id: `${rma.id}-${item.id}`,
+            returnId: rma.id,
+            orderNumber: rma.rmaNumber,
+            productSku: item.inventoryItem.sku,
+            productName: item.inventoryItem.name,
+            returnReason: rma.returnReason?.code || "OTHER",
+            condition: item.condition,
+            recommendedDisposition: rule.disposition,
+            confidence: rule.confidence,
+            estimatedRecovery: rule.recoveryRate,
+            processingTime: rule.processingTime,
+            requiresInspection: rule.requiresInspection,
+          };
+        }),
+      );
 
       return NextResponse.json({
-        recommendations: mockRecommendations,
-        total: mockRecommendations.length,
+        recommendations,
+        total: recommendations.length,
         summary: {
-          autoRestockable: 1,
-          needsRefurbishment: 1,
-          warrantyClaims: 1,
-          avgRecoveryRate: 81.7,
+          autoRestockable: recommendations.filter(
+            (r) => r.recommendedDisposition === "RESTOCK" && !r.requiresInspection,
+          ).length,
+          needsRefurbishment: recommendations.filter(
+            (r) => r.recommendedDisposition === "REFURBISH",
+          ).length,
+          warrantyClaims: recommendations.filter(
+            (r) => r.recommendedDisposition === "WARRANTY_CLAIM",
+          ).length,
+          avgRecoveryRate:
+            recommendations.length > 0
+              ? Number(
+                  (
+                    recommendations.reduce((sum, r) => sum + r.estimatedRecovery, 0) /
+                    recommendations.length
+                  ).toFixed(1),
+                )
+              : 0,
         },
       });
     }
 
     // GET STATISTICS
     if (action === "stats") {
+      const [totalReturns, pendingReturns, processedToday, completedReturns] =
+        await Promise.all([
+          prisma.rMA.count({ where: { organizationId } }),
+          prisma.rMA.count({
+            where: {
+              organizationId,
+              status: { in: ["PENDING", "APPROVED", "RECEIVED", "INSPECTING"] },
+            },
+          }),
+          prisma.rMA.count({
+            where: {
+              organizationId,
+              completedDate: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+            },
+          }),
+          prisma.rMA.findMany({
+            where: { organizationId, status: "COMPLETED" },
+            select: {
+              totalRefundAmount: true,
+              requestedDate: true,
+              completedDate: true,
+            },
+            take: 500,
+          }),
+        ]);
+
+      const avgProcessingTime =
+        completedReturns.length > 0
+          ? completedReturns.reduce((sum, r) => {
+              if (!r.completedDate) return sum;
+              return (
+                sum +
+                (r.completedDate.getTime() - r.requestedDate.getTime()) /
+                  (1000 * 60)
+              );
+            }, 0) / completedReturns.length
+          : 0;
+
+      const totalValueRecovered = completedReturns.reduce(
+        (sum, r) => sum + Number(r.totalRefundAmount || 0),
+        0,
+      );
+
       return NextResponse.json({
-        totalReturns: 847,
-        pendingReturns: 34,
-        processedToday: 42,
-        avgProcessingTime: 18.4, // minutes
+        totalReturns,
+        pendingReturns,
+        processedToday,
+        avgProcessingTime: Number(avgProcessingTime.toFixed(1)),
         targetProcessingTime: 12,
-        autoProcessedRate: 34.2, // percentage
+        autoProcessedRate:
+          totalReturns > 0
+            ? Number((((totalReturns - pendingReturns) / totalReturns) * 100).toFixed(1))
+            : 0,
         dispositionBreakdown: {
-          restock: 412,
-          refurbish: 158,
-          liquidate: 124,
-          vendorReturn: 87,
-          warrantyClaim: 42,
-          scrap: 24,
+          restock: null,
+          refurbish: null,
+          liquidate: null,
+          vendorReturn: null,
+          warrantyClaim: null,
+          scrap: null,
         },
         recoveryMetrics: {
-          avgRecoveryRate: 76.4, // percentage
-          totalValueRecovered: 284720,
-          potentialValue: 372500,
+          avgRecoveryRate: null,
+          totalValueRecovered,
+          potentialValue: null,
         },
         timesSavings: {
-          manualProcessingTime: 42 * 60, // minutes
-          automatedProcessingTime: 42 * 18.4,
-          timeSaved: 42 * (60 - 18.4),
+          manualProcessingTime: null,
+          automatedProcessingTime: null,
+          timeSaved: null,
         },
-        monthlySavings: 3583,
-        yearlySavings: 43000,
-        roi: 713,
+        monthlySavings: null,
+        yearlySavings: null,
+        roi: null,
       });
     }
 
@@ -539,13 +639,40 @@ export async function POST(req: NextRequest) {
     if (action === "PRE_PROCESS") {
       const validated = returnPreProcessSchema.parse(body);
 
+      const [salesOrder, inventory] = await Promise.all([
+        prisma.salesOrder.findUnique({
+          where: { id: validated.orderId },
+          select: { orderDate: true },
+        }),
+        prisma.inventoryItem.findMany({
+          where: {
+            organizationId,
+            sku: { in: validated.items.map((i) => i.productSku) },
+          },
+          select: { sku: true, sellingPrice: true },
+        }),
+      ]);
+
+      const inventoryPriceMap = new Map(
+        inventory.map((i) => [i.sku, Number(i.sellingPrice || 0)]),
+      );
+
+      const daysFromPurchase = salesOrder
+        ? Math.max(
+            1,
+            Math.floor(
+              (Date.now() - salesOrder.orderDate.getTime()) / (1000 * 60 * 60 * 24),
+            ),
+          )
+        : 15;
+
       // Generate AI recommendations for each item
       const recommendations = validated.items.map((item, index) => {
         const disposition = determineDisposition(
           item.returnReason,
           item.condition,
-          150, // Mock product value
-          15, // Mock days from purchase
+          inventoryPriceMap.get(item.productSku) || 0,
+          daysFromPurchase,
         );
 
         return {
@@ -568,9 +695,32 @@ export async function POST(req: NextRequest) {
     if (action === "APPLY_DISPOSITION") {
       const validated = dispositionDecisionSchema.parse(body);
 
-      // TODO: Once models are migrated
-      // Update return item with disposition decision
-      // Trigger appropriate workflow (restock, refurbish, etc.)
+      await prisma.rMAItem.update({
+        where: { id: validated.itemId },
+        data: {
+          metadata: {
+            disposition: {
+              decision: validated.decision,
+              reason: validated.reason,
+              estimatedValue: validated.estimatedValue,
+              processingTime: validated.processingTime,
+              decidedAt: new Date().toISOString(),
+              decidedBy: session.user.id,
+            },
+          },
+        },
+      });
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "RMA_DISPOSITION_APPLIED",
+          entityType: "RMAItem",
+          entityId: validated.itemId,
+          metadata: validated,
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -590,12 +740,22 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Auto-process all eligible returns
+      const processed = await prisma.rMA.updateMany({
+        where: {
+          organizationId,
+          id: { in: returnIds },
+          status: { in: ["PENDING", "APPROVED", "RECEIVED", "INSPECTING"] },
+        },
+        data: {
+          status: "COMPLETED",
+          completedDate: new Date(),
+        },
+      });
 
       return NextResponse.json({
         success: true,
-        message: `${returnIds.length} returns auto-processed`,
-        processed: returnIds.length,
+        message: `${processed.count} returns auto-processed`,
+        processed: processed.count,
       });
     }
 

@@ -5,7 +5,13 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const reportSchema = z.object({
-  type: z.string(),
+  type: z.enum([
+    "NCR_SUMMARY",
+    "CAPA_EFFECTIVENESS",
+    "SUPPLIER_SCORECARD",
+    "INSPECTION_RESULTS",
+    "COST_IMPACT",
+  ]),
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
   includeCharts: z.boolean().optional(),
@@ -20,7 +26,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const orgId = session.user.organizations?.[0]?.id;
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        organizationMemberships: {
+          where: { isActive: true },
+          include: { organization: true },
+          take: 1,
+        },
+      },
+    });
+
+    const orgId = user?.organizationMemberships?.[0]?.organizationId;
     if (!orgId) {
       return NextResponse.json(
         { error: "No active organization found for user" },
@@ -72,7 +89,10 @@ export async function POST(request: NextRequest) {
         reportData = await generateCostImpact(startDate, endDate);
         break;
       default:
-        reportData = { message: "Report type not implemented" };
+        return NextResponse.json(
+          { error: "Unsupported report type" },
+          { status: 400 },
+        );
     }
 
     // Update report with metrics

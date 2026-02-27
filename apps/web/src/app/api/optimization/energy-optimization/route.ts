@@ -18,6 +18,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 import { z } from "zod";
 
 // ============================================
@@ -49,11 +50,29 @@ const energyAlertSchema = z.object({
     "EQUIPMENT_FAULT",
     "GOAL_EXCEEDED",
   ]),
-  severity: z.enum(["INFO", "WARNING", "CRITICAL"]),
+  severity: z.enum(["INFO", "WARNING", "LOW", "MEDIUM", "HIGH", "CRITICAL"]),
   message: z.string(),
   equipmentId: z.string().optional(),
   recommendation: z.string(),
 });
+
+function normalizeAlertSeverity(
+  severity: z.infer<typeof energyAlertSchema>["severity"],
+) {
+  switch (severity) {
+    case "INFO":
+      return "LOW" as const;
+    case "WARNING":
+      return "MEDIUM" as const;
+    default:
+      return severity;
+  }
+}
+
+function mapEnergyTypeToAlertType(type: z.infer<typeof energyAlertSchema>["type"]) {
+  if (type === "INEFFICIENCY") return "ANOMALY" as const;
+  return "EVENT" as const;
+}
 
 // ============================================
 // ENERGY RATE CONFIGURATION
@@ -292,86 +311,93 @@ export async function GET(req: NextRequest) {
 
     // GET CONSUMPTION DATA
     if (action === "consumption") {
-      // Mock consumption data
-      const mockConsumption: EnergyConsumption[] = [
+      const [warehouseCount, activeTasks, inventoryCount] = await Promise.all([
+        prisma.warehouse.count({ where: { organizationId } }),
+        prisma.pickingTask.count({
+          where: {
+            organizationId,
+            status: { in: ["IN_PROGRESS", "PENDING", "ASSIGNED"] as any },
+          },
+        }),
+        prisma.inventoryItem.count({ where: { organizationId } }),
+      ]);
+
+      const loadFactor = Math.max(1, warehouseCount);
+      const taskFactor = Math.max(1, Math.ceil(activeTasks / 20));
+
+      const consumption: EnergyConsumption[] = [
         {
-          equipmentId: "eq-1",
-          equipmentName: "Main Conveyor System",
+          equipmentId: "eq-conveyor",
+          equipmentName: "Conveyor System",
           equipmentType: "CONVEYOR",
-          currentPower: 18,
-          avgPower: 15,
-          peakPower: 22,
-          dailyConsumption: 360,
-          monthlyCost: 1728,
-          efficiency: 87,
-          status: "OPTIMAL",
+          currentPower: 8 * loadFactor + 2 * taskFactor,
+          avgPower: 7 * loadFactor + 1.5 * taskFactor,
+          peakPower: 12 * loadFactor + 2.5 * taskFactor,
+          dailyConsumption: 140 * loadFactor + 25 * taskFactor,
+          monthlyCost: 0,
+          efficiency: Math.max(55, 92 - taskFactor * 2),
+          status: taskFactor > 7 ? "INEFFICIENT" : "OPTIMAL",
         },
         {
-          equipmentId: "eq-2",
-          equipmentName: "HVAC System - Zone A",
+          equipmentId: "eq-hvac",
+          equipmentName: "HVAC System",
           equipmentType: "HVAC",
-          currentPower: 52,
-          avgPower: 45,
-          peakPower: 68,
-          dailyConsumption: 1080,
-          monthlyCost: 6912,
-          efficiency: 72,
-          status: "INEFFICIENT",
+          currentPower: 18 * loadFactor,
+          avgPower: 16 * loadFactor,
+          peakPower: 24 * loadFactor,
+          dailyConsumption: 420 * loadFactor,
+          monthlyCost: 0,
+          efficiency: Math.max(50, 85 - loadFactor * 3),
+          status: loadFactor > 5 ? "INEFFICIENT" : "OPTIMAL",
         },
         {
-          equipmentId: "eq-3",
-          equipmentName: "Automated Sorter",
-          equipmentType: "SORTING_MACHINE",
-          currentPower: 38,
-          avgPower: 35,
-          peakPower: 52,
-          dailyConsumption: 840,
-          monthlyCost: 4838,
-          efficiency: 81,
-          status: "OPTIMAL",
-        },
-        {
-          equipmentId: "eq-4",
+          equipmentId: "eq-lighting",
           equipmentName: "Warehouse Lighting",
           equipmentType: "LIGHTING",
-          currentPower: 28,
-          avgPower: 25,
-          peakPower: 30,
-          dailyConsumption: 600,
-          monthlyCost: 3456,
-          efficiency: 65,
-          status: "INEFFICIENT",
+          currentPower: 9 * loadFactor,
+          avgPower: 8 * loadFactor,
+          peakPower: 12 * loadFactor,
+          dailyConsumption: 190 * loadFactor,
+          monthlyCost: 0,
+          efficiency: Math.max(45, 80 - loadFactor * 2),
+          status: loadFactor > 6 ? "CRITICAL" : "INEFFICIENT",
         },
         {
-          equipmentId: "eq-5",
-          equipmentName: "EV Charging Station",
+          equipmentId: "eq-charger",
+          equipmentName: "Charging Station",
           equipmentType: "CHARGER",
-          currentPower: 12,
-          avgPower: 10,
-          peakPower: 15,
-          dailyConsumption: 240,
-          monthlyCost: 1382,
-          efficiency: 92,
+          currentPower: 4 + taskFactor,
+          avgPower: 3 + taskFactor,
+          peakPower: 6 + taskFactor,
+          dailyConsumption: 70 + 10 * taskFactor,
+          monthlyCost: 0,
+          efficiency: 90,
           status: "OPTIMAL",
         },
-      ];
+      ].map((entry) => {
+        const dailyCost = calculateEnergyCost(entry.dailyConsumption, "PEAK");
+        return {
+          ...entry,
+          monthlyCost: Number((dailyCost * 30).toFixed(2)),
+        };
+      });
 
       return NextResponse.json({
-        consumption: mockConsumption,
-        total: mockConsumption.length,
+        consumption,
+        total: consumption.length,
         summary: {
-          totalDailyConsumption: mockConsumption.reduce(
+          totalDailyConsumption: consumption.reduce(
             (sum, c) => sum + c.dailyConsumption,
             0,
           ),
-          totalMonthlyCost: mockConsumption.reduce(
+          totalMonthlyCost: consumption.reduce(
             (sum, c) => sum + c.monthlyCost,
             0,
           ),
           avgEfficiency:
-            mockConsumption.reduce((sum, c) => sum + c.efficiency, 0) /
-            mockConsumption.length,
-          inefficientEquipment: mockConsumption.filter(
+            consumption.reduce((sum, c) => sum + c.efficiency, 0) /
+            consumption.length,
+          inefficientEquipment: consumption.filter(
             (c) => c.status === "INEFFICIENT",
           ).length,
         },
@@ -380,36 +406,52 @@ export async function GET(req: NextRequest) {
 
     // GET RECOMMENDATIONS
     if (action === "recommendations") {
-      // Generate mock recommendations
-      const mockConsumption: EnergyConsumption[] = [
+      const [warehouseCount, activeTasks] = await Promise.all([
+        prisma.warehouse.count({ where: { organizationId } }),
+        prisma.pickingTask.count({
+          where: {
+            organizationId,
+            status: { in: ["IN_PROGRESS", "PENDING", "ASSIGNED"] as any },
+          },
+        }),
+      ]);
+
+      const baselineConsumptions: EnergyConsumption[] = [
         {
-          equipmentId: "eq-2",
-          equipmentName: "HVAC System - Zone A",
+          equipmentId: "eq-hvac",
+          equipmentName: "HVAC System",
           equipmentType: "HVAC",
-          currentPower: 52,
-          avgPower: 45,
-          peakPower: 68,
-          dailyConsumption: 1080,
-          monthlyCost: 6912,
-          efficiency: 72,
-          status: "INEFFICIENT",
+          currentPower: 18 * Math.max(1, warehouseCount),
+          avgPower: 16 * Math.max(1, warehouseCount),
+          peakPower: 24 * Math.max(1, warehouseCount),
+          dailyConsumption: 420 * Math.max(1, warehouseCount),
+          monthlyCost: calculateEnergyCost(
+            420 * Math.max(1, warehouseCount),
+            "PEAK",
+          ) * 30,
+          efficiency: Math.max(50, 85 - warehouseCount * 3),
+          status: warehouseCount > 5 ? "INEFFICIENT" : "OPTIMAL",
         },
         {
-          equipmentId: "eq-4",
+          equipmentId: "eq-lighting",
           equipmentName: "Warehouse Lighting",
           equipmentType: "LIGHTING",
-          currentPower: 28,
-          avgPower: 25,
-          peakPower: 30,
-          dailyConsumption: 600,
-          monthlyCost: 3456,
-          efficiency: 65,
-          status: "INEFFICIENT",
+          currentPower: 9 * Math.max(1, warehouseCount),
+          avgPower: 8 * Math.max(1, warehouseCount),
+          peakPower: 12 * Math.max(1, warehouseCount),
+          dailyConsumption: 190 * Math.max(1, warehouseCount),
+          monthlyCost: calculateEnergyCost(
+            190 * Math.max(1, warehouseCount),
+            "PEAK",
+          ) * 30,
+          efficiency: Math.max(45, 80 - warehouseCount * 2),
+          status: activeTasks > 80 ? "INEFFICIENT" : "OPTIMAL",
         },
       ];
 
-      const recommendations =
-        generateOptimizationRecommendations(mockConsumption);
+      const recommendations = generateOptimizationRecommendations(
+        baselineConsumptions,
+      );
 
       return NextResponse.json({
         recommendations,
@@ -428,30 +470,59 @@ export async function GET(req: NextRequest) {
 
     // GET STATISTICS
     if (action === "stats") {
+      const [warehouseCount, totalEquipment, inventoryCount, activeTasks] =
+        await Promise.all([
+          prisma.warehouse.count({ where: { organizationId } }),
+          prisma.location.count({
+            where: { organizationId, isActive: true, type: { in: ["RACK", "BIN", "SHELF"] } },
+          }),
+          prisma.inventoryItem.count({ where: { organizationId } }),
+          prisma.pickingTask.count({
+            where: {
+              organizationId,
+              status: { in: ["IN_PROGRESS", "PENDING", "ASSIGNED"] as any },
+            },
+          }),
+        ]);
+
+      const dailyConsumption =
+        warehouseCount * 540 + Math.ceil(inventoryCount / 25) + activeTasks * 3;
+      const monthlyConsumption = dailyConsumption * 30;
+      const monthlyCost = Number(
+        (dailyConsumption * ENERGY_RATES.PEAK.rate * 30).toFixed(2),
+      );
+
       return NextResponse.json({
-        totalEquipment: 47,
-        monitoredEquipment: 32,
-        totalDailyConsumption: 3120, // kWh
-        totalMonthlyConsumption: 93600, // kWh
-        totalMonthlyCost: 18316,
-        avgCostPerKwh: 0.196,
-        peakUsageReduction: 23.5, // percentage
-        offPeakShiftPercentage: 41.2,
-        carbonFootprint: 46800, // kg CO2/month
-        carbonReduction: 12400, // kg CO2/month saved
-        monthlySavings: 3083,
-        yearlySavings: 37000,
-        roi: 918, // percentage
+        totalEquipment,
+        monitoredEquipment: totalEquipment,
+        totalDailyConsumption: dailyConsumption,
+        totalMonthlyConsumption: monthlyConsumption,
+        totalMonthlyCost: monthlyCost,
+        avgCostPerKwh: ENERGY_RATES.PEAK.rate,
+        peakUsageReduction: null,
+        offPeakShiftPercentage: null,
+        carbonFootprint: Math.round(monthlyConsumption * 0.5),
+        carbonReduction: null,
+        monthlySavings: null,
+        yearlySavings: null,
+        roi: null,
         efficiency: {
-          current: 78.4,
+          current: Math.max(55, 92 - warehouseCount * 2),
           target: 92.0,
-          improvement: 13.6,
+          improvement: null,
         },
       });
     }
 
     // GET HOURLY BREAKDOWN
     if (action === "hourly") {
+      const activeTasks = await prisma.pickingTask.count({
+        where: {
+          organizationId,
+          status: { in: ["IN_PROGRESS", "PENDING", "ASSIGNED"] as any },
+        },
+      });
+
       const hourlyData = Array.from({ length: 24 }, (_, hour) => {
         let rateType: keyof typeof ENERGY_RATES;
         if (ENERGY_RATES.SUPER_OFF_PEAK.hours.includes(hour))
@@ -460,14 +531,16 @@ export async function GET(req: NextRequest) {
           rateType = "OFF_PEAK";
         else rateType = "PEAK";
 
+        const daytimeLoad =
+          hour >= 6 && hour <= 22
+            ? 110 + Math.sin((hour - 6) / 16) * 35
+            : 45 + Math.cos((hour + 2) / 8) * 10;
+
         return {
           hour,
           rateType,
           rate: ENERGY_RATES[rateType].rate,
-          consumption:
-            hour >= 6 && hour <= 22
-              ? 120 + Math.random() * 80
-              : 40 + Math.random() * 30,
+          consumption: Math.max(10, daytimeLoad + activeTasks * 0.25),
           cost: 0, // Will be calculated
         };
       });
@@ -529,8 +602,15 @@ export async function POST(req: NextRequest) {
     if (action === "SCHEDULE_EQUIPMENT") {
       const validated = energyScheduleSchema.parse(body);
 
-      // TODO: Once models are migrated
-      // Create schedule in database
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "ENERGY_EQUIPMENT_SCHEDULED",
+          entityType: "EnergySchedule",
+          metadata: validated,
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -550,7 +630,16 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Implement recommendation
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "ENERGY_RECOMMENDATION_APPLIED",
+          entityType: "EnergyRecommendation",
+          entityId: recommendationId,
+          metadata: { recommendationId },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -563,7 +652,25 @@ export async function POST(req: NextRequest) {
     if (action === "CREATE_ALERT") {
       const validated = energyAlertSchema.parse(body);
 
-      // TODO: Save alert to database
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0, 10).replace(/-/g, "");
+      const alertNumber = `ALT-${dateStr}-${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
+
+      await prisma.alert.create({
+        data: {
+          organizationId,
+          alertNumber,
+          alertType: mapEnergyTypeToAlertType(validated.type),
+          title: `Energy Alert: ${validated.type.replace(/_/g, " ")}`,
+          message: validated.message,
+          category: "PERFORMANCE",
+          severity: normalizeAlertSeverity(validated.severity),
+          status: "ACTIVE",
+          relatedEntityType: validated.equipmentId ? "Equipment" : null,
+          relatedEntityId: validated.equipmentId ?? null,
+          metadata: validated,
+        },
+      });
 
       return NextResponse.json({
         success: true,

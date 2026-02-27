@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import crypto from "crypto";
 
 const inviteSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -121,7 +122,7 @@ export async function POST(
     }
 
     // Generate invitation token
-    const token = `inv_${Math.random().toString(36).substring(2)}${Date.now().toString(36)}`;
+    const token = `inv_${Date.now().toString(36)}_${crypto.randomUUID().replace(/-/g, "")}`;
 
     // Create invitation
     const invitation = await prisma.invitation.create({

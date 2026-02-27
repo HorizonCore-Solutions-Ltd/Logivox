@@ -5,6 +5,20 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+type CustomerPortalUser = {
+  id: string;
+  role?: string;
+};
+
+type PortalOrderWhere = {
+  customerId: string;
+  status?: string;
+  OR?: Array<{
+    soNumber?: { contains: string; mode: "insensitive" };
+    trackingNumber?: { contains: string; mode: "insensitive" };
+  }>;
+};
+
 const createOrderSchema = z.object({
   items: z.array(
     z.object({
@@ -35,7 +49,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as CustomerPortalUser;
     if (user.role !== "CUSTOMER") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -60,7 +74,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status");
     const search = searchParams.get("search");
 
-    const where: any = { customerId: customer.customerId };
+    const where: PortalOrderWhere = { customerId: customer.customerId };
 
     if (status && status !== "ALL") where.status = status;
     if (search) {
@@ -112,7 +126,7 @@ export async function GET(request: NextRequest) {
       limit,
       totalPages: Math.ceil(total / limit),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Portal orders list error:", error);
     return NextResponse.json(
       { error: "Failed to fetch orders" },
@@ -132,7 +146,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as CustomerPortalUser;
     if (user.role !== "CUSTOMER") {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
@@ -222,10 +236,26 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // TODO: Send notification to warehouse team about new customer order
+    await prisma.activityLog.create({
+      data: {
+        organizationId: order.organizationId,
+        userId: user.id,
+        action: "PORTAL_ORDER_CREATED",
+        entityType: "SalesOrder",
+        entityId: order.id,
+        metadata: {
+          soNumber: order.soNumber,
+          customerId: order.customerId,
+          total: order.total,
+          itemCount: order.items.length,
+          shippingMethod: order.shippingMethod,
+          requestedDate: order.requestedDate,
+        },
+      },
+    });
 
     return NextResponse.json({ order });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Portal order creation error:", error);
     if (error instanceof z.ZodError) {
       return NextResponse.json(

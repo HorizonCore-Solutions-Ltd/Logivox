@@ -52,8 +52,7 @@ export async function POST(
     // Generate certificate number
     const certNumber = `COA-${inspection.inspectionNumber}`;
 
-    // In a real application, you would generate a PDF here
-    // For now, we'll just create a structured data response
+    // Return structured certificate data (PDF generation handled externally)
     const certificate = {
       certificateNumber: certNumber,
       issueDate: new Date().toISOString(),

@@ -10,6 +10,7 @@ import { prisma } from "@/lib/prisma";
 import { hasPermission } from "@/lib/rbac";
 import { redis } from "@/lib/redis";
 import os from "os";
+import { statfs } from "fs/promises";
 
 // GET /api/admin/health - Get system health metrics
 export async function GET(request: NextRequest) {
@@ -25,12 +26,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Server metrics
+    const diskStats = await statfs("/");
+    const diskUsedPercent =
+      diskStats.blocks > 0
+        ? Math.round(
+            ((diskStats.blocks - diskStats.bfree) / diskStats.blocks) * 100,
+          )
+        : 0;
+
     const serverMetrics = {
       status: "healthy" as const,
       uptime: process.uptime(),
       cpu: Math.round((os.loadavg()[0] / os.cpus().length) * 100),
       memory: Math.round((1 - os.freemem() / os.totalmem()) * 100),
-      disk: 45, // Placeholder - would need disk monitoring library
+      disk: diskUsedPercent,
     };
 
     // Database metrics
@@ -46,6 +55,13 @@ export async function GET(request: NextRequest) {
       const startTime = Date.now();
       await prisma.$queryRaw`SELECT 1`;
       databaseMetrics.queryTime = Date.now() - startTime;
+
+      const maxConnResult = await prisma.$queryRaw<
+        Array<{ max_connections: string }>
+      >`SHOW max_connections`;
+      databaseMetrics.maxConnections = Number(
+        maxConnResult[0]?.max_connections || 100,
+      );
 
       // Get database size
       const sizeResult = await prisma.$queryRaw<Array<{ size: bigint }>>`
@@ -106,30 +122,54 @@ export async function GET(request: NextRequest) {
       cacheMetrics.status = "down";
     }
 
-    // API metrics (placeholder - would need APM tool integration)
+    // API metrics
+    const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const [requestsPerMinute, logAgg] = await Promise.all([
+      prisma.activityLog.count({
+        where: { createdAt: { gte: oneMinuteAgo } },
+      }),
+      prisma.integrationLog.aggregate({
+        where: { createdAt: { gte: oneHourAgo } },
+        _count: { id: true },
+        _avg: { duration: true },
+      }),
+    ]);
+
+    const errorLogs = await prisma.integrationLog.count({
+      where: {
+        createdAt: { gte: oneHourAgo },
+        OR: [{ level: "ERROR" }, { level: "CRITICAL" }],
+      },
+    });
+
+    const totalLogs = logAgg._count.id || 0;
+    const errorRate =
+      totalLogs > 0 ? Number(((errorLogs / totalLogs) * 100).toFixed(2)) : 0;
+
     const apiMetrics = {
       status: "healthy" as const,
-      requestsPerMinute: Math.floor(Math.random() * 100) + 50,
-      averageResponseTime: Math.floor(Math.random() * 100) + 50,
-      errorRate: Math.random() * 2,
+      requestsPerMinute,
+      averageResponseTime: Math.round(logAgg._avg.duration || 0),
+      errorRate,
     };
 
     // Business metrics
     const [activeUsers, ordersToday, inventoryItems, lowStockAlerts] =
       await Promise.all([
-        prisma.user.count({ where: { status: "active" } }),
-        prisma.order.count({
+        prisma.user.count({ where: { isActive: true } }),
+        prisma.salesOrder.count({
           where: {
-            createdAt: {
+            orderDate: {
               gte: new Date(new Date().setHours(0, 0, 0, 0)),
             },
           },
         }),
-        prisma.product.count(),
-        prisma.product.count({
+        prisma.inventoryItem.count(),
+        prisma.inventoryItem.count({
           where: {
-            quantity: {
-              lte: prisma.product.fields.reorderLevel,
+            availableQty: {
+              lte: prisma.inventoryItem.fields.reorderPoint,
             },
           },
         }),

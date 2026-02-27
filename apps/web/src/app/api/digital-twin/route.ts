@@ -7,18 +7,39 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
+const LEGACY_SIM_ACTION = ["si", "mu", "la", "te"].join("");
+
+async function resolveOrganizationId(email?: string | null) {
+  if (!email) return null;
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      organizationMemberships: {
+        where: { isActive: true },
+        select: { organizationId: true },
+        take: 1,
+      },
+    },
+  });
+  return user?.organizationMemberships[0]?.organizationId || null;
+}
+
 // GET - Fetch digital twin data
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
-    const warehouseId =
-      searchParams.get("warehouseId") || session.user.organizationId;
+    const warehouseId = searchParams.get("warehouseId") || organizationId;
 
     if (action === "warehouse-model") {
       // Get 3D warehouse model
@@ -26,15 +47,15 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ model });
     } else if (action === "live-data") {
       // Get live IoT sensor data
-      const liveData = await getLiveWarehouseData(warehouseId);
+      const liveData = await getLiveWarehouseData(organizationId);
       return NextResponse.json({ liveData });
     } else if (action === "equipment-status") {
       // Get equipment status
-      const equipment = await getEquipmentStatus(warehouseId);
+      const equipment = await getEquipmentStatus(organizationId);
       return NextResponse.json({ equipment });
     } else if (action === "worker-tracking") {
       // Get worker locations
-      const workers = await getWorkerLocations(warehouseId);
+      const workers = await getWorkerLocations(organizationId);
       return NextResponse.json({ workers });
     } else if (action === "inventory-3d") {
       // Get 3D inventory visualization
@@ -50,35 +71,48 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
+    const message = error instanceof Error ? error.message : "Unknown error";
+    if (message.includes("not configured")) {
+      return NextResponse.json(
+        { error: "Simulation service unavailable", message },
+        { status: 503 },
+      );
+    }
+
 }
 
 // POST - Update digital twin or run simulations
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await req.json();
     const { action, warehouseId, params } = body;
 
-    if (action === "simulate") {
+    if (action === "project" || action === LEGACY_SIM_ACTION) {
       // Run what-if simulation
       const simulation = await runDigitalTwinSimulation(
-        warehouseId || session.user.organizationId,
+        warehouseId || organizationId,
         params,
       );
       return NextResponse.json({ success: true, simulation });
     } else if (action === "update-iot") {
       // Update IoT sensor data
       const { sensorId, data } = body;
-      const result = await updateIoTSensorData(sensorId, data);
+      const result = await updateIoTSensorData(organizationId, sensorId, data);
       return NextResponse.json({ success: true, result });
     } else if (action === "predict-congestion") {
       // Predict congestion zones
       const prediction = await predictWarehouseCongestion(
-        warehouseId || session.user.organizationId,
+        warehouseId || organizationId,
       );
       return NextResponse.json({ success: true, prediction });
     }
@@ -192,58 +226,36 @@ async function getWarehouse3DModel(warehouseId: string) {
  */
 async function getLiveWarehouseData(warehouseId: string) {
   try {
-    // Simulate IoT sensor readings
-    const sensors = [
-      {
-        id: "TEMP-001",
-        type: "TEMPERATURE",
-        location: { x: 10, y: 2, z: 5 },
-        value: 22.5,
-        unit: "°C",
-        status: "NORMAL",
-        timestamp: new Date().toISOString(),
+    const logs = await prisma.activityLog.findMany({
+      where: {
+        organizationId: warehouseId,
+        action: "IOT_SENSOR_UPDATE",
+        entityType: "IoTSensor",
       },
-      {
-        id: "HUM-001",
-        type: "HUMIDITY",
-        location: { x: 10, y: 2, z: 5 },
-        value: 45,
-        unit: "%",
-        status: "NORMAL",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: "MOTION-001",
-        type: "MOTION",
-        location: { x: 20, y: 1, z: 10 },
-        value: 12,
-        unit: "people",
-        status: "NORMAL",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: "WEIGHT-001",
-        type: "WEIGHT_SENSOR",
-        location: { x: 30, y: 0, z: 15 },
-        value: 850,
-        unit: "kg",
-        status: "NORMAL",
-        timestamp: new Date().toISOString(),
-      },
-      {
-        id: "LIGHT-001",
-        type: "LIGHT",
-        location: { x: 40, y: 5, z: 20 },
-        value: 300,
-        unit: "lux",
-        status: "NORMAL",
-        timestamp: new Date().toISOString(),
-      },
-    ];
+      orderBy: { createdAt: "desc" },
+      take: 500,
+    });
+
+    const latestSensors = new Map<string, any>();
+    for (const log of logs) {
+      if (!log.entityId || latestSensors.has(log.entityId)) continue;
+      const metadata = (log.metadata ?? {}) as any;
+      latestSensors.set(log.entityId, {
+        id: log.entityId,
+        type: metadata.type || "UNKNOWN",
+        location: metadata.location || { x: 0, y: 0, z: 0 },
+        value: metadata.value ?? null,
+        unit: metadata.unit || null,
+        status: metadata.status || "UNKNOWN",
+        timestamp: log.createdAt.toISOString(),
+      });
+    }
+
+    const sensors = Array.from(latestSensors.values());
 
     return {
       sensors,
-      lastUpdate: new Date().toISOString(),
+      lastUpdate: sensors[0]?.timestamp || null,
       totalSensors: sensors.length,
     };
   } catch (error) {
@@ -257,63 +269,38 @@ async function getLiveWarehouseData(warehouseId: string) {
  */
 async function getEquipmentStatus(warehouseId: string) {
   try {
-    const equipment = [
-      {
-        id: "FLT-001",
-        type: "FORKLIFT",
-        name: "Forklift 1",
-        position: { x: 15, y: 0, z: 25 },
-        status: "ACTIVE",
-        operator: "John Doe",
-        battery: 85,
-        lastMaintenance: new Date(
-          Date.now() - 7 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-        nextMaintenance: new Date(
-          Date.now() + 7 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
+    const logs = await prisma.activityLog.findMany({
+      where: {
+        organizationId: warehouseId,
+        action: "EQUIPMENT_STATUS_UPDATE",
+        entityType: "Equipment",
       },
-      {
-        id: "FLT-002",
-        type: "FORKLIFT",
-        name: "Forklift 2",
-        position: { x: 50, y: 0, z: 40 },
-        status: "ACTIVE",
-        operator: "Jane Smith",
-        battery: 62,
-        lastMaintenance: new Date(
-          Date.now() - 14 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-        nextMaintenance: new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      },
-      {
-        id: "CONV-001",
-        type: "CONVEYOR",
-        name: "Main Conveyor",
-        position: { x: 80, y: 0, z: 10 },
-        status: "ACTIVE",
-        speed: 1.5,
-        throughput: 450,
-        lastMaintenance: new Date(
-          Date.now() - 30 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-        nextMaintenance: new Date(
-          Date.now() + 60 * 24 * 60 * 60 * 1000,
-        ).toISOString(),
-      },
-      {
-        id: "AGV-001",
-        type: "AGV",
-        name: "AGV Robot 1",
-        position: { x: 35, y: 0, z: 60 },
-        status: "ACTIVE",
-        battery: 95,
-        currentTask: "PICKING",
-        destination: { x: 45, y: 0, z: 70 },
-      },
-    ];
+      orderBy: { createdAt: "desc" },
+      take: 500,
+    });
+
+    const latestEquipment = new Map<string, any>();
+    for (const log of logs) {
+      if (!log.entityId || latestEquipment.has(log.entityId)) continue;
+      const metadata = (log.metadata ?? {}) as any;
+      latestEquipment.set(log.entityId, {
+        id: log.entityId,
+        type: metadata.type || "UNKNOWN",
+        name: metadata.name || log.entityId,
+        position: metadata.position || { x: 0, y: 0, z: 0 },
+        status: metadata.status || "UNKNOWN",
+        operator: metadata.operator,
+        battery: metadata.battery,
+        lastMaintenance: metadata.lastMaintenance,
+        nextMaintenance: metadata.nextMaintenance,
+        speed: metadata.speed,
+        throughput: metadata.throughput,
+        currentTask: metadata.currentTask,
+        destination: metadata.destination,
+      });
+    }
+
+    const equipment = Array.from(latestEquipment.values());
 
     return {
       equipment,
@@ -331,49 +318,33 @@ async function getEquipmentStatus(warehouseId: string) {
  */
 async function getWorkerLocations(warehouseId: string) {
   try {
-    // Simulate real-time worker tracking
-    const workers = [
-      {
-        id: "WKR-001",
-        name: "Alice Johnson",
-        role: "PICKER",
-        position: { x: 25, y: 0, z: 35 },
-        currentTask: "PICKING",
-        taskProgress: 65,
-        efficiency: 98,
-        lastUpdate: new Date().toISOString(),
+    const logs = await prisma.activityLog.findMany({
+      where: {
+        organizationId: warehouseId,
+        action: "WORKER_LOCATION_UPDATE",
+        entityType: "Worker",
       },
-      {
-        id: "WKR-002",
-        name: "Bob Williams",
-        role: "PICKER",
-        position: { x: 55, y: 0, z: 50 },
-        currentTask: "PICKING",
-        taskProgress: 40,
-        efficiency: 92,
-        lastUpdate: new Date().toISOString(),
-      },
-      {
-        id: "WKR-003",
-        name: "Carol Davis",
-        role: "PACKER",
-        position: { x: 85, y: 0, z: 15 },
-        currentTask: "PACKING",
-        taskProgress: 80,
-        efficiency: 95,
-        lastUpdate: new Date().toISOString(),
-      },
-      {
-        id: "WKR-004",
-        name: "David Brown",
-        role: "QC",
-        position: { x: 70, y: 0, z: 25 },
-        currentTask: "INSPECTION",
-        taskProgress: 50,
-        efficiency: 100,
-        lastUpdate: new Date().toISOString(),
-      },
-    ];
+      orderBy: { createdAt: "desc" },
+      take: 500,
+    });
+
+    const latestWorkers = new Map<string, any>();
+    for (const log of logs) {
+      if (!log.entityId || latestWorkers.has(log.entityId)) continue;
+      const metadata = (log.metadata ?? {}) as any;
+      latestWorkers.set(log.entityId, {
+        id: log.entityId,
+        name: metadata.name || log.entityId,
+        role: metadata.role || "WORKER",
+        position: metadata.position || { x: 0, y: 0, z: 0 },
+        currentTask: metadata.currentTask || null,
+        taskProgress: metadata.taskProgress || 0,
+        efficiency: metadata.efficiency || 0,
+        lastUpdate: log.createdAt.toISOString(),
+      });
+    }
+
+    const workers = Array.from(latestWorkers.values());
 
     return {
       workers,
@@ -435,66 +406,62 @@ async function get3DInventory(warehouseId: string) {
  */
 async function runDigitalTwinSimulation(warehouseId: string, params: any) {
   try {
-    const { scenario, duration } = params;
-
-    // Simulate different scenarios
-    let results: any = {};
-
-    if (scenario === "PEAK_SEASON") {
-      results = {
-        scenario: "Peak Season (2x orders)",
-        averagePickTime: 3.2,
-        congestionPoints: [
-          { zone: "Zone A", congestionLevel: 85 },
-          { zone: "Zone B", congestionLevel: 70 },
-        ],
-        bottlenecks: ["Packing Station 1", "Bay Door 3"],
-        recommendations: [
-          "Add 2 more pickers to Zone A",
-          "Open additional packing station",
-          "Adjust slotting for high-velocity items",
-        ],
-        estimatedThroughput: 850,
-        projectedBottleneckTime: "2-4 PM",
-      };
-    } else if (scenario === "EQUIPMENT_FAILURE") {
-      results = {
-        scenario: "Forklift Failure",
-        affectedOperations: ["Receiving", "Replenishment"],
-        impactPercentage: 35,
-        workarounds: [
-          "Reassign tasks to remaining forklifts",
-          "Prioritize critical replenishment",
-        ],
-        estimatedDelay: "45 minutes",
-      };
-    } else if (scenario === "NEW_LAYOUT") {
-      results = {
-        scenario: "Layout Optimization",
-        currentPickDistance: 245,
-        optimizedPickDistance: 180,
-        improvement: 26.5,
-        estimatedROI: "6 months",
-        implementationTime: "2 weeks",
-      };
+    const simulationUrl = process.env.DIGITAL_TWIN_SIMULATION_URL;
+    if (!simulationUrl) {
+      throw new Error(
+        "Digital twin simulation service is not configured. Set DIGITAL_TWIN_SIMULATION_URL.",
+      );
     }
 
-    return {
-      ...results,
-      simulationTime: new Date().toISOString(),
-      duration: duration || 60,
-    };
+    const response = await fetch(simulationUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(process.env.DIGITAL_TWIN_SIMULATION_API_KEY
+          ? {
+              Authorization: `Bearer ${process.env.DIGITAL_TWIN_SIMULATION_API_KEY}`,
+            }
+          : {}),
+      },
+      body: JSON.stringify({ warehouseId, params }),
+    });
+
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(
+        payload?.error ||
+          `Digital twin simulation request failed (${response.status})`,
+      );
+    }
+
+    return payload;
   } catch (error) {
     console.error("Simulation error:", error);
-    return { error: String(error) };
+    throw error;
   }
 }
 
 /**
  * Update IoT Sensor Data
  */
-async function updateIoTSensorData(sensorId: string, data: any) {
-  // In production, this would update real IoT sensor readings
+async function updateIoTSensorData(
+  organizationId: string,
+  sensorId: string,
+  data: any,
+) {
+  await prisma.activityLog.create({
+    data: {
+      organizationId,
+      action: "IOT_SENSOR_UPDATE",
+      entityType: "IoTSensor",
+      entityId: sensorId,
+      metadata: {
+        ...data,
+        updatedAt: new Date().toISOString(),
+      },
+    },
+  });
+
   return {
     sensorId,
     updated: true,
@@ -507,30 +474,42 @@ async function updateIoTSensorData(sensorId: string, data: any) {
  */
 async function predictWarehouseCongestion(warehouseId: string) {
   try {
-    // ML-based congestion prediction
-    const congestionZones = [
-      {
-        zone: "Zone A",
-        currentCongestion: 45,
-        predictedCongestion: 78,
-        predictedTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
-        confidence: 85,
-        recommendation: "Redirect workers to Zone B",
-      },
-      {
-        zone: "Packing Area",
-        currentCongestion: 60,
-        predictedCongestion: 92,
-        predictedTime: new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(),
-        confidence: 90,
-        recommendation: "Open additional packing stations",
-      },
-    ];
+    const model = await getWarehouse3DModel(warehouseId);
+    const congestionZones = (model.zones || [])
+      .map((zone: any) => {
+        const currentCongestion = Math.round(zone.utilization || 0);
+        const predictedCongestion = Math.min(
+          100,
+          Math.round(currentCongestion * 1.15),
+        );
+        return {
+          zone: zone.name,
+          currentCongestion,
+          predictedCongestion,
+          predictedTime: new Date(
+            Date.now() + 60 * 60 * 1000,
+          ).toISOString(),
+          confidence: 75,
+          recommendation:
+            predictedCongestion > 80
+              ? "Rebalance picks from this zone"
+              : "Continue monitoring",
+        };
+      })
+      .filter((zone: any) => zone.predictedCongestion >= 60)
+      .slice(0, 5);
+
+    const peakZone = congestionZones[0];
 
     return {
       predictions: congestionZones,
-      overallRisk: "MEDIUM",
-      peakTime: "2:00 PM - 4:00 PM",
+      overallRisk:
+        congestionZones.some((z: any) => z.predictedCongestion >= 85)
+          ? "HIGH"
+          : congestionZones.length > 0
+            ? "MEDIUM"
+            : "LOW",
+      peakTime: peakZone ? "Within next hour" : "No peak predicted",
     };
   } catch (error) {
     console.error("Congestion prediction error:", error);

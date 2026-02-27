@@ -130,7 +130,9 @@ const requestSchema = z.discriminatedUnion("action", [
   generateClaimSchema,
 ]);
 
-// AI Computer Vision simulation (would integrate with actual CV service)
+// AI Computer Vision — uses GPT-4 Vision when OPENAI_API_KEY is set.
+// Without it, returns a "requires_manual_inspection" result so inspectors
+// record findings manually rather than receiving fabricated AI confidence scores.
 async function analyzeDamageWithAI(imageUrl: string): Promise<{
   damageDetected: boolean;
   damageType: DamageType | null;
@@ -139,62 +141,84 @@ async function analyzeDamageWithAI(imageUrl: string): Promise<{
   boundingBoxes: Array<{ x: number; y: number; width: number; height: number }>;
   description: string;
 }> {
-  // In production, this would call:
-  // - AWS Rekognition Custom Labels
-  // - Google Cloud Vision API
-  // - Azure Computer Vision
-  // - Custom TensorFlow/PyTorch model
+  const apiKey = process.env.OPENAI_API_KEY;
 
-  // Simulation logic based on image URL patterns for demo
-  const hasDefect = Math.random() > 0.7; // 30% defect rate for demo
-
-  if (!hasDefect) {
+  if (!apiKey) {
+    // No computer vision configured — require manual inspection
     return {
       damageDetected: false,
       damageType: null,
       severity: null,
-      confidence: 92 + Math.random() * 7, // 92-99% confidence
+      confidence: 0,
       boundingBoxes: [],
-      description: "No damage detected",
+      description:
+        "REQUIRES_MANUAL_INSPECTION: AI computer vision is not configured. Set OPENAI_API_KEY to enable automated analysis.",
     };
   }
 
-  // Simulate detected damage
-  const damageTypes: DamageType[] = [
-    "COSMETIC",
-    "PACKAGING",
-    "STRUCTURAL",
-    "FUNCTIONAL",
-    "CONTAMINATION",
-  ];
-
-  const severities: DamageSeverity[] = [
-    "MINOR",
-    "MODERATE",
-    "SEVERE",
-    "CRITICAL",
-  ];
-
-  const detectedType =
-    damageTypes[Math.floor(Math.random() * damageTypes.length)];
-  const detectedSeverity =
-    severities[Math.floor(Math.random() * severities.length)];
-
-  return {
-    damageDetected: true,
-    damageType: detectedType,
-    severity: detectedSeverity,
-    confidence: 75 + Math.random() * 20, // 75-95% confidence
-    boundingBoxes: [
-      {
-        x: 100 + Math.random() * 200,
-        y: 100 + Math.random() * 200,
-        width: 50 + Math.random() * 100,
-        height: 50 + Math.random() * 100,
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
-    ],
-    description: `Detected ${detectedType.toLowerCase().replace("_", " ")} - ${detectedSeverity.toLowerCase()} severity`,
-  };
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: `Analyze this product/package image for damage. Respond ONLY with valid JSON in this exact format:
+{
+  "damageDetected": boolean,
+  "damageType": "COSMETIC" | "PACKAGING" | "STRUCTURAL" | "FUNCTIONAL" | "CONTAMINATION" | "MISSING_PARTS" | "WRONG_ITEM" | null,
+  "severity": "MINOR" | "MODERATE" | "SEVERE" | "CRITICAL" | null,
+  "confidence": number between 0-100,
+  "description": "brief description of findings"
+}`,
+              },
+              {
+                type: "image_url",
+                image_url: { url: imageUrl, detail: "high" },
+              },
+            ],
+          },
+        ],
+        max_tokens: 200,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenAI API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content ?? "{}";
+
+    const parsed = JSON.parse(content);
+    return {
+      damageDetected: Boolean(parsed.damageDetected),
+      damageType: parsed.damageType ?? null,
+      severity: parsed.severity ?? null,
+      confidence: Number(parsed.confidence ?? 0),
+      boundingBoxes: [],
+      description: parsed.description ?? "Analysis complete",
+    };
+  } catch (err) {
+    console.error("[analyzeDamageWithAI] GPT-4 Vision error:", err);
+    return {
+      damageDetected: false,
+      damageType: null,
+      severity: null,
+      confidence: 0,
+      boundingBoxes: [],
+      description:
+        "ANALYSIS_FAILED: Computer vision analysis encountered an error. Please inspect manually.",
+    };
+  }
 }
 
 // Calculate damage severity based on type and extent

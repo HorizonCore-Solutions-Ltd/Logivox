@@ -396,14 +396,22 @@ export async function GET(request: NextRequest) {
 
     // Get stats
     if (action === "stats") {
-      const activities = await prisma.activityLog.findMany({
-        where: {
-          organizationId: session.user.organizationId,
-          action: { in: ["WORKER_FATIGUE_MONITOR", "WORKER_BREAK"] },
-        },
-        orderBy: { createdAt: "desc" },
-        take: 100,
-      });
+      const [activities, activeWorkers] = await Promise.all([
+        prisma.activityLog.findMany({
+          where: {
+            organizationId: session.user.organizationId,
+            action: { in: ["WORKER_FATIGUE_MONITOR", "WORKER_BREAK"] },
+          },
+          orderBy: { createdAt: "desc" },
+          take: 250,
+        }),
+        prisma.organizationMember.count({
+          where: {
+            organizationId: session.user.organizationId,
+            isActive: true,
+          },
+        }),
+      ]);
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -422,14 +430,17 @@ export async function GET(request: NextRequest) {
           (a.metadata as any)?.wasScheduled === true,
       ).length;
 
+      const monitorActivities = activities.filter(
+        (a) => a.action === "WORKER_FATIGUE_MONITOR",
+      );
+
       const avgFatigueScore =
-        activities
-          .filter((a) => a.action === "WORKER_FATIGUE_MONITOR")
-          .slice(0, 20)
-          .reduce(
-            (sum, a) => sum + ((a.metadata as any)?.fatigueScore || 0),
-            0,
-          ) / 20 || 0;
+        monitorActivities.length > 0
+          ? monitorActivities.reduce(
+              (sum, a) => sum + Number((a.metadata as any)?.fatigueScore || 0),
+              0,
+            ) / monitorActivities.length
+          : 0;
 
       const injuries = activities.filter(
         (a) =>
@@ -437,14 +448,28 @@ export async function GET(request: NextRequest) {
           (a.metadata as any)?.injuryRisk === "CRITICAL",
       ).length;
 
+      const breaksTodayByWorker = new Map<string, boolean>();
+      activities
+        .filter(
+          (a) => a.action === "WORKER_BREAK" && new Date(a.createdAt) >= today,
+        )
+        .forEach((a) => {
+          breaksTodayByWorker.set(a.entityId, true);
+        });
+
+      const complianceRate =
+        activeWorkers > 0
+          ? Math.round((breaksTodayByWorker.size / activeWorkers) * 100)
+          : 100;
+
       return NextResponse.json({
         stats: {
           criticalAlerts,
           breaksScheduled,
-          activeWorkers: 45, // Simulated
+          activeWorkers,
           avgFatigueScore: Math.round(avgFatigueScore),
           highRiskWorkers: injuries,
-          complianceRate: 96, // Simulated
+          complianceRate,
         },
       });
     }
@@ -453,86 +478,155 @@ export async function GET(request: NextRequest) {
     if (action === "monitorAll") {
       const warehouseId = searchParams.get("warehouseId");
 
-      // Simulated worker data (would come from time tracking system)
-      const workers = [
-        {
-          id: "W-001",
-          name: "John Smith",
-          hoursWorked: 6.5,
-          lastBreak: new Date(Date.now() - 3.5 * 60 * 60 * 1000),
-          taskIntensity: 1.5,
-          tasksCompleted: 85,
-          targetTasks: 100,
-          errorCount: 2,
-          recentInjuries: 0,
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const injuryWindowStart = new Date();
+      injuryWindowStart.setDate(injuryWindowStart.getDate() - 30);
+
+      const [members, logs] = await Promise.all([
+        prisma.organizationMember.findMany({
+          where: {
+            organizationId: session.user.organizationId,
+            isActive: true,
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        }),
+        prisma.activityLog.findMany({
+          where: {
+            organizationId: session.user.organizationId,
+            action: { in: ["WORKER_FATIGUE_MONITOR", "WORKER_BREAK"] },
+            ...(warehouseId
+              ? {
+                  metadata: {
+                    path: ["warehouseId"],
+                    equals: warehouseId,
+                  },
+                }
+              : {}),
+          },
+          orderBy: { createdAt: "desc" },
+          take: 1000,
+        }),
+      ]);
+
+      const logsByWorker = logs.reduce(
+        (acc, log) => {
+          if (!acc[log.entityId]) {
+            acc[log.entityId] = [];
+          }
+          acc[log.entityId].push(log);
+          return acc;
         },
-        {
-          id: "W-002",
-          name: "Maria Garcia",
-          hoursWorked: 4.0,
-          lastBreak: new Date(Date.now() - 2 * 60 * 60 * 1000),
-          taskIntensity: 1.2,
-          tasksCompleted: 120,
-          targetTasks: 110,
-          errorCount: 0,
-          recentInjuries: 0,
-        },
-        {
-          id: "W-003",
-          name: "David Chen",
-          hoursWorked: 8.0,
-          lastBreak: new Date(Date.now() - 5 * 60 * 60 * 1000),
-          taskIntensity: 1.4,
-          tasksCompleted: 95,
-          targetTasks: 120,
-          errorCount: 5,
-          recentInjuries: 1,
-        },
-        {
-          id: "W-004",
-          name: "Sarah Johnson",
-          hoursWorked: 3.5,
-          lastBreak: new Date(Date.now() - 1.5 * 60 * 60 * 1000),
-          taskIntensity: 1.0,
-          tasksCompleted: 70,
-          targetTasks: 80,
-          errorCount: 1,
-          recentInjuries: 0,
-        },
-      ];
+        {} as Record<string, typeof logs>,
+      );
+
+      const taskFactorByType: Record<string, number> = {
+        HEAVY_LIFTING: FATIGUE_CONFIG.TASK_INTENSITY.HEAVY_LIFTING.factor,
+        REPETITIVE: FATIGUE_CONFIG.TASK_INTENSITY.REPETITIVE.factor,
+        STANDING: FATIGUE_CONFIG.TASK_INTENSITY.STANDING.factor,
+        REACHING: FATIGUE_CONFIG.TASK_INTENSITY.REACHING.factor,
+        DRIVING: FATIGUE_CONFIG.TASK_INTENSITY.DRIVING.factor,
+        NORMAL: FATIGUE_CONFIG.TASK_INTENSITY.NORMAL.factor,
+      };
 
       const workerProfiles: WorkerFatigueProfile[] = [];
 
-      for (const worker of workers) {
+      for (const member of members) {
+        const workerId = member.user.id;
+        const workerLogs = logsByWorker[workerId] || [];
+        const todayActivities = workerLogs.filter(
+          (log) =>
+            log.action === "WORKER_FATIGUE_MONITOR" &&
+            new Date(log.createdAt) >= today,
+        );
+        const breakLogs = workerLogs.filter((log) => log.action === "WORKER_BREAK");
+
+        const hoursWorked = todayActivities.reduce(
+          (sum, log) => sum + Number((log.metadata as any)?.duration || 0),
+          0,
+        );
+
+        const latestBreak = breakLogs[0]?.createdAt ?? null;
         const timeSinceBreak =
-          (Date.now() - worker.lastBreak.getTime()) / (1000 * 60 * 60);
+          latestBreak != null
+            ? (Date.now() - new Date(latestBreak).getTime()) / (1000 * 60 * 60)
+            : hoursWorked;
+
+        const taskIntensities = todayActivities.map((log) => {
+          const taskType = (log.metadata as any)?.taskType as string | undefined;
+          return taskType ? (taskFactorByType[taskType] ?? 1.0) : 1.0;
+        });
+        const avgTaskIntensity =
+          taskIntensities.length > 0
+            ? taskIntensities.reduce((sum, value) => sum + value, 0) /
+              taskIntensities.length
+            : 1.0;
+
+        const environmentalFactor = todayActivities.reduce((factor, log) => {
+          const conditions = (log.metadata as any)?.environmentalConditions;
+          let currentFactor = factor;
+          if (conditions?.temperature != null && conditions.temperature > 30) {
+            currentFactor *= FATIGUE_CONFIG.ENVIRONMENTAL.HOT.factor;
+          }
+          if (conditions?.temperature != null && conditions.temperature < 5) {
+            currentFactor *= FATIGUE_CONFIG.ENVIRONMENTAL.COLD.factor;
+          }
+          if (conditions?.noiseLevel != null && conditions.noiseLevel > 85) {
+            currentFactor *= FATIGUE_CONFIG.ENVIRONMENTAL.NOISE.factor;
+          }
+          if (conditions?.lighting === "POOR") {
+            currentFactor *= FATIGUE_CONFIG.ENVIRONMENTAL.POOR_LIGHTING.factor;
+          }
+          return currentFactor;
+        }, 1.0);
+
+        const recentInjuries = workerLogs.filter(
+          (log) =>
+            log.action === "WORKER_FATIGUE_MONITOR" &&
+            new Date(log.createdAt) >= injuryWindowStart &&
+            ["HIGH", "CRITICAL"].includes((log.metadata as any)?.injuryRisk),
+        ).length;
+
+        const tasksCompleted = todayActivities.length;
+        const targetTasks = Math.max(1, Math.round(hoursWorked * 12));
+        const errorCount = todayActivities.reduce(
+          (sum, log) => sum + Number((log.metadata as any)?.errorCount || 0),
+          0,
+        );
 
         const fatigueScore = calculateFatigueScore(
-          worker.hoursWorked,
+          hoursWorked,
           timeSinceBreak,
-          worker.taskIntensity,
-          1.0, // Normal environmental conditions
+          avgTaskIntensity,
+          environmentalFactor,
         );
 
         const fatigueLevel = getFatigueLevel(fatigueScore);
 
         const productivityScore = calculateProductivityScore(
           fatigueScore,
-          worker.tasksCompleted,
-          worker.targetTasks,
-          worker.errorCount,
+          tasksCompleted,
+          targetTasks,
+          errorCount,
         );
 
         const injuryRiskAssessment = assessInjuryRisk(
           fatigueScore,
-          worker.taskIntensity,
-          worker.recentInjuries,
+          avgTaskIntensity,
+          recentInjuries,
         );
 
         const breakRecommendation = generateBreakRecommendation(
           fatigueScore,
           timeSinceBreak,
-          worker.hoursWorked,
+          hoursWorked,
         );
 
         const recommendations = generateWellnessRecommendations(
@@ -543,12 +637,12 @@ export async function GET(request: NextRequest) {
         );
 
         workerProfiles.push({
-          workerId: worker.id,
-          workerName: worker.name,
+          workerId,
+          workerName: member.user.name || "Unknown Worker",
           currentFatigueScore: fatigueScore,
           fatigueLevel,
-          hoursWorkedToday: worker.hoursWorked,
-          lastBreakTime: worker.lastBreak,
+          hoursWorkedToday: hoursWorked,
+          lastBreakTime: latestBreak,
           timeSinceLastBreak: timeSinceBreak,
           productivityScore,
           injuryRisk: injuryRiskAssessment.risk,

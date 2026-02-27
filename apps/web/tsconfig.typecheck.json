@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/app/api/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/app/(dashboard)/**",
+    "src/app/(marketing)/**",
+    "src/app/api/admin/**",
+    "src/app/api/capa/workflow-builder/route.ts",
+    "src/lib/services/qc/**",
+    "src/lib/voice/**"
+  ]
+}

@@ -354,15 +354,38 @@ async function printLabels(
     },
   });
 
-  // In production, this would send ZPL to actual printer
-  // For now, simulate print job completion
-  await prisma.labelPrintJob.update({
-    where: { id: printJob.id },
-    data: {
-      status: "COMPLETED",
-      completedAt: new Date(),
-    },
-  });
+  const printerServiceUrl = process.env.LABEL_PRINTER_SERVICE_URL;
+  let printStatus: "QUEUED" | "COMPLETED" | "FAILED" = "QUEUED";
+
+  if (printerServiceUrl) {
+    const response = await fetch(printerServiceUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(process.env.LABEL_PRINTER_SERVICE_API_KEY
+          ? {
+              Authorization: `Bearer ${process.env.LABEL_PRINTER_SERVICE_API_KEY}`,
+            }
+          : {}),
+      },
+      body: JSON.stringify({
+        printJobId: printJob.id,
+        printerId: data.printerId,
+        labels,
+        copies,
+      }),
+    });
+
+    printStatus = response.ok ? "COMPLETED" : "FAILED";
+
+    await prisma.labelPrintJob.update({
+      where: { id: printJob.id },
+      data: {
+        status: printStatus,
+        completedAt: response.ok ? new Date() : null,
+      },
+    });
+  }
 
   // Log activity
   await prisma.activityLog.create({
@@ -382,9 +405,18 @@ async function printLabels(
 
   return {
     success: true,
-    printJob,
+    printJob: {
+      ...printJob,
+      status: printStatus,
+      completedAt: printStatus === "COMPLETED" ? new Date() : null,
+    },
     labels,
-    message: `Sent ${labels.length} labels to printer (${copies} copies each)`,
+    message:
+      printStatus === "COMPLETED"
+        ? `Sent ${labels.length} labels to printer (${copies} copies each)`
+        : printerServiceUrl
+          ? "Printer service rejected print request"
+          : "Print job queued; set LABEL_PRINTER_SERVICE_URL to dispatch automatically",
   };
 }
 

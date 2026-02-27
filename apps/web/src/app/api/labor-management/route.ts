@@ -69,13 +69,11 @@ export async function GET(req: NextRequest) {
           );
         }
 
-        // getAttendanceReport doesn't exist - returning mock data
-        const attendance = {
-          totalDays: 0,
-          present: 0,
-          absent: 0,
-          late: 0,
-        };
+        const attendance = await LaborManagementService.getAttendance({
+          employeeId: empId,
+          month: parseInt(month, 10),
+          year: parseInt(year, 10),
+        });
 
         return NextResponse.json(attendance);
 
@@ -153,8 +151,12 @@ export async function POST(req: NextRequest) {
           );
         }
 
-        // recordActivity doesn't exist - returning mock response
-        const activity = { success: true, message: "Activity recorded" };
+        const activity = await LaborManagementService.recordActivity({
+          employeeId,
+          activityType,
+          quantity,
+          duration,
+        });
 
         return NextResponse.json(activity);
 

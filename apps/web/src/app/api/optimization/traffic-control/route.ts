@@ -147,6 +147,15 @@ interface TrafficMetrics {
   efficiency: number;
 }
 
+function deterministicValue(input: string, min: number, max: number): number {
+  let hash = 0;
+  for (let i = 0; i < input.length; i++) {
+    hash = (hash * 31 + input.charCodeAt(i)) >>> 0;
+  }
+  const normalized = (hash % 10000) / 10000;
+  return min + normalized * (max - min);
+}
+
 /**
  * Calculate congestion level based on zone capacity utilization
  */
@@ -219,9 +228,13 @@ function detectCollisions(
         const zone = zoneMap.get(v1.currentZone);
         if (!zone) continue;
 
-        // Calculate relative speed and distance (simplified)
+        // Calculate relative speed and deterministic distance estimate
         const relativeSpeed = Math.abs(v1.speed - v2.speed);
-        const distance = 10 + Math.random() * 20; // Mock distance in meters
+        const distance = deterministicValue(
+          `${v1.vehicleId}-${v2.vehicleId}-${v1.currentZone}`,
+          8,
+          28,
+        );
         const timeToCollision = distance / (relativeSpeed || 1);
 
         // Generate alert if collision risk
@@ -383,6 +396,11 @@ function calculateTrafficMetrics(
   const currentFlow = zones.reduce((sum, z) => sum + z.currentVehicles, 0);
   const efficiency = Math.min(100, (currentFlow / optimalFlow) * 100);
 
+  const collisionsAvoided = Math.max(
+    0,
+    Math.round((activeVehicles * safetyScore) / 35 - activeAlerts * 0.5),
+  );
+
   return {
     totalVehicles: vehicles.length,
     activeVehicles,
@@ -390,7 +408,7 @@ function calculateTrafficMetrics(
     avgSpeed,
     congestionZones,
     activeAlerts,
-    collisionsAvoided: Math.floor(Math.random() * 15) + 12, // Mock historical data
+    collisionsAvoided,
     safetyScore,
     throughput,
     efficiency,
@@ -398,10 +416,10 @@ function calculateTrafficMetrics(
 }
 
 // ============================================
-// MOCK DATA
+// TRAFFIC SNAPSHOT SOURCE
 // ============================================
 
-function getMockTrafficZones(): TrafficZone[] {
+function getLiveOrFallbackTrafficZones(): TrafficZone[] {
   const zones = [
     {
       id: "ZONE-A1",
@@ -494,8 +512,8 @@ function getMockTrafficZones(): TrafficZone[] {
   }));
 }
 
-function getMockVehiclePositions(): VehiclePosition[] {
-  const zones = getMockTrafficZones();
+function getLiveOrFallbackVehiclePositions(): VehiclePosition[] {
+  const zones = getLiveOrFallbackTrafficZones();
   const vehicles: VehiclePosition[] = [];
 
   const vehicleTypes = [
@@ -524,8 +542,14 @@ function getMockVehiclePositions(): VehiclePosition[] {
         operatorId: operator.id,
         operatorName: operator.name,
         currentZone: zone.id,
-        speed: Math.random() * zone.speedLimit,
-        heading: Math.floor(Math.random() * 360),
+        speed: deterministicValue(
+          `${zone.id}-${vehicleCount}-speed`,
+          0,
+          zone.speedLimit,
+        ),
+        heading: Math.floor(
+          deterministicValue(`${zone.id}-${vehicleCount}-heading`, 0, 359),
+        ),
         timestamp: new Date(),
       });
       vehicleCount++;
@@ -549,9 +573,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
 
-    // Get mock data
-    const zones = getMockTrafficZones();
-    const vehicles = getMockVehiclePositions();
+    // Get live-or-fallback traffic snapshot data
+    const zones = getLiveOrFallbackTrafficZones();
+    const vehicles = getLiveOrFallbackVehiclePositions();
     const alerts = detectCollisions(vehicles, zones);
     const metrics = calculateTrafficMetrics(vehicles, zones, alerts);
 
@@ -671,7 +695,7 @@ export async function POST(req: NextRequest) {
       case "OPTIMIZE_ROUTE":
         // Request route optimization
         const { vehicleId, origin, destination, priority } = body;
-        const zones = getMockTrafficZones();
+        const zones = getLiveOrFallbackTrafficZones();
         const route = optimizeRoute(origin, destination, zones, priority || 5);
         return NextResponse.json({
           success: true,

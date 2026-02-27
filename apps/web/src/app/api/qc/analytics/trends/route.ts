@@ -111,9 +111,34 @@ export async function GET(req: NextRequest) {
       })
       .sort((a, b) => b.score - a.score);
 
-    // SPC Alerts (mock data - in production would come from SPC service)
-    const spcAlerts: any[] = [];
-    // In production: fetch actual SPC violations from QualityMeasurement records
+    // SPC Alerts — fetch real out-of-spec and out-of-control measurements
+    const spcViolations = await prisma.qualityMeasurement.findMany({
+      where: {
+        organizationId,
+        OR: [{ withinSpec: false }, { withinControl: false }],
+        measurementDate: {
+          gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        },
+      },
+      select: {
+        id: true, parameterName: true, productSku: true,
+        measuredValue: true, lowerSpecLimit: true, upperSpecLimit: true,
+        withinSpec: true, withinControl: true, measurementDate: true,
+      },
+      orderBy: { measurementDate: "desc" },
+      take: 20,
+    });
+
+    const spcAlerts = spcViolations.map((v) => ({
+      id: v.id,
+      parameter: v.parameterName,
+      sku: v.productSku,
+      value: Number(v.measuredValue),
+      lsl: v.lowerSpecLimit ? Number(v.lowerSpecLimit) : null,
+      usl: v.upperSpecLimit ? Number(v.upperSpecLimit) : null,
+      alertType: !v.withinSpec ? "OUT_OF_SPEC" : "OUT_OF_CONTROL",
+      detectedAt: v.measurementDate,
+    }));
 
     // Compliance metrics (ISO 9001:2015)
     const [

@@ -74,66 +74,108 @@ export async function POST(
           };
         }
 
-        // Mock label generation (in production, call carrier API)
-        // Generate tracking number
-        const trackingPrefix: Record<string, string> = {
-          UPS: "1Z",
-          FEDEX: "7",
-          DHL: "00",
-          USPS: "92",
+        const carrierCode = shipment.carrierCode || "UPS";
+        const carrierConfig = await tx.carrierConfig.findFirst({
+          where: {
+            organizationId,
+            carrierType: carrierCode as any,
+            isActive: true,
+          },
+        });
+
+        if (!carrierConfig || !carrierConfig.apiKey) {
+          throw new Error(
+            `Carrier label integration is not configured for ${carrierCode}. Configure an active carrier API key before label generation.`,
+          );
+        }
+
+        const config =
+          carrierConfig.config && typeof carrierConfig.config === "object"
+            ? (carrierConfig.config as Record<string, unknown>)
+            : {};
+        const labelEndpoint =
+          typeof config.labelEndpoint === "string"
+            ? config.labelEndpoint
+            : undefined;
+
+        if (!labelEndpoint) {
+          throw new Error(
+            `Carrier ${carrierCode} config missing labelEndpoint in carrier config.`,
+          );
+        }
+
+        const requestPayload = {
+          shipment: {
+            shipmentId: shipment.id,
+            shipmentNumber: shipment.shipmentNumber,
+            carrierCode,
+            carrierService: shipment.carrierService,
+            weight: shipment.weight ? Number(shipment.weight) : null,
+            weightUnit: shipment.weightUnit || "kg",
+            dimensions: shipment.dimensions || null,
+            recipient: {
+              name: shipment.recipientName || shipment.salesOrder.customer.name,
+              phone: shipment.recipientPhone || shipment.salesOrder.customer.phone,
+              email: shipment.recipientEmail || shipment.salesOrder.customer.email,
+              addressLine1:
+                shipment.addressLine1 || shipment.salesOrder.shippingAddress,
+              addressLine2: shipment.addressLine2,
+              city: shipment.city || shipment.salesOrder.shippingCity,
+              state: shipment.state || shipment.salesOrder.shippingState,
+              postalCode: shipment.postalCode || shipment.salesOrder.shippingZip,
+              country: shipment.country || shipment.salesOrder.shippingCountry,
+            },
+          },
+          order: {
+            salesOrderId: shipment.salesOrderId,
+            soNumber: shipment.salesOrder.soNumber,
+          },
         };
 
-        const prefix = trackingPrefix[shipment.carrierCode || "UPS"] || "XX";
-        const randomNum = Math.floor(Math.random() * 1000000000000)
-          .toString()
-          .padStart(12, "0");
-        const trackingNumber = `${prefix}${randomNum}`;
+        const labelResponse = await fetch(labelEndpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${carrierConfig.apiKey}`,
+            ...(carrierConfig.apiSecret
+              ? { "X-Api-Secret": carrierConfig.apiSecret }
+              : {}),
+            ...(carrierConfig.accountNumber
+              ? { "X-Account-Number": carrierConfig.accountNumber }
+              : {}),
+          },
+          body: JSON.stringify(requestPayload),
+        });
 
-        // Generate tracking URL
-        const trackingUrls: Record<string, string> = {
-          UPS: `https://www.ups.com/track?tracknum=${trackingNumber}`,
-          FEDEX: `https://www.fedex.com/fedextrack/?tracknumbers=${trackingNumber}`,
-          DHL: `https://www.dhl.com/en/express/tracking.html?AWB=${trackingNumber}`,
-          USPS: `https://tools.usps.com/go/TrackConfirmAction?tLabels=${trackingNumber}`,
-        };
+        const labelResult = await labelResponse.json().catch(() => ({}));
 
-        const trackingUrl = trackingUrls[shipment.carrierCode || "UPS"] || "#";
+        if (!labelResponse.ok) {
+          throw new Error(
+            labelResult?.error ||
+              `Carrier ${carrierCode} label API failed with status ${labelResponse.status}`,
+          );
+        }
 
-        // Mock label URL (in production, this would be the actual PDF/PNG from carrier)
-        const labelUrl = `https://labels.example.com/${shipmentId}.pdf`;
+        const trackingNumber = labelResult?.trackingNumber;
+        const labelUrl = labelResult?.labelUrl;
 
-        // Calculate estimated delivery
-        const serviceDays: Record<string, number> = {
-          GROUND: 5,
-          "3DAY": 3,
-          "2DAY": 2,
-          NEXT_DAY: 1,
-          EXPRESS: 2,
-          PRIORITY: 3,
-          FIRST_CLASS: 3,
-        };
+        if (!trackingNumber || !labelUrl) {
+          throw new Error(
+            `Carrier ${carrierCode} label API response missing trackingNumber or labelUrl`,
+          );
+        }
 
-        const serviceCode =
-          shipment.carrierService?.split(" ").pop()?.toUpperCase() || "GROUND";
-        const days = serviceDays[serviceCode] || 5;
-
-        const estimatedDelivery = new Date();
-        estimatedDelivery.setDate(estimatedDelivery.getDate() + days);
-
-        // Mock shipping cost calculation
-        const baseCosts: Record<string, number> = {
-          GROUND: 15,
-          "3DAY": 25,
-          "2DAY": 35,
-          NEXT_DAY: 50,
-          EXPRESS: 30,
-          PRIORITY: 12,
-          FIRST_CLASS: 8,
-        };
-
-        const baseCost = baseCosts[serviceCode] || 15;
-        const weightCost = (shipment.weight?.toNumber() || 1) * 2;
-        const shippingCost = baseCost + weightCost;
+        const trackingUrl =
+          labelResult?.trackingUrl ||
+          shipment.trackingUrl ||
+          null;
+        const estimatedDelivery = labelResult?.estimatedDelivery
+          ? new Date(labelResult.estimatedDelivery)
+          : shipment.estimatedDelivery;
+        const shippingCost =
+          typeof labelResult?.shippingCost === "number"
+            ? labelResult.shippingCost
+            : shipment.shippingCost;
 
         // Update shipment with label info
         const updatedShipment = await tx.shipment.update({
@@ -141,18 +183,18 @@ export async function POST(
           data: {
             status: "PROCESSING",
             trackingNumber,
-            trackingUrl,
+            trackingUrl: trackingUrl || undefined,
             labelUrl,
-            labelFormat: "PDF",
-            estimatedDelivery,
-            shippingCost,
+            labelFormat: String(labelResult?.labelFormat || "PDF"),
+            estimatedDelivery: estimatedDelivery || undefined,
+            shippingCost: shippingCost || undefined,
             lastTrackingUpdate: new Date(),
             trackingEvents: [
               {
                 status: "LABEL_CREATED",
                 description: "Shipping label created",
-                location: "Origin Facility",
                 timestamp: new Date().toISOString(),
+                carrierResponseId: labelResult?.id || null,
               },
             ] as any,
           },
@@ -180,7 +222,7 @@ export async function POST(
               trackingNumber,
               carrier: shipment.carrierCode,
               service: shipment.carrierService,
-              estimatedDelivery: estimatedDelivery.toISOString(),
+              estimatedDelivery: estimatedDelivery?.toISOString(),
             },
           },
         });
@@ -196,8 +238,13 @@ export async function POST(
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("Error generating label:", error);
+
+    const message = error?.message || "Failed to generate label";
+    if (message.includes("not configured")) {
+      return NextResponse.json({ error: message }, { status: 503 });
+    }
     return NextResponse.json(
-      { error: error.message || "Failed to generate label" },
+      { error: message },
       { status: 500 },
     );
   }

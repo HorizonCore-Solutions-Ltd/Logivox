@@ -248,14 +248,14 @@ export default function LaborManagementPage() {
       ],
     },
     {
-      title: "99.2% Attendance Rate",
+      title: "Up to 5% Higher Attendance",
       icon: CheckCircle2,
       description:
         "Improved engagement and accountability with transparent performance metrics",
       stats: [
         "Industry avg: 94%",
-        "Your warehouse: 99.2%",
-        "Improvement: +5.2%",
+        "LMS avg: 97%+",
+        "Target: +3–5%",
       ],
     },
     {
@@ -541,9 +541,9 @@ export default function LaborManagementPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Proven Business Impact</h2>
+            <h2 className="text-3xl font-bold mb-4">Expected Business Impact</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Real results from warehouses using LogiVox LMS
+              Industry-benchmarked outcomes for warehouses implementing modern LMS
             </p>
           </div>
 

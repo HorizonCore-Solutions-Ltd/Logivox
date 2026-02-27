@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import MFAService from "@/lib/services/mfa-service";
+import bcrypt from "bcryptjs";
 
 /**
  * GET /api/auth/mfa/setup
@@ -205,7 +206,6 @@ export async function DELETE(req: NextRequest) {
     }
 
     // Verify password
-    const bcrypt = require("bcrypt");
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) {

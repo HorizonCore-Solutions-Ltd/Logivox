@@ -25,6 +25,7 @@ import {
   MessageSquare,
   FileText,
   BarChart3,
+  Clock,
 } from "lucide-react";
 
 export default function IntegrationsPage() {
@@ -65,6 +66,81 @@ export default function IntegrationsPage() {
       title: "CRM Systems",
       description: "Salesforce, HubSpot, Microsoft Dynamics CRM, Zoho",
       count: "6+",
+    },
+    {
+      icon: Clock,
+      title: "Workforce, Rota & Time",
+      description:
+        "UKG/Kronos, ADP Workforce Now, Workday, Rippling, BambooHR, Deputy, Planday, When I Work",
+      count: "12+",
+    },
+  ];
+
+  const integrationCatalog = [
+    {
+      title: "Rota / Time & Attendance",
+      providers: [
+        "UKG / Kronos",
+        "ADP Workforce Now",
+        "Workday Time Tracking",
+        "Rippling",
+        "BambooHR",
+        "Gusto Time",
+        "Deputy",
+        "Planday",
+        "When I Work",
+        "Rotavu (native)",
+        "7shifts",
+        "Tanda / Workforce.com",
+        "Humanity",
+        "Shiftboard",
+      ],
+    },
+    {
+      title: "ERP / Finance",
+      providers: [
+        "SAP",
+        "Oracle NetSuite",
+        "Microsoft Dynamics 365",
+        "Infor",
+        "Sage Intacct",
+        "Epicor",
+      ],
+    },
+    {
+      title: "E-Commerce / Marketplaces",
+      providers: [
+        "Shopify",
+        "Magento / Adobe Commerce",
+        "BigCommerce",
+        "WooCommerce",
+        "Amazon",
+        "eBay",
+        "Walmart",
+      ],
+    },
+    {
+      title: "WMS / TMS / Shipping",
+      providers: [
+        "Manhattan",
+        "Blue Yonder",
+        "ShipEngine",
+        "EasyPost",
+        "FedEx",
+        "UPS",
+        "DHL",
+      ],
+    },
+    {
+      title: "Analytics / Data",
+      providers: [
+        "Power BI",
+        "Tableau",
+        "Looker",
+        "BigQuery",
+        "Snowflake",
+        "Datadog",
+      ],
     },
   ];
 
@@ -187,7 +263,7 @@ export default function IntegrationsPage() {
               100+ Pre-Built Integrations
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Connect with the tools you already use
+              Connect with the tools you already use (all connector-based and configurable)
             </p>
           </div>
 
@@ -212,6 +288,44 @@ export default function IntegrationsPage() {
                 </Card>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Integration Catalog */}
+      <section className="py-20 lg:py-28">
+        <div className="container-enterprise">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Integration Coverage</h2>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Rota, time, ERP, commerce, logistics, analytics — powered via API/webhooks and configurable mappings
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Availability depends on connector enablement and customer entitlements; setup required per provider.
+            </p>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {integrationCatalog.map((category) => (
+              <Card key={category.title} className="h-full">
+                <CardHeader>
+                  <CardTitle>{category.title}</CardTitle>
+                  <CardDescription>
+                    Connector-based; mapping required for IDs, locations, and payloads.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    {category.providers.map((provider) => (
+                      <li key={provider} className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <span>{provider}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
@@ -288,12 +402,12 @@ export default function IntegrationsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="bg-slate-900 text-slate-50 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                    <div className="text-green-400">// Get inventory items</div>
+                    <div className="text-green-400">{"// Get inventory items"}</div>
                     <div className="mt-2">
                       <span className="text-purple-400">GET</span>{" "}
                       <span className="text-blue-400">/api/v1/inventory</span>
                     </div>
-                    <div className="mt-4 text-green-400">// Create booking</div>
+                    <div className="mt-4 text-green-400">{"// Create booking"}</div>
                     <div className="mt-2">
                       <span className="text-purple-400">POST</span>{" "}
                       <span className="text-blue-400">/api/v1/bookings</span>
@@ -307,7 +421,7 @@ export default function IntegrationsPage() {
                       <span className="text-blue-300">"items"</span>: [...]
                     </div>
                     <div className="text-slate-400">{"}"}</div>
-                    <div className="mt-4 text-green-400">// Webhook events</div>
+                    <div className="mt-4 text-green-400">{"// Webhook events"}</div>
                     <div className="mt-2">
                       <span className="text-purple-400">POST</span>{" "}
                       <span className="text-blue-400">/webhooks</span>

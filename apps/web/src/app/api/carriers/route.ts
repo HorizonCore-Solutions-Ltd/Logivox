@@ -119,14 +119,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Log activity
+    // Log activity with organization scope
     await prisma.activityLog.create({
       data: {
+        organizationId: session.user.organizationId,
         userId: session.user.id,
         action: "CARRIER_CREATED",
         entityType: "Carrier",
         entityId: carrier.id,
-        details: {
+        metadata: {
           carrierName: carrier.name,
           carrierCode: carrier.code,
         },

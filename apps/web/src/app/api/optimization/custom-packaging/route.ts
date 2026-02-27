@@ -433,9 +433,9 @@ export async function GET(request: NextRequest) {
     const organizationId = session.user.organizationId || "default-org";
 
     if (action === "stats") {
-      // Get packaging-related statistics
-      const [packagingLogs] = await Promise.all([
-        // Packaging optimization activity logs
+      const since30Days = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+
+      const [packagingLogs, totalOrders, recentOrders] = await Promise.all([
         prisma.activityLog.findMany({
           where: {
             organizationId,
@@ -447,17 +447,47 @@ export async function GET(request: NextRequest) {
               ],
             },
             createdAt: {
-              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+              gte: since30Days,
             },
           },
           orderBy: { createdAt: "desc" },
           take: 1000,
         }),
+        prisma.salesOrder.count({
+          where: {
+            organizationId,
+            orderDate: {
+              gte: since30Days,
+            },
+          },
+        }),
+        prisma.salesOrder.findMany({
+          where: {
+            organizationId,
+            orderDate: {
+              gte: since30Days,
+            },
+          },
+          select: {
+            id: true,
+            shippingZip: true,
+            items: {
+              select: {
+                quantity: true,
+                inventoryItem: {
+                  select: {
+                    metadata: true,
+                  },
+                },
+              },
+            },
+          },
+          orderBy: {
+            orderDate: "desc",
+          },
+          take: 200,
+        }),
       ]);
-
-      // Mock data since Order model doesn't exist
-      const totalOrders = Math.floor(Math.random() * 500) + 100;
-      const recentOrders: any[] = [];
 
       // Calculate savings from logs
       let totalMaterialSavings = 0;
@@ -483,15 +513,32 @@ export async function GET(request: NextRequest) {
       let consolidationOpportunities = 0;
 
       for (const order of recentOrders) {
-        if (order.orderItems.length > 0) {
+        if (order.items.length > 0) {
           // Simplified analysis (would need actual product dimensions)
-          const items = order.orderItems.map((item: any) => ({
-            weight: (item.product as any)?.weight || 1,
-            length: (item.product as any)?.length || 6,
-            width: (item.product as any)?.width || 4,
-            height: (item.product as any)?.height || 2,
-            fragility: "MODERATE" as keyof typeof FRAGILITY_LEVELS,
-          }));
+          const items = order.items.flatMap((item) => {
+            const metadata = (item.inventoryItem?.metadata ?? {}) as Record<
+              string,
+              unknown
+            >;
+            const rawWeight = Number(metadata.weight ?? 1);
+            const rawLength = Number(metadata.length ?? 6);
+            const rawWidth = Number(metadata.width ?? 4);
+            const rawHeight = Number(metadata.height ?? 2);
+
+            const resolvedItem = {
+              weight: Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 1,
+              length: Number.isFinite(rawLength) && rawLength > 0 ? rawLength : 6,
+              width: Number.isFinite(rawWidth) && rawWidth > 0 ? rawWidth : 4,
+              height: Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 2,
+              fragility: "MODERATE" as keyof typeof FRAGILITY_LEVELS,
+            };
+
+            return Array.from({ length: Math.max(item.quantity, 1) }, () => resolvedItem);
+          });
+
+          if (items.length === 0) {
+            continue;
+          }
 
           const optimal = determineOptimalPackage(items);
           if (optimal.efficiency < EFFICIENCY_THRESHOLDS.ACCEPTABLE) {
@@ -503,7 +550,7 @@ export async function GET(request: NextRequest) {
       // Estimate consolidation opportunities (orders to same zip)
       const ordersByZip = new Map<string, number>();
       for (const order of recentOrders) {
-        const zip = (order as any).shippingZip || "UNKNOWN";
+        const zip = order.shippingZip || "UNKNOWN";
         ordersByZip.set(zip, (ordersByZip.get(zip) || 0) + 1);
       }
       for (const count of ordersByZip.values()) {
@@ -736,20 +783,27 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        // Mock order consolidation (Order model doesn't exist)
-        const orders = validatedData.orderIds.map((id: string) => ({
-          id,
-          orderItems: [
-            {
-              product: {
-                weight: 1,
-                length: 6,
-                width: 4,
-                height: 2,
+        const orders = await prisma.salesOrder.findMany({
+          where: {
+            organizationId,
+            id: {
+              in: validatedData.orderIds,
+            },
+          },
+          select: {
+            id: true,
+            items: {
+              select: {
+                quantity: true,
+                inventoryItem: {
+                  select: {
+                    metadata: true,
+                  },
+                },
               },
             },
-          ],
-        }));
+          },
+        });
 
         if (orders.length < 2) {
           return NextResponse.json(
@@ -759,21 +813,32 @@ export async function POST(request: NextRequest) {
         }
 
         // Prepare data for consolidation analysis
-        const ordersData = orders.map((order: any) => ({
+        const ordersData = orders.map((order) => ({
           orderId: order.id,
-          items: order.orderItems.map((item: any) => ({
-            weight: item.product?.weight || 1,
-            length: item.product?.length || 6,
-            width: item.product?.width || 4,
-            height: item.product?.height || 2,
-            fragility: "MODERATE" as keyof typeof FRAGILITY_LEVELS,
-          })),
-        }));
+          items: order.items.flatMap((item) => {
+            const metadata = (item.inventoryItem?.metadata ?? {}) as Record<
+              string,
+              unknown
+            >;
+            const rawWeight = Number(metadata.weight ?? 1);
+            const rawLength = Number(metadata.length ?? 6);
+            const rawWidth = Number(metadata.width ?? 4);
+            const rawHeight = Number(metadata.height ?? 2);
 
+            const resolvedItem = {
+              weight: Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 1,
+              length: Number.isFinite(rawLength) && rawLength > 0 ? rawLength : 6,
+              width: Number.isFinite(rawWidth) && rawWidth > 0 ? rawWidth : 4,
+              height: Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 2,
+              fragility: "MODERATE" as keyof typeof FRAGILITY_LEVELS,
+            };
+
+            return Array.from({ length: Math.max(item.quantity, 1) }, () => resolvedItem);
+          }),
+        }));
         const consolidation = analyzeConsolidation(ordersData);
 
         if (consolidation.canConsolidate) {
-          // Log the consolidation
           await prisma.activityLog.create({
             data: {
               organizationId,
@@ -803,7 +868,6 @@ export async function POST(request: NextRequest) {
       }
 
       case "calculate_savings": {
-        // Calculate total savings for recent optimizations
         const logs = await prisma.activityLog.findMany({
           where: {
             organizationId,
@@ -852,7 +916,6 @@ export async function POST(request: NextRequest) {
         const optimal = determineOptimalPackage(validatedData.items);
         const packageSpec = PACKAGE_TYPES[optimal.packageType];
 
-        // Log the recommendation
         await prisma.activityLog.create({
           data: {
             organizationId,

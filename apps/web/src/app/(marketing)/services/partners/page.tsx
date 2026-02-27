@@ -215,7 +215,7 @@ export default function PartnersPage() {
                 icon: Award,
                 title: "Industry-Leading Product",
                 description:
-                  "Sell a proven WMS that customers love, with 95% customer satisfaction and 98% retention rate.",
+                  "Sell a proven WMS that customers love. 4.9/5 G2 rating with strong customer retention.",
               },
               {
                 icon: Users,

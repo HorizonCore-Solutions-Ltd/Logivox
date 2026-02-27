@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +18,12 @@ import {
   Send,
   MessageSquare,
   HelpCircle,
+  Clock,
+  Zap,
+  CheckCircle2,
+  Globe,
+  HeadphonesIcon,
+  AlertCircle,
 } from "lucide-react";
 
 export default function ContactPage() {
@@ -29,6 +36,7 @@ export default function ContactPage() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [showLiveChat, setShowLiveChat] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,27 +72,33 @@ export default function ContactPage() {
     }));
   };
 
-  const contactMethods = [
+  const supportChannels = [
     {
       icon: Mail,
-      title: "Email Us",
-      description: "Our team typically responds within 24 hours",
-      value: "hello@logivox.ai",
-      action: "mailto:hello@logivox.ai",
+      title: "Email Support",
+      description: "General inquiries and non-urgent issues",
+      value: "support@logivox.ai",
+      sla: "Response within 24 hours",
+      action: "mailto:support@logivox.ai",
+      hours: "24/7",
     },
     {
       icon: Phone,
-      title: "Call Us",
-      description: "Mon-Fri from 8am to 6pm PST",
-      value: "+1 (555) 123-4567",
-      action: "tel:+15551234567",
+      title: "Sales Team",
+      description: "Pricing, demos, and partnership inquiries",
+      value: "sales@logivox.ai",
+      sla: "Response within 2 hours (business hours)",
+      action: "mailto:sales@logivox.ai",
+      hours: "Mon-Fri, 8am-6pm PST",
     },
     {
-      icon: MapPin,
-      title: "Visit Us",
-      description: "Our headquarters in San Francisco",
-      value: "123 Market Street, San Francisco, CA 94103",
-      action: null,
+      icon: HeadphonesIcon,
+      title: "Premium Support",
+      description: "Enterprise customers - priority support",
+      value: "+1 (555) SUPPORT-1",
+      sla: "Response within 30 minutes",
+      action: "tel:+15555878677",
+      hours: "24/7 Available",
     },
   ];
 
@@ -92,17 +106,51 @@ export default function ContactPage() {
     {
       icon: MessageSquare,
       title: "Sales Inquiry",
-      description: "Learn about pricing and plans",
+      description: "Pricing, plans, features, demos",
+      channel: "sales@logivox.ai",
+      sla: "2 hours",
     },
     {
-      icon: HelpCircle,
+      icon: AlertCircle,
       title: "Technical Support",
-      description: "Get help with your account",
+      description: "Account issues, troubleshooting, bugs",
+      channel: "support@logivox.ai",
+      sla: "24 hours",
     },
     {
-      icon: Send,
-      title: "General Question",
-      description: "Any other questions",
+      icon: Zap,
+      title: "Implementation",
+      description: "Onboarding, training, data migration",
+      channel: "sales@logivox.ai",
+      sla: "4 hours",
+    },
+    {
+      icon: Globe,
+      title: "Partnership",
+      description: "Reseller, integration, affiliate opportunities",
+      channel: "partnerships@logivox.ai",
+      sla: "48 hours",
+    },
+  ];
+
+  const contactMethods = [
+    {
+      icon: Mail,
+      title: "Email",
+      value: "support@logivox.ai",
+      action: "mailto:support@logivox.ai",
+    },
+    {
+      icon: Phone,
+      title: "Sales Phone",
+      value: "+1 (555) 123-4567",
+      action: "tel:+15551234567",
+    },
+    {
+      icon: MapPin,
+      title: "Headquarters",
+      value: "San Francisco, CA",
+      action: null,
     },
   ];
 
@@ -114,44 +162,94 @@ export default function ContactPage() {
           <div className="max-w-3xl mx-auto text-center space-y-6">
             <Badge variant="secondary">Contact Us</Badge>
             <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Get in Touch
+              We're Here to Help
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Have questions? We're here to help. Reach out to our team and
-              we'll get back to you as soon as possible.
+              Multiple ways to reach our team. Choose the channel that works best for you.
+              Average response time: less than 2 hours during business hours.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Contact Methods */}
+      {/* Quick Support Channels */}
       <section className="py-16">
         <div className="container-enterprise">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Direct Support Channels</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Choose your preferred way to contact us. All channels are actively monitored.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {contactMethods.map((method) => (
-              <Card key={method.title} className="text-center">
+            {supportChannels.map((channel) => (
+              <Card key={channel.title} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
-                  <div className="flex justify-center mb-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <method.icon className="h-6 w-6 text-primary" />
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <channel.icon className="h-5 w-5 text-primary" />
                     </div>
+                    <Badge variant="outline" className="text-xs">
+                      {channel.hours}
+                    </Badge>
                   </div>
-                  <CardTitle>{method.title}</CardTitle>
-                  <CardDescription>{method.description}</CardDescription>
+                  <CardTitle>{channel.title}</CardTitle>
+                  <CardDescription>{channel.description}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1">Response Time</p>
+                    <p className="text-sm font-semibold">{channel.sla}</p>
+                  </div>
+                  <Button asChild className="w-full" variant="outline">
+                    <a href={channel.action}>
+                      {channel.value}
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Support by Type */}
+      <section className="py-16 bg-muted/30">
+        <div className="container-enterprise">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">What Do You Need Help With?</h2>
+            <p className="text-muted-foreground">
+              Select your inquiry type to be routed to the right team
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {supportOptions.map((option) => (
+              <Card key={option.title} className="hover:border-primary transition-colors cursor-pointer">
+                <CardHeader>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <option.icon className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg">{option.title}</CardTitle>
+                        <CardDescription>{option.description}</CardDescription>
+                      </div>
+                    </div>
+                    <Badge variant="secondary" className="whitespace-nowrap">
+                      {option.sla} SLA
+                    </Badge>
+                  </div>
                 </CardHeader>
                 <CardContent>
-                  {method.action ? (
-                    <a
-                      href={method.action}
-                      className="text-primary hover:underline font-medium"
-                    >
-                      {method.value}
+                  <Button asChild variant="outline" className="w-full">
+                    <a href={`mailto:${option.channel}`}>
+                      <Mail className="mr-2 h-4 w-4" />
+                      {option.channel}
                     </a>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">
-                      {method.value}
-                    </p>
-                  )}
+                  </Button>
                 </CardContent>
               </Card>
             ))}
@@ -160,16 +258,15 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form */}
-      <section className="py-24 bg-muted/30">
+      <section className="py-24">
         <div className="container-enterprise">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
             {/* Form */}
-            <div>
+            <div className="lg:col-span-2">
               <div className="mb-8">
-                <h2 className="text-3xl font-bold mb-4">Send us a Message</h2>
+                <h2 className="text-3xl font-bold mb-4">Send Us a Message</h2>
                 <p className="text-muted-foreground">
-                  Fill out the form below and we'll get back to you within 24
-                  hours.
+                  Fill out the form and we'll get back to you as soon as possible.
                 </p>
               </div>
 
@@ -253,8 +350,9 @@ export default function ContactPage() {
                     className="form-input"
                   >
                     <option value="">Select a subject</option>
-                    <option value="sales">Sales Inquiry</option>
-                    <option value="support">Technical Support</option>
+                    <option value="sales">Sales Inquiry - Pricing & Demo</option>
+                    <option value="support">Technical Support - Account Help</option>
+                    <option value="implementation">Implementation & Onboarding</option>
                     <option value="partnership">Partnership Opportunity</option>
                     <option value="general">General Question</option>
                   </select>
@@ -272,7 +370,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     rows={6}
                     className="form-input resize-none"
-                    placeholder="Tell us how we can help..."
+                    placeholder="Tell us how we can help you..."
                   />
                 </div>
 
@@ -297,78 +395,98 @@ export default function ContactPage() {
               </form>
             </div>
 
-            {/* Support Options */}
-            <div>
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold mb-4">How Can We Help?</h2>
-                <p className="text-muted-foreground">
-                  Choose the option that best describes your inquiry for faster
-                  assistance.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {supportOptions.map((option) => (
-                  <Card key={option.title}>
-                    <CardHeader>
-                      <div className="flex items-start space-x-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                          <option.icon className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg">
-                            {option.title}
-                          </CardTitle>
-                          <CardDescription>
-                            {option.description}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-              </div>
-
-              <Card className="mt-8 bg-primary/5 border-primary/20">
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Actions */}
+              <Card className="border-2 border-primary bg-primary/5">
                 <CardHeader>
-                  <CardTitle>Need Immediate Assistance?</CardTitle>
-                  <CardDescription>
-                    For urgent technical issues, our support team is available
-                    24/7.
-                  </CardDescription>
-                  <div className="pt-4">
-                    <Button variant="outline" className="w-full" asChild>
-                      <a href="mailto:support@logivox.ai">
-                        <Mail className="mr-2 h-4 w-4" />
-                        Email Support
-                      </a>
-                    </Button>
-                  </div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5" />
+                    Quick Actions
+                  </CardTitle>
                 </CardHeader>
+                <CardContent className="space-y-3">
+                  <Button asChild variant="outline" className="w-full justify-start">
+                    <Link href="/pricing">View Pricing</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="w-full justify-start">
+                    <Link href="/features">Explore Features</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="w-full justify-start">
+                    <Link href="/help">Visit Help Center</Link>
+                  </Button>
+                  <Button asChild className="w-full justify-start">
+                    <Link href="/pricing">Schedule Demo</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Business Hours */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5" />
+                    Business Hours
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-sm font-semibold">Sales Team</p>
+                    <p className="text-sm text-muted-foreground">Mon-Fri, 8am-6pm PST</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">Technical Support</p>
+                    <p className="text-sm text-muted-foreground">24/7 Available</p>
+                  </div>
+                  <div className="pt-3 border-t">
+                    <p className="text-xs text-muted-foreground">
+                      All times in Pacific Standard Time (PST)
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Response Times */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle2 className="h-5 w-5" />
+                    Response Times
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Sales Inquiry</span>
+                    <Badge variant="secondary">2 hours</Badge>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Support Ticket</span>
+                    <Badge variant="secondary">24 hours</Badge>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span>Premium (SLA)</span>
+                    <Badge variant="secondary">30 min</Badge>
+                  </div>
+                </CardContent>
               </Card>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Map Section (Placeholder) */}
-      <section className="py-16">
-        <div className="container-enterprise">
-          <Card className="overflow-hidden">
-            <div className="bg-muted h-96 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <MapPin className="h-12 w-12 text-muted-foreground mx-auto" />
-                <p className="text-muted-foreground">
-                  Interactive map would be integrated here
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  123 Market Street, San Francisco, CA 94103
-                </p>
-              </div>
-            </div>
-          </Card>
+      {/* FAQ CTA */}
+      <section className="py-16 bg-muted/30">
+        <div className="container-enterprise text-center space-y-6">
+          <h2 className="text-3xl font-bold">Can't find what you're looking for?</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Check our help center for common questions, documentation, and troubleshooting guides.
+          </p>
+          <Button size="lg" asChild>
+            <Link href="/help">Visit Help Center</Link>
+          </Button>
         </div>
       </section>
     </div>
   );
 }
+

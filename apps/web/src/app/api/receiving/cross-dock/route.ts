@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import crypto from "crypto";
 
 // ============================================================================
 // CROSS-DOCK COORDINATION API
@@ -216,7 +217,7 @@ async function identifyOpportunity(
       );
 
       // Create cross-dock opportunity (using ActivityLog as crossDockOpportunity model doesn't exist)
-      const opportunityId = `CD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      const opportunityId = `CD-${Date.now()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
 
       await prisma.activityLog.create({
         data: {

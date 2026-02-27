@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 
 const WEBHOOK_DEPRECATION = {
   message: "Webhook management moved to /api/integrations/webhooks",
@@ -201,43 +202,66 @@ export async function DELETE(req: NextRequest) {
  */
 async function syncToERP(loadSheet: any, erpSystem: string) {
   try {
-    // ERP-specific logic
-    if (erpSystem === "SAP") {
-      // SAP integration
-      const sapPayload = {
-        deliveryNumber: loadSheet.loadSheetNumber,
-        customer: loadSheet.customer.code,
-        shipDate: loadSheet.shipmentDate,
-        items: loadSheet.containers.flatMap((c: any) =>
-          c.containerItems.map((item: any) => ({
-            material: item.sku,
-            quantity: item.quantity,
-          })),
-        ),
-      };
+    const payload = {
+      deliveryNumber: loadSheet.loadSheetNumber,
+      customer: {
+        code: loadSheet.customer?.code,
+        name: loadSheet.customer?.name,
+      },
+      shipDate: loadSheet.shipmentDate,
+      items: loadSheet.containers.flatMap((c: any) =>
+        c.containerItems.map((item: any) => ({
+          material: item.sku,
+          quantity: item.quantity,
+        })),
+      ),
+    };
 
-      // Call SAP API (mock)
-      console.log("Syncing to SAP:", sapPayload);
+    const endpointMap: Record<string, string | undefined> = {
+      SAP: process.env.SAP_API_URL,
+      ORACLE: process.env.ORACLE_API_URL,
+    };
 
+    const endpoint = endpointMap[erpSystem];
+    if (!endpoint) {
       return {
-        success: true,
-        message: "Synced to SAP successfully",
-        erpReference: `SAP-${Date.now()}`,
-      };
-    } else if (erpSystem === "ORACLE") {
-      // Oracle integration
-      console.log("Syncing to Oracle:", loadSheet.loadSheetNumber);
-
-      return {
-        success: true,
-        message: "Synced to Oracle successfully",
-        erpReference: `ORACLE-${Date.now()}`,
+        success: false,
+        message: `${erpSystem} ERP endpoint is not configured`,
       };
     }
 
+    const authToken = process.env.ERP_API_TOKEN;
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const responseBody = await response.text();
+    if (!response.ok) {
+      return {
+        success: false,
+        message: `ERP sync failed (${response.status}): ${responseBody}`,
+      };
+    }
+
+    let parsed: any = null;
+    try {
+      parsed = responseBody ? JSON.parse(responseBody) : null;
+    } catch {
+      parsed = { raw: responseBody };
+    }
+
     return {
-      success: false,
-      message: "Unsupported ERP system",
+      success: true,
+      message: `Synced to ${erpSystem} successfully`,
+      erpReference:
+        parsed?.reference ||
+        parsed?.id ||
+        `${erpSystem}-${loadSheet.loadSheetNumber}-${Date.now()}`,
     };
   } catch (error) {
     console.error("ERP sync error:", error);
@@ -329,14 +353,20 @@ export async function triggerWebhook(event: string, data: any) {
           data,
         };
 
+        const secret = process.env.WEBHOOK_SIGNING_SECRET || "";
+        const rawPayload = JSON.stringify(payload);
+        const signature = secret
+          ? crypto.createHmac("sha256", secret).update(rawPayload).digest("hex")
+          : "";
+
         await fetch(webhook.url, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "X-Webhook-Event": event,
-            "X-Webhook-Signature": "signature-here", // TODO: Implement HMAC signature
+            ...(signature ? { "X-Webhook-Signature": signature } : {}),
           },
-          body: JSON.stringify(payload),
+          body: rawPayload,
         });
 
         // Update last triggered timestamp

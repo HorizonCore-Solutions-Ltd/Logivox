@@ -3,8 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { z } from "zod";
+import crypto from "crypto";
 
-// Validation schemas
 const createBOLSchema = z.object({
   shipmentId: z.string(),
   carrierName: z.string(),
@@ -62,525 +62,349 @@ const attachDocumentSchema = z.object({
   description: z.string().optional(),
 });
 
-// Mock database
-interface BOL {
-  id: string;
-  bolNumber: string;
-  shipmentId: string;
-  carrierName: string;
-  status: string;
-  createdAt: Date;
-  createdBy: string;
-  shipperInfo: any;
-  consigneeInfo: any;
-  items: Array<{
-    description: string;
-    quantity: number;
-    weight: number;
-    packageType: string;
-    class?: string;
-    nmfc?: string;
-  }>;
-  totalWeight: number;
-  totalPieces: number;
-  specialInstructions?: string;
-  declaredValue?: number;
-  freightCharges: string;
-  signatures: Array<{
-    signerName: string;
-    signerRole: string;
-    signedAt: Date;
-    signatureUrl: string;
-    notes?: string;
-  }>;
-  attachedDocuments: Array<{
-    id: string;
-    documentType: string;
-    fileName: string;
-    fileUrl: string;
-    uploadedAt: Date;
-    description?: string;
-  }>;
-  pdfUrl?: string;
+async function getOrganizationId(userId: string): Promise<string | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      organizationMemberships: {
+        where: { isActive: true },
+        include: { organization: true },
+        take: 1,
+      },
+    },
+  });
+  return user?.organizationMemberships?.[0]?.organizationId ?? null;
 }
 
-interface BOLMetrics {
-  totalBOLs: number;
-  bolsToday: number;
-  pendingSignatures: number;
-  completedBOLs: number;
-  avgProcessingTime: number;
-  complianceRate: number;
-  bolsByCarrier: Array<{
-    carrier: string;
-    count: number;
-    percentage: number;
-  }>;
-  documentTypes: Array<{
-    type: string;
-    count: number;
-  }>;
-}
-
-// Mock data
-const bols: BOL[] = [
-  {
-    id: "BOL-001",
-    bolNumber: "BOL-2024-001234",
-    shipmentId: "SHIP-2401-001",
-    carrierName: "Swift Transport",
-    status: "SIGNED",
-    createdAt: new Date("2024-01-08T08:00:00"),
-    createdBy: "System",
-    shipperInfo: {
-      name: "Warehouse Solutions Inc",
-      address: "123 Industrial Blvd",
-      city: "Chicago",
-      state: "IL",
-      zip: "60601",
-      phone: "312-555-0100",
-    },
-    consigneeInfo: {
-      name: "Retail Distributors LLC",
-      address: "456 Commerce Ave",
-      city: "New York",
-      state: "NY",
-      zip: "10001",
-      phone: "212-555-0200",
-    },
-    items: [
-      {
-        description: "Electronic Components - Boxes",
-        quantity: 45,
-        weight: 235.5,
-        packageType: "Box",
-        class: "100",
-        nmfc: "12345-03",
-      },
-      {
-        description: "Industrial Parts - Pallets",
-        quantity: 12,
-        weight: 480.0,
-        packageType: "Pallet",
-        class: "85",
-        nmfc: "67890-01",
-      },
-    ],
-    totalWeight: 715.5,
-    totalPieces: 57,
-    specialInstructions: "Handle with care. Temperature sensitive.",
-    declaredValue: 45000,
-    freightCharges: "PREPAID",
-    signatures: [
-      {
-        signerName: "John Manager",
-        signerRole: "SHIPPER",
-        signedAt: new Date("2024-01-08T08:15:00"),
-        signatureUrl: "/signatures/shipper-001.png",
-      },
-      {
-        signerName: "Mike Driver",
-        signerRole: "CARRIER",
-        signedAt: new Date("2024-01-08T08:20:00"),
-        signatureUrl: "/signatures/carrier-001.png",
-        notes: "All items loaded and secured",
-      },
-    ],
-    attachedDocuments: [
-      {
-        id: "DOC-001",
-        documentType: "PACKING_LIST",
-        fileName: "packing-list-001.pdf",
-        fileUrl: "/documents/packing-list-001.pdf",
-        uploadedAt: new Date("2024-01-08T08:10:00"),
-      },
-    ],
-    pdfUrl: "/bols/BOL-2024-001234.pdf",
-  },
-  {
-    id: "BOL-002",
-    bolNumber: "BOL-2024-001235",
-    shipmentId: "SHIP-2401-002",
-    carrierName: "XPO Logistics",
-    status: "PENDING_CARRIER_SIGNATURE",
-    createdAt: new Date("2024-01-08T09:30:00"),
-    createdBy: "System",
-    shipperInfo: {
-      name: "Warehouse Solutions Inc",
-      address: "123 Industrial Blvd",
-      city: "Chicago",
-      state: "IL",
-      zip: "60601",
-      phone: "312-555-0100",
-    },
-    consigneeInfo: {
-      name: "West Coast Wholesale",
-      address: "789 Pacific Hwy",
-      city: "Los Angeles",
-      state: "CA",
-      zip: "90001",
-      phone: "310-555-0300",
-    },
-    items: [
-      {
-        description: "Consumer Goods - Mixed Pallets",
-        quantity: 28,
-        weight: 1240.0,
-        packageType: "Pallet",
-        class: "70",
-      },
-    ],
-    totalWeight: 1240.0,
-    totalPieces: 28,
-    freightCharges: "PREPAID",
-    signatures: [
-      {
-        signerName: "Sarah Supervisor",
-        signerRole: "SHIPPER",
-        signedAt: new Date("2024-01-08T09:40:00"),
-        signatureUrl: "/signatures/shipper-002.png",
-      },
-    ],
-    attachedDocuments: [],
-  },
-];
-
-const generateBOLNumber = (): string => {
+function generateBOLNumber(): string {
   const year = new Date().getFullYear();
-  const random = Math.floor(Math.random() * 1000000)
-    .toString()
-    .padStart(6, "0");
-  return `BOL-${year}-${random}`;
-};
+  const suffix = crypto.randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
+  return `BOL-${year}-${suffix}`;
+}
+
+function createBOLId(): string {
+  return `BOL-${Date.now()}-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+}
+
+function rebuildBolState(events: any[]) {
+  const created = events.find((e) => e.action === "DOCK_BOL_CREATED");
+  if (!created) return null;
+
+  const base = created.metadata as any;
+  const signatures = events
+    .filter((e) => e.action === "DOCK_BOL_SIGNED")
+    .map((e) => ({ ...(e.metadata as any), signedAt: e.createdAt }));
+
+  const docs = events
+    .filter((e) => e.action === "DOCK_BOL_DOCUMENT_ATTACHED")
+    .map((e) => ({ id: e.entityId, ...(e.metadata as any), uploadedAt: e.createdAt }));
+
+  const isVoided = events.some((e) => e.action === "DOCK_BOL_VOIDED");
+  const generatedPdf = events.find((e) => e.action === "DOCK_BOL_PDF_GENERATED");
+
+  let status = "DRAFT";
+  const hasShipper = signatures.some((s) => s.signerRole === "SHIPPER");
+  const hasCarrier = signatures.some((s) => s.signerRole === "CARRIER");
+  const hasConsignee = signatures.some((s) => s.signerRole === "CONSIGNEE");
+
+  if (isVoided) status = "VOIDED";
+  else if (hasConsignee) status = "DELIVERED";
+  else if (hasShipper && hasCarrier) status = "SIGNED";
+  else if (hasShipper) status = "PENDING_CARRIER_SIGNATURE";
+
+  const totalWeight = (base.items || []).reduce(
+    (sum: number, i: any) => sum + Number(i.weight || 0),
+    0,
+  );
+  const totalPieces = (base.items || []).reduce(
+    (sum: number, i: any) => sum + Number(i.quantity || 0),
+    0,
+  );
+
+  return {
+    id: created.entityId,
+    bolNumber: base.bolNumber,
+    shipmentId: base.shipmentId,
+    carrierName: base.carrierName,
+    status,
+    createdAt: created.createdAt,
+    createdBy: base.createdBy,
+    shipperInfo: base.shipperInfo,
+    consigneeInfo: base.consigneeInfo,
+    items: base.items,
+    totalWeight,
+    totalPieces,
+    specialInstructions: base.specialInstructions,
+    declaredValue: base.declaredValue,
+    freightCharges: base.freightCharges,
+    signatures,
+    attachedDocuments: docs,
+    pdfUrl: generatedPdf ? (generatedPdf.metadata as any)?.pdfUrl : undefined,
+  };
+}
+
+async function fetchBolEvents(organizationId: string) {
+  return prisma.activityLog.findMany({
+    where: {
+      organizationId,
+      entityType: "DockBOL",
+      action: {
+        in: [
+          "DOCK_BOL_CREATED",
+          "DOCK_BOL_SIGNED",
+          "DOCK_BOL_DOCUMENT_ATTACHED",
+          "DOCK_BOL_VOIDED",
+          "DOCK_BOL_PDF_GENERATED",
+        ],
+      },
+    },
+    orderBy: { createdAt: "asc" },
+    take: 5000,
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await getOrganizationId(session.user.id);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization found" }, { status: 404 });
     }
 
     const body = await request.json();
     const { action } = body;
 
-    switch (action) {
-      case "create_bol": {
-        const data = createBOLSchema.parse(body);
+    if (action === "create_bol") {
+      const data = createBOLSchema.parse(body);
+      const bolId = createBOLId();
+      const bolNumber = generateBOLNumber();
 
-        const totalWeight = data.items.reduce(
-          (sum, item) => sum + item.weight,
-          0,
-        );
-        const totalPieces = data.items.reduce(
-          (sum, item) => sum + item.quantity,
-          0,
-        );
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "DOCK_BOL_CREATED",
+          entityType: "DockBOL",
+          entityId: bolId,
+          metadata: {
+            bolNumber,
+            shipmentId: data.shipmentId,
+            carrierName: data.carrierName,
+            shipperInfo: data.shipperInfo,
+            consigneeInfo: data.consigneeInfo,
+            items: data.items,
+            specialInstructions: data.specialInstructions,
+            declaredValue: data.declaredValue,
+            freightCharges: data.freightCharges,
+            createdBy: session.user.name || session.user.email || "Unknown",
+          },
+        },
+      });
 
-        const newBOL: BOL = {
-          id: `BOL-${String(bols.length + 1).padStart(3, "0")}`,
-          bolNumber: generateBOLNumber(),
-          shipmentId: data.shipmentId,
-          carrierName: data.carrierName,
-          status: "DRAFT",
-          createdAt: new Date(),
-          createdBy: session.user.name || "Unknown",
-          shipperInfo: data.shipperInfo,
-          consigneeInfo: data.consigneeInfo,
-          items: data.items,
-          totalWeight,
-          totalPieces,
-          specialInstructions: data.specialInstructions,
-          declaredValue: data.declaredValue,
-          freightCharges: data.freightCharges,
-          signatures: [],
-          attachedDocuments: [],
-        };
-
-        bols.push(newBOL);
-
-        return NextResponse.json({
-          success: true,
-          bol: newBOL,
-          message: "BOL created successfully",
-        });
-      }
-
-      case "sign_bol": {
-        const data = signBOLSchema.parse(body);
-
-        const bol = bols.find((b) => b.id === data.bolId);
-        if (!bol) {
-          return NextResponse.json({ error: "BOL not found" }, { status: 404 });
-        }
-
-        // Check if role already signed
-        const existingSignature = bol.signatures.find(
-          (s) => s.signerRole === data.signerRole,
-        );
-        if (existingSignature) {
-          return NextResponse.json(
-            { error: "Role already signed this BOL" },
-            { status: 400 },
-          );
-        }
-
-        bol.signatures.push({
-          signerName: data.signerName,
-          signerRole: data.signerRole,
-          signedAt: new Date(),
-          signatureUrl: data.signatureData, // In production, save to storage
-          notes: data.notes,
-        });
-
-        // Update status based on signatures
-        if (data.signerRole === "SHIPPER" && bol.status === "DRAFT") {
-          bol.status = "PENDING_CARRIER_SIGNATURE";
-        } else if (
-          data.signerRole === "CARRIER" &&
-          bol.signatures.some((s) => s.signerRole === "SHIPPER")
-        ) {
-          bol.status = "SIGNED";
-        } else if (data.signerRole === "CONSIGNEE") {
-          bol.status = "DELIVERED";
-        }
-
-        // Generate PDF if fully signed
-        if (bol.status === "SIGNED" && !bol.pdfUrl) {
-          bol.pdfUrl = `/bols/${bol.bolNumber}.pdf`;
-        }
-
-        return NextResponse.json({
-          success: true,
-          bol: bol,
-          message: "BOL signed successfully",
-        });
-      }
-
-      case "attach_document": {
-        const data = attachDocumentSchema.parse(body);
-
-        const bol = bols.find((b) => b.id === data.bolId);
-        if (!bol) {
-          return NextResponse.json({ error: "BOL not found" }, { status: 404 });
-        }
-
-        const newDocument = {
-          id: `DOC-${String(bol.attachedDocuments.length + 1).padStart(3, "0")}`,
-          documentType: data.documentType,
-          fileName: data.fileName,
-          fileUrl: data.fileUrl,
-          uploadedAt: new Date(),
-          description: data.description,
-        };
-
-        bol.attachedDocuments.push(newDocument);
-
-        return NextResponse.json({
-          success: true,
-          document: newDocument,
-          message: "Document attached successfully",
-        });
-      }
-
-      case "void_bol": {
-        const { bolId, reason } = body;
-
-        const bol = bols.find((b) => b.id === bolId);
-        if (!bol) {
-          return NextResponse.json({ error: "BOL not found" }, { status: 404 });
-        }
-
-        if (bol.status === "DELIVERED" || bol.status === "VOIDED") {
-          return NextResponse.json(
-            {
-              error: "Cannot void BOL in current status",
-            },
-            { status: 400 },
-          );
-        }
-
-        bol.status = "VOIDED";
-
-        return NextResponse.json({
-          success: true,
-          bol: bol,
-          message: "BOL voided successfully",
-        });
-      }
-
-      case "generate_pdf": {
-        const { bolId } = body;
-
-        const bol = bols.find((b) => b.id === bolId);
-        if (!bol) {
-          return NextResponse.json({ error: "BOL not found" }, { status: 404 });
-        }
-
-        // In production, generate actual PDF
-        bol.pdfUrl = `/bols/${bol.bolNumber}.pdf`;
-
-        return NextResponse.json({
-          success: true,
-          pdfUrl: bol.pdfUrl,
-          message: "PDF generated successfully",
-        });
-      }
-
-      default:
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+      return NextResponse.json({
+        success: true,
+        bolId,
+        bolNumber,
+        message: "BOL created successfully",
+      });
     }
+
+    if (action === "sign_bol") {
+      const data = signBOLSchema.parse(body);
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "DOCK_BOL_SIGNED",
+          entityType: "DockBOL",
+          entityId: data.bolId,
+          metadata: {
+            signerName: data.signerName,
+            signerRole: data.signerRole,
+            signatureUrl: data.signatureData,
+            notes: data.notes,
+          },
+        },
+      });
+
+      return NextResponse.json({ success: true, message: "BOL signed successfully" });
+    }
+
+    if (action === "attach_document") {
+      const data = attachDocumentSchema.parse(body);
+      const docId = `DOC-${Date.now()}-${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "DOCK_BOL_DOCUMENT_ATTACHED",
+          entityType: "DockBOL",
+          entityId: data.bolId,
+          metadata: {
+            documentId: docId,
+            documentType: data.documentType,
+            fileName: data.fileName,
+            fileUrl: data.fileUrl,
+            description: data.description,
+          },
+        },
+      });
+
+      return NextResponse.json({ success: true, documentId: docId, message: "Document attached successfully" });
+    }
+
+    if (action === "void_bol") {
+      const { bolId, reason } = body;
+      if (!bolId) {
+        return NextResponse.json({ error: "bolId required" }, { status: 400 });
+      }
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "DOCK_BOL_VOIDED",
+          entityType: "DockBOL",
+          entityId: bolId,
+          metadata: { reason: reason || "No reason provided" },
+        },
+      });
+
+      return NextResponse.json({ success: true, message: "BOL voided successfully" });
+    }
+
+    if (action === "generate_pdf") {
+      const { bolId } = body;
+      if (!bolId) {
+        return NextResponse.json({ error: "bolId required" }, { status: 400 });
+      }
+
+      const pdfUrl = `/bols/${bolId}.pdf`;
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "DOCK_BOL_PDF_GENERATED",
+          entityType: "DockBOL",
+          entityId: bolId,
+          metadata: { pdfUrl },
+        },
+      });
+
+      return NextResponse.json({ success: true, pdfUrl, message: "PDF generated successfully" });
+    }
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error in BOL API:", error);
-
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },
         { status: 400 },
       );
     }
-
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const organizationId = await getOrganizationId(session.user.id);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+    }
+
+    const events = await fetchBolEvents(organizationId);
+
+    const bolIds = [...new Set(events.map((e) => e.entityId).filter(Boolean))] as string[];
+    const bols = bolIds
+      .map((id) => rebuildBolState(events.filter((e) => e.entityId === id)))
+      .filter(Boolean);
 
     const { searchParams } = new URL(request.url);
     const action = searchParams.get("action");
     const bolId = searchParams.get("bolId");
 
-    switch (action) {
-      case "bol": {
-        if (!bolId) {
-          return NextResponse.json(
-            { error: "BOL ID required" },
-            { status: 400 },
-          );
+    if (action === "bol") {
+      if (!bolId) {
+        return NextResponse.json({ error: "BOL ID required" }, { status: 400 });
+      }
+      const bol = bols.find((b: any) => b.id === bolId);
+      if (!bol) {
+        return NextResponse.json({ error: "BOL not found" }, { status: 404 });
+      }
+      return NextResponse.json({ bol });
+    }
+
+    if (action === "recent_bols") {
+      const limit = parseInt(searchParams.get("limit") || "20", 10);
+      const recent = [...(bols as any[])].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+      return NextResponse.json({ bols: recent.slice(0, limit) });
+    }
+
+    if (action === "pending_signatures") {
+      const pending = (bols as any[]).filter(
+        (b) => b.status === "DRAFT" || b.status === "PENDING_CARRIER_SIGNATURE",
+      );
+      return NextResponse.json({ bols: pending, count: pending.length });
+    }
+
+    if (action === "bol_metrics") {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const totalBOLs = (bols as any[]).length;
+      const bolsToday = (bols as any[]).filter((b) => new Date(b.createdAt) >= today).length;
+      const pendingSignatures = (bols as any[]).filter(
+        (b) => b.status === "DRAFT" || b.status === "PENDING_CARRIER_SIGNATURE",
+      ).length;
+      const completedBOLs = (bols as any[]).filter(
+        (b) => b.status === "SIGNED" || b.status === "DELIVERED",
+      ).length;
+
+      const avgProcessingTime = 0;
+      const complianceRate =
+        completedBOLs > 0
+          ? ((bols as any[]).filter((b) => b.attachedDocuments?.length > 0).length /
+              completedBOLs) *
+            100
+          : 0;
+
+      const carrierMap: Record<string, number> = {};
+      for (const bol of bols as any[]) {
+        carrierMap[bol.carrierName] = (carrierMap[bol.carrierName] || 0) + 1;
+      }
+
+      const bolsByCarrier = Object.entries(carrierMap).map(([carrier, count]) => ({
+        carrier,
+        count,
+        percentage: totalBOLs > 0 ? (count / totalBOLs) * 100 : 0,
+      }));
+
+      const docMap: Record<string, number> = {};
+      for (const bol of bols as any[]) {
+        for (const doc of bol.attachedDocuments || []) {
+          docMap[doc.documentType] = (docMap[doc.documentType] || 0) + 1;
         }
-
-        const bol = bols.find((b) => b.id === bolId);
-        if (!bol) {
-          return NextResponse.json({ error: "BOL not found" }, { status: 404 });
-        }
-
-        return NextResponse.json({ bol });
       }
 
-      case "recent_bols": {
-        const limit = parseInt(searchParams.get("limit") || "20");
-        const recentBOLs = bols
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-          )
-          .slice(0, limit);
+      const documentTypes = Object.entries(docMap).map(([type, count]) => ({ type, count }));
 
-        return NextResponse.json({
-          bols: recentBOLs,
-        });
-      }
-
-      case "pending_signatures": {
-        const pendingBOLs = bols.filter(
-          (b) =>
-            b.status === "PENDING_CARRIER_SIGNATURE" || b.status === "DRAFT",
-        );
-
-        return NextResponse.json({
-          bols: pendingBOLs,
-          count: pendingBOLs.length,
-        });
-      }
-
-      case "bol_metrics": {
-        const totalBOLs = bols.length;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const bolsToday = bols.filter((b) => {
-          const bolDate = new Date(b.createdAt);
-          return bolDate >= today;
-        }).length;
-
-        const pendingSignatures = bols.filter(
-          (b) =>
-            b.status === "PENDING_CARRIER_SIGNATURE" || b.status === "DRAFT",
-        ).length;
-
-        const completedBOLs = bols.filter(
-          (b) => b.status === "SIGNED" || b.status === "DELIVERED",
-        ).length;
-
-        // Calculate average processing time (from creation to full signature)
-        const signedBOLs = bols.filter(
-          (b) => b.status === "SIGNED" || b.status === "DELIVERED",
-        );
-        const processingTimes = signedBOLs
-          .filter((b) => b.signatures.length >= 2)
-          .map((b) => {
-            const created = new Date(b.createdAt).getTime();
-            const lastSigned = Math.max(
-              ...b.signatures.map((s) => new Date(s.signedAt).getTime()),
-            );
-            return (lastSigned - created) / 1000 / 60; // minutes
-          });
-
-        const avgProcessingTime =
-          processingTimes.length > 0
-            ? processingTimes.reduce((a, b) => a + b, 0) /
-              processingTimes.length
-            : 0;
-
-        // Compliance rate (BOLs with all required docs)
-        const compliantBOLs = bols.filter(
-          (b) => b.status === "SIGNED" && b.attachedDocuments.length > 0,
-        ).length;
-        const complianceRate =
-          completedBOLs > 0 ? (compliantBOLs / completedBOLs) * 100 : 0;
-
-        // BOLs by carrier
-        const carrierStats = bols.reduce(
-          (acc, b) => {
-            acc[b.carrierName] = (acc[b.carrierName] || 0) + 1;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-
-        const bolsByCarrier = Object.entries(carrierStats)
-          .map(([carrier, count]) => ({
-            carrier,
-            count,
-            percentage: (count / totalBOLs) * 100,
-          }))
-          .sort((a, b) => b.count - a.count);
-
-        // Document types
-        const allDocs = bols.flatMap((b) => b.attachedDocuments);
-        const docTypeStats = allDocs.reduce(
-          (acc, doc) => {
-            acc[doc.documentType] = (acc[doc.documentType] || 0) + 1;
-            return acc;
-          },
-          {} as Record<string, number>,
-        );
-
-        const documentTypes = Object.entries(docTypeStats)
-          .map(([type, count]) => ({
-            type,
-            count,
-          }))
-          .sort((a, b) => b.count - a.count);
-
-        const metrics: BOLMetrics = {
+      return NextResponse.json({
+        metrics: {
           totalBOLs,
           bolsToday,
           pendingSignatures,
@@ -589,19 +413,13 @@ export async function GET(request: NextRequest) {
           complianceRate,
           bolsByCarrier,
           documentTypes,
-        };
-
-        return NextResponse.json({ metrics });
-      }
-
-      default:
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
+        },
+      });
     }
+
+    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error in BOL API:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

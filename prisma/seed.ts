@@ -50,19 +50,8 @@ async function main() {
       logo: "/images/demo-logo.png",
       primaryColor: "#3b82f6",
       subscriptionTier: "PROFESSIONAL",
-      subscriptionValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year
-      maxUsers: 50,
-      maxWarehouses: 10,
-      features: {
-        analytics: true,
-        api_access: true,
-        custom_branding: true,
-        priority_support: true,
-      },
       timezone: "UTC",
       currency: "USD",
-      dateFormat: "MM/DD/YYYY",
-      timeFormat: "12h",
       createdById: admin.id,
     },
   });
@@ -72,9 +61,9 @@ async function main() {
   // Add Admin to Organization as Owner
   const adminMembership = await prisma.organizationMember.upsert({
     where: {
-      userId_organizationId: {
-        userId: admin.id,
+      organizationId_userId: {
         organizationId: demoOrg.id,
+        userId: admin.id,
       },
     },
     update: {},
@@ -122,9 +111,9 @@ async function main() {
   // Add Manager to Organization
   await prisma.organizationMember.upsert({
     where: {
-      userId_organizationId: {
-        userId: manager.id,
+      organizationId_userId: {
         organizationId: demoOrg.id,
+        userId: manager.id,
       },
     },
     update: {},
@@ -154,18 +143,10 @@ async function main() {
     data: {
       name: "Main Warehouse",
       code: "WH-MAIN",
-      location: "New York, NY",
       address: "123 Main Street",
       city: "New York",
-      state: "NY",
       country: "United States",
-      postalCode: "10001",
-      phone: "+1-555-0100",
-      email: "warehouse@demo-company.com",
-      capacity: 10000,
-      isActive: true,
       organizationId: demoOrg.id,
-      managerId: manager.id,
     },
   });
 
@@ -175,6 +156,7 @@ async function main() {
   const electronics = await prisma.category.create({
     data: {
       name: "Electronics",
+      slug: "electronics",
       description: "Electronic devices and accessories",
       organizationId: demoOrg.id,
     },
@@ -183,6 +165,7 @@ async function main() {
   const furniture = await prisma.category.create({
     data: {
       name: "Furniture",
+      slug: "furniture",
       description: "Office and home furniture",
       organizationId: demoOrg.id,
     },
@@ -191,6 +174,7 @@ async function main() {
   const supplies = await prisma.category.create({
     data: {
       name: "Office Supplies",
+      slug: "office-supplies",
       description: "Stationery and office essentials",
       organizationId: demoOrg.id,
     },
@@ -207,17 +191,17 @@ async function main() {
         'Dell Latitude 5420 - 14" FHD, Intel i5, 16GB RAM, 512GB SSD',
       barcode: "1234567890123",
       quantity: 50,
-      reservedQuantity: 10,
-      availableQuantity: 40,
+      reservedQty: 10,
+      availableQty: 40,
       minStockLevel: 10,
       reorderPoint: 15,
       costPrice: 899.99,
       sellingPrice: 1299.99,
-      unit: "piece",
       status: "ACTIVE",
       organizationId: demoOrg.id,
       warehouseId: mainWarehouse.id,
       categoryId: electronics.id,
+      createdById: admin.id,
     },
   });
 
@@ -227,17 +211,17 @@ async function main() {
       sku: "DESK-001",
       description: "Electric height-adjustable standing desk, 60x30 inches",
       quantity: 25,
-      reservedQuantity: 5,
-      availableQuantity: 20,
+      reservedQty: 5,
+      availableQty: 20,
       minStockLevel: 5,
       reorderPoint: 10,
       costPrice: 399.99,
       sellingPrice: 599.99,
-      unit: "piece",
       status: "ACTIVE",
       organizationId: demoOrg.id,
       warehouseId: mainWarehouse.id,
       categoryId: furniture.id,
+      createdById: admin.id,
     },
   });
 
@@ -247,17 +231,17 @@ async function main() {
       sku: "PEN-001",
       description: "Blue ballpoint pens, medium point",
       quantity: 200,
-      reservedQuantity: 0,
-      availableQuantity: 200,
+      reservedQty: 0,
+      availableQty: 200,
       minStockLevel: 50,
       reorderPoint: 75,
       costPrice: 12.99,
       sellingPrice: 19.99,
-      unit: "box",
       status: "ACTIVE",
       organizationId: demoOrg.id,
       warehouseId: mainWarehouse.id,
       categoryId: supplies.id,
+      createdById: admin.id,
     },
   });
 
@@ -273,12 +257,7 @@ async function main() {
       website: "https://techsupplies.com",
       address: "456 Supplier Ave",
       city: "San Francisco",
-      state: "CA",
       country: "United States",
-      postalCode: "94102",
-      contactPerson: "John Smith",
-      paymentTerms: "Net 30",
-      isActive: true,
       organizationId: demoOrg.id,
     },
   });
@@ -292,15 +271,9 @@ async function main() {
       code: "CUST-001",
       email: "purchasing@abccorp.com",
       phone: "+1-555-0300",
-      website: "https://abccorp.com",
       address: "789 Customer Blvd",
       city: "Chicago",
-      state: "IL",
       country: "United States",
-      postalCode: "60601",
-      contactPerson: "Jane Doe",
-      paymentTerms: "Net 60",
-      isActive: true,
       organizationId: demoOrg.id,
     },
   });
@@ -313,25 +286,26 @@ async function main() {
       bookingNumber: "BK-2024-001",
       status: "CONFIRMED",
       priority: "HIGH",
-      requestedDate: new Date(),
-      confirmedDate: new Date(),
+      totalItems: 15,
+      totalValue: 15999.85,
+      bookedAt: new Date(),
+      confirmedAt: new Date(),
       notes: "Office equipment for new location setup",
       organizationId: demoOrg.id,
       customerId: customer.id,
-      warehouseId: mainWarehouse.id,
-      requestedById: manager.id,
+      createdById: manager.id,
       items: {
         create: [
           {
             inventoryItemId: laptop.id,
-            quantity: 10,
+            quantityBooked: 10,
             unitPrice: 1299.99,
             totalPrice: 12999.9,
             notes: "For new employees",
           },
           {
             inventoryItemId: desk.id,
-            quantity: 5,
+            quantityBooked: 5,
             unitPrice: 599.99,
             totalPrice: 2999.95,
             notes: "For office setup",
@@ -348,12 +322,8 @@ async function main() {
     data: {
       type: "BOOKING",
       quantity: 10,
-      reference: booking.bookingNumber,
       notes: "Reserved for booking BK-2024-001",
-      organizationId: demoOrg.id,
       inventoryItemId: laptop.id,
-      warehouseId: mainWarehouse.id,
-      userId: manager.id,
     },
   });
 
@@ -361,12 +331,8 @@ async function main() {
     data: {
       type: "BOOKING",
       quantity: 5,
-      reference: booking.bookingNumber,
       notes: "Reserved for booking BK-2024-001",
-      organizationId: demoOrg.id,
       inventoryItemId: desk.id,
-      warehouseId: mainWarehouse.id,
-      userId: manager.id,
     },
   });
 
@@ -377,7 +343,7 @@ async function main() {
     data: {
       action: "DATABASE_SEEDED",
       entityType: "SYSTEM",
-      description: "Database seeded with demo data",
+      metadata: { message: "Database seeded with demo data" },
       ipAddress: "127.0.0.1",
       userAgent: "Prisma Seed Script",
       organizationId: demoOrg.id,

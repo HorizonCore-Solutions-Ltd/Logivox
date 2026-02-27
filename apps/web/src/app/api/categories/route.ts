@@ -1,22 +1,19 @@
 export const dynamic = "force-dynamic";
-import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth-helpers";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { resolveTenantFromRequest } from "@/lib/tenant-context";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
+    // Resolve tenant to get organizationId (fail-closed, no user-provided params)
+    const tenant = await resolveTenantFromRequest(request as any);
+    if (!tenant) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const organizationId =
-      searchParams.get("organizationId") || user.organizations[0]?.id;
-
     const categories = await prisma.category.findMany({
       where: {
-        organizationId,
+        organizationId: tenant.organizationId,
       },
       include: {
         parent: {
@@ -47,10 +44,11 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
+    // Resolve tenant to get organizationId
+    const tenant = await resolveTenantFromRequest(request as any);
+    if (!tenant) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
@@ -69,20 +67,21 @@ export async function POST(request: Request) {
         name,
         description,
         parentId,
-        organizationId: user.organizations[0]?.id,
+        organizationId: tenant.organizationId,
       },
     });
 
-    // Log activity
+    // Log activity with organization scope
     await prisma.activityLog.create({
       data: {
+        organizationId: tenant.organizationId,
+        userId: tenant.userId,
         action: "CREATE",
         entityType: "category",
         entityId: category.id,
-        userId: user.id,
-        details: JSON.stringify({ name }),
-        ipAddress: request.headers.get("x-forwarded-for") || "unknown",
-        userAgent: request.headers.get("user-agent") || "unknown",
+        metadata: { name },
+        ipAddress: (request as any).headers.get("x-forwarded-for") || "unknown",
+        userAgent: (request as any).headers.get("user-agent") || "unknown",
       },
     });
 

@@ -7,6 +7,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
+type OrderBatch = {
+  orders: Array<{ id: string; customer?: { city?: string | null; state?: string | null }; shipDate?: Date | null; customerId?: string; priority?: string | null }>;
+  priority: string;
+  reason: string;
+};
+
 // GET - List orders or waves
 export async function GET(req: NextRequest) {
   try {
@@ -74,7 +80,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Build order filters
-    const where: any = {};
+    const where: Record<string, string> = {};
 
     if (status) {
       where.status = status;
@@ -274,7 +280,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { waveId, orderId, status, action } = body;
+    const { waveId, orderId, status } = body;
 
     if (waveId) {
       // Update wave
@@ -348,10 +354,10 @@ async function autoBatchOrders(warehouseId: string) {
     }
 
     // Group orders by criteria
-    const batches: any[] = [];
+    const batches: OrderBatch[] = [];
 
     // Criteria 1: Same customer + same ship date
-    const customerDateGroups = new Map<string, any[]>();
+    const customerDateGroups = new Map<string, OrderBatch["orders"]>();
     for (const order of unassignedOrders) {
       const key = `${order.customerId}-${order.shipDate?.toISOString().split("T")[0] || "no-date"}`;
       if (!customerDateGroups.has(key)) {
@@ -361,7 +367,7 @@ async function autoBatchOrders(warehouseId: string) {
     }
 
     // Create batches from groups with 3+ orders
-    for (const [key, orders] of customerDateGroups) {
+    for (const [, orders] of customerDateGroups) {
       if (orders.length >= 3) {
         batches.push({
           orders,
@@ -372,7 +378,29 @@ async function autoBatchOrders(warehouseId: string) {
     }
 
     // Criteria 2: Similar destinations (same city/state)
-    // TODO: Implement geographic clustering
+    const destinationGroups = new Map<string, OrderBatch["orders"]>();
+    for (const order of unassignedOrders) {
+      if (batches.some((b) => b.orders.includes(order))) continue;
+      const city = String(order.customer?.city || "").trim().toUpperCase();
+      const state = String(order.customer?.state || "").trim().toUpperCase();
+      if (!city && !state) continue;
+
+      const key = `${city}-${state}`;
+      if (!destinationGroups.has(key)) {
+        destinationGroups.set(key, []);
+      }
+      destinationGroups.get(key)!.push(order);
+    }
+
+    for (const [key, orders] of destinationGroups) {
+      if (orders.length >= 3) {
+        batches.push({
+          orders,
+          priority: "MEDIUM",
+          reason: `Geographic cluster: ${key.replace("-", ", ")}`,
+        });
+      }
+    }
 
     // Criteria 3: Order priority (urgent orders)
     const urgentOrders = unassignedOrders.filter(
@@ -412,7 +440,7 @@ async function autoBatchOrders(warehouseId: string) {
 
       await prisma.order.updateMany({
         where: {
-          id: { in: batch.orders.map((o: any) => o.id) },
+          id: { in: batch.orders.map((o) => o.id) },
         },
         data: {
           waveId: wave.id,

@@ -455,6 +455,33 @@ export default function FulfillmentPage() {
         </div>
       </section>
 
+      {/* Testimonial */}
+      <section className="border-t bg-green-50 dark:bg-green-950/20 py-20">
+        <div className="container-enterprise">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Results from Real E-Commerce Leaders
+            </h2>
+          </div>
+          <Card className="mx-auto max-w-3xl">
+            <CardContent className="pt-8 pb-6">
+              <p className="text-lg italic mb-6">
+                "We're now fulfilling 8,000+ orders daily with 99.9% accuracy. 
+                Our pick rates jumped from 45/hour to 61/hour (+35%). 
+                Same-day shipping rate increased from 65% to 92%. LogiVox made all the difference."
+              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">Jennifer Martinez</p>
+                  <p className="text-sm text-muted-foreground">VP Operations, RetailFlow Inc</p>
+                </div>
+                <Badge className="bg-green-600">61 Orders/Hour</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="border-t py-20">
         <div className="container-enterprise">

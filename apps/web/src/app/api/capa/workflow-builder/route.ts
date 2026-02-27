@@ -500,7 +500,7 @@ export async function GET(request: NextRequest) {
 
     // Get specific workflow
     if (workflowId) {
-      // @ts-ignore - Model exists but TS needs restart
+      // @ts-expect-error - Model exists but TS needs restart
       const workflow = await prisma.workflowTemplate.findUnique({
         where: { id: workflowId },
         include: {
@@ -535,9 +535,9 @@ export async function GET(request: NextRequest) {
     }
 
     // List all workflows for organization
-    // @ts-ignore - session.user may have organizationId
+    // @ts-expect-error - session.user may have organizationId
     const organizationId = session.user.organizationId;
-    // @ts-ignore - Model exists but TS needs restart
+    // @ts-expect-error - Model exists but TS needs restart
 
     const workflows = await prisma.workflowTemplate.findMany({
       where: { organizationId },
@@ -584,7 +584,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { action } = body;
 
-    // @ts-ignore
+    // @ts-expect-error - NextAuth session user is augmented with organizationId at runtime
     const organizationId = session.user.organizationId;
     const userId = session.user.id;
 
@@ -599,7 +599,7 @@ export async function POST(request: NextRequest) {
           { error: "Template not found" },
           { status: 404 },
         );
-        // @ts-ignore - Model exists but TS needs restart
+        // @ts-expect-error - Model exists but TS needs restart
       }
 
       const workflow = await prisma.workflowTemplate.create({
@@ -633,7 +633,7 @@ export async function POST(request: NextRequest) {
           { error: "Missing required fields: name, nodes, edges" },
           { status: 400 },
         );
-        // @ts-ignore - Model exists but TS needs restart
+        // @ts-expect-error - Model exists but TS needs restart
       }
 
       const workflow = await prisma.workflowTemplate.create({
@@ -667,7 +667,7 @@ export async function POST(request: NextRequest) {
           { error: "workflowId required" },
           { status: 400 },
         );
-        // @ts-ignore - Model exists but TS needs restart
+        // @ts-expect-error - Model exists but TS needs restart
       }
 
       const workflow = await prisma.workflowTemplate.update({
@@ -699,7 +699,7 @@ export async function POST(request: NextRequest) {
           { status: 400 },
         );
       }
-      // @ts-ignore - Model exists but TS needs restart
+      // @ts-expect-error - Model exists but TS needs restart
 
       // Get workflow template
       const workflow = await prisma.workflowTemplate.findUnique({
@@ -712,7 +712,7 @@ export async function POST(request: NextRequest) {
           { status: 404 },
         );
       }
-      // @ts-ignore - Model exists but TS needs restart
+      // @ts-expect-error - Model exists but TS needs restart
 
       // Create instance
       const instance = await prisma.workflowInstance.create({
@@ -746,7 +746,7 @@ export async function POST(request: NextRequest) {
           { error: "instanceId required" },
           { status: 400 },
         );
-        // @ts-ignore - Model exists but TS needs restart
+        // @ts-expect-error - Model exists but TS needs restart
       }
 
       const instance = await prisma.workflowInstance.findUnique({
@@ -778,7 +778,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (
-        // @ts-ignore - Model exists but TS needs restart
+        // @ts-expect-error - Model exists but TS needs restart
         !nextEdge
       ) {
         // No next node = workflow complete
@@ -814,7 +814,7 @@ export async function POST(request: NextRequest) {
       const currentNodeIndex = (instance.workflow.nodes as any[]).findIndex(
         (n) => n.id === nextNode.id,
       );
-      // @ts-ignore - Model exists but TS needs restart
+      // @ts-expect-error - Model exists but TS needs restart
       const progress = Math.round((currentNodeIndex / totalNodes) * 100);
 
       await prisma.workflowInstance.update({
@@ -845,7 +845,7 @@ export async function POST(request: NextRequest) {
           { error: "workflowId required" },
           { status: 400 },
         );
-        // @ts-ignore - Model exists but TS needs restart
+        // @ts-expect-error - Model exists but TS needs restart
       }
 
       await prisma.workflowTemplate.delete({
@@ -876,7 +876,7 @@ async function executeWorkflowNode(
 ) {
   try {
     const { type, config } = node;
-    // @ts-ignore - Model exists but TS needs restart
+    // @ts-expect-error - Model exists but TS needs restart
 
     // Log execution
     await prisma.workflowInstance.update({

@@ -209,14 +209,34 @@ async function handleTaskCompletion(change: any, userId: string) {
 async function handleInventoryCount(change: any, userId: string) {
   const { locationId, inventoryItemId, countedQuantity, notes } = change.data;
 
-  // Create cycle count record
-  // This would integrate with existing cycle count functionality
-  // For now, just log it
-  console.log("Inventory count:", {
-    locationId,
-    inventoryItemId,
-    countedQuantity,
-    countedBy: userId,
-    notes,
+  const userMembership = await prisma.organizationMember.findFirst({
+    where: {
+      userId,
+      isActive: true,
+    },
+    select: {
+      organizationId: true,
+    },
+  });
+
+  if (!userMembership?.organizationId) {
+    throw new Error("Active organization membership not found for user");
+  }
+
+  await prisma.activityLog.create({
+    data: {
+      organizationId: userMembership.organizationId,
+      userId,
+      action: "MOBILE_INVENTORY_COUNT",
+      entityType: "InventoryCount",
+      entityId: inventoryItemId,
+      metadata: {
+        locationId,
+        inventoryItemId,
+        countedQuantity,
+        notes,
+        syncedAt: new Date().toISOString(),
+      },
+    },
   });
 }

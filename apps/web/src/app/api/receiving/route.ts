@@ -35,13 +35,12 @@ export async function GET(req: NextRequest) {
           );
         }
 
-        // Note: getReceivingStatistics doesn't exist in service - returning mock data
-        const stats = {
-          totalGRNs: 0,
-          totalItems: 0,
-          pendingQC: 0,
-          completedPutAway: 0,
-        };
+        const stats = await ReceivingService.getStatistics({
+          organizationId,
+          startDate: new Date(startDate),
+          endDate: new Date(endDate),
+          warehouseId: warehouseId || undefined,
+        });
 
         return NextResponse.json(stats);
 

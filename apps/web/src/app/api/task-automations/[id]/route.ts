@@ -160,6 +160,11 @@ async function handleToggleAutomation(automationId: string, isActive: boolean) {
 async function handleManualExecution(automationId: string, userId: string) {
   const automation = await prisma.taskAutomation.findUnique({
     where: { id: automationId },
+    include: {
+      assignToUser: {
+        select: { id: true, name: true, email: true },
+      },
+    },
   });
 
   if (!automation) {
@@ -201,8 +206,74 @@ async function handleManualExecution(automationId: string, userId: string) {
     },
   });
 
-  // TODO: Implement actual task creation logic based on automation rules
-  // For now, just mark as completed
+  let assignedToUserId = automation.assignToUserId || null;
+
+  if (!assignedToUserId) {
+    if (automation.assignmentRule === "RANDOM") {
+      const candidates = await prisma.organizationMember.findMany({
+        where: {
+          organizationId: automation.organizationId,
+          isActive: true,
+          ...(automation.assignToRole
+            ? { role: automation.assignToRole as any }
+            : {}),
+        },
+        select: { userId: true },
+      });
+
+      if (candidates.length > 0) {
+        const hashBase = execution.id
+          .split("")
+          .reduce((sum, char) => sum + char.charCodeAt(0), 0);
+        const idx = hashBase % candidates.length;
+        assignedToUserId = candidates[idx].userId;
+      }
+    } else {
+      const candidates = await prisma.organizationMember.findMany({
+        where: {
+          organizationId: automation.organizationId,
+          isActive: true,
+          ...(automation.assignToRole
+            ? { role: automation.assignToRole as any }
+            : {}),
+        },
+        orderBy: { joinedAt: "asc" },
+        select: { userId: true },
+      });
+
+      if (candidates.length > 0) {
+        const index = todayCount % candidates.length;
+        assignedToUserId = candidates[index].userId;
+      }
+    }
+  }
+
+  const dueAt = automation.delay
+    ? new Date(Date.now() + automation.delay * 60 * 1000)
+    : null;
+
+  const taskBlueprint = {
+    automationId: automation.id,
+    automationCode: automation.code,
+    taskType: automation.taskType,
+    taskPriority: automation.taskPriority,
+    template: automation.taskTemplate,
+    assignedToUserId,
+    dueAt,
+    triggerData: { manual: true, triggeredBy: userId },
+  };
+
+  await prisma.activityLog.create({
+    data: {
+      organizationId: automation.organizationId,
+      userId,
+      action: "TASK_AUTOMATION_EXECUTED",
+      entityType: "TaskAutomation",
+      entityId: automation.id,
+      metadata: taskBlueprint,
+    },
+  });
+
   await prisma.taskExecution.update({
     where: { id: execution.id },
     data: {
@@ -211,7 +282,8 @@ async function handleManualExecution(automationId: string, userId: string) {
       completedAt: new Date(),
       duration: 0,
       result: {
-        message: "Manual execution placeholder",
+        message: "Manual execution completed",
+        taskBlueprint,
       },
     },
   });
@@ -227,5 +299,12 @@ async function handleManualExecution(automationId: string, userId: string) {
     },
   });
 
-  return NextResponse.json(execution);
+  return NextResponse.json({
+    ...execution,
+    status: "COMPLETED",
+    result: {
+      message: "Manual execution completed",
+      taskBlueprint,
+    },
+  });
 }

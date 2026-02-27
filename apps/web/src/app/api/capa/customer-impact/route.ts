@@ -287,13 +287,21 @@ export async function POST(request: NextRequest) {
         const orderItems = shipment.salesOrder.items;
 
         if (data.lotNumber) {
-          // Check if any item has this lot number (would need lot tracking in schema)
-          return true; // Placeholder - actual implementation would check lot numbers
+          return orderItems.some((item) => item.batchNumber === data.lotNumber);
         }
 
         if (data.serialNumber) {
-          // Check if any item has this serial number
-          return true; // Placeholder
+          return orderItems.some((item) => {
+            if (!item.serialNumbers) return false;
+            const serials = Array.isArray(item.serialNumbers)
+              ? item.serialNumbers
+              : typeof item.serialNumbers === "string"
+                ? [item.serialNumbers]
+                : Object.values(item.serialNumbers as Record<string, unknown>);
+            return serials.some(
+              (serial) => String(serial).trim() === data.serialNumber,
+            );
+          });
         }
 
         if (data.productId) {

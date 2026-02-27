@@ -3,6 +3,23 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+async function resolveOrganizationId(email?: string | null) {
+  if (!email) return null;
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      organizationMemberships: {
+        where: { isActive: true },
+        select: { organizationId: true },
+        take: 1,
+      },
+    },
+  });
+
+  return user?.organizationMemberships[0]?.organizationId || null;
+}
+
 // Validation schemas
 const createAppointmentSchema = z.object({
   action: z.literal("create_appointment"),
@@ -324,8 +341,13 @@ function optimizeSchedule(
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const body = await request.json();
@@ -335,7 +357,6 @@ export async function POST(request: NextRequest) {
     if (action === "create_appointment") {
       const data = createAppointmentSchema.parse(body);
 
-      // Simulate appointment creation
       const appointment: DockAppointment = {
         id: `APT-${Date.now()}`,
         carrier: data.carrier,
@@ -349,7 +370,7 @@ export async function POST(request: NextRequest) {
       };
 
       // Get available docks
-      const docks = await getAvailableDocks();
+      const docks = await getAvailableDocks(organizationId);
       const availableDocks = calculateDockAvailability(
         docks,
         [],
@@ -368,6 +389,16 @@ export async function POST(request: NextRequest) {
         appointment.assignedDockId = assignment.dock.id;
       }
 
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          action: "DOCK_APPOINTMENT_CREATED",
+          entityType: "DockAppointment",
+          entityId: appointment.id,
+          metadata: appointment,
+        },
+      });
+
       return NextResponse.json({
         success: true,
         appointment,
@@ -380,6 +411,30 @@ export async function POST(request: NextRequest) {
     // ASSIGN DOCK
     if (action === "assign_dock") {
       const data = assignDockSchema.parse(body);
+
+      const appointment = await getAppointmentById(
+        organizationId,
+        data.appointmentId,
+      );
+
+      if (!appointment) {
+        return NextResponse.json(
+          { error: "Appointment not found" },
+          { status: 404 },
+        );
+      }
+
+      appointment.assignedDockId = data.dockId;
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          action: "DOCK_APPOINTMENT_UPDATED",
+          entityType: "DockAppointment",
+          entityId: appointment.id,
+          metadata: appointment,
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -395,13 +450,27 @@ export async function POST(request: NextRequest) {
       const data = optimizeScheduleSchema.parse(body);
 
       // Get appointments for the date
-      const appointments = await getAppointmentsForDate(data.date);
-      const docks = await getAvailableDocks();
+      const appointments = await getAppointmentsForDate(organizationId, data.date);
+      const docks = await getAvailableDocks(organizationId);
 
       const result = optimizeSchedule(
         appointments,
         docks,
         data.constraints || {},
+      );
+
+      await Promise.all(
+        result.optimizedAppointments.map((appointment) =>
+          prisma.activityLog.create({
+            data: {
+              organizationId,
+              action: "DOCK_APPOINTMENT_UPDATED",
+              entityType: "DockAppointment",
+              entityId: appointment.id,
+              metadata: appointment,
+            },
+          }),
+        ),
       );
 
       return NextResponse.json({
@@ -433,6 +502,23 @@ export async function POST(request: NextRequest) {
           break;
       }
 
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          action: "DOCK_CONFLICT_RESOLVED",
+          entityType: "DockConflict",
+          entityId: data.conflictId,
+          metadata: {
+            conflictId: data.conflictId,
+            resolution: data.resolution,
+            newDockId: data.newDockId,
+            newTime: data.newTime,
+            details: resolutionDetails,
+            resolvedAt: new Date().toISOString(),
+          },
+        },
+      });
+
       return NextResponse.json({
         success: true,
         conflictId: data.conflictId,
@@ -463,8 +549,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
-    if (!session?.user) {
+    if (!session?.user?.email) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const organizationId = await resolveOrganizationId(session.user.email);
+    if (!organizationId) {
+      return NextResponse.json({ error: "No organization" }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -474,8 +565,8 @@ export async function GET(request: NextRequest) {
     if (action === "schedule") {
       const date =
         searchParams.get("date") || new Date().toISOString().split("T")[0];
-      const appointments = await getAppointmentsForDate(date);
-      const docks = await getAvailableDocks();
+      const appointments = await getAppointmentsForDate(organizationId, date);
+      const docks = await getAvailableDocks(organizationId);
 
       return NextResponse.json({
         date,
@@ -501,8 +592,8 @@ export async function GET(request: NextRequest) {
     if (action === "conflicts") {
       const date =
         searchParams.get("date") || new Date().toISOString().split("T")[0];
-      const appointments = await getAppointmentsForDate(date);
-      const docks = await getAvailableDocks();
+      const appointments = await getAppointmentsForDate(organizationId, date);
+      const docks = await getAvailableDocks(organizationId);
 
       const conflicts = detectConflicts(appointments, docks);
 
@@ -521,8 +612,8 @@ export async function GET(request: NextRequest) {
     if (action === "dock_availability") {
       const date =
         searchParams.get("date") || new Date().toISOString().split("T")[0];
-      const docks = await getAvailableDocks();
-      const appointments = await getAppointmentsForDate(date);
+      const docks = await getAvailableDocks(organizationId);
+      const appointments = await getAppointmentsForDate(organizationId, date);
 
       const availability = docks.map((dock) => {
         const dockAppointments = appointments.filter(
@@ -565,117 +656,103 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Helper functions (simulated data for now)
-async function getAvailableDocks(): Promise<Dock[]> {
-  return [
-    {
-      id: "DOCK-01",
-      name: "Dock 1",
-      type: "LOADING",
-      capabilities: ["DOCK_HIGH", "LIFTGATE"],
-      status: "AVAILABLE",
+async function getAvailableDocks(organizationId: string): Promise<Dock[]> {
+  const warehouses = await prisma.warehouse.findMany({
+    where: {
+      organizationId,
+      isActive: true,
     },
-    {
-      id: "DOCK-02",
-      name: "Dock 2",
-      type: "LOADING",
-      capabilities: ["DOCK_HIGH", "REFRIGERATED"],
-      status: "AVAILABLE",
+    select: {
+      id: true,
+      name: true,
+      metadata: true,
     },
-    {
-      id: "DOCK-03",
-      name: "Dock 3",
-      type: "DUAL",
-      capabilities: ["DOCK_HIGH", "LIFTGATE", "OVERSIZED"],
-      status: "AVAILABLE",
-    },
-    {
-      id: "DOCK-04",
-      name: "Dock 4",
-      type: "LOADING",
-      capabilities: ["DOCK_HIGH", "HAZMAT"],
-      status: "AVAILABLE",
-    },
-    {
-      id: "DOCK-05",
-      name: "Dock 5",
-      type: "DUAL",
-      capabilities: ["DOCK_HIGH", "LIFTGATE"],
-      status: "AVAILABLE",
-    },
-    {
-      id: "DOCK-06",
-      name: "Dock 6",
-      type: "LOADING",
-      capabilities: ["DOCK_HIGH"],
-      status: "MAINTENANCE",
-    },
-  ];
+    take: 50,
+  });
+
+  return warehouses.map((warehouse) => {
+    const metadata = (warehouse.metadata ?? {}) as Record<string, unknown>;
+    const capabilities: string[] = ["DOCK_HIGH"];
+
+    if (metadata.refrigerated === true) capabilities.push("REFRIGERATED");
+    if (metadata.hazmatEnabled === true) capabilities.push("HAZMAT");
+    if (metadata.oversizedEnabled === true) capabilities.push("OVERSIZED");
+    if (metadata.liftgateAvailable === true) capabilities.push("LIFTGATE");
+
+    return {
+      id: `DOCK-${warehouse.id}`,
+      name: warehouse.name,
+      type: "DUAL" as const,
+      capabilities,
+      status: "AVAILABLE" as const,
+    };
+  });
 }
 
 async function getAppointmentsForDate(
+  organizationId: string,
   date: string,
 ): Promise<DockAppointment[]> {
-  const baseDate = new Date(date);
+  const logs = await prisma.activityLog.findMany({
+    where: {
+      organizationId,
+      entityType: "DockAppointment",
+      action: { in: ["DOCK_APPOINTMENT_CREATED", "DOCK_APPOINTMENT_UPDATED"] },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 1000,
+  });
 
-  return [
-    {
-      id: "APT-001",
-      carrier: "FedEx Freight",
-      shipmentId: "SHP-2024-501",
-      appointmentTime: new Date(baseDate.setHours(8, 0)),
-      estimatedDuration: 60,
-      priority: "HIGH",
-      shipmentType: "FTL",
-      status: "SCHEDULED",
-      assignedDockId: "DOCK-01",
-      requirements: ["DOCK_HIGH"],
+  const latestById = new Map<string, DockAppointment>();
+  logs.forEach((log) => {
+    const appointment = log.metadata as any;
+    if (!appointment?.id) return;
+    if (!latestById.has(appointment.id)) {
+      latestById.set(appointment.id, {
+        ...appointment,
+        appointmentTime: new Date(appointment.appointmentTime),
+        actualStartTime: appointment.actualStartTime
+          ? new Date(appointment.actualStartTime)
+          : undefined,
+        actualEndTime: appointment.actualEndTime
+          ? new Date(appointment.actualEndTime)
+          : undefined,
+      });
+    }
+  });
+
+  return Array.from(latestById.values()).filter(
+    (appointment) =>
+      appointment.appointmentTime.toISOString().split("T")[0] === date,
+  );
+}
+
+async function getAppointmentById(
+  organizationId: string,
+  appointmentId: string,
+): Promise<DockAppointment | null> {
+  const logs = await prisma.activityLog.findMany({
+    where: {
+      organizationId,
+      entityType: "DockAppointment",
+      entityId: appointmentId,
+      action: { in: ["DOCK_APPOINTMENT_CREATED", "DOCK_APPOINTMENT_UPDATED"] },
     },
-    {
-      id: "APT-002",
-      carrier: "XPO Logistics",
-      shipmentId: "SHP-2024-502",
-      appointmentTime: new Date(baseDate.setHours(9, 30)),
-      estimatedDuration: 90,
-      priority: "NORMAL",
-      shipmentType: "LTL",
-      status: "SCHEDULED",
-      assignedDockId: "DOCK-02",
-      requirements: ["REFRIGERATED"],
-    },
-    {
-      id: "APT-003",
-      carrier: "UPS Freight",
-      shipmentId: "SHP-2024-503",
-      appointmentTime: new Date(baseDate.setHours(11, 0)),
-      estimatedDuration: 45,
-      priority: "URGENT",
-      shipmentType: "PARCEL",
-      status: "SCHEDULED",
-      assignedDockId: "DOCK-03",
-    },
-    {
-      id: "APT-004",
-      carrier: "Old Dominion",
-      shipmentId: "SHP-2024-504",
-      appointmentTime: new Date(baseDate.setHours(13, 0)),
-      estimatedDuration: 120,
-      priority: "NORMAL",
-      shipmentType: "FTL",
-      status: "SCHEDULED",
-      assignedDockId: "DOCK-04",
-      requirements: ["HAZMAT"],
-    },
-    {
-      id: "APT-005",
-      carrier: "YRC Worldwide",
-      shipmentId: "SHP-2024-505",
-      appointmentTime: new Date(baseDate.setHours(15, 0)),
-      estimatedDuration: 60,
-      priority: "LOW",
-      shipmentType: "LTL",
-      status: "SCHEDULED",
-      assignedDockId: "DOCK-05",
-    },
-  ];
+    orderBy: { createdAt: "desc" },
+    take: 1,
+  });
+
+  const appointment = logs[0]?.metadata as any;
+  if (!appointment) return null;
+
+  return {
+    ...appointment,
+    appointmentTime: new Date(appointment.appointmentTime),
+    actualStartTime: appointment.actualStartTime
+      ? new Date(appointment.actualStartTime)
+      : undefined,
+    actualEndTime: appointment.actualEndTime
+      ? new Date(appointment.actualEndTime)
+      : undefined,
+  };
 }

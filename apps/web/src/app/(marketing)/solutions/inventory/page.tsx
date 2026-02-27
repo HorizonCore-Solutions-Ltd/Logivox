@@ -385,6 +385,122 @@ export default function InventoryManagementPage() {
         </div>
       </section>
 
+      {/* Testimonial */}
+      <section className="border-t bg-blue-50 dark:bg-blue-950/20 py-20">
+        <div className="container-enterprise">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Trusted by Leading Operations Teams
+            </h2>
+          </div>
+          <Card className="mx-auto max-w-3xl">
+            <CardContent className="pt-8 pb-6">
+              <p className="text-lg italic mb-6">
+                "LogiVox transformed our inventory accuracy from 87% to 99.9% in 60 days. 
+                We reduced stockouts by 58% and excess inventory by 35%. The system paid for 
+                itself in first month through prevented stockout losses alone."
+              </p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold">Sarah Chen</p>
+                  <p className="text-sm text-muted-foreground">Operations Director, PrecisionFlow Logistics</p>
+                </div>
+                <Badge>Achieved 99.9% Accuracy</Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Role-Specific Benefits */}
+      <section className="py-20">
+        <div className="container-enterprise">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Perfect for Every Role
+            </h2>
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Warehouse Manager</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Real-time visibility dashboard</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Automatic low stock alerts</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Performance metrics/KPIs</span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Finance/CFO</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>30-day ROI payback</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Cost reduction tracking</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Inventory value optimization</span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Warehouse Associate</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Mobile app guidance</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Reduced manual tasks</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Clear task prioritization</span>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">IT/Systems</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm space-y-2">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>API-first architecture</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Pre-built ERP integrations</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Cloud or on-premise</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="border-t py-20">
         <div className="container-enterprise">

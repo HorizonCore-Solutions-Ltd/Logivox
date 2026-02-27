@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { authenticator } from "otplib";
 import { prisma } from "@/lib/prisma";
 
 // Account lockout configuration
@@ -186,6 +187,9 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
         session.user.organizations = token.organizations as any;
+        // Convenience: set organizationId to first organization for backward compatibility
+        session.user.organizationId =
+          (token.organizations as any)?.[0]?.id ?? null;
       }
       return session;
     },
@@ -271,23 +275,11 @@ async function verifyMFACode(userId: string, code: string): Promise<boolean> {
       return false;
     }
 
-    // For production, implement TOTP verification using speakeasy or similar
-    // This basic implementation validates numeric codes for demo purposes
     if (!/^\d{6}$/.test(code)) {
       return false;
     }
 
-    // In production, replace with proper TOTP verification:
-    // const verified = speakeasy.totp.verify({
-    //   secret: securityProfile.mfaSecret,
-    //   encoding: 'base32',
-    //   token: code,
-    //   window: 2
-    // });
-
-    // Temporary: Accept any 6-digit code for demo
-    // Replace with actual TOTP verification in production
-    return code.length === 6 && /^\d+$/.test(code);
+    return authenticator.check(code, securityProfile.mfaSecret);
   } catch (error) {
     console.error("MFA verification error:", error);
     return false;

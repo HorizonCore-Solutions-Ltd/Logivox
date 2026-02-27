@@ -59,8 +59,13 @@ export async function POST(req: NextRequest) {
     // Save file
     await writeFile(filepath, buffer);
 
-    // TODO: Upload to S3 in production
-    // const s3Url = await uploadToS3(buffer, filename);
+    const storageBackend = process.env.DELIVERY_PHOTO_STORAGE || "local";
+    if (storageBackend !== "local") {
+      return NextResponse.json(
+        { error: `Unsupported DELIVERY_PHOTO_STORAGE backend: ${storageBackend}` },
+        { status: 503 },
+      );
+    }
 
     // Store photo reference in database
     const photoUrl = `/uploads/delivery-photos/${filename}`;

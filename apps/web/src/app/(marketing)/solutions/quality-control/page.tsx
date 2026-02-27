@@ -258,6 +258,9 @@ export default function QualityControlPage() {
                 </div>
               ))}
             </div>
+            <p className="text-xs text-muted-foreground mt-4 text-center">
+              * Based on industry benchmarks. Actual results depend on configuration and workflow.
+            </p>
           </div>
         </div>
       </section>

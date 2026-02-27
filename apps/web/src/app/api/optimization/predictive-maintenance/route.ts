@@ -189,8 +189,13 @@ function calculateHealthScore(equipment: {
   // Error rate factor (0-100, based on recent errors)
   const errorFactor = Math.max(0, 100 - equipment.errorCount * 5);
 
-  // Vibration/wear factor (simulated - would come from IoT sensors)
-  const vibrationFactor = 85; // Placeholder
+  const utilizationRatio =
+    config.interval > 0
+      ? Math.min(2, equipment.hoursOperated / config.interval)
+      : 1;
+  const vibrationPenalty =
+    Math.max(0, utilizationRatio - 1) * 30 + equipment.errorCount * 1.5;
+  const vibrationFactor = Math.max(20, 100 - vibrationPenalty);
 
   // Calculate weighted health score
   const healthScore =
@@ -371,50 +376,44 @@ export async function GET(request: NextRequest) {
     if (action === "analyzeAll") {
       const warehouseId = searchParams.get("warehouseId");
 
-      // Get equipment (simulated - would come from equipment table)
-      // For now, we'll generate sample equipment data
-      const sampleEquipment = [
-        {
-          id: "EQ-001",
-          name: "Forklift #1",
-          type: "FORKLIFT",
-          warehouseId: warehouseId || "WH-001",
-          hoursOperated: 1200,
-          errorCount: 2,
-          installDate: new Date("2022-03-15"),
-          lastMaintenanceDate: new Date("2025-11-15"),
+      const equipmentLogs = await prisma.activityLog.findMany({
+        where: {
+          organizationId: session.user.organizationId,
+          action: "EQUIPMENT_STATUS_UPDATE",
+          ...(warehouseId
+            ? {
+                metadata: {
+                  path: ["warehouseId"],
+                  equals: warehouseId,
+                },
+              }
+            : {}),
         },
-        {
-          id: "EQ-002",
-          name: "Conveyor Belt A",
-          type: "CONVEYOR",
-          warehouseId: warehouseId || "WH-001",
-          hoursOperated: 3500,
-          errorCount: 8,
-          installDate: new Date("2021-06-01"),
-          lastMaintenanceDate: new Date("2025-10-20"),
-        },
-        {
-          id: "EQ-003",
-          name: "Sorting Robot #1",
-          type: "ROBOT",
-          warehouseId: warehouseId || "WH-001",
-          hoursOperated: 800,
-          errorCount: 15,
-          installDate: new Date("2023-01-10"),
-          lastMaintenanceDate: new Date("2025-12-01"),
-        },
-        {
-          id: "EQ-004",
-          name: "Pallet Jack #3",
-          type: "PALLET_JACK",
-          warehouseId: warehouseId || "WH-001",
-          hoursOperated: 450,
-          errorCount: 1,
-          installDate: new Date("2024-02-20"),
-          lastMaintenanceDate: new Date("2025-12-15"),
-        },
-      ];
+        orderBy: { createdAt: "desc" },
+        take: 500,
+      });
+
+      const equipmentById = new Map<string, any>();
+      equipmentLogs.forEach((log) => {
+        if (!log.entityId || equipmentById.has(log.entityId)) return;
+        const metadata = (log.metadata ?? {}) as any;
+        equipmentById.set(log.entityId, {
+          id: log.entityId,
+          name: metadata.name || log.entityId,
+          type: metadata.type || "UNKNOWN",
+          warehouseId: metadata.warehouseId || warehouseId || "UNKNOWN",
+          hoursOperated: Number(metadata.hoursOperated || 0),
+          errorCount: Number(metadata.errorCount || 0),
+          installDate: metadata.installDate
+            ? new Date(metadata.installDate)
+            : new Date(log.createdAt),
+          lastMaintenanceDate: metadata.lastMaintenanceDate
+            ? new Date(metadata.lastMaintenanceDate)
+            : new Date(log.createdAt),
+        });
+      });
+
+      const sampleEquipment = Array.from(equipmentById.values());
 
       const equipmentHealth: EquipmentHealth[] = [];
 

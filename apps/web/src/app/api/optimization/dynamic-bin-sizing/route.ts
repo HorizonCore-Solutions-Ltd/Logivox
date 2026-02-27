@@ -227,116 +227,125 @@ export async function GET(req: NextRequest) {
     if (action === "recommendations") {
       const priority = searchParams.get("priority") || "ALL";
 
-      // Mock recommendations based on velocity analysis
-      const mockRecommendations: BinRecommendation[] = [
-        {
-          locationId: "loc-1",
-          locationCode: "A-12-03",
-          productId: "prod-1",
-          productSku: "WIDGET-001",
-          productName: "Premium Widget",
-          currentBinSize: "EXTRA_LARGE",
-          recommendedBinSize: "MEDIUM",
-          currentCost: 75,
-          recommendedCost: 25,
-          monthlySavings: 50,
-          yearlySavings: 600,
-          priority: "CRITICAL",
-          reason: "Velocity dropped 70% - oversized by 2 levels",
-          metrics: {
-            dailyPicks: 3.2,
-            weeklyPicks: 22,
-            monthlyPicks: 94,
-            avgPicksPerDay: 3.2,
-            peakPicksPerDay: 8,
-            trend: "DECREASING",
+      const [items, velocity] = await Promise.all([
+        prisma.inventoryItem.findMany({
+          where: { organizationId, isActive: true },
+          select: {
+            id: true,
+            sku: true,
+            name: true,
+            availableQty: true,
+            maxStockLevel: true,
+            reorderPoint: true,
+            warehouseId: true,
+            warehouse: { select: { code: true } },
           },
-          utilizationCurrent: 18,
-          utilizationProjected: 65,
-        },
-        {
-          locationId: "loc-2",
-          locationCode: "B-08-15",
-          productId: "prod-2",
-          productSku: "GADGET-042",
-          productName: "Mega Gadget",
-          currentBinSize: "SMALL",
-          recommendedBinSize: "LARGE",
-          currentCost: 15,
-          recommendedCost: 45,
-          monthlySavings: -30,
-          yearlySavings: -360,
-          priority: "CRITICAL",
-          reason:
-            "Velocity increased 400% - undersized by 2 levels causing stockouts",
-          metrics: {
-            dailyPicks: 28.5,
-            weeklyPicks: 199,
-            monthlyPicks: 855,
-            avgPicksPerDay: 28.5,
-            peakPicksPerDay: 47,
-            trend: "INCREASING",
+          take: 500,
+        }),
+        prisma.pickingTask.groupBy({
+          by: ["inventoryItemId"],
+          where: {
+            organizationId,
+            inventoryItemId: { not: null },
+            createdAt: {
+              gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+            },
           },
-          utilizationCurrent: 98,
-          utilizationProjected: 72,
-        },
-        {
-          locationId: "loc-3",
-          locationCode: "C-15-22",
-          productId: "prod-3",
-          productSku: "TOOL-128",
-          productName: "Power Tool Set",
-          currentBinSize: "LARGE",
-          recommendedBinSize: "MEDIUM",
-          currentCost: 45,
-          recommendedCost: 25,
-          monthlySavings: 20,
-          yearlySavings: 240,
-          priority: "HIGH",
-          reason: "Stable low velocity - can optimize space by downsizing",
-          metrics: {
-            dailyPicks: 6.8,
-            weeklyPicks: 48,
-            monthlyPicks: 204,
-            avgPicksPerDay: 6.8,
-            peakPicksPerDay: 12,
-            trend: "STABLE",
-          },
-          utilizationCurrent: 42,
-          utilizationProjected: 68,
-        },
-        {
-          locationId: "loc-4",
-          locationCode: "D-03-09",
-          productId: "prod-4",
-          productSku: "PART-567",
-          productName: "Replacement Part",
-          currentBinSize: "MEDIUM",
-          recommendedBinSize: "SMALL",
-          currentCost: 25,
-          recommendedCost: 15,
-          monthlySavings: 10,
-          yearlySavings: 120,
-          priority: "MEDIUM",
-          reason: "Very low velocity - small bin sufficient",
-          metrics: {
-            dailyPicks: 1.4,
-            weeklyPicks: 10,
-            monthlyPicks: 42,
-            avgPicksPerDay: 1.4,
-            peakPicksPerDay: 4,
-            trend: "STABLE",
-          },
-          utilizationCurrent: 28,
-          utilizationProjected: 55,
-        },
-      ];
+          _count: { id: true },
+          _sum: { quantity: true },
+        }),
+      ]);
+
+      const velocityMap = new Map(
+        velocity
+          .filter((v) => v.inventoryItemId)
+          .map((v) => [v.inventoryItemId as string, v]),
+      );
+
+      const recommendations = items
+        .map((item) => {
+          const vel = velocityMap.get(item.id);
+          const monthlyPicks = vel?._count.id || 0;
+          const weeklyPicks = monthlyPicks / 4;
+          const dailyPicks = monthlyPicks / 30;
+          const avgPicksPerDay = dailyPicks;
+          const peakPicksPerDay = Math.max(1, Math.ceil(dailyPicks * 1.5));
+
+          const trend: "INCREASING" | "STABLE" | "DECREASING" =
+            dailyPicks >= 15
+              ? "INCREASING"
+              : dailyPicks <= 2
+                ? "DECREASING"
+                : "STABLE";
+
+          const metrics: VelocityMetrics = {
+            dailyPicks,
+            weeklyPicks,
+            monthlyPicks,
+            avgPicksPerDay,
+            peakPicksPerDay,
+            trend,
+          };
+
+          const currentBinSize: BinSize =
+            item.availableQty > 300
+              ? "EXTRA_LARGE"
+              : item.availableQty > 120
+                ? "LARGE"
+                : item.availableQty > 40
+                  ? "MEDIUM"
+                  : "SMALL";
+
+          const recommendation = calculateOptimalBinSize(metrics);
+          const recommendedBinSize = recommendation.binSize;
+          const currentCost = BIN_SIZES[currentBinSize].cost;
+          const recommendedCost = BIN_SIZES[recommendedBinSize].cost;
+          const monthlySavings = currentCost - recommendedCost;
+          const yearlySavings = monthlySavings * 12;
+          const capBase = item.maxStockLevel || item.reorderPoint || 1;
+          const utilizationCurrent = Math.min(
+            100,
+            (item.availableQty / Math.max(capBase, 1)) * 100,
+          );
+          const utilizationProjected = Math.max(
+            10,
+            Math.min(
+              95,
+              utilizationCurrent + (recommendedCost < currentCost ? 20 : -10),
+            ),
+          );
+
+          return {
+            locationId: item.warehouseId,
+            locationCode: item.warehouse?.code || "UNASSIGNED",
+            productId: item.id,
+            productSku: item.sku,
+            productName: item.name,
+            currentBinSize,
+            recommendedBinSize,
+            currentCost,
+            recommendedCost,
+            monthlySavings,
+            yearlySavings,
+            priority: calculatePriority(
+              currentBinSize,
+              recommendedBinSize,
+              yearlySavings,
+              utilizationCurrent,
+            ),
+            reason: recommendation.reason,
+            metrics,
+            utilizationCurrent,
+            utilizationProjected,
+          } as BinRecommendation;
+        })
+        .filter((rec) => rec.currentBinSize !== rec.recommendedBinSize);
 
       // Filter by priority if specified
       const filtered =
         priority === "ALL"
-          ? mockRecommendations
-          : mockRecommendations.filter((r) => r.priority === priority);
+          ? recommendations
+          : recommendations.filter((r) => r.priority === priority);
 
       // Calculate totals
       const totalSavings = filtered.reduce(
@@ -353,75 +362,130 @@ export async function GET(req: NextRequest) {
         recommendations: filtered,
         total: filtered.length,
         summary: {
-          critical: mockRecommendations.filter((r) => r.priority === "CRITICAL")
+          critical: recommendations.filter((r) => r.priority === "CRITICAL")
             .length,
-          high: mockRecommendations.filter((r) => r.priority === "HIGH").length,
-          medium: mockRecommendations.filter((r) => r.priority === "MEDIUM")
+          high: recommendations.filter((r) => r.priority === "HIGH").length,
+          medium: recommendations.filter((r) => r.priority === "MEDIUM")
             .length,
-          low: mockRecommendations.filter((r) => r.priority === "LOW").length,
+          low: recommendations.filter((r) => r.priority === "LOW").length,
           totalYearlySavings: totalSavings,
-          avgUtilizationImprovement,
+          avgUtilizationImprovement: Number(
+            isFinite(avgUtilizationImprovement)
+              ? avgUtilizationImprovement.toFixed(2)
+              : 0,
+          ),
         },
       });
     }
 
     // GET REALLOCATION QUEUE
     if (action === "reallocations") {
-      const mockReallocations = [
-        {
-          id: "realloc-1",
-          sourceLocation: "A-12-03",
-          targetLocation: "C-08-14",
-          productSku: "WIDGET-001",
-          productName: "Premium Widget",
-          quantity: 240,
-          reason: "Downsizing bin - relocating to medium bin",
-          status: "PENDING",
-          scheduledDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
-          estimatedDuration: 15, // minutes
-          priority: "HIGH",
+      const tasks = await prisma.pickingTask.findMany({
+        where: {
+          organizationId,
+          taskType: "MOVE",
+          title: { contains: "Bin Reallocation" },
+          status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS", "COMPLETED"] as any },
         },
-        {
-          id: "realloc-2",
-          sourceLocation: "B-08-15",
-          targetLocation: "A-22-05",
-          productSku: "GADGET-042",
-          productName: "Mega Gadget",
-          quantity: 480,
-          reason: "Upsizing bin - high velocity product needs large bin",
-          status: "SCHEDULED",
-          scheduledDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
-          estimatedDuration: 25,
-          priority: "CRITICAL",
+        include: {
+          inventoryItem: { select: { sku: true, name: true } },
+          fromLocation: { select: { locationCode: true } },
+          toLocation: { select: { locationCode: true } },
         },
-      ];
+        orderBy: { createdAt: "desc" },
+        take: 100,
+      });
+
+      const reallocations = tasks.map((task) => ({
+        id: task.id,
+        sourceLocation: task.fromLocation?.locationCode || "UNSPECIFIED",
+        targetLocation: task.toLocation?.locationCode || "UNSPECIFIED",
+        productSku: task.inventoryItem?.sku || "N/A",
+        productName: task.inventoryItem?.name || "N/A",
+        quantity: task.quantity || 0,
+        reason: task.description || "Bin reallocation",
+        status: task.status,
+        scheduledDate: task.scheduledFor || task.createdAt,
+        estimatedDuration: task.duration || 20,
+        priority: task.priority,
+      }));
 
       return NextResponse.json({
-        reallocations: mockReallocations,
-        total: mockReallocations.length,
+        reallocations,
+        total: reallocations.length,
         summary: {
-          pending: 1,
-          scheduled: 1,
-          inProgress: 0,
-          completed: 0,
+          pending: reallocations.filter((r) => r.status === "PENDING").length,
+          scheduled: reallocations.filter((r) => r.status === "ASSIGNED").length,
+          inProgress: reallocations.filter((r) => r.status === "IN_PROGRESS")
+            .length,
+          completed: reallocations.filter((r) => r.status === "COMPLETED")
+            .length,
         },
       });
     }
 
     // GET STATISTICS
     if (action === "stats") {
+      const [totalBins, underUtilized, overUtilized, moveTasks, optimizedItems] =
+        await Promise.all([
+          prisma.location.count({
+            where: {
+              organizationId,
+              isActive: true,
+              type: { in: ["BIN", "SHELF", "RACK"] },
+            },
+          }),
+          prisma.location.count({
+            where: {
+              organizationId,
+              isActive: true,
+              metadata: {
+                path: ["utilizationPercent"],
+                lt: 30,
+              } as any,
+            },
+          }),
+          prisma.location.count({
+            where: {
+              organizationId,
+              isActive: true,
+              metadata: {
+                path: ["utilizationPercent"],
+                gt: 90,
+              } as any,
+            },
+          }),
+          prisma.pickingTask.count({
+            where: {
+              organizationId,
+              taskType: "MOVE",
+              title: { contains: "Bin Reallocation" },
+              status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS"] as any },
+            },
+          }),
+          prisma.inventoryItem.count({
+            where: {
+              organizationId,
+              availableQty: { gt: 0 },
+            },
+          }),
+        ]);
+
+      const optimizationRate =
+        totalBins > 0 ? Number(((optimizedItems / totalBins) * 100).toFixed(1)) : 0;
+
       return NextResponse.json({
-        totalBins: 8742,
-        optimizedBins: 3156,
-        optimizationRate: 36.1, // percentage
-        avgUtilization: 67.3, // percentage
-        underutilizedBins: 1247, // <30% utilization
-        overutilizedBins: 418, // >90% utilization
-        reallocationsPending: 47,
-        spaceSaved: 2840, // cubic feet
-        monthlyCostSavings: 5667,
-        yearlyCostSavings: 68000,
-        roi: 1350, // percentage
+        totalBins,
+        optimizedBins: optimizedItems,
+        optimizationRate,
+        avgUtilization: null,
+        underutilizedBins: underUtilized,
+        overutilizedBins: overUtilized,
+        reallocationsPending: moveTasks,
+        spaceSaved: null,
+        monthlyCostSavings: null,
+        yearlyCostSavings: null,
+        roi: null,
       });
     }
 
@@ -478,9 +542,29 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Once models are migrated
-      // Update inventory location with new bin size
-      // Create reallocation task if needed
+      await prisma.inventoryItem.update({
+        where: { id: productId },
+        data: {
+          metadata: {
+            binSizing: {
+              recommendedSize: newBinSize,
+              appliedAt: new Date().toISOString(),
+              appliedBy: session.user.id,
+            },
+          },
+        },
+      });
+
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "BIN_SIZE_UPDATED",
+          entityType: "InventoryItem",
+          entityId: productId,
+          metadata: { locationId, newBinSize },
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -495,13 +579,33 @@ export async function POST(req: NextRequest) {
     if (action === "SCHEDULE_REALLOCATION") {
       const validated = binReallocationSchema.parse(body);
 
-      // TODO: Once models are migrated
-      // Create reallocation task in database
+      const taskNumber = `MOVE-${Date.now()}`;
+      const moveTask = await prisma.pickingTask.create({
+        data: {
+          organizationId,
+          warehouseId: (await prisma.location.findUnique({ where: { id: validated.sourceLocationId }, select: { warehouseId: true } }))?.warehouseId ||
+            (await prisma.warehouse.findFirst({ where: { organizationId }, select: { id: true } }))!.id,
+          taskNumber,
+          taskType: "MOVE",
+          priority: "HIGH",
+          title: "Bin Reallocation",
+          description: validated.reason,
+          fromLocationId: validated.sourceLocationId,
+          toLocationId: validated.targetLocationId,
+          inventoryItemId: validated.productId,
+          quantity: Math.floor(validated.quantity),
+          status: "PENDING",
+          scheduledFor: validated.scheduledDate
+            ? new Date(validated.scheduledDate)
+            : new Date(Date.now() + 2 * 60 * 60 * 1000),
+          createdById: session.user.id,
+        },
+      });
 
       return NextResponse.json({
         success: true,
         message: "Reallocation scheduled",
-        reallocation: validated,
+        reallocation: moveTask,
       });
     }
 
@@ -535,14 +639,21 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // TODO: Run optimization algorithm on all specified locations
-      // Generate recommendations and schedule reallocations
+      await prisma.activityLog.create({
+        data: {
+          organizationId,
+          userId: session.user.id,
+          action: "BULK_BIN_OPTIMIZATION_QUEUED",
+          entityType: "Location",
+          metadata: { locationIds },
+        },
+      });
 
       return NextResponse.json({
         success: true,
         message: `Optimization queued for ${locationIds.length} locations`,
         processed: locationIds.length,
-        estimatedSavings: locationIds.length * 120, // ~$120/year per location
+        estimatedSavings: null,
       });
     }
 
@@ -590,14 +701,15 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: "status required" }, { status: 400 });
       }
 
-      // TODO: Once models are migrated
-      // Update reallocation status
+      const updated = await prisma.pickingTask.update({
+        where: { id },
+        data: { status },
+      });
 
       return NextResponse.json({
         success: true,
         message: "Reallocation updated",
-        id,
-        status,
+        reallocation: updated,
       });
     }
 
@@ -635,8 +747,23 @@ export async function DELETE(req: NextRequest) {
 
     // DELETE RECOMMENDATION
     if (type === "recommendation") {
-      // TODO: Once models are migrated
-      // Delete recommendation record
+      await prisma.activityLog.create({
+        data: {
+          organizationId: (await prisma.user.findUnique({
+            where: { id: session.user.id },
+            include: {
+              organizationMemberships: {
+                include: { organization: true },
+                take: 1,
+              },
+            },
+          }))?.organizationMemberships?.[0]?.organizationId || "",
+          userId: session.user.id,
+          action: "BIN_RECOMMENDATION_DISMISSED",
+          entityType: "Recommendation",
+          entityId: id,
+        },
+      });
 
       return NextResponse.json({
         success: true,
@@ -646,8 +773,10 @@ export async function DELETE(req: NextRequest) {
 
     // CANCEL REALLOCATION
     if (type === "reallocation") {
-      // TODO: Once models are migrated
-      // Cancel reallocation task
+      await prisma.pickingTask.update({
+        where: { id },
+        data: { status: "CANCELLED" },
+      });
 
       return NextResponse.json({
         success: true,

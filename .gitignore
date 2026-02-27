@@ -207,3 +207,10 @@ releases/
 # Turbo cache and logs
 .turbo/
 *.turbo.log*
+
+# System directories accidentally included in docs/archive
+docs/archive/etc/
+docs/archive/proc/
+docs/archive/home/
+docs/archive/go/
+docs/archive/opt/

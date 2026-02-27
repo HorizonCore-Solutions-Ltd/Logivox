@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -67,8 +68,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In production, this would call a real ML model (TensorFlow.js, AWS Rekognition, Google Vision API, etc.)
-    // For now, we'll simulate realistic results
     const result = await analyzeImage(image, mode, {
       locationId,
       sku,
@@ -105,177 +104,96 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Computer vision analysis error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    if (message.includes("not configured")) {
+      return NextResponse.json(
+        {
+          error: "Computer vision service unavailable",
+          message,
+        },
+        { status: 503 },
+      );
+    }
     return NextResponse.json(
       {
         error: "Failed to analyze image",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message,
       },
       { status: 500 },
     );
   }
 }
 
-/**
- * Simulate ML model analysis
- * In production, replace with actual ML model calls
- */
 async function analyzeImage(
   image: string,
   mode: string,
   context: { locationId?: string; sku?: string; expectedQuantity?: number },
 ): Promise<AnalysisResult> {
-  // Simulate processing delay
-  await new Promise((resolve) =>
-    setTimeout(resolve, 800 + Math.random() * 400),
-  );
-
-  const timestamp = new Date();
-
-  switch (mode) {
-    case "cycle-count":
-      const detectedCount = context.expectedQuantity
-        ? Math.round(context.expectedQuantity + (Math.random() - 0.5) * 4)
-        : Math.floor(Math.random() * 50) + 10;
-
-      const variance = context.expectedQuantity
-        ? detectedCount - context.expectedQuantity
-        : 0;
-
-      return {
-        success: true,
-        mode,
-        confidence: 0.88 + Math.random() * 0.11, // 88-99%
-        processingTime: 800 + Math.random() * 400,
-        detectedItems: detectedCount,
-        variance,
-        results: {
-          detectedCount,
-          expectedCount: context.expectedQuantity || detectedCount,
-          variance,
-          boundingBoxes: Array.from({ length: detectedCount }, (_, i) => ({
-            x: Math.random() * 800,
-            y: Math.random() * 600,
-            width: 50 + Math.random() * 100,
-            height: 50 + Math.random() * 100,
-            confidence: 0.85 + Math.random() * 0.14,
-          })),
-        },
-        timestamp,
-      };
-
-    case "damage-detection":
-      const damageDetected = Math.random() > 0.7;
-      return {
-        success: true,
-        mode,
-        confidence: 0.85 + Math.random() * 0.14,
-        processingTime: 900 + Math.random() * 500,
-        damageDetected,
-        results: {
-          damageDetected,
-          damageTypes: damageDetected
-            ? [
-                Math.random() > 0.5 ? "Dent" : "Tear",
-                Math.random() > 0.6 ? "Scratch" : "Crush",
-              ]
-            : [],
-          damageLocations: damageDetected
-            ? [
-                {
-                  type: "Dent",
-                  x: Math.random() * 800,
-                  y: Math.random() * 600,
-                  severity: Math.random() > 0.5 ? "High" : "Medium",
-                  confidence: 0.82 + Math.random() * 0.17,
-                },
-              ]
-            : [],
-          overallCondition: damageDetected ? "Damaged" : "Good",
-        },
-        timestamp,
-      };
-
-    case "package-verify":
-      const matches = Math.random() > 0.2;
-      return {
-        success: true,
-        mode,
-        confidence: 0.9 + Math.random() * 0.09,
-        processingTime: 700 + Math.random() * 300,
-        results: {
-          matches,
-          expectedSku: context.sku,
-          detectedSku: matches
-            ? context.sku
-            : `SKU-${Math.floor(Math.random() * 10000)}`,
-          verificationStatus: matches ? "Match" : "Mismatch",
-          detectedFeatures: [
-            "Barcode verified",
-            "Product logo detected",
-            matches ? "Package size correct" : "Package size mismatch",
-          ],
-        },
-        timestamp,
-      };
-
-    case "dimensioning":
-      return {
-        success: true,
-        mode,
-        confidence: 0.92 + Math.random() * 0.07,
-        processingTime: 1000 + Math.random() * 500,
-        dimensions: {
-          length: 10 + Math.random() * 40,
-          width: 8 + Math.random() * 30,
-          height: 6 + Math.random() * 20,
-          weight: 1 + Math.random() * 50,
-        },
-        results: {
-          dimensions: {
-            length: Math.round((10 + Math.random() * 40) * 10) / 10,
-            width: Math.round((8 + Math.random() * 30) * 10) / 10,
-            height: Math.round((6 + Math.random() * 20) * 10) / 10,
-            unit: "inches",
-          },
-          weight: {
-            value: Math.round((1 + Math.random() * 50) * 10) / 10,
-            unit: "lbs",
-          },
-          volume: Math.round(Math.random() * 10000),
-          volumeUnit: "cubic inches",
-        },
-        timestamp,
-      };
-
-    case "label-reading":
-      const barcodeDetected = Math.random() > 0.1;
-      return {
-        success: true,
-        mode,
-        confidence: 0.94 + Math.random() * 0.05,
-        processingTime: 600 + Math.random() * 300,
-        labelData: {
-          barcode: barcodeDetected
-            ? `${Math.floor(Math.random() * 9000000000000) + 1000000000000}`
-            : undefined,
-          text: "FRAGILE\nHANDLE WITH CARE\nTHIS SIDE UP",
-          sku: context.sku || `SKU-${Math.floor(Math.random() * 10000)}`,
-        },
-        results: {
-          barcodeDetected,
-          barcode: barcodeDetected
-            ? `${Math.floor(Math.random() * 9000000000000) + 1000000000000}`
-            : null,
-          barcodeType: barcodeDetected ? "UPC-A" : null,
-          textDetected: true,
-          text: "FRAGILE\nHANDLE WITH CARE\nTHIS SIDE UP",
-          orientation: "Portrait",
-          quality: "Good",
-        },
-        timestamp,
-      };
-
-    default:
-      throw new Error(`Unknown analysis mode: ${mode}`);
+  const serviceUrl = process.env.COMPUTER_VISION_SERVICE_URL;
+  if (!serviceUrl) {
+    throw new Error(
+      "Computer vision service is not configured. Set COMPUTER_VISION_SERVICE_URL.",
+    );
   }
+
+  const response = await fetch(serviceUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(process.env.COMPUTER_VISION_SERVICE_API_KEY
+        ? {
+            Authorization: `Bearer ${process.env.COMPUTER_VISION_SERVICE_API_KEY}`,
+          }
+        : {}),
+    },
+    body: JSON.stringify({
+      image,
+      mode,
+      context,
+    }),
+  });
+
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      payload?.error ||
+        `Computer vision service request failed (${response.status})`,
+    );
+  }
+
+  if (typeof payload?.confidence !== "number" || payload?.results == null) {
+    throw new Error("Computer vision service response missing required fields");
+  }
+
+  const timestamp = payload?.timestamp
+    ? new Date(payload.timestamp)
+    : new Date();
+
+  return {
+    success: true,
+    mode,
+    confidence: payload.confidence,
+    results: payload.results,
+    processingTime:
+      typeof payload.processingTime === "number" ? payload.processingTime : 0,
+    detectedItems:
+      typeof payload.detectedItems === "number"
+        ? payload.detectedItems
+        : undefined,
+    damageDetected:
+      typeof payload.damageDetected === "boolean"
+        ? payload.damageDetected
+        : undefined,
+    dimensions:
+      payload.dimensions && typeof payload.dimensions === "object"
+        ? payload.dimensions
+        : undefined,
+    labelData:
+      payload.labelData && typeof payload.labelData === "object"
+        ? payload.labelData
+        : undefined,
+    variance:
+      typeof payload.variance === "number" ? payload.variance : undefined,
+    timestamp,
+  };
 }

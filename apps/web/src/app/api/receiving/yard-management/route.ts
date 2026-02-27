@@ -70,136 +70,184 @@ async function calculateYardMetrics(organizationId: string) {
   const today = new Date(now);
   today.setHours(0, 0, 0, 0);
 
-  // In production, fetch from YardTruck table
-  // For now, simulate yard operations
+  const [trucksInYard, detentionEvents, todayCheckIns, activeWarehouses] =
+    await Promise.all([
+      getTrucksInYard(organizationId),
+      getDetentionEvents(organizationId),
+      prisma.auditLog.count({
+        where: {
+          organizationId,
+          action: "TRUCK_CHECK_IN",
+          createdAt: { gte: today },
+        },
+      }),
+      prisma.warehouse.count({
+        where: {
+          organizationId,
+          isActive: true,
+        },
+      }),
+    ]);
+
+  const waitTimes = trucksInYard
+    .filter((truck) => ["WAITING", "CHECKED_IN"].includes(truck.status))
+    .map((truck) =>
+      Math.max(
+        0,
+        Math.round(
+          (Date.now() - new Date(truck.checkInTime).getTime()) / (1000 * 60),
+        ),
+      ),
+    );
+
+  const dwellTimes = trucksInYard.map((truck) =>
+    Math.max(
+      0,
+      Math.round(
+        (Date.now() - new Date(truck.checkInTime).getTime()) / (1000 * 60),
+      ),
+    ),
+  );
+
+  const docksInUse = trucksInYard.filter((truck) =>
+    ["CALLED_TO_DOCK", "AT_DOCK", "UNLOADING"].includes(truck.status),
+  ).length;
+
   const metrics = {
-    trucksInYard: 8,
-    averageWaitTime: 23, // minutes
-    docksInUse: 9,
-    availableDocks: 3,
-    todayTrucks: 47,
-    avgDwellTime: 87, // minutes
-    detentionEvents: 2,
-    onTimePercentage: 94,
+    trucksInYard: trucksInYard.length,
+    averageWaitTime:
+      waitTimes.length > 0
+        ? Math.round(waitTimes.reduce((sum, value) => sum + value, 0) / waitTimes.length)
+        : 0,
+    docksInUse,
+    availableDocks: Math.max(0, activeWarehouses - docksInUse),
+    todayTrucks: todayCheckIns,
+    avgDwellTime:
+      dwellTimes.length > 0
+        ? Math.round(dwellTimes.reduce((sum, value) => sum + value, 0) / dwellTimes.length)
+        : 0,
+    detentionEvents: detentionEvents.length,
+    onTimePercentage:
+      todayCheckIns > 0
+        ? Math.round(
+            ((todayCheckIns - detentionEvents.length) / todayCheckIns) * 100,
+          )
+        : 100,
   };
 
   return metrics;
 }
 
 async function getParkingSpots(organizationId: string) {
-  // In production, fetch from database
-  // Simulate 20 parking spots across different types
-  const spots = [
-    // Waiting area (10 spots)
-    ...Array.from({ length: 10 }, (_, i) => ({
-      spotNumber: `W-${i + 1}`,
-      type: "WAITING",
-      status: i < 4 ? "OCCUPIED" : "AVAILABLE",
-      truckNumber: i < 4 ? `TRUCK-${i + 1}` : null,
-      occupiedSince:
-        i < 4 ? new Date(Date.now() - (i + 1) * 30 * 60 * 1000) : null,
-    })),
-    // Live load (4 spots)
-    ...Array.from({ length: 4 }, (_, i) => ({
-      spotNumber: `L-${i + 1}`,
-      type: "LIVE_LOAD",
-      status: i < 2 ? "OCCUPIED" : "AVAILABLE",
-      truckNumber: i < 2 ? `TRUCK-${i + 11}` : null,
-      occupiedSince:
-        i < 2 ? new Date(Date.now() - (i + 1) * 45 * 60 * 1000) : null,
-    })),
-    // Drop trailer (4 spots)
-    ...Array.from({ length: 4 }, (_, i) => ({
-      spotNumber: `D-${i + 1}`,
-      type: "DROP_TRAILER",
-      status: i < 1 ? "OCCUPIED" : "AVAILABLE",
-      truckNumber: i < 1 ? `TRUCK-${i + 21}` : null,
-      occupiedSince: i < 1 ? new Date(Date.now() - 120 * 60 * 1000) : null,
-    })),
-    // Staging (2 spots)
-    ...Array.from({ length: 2 }, (_, i) => ({
-      spotNumber: `S-${i + 1}`,
-      type: "STAGING",
-      status: i < 1 ? "OCCUPIED" : "AVAILABLE",
-      truckNumber: i < 1 ? `TRUCK-${i + 31}` : null,
-      occupiedSince: i < 1 ? new Date(Date.now() - 15 * 60 * 1000) : null,
-    })),
-  ];
-
-  return spots;
+  const trucksInYard = await getTrucksInYard(organizationId);
+  return trucksInYard
+    .filter((truck) => Boolean(truck.parkingSpot))
+    .map((truck) => ({
+      spotNumber: truck.parkingSpot,
+      type: truck.spotType || "WAITING",
+      status: "OCCUPIED",
+      truckNumber: truck.truckNumber,
+      occupiedSince: truck.checkInTime,
+    }));
 }
 
 async function getTrucksInYard(organizationId: string) {
-  // In production, fetch from YardTruck table
-  // Simulate trucks currently in yard
-  const trucks = [
-    {
-      id: "truck_1",
-      truckNumber: "TRUCK-001",
-      carrier: "ABC Transport",
-      driverName: "John Smith",
-      driverPhone: "555-0101",
-      status: "WAITING",
-      checkInTime: new Date(Date.now() - 45 * 60 * 1000),
-      parkingSpot: "W-1",
-      appointmentTime: new Date(Date.now() - 30 * 60 * 1000),
-      priority: "NORMAL",
+  const logs = await prisma.auditLog.findMany({
+    where: {
+      organizationId,
+      action: {
+        in: [
+          "TRUCK_CHECK_IN",
+          "ASSIGN_PARKING_SPOT",
+          "CALL_TO_DOCK",
+          "UPDATE_TRUCK_STATUS",
+          "TRUCK_CHECK_OUT",
+        ],
+      },
     },
-    {
-      id: "truck_2",
-      truckNumber: "TRUCK-002",
-      carrier: "XYZ Logistics",
-      driverName: "Sarah Johnson",
-      driverPhone: "555-0102",
-      status: "AT_DOCK",
-      checkInTime: new Date(Date.now() - 90 * 60 * 1000),
-      dockNumber: 3,
-      appointmentTime: new Date(Date.now() - 60 * 60 * 1000),
-      priority: "HIGH",
-    },
-    {
-      id: "truck_3",
-      truckNumber: "TRUCK-003",
-      carrier: "Fast Freight",
-      driverName: "Mike Brown",
-      driverPhone: "555-0103",
-      status: "UNLOADING",
-      checkInTime: new Date(Date.now() - 120 * 60 * 1000),
-      dockNumber: 7,
-      appointmentTime: new Date(Date.now() - 90 * 60 * 1000),
-      priority: "URGENT",
-    },
-  ];
+    orderBy: { createdAt: "asc" },
+    take: 2000,
+  });
 
-  return trucks;
+  const trucks = new Map<string, any>();
+
+  logs.forEach((log) => {
+    const changes = (log.changes ?? {}) as any;
+    const truckId = log.entityId || changes.truckId;
+    if (!truckId) return;
+
+    const current = trucks.get(truckId) || {
+      id: truckId,
+      truckNumber: changes.truckNumber || "UNKNOWN",
+      carrier: changes.carrier || "UNKNOWN",
+      driverName: changes.driver || "Unknown Driver",
+      driverPhone: null,
+      status: "CHECKED_IN",
+      checkInTime: log.createdAt,
+      priority: "NORMAL",
+    };
+
+    if (log.action === "TRUCK_CHECK_IN") {
+      current.truckNumber = changes.truckNumber || current.truckNumber;
+      current.carrier = changes.carrier || current.carrier;
+      current.driverName = changes.driver || current.driverName;
+      current.status = "CHECKED_IN";
+      current.checkInTime = log.createdAt;
+    }
+
+    if (log.action === "ASSIGN_PARKING_SPOT") {
+      current.parkingSpot = changes.spotNumber;
+      current.spotType = changes.spotType;
+      current.status = "WAITING";
+    }
+
+    if (log.action === "CALL_TO_DOCK") {
+      current.dockNumber = changes.dockNumber;
+      current.priority = changes.priority || current.priority;
+      current.status = "CALLED_TO_DOCK";
+    }
+
+    if (log.action === "UPDATE_TRUCK_STATUS") {
+      current.status = changes.status || current.status;
+      current.location = changes.location || current.location;
+    }
+
+    if (log.action === "TRUCK_CHECK_OUT") {
+      current.status = "CHECKED_OUT";
+      current.checkOutTime = changes.checkOutTime || log.createdAt;
+    }
+
+    trucks.set(truckId, current);
+  });
+
+  return Array.from(trucks.values()).filter(
+    (truck) => truck.status !== "CHECKED_OUT",
+  );
 }
 
 async function getDetentionEvents(organizationId: string) {
-  // In production, fetch from database
-  const events = [
-    {
-      id: "det_1",
-      truckNumber: "TRUCK-045",
-      carrier: "ABC Transport",
-      detentionMinutes: 145,
-      reason: "Dock delay - previous shipment took longer",
-      chargeable: false,
-      timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
-      cost: 0,
+  const logs = await prisma.auditLog.findMany({
+    where: {
+      organizationId,
+      action: "RECORD_DETENTION",
     },
-    {
-      id: "det_2",
-      truckNumber: "TRUCK-046",
-      carrier: "XYZ Logistics",
-      detentionMinutes: 180,
-      reason: "Missing paperwork",
-      chargeable: true,
-      timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
-      cost: 120, // $120 detention charge
-    },
-  ];
+    orderBy: { createdAt: "desc" },
+    take: 500,
+  });
 
-  return events;
+  return logs.map((log) => {
+    const changes = (log.changes ?? {}) as any;
+    return {
+      id: log.entityId || log.id,
+      truckNumber: changes.truckNumber || "UNKNOWN",
+      carrier: changes.carrier || "UNKNOWN",
+      detentionMinutes: Number(changes.detentionMinutes || 0),
+      reason: changes.reason || "Not specified",
+      chargeable: Boolean(changes.chargeable),
+      timestamp: log.createdAt,
+      cost: Number(changes.cost || 0),
+    };
+  });
 }
 
 // GET endpoint - Yard management queries
@@ -252,16 +300,21 @@ export async function GET(request: NextRequest) {
     }
 
     if (action === "yard_stats") {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
+      const [metrics, detentionEvents] = await Promise.all([
+        calculateYardMetrics(user.organizationId),
+        getDetentionEvents(user.organizationId),
+      ]);
 
       const stats = {
-        todayTrucks: 47,
-        avgWaitTime: 23,
-        avgDwellTime: 87,
-        onTimePercentage: 94,
-        detentionEvents: 2,
-        detentionCost: 120,
+        todayTrucks: metrics.todayTrucks,
+        avgWaitTime: metrics.averageWaitTime,
+        avgDwellTime: metrics.avgDwellTime,
+        onTimePercentage: metrics.onTimePercentage,
+        detentionEvents: detentionEvents.length,
+        detentionCost: detentionEvents.reduce(
+          (sum, event) => sum + Number(event.cost || 0),
+          0,
+        ),
       };
 
       return NextResponse.json({ stats });
@@ -299,8 +352,6 @@ export async function POST(request: NextRequest) {
 
     switch (validated.action) {
       case "check_in_truck": {
-        // Check in truck at gate
-        // In production, create YardTruck record
         const truck = {
           id: `truck_${Date.now()}`,
           organizationId: user.organizationId,
@@ -338,8 +389,6 @@ export async function POST(request: NextRequest) {
       }
 
       case "assign_parking_spot": {
-        // Assign truck to parking spot
-        // In production, update YardTruck record
         await prisma.auditLog.create({
           data: {
             organizationId: user.organizationId,
@@ -362,8 +411,6 @@ export async function POST(request: NextRequest) {
       }
 
       case "call_to_dock": {
-        // Call truck to dock
-        // In production, update YardTruck status and notify driver
         await prisma.auditLog.create({
           data: {
             organizationId: user.organizationId,
@@ -379,7 +426,6 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        // In production, send SMS/app notification to driver
         return NextResponse.json({
           success: true,
           message: `Truck called to dock ${validated.dockNumber}`,
@@ -387,8 +433,6 @@ export async function POST(request: NextRequest) {
       }
 
       case "check_out_truck": {
-        // Check out truck from yard
-        // In production, update YardTruck status and calculate dwell time
         const checkOutTime = new Date();
 
         await prisma.auditLog.create({
@@ -412,7 +456,6 @@ export async function POST(request: NextRequest) {
       }
 
       case "update_truck_status": {
-        // Update truck status
         await prisma.auditLog.create({
           data: {
             organizationId: user.organizationId,
@@ -435,8 +478,6 @@ export async function POST(request: NextRequest) {
       }
 
       case "record_detention": {
-        // Record detention event
-        // In production, create DetentionEvent record
         const detentionCost = validated.chargeable
           ? Math.floor(validated.detentionMinutes / 60) * 65 // $65/hour
           : 0;
@@ -461,6 +502,7 @@ export async function POST(request: NextRequest) {
             entityType: "DETENTION_EVENT",
             entityId: detentionEvent.id,
             changes: {
+              truckId: validated.truckId,
               detentionMinutes: validated.detentionMinutes,
               reason: validated.reason,
               chargeable: validated.chargeable,
@@ -477,8 +519,18 @@ export async function POST(request: NextRequest) {
       }
 
       case "send_driver_notification": {
-        // Send notification to driver
-        // In production, send via SMS, app push, or display system
+        const notificationWebhook =
+          process.env.YARD_DRIVER_NOTIFICATION_WEBHOOK_URL;
+        if (!notificationWebhook) {
+          return NextResponse.json(
+            {
+              error:
+                "Driver notification service is not configured. Set YARD_DRIVER_NOTIFICATION_WEBHOOK_URL.",
+            },
+            { status: 503 },
+          );
+        }
+
         const notification = {
           truckId: validated.truckId,
           type: validated.notificationType,
@@ -487,10 +539,31 @@ export async function POST(request: NextRequest) {
           sentAt: new Date(),
         };
 
+        const response = await fetch(notificationWebhook, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(notification),
+        });
+
+        await prisma.auditLog.create({
+          data: {
+            organizationId: user.organizationId,
+            userId: user.id,
+            action: "DRIVER_NOTIFICATION_SENT",
+            entityType: "YARD_TRUCK",
+            entityId: validated.truckId,
+            changes: {
+              ...notification,
+              statusCode: response.status,
+              delivered: response.ok,
+            },
+          },
+        });
+
         return NextResponse.json({
-          success: true,
+          success: response.ok,
           notification,
-          message: "Driver notified",
+          message: response.ok ? "Driver notified" : "Driver notification failed",
         });
       }
 

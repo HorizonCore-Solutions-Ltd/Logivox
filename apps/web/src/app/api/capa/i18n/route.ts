@@ -28,6 +28,62 @@ const saveTranslationSchema = z.object({
   category: z.string().optional(),
 });
 
+async function translateWithOpenAI(input: {
+  text: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  context?: string;
+}) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "Translation service not configured. Set OPENAI_API_KEY to enable translation.",
+    );
+  }
+
+  const target =
+    SUPPORTED_LANGUAGES[input.targetLanguage as keyof typeof SUPPORTED_LANGUAGES]
+      ?.name || input.targetLanguage;
+
+  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      temperature: 0.1,
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a precise enterprise translation engine. Return only the translated text with no commentary.",
+        },
+        {
+          role: "user",
+          content: `Translate the following ${input.context ? `${input.context} ` : ""}text from ${input.sourceLanguage} to ${target}:\n\n${input.text}`,
+        },
+      ],
+    }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      data?.error?.message ||
+        `Translation provider failed with status ${response.status}`,
+    );
+  }
+
+  const translatedText = data?.choices?.[0]?.message?.content?.trim();
+  if (!translatedText) {
+    throw new Error("Translation provider returned empty response");
+  }
+
+  return translatedText;
+}
+
 // ============================================
 // SUPPORTED LANGUAGES
 // ============================================
@@ -377,9 +433,12 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // In production, this would call Google Translate API or similar
-      // For now, return mock translation
-      const mockTranslation = `[${data.targetLanguage.toUpperCase()}] ${data.text}`;
+      const translatedText = await translateWithOpenAI({
+        text: data.text,
+        sourceLanguage: data.sourceLanguage,
+        targetLanguage: data.targetLanguage,
+        context: data.context,
+      });
 
       // Save translation to database for future use
       await prisma.translation.create({
@@ -387,7 +446,7 @@ export async function POST(request: NextRequest) {
           organizationId: session.user.organizationId,
           key: data.text,
           language: data.targetLanguage,
-          value: mockTranslation,
+          value: translatedText,
           category: data.context || "GENERAL",
           translatedBy: session.user.id,
           translatedAt: new Date(),
@@ -396,7 +455,7 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        translatedText: mockTranslation,
+        translatedText,
         source: "api",
         cached: false,
         message: "Translation generated and cached for future use",
@@ -522,7 +581,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Update user language preference
-      // @ts-ignore - preferredLanguage field exists in schema but TS needs restart
+      // @ts-expect-error - preferredLanguage exists in runtime schema but generated client may be stale
       await prisma.user.update({
         where: { id: session.user.id },
         data: { preferredLanguage: language },
@@ -536,7 +595,11 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (error) {
+  } catch (error: any) {
+    if (error?.message?.includes("not configured")) {
+      return NextResponse.json({ error: error.message }, { status: 503 });
+    }
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Validation error", details: error.errors },

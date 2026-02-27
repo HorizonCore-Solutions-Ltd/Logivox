@@ -54,7 +54,6 @@ const supplierResponseSchema = z.object({
   responseNotes: z.string().optional(),
 });
 
-// Simulate ERP API clients (in production, use actual SDK/APIs)
 interface ERPClient {
   type: "SAP" | "ORACLE" | "NETSUITE" | "CUSTOM";
   createSupplierCAPA(
@@ -64,34 +63,102 @@ interface ERPClient {
   sendNotification(externalId: string, message: string): Promise<boolean>;
 }
 
-/**
- * Supplier ERP Client Factory
- * In production, implement actual API integrations using vendor SDKs
- */
 function getERPClient(erpType: string): ERPClient {
-  // Mock implementation - replace with actual ERP SDK calls
-  const mockClient: ERPClient = {
-    type: erpType as any,
+  const baseUrl = process.env.SUPPLIER_ERP_BASE_URL;
+  const apiKey = process.env.SUPPLIER_ERP_API_KEY;
+
+  if (!baseUrl || !apiKey) {
+    throw new Error(
+      "Supplier ERP integration is not configured. Set SUPPLIER_ERP_BASE_URL and SUPPLIER_ERP_API_KEY.",
+    );
+  }
+
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, "");
+
+  return {
+    type: erpType as ERPClient["type"],
     async createSupplierCAPA(data: any) {
-      // In production: Call SAP/Oracle/NetSuite API
-      const externalId = `${erpType.toUpperCase()}-CAPA-${Date.now()}`;
-      console.log(`[${erpType}] Creating CAPA in supplier system:`, externalId);
+      const response = await fetch(`${normalizedBaseUrl}/capa`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+          "X-ERP-Type": erpType,
+        },
+        body: JSON.stringify(data),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ||
+            `ERP create CAPA request failed with status ${response.status}`,
+        );
+      }
+
+      const externalId =
+        typeof payload?.externalId === "string"
+          ? payload.externalId
+          : typeof payload?.id === "string"
+            ? payload.id
+            : null;
+
+      if (!externalId) {
+        throw new Error("ERP response missing externalId");
+      }
+
       return { externalId, success: true };
     },
     async getStatus(externalId: string) {
-      // In production: Query supplier's ERP for CAPA status
-      return { status: "IN_PROGRESS", progress: 45 };
+      const response = await fetch(
+        `${normalizedBaseUrl}/capa/${encodeURIComponent(externalId)}`,
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "X-ERP-Type": erpType,
+          },
+        },
+      );
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(
+          payload?.error ||
+            `ERP status request failed with status ${response.status}`,
+        );
+      }
+
+      if (typeof payload?.status !== "string") {
+        throw new Error("ERP status response missing status field");
+      }
+
+      return {
+        status: payload.status,
+        progress:
+          typeof payload.progress === "number"
+            ? payload.progress
+            : payload.status === "ACTIONS_COMPLETED"
+              ? 100
+              : 0,
+      };
     },
     async sendNotification(externalId: string, message: string) {
-      // In production: Send notification through supplier's ERP
-      console.log(
-        `[${erpType}] Notification sent for ${externalId}: ${message}`,
+      const response = await fetch(
+        `${normalizedBaseUrl}/capa/${encodeURIComponent(externalId)}/notify`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${apiKey}`,
+            "X-ERP-Type": erpType,
+          },
+          body: JSON.stringify({ message }),
+        },
       );
-      return true;
+
+      return response.ok;
     },
   };
-
-  return mockClient;
 }
 
 /**
@@ -304,7 +371,20 @@ export async function POST(req: NextRequest) {
 
       // Send email notification to supplier
       if (supplier.contactEmail) {
-        await sendSupplierNotification(supplier, capa, supplierCapa);
+        try {
+          await sendSupplierNotification(supplier, capa, supplierCapa);
+        } catch (notificationError: any) {
+          await prisma.activityLog.create({
+            data: {
+              organizationId,
+              userId,
+              action: "SUPPLIER_CAPA_NOTIFICATION_FAILED",
+              entityType: "SupplierCAPARequest",
+              entityId: supplierCapa.id,
+              notes: notificationError.message,
+            },
+          });
+        }
       }
 
       // Log activity
@@ -613,36 +693,50 @@ function getQualityGrade(score: number): string {
   return "F";
 }
 
-/**
- * Helper: Send supplier notification (mock email)
- */
 async function sendSupplierNotification(
   supplier: any,
   capa: any,
   supplierCapa: any,
 ) {
-  // In production: Use email service (SendGrid, SES, etc.)
-  console.log(`
-[EMAIL NOTIFICATION]
-To: ${supplier.contactEmail}
-Subject: Action Required: CAPA ${capa.capaNumber} - ${capa.title}
+  const webhookUrl = process.env.SUPPLIER_NOTIFICATION_WEBHOOK_URL;
+  if (!webhookUrl) {
+    throw new Error(
+      "Supplier notifications are not configured. Set SUPPLIER_NOTIFICATION_WEBHOOK_URL.",
+    );
+  }
 
-Dear ${supplier.name},
+  const payload = {
+    to: supplier.contactEmail,
+    subject: `Action Required: CAPA ${capa.capaNumber} - ${capa.title}`,
+    template: "supplier-capa-request",
+    data: {
+      supplierName: supplier.name,
+      capaNumber: capa.capaNumber,
+      capaTitle: capa.title,
+      severity: supplierCapa.severity,
+      dueDate: supplierCapa.dueDate,
+      description: supplierCapa.description,
+      requestedActions: supplierCapa.requestedActions,
+    },
+  };
 
-You have been assigned a Corrective and Preventive Action (CAPA) that requires your immediate attention.
+  const response = await fetch(webhookUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(process.env.SUPPLIER_NOTIFICATION_WEBHOOK_TOKEN
+        ? {
+            Authorization: `Bearer ${process.env.SUPPLIER_NOTIFICATION_WEBHOOK_TOKEN}`,
+          }
+        : {}),
+    },
+    body: JSON.stringify(payload),
+  });
 
-CAPA Number: ${capa.capaNumber}
-Severity: ${supplierCapa.severity}
-Due Date: ${supplierCapa.dueDate.toLocaleDateString()}
-
-Description:
-${supplierCapa.description}
-
-Please log into your ERP system or respond through our supplier portal to acknowledge this request and provide status updates.
-
-Thank you for your prompt attention to this matter.
-
-Best regards,
-Quality Management Team
-  `);
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    throw new Error(
+      `Supplier notification delivery failed (${response.status}): ${body}`,
+    );
+  }
 }

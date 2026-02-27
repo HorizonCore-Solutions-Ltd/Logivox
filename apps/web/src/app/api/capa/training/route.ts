@@ -303,14 +303,21 @@ export async function POST(request: NextRequest) {
         data.targetAudience === "DEPARTMENT" &&
         data.targetDepartment
       ) {
-        // Assume users have a department field (would need schema update)
-        // For now, enroll all users in organization as placeholder
-        const users = await prisma.user.findMany({
-          where: { organizationId: session.user.organizationId },
-          select: { id: true },
-          take: 50, // Safety limit
-        });
-        usersToEnroll.push(...users.map((u) => u.id));
+        const explicitDepartmentUsers = Array.isArray((data as any).targetUserIds)
+          ? ((data as any).targetUserIds as string[])
+          : [];
+
+        if (explicitDepartmentUsers.length === 0) {
+          return NextResponse.json(
+            {
+              error:
+                "Department auto-enrollment is not configured. Provide targetUserIds for department audiences.",
+            },
+            { status: 422 },
+          );
+        }
+
+        usersToEnroll.push(...explicitDepartmentUsers);
       }
 
       // Create enrollments

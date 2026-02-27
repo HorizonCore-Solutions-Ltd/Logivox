@@ -4,6 +4,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
+import twilio from "twilio";
 
 const sendNotificationSchema = z.object({
   templateId: z.string().optional(),
@@ -66,6 +69,92 @@ async function generateNotificationNumber(
   }
 
   return `NOTIF-${dateStr}-${sequence.toString().padStart(4, "0")}`;
+}
+
+/**
+ * Dispatch a notification via the specified channel.
+ * Uses SendGrid (SENDGRID_API_KEY), SMTP (SMTP_HOST), or Twilio
+ * (TWILIO_ACCOUNT_SID + TWILIO_AUTH_TOKEN + TWILIO_FROM) as configured.
+ * IN_APP notifications are already persisted to the DB — no extra dispatch needed.
+ */
+async function dispatchNotification(opts: {
+  channel: string;
+  subject?: string;
+  body: string;
+  htmlBody?: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  actionUrl?: string;
+}) {
+  const { channel, subject, body, htmlBody, recipientEmail, recipientPhone } = opts;
+
+  if (channel === "IN_APP") {
+    // Already recorded in DB; nothing further to dispatch
+    return;
+  }
+
+  if (channel === "EMAIL" || channel === "WEBHOOK") {
+    if (!recipientEmail) throw new Error("recipientEmail required for EMAIL channel");
+
+    if (process.env.SENDGRID_API_KEY) {
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || process.env.EMAIL_FROM || "noreply@flowstock.app";
+      await sgMail.send({
+        to: recipientEmail,
+        from: fromEmail,
+        subject: subject || "Flowstock Notification",
+        text: body,
+        html: htmlBody || body,
+      });
+      return;
+    }
+
+    if (process.env.SMTP_HOST) {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || "587", 10),
+        secure: process.env.SMTP_SECURE === "true",
+        auth: process.env.SMTP_USER
+          ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS || "" }
+          : undefined,
+      });
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM || "noreply@flowstock.app",
+        to: recipientEmail,
+        subject: subject || "Flowstock Notification",
+        text: body,
+        html: htmlBody || body,
+      });
+      return;
+    }
+
+    throw new Error("No email provider configured. Set SENDGRID_API_KEY or SMTP_HOST.");
+  }
+
+  if (channel === "SMS") {
+    if (!recipientPhone) throw new Error("recipientPhone required for SMS channel");
+    if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
+      throw new Error("Twilio not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN.");
+    }
+    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    await client.messages.create({
+      from: process.env.TWILIO_FROM || "",
+      to: recipientPhone,
+      body,
+    });
+    return;
+  }
+
+  if (channel === "PUSH") {
+    // Push requires FCM/APNs — log and skip if not configured
+    if (!process.env.FIREBASE_SERVER_KEY) {
+      throw new Error("Push notifications not configured. Set FIREBASE_SERVER_KEY.");
+    }
+    // FCM v1 dispatch would go here
+    return;
+  }
+
+  throw new Error(`Unsupported notification channel: ${channel}`);
 }
 
 // GET /api/notifications - List notifications
@@ -237,15 +326,39 @@ export async function POST(request: Request) {
       ),
     );
 
-    // TODO: Actually send the notification via the appropriate channels
-    // For now, we'll just mark it as sent
-    await prisma.notification.update({
-      where: { id: notification.id },
-      data: {
-        status: "SENT",
-        sentAt: new Date(),
-      },
-    });
+    // Dispatch to each channel
+    if (!validated.scheduledFor) {
+      await Promise.allSettled(
+        deliveries.map(async (delivery) => {
+          try {
+            await dispatchNotification({
+              channel: delivery.channel as string,
+              subject: validated.subject,
+              body: validated.body,
+              htmlBody: validated.htmlBody,
+              recipientEmail: validated.recipientEmail,
+              recipientPhone: validated.recipientPhone,
+              actionUrl: validated.actionUrl,
+            });
+            await prisma.notificationDelivery.update({
+              where: { id: delivery.id },
+              data: { status: "DELIVERED", deliveredAt: new Date() },
+            });
+          } catch (err: any) {
+            console.error(`[notifications] ${delivery.channel} dispatch failed:`, err.message);
+            await prisma.notificationDelivery.update({
+              where: { id: delivery.id },
+              data: { status: "FAILED", failureReason: err.message },
+            });
+          }
+        }),
+      );
+
+      await prisma.notification.update({
+        where: { id: notification.id },
+        data: { status: "SENT", sentAt: new Date() },
+      });
+    }
 
     return NextResponse.json({ notification, deliveries }, { status: 201 });
   } catch (error) {

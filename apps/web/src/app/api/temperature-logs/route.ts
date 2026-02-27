@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import crypto from "crypto";
 import { z } from "zod";
 import { sendSMS } from "@/lib/services/sms-service";
 
@@ -160,13 +161,19 @@ export async function POST(req: NextRequest) {
       }
 
       // Create alert in system
+      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+      const alertNumber = `ALT-${dateStr}-${crypto.randomUUID().slice(0, 6).toUpperCase()}`;
       await prisma.alert.create({
         data: {
           organizationId,
-          type: "TEMPERATURE_VIOLATION",
+          alertNumber,
+          alertType: "THRESHOLD",
+          category: "QUALITY",
           severity: "HIGH",
           title: "Temperature Out of Range",
           message: `Temperature reading of ${validatedData.temperature}°C at ${warehouse.name} is outside acceptable range (${minTemp}°C to ${maxTemp}°C)`,
+          relatedEntityType: "TemperatureLog",
+          relatedEntityId: log.id,
           metadata: {
             logId: log.id,
             temperature: validatedData.temperature,

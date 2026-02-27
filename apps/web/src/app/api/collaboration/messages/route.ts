@@ -7,6 +7,30 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
+async function emitCollaborationMessageEvent(payload: Record<string, unknown>) {
+  const webhookUrl = process.env.COLLABORATION_EVENTS_WEBHOOK_URL;
+  if (!webhookUrl) {
+    return { delivered: false, reason: "not_configured" };
+  }
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        eventType: "COLLABORATION_MESSAGE_CREATED",
+        payload,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+
+    return { delivered: response.ok, statusCode: response.status };
+  } catch (error) {
+    console.error("Collaboration message webhook error:", error);
+    return { delivered: false, reason: "request_failed" };
+  }
+}
+
 // GET - List messages for a collaboration request
 export async function GET(req: NextRequest) {
   try {
@@ -109,7 +133,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // TODO: Send real-time notification via WebSocket
+    await emitCollaborationMessageEvent({
+      requestId,
+      messageId: message.id,
+      senderId: session.user.id,
+      messageType: message.messageType,
+    });
 
     return NextResponse.json({
       success: true,

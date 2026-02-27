@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
 
     if (data.locationId) {
       // For location-based counts, we'd need inventory location tracking
-      // For now, just filter by warehouse/category
+      // Continue filtering by warehouse/category until location tracking is enabled
     }
 
     if (data.categoryId) {

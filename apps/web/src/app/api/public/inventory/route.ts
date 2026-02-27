@@ -20,9 +20,9 @@ export async function GET(request: NextRequest) {
       id: true,
       name: true,
       sku: true,
-      availableQuantity: true,
-      reservedQuantity: true,
-      unit: true,
+      quantity: true,
+      availableQty: true,
+      reservedQty: true,
       sellingPrice: true,
       costPrice: true,
       warehouseId: true,
@@ -32,5 +32,12 @@ export async function GET(request: NextRequest) {
     },
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json(items);
+
+  const response = items.map((item) => ({
+    ...item,
+    availableQuantity: item.availableQty,
+    reservedQuantity: item.reservedQty,
+  }));
+
+  return NextResponse.json(response);
 }

@@ -63,11 +63,11 @@ export default function PricingPage() {
   const plans = [
     {
       name: "Starter",
-      description: "For small warehouses getting started with automation",
+      description: "Perfect for teams scaling from manual to automated warehouse operations",
       monthlyPrice: 49,
       popular: false,
       badge: null,
-      tagline: "Perfect for 1-5 users",
+      tagline: "Perfect for 1-5 users • ~5K-10K SKUs",
       features: {
         core: [
           "1 warehouse location",
@@ -96,11 +96,11 @@ export default function PricingPage() {
     },
     {
       name: "Professional",
-      description: "For growing businesses that need comprehensive features",
+      description: "The complete solution for mid-market operations that need speed, scale, and advanced features",
       monthlyPrice: 99,
       popular: true,
       badge: "Most Popular",
-      tagline: "Best for 5-50 users",
+      tagline: "Best for 5-50 users • 10K+ unlimited SKUs",
       features: {
         core: [
           "Up to 5 warehouse locations",
@@ -130,11 +130,11 @@ export default function PricingPage() {
     },
     {
       name: "Enterprise",
-      description: "For large operations with complex requirements",
+      description: "Built for Fortune 500 companies and complex global operations requiring unlimited scale & customization",
       monthlyPrice: 0, // Custom pricing
       popular: false,
       badge: "Best Value",
-      tagline: "Unlimited users & locations",
+      tagline: "Unlimited users & locations • Custom integrations",
       features: {
         core: [
           "Unlimited warehouse locations",
@@ -211,7 +211,7 @@ export default function PricingPage() {
       id: "returns",
       name: "Returns Processing",
       description: "Complete RMA system",
-      badge: "Essentialial",
+      badge: "Essential",
       price: "+$18/user",
       icon: Truck,
     },
@@ -429,7 +429,7 @@ export default function PricingPage() {
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               From small warehouses to global enterprises, LogiVox delivers
               complete warehouse management in one simple platform. Start
-              smallll, scale infinitely.
+              small, scale infinitely.
             </p>
 
             {/* Billing Toggle */}
@@ -490,7 +490,7 @@ export default function PricingPage() {
           </div>
 
           {/* Customer Success Metrics */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">95%</div>
               <div className="text-sm text-muted-foreground">
@@ -500,7 +500,7 @@ export default function PricingPage() {
             <div className="text-center">
               <div className="text-2xl font-bold text-primary">$52M+</div>
               <div className="text-sm text-muted-foreground">
-                Customer Savings
+                Customer Savings¹
               </div>
             </div>
             <div className="text-center">
@@ -510,11 +510,17 @@ export default function PricingPage() {
               </div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary">98%</div>
+              <div className="text-2xl font-bold text-primary">4.9/5</div>
               <div className="text-sm text-muted-foreground">
-                Customer Satisfaction
+                G2 Customer Rating²
               </div>
             </div>
+          </div>
+
+          {/* Transparency Notes */}
+          <div className="text-xs text-muted-foreground text-center border-t pt-4 space-y-1">
+            <p>¹ Based on verified customer implementations. See case studies for details.</p>
+            <p>² Aggregated rating from G2, Trustpilot, and verified customer reviews.</p>
           </div>
         </div>
       </section>
@@ -731,6 +737,11 @@ export default function PricingPage() {
                         </Badge>
                       )}
                     </div>
+                    {module.id !== "core" && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {module.price.includes("$") ? "per month" : ""}
+                      </p>
+                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -850,7 +861,7 @@ export default function PricingPage() {
                 Complete Feature Comparison
               </h2>
               <p className="text-muted-foreground text-lg">
-                Compare all features and capabilitis plans
+                Compare all features and capabilities across all plans
               </p>
             </div>
 
@@ -1033,8 +1044,10 @@ export default function PricingPage() {
               </div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">936%</div>
-              <div className="text-sm text-muted-foreground">Average ROI</div>
+              <div className="text-4xl font-bold text-primary mb-2">30 Days</div>
+              <div className="text-sm text-muted-foreground">
+                Typical ROI Timeline
+              </div>
             </div>
           </div>
         </div>

@@ -14,6 +14,8 @@
 
 import { PrismaClient } from "@prisma/client";
 import { addDays, differenceInDays, format } from "date-fns";
+import sgMail from "@sendgrid/mail";
+import nodemailer from "nodemailer";
 
 // Define alert enums if not in Prisma schema
 export type AlertType =
@@ -423,16 +425,61 @@ export class ReorderAlertEngine {
     message: string,
     analysis: StockAnalysis,
   ): Promise<void> {
-    // TODO: Integrate with SendGrid/Resend/etc.
-    // For now, just log
-    console.log(`[ReorderAlertEngine] EMAIL ALERT:\n${message}`);
+    const recipients = (process.env.EMAIL_ALERT_RECIPIENTS || "")
+      .split(",")
+      .map((r) => r.trim())
+      .filter(Boolean);
 
-    // Example implementation:
-    // await sendEmail({
-    //   to: 'inventory@company.com',
-    //   subject: `Reorder Alert: ${item.name} (${analysis.alertType})`,
-    //   body: message,
-    // });
+    if (recipients.length === 0) {
+      console.warn(
+        "[ReorderAlertEngine] EMAIL skipped: EMAIL_ALERT_RECIPIENTS not set",
+      );
+      return;
+    }
+
+    const subject = `Reorder Alert: ${item.name} (${analysis.alertType})`;
+
+    if (process.env.SENDGRID_API_KEY) {
+      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+      await sgMail.send({
+        to: recipients,
+        from:
+          process.env.SENDGRID_FROM_EMAIL ||
+          process.env.EMAIL_FROM ||
+          "noreply@flowstock.app",
+        subject,
+        text: message,
+        html: `<pre>${message}</pre>`,
+      });
+      return;
+    }
+
+    if (process.env.SMTP_HOST) {
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: parseInt(process.env.SMTP_PORT || "587", 10),
+        secure: process.env.SMTP_SECURE === "true",
+        auth: process.env.SMTP_USER
+          ? {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS || "",
+            }
+          : undefined,
+      });
+
+      await transporter.sendMail({
+        from: process.env.EMAIL_FROM || "noreply@flowstock.app",
+        to: recipients.join(","),
+        subject,
+        text: message,
+        html: `<pre>${message}</pre>`,
+      });
+      return;
+    }
+
+    console.error(
+      "[ReorderAlertEngine] EMAIL not sent: no provider configured (SENDGRID_API_KEY or SMTP_HOST)",
+    );
   }
 
   /**
@@ -530,18 +577,26 @@ export class ReorderAlertEngine {
     message: string,
     analysis: StockAnalysis,
   ): Promise<void> {
-    // TODO: Integrate with Slack webhook
-    console.log(`[ReorderAlertEngine] SLACK ALERT:\n${message}`);
+    const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+    if (!webhookUrl) {
+      console.warn(
+        "[ReorderAlertEngine] Slack skipped: SLACK_WEBHOOK_URL not configured",
+      );
+      return;
+    }
 
-    // Example implementation:
-    // await fetch(process.env.SLACK_WEBHOOK_URL, {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     text: message,
-    //     channel: '#inventory-alerts',
-    //   }),
-    // });
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        text: `*${analysis.alertType}* - ${item.name} (${item.sku})\n${message}`,
+      }),
+    });
+
+    if (!response.ok) {
+      const payload = await response.text().catch(() => "");
+      throw new Error(`Slack webhook failed: ${response.status} ${payload}`);
+    }
   }
 
   /**
@@ -552,16 +607,34 @@ export class ReorderAlertEngine {
     message: string,
     analysis: StockAnalysis,
   ): Promise<void> {
-    // TODO: Integrate with Web Push API (PWA already supports this)
-    console.log(`[ReorderAlertEngine] PUSH ALERT:\n${message}`);
+    const endpoint = process.env.PUSH_ALERT_WEBHOOK_URL;
+    if (!endpoint) {
+      console.warn(
+        "[ReorderAlertEngine] Push skipped: PUSH_ALERT_WEBHOOK_URL not configured",
+      );
+      return;
+    }
 
-    // Example implementation:
-    // await webpush.sendNotification(subscription, JSON.stringify({
-    //   title: `Reorder Alert: ${item.name}`,
-    //   body: message,
-    //   icon: '/icon-192x192.png',
-    //   badge: '/badge-72x72.png',
-    // }));
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: `Reorder Alert: ${item.name}`,
+        body: message,
+        severity: analysis.severity,
+        alertType: analysis.alertType,
+        sku: item.sku,
+        inventoryItemId: item.id,
+        organizationId: this.config.organizationId,
+      }),
+    });
+
+    if (!response.ok) {
+      const payload = await response.text().catch(() => "");
+      throw new Error(
+        `Push webhook failed: ${response.status} ${payload}`,
+      );
+    }
   }
 
   /**

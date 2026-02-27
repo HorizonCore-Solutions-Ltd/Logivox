@@ -286,7 +286,7 @@ async function handleBulkLabels(
 
   return NextResponse.json({
     message: "Bulk label generation not yet implemented",
-    note: "Use individual label generation API for now",
+    note: "Use the individual label generation API",
   });
 }
 

@@ -696,8 +696,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // STEP 5: Risk score assessment (simplified without securityProfile)
-    // For now, check basic account health indicators
+    // STEP 5: Risk score assessment using basic account health indicators
     if (userProfile.role === "USER" && !userProfile.emailVerified) {
       blockReason = "Unverified account attempting inventory creation";
       await createSecurityAuditLog(

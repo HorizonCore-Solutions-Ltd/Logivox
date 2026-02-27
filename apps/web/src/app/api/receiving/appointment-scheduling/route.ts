@@ -4,6 +4,29 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
+async function sendAppointmentConfirmation(payload: Record<string, unknown>) {
+  const webhookUrl = process.env.APPOINTMENT_CONFIRMATION_WEBHOOK_URL;
+  if (!webhookUrl) {
+    return { delivered: false, reason: "not_configured" };
+  }
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        type: "APPOINTMENT_CONFIRMED",
+        payload,
+        timestamp: new Date().toISOString(),
+      }),
+    });
+    return { delivered: response.ok, statusCode: response.status };
+  } catch (error) {
+    console.error("Appointment confirmation webhook error:", error);
+    return { delivered: false, reason: "request_failed" };
+  }
+}
+
 // ============================================================================
 // APPOINTMENT SCHEDULING SYSTEM API
 // ============================================================================
@@ -33,18 +56,6 @@ import { z } from "zod";
 // - Zero dock congestion
 // ============================================================================
 
-// Appointment status codes
-const APPOINTMENT_STATUS = {
-  REQUESTED: "Requested",
-  CONFIRMED: "Confirmed",
-  CHECKED_IN: "Checked In",
-  IN_PROGRESS: "In Progress",
-  COMPLETED: "Completed",
-  CANCELLED: "Cancelled",
-  NO_SHOW: "No Show",
-  RESCHEDULED: "Rescheduled",
-} as const;
-
 // Dock door types
 const DOCK_DOOR_TYPES = {
   STANDARD: { name: "Standard", capacity: 4, slotDuration: 30 },
@@ -65,15 +76,6 @@ const CARRIER_TIERS = {
   SILVER: { name: "Silver", priorityScore: 50, advanceBookingDays: 7 },
   BRONZE: { name: "Bronze", priorityScore: 25, advanceBookingDays: 5 },
   STANDARD: { name: "Standard", priorityScore: 10, advanceBookingDays: 3 },
-} as const;
-
-// Time slot configurations
-const TIME_SLOTS = {
-  SLOT_15_MIN: 15,
-  SLOT_30_MIN: 30,
-  SLOT_60_MIN: 60,
-  SLOT_90_MIN: 90,
-  SLOT_120_MIN: 120,
 } as const;
 
 // Validation schemas
@@ -205,19 +207,21 @@ function assignDockDoor(
   appointmentDate: Date,
   duration: number,
 ): number {
-  // Simplified assignment - production would check actual dock availability
-  const dockConfig = DOCK_DOOR_TYPES[dockType];
+  const slotSeed =
+    appointmentDate.getUTCHours() * 60 +
+    appointmentDate.getUTCMinutes() +
+    Math.max(0, Math.round(duration));
 
   if (dockType === "EXPRESS") {
-    return 1 + Math.floor(Math.random() * 2); // Doors 1-2
+    return 1 + (slotSeed % 2); // Doors 1-2
   } else if (dockType === "OVERSIZED") {
-    return 10 + Math.floor(Math.random() * 2); // Doors 10-11
+    return 10 + (slotSeed % 2); // Doors 10-11
   } else if (dockType === "REFRIGERATED") {
-    return 12 + Math.floor(Math.random() * 2); // Doors 12-13
+    return 12 + (slotSeed % 2); // Doors 12-13
   } else if (dockType === "HAZMAT") {
     return 14; // Door 14 only
   } else {
-    return 3 + Math.floor(Math.random() * 7); // Doors 3-9
+    return 3 + (slotSeed % 7); // Doors 3-9
   }
 }
 
@@ -291,7 +295,7 @@ export async function GET(request: NextRequest) {
       const statusCounts = new Map<string, number>();
 
       for (const log of appointmentLogs) {
-        const metadata = log.metadata as any;
+        const metadata = (log.metadata ?? {}) as Record<string, unknown>;
         const action = log.action;
 
         if (action === "APPOINTMENT_BOOKED") {
@@ -395,14 +399,22 @@ export async function GET(request: NextRequest) {
         success: true,
         appointments: appointments.map((apt) => ({
           id: apt.id,
-          appointmentId: (apt.metadata as any)?.appointmentId,
-          carrierName: (apt.metadata as any)?.carrierName,
-          appointmentTime: (apt.metadata as any)?.appointmentTime,
-          dockDoor: (apt.metadata as any)?.dockDoor,
-          status: (apt.metadata as any)?.status,
-          shipmentType: (apt.metadata as any)?.shipmentType,
-          expectedDuration: (apt.metadata as any)?.expectedDuration,
-          contactPhone: (apt.metadata as any)?.contactPhone,
+          appointmentId:
+            ((apt.metadata ?? {}) as Record<string, unknown>).appointmentId,
+          carrierName:
+            ((apt.metadata ?? {}) as Record<string, unknown>).carrierName,
+          appointmentTime:
+            ((apt.metadata ?? {}) as Record<string, unknown>)
+              .appointmentTime,
+          dockDoor: ((apt.metadata ?? {}) as Record<string, unknown>).dockDoor,
+          status: ((apt.metadata ?? {}) as Record<string, unknown>).status,
+          shipmentType:
+            ((apt.metadata ?? {}) as Record<string, unknown>).shipmentType,
+          expectedDuration:
+            ((apt.metadata ?? {}) as Record<string, unknown>)
+              .expectedDuration,
+          contactPhone:
+            ((apt.metadata ?? {}) as Record<string, unknown>).contactPhone,
         })),
       });
     }
@@ -428,7 +440,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({
         success: true,
         appointments: appointments.map((apt) => {
-          const metadata = apt.metadata as any;
+          const metadata = (apt.metadata ?? {}) as Record<string, unknown>;
           return {
             id: apt.id,
             appointmentId: metadata?.appointmentId,
@@ -525,7 +537,19 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        // TODO: Send confirmation email/SMS
+        const confirmationDelivery = await sendAppointmentConfirmation({
+          appointmentId,
+          carrierName: validatedData.carrierName,
+          contactName: validatedData.contactName,
+          contactPhone: validatedData.contactPhone,
+          contactEmail: validatedData.contactEmail,
+          appointmentDate: validatedData.appointmentDate,
+          appointmentTime: validatedData.appointmentTime,
+          dockDoor,
+          dockDoorType: validatedData.dockDoorType,
+          expectedDuration,
+          shipmentType: validatedData.shipmentType,
+        });
 
         return NextResponse.json({
           success: true,
@@ -538,6 +562,7 @@ export async function POST(request: NextRequest) {
             dockDoorType: validatedData.dockDoorType,
             expectedDuration,
             status: "CONFIRMED",
+            confirmationDelivery,
             message:
               "Appointment confirmed! Confirmation sent to " +
               validatedData.contactEmail,
@@ -562,7 +587,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const metadata = appointment.metadata as any;
+        const metadata = (appointment.metadata ?? {}) as Record<string, unknown>;
         const scheduledTime = new Date(metadata.appointmentDateTime);
         const actualArrivalTime = validatedData.actualArrivalTime
           ? new Date(validatedData.actualArrivalTime)
@@ -625,7 +650,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const metadata = appointment.metadata as any;
+        const metadata = (appointment.metadata ?? {}) as Record<string, unknown>;
         const expectedDuration = metadata.expectedDuration || 30;
         const durationDiff = validatedData.actualDuration - expectedDuration;
 
@@ -707,7 +732,7 @@ export async function POST(request: NextRequest) {
         });
 
         const bookedSlots = bookedAppointments.map((apt) => {
-          const metadata = apt.metadata as any;
+          const metadata = (apt.metadata ?? {}) as Record<string, unknown>;
           const startTime = new Date(metadata.appointmentDateTime);
           const duration = metadata.expectedDuration || 30;
           const endTime = new Date(startTime.getTime() + duration * 60000);

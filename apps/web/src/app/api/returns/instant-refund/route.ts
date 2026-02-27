@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 import { instantRefundService } from "@/lib/services/returns/instant-refund-service";
 
 /**
@@ -56,29 +59,75 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
+    const requestedOrgId = searchParams.get("organizationId");
     const status = searchParams.get("status");
 
-    if (!organizationId) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: {
+        organizationMemberships: {
+          where: { isActive: true },
+          include: { organization: true },
+        },
+      },
+    });
+
+    if (!user?.organizationMemberships?.length) {
       return NextResponse.json(
-        { error: "Missing organizationId parameter" },
-        { status: 400 },
+        { error: "No active organization found" },
+        { status: 404 },
       );
     }
 
-    // TODO: Implement database query
-    // const instantRefunds = await prisma.instantRefund.findMany({
-    //   where: {
-    //     organizationId,
-    //     ...(status && { verificationStatus: status }),
-    //   },
-    //   orderBy: { createdAt: 'desc' },
-    // });
+    const allowedOrgIds = new Set(
+      user.organizationMemberships.map((m) => m.organizationId),
+    );
+    const organizationId =
+      requestedOrgId && allowedOrgIds.has(requestedOrgId)
+        ? requestedOrgId
+        : user.organizationMemberships[0].organizationId;
+
+    if (!organizationId) {
+      return NextResponse.json(
+        { error: "Missing organization context" },
+        { status: 403 },
+      );
+    }
+
+    const instantRefunds = await prisma.instantRefund.findMany({
+      where: {
+        organizationId,
+        ...(status ? { verificationStatus: status } : {}),
+      },
+      include: {
+        rma: {
+          select: {
+            id: true,
+            rmaNumber: true,
+            status: true,
+          },
+        },
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+      take: 200,
+    });
 
     return NextResponse.json({
-      instantRefunds: [],
-      message: "Database integration pending",
+      instantRefunds,
+      count: instantRefunds.length,
     });
   } catch (error: any) {
     console.error("Get instant refunds error:", error);

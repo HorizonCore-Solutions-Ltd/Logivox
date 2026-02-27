@@ -223,11 +223,56 @@ function parseASN(
       const asn = JSON.parse(data);
       return { success: true, asn };
     } else if (format === "XML") {
-      // Simplified - production would use XML parser
-      return { success: false, error: "XML parsing not implemented in demo" };
+      // Parse minimal XML ASN using regex (no external dependency needed)
+      // Expected structure: <asn><items><item><sku/><quantity/></item></asn>
+      const parseTag = (tag: string, src: string) => {
+        const m = src.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"));
+        return m ? m[1].trim() : null;
+      };
+      const asnNode = parseTag("asn", data) || data;
+      const itemMatches = [...data.matchAll(/<item[^>]*>([\s\S]*?)<\/item>/gi)];
+      const items = itemMatches.map((m) => ({
+        sku: parseTag("sku", m[1]) || "",
+        quantity: parseInt(parseTag("quantity", m[1]) || "0", 10),
+        batchNumber: parseTag("batchNumber", m[1]) || undefined,
+        expiryDate: parseTag("expiryDate", m[1]) || undefined,
+        unitCost: parseTag("unitCost", m[1])
+          ? parseFloat(parseTag("unitCost", m[1])!)
+          : undefined,
+      }));
+      const asn = {
+        referenceNumber: parseTag("referenceNumber", data),
+        supplierCode: parseTag("supplierCode", data),
+        shipDate: parseTag("shipDate", data),
+        items,
+      };
+      return { success: true, asn };
     } else if (format === "CSV") {
-      // Simplified - production would use CSV parser
-      return { success: false, error: "CSV parsing not implemented in demo" };
+      // Parse CSV ASN: header row with sku,quantity[,batchNumber,expiryDate,unitCost]
+      const lines = data.trim().split(/\r?\n/);
+      if (lines.length < 2) {
+        return { success: false, error: "CSV has no data rows" };
+      }
+      const headers = lines[0].split(",").map((h) => h.trim().toLowerCase());
+      const skuIdx = headers.indexOf("sku");
+      const qtyIdx = headers.indexOf("quantity");
+      if (skuIdx === -1 || qtyIdx === -1) {
+        return { success: false, error: "CSV must have 'sku' and 'quantity' columns" };
+      }
+      const batchIdx = headers.indexOf("batchnumber");
+      const expiryIdx = headers.indexOf("expirydate");
+      const costIdx = headers.indexOf("unitcost");
+      const items = lines.slice(1).map((line) => {
+        const cols = line.split(",").map((c) => c.trim());
+        return {
+          sku: cols[skuIdx] || "",
+          quantity: parseInt(cols[qtyIdx] || "0", 10),
+          batchNumber: batchIdx >= 0 ? cols[batchIdx] || undefined : undefined,
+          expiryDate: expiryIdx >= 0 ? cols[expiryIdx] || undefined : undefined,
+          unitCost: costIdx >= 0 ? parseFloat(cols[costIdx] || "0") : undefined,
+        };
+      });
+      return { success: true, asn: { items } };
     }
     return { success: false, error: "Unsupported format" };
   } catch (error) {
@@ -296,17 +341,17 @@ function assignDockDoor(
   estimatedDuration: number,
   carrierType: string,
 ): number {
-  // Simplified dock assignment - production would check actual dock schedule
-  // Dock doors 1-5: LTL/Parcel
-  // Dock doors 6-10: FTL
-  // Dock doors 11-12: Intermodal
+  const slotSeed =
+    scheduledArrival.getUTCHours() * 60 +
+    scheduledArrival.getUTCMinutes() +
+    Math.max(0, Math.round(estimatedDuration));
 
   if (carrierType === "FTL") {
-    return 6 + Math.floor(Math.random() * 5);
+    return 6 + (slotSeed % 5);
   } else if (carrierType === "INTERMODAL") {
-    return 11 + Math.floor(Math.random() * 2);
+    return 11 + (slotSeed % 2);
   } else {
-    return 1 + Math.floor(Math.random() * 5);
+    return 1 + (slotSeed % 5);
   }
 }
 
