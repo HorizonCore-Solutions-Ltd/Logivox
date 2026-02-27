@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { z } from "zod";
+import { requireApiAuth } from "@/lib/api-guard";
 
 // ULTRA-STRICT Input validation schema with enterprise constraints
 const createInventorySchema = z.object({
@@ -216,6 +217,10 @@ async function validateOrganizationAccess(
 
 // ULTRA-SECURE GET ENDPOINT - Zero Trust Architecture
 export async function GET(request: NextRequest) {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
   const startTime = Date.now();
   let user: any = null;
   let securityViolation = false;
@@ -570,6 +575,10 @@ export async function GET(request: NextRequest) {
 // POST /api/inventory - Create new inventory item
 // ULTRA-SECURE POST ENDPOINT - Maximum Security Controls
 export async function POST(request: NextRequest) {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
   const startTime = Date.now();
   let user: any = null;
   let validatedData: any = null;

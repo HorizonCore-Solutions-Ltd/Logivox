@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { QualityHoldService } from "@/lib/services/qc/quality-hold-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const hold = await QualityHoldService.getHoldById(params.id);
 
     if (!hold) {
@@ -30,6 +34,9 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
     const { action, ...data } = body;
 

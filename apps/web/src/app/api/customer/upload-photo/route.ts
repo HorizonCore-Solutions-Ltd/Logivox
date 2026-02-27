@@ -7,9 +7,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { prisma } from "@/lib/prisma";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const formData = await req.formData();
     const photo = formData.get("photo") as File;
     const loadSheetId = formData.get("loadSheetId") as string;

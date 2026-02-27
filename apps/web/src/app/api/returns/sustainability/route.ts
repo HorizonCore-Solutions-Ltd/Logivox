@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sustainabilityService } from "@/lib/services/returns/sustainability-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/sustainability/report
@@ -7,6 +8,10 @@ import { sustainabilityService } from "@/lib/services/returns/sustainability-ser
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { rmaId, organizationId, reportType, periodStart, periodEnd } = body;
 
@@ -63,9 +68,12 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
     const sku = searchParams.get("sku");
-    const organizationId = searchParams.get("organizationId");
 
     if (!sku || !organizationId) {
       return NextResponse.json(

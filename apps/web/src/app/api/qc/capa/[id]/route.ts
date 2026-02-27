@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CAPAService } from "@/lib/services/qc/capa-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const capa = await CAPAService.getCAPIById(params.id);
 
     if (!capa) {
@@ -27,6 +31,9 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
     const { action, ...data } = body;
 

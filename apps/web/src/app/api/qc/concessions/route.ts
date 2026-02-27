@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import vendorConcessionService from "@/lib/services/qc/vendor-concession-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/concessions
@@ -7,8 +8,11 @@ import vendorConcessionService from "@/lib/services/qc/vendor-concession-service
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get("organizationId");
     const vendorId = searchParams.get("vendorId");
     const status = searchParams.get("status");
     const concessionType = searchParams.get("concessionType");
@@ -43,6 +47,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const concession = await vendorConcessionService.createConcession({

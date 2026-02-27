@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SamplingPlanService } from "@/lib/services/qc/sampling-plan-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
     const status = searchParams.get("status") || undefined;
     const targetType = searchParams.get("targetType") || undefined;
     const targetId = searchParams.get("targetId") || undefined;
@@ -36,6 +40,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const plan = await SamplingPlanService.createPlan(body);

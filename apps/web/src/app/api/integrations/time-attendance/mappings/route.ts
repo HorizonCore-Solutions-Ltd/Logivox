@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import prisma from "@/lib/prisma";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
@@ -14,9 +15,12 @@ const upsertSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
   const { searchParams } = new URL(req.url);
   const provider = searchParams.get("provider") || undefined;
-  const organizationId = searchParams.get("organizationId") || undefined;
 
   const mappings = await prisma.timeAttendanceMapping.findMany({
     where: {
@@ -31,6 +35,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const parsed = upsertSchema.safeParse(body);
 

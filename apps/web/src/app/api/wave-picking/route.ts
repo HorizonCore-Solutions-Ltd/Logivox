@@ -5,12 +5,17 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { WavePickingService } from "@/lib/services/wave-picking.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 // GET - Get wave details or performance metrics
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
 
@@ -28,7 +33,6 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(wave);
 
       case "performance":
-        const organizationId = searchParams.get("organizationId");
         const startDate = searchParams.get("startDate");
         const endDate = searchParams.get("endDate");
 
@@ -65,6 +69,10 @@ export async function GET(req: NextRequest) {
 // POST - Create wave, release, optimize, or record picks
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const { action } = body;
 

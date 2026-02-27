@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { returnAggregationService } from "@/lib/services/returns/return-aggregation-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/aggregation
@@ -7,6 +8,10 @@ import { returnAggregationService } from "@/lib/services/returns/return-aggregat
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { customerId, organizationId, rmaIds } = body;
 
@@ -58,9 +63,12 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
     const customerId = searchParams.get("customerId");
-    const organizationId = searchParams.get("organizationId");
 
     if (!customerId || !organizationId) {
       return NextResponse.json(

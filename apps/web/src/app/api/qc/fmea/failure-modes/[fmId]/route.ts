@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { requireApiAuth } from "@/lib/api-guard";
 
 const prisma = new PrismaClient();
 
@@ -9,6 +10,9 @@ export async function PUT(
   { params }: { params: { fmId: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await req.json();
     const {
       processStep,
@@ -131,6 +135,9 @@ export async function DELETE(
   { params }: { params: { fmId: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     await prisma.fMEAFailureMode.delete({
       where: { id: params.fmId },
     });

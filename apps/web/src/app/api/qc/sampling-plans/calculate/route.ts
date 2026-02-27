@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SamplingPlanService } from "@/lib/services/qc/sampling-plan-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const {
       lotSize,

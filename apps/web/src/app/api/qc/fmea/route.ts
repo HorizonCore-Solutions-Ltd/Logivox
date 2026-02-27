@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { requireApiAuth } from "@/lib/api-guard";
 
 const prisma = new PrismaClient();
 
 // GET /api/qc/fmea - List all FMEAs
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
     const status = searchParams.get("status");
@@ -42,6 +47,10 @@ export async function GET(req: NextRequest) {
 // POST /api/qc/fmea - Create new FMEA
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const {
       title,

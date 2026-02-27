@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import AuditService from "@/lib/services/audit.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/audits/metrics
@@ -7,8 +8,11 @@ import AuditService from "@/lib/services/audit.service";
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId") || "org-1";
     const startDate = searchParams.get("startDate")
       ? new Date(searchParams.get("startDate")!)
       : undefined;

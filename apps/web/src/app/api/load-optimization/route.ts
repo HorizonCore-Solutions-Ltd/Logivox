@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { loadOptimizationService } from "@/lib/services/load-optimization-service";
 import { requireAuth } from "@/lib/auth";
 import { z } from "zod";
+import { requireApiAuth } from "@/lib/api-guard";
 
 // ============================================================================
 // REQUEST VALIDATION SCHEMAS
@@ -53,6 +54,10 @@ const vehicleRecommendationSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const user = await requireAuth(req);
     const body = await req.json();
 

@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { syncPunches } from "@/lib/integrations/time-attendance/service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const { startDate, endDate, locationExternalId } = body;
 

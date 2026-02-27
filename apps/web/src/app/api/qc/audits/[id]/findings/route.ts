@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import AuditService from "@/lib/services/audit.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/qc/audits/[id]/findings
@@ -10,6 +11,9 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
 
     const finding = await AuditService.addFinding({

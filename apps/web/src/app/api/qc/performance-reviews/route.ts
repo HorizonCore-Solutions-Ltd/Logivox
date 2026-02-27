@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import supplierPerformanceReviewService from "@/lib/services/qc/supplier-performance-review-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/performance-reviews
@@ -7,8 +8,11 @@ import supplierPerformanceReviewService from "@/lib/services/qc/supplier-perform
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get("organizationId");
     const vendorId = searchParams.get("vendorId");
     const status = searchParams.get("status");
 
@@ -41,6 +45,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const review = await supplierPerformanceReviewService.createReview({

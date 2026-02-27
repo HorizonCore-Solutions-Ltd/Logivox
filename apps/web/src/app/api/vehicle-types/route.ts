@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import {
+import { requireApiAuth } from "@/lib/api-guard";
   getAllVehicleTypes,
   getVehicleTypesByRegion,
   recommendVehicle,
@@ -22,6 +23,10 @@ import {
 
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const region = searchParams.get("region") as VehicleType["region"] | null;
 
@@ -50,6 +55,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
 
     const {
@@ -123,6 +132,10 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const vehicleType: VehicleType = body;
 

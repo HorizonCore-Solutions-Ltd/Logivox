@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { requireApiAuth } from "@/lib/api-guard";
 
 const prisma = new PrismaClient();
 
 // GET /api/qc/analytics/trends - Get trend data for charts
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const period = parseInt(searchParams.get("period") || "30");
 

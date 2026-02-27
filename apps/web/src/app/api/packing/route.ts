@@ -6,12 +6,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PackingService } from "@/lib/services/packing.service";
 import { prisma } from "@/lib/prisma";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 // GET - Get pack details or packer metrics
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
 
@@ -74,6 +79,10 @@ export async function GET(req: NextRequest) {
 // POST - Create pack, cartonize, start/complete packing
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const { action } = body;
 

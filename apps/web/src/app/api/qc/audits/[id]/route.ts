@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import AuditService from "@/lib/services/audit.service";
 import { PrismaClient } from "@prisma/client";
+import { requireApiAuth } from "@/lib/api-guard";
 
 const prisma = new PrismaClient();
 
@@ -13,6 +14,9 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const audit = await prisma.audit.findUnique({
       where: { id: params.id },
       include: {
@@ -50,6 +54,9 @@ export async function PUT(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
 
     const audit = await AuditService.updateAuditStatus(
@@ -80,6 +87,9 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     await prisma.audit.delete({
       where: { id: params.id },
     });

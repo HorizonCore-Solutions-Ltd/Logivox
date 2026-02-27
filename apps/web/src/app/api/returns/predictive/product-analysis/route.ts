@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enhancedPredictiveService } from "@/lib/services/returns/enhanced-predictive-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/returns/predictive/product-analysis?sku=xxx&organizationId=xxx
@@ -7,9 +8,12 @@ import { enhancedPredictiveService } from "@/lib/services/returns/enhanced-predi
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
     const sku = searchParams.get("sku");
-    const organizationId = searchParams.get("organizationId");
 
     if (!sku || !organizationId) {
       return NextResponse.json(

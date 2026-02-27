@@ -37,12 +37,22 @@ export async function POST(request: Request) {
       signature,
     } = body;
 
-    // Verify NCR belongs to supplier
+    // Resolve organizationId from supplier record — enforces tenant isolation
+    const supplier = await prisma.supplier.findUnique({
+      where: { id: decoded.supplierId },
+      select: { organizationId: true },
+    });
+    if (!supplier) {
+      return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+    }
+    const organizationId = supplier.organizationId;
+
+    // Verify NCR belongs to supplier AND same org
     const ncr = await prisma.nonConformanceReport.findUnique({
       where: { id: ncrId },
     });
 
-    if (!ncr || ncr.supplierId !== decoded.supplierId) {
+    if (!ncr || ncr.supplierId !== decoded.supplierId || ncr.organizationId !== organizationId) {
       return NextResponse.json(
         { error: "Unauthorized access to NCR" },
         { status: 403 },

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { qrReturnService } from "@/lib/services/returns/qr-return-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/qr-code
@@ -7,6 +8,10 @@ import { qrReturnService } from "@/lib/services/returns/qr-return-service";
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { rmaId, organizationId } = body;
 

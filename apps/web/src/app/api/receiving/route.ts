@@ -5,15 +5,19 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { ReceivingService } from "@/lib/services/receiving.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 // GET - Get GRNs or receiving statistics
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
-    const organizationId = searchParams.get("organizationId");
     const warehouseId = searchParams.get("warehouseId");
 
     if (!organizationId) {
@@ -74,6 +78,10 @@ export async function GET(req: NextRequest) {
 // POST - Create GRN, perform QC, complete put-away, or process ASN
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const { action } = body;
 

@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { NCRService } from "@/lib/services/qc/ncr-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
     const status = searchParams.get("status") || undefined;
     const supplierId = searchParams.get("supplierId") || undefined;
     const startDate = searchParams.get("startDate")
@@ -40,6 +44,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const ncr = await NCRService.createNCR(body);

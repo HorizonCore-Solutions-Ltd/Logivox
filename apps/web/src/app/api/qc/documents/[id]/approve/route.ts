@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import DocumentService from "@/lib/services/document.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/qc/documents/[id]/approve
@@ -10,6 +11,9 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
 
     const document = await DocumentService.approveDocument(

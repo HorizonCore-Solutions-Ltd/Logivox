@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import SupplierQualityService from "@/lib/services/qc/supplier-quality-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
     const supplierId = searchParams.get("supplierId");
     const action = searchParams.get("action");
 
@@ -65,6 +69,10 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { action, organizationId, supplierId } = body;
 

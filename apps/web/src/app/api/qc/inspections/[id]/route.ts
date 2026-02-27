@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import QCInspectionService from "@/lib/services/qc/inspection-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(
   request: Request,
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const inspection = await QCInspectionService.getInspectionById(params.id);
 
     if (!inspection) {
@@ -27,6 +31,9 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
     const { action, userId } = body;
 

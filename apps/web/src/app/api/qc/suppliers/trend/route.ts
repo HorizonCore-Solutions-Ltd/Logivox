@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import SupplierScorecardService from "@/lib/services/supplier-scorecard.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/suppliers/trend
@@ -7,6 +8,10 @@ import SupplierScorecardService from "@/lib/services/supplier-scorecard.service"
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
 
     const supplierId = searchParams.get("supplierId");

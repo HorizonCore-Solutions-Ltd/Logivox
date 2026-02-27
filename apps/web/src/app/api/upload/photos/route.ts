@@ -3,9 +3,14 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
 import crypto from "crypto";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
 

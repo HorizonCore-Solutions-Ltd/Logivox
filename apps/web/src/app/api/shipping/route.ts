@@ -6,12 +6,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ShippingService } from "@/lib/services/shipping.service";
 import { prisma } from "@/lib/prisma";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 // GET - Get shipment details, rates, or tracking
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const action = searchParams.get("action");
 
@@ -45,7 +50,6 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(tracking);
 
       case "performance":
-        const organizationId = searchParams.get("organizationId");
         const startDate = searchParams.get("startDate");
         const endDate = searchParams.get("endDate");
 
@@ -82,6 +86,10 @@ export async function GET(req: NextRequest) {
 // POST - Create shipment, get rates, or generate label
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await req.json();
     const { action } = body;
 

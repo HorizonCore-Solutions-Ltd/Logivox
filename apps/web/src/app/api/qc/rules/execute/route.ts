@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import EscalationEngine from "@/lib/engines/escalation.engine";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/qc/rules/execute
@@ -7,6 +8,10 @@ import EscalationEngine from "@/lib/engines/escalation.engine";
  */
 export async function POST(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     await EscalationEngine.runAllRules();
 
     return NextResponse.json({
@@ -27,6 +32,10 @@ export async function POST(request: Request) {
  * Get escalation rule status
  */
 export async function GET(request: Request) {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
   return NextResponse.json({
     success: true,
     data: {

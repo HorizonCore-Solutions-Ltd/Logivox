@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CAPAService } from "@/lib/services/qc/capa-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
 
     if (!organizationId) {
       return NextResponse.json(

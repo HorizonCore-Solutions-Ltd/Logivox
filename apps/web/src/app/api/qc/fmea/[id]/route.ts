@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { requireApiAuth } from "@/lib/api-guard";
 
 const prisma = new PrismaClient();
 
@@ -9,6 +10,9 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const fmea = await prisma.fMEA.findUnique({
       where: { id: params.id },
       include: {
@@ -42,6 +46,9 @@ export async function PUT(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await req.json();
     const { title, scope, teamLead, teamMembers, status, lastReviewDate } =
       body;
@@ -77,6 +84,9 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     // Delete all failure modes first
     await prisma.fMEAFailureMode.deleteMany({
       where: { fmeaId: params.id },

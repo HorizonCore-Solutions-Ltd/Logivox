@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import debitMemoService from "@/lib/services/qc/debit-memo-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/debit-memos
@@ -7,8 +8,11 @@ import debitMemoService from "@/lib/services/qc/debit-memo-service";
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get("organizationId");
     const vendorId = searchParams.get("vendorId");
     const status = searchParams.get("status");
     const reason = searchParams.get("reason");
@@ -47,6 +51,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const debitMemo = await debitMemoService.createDebitMemo({

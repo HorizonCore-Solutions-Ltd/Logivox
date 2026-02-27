@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { SamplingPlanService } from "@/lib/services/qc/sampling-plan-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const plan = await SamplingPlanService.getPlanById(params.id);
 
     if (!plan) {
@@ -30,6 +34,9 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
     const { action, ...data } = body;
 

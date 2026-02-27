@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import FMEAService from "@/lib/services/fmea.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/fmea/analytics
@@ -7,8 +8,11 @@ import FMEAService from "@/lib/services/fmea.service";
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId") || "org-1";
 
     const analytics = await FMEAService.getFMEAAnalytics(organizationId);
 

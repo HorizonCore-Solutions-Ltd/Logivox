@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import DocumentService from "@/lib/services/document.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/documents/metrics
@@ -7,8 +8,11 @@ import DocumentService from "@/lib/services/document.service";
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId") || "org-1";
 
     const metrics = await DocumentService.getDocumentMetrics(organizationId);
 

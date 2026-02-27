@@ -23,6 +23,10 @@ import {
   Brain,
   Smartphone,
   CloudCog,
+  Truck,
+  Bot,
+  Network,
+  Wifi,
 } from "lucide-react";
 
 interface CompetitorData {
@@ -45,6 +49,10 @@ interface CompetitorData {
     customization: boolean | "limited";
     integrations: boolean | "limited";
     multiTenant: boolean | "limited";
+    yardManagement: boolean | "limited";
+    amrRoboticsFleet: boolean | "limited";
+    sortationControl: boolean | "limited";
+    iotSensorIntegration: boolean | "limited";
   };
   pros: string[];
   cons: string[];
@@ -72,6 +80,10 @@ export function CompetitiveComparison() {
         customization: true,
         integrations: true,
         multiTenant: true,
+        yardManagement: true,
+        amrRoboticsFleet: true,
+        sortationControl: true,
+        iotSensorIntegration: true,
       },
       pros: [
         "Revolutionary voice AI technology",
@@ -106,6 +118,10 @@ export function CompetitiveComparison() {
         customization: true,
         integrations: true,
         multiTenant: false,
+        yardManagement: "limited",
+        amrRoboticsFleet: "limited",
+        sortationControl: false,
+        iotSensorIntegration: "limited",
       },
       pros: [
         "Deep ERP integration",
@@ -141,6 +157,10 @@ export function CompetitiveComparison() {
         customization: true,
         integrations: true,
         multiTenant: false,
+        yardManagement: "limited",
+        amrRoboticsFleet: false,
+        sortationControl: false,
+        iotSensorIntegration: false,
       },
       pros: [
         "Mature WMS platform",
@@ -176,6 +196,10 @@ export function CompetitiveComparison() {
         customization: "limited",
         integrations: true,
         multiTenant: "limited",
+        yardManagement: false,
+        amrRoboticsFleet: false,
+        sortationControl: false,
+        iotSensorIntegration: "limited",
       },
       pros: [
         "Strong database foundation",
@@ -211,6 +235,10 @@ export function CompetitiveComparison() {
         customization: "limited",
         integrations: "limited",
         multiTenant: false,
+        yardManagement: false,
+        amrRoboticsFleet: false,
+        sortationControl: false,
+        iotSensorIntegration: false,
       },
       pros: [
         "Lower upfront cost",
@@ -381,6 +409,46 @@ export function CompetitiveComparison() {
                     value={logiVox.features.realTimeAnalytics}
                   />
                 </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Truck className="h-4 w-4" />
+                    Yard Management (YMS)
+                  </span>
+                  <FeatureIcon
+                    feature="yardManagement"
+                    value={logiVox.features.yardManagement}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Bot className="h-4 w-4" />
+                    AMR / Robotics Fleet
+                  </span>
+                  <FeatureIcon
+                    feature="amrRoboticsFleet"
+                    value={logiVox.features.amrRoboticsFleet}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Network className="h-4 w-4" />
+                    Sortation Control
+                  </span>
+                  <FeatureIcon
+                    feature="sortationControl"
+                    value={logiVox.features.sortationControl}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Wifi className="h-4 w-4" />
+                    IoT Sensor Integration
+                  </span>
+                  <FeatureIcon
+                    feature="iotSensorIntegration"
+                    value={logiVox.features.iotSensorIntegration}
+                  />
+                </div>
               </div>
             </div>
 
@@ -491,6 +559,46 @@ export function CompetitiveComparison() {
                   <FeatureIcon
                     feature="realTimeAnalytics"
                     value={competitor.features.realTimeAnalytics}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Truck className="h-4 w-4" />
+                    Yard Management (YMS)
+                  </span>
+                  <FeatureIcon
+                    feature="yardManagement"
+                    value={competitor.features.yardManagement}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Bot className="h-4 w-4" />
+                    AMR / Robotics Fleet
+                  </span>
+                  <FeatureIcon
+                    feature="amrRoboticsFleet"
+                    value={competitor.features.amrRoboticsFleet}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Network className="h-4 w-4" />
+                    Sortation Control
+                  </span>
+                  <FeatureIcon
+                    feature="sortationControl"
+                    value={competitor.features.sortationControl}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-2 text-sm">
+                    <Wifi className="h-4 w-4" />
+                    IoT Sensor Integration
+                  </span>
+                  <FeatureIcon
+                    feature="iotSensorIntegration"
+                    value={competitor.features.iotSensorIntegration}
                   />
                 </div>
               </div>

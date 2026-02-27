@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import PDFDocument from "pdfkit";
 import { prisma } from "@/lib/prisma";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const { id } = params;
     const { searchParams } = new URL(request.url);
     const type = searchParams.get("type") || "ncr";

@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   Zap,
   Phone,
+  Cpu,
 } from "lucide-react";
 
 export default function HelpCenterPage() {
@@ -48,8 +49,15 @@ export default function HelpCenterPage() {
       icon: Zap,
       title: "Features & Functionality",
       description: "Learn how to use core features",
-      articles: 58,
+      articles: 74,
       href: "/help/features",
+    },
+    {
+      icon: Cpu,
+      title: "Next-Gen WMS Intelligence",
+      description: "Yard Management, Robotics, IoT & AI modules",
+      articles: 18,
+      href: "/help/advanced-features",
     },
     {
       icon: FileText,
@@ -90,6 +98,15 @@ export default function HelpCenterPage() {
     "Understanding inventory valuation methods",
     "Configuring shipping carrier integrations",
     "Mobile app setup and usage",
+    // Next-Gen WMS
+    "How does the Yard Management gate check-in work?",
+    "Setting up shunter dispatch and yard map locations",
+    "AMR Fleet: connecting your first robot device",
+    "Understanding sortation throughput charts and alerts",
+    "Configuring IoT temperature and humidity thresholds",
+    "RFID portal integration — reader setup and scan monitoring",
+    "Labor heatmap: reading the floor productivity view",
+    "Task interleaving — how wave dead-heading is eliminated",
   ];
 
   const supportOptions = [

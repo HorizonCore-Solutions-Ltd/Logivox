@@ -39,10 +39,21 @@ export async function GET(request: Request) {
       );
     }
 
+    // Resolve organizationId from supplier record — enforces tenant isolation
+    const supplier = await prisma.supplier.findUnique({
+      where: { id: supplierId },
+      select: { organizationId: true },
+    });
+    if (!supplier) {
+      return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+    }
+    const organizationId = supplier.organizationId;
+
     // Get open NCRs count
     const openNCRs = await prisma.nonConformanceReport.count({
       where: {
         supplierId,
+        organizationId,
         status: {
           in: ["OPEN", "INVESTIGATING", "ACTION_PENDING"],
         },
@@ -53,6 +64,7 @@ export async function GET(request: Request) {
     const pendingResponses = await prisma.nonConformanceReport.count({
       where: {
         supplierId,
+        organizationId,
         status: {
           in: ["OPEN", "INVESTIGATING"],
         },
@@ -64,7 +76,7 @@ export async function GET(request: Request) {
 
     // Get recent NCRs
     const recentNCRs = await prisma.nonConformanceReport.findMany({
-      where: { supplierId },
+      where: { supplierId, organizationId },
       orderBy: { reportDate: "desc" },
       take: 5,
       select: {
@@ -81,6 +93,7 @@ export async function GET(request: Request) {
     const totalNCRs = await prisma.nonConformanceReport.count({
       where: {
         supplierId,
+        organizationId,
         reportDate: {
           gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // Last 90 days
         },
@@ -90,6 +103,7 @@ export async function GET(request: Request) {
     const closedNCRs = await prisma.nonConformanceReport.count({
       where: {
         supplierId,
+        organizationId,
         status: "CLOSED",
         reportDate: {
           gte: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
@@ -101,6 +115,7 @@ export async function GET(request: Request) {
     const criticalNCRs = await prisma.nonConformanceReport.count({
       where: {
         supplierId,
+        organizationId,
         severity: "CRITICAL",
         status: {
           not: "CLOSED",

@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import QCInspectionService from "@/lib/services/qc/inspection-service";
 import RTVService from "@/lib/services/qc/rtv-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
     const type = searchParams.get("type");
     const days = parseInt(searchParams.get("days") || "30");
 

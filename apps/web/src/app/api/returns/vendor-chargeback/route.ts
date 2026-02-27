@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { vendorChargebackService } from "@/lib/services/returns/vendor-chargeback-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/vendor-chargeback
@@ -7,6 +8,10 @@ import { vendorChargebackService } from "@/lib/services/returns/vendor-chargebac
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { organizationId, supplierId, sku, periodStart, periodEnd } = body;
 
@@ -53,8 +58,11 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
     const status = searchParams.get("status");
 
     if (!organizationId) {

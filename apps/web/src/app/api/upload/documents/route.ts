@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/upload/documents
@@ -9,6 +10,10 @@ import { existsSync } from "fs";
  */
 export async function POST(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
 

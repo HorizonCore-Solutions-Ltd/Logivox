@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { CAPAService } from "@/lib/services/qc/capa-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
     const status = searchParams.get("status") as any;
     const capaType = searchParams.get("capaType") as any;
     const startDate = searchParams.get("startDate")
@@ -38,6 +42,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const capa = await CAPAService.createCAPA(body);

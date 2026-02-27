@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { qrReturnService } from "@/lib/services/returns/qr-return-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/returns/qr-code/drop-off-locations?zip=xxxxx&carrier=UPS&radius=25
@@ -7,6 +8,10 @@ import { qrReturnService } from "@/lib/services/returns/qr-return-service";
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
     const zip = searchParams.get("zip");
     const carrier = searchParams.get("carrier");

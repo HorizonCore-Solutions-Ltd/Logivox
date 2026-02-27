@@ -5,15 +5,19 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { ReportingService } from "@/lib/services/reporting.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 // GET - Generate various reports
 export async function GET(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(req.url);
     const reportType = searchParams.get("type");
-    const organizationId = searchParams.get("organizationId");
 
     if (!organizationId) {
       return NextResponse.json(

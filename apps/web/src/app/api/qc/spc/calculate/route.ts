@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import SPCService from "@/lib/services/spc.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/spc/calculate
@@ -7,6 +8,10 @@ import SPCService from "@/lib/services/spc.service";
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
 
     const measurementType = searchParams.get("measurementType");
@@ -63,6 +68,10 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { values, lsl, usl } = body;
 

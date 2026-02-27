@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import AuditService from "@/lib/services/audit.service";
 import { PrismaClient } from "@prisma/client";
+import { requireApiAuth } from "@/lib/api-guard";
 
 const prisma = new PrismaClient();
 
@@ -10,8 +11,11 @@ const prisma = new PrismaClient();
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId") || "org-1";
 
     const audits = await prisma.audit.findMany({
       where: { organizationId },
@@ -40,6 +44,10 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const audit = await prisma.audit.create({

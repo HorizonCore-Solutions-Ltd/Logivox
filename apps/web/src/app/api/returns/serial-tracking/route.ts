@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { serialTrackingService } from "@/lib/services/returns/serial-tracking-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/serial-tracking/validate
@@ -7,6 +8,10 @@ import { serialTrackingService } from "@/lib/services/returns/serial-tracking-se
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { rmaId, serialNumber, sku, organizationId } = body;
 
@@ -43,9 +48,12 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
     const serialNumber = searchParams.get("serialNumber");
-    const organizationId = searchParams.get("organizationId");
 
     if (!serialNumber || !organizationId) {
       return NextResponse.json(

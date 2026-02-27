@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enhancedPredictiveService } from "@/lib/services/returns/enhanced-predictive-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/predictive/prevention-dashboard
@@ -7,6 +8,10 @@ import { enhancedPredictiveService } from "@/lib/services/returns/enhanced-predi
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { organizationId, periodStart, periodEnd } = body;
 

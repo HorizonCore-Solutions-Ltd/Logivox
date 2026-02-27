@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { QualityReportService } from "@/lib/services/qc/quality-report-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get("organizationId");
     const reportType = searchParams.get("reportType") as any;
     const reportCategory = searchParams.get("reportCategory") as any;
     const startDate = searchParams.get("startDate")
@@ -40,6 +44,10 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const report = await QualityReportService.createReport(body);

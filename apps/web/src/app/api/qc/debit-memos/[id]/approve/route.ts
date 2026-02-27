@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import debitMemoService from "@/lib/services/qc/debit-memo-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/qc/debit-memos/[id]/approve
@@ -10,6 +11,9 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const body = await request.json();
 
     const debitMemo = await debitMemoService.approveDebitMemo({

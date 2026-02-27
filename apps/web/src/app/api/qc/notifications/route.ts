@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import nodemailer from "nodemailer";
+import { requireApiAuth } from "@/lib/api-guard";
 
 // Email configuration
 const transporter = nodemailer.createTransport({
@@ -15,6 +16,10 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const { type, id, recipients } = body;
 
@@ -209,6 +214,10 @@ function generateHoldReleasedEmail(hold: any): string {
 // Cron job endpoint to check for overdue CAPAs
 export async function GET() {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const overdueCAPAs = await prisma.correctivePreventiveAction.findMany({
       where: {
         targetCompletionDate: {

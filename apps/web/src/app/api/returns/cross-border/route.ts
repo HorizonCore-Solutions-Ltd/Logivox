@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { crossBorderService } from "@/lib/services/returns/cross-border-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/cross-border/routing
@@ -7,6 +8,10 @@ import { crossBorderService } from "@/lib/services/returns/cross-border-service"
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
     const {
       rmaId,
@@ -52,6 +57,10 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const { searchParams } = new URL(request.url);
     const countryCode = searchParams.get("countryCode");
 

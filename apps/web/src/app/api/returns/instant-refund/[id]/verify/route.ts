@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { instantRefundService } from "@/lib/services/returns/instant-refund-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/instant-refund/[id]/verify

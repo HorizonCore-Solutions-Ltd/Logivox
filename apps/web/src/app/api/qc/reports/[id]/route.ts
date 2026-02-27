@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { QualityReportService } from "@/lib/services/qc/quality-report-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
     const report = await QualityReportService.getReportById(params.id);
 
     if (!report) {

@@ -197,6 +197,40 @@ export default function BlogPage() {
       readTime: "10 min read",
       category: "Operations",
     },
+    {
+      slug: "enterprise-yard-management-detention-fees",
+      title: "Integrated Yard Management: How LogiVox Eliminates Detention Fees for Good",
+      excerpt:
+        "A deep dive into how our live yard map, automated gate check-in, and AI-driven shunter dispatch work together to eliminate truck dwell time and detention charges — with real customer numbers.",
+      author: "LogiVox Product Team",
+      date: "2026-02-27",
+      readTime: "11 min read",
+      category: "Operations",
+      trending: true,
+      featured: true,
+    },
+    {
+      slug: "amr-fleet-ai-dispatch-warehouse",
+      title: "Robots in the Warehouse: Inside Our AMR Fleet Orchestration & AI Dispatch",
+      excerpt:
+        "How LogiVox matches queued tasks to the best available robot using battery level, device type, and real-time location — and why that matters for throughput at scale.",
+      author: "LogiVox Engineering",
+      date: "2026-02-27",
+      readTime: "9 min read",
+      category: "AI & ML",
+      trending: true,
+    },
+    {
+      slug: "iot-automation-sortation-smart-warehouse",
+      title: "The Complete IoT & Automation Playbook: Sensors, Sortation, and Smart Warehousing",
+      excerpt:
+        "How environmental sensors, RFID portals, cross-belt sorters, and AS/RS cranes connect to form a self-monitoring, self-optimising warehouse — and how LogiVox ties it all together.",
+      author: "LogiVox Platform Team",
+      date: "2026-02-27",
+      readTime: "13 min read",
+      category: "Technology",
+      trending: true,
+    },
   ];
 
   const filteredPosts = blogPosts.filter((post) => {

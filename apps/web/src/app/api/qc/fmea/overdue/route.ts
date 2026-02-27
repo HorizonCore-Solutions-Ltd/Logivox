@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import FMEAService from "@/lib/services/fmea.service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/fmea/overdue
@@ -7,6 +8,10 @@ import FMEAService from "@/lib/services/fmea.service";
  */
 export async function GET(request: Request) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const overdueActions = await FMEAService.getFailureModesDueForAction();
 
     return NextResponse.json({

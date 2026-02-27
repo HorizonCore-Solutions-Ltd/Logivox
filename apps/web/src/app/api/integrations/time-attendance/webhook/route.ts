@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { handleWebhook } from "@/lib/integrations/time-attendance/service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const rawBody = await req.text();
     const payload = rawBody ? JSON.parse(rawBody) : {};
     const result = await handleWebhook(

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import vendorComplianceService from "@/lib/services/qc/vendor-compliance-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * GET /api/qc/compliance-checks
@@ -7,8 +8,11 @@ import vendorComplianceService from "@/lib/services/qc/vendor-compliance-service
  */
 export async function GET(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const searchParams = request.nextUrl.searchParams;
-    const organizationId = searchParams.get("organizationId");
     const vendorId = searchParams.get("vendorId");
     const checkType = searchParams.get("checkType");
 
@@ -41,6 +45,10 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const auth = await requireApiAuth();
+    if ("error" in auth) return auth.error;
+    const { organizationId } = auth;
+
     const body = await request.json();
 
     const check = await vendorComplianceService.createCheck({

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { vendorChargebackService } from "@/lib/services/returns/vendor-chargeback-service";
+import { requireApiAuth } from "@/lib/api-guard";
 
 /**
  * POST /api/returns/vendor-chargeback/[id]/dispute

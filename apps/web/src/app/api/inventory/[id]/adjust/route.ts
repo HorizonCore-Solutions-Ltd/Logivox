@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth-helpers";
+import { requireApiAuth } from "@/lib/api-guard";
 
 // POST /api/inventory/[id]/adjust - Adjust inventory quantity
 export async function POST(
