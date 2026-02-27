@@ -5,6 +5,7 @@
 **Q: How is LogiVox different from other WMS platforms?**
 
 A: LogiVox combines three differentiators:
+
 1. **Voice-first operations**: Built for hands-free, voice-guided picking, receiving, and cycle counting with 75% faster onboarding and 99.9% accuracy.
 2. **True multi-tenant architecture**: Complete data isolation via Postgres RLS; no cross-tenant data leaks; built to scale (not bolted on).
 3. **Unified platform**: Inventory, picking, shipping, returns, quality, analytics all in one system—no integration nightmare.
@@ -14,6 +15,7 @@ Compared to legacy WMS (SAP, Kinaxis): We implement in weeks, not months. Compar
 **Q: Can LogiVox work for my specific industry?**
 
 A: We support:
+
 - Retail/e-commerce (high-volume picking, multi-channel shipping)
 - 3PL/logistics (multi-tenant, cost-per-order optimisation)
 - Pharma (DSCSA/SECURPHARM, cold-chain, recalls in minutes)
@@ -28,7 +30,8 @@ A: We are cloud-first (AWS). On-premises is on our roadmap for H2 2027 (enterpri
 
 **Q: What's your uptime SLA?**
 
-A: 
+A:
+
 - **Professional tier**: 99.5% (47 min downtime/month acceptable)
 - **Enterprise tier**: 99.9% (4 min downtime/month); documented RTO/RPO; financial credits for breaches
 - Our current status: 99.8% (2025 annualised). We're targeting 99.9% by Q2 2026.
@@ -40,6 +43,7 @@ A:
 **Q: How long does implementation take?**
 
 A: Typically 3–4 weeks:
+
 - Week 1: Setup, data migration (inventory, customer master, supplier lists)
 - Week 2: Staff training, pilot location testing
 - Week 3: Go-live with full operations (inventory, picking, shipping)
@@ -49,7 +53,8 @@ For multi-location rollouts, add 1–2 weeks per location.
 
 **Q: What data do I need to bring?**
 
-A: 
+A:
+
 1. **Inventory**: Current stock levels, SKU master (description, UOM, location, tier)
 2. **Customers**: Name, address, ship-to locations, pricing tier
 3. **Suppliers**: Name, contact, lead times, quality metrics
@@ -72,7 +77,8 @@ A: Yes. Most customers pilot one location for 2–4 weeks. Successful pilots lea
 
 **Q: What's the cost difference between Starter, Professional, and Enterprise tiers?**
 
-A: 
+A:
+
 - **Starter**: £200/month per location (5 users); core WMS (inventory, picking, shipping)
 - **Professional**: £600/month per location (25 users); + voice ops, returns, quality, advanced analytics
 - **Enterprise**: Custom pricing (unlimited users, dedicated support, SLA 99.9%, integration priority)
@@ -94,6 +100,7 @@ A: There are no surprise overage fees. Core features are unlimited (transactions
 **Q: Do you offer discounts?**
 
 A: Yes:
+
 - Annual prepayment: 15% discount
 - Multi-year contracts: 20% discount (3-year)
 - Non-profit/charity: 30% discount
@@ -134,6 +141,7 @@ A: Yes. You can export inventory, picks, orders in CSV format anytime via the ad
 **Q: What support is included?**
 
 A:
+
 - **Starter**: Email support (24h response time)
 - **Professional**: Email + phone support (4h response time, business hours)
 - **Enterprise**: 24/7 phone + Slack support; dedicated success manager; 30min response SLA for critical issues
@@ -143,6 +151,7 @@ All tiers include access to our knowledge base and user community.
 **Q: Do you have API documentation?**
 
 A: Yes. Full API docs (283 endpoints) are available at https://docs.logivox.ai. We provide:
+
 - OpenAPI schema
 - Code examples (Python, JavaScript, cURL)
 - Postman collection
@@ -207,13 +216,14 @@ A: We offer a 14-day free trial (full Professional features) on a dedicated test
 
 **Q: What's the typical buying process?**
 
-A: 
+A:
+
 1. Demo or trial
 2. Security & compliance Q&A (if Enterprise)
 3. Proposal & statement of work
 4. MSA signature
 5. Onboarding kicks off
-(Typically 2–4 weeks from first contact to go-live)
+   (Typically 2–4 weeks from first contact to go-live)
 
 **Q: Who do I contact for sales?**
 

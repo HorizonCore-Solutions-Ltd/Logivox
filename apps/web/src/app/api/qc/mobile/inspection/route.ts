@@ -18,7 +18,10 @@ export async function POST(request: NextRequest) {
     });
     const orgId = dbUser?.organizationMemberships?.[0]?.organization?.id;
     if (!orgId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
     const userName = session.user.name || session.user.email || session.user.id;
 

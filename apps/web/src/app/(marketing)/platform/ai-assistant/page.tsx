@@ -146,15 +146,24 @@ export default function AIAssistantPage() {
       <section className="border-b bg-amber-50 dark:bg-amber-950/20 py-4">
         <div className="container-enterprise">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm">
-            <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-400 shrink-0">
+            <Badge
+              variant="outline"
+              className="border-amber-500 text-amber-700 dark:text-amber-400 shrink-0"
+            >
               Setup Required
             </Badge>
             <p className="text-muted-foreground">
               <strong className="text-foreground">Tenant-aware AI</strong> and{" "}
-              <strong className="text-foreground">context-aware intelligence</strong> require an LLM API
-              key (OpenAI or compatible) to be configured. Browser-based pre-sales assistant is
-              available immediately. Full warehouse AI activates once{" "}
-              <code className="bg-muted px-1 rounded text-xs">OPENAI_API_KEY</code> is set.
+              <strong className="text-foreground">
+                context-aware intelligence
+              </strong>{" "}
+              require an LLM API key (OpenAI or compatible) to be configured.
+              Browser-based pre-sales assistant is available immediately. Full
+              warehouse AI activates once{" "}
+              <code className="bg-muted px-1 rounded text-xs">
+                OPENAI_API_KEY
+              </code>{" "}
+              is set.
             </p>
           </div>
         </div>

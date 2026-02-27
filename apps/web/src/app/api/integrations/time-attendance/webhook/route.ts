@@ -8,7 +8,11 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text();
     const payload = rawBody ? JSON.parse(rawBody) : {};
-    const result = await handleWebhook(payload, Object.fromEntries(req.headers.entries()), rawBody);
+    const result = await handleWebhook(
+      payload,
+      Object.fromEntries(req.headers.entries()),
+      rawBody,
+    );
     return NextResponse.json({ status: "ok", result });
   } catch (error: any) {
     const message = error?.message || "Webhook processing failed";

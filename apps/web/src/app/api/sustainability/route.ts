@@ -297,7 +297,10 @@ async function getEnergyConsumption(
       take: 5000,
     });
 
-    const byDate = new Map<string, { consumption: number; renewable: number }>();
+    const byDate = new Map<
+      string,
+      { consumption: number; renewable: number }
+    >();
     logs.forEach((log) => {
       const metadata = (log.metadata ?? {}) as any;
       const date = new Date(log.createdAt).toISOString().split("T")[0];
@@ -392,8 +395,7 @@ async function getWasteMetrics(
       const metadata = (log.metadata ?? {}) as any;
       const type = String(metadata.type || "general").toLowerCase();
       const amount = Number(metadata.amount || 0);
-      const normalizedType =
-        type in breakdown ? type : "general";
+      const normalizedType = type in breakdown ? type : "general";
       breakdown[normalizedType] += amount;
       if (metadata.recycled) recycled += amount;
       else landfill += amount;
@@ -442,41 +444,42 @@ async function generateESGReport(
     const energy = await getEnergyConsumption(warehouseId, startDate, endDate);
     const waste = await getWasteMetrics(warehouseId, startDate, endDate);
 
-    const [employeeCount, safetyIncidents, complianceEvents] = await Promise.all([
-      prisma.organizationMember.count({
-        where: {
-          organizationId: warehouseId,
-          isActive: true,
-        },
-      }),
-      prisma.activityLog.count({
-        where: {
-          organizationId: warehouseId,
-          action: "SAFETY_INCIDENT",
-          ...(startDate || endDate
-            ? {
-                createdAt: {
-                  ...(startDate ? { gte: new Date(startDate) } : {}),
-                  ...(endDate ? { lte: new Date(endDate) } : {}),
-                },
-              }
-            : {}),
-        },
-      }),
-      prisma.auditLog.count({
-        where: {
-          organizationId: warehouseId,
-          ...(startDate || endDate
-            ? {
-                timestamp: {
-                  ...(startDate ? { gte: new Date(startDate) } : {}),
-                  ...(endDate ? { lte: new Date(endDate) } : {}),
-                },
-              }
-            : {}),
-        },
-      }),
-    ]);
+    const [employeeCount, safetyIncidents, complianceEvents] =
+      await Promise.all([
+        prisma.organizationMember.count({
+          where: {
+            organizationId: warehouseId,
+            isActive: true,
+          },
+        }),
+        prisma.activityLog.count({
+          where: {
+            organizationId: warehouseId,
+            action: "SAFETY_INCIDENT",
+            ...(startDate || endDate
+              ? {
+                  createdAt: {
+                    ...(startDate ? { gte: new Date(startDate) } : {}),
+                    ...(endDate ? { lte: new Date(endDate) } : {}),
+                  },
+                }
+              : {}),
+          },
+        }),
+        prisma.auditLog.count({
+          where: {
+            organizationId: warehouseId,
+            ...(startDate || endDate
+              ? {
+                  timestamp: {
+                    ...(startDate ? { gte: new Date(startDate) } : {}),
+                    ...(endDate ? { lte: new Date(endDate) } : {}),
+                  },
+                }
+              : {}),
+          },
+        }),
+      ]);
 
     return {
       environmental: {

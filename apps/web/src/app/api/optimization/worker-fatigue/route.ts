@@ -546,7 +546,9 @@ export async function GET(request: NextRequest) {
             log.action === "WORKER_FATIGUE_MONITOR" &&
             new Date(log.createdAt) >= today,
         );
-        const breakLogs = workerLogs.filter((log) => log.action === "WORKER_BREAK");
+        const breakLogs = workerLogs.filter(
+          (log) => log.action === "WORKER_BREAK",
+        );
 
         const hoursWorked = todayActivities.reduce(
           (sum, log) => sum + Number((log.metadata as any)?.duration || 0),
@@ -560,7 +562,9 @@ export async function GET(request: NextRequest) {
             : hoursWorked;
 
         const taskIntensities = todayActivities.map((log) => {
-          const taskType = (log.metadata as any)?.taskType as string | undefined;
+          const taskType = (log.metadata as any)?.taskType as
+            | string
+            | undefined;
           return taskType ? (taskFactorByType[taskType] ?? 1.0) : 1.0;
         });
         const avgTaskIntensity =

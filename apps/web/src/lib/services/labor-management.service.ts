@@ -23,7 +23,9 @@ export class LaborManagementService {
     startDate: Date;
     endDate: Date;
   }) {
-    const payload = scopedEmployeeSchema.merge(dateRangeSchema).safeParse(input);
+    const payload = scopedEmployeeSchema
+      .merge(dateRangeSchema)
+      .safeParse(input);
 
     if (!payload.success) {
       throw new Error("Invalid productivity metrics request");
@@ -74,7 +76,13 @@ export class LaborManagementService {
         acc.hoursWorked += record.hoursWorked ?? 0;
         return acc;
       },
-      { tasksCompleted: 0, linesProcessed: 0, unitsPicked: 0, unitsPacked: 0, hoursWorked: 0 },
+      {
+        tasksCompleted: 0,
+        linesProcessed: 0,
+        unitsPicked: 0,
+        unitsPacked: 0,
+        hoursWorked: 0,
+      },
     );
 
     return {
@@ -86,7 +94,9 @@ export class LaborManagementService {
         hoursWorked: totals.hoursWorked || hoursWorked,
         unitsPerHour:
           totals.hoursWorked && totals.hoursWorked > 0
-            ? Number((totals.unitsPicked + totals.unitsPacked) / totals.hoursWorked)
+            ? Number(
+                (totals.unitsPicked + totals.unitsPacked) / totals.hoursWorked,
+              )
             : hoursWorked > 0
               ? Number((totals.unitsPicked + totals.unitsPacked) / hoursWorked)
               : null,
@@ -122,7 +132,13 @@ export class LaborManagementService {
     const summary = entries.reduce(
       (acc, entry) => {
         const end = entry.endTime ?? new Date();
-        const hours = entry.duration ?? Math.max(0, (end.getTime() - entry.startTime.getTime()) / 3_600_000 - (entry.breakDuration ?? 0));
+        const hours =
+          entry.duration ??
+          Math.max(
+            0,
+            (end.getTime() - entry.startTime.getTime()) / 3_600_000 -
+              (entry.breakDuration ?? 0),
+          );
         const rate = entry.hourlyRate ?? entry.employee.hourlyRate ?? 0;
         const multiplier = entry.payMultiplier ?? 1;
         const cost = Number(rate) * hours * multiplier;
@@ -193,13 +209,19 @@ export class LaborManagementService {
     // Group by date
     const byDate: Record<
       string,
-      { date: string; clockIn: Date; clockOut: Date | null; hours: number | null }
+      {
+        date: string;
+        clockIn: Date;
+        clockOut: Date | null;
+        hours: number | null;
+      }
     > = {};
 
     for (const entry of entries) {
       const date = entry.startTime.toISOString().split("T")[0] as string;
-      const hours = entry.duration
-        ?? (entry.endTime
+      const hours =
+        entry.duration ??
+        (entry.endTime
           ? Math.max(
               0,
               (entry.endTime.getTime() - entry.startTime.getTime()) /
@@ -209,7 +231,12 @@ export class LaborManagementService {
           : null);
 
       if (!byDate[date]) {
-        byDate[date] = { date, clockIn: entry.startTime, clockOut: entry.endTime ?? null, hours };
+        byDate[date] = {
+          date,
+          clockIn: entry.startTime,
+          clockOut: entry.endTime ?? null,
+          hours,
+        };
       } else {
         if (entry.endTime) byDate[date].clockOut = entry.endTime;
         if (hours !== null) byDate[date].hours = hours;
@@ -217,7 +244,9 @@ export class LaborManagementService {
     }
 
     const days = Object.values(byDate);
-    const daysPresent = days.filter((d) => d.hours !== null && d.hours > 0).length;
+    const daysPresent = days.filter(
+      (d) => d.hours !== null && d.hours > 0,
+    ).length;
     const totalHours = days.reduce((acc, d) => acc + (d.hours ?? 0), 0);
 
     return {
@@ -228,9 +257,7 @@ export class LaborManagementService {
         daysPresent,
         totalHours: Number(totalHours.toFixed(2)),
         averageHoursPerDay:
-          daysPresent > 0
-            ? Number((totalHours / daysPresent).toFixed(2))
-            : 0,
+          daysPresent > 0 ? Number((totalHours / daysPresent).toFixed(2)) : 0,
       },
       days,
     };
@@ -393,9 +420,7 @@ export class LaborManagementService {
         ...(activityType === "LINE_PROCESSED"
           ? { linesProcessed: { increment: 1 } }
           : {}),
-        ...(duration
-          ? { hoursWorked: { increment: duration / 60 } }
-          : {}),
+        ...(duration ? { hoursWorked: { increment: duration / 60 } } : {}),
       },
       create: {
         organizationId: employee.organizationId,

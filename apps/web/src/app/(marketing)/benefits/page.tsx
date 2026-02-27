@@ -38,8 +38,7 @@ export default function BenefitsPage() {
         "Typical ROI visible within 90 days for Professional tier customers",
         "Implementation completed in 30 days, not 6+ months",
       ],
-      benefit:
-        "Calculate your ROI",
+      benefit: "Calculate your ROI",
       link: "/pricing",
     },
     {
@@ -54,8 +53,7 @@ export default function BenefitsPage() {
         "Eliminate emergency 30% markup air shipments",
         "Reduce inventory carrying costs 15-35% through optimization",
       ],
-      benefit:
-        "See case studies",
+      benefit: "See case studies",
       link: "/case-studies",
     },
     {
@@ -70,8 +68,7 @@ export default function BenefitsPage() {
         "Real-time alerts prevent costly mistakes before they happen",
         "Career growth opportunities as efficiency increases",
       ],
-      benefit:
-        "Read team testimonials",
+      benefit: "Read team testimonials",
       link: "/about",
     },
     {
@@ -86,8 +83,7 @@ export default function BenefitsPage() {
         "Automated workflows reduce manual exceptions by 80%",
         "Compliance reporting automated - pass audits first try",
       ],
-      benefit:
-        "See how we do it",
+      benefit: "See how we do it",
       link: "/features",
     },
     {
@@ -102,8 +98,7 @@ export default function BenefitsPage() {
         "Predictive analytics prevent problems before they occur",
         "Executive dashboards for C-level visibility",
       ],
-      benefit:
-        "Explore analytics",
+      benefit: "Explore analytics",
       link: "/solutions/analytics",
     },
     {
@@ -118,8 +113,7 @@ export default function BenefitsPage() {
         "256-bit AES encryption for all data (in transit & at rest)",
         "Zero-trust architecture - every request verified",
       ],
-      benefit:
-        "View security details",
+      benefit: "View security details",
       link: "/security",
     },
   ];
@@ -308,10 +302,7 @@ export default function BenefitsPage() {
                   <div className="p-8 md:p-12 flex flex-col justify-center">
                     <ul className="space-y-3 mb-8">
                       {benefit.bullets.map((bullet) => (
-                        <li
-                          key={bullet}
-                          className="flex items-start gap-3"
-                        >
+                        <li key={bullet} className="flex items-start gap-3">
                           <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                           <span className="text-sm">{bullet}</span>
                         </li>
@@ -351,8 +342,8 @@ export default function BenefitsPage() {
                 <h3 className="font-bold mb-3">{item.metric}</h3>
                 <div className="space-y-2 mb-4">
                   <div className="text-sm text-muted-foreground">
-                    <span className="line-through">{item.before}</span>
-                    {" "}→ <span className="font-bold text-primary">{item.after}</span>
+                    <span className="line-through">{item.before}</span> →{" "}
+                    <span className="font-bold text-primary">{item.after}</span>
                   </div>
                   <div className="text-lg font-bold text-green-600">
                     {item.improvement}
@@ -376,7 +367,10 @@ export default function BenefitsPage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {byRole.map((role) => (
-              <Card key={role.role} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={role.role}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <CardTitle className="text-xl">{role.role}</CardTitle>
                   <CardDescription className="text-base">
@@ -423,7 +417,10 @@ export default function BenefitsPage() {
                 <CardContent>
                   <ul className="space-y-3">
                     {item.benefits.map((benefit) => (
-                      <li key={benefit} className="flex items-start gap-2 text-sm">
+                      <li
+                        key={benefit}
+                        className="flex items-start gap-2 text-sm"
+                      >
                         <AlertCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
                         {benefit}
                       </li>

@@ -450,7 +450,10 @@ export async function POST(request: NextRequest) {
       const data = optimizeScheduleSchema.parse(body);
 
       // Get appointments for the date
-      const appointments = await getAppointmentsForDate(organizationId, data.date);
+      const appointments = await getAppointmentsForDate(
+        organizationId,
+        data.date,
+      );
       const docks = await getAvailableDocks(organizationId);
 
       const result = optimizeSchedule(

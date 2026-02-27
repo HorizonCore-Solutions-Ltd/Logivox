@@ -333,14 +333,17 @@ export default function WarehouseManagementPage() {
           <Card className="mx-auto max-w-3xl">
             <CardContent className="pt-8 pb-6">
               <p className="text-lg italic mb-6">
-                "We went from 3 separate systems to one unified platform. 
-                Labor costs down 22%, inventory accuracy 99.9%, and our team loves the interface. 
-                Implementation took just 3 weeks. Game changer for a 150,000 sq ft facility."
+                "We went from 3 separate systems to one unified platform. Labor
+                costs down 22%, inventory accuracy 99.9%, and our team loves the
+                interface. Implementation took just 3 weeks. Game changer for a
+                150,000 sq ft facility."
               </p>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">David Rodriguez</p>
-                  <p className="text-sm text-muted-foreground">Director of Ops, MegaDist Warehousing</p>
+                  <p className="text-sm text-muted-foreground">
+                    Director of Ops, MegaDist Warehousing
+                  </p>
                 </div>
                 <Badge className="bg-indigo-600">150K sq ft</Badge>
               </div>

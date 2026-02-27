@@ -263,7 +263,8 @@ export default function IntegrationsPage() {
               100+ Pre-Built Integrations
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Connect with the tools you already use (all connector-based and configurable)
+              Connect with the tools you already use (all connector-based and
+              configurable)
             </p>
           </div>
 
@@ -298,10 +299,12 @@ export default function IntegrationsPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Integration Coverage</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Rota, time, ERP, commerce, logistics, analytics — powered via API/webhooks and configurable mappings
+              Rota, time, ERP, commerce, logistics, analytics — powered via
+              API/webhooks and configurable mappings
             </p>
             <p className="text-sm text-muted-foreground">
-              Availability depends on connector enablement and customer entitlements; setup required per provider.
+              Availability depends on connector enablement and customer
+              entitlements; setup required per provider.
             </p>
           </div>
 
@@ -311,7 +314,8 @@ export default function IntegrationsPage() {
                 <CardHeader>
                   <CardTitle>{category.title}</CardTitle>
                   <CardDescription>
-                    Connector-based; mapping required for IDs, locations, and payloads.
+                    Connector-based; mapping required for IDs, locations, and
+                    payloads.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -402,12 +406,16 @@ export default function IntegrationsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="bg-slate-900 text-slate-50 p-4 rounded-lg font-mono text-sm overflow-x-auto">
-                    <div className="text-green-400">{"// Get inventory items"}</div>
+                    <div className="text-green-400">
+                      {"// Get inventory items"}
+                    </div>
                     <div className="mt-2">
                       <span className="text-purple-400">GET</span>{" "}
                       <span className="text-blue-400">/api/v1/inventory</span>
                     </div>
-                    <div className="mt-4 text-green-400">{"// Create booking"}</div>
+                    <div className="mt-4 text-green-400">
+                      {"// Create booking"}
+                    </div>
                     <div className="mt-2">
                       <span className="text-purple-400">POST</span>{" "}
                       <span className="text-blue-400">/api/v1/bookings</span>
@@ -421,7 +429,9 @@ export default function IntegrationsPage() {
                       <span className="text-blue-300">"items"</span>: [...]
                     </div>
                     <div className="text-slate-400">{"}"}</div>
-                    <div className="mt-4 text-green-400">{"// Webhook events"}</div>
+                    <div className="mt-4 text-green-400">
+                      {"// Webhook events"}
+                    </div>
                     <div className="mt-2">
                       <span className="text-purple-400">POST</span>{" "}
                       <span className="text-blue-400">/webhooks</span>

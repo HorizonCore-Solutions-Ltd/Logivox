@@ -48,7 +48,9 @@ export async function resolveTenantFromRequest(
     if (!session?.user) {
       throw new Error("Unauthorized: session required");
     }
-    const org = session.user.organizations?.find((o: any) => o.slug === slugHeader);
+    const org = session.user.organizations?.find(
+      (o: any) => o.slug === slugHeader,
+    );
     if (!org) {
       throw new Error(`Organization '${slugHeader}' not found or not a member`);
     }
@@ -56,7 +58,8 @@ export async function resolveTenantFromRequest(
       organizationId: org.id,
       userId: session.user.id,
       role: org.role as any,
-      isAdmin: ["OWNER", "ADMIN"].includes(org.role) || session.user.role === "ADMIN",
+      isAdmin:
+        ["OWNER", "ADMIN"].includes(org.role) || session.user.role === "ADMIN",
     };
   }
 
@@ -71,7 +74,9 @@ export async function resolveTenantFromRequest(
     organizationId: firstOrg.id,
     userId: session.user.id,
     role: firstOrg.role as any,
-    isAdmin: ["OWNER", "ADMIN"].includes(firstOrg.role) || session.user.role === "ADMIN",
+    isAdmin:
+      ["OWNER", "ADMIN"].includes(firstOrg.role) ||
+      session.user.role === "ADMIN",
   };
 }
 
@@ -86,11 +91,11 @@ export async function injectTenantContext(request: NextRequest) {
     requestHeaders.set("x-tenant-organization-id", tenant.organizationId);
     requestHeaders.set("x-tenant-user-id", tenant.userId);
     requestHeaders.set("x-tenant-role", tenant.role);
-    requestHeaders.set(
-      "x-tenant-is-admin",
-      tenant.isAdmin ? "true" : "false",
-    );
-    return { request: new NextRequest(request, { headers: requestHeaders }), tenant };
+    requestHeaders.set("x-tenant-is-admin", tenant.isAdmin ? "true" : "false");
+    return {
+      request: new NextRequest(request, { headers: requestHeaders }),
+      tenant,
+    };
   } catch (error) {
     throw new Error(`Failed to inject tenant context: ${error}`);
   }
@@ -103,7 +108,8 @@ export async function injectTenantContext(request: NextRequest) {
 export function extractTenantFromHeaders(
   headers: HeadersInit | Record<string, string>,
 ): TenantContext {
-  const headersMap = headers instanceof Headers ? headers : new Headers(headers);
+  const headersMap =
+    headers instanceof Headers ? headers : new Headers(headers);
   const organizationId = headersMap.get("x-tenant-organization-id");
   const userId = headersMap.get("x-tenant-user-id");
   const role = headersMap.get("x-tenant-role") as any;
@@ -159,6 +165,7 @@ export async function verifyOrganizationAccess(
     organizationId,
     userId,
     role: membership.role,
-    isAdmin: user?.role === "ADMIN" || ["OWNER", "ADMIN"].includes(membership.role),
+    isAdmin:
+      user?.role === "ADMIN" || ["OWNER", "ADMIN"].includes(membership.role),
   };
 }

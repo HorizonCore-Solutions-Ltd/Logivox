@@ -17,12 +17,15 @@ function mapPunch(raw: any): TimeAttendancePunch {
     throw new Error("Rotavu punch payload missing required fields");
   }
 
-  const typeMap: Record<string, "clock-in" | "clock-out" | "break-start" | "break-end"> = {
-    "clock_in": "clock-in",
+  const typeMap: Record<
+    string,
+    "clock-in" | "clock-out" | "break-start" | "break-end"
+  > = {
+    clock_in: "clock-in",
     "clock-out": "clock-out",
-    "clock_out": "clock-out",
-    "break_start": "break-start",
-    "break_end": "break-end",
+    clock_out: "clock-out",
+    break_start: "break-start",
+    break_end: "break-end",
   };
 
   const mappedType = typeMap[raw.type] ?? "clock-in";
@@ -68,14 +71,27 @@ export const rotavuAdapter: TimeAttendanceAdapter = {
     return (punches as any[]).map(mapPunch);
   },
 
-  async verifyWebhook(rawBody: string, headers: Record<string, string | string[] | undefined>) {
+  async verifyWebhook(
+    rawBody: string,
+    headers: Record<string, string | string[] | undefined>,
+  ) {
     if (!webhookSecret) {
-      throw new Error("Rotavu webhook secret missing; set ROTAVU_WEBHOOK_SECRET");
+      throw new Error(
+        "Rotavu webhook secret missing; set ROTAVU_WEBHOOK_SECRET",
+      );
     }
-    const signature = (headers["x-rotavu-signature"] as string | undefined)?.trim();
+    const signature = (
+      headers["x-rotavu-signature"] as string | undefined
+    )?.trim();
     if (!signature) return false;
-    const computed = crypto.createHmac("sha256", webhookSecret).update(rawBody).digest("hex");
-    return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(computed));
+    const computed = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(rawBody)
+      .digest("hex");
+    return crypto.timingSafeEqual(
+      Buffer.from(signature),
+      Buffer.from(computed),
+    );
   },
 
   async parseWebhook(payload: any) {

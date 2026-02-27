@@ -42,8 +42,9 @@ async function translateWithOpenAI(input: {
   }
 
   const target =
-    SUPPORTED_LANGUAGES[input.targetLanguage as keyof typeof SUPPORTED_LANGUAGES]
-      ?.name || input.targetLanguage;
+    SUPPORTED_LANGUAGES[
+      input.targetLanguage as keyof typeof SUPPORTED_LANGUAGES
+    ]?.name || input.targetLanguage;
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",

@@ -399,22 +399,20 @@ export async function GET(request: NextRequest) {
         success: true,
         appointments: appointments.map((apt) => ({
           id: apt.id,
-          appointmentId:
-            ((apt.metadata ?? {}) as Record<string, unknown>).appointmentId,
-          carrierName:
-            ((apt.metadata ?? {}) as Record<string, unknown>).carrierName,
-          appointmentTime:
-            ((apt.metadata ?? {}) as Record<string, unknown>)
-              .appointmentTime,
+          appointmentId: ((apt.metadata ?? {}) as Record<string, unknown>)
+            .appointmentId,
+          carrierName: ((apt.metadata ?? {}) as Record<string, unknown>)
+            .carrierName,
+          appointmentTime: ((apt.metadata ?? {}) as Record<string, unknown>)
+            .appointmentTime,
           dockDoor: ((apt.metadata ?? {}) as Record<string, unknown>).dockDoor,
           status: ((apt.metadata ?? {}) as Record<string, unknown>).status,
-          shipmentType:
-            ((apt.metadata ?? {}) as Record<string, unknown>).shipmentType,
-          expectedDuration:
-            ((apt.metadata ?? {}) as Record<string, unknown>)
-              .expectedDuration,
-          contactPhone:
-            ((apt.metadata ?? {}) as Record<string, unknown>).contactPhone,
+          shipmentType: ((apt.metadata ?? {}) as Record<string, unknown>)
+            .shipmentType,
+          expectedDuration: ((apt.metadata ?? {}) as Record<string, unknown>)
+            .expectedDuration,
+          contactPhone: ((apt.metadata ?? {}) as Record<string, unknown>)
+            .contactPhone,
         })),
       });
     }
@@ -587,7 +585,10 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const metadata = (appointment.metadata ?? {}) as Record<string, unknown>;
+        const metadata = (appointment.metadata ?? {}) as Record<
+          string,
+          unknown
+        >;
         const scheduledTime = new Date(metadata.appointmentDateTime);
         const actualArrivalTime = validatedData.actualArrivalTime
           ? new Date(validatedData.actualArrivalTime)
@@ -650,7 +651,10 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const metadata = (appointment.metadata ?? {}) as Record<string, unknown>;
+        const metadata = (appointment.metadata ?? {}) as Record<
+          string,
+          unknown
+        >;
         const expectedDuration = metadata.expectedDuration || 30;
         const durationDiff = validatedData.actualDuration - expectedDuration;
 

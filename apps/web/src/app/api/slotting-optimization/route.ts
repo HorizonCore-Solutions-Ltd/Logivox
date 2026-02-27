@@ -7,8 +7,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
-const LEGACY_SLOTTING_SIM_ACTION =
-  ["si", "mu", "la", "te", "Sl", "ot", "ti", "ng"].join("");
+const LEGACY_SLOTTING_SIM_ACTION = [
+  "si",
+  "mu",
+  "la",
+  "te",
+  "Sl",
+  "ot",
+  "ti",
+  "ng",
+].join("");
 
 // GET - Fetch slotting recommendations
 export async function GET(req: NextRequest) {
@@ -71,7 +79,10 @@ export async function POST(req: NextRequest) {
       const { recommendations } = body;
       const result = await applySlottingRecommendations(recommendations);
       return NextResponse.json({ success: true, result });
-    } else if (action === "projectSlotting" || action === LEGACY_SLOTTING_SIM_ACTION) {
+    } else if (
+      action === "projectSlotting" ||
+      action === LEGACY_SLOTTING_SIM_ACTION
+    ) {
       // Generate slotting projection scenario
       const simulation = await projectSlottingScenario(
         warehouseId || session.user.organizationId,
@@ -406,10 +417,10 @@ async function analyzeSlottingEfficiency(warehouseId: string) {
         itemCount === 0
           ? "No inventory movement data available"
           : totalScore / itemCount > 70
-          ? "Good slotting efficiency"
-          : totalScore / itemCount > 50
-            ? "Moderate efficiency - consider re-slotting"
-            : "Poor efficiency - re-slotting recommended",
+            ? "Good slotting efficiency"
+            : totalScore / itemCount > 50
+              ? "Moderate efficiency - consider re-slotting"
+              : "Poor efficiency - re-slotting recommended",
     };
   } catch (error) {
     console.error("Efficiency analysis error:", error);

@@ -18,7 +18,14 @@ interface ChargebackInput {
 
 export const vendorChargebackService = {
   async autoCalculateChargeback(input: ChargebackInput) {
-    const { organizationId, supplierId, sku, periodStart, periodEnd, defectRateThreshold } = input;
+    const {
+      organizationId,
+      supplierId,
+      sku,
+      periodStart,
+      periodEnd,
+      defectRateThreshold,
+    } = input;
 
     // Find all GRN items from this supplier in the given period
     const grnItems = await prisma.gRNItem.findMany({

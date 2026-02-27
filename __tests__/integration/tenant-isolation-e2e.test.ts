@@ -156,7 +156,7 @@ describe("Tenant Isolation - Full E2E", () => {
       const items = await prisma.inventoryItem.findMany({
         where: {
           organizationId: org1Id,
-          sku: "SKU-ORG2-001",  // ← This SKU is in org2
+          sku: "SKU-ORG2-001", // ← This SKU is in org2
         },
       });
       expect(items).toHaveLength(0);
@@ -167,7 +167,7 @@ describe("Tenant Isolation - Full E2E", () => {
       const items = await prisma.inventoryItem.findMany({
         where: {
           organizationId: org2Id,
-          id: org1ItemId,  // ← This item belongs to org1
+          id: org1ItemId, // ← This item belongs to org1
         },
       });
       expect(items).toHaveLength(0);
@@ -222,7 +222,7 @@ describe("Tenant Isolation - Full E2E", () => {
       const updated = await prisma.inventoryItem.updateMany({
         where: {
           organizationId: org2Id,
-          id: org1ItemId,  // ← Belongs to org1
+          id: org1ItemId, // ← Belongs to org1
         },
         data: {
           quantity: 9999,
@@ -235,7 +235,7 @@ describe("Tenant Isolation - Full E2E", () => {
       const item = await prisma.inventoryItem.findUnique({
         where: { id: org1ItemId },
       });
-      expect(item?.quantity).toBe(100);  // Original value
+      expect(item?.quantity).toBe(100); // Original value
     });
 
     it("should prevent deleting items from other tenant", async () => {
@@ -243,7 +243,7 @@ describe("Tenant Isolation - Full E2E", () => {
       const deleted = await prisma.inventoryItem.deleteMany({
         where: {
           organizationId: org1Id,
-          id: org2ItemId,  // ← Belongs to org2
+          id: org2ItemId, // ← Belongs to org2
         },
       });
 
@@ -338,7 +338,7 @@ describe("Tenant Isolation - Full E2E", () => {
     it("should log all tenant access attempts", async () => {
       // This would be implemented in production with actual access logging
       // For now, verify the audit mechanisms are in place
-      
+
       const auditCount = await prisma.auditLog.count({
         where: {
           organizationId: org1Id,

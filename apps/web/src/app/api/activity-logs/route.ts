@@ -53,7 +53,7 @@ export const GET = withTenantContext(async (request: NextRequest) => {
       if (!userInOrg) {
         return NextResponse.json(
           { error: "User not found in this organization" },
-          { status: 403 }
+          { status: 403 },
         );
       }
 

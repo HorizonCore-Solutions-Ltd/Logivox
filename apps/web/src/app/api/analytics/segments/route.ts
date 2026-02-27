@@ -67,7 +67,9 @@ export async function GET(request: NextRequest) {
       const lastPurchaseDate = metrics?._max.orderDate || c.createdAt;
       const daysSinceLastPurchase = Math.max(
         0,
-        Math.floor((now - new Date(lastPurchaseDate).getTime()) / (1000 * 60 * 60 * 24)),
+        Math.floor(
+          (now - new Date(lastPurchaseDate).getTime()) / (1000 * 60 * 60 * 24),
+        ),
       );
       const activeDays = metrics?._min.orderDate
         ? Math.max(

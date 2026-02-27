@@ -22,8 +22,7 @@ export async function GET(request: Request) {
       modelName: m.modelName,
       version: m.version,
       accuracy: m.accuracy,
-      mape:
-        typeof m.parameters?.mape === "number" ? m.parameters.mape : null,
+      mape: typeof m.parameters?.mape === "number" ? m.parameters.mape : null,
       mae: typeof m.parameters?.mae === "number" ? m.parameters.mae : null,
       lastTrained: m.lastTrainedAt.toISOString(),
       trainingDataPoints: m.trainingDataCount,

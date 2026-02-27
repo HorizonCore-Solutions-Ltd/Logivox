@@ -16,12 +16,17 @@ export async function GET(request: NextRequest) {
     if (!tenantId) {
       const dbUser = await prisma.user.findUnique({
         where: { id: session.user.id },
-        include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+        include: {
+          organizationMemberships: { include: { organization: true }, take: 1 },
+        },
       });
       tenantId = dbUser?.organizationMemberships?.[0]?.organization?.id;
     }
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     // Return popular searches derived from most-ordered item names in the last 90 days
@@ -45,7 +50,9 @@ export async function GET(request: NextRequest) {
       where: { id: { in: itemIds } },
       select: { id: true, name: true, sku: true },
     });
-    const nameMap = Object.fromEntries(itemNames.map((i) => [i.id, i.name || i.sku]));
+    const nameMap = Object.fromEntries(
+      itemNames.map((i) => [i.id, i.name || i.sku]),
+    );
 
     const popularSearches = topItems.map((t) => ({
       query: nameMap[t.inventoryItemId] ?? t.inventoryItemId,

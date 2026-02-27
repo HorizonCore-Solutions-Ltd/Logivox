@@ -303,7 +303,9 @@ export async function POST(request: NextRequest) {
         data.targetAudience === "DEPARTMENT" &&
         data.targetDepartment
       ) {
-        const explicitDepartmentUsers = Array.isArray((data as any).targetUserIds)
+        const explicitDepartmentUsers = Array.isArray(
+          (data as any).targetUserIds,
+        )
           ? ((data as any).targetUserIds as string[])
           : [];
 

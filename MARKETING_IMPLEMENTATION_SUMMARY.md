@@ -103,7 +103,12 @@
 12. White-label app (Enterprise)
 13. Digital twin (Enterprise)
 14. 24/7 premium support (Enterprise)
-15. And 6+ more...
+15. Real-time labor management (Enterprise)
+16. Task interleaving (Enterprise)
+17. Yard management (Enterprise)
+18. Omnichannel fulfillment (Enterprise)
+19. Robotics integration (Enterprise)
+20. IoT sensor network (Enterprise)
 
 #### Key Improvements:
 - ✅ Benefits-focused descriptions (not just features)

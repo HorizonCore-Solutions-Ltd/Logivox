@@ -526,14 +526,20 @@ export async function GET(request: NextRequest) {
             const rawHeight = Number(metadata.height ?? 2);
 
             const resolvedItem = {
-              weight: Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 1,
-              length: Number.isFinite(rawLength) && rawLength > 0 ? rawLength : 6,
+              weight:
+                Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 1,
+              length:
+                Number.isFinite(rawLength) && rawLength > 0 ? rawLength : 6,
               width: Number.isFinite(rawWidth) && rawWidth > 0 ? rawWidth : 4,
-              height: Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 2,
+              height:
+                Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 2,
               fragility: "MODERATE" as keyof typeof FRAGILITY_LEVELS,
             };
 
-            return Array.from({ length: Math.max(item.quantity, 1) }, () => resolvedItem);
+            return Array.from(
+              { length: Math.max(item.quantity, 1) },
+              () => resolvedItem,
+            );
           });
 
           if (items.length === 0) {
@@ -826,14 +832,20 @@ export async function POST(request: NextRequest) {
             const rawHeight = Number(metadata.height ?? 2);
 
             const resolvedItem = {
-              weight: Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 1,
-              length: Number.isFinite(rawLength) && rawLength > 0 ? rawLength : 6,
+              weight:
+                Number.isFinite(rawWeight) && rawWeight > 0 ? rawWeight : 1,
+              length:
+                Number.isFinite(rawLength) && rawLength > 0 ? rawLength : 6,
               width: Number.isFinite(rawWidth) && rawWidth > 0 ? rawWidth : 4,
-              height: Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 2,
+              height:
+                Number.isFinite(rawHeight) && rawHeight > 0 ? rawHeight : 2,
               fragility: "MODERATE" as keyof typeof FRAGILITY_LEVELS,
             };
 
-            return Array.from({ length: Math.max(item.quantity, 1) }, () => resolvedItem);
+            return Array.from(
+              { length: Math.max(item.quantity, 1) },
+              () => resolvedItem,
+            );
           }),
         }));
         const consolidation = analyzeConsolidation(ordersData);

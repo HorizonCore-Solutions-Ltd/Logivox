@@ -70,9 +70,14 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const customerBehaviors: CustomerBehavior[] = customers.map((customer) => {
       const completedOrders = customer.salesOrders.filter((order) =>
-        ["APPROVED", "PICKING", "PICKED", "PACKING", "SHIPPED", "DELIVERED"].includes(
-          String(order.status),
-        ),
+        [
+          "APPROVED",
+          "PICKING",
+          "PICKED",
+          "PACKING",
+          "SHIPPED",
+          "DELIVERED",
+        ].includes(String(order.status)),
       );
 
       const totalPurchases = completedOrders.length;
@@ -109,7 +114,8 @@ export async function GET(request: NextRequest) {
       let totalCategoryHits = 0;
       for (const order of completedOrders) {
         for (const item of order.items) {
-          const category = item.inventoryItem?.category?.name || "Uncategorized";
+          const category =
+            item.inventoryItem?.category?.name || "Uncategorized";
           categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
           totalCategoryHits += 1;
         }
@@ -130,7 +136,7 @@ export async function GET(request: NextRequest) {
         0,
         Math.min(
           1,
-          daysSinceLastPurchase / 180 * 0.5 +
+          (daysSinceLastPurchase / 180) * 0.5 +
             (purchaseFrequency < 1 ? 0.25 : 0) +
             (averageOrderValue < 100 ? 0.15 : 0) +
             (totalPurchases < 3 ? 0.1 : 0),

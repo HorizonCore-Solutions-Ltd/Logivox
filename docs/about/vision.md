@@ -26,15 +26,19 @@ To provide the most adaptable and efficient warehouse management system for mode
 ## Stakeholder Promise
 
 ### For Warehouse Operators
+
 "Your job gets easier. Voice guidance, smart allocation, real-time visibility. Train new staff in hours, not weeks. Mistake rates drop 70%+. You get time back for strategy."
 
 ### For Finance Teams
+
 "30-day ROI is real. One system replacing three. No per-user licences. Predictable costs. Measurable upside: 35% productivity lift, £50K+ annual savings at scale."
 
 ### For Supply Chain Directors
+
 "True multi-location control. Unified ruleset across your network. Compliance automated. Supplier integration baked in. Scale without adding complexity."
 
 ### For Investors
+
 "Blue ocean in the mid-market WMS space. Real traction (70K LOC production app, zero mocks). Clear path to £8M+ ARR within 36 months. Defensible tech (voice + RLS). Experienced team."
 
 ---

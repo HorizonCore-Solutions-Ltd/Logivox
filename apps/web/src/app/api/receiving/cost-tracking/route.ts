@@ -62,7 +62,11 @@ const DEFAULT_LABOR_RATES: LaborRates = {
 };
 
 function calculateShipmentCostFromRecord(
-  shipment: { createdAt: Date; completedAt: Date | null; quantityReceived: number | null },
+  shipment: {
+    createdAt: Date;
+    completedAt: Date | null;
+    quantityReceived: number | null;
+  },
   rates: LaborRates,
 ) {
   const processingMinutes = shipment.completedAt
@@ -273,18 +277,26 @@ async function analyzeCostPerUnit(
       key = shipment.supplier?.name || "Unknown Supplier";
     } else if (groupBy === "SHIFT") {
       const hour = shipment.createdAt.getHours();
-      key = hour >= 6 && hour < 14
-        ? "Day Shift"
-        : hour >= 14 && hour < 22
-          ? "Evening Shift"
-          : "Night Shift";
+      key =
+        hour >= 6 && hour < 14
+          ? "Day Shift"
+          : hour >= 14 && hour < 22
+            ? "Evening Shift"
+            : "Night Shift";
     } else if (groupBy === "DOCK") {
-      key = ((shipment as any).dockDoor as string | undefined) || "Unassigned Dock";
+      key =
+        ((shipment as any).dockDoor as string | undefined) || "Unassigned Dock";
     } else if (groupBy === "PRODUCT_CATEGORY") {
-      key = ((shipment as any).productCategory as string | undefined) || "Uncategorized";
+      key =
+        ((shipment as any).productCategory as string | undefined) ||
+        "Uncategorized";
     }
 
-    const existing = aggregated.get(key) || { name: key, units: 0, totalCost: 0 };
+    const existing = aggregated.get(key) || {
+      name: key,
+      units: 0,
+      totalCost: 0,
+    };
     existing.units += cost.unitsReceived;
     existing.totalCost += cost.totalCost;
     aggregated.set(key, existing);
@@ -303,7 +315,8 @@ async function analyzeCostPerUnit(
     groups: groups.map((g) => ({
       name: g.name,
       units: g.units,
-      costPerUnit: g.units > 0 ? Math.round((g.totalCost / g.units) * 100) / 100 : 0,
+      costPerUnit:
+        g.units > 0 ? Math.round((g.totalCost / g.units) * 100) / 100 : 0,
       totalCost: Math.round(g.totalCost * 100) / 100,
       percentageOfTotal: units > 0 ? Math.round((g.units / units) * 100) : 0,
     })),
@@ -354,7 +367,10 @@ export async function GET(request: NextRequest) {
       const monthCosts = monthShipments.map((shipment) =>
         calculateShipmentCostFromRecord(shipment, rates),
       );
-      const units = monthCosts.reduce((sum, item) => sum + item.unitsReceived, 0);
+      const units = monthCosts.reduce(
+        (sum, item) => sum + item.unitsReceived,
+        0,
+      );
       const estimatedCost = monthCosts.reduce(
         (sum, item) => sum + item.totalCost,
         0,

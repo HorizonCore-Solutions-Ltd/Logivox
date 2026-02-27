@@ -58,23 +58,38 @@ async function executeReportQuery(
       where: {
         organizationId: orgId,
         ...(mergedFilters.status ? { status: mergedFilters.status } : {}),
-        ...(mergedFilters.warehouseId ? { warehouseId: mergedFilters.warehouseId } : {}),
+        ...(mergedFilters.warehouseId
+          ? { warehouseId: mergedFilters.warehouseId }
+          : {}),
       },
       take: takeLimit,
       orderBy: { createdAt: "desc" },
       select: {
-        id: true, sku: true, name: true, category: true,
-        availableQty: true, reservedQty: true, totalQty: true,
-        unitCost: true, status: true, createdAt: true,
+        id: true,
+        sku: true,
+        name: true,
+        category: true,
+        availableQty: true,
+        reservedQty: true,
+        totalQty: true,
+        unitCost: true,
+        status: true,
+        createdAt: true,
       },
     });
     return {
       data: rows,
       count: rows.length,
-      aggregations: reportType === "SUMMARY" ? {
-        total: rows.length,
-        totalQty: rows.reduce((s: number, r: any) => s + (r.totalQty || 0), 0),
-      } : undefined,
+      aggregations:
+        reportType === "SUMMARY"
+          ? {
+              total: rows.length,
+              totalQty: rows.reduce(
+                (s: number, r: any) => s + (r.totalQty || 0),
+                0,
+              ),
+            }
+          : undefined,
     };
   }
 
@@ -87,14 +102,23 @@ async function executeReportQuery(
       take: takeLimit,
       orderBy: { createdAt: "desc" },
       select: {
-        id: true, soNumber: true, status: true, orderDate: true,
-        customerId: true, warehouseId: true, createdAt: true,
+        id: true,
+        soNumber: true,
+        status: true,
+        orderDate: true,
+        customerId: true,
+        warehouseId: true,
+        createdAt: true,
       },
     });
     return { data: rows, count: rows.length };
   }
 
-  if (src.includes("grn") || src.includes("receipt") || src.includes("receiving")) {
+  if (
+    src.includes("grn") ||
+    src.includes("receipt") ||
+    src.includes("receiving")
+  ) {
     const rows = await prisma.goodsReceiptNote.findMany({
       where: {
         organizationId: orgId,
@@ -103,8 +127,13 @@ async function executeReportQuery(
       take: takeLimit,
       orderBy: { receivedDate: "desc" },
       select: {
-        id: true, grnNumber: true, status: true, receivedDate: true,
-        putAwayCompleted: true, hasDiscrepancy: true, createdAt: true,
+        id: true,
+        grnNumber: true,
+        status: true,
+        receivedDate: true,
+        putAwayCompleted: true,
+        hasDiscrepancy: true,
+        createdAt: true,
       },
     });
     return { data: rows, count: rows.length };
@@ -119,8 +148,14 @@ async function executeReportQuery(
       take: takeLimit,
       orderBy: { createdAt: "desc" },
       select: {
-        id: true, employeeNumber: true, firstName: true, lastName: true,
-        department: true, position: true, status: true, hireDate: true,
+        id: true,
+        employeeNumber: true,
+        firstName: true,
+        lastName: true,
+        department: true,
+        position: true,
+        status: true,
+        hireDate: true,
       },
     });
     return { data: rows, count: rows.length };
@@ -135,16 +170,27 @@ async function executeReportQuery(
       take: takeLimit,
       orderBy: { createdAt: "desc" },
       select: {
-        id: true, poNumber: true, status: true, orderDate: true,
-        totalAmount: true, currency: true, supplierId: true,
+        id: true,
+        poNumber: true,
+        status: true,
+        orderDate: true,
+        totalAmount: true,
+        currency: true,
+        supplierId: true,
       },
     });
     return { data: rows, count: rows.length };
   }
 
   // Unknown dataSource — return empty result set with a note
-  console.warn(`[reports] Unknown dataSource: ${dataSource} — returning empty result`);
-  return { data: [], count: 0, note: `No query handler registered for dataSource: ${dataSource}` };
+  console.warn(
+    `[reports] Unknown dataSource: ${dataSource} — returning empty result`,
+  );
+  return {
+    data: [],
+    count: 0,
+    note: `No query handler registered for dataSource: ${dataSource}`,
+  };
 }
 
 // POST /api/reports/[id]/execute - Execute report

@@ -47,7 +47,11 @@ function assertWhereScoped(params: {
   }
 }
 
-function assertCreateScoped(data: unknown, model?: string | null, action?: string) {
+function assertCreateScoped(
+  data: unknown,
+  model?: string | null,
+  action?: string,
+) {
   if (Array.isArray(data)) {
     data.forEach((entry) => assertCreateScoped(entry, model, action));
     return;

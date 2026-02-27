@@ -71,14 +71,13 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-    const message = error instanceof Error ? error.message : "Unknown error";
-    if (message.includes("not configured")) {
-      return NextResponse.json(
-        { error: "Simulation service unavailable", message },
-        { status: 503 },
-      );
-    }
-
+  const message = error instanceof Error ? error.message : "Unknown error";
+  if (message.includes("not configured")) {
+    return NextResponse.json(
+      { error: "Simulation service unavailable", message },
+      { status: 503 },
+    );
+  }
 }
 
 // POST - Update digital twin or run simulations
@@ -486,9 +485,7 @@ async function predictWarehouseCongestion(warehouseId: string) {
           zone: zone.name,
           currentCongestion,
           predictedCongestion,
-          predictedTime: new Date(
-            Date.now() + 60 * 60 * 1000,
-          ).toISOString(),
+          predictedTime: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
           confidence: 75,
           recommendation:
             predictedCongestion > 80
@@ -503,12 +500,11 @@ async function predictWarehouseCongestion(warehouseId: string) {
 
     return {
       predictions: congestionZones,
-      overallRisk:
-        congestionZones.some((z: any) => z.predictedCongestion >= 85)
-          ? "HIGH"
-          : congestionZones.length > 0
-            ? "MEDIUM"
-            : "LOW",
+      overallRisk: congestionZones.some((z: any) => z.predictedCongestion >= 85)
+        ? "HIGH"
+        : congestionZones.length > 0
+          ? "MEDIUM"
+          : "LOW",
       peakTime: peakZone ? "Within next hour" : "No peak predicted",
     };
   } catch (error) {

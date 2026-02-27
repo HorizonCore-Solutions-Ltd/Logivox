@@ -662,8 +662,10 @@ export async function GET(request: NextRequest) {
           : 0;
       const avgWeightUtilization =
         totalPlans > 0
-          ? plans.reduce((sum, plan) => sum + plan.utilization.weightPercent, 0) /
-            totalPlans
+          ? plans.reduce(
+              (sum, plan) => sum + plan.utilization.weightPercent,
+              0,
+            ) / totalPlans
           : 0;
       const avgScore =
         totalPlans > 0

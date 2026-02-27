@@ -3,7 +3,9 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
-async function sendDocumentRequestNotification(payload: Record<string, unknown>) {
+async function sendDocumentRequestNotification(
+  payload: Record<string, unknown>,
+) {
   const webhookUrl = process.env.RECEIVING_DOCUMENT_REQUEST_WEBHOOK_URL;
   if (!webhookUrl) {
     return { delivered: false, reason: "not_configured" };

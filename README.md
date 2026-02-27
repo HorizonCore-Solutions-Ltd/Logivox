@@ -48,6 +48,17 @@
 - ✅ **Analytics & BI** - Real-time dashboards, forecasting, KPI tracking
 - ✅ **Sustainability Tracking** - Carbon footprint, green initiatives
 
+### 🚀 Next-Generation Roadmap (NGWE Strategy)
+
+LogiVox is evolving with the **[NGWE Strategy](docs/NEXT_GEN_SYSTEM_ENHANCEMENTS.md)** to provide:
+
+- 📊 **Real-time Labor Management** - Live worker heatmaps, dynamic re-assignment, and AI performance coaching.
+- ⚡ **Advanced Wave & Task Interleaving** - Maximum forklift utilization through intelligent pick/putaway chaining.
+- 🚚 **Modern Yard Management** - Automated gate-to-dock trailer lifecycle tracking and detention prevention.
+- 🌐 **Omnichannel Fulfillment Excellence** - Retail, DTC, and Wholesale order routing from a unified hub.
+- 🤖 **Automation & Robotics Integration** - Seamless AMRs (Autonomous Mobile Robots) and sortation system handshakes.
+- 📡 **Enterprise IoT Ingestion** - Live telemetry from temperature, scale, and RFID portal networks.
+
 **Production Statistics:**
 
 - **283 functional API endpoints** (ZERO stubs!)

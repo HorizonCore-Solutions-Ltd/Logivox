@@ -31,7 +31,10 @@ export async function GET(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const searchParams = request.nextUrl.searchParams;
@@ -71,7 +74,10 @@ export async function POST(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const engine = new ReorderAlertEngine({

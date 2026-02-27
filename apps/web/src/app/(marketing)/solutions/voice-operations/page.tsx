@@ -240,15 +240,25 @@ export default function VoiceOperationsPage() {
       <section className="border-b bg-amber-50 dark:bg-amber-950/20 py-4">
         <div className="container-enterprise">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm">
-            <Badge variant="outline" className="border-amber-500 text-amber-700 dark:text-amber-400 shrink-0">
+            <Badge
+              variant="outline"
+              className="border-amber-500 text-amber-700 dark:text-amber-400 shrink-0"
+            >
               Setup Required
             </Badge>
             <p className="text-muted-foreground">
-              <strong className="text-foreground">Browser-based voice control</strong> is available
-              immediately via the Web Speech API.{" "}
-              <strong className="text-foreground">Server-side voice recognition</strong> (Whisper STT,
-              30+ languages, noise cancellation) requires{" "}
-              <code className="bg-muted px-1 rounded text-xs">OPENAI_API_KEY</code> to be configured.
+              <strong className="text-foreground">
+                Browser-based voice control
+              </strong>{" "}
+              is available immediately via the Web Speech API.{" "}
+              <strong className="text-foreground">
+                Server-side voice recognition
+              </strong>{" "}
+              (Whisper STT, 30+ languages, noise cancellation) requires{" "}
+              <code className="bg-muted px-1 rounded text-xs">
+                OPENAI_API_KEY
+              </code>{" "}
+              to be configured.
             </p>
           </div>
         </div>
@@ -430,14 +440,17 @@ export default function VoiceOperationsPage() {
           <Card className="mx-auto max-w-3xl">
             <CardContent className="pt-8 pb-6">
               <p className="text-lg italic mb-6">
-                "Voice operations reduced our training time by 75% and picking errors by 35%. 
-                New employees are productive within hours instead of days. 
-                Accuracy sits at 99.9% consistently. Best investment we made."
+                "Voice operations reduced our training time by 75% and picking
+                errors by 35%. New employees are productive within hours instead
+                of days. Accuracy sits at 99.9% consistently. Best investment we
+                made."
               </p>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">Michael Thompson</p>
-                  <p className="text-sm text-muted-foreground">Warehouse Manager, SwiftLogistics DC</p>
+                  <p className="text-sm text-muted-foreground">
+                    Warehouse Manager, SwiftLogistics DC
+                  </p>
                 </div>
                 <Badge className="bg-purple-600">75% Training Reduction</Badge>
               </div>

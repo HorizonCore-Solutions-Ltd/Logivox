@@ -63,7 +63,8 @@ export default function PricingPage() {
   const plans = [
     {
       name: "Starter",
-      description: "Perfect for teams scaling from manual to automated warehouse operations",
+      description:
+        "Perfect for teams scaling from manual to automated warehouse operations",
       monthlyPrice: 49,
       popular: false,
       badge: null,
@@ -96,7 +97,8 @@ export default function PricingPage() {
     },
     {
       name: "Professional",
-      description: "The complete solution for mid-market operations that need speed, scale, and advanced features",
+      description:
+        "The complete solution for mid-market operations that need speed, scale, and advanced features",
       monthlyPrice: 99,
       popular: true,
       badge: "Most Popular",
@@ -130,7 +132,8 @@ export default function PricingPage() {
     },
     {
       name: "Enterprise",
-      description: "Built for Fortune 500 companies and complex global operations requiring unlimited scale & customization",
+      description:
+        "Built for Fortune 500 companies and complex global operations requiring unlimited scale & customization",
       monthlyPrice: 0, // Custom pricing
       popular: false,
       badge: "Best Value",
@@ -428,8 +431,8 @@ export default function PricingPage() {
 
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               From small warehouses to global enterprises, LogiVox delivers
-              complete warehouse management in one simple platform. Start
-              small, scale infinitely.
+              complete warehouse management in one simple platform. Start small,
+              scale infinitely.
             </p>
 
             {/* Billing Toggle */}
@@ -519,8 +522,14 @@ export default function PricingPage() {
 
           {/* Transparency Notes */}
           <div className="text-xs text-muted-foreground text-center border-t pt-4 space-y-1">
-            <p>¹ Based on verified customer implementations. See case studies for details.</p>
-            <p>² Aggregated rating from G2, Trustpilot, and verified customer reviews.</p>
+            <p>
+              ¹ Based on verified customer implementations. See case studies for
+              details.
+            </p>
+            <p>
+              ² Aggregated rating from G2, Trustpilot, and verified customer
+              reviews.
+            </p>
           </div>
         </div>
       </section>
@@ -1044,7 +1053,9 @@ export default function PricingPage() {
               </div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-primary mb-2">30 Days</div>
+              <div className="text-4xl font-bold text-primary mb-2">
+                30 Days
+              </div>
               <div className="text-sm text-muted-foreground">
                 Typical ROI Timeline
               </div>

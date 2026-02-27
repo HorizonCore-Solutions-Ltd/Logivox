@@ -20,7 +20,11 @@ async function emitCollaborationEvent(
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ eventType, payload, timestamp: new Date().toISOString() }),
+      body: JSON.stringify({
+        eventType,
+        payload,
+        timestamp: new Date().toISOString(),
+      }),
     });
     return { delivered: response.ok, statusCode: response.status };
   } catch (error) {
@@ -367,12 +371,15 @@ async function analyzePredictiveRequest(requestId: string) {
 
     if (!request) return;
 
-    await emitCollaborationEvent("COLLABORATION_PREDICTIVE_ANALYSIS_REQUESTED", {
-      requestId,
-      requesterId: request.requesterId,
-      status: request.status,
-      taskType: request.taskType,
-    });
+    await emitCollaborationEvent(
+      "COLLABORATION_PREDICTIVE_ANALYSIS_REQUESTED",
+      {
+        requestId,
+        requesterId: request.requesterId,
+        status: request.status,
+        taskType: request.taskType,
+      },
+    );
   } catch (error) {
     console.error("Analyze predictive request error:", error);
   }

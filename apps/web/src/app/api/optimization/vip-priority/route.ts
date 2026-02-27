@@ -390,7 +390,11 @@ export async function GET(req: NextRequest) {
         const annualSpend = spendByCustomer.get(customer.id) || 0;
         const orderCount = countByCustomer.get(customer.id) || 0;
         const avgOrderValue = orderCount > 0 ? annualSpend / orderCount : 0;
-        const resolvedTier = resolveTier(customer.id, annualSpend, tierOverrides);
+        const resolvedTier = resolveTier(
+          customer.id,
+          annualSpend,
+          tierOverrides,
+        );
 
         return {
           id: `${customer.id}-${resolvedTier.tier}`,
@@ -480,7 +484,8 @@ export async function GET(req: NextRequest) {
           });
 
           const targetShipTime = new Date(
-            order.createdAt.getTime() + tierResolution.slaHours * 60 * 60 * 1000,
+            order.createdAt.getTime() +
+              tierResolution.slaHours * 60 * 60 * 1000,
           );
           const sla = checkSLAStatus(targetShipTime);
 
@@ -531,7 +536,9 @@ export async function GET(req: NextRequest) {
           prisma.salesOrder.count({
             where: {
               organizationId,
-              status: { in: ["APPROVED", "PICKING", "PICKED", "PACKING"] as any },
+              status: {
+                in: ["APPROVED", "PICKING", "PICKED", "PACKING"] as any,
+              },
             },
           }),
           prisma.salesOrder.aggregate({
@@ -823,7 +830,14 @@ export async function POST(req: NextRequest) {
 
       const validRows = updates
         .map((row: unknown) => customerTierSchema.safeParse(row))
-        .filter((result): result is { success: true; data: z.infer<typeof customerTierSchema> } => result.success)
+        .filter(
+          (
+            result,
+          ): result is {
+            success: true;
+            data: z.infer<typeof customerTierSchema>;
+          } => result.success,
+        )
         .map((result) => result.data);
 
       if (validRows.length === 0) {
@@ -844,7 +858,8 @@ export async function POST(req: NextRequest) {
             customerId: row.customerId,
             tier: row.tier,
             priorityMultiplier: row.priorityMultiplier,
-            targetShipHours: row.targetShipHours || TIER_CONFIG[row.tier].slaHours,
+            targetShipHours:
+              row.targetShipHours || TIER_CONFIG[row.tier].slaHours,
             effectiveFrom: row.effectiveFrom || null,
             effectiveUntil: row.effectiveUntil || null,
             isActive: true,
@@ -923,7 +938,10 @@ export async function PUT(req: NextRequest) {
       });
 
       if (!customer) {
-        return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Customer not found" },
+          { status: 404 },
+        );
       }
 
       await prisma.activityLog.create({
@@ -989,7 +1007,9 @@ export async function PUT(req: NextRequest) {
               notifyManager: updates.notifyManager,
             }),
             ...(updates.tierId !== undefined && { tierId: updates.tierId }),
-            ...(updates.priority !== undefined && { priority: updates.priority }),
+            ...(updates.priority !== undefined && {
+              priority: updates.priority,
+            }),
           },
         },
       });

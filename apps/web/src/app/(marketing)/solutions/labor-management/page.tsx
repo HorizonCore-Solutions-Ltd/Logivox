@@ -252,11 +252,7 @@ export default function LaborManagementPage() {
       icon: CheckCircle2,
       description:
         "Improved engagement and accountability with transparent performance metrics",
-      stats: [
-        "Industry avg: 94%",
-        "LMS avg: 97%+",
-        "Target: +3–5%",
-      ],
+      stats: ["Industry avg: 94%", "LMS avg: 97%+", "Target: +3–5%"],
     },
     {
       title: "Reduced Turnover 42%",
@@ -541,9 +537,12 @@ export default function LaborManagementPage() {
       <section className="py-20">
         <div className="container-enterprise">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">Expected Business Impact</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Expected Business Impact
+            </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Industry-benchmarked outcomes for warehouses implementing modern LMS
+              Industry-benchmarked outcomes for warehouses implementing modern
+              LMS
             </p>
           </div>
 

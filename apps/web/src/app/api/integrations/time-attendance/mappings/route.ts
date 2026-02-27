@@ -38,7 +38,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
     }
 
-    const { provider, externalEmployeeId, employeeId, locationExternalId, metadata } = parsed.data;
+    const {
+      provider,
+      externalEmployeeId,
+      employeeId,
+      locationExternalId,
+      metadata,
+    } = parsed.data;
 
     const employee = await prisma.employee.findUnique({
       where: { id: employeeId },
@@ -46,7 +52,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!employee) {
-      return NextResponse.json({ error: "Employee not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Employee not found" },
+        { status: 404 },
+      );
     }
 
     const mapping = await prisma.timeAttendanceMapping.upsert({

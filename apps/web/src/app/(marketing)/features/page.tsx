@@ -53,7 +53,8 @@ export default function FeaturesPage() {
       benefit: "Know exactly what you have, where you have it, right now",
       description:
         "Live visibility across all warehouse locations with instant updates on every SKU movement and stock level change.",
-      impact: "Eliminate stockouts, reduce overstocking by 35%, prevent $10K+ emergency air shipments",
+      impact:
+        "Eliminate stockouts, reduce overstocking by 35%, prevent $10K+ emergency air shipments",
       usedBy: ["Starter", "Professional", "Enterprise"],
     },
     {
@@ -64,7 +65,8 @@ export default function FeaturesPage() {
       benefit: "30% faster transactions with zero manual entry errors",
       description:
         "Support for 1D/2D barcodes, RFID tags, and QR codes with automatic data capture and validation.",
-      impact: "Reduce picking errors from 5-8% to <0.5%, eliminate data entry time",
+      impact:
+        "Reduce picking errors from 5-8% to <0.5%, eliminate data entry time",
       usedBy: ["Starter", "Professional", "Enterprise"],
     },
     {
@@ -72,7 +74,8 @@ export default function FeaturesPage() {
       tier: "starter",
       icon: Database,
       name: "Multi-Location Management",
-      benefit: "Centrally manage unlimited warehouse locations with one platform",
+      benefit:
+        "Centrally manage unlimited warehouse locations with one platform",
       description:
         "Seamless inventory visibility and control across all your warehouses, distribution centers, and satellite locations.",
       impact: "Support global expansion without adding complexity or systems",
@@ -86,7 +89,8 @@ export default function FeaturesPage() {
       benefit: "Give each team member exactly the permissions they need",
       description:
         "Granular permission system with 20+ predefined roles (Warehouse Manager, Picker, QC Inspector, etc.) customizable to your org.",
-      impact: "Reduce security risks, ensure GDPR/HIPAA compliance, audit all actions",
+      impact:
+        "Reduce security risks, ensure GDPR/HIPAA compliance, audit all actions",
       usedBy: ["Starter", "Professional", "Enterprise"],
     },
 
@@ -107,10 +111,12 @@ export default function FeaturesPage() {
       tier: "professional",
       icon: Truck,
       name: "Multi-Carrier Shipping Integration",
-      benefit: "Automatically select the best carrier for each shipment, cut shipping costs 12-18%",
+      benefit:
+        "Automatically select the best carrier for each shipment, cut shipping costs 12-18%",
       description:
         "Real-time rate shopping across UPS, FedEx, USPS, DHL with automatic label generation and tracking.",
-      impact: "Reduce shipping spend, improve customer satisfaction with tracking",
+      impact:
+        "Reduce shipping spend, improve customer satisfaction with tracking",
       usedBy: ["Professional", "Enterprise"],
     },
     {
@@ -121,7 +127,8 @@ export default function FeaturesPage() {
       benefit: "99.9% inventory accuracy without shutting down operations",
       description:
         "Continuous verification using ABC analysis, blind counting, and automatic adjustments.",
-      impact: "Eliminate annual physical inventory chaos, maintain 99.9%+ accuracy year-round",
+      impact:
+        "Eliminate annual physical inventory chaos, maintain 99.9%+ accuracy year-round",
       usedBy: ["Professional", "Enterprise"],
     },
     {
@@ -132,7 +139,8 @@ export default function FeaturesPage() {
       benefit: "Turn returns into profit with complete RMA management",
       description:
         "Automated returns workflows with quality inspection, restocking decisions, and refund processing.",
-      impact: "Reduce returns processing cost 40%, increase sellable inventory recovery",
+      impact:
+        "Reduce returns processing cost 40%, increase sellable inventory recovery",
       usedBy: ["Professional", "Enterprise"],
     },
     {
@@ -140,10 +148,12 @@ export default function FeaturesPage() {
       tier: "professional",
       icon: Shield,
       name: "Quality Control Suite",
-      benefit: "Catch 95% of defects before shipping, eliminate customer complaints",
+      benefit:
+        "Catch 95% of defects before shipping, eliminate customer complaints",
       description:
         "Automated inspection workflows, exception management, and quality metrics with audit trails.",
-      impact: "Reduce customer returns by 90%, eliminate $847K annual rework costs",
+      impact:
+        "Reduce customer returns by 90%, eliminate $847K annual rework costs",
       usedBy: ["Professional", "Enterprise"],
     },
 
@@ -153,7 +163,8 @@ export default function FeaturesPage() {
       tier: "professional",
       icon: Voice,
       name: "Voice Operations",
-      benefit: "Hands-free warehouse control - pickers work 35% faster without distractions",
+      benefit:
+        "Hands-free warehouse control - pickers work 35% faster without distractions",
       description:
         "Natural language voice commands in 15+ languages. Say what you want, LogiVox handles it. Zero training required.",
       impact: "$847K annual savings + 99.2% picking accuracy + 0 training days",
@@ -178,7 +189,8 @@ export default function FeaturesPage() {
       benefit: "Catch errors and fraud with AI-powered image recognition",
       description:
         "Automated quality control, shrinkage detection, and compliance verification using advanced computer vision.",
-      impact: "Eliminate false claims, reduce shrinkage 20%, replace manual inspections",
+      impact:
+        "Eliminate false claims, reduce shrinkage 20%, replace manual inspections",
       usedBy: ["Enterprise"],
     },
     {
@@ -210,10 +222,12 @@ export default function FeaturesPage() {
       tier: "enterprise",
       icon: Lock,
       name: "Compliance Reporting",
-      benefit: "Meet GDPR, HIPAA, SOC 2, and ISO 27001 requirements automatically",
+      benefit:
+        "Meet GDPR, HIPAA, SOC 2, and ISO 27001 requirements automatically",
       description:
         "Automated compliance reporting, audit trails, data residency controls, and consent management.",
-      impact: "Eliminate compliance risk, pass audits first try, avoid $5M+ penalties",
+      impact:
+        "Eliminate compliance risk, pass audits first try, avoid $5M+ penalties",
       usedBy: ["Enterprise"],
     },
     {
@@ -234,10 +248,12 @@ export default function FeaturesPage() {
       tier: "enterprise",
       icon: Globe,
       name: "White-Label Mobile App",
-      benefit: "Brand the app with your logo and colors - your customers use YOUR app",
+      benefit:
+        "Brand the app with your logo and colors - your customers use YOUR app",
       description:
         "Fully customizable mobile experience with your branding, custom workflows, and private app store distribution.",
-      impact: "Build brand loyalty, control customer experience, reduce training time",
+      impact:
+        "Build brand loyalty, control customer experience, reduce training time",
       usedBy: ["Enterprise"],
     },
     {
@@ -248,7 +264,8 @@ export default function FeaturesPage() {
       benefit: "See and test changes before implementing them",
       description:
         "Virtual simulation of your warehouse operations for scenario planning and testing optimization changes.",
-      impact: "Reduce implementation risk, test changes before release, optimize layouts",
+      impact:
+        "Reduce implementation risk, test changes before release, optimize layouts",
       usedBy: ["Enterprise"],
     },
     {
@@ -259,7 +276,8 @@ export default function FeaturesPage() {
       benefit: "Your personal expert ensuring you hit all your goals",
       description:
         "Assigned success manager monitors your KPIs, suggests optimizations, and handles all priorities.",
-      impact: "Achieve rapid ROI payback, hit all strategic goals with dedicated guidance",
+      impact:
+        "Achieve rapid ROI payback, hit all strategic goals with dedicated guidance",
       usedBy: ["Enterprise"],
     },
     {
@@ -273,6 +291,75 @@ export default function FeaturesPage() {
       impact: "Zero downtime, immediate issue resolution, peace of mind",
       usedBy: ["Enterprise"],
     },
+
+    // Next-Gen WMS Intelligence
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: Users,
+      name: "Real-Time Labor Management",
+      benefit: "Optimize your workforce with live performance heatmaps",
+      description:
+        "Monitor worker productivity in real-time with AI-driven performance tracking and dynamic labor re-assignment algorithms.",
+      impact:
+        "25% reduction in labor costs, 35% increase in worker productivity",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: Layers,
+      name: "Advanced Wave & Task Interleaving",
+      benefit: "Eliminate dead-heading with intelligent task chaining",
+      description:
+        "Automatically assign putaway tasks to operators after picking tasks in the same area to maximize forklift utilization.",
+      impact: "20% reduction in travel time, 15% increase in pallet throughput",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: Gauge,
+      name: "Modern Yard Management",
+      benefit: "Full visibility from gate arrival to dock departure",
+      description:
+        "Track trailer lifecycle, automate dock scheduling, and manage shunter tasks with real-time gate-to-door integration.",
+      impact: "Eliminate detention fees, reduce yard congestion by 40%",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: Globe,
+      name: "Omnichannel Fulfillment Hub",
+      benefit: "Unified inventory for Retail, E-com, and Wholesale",
+      description:
+        "Intelligent order routing cross-channels with dedicated workflows for B2B, DTC, and ship-from-store operations.",
+      impact: "15% revenue increase from improved omnichannel stock pooling",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: Sparkles,
+      name: "Robotics & Automation Integration",
+      benefit: "Seamlessly scale with AMRs and sortation systems",
+      description:
+        "Future-proof your warehouse with built-in APIs for Autonomous Mobile Robots, conveyors, and automated packing.",
+      impact: "4x increase in scaling capability without adding headcount",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: Zap,
+      name: "Enterprise IoT Ingestion",
+      benefit: "Proactive management through real-time telemetry",
+      description:
+        "Log and alert on temperature, humidity, weight, and RFID data via a massive sensor network integration.",
+      impact: "100% cold-chain compliance, zero inventory loss from spoilage",
+      usedBy: ["Enterprise"],
+    },
   ];
 
   const categories = [
@@ -282,6 +369,7 @@ export default function FeaturesPage() {
     { id: "AI & Optimization", label: "AI & Optimization" },
     { id: "Quality & Compliance", label: "Quality & Compliance" },
     { id: "Enterprise Features", label: "Enterprise Features" },
+    { id: "Next-Gen Intelligence", label: "Next-Gen Intelligence" },
   ];
 
   const filteredFeatures = features.filter((feature) => {
@@ -379,12 +467,17 @@ export default function FeaturesPage() {
         <div className="container-enterprise">
           <div className="space-y-8">
             {categories
-              .filter((cat) => selectedCategory === "all" || cat.id === "all" || cat.id === selectedCategory)
+              .filter(
+                (cat) =>
+                  selectedCategory === "all" ||
+                  cat.id === "all" ||
+                  cat.id === selectedCategory,
+              )
               .map((category) => {
                 if (category.id === "all") return null;
 
                 const categoryFeatures = filteredFeatures.filter(
-                  (f) => f.category === category.id
+                  (f) => f.category === category.id,
                 );
 
                 if (categoryFeatures.length === 0) return null;
@@ -437,7 +530,11 @@ export default function FeaturesPage() {
                             {/* Available In */}
                             <div className="flex flex-wrap gap-1">
                               {feature.usedBy.map((tier) => (
-                                <Badge key={tier} variant="outline" className="text-xs">
+                                <Badge
+                                  key={tier}
+                                  variant="outline"
+                                  className="text-xs"
+                                >
                                   {tier}
                                 </Badge>
                               ))}
@@ -491,7 +588,11 @@ export default function FeaturesPage() {
 
                       <div className="flex flex-wrap gap-1">
                         {feature.usedBy.map((tier) => (
-                          <Badge key={tier} variant="outline" className="text-xs">
+                          <Badge
+                            key={tier}
+                            variant="outline"
+                            className="text-xs"
+                          >
                             {tier}
                           </Badge>
                         ))}
@@ -527,9 +628,12 @@ export default function FeaturesPage() {
       <section className="py-16 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Which Features Are Right For You?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Which Features Are Right For You?
+            </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              All plans include the core platform. Add advanced features as your operation grows.
+              All plans include the core platform. Add advanced features as your
+              operation grows.
             </p>
           </div>
 
@@ -537,20 +641,28 @@ export default function FeaturesPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Starter</CardTitle>
-                <CardDescription>Essential warehouse automation</CardDescription>
+                <CardDescription>
+                  Essential warehouse automation
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <p className="font-semibold text-sm">Includes:</p>
                   <ul className="space-y-1">
-                    {["Real-time tracking", "Barcode scanning", "Multi-location mgmt", "Basic reports"].map(
-                      (feature) => (
-                        <li key={feature} className="flex items-center gap-2 text-sm">
-                          <Check className="h-4 w-4 text-green-600" />
-                          {feature}
-                        </li>
-                      )
-                    )}
+                    {[
+                      "Real-time tracking",
+                      "Barcode scanning",
+                      "Multi-location mgmt",
+                      "Basic reports",
+                    ].map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <Check className="h-4 w-4 text-green-600" />
+                        {feature}
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <Button asChild className="w-full">
@@ -567,7 +679,9 @@ export default function FeaturesPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <p className="font-semibold text-sm">Includes everything in Starter, plus:</p>
+                  <p className="font-semibold text-sm">
+                    Includes everything in Starter, plus:
+                  </p>
                   <ul className="space-y-1">
                     {[
                       "Wave picking & batching",
@@ -577,7 +691,10 @@ export default function FeaturesPage() {
                       "Quality control",
                       "Advanced analytics",
                     ].map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm">
+                      <li
+                        key={feature}
+                        className="flex items-center gap-2 text-sm"
+                      >
                         <Check className="h-4 w-4 text-green-600" />
                         {feature}
                       </li>
@@ -593,21 +710,27 @@ export default function FeaturesPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Enterprise</CardTitle>
-                <CardDescription>Unlimited scale & customization</CardDescription>
+                <CardDescription>
+                  Unlimited scale & customization
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
-                  <p className="font-semibold text-sm">Includes everything, plus:</p>
+                  <p className="font-semibold text-sm">
+                    Includes everything, plus:
+                  </p>
                   <ul className="space-y-1">
                     {[
                       "Computer vision",
                       "Digital twin",
-                      "Custom integrations",
+                      "Next-Gen Intelligence Suite",
                       "White-label app",
                       "Dedicated success mgr",
-                      "24/7 premium support",
                     ].map((feature) => (
-                      <li key={feature} className="flex items-center gap-2 text-sm">
+                      <li
+                        key={feature}
+                        className="flex items-center gap-2 text-sm"
+                      >
                         <Check className="h-4 w-4 text-green-600" />
                         {feature}
                       </li>
@@ -627,9 +750,7 @@ export default function FeaturesPage() {
       <section className="py-16">
         <div className="container-enterprise">
           <div className="text-center space-y-6 max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold">
-              See All Features in Action
-            </h2>
+            <h2 className="text-3xl font-bold">See All Features in Action</h2>
             <p className="text-muted-foreground text-lg">
               Schedule a demo and let our team walk you through how LogiVox can
               transform your warehouse operations.

@@ -504,7 +504,9 @@ async function optimizeWarehouseLayout(organizationId: string) {
   );
 
   if (!response.ok) {
-    throw new Error(`Layout optimization failed with status ${response.status}`);
+    throw new Error(
+      `Layout optimization failed with status ${response.status}`,
+    );
   }
 
   return response.json();
@@ -531,7 +533,9 @@ async function optimizeWorkerSchedule(organizationId: string) {
   );
 
   if (!response.ok) {
-    throw new Error(`Schedule optimization failed with status ${response.status}`);
+    throw new Error(
+      `Schedule optimization failed with status ${response.status}`,
+    );
   }
 
   return response.json();

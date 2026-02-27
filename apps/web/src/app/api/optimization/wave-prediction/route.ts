@@ -510,7 +510,10 @@ export async function GET(req: NextRequest) {
 
           const totalQty = group._sum.quantity ?? 0;
           const avgDailyPicks = totalQty / horizonDays;
-          const predictedPicksToday = Math.max(1, Math.round(avgDailyPicks * 1.15));
+          const predictedPicksToday = Math.max(
+            1,
+            Math.round(avgDailyPicks * 1.15),
+          );
           const currentStockPrimaryZone = item.availableQty;
           const optimalStockPrimaryZone = Math.max(
             item.reorderPoint ?? 0,
@@ -604,12 +607,16 @@ export async function GET(req: NextRequest) {
       );
       const unitsProcessed = todayOrders.reduce(
         (sum, order) =>
-          sum + order.items.reduce((lineSum, item) => lineSum + item.quantity, 0),
+          sum +
+          order.items.reduce((lineSum, item) => lineSum + item.quantity, 0),
         0,
       );
 
       const completedTasks = todayTasks.filter(
-        (task) => String(task.status) === "COMPLETED" && task.startedAt && task.completedAt,
+        (task) =>
+          String(task.status) === "COMPLETED" &&
+          task.startedAt &&
+          task.completedAt,
       );
       const avgWaveTime =
         completedTasks.length > 0
@@ -651,7 +658,10 @@ export async function GET(req: NextRequest) {
               units: unitsProcessed,
               startTime: activeTask.startedAt,
               estimatedCompletion: activeTask.startedAt
-                ? new Date(new Date(activeTask.startedAt).getTime() + targetWaveTime * 60 * 1000)
+                ? new Date(
+                    new Date(activeTask.startedAt).getTime() +
+                      targetWaveTime * 60 * 1000,
+                  )
                 : null,
               progressPercentage: Number(activeTask.progress),
             }
@@ -712,7 +722,10 @@ export async function GET(req: NextRequest) {
           : 0;
 
       const completedMonthTasks = monthlyTasks.filter(
-        (task) => String(task.status) === "COMPLETED" && task.startedAt && task.completedAt,
+        (task) =>
+          String(task.status) === "COMPLETED" &&
+          task.startedAt &&
+          task.completedAt,
       );
       const avgWaveTime =
         completedMonthTasks.length > 0
@@ -736,10 +749,7 @@ export async function GET(req: NextRequest) {
         avgWaveTime > 0
           ? Math.max(0, Math.min(100, (targetWaveTime / avgWaveTime) * 100))
           : 0;
-      const efficiencyWithoutPreStage = Math.max(
-        0,
-        efficiencyWithPreStage - 8,
-      );
+      const efficiencyWithoutPreStage = Math.max(0, efficiencyWithPreStage - 8);
       const improvement = efficiencyWithPreStage - efficiencyWithoutPreStage;
       const timeSavedPerWave = Math.max(0, targetWaveTime - avgWaveTime);
       const daily = timeSavedPerWave * 6;
@@ -764,7 +774,7 @@ export async function GET(req: NextRequest) {
         },
         monthlySavings: Number((monthly * 4.2).toFixed(2)),
         yearlySavings: Number((monthly * 4.2 * 12).toFixed(2)),
-        roi: Number(((monthly * 4.2 * 12) / 15000 * 100).toFixed(1)),
+        roi: Number((((monthly * 4.2 * 12) / 15000) * 100).toFixed(1)),
       });
     }
 

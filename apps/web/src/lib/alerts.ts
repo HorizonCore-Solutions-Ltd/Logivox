@@ -631,9 +631,7 @@ export class ReorderAlertEngine {
 
     if (!response.ok) {
       const payload = await response.text().catch(() => "");
-      throw new Error(
-        `Push webhook failed: ${response.status} ${payload}`,
-      );
+      throw new Error(`Push webhook failed: ${response.status} ${payload}`);
     }
   }
 

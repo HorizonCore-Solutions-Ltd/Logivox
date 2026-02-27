@@ -10,7 +10,10 @@ export async function POST(req: NextRequest) {
     const { startDate, endDate, locationExternalId } = body;
 
     if (!startDate || !endDate) {
-      return NextResponse.json({ error: "startDate and endDate are required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "startDate and endDate are required" },
+        { status: 400 },
+      );
     }
 
     const result = await syncPunches({

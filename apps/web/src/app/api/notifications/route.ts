@@ -86,7 +86,8 @@ async function dispatchNotification(opts: {
   recipientPhone?: string;
   actionUrl?: string;
 }) {
-  const { channel, subject, body, htmlBody, recipientEmail, recipientPhone } = opts;
+  const { channel, subject, body, htmlBody, recipientEmail, recipientPhone } =
+    opts;
 
   if (channel === "IN_APP") {
     // Already recorded in DB; nothing further to dispatch
@@ -94,11 +95,15 @@ async function dispatchNotification(opts: {
   }
 
   if (channel === "EMAIL" || channel === "WEBHOOK") {
-    if (!recipientEmail) throw new Error("recipientEmail required for EMAIL channel");
+    if (!recipientEmail)
+      throw new Error("recipientEmail required for EMAIL channel");
 
     if (process.env.SENDGRID_API_KEY) {
       sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-      const fromEmail = process.env.SENDGRID_FROM_EMAIL || process.env.EMAIL_FROM || "noreply@flowstock.app";
+      const fromEmail =
+        process.env.SENDGRID_FROM_EMAIL ||
+        process.env.EMAIL_FROM ||
+        "noreply@flowstock.app";
       await sgMail.send({
         to: recipientEmail,
         from: fromEmail,
@@ -128,15 +133,23 @@ async function dispatchNotification(opts: {
       return;
     }
 
-    throw new Error("No email provider configured. Set SENDGRID_API_KEY or SMTP_HOST.");
+    throw new Error(
+      "No email provider configured. Set SENDGRID_API_KEY or SMTP_HOST.",
+    );
   }
 
   if (channel === "SMS") {
-    if (!recipientPhone) throw new Error("recipientPhone required for SMS channel");
+    if (!recipientPhone)
+      throw new Error("recipientPhone required for SMS channel");
     if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) {
-      throw new Error("Twilio not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN.");
+      throw new Error(
+        "Twilio not configured. Set TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN.",
+      );
     }
-    const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+    const client = twilio(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN,
+    );
     await client.messages.create({
       from: process.env.TWILIO_FROM || "",
       to: recipientPhone,
@@ -148,7 +161,9 @@ async function dispatchNotification(opts: {
   if (channel === "PUSH") {
     // Push requires FCM/APNs — log and skip if not configured
     if (!process.env.FIREBASE_SERVER_KEY) {
-      throw new Error("Push notifications not configured. Set FIREBASE_SERVER_KEY.");
+      throw new Error(
+        "Push notifications not configured. Set FIREBASE_SERVER_KEY.",
+      );
     }
     // FCM v1 dispatch would go here
     return;
@@ -345,7 +360,10 @@ export async function POST(request: Request) {
               data: { status: "DELIVERED", deliveredAt: new Date() },
             });
           } catch (err: any) {
-            console.error(`[notifications] ${delivery.channel} dispatch failed:`, err.message);
+            console.error(
+              `[notifications] ${delivery.channel} dispatch failed:`,
+              err.message,
+            );
             await prisma.notificationDelivery.update({
               where: { id: delivery.id },
               data: { status: "FAILED", failureReason: err.message },

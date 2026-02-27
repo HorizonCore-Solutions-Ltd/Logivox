@@ -78,7 +78,11 @@ async function getOrganizationId(userId: string): Promise<string | null> {
 
 function generateBOLNumber(): string {
   const year = new Date().getFullYear();
-  const suffix = crypto.randomUUID().replace(/-/g, "").slice(0, 6).toUpperCase();
+  const suffix = crypto
+    .randomUUID()
+    .replace(/-/g, "")
+    .slice(0, 6)
+    .toUpperCase();
   return `BOL-${year}-${suffix}`;
 }
 
@@ -97,10 +101,16 @@ function rebuildBolState(events: any[]) {
 
   const docs = events
     .filter((e) => e.action === "DOCK_BOL_DOCUMENT_ATTACHED")
-    .map((e) => ({ id: e.entityId, ...(e.metadata as any), uploadedAt: e.createdAt }));
+    .map((e) => ({
+      id: e.entityId,
+      ...(e.metadata as any),
+      uploadedAt: e.createdAt,
+    }));
 
   const isVoided = events.some((e) => e.action === "DOCK_BOL_VOIDED");
-  const generatedPdf = events.find((e) => e.action === "DOCK_BOL_PDF_GENERATED");
+  const generatedPdf = events.find(
+    (e) => e.action === "DOCK_BOL_PDF_GENERATED",
+  );
 
   let status = "DRAFT";
   const hasShipper = signatures.some((s) => s.signerRole === "SHIPPER");
@@ -172,7 +182,10 @@ export async function POST(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -232,7 +245,10 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, message: "BOL signed successfully" });
+      return NextResponse.json({
+        success: true,
+        message: "BOL signed successfully",
+      });
     }
 
     if (action === "attach_document") {
@@ -256,7 +272,11 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, documentId: docId, message: "Document attached successfully" });
+      return NextResponse.json({
+        success: true,
+        documentId: docId,
+        message: "Document attached successfully",
+      });
     }
 
     if (action === "void_bol") {
@@ -276,7 +296,10 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, message: "BOL voided successfully" });
+      return NextResponse.json({
+        success: true,
+        message: "BOL voided successfully",
+      });
     }
 
     if (action === "generate_pdf") {
@@ -297,7 +320,11 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, pdfUrl, message: "PDF generated successfully" });
+      return NextResponse.json({
+        success: true,
+        pdfUrl,
+        message: "PDF generated successfully",
+      });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
@@ -309,7 +336,10 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -322,12 +352,17 @@ export async function GET(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const events = await fetchBolEvents(organizationId);
 
-    const bolIds = [...new Set(events.map((e) => e.entityId).filter(Boolean))] as string[];
+    const bolIds = [
+      ...new Set(events.map((e) => e.entityId).filter(Boolean)),
+    ] as string[];
     const bols = bolIds
       .map((id) => rebuildBolState(events.filter((e) => e.entityId === id)))
       .filter(Boolean);
@@ -350,7 +385,8 @@ export async function GET(request: NextRequest) {
     if (action === "recent_bols") {
       const limit = parseInt(searchParams.get("limit") || "20", 10);
       const recent = [...(bols as any[])].sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
       return NextResponse.json({ bols: recent.slice(0, limit) });
     }
@@ -367,7 +403,9 @@ export async function GET(request: NextRequest) {
       today.setHours(0, 0, 0, 0);
 
       const totalBOLs = (bols as any[]).length;
-      const bolsToday = (bols as any[]).filter((b) => new Date(b.createdAt) >= today).length;
+      const bolsToday = (bols as any[]).filter(
+        (b) => new Date(b.createdAt) >= today,
+      ).length;
       const pendingSignatures = (bols as any[]).filter(
         (b) => b.status === "DRAFT" || b.status === "PENDING_CARRIER_SIGNATURE",
       ).length;
@@ -378,7 +416,8 @@ export async function GET(request: NextRequest) {
       const avgProcessingTime = 0;
       const complianceRate =
         completedBOLs > 0
-          ? ((bols as any[]).filter((b) => b.attachedDocuments?.length > 0).length /
+          ? ((bols as any[]).filter((b) => b.attachedDocuments?.length > 0)
+              .length /
               completedBOLs) *
             100
           : 0;
@@ -388,11 +427,13 @@ export async function GET(request: NextRequest) {
         carrierMap[bol.carrierName] = (carrierMap[bol.carrierName] || 0) + 1;
       }
 
-      const bolsByCarrier = Object.entries(carrierMap).map(([carrier, count]) => ({
-        carrier,
-        count,
-        percentage: totalBOLs > 0 ? (count / totalBOLs) * 100 : 0,
-      }));
+      const bolsByCarrier = Object.entries(carrierMap).map(
+        ([carrier, count]) => ({
+          carrier,
+          count,
+          percentage: totalBOLs > 0 ? (count / totalBOLs) * 100 : 0,
+        }),
+      );
 
       const docMap: Record<string, number> = {};
       for (const bol of bols as any[]) {
@@ -401,7 +442,10 @@ export async function GET(request: NextRequest) {
         }
       }
 
-      const documentTypes = Object.entries(docMap).map(([type, count]) => ({ type, count }));
+      const documentTypes = Object.entries(docMap).map(([type, count]) => ({
+        type,
+        count,
+      }));
 
       return NextResponse.json({
         metrics: {
@@ -420,6 +464,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error in BOL API:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

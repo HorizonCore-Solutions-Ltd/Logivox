@@ -111,19 +111,26 @@ function buildVerificationState(events: any[]) {
   const discrepancyResolved = events.filter(
     (e) => e.action === "DOCK_VERIFICATION_DISCREPANCY_RESOLVED",
   );
-  const completed = events.find((e) => e.action === "DOCK_VERIFICATION_COMPLETED");
+  const completed = events.find(
+    (e) => e.action === "DOCK_VERIFICATION_COMPLETED",
+  );
 
   const resolvedSet = new Set(
-    discrepancyResolved.map((e) => (e.metadata as any)?.discrepancyId).filter(Boolean),
+    discrepancyResolved
+      .map((e) => (e.metadata as any)?.discrepancyId)
+      .filter(Boolean),
   );
 
   const openDiscrepancies = discrepancyReported.filter(
     (e) => !resolvedSet.has((e.metadata as any)?.discrepancyId),
   );
 
-  const passedItems = scannedItems.filter((e) => !(e.metadata as any)?.hasDiscrepancy).length;
+  const passedItems = scannedItems.filter(
+    (e) => !(e.metadata as any)?.hasDiscrepancy,
+  ).length;
   const totalItems = scannedItems.length;
-  const verificationScore = totalItems > 0 ? (passedItems / totalItems) * 100 : 0;
+  const verificationScore =
+    totalItems > 0 ? (passedItems / totalItems) * 100 : 0;
 
   const base = created.metadata as any;
 
@@ -134,7 +141,11 @@ function buildVerificationState(events: any[]) {
     verifierUserId: base.verifierUserId,
     verifierName: base.verifierName,
     verificationType: base.verificationType,
-    status: completed ? (completed.metadata as any)?.status || "COMPLETED" : totalItems > 0 ? "IN_PROGRESS" : "PENDING",
+    status: completed
+      ? (completed.metadata as any)?.status || "COMPLETED"
+      : totalItems > 0
+        ? "IN_PROGRESS"
+        : "PENDING",
     startedAt: created.createdAt,
     completedAt: completed?.createdAt,
     totalItems,
@@ -154,7 +165,10 @@ export async function POST(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -192,7 +206,8 @@ export async function POST(request: NextRequest) {
       const data = scanItemSchema.parse(body);
       const itemEventId = createItemEventId();
       const hasDiscrepancy =
-        data.scannedQuantity !== data.expectedQuantity || data.condition !== "GOOD";
+        data.scannedQuantity !== data.expectedQuantity ||
+        data.condition !== "GOOD";
 
       await prisma.activityLog.create({
         data: {
@@ -219,7 +234,9 @@ export async function POST(request: NextRequest) {
         success: true,
         itemId: itemEventId,
         hasDiscrepancy,
-        message: hasDiscrepancy ? "Discrepancy detected" : "Item verified successfully",
+        message: hasDiscrepancy
+          ? "Discrepancy detected"
+          : "Item verified successfully",
       });
     }
 
@@ -248,7 +265,11 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, discrepancyId, message: "Discrepancy reported" });
+      return NextResponse.json({
+        success: true,
+        discrepancyId,
+        message: "Discrepancy reported",
+      });
     }
 
     if (action === "complete_verification") {
@@ -269,7 +290,10 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, message: "Verification completed" });
+      return NextResponse.json({
+        success: true,
+        message: "Verification completed",
+      });
     }
 
     if (action === "resolve_discrepancy") {
@@ -296,7 +320,10 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, message: "Discrepancy resolved" });
+      return NextResponse.json({
+        success: true,
+        message: "Discrepancy resolved",
+      });
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
@@ -310,7 +337,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -323,7 +353,10 @@ export async function GET(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -334,23 +367,41 @@ export async function GET(request: NextRequest) {
 
     if (action === "verification") {
       if (!verificationId) {
-        return NextResponse.json({ error: "Verification ID required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Verification ID required" },
+          { status: 400 },
+        );
       }
 
-      const verificationEvents = events.filter((e) => e.entityId === verificationId || (e.metadata as any)?.verificationId === verificationId);
+      const verificationEvents = events.filter(
+        (e) =>
+          e.entityId === verificationId ||
+          (e.metadata as any)?.verificationId === verificationId,
+      );
       const verification = buildVerificationState(verificationEvents);
 
       if (!verification) {
-        return NextResponse.json({ error: "Verification not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Verification not found" },
+          { status: 404 },
+        );
       }
 
       const items = verificationEvents
         .filter((e) => e.action === "DOCK_VERIFICATION_ITEM_SCANNED")
-        .map((e) => ({ id: e.entityId, ...(e.metadata as any), scannedAt: e.createdAt }));
+        .map((e) => ({
+          id: e.entityId,
+          ...(e.metadata as any),
+          scannedAt: e.createdAt,
+        }));
 
       const discrepancies = verificationEvents
         .filter((e) => e.action === "DOCK_VERIFICATION_DISCREPANCY_REPORTED")
-        .map((e) => ({ id: e.entityId, ...(e.metadata as any), reportedAt: e.createdAt }));
+        .map((e) => ({
+          id: e.entityId,
+          ...(e.metadata as any),
+          reportedAt: e.createdAt,
+        }));
 
       return NextResponse.json({ verification, items, discrepancies });
     }
@@ -367,7 +418,8 @@ export async function GET(request: NextRequest) {
     const verifications = verificationIds
       .map((id) => {
         const verificationEvents = events.filter(
-          (e) => e.entityId === id || (e.metadata as any)?.verificationId === id,
+          (e) =>
+            e.entityId === id || (e.metadata as any)?.verificationId === id,
         );
         return buildVerificationState(verificationEvents);
       })
@@ -394,7 +446,11 @@ export async function GET(request: NextRequest) {
 
       const openDiscrepancies = reported
         .filter((e) => !resolvedIds.has((e.metadata as any)?.discrepancyId))
-        .map((e) => ({ id: e.entityId, ...(e.metadata as any), reportedAt: e.createdAt }));
+        .map((e) => ({
+          id: e.entityId,
+          ...(e.metadata as any),
+          reportedAt: e.createdAt,
+        }));
 
       const bySeverity = {
         CRITICAL: openDiscrepancies.filter((d) => d.severity === "CRITICAL"),
@@ -412,11 +468,17 @@ export async function GET(request: NextRequest) {
     }
 
     if (action === "quality_metrics") {
-      const completed = verifications.filter((v: any) => v.status === "COMPLETED");
+      const completed = verifications.filter(
+        (v: any) => v.status === "COMPLETED",
+      );
       const totalVerifications = completed.length;
-      const passedVerifications = completed.filter((v: any) => v.verificationScore >= 95).length;
+      const passedVerifications = completed.filter(
+        (v: any) => v.verificationScore >= 95,
+      ).length;
       const passRate =
-        totalVerifications > 0 ? (passedVerifications / totalVerifications) * 100 : 0;
+        totalVerifications > 0
+          ? (passedVerifications / totalVerifications) * 100
+          : 0;
 
       const verificationTimes = completed
         .filter((v: any) => v.completedAt)
@@ -434,8 +496,10 @@ export async function GET(request: NextRequest) {
 
       const avgAccuracy =
         completed.length > 0
-          ? completed.reduce((sum: number, v: any) => sum + v.verificationScore, 0) /
-            completed.length
+          ? completed.reduce(
+              (sum: number, v: any) => sum + v.verificationScore,
+              0,
+            ) / completed.length
           : 0;
 
       const allDiscrepancies = events.filter(
@@ -461,6 +525,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error in verification API:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

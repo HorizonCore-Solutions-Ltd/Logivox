@@ -404,7 +404,8 @@ export async function GET(req: NextRequest) {
       const returns = rmas.map((rma) => {
         const totalValue = Number(rma.totalRefundAmount || 0);
         const itemCount = rma.items.length;
-        const ageHours = (Date.now() - rma.createdAt.getTime()) / (1000 * 60 * 60);
+        const ageHours =
+          (Date.now() - rma.createdAt.getTime()) / (1000 * 60 * 60);
         const priority =
           ageHours > 72 || totalValue > 500
             ? "CRITICAL"
@@ -433,7 +434,8 @@ export async function GET(req: NextRequest) {
         summary: {
           pending: returns.filter((r) => r.status === "PENDING").length,
           autoProcessed: returns.filter((r) => r.status === "COMPLETED").length,
-          needsInspection: returns.filter((r) => r.status === "INSPECTING").length,
+          needsInspection: returns.filter((r) => r.status === "INSPECTING")
+            .length,
           totalValue: returns.reduce((sum, r) => sum + r.totalValue, 0),
         },
       });
@@ -450,7 +452,9 @@ export async function GET(req: NextRequest) {
           returnReason: { select: { code: true } },
           items: {
             include: {
-              inventoryItem: { select: { sku: true, name: true, sellingPrice: true } },
+              inventoryItem: {
+                select: { sku: true, name: true, sellingPrice: true },
+              },
             },
           },
         },
@@ -462,11 +466,17 @@ export async function GET(req: NextRequest) {
           const rule = determineDisposition(
             mapRmaReason(rma.returnReason?.code),
             mapRmaCondition(item.condition as string | null),
-            Number(item.inventoryItem.sellingPrice || item.refundAmount || item.unitPrice || 0),
+            Number(
+              item.inventoryItem.sellingPrice ||
+                item.refundAmount ||
+                item.unitPrice ||
+                0,
+            ),
             Math.max(
               1,
               Math.floor(
-                (Date.now() - rma.requestedDate.getTime()) / (1000 * 60 * 60 * 24),
+                (Date.now() - rma.requestedDate.getTime()) /
+                  (1000 * 60 * 60 * 24),
               ),
             ),
           );
@@ -493,7 +503,8 @@ export async function GET(req: NextRequest) {
         total: recommendations.length,
         summary: {
           autoRestockable: recommendations.filter(
-            (r) => r.recommendedDisposition === "RESTOCK" && !r.requiresInspection,
+            (r) =>
+              r.recommendedDisposition === "RESTOCK" && !r.requiresInspection,
           ).length,
           needsRefurbishment: recommendations.filter(
             (r) => r.recommendedDisposition === "REFURBISH",
@@ -505,8 +516,10 @@ export async function GET(req: NextRequest) {
             recommendations.length > 0
               ? Number(
                   (
-                    recommendations.reduce((sum, r) => sum + r.estimatedRecovery, 0) /
-                    recommendations.length
+                    recommendations.reduce(
+                      (sum, r) => sum + r.estimatedRecovery,
+                      0,
+                    ) / recommendations.length
                   ).toFixed(1),
                 )
               : 0,
@@ -567,7 +580,12 @@ export async function GET(req: NextRequest) {
         targetProcessingTime: 12,
         autoProcessedRate:
           totalReturns > 0
-            ? Number((((totalReturns - pendingReturns) / totalReturns) * 100).toFixed(1))
+            ? Number(
+                (
+                  ((totalReturns - pendingReturns) / totalReturns) *
+                  100
+                ).toFixed(1),
+              )
             : 0,
         dispositionBreakdown: {
           restock: null,
@@ -661,7 +679,8 @@ export async function POST(req: NextRequest) {
         ? Math.max(
             1,
             Math.floor(
-              (Date.now() - salesOrder.orderDate.getTime()) / (1000 * 60 * 60 * 24),
+              (Date.now() - salesOrder.orderDate.getTime()) /
+                (1000 * 60 * 60 * 24),
             ),
           )
         : 15;

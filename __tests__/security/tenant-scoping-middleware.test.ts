@@ -10,7 +10,7 @@ import { Prisma, PrismaClient } from "@prisma/client";
 const mockPrismaClient = () => {
   // This test validates the tenant scoping logic conceptually
   // In a real environment, it would use the actual Prisma instance
-  
+
   const TENANT_SCOPED_MODELS = new Set([
     "InventoryItem",
     "Organization",
@@ -69,10 +69,7 @@ describe("Tenant Scoping Middleware", () => {
 
     it("should detect organizationId in AND clause", () => {
       const query = {
-        AND: [
-          { organizationId: "org-123" },
-          { status: "ACTIVE" },
-        ],
+        AND: [{ organizationId: "org-123" }, { status: "ACTIVE" }],
       };
       expect(containsOrganizationId(query)).toBe(true);
     });
@@ -119,9 +116,7 @@ describe("Tenant Scoping Middleware", () => {
         model: "InventoryItem",
         action: "findMany",
       };
-      expect(() => assertWhereScoped(params)).toThrow(
-        /Tenant scope required/,
-      );
+      expect(() => assertWhereScoped(params)).toThrow(/Tenant scope required/);
     });
 
     it("should allow deeply nested scoped queries", () => {
@@ -129,16 +124,10 @@ describe("Tenant Scoping Middleware", () => {
         where: {
           OR: [
             {
-              AND: [
-                { organizationId: "org-123" },
-                { status: "ACTIVE" },
-              ],
+              AND: [{ organizationId: "org-123" }, { status: "ACTIVE" }],
             },
             {
-              AND: [
-                { organizationId: "org-123" },
-                { status: "INACTIVE" },
-              ],
+              AND: [{ organizationId: "org-123" }, { status: "INACTIVE" }],
             },
           ],
         },

@@ -10,6 +10,7 @@
 ## H1 2026 (Jan–Jun 2026)
 
 ### Q1 2026 (Jan–Mar)
+
 - **Voice Multilingual Expansion**: Add 20+ additional languages; support for regional accents
 - **ISo 27001 Audit Prep**: Security documentation, access control hardening, vulnerability remediation
 - **Computer Vision QC**: TensorFlow-based quality inspection; defect classification
@@ -17,6 +18,7 @@
 - **EDI/ASN Enhancements**: SAP/Oracle EDI connectors; full ORDERS/DESADV/RECADV support
 
 ### Q2 2026 (Apr–Jun)
+
 - **SOC 2 Type II Certification**: Complete audit; certification target June
 - **Cold-Chain Module**: Temperature monitoring, FEFO automation, cold-chain compliance for pharma
 - **Advanced Analytics**: Predictive maintenance for equipment; anomaly detection for inventory shrinkage
@@ -28,6 +30,7 @@
 ## H2 2026 (Jul–Dec 2026)
 
 ### Q3 2026 (Jul–Sep)
+
 - **Pharmaceutical Compliance Pack**: FDA 21 CFR Part 11; HIPAA audit trails; serialisation (DSCSA/SECURPHARM)
 - **Automotive Module**: JIT scheduling, supplier quality tracking, IATF 16949 compliance
 - **Predictive Replenishment**: ML-driven auto-reordering based on historical patterns + forecast signals
@@ -35,6 +38,7 @@
 - **Integration Marketplace Beta**: Third-party developer ecosystem (carriers, ERP, IoT)
 
 ### Q4 2026 (Oct–Dec)
+
 - **Digital Twin Module**: Real-time warehouse simulation; "what-if" scenario planning
 - **Supplier Collaboration Portal**: Supplier scorecards, order visibility, compliance documentation sharing
 - **Advanced Labor Analytics**: Worker fatigue monitoring, fair allocation scoring, career path recommendations
@@ -46,6 +50,7 @@
 ## H1 2027 (Jan–Jun 2027)
 
 ### Q1 2027 (Jan–Mar)
+
 - **Vertical Expansion**: Food & Beverage compliance module (FSMA, GFSI, allergen management)
 - **Voice-Enabled Returns**: Voice-driven returns inspection and disposition
 - **Warehouse-as-a-Service (WaaS)**: Managed warehouse network; LogiVox-powered fulfillment on-demand
@@ -53,6 +58,7 @@
 - **Benchmark Analytics**: Industry-standard KPI comparisons (picking rate, accuracy, fill rate vs. peers)
 
 ### Q2 2027 (Apr–Jun)
+
 - **Advanced Compliance Reporting**: Automated audit report generation; regulatory submission templates
 - **Logistics AI**: Route optimisation; carrier selection recommendations; cost-per-unit optimisation
 - **Workforce Planning**: Predictive staffing models; seasonal hiring recommendations; training path personalisation
@@ -64,6 +70,7 @@
 ## Committed vs. Exploratory
 
 ### Committed (High Confidence; Will Ship)
+
 - ISO/SOC 2 certifications
 - Pharma module (DSCSA/SECURPHARM)
 - Digital Twin
@@ -72,12 +79,14 @@
 - Integration marketplace
 
 ### Exploratory (Monitoring; Dependent on Customer Demand)
+
 - WaaS offering (depends on 3PL partnership traction)
 - Autonomous yard scheduling (depends on IoT sensor adoption)
 - APAC expansion (depends on regional customer growth)
 - AI-driven replenishment (depends on forecast accuracy validation)
 
 ### Not on Roadmap (Out of Scope)
+
 - Transportation Management System (TMS) as core product (integration instead)
 - Last-mile delivery optimisation (partnership play)
 - B2C mobile app (enterprise-only)
@@ -88,6 +97,7 @@
 ## Customer Feedback Influence
 
 Roadmap is **customer-driven**. Q1 2026 prioritisation based on top 10 customer requests:
+
 1. ✅ Multi-language voice support (6 requests)
 2. ✅ Pharma compliance (4 requests)
 3. ✅ Advanced analytics (5 requests)

@@ -12,15 +12,34 @@ export async function syncPunches(params: {
   return upsertPunches(punches, adapter.provider);
 }
 
-export async function upsertPunches(punches: TimeAttendancePunch[], provider: string) {
-  const results: Array<{ externalId: string; status: "upserted" | "skipped"; reason?: string }> = [];
+export async function upsertPunches(
+  punches: TimeAttendancePunch[],
+  provider: string,
+) {
+  const results: Array<{
+    externalId: string;
+    status: "upserted" | "skipped";
+    reason?: string;
+  }> = [];
 
   for (const punch of punches) {
-    const { externalId, employeeExternalId, occurredAt, type, locationExternalId, payload } = punch;
+    const {
+      externalId,
+      employeeExternalId,
+      occurredAt,
+      type,
+      locationExternalId,
+      payload,
+    } = punch;
 
     // Try explicit mapping first, then fall back to employeeNumber for simple cases.
     const mapping = await prisma.timeAttendanceMapping.findUnique({
-      where: { provider_externalEmployeeId: { provider, externalEmployeeId: employeeExternalId } },
+      where: {
+        provider_externalEmployeeId: {
+          provider,
+          externalEmployeeId: employeeExternalId,
+        },
+      },
       select: { employeeId: true, organizationId: true },
     });
 
@@ -35,7 +54,11 @@ export async function upsertPunches(punches: TimeAttendancePunch[], provider: st
         });
 
     if (!employee) {
-      results.push({ externalId, status: "skipped", reason: "employee mapping not found" });
+      results.push({
+        externalId,
+        status: "skipped",
+        reason: "employee mapping not found",
+      });
       continue;
     }
 
@@ -76,7 +99,11 @@ export async function upsertPunches(punches: TimeAttendancePunch[], provider: st
   return { count: results.length, results };
 }
 
-export async function handleWebhook(payload: unknown, headers: Record<string, string | string[] | undefined>, rawBody: string) {
+export async function handleWebhook(
+  payload: unknown,
+  headers: Record<string, string | string[] | undefined>,
+  rawBody: string,
+) {
   const adapter = getTimeAttendanceAdapter();
 
   if (!adapter.verifyWebhook || !adapter.parseWebhook) {
@@ -89,7 +116,9 @@ export async function handleWebhook(payload: unknown, headers: Record<string, st
   }
 
   const parsed = await adapter.parseWebhook(payload);
-  const punchResult = parsed.punches ? await upsertPunches(parsed.punches, adapter.provider) : null;
+  const punchResult = parsed.punches
+    ? await upsertPunches(parsed.punches, adapter.provider)
+    : null;
 
   return { punchResult };
 }

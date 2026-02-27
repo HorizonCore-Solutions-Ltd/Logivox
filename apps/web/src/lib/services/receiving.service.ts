@@ -65,7 +65,9 @@ export class ReceivingService {
         items: {
           include: {
             inventoryItem: { select: { sku: true, name: true } },
-            purchaseOrderItem: { select: { unitPrice: true, description: true } },
+            purchaseOrderItem: {
+              select: { unitPrice: true, description: true },
+            },
           },
         },
         purchaseOrder: { select: { poNumber: true, supplierId: true } },
@@ -89,7 +91,13 @@ export class ReceivingService {
     receivedById: string;
     items: GRNItemInput[];
   }) {
-    const { organizationId, purchaseOrderId, warehouseId, receivedById, items } = params;
+    const {
+      organizationId,
+      purchaseOrderId,
+      warehouseId,
+      receivedById,
+      items,
+    } = params;
 
     // Verify PO belongs to org
     const po = await prisma.purchaseOrder.findFirst({
@@ -115,7 +123,8 @@ export class ReceivingService {
                 purchaseOrderItemId: item.purchaseOrderItemId || null,
                 orderedQuantity: item.orderedQuantity,
                 receivedQuantity: item.receivedQuantity,
-                acceptedQuantity: item.acceptedQuantity ?? item.receivedQuantity,
+                acceptedQuantity:
+                  item.acceptedQuantity ?? item.receivedQuantity,
                 rejectedQuantity: item.rejectedQuantity ?? 0,
                 unitCost: item.unitCost ?? 0,
                 binLocation: item.binLocation || null,
@@ -235,9 +244,7 @@ export class ReceivingService {
 
     for (const asnItem of asnData.items) {
       const poItem = po.items.find(
-        (p) =>
-          p.sku === asnItem.sku ||
-          p.inventoryItem?.sku === asnItem.sku,
+        (p) => p.sku === asnItem.sku || p.inventoryItem?.sku === asnItem.sku,
       );
 
       if (!poItem || !poItem.inventoryItemId) {

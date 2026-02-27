@@ -38,24 +38,21 @@ export function withTenantContext(handler: TenantAwareHandler) {
     try {
       // Resolve tenant and attach to request for handler to use
       const tenant = await resolveTenantFromRequest(request);
-      
+
       // Inject tenant into request so handler can access it
       (request as any).tenant = tenant;
-      
+
       return await handler(request, context || {});
     } catch (error: any) {
       // Tenant resolution failed
-      if (error.message.includes("Unauthorized") || error.message.includes("not found")) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 403 }
-        );
+      if (
+        error.message.includes("Unauthorized") ||
+        error.message.includes("not found")
+      ) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
       }
       console.error("[TENANT_CONTEXT] Error:", error);
-      return NextResponse.json(
-        { error: "Access denied" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
   };
 }

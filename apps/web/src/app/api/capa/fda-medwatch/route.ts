@@ -607,10 +607,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (error?.message?.includes("not configured")) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 503 },
-      );
+      return NextResponse.json({ error: error.message }, { status: 503 });
     }
 
     return NextResponse.json(

@@ -53,9 +53,7 @@ const TRUST_TIER_THRESHOLDS = {
   BASIC: 0,
 } as const;
 
-function getTrustTier(
-  score: number,
-): "PLATINUM" | "GOLD" | "SILVER" | "BASIC" {
+function getTrustTier(score: number): "PLATINUM" | "GOLD" | "SILVER" | "BASIC" {
   if (score >= TRUST_TIER_THRESHOLDS.PLATINUM) return "PLATINUM";
   if (score >= TRUST_TIER_THRESHOLDS.GOLD) return "GOLD";
   if (score >= TRUST_TIER_THRESHOLDS.SILVER) return "SILVER";
@@ -128,15 +126,11 @@ async function computeTrustScore(
   factors.orderHistory = Math.min(30, completedOrders.length * 3);
 
   // Order value (max 20 points)
-  const totalSpend = orders.reduce(
-    (acc, o) => acc + Number(o.total ?? 0),
-    0,
-  );
+  const totalSpend = orders.reduce((acc, o) => acc + Number(o.total ?? 0), 0);
   factors.orderValue = Math.min(20, Math.round(totalSpend / 500));
 
   // Return rate risk
-  const returnRate =
-    orders.length > 0 ? priorRmas.length / orders.length : 0;
+  const returnRate = orders.length > 0 ? priorRmas.length / orders.length : 0;
   if (returnRate > 0.5) {
     riskFactors.returnRate = `High return rate: ${(returnRate * 100).toFixed(0)}%`;
     factors.returnBehavior = 0;
@@ -235,7 +229,8 @@ export const instantRefundService = {
     const estimatedAmount =
       Number(rma.totalRefundAmount) ||
       rma.items.reduce(
-        (acc: number, item) => acc + Number(item.inventoryItem?.sellingPrice ?? 0),
+        (acc: number, item) =>
+          acc + Number(item.inventoryItem?.sellingPrice ?? 0),
         0,
       );
 
@@ -311,9 +306,7 @@ export const instantRefundService = {
       }
     }
 
-    const verificationDeadline = new Date(
-      Date.now() + 7 * 24 * 60 * 60 * 1000,
-    ); // 7 days
+    const verificationDeadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
 
     const record = await prisma.instantRefund.create({
       data: {
@@ -331,9 +324,11 @@ export const instantRefundService = {
         transactionId,
         verificationDeadline,
         requiresPhotos: eligibility.trustScore < TRUST_TIER_THRESHOLDS.GOLD,
-        requiresSerialNumber: eligibility.trustScore < TRUST_TIER_THRESHOLDS.GOLD,
+        requiresSerialNumber:
+          eligibility.trustScore < TRUST_TIER_THRESHOLDS.GOLD,
         requiresTrackingUpdate: true,
-        requiresSignature: eligibility.trustScore < TRUST_TIER_THRESHOLDS.PLATINUM,
+        requiresSignature:
+          eligibility.trustScore < TRUST_TIER_THRESHOLDS.PLATINUM,
         verificationStatus: "PENDING",
         discrepancies: [],
       },

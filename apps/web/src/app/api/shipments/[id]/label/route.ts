@@ -115,14 +115,17 @@ export async function POST(
             dimensions: shipment.dimensions || null,
             recipient: {
               name: shipment.recipientName || shipment.salesOrder.customer.name,
-              phone: shipment.recipientPhone || shipment.salesOrder.customer.phone,
-              email: shipment.recipientEmail || shipment.salesOrder.customer.email,
+              phone:
+                shipment.recipientPhone || shipment.salesOrder.customer.phone,
+              email:
+                shipment.recipientEmail || shipment.salesOrder.customer.email,
               addressLine1:
                 shipment.addressLine1 || shipment.salesOrder.shippingAddress,
               addressLine2: shipment.addressLine2,
               city: shipment.city || shipment.salesOrder.shippingCity,
               state: shipment.state || shipment.salesOrder.shippingState,
-              postalCode: shipment.postalCode || shipment.salesOrder.shippingZip,
+              postalCode:
+                shipment.postalCode || shipment.salesOrder.shippingZip,
               country: shipment.country || shipment.salesOrder.shippingCountry,
             },
           },
@@ -166,9 +169,7 @@ export async function POST(
         }
 
         const trackingUrl =
-          labelResult?.trackingUrl ||
-          shipment.trackingUrl ||
-          null;
+          labelResult?.trackingUrl || shipment.trackingUrl || null;
         const estimatedDelivery = labelResult?.estimatedDelivery
           ? new Date(labelResult.estimatedDelivery)
           : shipment.estimatedDelivery;
@@ -243,9 +244,6 @@ export async function POST(
     if (message.includes("not configured")) {
       return NextResponse.json({ error: message }, { status: 503 });
     }
-    return NextResponse.json(
-      { error: message },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

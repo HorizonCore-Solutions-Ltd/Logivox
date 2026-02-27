@@ -293,7 +293,9 @@ export async function GET(request: NextRequest) {
         (log) => (log.metadata as any)?.status === "COMPLETED",
       ).length;
       const failedSyncs = totalSyncs - successfulSyncs;
-      const todaySyncs = syncLogs.filter((log) => log.createdAt >= today).length;
+      const todaySyncs = syncLogs.filter(
+        (log) => log.createdAt >= today,
+      ).length;
 
       const avgLatencyValues = webhookLogs
         .map((log) => Number((log.metadata as any)?.latency || 0))

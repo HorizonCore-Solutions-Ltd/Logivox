@@ -8,7 +8,13 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 
 type OrderBatch = {
-  orders: Array<{ id: string; customer?: { city?: string | null; state?: string | null }; shipDate?: Date | null; customerId?: string; priority?: string | null }>;
+  orders: Array<{
+    id: string;
+    customer?: { city?: string | null; state?: string | null };
+    shipDate?: Date | null;
+    customerId?: string;
+    priority?: string | null;
+  }>;
   priority: string;
   reason: string;
 };
@@ -381,8 +387,12 @@ async function autoBatchOrders(warehouseId: string) {
     const destinationGroups = new Map<string, OrderBatch["orders"]>();
     for (const order of unassignedOrders) {
       if (batches.some((b) => b.orders.includes(order))) continue;
-      const city = String(order.customer?.city || "").trim().toUpperCase();
-      const state = String(order.customer?.state || "").trim().toUpperCase();
+      const city = String(order.customer?.city || "")
+        .trim()
+        .toUpperCase();
+      const state = String(order.customer?.state || "")
+        .trim()
+        .toUpperCase();
       if (!city && !state) continue;
 
       const key = `${city}-${state}`;

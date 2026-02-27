@@ -57,7 +57,12 @@ export async function GET(req: NextRequest) {
     const locations = locationIds.length
       ? await prisma.location.findMany({
           where: { id: { in: locationIds }, organizationId },
-          select: { id: true, locationCode: true, name: true, warehouseId: true },
+          select: {
+            id: true,
+            locationCode: true,
+            name: true,
+            warehouseId: true,
+          },
         })
       : [];
 
@@ -68,13 +73,17 @@ export async function GET(req: NextRequest) {
         const currentLocation = rec.currentLocationId
           ? locationMap.get(rec.currentLocationId)
           : null;
-        const recommendedLocation = locationMap.get(rec.recommendedLocationId) || null;
+        const recommendedLocation =
+          locationMap.get(rec.recommendedLocationId) || null;
 
         return {
           ...rec,
           inventoryItem: rec.item,
           currentLocation: currentLocation
-            ? { locationCode: currentLocation.locationCode, name: currentLocation.name }
+            ? {
+                locationCode: currentLocation.locationCode,
+                name: currentLocation.name,
+              }
             : null,
           recommendedLocation: recommendedLocation
             ? {
@@ -87,8 +96,8 @@ export async function GET(req: NextRequest) {
       })
       .filter((rec) =>
         warehouseId
-          ? (locationMap.get(rec.recommendedLocationId)?.warehouseId || null) ===
-            warehouseId
+          ? (locationMap.get(rec.recommendedLocationId)?.warehouseId ||
+              null) === warehouseId
           : true,
       );
 
@@ -216,10 +225,15 @@ export async function POST(req: NextRequest) {
           data: {
             inventoryItemId: recommendation.itemId,
             fromWarehouse:
-              fromLocation?.warehouseId || inventoryItem.warehouseId || undefined,
+              fromLocation?.warehouseId ||
+              inventoryItem.warehouseId ||
+              undefined,
             toWarehouse:
               toLocation?.warehouseId || inventoryItem.warehouseId || undefined,
-            quantity: Math.max(1, inventoryItem.availableQty || inventoryItem.quantity),
+            quantity: Math.max(
+              1,
+              inventoryItem.availableQty || inventoryItem.quantity,
+            ),
             type: "TRANSFER",
             reason: recommendation.reason,
             notes: `Slotting move from ${recommendation.currentLocationId || "UNASSIGNED"} to ${recommendation.recommendedLocationId}`,

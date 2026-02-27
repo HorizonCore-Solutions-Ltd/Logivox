@@ -4,6 +4,7 @@
 
 **Completion Date:** January 8, 2026  
 **Systems Delivered:** 18 of 18 CAPA Enhancement Systems (100%)  
+**Strategic Roadmap:** [NEXT_GEN_SYSTEM_ENHANCEMENTS.md](docs/NEXT_GEN_SYSTEM_ENHANCEMENTS.md)  
 **Next Phase:** Additional Platform Enhancements
 
 ---

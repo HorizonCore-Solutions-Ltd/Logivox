@@ -466,14 +466,17 @@ export default function FulfillmentPage() {
           <Card className="mx-auto max-w-3xl">
             <CardContent className="pt-8 pb-6">
               <p className="text-lg italic mb-6">
-                "We're now fulfilling 8,000+ orders daily with 99.9% accuracy. 
-                Our pick rates jumped from 45/hour to 61/hour (+35%). 
-                Same-day shipping rate increased from 65% to 92%. LogiVox made all the difference."
+                "We're now fulfilling 8,000+ orders daily with 99.9% accuracy.
+                Our pick rates jumped from 45/hour to 61/hour (+35%). Same-day
+                shipping rate increased from 65% to 92%. LogiVox made all the
+                difference."
               </p>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">Jennifer Martinez</p>
-                  <p className="text-sm text-muted-foreground">VP Operations, RetailFlow Inc</p>
+                  <p className="text-sm text-muted-foreground">
+                    VP Operations, RetailFlow Inc
+                  </p>
                 </div>
                 <Badge className="bg-green-600">61 Orders/Hour</Badge>
               </div>

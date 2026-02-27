@@ -165,8 +165,9 @@ export default function ContactPage() {
               We're Here to Help
             </h1>
             <p className="text-xl text-muted-foreground leading-relaxed">
-              Multiple ways to reach our team. Choose the channel that works best for you.
-              Average response time: less than 2 hours during business hours.
+              Multiple ways to reach our team. Choose the channel that works
+              best for you. Average response time: less than 2 hours during
+              business hours.
             </p>
           </div>
         </div>
@@ -178,13 +179,17 @@ export default function ContactPage() {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Direct Support Channels</h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Choose your preferred way to contact us. All channels are actively monitored.
+              Choose your preferred way to contact us. All channels are actively
+              monitored.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {supportChannels.map((channel) => (
-              <Card key={channel.title} className="hover:shadow-lg transition-shadow">
+              <Card
+                key={channel.title}
+                className="hover:shadow-lg transition-shadow"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between mb-3">
                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -199,13 +204,13 @@ export default function ContactPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <p className="text-sm text-muted-foreground mb-1">Response Time</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      Response Time
+                    </p>
                     <p className="text-sm font-semibold">{channel.sla}</p>
                   </div>
                   <Button asChild className="w-full" variant="outline">
-                    <a href={channel.action}>
-                      {channel.value}
-                    </a>
+                    <a href={channel.action}>{channel.value}</a>
                   </Button>
                 </CardContent>
               </Card>
@@ -218,7 +223,9 @@ export default function ContactPage() {
       <section className="py-16 bg-muted/30">
         <div className="container-enterprise">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">What Do You Need Help With?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              What Do You Need Help With?
+            </h2>
             <p className="text-muted-foreground">
               Select your inquiry type to be routed to the right team
             </p>
@@ -226,7 +233,10 @@ export default function ContactPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {supportOptions.map((option) => (
-              <Card key={option.title} className="hover:border-primary transition-colors cursor-pointer">
+              <Card
+                key={option.title}
+                className="hover:border-primary transition-colors cursor-pointer"
+              >
                 <CardHeader>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-3 flex-1">
@@ -234,7 +244,9 @@ export default function ContactPage() {
                         <option.icon className="h-5 w-5 text-primary" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">{option.title}</CardTitle>
+                        <CardTitle className="text-lg">
+                          {option.title}
+                        </CardTitle>
                         <CardDescription>{option.description}</CardDescription>
                       </div>
                     </div>
@@ -266,7 +278,8 @@ export default function ContactPage() {
               <div className="mb-8">
                 <h2 className="text-3xl font-bold mb-4">Send Us a Message</h2>
                 <p className="text-muted-foreground">
-                  Fill out the form and we'll get back to you as soon as possible.
+                  Fill out the form and we'll get back to you as soon as
+                  possible.
                 </p>
               </div>
 
@@ -350,9 +363,15 @@ export default function ContactPage() {
                     className="form-input"
                   >
                     <option value="">Select a subject</option>
-                    <option value="sales">Sales Inquiry - Pricing & Demo</option>
-                    <option value="support">Technical Support - Account Help</option>
-                    <option value="implementation">Implementation & Onboarding</option>
+                    <option value="sales">
+                      Sales Inquiry - Pricing & Demo
+                    </option>
+                    <option value="support">
+                      Technical Support - Account Help
+                    </option>
+                    <option value="implementation">
+                      Implementation & Onboarding
+                    </option>
                     <option value="partnership">Partnership Opportunity</option>
                     <option value="general">General Question</option>
                   </select>
@@ -406,13 +425,25 @@ export default function ContactPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  <Button asChild variant="outline" className="w-full justify-start">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
                     <Link href="/pricing">View Pricing</Link>
                   </Button>
-                  <Button asChild variant="outline" className="w-full justify-start">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
                     <Link href="/features">Explore Features</Link>
                   </Button>
-                  <Button asChild variant="outline" className="w-full justify-start">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
                     <Link href="/help">Visit Help Center</Link>
                   </Button>
                   <Button asChild className="w-full justify-start">
@@ -432,11 +463,15 @@ export default function ContactPage() {
                 <CardContent className="space-y-3">
                   <div>
                     <p className="text-sm font-semibold">Sales Team</p>
-                    <p className="text-sm text-muted-foreground">Mon-Fri, 8am-6pm PST</p>
+                    <p className="text-sm text-muted-foreground">
+                      Mon-Fri, 8am-6pm PST
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm font-semibold">Technical Support</p>
-                    <p className="text-sm text-muted-foreground">24/7 Available</p>
+                    <p className="text-sm text-muted-foreground">
+                      24/7 Available
+                    </p>
                   </div>
                   <div className="pt-3 border-t">
                     <p className="text-xs text-muted-foreground">
@@ -477,9 +512,12 @@ export default function ContactPage() {
       {/* FAQ CTA */}
       <section className="py-16 bg-muted/30">
         <div className="container-enterprise text-center space-y-6">
-          <h2 className="text-3xl font-bold">Can't find what you're looking for?</h2>
+          <h2 className="text-3xl font-bold">
+            Can't find what you're looking for?
+          </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            Check our help center for common questions, documentation, and troubleshooting guides.
+            Check our help center for common questions, documentation, and
+            troubleshooting guides.
           </p>
           <Button size="lg" asChild>
             <Link href="/help">Visit Help Center</Link>
@@ -489,4 +527,3 @@ export default function ContactPage() {
     </div>
   );
 }
-

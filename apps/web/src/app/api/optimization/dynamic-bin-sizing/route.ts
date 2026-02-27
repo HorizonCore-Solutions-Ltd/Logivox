@@ -365,8 +365,7 @@ export async function GET(req: NextRequest) {
           critical: recommendations.filter((r) => r.priority === "CRITICAL")
             .length,
           high: recommendations.filter((r) => r.priority === "HIGH").length,
-          medium: recommendations.filter((r) => r.priority === "MEDIUM")
-            .length,
+          medium: recommendations.filter((r) => r.priority === "MEDIUM").length,
           low: recommendations.filter((r) => r.priority === "LOW").length,
           totalYearlySavings: totalSavings,
           avgUtilizationImprovement: Number(
@@ -385,7 +384,9 @@ export async function GET(req: NextRequest) {
           organizationId,
           taskType: "MOVE",
           title: { contains: "Bin Reallocation" },
-          status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS", "COMPLETED"] as any },
+          status: {
+            in: ["PENDING", "ASSIGNED", "IN_PROGRESS", "COMPLETED"] as any,
+          },
         },
         include: {
           inventoryItem: { select: { sku: true, name: true } },
@@ -415,7 +416,8 @@ export async function GET(req: NextRequest) {
         total: reallocations.length,
         summary: {
           pending: reallocations.filter((r) => r.status === "PENDING").length,
-          scheduled: reallocations.filter((r) => r.status === "ASSIGNED").length,
+          scheduled: reallocations.filter((r) => r.status === "ASSIGNED")
+            .length,
           inProgress: reallocations.filter((r) => r.status === "IN_PROGRESS")
             .length,
           completed: reallocations.filter((r) => r.status === "COMPLETED")
@@ -426,53 +428,60 @@ export async function GET(req: NextRequest) {
 
     // GET STATISTICS
     if (action === "stats") {
-      const [totalBins, underUtilized, overUtilized, moveTasks, optimizedItems] =
-        await Promise.all([
-          prisma.location.count({
-            where: {
-              organizationId,
-              isActive: true,
-              type: { in: ["BIN", "SHELF", "RACK"] },
-            },
-          }),
-          prisma.location.count({
-            where: {
-              organizationId,
-              isActive: true,
-              metadata: {
-                path: ["utilizationPercent"],
-                lt: 30,
-              } as any,
-            },
-          }),
-          prisma.location.count({
-            where: {
-              organizationId,
-              isActive: true,
-              metadata: {
-                path: ["utilizationPercent"],
-                gt: 90,
-              } as any,
-            },
-          }),
-          prisma.pickingTask.count({
-            where: {
-              organizationId,
-              taskType: "MOVE",
-              title: { contains: "Bin Reallocation" },
-              status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS"] as any },
-            },
-          }),
-          prisma.inventoryItem.count({
-            where: {
-              organizationId,
-              availableQty: { gt: 0 },
-            },
-          }),
-        ]);
+      const [
+        totalBins,
+        underUtilized,
+        overUtilized,
+        moveTasks,
+        optimizedItems,
+      ] = await Promise.all([
+        prisma.location.count({
+          where: {
+            organizationId,
+            isActive: true,
+            type: { in: ["BIN", "SHELF", "RACK"] },
+          },
+        }),
+        prisma.location.count({
+          where: {
+            organizationId,
+            isActive: true,
+            metadata: {
+              path: ["utilizationPercent"],
+              lt: 30,
+            } as any,
+          },
+        }),
+        prisma.location.count({
+          where: {
+            organizationId,
+            isActive: true,
+            metadata: {
+              path: ["utilizationPercent"],
+              gt: 90,
+            } as any,
+          },
+        }),
+        prisma.pickingTask.count({
+          where: {
+            organizationId,
+            taskType: "MOVE",
+            title: { contains: "Bin Reallocation" },
+            status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS"] as any },
+          },
+        }),
+        prisma.inventoryItem.count({
+          where: {
+            organizationId,
+            availableQty: { gt: 0 },
+          },
+        }),
+      ]);
 
       const optimizationRate =
-        totalBins > 0 ? Number(((optimizedItems / totalBins) * 100).toFixed(1)) : 0;
+        totalBins > 0
+          ? Number(((optimizedItems / totalBins) * 100).toFixed(1))
+          : 0;
 
       return NextResponse.json({
         totalBins,
@@ -583,8 +592,17 @@ export async function POST(req: NextRequest) {
       const moveTask = await prisma.pickingTask.create({
         data: {
           organizationId,
-          warehouseId: (await prisma.location.findUnique({ where: { id: validated.sourceLocationId }, select: { warehouseId: true } }))?.warehouseId ||
-            (await prisma.warehouse.findFirst({ where: { organizationId }, select: { id: true } }))!.id,
+          warehouseId:
+            (
+              await prisma.location.findUnique({
+                where: { id: validated.sourceLocationId },
+                select: { warehouseId: true },
+              })
+            )?.warehouseId ||
+            (await prisma.warehouse.findFirst({
+              where: { organizationId },
+              select: { id: true },
+            }))!.id,
           taskNumber,
           taskType: "MOVE",
           priority: "HIGH",
@@ -749,15 +767,18 @@ export async function DELETE(req: NextRequest) {
     if (type === "recommendation") {
       await prisma.activityLog.create({
         data: {
-          organizationId: (await prisma.user.findUnique({
-            where: { id: session.user.id },
-            include: {
-              organizationMemberships: {
-                include: { organization: true },
-                take: 1,
-              },
-            },
-          }))?.organizationMemberships?.[0]?.organizationId || "",
+          organizationId:
+            (
+              await prisma.user.findUnique({
+                where: { id: session.user.id },
+                include: {
+                  organizationMemberships: {
+                    include: { organization: true },
+                    take: 1,
+                  },
+                },
+              })
+            )?.organizationMemberships?.[0]?.organizationId || "",
           userId: session.user.id,
           action: "BIN_RECOMMENDATION_DISMISSED",
           entityType: "Recommendation",

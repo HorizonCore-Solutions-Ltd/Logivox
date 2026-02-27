@@ -226,7 +226,9 @@ function parseASN(
       // Parse minimal XML ASN using regex (no external dependency needed)
       // Expected structure: <asn><items><item><sku/><quantity/></item></asn>
       const parseTag = (tag: string, src: string) => {
-        const m = src.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"));
+        const m = src.match(
+          new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`, "i"),
+        );
         return m ? m[1].trim() : null;
       };
       const asnNode = parseTag("asn", data) || data;
@@ -257,7 +259,10 @@ function parseASN(
       const skuIdx = headers.indexOf("sku");
       const qtyIdx = headers.indexOf("quantity");
       if (skuIdx === -1 || qtyIdx === -1) {
-        return { success: false, error: "CSV must have 'sku' and 'quantity' columns" };
+        return {
+          success: false,
+          error: "CSV must have 'sku' and 'quantity' columns",
+        };
       }
       const batchIdx = headers.indexOf("batchnumber");
       const expiryIdx = headers.indexOf("expirydate");

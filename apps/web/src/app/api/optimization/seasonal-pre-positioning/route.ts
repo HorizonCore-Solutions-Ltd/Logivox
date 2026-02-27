@@ -263,7 +263,9 @@ async function buildSeasonalForecasts(
   const { start: seasonStart, end: seasonEnd } = getSeasonDateRange(season);
   const seasonDays = Math.max(
     1,
-    Math.ceil((seasonEnd.getTime() - seasonStart.getTime()) / (24 * 60 * 60 * 1000)),
+    Math.ceil(
+      (seasonEnd.getTime() - seasonStart.getTime()) / (24 * 60 * 60 * 1000),
+    ),
   );
 
   const now = new Date();
@@ -327,8 +329,12 @@ async function buildSeasonalForecasts(
     }),
   ]);
 
-  const demand90Map = new Map(demand90.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]));
-  const demand30Map = new Map(demand30.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]));
+  const demand90Map = new Map(
+    demand90.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]),
+  );
+  const demand30Map = new Map(
+    demand30.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]),
+  );
   const demandPrev30Map = new Map(
     demandPrev30.map((row) => [row.inventoryItemId, row._sum.quantity ?? 0]),
   );
@@ -350,7 +356,14 @@ async function buildSeasonalForecasts(
             : 1.0;
 
       const predictedDaily = calculateSeasonalDemand(
-        [{ year: now.getFullYear(), month: now.getMonth() + 1, sales: qty90, avgDailyDemand }],
+        [
+          {
+            year: now.getFullYear(),
+            month: now.getMonth() + 1,
+            sales: qty90,
+            avgDailyDemand,
+          },
+        ],
         multiplier,
         trendMultiplier,
       );
@@ -369,7 +382,10 @@ async function buildSeasonalForecasts(
 
       const confidence = Math.max(
         65,
-        Math.min(96, 70 + Math.min(20, qty90 / 25) + (trend === "STABLE" ? 5 : 0)),
+        Math.min(
+          96,
+          70 + Math.min(20, qty90 / 25) + (trend === "STABLE" ? 5 : 0),
+        ),
       );
 
       return {
@@ -389,7 +405,9 @@ async function buildSeasonalForecasts(
         trend,
       } as SeasonalForecast;
     })
-    .filter((forecast) => forecast.predictedDemand > 0 || forecast.currentStock > 0);
+    .filter(
+      (forecast) => forecast.predictedDemand > 0 || forecast.currentStock > 0,
+    );
 }
 
 // ============================================
@@ -489,12 +507,17 @@ export async function GET(req: NextRequest) {
     // GET STATISTICS
     if (action === "stats") {
       const currentSeason = getCurrentSeason();
-      const forecasts = await buildSeasonalForecasts(organizationId, currentSeason);
+      const forecasts = await buildSeasonalForecasts(
+        organizationId,
+        currentSeason,
+      );
       const recommendations = generatePrePositionRecommendations(forecasts);
 
       const [totalProducts, trackedProducts, implementedTransfers] =
         await Promise.all([
-          prisma.inventoryItem.count({ where: { organizationId, isActive: true } }),
+          prisma.inventoryItem.count({
+            where: { organizationId, isActive: true },
+          }),
           prisma.salesOrderItem
             .groupBy({
               by: ["inventoryItemId"],
@@ -565,7 +588,8 @@ export async function GET(req: NextRequest) {
           name: nextSeason?.season || currentSeason,
           date: (nextSeason?.date || new Date()).toISOString().split("T")[0],
           daysUntil: nextSeason?.daysUntil ?? 0,
-          productsAffected: forecasts.filter((forecast) => forecast.gap > 0).length,
+          productsAffected: forecasts.filter((forecast) => forecast.gap > 0)
+            .length,
         },
       });
     }
@@ -625,7 +649,8 @@ export async function POST(req: NextRequest) {
 
       const forecasts = await buildSeasonalForecasts(organizationId, season);
       const forecast = forecasts.find(
-        (entry) => entry.productId === productId && entry.warehouseId === warehouseId,
+        (entry) =>
+          entry.productId === productId && entry.warehouseId === warehouseId,
       );
 
       if (!forecast) {
@@ -696,9 +721,12 @@ export async function POST(req: NextRequest) {
       }
 
       const allForecasts = await buildSeasonalForecasts(organizationId, season);
-      const filteredForecasts = Array.isArray(productIds) && productIds.length > 0
-        ? allForecasts.filter((forecast) => productIds.includes(forecast.productId))
-        : allForecasts;
+      const filteredForecasts =
+        Array.isArray(productIds) && productIds.length > 0
+          ? allForecasts.filter((forecast) =>
+              productIds.includes(forecast.productId),
+            )
+          : allForecasts;
 
       const batchId = `SEASONAL-BULK-${Date.now()}`;
       if (filteredForecasts.length > 0) {

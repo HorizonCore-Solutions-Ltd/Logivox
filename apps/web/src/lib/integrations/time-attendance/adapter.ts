@@ -21,8 +21,24 @@ export interface TimeAttendanceSchedule {
 
 export interface TimeAttendanceAdapter {
   provider: string;
-  pullPunches(params: { start: Date; end: Date; locationExternalId?: string }): Promise<TimeAttendancePunch[]>;
-  pullSchedules?(params: { start: Date; end: Date; locationExternalId?: string }): Promise<TimeAttendanceSchedule[]>;
-  verifyWebhook?(payload: unknown, headers: Record<string, string | string[] | undefined>): Promise<boolean>;
-  parseWebhook?(payload: unknown): Promise<{ punches?: TimeAttendancePunch[]; schedules?: TimeAttendanceSchedule[] }>;
+  pullPunches(params: {
+    start: Date;
+    end: Date;
+    locationExternalId?: string;
+  }): Promise<TimeAttendancePunch[]>;
+  pullSchedules?(params: {
+    start: Date;
+    end: Date;
+    locationExternalId?: string;
+  }): Promise<TimeAttendanceSchedule[]>;
+  verifyWebhook?(
+    payload: unknown,
+    headers: Record<string, string | string[] | undefined>,
+  ): Promise<boolean>;
+  parseWebhook?(
+    payload: unknown,
+  ): Promise<{
+    punches?: TimeAttendancePunch[];
+    schedules?: TimeAttendanceSchedule[];
+  }>;
 }

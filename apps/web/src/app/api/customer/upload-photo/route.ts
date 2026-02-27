@@ -62,7 +62,9 @@ export async function POST(req: NextRequest) {
     const storageBackend = process.env.DELIVERY_PHOTO_STORAGE || "local";
     if (storageBackend !== "local") {
       return NextResponse.json(
-        { error: `Unsupported DELIVERY_PHOTO_STORAGE backend: ${storageBackend}` },
+        {
+          error: `Unsupported DELIVERY_PHOTO_STORAGE backend: ${storageBackend}`,
+        },
         { status: 503 },
       );
     }

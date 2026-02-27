@@ -117,14 +117,19 @@ async function calculateYardMetrics(organizationId: string) {
     trucksInYard: trucksInYard.length,
     averageWaitTime:
       waitTimes.length > 0
-        ? Math.round(waitTimes.reduce((sum, value) => sum + value, 0) / waitTimes.length)
+        ? Math.round(
+            waitTimes.reduce((sum, value) => sum + value, 0) / waitTimes.length,
+          )
         : 0,
     docksInUse,
     availableDocks: Math.max(0, activeWarehouses - docksInUse),
     todayTrucks: todayCheckIns,
     avgDwellTime:
       dwellTimes.length > 0
-        ? Math.round(dwellTimes.reduce((sum, value) => sum + value, 0) / dwellTimes.length)
+        ? Math.round(
+            dwellTimes.reduce((sum, value) => sum + value, 0) /
+              dwellTimes.length,
+          )
         : 0,
     detentionEvents: detentionEvents.length,
     onTimePercentage:
@@ -563,7 +568,9 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
           success: response.ok,
           notification,
-          message: response.ok ? "Driver notified" : "Driver notification failed",
+          message: response.ok
+            ? "Driver notified"
+            : "Driver notification failed",
         });
       }
 

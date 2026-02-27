@@ -135,7 +135,10 @@ function buildCheckInState(checkInId: string, events: any[]) {
     }
   }
   const detention = [...detentionById.values()];
-  const totalDetention = detention.reduce((sum, d) => sum + Number(d.duration || 0), 0);
+  const totalDetention = detention.reduce(
+    (sum, d) => sum + Number(d.duration || 0),
+    0,
+  );
 
   const checkInTime = created.createdAt;
   const checkOutTime = checkout?.createdAt;
@@ -177,7 +180,10 @@ export async function POST(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const body = await request.json();
@@ -220,7 +226,11 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      return NextResponse.json({ success: true, checkInId, message: "Driver checked in successfully" });
+      return NextResponse.json({
+        success: true,
+        checkInId,
+        message: "Driver checked in successfully",
+      });
     }
 
     if (action === "check_out") {
@@ -258,7 +268,10 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, message: "Driver checked out successfully" });
+      return NextResponse.json({
+        success: true,
+        message: "Driver checked out successfully",
+      });
     }
 
     if (action === "start_detention") {
@@ -281,13 +294,20 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, detentionId, message: "Detention tracking started" });
+      return NextResponse.json({
+        success: true,
+        detentionId,
+        message: "Detention tracking started",
+      });
     }
 
     if (action === "end_detention") {
       const { checkInId, detentionId } = body;
       if (!checkInId || !detentionId) {
-        return NextResponse.json({ error: "checkInId and detentionId required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "checkInId and detentionId required" },
+          { status: 400 },
+        );
       }
 
       const events = await getEvents(organizationId);
@@ -297,10 +317,15 @@ export async function POST(request: NextRequest) {
           (e.metadata as any)?.detentionId === detentionId,
       );
       if (!startEvent) {
-        return NextResponse.json({ error: "Detention event not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Detention event not found" },
+          { status: 404 },
+        );
       }
 
-      const duration = Math.round((Date.now() - startEvent.createdAt.getTime()) / 60000);
+      const duration = Math.round(
+        (Date.now() - startEvent.createdAt.getTime()) / 60000,
+      );
       const cost = calculateDetentionCost(duration);
 
       await prisma.activityLog.create({
@@ -319,7 +344,13 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return NextResponse.json({ success: true, detentionId, duration, cost, message: "Detention tracking ended" });
+      return NextResponse.json({
+        success: true,
+        detentionId,
+        duration,
+        cost,
+        message: "Detention tracking ended",
+      });
     }
 
     if (action === "update_document") {
@@ -360,7 +391,10 @@ export async function POST(request: NextRequest) {
         { status: 400 },
       );
     }
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -373,7 +407,10 @@ export async function GET(request: NextRequest) {
 
     const organizationId = await getOrganizationId(session.user.id);
     if (!organizationId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 404 },
+      );
     }
 
     const events = await getEvents(organizationId);
@@ -395,16 +432,27 @@ export async function GET(request: NextRequest) {
 
     if (action === "check_in") {
       if (!checkInId) {
-        return NextResponse.json({ error: "Check-in ID required" }, { status: 400 });
+        return NextResponse.json(
+          { error: "Check-in ID required" },
+          { status: 400 },
+        );
       }
       const checkIn = checkIns.find((c) => c.id === checkInId);
       if (!checkIn) {
-        return NextResponse.json({ error: "Check-in not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Check-in not found" },
+          { status: 404 },
+        );
       }
 
       const currentDetention =
         checkIn.status !== "CHECKED_OUT"
-          ? Math.max(0, Math.round((Date.now() - new Date(checkIn.checkInTime).getTime()) / 60000) - 120)
+          ? Math.max(
+              0,
+              Math.round(
+                (Date.now() - new Date(checkIn.checkInTime).getTime()) / 60000,
+              ) - 120,
+            )
           : 0;
 
       return NextResponse.json({
@@ -412,7 +460,9 @@ export async function GET(request: NextRequest) {
         documents: checkIn.documents,
         detention: checkIn.detention,
         currentDetention,
-        detentionCost: calculateDetentionCost(currentDetention || checkIn.detentionMinutes),
+        detentionCost: calculateDetentionCost(
+          currentDetention || checkIn.detentionMinutes,
+        ),
       });
     }
 
@@ -423,7 +473,10 @@ export async function GET(request: NextRequest) {
 
     if (action === "detention_report") {
       const allDetention = checkIns.flatMap((c) => c.detention || []);
-      const totalCost = allDetention.reduce((sum, d) => sum + Number(d.cost || 0), 0);
+      const totalCost = allDetention.reduce(
+        (sum, d) => sum + Number(d.cost || 0),
+        0,
+      );
       return NextResponse.json({
         totalEvents: allDetention.length,
         totalCost,
@@ -435,13 +488,19 @@ export async function GET(request: NextRequest) {
     if (action === "carrier_metrics") {
       const completed = checkIns.filter((c) => c.status === "CHECKED_OUT");
       const totalCheckIns = completed.length;
-      const activeDrivers = checkIns.filter((c) => c.status !== "CHECKED_OUT").length;
+      const activeDrivers = checkIns.filter(
+        (c) => c.status !== "CHECKED_OUT",
+      ).length;
       const avgDetentionTime =
         completed.length > 0
-          ? completed.reduce((sum, c) => sum + Number(c.detentionMinutes || 0), 0) / completed.length
+          ? completed.reduce(
+              (sum, c) => sum + Number(c.detentionMinutes || 0),
+              0,
+            ) / completed.length
           : 0;
       const totalDetentionCost = completed.reduce(
-        (sum, c) => sum + calculateDetentionCost(Number(c.detentionMinutes || 0)),
+        (sum, c) =>
+          sum + calculateDetentionCost(Number(c.detentionMinutes || 0)),
         0,
       );
 
@@ -463,6 +522,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
   } catch (error) {
     console.error("Error in carrier management API:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

@@ -32,20 +32,30 @@ export async function GET(
     if (!tenantId) {
       const dbUser = await prisma.user.findUnique({
         where: { id: session.user.id },
-        include: { organizationMemberships: { include: { organization: true }, take: 1 } },
+        include: {
+          organizationMemberships: { include: { organization: true }, take: 1 },
+        },
       });
       tenantId = dbUser?.organizationMemberships?.[0]?.organization?.id;
     }
     if (!tenantId) {
-      return NextResponse.json({ error: "No organization found" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No organization found" },
+        { status: 400 },
+      );
     }
 
     // Fetch inventory items (InventoryItem is the product catalog)
     const inventoryItems = await prisma.inventoryItem.findMany({
       where: { organizationId: tenantId },
       select: {
-        id: true, name: true, description: true, category: true,
-        totalQty: true, unitCost: true, tags: true,
+        id: true,
+        name: true,
+        description: true,
+        category: true,
+        totalQty: true,
+        unitCost: true,
+        tags: true,
       },
       take: 500,
     });
@@ -81,16 +91,25 @@ export async function GET(
 
     const userProfile: UserProfile = {
       userId: session.user.id,
-      purchases: purchasedItemIds.map((id) => ({ productId: id, quantity: 1, date: new Date() })),
+      purchases: purchasedItemIds.map((id) => ({
+        productId: id,
+        quantity: 1,
+        date: new Date(),
+      })),
       views: [],
       categories: purchasedCategories,
       priceRange: { min: 0, max: 100000 },
     };
 
     // Build purchase history pairs for item-based recommendations
-    const purchaseHistory: Array<{ productId: string; relatedProductId: string }> = [];
+    const purchaseHistory: Array<{
+      productId: string;
+      relatedProductId: string;
+    }> = [];
     for (const order of recentOrders) {
-      const ids = order.items.map((i) => i.inventoryItemId).filter(Boolean) as string[];
+      const ids = order.items
+        .map((i) => i.inventoryItemId)
+        .filter(Boolean) as string[];
       for (let i = 0; i < ids.length; i++) {
         for (let j = i + 1; j < ids.length; j++) {
           purchaseHistory.push({ productId: ids[i], relatedProductId: ids[j] });
@@ -153,11 +172,18 @@ export async function GET(
       default: {
         // Blend personalized + trending as a combined "all" result
         const [personalized, trending] = await Promise.all([
-          getPersonalizedRecommendations(userProfile, productList, Math.ceil(limit / 2)),
+          getPersonalizedRecommendations(
+            userProfile,
+            productList,
+            Math.ceil(limit / 2),
+          ),
           getTrendingProducts(
             recentOrders
               .flatMap((o) =>
-                o.items.map((i) => ({ productId: i.inventoryItemId!, date: o.createdAt })),
+                o.items.map((i) => ({
+                  productId: i.inventoryItemId!,
+                  date: o.createdAt,
+                })),
               )
               .filter((p) => p.productId),
             productList,
@@ -167,11 +193,13 @@ export async function GET(
         ]);
         // Merge and de-duplicate
         const seen = new Set<string>();
-        recommendations = [...personalized, ...trending].filter((r) => {
-          if (seen.has(r.productId)) return false;
-          seen.add(r.productId);
-          return true;
-        }).slice(0, limit);
+        recommendations = [...personalized, ...trending]
+          .filter((r) => {
+            if (seen.has(r.productId)) return false;
+            seen.add(r.productId);
+            return true;
+          })
+          .slice(0, limit);
         break;
       }
     }

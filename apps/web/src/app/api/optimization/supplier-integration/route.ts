@@ -357,10 +357,12 @@ export async function GET(request: NextRequest) {
         "PARTIALLY_RECEIVED",
       ]);
 
-      const activeOrders = orders.filter((o) => activeStatuses.has(o.status))
-        .length;
-      const pendingApproval = orders.filter((o) => o.status === "PENDING")
-        .length;
+      const activeOrders = orders.filter((o) =>
+        activeStatuses.has(o.status),
+      ).length;
+      const pendingApproval = orders.filter(
+        (o) => o.status === "PENDING",
+      ).length;
       const totalSpend = orders.reduce(
         (sum, o) => sum + decimalToNumber(o.totalAmount),
         0,
@@ -552,8 +554,8 @@ export async function GET(request: NextRequest) {
 
       const salesByItem = recentSales.reduce(
         (acc, item) => {
-          acc[item.inventoryItemId] = (acc[item.inventoryItemId] || 0) +
-            item.quantity;
+          acc[item.inventoryItemId] =
+            (acc[item.inventoryItemId] || 0) + item.quantity;
           return acc;
         },
         {} as Record<string, number>,
@@ -632,7 +634,10 @@ export async function POST(request: NextRequest) {
       });
 
       if (!supplier) {
-        return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+        return NextResponse.json(
+          { error: "Supplier not found" },
+          { status: 404 },
+        );
       }
 
       const skus = data.items.map((item) => item.sku);
@@ -648,7 +653,9 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      const inventoryBySku = new Map(inventoryLookup.map((item) => [item.sku, item]));
+      const inventoryBySku = new Map(
+        inventoryLookup.map((item) => [item.sku, item]),
+      );
 
       const po = await prisma.purchaseOrder.create({
         data: {
@@ -656,7 +663,8 @@ export async function POST(request: NextRequest) {
           supplierId: data.supplierId,
           poNumber,
           status:
-            totalAmount < INTEGRATION_CONFIG.AUTOMATION_RULES.AUTO_APPROVE_THRESHOLD
+            totalAmount <
+            INTEGRATION_CONFIG.AUTOMATION_RULES.AUTO_APPROVE_THRESHOLD
               ? "APPROVED"
               : "PENDING",
           expectedDate: new Date(data.deliveryDate),

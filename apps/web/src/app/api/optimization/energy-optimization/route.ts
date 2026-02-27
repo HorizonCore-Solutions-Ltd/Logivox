@@ -69,7 +69,9 @@ function normalizeAlertSeverity(
   }
 }
 
-function mapEnergyTypeToAlertType(type: z.infer<typeof energyAlertSchema>["type"]) {
+function mapEnergyTypeToAlertType(
+  type: z.infer<typeof energyAlertSchema>["type"],
+) {
   if (type === "INEFFICIENCY") return "ANOMALY" as const;
   return "EVENT" as const;
 }
@@ -425,10 +427,8 @@ export async function GET(req: NextRequest) {
           avgPower: 16 * Math.max(1, warehouseCount),
           peakPower: 24 * Math.max(1, warehouseCount),
           dailyConsumption: 420 * Math.max(1, warehouseCount),
-          monthlyCost: calculateEnergyCost(
-            420 * Math.max(1, warehouseCount),
-            "PEAK",
-          ) * 30,
+          monthlyCost:
+            calculateEnergyCost(420 * Math.max(1, warehouseCount), "PEAK") * 30,
           efficiency: Math.max(50, 85 - warehouseCount * 3),
           status: warehouseCount > 5 ? "INEFFICIENT" : "OPTIMAL",
         },
@@ -440,18 +440,15 @@ export async function GET(req: NextRequest) {
           avgPower: 8 * Math.max(1, warehouseCount),
           peakPower: 12 * Math.max(1, warehouseCount),
           dailyConsumption: 190 * Math.max(1, warehouseCount),
-          monthlyCost: calculateEnergyCost(
-            190 * Math.max(1, warehouseCount),
-            "PEAK",
-          ) * 30,
+          monthlyCost:
+            calculateEnergyCost(190 * Math.max(1, warehouseCount), "PEAK") * 30,
           efficiency: Math.max(45, 80 - warehouseCount * 2),
           status: activeTasks > 80 ? "INEFFICIENT" : "OPTIMAL",
         },
       ];
 
-      const recommendations = generateOptimizationRecommendations(
-        baselineConsumptions,
-      );
+      const recommendations =
+        generateOptimizationRecommendations(baselineConsumptions);
 
       return NextResponse.json({
         recommendations,
@@ -474,7 +471,11 @@ export async function GET(req: NextRequest) {
         await Promise.all([
           prisma.warehouse.count({ where: { organizationId } }),
           prisma.location.count({
-            where: { organizationId, isActive: true, type: { in: ["RACK", "BIN", "SHELF"] } },
+            where: {
+              organizationId,
+              isActive: true,
+              type: { in: ["RACK", "BIN", "SHELF"] },
+            },
           }),
           prisma.inventoryItem.count({ where: { organizationId } }),
           prisma.pickingTask.count({

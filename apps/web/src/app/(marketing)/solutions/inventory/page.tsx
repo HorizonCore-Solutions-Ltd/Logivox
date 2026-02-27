@@ -396,14 +396,17 @@ export default function InventoryManagementPage() {
           <Card className="mx-auto max-w-3xl">
             <CardContent className="pt-8 pb-6">
               <p className="text-lg italic mb-6">
-                "LogiVox transformed our inventory accuracy from 87% to 99.9% in 60 days. 
-                We reduced stockouts by 58% and excess inventory by 35%. The system paid for 
-                itself in first month through prevented stockout losses alone."
+                "LogiVox transformed our inventory accuracy from 87% to 99.9% in
+                60 days. We reduced stockouts by 58% and excess inventory by
+                35%. The system paid for itself in first month through prevented
+                stockout losses alone."
               </p>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold">Sarah Chen</p>
-                  <p className="text-sm text-muted-foreground">Operations Director, PrecisionFlow Logistics</p>
+                  <p className="text-sm text-muted-foreground">
+                    Operations Director, PrecisionFlow Logistics
+                  </p>
                 </div>
                 <Badge>Achieved 99.9% Accuracy</Badge>
               </div>
