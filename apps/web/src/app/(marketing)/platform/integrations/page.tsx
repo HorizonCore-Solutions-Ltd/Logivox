@@ -21,12 +21,654 @@ import {
   ArrowRight,
   Database,
   ShoppingCart,
-  Mail,
-  MessageSquare,
-  FileText,
   BarChart3,
-  Clock,
+  MessageSquare,
+  Users,
+  Shield,
+  Package,
+  Bot,
+  Truck,
+  ClipboardCheck,
+  Cpu,
+  Mic,
+  CreditCard,
+  Globe,
+  Mail,
+  Building2,
+  Lock,
 } from "lucide-react";
+
+// ── Provider catalogue by category ──────────────────────────────────────────
+
+interface Provider {
+  name: string;
+  emoji: string;
+  popularity: "HIGH" | "MEDIUM" | "LOW";
+  complexity: "LOW" | "MEDIUM" | "HIGH" | "ENTERPRISE";
+}
+
+interface IntegrationCategory {
+  id: string;
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  colorClass: string;
+  providers: Provider[];
+}
+
+const CATEGORIES: IntegrationCategory[] = [
+  {
+    id: "ERP",
+    label: "ERP Systems",
+    description:
+      "Enterprise resource planning — materials, POs, GR/GI, and inventory sync.",
+    icon: Building2,
+    colorClass: "bg-blue-600",
+    providers: [
+      {
+        name: "SAP S/4HANA",
+        emoji: "🔵",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "SAP ECC",
+        emoji: "🔵",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "Oracle ERP Cloud",
+        emoji: "🔴",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "Microsoft Dynamics 365 F&SCM",
+        emoji: "🟦",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "Dynamics 365 Business Central",
+        emoji: "🟦",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      { name: "Odoo", emoji: "🟣", popularity: "MEDIUM", complexity: "MEDIUM" },
+    ],
+  },
+  {
+    id: "ACCOUNTING",
+    label: "Accounting & Finance",
+    description: "Invoices, P&L, stock valuation, and financial journals.",
+    icon: CreditCard,
+    colorClass: "bg-emerald-600",
+    providers: [
+      {
+        name: "QuickBooks Online",
+        emoji: "🟢",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+      { name: "Xero", emoji: "🔵", popularity: "HIGH", complexity: "LOW" },
+      {
+        name: "Sage Business Cloud",
+        emoji: "🟩",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Oracle NetSuite",
+        emoji: "🔷",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      { name: "FreshBooks", emoji: "🌿", popularity: "LOW", complexity: "LOW" },
+    ],
+  },
+  {
+    id: "HR",
+    label: "HR & Workforce",
+    description: "Workers, contracts, shifts, and time-and-attendance data.",
+    icon: Users,
+    colorClass: "bg-violet-600",
+    providers: [
+      {
+        name: "Workday HCM",
+        emoji: "🏢",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "SAP SuccessFactors",
+        emoji: "🔵",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "UKG (Kronos)",
+        emoji: "⏱️",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      {
+        name: "ADP Workforce Now",
+        emoji: "💼",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      {
+        name: "BambooHR",
+        emoji: "🎋",
+        popularity: "MEDIUM",
+        complexity: "LOW",
+      },
+      { name: "HiBob", emoji: "👥", popularity: "MEDIUM", complexity: "LOW" },
+    ],
+  },
+  {
+    id: "SSO",
+    label: "Identity & SSO",
+    description: "SAML / OIDC single-sign-on and SCIM directory provisioning.",
+    icon: Lock,
+    colorClass: "bg-sky-600",
+    providers: [
+      {
+        name: "Microsoft Entra ID (Azure AD)",
+        emoji: "🟦",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      { name: "Okta", emoji: "🔵", popularity: "HIGH", complexity: "MEDIUM" },
+      {
+        name: "Google Workspace",
+        emoji: "🔴",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+      {
+        name: "Auth0",
+        emoji: "⚫",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "OneLogin",
+        emoji: "🟢",
+        popularity: "LOW",
+        complexity: "MEDIUM",
+      },
+    ],
+  },
+  {
+    id: "ACCESS_CONTROL",
+    label: "Physical Access Control",
+    description: "Badge holders, door events, and zone-based access rules.",
+    icon: Shield,
+    colorClass: "bg-rose-600",
+    providers: [
+      {
+        name: "Paxton Net2",
+        emoji: "🚪",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Gallagher Command Centre",
+        emoji: "🔐",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "HID Origo",
+        emoji: "📛",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      { name: "LenelS2", emoji: "🔑", popularity: "LOW", complexity: "HIGH" },
+      {
+        name: "Brivo",
+        emoji: "☁️",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Genetec Security Center",
+        emoji: "🎥",
+        popularity: "MEDIUM",
+        complexity: "ENTERPRISE",
+      },
+    ],
+  },
+  {
+    id: "HARDWARE",
+    label: "Warehouse Hardware",
+    description: "Barcode scanners, label printers, RFID readers, and PLCs.",
+    icon: Cpu,
+    colorClass: "bg-amber-600",
+    providers: [
+      {
+        name: "Zebra Mobile Computers",
+        emoji: "🦓",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Zebra Label Printers",
+        emoji: "🖨️",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+      {
+        name: "Honeywell Scanners",
+        emoji: "📡",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Datalogic",
+        emoji: "📶",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Impinj RFID",
+        emoji: "📡",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "Siemens PLC / SCADA",
+        emoji: "⚙️",
+        popularity: "MEDIUM",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "Allen-Bradley / Rockwell",
+        emoji: "🔧",
+        popularity: "MEDIUM",
+        complexity: "ENTERPRISE",
+      },
+    ],
+  },
+  {
+    id: "ROBOTICS",
+    label: "Robotics & Automation",
+    description: "AS/RS, AMR fleets, conveyors, and sortation systems.",
+    icon: Bot,
+    colorClass: "bg-teal-600",
+    providers: [
+      {
+        name: "AutoStore",
+        emoji: "🤖",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "Dematic iQ WCS",
+        emoji: "🏭",
+        popularity: "HIGH",
+        complexity: "ENTERPRISE",
+      },
+      {
+        name: "Locus Robotics (AMR)",
+        emoji: "🤖",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "Geek+ (Goods-to-Person)",
+        emoji: "📦",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "Fetch Robotics",
+        emoji: "🚗",
+        popularity: "LOW",
+        complexity: "HIGH",
+      },
+    ],
+  },
+  {
+    id: "TMS_YMS",
+    label: "TMS & Yard Management",
+    description: "Fleet telematics, dock assignments, and carrier management.",
+    icon: Truck,
+    colorClass: "bg-orange-600",
+    providers: [
+      {
+        name: "FleetOps360",
+        emoji: "🚛",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Samsara",
+        emoji: "📍",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Webfleet (TomTom)",
+        emoji: "🗺️",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Trimble TMS",
+        emoji: "🚚",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "MercuryGate TMS",
+        emoji: "☿",
+        popularity: "LOW",
+        complexity: "HIGH",
+      },
+    ],
+  },
+  {
+    id: "QMS",
+    label: "Quality Management (QMS)",
+    description:
+      "CAPA actions, audit findings, deviations, and nonconformances.",
+    icon: ClipboardCheck,
+    colorClass: "bg-lime-600",
+    providers: [
+      {
+        name: "iAuditor (SafetyCulture)",
+        emoji: "✅",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+      {
+        name: "EcoOnline (EHS)",
+        emoji: "🟢",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "MasterControl",
+        emoji: "📋",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "ETQ Reliance",
+        emoji: "🔵",
+        popularity: "LOW",
+        complexity: "HIGH",
+      },
+      {
+        name: "Veeva Vault QMS",
+        emoji: "🏥",
+        popularity: "LOW",
+        complexity: "ENTERPRISE",
+      },
+    ],
+  },
+  {
+    id: "BI",
+    label: "Analytics & BI",
+    description: "KPI datasets, inventory metrics, and executive dashboards.",
+    icon: BarChart3,
+    colorClass: "bg-indigo-600",
+    providers: [
+      {
+        name: "Microsoft Power BI",
+        emoji: "📊",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Tableau",
+        emoji: "📈",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Looker / Google Looker Studio",
+        emoji: "🔍",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "Qlik Sense",
+        emoji: "🟢",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      { name: "Domo", emoji: "🔴", popularity: "LOW", complexity: "MEDIUM" },
+      {
+        name: "Google Analytics 4",
+        emoji: "📉",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+    ],
+  },
+  {
+    id: "IOT_CLOUD",
+    label: "IoT & Cloud Sensors",
+    description: "Device telemetry, sensor streaming, and shadow state sync.",
+    icon: Globe,
+    colorClass: "bg-cyan-600",
+    providers: [
+      {
+        name: "AWS IoT Core",
+        emoji: "☁️",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      {
+        name: "Azure IoT Hub",
+        emoji: "🔵",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      {
+        name: "Google Cloud IoT",
+        emoji: "🔴",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+    ],
+  },
+  {
+    id: "VOICE_HARDWARE",
+    label: "Voice-Directed Picking",
+    description: "Operator voice profiles, task lists, and headset firmware.",
+    icon: Mic,
+    colorClass: "bg-pink-600",
+    providers: [
+      {
+        name: "Honeywell Vocollect",
+        emoji: "🎧",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      {
+        name: "Lydia Voice",
+        emoji: "🎤",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      {
+        name: "Android Voice (BYOD)",
+        emoji: "📱",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+    ],
+  },
+  {
+    id: "ECOMMERCE",
+    label: "E-Commerce & Marketplaces",
+    description:
+      "Real-time inventory sync, order fulfilment, and listing management.",
+    icon: ShoppingCart,
+    colorClass: "bg-fuchsia-600",
+    providers: [
+      { name: "Shopify", emoji: "🛍️", popularity: "HIGH", complexity: "LOW" },
+      {
+        name: "WooCommerce",
+        emoji: "🟣",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+      {
+        name: "Amazon Seller Central",
+        emoji: "🟠",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      { name: "eBay", emoji: "🔴", popularity: "MEDIUM", complexity: "MEDIUM" },
+      {
+        name: "BigCommerce",
+        emoji: "🔵",
+        popularity: "MEDIUM",
+        complexity: "LOW",
+      },
+      {
+        name: "Adobe Commerce (Magento)",
+        emoji: "🔴",
+        popularity: "MEDIUM",
+        complexity: "HIGH",
+      },
+      { name: "Etsy", emoji: "🟠", popularity: "LOW", complexity: "LOW" },
+      {
+        name: "Squarespace",
+        emoji: "⬛",
+        popularity: "LOW",
+        complexity: "LOW",
+      },
+    ],
+  },
+  {
+    id: "SHIPPING",
+    label: "Carriers & Shipping",
+    description:
+      "Rate shopping, label generation, and real-time parcel tracking.",
+    icon: Package,
+    colorClass: "bg-yellow-600",
+    providers: [
+      { name: "FedEx", emoji: "🟣", popularity: "HIGH", complexity: "MEDIUM" },
+      { name: "UPS", emoji: "🟤", popularity: "HIGH", complexity: "MEDIUM" },
+      {
+        name: "DHL Express",
+        emoji: "🟡",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Royal Mail",
+        emoji: "🇬🇧",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      { name: "DPD", emoji: "🔴", popularity: "HIGH", complexity: "MEDIUM" },
+      { name: "USPS", emoji: "🦅", popularity: "HIGH", complexity: "LOW" },
+      {
+        name: "ShipStation",
+        emoji: "⚓",
+        popularity: "MEDIUM",
+        complexity: "LOW",
+      },
+    ],
+  },
+  {
+    id: "CRM",
+    label: "CRM Systems",
+    description: "Customers, contacts, deal stages, and fulfilment events.",
+    icon: Database,
+    colorClass: "bg-slate-600",
+    providers: [
+      {
+        name: "Salesforce",
+        emoji: "☁️",
+        popularity: "HIGH",
+        complexity: "HIGH",
+      },
+      {
+        name: "HubSpot",
+        emoji: "🟠",
+        popularity: "HIGH",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Zoho CRM",
+        emoji: "🟢",
+        popularity: "MEDIUM",
+        complexity: "MEDIUM",
+      },
+      {
+        name: "Pipedrive",
+        emoji: "🟢",
+        popularity: "MEDIUM",
+        complexity: "LOW",
+      },
+    ],
+  },
+  {
+    id: "COMMUNICATION",
+    label: "Communication & Alerts",
+    description:
+      "SMS, push, email, and chat notifications for warehouse events.",
+    icon: MessageSquare,
+    colorClass: "bg-green-600",
+    providers: [
+      { name: "Slack", emoji: "💬", popularity: "HIGH", complexity: "LOW" },
+      {
+        name: "Microsoft Teams",
+        emoji: "🟦",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+      {
+        name: "Twilio (SMS / WhatsApp)",
+        emoji: "📱",
+        popularity: "HIGH",
+        complexity: "LOW",
+      },
+      { name: "SendGrid", emoji: "🔵", popularity: "HIGH", complexity: "LOW" },
+      {
+        name: "Mailchimp",
+        emoji: "🐒",
+        popularity: "MEDIUM",
+        complexity: "LOW",
+      },
+      { name: "Klaviyo", emoji: "🟢", popularity: "MEDIUM", complexity: "LOW" },
+    ],
+  },
+  {
+    id: "PAYMENT",
+    label: "Payments",
+    description: "Payment collection, invoicing, and billing automation.",
+    icon: CreditCard,
+    colorClass: "bg-red-600",
+    providers: [
+      { name: "Stripe", emoji: "💳", popularity: "HIGH", complexity: "LOW" },
+      { name: "PayPal", emoji: "🔵", popularity: "HIGH", complexity: "LOW" },
+      { name: "Square", emoji: "⬛", popularity: "MEDIUM", complexity: "LOW" },
+    ],
+  },
+];
+
+const complexityLabel: Record<string, string> = {
+  LOW: "Easy setup",
+  MEDIUM: "Medium setup",
+  HIGH: "Complex setup",
+  ENTERPRISE: "Enterprise",
+};
+const complexityColor: Record<string, string> = {
+  LOW: "bg-green-100 text-green-800",
+  MEDIUM: "bg-yellow-100 text-yellow-800",
+  HIGH: "bg-orange-100 text-orange-800",
+  ENTERPRISE: "bg-red-100 text-red-800",
+};
 
 export default function IntegrationsPage() {
   const integrationCategories = [
