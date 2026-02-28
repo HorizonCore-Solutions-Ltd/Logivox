@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { NCRService } from "@/lib/services/qc/ncr-service";
 
 const createAdjustmentSchema = z.object({
   inventoryId: z.string().min(1, "Inventory item is required"),
@@ -310,6 +311,30 @@ export async function POST(request: NextRequest) {
           availableQty: quantityAfter - inventoryItem.reservedQty,
         },
       });
+    }
+
+    // Auto-create NCR for stock loss/damage adjustments (best-effort)
+    if (["DAMAGE", "THEFT", "LOSS", "EXPIRY"].includes(validatedData.reason) && validatedData.quantityChange < 0) {
+      const absQty = Math.abs(validatedData.quantityChange);
+      NCRService.createNCR({
+        organizationId: membership.organizationId,
+        title: `Stock ${validatedData.reason}: ${inventoryItem.name} — ${absQty} units (${adjustment.adjustmentNumber})`,
+        description: `${absQty} unit(s) written off via stock adjustment ${adjustment.adjustmentNumber}. Reason: ${validatedData.reason}. Notes: ${validatedData.reasonNotes ?? "None provided."}`,
+        discoveredBy: session.user.id,
+        discoveryLocation: "Warehouse",
+        sourceType: "PRODUCTION",
+        sourceId: adjustment.id,
+        productSku: inventoryItem.sku ?? undefined,
+        productDescription: inventoryItem.name,
+        quantityAffected: absQty,
+        nonConformanceType: validatedData.reason === "DAMAGE" ? "DAMAGE" : "LOSS",
+        severity: absQty > 50 ? "HIGH" : "MEDIUM",
+        category: "INVENTORY_ADJUSTMENT",
+        disposition: validatedData.reason === "DAMAGE" ? "SCRAP" : "QUARANTINE",
+        capaRequired: absQty > 50,
+        priority: absQty > 50 ? "HIGH" : "MEDIUM",
+        createdBy: session.user.id,
+      }).catch((e: any) => console.error("Auto-NCR for adjustment failed:", e));
     }
 
     // Log activity

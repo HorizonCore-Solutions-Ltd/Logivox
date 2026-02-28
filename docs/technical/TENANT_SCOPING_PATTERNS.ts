@@ -5,7 +5,7 @@
 
 /**
  * ✅ PATTERN 1: Using Tenant Context in Route Handlers
- * 
+ *
  * Most secure and recommended approach
  */
 export const PATTERN_1_TENANT_CONTEXT = `
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 
 /**
  * ❌ BAD PATTERN 1: Unscoped Query
- * 
+ *
  * This will be REJECTED by Prisma middleware
  */
 export const BAD_PATTERN_1_UNSCOPED = `
@@ -119,7 +119,7 @@ const items = await prisma.inventoryItem.findMany({
 
 /**
  * ❌ BAD PATTERN 2: Assuming organizationId from Request Body
- * 
+ *
  * Trusting user input without verification
  */
 export const BAD_PATTERN_2_UNVERIFIED = `
@@ -470,6 +470,4 @@ export const ALL_PATTERNS = {
 };
 
 console.log("✅ Tenant Scoping Patterns Reference");
-console.log(
-  "See docs/technical/TENANT_SCOPING_PATTERNS.md for full examples",
-);
+console.log("See docs/technical/TENANT_SCOPING_PATTERNS.md for full examples");

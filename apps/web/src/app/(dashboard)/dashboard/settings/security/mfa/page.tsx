@@ -53,7 +53,7 @@ export default function MFASettingsPage() {
 
   async function checkMFAStatus() {
     try {
-      const response = await fetch("/api/user/mfa-status");
+      const response = await fetch("/api/auth/mfa/status");
       if (response.ok) {
         const data = await response.json();
         setMfaEnabled(data.mfaEnabled);

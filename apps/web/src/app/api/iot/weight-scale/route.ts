@@ -60,17 +60,18 @@ export async function GET(req: NextRequest) {
 
     // Also try to get weight readings from dedicated weight route (if exists)
     // Additional readings from the inventory IoT weight endpoint
-    const inventoryWeightReadings = await (prisma as any).ioTReading
-      ?.findMany({
-        where: {
-          deviceType: "WEIGHT",
-          createdAt: { gte: since },
-          ...(warehouseId ? { warehouseId } : {}),
-        },
-        orderBy: { createdAt: "desc" },
-        take: 200,
-      })
-      .catch(() => []) ?? [];
+    const inventoryWeightReadings =
+      (await (prisma as any).ioTReading
+        ?.findMany({
+          where: {
+            deviceType: "WEIGHT",
+            createdAt: { gte: since },
+            ...(warehouseId ? { warehouseId } : {}),
+          },
+          orderBy: { createdAt: "desc" },
+          take: 200,
+        })
+        .catch(() => [])) ?? [];
 
     // Build per-scale summary
     const scaleSummaries = scaleDevices.map((device) => {
@@ -116,7 +117,8 @@ export async function GET(req: NextRequest) {
     });
 
     // Overall summary
-    const totalReadings = weightReadings.length + inventoryWeightReadings.length;
+    const totalReadings =
+      weightReadings.length + inventoryWeightReadings.length;
     const totalPassed = scaleSummaries.reduce((s, d) => s + d.passCount, 0);
     const totalFailed = scaleSummaries.reduce((s, d) => s + d.failCount, 0);
     const overallPassRate =

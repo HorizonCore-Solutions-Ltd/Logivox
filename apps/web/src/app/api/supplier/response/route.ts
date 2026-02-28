@@ -43,7 +43,10 @@ export async function POST(request: Request) {
       select: { organizationId: true },
     });
     if (!supplier) {
-      return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Supplier not found" },
+        { status: 404 },
+      );
     }
     const organizationId = supplier.organizationId;
 
@@ -52,7 +55,11 @@ export async function POST(request: Request) {
       where: { id: ncrId },
     });
 
-    if (!ncr || ncr.supplierId !== decoded.supplierId || ncr.organizationId !== organizationId) {
+    if (
+      !ncr ||
+      ncr.supplierId !== decoded.supplierId ||
+      ncr.organizationId !== organizationId
+    ) {
       return NextResponse.json(
         { error: "Unauthorized access to NCR" },
         { status: 403 },

@@ -35,9 +35,7 @@ export interface TimeAttendanceAdapter {
     payload: unknown,
     headers: Record<string, string | string[] | undefined>,
   ): Promise<boolean>;
-  parseWebhook?(
-    payload: unknown,
-  ): Promise<{
+  parseWebhook?(payload: unknown): Promise<{
     punches?: TimeAttendancePunch[];
     schedules?: TimeAttendanceSchedule[];
   }>;

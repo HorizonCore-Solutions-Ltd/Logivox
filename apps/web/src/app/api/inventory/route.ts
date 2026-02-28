@@ -12,6 +12,7 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth-helpers";
 import { z } from "zod";
 import { requireApiAuth } from "@/lib/api-guard";
+import { withObservability } from "@/lib/middleware/observability";
 
 // ULTRA-STRICT Input validation schema with enterprise constraints
 const createInventorySchema = z.object({
@@ -217,16 +218,17 @@ async function validateOrganizationAccess(
 
 // ULTRA-SECURE GET ENDPOINT - Zero Trust Architecture
 export async function GET(request: NextRequest) {
+  return withObservability(async () => {
     const auth = await requireApiAuth();
     if ("error" in auth) return auth.error;
     const { organizationId } = auth;
 
-  const startTime = Date.now();
-  let user: any = null;
-  let securityViolation = false;
-  let blockReason = "";
+    const startTime = Date.now();
+    let user: any = null;
+    let securityViolation = false;
+    let blockReason = "";
 
-  try {
+    try {
     // STEP 1: Ultra-conservative rate limiting (prioritize security over usability)
     if (!enforceRateLimit(request, "GET")) {
       securityViolation = true;
@@ -540,52 +542,24 @@ export async function GET(request: NextRequest) {
     response.headers.set("X-Security-Level", "ENTERPRISE");
 
     return response;
-  } catch (error: any) {
-    // CRITICAL: Log ALL errors for security monitoring
-    await createSecurityAuditLog(
-      "INVENTORY_LIST_ERROR",
-      user?.id || "unknown",
-      request,
-      null,
-      "FAILURE",
-      `System error: ${error.message}`,
-    );
-
-    console.error("[SECURITY ERROR] Inventory GET failed:", {
-      error: error.message,
-      stack: error.stack,
-      userId: user?.id,
-      timestamp: new Date(),
-      requestUrl: request.url,
-    });
-
-    // SECURITY: Never expose internal error details
-    return NextResponse.json(
-      {
-        error: "Internal security error",
-        code: "SECURITY_ERROR",
-        securityLevel: "HIGH",
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 },
-    );
-  }
+  }, request);
 }
 
 // POST /api/inventory - Create new inventory item
 // ULTRA-SECURE POST ENDPOINT - Maximum Security Controls
 export async function POST(request: NextRequest) {
+  return withObservability(async () => {
     const auth = await requireApiAuth();
     if ("error" in auth) return auth.error;
     const { organizationId } = auth;
 
-  const startTime = Date.now();
-  let user: any = null;
-  let validatedData: any = null;
-  let securityViolation = false;
-  let blockReason = "";
+    const startTime = Date.now();
+    let user: any = null;
+    let validatedData: any = null;
+    let securityViolation = false;
+    let blockReason = "";
 
-  try {
+    try {
     // STEP 1: Ultra-conservative rate limiting (2 creates per minute maximum)
     if (!enforceRateLimit(request, "POST")) {
       blockReason =
@@ -1021,35 +995,5 @@ export async function POST(request: NextRequest) {
     response.headers.set("X-Compliance-Level", "SOX-GDPR-ISO27001");
 
     return response;
-  } catch (error: any) {
-    // CRITICAL: Log ALL creation failures
-    await createSecurityAuditLog(
-      "INVENTORY_CREATE_ERROR",
-      user?.id || "unknown",
-      request,
-      validatedData,
-      "FAILURE",
-      `Creation failed: ${error.message}`,
-    );
-
-    console.error("[CRITICAL SECURITY] Inventory creation failed:", {
-      error: error.message,
-      stack: error.stack,
-      userId: user?.id,
-      data: validatedData,
-      timestamp: new Date(),
-      requestUrl: request.url,
-    });
-
-    // SECURITY: Never expose internal error details
-    return NextResponse.json(
-      {
-        error: "Inventory creation failed",
-        code: "CREATION_FAILED",
-        securityLevel: "HIGH",
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 },
-    );
-  }
+  }, request);
 }

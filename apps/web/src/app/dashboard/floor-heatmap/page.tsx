@@ -10,7 +10,14 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Activity, AlertTriangle, RefreshCw, Users, MapPin, Zap } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  RefreshCw,
+  Users,
+  MapPin,
+  Zap,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface Zone {
@@ -120,26 +127,131 @@ export default function FloorHeatmapPage() {
     zones.length > 0
       ? zones
       : [
-          { aisle: "A", locationCount: 24, activeWorkers: 3, activeTasks: 7, picksLastHour: 42, congestionLevel: "high", workers: ["J. Smith", "M. Patel", "L. Jones"] },
-          { aisle: "B", locationCount: 20, activeWorkers: 1, activeTasks: 2, picksLastHour: 18, congestionLevel: "low", workers: ["T. Williams"] },
-          { aisle: "C", locationCount: 18, activeWorkers: 5, activeTasks: 12, picksLastHour: 67, congestionLevel: "critical", workers: ["A. Brown", "R. Davis", "S. Wilson", "K. Moore", "E. Taylor"] },
-          { aisle: "D", locationCount: 22, activeWorkers: 2, activeTasks: 5, picksLastHour: 31, congestionLevel: "medium", workers: ["P. Anderson", "H. Thomas"] },
-          { aisle: "E", locationCount: 16, activeWorkers: 0, activeTasks: 0, picksLastHour: 3, congestionLevel: "low", workers: [] },
-          { aisle: "F", locationCount: 14, activeWorkers: 4, activeTasks: 9, picksLastHour: 54, congestionLevel: "high", workers: ["C. Jackson", "B. White", "N. Harris", "G. Martin"] },
-          { aisle: "G", locationCount: 20, activeWorkers: 1, activeTasks: 1, picksLastHour: 10, congestionLevel: "low", workers: ["D. Garcia"] },
-          { aisle: "H", locationCount: 12, activeWorkers: 2, activeTasks: 4, picksLastHour: 23, congestionLevel: "medium", workers: ["F. Martinez", "I. Lopez"] },
-          { aisle: "RECEIVE", locationCount: 8, activeWorkers: 3, activeTasks: 6, picksLastHour: 28, congestionLevel: "medium", workers: ["J. Lee", "M. Walker", "O. Hall"] },
-          { aisle: "PACK", locationCount: 6, activeWorkers: 4, activeTasks: 8, picksLastHour: 38, congestionLevel: "high", workers: ["Q. Allen", "R. Young", "S. King", "T. Scott"] },
-          { aisle: "SHIP", locationCount: 6, activeWorkers: 2, activeTasks: 3, picksLastHour: 15, congestionLevel: "low", workers: ["U. Adams", "V. Nelson"] },
-          { aisle: "BULK", locationCount: 30, activeWorkers: 1, activeTasks: 2, picksLastHour: 8, congestionLevel: "low", workers: ["W. Carter"] },
+          {
+            aisle: "A",
+            locationCount: 24,
+            activeWorkers: 3,
+            activeTasks: 7,
+            picksLastHour: 42,
+            congestionLevel: "high",
+            workers: ["J. Smith", "M. Patel", "L. Jones"],
+          },
+          {
+            aisle: "B",
+            locationCount: 20,
+            activeWorkers: 1,
+            activeTasks: 2,
+            picksLastHour: 18,
+            congestionLevel: "low",
+            workers: ["T. Williams"],
+          },
+          {
+            aisle: "C",
+            locationCount: 18,
+            activeWorkers: 5,
+            activeTasks: 12,
+            picksLastHour: 67,
+            congestionLevel: "critical",
+            workers: [
+              "A. Brown",
+              "R. Davis",
+              "S. Wilson",
+              "K. Moore",
+              "E. Taylor",
+            ],
+          },
+          {
+            aisle: "D",
+            locationCount: 22,
+            activeWorkers: 2,
+            activeTasks: 5,
+            picksLastHour: 31,
+            congestionLevel: "medium",
+            workers: ["P. Anderson", "H. Thomas"],
+          },
+          {
+            aisle: "E",
+            locationCount: 16,
+            activeWorkers: 0,
+            activeTasks: 0,
+            picksLastHour: 3,
+            congestionLevel: "low",
+            workers: [],
+          },
+          {
+            aisle: "F",
+            locationCount: 14,
+            activeWorkers: 4,
+            activeTasks: 9,
+            picksLastHour: 54,
+            congestionLevel: "high",
+            workers: ["C. Jackson", "B. White", "N. Harris", "G. Martin"],
+          },
+          {
+            aisle: "G",
+            locationCount: 20,
+            activeWorkers: 1,
+            activeTasks: 1,
+            picksLastHour: 10,
+            congestionLevel: "low",
+            workers: ["D. Garcia"],
+          },
+          {
+            aisle: "H",
+            locationCount: 12,
+            activeWorkers: 2,
+            activeTasks: 4,
+            picksLastHour: 23,
+            congestionLevel: "medium",
+            workers: ["F. Martinez", "I. Lopez"],
+          },
+          {
+            aisle: "RECEIVE",
+            locationCount: 8,
+            activeWorkers: 3,
+            activeTasks: 6,
+            picksLastHour: 28,
+            congestionLevel: "medium",
+            workers: ["J. Lee", "M. Walker", "O. Hall"],
+          },
+          {
+            aisle: "PACK",
+            locationCount: 6,
+            activeWorkers: 4,
+            activeTasks: 8,
+            picksLastHour: 38,
+            congestionLevel: "high",
+            workers: ["Q. Allen", "R. Young", "S. King", "T. Scott"],
+          },
+          {
+            aisle: "SHIP",
+            locationCount: 6,
+            activeWorkers: 2,
+            activeTasks: 3,
+            picksLastHour: 15,
+            congestionLevel: "low",
+            workers: ["U. Adams", "V. Nelson"],
+          },
+          {
+            aisle: "BULK",
+            locationCount: 30,
+            activeWorkers: 1,
+            activeTasks: 2,
+            picksLastHour: 8,
+            congestionLevel: "low",
+            workers: ["W. Carter"],
+          },
         ];
 
   const summaryDisplay = summary ?? {
     totalZones: displayZones.length,
     totalActiveTasks: displayZones.reduce((s, z) => s + z.activeTasks, 0),
     totalActiveWorkers: displayZones.reduce((s, z) => s + z.activeWorkers, 0),
-    criticalZones: displayZones.filter((z) => z.congestionLevel === "critical").length,
-    highCongestionZones: displayZones.filter((z) => z.congestionLevel === "high").length,
+    criticalZones: displayZones.filter((z) => z.congestionLevel === "critical")
+      .length,
+    highCongestionZones: displayZones.filter(
+      (z) => z.congestionLevel === "high",
+    ).length,
     picksLastHour: displayZones.reduce((s, z) => s + z.picksLastHour, 0),
     lastUpdated: new Date().toISOString(),
   };
@@ -187,7 +299,9 @@ export default function FloorHeatmapPage() {
             <p className="text-3xl font-bold text-blue-600">
               {summaryDisplay.totalActiveWorkers}
             </p>
-            <p className="text-xs text-gray-400 mt-0.5">across {summaryDisplay.totalZones} zones</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              across {summaryDisplay.totalZones} zones
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -199,10 +313,16 @@ export default function FloorHeatmapPage() {
             <p className="text-xs text-gray-400 mt-0.5">in progress now</p>
           </CardContent>
         </Card>
-        <Card className={summaryDisplay.criticalZones > 0 ? "border-red-200 bg-red-50" : ""}>
+        <Card
+          className={
+            summaryDisplay.criticalZones > 0 ? "border-red-200 bg-red-50" : ""
+          }
+        >
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Critical Zones</p>
-            <p className={`text-3xl font-bold ${summaryDisplay.criticalZones > 0 ? "text-red-600" : "text-gray-400"}`}>
+            <p
+              className={`text-3xl font-bold ${summaryDisplay.criticalZones > 0 ? "text-red-600" : "text-gray-400"}`}
+            >
               {summaryDisplay.criticalZones}
             </p>
             <p className="text-xs text-gray-400 mt-0.5">
@@ -243,7 +363,9 @@ export default function FloorHeatmapPage() {
             <button
               key={zone.aisle}
               onClick={() =>
-                setSelectedZone(selectedZone?.aisle === zone.aisle ? null : zone)
+                setSelectedZone(
+                  selectedZone?.aisle === zone.aisle ? null : zone,
+                )
               }
               className={`p-4 rounded-xl border-2 text-left transition-all cursor-pointer ${cfg.bg} ${cfg.border} ${selectedZone?.aisle === zone.aisle ? "ring-2 ring-offset-1 ring-blue-400 scale-105" : "hover:scale-102"}`}
             >
@@ -251,7 +373,9 @@ export default function FloorHeatmapPage() {
                 <span className={`font-bold text-lg ${cfg.text}`}>
                   {zone.aisle}
                 </span>
-                <div className={`w-2.5 h-2.5 rounded-full ${cfg.dot} animate-pulse`} />
+                <div
+                  className={`w-2.5 h-2.5 rounded-full ${cfg.dot} animate-pulse`}
+                />
               </div>
               <div className={`text-2xl font-bold ${cfg.text}`}>
                 {zone.activeWorkers}
@@ -273,14 +397,21 @@ export default function FloorHeatmapPage() {
 
       {/* Zone Detail Panel */}
       {selectedZone && (
-        <Card className={`border-2 ${CONGESTION_CONFIG[selectedZone.congestionLevel].border}`}>
+        <Card
+          className={`border-2 ${CONGESTION_CONFIG[selectedZone.congestionLevel].border}`}
+        >
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
                 Zone {selectedZone.aisle} — Detail View
-                <Badge className={CONGESTION_CONFIG[selectedZone.congestionLevel].badge}>
-                  {CONGESTION_CONFIG[selectedZone.congestionLevel].label} Congestion
+                <Badge
+                  className={
+                    CONGESTION_CONFIG[selectedZone.congestionLevel].badge
+                  }
+                >
+                  {CONGESTION_CONFIG[selectedZone.congestionLevel].label}{" "}
+                  Congestion
                 </Badge>
               </CardTitle>
               <Button
@@ -307,7 +438,9 @@ export default function FloorHeatmapPage() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Picks / Last Hour</p>
+                <p className="text-sm text-muted-foreground">
+                  Picks / Last Hour
+                </p>
                 <p className="text-2xl font-bold text-green-600">
                   {selectedZone.picksLastHour}
                 </p>
@@ -320,7 +453,11 @@ export default function FloorHeatmapPage() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {selectedZone.workers.map((w) => (
-                    <Badge key={w} variant="outline" className="text-sm py-1 px-3">
+                    <Badge
+                      key={w}
+                      variant="outline"
+                      className="text-sm py-1 px-3"
+                    >
                       <Users className="h-3 w-3 mr-1" />
                       {w}
                     </Badge>
@@ -332,8 +469,8 @@ export default function FloorHeatmapPage() {
               <div className="mt-4 p-3 rounded-lg bg-red-50 border border-red-200 flex items-start gap-2">
                 <AlertTriangle className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-red-700">
-                  <strong>Action recommended:</strong> Consider re-assigning workers from
-                  this zone to reduce congestion. Go to{" "}
+                  <strong>Action recommended:</strong> Consider re-assigning
+                  workers from this zone to reduce congestion. Go to{" "}
                   <a href="/dashboard/labor" className="underline font-medium">
                     Labor Dashboard
                   </a>{" "}

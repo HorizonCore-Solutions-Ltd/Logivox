@@ -138,6 +138,40 @@ async function main() {
 
   console.log("✅ Added Manager to Organization");
 
+  // Create Demo Operator User with secure password
+  const operatorPasswordPlain = getSecurePassword("SEED_OPERATOR_PASSWORD", "TempOperator123!");
+  const operatorPassword = await bcrypt.hash(operatorPasswordPlain, 12);
+  const operator = await prisma.user.upsert({
+    where: { email: "operator@demo-company.com" },
+    update: {},
+    create: {
+      email: "operator@demo-company.com",
+      name: "Demo Operator",
+      password: operatorPassword,
+      role: "STAFF",
+      emailVerified: new Date(),
+    },
+  });
+  console.log("✅ Created Operator User:", operator.email);
+
+  // Add Operator to Organization
+  await prisma.organizationMember.upsert({
+    where: { organizationId_userId: { organizationId: demoOrg.id, userId: operator.id } },
+    update: {},
+    create: {
+      userId: operator.id,
+      organizationId: demoOrg.id,
+      role: "MEMBER",
+      permissions: {
+        manage_organization: false, manage_members: false, manage_warehouses: false,
+        manage_inventory: true, manage_bookings: true, manage_suppliers: false,
+        manage_customers: false, manage_integrations: false, view_analytics: false, export_data: false,
+      },
+    },
+  });
+  console.log("✅ Added Operator to Organization");
+
+
   // Create Main Warehouse
   const mainWarehouse = await prisma.warehouse.create({
     data: {
@@ -151,6 +185,48 @@ async function main() {
   });
 
   console.log("✅ Created Main Warehouse:", mainWarehouse.name);
+
+  // Create Employee Profiles for users
+  const empManager = await prisma.employee.create({
+    data: {
+      organizationId: demoOrg.id,
+      userId: manager.id,
+      employeeNumber: "EMP-MGR-01",
+      firstName: "Demo",
+      lastName: "Manager",
+      email: "manager@demo-company.com",
+      hireDate: new Date(),
+      status: "ACTIVE",
+      employmentType: "FULL_TIME",
+      department: "Management",
+      position: "Warehouse Manager",
+      warehouseId: mainWarehouse.id,
+      skills: ["quality_control", "inventory_audit"],
+      certifications: ["six_sigma", "iso9001"],
+    }
+  });
+  console.log("✅ Created Employee Profile for Manager");
+
+  const empOperator = await prisma.employee.create({
+    data: {
+      organizationId: demoOrg.id,
+      userId: operator.id,
+      employeeNumber: "EMP-OP-01",
+      firstName: "Demo",
+      lastName: "Operator",
+      email: "operator@demo-company.com",
+      hireDate: new Date(),
+      status: "ACTIVE",
+      employmentType: "FULL_TIME",
+      department: "Warehouse Floor",
+      position: "Senior Operator",
+      warehouseId: mainWarehouse.id,
+      skills: ["picking", "packing", "forklift", "voice_picking"],
+      certifications: ["forklift_class_1", "hazmat"],
+    }
+  });
+  console.log("✅ Created Employee Profile for Operator");
+
 
   // Create Categories
   const electronics = await prisma.category.create({
@@ -338,6 +414,78 @@ async function main() {
 
   console.log("✅ Created Inventory Movements");
 
+  // Create Sample CAPA Record
+  const capa = await prisma.correctivePreventiveAction.create({
+    data: {
+      organizationId: demoOrg.id,
+      capaNumber: "CAPA-2026-001",
+      capaType: "PREVENTIVE",
+      actionCategory: "PROCESS_IMPROVEMENT",
+      sourceType: "USER_REPORT",
+      problemStatement: "Recurring miscounts in aisle B",
+      problemSeverity: "MEDIUM",
+      status: "OPEN",
+    },
+  });
+  console.log("✅ Created CAPA Record:", capa.capaNumber);
+
+  // Create Duty Types
+  const inventoryCheckDutyType = await prisma.dutyType.create({
+    data: {
+      organizationId: demoOrg.id,
+      name: "Standard Inventory Count",
+      category: "PICKING",
+      description: "Routine count of specified bins",
+      requiredSkills: ["forklift", "scanning"],
+      defaultDuration: 30,
+    },
+  });
+
+  const capaActionDutyType = await prisma.dutyType.create({
+    data: {
+      organizationId: demoOrg.id,
+      name: "CAPA Preventative Action",
+      category: "CAPA_PREVENTIVE",
+      description: "Implement preventative actions as described in CAPA",
+      requiredSkills: ["qms_trained"],
+      defaultDuration: 60,
+    },
+  });
+  console.log("✅ Created Duty Types");
+
+  // Create Duties
+  await prisma.duty.create({
+    data: {
+      organizationId: demoOrg.id,
+      dutyTypeId: inventoryCheckDutyType.id,
+      employeeId: operator.id,
+      assignedBy: manager.id,
+      warehouseId: mainWarehouse.id,
+      title: "Morning Aisle B Count",
+      priority: "MEDIUM",
+      status: "PLANNED",
+      dueDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // tomorrow
+    },
+  });
+
+  await prisma.duty.create({
+    data: {
+      organizationId: demoOrg.id,
+      dutyTypeId: capaActionDutyType.id,
+      employeeId: operator.id,
+      assignedBy: manager.id,
+      warehouseId: mainWarehouse.id,
+      title: "Implement Aisle B Scanning Rules",
+      priority: "HIGH",
+      status: "ACTIVE",
+      notes: "Follow newly established scanning procedures from CAPA-2026-001",
+      linkedEntityId: capa.id,
+      linkedEntityType: "CAPA",
+      dueDate: new Date(), // today
+    },
+  });
+  console.log("✅ Created Sample Duties");
+
   // Log Activity
   await prisma.activityLog.create({
     data: {
@@ -368,6 +516,10 @@ async function main() {
     console.log(
       "  Password: [Check SEED_MANAGER_PASSWORD env var or use fallback]",
     );
+    console.log("\nOperator:");
+    console.log("  Email: operator@demo-company.com");
+    console.log("  Password: [Check SEED_OPERATOR_PASSWORD env var or use fallback]");
+
     console.log("━".repeat(50));
   } else {
     console.log(

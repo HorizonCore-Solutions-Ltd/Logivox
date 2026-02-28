@@ -34,7 +34,17 @@ const AuditService = {
    * Auto-generates findingNumber based on existing finding count.
    */
   async addFinding(input: AddFindingInput) {
-    const { auditId, severity, clause, category, description, evidence, requirement, responsiblePerson, dueDate } = input;
+    const {
+      auditId,
+      severity,
+      clause,
+      category,
+      description,
+      evidence,
+      requirement,
+      responsiblePerson,
+      dueDate,
+    } = input;
 
     // Verify audit exists
     const audit = await prisma.audit.findUnique({
@@ -182,8 +192,11 @@ const AuditService = {
     };
     const findingsByStatus = {
       OPEN: findings.filter((f) => f.status === "OPEN").length,
-      CAPA_ASSIGNED: findings.filter((f) => f.status === "CAPA_ASSIGNED").length,
-      PENDING_VERIFICATION: findings.filter((f) => f.status === "PENDING_VERIFICATION").length,
+      CAPA_ASSIGNED: findings.filter((f) => f.status === "CAPA_ASSIGNED")
+        .length,
+      PENDING_VERIFICATION: findings.filter(
+        (f) => f.status === "PENDING_VERIFICATION",
+      ).length,
       VERIFIED: findings.filter((f) => f.status === "VERIFIED").length,
       CLOSED: findings.filter((f) => f.status === "CLOSED").length,
     };
@@ -191,7 +204,9 @@ const AuditService = {
     const closureRate =
       totalFindings > 0
         ? Math.round(
-            ((findingsByStatus.CLOSED + findingsByStatus.VERIFIED) / totalFindings) * 100,
+            ((findingsByStatus.CLOSED + findingsByStatus.VERIFIED) /
+              totalFindings) *
+              100,
           )
         : 100;
 
@@ -199,7 +214,9 @@ const AuditService = {
     const completionRate =
       totalAudits > 0
         ? Math.round(
-            ((byStatus.CLOSED + byStatus.REPORT_ISSUED + byStatus.COMPLETED) / totalAudits) * 100,
+            ((byStatus.CLOSED + byStatus.REPORT_ISSUED + byStatus.COMPLETED) /
+              totalAudits) *
+              100,
           )
         : 0;
 
@@ -213,7 +230,13 @@ const AuditService = {
       findingsBySeverity,
       findingsByStatus,
       closureRate,
-      openMajorFindings: findingsBySeverity.MAJOR - (findings.filter((f) => f.severity === "MAJOR" && (f.status === "CLOSED" || f.status === "VERIFIED")).length),
+      openMajorFindings:
+        findingsBySeverity.MAJOR -
+        findings.filter(
+          (f) =>
+            f.severity === "MAJOR" &&
+            (f.status === "CLOSED" || f.status === "VERIFIED"),
+        ).length,
     };
   },
 };

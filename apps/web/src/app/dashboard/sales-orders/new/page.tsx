@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Plus, Trash2, ShoppingCart } from "lucide-react";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 interface Customer {
   id: string;
@@ -279,6 +280,7 @@ export default function NewSalesOrderPage() {
   };
 
   return (
+    <DashboardSidebar>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -666,5 +668,6 @@ export default function NewSalesOrderPage() {
         </Button>
       </div>
     </div>
+    </DashboardSidebar>
   );
 }

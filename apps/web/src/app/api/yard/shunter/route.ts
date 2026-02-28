@@ -19,7 +19,9 @@ export async function GET() {
           include: {
             appointments: {
               where: {
-                status: { in: ["SCHEDULED", "CONFIRMED", "CHECKED_IN", "IN_PROGRESS"] },
+                status: {
+                  in: ["SCHEDULED", "CONFIRMED", "CHECKED_IN", "IN_PROGRESS"],
+                },
               },
               select: {
                 id: true,
@@ -47,7 +49,11 @@ export async function GET() {
           },
           include: {
             yardLocation: {
-              select: { locationCode: true, locationName: true, locationType: true },
+              select: {
+                locationCode: true,
+                locationName: true,
+                locationType: true,
+              },
             },
           },
           orderBy: { scheduledStart: "asc" },
@@ -62,7 +68,11 @@ export async function GET() {
           },
           include: {
             yardLocation: {
-              select: { locationCode: true, locationName: true, locationType: true },
+              select: {
+                locationCode: true,
+                locationName: true,
+                locationType: true,
+              },
             },
           },
           orderBy: { actualEnd: "desc" },
@@ -129,7 +139,10 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching shunter data:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -155,7 +168,11 @@ export async function POST(request: Request) {
     let targetLocationId: string | null = null;
     if (taskType === "SPOT_TRAILER" && !toLocation) {
       const freeSpot = await prisma.yardLocation.findFirst({
-        where: { locationType: "PARKING_SPOT", isOccupied: false, isActive: true },
+        where: {
+          locationType: "PARKING_SPOT",
+          isOccupied: false,
+          isActive: true,
+        },
         orderBy: { locationCode: "asc" },
       });
       targetLocationId = freeSpot?.id ?? null;
@@ -186,6 +203,9 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Error dispatching shunter:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

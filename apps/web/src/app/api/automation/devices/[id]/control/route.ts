@@ -15,7 +15,10 @@ export async function POST(
 
     const { command } = await request.json();
     if (!command) {
-      return NextResponse.json({ error: "command is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "command is required" },
+        { status: 400 },
+      );
     }
 
     // Map commands to device status changes
@@ -58,6 +61,9 @@ export async function POST(
     });
   } catch (error) {
     console.error("Error sending device control command:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

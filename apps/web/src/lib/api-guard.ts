@@ -37,7 +37,7 @@ export type AuthResult = AuthContext | AuthError;
  *   const { organizationId } = auth;
  */
 export async function requireApiAuth(
-  allowedRoles?: string[]
+  allowedRoles?: string[],
 ): Promise<AuthResult> {
   const session = await getServerSession(authOptions);
 
@@ -45,19 +45,19 @@ export async function requireApiAuth(
     return {
       error: NextResponse.json(
         { error: "Unauthorized", code: "UNAUTHENTICATED" },
-        { status: 401 }
+        { status: 401 },
       ),
     };
   }
 
-  const organizationId: string | undefined =
-    (session.user as any).organizationId;
+  const organizationId: string | undefined = (session.user as any)
+    .organizationId;
 
   if (!organizationId) {
     return {
       error: NextResponse.json(
         { error: "No organisation context", code: "NO_ORG" },
-        { status: 403 }
+        { status: 403 },
       ),
     };
   }
@@ -73,7 +73,7 @@ export async function requireApiAuth(
           required: allowedRoles,
           actual: role,
         },
-        { status: 403 }
+        { status: 403 },
       ),
     };
   }

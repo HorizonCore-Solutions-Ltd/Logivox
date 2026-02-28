@@ -39,6 +39,7 @@ import {
   Calendar,
   ListChecks,
 } from "lucide-react";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 interface PickListItem {
   id: string;
@@ -246,6 +247,7 @@ export default function PickListDetailPage() {
   }
 
   return (
+    <DashboardSidebar>
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -588,5 +590,6 @@ export default function PickListDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </DashboardSidebar>
   );
 }

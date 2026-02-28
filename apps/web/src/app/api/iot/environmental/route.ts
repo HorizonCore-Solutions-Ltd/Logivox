@@ -26,7 +26,9 @@ export async function GET(req: NextRequest) {
     // Fetch environmental/temp/humidity IoT devices
     const envDevices = await prisma.ioTDevice.findMany({
       where: {
-        deviceType: { in: ["TEMPERATURE_SENSOR", "HUMIDITY_SENSOR", "ENVIRONMENTAL"] },
+        deviceType: {
+          in: ["TEMPERATURE_SENSOR", "HUMIDITY_SENSOR", "ENVIRONMENTAL"],
+        },
         ...(warehouseId ? { warehouseId } : {}),
       },
       include: {
@@ -62,11 +64,14 @@ export async function GET(req: NextRequest) {
       const deviceAlerts = alerts.filter((a) => a.deviceId === device.id);
 
       // Trend: last 12 readings for this device
-      const trend = deviceReadings.slice(0, 12).reverse().map((r) => ({
-        timestamp: r.timestamp.toISOString(),
-        temperature: r.temperature ?? null,
-        humidity: r.humidity ?? null,
-      }));
+      const trend = deviceReadings
+        .slice(0, 12)
+        .reverse()
+        .map((r) => ({
+          timestamp: r.timestamp.toISOString(),
+          temperature: r.temperature ?? null,
+          humidity: r.humidity ?? null,
+        }));
 
       // Cold-chain compliance: temp must be 2-8°C for cold, or per device threshold
       const minTemp = (device as any).minTemperature ?? null;
@@ -74,14 +79,12 @@ export async function GET(req: NextRequest) {
       const currentTemp = latest?.temperature ?? null;
       const currentHumidity = latest?.humidity ?? null;
 
-      let complianceStatus: "compliant" | "breach" | "warning" | "unknown" = "unknown";
+      let complianceStatus: "compliant" | "breach" | "warning" | "unknown" =
+        "unknown";
       if (currentTemp !== null && minTemp !== null && maxTemp !== null) {
         if (currentTemp < minTemp || currentTemp > maxTemp) {
           complianceStatus = "breach";
-        } else if (
-          currentTemp < minTemp + 0.5 ||
-          currentTemp > maxTemp - 0.5
-        ) {
+        } else if (currentTemp < minTemp + 0.5 || currentTemp > maxTemp - 0.5) {
           complianceStatus = "warning";
         } else {
           complianceStatus = "compliant";
@@ -120,9 +123,7 @@ export async function GET(req: NextRequest) {
     const compliant = deviceSummaries.filter(
       (d) => d.complianceStatus === "compliant",
     ).length;
-    const activeAlertCount = alerts.filter(
-      (a) => a.status === "ACTIVE",
-    ).length;
+    const activeAlertCount = alerts.filter((a) => a.status === "ACTIVE").length;
 
     return NextResponse.json({
       summary: {

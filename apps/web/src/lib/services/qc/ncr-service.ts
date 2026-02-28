@@ -4,6 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { CAPAService } from "./capa-service";
 
 export type NCRSourceType =
   | "RECEIVING"
@@ -90,6 +91,7 @@ export class NCRService {
     assignedTo?: string;
     dueDate?: Date;
     customerImpact?: boolean;
+    capaRequired?: boolean;
     createdBy: string;
   }) {
     const ncrNumber = await this.generateNCRNumber(params.organizationId);
@@ -126,12 +128,72 @@ export class NCRService {
         assignedTo: params.assignedTo,
         dueDate: params.dueDate,
         customerImpact: params.customerImpact || false,
+        capaRequired: params.capaRequired || false,
         createdBy: params.createdBy,
       },
       include: {
         supplier: true,
       },
     });
+
+    // Update supplier quality score on NCR creation (best-effort)
+    if (params.supplierId) {
+      const deduction = params.severity === "CRITICAL" ? 10 : params.severity === "HIGH" ? 5 : 2;
+      prisma.vendorQualityScore
+        .upsert({
+          where: { supplierId: params.supplierId },
+          update: {
+            totalDefectiveUnits: { increment: params.quantityAffected },
+            qualityScore: { decrement: deduction },
+            lastDefectDate: new Date(),
+          },
+          create: {
+            organizationId: params.organizationId,
+            supplierId: params.supplierId,
+            totalDefectiveUnits: params.quantityAffected,
+            qualityScore: Math.max(0, 100 - deduction),
+            lastDefectDate: new Date(),
+          },
+        })
+        .catch((e: any) => console.error("Supplier score update failed:", e));
+    }
+
+    // Auto-create CAPA when capaRequired is flagged and severity is HIGH/CRITICAL
+    if (params.capaRequired || params.severity === "CRITICAL") {
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 30);
+      try {
+        const capa = await CAPAService.createCAPA({
+          organizationId: params.organizationId,
+          capaType: "CORRECTIVE",
+          actionCategory: "QUALITY",
+          sourceType: "NCR",
+          sourceId: ncr.id,
+          ncrId: ncr.id,
+          problemStatement: ncr.title,
+          problemSeverity: params.severity,
+          rootCauseMethod: "5_WHY",
+          rootCauseAnalysis: { method: "5_WHY", status: "PENDING" },
+          rootCause: "Root cause under investigation — linked to NCR " + ncr.ncrNumber,
+          immediateActions: [{ action: "Quarantine affected stock", status: "OPEN" }],
+          correctiveActions: [{ action: "Investigate and address root cause", owner: params.createdBy, status: "OPEN" }],
+          preventiveActions: [{ action: "Review process controls to prevent recurrence", status: "OPEN" }],
+          responsiblePerson: params.createdBy,
+          targetCompletionDate: targetDate,
+          priority: params.severity === "CRITICAL" ? "CRITICAL" : "HIGH",
+          createdBy: params.createdBy,
+        });
+
+        // Link CAPA back to NCR
+        await prisma.nonConformanceReport.update({
+          where: { id: ncr.id },
+          data: { capaIds: { push: capa.id } },
+        });
+      } catch (e) {
+        // CAPA creation is best-effort; don't fail the NCR creation
+        console.error("Auto-CAPA creation failed for NCR", ncr.ncrNumber, e);
+      }
+    }
 
     return ncr;
   }

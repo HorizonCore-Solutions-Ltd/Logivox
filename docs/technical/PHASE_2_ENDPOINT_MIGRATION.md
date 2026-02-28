@@ -1,15 +1,17 @@
 # PHASE 2: ENDPOINT MIGRATION GUIDE
+
 ## Tenant Scoping Implementation for Existing API Routes
 
 **Date:** February 27, 2026  
 **Phase:** 2 - Endpoint Migration  
-**Estimated Duration:** 1-2 weeks  
+**Estimated Duration:** 1-2 weeks
 
 ---
 
 ## 🎯 PRIORITY LEVELS
 
 ### 🔴 CRITICAL (Data-Sensitive, Fix This Week)
+
 These endpoints handle sensitive data and must be tenant-scoped immediately:
 
 1. **Inventory Management** (`/api/inventory/*`)
@@ -40,18 +42,21 @@ These endpoints handle sensitive data and must be tenant-scoped immediately:
    - CRITICAL: Can leak cross-tenant data
 
 ### 🟠 HIGH (Business-Critical, Fix in Week 1-2)
+
 1. **Picking/Wave Management** (`/api/waves/*`, `/api/picking-tasks/*`)
 2. **Receiving** (`/api/grn/*`, `/api/receiving/*`)
 3. **Returns** (`/api/returns/*`, `/api/rmas/*`)
 4. **Billing** (`/api/billing/*`, `/api/invoices/*`)
 
 ### 🟡 MEDIUM (Standard Operations, Fix in Week 2)
+
 1. **Categories** (`/api/categories/*`)
 2. **Suppliers** (`/api/suppliers/*`)
 3. **Serial Numbers** (`/api/serial-numbers/*`)
 4. **Cycle Counts** (`/api/cycle-counts/*`)
 
 ### 🟢 LOW (Support Functions, Fix Later)
+
 1. **Notifications** (`/api/notifications/*`)
 2. **Integrations** (`/api/integrations/*`)
 3. **API Keys** (`/api/api-keys/*`)
@@ -116,6 +121,7 @@ export const GET = withTenantContext(async (request) => {
 ```
 
 **Advantages:**
+
 - ✅ Automatic tenant resolution
 - ✅ Consistent error handling
 - ✅ 80% less boilerplate code
@@ -169,36 +175,37 @@ export async function GET(request: NextRequest) {
 For each endpoint, follow this sequence:
 
 ### Step 1: Identify Tenant-Scoped Models
+
 ```typescript
 // ✅ These models need organizationId scoping:
-- InventoryItem
-- SalesOrder
-- PurchaseOrder
-- Customer
-- Supplier
-- Warehouse
-- PickingRoute
-- PickingTask
-- WavePick
-- GoodsReceiptNote
-- Invoice
-- CycleCount
-- Category
-- Employee
-- DeliveryRoute
-- // ... ~40 models total from schema
-
-// ❌ These models are NOT tenant-scoped (global):
-- User
-- Organization
-- OrganizationMember
-- Account (OAuth)
-- Session
-- SecurityProfile
+-InventoryItem -
+  SalesOrder -
+  PurchaseOrder -
+  Customer -
+  Supplier -
+  Warehouse -
+  PickingRoute -
+  PickingTask -
+  WavePick -
+  GoodsReceiptNote -
+  Invoice -
+  CycleCount -
+  Category -
+  Employee -
+  DeliveryRoute - // ... ~40 models total from schema
+  // ❌ These models are NOT tenant-scoped (global):
+  -User -
+  Organization -
+  OrganizationMember -
+  Account(OAuth) -
+  Session -
+  SecurityProfile;
 ```
 
 ### Step 2: Add organizationId to WHERE Clause
+
 Every select/read/delete/update must include:
+
 ```typescript
 where: {
   organizationId: tenant.organizationId,  // ← ADD THIS LINE
@@ -207,7 +214,9 @@ where: {
 ```
 
 ### Step 3: Add organizationId to CREATE Data
+
 Every create/upsert must include:
+
 ```typescript
 data: {
   organizationId: tenant.organizationId,  // ← ADD THIS LINE
@@ -216,6 +225,7 @@ data: {
 ```
 
 ### Step 4: Test in Two Scenarios
+
 1. **Same-tenant access**: Should work ✅
 2. **Cross-tenant access**: Should fail with 403 ❌
 
@@ -232,12 +242,12 @@ test("should block cross-tenant access", async () => {
   // Try to query as org2
   const result = await prisma.inventoryItem.findMany({
     where: {
-      organizationId: "org-2",  // ← Different org
+      organizationId: "org-2", // ← Different org
       id: item.id,
     },
   });
 
-  expect(result).toHaveLength(0);  // ← Should return empty
+  expect(result).toHaveLength(0); // ← Should return empty
 });
 ```
 
@@ -248,6 +258,7 @@ test("should block cross-tenant access", async () => {
 ### Week 1: Foundation + Top 10 Routes
 
 **Days 1-2: Setup & Enable Guards**
+
 - [ ] Merge Phase 1 PR (tenant context + middleware)
 - [ ] Run database migration: `tenant-isolation-indexes.sql`
 - [ ] Enable Prisma middleware logging (non-blocking)
@@ -265,14 +276,10 @@ Priority: Highest volume, most sensitive data
 4. `/api/customers/route.ts`
 5. `/api/suppliers/route.ts`
 
-**Days 3-5: Warehousing Routes**
-6. `/api/warehouses/route.ts`
-7. `/api/waves/route.ts`
-8. `/api/picking-tasks/route.ts`
-9. `/api/grn/route.ts` (Goods Receipt Notes)
-10. `/api/reports/route.ts` - **HIGHEST PRIORITY**
+**Days 3-5: Warehousing Routes** 6. `/api/warehouses/route.ts` 7. `/api/waves/route.ts` 8. `/api/picking-tasks/route.ts` 9. `/api/grn/route.ts` (Goods Receipt Notes) 10. `/api/reports/route.ts` - **HIGHEST PRIORITY**
 
 **Days 5-7: Testing & Hardening**
+
 - [ ] Run full E2E test suite
 - [ ] Run CI guard on all fixed endpoints
 - [ ] Performance testing (verify indexes help)
@@ -281,12 +288,14 @@ Priority: Highest volume, most sensitive data
 ### Week 2: Remaining Routes + Deployment
 
 **Days 8-10: Medium Priority Routes**
+
 - [ ] Billing endpoints
 - [ ] Returns management
 - [ ] Cycle counts
 - [ ] Serial numbers
 
 **Days 10-12: Low Priority + Testing**
+
 - [ ] Notifications
 - [ ] Integrations
 - [ ] API keys
@@ -294,6 +303,7 @@ Priority: Highest volume, most sensitive data
 - [ ] Final E2E pass
 
 **Days 13-14: Deployment**
+
 - [ ] Staging deployment
 - [ ] Canary to 10% of traffic
 - [ ] Monitor for "Tenant scope required" errors
@@ -306,40 +316,44 @@ Priority: Highest volume, most sensitive data
 ### Automated Detection (CI Guard)
 
 Run on all API files to find violations:
+
 ```bash
 cd /workspaces/Flowstock
 npx ts-node scripts/tenant-scoping-ci-guard.ts apps/web/src/app/api
 ```
 
 **Expected patterns to flag:**
+
 ```typescript
 // ❌ FLAG: Missing organizationId in WHERE
-await prisma.inventoryItem.findMany({ where: { status: "ACTIVE" } })
+await prisma.inventoryItem.findMany({ where: { status: "ACTIVE" } });
 
 // ❌ FLAG: Missing organizationId in CREATE
-await prisma.customer.create({ data: { name: "Acme Corp" } })
+await prisma.customer.create({ data: { name: "Acme Corp" } });
 
 // ❌ FLAG: Bare findUnique without context
-await prisma.organization.findUnique({ where: { id } })
+await prisma.organization.findUnique({ where: { id } });
 
 // ✅ OK: System models are exempt
-await prisma.user.findUnique({ where: { id } })
+await prisma.user.findUnique({ where: { id } });
 
 // ✅ OK: Has organizationId
-await prisma.inventoryItem.findMany({ 
-  where: { organizationId, status: "ACTIVE" } 
-})
+await prisma.inventoryItem.findMany({
+  where: { organizationId, status: "ACTIVE" },
+});
 ```
 
 ### Manual Inspection Points
 
 For each file, search for:
+
 1. `prisma.TENANT_MODEL.find*` - Must have organizationId in where
 2. `prisma.TENANT_MODEL.create` - Must have organizationId in data
 3. `prisma.TENANT_MODEL.update` - Must have organizationId in where
 4. `prisma.TENANT_MODEL.delete` - Must have organizationId in where
 
 **Example grep:**
+
 ```bash
 grep -n "prisma\.inventoryItem\.findMany" apps/web/src/app/api/**/*.ts
 # Then verify each has: where: { organizationId, ...
@@ -349,14 +363,14 @@ grep -n "prisma\.inventoryItem\.findMany" apps/web/src/app/api/**/*.ts
 
 ## ⚠️ COMMON PITFALLS & SOLUTIONS
 
-| Problem | Solution |
-|---------|----------|
-| "organizationId is not defined" | Use tenant context: `await resolveTenantFromRequest(request)` |
-| Queries returning items from wrong org | Verify WHERE clause includes: `organizationId: tenant.organizationId` |
-| "Tenant scope required" error in Prisma middleware | Add `organizationId` to your query WHERE or CREATE data |
-| Forgetting to update nested creates | Check upsert/batch operations - ALL create data needs organizationId |
-| Using hardcoded organizationId | Always derive from tenant context, never from user input |
-| Tests passing but Middleware logs violations | CI tests may not catch nested where clauses - review manually |
+| Problem                                            | Solution                                                              |
+| -------------------------------------------------- | --------------------------------------------------------------------- |
+| "organizationId is not defined"                    | Use tenant context: `await resolveTenantFromRequest(request)`         |
+| Queries returning items from wrong org             | Verify WHERE clause includes: `organizationId: tenant.organizationId` |
+| "Tenant scope required" error in Prisma middleware | Add `organizationId` to your query WHERE or CREATE data               |
+| Forgetting to update nested creates                | Check upsert/batch operations - ALL create data needs organizationId  |
+| Using hardcoded organizationId                     | Always derive from tenant context, never from user input              |
+| Tests passing but Middleware logs violations       | CI tests may not catch nested where clauses - review manually         |
 
 ---
 
@@ -378,6 +392,7 @@ Each endpoint is "complete" when:
 ## 🔍 TESTING FRAMEWORK
 
 ### Unit Test Template
+
 ```typescript
 describe("Tenant Scoping - /api/inventory", () => {
   let org1: Organization;
@@ -398,7 +413,7 @@ describe("Tenant Scoping - /api/inventory", () => {
       headers: { "x-organization-id": org1.id, ...user1Session },
     });
     const { data } = await response.json();
-    
+
     expect(response.status).toBe(200);
     expect(data.every((item) => item.organizationId === org1.id)).toBe(true);
   });
@@ -414,7 +429,7 @@ describe("Tenant Scoping - /api/inventory", () => {
     try {
       // This should throw from Prisma middleware
       await prisma.inventoryItem.findMany({
-        where: { status: "ACTIVE" },  // Missing organizationId
+        where: { status: "ACTIVE" }, // Missing organizationId
       });
       fail("Should have thrown");
     } catch (error) {
@@ -436,6 +451,7 @@ describe("Tenant Scoping - /api/inventory", () => {
 4. **Feeling overwhelmed** → Use `withTenantContext` HOF for new endpoints instead of refactoring
 
 **Reference docs:**
+
 - Quick Start: `docs/technical/TENANT_SCOPING_QUICK_START.md`
 - Patterns: `docs/technical/TENANT_SCOPING_PATTERNS.ts`
 - Full Implementation: `docs/technical/TENANT_SCOPING_IMPLEMENTATION_SUMMARY.md`
@@ -445,12 +461,14 @@ describe("Tenant Scoping - /api/inventory", () => {
 ## 🎉 SUCCESS METRICS
 
 **Week 1 Goals:**
+
 - ✅ 10 critical routes fixed & tested
 - ✅ 0 "Tenant scope required" errors from Prisma middleware
 - ✅ E2E tests passing
 - ✅ Cross-tenant access blocked
 
 **Week 2 Goals:**
+
 - ✅ All routes migrated
 - ✅ CI guard integrated (blocks PRs with violations)
 - ✅ Staging deployment clean

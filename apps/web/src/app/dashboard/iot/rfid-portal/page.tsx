@@ -10,7 +10,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Activity, RefreshCw, Radio, Wifi, WifiOff, ScanLine, TrendingUp } from "lucide-react";
+import {
+  Activity,
+  RefreshCw,
+  Radio,
+  Wifi,
+  WifiOff,
+  ScanLine,
+  TrendingUp,
+} from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -50,22 +58,147 @@ interface RFIDSummary {
 }
 
 const DEMO_READERS: RFIDReader[] = [
-  { id: "R1", name: "Dock Door 1", location: "Receiving Dock - Door 1", status: "ACTIVE", scanRate: 142, scansToday: 1892, activeAlerts: 0, hourlyTrend: [{ hour: "08:00", scans: 90 }, { hour: "09:00", scans: 145 }, { hour: "10:00", scans: 178 }, { hour: "11:00", scans: 203 }, { hour: "12:00", scans: 165 }, { hour: "13:00", scans: 142 }, { hour: "14:00", scans: 158 }] },
-  { id: "R2", name: "Dock Door 2", location: "Receiving Dock - Door 2", status: "ACTIVE", scanRate: 98, scansToday: 1244, activeAlerts: 0, hourlyTrend: [{ hour: "08:00", scans: 60 }, { hour: "09:00", scans: 98 }, { hour: "10:00", scans: 130 }, { hour: "11:00", scans: 155 }, { hour: "12:00", scans: 120 }, { hour: "13:00", scans: 98 }, { hour: "14:00", scans: 88 }] },
-  { id: "R3", name: "Pick Zone A", location: "Aisle A Entry", status: "ACTIVE", scanRate: 67, scansToday: 834, activeAlerts: 0, hourlyTrend: [{ hour: "08:00", scans: 40 }, { hour: "09:00", scans: 68 }, { hour: "10:00", scans: 82 }, { hour: "11:00", scans: 95 }, { hour: "12:00", scans: 70 }, { hour: "13:00", scans: 67 }, { hour: "14:00", scans: 74 }] },
-  { id: "R4", name: "Shipping Gate", location: "Outbound Dock", status: "ACTIVE", scanRate: 210, scansToday: 2610, activeAlerts: 0, hourlyTrend: [{ hour: "08:00", scans: 120 }, { hour: "09:00", scans: 198 }, { hour: "10:00", scans: 245 }, { hour: "11:00", scans: 310 }, { hour: "12:00", scans: 280 }, { hour: "13:00", scans: 210 }, { hour: "14:00", scans: 220 }] },
-  { id: "R5", name: "Cold Storage Entry", location: "Cold Storage Gate", status: "INACTIVE", scanRate: 0, scansToday: 0, activeAlerts: 1, hourlyTrend: [] },
+  {
+    id: "R1",
+    name: "Dock Door 1",
+    location: "Receiving Dock - Door 1",
+    status: "ACTIVE",
+    scanRate: 142,
+    scansToday: 1892,
+    activeAlerts: 0,
+    hourlyTrend: [
+      { hour: "08:00", scans: 90 },
+      { hour: "09:00", scans: 145 },
+      { hour: "10:00", scans: 178 },
+      { hour: "11:00", scans: 203 },
+      { hour: "12:00", scans: 165 },
+      { hour: "13:00", scans: 142 },
+      { hour: "14:00", scans: 158 },
+    ],
+  },
+  {
+    id: "R2",
+    name: "Dock Door 2",
+    location: "Receiving Dock - Door 2",
+    status: "ACTIVE",
+    scanRate: 98,
+    scansToday: 1244,
+    activeAlerts: 0,
+    hourlyTrend: [
+      { hour: "08:00", scans: 60 },
+      { hour: "09:00", scans: 98 },
+      { hour: "10:00", scans: 130 },
+      { hour: "11:00", scans: 155 },
+      { hour: "12:00", scans: 120 },
+      { hour: "13:00", scans: 98 },
+      { hour: "14:00", scans: 88 },
+    ],
+  },
+  {
+    id: "R3",
+    name: "Pick Zone A",
+    location: "Aisle A Entry",
+    status: "ACTIVE",
+    scanRate: 67,
+    scansToday: 834,
+    activeAlerts: 0,
+    hourlyTrend: [
+      { hour: "08:00", scans: 40 },
+      { hour: "09:00", scans: 68 },
+      { hour: "10:00", scans: 82 },
+      { hour: "11:00", scans: 95 },
+      { hour: "12:00", scans: 70 },
+      { hour: "13:00", scans: 67 },
+      { hour: "14:00", scans: 74 },
+    ],
+  },
+  {
+    id: "R4",
+    name: "Shipping Gate",
+    location: "Outbound Dock",
+    status: "ACTIVE",
+    scanRate: 210,
+    scansToday: 2610,
+    activeAlerts: 0,
+    hourlyTrend: [
+      { hour: "08:00", scans: 120 },
+      { hour: "09:00", scans: 198 },
+      { hour: "10:00", scans: 245 },
+      { hour: "11:00", scans: 310 },
+      { hour: "12:00", scans: 280 },
+      { hour: "13:00", scans: 210 },
+      { hour: "14:00", scans: 220 },
+    ],
+  },
+  {
+    id: "R5",
+    name: "Cold Storage Entry",
+    location: "Cold Storage Gate",
+    status: "INACTIVE",
+    scanRate: 0,
+    scansToday: 0,
+    activeAlerts: 1,
+    hourlyTrend: [],
+  },
 ];
 
 const DEMO_SCAN_FEED: ScanEvent[] = [
-  { time: "14:33:21", reader: "Shipping Gate", tag: "EPC-A8F3329", product: "SKU-7734 / 24pk Beverages", location: "SHIP-OUT" },
-  { time: "14:33:18", reader: "Shipping Gate", tag: "EPC-B2C4418", product: "SKU-2291 / Apparel Box A", location: "SHIP-OUT" },
-  { time: "14:33:10", reader: "Dock Door 1", tag: "EPC-C9E1104", product: "SKU-8812 / Electronics Kit", location: "RECV-IN" },
-  { time: "14:33:05", reader: "Pick Zone A", tag: "EPC-D4A7723", product: "SKU-1107 / Medical Supply", location: "PICK" },
-  { time: "14:32:58", reader: "Shipping Gate", tag: "EPC-E6F0091", product: "SKU-3354 / Books Carton", location: "SHIP-OUT" },
-  { time: "14:32:45", reader: "Dock Door 2", tag: "EPC-F1G8807", product: "SKU-5561 / Grocery Pallet", location: "RECV-IN" },
-  { time: "14:32:31", reader: "Pick Zone A", tag: "EPC-G3H2215", product: "SKU-9920 / Sporting Goods", location: "PICK" },
-  { time: "14:32:20", reader: "Shipping Gate", tag: "EPC-H5I4432", product: "SKU-6643 / Hardware Kit", location: "SHIP-OUT" },
+  {
+    time: "14:33:21",
+    reader: "Shipping Gate",
+    tag: "EPC-A8F3329",
+    product: "SKU-7734 / 24pk Beverages",
+    location: "SHIP-OUT",
+  },
+  {
+    time: "14:33:18",
+    reader: "Shipping Gate",
+    tag: "EPC-B2C4418",
+    product: "SKU-2291 / Apparel Box A",
+    location: "SHIP-OUT",
+  },
+  {
+    time: "14:33:10",
+    reader: "Dock Door 1",
+    tag: "EPC-C9E1104",
+    product: "SKU-8812 / Electronics Kit",
+    location: "RECV-IN",
+  },
+  {
+    time: "14:33:05",
+    reader: "Pick Zone A",
+    tag: "EPC-D4A7723",
+    product: "SKU-1107 / Medical Supply",
+    location: "PICK",
+  },
+  {
+    time: "14:32:58",
+    reader: "Shipping Gate",
+    tag: "EPC-E6F0091",
+    product: "SKU-3354 / Books Carton",
+    location: "SHIP-OUT",
+  },
+  {
+    time: "14:32:45",
+    reader: "Dock Door 2",
+    tag: "EPC-F1G8807",
+    product: "SKU-5561 / Grocery Pallet",
+    location: "RECV-IN",
+  },
+  {
+    time: "14:32:31",
+    reader: "Pick Zone A",
+    tag: "EPC-G3H2215",
+    product: "SKU-9920 / Sporting Goods",
+    location: "PICK",
+  },
+  {
+    time: "14:32:20",
+    reader: "Shipping Gate",
+    tag: "EPC-H5I4432",
+    product: "SKU-6643 / Hardware Kit",
+    location: "SHIP-OUT",
+  },
 ];
 
 export default function RFIDPortalPage() {
@@ -95,7 +228,9 @@ export default function RFIDPortalPage() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   useEffect(() => {
     if (!autoRefresh) return;
     const i = setInterval(fetchData, 15_000);
@@ -110,7 +245,9 @@ export default function RFIDPortalPage() {
     offlineReaders: displayReaders.filter((r) => r.status !== "ACTIVE").length,
     totalScansToday: displayReaders.reduce((s, r) => s + r.scansToday, 0),
     avgScanRatePerHr: Math.round(
-      displayReaders.filter((r) => r.status === "ACTIVE").reduce((s, r) => s + r.scanRate, 0) /
+      displayReaders
+        .filter((r) => r.status === "ACTIVE")
+        .reduce((s, r) => s + r.scanRate, 0) /
         Math.max(displayReaders.filter((r) => r.status === "ACTIVE").length, 1),
     ),
   };
@@ -128,7 +265,11 @@ export default function RFIDPortalPage() {
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Reader status, scan rates, and live tag feed
-            {lastUpdated && <span className="ml-2 text-xs text-gray-400">· Updated: {lastUpdated}</span>}
+            {lastUpdated && (
+              <span className="ml-2 text-xs text-gray-400">
+                · Updated: {lastUpdated}
+              </span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -154,27 +295,51 @@ export default function RFIDPortalPage() {
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Total Readers</p>
             <p className="text-3xl font-bold">{displaySummary.totalReaders}</p>
-            <p className="text-xs mt-1 text-green-600">{displaySummary.onlineReaders} online · <span className="text-gray-400">{displaySummary.offlineReaders} offline</span></p>
+            <p className="text-xs mt-1 text-green-600">
+              {displaySummary.onlineReaders} online ·{" "}
+              <span className="text-gray-400">
+                {displaySummary.offlineReaders} offline
+              </span>
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Scans Today</p>
-            <p className="text-3xl font-bold text-indigo-600">{displaySummary.totalScansToday.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-indigo-600">
+              {displaySummary.totalScansToday.toLocaleString()}
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Avg Scan Rate</p>
-            <p className="text-3xl font-bold text-blue-600">{displaySummary.avgScanRatePerHr}</p>
-            <p className="text-xs text-gray-400 mt-0.5">scans / hr per reader</p>
+            <p className="text-3xl font-bold text-blue-600">
+              {displaySummary.avgScanRatePerHr}
+            </p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              scans / hr per reader
+            </p>
           </CardContent>
         </Card>
-        <Card className={displaySummary.offlineReaders > 0 ? "border-orange-200 bg-orange-50" : "border-green-200 bg-green-50"}>
+        <Card
+          className={
+            displaySummary.offlineReaders > 0
+              ? "border-orange-200 bg-orange-50"
+              : "border-green-200 bg-green-50"
+          }
+        >
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Network Health</p>
-            <p className={`text-3xl font-bold ${displaySummary.offlineReaders > 0 ? "text-orange-600" : "text-green-600"}`}>
-              {Math.round((displaySummary.onlineReaders / Math.max(displaySummary.totalReaders, 1)) * 100)}%
+            <p
+              className={`text-3xl font-bold ${displaySummary.offlineReaders > 0 ? "text-orange-600" : "text-green-600"}`}
+            >
+              {Math.round(
+                (displaySummary.onlineReaders /
+                  Math.max(displaySummary.totalReaders, 1)) *
+                  100,
+              )}
+              %
             </p>
             <p className="text-xs text-gray-400 mt-0.5">readers online</p>
           </CardContent>
@@ -194,7 +359,11 @@ export default function RFIDPortalPage() {
             {displayReaders.map((reader) => (
               <button
                 key={reader.id}
-                onClick={() => setSelectedReader(selectedReader === reader.id ? null : reader.id)}
+                onClick={() =>
+                  setSelectedReader(
+                    selectedReader === reader.id ? null : reader.id,
+                  )
+                }
                 className={`w-full text-left p-3 rounded-lg border transition-all hover:bg-gray-50 ${selectedReader === reader.id ? "ring-2 ring-blue-300 bg-blue-50" : ""}`}
               >
                 <div className="flex items-center justify-between">
@@ -206,17 +375,23 @@ export default function RFIDPortalPage() {
                     )}
                     <span className="font-medium text-sm">{reader.name}</span>
                     {reader.activeAlerts > 0 && (
-                      <Badge variant="destructive" className="text-xs">!</Badge>
+                      <Badge variant="destructive" className="text-xs">
+                        !
+                      </Badge>
                     )}
                   </div>
                   <div className="text-right">
-                    <span className={`text-base font-bold ${reader.status === "ACTIVE" ? "text-indigo-600" : "text-gray-300"}`}>
+                    <span
+                      className={`text-base font-bold ${reader.status === "ACTIVE" ? "text-indigo-600" : "text-gray-300"}`}
+                    >
                       {reader.scanRate}
                     </span>
                     <span className="text-xs text-gray-400"> /hr</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-400 mt-0.5 ml-6">{reader.location}</p>
+                <p className="text-xs text-gray-400 mt-0.5 ml-6">
+                  {reader.location}
+                </p>
               </button>
             ))}
           </CardContent>
@@ -227,13 +402,20 @@ export default function RFIDPortalPage() {
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
               {activeReader ? (
-                <><TrendingUp className="h-4 w-4" /> {activeReader.name} — Hourly Trend</>
+                <>
+                  <TrendingUp className="h-4 w-4" /> {activeReader.name} —
+                  Hourly Trend
+                </>
               ) : (
-                <><Radio className="h-4 w-4" /> Live Scan Feed</>
+                <>
+                  <Radio className="h-4 w-4" /> Live Scan Feed
+                </>
               )}
             </CardTitle>
             {activeReader && (
-              <CardDescription>{activeReader.scansToday.toLocaleString()} total scans today</CardDescription>
+              <CardDescription>
+                {activeReader.scansToday.toLocaleString()} total scans today
+              </CardDescription>
             )}
           </CardHeader>
           <CardContent>
@@ -250,13 +432,24 @@ export default function RFIDPortalPage() {
             ) : (
               <div className="space-y-2 max-h-[260px] overflow-y-auto">
                 {displayFeed.map((event, i) => (
-                  <div key={i} className="flex items-start gap-3 py-2 border-b last:border-0">
-                    <span className="text-xs font-mono text-gray-400 whitespace-nowrap">{event.time}</span>
+                  <div
+                    key={i}
+                    className="flex items-start gap-3 py-2 border-b last:border-0"
+                  >
+                    <span className="text-xs font-mono text-gray-400 whitespace-nowrap">
+                      {event.time}
+                    </span>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{event.product}</p>
-                      <p className="text-xs text-gray-400">{event.reader} · {event.tag}</p>
+                      <p className="text-sm font-medium truncate">
+                        {event.product}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {event.reader} · {event.tag}
+                      </p>
                     </div>
-                    <Badge variant="outline" className="text-xs shrink-0">{event.location}</Badge>
+                    <Badge variant="outline" className="text-xs shrink-0">
+                      {event.location}
+                    </Badge>
                   </div>
                 ))}
               </div>

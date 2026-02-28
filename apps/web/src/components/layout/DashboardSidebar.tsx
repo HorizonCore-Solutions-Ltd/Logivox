@@ -32,6 +32,20 @@ import {
   Book,
   FileBarChart,
   Smartphone,
+  ShoppingCart,
+  ClipboardList,
+  BoxSelect,
+  Truck,
+  Globe2,
+  PackagePlus,
+  Building,
+  RotateCcw,
+  ClipboardCheck,
+  ShieldCheck,
+  ShieldAlert,
+  FileWarning,
+  AlertTriangle,
+  Zap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { OrganizationSwitcher } from "@/components/organizations/organization-switcher";
@@ -43,8 +57,19 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ children }: DashboardSidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
-  const [isInventoryExpanded, setIsInventoryExpanded] = React.useState(true);
+  const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
+    Inventory: true,
+    Fulfillment: false,
+    Procurement: false,
+    Operations: false,
+    Quality: false,
+    Duties: false,
+    Duties: false,
+  });
   const [currentOrgId, setCurrentOrgId] = React.useState<string>("");
+
+  const toggleSection = (name: string) =>
+    setExpandedSections((prev) => ({ ...prev, [name]: !prev[name] }));
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { data: session } = useSession();
@@ -75,6 +100,57 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
       ],
     },
+    {
+      name: "Fulfillment",
+      href: "/dashboard/fulfillment",
+      icon: Globe2,
+      subItems: [
+        { name: "Hub Overview", href: "/dashboard/fulfillment", icon: Globe2 },
+        { name: "Sales Orders", href: "/dashboard/sales-orders", icon: ShoppingCart },
+        { name: "Pick Lists", href: "/dashboard/pick-lists", icon: ClipboardList },
+        { name: "Packing", href: "/dashboard/packs", icon: BoxSelect },
+        { name: "Shipments", href: "/dashboard/shipments", icon: Truck },
+      ],
+    },
+    {
+      name: "Procurement",
+      href: "/dashboard/purchase-orders",
+      icon: PackagePlus,
+      subItems: [
+        { name: "Purchase Orders", href: "/dashboard/purchase-orders", icon: PackagePlus },
+        { name: "GRN / Receiving", href: "/dashboard/receiving", icon: ClipboardCheck },
+        { name: "Suppliers", href: "/dashboard/suppliers", icon: Building },
+      ],
+    },
+    {
+      name: "Operations",
+      href: "/dashboard/returns",
+      icon: ShieldCheck,
+      subItems: [
+        { name: "Returns & RMAs", href: "/dashboard/returns", icon: RotateCcw },
+        { name: "QC Inspections", href: "/dashboard/qc-inspections", icon: ClipboardCheck },
+        { name: "Cycle Counts", href: "/dashboard/cycle-counts", icon: ClipboardList },
+      ],
+    },
+    {
+      name: "Quality",
+      href: "/capa/hub",
+      icon: ShieldAlert,
+      subItems: [
+        { name: "CAPA Hub", href: "/capa/hub", icon: ShieldAlert },
+        { name: "NCR List", href: "/capa/monitoring", icon: FileWarning },
+        { name: "Risk Scoring", href: "/capa/risk-scoring", icon: AlertTriangle },
+      ],
+    },
+    {
+      name: "Duties",
+      href: "/dashboard/duties",
+      icon: ClipboardList,
+      subItems: [
+        { name: "Duty Board", href: "/dashboard/duties", icon: ClipboardList },
+        { name: "Auto-Planner", href: "/dashboard/duties/planner", icon: Zap },
+      ],
+    },
     { name: "Customers", href: "/dashboard/customers", icon: Users },
     { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
@@ -92,6 +168,34 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     pathname.startsWith("/dashboard/inventory") ||
     pathname.startsWith("/dashboard/warehouses") ||
     pathname.startsWith("/dashboard/categories");
+  const isFulfillmentActive =
+    pathname.startsWith("/dashboard/fulfillment") ||
+    pathname.startsWith("/dashboard/sales-orders") ||
+    pathname.startsWith("/dashboard/pick-lists") ||
+    pathname.startsWith("/dashboard/packs") ||
+    pathname.startsWith("/dashboard/shipments");
+  const isProcurementActive =
+    pathname.startsWith("/dashboard/purchase-orders") ||
+    pathname.startsWith("/dashboard/receiving") ||
+    pathname.startsWith("/dashboard/suppliers");
+  const isOperationsActive =
+    pathname.startsWith("/dashboard/returns") ||
+    pathname.startsWith("/dashboard/qc-inspections") ||
+    pathname.startsWith("/dashboard/cycle-counts");
+  const isQualityActive =
+    pathname.startsWith("/capa") ||
+    pathname.startsWith("/dashboard/ncr");
+  const isDutiesActive = pathname.startsWith("/dashboard/duties");
+
+  const isSectionActive = (name: string) => {
+    if (name === "Inventory") return isInventoryActive;
+    if (name === "Fulfillment") return isFulfillmentActive;
+    if (name === "Procurement") return isProcurementActive;
+    if (name === "Operations") return isOperationsActive;
+    if (name === "Quality") return isQualityActive;
+    if (name === "Duties") return isDutiesActive;
+    return false;
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -117,9 +221,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
               return (
                 <div key={item.name}>
                   <button
-                    onClick={() => setIsInventoryExpanded(!isInventoryExpanded)}
+                    onClick={() => toggleSection(item.name)}
                     className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                      isInventoryActive
+                      isSectionActive(item.name)
                         ? "bg-primary/10 text-primary"
                         : "text-muted-foreground hover:bg-muted hover:text-foreground"
                     }`}
@@ -129,10 +233,10 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                       {item.name}
                     </div>
                     <ChevronRight
-                      className={`h-4 w-4 transition-transform ${isInventoryExpanded ? "rotate-90" : ""}`}
+                      className={`h-4 w-4 transition-transform ${expandedSections[item.name] ? "rotate-90" : ""}`}
                     />
                   </button>
-                  {isInventoryExpanded && (
+                  {expandedSections[item.name] && (
                     <div className="ml-4 mt-1 space-y-1">
                       {item.subItems.map((subItem) => {
                         const SubIcon = subItem.icon;
@@ -332,11 +436,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                     return (
                       <div key={item.name}>
                         <button
-                          onClick={() =>
-                            setIsInventoryExpanded(!isInventoryExpanded)
-                          }
+                          onClick={() => toggleSection(item.name)}
                           className={`flex items-center justify-between w-full px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                            isInventoryActive
+                            isSectionActive(item.name)
                               ? "bg-primary/10 text-primary"
                               : "text-muted-foreground hover:bg-muted hover:text-foreground"
                           }`}
@@ -346,10 +448,10 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                             {item.name}
                           </div>
                           <ChevronRight
-                            className={`h-4 w-4 transition-transform ${isInventoryExpanded ? "rotate-90" : ""}`}
+                            className={`h-4 w-4 transition-transform ${expandedSections[item.name] ? "rotate-90" : ""}`}
                           />
                         </button>
-                        {isInventoryExpanded && (
+                        {expandedSections[item.name] && (
                           <div className="ml-4 mt-1 space-y-1">
                             {item.subItems.map((subItem) => {
                               const SubIcon = subItem.icon;

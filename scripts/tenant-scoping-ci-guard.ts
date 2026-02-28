@@ -18,7 +18,8 @@ const ANTI_PATTERNS = [
     pattern: /prisma\.(\w+)\.findUnique\s*\(\s*{[^}]*}\s*\)/g,
     check: (match: string) =>
       !match.includes("organizationId") && !isSystemModel(match),
-    message: "Potentially unscoped findUnique - verify organizationId is present",
+    message:
+      "Potentially unscoped findUnique - verify organizationId is present",
   },
   {
     pattern: /prisma\.(\w+)\.update\s*\(\s*{[^}]*}\s*\)/g,
@@ -50,7 +51,9 @@ const SYSTEM_MODELS = new Set([
 
 function isSystemModel(query: string): boolean {
   for (const model of SYSTEM_MODELS) {
-    if (query.includes(`prisma.${model.charAt(0).toLowerCase() + model.slice(1)}`)) {
+    if (
+      query.includes(`prisma.${model.charAt(0).toLowerCase() + model.slice(1)}`)
+    ) {
       return true;
     }
   }

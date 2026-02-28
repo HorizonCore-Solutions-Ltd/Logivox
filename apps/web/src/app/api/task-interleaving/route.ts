@@ -31,7 +31,12 @@ export async function GET(req: NextRequest) {
         },
         include: {
           assignedTo: {
-            select: { id: true, firstName: true, lastName: true, department: true },
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              department: true,
+            },
           },
           location: { select: { code: true, aisle: true } },
         },

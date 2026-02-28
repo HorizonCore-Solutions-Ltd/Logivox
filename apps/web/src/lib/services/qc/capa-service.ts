@@ -4,6 +4,7 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { CAPADutyBridge } from "@/lib/services/duties/capa-duty-bridge";
 
 export type CAPAType = "CORRECTIVE" | "PREVENTIVE" | "BOTH";
 export type CAPAStatus =
@@ -150,6 +151,15 @@ export class CAPAService {
       },
     });
 
+    // Emit Containment duty via bridge (fire-and-forget)
+    CAPADutyBridge.onCAPACreated({
+      organizationId: params.organizationId,
+      capaId: capa.id,
+      capaTitle: `${capa.capaNumber}: ${params.problemStatement.slice(0, 80)}`,
+      priority: params.priority,
+      ncrId: params.ncrId,
+    }).catch((e) => console.error("[capa-service] duty bridge failed:", e));
+
     return capa;
   }
 
@@ -167,13 +177,23 @@ export class CAPAService {
    * Complete containment actions
    */
   static async completeContainment(capaId: string) {
-    return await prisma.correctivePreventiveAction.update({
+    const result = await prisma.correctivePreventiveAction.update({
       where: { id: capaId },
       data: {
         containmentComplete: true,
         containmentDate: new Date(),
       },
     });
+    // Emit Root Cause Investigation duty
+    CAPADutyBridge.onStageAdvanced({
+      organizationId: result.organizationId,
+      capaId: result.id,
+      capaTitle: result.capaNumber,
+      newStage: "ROOT_CAUSE",
+      priority: result.priority ?? "HIGH",
+      ncrId: (result as any).ncrId ?? undefined,
+    }).catch((e) => console.error("[capa-service] bridge failed:", e));
+    return result;
   }
 
   /**
@@ -260,7 +280,7 @@ export class CAPAService {
     closedBy: string;
     closureApprovedBy?: string;
   }) {
-    return await prisma.correctivePreventiveAction.update({
+    const capa = await prisma.correctivePreventiveAction.update({
       where: { id: params.capaId },
       data: {
         status: "CLOSED",
@@ -271,6 +291,38 @@ export class CAPAService {
         closureApprovedDate: new Date(),
       },
     });
+
+    // Log CAPA closure so procurement/operations teams can see it in the activity feed
+    try {
+      await prisma.activityLog.create({
+        data: {
+          organizationId: capa.organizationId,
+          userId: params.closedBy,
+          action: "CAPA_CLOSED",
+          entityType: "CAPA",
+          entityId: capa.id,
+          metadata: {
+            capaNumber: capa.capaNumber,
+            closedBy: params.closedBy,
+            closedDate: new Date().toISOString(),
+            message: "CAPA closed and verified. Procurement and operations teams may resume normal supplier activities if no further action is required.",
+          },
+        },
+      });
+    } catch (e) {
+      // Activity log is non-critical
+      console.error("Failed to log CAPA closure activity:", e);
+    }
+
+    // Emit Verification duty
+    CAPADutyBridge.onCAPAClosed({
+      organizationId: capa.organizationId,
+      capaId: capa.id,
+      capaTitle: capa.capaNumber,
+      ncrId: (capa as any).ncrId ?? undefined,
+    }).catch((e) => console.error("[capa-service] bridge failed:", e));
+
+    return capa;
   }
 
   /**

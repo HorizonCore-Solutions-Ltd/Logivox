@@ -6,6 +6,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
+import { withObservability } from "@/lib/middleware/observability";
+import { authOptions } from "@/lib/auth";
 
 type OrderBatch = {
   orders: Array<{
@@ -21,8 +23,8 @@ type OrderBatch = {
 
 // GET - List orders or waves
 export async function GET(req: NextRequest) {
-  try {
-    const session = await getServerSession();
+  return withObservability(async () => {
+    const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -139,19 +141,13 @@ export async function GET(req: NextRequest) {
       orders,
       total: orders.length,
     });
-  } catch (error) {
-    console.error("Order GET error:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch orders" },
-      { status: 500 },
-    );
-  }
+  }, req);
 }
 
 // POST - Create wave or release orders
 export async function POST(req: NextRequest) {
-  try {
-    const session = await getServerSession();
+  return withObservability(async () => {
+    const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -268,19 +264,13 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (error) {
-    console.error("Order POST error:", error);
-    return NextResponse.json(
-      { error: "Failed to process order action" },
-      { status: 500 },
-    );
-  }
+  }, req);
 }
 
 // PATCH - Update wave or order status
 export async function PATCH(req: NextRequest) {
-  try {
-    const session = await getServerSession();
+  return withObservability(async () => {
+    const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -321,17 +311,7 @@ export async function PATCH(req: NextRequest) {
       { error: "Wave ID or Order ID is required" },
       { status: 400 },
     );
-  } catch (error) {
-    console.error("Order PATCH error:", error);
-    return NextResponse.json(
-      { error: "Failed to update order/wave" },
-      { status: 500 },
-    );
-  }
-}
-
-/**
- * Auto-batch orders into optimal waves
+    }, req);
  */
 async function autoBatchOrders(warehouseId: string) {
   try {

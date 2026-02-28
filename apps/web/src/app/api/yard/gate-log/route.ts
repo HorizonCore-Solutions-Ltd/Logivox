@@ -40,13 +40,13 @@ export async function GET(request: Request) {
       }),
     ]);
 
-    const inbound = summary.find((s) => s.direction === "INBOUND")?._count.id ?? 0;
-    const outbound = summary.find((s) => s.direction === "OUTBOUND")?._count.id ?? 0;
+    const inbound =
+      summary.find((s) => s.direction === "INBOUND")?._count.id ?? 0;
+    const outbound =
+      summary.find((s) => s.direction === "OUTBOUND")?._count.id ?? 0;
 
     // Check-in time KPI: avg minutes between scheduledTime and createdAt
-    const withAppt = entries.filter(
-      (e) => e.scheduledTime && e.createdAt,
-    );
+    const withAppt = entries.filter((e) => e.scheduledTime && e.createdAt);
     const avgWaitMin =
       withAppt.length > 0
         ? Math.round(
@@ -55,8 +55,7 @@ export async function GET(request: Request) {
                 Math.abs(
                   new Date(e.createdAt).getTime() -
                     new Date(e.scheduledTime!).getTime(),
-                ) /
-                60_000;
+                ) / 60_000;
               return acc + diff;
             }, 0) / withAppt.length,
           )
@@ -69,7 +68,8 @@ export async function GET(request: Request) {
         outbound,
         avgCheckInVarianceMinutes: avgWaitMin,
         securityChecksPass: entries.filter((e) => e.securityCheckPassed).length,
-        securityChecksFail: entries.filter((e) => !e.securityCheckPassed).length,
+        securityChecksFail: entries.filter((e) => !e.securityCheckPassed)
+          .length,
       },
       entries: entries.map((e) => ({
         id: e.id,
@@ -94,7 +94,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching gate log:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -190,6 +193,9 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Error creating gate entry:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

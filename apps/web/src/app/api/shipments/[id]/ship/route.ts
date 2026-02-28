@@ -109,25 +109,32 @@ export async function POST(
         });
 
         for (const item of soItems) {
+          const qtyToShip = item.quantityPacked || item.quantityPicked || item.quantity;
+
+          // Decrement reserved quantity and on-hand quantity (stock physically leaves)
           await tx.inventoryItem.update({
             where: { id: item.inventoryItemId },
             data: {
-              reservedQty: {
-                decrement: item.quantityShipped,
-              },
-              // Optionally track as shipped inventory
-              availableQty: {
-                // Already decremented during picking
-              },
+              reservedQty: { decrement: qtyToShip },
+              quantity: { decrement: qtyToShip },
+            },
+          });
+
+          // Create outbound inventory movement record
+          await tx.inventoryMovement.create({
+            data: {
+              inventoryItemId: item.inventoryItemId,
+              type: "SALE",
+              quantity: qtyToShip,
+              reason: `Shipped via ${shipment.shipmentNumber}`,
+              notes: `Sales Order ${shipment.salesOrder.soNumber} — dispatched by carrier ${shipment.carrierCode}`,
             },
           });
 
           // Update SO item shipped quantity
           await tx.salesOrderItem.update({
             where: { id: item.id },
-            data: {
-              quantityShipped: item.quantityPacked,
-            },
+            data: { quantityShipped: qtyToShip },
           });
         }
 

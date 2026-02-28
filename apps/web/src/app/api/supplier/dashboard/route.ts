@@ -45,7 +45,10 @@ export async function GET(request: Request) {
       select: { organizationId: true },
     });
     if (!supplier) {
-      return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Supplier not found" },
+        { status: 404 },
+      );
     }
     const organizationId = supplier.organizationId;
 

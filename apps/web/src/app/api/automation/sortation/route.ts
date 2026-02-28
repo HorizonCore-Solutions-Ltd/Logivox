@@ -42,7 +42,11 @@ export async function GET() {
       const hourEnd = new Date(now - (6 - i) * 60 * 60 * 1000);
       const count = recentTasks.filter((t: any) => {
         const created = new Date(t.createdAt).getTime();
-        return created >= hourStart.getTime() && created < hourEnd.getTime() && t.status === "COMPLETED";
+        return (
+          created >= hourStart.getTime() &&
+          created < hourEnd.getTime() &&
+          t.status === "COMPLETED"
+        );
       }).length;
       return {
         hour: hourStart.getHours().toString().padStart(2, "0") + ":00",
@@ -52,11 +56,13 @@ export async function GET() {
 
     // Per-device sorter stats
     const deviceStats = allDevices.map((d: any) => {
-      const deviceTasks = recentTasks.filter(
-        (t: any) => t.deviceId === d.id,
-      );
-      const completed = deviceTasks.filter((t: any) => t.status === "COMPLETED").length;
-      const failed = deviceTasks.filter((t: any) => t.status === "FAILED").length;
+      const deviceTasks = recentTasks.filter((t: any) => t.deviceId === d.id);
+      const completed = deviceTasks.filter(
+        (t: any) => t.status === "COMPLETED",
+      ).length;
+      const failed = deviceTasks.filter(
+        (t: any) => t.status === "FAILED",
+      ).length;
       return {
         id: d.id,
         name: d.name,
@@ -65,7 +71,10 @@ export async function GET() {
         currentLocation: d.currentLocation ?? null,
         utilizationPct: Math.round((d.utilizationRate ?? 0) * 100),
         tasksToday: completed + failed,
-        successRate: completed + failed > 0 ? Math.round((completed / (completed + failed)) * 100) : 100,
+        successRate:
+          completed + failed > 0
+            ? Math.round((completed / (completed + failed)) * 100)
+            : 100,
         lastMaintenance: d.lastMaintenanceDate?.toISOString() ?? null,
       };
     });
@@ -100,6 +109,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching sortation data:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

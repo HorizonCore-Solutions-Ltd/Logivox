@@ -15,9 +15,9 @@ const upsertSchema = z.object({
 });
 
 export async function GET(req: NextRequest) {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+  const auth = await requireApiAuth();
+  if ("error" in auth) return auth.error;
+  const { organizationId } = auth;
 
   const { searchParams } = new URL(req.url);
   const provider = searchParams.get("provider") || undefined;

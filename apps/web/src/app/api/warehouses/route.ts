@@ -2,9 +2,10 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { resolveTenantFromRequest } from "@/lib/tenant-context";
+import { withObservability } from "@/lib/middleware/observability";
 
 export async function GET(request: NextRequest) {
-  try {
+  return withObservability(async () => {
     // Resolve tenant to get organizationId (fail-closed, no user-provided params)
     const tenant = await resolveTenantFromRequest(request as any);
     if (!tenant) {
@@ -21,17 +22,11 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json(warehouses);
-  } catch (error) {
-    console.error("Error fetching warehouses:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 },
-    );
-  }
+  }, request);
 }
 
 export async function POST(request: NextRequest) {
-  try {
+  return withObservability(async () => {
     // Resolve tenant to get organizationId
     const tenant = await resolveTenantFromRequest(request as any);
     if (!tenant) {
@@ -72,11 +67,5 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json(warehouse, { status: 201 });
-  } catch (error) {
-    console.error("Error creating warehouse:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 },
-    );
-  }
+  }, request);
 }

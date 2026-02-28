@@ -1,4 +1,6 @@
 import { prisma } from "@/lib/prisma";
+import { NCRService } from "./ncr-service";
+import { QualityHoldService } from "./quality-hold-service";
 
 export interface CreateInspectionData {
   organizationId: string;
@@ -326,6 +328,65 @@ export class QCInspectionService {
       `Inspection completed with result: ${result}`,
       userId,
     );
+
+    // Auto-create NCR and QualityHold when inspection FAILS (best-effort)
+    if (result === "FAIL") {
+      try {
+        const failedItems = updatedInspection.items.filter(
+          (i: any) => i.result === "FAIL",
+        );
+        const totalFailed = failedItems.reduce(
+          (sum: number, i: any) => sum + (i.failedQty || 0),
+          Math.max(inspection.failedUnits, 1),
+        );
+        const firstItem = failedItems[0] as any;
+
+        const ncr = await NCRService.createNCR({
+          organizationId: inspection.organizationId,
+          title: `QC Inspection Failure: ${(updatedInspection as any).supplier?.name ?? "Supplier"} — ${updatedInspection.inspectionNumber}`,
+          description: `QC receiving inspection ${updatedInspection.inspectionNumber} failed with ${updatedInspection.defects.length} defect(s) and ${totalFailed} failed unit(s). Immediate quarantine and corrective action required.`,
+          discoveredBy: userId,
+          discoveryLocation: "QC Receiving Inspection",
+          sourceType: "RECEIVING",
+          sourceId: updatedInspection.id,
+          supplierId: inspection.supplierId,
+          supplierName: (updatedInspection as any).supplier?.name ?? undefined,
+          poNumber: (updatedInspection as any).purchaseOrder?.poNumber ?? undefined,
+          productSku: firstItem?.sku ?? undefined,
+          productDescription: firstItem?.productName ?? undefined,
+          quantityAffected: totalFailed,
+          nonConformanceType: "INCOMING_QUALITY",
+          severity: "HIGH",
+          category: "QC_INSPECTION",
+          disposition: "QUARANTINE",
+          capaRequired: true,
+          priority: "HIGH",
+          createdBy: userId,
+        });
+
+        await QualityHoldService.createHold({
+          organizationId: inspection.organizationId,
+          holdType: "PRODUCT",
+          holdLevel: "INSPECTION",
+          productSku: firstItem?.sku ?? undefined,
+          productName: firstItem?.productName ?? undefined,
+          vendorId: inspection.supplierId,
+          quantityOnHold: totalFailed,
+          holdReason: "QC_INSPECTION_FAILURE",
+          holdDescription: `Failed QC inspection ${updatedInspection.inspectionNumber}. NCR: ${ncr.ncrNumber}`,
+          severity: "HIGH",
+          initiatedBy: userId,
+          sourceType: "QC_INSPECTION",
+          sourceId: updatedInspection.id,
+          ncrId: ncr.id,
+          investigationRequired: true,
+          priority: "HIGH",
+          createdBy: userId,
+        });
+      } catch (e) {
+        console.error("Auto NCR/QualityHold creation failed for inspection", inspectionId, e);
+      }
+    }
 
     return updatedInspection;
   }

@@ -33,7 +33,10 @@ export async function GET() {
     const avgUtilization =
       devices.length > 0
         ? Math.round(
-            (devices.reduce((s: number, d: any) => s + (d.utilizationRate ?? 0), 0) /
+            (devices.reduce(
+              (s: number, d: any) => s + (d.utilizationRate ?? 0),
+              0,
+            ) /
               devices.length) *
               100,
           )
@@ -51,7 +54,8 @@ export async function GET() {
         (d: any) =>
           d.status === "IDLE" &&
           (d.deviceType === task.deviceType ||
-            (task.deviceType === "PICK" && ["AGV", "AMR"].includes(d.deviceType))),
+            (task.deviceType === "PICK" &&
+              ["AGV", "AMR"].includes(d.deviceType))),
       );
       return {
         taskId: task.id,
@@ -60,7 +64,8 @@ export async function GET() {
         sourceLocation: task.sourceLocation,
         destinationLocation: task.destinationLocation,
         suggestedDeviceId: compatibleDevices[0]?.id ?? null,
-        suggestedDeviceName: compatibleDevices[0]?.name ?? "No idle device available",
+        suggestedDeviceName:
+          compatibleDevices[0]?.name ?? "No idle device available",
       };
     });
 
@@ -74,7 +79,8 @@ export async function GET() {
         avgUtilizationPct: avgUtilization,
         totalTasksToday,
         queuedTasks: pendingTasks.length,
-        activeTasks: tasks.filter((t: any) => t.status === "IN_PROGRESS").length,
+        activeTasks: tasks.filter((t: any) => t.status === "IN_PROGRESS")
+          .length,
       },
       devices: devices.map((d: any) => ({
         id: d.id,
@@ -85,7 +91,7 @@ export async function GET() {
         currentLocation: d.currentLocation ?? null,
         utilizationPct: Math.round((d.utilizationRate ?? 0) * 100),
         tasksCompletedToday: d.tasksCompletedToday ?? 0,
-        uptimeHours: Math.round((d.uptimeToday ?? 0) / 60 * 10) / 10,
+        uptimeHours: Math.round(((d.uptimeToday ?? 0) / 60) * 10) / 10,
       })),
       pendingTasks: tasks.map((t: any) => ({
         id: t.id,
@@ -103,7 +109,10 @@ export async function GET() {
     });
   } catch (error) {
     console.error("Error fetching fleet data:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -159,6 +168,9 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Error dispatching fleet task:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

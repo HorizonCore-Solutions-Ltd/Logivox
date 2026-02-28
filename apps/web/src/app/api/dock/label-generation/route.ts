@@ -10,17 +10,17 @@ const DEPRECATION = {
 };
 
 export async function GET(_request: NextRequest) {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+  const auth = await requireApiAuth();
+  if ("error" in auth) return auth.error;
+  const { organizationId } = auth;
 
   return NextResponse.json(DEPRECATION, { status: 410 });
 }
 
 export async function POST(_request: NextRequest) {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+  const auth = await requireApiAuth();
+  if ("error" in auth) return auth.error;
+  const { organizationId } = auth;
 
   return NextResponse.json(DEPRECATION, { status: 410 });
 }

@@ -65,17 +65,12 @@ export async function GET(req: NextRequest) {
       const latest = deviceReadings[0];
 
       // Scan rate: scans per hour in last window
-      const scanRate =
-        hours > 0 ? +(scansInWindow / hours).toFixed(1) : 0;
+      const scanRate = hours > 0 ? +(scansInWindow / hours).toFixed(1) : 0;
 
       // Hourly scan trend last 8 data points
       const trend = Array.from({ length: 8 }, (_, i) => {
-        const windowStart = new Date(
-          Date.now() - (8 - i) * 60 * 60 * 1000,
-        );
-        const windowEnd = new Date(
-          Date.now() - (7 - i) * 60 * 60 * 1000,
-        );
+        const windowStart = new Date(Date.now() - (8 - i) * 60 * 60 * 1000);
+        const windowEnd = new Date(Date.now() - (7 - i) * 60 * 60 * 1000);
         const count = deviceReadings.filter(
           (r) => r.timestamp >= windowStart && r.timestamp < windowEnd,
         ).length;

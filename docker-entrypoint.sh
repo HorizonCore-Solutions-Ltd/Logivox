@@ -15,9 +15,7 @@ echo "✅ Database is ready"
 # Run migrations (if AUTO_MIGRATE is enabled)
 if [ "$AUTO_MIGRATE" = "true" ]; then
   echo "🔄 Running database migrations..."
-  cd packages/database
   npx prisma migrate deploy
-  cd ../..
   echo "✅ Migrations complete"
 fi
 

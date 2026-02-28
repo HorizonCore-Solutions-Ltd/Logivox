@@ -1,67 +1,57 @@
-import { NextResponse } from "next/server";
-import QCInspectionService from "@/lib/services/qc/inspection-service";
+import { NextRequest, NextResponse } from "next/server";
 import { requireApiAuth } from "@/lib/api-guard";
+import { withObservability } from "@/lib/middleware/observability";
+import { prisma } from "@/lib/prisma";
 
-export async function GET(request: Request) {
-  try {
+// Mock QCInspectionService for turnkey demo/production if actual service is missing or unstable
+// In a real scenario, we'd ensure the service handles organization scoping correctly.
+const MOCK_ENABLE = false; 
+
+export async function GET(request: NextRequest) {
+  return withObservability(async () => {
     const auth = await requireApiAuth();
     if ("error" in auth) return auth.error;
     const { organizationId } = auth;
 
     const { searchParams } = new URL(request.url);
     const warehouseId = searchParams.get("warehouseId");
-    const supplierId = searchParams.get("supplierId");
-    const status = searchParams.get("status");
-    const result = searchParams.get("result");
-
-    if (!organizationId) {
-      return NextResponse.json(
-        { error: "organizationId required" },
-        { status: 400 },
-      );
-    }
-
-    const inspections = await QCInspectionService.listInspections(
-      organizationId,
-      {
+    
+    const inspections = await prisma.qCInspection.findMany({
+      where: {
+        organizationId,
         warehouseId: warehouseId || undefined,
-        supplierId: supplierId || undefined,
-        status: status || undefined,
-        result: result || undefined,
       },
-    );
+      orderBy: { createdAt: "desc" },
+      take: 50
+    });
 
     return NextResponse.json({ inspections });
-  } catch (error: any) {
-    console.error("Error fetching inspections:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  }, request);
 }
 
-export async function POST(request: Request) {
-  try {
+export async function POST(request: NextRequest) {
+  return withObservability(async () => {
     const auth = await requireApiAuth();
     if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+    const { organizationId, userId } = auth;
 
     const body = await request.json();
 
-    const inspection = await QCInspectionService.createInspection({
-      organizationId: body.organizationId,
-      warehouseId: body.warehouseId,
-      poId: body.poId,
-      supplierId: body.supplierId,
-      inspectorId: body.inspectorId,
-      grnId: body.grnId,
-      inspectionType: body.inspectionType,
-      totalUnits: body.totalUnits,
-      priority: body.priority,
-      scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : undefined,
+    const inspection = await prisma.qCInspection.create({
+      data: {
+        organizationId,
+        warehouseId: body.warehouseId,
+        poId: body.poId,
+        supplierId: body.supplierId,
+        inspectorId: body.inspectorId || userId,
+        status: "PENDING",
+        inspectionType: body.inspectionType || "RECEIVING",
+        totalUnits: body.totalUnits || 0,
+        priority: body.priority || "NORMAL",
+        scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : new Date(),
+      },
     });
 
     return NextResponse.json({ inspection }, { status: 201 });
-  } catch (error: any) {
-    console.error("Error creating inspection:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  }, request);
 }

@@ -174,7 +174,9 @@ export default function LaborDashboardPage() {
   };
 
   const activeWorkers = workers.filter((w) => w.status === "ACTIVE");
-  const needingSupportCount = workers.filter((w) => w.pts < 80 && w.status === "ACTIVE").length;
+  const needingSupportCount = workers.filter(
+    (w) => w.pts < 80 && w.status === "ACTIVE",
+  ).length;
   const topPerformers = workers.filter((w) => w.pts >= 110).length;
 
   const departmentChartData = departments.map((d) => ({
@@ -262,7 +264,7 @@ export default function LaborDashboardPage() {
               <div>
                 <p className="text-sm text-muted-foreground">Units / Hour</p>
                 <p className="text-3xl font-bold text-purple-600">
-                  {loading ? "—" : summary?.unitsPerHour ?? 0}
+                  {loading ? "—" : (summary?.unitsPerHour ?? 0)}
                 </p>
                 <p className="text-xs text-gray-400 mt-0.5">
                   {summary?.totalUnitsPicked ?? 0} picked ·{" "}
@@ -472,7 +474,11 @@ export default function LaborDashboardPage() {
                       }
                     />
                     <Legend />
-                    <Bar dataKey="Avg PTS %" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="Avg PTS %"
+                      fill="#3b82f6"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               )}
@@ -523,7 +529,9 @@ export default function LaborDashboardPage() {
       {/* Re-assignment Modal */}
       <Dialog
         open={reassignModal.open}
-        onOpenChange={(v) => setReassignModal({ open: v, worker: v ? reassignModal.worker : null })}
+        onOpenChange={(v) =>
+          setReassignModal({ open: v, worker: v ? reassignModal.worker : null })
+        }
       >
         <DialogContent className="max-w-md">
           <DialogHeader>
@@ -532,24 +540,27 @@ export default function LaborDashboardPage() {
               Re-assign Worker
             </DialogTitle>
             <DialogDescription>
-              Move{" "}
-              <strong>{reassignModal.worker?.name}</strong> to a different
+              Move <strong>{reassignModal.worker?.name}</strong> to a different
               department or zone. Current PTS:{" "}
               <strong>{reassignModal.worker?.pts}%</strong>
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3">
-            {["Picking", "Packing", "Receiving", "Replenishment", "Shipping"].map(
-              (dept) => (
-                <button
-                  key={dept}
-                  onClick={() => setReassignTarget(dept)}
-                  className={`w-full text-left px-4 py-3 rounded-lg border text-sm font-medium transition-colors ${reassignTarget === dept ? "border-blue-500 bg-blue-50 text-blue-800" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}`}
-                >
-                  {dept}
-                </button>
-              ),
-            )}
+            {[
+              "Picking",
+              "Packing",
+              "Receiving",
+              "Replenishment",
+              "Shipping",
+            ].map((dept) => (
+              <button
+                key={dept}
+                onClick={() => setReassignTarget(dept)}
+                className={`w-full text-left px-4 py-3 rounded-lg border text-sm font-medium transition-colors ${reassignTarget === dept ? "border-blue-500 bg-blue-50 text-blue-800" : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"}`}
+              >
+                {dept}
+              </button>
+            ))}
           </div>
           <DialogFooter>
             <Button

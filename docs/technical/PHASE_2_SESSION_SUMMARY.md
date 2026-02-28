@@ -8,16 +8,15 @@
 
 ## 📊 Overall Progress
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Queries with organizationId | 1 (0.1%) | 592 (85.6%) | +591 ✅ |
-| Queries missing organizationId | 692 | 100 | -592 ✅ |
-| Routes Fixed | 0 | 6 | +6 ✅ |
-
+| Metric                         | Before   | After       | Change  |
+| ------------------------------ | -------- | ----------- | ------- |
+| Queries with organizationId    | 1 (0.1%) | 592 (85.6%) | +591 ✅ |
+| Queries missing organizationId | 692      | 100         | -592 ✅ |
+| Routes Fixed                   | 0        | 6           | +6 ✅   |
 
 ## ✅ Fixed Routes (Session)
 
-1. **[/api/activity-logs](apps/web/src/app/api/activity-logs/route.ts)** 
+1. **[/api/activity-logs](apps/web/src/app/api/activity-logs/route.ts)**
    - Pattern: withTenantContext() HOF wrapper
    - Added: organizationId WHERE clause + user validation for userId filter
    - Security: Audit log isolation enforced
@@ -52,6 +51,7 @@
 ## 🔍 Key Discovery: Many Routes Already Scoped!
 
 When we reviewed popular routes flagged as "CRITICAL":
+
 - ✅ /api/task-automations - Already has organizationId in GET + POST
 - ✅ /api/picking-tasks - Already has organizationId in GET
 - ✅ /api/notifications - Already has organizationId in GET + POST
@@ -65,12 +65,14 @@ When we reviewed popular routes flagged as "CRITICAL":
 ## 📈 True Impact
 
 **What the 6 fixes addressed:**
+
 1. Audit trail isolation (activity-logs, admin/audit-logs, carriers)
 2. Security vulnerability in org selection (/categories, /warehouses)
 3. AI decision logging (ai-intervention)
 4. ~100+ queries now properly scoped through full app
 
-**Remaining work estimated:** 
+**Remaining work estimated:**
+
 - 100 unscoped queries remaining
 - Estimated 10-15 routes need attention (vs. initial 33 assumed CRITICAL)
 - Many routes already compliant after fixes to shared patterns
@@ -80,6 +82,7 @@ When we reviewed popular routes flagged as "CRITICAL":
 ## 🛠️ Technical Patterns Deployed
 
 ### Pattern 1: withTenantContext() HOF (2 routes)
+
 ```typescript
 export const GET = withTenantContext(async (request) => {
   const tenant = (request as any).tenant;
@@ -89,45 +92,54 @@ export const GET = withTenantContext(async (request) => {
   return NextResponse.json(items);
 });
 ```
+
 - **Cost:** ~3 lines of code
 - **Benefit:** Fail-closed, ensures organizationId required
 - **Coverage:** Automatic with middleware fallback
 
 ### Pattern 2: Direct resolveTenantFromRequest() (2 routes)
+
 ```typescript
 const tenant = await resolveTenantFromRequest(request);
-if (!tenant) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+if (!tenant)
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 // Then use tenant.organizationId in queries
 ```
+
 - **Cost:** ~5 lines at route top
 - **Benefit:** More control for complex routes
 - **Coverage:** Manual but very explicit
 
 ### Pattern 3: Audit Log Scoping Fix (1 route)
+
 ```typescript
 await prisma.activityLog.create({
   data: {
-    organizationId: tenant.organizationId,  // REQUIRED
+    organizationId: tenant.organizationId, // REQUIRED
     userId: tenant.userId,
     action: "...",
     entityId: "...",
-    metadata: { ...details },  // Better than 'details' field
+    metadata: { ...details }, // Better than 'details' field
   },
 });
 ```
+
 - **Cost:** 1 added field
 - **Benefit:** Cross-org audit log leakage prevented
 - **Coverage:** Now consistent across app
 
 ### Pattern 4: Security Fix - No User-Provided Org (2 routes)
+
 ```typescript
 // BEFORE (VULNERABLE):
-const organizationId = searchParams.get("organizationId") || user.organizations[0]?.id;
+const organizationId =
+  searchParams.get("organizationId") || user.organizations[0]?.id;
 
 // AFTER (SECURE):
 const tenant = await resolveTenantFromRequest(request);
-const organizationId = tenant.organizationId;  // From auth, never user input
+const organizationId = tenant.organizationId; // From auth, never user input
 ```
+
 - **Cost:** Refactor ~15 lines per route
 - **Benefit:** Eliminates org manipulation attacks
 - **Coverage:** All new routes must follow this
@@ -137,8 +149,9 @@ const organizationId = tenant.organizationId;  // From auth, never user input
 ## 🚀 Next Batch of Low-Hanging Fruit
 
 Based on code review, these are likely quick fixes (1-2 unscoped queries each):
-1. /api/admin/* endpoints - Check scope on all 4 subroutes
-2. /api/purchase-orders/*/route.ts - Multi-file coordination
+
+1. /api/admin/\* endpoints - Check scope on all 4 subroutes
+2. /api/purchase-orders/\*/route.ts - Multi-file coordination
 3. /api/assembly-orders - Create flow might be missing scope
 4. /api/boms - Review create + delete operations
 5. /api/integrations - Webhook/connection scoping
@@ -156,7 +169,7 @@ Based on code review, these are likely quick fixes (1-2 unscoped queries each):
 ## ✔️ Quality Assurance
 
 - ✅ Code changes compile without errors
-- ✅ No regressions in existing test files  
+- ✅ No regressions in existing test files
 - ✅ Prisma middleware acts as safety net for unscoped queries
 - ✅ Session integration works across all patterns
 - ✅ activityLog schema supports new organizationId field
@@ -168,13 +181,15 @@ Based on code review, these are likely quick fixes (1-2 unscoped queries each):
 **Estimated remaining effort:** 12-20 hours (with 2-3 devs working in parallel)
 
 **Next priorities:**
-1. Audit all /api/admin/* routes (4 routes, ~2 hours)
+
+1. Audit all /api/admin/\* routes (4 routes, ~2 hours)
 2. Fix purchase-orders multi-file issue (4 routes, ~3 hours)
 3. Verify assembly-orders create operations (2 routes, ~1 hour)
 4. Clean up remaining queries (~20 queries, ~4-5 hours)
 5. Full test pass + CI integration (~3 hours)
 
 **Team can begin immediately with:**
+
 - Documentation ready ✅
 - Patterns established ✅
 - Code examples available ✅
@@ -186,6 +201,7 @@ Based on code review, these are likely quick fixes (1-2 unscoped queries each):
 ## 📝 Commit Summary
 
 If this were a PR:
+
 ```
 fix: Enforce tenant scoping in 6 critical routes
 
@@ -205,4 +221,3 @@ Testing:
 - Prisma middleware prevents any regressions
 - Existing unit/E2E tests pass
 ```
-

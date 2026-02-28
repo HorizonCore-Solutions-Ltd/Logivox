@@ -11,7 +11,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Activity, RefreshCw, CheckCircle2, XCircle, Scale, Package, AlertTriangle } from "lucide-react";
+import {
+  Activity,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
+  Scale,
+  Package,
+  AlertTriangle,
+} from "lucide-react";
 import {
   PieChart,
   Pie,
@@ -56,22 +64,131 @@ interface ScaleSummary {
 }
 
 const DEMO_SCALES: ScaleDevice[] = [
-  { id: "SC1", name: "Pack Station 1", location: "Packing Area - Station 1", status: "ACTIVE", passCount: 312, failCount: 14, passRate: 95.7, lastWeight: 2.34 },
-  { id: "SC2", name: "Pack Station 2", location: "Packing Area - Station 2", status: "ACTIVE", passCount: 287, failCount: 8, passRate: 97.3, lastWeight: 1.12 },
-  { id: "SC3", name: "Pack Station 3", location: "Packing Area - Station 3", status: "ACTIVE", passCount: 198, failCount: 31, passRate: 86.5, lastWeight: 3.77 },
-  { id: "SC4", name: "Receiving Scale", location: "Receiving Dock", status: "ACTIVE", passCount: 155, failCount: 3, passRate: 98.1, lastWeight: 18.50 },
-  { id: "SC5", name: "Outbound Check", location: "Shipping Dock", status: "INACTIVE", passCount: 0, failCount: 0, passRate: 0, lastWeight: null },
+  {
+    id: "SC1",
+    name: "Pack Station 1",
+    location: "Packing Area - Station 1",
+    status: "ACTIVE",
+    passCount: 312,
+    failCount: 14,
+    passRate: 95.7,
+    lastWeight: 2.34,
+  },
+  {
+    id: "SC2",
+    name: "Pack Station 2",
+    location: "Packing Area - Station 2",
+    status: "ACTIVE",
+    passCount: 287,
+    failCount: 8,
+    passRate: 97.3,
+    lastWeight: 1.12,
+  },
+  {
+    id: "SC3",
+    name: "Pack Station 3",
+    location: "Packing Area - Station 3",
+    status: "ACTIVE",
+    passCount: 198,
+    failCount: 31,
+    passRate: 86.5,
+    lastWeight: 3.77,
+  },
+  {
+    id: "SC4",
+    name: "Receiving Scale",
+    location: "Receiving Dock",
+    status: "ACTIVE",
+    passCount: 155,
+    failCount: 3,
+    passRate: 98.1,
+    lastWeight: 18.5,
+  },
+  {
+    id: "SC5",
+    name: "Outbound Check",
+    location: "Shipping Dock",
+    status: "INACTIVE",
+    passCount: 0,
+    failCount: 0,
+    passRate: 0,
+    lastWeight: null,
+  },
 ];
 
 const DEMO_FEED: VerificationEvent[] = [
-  { time: "14:33:42", scale: "Pack Station 1", product: "SKU-7734 / 24pk Beverages", expected: 11.2, actual: 11.18, variance: -0.02, result: "pass" },
-  { time: "14:33:38", scale: "Pack Station 2", product: "SKU-2291 / Apparel Box A", expected: 1.8, actual: 3.21, variance: 1.41, result: "fail" },
-  { time: "14:33:29", scale: "Pack Station 3", product: "SKU-8812 / Electronics Kit", expected: 2.5, actual: 2.49, variance: -0.01, result: "pass" },
-  { time: "14:33:14", scale: "Pack Station 1", product: "SKU-1107 / Medical Supply", expected: 0.9, actual: 0.91, variance: 0.01, result: "pass" },
-  { time: "14:33:02", scale: "Receiving Scale", product: "SKU-3354 / Books Carton", expected: 18.0, actual: 23.5, variance: 5.5, result: "fail" },
-  { time: "14:32:55", scale: "Pack Station 2", product: "SKU-5561 / Grocery Pallet", expected: 3.1, actual: 3.12, variance: 0.02, result: "pass" },
-  { time: "14:32:44", scale: "Pack Station 3", product: "SKU-9920 / Sporting Goods", expected: 4.4, actual: 4.42, variance: 0.02, result: "pass" },
-  { time: "14:32:30", scale: "Pack Station 1", product: "SKU-6643 / Hardware Kit", expected: 7.6, actual: 7.64, variance: 0.04, result: "pass" },
+  {
+    time: "14:33:42",
+    scale: "Pack Station 1",
+    product: "SKU-7734 / 24pk Beverages",
+    expected: 11.2,
+    actual: 11.18,
+    variance: -0.02,
+    result: "pass",
+  },
+  {
+    time: "14:33:38",
+    scale: "Pack Station 2",
+    product: "SKU-2291 / Apparel Box A",
+    expected: 1.8,
+    actual: 3.21,
+    variance: 1.41,
+    result: "fail",
+  },
+  {
+    time: "14:33:29",
+    scale: "Pack Station 3",
+    product: "SKU-8812 / Electronics Kit",
+    expected: 2.5,
+    actual: 2.49,
+    variance: -0.01,
+    result: "pass",
+  },
+  {
+    time: "14:33:14",
+    scale: "Pack Station 1",
+    product: "SKU-1107 / Medical Supply",
+    expected: 0.9,
+    actual: 0.91,
+    variance: 0.01,
+    result: "pass",
+  },
+  {
+    time: "14:33:02",
+    scale: "Receiving Scale",
+    product: "SKU-3354 / Books Carton",
+    expected: 18.0,
+    actual: 23.5,
+    variance: 5.5,
+    result: "fail",
+  },
+  {
+    time: "14:32:55",
+    scale: "Pack Station 2",
+    product: "SKU-5561 / Grocery Pallet",
+    expected: 3.1,
+    actual: 3.12,
+    variance: 0.02,
+    result: "pass",
+  },
+  {
+    time: "14:32:44",
+    scale: "Pack Station 3",
+    product: "SKU-9920 / Sporting Goods",
+    expected: 4.4,
+    actual: 4.42,
+    variance: 0.02,
+    result: "pass",
+  },
+  {
+    time: "14:32:30",
+    scale: "Pack Station 1",
+    product: "SKU-6643 / Hardware Kit",
+    expected: 7.6,
+    actual: 7.64,
+    variance: 0.04,
+    result: "pass",
+  },
 ];
 
 export default function WeightScalePage() {
@@ -99,7 +216,9 @@ export default function WeightScalePage() {
     }
   }, []);
 
-  useEffect(() => { fetchData(); }, [fetchData]);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
   useEffect(() => {
     if (!autoRefresh) return;
     const i = setInterval(fetchData, 30_000);
@@ -111,11 +230,17 @@ export default function WeightScalePage() {
   const displaySummary: ScaleSummary = summary ?? {
     totalScales: displayScales.length,
     activeScales: displayScales.filter((s) => s.status === "ACTIVE").length,
-    totalVerificationsToday: displayScales.reduce((acc, s) => acc + s.passCount + s.failCount, 0),
+    totalVerificationsToday: displayScales.reduce(
+      (acc, s) => acc + s.passCount + s.failCount,
+      0,
+    ),
     totalPasses: displayScales.reduce((acc, s) => acc + s.passCount, 0),
     totalFails: displayScales.reduce((acc, s) => acc + s.failCount, 0),
     overallPassRate: (() => {
-      const total = displayScales.reduce((acc, s) => acc + s.passCount + s.failCount, 0);
+      const total = displayScales.reduce(
+        (acc, s) => acc + s.passCount + s.failCount,
+        0,
+      );
       const pass = displayScales.reduce((acc, s) => acc + s.passCount, 0);
       return total > 0 ? Math.round((pass / total) * 100 * 10) / 10 : 0;
     })(),
@@ -145,7 +270,11 @@ export default function WeightScalePage() {
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Packing station accuracy · Pass/fail rates per scale
-            {lastUpdated && <span className="ml-2 text-xs text-gray-400">· Updated: {lastUpdated}</span>}
+            {lastUpdated && (
+              <span className="ml-2 text-xs text-gray-400">
+                · Updated: {lastUpdated}
+              </span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -170,26 +299,41 @@ export default function WeightScalePage() {
         <Card className="border-teal-200 bg-teal-50 col-span-2 md:col-span-1">
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Overall Pass Rate</p>
-            <p className="text-4xl font-bold text-teal-700">{displaySummary.overallPassRate}%</p>
-            <Progress value={displaySummary.overallPassRate} className="h-2 mt-2" />
+            <p className="text-4xl font-bold text-teal-700">
+              {displaySummary.overallPassRate}%
+            </p>
+            <Progress
+              value={displaySummary.overallPassRate}
+              className="h-2 mt-2"
+            />
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Verifications Today</p>
-            <p className="text-3xl font-bold">{displaySummary.totalVerificationsToday.toLocaleString()}</p>
+            <p className="text-3xl font-bold">
+              {displaySummary.totalVerificationsToday.toLocaleString()}
+            </p>
           </CardContent>
         </Card>
         <Card className="border-green-100">
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Passed</p>
-            <p className="text-3xl font-bold text-green-600">{displaySummary.totalPasses.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-green-600">
+              {displaySummary.totalPasses.toLocaleString()}
+            </p>
           </CardContent>
         </Card>
-        <Card className={displaySummary.totalFails > 0 ? "border-red-200 bg-red-50" : ""}>
+        <Card
+          className={
+            displaySummary.totalFails > 0 ? "border-red-200 bg-red-50" : ""
+          }
+        >
           <CardContent className="pt-5">
             <p className="text-sm text-muted-foreground">Failed</p>
-            <p className={`text-3xl font-bold ${displaySummary.totalFails > 0 ? "text-red-600" : "text-gray-400"}`}>
+            <p
+              className={`text-3xl font-bold ${displaySummary.totalFails > 0 ? "text-red-600" : "text-gray-400"}`}
+            >
               {displaySummary.totalFails.toLocaleString()}
             </p>
           </CardContent>
@@ -217,20 +361,26 @@ export default function WeightScalePage() {
                   <div className="flex items-center justify-between mb-2">
                     <div>
                       <span className="font-medium text-sm flex items-center gap-1.5">
-                        {needsAttention && <AlertTriangle className="h-3.5 w-3.5 text-red-500" />}
+                        {needsAttention && (
+                          <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
+                        )}
                         {scale.name}
                       </span>
                       <p className="text-xs text-gray-400">{scale.location}</p>
                     </div>
                     <div className="text-right">
                       <Badge
-                        variant={scale.status === "ACTIVE" ? "default" : "secondary"}
+                        variant={
+                          scale.status === "ACTIVE" ? "default" : "secondary"
+                        }
                         className={`text-xs ${scale.status === "ACTIVE" ? "bg-green-100 text-green-800" : ""}`}
                       >
                         {scale.status}
                       </Badge>
                       {scale.lastWeight !== null && (
-                        <p className="text-xs text-gray-400 mt-0.5">Last: {scale.lastWeight} kg</p>
+                        <p className="text-xs text-gray-400 mt-0.5">
+                          Last: {scale.lastWeight} kg
+                        </p>
                       )}
                     </div>
                   </div>
@@ -241,18 +391,26 @@ export default function WeightScalePage() {
                           value={scale.passRate}
                           className={`h-1.5 flex-1 ${needsAttention ? "bg-red-100" : ""}`}
                         />
-                        <span className={`text-xs font-bold ${needsAttention ? "text-red-600" : "text-green-600"}`}>
+                        <span
+                          className={`text-xs font-bold ${needsAttention ? "text-red-600" : "text-green-600"}`}
+                        >
                           {scale.passRate.toFixed(1)}%
                         </span>
                       </div>
                       <div className="flex gap-3 text-xs text-gray-500">
-                        <span className="text-green-600">{scale.passCount} pass</span>
-                        <span className="text-red-500">{scale.failCount} fail</span>
+                        <span className="text-green-600">
+                          {scale.passCount} pass
+                        </span>
+                        <span className="text-red-500">
+                          {scale.failCount} fail
+                        </span>
                         <span>{total} total</span>
                       </div>
                     </>
                   ) : (
-                    <p className="text-xs text-gray-400">No verifications today</p>
+                    <p className="text-xs text-gray-400">
+                      No verifications today
+                    </p>
                   )}
                 </div>
               );
@@ -265,27 +423,48 @@ export default function WeightScalePage() {
           {/* Pie chart */}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-base">Today&apos;s Pass/Fail Split</CardTitle>
+              <CardTitle className="text-base">
+                Today&apos;s Pass/Fail Split
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="flex items-center gap-4">
                 <ResponsiveContainer width={120} height={120}>
                   <PieChart>
-                    <Pie data={pieData} dataKey="value" cx="50%" cy="50%" innerRadius={30} outerRadius={55}>
+                    <Pie
+                      data={pieData}
+                      dataKey="value"
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={30}
+                      outerRadius={55}
+                    >
                       <Cell fill="#22c55e" />
                       <Cell fill="#ef4444" />
                     </Pie>
-                    <Tooltip formatter={(v: number) => [v.toLocaleString(), ""]} />
+                    <Tooltip
+                      formatter={(v: number) => [v.toLocaleString(), ""]}
+                    />
                   </PieChart>
                 </ResponsiveContainer>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-sm">
                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span>Pass: <strong>{displaySummary.totalPasses.toLocaleString()}</strong></span>
+                    <span>
+                      Pass:{" "}
+                      <strong>
+                        {displaySummary.totalPasses.toLocaleString()}
+                      </strong>
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span>Fail: <strong>{displaySummary.totalFails.toLocaleString()}</strong></span>
+                    <span>
+                      Fail:{" "}
+                      <strong>
+                        {displaySummary.totalFails.toLocaleString()}
+                      </strong>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -302,10 +481,20 @@ export default function WeightScalePage() {
                 <BarChart data={barData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis type="number" tick={{ fontSize: 10 }} />
-                  <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={50} />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    tick={{ fontSize: 10 }}
+                    width={50}
+                  />
                   <Tooltip />
                   <Bar dataKey="pass" stackId="a" fill="#22c55e" />
-                  <Bar dataKey="fail" stackId="a" fill="#ef4444" radius={[0, 3, 3, 0]} />
+                  <Bar
+                    dataKey="fail"
+                    stackId="a"
+                    fill="#ef4444"
+                    radius={[0, 3, 3, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -320,7 +509,9 @@ export default function WeightScalePage() {
             <Package className="h-4 w-4" />
             Live Verification Feed
           </CardTitle>
-          <CardDescription>Most recent weight checks — ± 5% tolerance</CardDescription>
+          <CardDescription>
+            Most recent weight checks — ± 5% tolerance
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -338,14 +529,30 @@ export default function WeightScalePage() {
               </thead>
               <tbody>
                 {displayFeed.map((event, i) => (
-                  <tr key={i} className={`border-b last:border-0 ${event.result === "fail" ? "bg-red-50" : ""}`}>
-                    <td className="py-2 pr-4 font-mono text-xs text-gray-400">{event.time}</td>
-                    <td className="py-2 pr-4 text-xs text-gray-600">{event.scale}</td>
-                    <td className="py-2 pr-4 text-xs font-medium max-w-xs truncate">{event.product}</td>
-                    <td className="py-2 pr-4 text-right text-xs">{event.expected} kg</td>
-                    <td className="py-2 pr-4 text-right text-xs font-medium">{event.actual} kg</td>
-                    <td className={`py-2 pr-4 text-right text-xs font-bold ${Math.abs(event.variance) > 0.5 ? "text-red-600" : "text-gray-400"}`}>
-                      {event.variance > 0 ? "+" : ""}{event.variance.toFixed(2)} kg
+                  <tr
+                    key={i}
+                    className={`border-b last:border-0 ${event.result === "fail" ? "bg-red-50" : ""}`}
+                  >
+                    <td className="py-2 pr-4 font-mono text-xs text-gray-400">
+                      {event.time}
+                    </td>
+                    <td className="py-2 pr-4 text-xs text-gray-600">
+                      {event.scale}
+                    </td>
+                    <td className="py-2 pr-4 text-xs font-medium max-w-xs truncate">
+                      {event.product}
+                    </td>
+                    <td className="py-2 pr-4 text-right text-xs">
+                      {event.expected} kg
+                    </td>
+                    <td className="py-2 pr-4 text-right text-xs font-medium">
+                      {event.actual} kg
+                    </td>
+                    <td
+                      className={`py-2 pr-4 text-right text-xs font-bold ${Math.abs(event.variance) > 0.5 ? "text-red-600" : "text-gray-400"}`}
+                    >
+                      {event.variance > 0 ? "+" : ""}
+                      {event.variance.toFixed(2)} kg
                     </td>
                     <td className="py-2 text-center">
                       {event.result === "pass" ? (

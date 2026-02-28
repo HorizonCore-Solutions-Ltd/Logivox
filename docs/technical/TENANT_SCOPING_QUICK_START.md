@@ -1,12 +1,15 @@
 # TENANT SCOPING - QUICK START GUIDE
+
 ## For API Developers
 
 ### Step 1: Import Tenant Context
+
 ```typescript
 import { resolveTenantFromRequest } from "@/lib/tenant-context";
 ```
 
 ### Step 2: Resolve Tenant at Route Start
+
 ```typescript
 export async function GET(request: NextRequest) {
   try {
@@ -22,11 +25,12 @@ export async function GET(request: NextRequest) {
 ```
 
 ### Step 3: Add organizationId to WHERE Clause
+
 ```typescript
 // ✅ CORRECT
 const items = await prisma.inventoryItem.findMany({
   where: {
-    organizationId: tenant.organizationId,  // ← REQUIRED
+    organizationId: tenant.organizationId, // ← REQUIRED
     status: "ACTIVE",
   },
 });
@@ -34,17 +38,18 @@ const items = await prisma.inventoryItem.findMany({
 // ❌ WRONG
 const items = await prisma.inventoryItem.findMany({
   where: {
-    status: "ACTIVE",  // Missing organizationId!
+    status: "ACTIVE", // Missing organizationId!
   },
 });
 ```
 
 ### Step 4: Add organizationId to CREATE Data
+
 ```typescript
 // ✅ CORRECT
 const item = await prisma.inventoryItem.create({
   data: {
-    organizationId: tenant.organizationId,  // ← REQUIRED
+    organizationId: tenant.organizationId, // ← REQUIRED
     warehouseId: body.warehouseId,
     name: body.name,
     sku: body.sku,
@@ -63,6 +68,7 @@ const item = await prisma.inventoryItem.create({
 ```
 
 ### Step 5: Verify Role (Optional but Recommended)
+
 ```typescript
 import { assertRole } from "@/lib/tenant-context";
 
@@ -75,12 +81,12 @@ assertRole(tenant, ["OWNER", "ADMIN", "EDITOR"]);
 
 ### Common Issues & Fixes
 
-| Issue | Fix |
-|-------|-----|
-| "Tenant scope required" error | Add `organizationId` to your where/data clause |
-| "Unauthorized" when accessing other org | Make sure you're using `tenant.organizationId` not user input |
-| Can't find records that should exist | Verify `organizationId` value matches - don't trust from URL/body |
-| Queries are slow | Check indexes are applied - run migration |
+| Issue                                   | Fix                                                               |
+| --------------------------------------- | ----------------------------------------------------------------- |
+| "Tenant scope required" error           | Add `organizationId` to your where/data clause                    |
+| "Unauthorized" when accessing other org | Make sure you're using `tenant.organizationId` not user input     |
+| Can't find records that should exist    | Verify `organizationId` value matches - don't trust from URL/body |
+| Queries are slow                        | Check indexes are applied - run migration                         |
 
 ### Testing Your Endpoint
 
@@ -89,7 +95,7 @@ describe("Tenant Scoping", () => {
   it("should enforce organizationId", async () => {
     try {
       await prisma.inventoryItem.findMany({
-        where: { status: "ACTIVE" },  // Missing organizationId
+        where: { status: "ACTIVE" }, // Missing organizationId
       });
       fail("Should have thrown");
     } catch (error) {
@@ -115,7 +121,7 @@ export async function GET(request: NextRequest) {
 
     // 3. Build where clause WITH organizationId
     const where: any = {
-      organizationId: tenant.organizationId,  // ← ALWAYS FIRST
+      organizationId: tenant.organizationId, // ← ALWAYS FIRST
     };
     if (status) where.status = status;
 
@@ -130,15 +136,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(items);
   } catch (error) {
     if (error.message.includes("Tenant")) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
     console.error("Error fetching inventory:", error);
     return NextResponse.json(
       { error: "Failed to fetch inventory" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -157,6 +160,7 @@ export async function GET(request: NextRequest) {
 ### Need Help?
 
 **Reference Documentation:**
+
 - Full patterns: `docs/technical/TENANT_SCOPING_PATTERNS.ts`
 - Schema audit: `docs/technical/SCHEMA_AUDIT_TENANT_SCOPING.md`
 - Implementation summary: `docs/technical/TENANT_SCOPING_IMPLEMENTATION_SUMMARY.md`

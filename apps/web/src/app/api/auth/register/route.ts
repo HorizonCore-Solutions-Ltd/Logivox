@@ -2,9 +2,10 @@ export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { prisma } from "@/lib/prisma";
+import { withObservability } from "@/lib/middleware/observability";
 
 export async function POST(request: NextRequest) {
-  try {
+  return withObservability(async () => {
     const body = await request.json();
     const { name, email, password, organizationName } = body;
 
@@ -163,16 +164,5 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 },
     );
-  } catch (error: any) {
-    console.error("Registration error:", error);
-
-    if (error.message === "Organization name is already taken") {
-      return NextResponse.json({ error: error.message }, { status: 409 });
-    }
-
-    return NextResponse.json(
-      { error: "Failed to create user. Please try again." },
-      { status: 500 },
-    );
-  }
+  }, request);
 }

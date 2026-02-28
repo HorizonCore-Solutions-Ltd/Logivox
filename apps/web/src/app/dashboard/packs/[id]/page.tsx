@@ -33,6 +33,7 @@ import {
   Barcode,
   MapPin,
 } from "lucide-react";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 interface PackItem {
   id: string;
@@ -267,6 +268,7 @@ export default function PackingStationPage() {
   const availableItems = getAvailableItems();
 
   return (
+    <DashboardSidebar>
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
@@ -665,5 +667,6 @@ export default function PackingStationPage() {
         </div>
       )}
     </div>
+    </DashboardSidebar>
   );
 }

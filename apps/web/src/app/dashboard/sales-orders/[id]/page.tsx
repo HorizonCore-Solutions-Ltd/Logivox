@@ -43,6 +43,7 @@ import {
   CreditCard,
   Truck,
 } from "lucide-react";
+import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 
 interface SalesOrder {
   id: string;
@@ -292,7 +293,9 @@ export default function SalesOrderDetailPage() {
 
   if (loading) {
     return (
+      <DashboardSidebar>
       <div className="flex justify-center items-center h-64">Loading...</div>
+      </DashboardSidebar>
     );
   }
 
@@ -301,6 +304,7 @@ export default function SalesOrderDetailPage() {
   }
 
   return (
+    <DashboardSidebar>
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
@@ -719,5 +723,6 @@ export default function SalesOrderDetailPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+    </DashboardSidebar>
   );
 }

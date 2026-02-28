@@ -32,9 +32,9 @@ export async function POST(request: Request) {
  * Get escalation rule status
  */
 export async function GET(request: Request) {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+  const auth = await requireApiAuth();
+  if ("error" in auth) return auth.error;
+  const { organizationId } = auth;
 
   return NextResponse.json({
     success: true,

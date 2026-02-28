@@ -52,7 +52,14 @@ const TENANT_SCOPED_MODELS = [
 
 interface QueryUsage {
   model: string;
-  operation: "findMany" | "findFirst" | "findUnique" | "create" | "update" | "delete" | "upsert";
+  operation:
+    | "findMany"
+    | "findFirst"
+    | "findUnique"
+    | "create"
+    | "update"
+    | "delete"
+    | "upsert";
   line: number;
   hasOrganizationId: boolean;
   context: string;
@@ -92,17 +99,35 @@ function analyzeFile(filePath: string): EndpointAnalysis | null {
     lines.forEach((line, idx) => {
       for (const model of TENANT_SCOPED_MODELS) {
         const patterns = [
-          new RegExp(`prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.findMany\\s*\\(`, "i"),
-          new RegExp(`prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.findFirst\\s*\\(`, "i"),
-          new RegExp(`prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.findUnique\\s*\\(`, "i"),
-          new RegExp(`prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.create\\s*\\(`, "i"),
-          new RegExp(`prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.update\\s*\\(`, "i"),
-          new RegExp(`prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.delete\\s*\\(`, "i"),
+          new RegExp(
+            `prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.findMany\\s*\\(`,
+            "i",
+          ),
+          new RegExp(
+            `prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.findFirst\\s*\\(`,
+            "i",
+          ),
+          new RegExp(
+            `prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.findUnique\\s*\\(`,
+            "i",
+          ),
+          new RegExp(
+            `prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.create\\s*\\(`,
+            "i",
+          ),
+          new RegExp(
+            `prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.update\\s*\\(`,
+            "i",
+          ),
+          new RegExp(
+            `prisma\\.${model.charAt(0).toLowerCase() + model.slice(1)}\\.delete\\s*\\(`,
+            "i",
+          ),
         ];
 
         for (const pattern of patterns) {
           if (pattern.test(line)) {
-          let op: QueryUsage["operation"] = "findMany";
+            let op: QueryUsage["operation"] = "findMany";
             if (line.includes("findFirst")) op = "findFirst";
             if (line.includes("findUnique")) op = "findUnique";
             if (line.includes("create")) op = "create";
@@ -113,18 +138,41 @@ function analyzeFile(filePath: string): EndpointAnalysis | null {
             // Check if this operation is properly scoped
             // Method 1: organizationId in WHERE clause (single or multiline)
             const whereMatch = content.indexOf("where:");
-            const nextOpMatch = content.indexOf("select:", whereMatch > -1 ? whereMatch : 0);
-            const whereBlock = whereMatch > -1 ? content.substring(whereMatch, nextOpMatch > whereMatch ? nextOpMatch : Math.min(whereMatch + 500, content.length)) : "";
-            
+            const nextOpMatch = content.indexOf(
+              "select:",
+              whereMatch > -1 ? whereMatch : 0,
+            );
+            const whereBlock =
+              whereMatch > -1
+                ? content.substring(
+                    whereMatch,
+                    nextOpMatch > whereMatch
+                      ? nextOpMatch
+                      : Math.min(whereMatch + 500, content.length),
+                  )
+                : "";
+
             // Method 2: organizationId in data payload
             const dataMatch = content.indexOf("data:");
-            const nextFieldMatch = content.indexOf("}", dataMatch > -1 ? dataMatch : 0);
-            const dataBlock = dataMatch > -1 ? content.substring(dataMatch, Math.min(dataMatch + 300, content.length)) : "";
-            
+            const nextFieldMatch = content.indexOf(
+              "}",
+              dataMatch > -1 ? dataMatch : 0,
+            );
+            const dataBlock =
+              dataMatch > -1
+                ? content.substring(
+                    dataMatch,
+                    Math.min(dataMatch + 300, content.length),
+                  )
+                : "";
+
             // Method 3: Using tenant context helpers (withTenantContext, resolveTenantFromRequest, validateOrganizationAccess)
-            const usesTenantContext = /withTenantContext|resolveTenantFromRequest|validateOrganizationAccess/.test(content);
-            
-            const hasOrgId = 
+            const usesTenantContext =
+              /withTenantContext|resolveTenantFromRequest|validateOrganizationAccess/.test(
+                content,
+              );
+
+            const hasOrgId =
               /organizationId/.test(whereBlock) ||
               /organizationId/.test(dataBlock) ||
               usesTenantContext;
@@ -137,7 +185,13 @@ function analyzeFile(filePath: string): EndpointAnalysis | null {
               context: line.trim().substring(0, 80),
             });
 
-            if (!hasOrgId && (op === "findMany" || op === "create" || op === "update" || op === "delete")) {
+            if (
+              !hasOrgId &&
+              (op === "findMany" ||
+                op === "create" ||
+                op === "update" ||
+                op === "delete")
+            ) {
               hasUnscoped = true;
             }
           }
@@ -254,8 +308,14 @@ console.log(formatReport(analyses));
 
 console.log("\n## Summary Statistics\n");
 console.log(`Total endpoints: ${analyses.length}`);
-console.log(`Queries found: ${analyses.reduce((sum, a) => sum + a.queries.length, 0)}`);
-console.log(`With organizationId: ${analyses.reduce((sum, a) => sum + a.queries.filter((q) => q.hasOrganizationId).length, 0)}`);
-console.log(`Missing organizationId: ${analyses.reduce((sum, a) => sum + a.queries.filter((q) => !q.hasOrganizationId).length, 0)}`);
+console.log(
+  `Queries found: ${analyses.reduce((sum, a) => sum + a.queries.length, 0)}`,
+);
+console.log(
+  `With organizationId: ${analyses.reduce((sum, a) => sum + a.queries.filter((q) => q.hasOrganizationId).length, 0)}`,
+);
+console.log(
+  `Missing organizationId: ${analyses.reduce((sum, a) => sum + a.queries.filter((q) => !q.hasOrganizationId).length, 0)}`,
+);
 
 process.exit(analyses.some((a) => a.riskLevel === "CRITICAL") ? 1 : 0);

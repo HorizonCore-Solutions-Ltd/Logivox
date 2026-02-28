@@ -198,6 +198,8 @@ model Organization {
   deliveryRoutes             DeliveryRoute[]
   dockAppointments           DockAppointment[]
   documents                  Document[]
+  duties                     Duty[]
+  dutyTypes                  DutyType[]
   employees                  Employee[]
   equipment                  equipment[]
   fmeas                      FMEA[]
@@ -7440,13 +7442,20 @@ enum DigestFrequency {
 }
 
 enum IntegrationProvider {
+  // Accounting & Finance
   QUICKBOOKS_ONLINE
   QUICKBOOKS_DESKTOP
   XERO
   SAGE
+  // ERP
   NETSUITE
   SAP
+  SAP_S4HANA
+  ORACLE_ERP
   MICROSOFT_DYNAMICS
+  MICROSOFT_DYNAMICS_365
+  ODOO
+  // E-commerce
   SHOPIFY
   WOOCOMMERCE
   MAGENTO
@@ -7454,29 +7463,98 @@ enum IntegrationProvider {
   AMAZON
   EBAY
   ETSY
+  // Carriers
   FEDEX
   UPS
   DHL
   USPS
+  ROYAL_MAIL
+  DPD
   SHIPSTATION
   EASYPOST
   SHIPPO
-  STRIPE
-  PAYPAL
-  SQUARE
-  BRAINTREE
-  AUTHORIZE_NET
+  // HR & Workforce
+  WORKDAY
+  SAP_SUCCESSFACTORS
+  UKG
+  BAMBOOHR
+  HIBOB
+  ADP
+  // SSO / Identity
+  ENTRA_ID
+  OKTA
+  GOOGLE_WORKSPACE
+  AUTH0
+  ONELOGIN
+  // CRM & Marketing
   SALESFORCE
   HUBSPOT
   ZOHO_CRM
   TWILIO
   SENDGRID
   MAILCHIMP
+  // Payment
+  STRIPE
+  PAYPAL
+  SQUARE
+  BRAINTREE
+  AUTHORIZE_NET
+  // Access Control & Security
+  PAXTON_NET2
+  GALLAGHER
+  HID_ORIGO
+  LENELS2
+  BRIVO
+  GENETEC
+  // Warehouse Hardware
+  ZEBRA
+  HONEYWELL_SCANNER
+  DATALOGIC
+  IMPINJ_RFID
+  ZEBRA_PRINTER
+  SIEMENS_PLC
+  ALLEN_BRADLEY
+  // Robotics & Automation
+  AUTOSTORE
+  DEMATIC
+  LOCUS_ROBOTICS
+  GEEK_PLUS
+  6_RIVER_SYSTEMS
+  FETCH_ROBOTICS
+  // TMS & YMS
+  FLEETOPS360
+  SAMSARA
+  WEBFLEET
+  TRAILER_YARD_SYSTEMS
+  TRIMBLE_TMS
+  MERCURYGATE
+  // QMS
+  IAUDITOR
+  ECOONLINE
+  MASTERCONTROL
+  ETQ_RELIANCE
+  VEEVA_VAULT
+  // Voice Hardware
+  HONEYWELL_VOCOLLECT
+  LYDIA_VOICE
+  ANDROID_HEADSET
+  // BI & Analytics
+  POWER_BI
+  TABLEAU
+  LOOKER
+  QLIK
+  DOMO
+  // IoT Cloud
+  AWS_IOT
+  AZURE_IOT
+  GOOGLE_IOT
+  // Other
   CUSTOM
   WEBHOOK
 }
 
 enum IntegrationCategory {
+  // Existing
   ACCOUNTING
   ECOMMERCE
   SHIPPING
@@ -7485,6 +7563,18 @@ enum IntegrationCategory {
   MARKETING
   COMMUNICATION
   ANALYTICS
+  // New — Playbook additions
+  ERP
+  HR
+  SSO
+  ACCESS_CONTROL
+  HARDWARE
+  ROBOTICS
+  TMS_YMS
+  QMS
+  BI
+  IOT_CLOUD
+  VOICE_HARDWARE
   CUSTOM
 }
 
@@ -8525,4 +8615,154 @@ enum PatrolStatus {
   COMPLETED
   MISSED
   CANCELLED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DUTIES MODULE — WMS + CAPA + Voice
+// ─────────────────────────────────────────────────────────────────────────────
+
+model DutyType {
+  id               String       @id @default(cuid())
+  organizationId   String
+  name             String
+  category         DutyCategory @default(OTHER)
+  description      String?
+  requiredSkills   String[]
+  requiredCerts    String[]
+  defaultDuration  Int          @default(30)
+  voiceTemplate    Json?
+  checklistItems   Json?
+  requiresEvidence Boolean      @default(false)
+  evidenceTypes    String[]
+  isActive         Boolean      @default(true)
+  metadata         Json?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  duties           Duty[]
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@index([category])
+  @@map("duty_types")
+}
+
+model Duty {
+  id                 String       @id @default(cuid())
+  organizationId     String
+  dutyTypeId         String?
+  shiftId            String?
+  employeeId         String?
+  assignedBy         String?
+  zoneId             String?
+  zoneName           String?
+  warehouseId        String?
+  title              String
+  description        String?
+  category           DutyCategory @default(OTHER)
+  status             DutyStatus   @default(PLANNED)
+  priority           DutyPriority @default(MEDIUM)
+  scheduledStart     DateTime?
+  scheduledEnd       DateTime?
+  actualStart        DateTime?
+  actualEnd          DateTime?
+  durationMinutes    Int?
+  slaMinutes         Int?
+  slaBreached        Boolean      @default(false)
+  // CAPA coupling
+  capaId             String?
+  capaStage          String?
+  ncrId              String?
+  // Auto-assignment
+  autoAssigned       Boolean      @default(false)
+  assignmentRule     String?
+  // Voice
+  voiceScriptRef     String?
+  voiceSessionId     String?
+  // Progress
+  checklistItems     Json?
+  completionNotes    String?
+  rejectionReason    String?
+  // Reassignment tracking
+  previousEmployeeId String?
+  reassignReason     String?
+  reassignCount      Int          @default(0)
+  metadata           Json?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  dutyType           DutyType?    @relation(fields: [dutyTypeId], references: [id])
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  evidence           DutyEvidence[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([employeeId])
+  @@index([shiftId])
+  @@index([capaId])
+  @@index([scheduledStart])
+  @@index([slaBreached])
+  @@map("duties")
+}
+
+model DutyEvidence {
+  id           String       @id @default(cuid())
+  dutyId       String
+  evidenceType EvidenceType
+  label        String?
+  value        String?
+  fileKey      String?
+  capturedBy   String?
+  capturedAt   DateTime     @default(now())
+  metadata     Json?
+  duty         Duty         @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+
+  @@index([dutyId])
+  @@map("duty_evidence")
+}
+
+enum DutyStatus {
+  PLANNED
+  ACTIVE
+  PAUSED
+  DONE
+  CANCELLED
+  SKIPPED
+  ESCALATED
+}
+
+enum DutyPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum DutyCategory {
+  RECEIVING
+  PICKING
+  PACKING
+  QUALITY_CHECK
+  SAFETY_INSPECTION
+  MAINTENANCE
+  CAPA_CONTAINMENT
+  CAPA_INVESTIGATION
+  CAPA_CORRECTIVE
+  CAPA_PREVENTIVE
+  CAPA_VERIFICATION
+  CLEANING
+  TRAINING
+  HANDOVER
+  AUDIT
+  OTHER
+}
+
+enum EvidenceType {
+  PHOTO
+  VOICE_NOTE
+  TEXT_NOTE
+  NUMERIC_READING
+  SIGNATURE
+  BARCODE_SCAN
+  TEMPERATURE
+  CHECKLIST
 }
