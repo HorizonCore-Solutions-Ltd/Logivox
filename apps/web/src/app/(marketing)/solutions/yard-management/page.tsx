@@ -132,21 +132,6 @@ export default function YardManagementPage() {
     },
   ];
 
-  // --- legacy variables kept to avoid removing below JSX that references them ---
-  const features = [
-    { icon: Calendar, title: "Smart Dock Scheduling", description: "Advanced appointment system prevents congestion and optimizes dock door utilization for inbound and outbound operations." },
-    { icon: Clock, title: "Time Slot Management", description: "Flexible scheduling with configurable time slots, buffer periods, and appointment types (inbound, outbound, cross-dock)." },
-    { icon: Truck, title: "Carrier Coordination", description: "Seamless carrier check-in process with appointment verification and automatic dock assignment upon arrival." },
-    { icon: MapPin, title: "Dock Door Management", description: "Track dock door availability, capacity, and real-time status across all loading and unloading positions." },
-    { icon: Timer, title: "Dwell Time Monitoring", description: "Monitor truck turnaround times with automated alerts when vehicles exceed scheduled duration." },
-    { icon: Zap, title: "Real-Time Updates", description: "Live dashboard showing current dock status, upcoming appointments, and loading/unloading progress." },
-  ];
-  const benefits = [
-    { metric: "65%", label: "Reduction in Wait Times", description: "Trucks arrive at pre-scheduled times, eliminating congestion" },
-    { metric: "40%", label: "More Throughput", description: "Optimized scheduling increases daily shipments processed" },
-    { metric: "85%", label: "On-Time Arrivals", description: "Carrier coordination improves punctuality and planning" },
-    { metric: "30%", label: "Labor Efficiency", description: "Receiving teams prepared for scheduled arrivals" },
-  ];
   const features = [
     {
       icon: Calendar,

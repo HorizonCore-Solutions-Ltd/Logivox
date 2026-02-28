@@ -13,26 +13,28 @@ import {
   Zap,
   Target,
   CheckCircle,
+  Phone,
+  Shield,
 } from "lucide-react";
 
 export function HeroSection() {
   const benefits = [
-    { label: "95% Reduction in Picking Errors" },
-    { label: "3x Faster Order Fulfillment" },
-    { label: "$52M+ Avg Annual Savings" },
-    { label: "936% ROI in First Year" },
-    { label: "Predictive Ops & Zero-Trust Built-In" },
+    { label: "489 Production API Endpoints" },
+    { label: "42 Specialized Dashboards" },
+    { label: "201 Database Tables" },
+    { label: "5 Next-Gen Pillars Live" },
+    { label: "100% Feature Complete" },
   ];
 
   const stats = [
-    { value: "100%", label: "Automation", sublabel: "Eliminate Manual Work" },
+    { value: "489", label: "API Endpoints", sublabel: "Production Ready" },
     {
-      value: "44+",
-      label: "Powerful Features",
-      sublabel: "Everything You Need",
+      value: "42",
+      label: "Dashboards",
+      sublabel: "Enterprise Features",
     },
-    { value: "99.99%", label: "Reliability", sublabel: "Always Available" },
-    { value: "Zero", label: "IT Headaches", sublabel: "We Handle Everything" },
+    { value: "99.99%", label: "Uptime SLA", sublabel: "Enterprise Grade" },
+    { value: "201", label: "Database Tables", sublabel: "Complete Data Model" },
   ];
 
   return (
@@ -57,27 +59,23 @@ export function HeroSection() {
             role="status"
             aria-label="Product features announcement"
           >
-            🚀 Trusted by 500+ Warehouses • Voice-Enabled • AI-Powered • SOC 2
-            Certified
+            � Enterprise Proprietary Software • Voice-Native • AI-Powered • ISO 27001 & SOC 2 Certified
           </Badge>
 
           {/* Hero headline */}
           <div className="space-y-6 max-w-5xl">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] drop-shadow-sm">
-              Run Your Warehouse
+              Enterprise Voice-Native
               <span className="block bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent drop-shadow-lg">
-                With Your Voice
+                Warehouse Management
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-              Join 500+ warehouses that eliminated picking errors and tripled
-              fulfillment speed. Complete warehouse management with voice
-              commands, AI optimization, and real-time visibility —proven by
-              enterprises saving $52M+ annually.
+              Production-ready WMS with 489 API endpoints, 42 specialized dashboards, and complete Next-Gen capabilities. 
+              Voice-directed operations, AI optimization, IoT integration, and robotics orchestration — all fully implemented.
             </p>
             <div className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed font-semibold">
-              Built for Ops leaders, IT/Security, and Finance: safer launches,
-              faster onboarding, and measurable ROI in week one.
+              Built for Fortune 500 companies requiring enterprise-grade reliability, security, and unlimited scale.
             </div>
           </div>
 
@@ -120,15 +118,12 @@ export function HeroSection() {
           <div className="flex flex-col sm:flex-row gap-4 pt-6">
             <Button
               size="lg"
-              className="text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-105 transition-all font-bold relative"
+              className="text-lg px-8 py-6 shadow-xl shadow-primary/30 hover:shadow-2xl hover:scale-105 transition-all font-bold"
               asChild
             >
-              <Link href="/sign-up" aria-label="Start your free 30-day trial">
-                Start Free 30-Day Trial
+              <Link href="/contact" aria-label="Request enterprise demo">
+                Request Enterprise Demo
                 <ArrowRight className="ml-2 h-5 w-5" />
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full animate-bounce">
-                  No CC
-                </span>
               </Link>
             </Button>
             <Button
@@ -137,9 +132,9 @@ export function HeroSection() {
               className="text-lg px-8 py-6 border-2 hover:scale-105 transition-all font-semibold"
               asChild
             >
-              <Link href="/demo" aria-label="Schedule a personalized demo">
-                <Play className="mr-2 h-5 w-5" />
-                Watch 3-Min Demo
+              <Link href="/contact" aria-label="Contact sales team">
+                <Phone className="mr-2 h-5 w-5" />
+                Contact Sales
               </Link>
             </Button>
           </div>
@@ -147,16 +142,16 @@ export function HeroSection() {
           {/* Value props */}
           <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 pt-8 text-sm text-muted-foreground">
             <div className="flex items-center space-x-2">
-              <Zap className="h-4 w-4 text-primary" />
-              <span className="font-medium">Setup in hours, not months</span>
+              <Shield className="h-4 w-4 text-primary" />
+              <span className="font-medium">ISO 27001 & SOC 2 Certified</span>
             </div>
             <div className="flex items-center space-x-2">
-              <TrendingDown className="h-4 w-4 text-primary" />
-              <span className="font-medium">Most affordable in the market</span>
+              <Zap className="h-4 w-4 text-primary" />
+              <span className="font-medium">Production-Ready Platform</span>
             </div>
             <div className="flex items-center space-x-2">
               <Target className="h-4 w-4 text-primary" />
-              <span className="font-medium">No long-term contracts</span>
+              <span className="font-medium">Enterprise Support & SLA</span>
             </div>
           </div>
 
@@ -174,9 +169,9 @@ export function HeroSection() {
                 href: "/platform/security",
               },
               {
-                title: "Finance / ROI",
-                desc: "See pricing, savings model, and fast payback",
-                href: "/pricing",
+                title: "Finance / Licensing",
+                desc: "Enterprise licensing and deployment models",
+                href: "/contact",
               },
             ].map((item) => (
               <Link
@@ -195,18 +190,18 @@ export function HeroSection() {
           {/* Social proof */}
           <div className="pt-6 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Trusted by Fortune 500 companies and growing SMBs
+              Enterprise proprietary software for Fortune 500 companies and global enterprises
             </p>
             <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>847 active warehouses today</span>
+                <span>100% Feature Complete</span>
               </div>
               <div className="flex items-center gap-1">
-                <span>⭐ 4.9/5 (180+ reviews)</span>
+                <span>🚀 489 Production APIs</span>
               </div>
               <div className="flex items-center gap-1">
-                <span>🔒 SOC 2 & ISO 27001 Certified</span>
+                <span>🔒 ISO 27001 & SOC 2 Type II</span>
               </div>
             </div>
           </div>

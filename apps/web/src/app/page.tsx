@@ -13,22 +13,23 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title:
-    "LogiVox - Voice-Enabled Warehouse Management System | Cut Picking Errors 95%",
+    "LogiVox - Enterprise Voice-Native Warehouse Management System | Production Ready",
   description:
-    "Complete warehouse management with voice commands, AI optimization & real-time tracking. Reduce picking errors by 95%, increase fulfillment speed 3x. 30-day free trial.",
+    "Production-ready enterprise WMS with 489 API endpoints, 42 specialized dashboards, and complete Next-Gen capabilities. Voice-directed operations, AI optimization, IoT integration, and robotics orchestration.",
   keywords: [
-    "warehouse management system",
-    "voice-enabled WMS",
-    "inventory management",
-    "picking optimization",
-    "warehouse automation",
-    "order fulfillment",
+    "enterprise warehouse management",
+    "voice-native WMS",
+    "production inventory management",
+    "AI warehouse optimization",
+    "enterprise warehouse automation",
+    "voice-directed warehouse",
     "real-time inventory tracking",
+    "warehouse robotics integration",
   ],
   openGraph: {
-    title: "LogiVox - Voice-Enabled Warehouse Management",
+    title: "LogiVox - Enterprise Voice-Native Warehouse Management",
     description:
-      "Complete warehouse management with voice commands. Reduce errors by 95%, speed up fulfillment 3x.",
+      "Production-ready WMS with 489 APIs, voice operations, AI optimization, and complete Next-Gen features.",
     url: "https://logivox.com",
     siteName: "LogiVox",
     locale: "en_US",
@@ -55,26 +56,26 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   name: "LogiVox",
   applicationCategory: "BusinessApplication",
+  description: "Enterprise voice-native warehouse management system with 489 production API endpoints and complete Next-Gen capabilities",
+  operatingSystem: "Web, Cloud",
   offers: {
     "@type": "Offer",
-    price: "49",
-    priceCurrency: "USD",
+    description: "Enterprise licensing - contact for pricing",
     priceSpecification: {
-      "@type": "RecurringPayment",
-      billingDuration: "P1M",
-      billingIncrement: 1,
+      "@type": "UnitPriceSpecification",
+      priceCurrency: "USD",
+      price: "Contact for quote"
     },
   },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: 4.9,
-    reviewCount: 847,
-  },
   featureList: [
-    "Voice-enabled operations",
-    "Real-time inventory tracking",
+    "Voice-directed warehouse operations",
+    "489 production API endpoints",
+    "42 specialized dashboards",
+    "Real-time IoT sensor integration",
     "AI-powered optimization",
+    "Robotics and automation orchestration",
     "Multi-warehouse management",
+    "Enterprise security (ISO 27001, SOC 2)",
   ],
 };
 

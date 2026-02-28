@@ -419,42 +419,45 @@ export default function PricingPage() {
           <div className="text-center space-y-6 max-w-4xl mx-auto">
             <Badge variant="secondary" className="text-sm px-4 py-2">
               <Sparkles className="h-4 w-4 mr-2 inline" />
-              Simple, Transparent Pricing
+              Enterprise Licensing & Deployment Models
             </Badge>
 
             <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight">
-              Pricing that scales
+              Enterprise Software
               <span className="block bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-                with your business
+                Licensing Options
               </span>
             </h1>
 
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              From small warehouses to global enterprises, LogiVox delivers
-              complete warehouse management in one simple platform. Start small,
-              scale infinitely.
+              Production-ready enterprise WMS with flexible deployment models.
+              Cloud SaaS, Private Cloud, On-Premise, or Hybrid deployment with
+              customized licensing agreements tailored to your organization.
             </p>
 
-            {/* Billing Toggle */}
+            {/* Contact CTA */}
             <div className="flex items-center justify-center gap-4 pt-8">
               <Button
-                variant={billingCycle === "monthly" ? "default" : "outline"}
-                onClick={() => setBillingCycle("monthly")}
+                variant="default"
                 size="lg"
-                className="min-w-32"
+                className="min-w-48"
+                asChild
               >
-                Monthly
+                <Link href="/contact">
+                  <Phone className="h-4 w-4 mr-2" />
+                  Contact Sales
+                </Link>
               </Button>
               <Button
-                variant={billingCycle === "annual" ? "default" : "outline"}
-                onClick={() => setBillingCycle("annual")}
+                variant="outline"
                 size="lg"
-                className="min-w-32 relative"
+                className="min-w-48"
+                asChild
               >
-                Annual
-                <Badge className="absolute -top-2 -right-2 bg-green-600 hover:bg-green-700">
-                  Save 20%
-                </Badge>
+                <Link href="/contact">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Request Information
+                </Link>
               </Button>
             </div>
           </div>
@@ -466,7 +469,7 @@ export default function PricingPage() {
         <div className="container-enterprise">
           <div className="text-center mb-8">
             <p className="text-sm text-muted-foreground mb-6">
-              Trusted by 500+ warehouses worldwide
+              Enterprise proprietary software trusted by Fortune 500 companies
             </p>
             <div className="flex flex-wrap justify-center items-center gap-8">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -665,21 +668,15 @@ export default function PricingPage() {
                     size="lg"
                     asChild
                   >
-                    <Link
-                      href={plan.monthlyPrice === 0 ? "/contact" : "/sign-up"}
-                    >
-                      {plan.monthlyPrice === 0
-                        ? "Contact Sales"
-                        : "Start Free Trial"}
+                    <Link href="/contact">
+                      Contact Sales
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
 
-                  {plan.monthlyPrice !== 0 && (
-                    <p className="text-xs text-center text-muted-foreground">
-                      30-day free trial • No credit card required
-                    </p>
-                  )}
+                  <p className="text-xs text-center text-muted-foreground">
+                    Enterprise licensing • Custom agreements
+                  </p>
                 </CardContent>
               </Card>
             ))}

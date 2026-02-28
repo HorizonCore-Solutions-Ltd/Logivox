@@ -7,9 +7,9 @@ import { ArrowRight, CheckCircle, Phone, Mail, Clock } from "lucide-react";
 
 export function CTASection() {
   const benefits = [
-    "30-day money-back guarantee",
-    "No credit card required",
-    "Cancel anytime",
+    "Enterprise-grade reliability",
+    "Dedicated success manager",
+    "Custom deployment options",
   ];
 
   return (
@@ -26,17 +26,16 @@ export function CTASection() {
           {/* Headline */}
           <div className="space-y-4">
             <h2 className="text-3xl md:text-5xl font-bold tracking-tight">
-              Transform Your Warehouse in 30 Days
+              Ready for Enterprise-Grade WMS?
             </h2>
             <p className="text-xl text-muted-foreground">
-              Join 500+ warehouses that eliminated picking errors, tripled
-              fulfillment speed, and saved $52M+ annually with LogiVox.
+              Production-ready platform with 489 APIs, 42 dashboards, and complete Next-Gen capabilities.
+              Voice operations, AI optimization, and IoT integration fully deployed.
             </p>
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-2xl mx-auto mt-6">
-              <p className="text-sm font-semibold text-yellow-800 flex items-center gap-2">
-                <span className="animate-pulse">⚡</span>
-                <strong>Limited Time:</strong> Setup bonus worth $2,500 for new
-                customers this month
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-2xl mx-auto mt-6">
+              <p className="text-sm font-semibold text-blue-800 flex items-center gap-2">
+                <span>🔒</span>
+                <strong>Enterprise Ready:</strong> ISO 27001 & SOC 2 certified with 99.99% uptime SLA
               </p>
             </div>
           </div>
@@ -55,15 +54,12 @@ export function CTASection() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
             <Button
               size="lg"
-              className="text-lg px-8 py-6 shadow-lg shadow-primary/25 relative"
+              className="text-lg px-8 py-6 shadow-lg shadow-primary/25"
               asChild
             >
-              <Link href="/sign-up" aria-label="Start your risk-free trial now">
-                Get Started - No Credit Card
+              <Link href="/contact" aria-label="Request enterprise demo">
+                Request Enterprise Demo
                 <ArrowRight className="ml-2 h-5 w-5" />
-                <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full animate-pulse">
-                  FREE
-                </span>
               </Link>
             </Button>
             <Button
@@ -72,8 +68,8 @@ export function CTASection() {
               className="text-lg px-8 py-6"
               asChild
             >
-              <Link href="/demo" aria-label="Watch personalized demo">
-                See ROI Calculator
+              <Link href="/contact" aria-label="Contact sales team">
+                Contact Sales Team
               </Link>
             </Button>
           </div>
@@ -81,20 +77,19 @@ export function CTASection() {
           {/* Trust line */}
           <div className="pt-6 space-y-3">
             <p className="text-sm text-muted-foreground">
-              <strong>Questions?</strong> Our warehouse experts respond in under
-              2 hours
+              <strong>Need information?</strong> Our enterprise team responds within 2 hours
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 text-sm">
               <span className="font-semibold text-foreground flex items-center gap-1">
                 <Phone className="h-4 w-4" />
-                (555) 847-2639
+                Enterprise Sales
               </span>
               <Link
                 href="/contact"
                 className="text-primary hover:underline flex items-center gap-1"
               >
                 <Mail className="h-4 w-4" />
-                Live chat available
+                Contact form available
               </Link>
               <span className="text-green-600 font-medium flex items-center gap-1">
                 <Clock className="h-4 w-4" />

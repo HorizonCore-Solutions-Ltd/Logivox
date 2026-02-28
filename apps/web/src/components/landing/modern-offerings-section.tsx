@@ -13,23 +13,23 @@ const offerings = [
     description:
       "Catch bad signals before they hit customers with burn alerts, rollbacks, and SLO dashboards tuned for pick/pack/ship.",
     icon: Activity,
-    href: "/blog/predictive-ops-anomaly-defense",
-    pill: "New",
+    href: "/features",
+    pill: "Production",
   },
   {
     title: "Offline Voice & Edge Resilience",
     description:
       "Keep voice + scans working when Wi-Fi drops. Queue changes and sync cleanly when you’re back online.",
     icon: Zap,
-    href: "/blog/offline-voice-edge-warehouses",
-    pill: "Floor-tested",
+    href: "/features",
+    pill: "Live",
   },
   {
     title: "Copilot Over Your SOPs",
     description:
       "Tenant-aware RAG that surfaces your SOPs inline with citations, so teams execute perfectly the first time.",
     icon: Brain,
-    href: "/blog/copilot-sops-rag",
+    href: "/features",
     pill: "AI",
   },
   {
@@ -37,7 +37,7 @@ const offerings = [
     description:
       "Per-warehouse scopes, signed webhooks, retries + dead letters, and SIEM-friendly audit streaming.",
     icon: Shield,
-    href: "/blog/zero-trust-warehouse-security",
+    href: "/features",
     pill: "Security",
   },
 ];
@@ -47,13 +47,13 @@ export function ModernOfferingsSection() {
     <section className="py-16 md:py-20 bg-gradient-to-b from-background to-muted/20">
       <div className="container-enterprise space-y-6">
         <div className="space-y-2 text-center">
-          <Badge variant="secondary">What’s New</Badge>
+          <Badge variant="secondary">Enterprise Capabilities</Badge>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Modern Logistics Without the Risk
+            Next-Generation Features in Production
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Reliability, security, and speed baked into voice, automation, and
-            integrations—ready for the floor and the boardroom.
+            Advanced capabilities fully deployed and battle-tested - voice operations, AI optimization, 
+            IoT integration, and enterprise security all live and operational.
           </p>
         </div>
 
@@ -83,14 +83,14 @@ export function ModernOfferingsSection() {
                     href={item.href}
                     className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80"
                   >
-                    Read the deep dive
+                    Explore feature details
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Link>
                   <Link
-                    href="/demo"
+                    href="/contact"
                     className="inline-flex items-center text-sm font-semibold text-primary hover:text-primary/80"
                   >
-                    Book a session
+                    Request demo
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Link>
                 </div>
