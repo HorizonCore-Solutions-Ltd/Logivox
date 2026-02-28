@@ -105,6 +105,8 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.0",
+    "@aws-sdk/client-secrets-manager": "^3.1000.0",
+    "@aws-sdk/client-sesv2": "^3.1000.0",
     "@prisma/client": "^6.17.1",
     "@sendgrid/mail": "^8.1.6",
     "@types/lru-cache": "^7.10.9",
