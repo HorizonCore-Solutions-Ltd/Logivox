@@ -148,7 +148,7 @@ async function main() {
       email: "operator@demo-company.com",
       name: "Demo Operator",
       password: operatorPassword,
-      role: "STAFF",
+      role: "USER",
       emailVerified: new Date(),
     },
   });
@@ -425,6 +425,15 @@ async function main() {
       problemStatement: "Recurring miscounts in aisle B",
       problemSeverity: "MEDIUM",
       status: "OPEN",
+      rootCauseMethod: "5_WHYS",
+      rootCauseAnalysis: { whys: ["Why 1", "Why 2", "Why 3", "Why 4", "Why 5"] },
+      rootCause: "Inadequate training on count procedures",
+      immediateActions: [{ action: "Recount aisle B inventory", status: "COMPLETED" }],
+      correctiveActions: [{ action: "Update training materials", owner: admin.id, dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }],
+      preventiveActions: [{ action: "Implement quarterly training refreshers", owner: admin.id, dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) }],
+      responsiblePerson: admin.id,
+      targetCompletionDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
+      createdBy: admin.id,
     },
   });
   console.log("✅ Created CAPA Record:", capa.capaNumber);
@@ -464,7 +473,7 @@ async function main() {
       title: "Morning Aisle B Count",
       priority: "MEDIUM",
       status: "PLANNED",
-      dueDate: new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // tomorrow
+      scheduledStart: new Date(new Date().getTime() + 24 * 60 * 60 * 1000), // tomorrow
     },
   });
 
@@ -478,10 +487,9 @@ async function main() {
       title: "Implement Aisle B Scanning Rules",
       priority: "HIGH",
       status: "ACTIVE",
-      notes: "Follow newly established scanning procedures from CAPA-2026-001",
-      linkedEntityId: capa.id,
-      linkedEntityType: "CAPA",
-      dueDate: new Date(), // today
+      completionNotes: "Follow newly established scanning procedures from CAPA-2026-001",
+      capaId: capa.id,
+      scheduledStart: new Date(), // today
     },
   });
   console.log("✅ Created Sample Duties");
