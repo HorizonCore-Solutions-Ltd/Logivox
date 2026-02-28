@@ -95,7 +95,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, code, email, phone, address, city, country, website, notes } = body;
+    const { name, code, email, phone, address, city, country, website, notes } =
+      body;
 
     if (!name || !code) {
       return NextResponse.json(

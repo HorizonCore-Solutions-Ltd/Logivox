@@ -14,7 +14,12 @@ export async function GET(req: NextRequest) {
       where: {
         userId: session.user.id,
         action: {
-          in: ["SECURITY_MFA_ENABLED", "SECURITY_MFA_DISABLED", "USER_LOGIN", "USER_LOGOUT"],
+          in: [
+            "SECURITY_MFA_ENABLED",
+            "SECURITY_MFA_DISABLED",
+            "USER_LOGIN",
+            "USER_LOGOUT",
+          ],
         },
       },
       orderBy: { createdAt: "desc" },
@@ -23,6 +28,9 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ logs });
   } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch security logs" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch security logs" },
+      { status: 500 },
+    );
   }
 }

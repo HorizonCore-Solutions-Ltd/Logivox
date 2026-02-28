@@ -47,7 +47,12 @@ interface Duty {
   autoAssigned: boolean;
   assignmentRule?: string;
   completionNotes?: string;
-  checklistItems?: Array<{ step: string; required: boolean; done: boolean; doneAt?: string }>;
+  checklistItems?: Array<{
+    step: string;
+    required: boolean;
+    done: boolean;
+    doneAt?: string;
+  }>;
   voiceScriptRef?: string;
   evidence: Evidence[];
   dutyType?: { name: string; category: string; voiceTemplate?: any };
@@ -90,7 +95,10 @@ const EVIDENCE_ICONS: Record<string, React.ReactNode> = {
 
 function formatDT(iso?: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleString([], { dateStyle: "short", timeStyle: "short" });
+  return new Date(iso).toLocaleString([], {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
 }
 
 export default function DutyDetailPage() {
@@ -102,8 +110,14 @@ export default function DutyDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [voiceScript, setVoiceScript] = useState<any>(null);
   const [showEvidenceForm, setShowEvidenceForm] = useState(false);
-  const [evidenceForm, setEvidenceForm] = useState({ evidenceType: "TEXT_NOTE", label: "", value: "" });
-  const [checklistItems, setChecklistItems] = useState<Duty["checklistItems"]>([]);
+  const [evidenceForm, setEvidenceForm] = useState({
+    evidenceType: "TEXT_NOTE",
+    label: "",
+    value: "",
+  });
+  const [checklistItems, setChecklistItems] = useState<Duty["checklistItems"]>(
+    [],
+  );
 
   const loadDuty = async () => {
     const res = await fetch(`/api/duties/${id}`);
@@ -148,7 +162,9 @@ export default function DutyDetailPage() {
   const toggleChecklist = async (idx: number) => {
     if (!checklistItems) return;
     const updated = checklistItems.map((item, i) =>
-      i === idx ? { ...item, done: !item.done, doneAt: new Date().toISOString() } : item
+      i === idx
+        ? { ...item, done: !item.done, doneAt: new Date().toISOString() }
+        : item,
     );
     setChecklistItems(updated);
     await fetch(`/api/duties/${id}`, {
@@ -172,7 +188,10 @@ export default function DutyDetailPage() {
         <div className="text-center">
           <AlertTriangle size={40} className="text-red-400 mx-auto mb-2" />
           <p className="text-gray-600">Duty not found</p>
-          <Link href="/dashboard/duties" className="text-blue-600 text-sm mt-2 inline-block hover:underline">
+          <Link
+            href="/dashboard/duties"
+            className="text-blue-600 text-sm mt-2 inline-block hover:underline"
+          >
             ← Back to board
           </Link>
         </div>
@@ -203,10 +222,14 @@ export default function DutyDetailPage() {
             <div className="flex items-start justify-between gap-4 mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1.5">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[duty.status] ?? "bg-gray-100 text-gray-700"}`}>
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${STATUS_COLORS[duty.status] ?? "bg-gray-100 text-gray-700"}`}
+                  >
                     {duty.status}
                   </span>
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${duty.priority === "CRITICAL" ? "bg-red-100 text-red-700" : duty.priority === "HIGH" ? "bg-orange-100 text-orange-700" : "bg-gray-100 text-gray-600"}`}>
+                  <span
+                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${duty.priority === "CRITICAL" ? "bg-red-100 text-red-700" : duty.priority === "HIGH" ? "bg-orange-100 text-orange-700" : "bg-gray-100 text-gray-600"}`}
+                  >
                     {duty.priority}
                   </span>
                   {duty.slaBreached && (
@@ -216,13 +239,18 @@ export default function DutyDetailPage() {
                   )}
                   {duty.capaId && (
                     <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-medium flex items-center gap-1">
-                      <Shield size={10} /> CAPA — {duty.capaStage?.replace(/_/g, " ")}
+                      <Shield size={10} /> CAPA —{" "}
+                      {duty.capaStage?.replace(/_/g, " ")}
                     </span>
                   )}
                 </div>
-                <h1 className="text-xl font-bold text-gray-900">{duty.title}</h1>
+                <h1 className="text-xl font-bold text-gray-900">
+                  {duty.title}
+                </h1>
                 {duty.description && (
-                  <p className="text-sm text-gray-500 mt-2">{duty.description}</p>
+                  <p className="text-sm text-gray-500 mt-2">
+                    {duty.description}
+                  </p>
                 )}
               </div>
             </div>
@@ -230,14 +258,24 @@ export default function DutyDetailPage() {
             {/* Timing */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-100">
               {[
-                { label: "Scheduled Start", value: formatDT(duty.scheduledStart) },
+                {
+                  label: "Scheduled Start",
+                  value: formatDT(duty.scheduledStart),
+                },
                 { label: "Scheduled End", value: formatDT(duty.scheduledEnd) },
                 { label: "Actual Start", value: formatDT(duty.actualStart) },
-                { label: "Duration", value: duty.durationMinutes ? `${duty.durationMinutes}m` : "—" },
+                {
+                  label: "Duration",
+                  value: duty.durationMinutes
+                    ? `${duty.durationMinutes}m`
+                    : "—",
+                },
               ].map((f) => (
                 <div key={f.label}>
                   <p className="text-xs text-gray-500">{f.label}</p>
-                  <p className="text-sm font-medium text-gray-900 mt-0.5">{f.value}</p>
+                  <p className="text-sm font-medium text-gray-900 mt-0.5">
+                    {f.value}
+                  </p>
                 </div>
               ))}
             </div>
@@ -314,7 +352,8 @@ export default function DutyDetailPage() {
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                  <ClipboardList size={16} className="text-blue-500" /> Checklist
+                  <ClipboardList size={16} className="text-blue-500" />{" "}
+                  Checklist
                 </h2>
                 <span className="text-xs text-gray-500">
                   {checklistDone}/{checklistTotal} completed
@@ -324,7 +363,9 @@ export default function DutyDetailPage() {
               <div className="w-full bg-gray-100 rounded-full h-1.5 mb-4">
                 <div
                   className="bg-blue-500 h-1.5 rounded-full transition-all"
-                  style={{ width: `${checklistTotal > 0 ? (checklistDone / checklistTotal) * 100 : 0}%` }}
+                  style={{
+                    width: `${checklistTotal > 0 ? (checklistDone / checklistTotal) * 100 : 0}%`,
+                  }}
                 />
               </div>
               <div className="space-y-2">
@@ -339,14 +380,20 @@ export default function DutyDetailPage() {
                       onChange={() => toggleChecklist(idx)}
                       className="w-4 h-4 accent-blue-600"
                     />
-                    <span className={`text-sm flex-1 ${item.done ? "line-through text-gray-400" : "text-gray-800"}`}>
+                    <span
+                      className={`text-sm flex-1 ${item.done ? "line-through text-gray-400" : "text-gray-800"}`}
+                    >
                       {item.step}
                     </span>
                     {item.required && !item.done && (
-                      <span className="text-xs text-red-500 font-medium">Required</span>
+                      <span className="text-xs text-red-500 font-medium">
+                        Required
+                      </span>
                     )}
                     {item.done && item.doneAt && (
-                      <span className="text-xs text-gray-400">{formatDT(item.doneAt)}</span>
+                      <span className="text-xs text-gray-400">
+                        {formatDT(item.doneAt)}
+                      </span>
                     )}
                   </label>
                 ))}
@@ -372,32 +419,59 @@ export default function DutyDetailPage() {
               <div className="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
-                    <label className="text-xs text-gray-600 mb-1 block">Type</label>
+                    <label className="text-xs text-gray-600 mb-1 block">
+                      Type
+                    </label>
                     <select
                       value={evidenceForm.evidenceType}
-                      onChange={(e) => setEvidenceForm((f) => ({ ...f, evidenceType: e.target.value }))}
+                      onChange={(e) =>
+                        setEvidenceForm((f) => ({
+                          ...f,
+                          evidenceType: e.target.value,
+                        }))
+                      }
                       className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      {["TEXT_NOTE","VOICE_NOTE","NUMERIC_READING","TEMPERATURE","BARCODE_SCAN","CHECKLIST"].map((t) => (
-                        <option key={t} value={t}>{t.replace(/_/g, " ")}</option>
+                      {[
+                        "TEXT_NOTE",
+                        "VOICE_NOTE",
+                        "NUMERIC_READING",
+                        "TEMPERATURE",
+                        "BARCODE_SCAN",
+                        "CHECKLIST",
+                      ].map((t) => (
+                        <option key={t} value={t}>
+                          {t.replace(/_/g, " ")}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="text-xs text-gray-600 mb-1 block">Label</label>
+                    <label className="text-xs text-gray-600 mb-1 block">
+                      Label
+                    </label>
                     <input
                       value={evidenceForm.label}
-                      onChange={(e) => setEvidenceForm((f) => ({ ...f, label: e.target.value }))}
+                      onChange={(e) =>
+                        setEvidenceForm((f) => ({
+                          ...f,
+                          label: e.target.value,
+                        }))
+                      }
                       placeholder="e.g. Temperature reading"
                       className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
                 <div className="mb-3">
-                  <label className="text-xs text-gray-600 mb-1 block">Value / Note</label>
+                  <label className="text-xs text-gray-600 mb-1 block">
+                    Value / Note
+                  </label>
                   <textarea
                     value={evidenceForm.value}
-                    onChange={(e) => setEvidenceForm((f) => ({ ...f, value: e.target.value }))}
+                    onChange={(e) =>
+                      setEvidenceForm((f) => ({ ...f, value: e.target.value }))
+                    }
                     rows={2}
                     className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
@@ -420,18 +494,33 @@ export default function DutyDetailPage() {
             )}
 
             {duty.evidence.length === 0 && !showEvidenceForm && (
-              <p className="text-xs text-gray-400 italic">No evidence captured yet.</p>
+              <p className="text-xs text-gray-400 italic">
+                No evidence captured yet.
+              </p>
             )}
 
             <div className="space-y-2">
               {duty.evidence.map((ev) => (
-                <div key={ev.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <span className="text-gray-500">{EVIDENCE_ICONS[ev.evidenceType] ?? <FileText size={14} />}</span>
+                <div
+                  key={ev.id}
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                >
+                  <span className="text-gray-500">
+                    {EVIDENCE_ICONS[ev.evidenceType] ?? <FileText size={14} />}
+                  </span>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-700">{ev.label ?? ev.evidenceType.replace(/_/g, " ")}</p>
-                    {ev.value && <p className="text-xs text-gray-500 mt-0.5 truncate">{ev.value}</p>}
+                    <p className="text-xs font-medium text-gray-700">
+                      {ev.label ?? ev.evidenceType.replace(/_/g, " ")}
+                    </p>
+                    {ev.value && (
+                      <p className="text-xs text-gray-500 mt-0.5 truncate">
+                        {ev.value}
+                      </p>
+                    )}
                   </div>
-                  <span className="text-xs text-gray-400 flex-shrink-0">{formatDT(ev.capturedAt)}</span>
+                  <span className="text-xs text-gray-400 flex-shrink-0">
+                    {formatDT(ev.capturedAt)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -450,8 +539,12 @@ export default function DutyDetailPage() {
                 <p className="text-sm font-medium text-gray-900">
                   {employee.firstName} {employee.lastName}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">{employee.position ?? "—"}</p>
-                <p className="text-xs text-gray-400">{employee.department ?? "—"}</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {employee.position ?? "—"}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {employee.department ?? "—"}
+                </p>
               </div>
             ) : (
               <p className="text-xs text-orange-600 flex items-center gap-1">
@@ -481,7 +574,9 @@ export default function DutyDetailPage() {
                 View CAPA <ChevronRight size={10} />
               </Link>
               {duty.ncrId && (
-                <p className="text-xs text-gray-500 mt-1">NCR: {duty.ncrId.slice(-8)}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  NCR: {duty.ncrId.slice(-8)}
+                </p>
               )}
             </div>
           )}
@@ -509,7 +604,8 @@ export default function DutyDetailPage() {
                       <p className="text-xs text-gray-800">{step.prompt}</p>
                       {step.checkDigit && (
                         <p className="text-xs text-gray-400 mt-0.5">
-                          Check digit: <code className="font-mono">{step.checkDigit}</code>
+                          Check digit:{" "}
+                          <code className="font-mono">{step.checkDigit}</code>
                         </p>
                       )}
                     </div>
@@ -521,18 +617,29 @@ export default function DutyDetailPage() {
 
           {/* SLA info */}
           {duty.slaMinutes && (
-            <div className={`rounded-xl border p-4 ${duty.slaBreached ? "bg-red-50 border-red-200" : "bg-white border-gray-200"}`}>
+            <div
+              className={`rounded-xl border p-4 ${duty.slaBreached ? "bg-red-50 border-red-200" : "bg-white border-gray-200"}`}
+            >
               <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <Clock size={14} className={duty.slaBreached ? "text-red-500" : "text-blue-500"} />
+                <Clock
+                  size={14}
+                  className={
+                    duty.slaBreached ? "text-red-500" : "text-blue-500"
+                  }
+                />
                 SLA Window
               </h3>
-              <p className={`text-sm font-medium ${duty.slaBreached ? "text-red-700" : "text-gray-900"}`}>
+              <p
+                className={`text-sm font-medium ${duty.slaBreached ? "text-red-700" : "text-gray-900"}`}
+              >
                 {duty.slaMinutes >= 60
                   ? `${Math.round(duty.slaMinutes / 60)}h`
                   : `${duty.slaMinutes}m`}
               </p>
               {duty.slaBreached && (
-                <p className="text-xs text-red-600 mt-1 font-medium">⚠ SLA exceeded</p>
+                <p className="text-xs text-red-600 mt-1 font-medium">
+                  ⚠ SLA exceeded
+                </p>
               )}
             </div>
           )}

@@ -92,16 +92,28 @@ export default function SSOIntegrationPage() {
               Integrations
             </Link>
           </div>
-          <h1 className="text-4xl font-bold mb-4">SSO & Identity Integration</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            SSO & Identity Integration
+          </h1>
           <p className="text-xl text-slate-300 max-w-2xl">
-            Secure your warehouse operations with enterprise-grade Single Sign-On.
-            LogiVox supports SAML 2.0 and OIDC for seamless authentication.
+            Secure your warehouse operations with enterprise-grade Single
+            Sign-On. LogiVox supports SAML 2.0 and OIDC for seamless
+            authentication.
           </p>
           <div className="flex gap-4 mt-8">
-            <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground" asChild>
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              asChild
+            >
               <Link href="/contact">Configure SSO</Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-slate-600 hover:bg-slate-700 text-white" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-transparent border-slate-600 hover:bg-slate-700 text-white"
+              asChild
+            >
               <Link href="/docs/api/getting-started">View API Specs</Link>
             </Button>
           </div>
@@ -113,11 +125,14 @@ export default function SSOIntegrationPage() {
         <div className="container-enterprise">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold mb-6">Centralized Access Control</h2>
+              <h2 className="text-3xl font-bold mb-6">
+                Centralized Access Control
+              </h2>
               <p className="text-lg text-slate-600 mb-6">
-                Manage user access to LogiVox directly from your existing directory service. 
-                Whether you use Microsoft Entra ID (Azure AD), Okta, Google Workspace, or generic SAML, 
-                we ensure secure and compliant access.
+                Manage user access to LogiVox directly from your existing
+                directory service. Whether you use Microsoft Entra ID (Azure
+                AD), Okta, Google Workspace, or generic SAML, we ensure secure
+                and compliant access.
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
@@ -125,8 +140,13 @@ export default function SSOIntegrationPage() {
                     <Shield className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-lg">Zero Trust Security</h3>
-                    <p className="text-slate-600">Enforce MFA and conditional access policies defined in your IdP.</p>
+                    <h3 className="font-semibold text-lg">
+                      Zero Trust Security
+                    </h3>
+                    <p className="text-slate-600">
+                      Enforce MFA and conditional access policies defined in
+                      your IdP.
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
@@ -135,7 +155,9 @@ export default function SSOIntegrationPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">SCIM Provisioning</h3>
-                    <p className="text-slate-600">Automate user onboarding and offboarding via SCIM 2.0.</p>
+                    <p className="text-slate-600">
+                      Automate user onboarding and offboarding via SCIM 2.0.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -145,8 +167,18 @@ export default function SSOIntegrationPage() {
                 <Lock className="w-5 h-5" /> Supported Providers
               </h3>
               <div className="grid grid-cols-2 gap-4">
-                {["Microsoft Entra ID", "Okta", "Google Workspace", "Auth0", "OneLogin", "PingIdentity"].map((p) => (
-                  <div key={p} className="flex items-center gap-2 p-3 bg-white rounded-lg border shadow-sm">
+                {[
+                  "Microsoft Entra ID",
+                  "Okta",
+                  "Google Workspace",
+                  "Auth0",
+                  "OneLogin",
+                  "PingIdentity",
+                ].map((p) => (
+                  <div
+                    key={p}
+                    className="flex items-center gap-2 p-3 bg-white rounded-lg border shadow-sm"
+                  >
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
                     <span className="text-sm font-medium">{p}</span>
                   </div>
@@ -160,7 +192,9 @@ export default function SSOIntegrationPage() {
       {/* Setup Steps */}
       <section className="py-16 bg-slate-50 border-y">
         <div className="container-enterprise">
-          <h2 className="text-3xl font-bold mb-12 text-center">Setup & Configuration</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center">
+            Setup & Configuration
+          </h2>
           <div className="grid md:grid-cols-5 gap-6">
             {integrationSteps.map((step) => (
               <Card key={step.step} className="relative">
@@ -182,10 +216,15 @@ export default function SSOIntegrationPage() {
       {/* Synced Data */}
       <section className="py-16 bg-white">
         <div className="container-enterprise">
-          <h2 className="text-3xl font-bold mb-12 text-center">Data Synchronization</h2>
+          <h2 className="text-3xl font-bold mb-12 text-center">
+            Data Synchronization
+          </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {syncedData.map((data) => (
-              <Card key={data.title} className="hover:shadow-md transition-shadow">
+              <Card
+                key={data.title}
+                className="hover:shadow-md transition-shadow"
+              >
                 <CardHeader>
                   <div className="mb-2 w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                     <RefreshCw className="w-5 h-5 text-blue-600" />
@@ -205,15 +244,23 @@ export default function SSOIntegrationPage() {
       {/* CTA */}
       <section className="py-20 bg-slate-900 text-white">
         <div className="container-enterprise text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to secure your access?</h2>
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to secure your access?
+          </h2>
           <p className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto">
-            Contact our security team to enable enterprise SSO and configure your identity provider.
+            Contact our security team to enable enterprise SSO and configure
+            your identity provider.
           </p>
           <div className="flex gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>
               <Link href="/contact">Enable Enterprise SSO</Link>
             </Button>
-            <Button size="lg" variant="outline" className="bg-transparent border-slate-600 hover:bg-slate-700 text-white" asChild>
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-transparent border-slate-600 hover:bg-slate-700 text-white"
+              asChild
+            >
               <Link href="/docs/api">View API Documentation</Link>
             </Button>
           </div>

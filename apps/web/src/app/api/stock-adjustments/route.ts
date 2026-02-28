@@ -314,7 +314,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Auto-create NCR for stock loss/damage adjustments (best-effort)
-    if (["DAMAGE", "THEFT", "LOSS", "EXPIRY"].includes(validatedData.reason) && validatedData.quantityChange < 0) {
+    if (
+      ["DAMAGE", "THEFT", "LOSS", "EXPIRY"].includes(validatedData.reason) &&
+      validatedData.quantityChange < 0
+    ) {
       const absQty = Math.abs(validatedData.quantityChange);
       NCRService.createNCR({
         organizationId: membership.organizationId,
@@ -327,7 +330,8 @@ export async function POST(request: NextRequest) {
         productSku: inventoryItem.sku ?? undefined,
         productDescription: inventoryItem.name,
         quantityAffected: absQty,
-        nonConformanceType: validatedData.reason === "DAMAGE" ? "DAMAGE" : "LOSS",
+        nonConformanceType:
+          validatedData.reason === "DAMAGE" ? "DAMAGE" : "LOSS",
         severity: absQty > 50 ? "HIGH" : "MEDIUM",
         category: "INVENTORY_ADJUSTMENT",
         disposition: validatedData.reason === "DAMAGE" ? "SCRAP" : "QUARANTINE",

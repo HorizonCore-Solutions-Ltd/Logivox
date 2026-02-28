@@ -208,7 +208,8 @@ export async function POST(
             sourceType: "RECEIVING",
             sourceId: grn.id,
             supplierId: grn.purchaseOrder?.supplierId ?? undefined,
-            supplierName: (grn.purchaseOrder as any)?.supplier?.name ?? undefined,
+            supplierName:
+              (grn.purchaseOrder as any)?.supplier?.name ?? undefined,
             poNumber: grn.purchaseOrder?.poNumber ?? undefined,
             productSku: item.inventoryItem?.sku ?? undefined,
             productDescription: item.inventoryItem?.name ?? undefined,

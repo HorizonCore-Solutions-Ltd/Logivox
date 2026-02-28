@@ -1,12 +1,32 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Building2, Users, Lock, Shield, Cpu, Bot, Truck, ClipboardCheck,
-  BarChart3, Globe, Mic, Package, ShoppingCart, CreditCard, MessageSquare,
-  ArrowRight, CheckCircle2,
+  Building2,
+  Users,
+  Lock,
+  Shield,
+  Cpu,
+  Bot,
+  Truck,
+  ClipboardCheck,
+  BarChart3,
+  Globe,
+  Mic,
+  Package,
+  ShoppingCart,
+  CreditCard,
+  MessageSquare,
+  ArrowRight,
+  CheckCircle2,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -57,7 +77,8 @@ const GUIDES = [
     icon: Cpu,
     color: "bg-amber-600",
     label: "Warehouse Hardware",
-    description: "Zebra, Honeywell, Datalogic, Impinj RFID, Siemens PLC, Allen-Bradley",
+    description:
+      "Zebra, Honeywell, Datalogic, Impinj RFID, Siemens PLC, Allen-Bradley",
     providers: 7,
     difficulty: "Medium–Enterprise",
   },
@@ -84,7 +105,8 @@ const GUIDES = [
     icon: ClipboardCheck,
     color: "bg-lime-600",
     label: "Quality Management (QMS)",
-    description: "iAuditor, EcoOnline, MasterControl, ETQ Reliance, Veeva Vault",
+    description:
+      "iAuditor, EcoOnline, MasterControl, ETQ Reliance, Veeva Vault",
     providers: 5,
     difficulty: "Medium–Enterprise",
   },
@@ -162,8 +184,8 @@ export default function IntegrationsDocsIndex() {
           <Badge className="mb-3">Integration Guides</Badge>
           <h1 className="text-4xl font-bold mb-3">All Integration Guides</h1>
           <p className="text-lg text-muted-foreground max-w-2xl">
-            Step-by-step setup guides for every LogiVox connector — from SAP ERP to
-            AutoStore robotics, carrier labels to voice-directed picking.
+            Step-by-step setup guides for every LogiVox connector — from SAP ERP
+            to AutoStore robotics, carrier labels to voice-directed picking.
           </p>
           <p className="text-sm text-muted-foreground mt-2">
             {GUIDES.length} guides · 60+ providers covered
@@ -181,21 +203,29 @@ export default function IntegrationsDocsIndex() {
                 <Card className="h-full hover:shadow-md transition-shadow group-hover:border-primary">
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between mb-3">
-                      <div className={`h-10 w-10 rounded-lg ${g.color} flex items-center justify-center`}>
+                      <div
+                        className={`h-10 w-10 rounded-lg ${g.color} flex items-center justify-center`}
+                      >
                         <Icon className="h-5 w-5 text-white" />
                       </div>
-                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded ${difficultyColor[g.difficulty] ?? "bg-slate-100 text-slate-700"}`}>
+                      <span
+                        className={`text-[10px] font-medium px-2 py-0.5 rounded ${difficultyColor[g.difficulty] ?? "bg-slate-100 text-slate-700"}`}
+                      >
                         {g.difficulty}
                       </span>
                     </div>
                     <CardTitle className="text-base group-hover:text-primary transition-colors">
                       {g.label}
                     </CardTitle>
-                    <CardDescription className="text-xs">{g.description}</CardDescription>
+                    <CardDescription className="text-xs">
+                      {g.description}
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="pt-0">
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{g.providers} provider{g.providers !== 1 ? "s" : ""}</span>
+                      <span>
+                        {g.providers} provider{g.providers !== 1 ? "s" : ""}
+                      </span>
                       <ArrowRight className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                     </div>
                   </CardContent>
@@ -227,7 +257,9 @@ export default function IntegrationsDocsIndex() {
 
         {/* Help CTA */}
         <div className="mt-8 text-center">
-          <p className="text-muted-foreground mb-4">Need help with a specific connector?</p>
+          <p className="text-muted-foreground mb-4">
+            Need help with a specific connector?
+          </p>
           <Button asChild>
             <Link href="/contact">
               Talk to an Integration Specialist

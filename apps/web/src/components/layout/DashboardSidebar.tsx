@@ -57,7 +57,9 @@ interface DashboardSidebarProps {
 export function DashboardSidebar({ children }: DashboardSidebarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = React.useState(false);
-  const [expandedSections, setExpandedSections] = React.useState<Record<string, boolean>>({
+  const [expandedSections, setExpandedSections] = React.useState<
+    Record<string, boolean>
+  >({
     Inventory: true,
     Fulfillment: false,
     Procurement: false,
@@ -106,8 +108,16 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       icon: Globe2,
       subItems: [
         { name: "Hub Overview", href: "/dashboard/fulfillment", icon: Globe2 },
-        { name: "Sales Orders", href: "/dashboard/sales-orders", icon: ShoppingCart },
-        { name: "Pick Lists", href: "/dashboard/pick-lists", icon: ClipboardList },
+        {
+          name: "Sales Orders",
+          href: "/dashboard/sales-orders",
+          icon: ShoppingCart,
+        },
+        {
+          name: "Pick Lists",
+          href: "/dashboard/pick-lists",
+          icon: ClipboardList,
+        },
         { name: "Packing", href: "/dashboard/packs", icon: BoxSelect },
         { name: "Shipments", href: "/dashboard/shipments", icon: Truck },
       ],
@@ -117,8 +127,16 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       href: "/dashboard/purchase-orders",
       icon: PackagePlus,
       subItems: [
-        { name: "Purchase Orders", href: "/dashboard/purchase-orders", icon: PackagePlus },
-        { name: "GRN / Receiving", href: "/dashboard/receiving", icon: ClipboardCheck },
+        {
+          name: "Purchase Orders",
+          href: "/dashboard/purchase-orders",
+          icon: PackagePlus,
+        },
+        {
+          name: "GRN / Receiving",
+          href: "/dashboard/receiving",
+          icon: ClipboardCheck,
+        },
         { name: "Suppliers", href: "/dashboard/suppliers", icon: Building },
       ],
     },
@@ -128,8 +146,16 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       icon: ShieldCheck,
       subItems: [
         { name: "Returns & RMAs", href: "/dashboard/returns", icon: RotateCcw },
-        { name: "QC Inspections", href: "/dashboard/qc-inspections", icon: ClipboardCheck },
-        { name: "Cycle Counts", href: "/dashboard/cycle-counts", icon: ClipboardList },
+        {
+          name: "QC Inspections",
+          href: "/dashboard/qc-inspections",
+          icon: ClipboardCheck,
+        },
+        {
+          name: "Cycle Counts",
+          href: "/dashboard/cycle-counts",
+          icon: ClipboardList,
+        },
       ],
     },
     {
@@ -139,7 +165,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       subItems: [
         { name: "CAPA Hub", href: "/capa/hub", icon: ShieldAlert },
         { name: "NCR List", href: "/capa/monitoring", icon: FileWarning },
-        { name: "Risk Scoring", href: "/capa/risk-scoring", icon: AlertTriangle },
+        {
+          name: "Risk Scoring",
+          href: "/capa/risk-scoring",
+          icon: AlertTriangle,
+        },
       ],
     },
     {
@@ -183,8 +213,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     pathname.startsWith("/dashboard/qc-inspections") ||
     pathname.startsWith("/dashboard/cycle-counts");
   const isQualityActive =
-    pathname.startsWith("/capa") ||
-    pathname.startsWith("/dashboard/ncr");
+    pathname.startsWith("/capa") || pathname.startsWith("/dashboard/ncr");
   const isDutiesActive = pathname.startsWith("/dashboard/duties");
 
   const isSectionActive = (name: string) => {

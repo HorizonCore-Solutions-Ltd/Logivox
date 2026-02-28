@@ -65,7 +65,9 @@ export async function GET(req: NextRequest) {
       take: limit,
       include: {
         dutyType: { select: { name: true, category: true } },
-        evidence: { select: { id: true, evidenceType: true, capturedAt: true } },
+        evidence: {
+          select: { id: true, evidenceType: true, capturedAt: true },
+        },
       },
     }),
     prisma.duty.count({ where }),
@@ -82,13 +84,18 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const parsed = CreateDutySchema.safeParse(body);
   if (!parsed.success)
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 },
+    );
 
   const data = parsed.data;
   const duty = await DutyService.createDuty({
     organizationId: session.user.organizationId,
     ...data,
-    scheduledStart: data.scheduledStart ? new Date(data.scheduledStart) : undefined,
+    scheduledStart: data.scheduledStart
+      ? new Date(data.scheduledStart)
+      : undefined,
     scheduledEnd: data.scheduledEnd ? new Date(data.scheduledEnd) : undefined,
     assignedBy: session.user.id,
   });
@@ -96,9 +103,10 @@ export async function POST(req: NextRequest) {
   // Auto-assign if no employee specified
   let assignment = null;
   if (!data.employeeId) {
-    assignment = await DutyService.autoAssign(duty.id, session.user.organizationId).catch(
-      () => null
-    );
+    assignment = await DutyService.autoAssign(
+      duty.id,
+      session.user.organizationId,
+    ).catch(() => null);
   }
 
   return NextResponse.json({ duty, assignment }, { status: 201 });

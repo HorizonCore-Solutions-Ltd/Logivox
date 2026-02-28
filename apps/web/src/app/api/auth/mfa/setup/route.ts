@@ -215,7 +215,10 @@ export async function DELETE(req: NextRequest) {
       const isValidPassword = await bcrypt.compare(password, user.password);
 
       if (!isValidPassword) {
-        return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+        return NextResponse.json(
+          { error: "Invalid password" },
+          { status: 401 },
+        );
       }
 
       // If MFA is currently enabled, require MFA token as well
@@ -278,4 +281,3 @@ export async function DELETE(req: NextRequest) {
     }
   }, req);
 }
-

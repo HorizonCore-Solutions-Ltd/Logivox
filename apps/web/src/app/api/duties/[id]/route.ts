@@ -7,7 +7,15 @@ import { z } from "zod";
 
 const UpdateSchema = z.object({
   status: z
-    .enum(["PLANNED", "ACTIVE", "PAUSED", "DONE", "CANCELLED", "SKIPPED", "ESCALATED"])
+    .enum([
+      "PLANNED",
+      "ACTIVE",
+      "PAUSED",
+      "DONE",
+      "CANCELLED",
+      "SKIPPED",
+      "ESCALATED",
+    ])
     .optional(),
   employeeId: z.string().cuid().optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).optional(),
@@ -21,7 +29,7 @@ const UpdateSchema = z.object({
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.organizationId)
@@ -42,7 +50,13 @@ export async function GET(
   if (duty.employeeId) {
     employee = await prisma.employee.findUnique({
       where: { id: duty.employeeId },
-      select: { id: true, firstName: true, lastName: true, position: true, department: true },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        position: true,
+        department: true,
+      },
     });
   }
 
@@ -51,7 +65,7 @@ export async function GET(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.organizationId)
@@ -60,7 +74,10 @@ export async function PATCH(
   const body = await req.json();
   const parsed = UpdateSchema.safeParse(body);
   if (!parsed.success)
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 },
+    );
 
   const data = parsed.data;
   const orgId = session.user.organizationId;
@@ -80,7 +97,7 @@ export async function PATCH(
       params.id,
       orgId,
       data.employeeId,
-      data.reassignReason
+      data.reassignReason,
     );
     return NextResponse.json({ duty });
   }
@@ -91,7 +108,9 @@ export async function PATCH(
     data: {
       priority: data.priority as any,
       checklistItems: data.checklistItems,
-      scheduledStart: data.scheduledStart ? new Date(data.scheduledStart) : undefined,
+      scheduledStart: data.scheduledStart
+        ? new Date(data.scheduledStart)
+        : undefined,
       scheduledEnd: data.scheduledEnd ? new Date(data.scheduledEnd) : undefined,
     },
   });

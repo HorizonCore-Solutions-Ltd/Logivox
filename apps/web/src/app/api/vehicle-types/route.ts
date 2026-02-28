@@ -6,8 +6,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import {
 import { requireApiAuth } from "@/lib/api-guard";
+import {
   getAllVehicleTypes,
   getVehicleTypesByRegion,
   recommendVehicle,

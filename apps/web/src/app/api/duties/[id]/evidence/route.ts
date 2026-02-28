@@ -6,8 +6,14 @@ import { z } from "zod";
 
 const Schema = z.object({
   evidenceType: z.enum([
-    "PHOTO", "VOICE_NOTE", "TEXT_NOTE", "NUMERIC_READING",
-    "SIGNATURE", "BARCODE_SCAN", "TEMPERATURE", "CHECKLIST",
+    "PHOTO",
+    "VOICE_NOTE",
+    "TEXT_NOTE",
+    "NUMERIC_READING",
+    "SIGNATURE",
+    "BARCODE_SCAN",
+    "TEMPERATURE",
+    "CHECKLIST",
   ]),
   label: z.string().optional(),
   value: z.string().optional(),
@@ -16,7 +22,7 @@ const Schema = z.object({
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.organizationId)
@@ -25,7 +31,10 @@ export async function POST(
   const body = await req.json();
   const parsed = Schema.safeParse(body);
   if (!parsed.success)
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 },
+    );
 
   const evidence = await DutyService.addEvidence({
     dutyId: params.id,

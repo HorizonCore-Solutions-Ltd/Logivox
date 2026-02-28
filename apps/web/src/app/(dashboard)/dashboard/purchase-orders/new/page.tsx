@@ -65,12 +65,19 @@ export default function NewPurchaseOrderPage() {
   }, []);
 
   const addItem = () =>
-    setItems([...items, { sku: "", description: "", quantityOrdered: 1, unitPrice: 0 }]);
+    setItems([
+      ...items,
+      { sku: "", description: "", quantityOrdered: 1, unitPrice: 0 },
+    ]);
 
   const removeItem = (idx: number) =>
     setItems(items.filter((_, i) => i !== idx));
 
-  const updateItem = (idx: number, field: keyof LineItem, value: string | number) => {
+  const updateItem = (
+    idx: number,
+    field: keyof LineItem,
+    value: string | number,
+  ) => {
     const updated = [...items];
     (updated[idx] as any)[field] = value;
     setItems(updated);
@@ -114,7 +121,9 @@ export default function NewPurchaseOrderPage() {
     try {
       const body: any = {
         supplierId,
-        expectedDate: expectedDate ? new Date(expectedDate).toISOString() : undefined,
+        expectedDate: expectedDate
+          ? new Date(expectedDate).toISOString()
+          : undefined,
         deliveryAddress: deliveryAddress || undefined,
         deliveryCity: deliveryCity || undefined,
         deliveryCountry: deliveryCountry || undefined,
@@ -142,7 +151,11 @@ export default function NewPurchaseOrderPage() {
 
       const data = await res.json();
       const poId = data.id ?? data.purchaseOrder?.id ?? data.po?.id;
-      router.push(poId ? `/dashboard/purchase-orders/${poId}` : "/dashboard/purchase-orders");
+      router.push(
+        poId
+          ? `/dashboard/purchase-orders/${poId}`
+          : "/dashboard/purchase-orders",
+      );
     } catch (e: any) {
       alert(e.message);
     } finally {
@@ -165,7 +178,11 @@ export default function NewPurchaseOrderPage() {
       <div className="p-6 space-y-6 max-w-4xl">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard/purchase-orders")}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/dashboard/purchase-orders")}
+          >
             <ArrowLeft className="h-4 w-4 mr-1" /> Back
           </Button>
           <h1 className="text-2xl font-bold">New Purchase Order</h1>
@@ -195,7 +212,11 @@ export default function NewPurchaseOrderPage() {
                   </option>
                 ))}
               </select>
-              {errors.supplierId && <p className="text-xs text-destructive mt-1">{errors.supplierId}</p>}
+              {errors.supplierId && (
+                <p className="text-xs text-destructive mt-1">
+                  {errors.supplierId}
+                </p>
+              )}
             </div>
 
             {/* Expected Date */}
@@ -213,7 +234,9 @@ export default function NewPurchaseOrderPage() {
 
             {/* Priority */}
             <div>
-              <label className="text-sm font-medium mb-1.5 block">Priority</label>
+              <label className="text-sm font-medium mb-1.5 block">
+                Priority
+              </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
@@ -230,7 +253,8 @@ export default function NewPurchaseOrderPage() {
           {/* Delivery Address */}
           <div>
             <h3 className="text-sm font-medium mb-2 flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-muted-foreground" /> Delivery Address
+              <MapPin className="h-3.5 w-3.5 text-muted-foreground" /> Delivery
+              Address
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-3">
@@ -286,11 +310,21 @@ export default function NewPurchaseOrderPage() {
           </div>
           <div className="p-4 space-y-4">
             {items.map((item, idx) => (
-              <div key={idx} className="rounded-lg border bg-muted/20 p-4 space-y-3">
+              <div
+                key={idx}
+                className="rounded-lg border bg-muted/20 p-4 space-y-3"
+              >
                 <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-muted-foreground">Item #{idx + 1}</p>
+                  <p className="text-sm font-medium text-muted-foreground">
+                    Item #{idx + 1}
+                  </p>
                   {items.length > 1 && (
-                    <Button variant="ghost" size="sm" onClick={() => removeItem(idx)} className="text-destructive hover:text-destructive">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeItem(idx)}
+                      className="text-destructive hover:text-destructive"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   )}
@@ -298,13 +332,21 @@ export default function NewPurchaseOrderPage() {
 
                 {/* Pick from inventory */}
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Linked Inventory Item (optional)</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">
+                    Linked Inventory Item (optional)
+                  </label>
                   <select
                     value={item.inventoryItemId ?? ""}
-                    onChange={(e) => e.target.value ? populateFromInventory(idx, e.target.value) : updateItem(idx, "inventoryItemId", "")}
+                    onChange={(e) =>
+                      e.target.value
+                        ? populateFromInventory(idx, e.target.value)
+                        : updateItem(idx, "inventoryItemId", "")
+                    }
                     className="w-full rounded-md border border-input px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
                   >
-                    <option value="">Select from inventory (or enter manually below)…</option>
+                    <option value="">
+                      Select from inventory (or enter manually below)…
+                    </option>
                     {inventoryItems.map((inv: any) => (
                       <option key={inv.id} value={inv.id}>
                         {inv.sku} — {inv.name}
@@ -325,7 +367,11 @@ export default function NewPurchaseOrderPage() {
                       onChange={(e) => updateItem(idx, "sku", e.target.value)}
                       className={`w-full rounded-md border px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring ${errors[`item_${idx}_sku`] ? "border-destructive" : "border-input"}`}
                     />
-                    {errors[`item_${idx}_sku`] && <p className="text-xs text-destructive mt-1">{errors[`item_${idx}_sku`]}</p>}
+                    {errors[`item_${idx}_sku`] && (
+                      <p className="text-xs text-destructive mt-1">
+                        {errors[`item_${idx}_sku`]}
+                      </p>
+                    )}
                   </div>
                   <div className="col-span-1 sm:col-span-1">
                     <label className="text-xs text-muted-foreground mb-1 block">
@@ -335,7 +381,13 @@ export default function NewPurchaseOrderPage() {
                       type="number"
                       min={1}
                       value={item.quantityOrdered}
-                      onChange={(e) => updateItem(idx, "quantityOrdered", parseInt(e.target.value) || 1)}
+                      onChange={(e) =>
+                        updateItem(
+                          idx,
+                          "quantityOrdered",
+                          parseInt(e.target.value) || 1,
+                        )
+                      }
                       className={`w-full rounded-md border px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring ${errors[`item_${idx}_qty`] ? "border-destructive" : "border-input"}`}
                     />
                   </div>
@@ -348,7 +400,13 @@ export default function NewPurchaseOrderPage() {
                       min={0.01}
                       step={0.01}
                       value={item.unitPrice}
-                      onChange={(e) => updateItem(idx, "unitPrice", parseFloat(e.target.value) || 0)}
+                      onChange={(e) =>
+                        updateItem(
+                          idx,
+                          "unitPrice",
+                          parseFloat(e.target.value) || 0,
+                        )
+                      }
                       className={`w-full rounded-md border px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring ${errors[`item_${idx}_price`] ? "border-destructive" : "border-input"}`}
                     />
                   </div>
@@ -367,10 +425,16 @@ export default function NewPurchaseOrderPage() {
                     type="text"
                     placeholder="Product description"
                     value={item.description}
-                    onChange={(e) => updateItem(idx, "description", e.target.value)}
+                    onChange={(e) =>
+                      updateItem(idx, "description", e.target.value)
+                    }
                     className={`w-full rounded-md border px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring ${errors[`item_${idx}_desc`] ? "border-destructive" : "border-input"}`}
                   />
-                  {errors[`item_${idx}_desc`] && <p className="text-xs text-destructive mt-1">{errors[`item_${idx}_desc`]}</p>}
+                  {errors[`item_${idx}_desc`] && (
+                    <p className="text-xs text-destructive mt-1">
+                      {errors[`item_${idx}_desc`]}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}
@@ -381,9 +445,14 @@ export default function NewPurchaseOrderPage() {
             <div className="text-right">
               <p className="text-sm text-muted-foreground">Total Value</p>
               <p className="text-2xl font-bold">
-                {new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" }).format(totalValue)}
+                {new Intl.NumberFormat("en-GB", {
+                  style: "currency",
+                  currency: "GBP",
+                }).format(totalValue)}
               </p>
-              <p className="text-xs text-muted-foreground">{items.length} item(s)</p>
+              <p className="text-xs text-muted-foreground">
+                {items.length} item(s)
+              </p>
             </div>
           </div>
         </div>
@@ -392,20 +461,29 @@ export default function NewPurchaseOrderPage() {
         {Object.keys(errors).length > 0 && (
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 flex items-start gap-2">
             <AlertTriangle className="h-4 w-4 text-destructive mt-0.5 flex-shrink-0" />
-            <p className="text-sm text-destructive">Please fix the errors above before submitting.</p>
+            <p className="text-sm text-destructive">
+              Please fix the errors above before submitting.
+            </p>
           </div>
         )}
 
         {/* Action buttons */}
         <div className="flex gap-3 justify-end pb-6">
-          <Button variant="outline" onClick={() => router.push("/dashboard/purchase-orders")}>
+          <Button
+            variant="outline"
+            onClick={() => router.push("/dashboard/purchase-orders")}
+          >
             Cancel
           </Button>
           <Button onClick={() => handleSubmit()} disabled={submitting}>
             {submitting ? (
-              <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Creating…</>
+              <>
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" /> Creating…
+              </>
             ) : (
-              <><Send className="h-4 w-4 mr-1" /> Create Purchase Order</>
+              <>
+                <Send className="h-4 w-4 mr-1" /> Create Purchase Order
+              </>
             )}
           </Button>
         </div>

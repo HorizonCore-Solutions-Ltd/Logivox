@@ -24,7 +24,14 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-type DutyStatus = "PLANNED" | "ACTIVE" | "PAUSED" | "DONE" | "CANCELLED" | "SKIPPED" | "ESCALATED";
+type DutyStatus =
+  | "PLANNED"
+  | "ACTIVE"
+  | "PAUSED"
+  | "DONE"
+  | "CANCELLED"
+  | "SKIPPED"
+  | "ESCALATED";
 type DutyPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 interface Duty {
@@ -56,14 +63,45 @@ interface DutyKPIs {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const STATUS_CONFIG: Record<DutyStatus, { label: string; color: string; icon: React.ReactNode }> = {
-  PLANNED: { label: "Planned", color: "bg-slate-100 text-slate-700", icon: <Clock size={12} /> },
-  ACTIVE: { label: "Active", color: "bg-blue-100 text-blue-700", icon: <Play size={12} /> },
-  PAUSED: { label: "Paused", color: "bg-yellow-100 text-yellow-700", icon: <Pause size={12} /> },
-  DONE: { label: "Done", color: "bg-green-100 text-green-700", icon: <CheckCircle2 size={12} /> },
-  CANCELLED: { label: "Cancelled", color: "bg-red-100 text-red-700", icon: <SkipForward size={12} /> },
-  SKIPPED: { label: "Skipped", color: "bg-orange-100 text-orange-700", icon: <SkipForward size={12} /> },
-  ESCALATED: { label: "Escalated", color: "bg-purple-100 text-purple-700", icon: <AlertTriangle size={12} /> },
+const STATUS_CONFIG: Record<
+  DutyStatus,
+  { label: string; color: string; icon: React.ReactNode }
+> = {
+  PLANNED: {
+    label: "Planned",
+    color: "bg-slate-100 text-slate-700",
+    icon: <Clock size={12} />,
+  },
+  ACTIVE: {
+    label: "Active",
+    color: "bg-blue-100 text-blue-700",
+    icon: <Play size={12} />,
+  },
+  PAUSED: {
+    label: "Paused",
+    color: "bg-yellow-100 text-yellow-700",
+    icon: <Pause size={12} />,
+  },
+  DONE: {
+    label: "Done",
+    color: "bg-green-100 text-green-700",
+    icon: <CheckCircle2 size={12} />,
+  },
+  CANCELLED: {
+    label: "Cancelled",
+    color: "bg-red-100 text-red-700",
+    icon: <SkipForward size={12} />,
+  },
+  SKIPPED: {
+    label: "Skipped",
+    color: "bg-orange-100 text-orange-700",
+    icon: <SkipForward size={12} />,
+  },
+  ESCALATED: {
+    label: "Escalated",
+    color: "bg-purple-100 text-purple-700",
+    icon: <AlertTriangle size={12} />,
+  },
 };
 
 const PRIORITY_COLOR: Record<DutyPriority, string> = {
@@ -85,20 +123,33 @@ const CATEGORY_ICON: Record<string, React.ReactNode> = {
 
 function formatTime(iso?: string) {
   if (!iso) return "—";
-  return new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return new Date(iso).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 // ─── DutyCard ────────────────────────────────────────────────────────────────
 
-function DutyCard({ duty, onStatusChange }: { duty: Duty; onStatusChange: (id: string, status: string) => void }) {
+function DutyCard({
+  duty,
+  onStatusChange,
+}: {
+  duty: Duty;
+  onStatusChange: (id: string, status: string) => void;
+}) {
   const sc = STATUS_CONFIG[duty.status];
   const pc = PRIORITY_COLOR[duty.priority];
 
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 border-l-4 ${pc} shadow-sm hover:shadow-md transition-shadow p-3`}>
+    <div
+      className={`bg-white rounded-lg border border-gray-200 border-l-4 ${pc} shadow-sm hover:shadow-md transition-shadow p-3`}
+    >
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex items-center gap-1.5 flex-1 min-w-0">
-          {CATEGORY_ICON[duty.category] ?? <ClipboardList size={14} className="text-gray-400" />}
+          {CATEGORY_ICON[duty.category] ?? (
+            <ClipboardList size={14} className="text-gray-400" />
+          )}
           <Link
             href={`/dashboard/duties/${duty.id}`}
             className="text-sm font-medium text-gray-900 hover:text-blue-600 truncate"
@@ -114,8 +165,11 @@ function DutyCard({ duty, onStatusChange }: { duty: Duty; onStatusChange: (id: s
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-2">
-        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${sc.color}`}>
-          {sc.icon}{sc.label}
+        <span
+          className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${sc.color}`}
+        >
+          {sc.icon}
+          {sc.label}
         </span>
         <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
           {duty.priority}
@@ -127,7 +181,8 @@ function DutyCard({ duty, onStatusChange }: { duty: Duty; onStatusChange: (id: s
         )}
         {duty.autoAssigned && (
           <span className="text-xs bg-cyan-100 text-cyan-700 px-2 py-0.5 rounded-full">
-            <Zap size={10} className="inline mr-0.5" />Auto
+            <Zap size={10} className="inline mr-0.5" />
+            Auto
           </span>
         )}
       </div>
@@ -137,7 +192,9 @@ function DutyCard({ duty, onStatusChange }: { duty: Duty; onStatusChange: (id: s
           <Calendar size={10} />
           {formatTime(duty.scheduledStart)} – {formatTime(duty.scheduledEnd)}
         </span>
-        {duty.zoneName && <span className="truncate max-w-[80px]">{duty.zoneName}</span>}
+        {duty.zoneName && (
+          <span className="truncate max-w-[80px]">{duty.zoneName}</span>
+        )}
       </div>
 
       <div className="mt-2 flex gap-1">
@@ -204,7 +261,10 @@ export default function DutiesPage() {
       fetch(`/api/duties?${params}`),
       fetch("/api/duties/kpis?days=7"),
     ]);
-    const [dutiesData, kpisData] = await Promise.all([dutiesRes.json(), kpisRes.json()]);
+    const [dutiesData, kpisData] = await Promise.all([
+      dutiesRes.json(),
+      kpisRes.json(),
+    ]);
     setDuties(dutiesData.duties ?? []);
     setKPIs(kpisData);
     setLoading(false);
@@ -224,11 +284,20 @@ export default function DutiesPage() {
   };
 
   // Group by status for board view
-  const boardColumns: DutyStatus[] = ["PLANNED", "ACTIVE", "PAUSED", "DONE", "ESCALATED"];
-  const grouped = boardColumns.reduce((acc, s) => {
-    acc[s] = duties.filter((d) => d.status === s);
-    return acc;
-  }, {} as Record<string, Duty[]>);
+  const boardColumns: DutyStatus[] = [
+    "PLANNED",
+    "ACTIVE",
+    "PAUSED",
+    "DONE",
+    "ESCALATED",
+  ];
+  const grouped = boardColumns.reduce(
+    (acc, s) => {
+      acc[s] = duties.filter((d) => d.status === s);
+      return acc;
+    },
+    {} as Record<string, Duty[]>,
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -269,18 +338,42 @@ export default function DutiesPage() {
       {kpis && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
           {[
-            { label: "Total Duties", value: kpis.total, color: "text-gray-900" },
+            {
+              label: "Total Duties",
+              value: kpis.total,
+              color: "text-gray-900",
+            },
             { label: "Completed", value: kpis.done, color: "text-green-600" },
             {
               label: "SLA Hit Rate",
               value: `${kpis.slaHitRate}%`,
-              color: kpis.slaHitRate >= 90 ? "text-green-600" : kpis.slaHitRate >= 70 ? "text-yellow-600" : "text-red-600",
+              color:
+                kpis.slaHitRate >= 90
+                  ? "text-green-600"
+                  : kpis.slaHitRate >= 70
+                    ? "text-yellow-600"
+                    : "text-red-600",
             },
-            { label: "SLA Breaches", value: kpis.slaBreached, color: kpis.slaBreached > 0 ? "text-red-600" : "text-green-600" },
-            { label: "CAPA Duties", value: kpis.capaLinked, color: "text-purple-600" },
-            { label: "Avg Duration", value: `${kpis.avgDurationMinutes}m`, color: "text-gray-700" },
+            {
+              label: "SLA Breaches",
+              value: kpis.slaBreached,
+              color: kpis.slaBreached > 0 ? "text-red-600" : "text-green-600",
+            },
+            {
+              label: "CAPA Duties",
+              value: kpis.capaLinked,
+              color: "text-purple-600",
+            },
+            {
+              label: "Avg Duration",
+              value: `${kpis.avgDurationMinutes}m`,
+              color: "text-gray-700",
+            },
           ].map((k) => (
-            <div key={k.label} className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+            <div
+              key={k.label}
+              className="bg-white rounded-xl border border-gray-200 p-3 text-center"
+            >
               <p className={`text-xl font-bold ${k.color}`}>{k.value}</p>
               <p className="text-xs text-gray-500 mt-0.5">{k.label}</p>
             </div>
@@ -314,7 +407,9 @@ export default function DutiesPage() {
           >
             <option value="">All statuses</option>
             {Object.keys(STATUS_CONFIG).map((s) => (
-              <option key={s} value={s}>{STATUS_CONFIG[s as DutyStatus].label}</option>
+              <option key={s} value={s}>
+                {STATUS_CONFIG[s as DutyStatus].label}
+              </option>
             ))}
           </select>
         </div>
@@ -327,8 +422,23 @@ export default function DutiesPage() {
             className="text-sm py-2 bg-transparent focus:outline-none text-gray-700"
           >
             <option value="">All categories</option>
-            {["RECEIVING","PICKING","PACKING","QUALITY_CHECK","SAFETY_INSPECTION","CAPA_CONTAINMENT","CAPA_INVESTIGATION","CAPA_CORRECTIVE","CAPA_PREVENTIVE","CAPA_VERIFICATION","MAINTENANCE","OTHER"].map((c) => (
-              <option key={c} value={c}>{c.replace(/_/g, " ")}</option>
+            {[
+              "RECEIVING",
+              "PICKING",
+              "PACKING",
+              "QUALITY_CHECK",
+              "SAFETY_INSPECTION",
+              "CAPA_CONTAINMENT",
+              "CAPA_INVESTIGATION",
+              "CAPA_CORRECTIVE",
+              "CAPA_PREVENTIVE",
+              "CAPA_VERIFICATION",
+              "MAINTENANCE",
+              "OTHER",
+            ].map((c) => (
+              <option key={c} value={c}>
+                {c.replace(/_/g, " ")}
+              </option>
             ))}
           </select>
         </div>
@@ -342,7 +452,9 @@ export default function DutiesPage() {
             const col = grouped[status] ?? [];
             return (
               <div key={status} className="flex flex-col gap-3">
-                <div className={`flex items-center justify-between px-2 py-1.5 rounded-lg ${sc.color}`}>
+                <div
+                  className={`flex items-center justify-between px-2 py-1.5 rounded-lg ${sc.color}`}
+                >
                   <span className="text-xs font-semibold flex items-center gap-1">
                     {sc.icon} {sc.label}
                   </span>
@@ -355,7 +467,11 @@ export default function DutiesPage() {
                     </div>
                   )}
                   {col.map((d) => (
-                    <DutyCard key={d.id} duty={d} onStatusChange={handleStatusChange} />
+                    <DutyCard
+                      key={d.id}
+                      duty={d}
+                      onStatusChange={handleStatusChange}
+                    />
                   ))}
                 </div>
               </div>
@@ -370,8 +486,21 @@ export default function DutiesPage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                {["Title", "Category", "Status", "Priority", "Zone", "Scheduled", "SLA", "CAPA", ""].map((h) => (
-                  <th key={h} className="text-left text-xs font-semibold text-gray-600 px-4 py-3">
+                {[
+                  "Title",
+                  "Category",
+                  "Status",
+                  "Priority",
+                  "Zone",
+                  "Scheduled",
+                  "SLA",
+                  "CAPA",
+                  "",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left text-xs font-semibold text-gray-600 px-4 py-3"
+                  >
                     {h}
                   </th>
                 ))}
@@ -394,9 +523,15 @@ export default function DutiesPage() {
                 duties.map((d) => {
                   const sc = STATUS_CONFIG[d.status];
                   return (
-                    <tr key={d.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={d.id}
+                      className="hover:bg-gray-50 transition-colors"
+                    >
                       <td className="px-4 py-3 font-medium text-gray-900 max-w-[200px] truncate">
-                        <Link href={`/dashboard/duties/${d.id}`} className="hover:text-blue-600">
+                        <Link
+                          href={`/dashboard/duties/${d.id}`}
+                          className="hover:text-blue-600"
+                        >
                           {d.title}
                         </Link>
                       </td>
@@ -407,22 +542,30 @@ export default function DutiesPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${sc.color}`}>
+                        <span
+                          className={`inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full font-medium ${sc.color}`}
+                        >
                           {sc.icon} {sc.label}
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        <span className={`text-xs font-medium ${d.priority === "CRITICAL" ? "text-red-600" : d.priority === "HIGH" ? "text-orange-600" : "text-gray-600"}`}>
+                        <span
+                          className={`text-xs font-medium ${d.priority === "CRITICAL" ? "text-red-600" : d.priority === "HIGH" ? "text-orange-600" : "text-gray-600"}`}
+                        >
                           {d.priority}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-gray-500">{d.zoneName ?? "—"}</td>
+                      <td className="px-4 py-3 text-xs text-gray-500">
+                        {d.zoneName ?? "—"}
+                      </td>
                       <td className="px-4 py-3 text-xs text-gray-500">
                         {d.scheduledStart ? formatTime(d.scheduledStart) : "—"}
                       </td>
                       <td className="px-4 py-3">
                         {d.slaBreached ? (
-                          <span className="text-xs text-red-600 font-medium">Breached</span>
+                          <span className="text-xs text-red-600 font-medium">
+                            Breached
+                          </span>
                         ) : (
                           <span className="text-xs text-green-600">OK</span>
                         )}

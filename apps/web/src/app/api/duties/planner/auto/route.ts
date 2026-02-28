@@ -13,7 +13,7 @@ const Schema = z.object({
       quantity: z.number().int().min(1).max(50),
       zoneId: z.string().optional(),
       scheduledStart: z.string().datetime().optional(),
-    })
+    }),
   ),
 });
 
@@ -25,7 +25,10 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const parsed = Schema.safeParse(body);
   if (!parsed.success)
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 },
+    );
 
   const results = await DutyService.autoPlan({
     organizationId: session.user.organizationId,
@@ -47,7 +50,8 @@ export async function POST(req: NextRequest) {
       total: results.length,
       assigned,
       unassigned,
-      assignmentRate: results.length > 0 ? Math.round((assigned / results.length) * 100) : 0,
+      assignmentRate:
+        results.length > 0 ? Math.round((assigned / results.length) * 100) : 0,
     },
   });
 }

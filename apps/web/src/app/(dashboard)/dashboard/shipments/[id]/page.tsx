@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,8 +16,17 @@ import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import {
-  ArrowLeft, Truck, Package, MapPin, User, Calendar,
-  ExternalLink, RefreshCw, CheckCircle, Clock, AlertTriangle,
+  ArrowLeft,
+  Truck,
+  Package,
+  MapPin,
+  User,
+  Calendar,
+  ExternalLink,
+  RefreshCw,
+  CheckCircle,
+  Clock,
+  AlertTriangle,
 } from "lucide-react";
 
 interface Shipment {
@@ -67,16 +80,58 @@ interface Shipment {
   createdAt: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Truck }> = {
-  PENDING:   { label: "Pending",    color: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200", icon: Clock },
-  LABEL_CREATED: { label: "Label Created", color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200", icon: Package },
-  PICKED_UP: { label: "Picked Up",  color: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200", icon: Truck },
-  IN_TRANSIT:{ label: "In Transit", color: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200", icon: Truck },
-  SHIPPED:   { label: "Shipped",    color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200", icon: Truck },
-  OUT_FOR_DELIVERY: { label: "Out for Delivery", color: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200", icon: Truck },
-  DELIVERED: { label: "Delivered",  color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200", icon: CheckCircle },
-  EXCEPTION: { label: "Exception",  color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200", icon: AlertTriangle },
-  RETURNED:  { label: "Returned",   color: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200", icon: AlertTriangle },
+const STATUS_CONFIG: Record<
+  string,
+  { label: string; color: string; icon: typeof Truck }
+> = {
+  PENDING: {
+    label: "Pending",
+    color:
+      "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+    icon: Clock,
+  },
+  LABEL_CREATED: {
+    label: "Label Created",
+    color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    icon: Package,
+  },
+  PICKED_UP: {
+    label: "Picked Up",
+    color:
+      "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    icon: Truck,
+  },
+  IN_TRANSIT: {
+    label: "In Transit",
+    color:
+      "bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200",
+    icon: Truck,
+  },
+  SHIPPED: {
+    label: "Shipped",
+    color: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    icon: Truck,
+  },
+  OUT_FOR_DELIVERY: {
+    label: "Out for Delivery",
+    color: "bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200",
+    icon: Truck,
+  },
+  DELIVERED: {
+    label: "Delivered",
+    color: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    icon: CheckCircle,
+  },
+  EXCEPTION: {
+    label: "Exception",
+    color: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    icon: AlertTriangle,
+  },
+  RETURNED: {
+    label: "Returned",
+    color: "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200",
+    icon: AlertTriangle,
+  },
 };
 
 export default function ShipmentDetailPage() {
@@ -99,7 +154,11 @@ export default function ShipmentDetailPage() {
       const data = await res.json();
       setShipment(data);
     } catch {
-      toast({ title: "Error", description: "Failed to load shipment", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to load shipment",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -109,12 +168,17 @@ export default function ShipmentDetailPage() {
     if (!shipment) return;
     setMarking(true);
     try {
-      const res = await fetch(`/api/shipments/${shipment.id}/ship`, { method: "POST" });
+      const res = await fetch(`/api/shipments/${shipment.id}/ship`, {
+        method: "POST",
+      });
       if (!res.ok) {
         const err = await res.json();
         throw new Error(err.error || "Failed to mark as shipped");
       }
-      toast({ title: "Shipped!", description: "Inventory updated and order marked as shipped." });
+      toast({
+        title: "Shipped!",
+        description: "Inventory updated and order marked as shipped.",
+      });
       fetchShipment();
     } catch (e: any) {
       toast({ title: "Error", description: e.message, variant: "destructive" });
@@ -127,26 +191,41 @@ export default function ShipmentDetailPage() {
     if (!shipment) return;
     setTracking(true);
     try {
-      const res = await fetch(`/api/shipments/${shipment.id}/track`, { method: "POST" });
+      const res = await fetch(`/api/shipments/${shipment.id}/track`, {
+        method: "POST",
+      });
       if (!res.ok) throw new Error("Track request failed");
       const data = await res.json();
       if (data.shipment) setShipment(data.shipment);
-      toast({ title: "Tracking Updated", description: "Latest carrier status retrieved." });
+      toast({
+        title: "Tracking Updated",
+        description: "Latest carrier status retrieved.",
+      });
     } catch {
-      toast({ title: "Note", description: "Carrier tracking unavailable — check carrier website.", variant: "default" });
+      toast({
+        title: "Note",
+        description: "Carrier tracking unavailable — check carrier website.",
+        variant: "default",
+      });
     } finally {
       setTracking(false);
     }
   };
 
-  const cfg = shipment ? (STATUS_CONFIG[shipment.status] ?? STATUS_CONFIG.PENDING) : STATUS_CONFIG.PENDING;
+  const cfg = shipment
+    ? (STATUS_CONFIG[shipment.status] ?? STATUS_CONFIG.PENDING)
+    : STATUS_CONFIG.PENDING;
 
   return (
     <DashboardSidebar>
       <div className="p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard/shipments")}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/dashboard/shipments")}
+          >
             <ArrowLeft className="h-4 w-4 mr-2" /> Shipments
           </Button>
           <Separator orientation="vertical" className="h-6" />
@@ -164,8 +243,15 @@ export default function ShipmentDetailPage() {
           {!loading && shipment && (
             <div className="flex items-center gap-2 ml-auto">
               {shipment.trackingNumber && (
-                <Button variant="outline" size="sm" onClick={handleTrackingRefresh} disabled={tracking}>
-                  <RefreshCw className={`h-4 w-4 mr-2 ${tracking ? "animate-spin" : ""}`} />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleTrackingRefresh}
+                  disabled={tracking}
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${tracking ? "animate-spin" : ""}`}
+                  />
                   Refresh Tracking
                 </Button>
               )}
@@ -181,8 +267,13 @@ export default function ShipmentDetailPage() {
                   </a>
                 </Button>
               )}
-              {["PENDING", "LABEL_CREATED", "PICKED_UP"].includes(shipment.status) && (
-                <Button onClick={handleMarkShipped} disabled={marking || !shipment.trackingNumber}>
+              {["PENDING", "LABEL_CREATED", "PICKED_UP"].includes(
+                shipment.status,
+              ) && (
+                <Button
+                  onClick={handleMarkShipped}
+                  disabled={marking || !shipment.trackingNumber}
+                >
                   <Truck className="h-4 w-4 mr-2" />
                   {marking ? "Marking..." : "Mark as Shipped"}
                 </Button>
@@ -193,7 +284,9 @@ export default function ShipmentDetailPage() {
 
         {loading ? (
           <div className="grid gap-6 lg:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((n) => <Skeleton key={n} className="h-48 rounded-xl" />)}
+            {[1, 2, 3, 4, 5, 6].map((n) => (
+              <Skeleton key={n} className="h-48 rounded-xl" />
+            ))}
           </div>
         ) : shipment ? (
           <div className="grid gap-6 lg:grid-cols-3">
@@ -209,31 +302,60 @@ export default function ShipmentDetailPage() {
                 <CardContent className="grid sm:grid-cols-2 gap-6">
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Carrier</p>
-                    <p className="font-semibold">{shipment.carrierName || shipment.carrierCode}</p>
+                    <p className="font-semibold">
+                      {shipment.carrierName || shipment.carrierCode}
+                    </p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Service</p>
                     <p className="font-semibold">{shipment.carrierService}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Tracking Number</p>
-                    <p className="font-mono font-semibold">{shipment.trackingNumber || "Not yet generated"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Tracking Number
+                    </p>
+                    <p className="font-mono font-semibold">
+                      {shipment.trackingNumber || "Not yet generated"}
+                    </p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-xs text-muted-foreground">Weight</p>
-                    <p className="font-semibold">{shipment.weight ? `${shipment.weight} ${shipment.weightUnit || "kg"}` : "—"}</p>
+                    <p className="font-semibold">
+                      {shipment.weight
+                        ? `${shipment.weight} ${shipment.weightUnit || "kg"}`
+                        : "—"}
+                    </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Shipped Date</p>
-                    <p className="font-semibold">{shipment.shippedDate ? new Date(shipment.shippedDate).toLocaleDateString() : "—"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Shipped Date
+                    </p>
+                    <p className="font-semibold">
+                      {shipment.shippedDate
+                        ? new Date(shipment.shippedDate).toLocaleDateString()
+                        : "—"}
+                    </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-muted-foreground">Est. Delivery</p>
-                    <p className="font-semibold">{shipment.estimatedDeliveryDate ? new Date(shipment.estimatedDeliveryDate).toLocaleDateString() : "—"}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Est. Delivery
+                    </p>
+                    <p className="font-semibold">
+                      {shipment.estimatedDeliveryDate
+                        ? new Date(
+                            shipment.estimatedDeliveryDate,
+                          ).toLocaleDateString()
+                        : "—"}
+                    </p>
                   </div>
                   {shipment.signatureRequired && (
                     <div className="col-span-2">
-                      <Badge variant="secondary" className="bg-amber-100 text-amber-800">Signature Required</Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-amber-100 text-amber-800"
+                      >
+                        Signature Required
+                      </Badge>
                     </div>
                   )}
                 </CardContent>
@@ -249,7 +371,11 @@ export default function ShipmentDetailPage() {
                     From Sales Order{" "}
                     <button
                       className="text-primary underline"
-                      onClick={() => router.push(`/dashboard/sales-orders/${shipment.salesOrder.id}`)}
+                      onClick={() =>
+                        router.push(
+                          `/dashboard/sales-orders/${shipment.salesOrder.id}`,
+                        )
+                      }
                     >
                       {shipment.salesOrder.soNumber}
                     </button>
@@ -258,14 +384,25 @@ export default function ShipmentDetailPage() {
                 <CardContent>
                   <div className="space-y-2">
                     {shipment.salesOrder.items.map((item) => (
-                      <div key={item.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div>
-                          <p className="font-medium text-sm">{item.inventoryItem.name}</p>
-                          <p className="text-xs text-muted-foreground">{item.inventoryItem.sku}</p>
+                          <p className="font-medium text-sm">
+                            {item.inventoryItem.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.inventoryItem.sku}
+                          </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-sm">{item.quantityShipped || item.quantity} units</p>
-                          <p className="text-xs text-muted-foreground">ordered: {item.quantity}</p>
+                          <p className="font-semibold text-sm">
+                            {item.quantityShipped || item.quantity} units
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            ordered: {item.quantity}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -281,30 +418,39 @@ export default function ShipmentDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {!shipment.trackingEvents || shipment.trackingEvents.length === 0 ? (
+                  {!shipment.trackingEvents ||
+                  shipment.trackingEvents.length === 0 ? (
                     <div className="text-center py-6 text-muted-foreground">
                       <p className="text-sm">No tracking events yet.</p>
-                      <p className="text-xs mt-1">Events appear once the carrier scans the package.</p>
+                      <p className="text-xs mt-1">
+                        Events appear once the carrier scans the package.
+                      </p>
                     </div>
                   ) : (
                     <div className="relative space-y-0">
-                      {[...shipment.trackingEvents].reverse().map((event, idx) => (
-                        <div key={idx} className="flex gap-4 pb-6 last:pb-0">
-                          <div className="flex flex-col items-center">
-                            <div className={`h-3 w-3 rounded-full mt-1 flex-shrink-0 ${idx === 0 ? "bg-primary" : "bg-muted-foreground/30"}`} />
-                            {idx < shipment.trackingEvents.length - 1 && (
-                              <div className="w-px bg-border flex-1 mt-1" />
-                            )}
+                      {[...shipment.trackingEvents]
+                        .reverse()
+                        .map((event, idx) => (
+                          <div key={idx} className="flex gap-4 pb-6 last:pb-0">
+                            <div className="flex flex-col items-center">
+                              <div
+                                className={`h-3 w-3 rounded-full mt-1 flex-shrink-0 ${idx === 0 ? "bg-primary" : "bg-muted-foreground/30"}`}
+                              />
+                              {idx < shipment.trackingEvents.length - 1 && (
+                                <div className="w-px bg-border flex-1 mt-1" />
+                              )}
+                            </div>
+                            <div className="pb-1">
+                              <p className="font-medium text-sm">
+                                {event.description}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {event.location} &bull;{" "}
+                                {new Date(event.timestamp).toLocaleString()}
+                              </p>
+                            </div>
                           </div>
-                          <div className="pb-1">
-                            <p className="font-medium text-sm">{event.description}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {event.location} &bull;{" "}
-                              {new Date(event.timestamp).toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   )}
                 </CardContent>
@@ -322,16 +468,33 @@ export default function ShipmentDetailPage() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div>
-                    <p className="font-semibold">{shipment.recipientName || shipment.salesOrder.customer.name}</p>
-                    {shipment.recipientPhone && <p className="text-sm text-muted-foreground">{shipment.recipientPhone}</p>}
-                    {shipment.recipientEmail && <p className="text-sm text-muted-foreground">{shipment.recipientEmail}</p>}
+                    <p className="font-semibold">
+                      {shipment.recipientName ||
+                        shipment.salesOrder.customer.name}
+                    </p>
+                    {shipment.recipientPhone && (
+                      <p className="text-sm text-muted-foreground">
+                        {shipment.recipientPhone}
+                      </p>
+                    )}
+                    {shipment.recipientEmail && (
+                      <p className="text-sm text-muted-foreground">
+                        {shipment.recipientEmail}
+                      </p>
+                    )}
                   </div>
                   <Separator />
                   <div className="text-sm space-y-0.5">
                     {shipment.addressLine1 && <p>{shipment.addressLine1}</p>}
                     {shipment.addressLine2 && <p>{shipment.addressLine2}</p>}
-                    {(shipment.city || shipment.state || shipment.postalCode) && (
-                      <p>{[shipment.city, shipment.state, shipment.postalCode].filter(Boolean).join(", ")}</p>
+                    {(shipment.city ||
+                      shipment.state ||
+                      shipment.postalCode) && (
+                      <p>
+                        {[shipment.city, shipment.state, shipment.postalCode]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </p>
                     )}
                     {shipment.country && <p>{shipment.country}</p>}
                   </div>
@@ -346,15 +509,23 @@ export default function ShipmentDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <p className="font-semibold">{shipment.salesOrder.customer.name}</p>
+                  <p className="font-semibold">
+                    {shipment.salesOrder.customer.name}
+                  </p>
                   {shipment.salesOrder.customer.email && (
-                    <p className="text-sm text-muted-foreground">{shipment.salesOrder.customer.email}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {shipment.salesOrder.customer.email}
+                    </p>
                   )}
                   <Button
                     variant="outline"
                     size="sm"
                     className="w-full mt-2"
-                    onClick={() => router.push(`/dashboard/sales-orders/${shipment.salesOrder.id}`)}
+                    onClick={() =>
+                      router.push(
+                        `/dashboard/sales-orders/${shipment.salesOrder.id}`,
+                      )
+                    }
                   >
                     View Sales Order
                   </Button>
@@ -371,28 +542,42 @@ export default function ShipmentDetailPage() {
                 <CardContent className="space-y-3 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Created</span>
-                    <span>{new Date(shipment.createdAt).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(shipment.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Created By</span>
-                    <span>{shipment.createdBy.name || shipment.createdBy.email}</span>
+                    <span>
+                      {shipment.createdBy.name || shipment.createdBy.email}
+                    </span>
                   </div>
                   {shipment.shippedDate && (
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Shipped</span>
-                      <span>{new Date(shipment.shippedDate).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(shipment.shippedDate).toLocaleDateString()}
+                      </span>
                     </div>
                   )}
                   {shipment.estimatedDeliveryDate && (
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Est. Delivery</span>
-                      <span>{new Date(shipment.estimatedDeliveryDate).toLocaleDateString()}</span>
+                      <span className="text-muted-foreground">
+                        Est. Delivery
+                      </span>
+                      <span>
+                        {new Date(
+                          shipment.estimatedDeliveryDate,
+                        ).toLocaleDateString()}
+                      </span>
                     </div>
                   )}
                   {shipment.deliveredDate && (
                     <div className="flex justify-between text-green-600 font-medium">
                       <span>Delivered</span>
-                      <span>{new Date(shipment.deliveredDate).toLocaleDateString()}</span>
+                      <span>
+                        {new Date(shipment.deliveredDate).toLocaleDateString()}
+                      </span>
                     </div>
                   )}
                 </CardContent>
@@ -403,7 +588,11 @@ export default function ShipmentDetailPage() {
           <div className="text-center py-16 text-muted-foreground">
             <Truck className="h-12 w-12 mx-auto mb-3 opacity-30" />
             <p className="font-medium">Shipment not found</p>
-            <Button variant="outline" className="mt-4" onClick={() => router.push("/dashboard/shipments")}>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => router.push("/dashboard/shipments")}
+            >
               Back to Shipments
             </Button>
           </div>

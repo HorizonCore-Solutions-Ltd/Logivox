@@ -109,7 +109,8 @@ export async function POST(
         });
 
         for (const item of soItems) {
-          const qtyToShip = item.quantityPacked || item.quantityPicked || item.quantity;
+          const qtyToShip =
+            item.quantityPacked || item.quantityPicked || item.quantity;
 
           // Decrement reserved quantity and on-hand quantity (stock physically leaves)
           await tx.inventoryItem.update({

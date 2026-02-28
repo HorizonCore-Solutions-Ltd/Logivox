@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 // Mock QCInspectionService for turnkey demo/production if actual service is missing or unstable
 // In a real scenario, we'd ensure the service handles organization scoping correctly.
-const MOCK_ENABLE = false; 
+const MOCK_ENABLE = false;
 
 export async function GET(request: NextRequest) {
   return withObservability(async () => {
@@ -15,14 +15,14 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const warehouseId = searchParams.get("warehouseId");
-    
+
     const inspections = await prisma.qCInspection.findMany({
       where: {
         organizationId,
         warehouseId: warehouseId || undefined,
       },
       orderBy: { createdAt: "desc" },
-      take: 50
+      take: 50,
     });
 
     return NextResponse.json({ inspections });

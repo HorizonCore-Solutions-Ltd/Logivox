@@ -86,25 +86,33 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const [invRes, soRes, poRes, shipRes, ncrRes, capaRes, dutyKpisRes] = await Promise.all([
-        fetch("/api/inventory?limit=500"),
-        fetch("/api/sales-orders?limit=10&page=1"),
-        fetch("/api/purchase-orders?status=PENDING,SENT&limit=1"),
-        fetch("/api/shipments?status=SHIPPED&limit=1"),
-        fetch("/api/qc/ncr?status=OPEN&limit=1"),
-        fetch("/api/qc/capa/overdue"),
-        fetch("/api/duties/kpis?days=1"),
-      ]);
+      const [invRes, soRes, poRes, shipRes, ncrRes, capaRes, dutyKpisRes] =
+        await Promise.all([
+          fetch("/api/inventory?limit=500"),
+          fetch("/api/sales-orders?limit=10&page=1"),
+          fetch("/api/purchase-orders?status=PENDING,SENT&limit=1"),
+          fetch("/api/shipments?status=SHIPPED&limit=1"),
+          fetch("/api/qc/ncr?status=OPEN&limit=1"),
+          fetch("/api/qc/capa/overdue"),
+          fetch("/api/duties/kpis?days=1"),
+        ]);
 
-      const [invData, soData, poData, shipData, ncrData, capaData, dutyKpis] = await Promise.all([
-        invRes.ok ? invRes.json() : { items: [], pagination: { total: 0 } },
-        soRes.ok ? soRes.json() : { salesOrders: [], total: 0 },
-        poRes.ok ? poRes.json() : { purchaseOrders: [], total: 0, pagination: { total: 0 } },
-        shipRes.ok ? shipRes.json() : { shipments: [], total: 0, pagination: { total: 0 } },
-        ncrRes.ok ? ncrRes.json() : { total: 0, data: [] },
-        capaRes.ok ? capaRes.json() : [],
-        dutyKpisRes?.ok ? dutyKpisRes.json() : { byStatus: {}, slaBreached: 0 },
-      ]);
+      const [invData, soData, poData, shipData, ncrData, capaData, dutyKpis] =
+        await Promise.all([
+          invRes.ok ? invRes.json() : { items: [], pagination: { total: 0 } },
+          soRes.ok ? soRes.json() : { salesOrders: [], total: 0 },
+          poRes.ok
+            ? poRes.json()
+            : { purchaseOrders: [], total: 0, pagination: { total: 0 } },
+          shipRes.ok
+            ? shipRes.json()
+            : { shipments: [], total: 0, pagination: { total: 0 } },
+          ncrRes.ok ? ncrRes.json() : { total: 0, data: [] },
+          capaRes.ok ? capaRes.json() : [],
+          dutyKpisRes?.ok
+            ? dutyKpisRes.json()
+            : { byStatus: {}, slaBreached: 0 },
+        ]);
 
       const items: any[] = invData.items || [];
       const totalValue = items.reduce((sum: number, item: any) => {
@@ -112,26 +120,45 @@ export default function DashboardPage() {
         return sum + val;
       }, 0);
       const lowStock = items.filter(
-        (i: any) => i.reorderPoint && i.quantity <= i.reorderPoint
+        (i: any) => i.reorderPoint && i.quantity <= i.reorderPoint,
       );
 
-      const salesOrders: RecentOrder[] = soData.salesOrders || soData.data || [];
-      const openStatuses = ["PENDING_APPROVAL", "APPROVED", "PICKING", "PICKED", "PACKING", "PACKED", "SHIPPING"];
-      const openCount = (soData.total || salesOrders.length);
+      const salesOrders: RecentOrder[] =
+        soData.salesOrders || soData.data || [];
+      const openStatuses = [
+        "PENDING_APPROVAL",
+        "APPROVED",
+        "PICKING",
+        "PICKED",
+        "PACKING",
+        "PACKED",
+        "SHIPPING",
+      ];
+      const openCount = soData.total || salesOrders.length;
 
       const activeDuties: number = dutyKpis?.byStatus?.ACTIVE ?? 0;
       const slaBreachedDuties: number = dutyKpis?.slaBreached ?? 0;
 
-      const openNcrs = ncrData.total ?? (Array.isArray(ncrData) ? ncrData.length : (ncrData.data?.length ?? 0));
-      const overdueCAPAs = Array.isArray(capaData) ? capaData.length : (capaData.total ?? 0);
+      const openNcrs =
+        ncrData.total ??
+        (Array.isArray(ncrData) ? ncrData.length : (ncrData.data?.length ?? 0));
+      const overdueCAPAs = Array.isArray(capaData)
+        ? capaData.length
+        : (capaData.total ?? 0);
 
       setStats({
         totalItems: invData.pagination?.total || items.length,
         totalValue,
         lowStockCount: lowStock.length,
         openSalesOrders: openCount,
-        pendingPurchaseOrders: poData.pagination?.total || poData.total || (poData.purchaseOrders || []).length,
-        shipmentsInTransit: shipData.pagination?.total || shipData.total || (shipData.shipments || []).length,
+        pendingPurchaseOrders:
+          poData.pagination?.total ||
+          poData.total ||
+          (poData.purchaseOrders || []).length,
+        shipmentsInTransit:
+          shipData.pagination?.total ||
+          shipData.total ||
+          (shipData.shipments || []).length,
         openNcrs,
         overdueCAPAs,
         activeDuties,
@@ -147,7 +174,7 @@ export default function DashboardPage() {
           quantity: i.quantity,
           reorderPoint: i.reorderPoint,
           availableQty: i.availableQty,
-        }))
+        })),
       );
       setLastUpdated(new Date());
     } catch (error) {
@@ -175,12 +202,24 @@ export default function DashboardPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "SHIPPED": case "DELIVERED": return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      case "APPROVED": case "PICKED": case "PACKED": return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
-      case "PENDING_APPROVAL": case "DRAFT": return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "PICKING": case "PACKING": case "SHIPPING": return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
-      case "CANCELLED": return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      default: return "bg-gray-100 text-gray-800";
+      case "SHIPPED":
+      case "DELIVERED":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
+      case "APPROVED":
+      case "PICKED":
+      case "PACKED":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200";
+      case "PENDING_APPROVAL":
+      case "DRAFT":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
+      case "PICKING":
+      case "PACKING":
+      case "SHIPPING":
+        return "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200";
+      case "CANCELLED":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
@@ -243,7 +282,10 @@ export default function DashboardPage() {
       icon: FileWarning,
       description: "non-conformance reports open",
       color: stats.openNcrs > 0 ? "text-red-600" : "text-gray-400",
-      bg: stats.openNcrs > 0 ? "bg-red-50 dark:bg-red-950" : "bg-gray-50 dark:bg-gray-900",
+      bg:
+        stats.openNcrs > 0
+          ? "bg-red-50 dark:bg-red-950"
+          : "bg-gray-50 dark:bg-gray-900",
       href: "/capa/hub",
     },
     {
@@ -251,8 +293,11 @@ export default function DashboardPage() {
       value: loading ? "—" : stats.overdueCAPAs.toString(),
       icon: ShieldAlert,
       description: "corrective actions past due",
-            color: stats.overdueCAPAs > 0 ? "text-orange-600" : "text-gray-400",
-      bg: stats.overdueCAPAs > 0 ? "bg-orange-50 dark:bg-orange-950" : "bg-gray-50 dark:bg-gray-900",
+      color: stats.overdueCAPAs > 0 ? "text-orange-600" : "text-gray-400",
+      bg:
+        stats.overdueCAPAs > 0
+          ? "bg-orange-50 dark:bg-orange-950"
+          : "bg-gray-50 dark:bg-gray-900",
       href: "/capa/hub",
     },
     {
@@ -270,7 +315,10 @@ export default function DashboardPage() {
       icon: AlertTriangle,
       description: "duties past SLA window",
       color: stats.slaBreachedDuties > 0 ? "text-red-600" : "text-gray-400",
-      bg: stats.slaBreachedDuties > 0 ? "bg-red-50 dark:bg-red-950" : "bg-gray-50 dark:bg-gray-900",
+      bg:
+        stats.slaBreachedDuties > 0
+          ? "bg-red-50 dark:bg-red-950"
+          : "bg-gray-50 dark:bg-gray-900",
       href: "/dashboard/duties?slaBreached=true",
     },
   ];
@@ -283,7 +331,8 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
             <p className="text-muted-foreground mt-1">
-              Live operations overview &mdash; real-time data across all modules.
+              Live operations overview &mdash; real-time data across all
+              modules.
               {lastUpdated && (
                 <span className="ml-2 text-xs">
                   Last updated: {lastUpdated.toLocaleTimeString()}
@@ -292,11 +341,21 @@ export default function DashboardPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleRefresh} disabled={refreshing}>
-              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
-            <Button size="sm" onClick={() => router.push("/dashboard/sales-orders/new")}>
+            <Button
+              size="sm"
+              onClick={() => router.push("/dashboard/sales-orders/new")}
+            >
               <PlusCircle className="h-4 w-4 mr-2" />
               New Sales Order
             </Button>
@@ -317,7 +376,9 @@ export default function DashboardPage() {
                   <CardTitle className="text-xs font-medium text-muted-foreground leading-tight">
                     {stat.title}
                   </CardTitle>
-                  <div className={`h-8 w-8 rounded-full ${stat.bg} flex items-center justify-center flex-shrink-0`}>
+                  <div
+                    className={`h-8 w-8 rounded-full ${stat.bg} flex items-center justify-center flex-shrink-0`}
+                  >
                     <Icon className={`h-4 w-4 ${stat.color}`} />
                   </div>
                 </CardHeader>
@@ -327,7 +388,9 @@ export default function DashboardPage() {
                   ) : (
                     <div className="text-2xl font-bold">{stat.value}</div>
                   )}
-                  <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {stat.description}
+                  </p>
                 </CardContent>
               </Card>
             );
@@ -341,9 +404,15 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Recent Sales Orders</CardTitle>
-                  <CardDescription>Latest orders in the fulfillment pipeline</CardDescription>
+                  <CardDescription>
+                    Latest orders in the fulfillment pipeline
+                  </CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard/sales-orders")}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.push("/dashboard/sales-orders")}
+                >
                   View All <ArrowUpRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
@@ -359,7 +428,12 @@ export default function DashboardPage() {
                 <div className="text-center py-8 text-muted-foreground">
                   <ShoppingCart className="h-8 w-8 mx-auto mb-2 opacity-40" />
                   <p className="text-sm">No sales orders yet.</p>
-                  <Button size="sm" variant="outline" className="mt-3" onClick={() => router.push("/dashboard/sales-orders/new")}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-3"
+                    onClick={() => router.push("/dashboard/sales-orders/new")}
+                  >
                     Create First Order
                   </Button>
                 </div>
@@ -369,24 +443,34 @@ export default function DashboardPage() {
                     <div
                       key={order.id}
                       className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                      onClick={() => router.push(`/dashboard/sales-orders/${order.id}`)}
+                      onClick={() =>
+                        router.push(`/dashboard/sales-orders/${order.id}`)
+                      }
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <p className="font-medium truncate">{order.customer?.name || "Unknown"}</p>
-                          <Badge className={getStatusColor(order.status)} variant="secondary">
+                          <p className="font-medium truncate">
+                            {order.customer?.name || "Unknown"}
+                          </p>
+                          <Badge
+                            className={getStatusColor(order.status)}
+                            variant="secondary"
+                          >
                             {order.status.replace(/_/g, " ")}
                           </Badge>
                         </div>
                         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
                           <span>{order.soNumber}</span>
                           <span>•</span>
-                          <span>{new Date(order.orderDate).toLocaleDateString()}</span>
+                          <span>
+                            {new Date(order.orderDate).toLocaleDateString()}
+                          </span>
                         </div>
                       </div>
                       <div className="text-right flex-shrink-0 ml-2">
                         <p className="font-semibold text-sm">
-                          {order.currency || "USD"} {Number(order.total || 0).toFixed(2)}
+                          {order.currency || "USD"}{" "}
+                          {Number(order.total || 0).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -402,9 +486,15 @@ export default function DashboardPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle>Low Stock Alerts</CardTitle>
-                  <CardDescription>Items at or below reorder point</CardDescription>
+                  <CardDescription>
+                    Items at or below reorder point
+                  </CardDescription>
                 </div>
-                <Button variant="ghost" size="sm" onClick={() => router.push("/dashboard/inventory")}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => router.push("/dashboard/inventory")}
+                >
                   View All <ArrowUpRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>
@@ -419,15 +509,18 @@ export default function DashboardPage() {
               ) : lowStockItems.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   <Activity className="h-8 w-8 mx-auto mb-2 opacity-40 text-green-500" />
-                  <p className="text-sm font-medium text-green-600">All stock levels healthy!</p>
+                  <p className="text-sm font-medium text-green-600">
+                    All stock levels healthy!
+                  </p>
                   <p className="text-xs mt-1">No items below reorder point.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {lowStockItems.map((item) => {
-                    const pct = item.reorderPoint > 0
-                      ? Math.round((item.quantity / item.reorderPoint) * 100)
-                      : 100;
+                    const pct =
+                      item.reorderPoint > 0
+                        ? Math.round((item.quantity / item.reorderPoint) * 100)
+                        : 100;
                     const isCritical = pct < 50;
                     return (
                       <div
@@ -436,21 +529,33 @@ export default function DashboardPage() {
                       >
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <p className="font-medium text-sm truncate">{item.name}</p>
+                            <p className="font-medium text-sm truncate">
+                              {item.name}
+                            </p>
                             <Badge
-                              className={isCritical ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" : "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"}
+                              className={
+                                isCritical
+                                  ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                                  : "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                              }
                               variant="secondary"
                             >
                               {isCritical ? "Critical" : "Low"}
                             </Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">{item.sku} &bull; Reorder at {item.reorderPoint}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {item.sku} &bull; Reorder at {item.reorderPoint}
+                          </p>
                         </div>
                         <div className="text-right flex-shrink-0 ml-2">
-                          <p className={`font-bold text-sm ${isCritical ? "text-red-600" : "text-orange-600"}`}>
+                          <p
+                            className={`font-bold text-sm ${isCritical ? "text-red-600" : "text-orange-600"}`}
+                          >
                             {item.quantity} units
                           </p>
-                          <p className="text-xs text-muted-foreground">{pct}% of threshold</p>
+                          <p className="text-xs text-muted-foreground">
+                            {pct}% of threshold
+                          </p>
                         </div>
                       </div>
                     );
@@ -470,13 +575,48 @@ export default function DashboardPage() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
               {[
-                { label: "New Sales Order", icon: ShoppingCart, href: "/dashboard/sales-orders/new", color: "text-violet-600" },
-                { label: "Receive Goods (GRN)", icon: Package, href: "/dashboard/receiving", color: "text-teal-600" },
-                { label: "Fulfillment Hub", icon: Truck, href: "/dashboard/fulfillment", color: "text-green-600" },
-                { label: "Cycle Count", icon: ClipboardList, href: "/dashboard/inventory", color: "text-blue-600" },
-                { label: "New Purchase Order", icon: Activity, href: "/dashboard/purchase-orders/new", color: "text-indigo-600" },
-                { label: "CAPA Hub", icon: ShieldAlert, href: "/capa/hub", color: "text-red-600" },
-                { label: "View Reports", icon: BarChart3, href: "/dashboard/reports", color: "text-orange-600" },
+                {
+                  label: "New Sales Order",
+                  icon: ShoppingCart,
+                  href: "/dashboard/sales-orders/new",
+                  color: "text-violet-600",
+                },
+                {
+                  label: "Receive Goods (GRN)",
+                  icon: Package,
+                  href: "/dashboard/receiving",
+                  color: "text-teal-600",
+                },
+                {
+                  label: "Fulfillment Hub",
+                  icon: Truck,
+                  href: "/dashboard/fulfillment",
+                  color: "text-green-600",
+                },
+                {
+                  label: "Cycle Count",
+                  icon: ClipboardList,
+                  href: "/dashboard/inventory",
+                  color: "text-blue-600",
+                },
+                {
+                  label: "New Purchase Order",
+                  icon: Activity,
+                  href: "/dashboard/purchase-orders/new",
+                  color: "text-indigo-600",
+                },
+                {
+                  label: "CAPA Hub",
+                  icon: ShieldAlert,
+                  href: "/capa/hub",
+                  color: "text-red-600",
+                },
+                {
+                  label: "View Reports",
+                  icon: BarChart3,
+                  href: "/dashboard/reports",
+                  color: "text-orange-600",
+                },
               ].map((action) => {
                 const Icon = action.icon;
                 return (
@@ -488,7 +628,9 @@ export default function DashboardPage() {
                     <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center group-hover:scale-110 transition-transform">
                       <Icon className={`h-5 w-5 ${action.color}`} />
                     </div>
-                    <span className="text-xs font-medium leading-tight">{action.label}</span>
+                    <span className="text-xs font-medium leading-tight">
+                      {action.label}
+                    </span>
                   </button>
                 );
               })}
@@ -499,5 +641,3 @@ export default function DashboardPage() {
     </DashboardSidebar>
   );
 }
-
-

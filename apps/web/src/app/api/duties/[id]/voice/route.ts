@@ -5,7 +5,7 @@ import { DutyService } from "@/lib/services/duties/duty-service";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.organizationId)
