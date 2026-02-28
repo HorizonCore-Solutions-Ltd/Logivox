@@ -66,7 +66,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     Operations: false,
     Quality: false,
     Duties: false,
-    Duties: false,
+    "Next-Gen": false,
   });
   const [currentOrgId, setCurrentOrgId] = React.useState<string>("");
 
@@ -137,6 +137,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           href: "/dashboard/receiving",
           icon: ClipboardCheck,
         },
+        {
+          name: "GRN Detail View",
+          href: "/dashboard/grn",
+          icon: ClipboardCheck,
+        },
         { name: "Suppliers", href: "/dashboard/suppliers", icon: Building },
       ],
     },
@@ -145,7 +150,13 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       href: "/dashboard/returns",
       icon: ShieldCheck,
       subItems: [
+        { name: "Operations Hub", href: "/dashboard/operations", icon: Activity },
         { name: "Returns & RMAs", href: "/dashboard/returns", icon: RotateCcw },
+        {
+          name: "RMA Detail View",
+          href: "/dashboard/rmas",
+          icon: RotateCcw,
+        },
         {
           name: "QC Inspections",
           href: "/dashboard/qc-inspections",
@@ -181,6 +192,26 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         { name: "Auto-Planner", href: "/dashboard/duties/planner", icon: Zap },
       ],
     },
+    {
+      name: "Next-Gen",
+      href: "/dashboard/labor",
+      icon: Zap,
+      badge: "Advanced",
+      subItems: [
+        { name: "Labor Management", href: "/dashboard/labor", icon: Users },
+        { name: "Task Interleaving", href: "/dashboard/task-interleaving", icon: Zap },
+        { name: "Yard Management", href: "/dashboard/yard-management", icon: Truck },
+        { name: "Floor Heatmap", href: "/dashboard/floor-heatmap", icon: Activity },
+        { name: "Automation/Robotics", href: "/dashboard/automation", icon: Zap },
+        { name: "IoT Sensors", href: "/dashboard/iot", icon: Zap },
+        { name: "AI Forecasting", href: "/dashboard/ai-forecasting", icon: BarChart3 },
+        { name: "Demand Forecasting", href: "/dashboard/forecasting", icon: BarChart3 },
+        { name: "Computer Vision", href: "/dashboard/computer-vision", icon: Zap },
+        { name: "Customer Analytics", href: "/dashboard/customer-analytics", icon: BarChart3 },
+        { name: "Sustainability", href: "/dashboard/sustainability", icon: Globe2 },
+        { name: "Blockchain", href: "/dashboard/blockchain", icon: ShieldCheck },
+      ],
+    },
     { name: "Customers", href: "/dashboard/customers", icon: Users },
     { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
@@ -207,14 +238,30 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
   const isProcurementActive =
     pathname.startsWith("/dashboard/purchase-orders") ||
     pathname.startsWith("/dashboard/receiving") ||
+    pathname.startsWith("/dashboard/grn") ||
     pathname.startsWith("/dashboard/suppliers");
   const isOperationsActive =
+    pathname.startsWith("/dashboard/operations") ||
     pathname.startsWith("/dashboard/returns") ||
+    pathname.startsWith("/dashboard/rmas") ||
     pathname.startsWith("/dashboard/qc-inspections") ||
     pathname.startsWith("/dashboard/cycle-counts");
   const isQualityActive =
     pathname.startsWith("/capa") || pathname.startsWith("/dashboard/ncr");
   const isDutiesActive = pathname.startsWith("/dashboard/duties");
+  const isNextGenActive =
+    pathname.startsWith("/dashboard/labor") ||
+    pathname.startsWith("/dashboard/task-interleaving") ||
+    pathname.startsWith("/dashboard/yard-management") ||
+    pathname.startsWith("/dashboard/floor-heatmap") ||
+    pathname.startsWith("/dashboard/automation") ||
+    pathname.startsWith("/dashboard/iot") ||
+    pathname.startsWith("/dashboard/ai-forecasting") ||
+    pathname.startsWith("/dashboard/forecasting") ||
+    pathname.startsWith("/dashboard/computer-vision") ||
+    pathname.startsWith("/dashboard/customer-analytics") ||
+    pathname.startsWith("/dashboard/sustainability") ||
+    pathname.startsWith("/dashboard/blockchain");
 
   const isSectionActive = (name: string) => {
     if (name === "Inventory") return isInventoryActive;
@@ -223,6 +270,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     if (name === "Operations") return isOperationsActive;
     if (name === "Quality") return isQualityActive;
     if (name === "Duties") return isDutiesActive;
+    if (name === "Next-Gen") return isNextGenActive;
     return false;
   };
 
