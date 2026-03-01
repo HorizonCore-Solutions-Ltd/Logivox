@@ -37,6 +37,7 @@ import {
   Building2,
   Lock,
   FileText,
+  Clock,
 } from "lucide-react";
 
 // ── Provider catalogue by category ──────────────────────────────────────────
