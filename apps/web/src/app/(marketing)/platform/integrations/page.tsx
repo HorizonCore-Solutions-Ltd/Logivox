@@ -36,6 +36,7 @@ import {
   Mail,
   Building2,
   Lock,
+  FileText,
 } from "lucide-react";
 
 // ── Provider catalogue by category ──────────────────────────────────────────
