@@ -138,7 +138,12 @@ export class NCRService {
 
     // Update supplier quality score on NCR creation (best-effort)
     if (params.supplierId) {
-      const deduction = params.severity === "CRITICAL" ? 10 : params.severity === "HIGH" ? 5 : 2;
+      const deduction =
+        params.severity === "CRITICAL"
+          ? 10
+          : params.severity === "HIGH"
+            ? 5
+            : 2;
       prisma.vendorQualityScore
         .upsert({
           where: { supplierId: params.supplierId },
@@ -174,10 +179,24 @@ export class NCRService {
           problemSeverity: params.severity,
           rootCauseMethod: "5_WHY",
           rootCauseAnalysis: { method: "5_WHY", status: "PENDING" },
-          rootCause: "Root cause under investigation — linked to NCR " + ncr.ncrNumber,
-          immediateActions: [{ action: "Quarantine affected stock", status: "OPEN" }],
-          correctiveActions: [{ action: "Investigate and address root cause", owner: params.createdBy, status: "OPEN" }],
-          preventiveActions: [{ action: "Review process controls to prevent recurrence", status: "OPEN" }],
+          rootCause:
+            "Root cause under investigation — linked to NCR " + ncr.ncrNumber,
+          immediateActions: [
+            { action: "Quarantine affected stock", status: "OPEN" },
+          ],
+          correctiveActions: [
+            {
+              action: "Investigate and address root cause",
+              owner: params.createdBy,
+              status: "OPEN",
+            },
+          ],
+          preventiveActions: [
+            {
+              action: "Review process controls to prevent recurrence",
+              status: "OPEN",
+            },
+          ],
           responsiblePerson: params.createdBy,
           targetCompletionDate: targetDate,
           priority: params.severity === "CRITICAL" ? "CRITICAL" : "HIGH",

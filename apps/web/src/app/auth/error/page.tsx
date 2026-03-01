@@ -26,26 +26,20 @@ export default function AuthErrorPage() {
             <AlertCircle className="h-8 w-8 text-red-600" />
           </div>
         </div>
-        
+
         <h1 className="text-2xl font-bold text-center text-gray-900 mb-2">
           Authentication Error
         </h1>
-        
-        <p className="text-center text-gray-600 mb-8">
-          {errorMessage}
-        </p>
+
+        <p className="text-center text-gray-600 mb-8">{errorMessage}</p>
 
         <div className="space-y-3">
           <Button asChild className="w-full">
-            <Link href="/sign-in">
-              Try Again
-            </Link>
+            <Link href="/sign-in">Try Again</Link>
           </Button>
-          
+
           <Button asChild variant="outline" className="w-full">
-            <Link href="/">
-              Go to Homepage
-            </Link>
+            <Link href="/">Go to Homepage</Link>
           </Button>
         </div>
 

@@ -71,11 +71,11 @@ const CAPA_STAGE_CATEGORY: Record<string, string> = {
 };
 
 const CAPA_STAGE_SLA: Record<string, number> = {
-  CONTAINMENT: 60,       // 1 h
-  ROOT_CAUSE: 480,       // 8 h
-  CORRECTIVE: 1440,      // 24 h
-  PREVENTIVE: 2880,      // 48 h
-  VERIFICATION: 1440,    // 24 h
+  CONTAINMENT: 60, // 1 h
+  ROOT_CAUSE: 480, // 8 h
+  CORRECTIVE: 1440, // 24 h
+  PREVENTIVE: 2880, // 48 h
+  VERIFICATION: 1440, // 24 h
 };
 
 // ─── Helper — parse Employee.skills/certifications JSON ──────────────────────
@@ -87,7 +87,9 @@ function getEmployeeSkills(emp: { skills?: Prisma.JsonValue }): string[] {
   return [];
 }
 
-function getEmployeeCerts(emp: { certifications?: Prisma.JsonValue }): string[] {
+function getEmployeeCerts(emp: {
+  certifications?: Prisma.JsonValue;
+}): string[] {
   if (!emp.certifications) return [];
   if (Array.isArray(emp.certifications)) return emp.certifications as string[];
   if (typeof emp.certifications === "object")
@@ -139,7 +141,12 @@ export class DutyService {
 
     // Resolve checklist from DutyType if not provided
     let resolvedChecklist: Prisma.JsonValue | undefined = checklistItems
-      ? checklistItems.map((c) => ({ ...c, done: false, doneAt: null, doneBy: null }))
+      ? checklistItems.map((c) => ({
+          ...c,
+          done: false,
+          doneAt: null,
+          doneBy: null,
+        }))
       : undefined;
 
     if (!resolvedChecklist && dutyTypeId) {
@@ -176,7 +183,10 @@ export class DutyService {
           ? { idempotencyKey: input.idempotencyKey }
           : undefined,
       },
-      include: { evidence: true, dutyType: { select: { name: true, category: true } } },
+      include: {
+        evidence: true,
+        dutyType: { select: { name: true, category: true } },
+      },
     });
 
     return duty;
@@ -186,7 +196,7 @@ export class DutyService {
 
   static async autoAssign(
     dutyId: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<AssignmentResult> {
     const duty = await prisma.duty.findUnique({
       where: { id: dutyId },
@@ -244,11 +254,21 @@ export class DutyService {
     });
 
     if (employees.length === 0) {
-      return { dutyId, employeeId: null, employeeName: null, rule: "no-eligible-employees", confidence: 0 };
+      return {
+        dutyId,
+        employeeId: null,
+        employeeName: null,
+        rule: "no-eligible-employees",
+        confidence: 0,
+      };
     }
 
     // Score each candidate
-    type ScoredEmployee = { emp: typeof employees[0]; score: number; rule: string };
+    type ScoredEmployee = {
+      emp: (typeof employees)[0];
+      score: number;
+      rule: string;
+    };
     const scored: ScoredEmployee[] = employees.map((emp) => {
       const empSkills = getEmployeeSkills(emp);
       const empCerts = getEmployeeCerts(emp);
@@ -258,14 +278,14 @@ export class DutyService {
 
       // Skill match
       const skillMatches = requiredSkills.filter((s) =>
-        empSkills.some((es) => es.toLowerCase().includes(s.toLowerCase()))
+        empSkills.some((es) => es.toLowerCase().includes(s.toLowerCase())),
       ).length;
       score += skillMatches * 10;
       if (requiredSkills.length > 0 && skillMatches > 0) rule = "skill-match";
 
       // Cert match
       const certMatches = requiredCerts.filter((c) =>
-        empCerts.some((ec) => ec.toLowerCase().includes(c.toLowerCase()))
+        empCerts.some((ec) => ec.toLowerCase().includes(c.toLowerCase())),
       ).length;
       score += certMatches * 15;
       if (requiredCerts.length > 0 && certMatches > 0) rule = "cert-match";
@@ -281,7 +301,10 @@ export class DutyService {
 
     scored.sort((a, b) => b.score - a.score);
     const winner = scored[0];
-    const maxScore = Math.max(1, requiredSkills.length * 10 + requiredCerts.length * 15 + 5);
+    const maxScore = Math.max(
+      1,
+      requiredSkills.length * 10 + requiredCerts.length * 15 + 5,
+    );
     const confidence = Math.min(1, winner.score / maxScore);
 
     await prisma.duty.update({
@@ -310,16 +333,27 @@ export class DutyService {
     for (const req of input.duties) {
       const dutyType = await prisma.dutyType.findUnique({
         where: { id: req.dutyTypeId },
-        select: { name: true, category: true, defaultDuration: true, slaMinutes: undefined as any },
+        select: {
+          name: true,
+          category: true,
+          defaultDuration: true,
+          slaMinutes: undefined as any,
+        },
       });
       if (!dutyType) continue;
 
       for (let i = 0; i < req.quantity; i++) {
         const scheduledStart = req.scheduledStart
-          ? new Date(req.scheduledStart.getTime() + i * (dutyType.defaultDuration ?? 30) * 60_000)
+          ? new Date(
+              req.scheduledStart.getTime() +
+                i * (dutyType.defaultDuration ?? 30) * 60_000,
+            )
           : undefined;
         const scheduledEnd = scheduledStart
-          ? new Date(scheduledStart.getTime() + (dutyType.defaultDuration ?? 30) * 60_000)
+          ? new Date(
+              scheduledStart.getTime() +
+                (dutyType.defaultDuration ?? 30) * 60_000,
+            )
           : undefined;
 
         const duty = await DutyService.createDuty({
@@ -335,7 +369,10 @@ export class DutyService {
           assignedBy: input.requestedBy,
         });
 
-        const assignment = await DutyService.autoAssign(duty.id, input.organizationId);
+        const assignment = await DutyService.autoAssign(
+          duty.id,
+          input.organizationId,
+        );
         results.push(assignment);
       }
     }
@@ -354,7 +391,8 @@ export class DutyService {
     ncrId?: string;
     priority?: string;
   }) {
-    const { organizationId, capaId, capaTitle, stage, ncrId, priority } = params;
+    const { organizationId, capaId, capaTitle, stage, ncrId, priority } =
+      params;
     const category = CAPA_STAGE_CATEGORY[stage] ?? "OTHER";
     const slaMinutes = CAPA_STAGE_SLA[stage] ?? 240;
     const stageName = stage.replace(/_/g, " ").toLowerCase();
@@ -383,7 +421,11 @@ export class DutyService {
     id: string,
     organizationId: string,
     status: string,
-    opts?: { completionNotes?: string; rejectionReason?: string; employeeId?: string }
+    opts?: {
+      completionNotes?: string;
+      rejectionReason?: string;
+      employeeId?: string;
+    },
   ) {
     const now = new Date();
     const data: Prisma.DutyUpdateInput = { status: status as any };
@@ -395,9 +437,17 @@ export class DutyService {
     if (opts?.rejectionReason) data.rejectionReason = opts.rejectionReason;
 
     // Compute duration
-    const existing = await prisma.duty.findUnique({ where: { id }, select: { actualStart: true } });
-    if (existing?.actualStart && (status === "DONE" || status === "CANCELLED")) {
-      data.durationMinutes = Math.round((now.getTime() - existing.actualStart.getTime()) / 60_000);
+    const existing = await prisma.duty.findUnique({
+      where: { id },
+      select: { actualStart: true },
+    });
+    if (
+      existing?.actualStart &&
+      (status === "DONE" || status === "CANCELLED")
+    ) {
+      data.durationMinutes = Math.round(
+        (now.getTime() - existing.actualStart.getTime()) / 60_000,
+      );
     }
 
     return prisma.duty.update({ where: { id, organizationId }, data });
@@ -409,9 +459,12 @@ export class DutyService {
     id: string,
     organizationId: string,
     newEmployeeId: string,
-    reason: string
+    reason: string,
   ) {
-    const duty = await prisma.duty.findUnique({ where: { id }, select: { employeeId: true, reassignCount: true } });
+    const duty = await prisma.duty.findUnique({
+      where: { id },
+      select: { employeeId: true, reassignCount: true },
+    });
     return prisma.duty.update({
       where: { id, organizationId },
       data: {
@@ -458,7 +511,8 @@ export class DutyService {
 
     // Use DutyType template if present, else build a default one
     const template = duty.dutyType?.voiceTemplate as any;
-    const checklist = (duty.checklistItems ?? duty.dutyType?.checklistItems) as any[];
+    const checklist = (duty.checklistItems ??
+      duty.dutyType?.checklistItems) as any[];
 
     const steps = checklist
       ? checklist.map((item: any, idx: number) => ({
@@ -468,9 +522,24 @@ export class DutyService {
           checkDigit: randomBytes(2).toString("hex").toUpperCase(),
         }))
       : [
-          { seq: 1, prompt: `Begin: ${duty.title}`, confirmationType: "acknowledge", checkDigit: null },
-          { seq: 2, prompt: "Confirm area is clear and safe.", confirmationType: "voice_confirm", checkDigit: randomBytes(2).toString("hex").toUpperCase() },
-          { seq: 3, prompt: "Task complete? Confirm.", confirmationType: "voice_confirm", checkDigit: randomBytes(2).toString("hex").toUpperCase() },
+          {
+            seq: 1,
+            prompt: `Begin: ${duty.title}`,
+            confirmationType: "acknowledge",
+            checkDigit: null,
+          },
+          {
+            seq: 2,
+            prompt: "Confirm area is clear and safe.",
+            confirmationType: "voice_confirm",
+            checkDigit: randomBytes(2).toString("hex").toUpperCase(),
+          },
+          {
+            seq: 3,
+            prompt: "Task complete? Confirm.",
+            confirmationType: "voice_confirm",
+            checkDigit: randomBytes(2).toString("hex").toUpperCase(),
+          },
         ];
 
     const script = {
@@ -520,10 +589,26 @@ export class DutyService {
 
     const [total, done, breached, capaLinked, byStatus, byCategory] =
       await Promise.all([
-        prisma.duty.count({ where: { organizationId, createdAt: { gte: from } } }),
-        prisma.duty.count({ where: { organizationId, status: "DONE", createdAt: { gte: from } } }),
-        prisma.duty.count({ where: { organizationId, slaBreached: true, createdAt: { gte: from } } }),
-        prisma.duty.count({ where: { organizationId, capaId: { not: null }, createdAt: { gte: from } } }),
+        prisma.duty.count({
+          where: { organizationId, createdAt: { gte: from } },
+        }),
+        prisma.duty.count({
+          where: { organizationId, status: "DONE", createdAt: { gte: from } },
+        }),
+        prisma.duty.count({
+          where: {
+            organizationId,
+            slaBreached: true,
+            createdAt: { gte: from },
+          },
+        }),
+        prisma.duty.count({
+          where: {
+            organizationId,
+            capaId: { not: null },
+            createdAt: { gte: from },
+          },
+        }),
         prisma.duty.groupBy({
           by: ["status"],
           where: { organizationId, createdAt: { gte: from } },
@@ -538,7 +623,12 @@ export class DutyService {
 
     // Average duration for DONE duties
     const doneWithDuration = await prisma.duty.findMany({
-      where: { organizationId, status: "DONE", durationMinutes: { not: null }, createdAt: { gte: from } },
+      where: {
+        organizationId,
+        status: "DONE",
+        durationMinutes: { not: null },
+        createdAt: { gte: from },
+      },
       select: { durationMinutes: true },
     });
     const avgDurationMinutes =
@@ -550,12 +640,15 @@ export class DutyService {
     return {
       total,
       done,
-      slaHitRate: total > 0 ? Math.round(((total - breached) / total) * 100) : 100,
+      slaHitRate:
+        total > 0 ? Math.round(((total - breached) / total) * 100) : 100,
       slaBreached: breached,
       capaLinked,
       avgDurationMinutes: Math.round(avgDurationMinutes),
       byStatus: Object.fromEntries(byStatus.map((r) => [r.status, r._count])),
-      byCategory: Object.fromEntries(byCategory.map((r) => [r.category, r._count])),
+      byCategory: Object.fromEntries(
+        byCategory.map((r) => [r.category, r._count]),
+      ),
     };
   }
 }

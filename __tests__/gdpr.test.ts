@@ -42,10 +42,7 @@ describe("GDPR Compliance", () => {
     // Clean up - find user by anonymized email pattern
     await prisma.user.deleteMany({
       where: {
-        OR: [
-          { email: testEmail },
-          { email: { contains: "deleted_" } },
-        ],
+        OR: [{ email: testEmail }, { email: { contains: "deleted_" } }],
       },
     });
     await prisma.$disconnect();

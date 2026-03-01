@@ -29,13 +29,15 @@ export function CTASection() {
               Ready for Enterprise-Grade WMS?
             </h2>
             <p className="text-xl text-muted-foreground">
-              Production-ready platform with 489 APIs, 42 dashboards, and complete Next-Gen capabilities.
-              Voice operations, AI optimization, and IoT integration fully deployed.
+              Production-ready platform with 489 APIs, 42 dashboards, and
+              complete Next-Gen capabilities. Voice operations, AI optimization,
+              and IoT integration fully deployed.
             </p>
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-2xl mx-auto mt-6">
               <p className="text-sm font-semibold text-blue-800 flex items-center gap-2">
                 <span>🔒</span>
-                <strong>Enterprise Ready:</strong> ISO 27001 & SOC 2 certified with 99.99% uptime SLA
+                <strong>Enterprise Ready:</strong> ISO 27001 & SOC 2 certified
+                with 99.99% uptime SLA
               </p>
             </div>
           </div>
@@ -77,7 +79,8 @@ export function CTASection() {
           {/* Trust line */}
           <div className="pt-6 space-y-3">
             <p className="text-sm text-muted-foreground">
-              <strong>Need information?</strong> Our enterprise team responds within 2 hours
+              <strong>Need information?</strong> Our enterprise team responds
+              within 2 hours
             </p>
             <div className="flex flex-col sm:flex-row justify-center items-center gap-4 text-sm">
               <span className="font-semibold text-foreground flex items-center gap-1">

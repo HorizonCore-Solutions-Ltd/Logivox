@@ -305,7 +305,8 @@ export class CAPAService {
             capaNumber: capa.capaNumber,
             closedBy: params.closedBy,
             closedDate: new Date().toISOString(),
-            message: "CAPA closed and verified. Procurement and operations teams may resume normal supplier activities if no further action is required.",
+            message:
+              "CAPA closed and verified. Procurement and operations teams may resume normal supplier activities if no further action is required.",
           },
         },
       });

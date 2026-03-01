@@ -5,7 +5,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Shield, Zap, Brain, Waves, Activity } from "lucide-react";
+import { ArrowRight, Shield, Zap, Brain, Activity, Truck, GitMerge } from "lucide-react";
 
 const offerings = [
   {
@@ -40,6 +40,22 @@ const offerings = [
     href: "/features",
     pill: "Security",
   },
+  {
+    title: "Marshalling & Yard Add-On",
+    description:
+      "Yard slots, dock scheduling, and load marshalling — with 1-tap mobile quick actions for marshallers. Activated per-tenant; invisible to users who don't have the licence.",
+    icon: GitMerge,
+    href: "/solutions/yard-management",
+    pill: "Add-On",
+  },
+  {
+    title: "Last Mile Delivery Add-On",
+    description:
+      "Driver dispatch, route management, and proof-of-delivery — surfaced as quick actions directly on delivery list cards. Separately licensed for fleets.",
+    icon: Truck,
+    href: "/features",
+    pill: "Add-On",
+  },
 ];
 
 export function ModernOfferingsSection() {
@@ -52,12 +68,13 @@ export function ModernOfferingsSection() {
             Next-Generation Features in Production
           </h2>
           <p className="text-muted-foreground max-w-3xl mx-auto">
-            Advanced capabilities fully deployed and battle-tested - voice operations, AI optimization, 
-            IoT integration, and enterprise security all live and operational.
+            Advanced capabilities fully deployed and battle-tested - voice
+            operations, AI optimization, IoT integration, and enterprise
+            security all live and operational.
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {offerings.map((item) => (
             <Card
               key={item.title}

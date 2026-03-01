@@ -6,7 +6,11 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { recommendVehicle, type VehicleType, calculateUtilization } from "../vehicle-types";
+import {
+  recommendVehicle,
+  type VehicleType,
+  calculateUtilization,
+} from "../vehicle-types";
 
 const prisma = new PrismaClient();
 
@@ -106,7 +110,11 @@ export class LoadOptimizationService {
 
     // Calculate utilization
     const utilization = recommendedVehicle
-      ? calculateUtilization(recommendedVehicle, totalVolumeCubicFeet, totalWeightLbs)
+      ? calculateUtilization(
+          recommendedVehicle,
+          totalVolumeCubicFeet,
+          totalWeightLbs,
+        )
       : null;
 
     // Calculate estimated cost
@@ -129,9 +137,7 @@ export class LoadOptimizationService {
   /**
    * Find consolidation opportunities for multiple orders
    */
-  static async findConsolidationOpportunities(
-    orderIds: string[],
-  ): Promise<{
+  static async findConsolidationOpportunities(orderIds: string[]): Promise<{
     canConsolidate: boolean;
     groups: string[][];
     savings: number;
@@ -200,10 +206,8 @@ export class LoadOptimizationService {
 
     // Simple optimization: sort by location zone
     const sortedOrders = orders.sort((a, b) => {
-      const aZone =
-        a.items[0]?.inventoryItem?.location?.zone || "Z";
-      const bZone =
-        b.items[0]?.inventoryItem?.location?.zone || "Z";
+      const aZone = a.items[0]?.inventoryItem?.location?.zone || "Z";
+      const bZone = b.items[0]?.inventoryItem?.location?.zone || "Z";
       return aZone.localeCompare(bZone);
     });
 

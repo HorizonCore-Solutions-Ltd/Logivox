@@ -16,11 +16,11 @@ import { prisma } from "@/lib/prisma";
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized - Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -57,19 +57,11 @@ export async function POST(request: NextRequest) {
     });
 
     if (!userData) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Remove sensitive fields
-    const {
-      password,
-      mfaSecret,
-      mfaBackupCodes,
-      ...safeUserData
-    } = userData;
+    const { password, mfaSecret, mfaBackupCodes, ...safeUserData } = userData;
 
     // Create export package
     const exportPackage = {
@@ -166,7 +158,7 @@ export async function POST(request: NextRequest) {
           "Content-Type": "application/json",
           "Content-Disposition": `attachment; filename="gdpr-data-export-${userId}-${Date.now()}.json"`,
         },
-      }
+      },
     );
   } catch (error) {
     console.error("GDPR data export error:", error);
@@ -175,7 +167,7 @@ export async function POST(request: NextRequest) {
         error: "Failed to export data",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

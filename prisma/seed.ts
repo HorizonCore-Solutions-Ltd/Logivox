@@ -139,7 +139,10 @@ async function main() {
   console.log("✅ Added Manager to Organization");
 
   // Create Demo Operator User with secure password
-  const operatorPasswordPlain = getSecurePassword("SEED_OPERATOR_PASSWORD", "TempOperator123!");
+  const operatorPasswordPlain = getSecurePassword(
+    "SEED_OPERATOR_PASSWORD",
+    "TempOperator123!",
+  );
   const operatorPassword = await bcrypt.hash(operatorPasswordPlain, 12);
   const operator = await prisma.user.upsert({
     where: { email: "operator@demo-company.com" },
@@ -156,21 +159,32 @@ async function main() {
 
   // Add Operator to Organization
   await prisma.organizationMember.upsert({
-    where: { organizationId_userId: { organizationId: demoOrg.id, userId: operator.id } },
+    where: {
+      organizationId_userId: {
+        organizationId: demoOrg.id,
+        userId: operator.id,
+      },
+    },
     update: {},
     create: {
       userId: operator.id,
       organizationId: demoOrg.id,
       role: "MEMBER",
       permissions: {
-        manage_organization: false, manage_members: false, manage_warehouses: false,
-        manage_inventory: true, manage_bookings: true, manage_suppliers: false,
-        manage_customers: false, manage_integrations: false, view_analytics: false, export_data: false,
+        manage_organization: false,
+        manage_members: false,
+        manage_warehouses: false,
+        manage_inventory: true,
+        manage_bookings: true,
+        manage_suppliers: false,
+        manage_customers: false,
+        manage_integrations: false,
+        view_analytics: false,
+        export_data: false,
       },
     },
   });
   console.log("✅ Added Operator to Organization");
-
 
   // Create Main Warehouse
   const mainWarehouse = await prisma.warehouse.create({
@@ -203,7 +217,7 @@ async function main() {
       warehouseId: mainWarehouse.id,
       skills: ["quality_control", "inventory_audit"],
       certifications: ["six_sigma", "iso9001"],
-    }
+    },
   });
   console.log("✅ Created Employee Profile for Manager");
 
@@ -223,10 +237,9 @@ async function main() {
       warehouseId: mainWarehouse.id,
       skills: ["picking", "packing", "forklift", "voice_picking"],
       certifications: ["forklift_class_1", "hazmat"],
-    }
+    },
   });
   console.log("✅ Created Employee Profile for Operator");
-
 
   // Create Categories
   const electronics = await prisma.category.create({
@@ -426,11 +439,27 @@ async function main() {
       problemSeverity: "MEDIUM",
       status: "OPEN",
       rootCauseMethod: "5_WHYS",
-      rootCauseAnalysis: { whys: ["Why 1", "Why 2", "Why 3", "Why 4", "Why 5"] },
+      rootCauseAnalysis: {
+        whys: ["Why 1", "Why 2", "Why 3", "Why 4", "Why 5"],
+      },
       rootCause: "Inadequate training on count procedures",
-      immediateActions: [{ action: "Recount aisle B inventory", status: "COMPLETED" }],
-      correctiveActions: [{ action: "Update training materials", owner: admin.id, dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }],
-      preventiveActions: [{ action: "Implement quarterly training refreshers", owner: admin.id, dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000) }],
+      immediateActions: [
+        { action: "Recount aisle B inventory", status: "COMPLETED" },
+      ],
+      correctiveActions: [
+        {
+          action: "Update training materials",
+          owner: admin.id,
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        },
+      ],
+      preventiveActions: [
+        {
+          action: "Implement quarterly training refreshers",
+          owner: admin.id,
+          dueDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        },
+      ],
       responsiblePerson: admin.id,
       targetCompletionDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000),
       createdBy: admin.id,
@@ -487,7 +516,8 @@ async function main() {
       title: "Implement Aisle B Scanning Rules",
       priority: "HIGH",
       status: "ACTIVE",
-      completionNotes: "Follow newly established scanning procedures from CAPA-2026-001",
+      completionNotes:
+        "Follow newly established scanning procedures from CAPA-2026-001",
       capaId: capa.id,
       scheduledStart: new Date(), // today
     },
@@ -526,7 +556,9 @@ async function main() {
     );
     console.log("\nOperator:");
     console.log("  Email: operator@demo-company.com");
-    console.log("  Password: [Check SEED_OPERATOR_PASSWORD env var or use fallback]");
+    console.log(
+      "  Password: [Check SEED_OPERATOR_PASSWORD env var or use fallback]",
+    );
 
     console.log("━".repeat(50));
   } else {

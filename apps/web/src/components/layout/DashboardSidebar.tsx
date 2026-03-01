@@ -150,7 +150,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       href: "/dashboard/returns",
       icon: ShieldCheck,
       subItems: [
-        { name: "Operations Hub", href: "/dashboard/operations", icon: Activity },
+        {
+          name: "Operations Hub",
+          href: "/dashboard/operations",
+          icon: Activity,
+        },
         { name: "Returns & RMAs", href: "/dashboard/returns", icon: RotateCcw },
         {
           name: "RMA Detail View",
@@ -199,17 +203,57 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       badge: "Advanced",
       subItems: [
         { name: "Labor Management", href: "/dashboard/labor", icon: Users },
-        { name: "Task Interleaving", href: "/dashboard/task-interleaving", icon: Zap },
-        { name: "Yard Management", href: "/dashboard/yard-management", icon: Truck },
-        { name: "Floor Heatmap", href: "/dashboard/floor-heatmap", icon: Activity },
-        { name: "Automation/Robotics", href: "/dashboard/automation", icon: Zap },
+        {
+          name: "Task Interleaving",
+          href: "/dashboard/task-interleaving",
+          icon: Zap,
+        },
+        {
+          name: "Yard Management",
+          href: "/dashboard/yard-management",
+          icon: Truck,
+        },
+        {
+          name: "Floor Heatmap",
+          href: "/dashboard/floor-heatmap",
+          icon: Activity,
+        },
+        {
+          name: "Automation/Robotics",
+          href: "/dashboard/automation",
+          icon: Zap,
+        },
         { name: "IoT Sensors", href: "/dashboard/iot", icon: Zap },
-        { name: "AI Forecasting", href: "/dashboard/ai-forecasting", icon: BarChart3 },
-        { name: "Demand Forecasting", href: "/dashboard/forecasting", icon: BarChart3 },
-        { name: "Computer Vision", href: "/dashboard/computer-vision", icon: Zap },
-        { name: "Customer Analytics", href: "/dashboard/customer-analytics", icon: BarChart3 },
-        { name: "Sustainability", href: "/dashboard/sustainability", icon: Globe2 },
-        { name: "Blockchain", href: "/dashboard/blockchain", icon: ShieldCheck },
+        {
+          name: "AI Forecasting",
+          href: "/dashboard/ai-forecasting",
+          icon: BarChart3,
+        },
+        {
+          name: "Demand Forecasting",
+          href: "/dashboard/forecasting",
+          icon: BarChart3,
+        },
+        {
+          name: "Computer Vision",
+          href: "/dashboard/computer-vision",
+          icon: Zap,
+        },
+        {
+          name: "Customer Analytics",
+          href: "/dashboard/customer-analytics",
+          icon: BarChart3,
+        },
+        {
+          name: "Sustainability",
+          href: "/dashboard/sustainability",
+          icon: Globe2,
+        },
+        {
+          name: "Blockchain",
+          href: "/dashboard/blockchain",
+          icon: ShieldCheck,
+        },
       ],
     },
     { name: "Customers", href: "/dashboard/customers", icon: Users },

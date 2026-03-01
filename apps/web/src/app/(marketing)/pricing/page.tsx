@@ -218,6 +218,24 @@ export default function PricingPage() {
       price: "+$18/user",
       icon: Truck,
     },
+    {
+      id: "marshalling",
+      name: "Marshalling & Yard",
+      description:
+        "Yard slot management, dock scheduling, load marshalling, and vehicle check-in/out — with 1-tap mobile actions for marshallers.",
+      badge: "Add-On",
+      price: "+$22/user",
+      icon: Globe,
+    },
+    {
+      id: "delivery",
+      name: "Last Mile Delivery",
+      description:
+        "Driver dispatch, live stop tracking, proof-of-delivery scanning, and route management — all accessible in 1-2 taps on mobile.",
+      badge: "Add-On",
+      price: "+$20/user",
+      icon: Truck,
+    },
   ];
 
   const comparisonCategories = [
@@ -361,6 +379,18 @@ export default function PricingPage() {
           enterprise: true,
         },
         {
+          name: "Marshalling & Dock",
+          starter: false,
+          professional: false,
+          enterprise: "Add-On",
+        },
+        {
+          name: "Last Mile Delivery",
+          starter: false,
+          professional: false,
+          enterprise: "Add-On",
+        },
+        {
           name: "Labor Management",
           starter: false,
           professional: false,
@@ -437,23 +467,13 @@ export default function PricingPage() {
 
             {/* Contact CTA */}
             <div className="flex items-center justify-center gap-4 pt-8">
-              <Button
-                variant="default"
-                size="lg"
-                className="min-w-48"
-                asChild
-              >
+              <Button variant="default" size="lg" className="min-w-48" asChild>
                 <Link href="/contact">
                   <Phone className="h-4 w-4 mr-2" />
                   Contact Sales
                 </Link>
               </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="min-w-48"
-                asChild
-              >
+              <Button variant="outline" size="lg" className="min-w-48" asChild>
                 <Link href="/contact">
                   <Mail className="h-4 w-4 mr-2" />
                   Request Information

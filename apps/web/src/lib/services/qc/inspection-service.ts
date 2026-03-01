@@ -351,7 +351,8 @@ export class QCInspectionService {
           sourceId: updatedInspection.id,
           supplierId: inspection.supplierId,
           supplierName: (updatedInspection as any).supplier?.name ?? undefined,
-          poNumber: (updatedInspection as any).purchaseOrder?.poNumber ?? undefined,
+          poNumber:
+            (updatedInspection as any).purchaseOrder?.poNumber ?? undefined,
           productSku: firstItem?.sku ?? undefined,
           productDescription: firstItem?.productName ?? undefined,
           quantityAffected: totalFailed,
@@ -384,7 +385,11 @@ export class QCInspectionService {
           createdBy: userId,
         });
       } catch (e) {
-        console.error("Auto NCR/QualityHold creation failed for inspection", inspectionId, e);
+        console.error(
+          "Auto NCR/QualityHold creation failed for inspection",
+          inspectionId,
+          e,
+        );
       }
     }
 

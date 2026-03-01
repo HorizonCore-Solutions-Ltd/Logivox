@@ -9,25 +9,30 @@ LogiVox is committed to maintaining the highest standards of security for our en
 Our security architecture is built on these core principles:
 
 ### 1. **Defense in Depth**
+
 Multiple layers of security controls at every level:
+
 - Network security (firewalls, WAF, DDoS protection)
 - Application security (input validation, CSRF protection, XSS prevention)
 - Data security (encryption at rest and in transit)
 - Identity security (MFA, SSO, RBAC)
 
 ### 2. **Least Privilege**
+
 - Users granted minimum permissions necessary
 - Role-based access control (RBAC) enforced
 - Temporary elevated access with audit trails
 - Regular permission reviews and audits
 
 ### 3. **Zero Trust Architecture**
+
 - Verify every request regardless of source
 - Continuous authentication and authorization
 - Micro-segmentation of network resources
 - Assume breach mentality in design
 
 ### 4. **Security by Design**
+
 - Security requirements in every feature
 - Threat modeling during design phase
 - Secure coding standards enforced
@@ -38,18 +43,21 @@ Multiple layers of security controls at every level:
 ### Authentication & Access Control
 
 **Multi-Factor Authentication (MFA)**
+
 - Enforced for all user accounts
 - Support for TOTP, SMS, and hardware tokens
 - Backup codes for account recovery
 - Device fingerprinting and trusted devices
 
 **Single Sign-On (SSO)**
+
 - SAML 2.0 integration
 - OAuth 2.0 / OpenID Connect support
 - Integration with Azure AD, Okta, Auth0
 - Automatic user provisioning and de-provisioning
 
 **Role-Based Access Control (RBAC)**
+
 - Granular permission system
 - Pre-defined roles: Admin, Manager, Operator, Viewer
 - Custom role creation capability
@@ -57,6 +65,7 @@ Multiple layers of security controls at every level:
 - Time-based access grants
 
 **Session Management**
+
 - Secure session tokens (HTTP-only, Secure, SameSite)
 - Automatic session timeout after inactivity
 - Concurrent session limits
@@ -66,6 +75,7 @@ Multiple layers of security controls at every level:
 ### Data Security
 
 **Encryption at Rest**
+
 - AES-256 encryption for all stored data
 - Encrypted database fields for sensitive information
 - Encrypted file storage (AWS S3 SSE)
@@ -73,6 +83,7 @@ Multiple layers of security controls at every level:
 - Hardware Security Module (HSM) key storage
 
 **Encryption in Transit**
+
 - TLS 1.3 for all connections
 - HSTS (HTTP Strict Transport Security) enforced
 - Certificate pinning for mobile applications
@@ -80,6 +91,7 @@ Multiple layers of security controls at every level:
 - No support for legacy SSL/TLS protocols
 
 **Data Isolation**
+
 - Complete tenant data separation at database level
 - Row-level security policies enforced
 - Dedicated schema per organization option
@@ -87,6 +99,7 @@ Multiple layers of security controls at every level:
 - Regular isolation testing and audits
 
 **Data Retention & Deletion**
+
 - Configurable data retention policies
 - Automated data archival
 - Secure data deletion (cryptographic erasure)
@@ -96,6 +109,7 @@ Multiple layers of security controls at every level:
 ### Application Security
 
 **Input Validation**
+
 - Server-side validation for all inputs
 - Zod schema validation library
 - Type-safe TypeScript throughout
@@ -103,6 +117,7 @@ Multiple layers of security controls at every level:
 - Command injection prevention
 
 **Output Encoding**
+
 - Context-aware output encoding
 - XSS (Cross-Site Scripting) prevention
 - Content Security Policy (CSP) headers
@@ -110,6 +125,7 @@ Multiple layers of security controls at every level:
 - Sanitization of user-generated content
 
 **API Security**
+
 - JWT-based authentication
 - Rate limiting (per user, per endpoint)
 - Request throttling for compute-intensive operations
@@ -118,6 +134,7 @@ Multiple layers of security controls at every level:
 - OpenAPI 3.0 documentation with security schemes
 
 **Secure Development**
+
 - Static Application Security Testing (SAST)
 - Dependency vulnerability scanning
 - Automated security testing in CI/CD
@@ -127,6 +144,7 @@ Multiple layers of security controls at every level:
 ### Infrastructure Security
 
 **Network Security**
+
 - Web Application Firewall (WAF)
 - DDoS protection (Cloudflare/AWS Shield)
 - VPC isolation for cloud deployments
@@ -134,6 +152,7 @@ Multiple layers of security controls at every level:
 - Network ACLs and security groups
 
 **Container Security**
+
 - Minimal base images (distroless when possible)
 - Regular image scanning for vulnerabilities
 - Non-root container execution
@@ -141,6 +160,7 @@ Multiple layers of security controls at every level:
 - Secret management (AWS Secrets Manager)
 
 **Database Security**
+
 - PostgreSQL with advanced security features
 - Database encryption at rest
 - Automated backup to encrypted storage
@@ -149,6 +169,7 @@ Multiple layers of security controls at every level:
 - Regular security patches and updates
 
 **Monitoring & Logging**
+
 - Centralized log aggregation
 - Real-time security event monitoring
 - Automated threat detection
@@ -160,6 +181,7 @@ Multiple layers of security controls at every level:
 ### Compliance & Certifications
 
 **Standards Adherence**
+
 - ISO 27001 Information Security Management
 - SOC 2 Type II compliance framework
 - GDPR (General Data Protection Regulation)
@@ -169,6 +191,7 @@ Multiple layers of security controls at every level:
 - GxP compliance for regulated industries
 
 **Regular Audits**
+
 - Annual third-party security audits
 - Quarterly internal security assessments
 - Continuous vulnerability assessments
@@ -183,6 +206,7 @@ Multiple layers of security controls at every level:
 | < 1.0   | ❌ Not Supported   | N/A            |
 
 **Support Policy:**
+
 - Security patches for current major version
 - Critical security fixes backported for 1 previous major version
 - End of Life (EOL) versions receive no security updates
@@ -195,6 +219,7 @@ Multiple layers of security controls at every level:
 We encourage security researchers and users to report vulnerabilities responsibly. We are committed to working with the security community to verify and address security issues promptly.
 
 **Our Commitment:**
+
 - Acknowledge receipt within 24 hours (business days)
 - Provide initial assessment within 72 hours
 - Keep reporter updated throughout investigation
@@ -208,11 +233,13 @@ We encourage security researchers and users to report vulnerabilities responsibl
 #### Reporting Channels
 
 **🔐 Primary Channel: Email**
+
 ```
 security@logivox.com
 ```
 
 **PGP Encrypted Reports (Recommended for critical issues):**
+
 ```
 PGP Key ID: [To be published]
 PGP Fingerprint: [To be published]
@@ -220,6 +247,7 @@ Download key: https://logivox.com/.well-known/pgp-key.txt
 ```
 
 **Alternative Channel: Security Portal**
+
 ```
 https://security.logivox.com/report
 (Requires account creation)
@@ -259,14 +287,15 @@ Please include the following in your report:
 
 We use CVSS 3.1 scoring to classify vulnerabilities:
 
-| Severity | CVSS Score | Response Time | Resolution Target |
-|----------|------------|---------------|-------------------|
-| **Critical** | 9.0 - 10.0 | 4 hours | 7 days |
-| **High** | 7.0 - 8.9 | 24 hours | 30 days |
-| **Medium** | 4.0 - 6.9 | 72 hours | 90 days |
-| **Low** | 0.1 - 3.9 | 1 week | Next release |
+| Severity     | CVSS Score | Response Time | Resolution Target |
+| ------------ | ---------- | ------------- | ----------------- |
+| **Critical** | 9.0 - 10.0 | 4 hours       | 7 days            |
+| **High**     | 7.0 - 8.9  | 24 hours      | 30 days           |
+| **Medium**   | 4.0 - 6.9  | 72 hours      | 90 days           |
+| **Low**      | 0.1 - 3.9  | 1 week        | Next release      |
 
 **Critical Vulnerabilities:**
+
 - Remote code execution (RCE)
 - SQL injection affecting production data
 - Authentication bypass
@@ -274,6 +303,7 @@ We use CVSS 3.1 scoring to classify vulnerabilities:
 - Data exfiltration vulnerabilities
 
 **High Vulnerabilities:**
+
 - Cross-site scripting (XSS) affecting sensitive data
 - Cross-site request forgery (CSRF)
 - Server-side request forgery (SSRF)
@@ -281,6 +311,7 @@ We use CVSS 3.1 scoring to classify vulnerabilities:
 - Information disclosure of sensitive data
 
 **Medium Vulnerabilities:**
+
 - Rate limiting bypass
 - Session fixation
 - Insufficient logging
@@ -288,6 +319,7 @@ We use CVSS 3.1 scoring to classify vulnerabilities:
 - Weak cryptographic algorithms
 
 **Low Vulnerabilities:**
+
 - Information disclosure (non-sensitive)
 - Minor configuration issues
 - Denial of service (local only)
@@ -323,12 +355,13 @@ We use CVSS 3.1 scoring to classify vulnerabilities:
 We are developing a formal bug bounty program with rewards for qualifying vulnerabilities:
 
 **Proposed Reward Structure:**
+
 - Critical: $5,000 - $15,000
 - High: $1,000 - $5,000
 - Medium: $250 - $1,000
 - Low: $50 - $250
 
-*Program details and official launch date to be announced.*
+_Program details and official launch date to be announced._
 
 ## 🔐 Security Best Practices for Users
 
@@ -395,12 +428,14 @@ We are developing a formal bug bounty program with rewards for qualifying vulner
 ## 📞 Security Contact Information
 
 ### General Security Inquiries
+
 ```
 Email: security@logivox.com
 Response Time: 24 hours (business days)
 ```
 
 ### Critical Security Issues (24/7)
+
 ```
 Email: security-urgent@logivox.com
 Phone: [Enterprise customers - see support portal]
@@ -408,13 +443,16 @@ Response Time: 4 hours maximum
 ```
 
 ### Compliance Questions
+
 ```
 Email: compliance@logivox.com
 Response Time: 48 hours (business days)
 ```
 
 ### Security Team
+
 Our security team consists of:
+
 - Chief Information Security Officer (CISO)
 - Security Engineers
 - Security Operations Center (SOC) analysts
@@ -424,6 +462,7 @@ Our security team consists of:
 ## 📋 Security Changelog
 
 ### 2026-02-28 - Initial Security Policy
+
 - Published comprehensive security policy
 - Established vulnerability disclosure process
 - Defined severity classification system
@@ -435,7 +474,7 @@ Our security team consists of:
 
 We recognize and thank security researchers who have responsibly disclosed vulnerabilities:
 
-*No vulnerabilities disclosed yet - be the first!*
+_No vulnerabilities disclosed yet - be the first!_
 
 ---
 
@@ -446,4 +485,4 @@ For more information about our security practices, contact our security team at 
 
 ---
 
-*This security policy is subject to change. Please check back regularly for updates.*
+_This security policy is subject to change. Please check back regularly for updates._

@@ -59,7 +59,8 @@ export function HeroSection() {
             role="status"
             aria-label="Product features announcement"
           >
-            � Enterprise Proprietary Software • Voice-Native • AI-Powered • ISO 27001 & SOC 2 Certified
+            � Enterprise Proprietary Software • Voice-Native • AI-Powered • ISO
+            27001 & SOC 2 Certified
           </Badge>
 
           {/* Hero headline */}
@@ -71,11 +72,14 @@ export function HeroSection() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-foreground/80 max-w-3xl mx-auto leading-relaxed font-medium">
-              Production-ready WMS with 489 API endpoints, 42 specialized dashboards, and complete Next-Gen capabilities. 
-              Voice-directed operations, AI optimization, IoT integration, and robotics orchestration — all fully implemented.
+              Production-ready WMS with 489 API endpoints, 42 specialized
+              dashboards, and complete Next-Gen capabilities. Voice-directed
+              operations, AI optimization, IoT integration, and robotics
+              orchestration — all fully implemented.
             </p>
             <div className="text-base md:text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed font-semibold">
-              Built for Fortune 500 companies requiring enterprise-grade reliability, security, and unlimited scale.
+              Built for Fortune 500 companies requiring enterprise-grade
+              reliability, security, and unlimited scale.
             </div>
           </div>
 
@@ -190,7 +194,8 @@ export function HeroSection() {
           {/* Social proof */}
           <div className="pt-6 space-y-3">
             <p className="text-sm text-muted-foreground">
-              Enterprise proprietary software for Fortune 500 companies and global enterprises
+              Enterprise proprietary software for Fortune 500 companies and
+              global enterprises
             </p>
             <div className="flex flex-wrap justify-center items-center gap-4 text-xs text-muted-foreground">
               <div className="flex items-center gap-1">

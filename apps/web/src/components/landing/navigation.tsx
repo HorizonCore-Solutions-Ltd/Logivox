@@ -281,7 +281,9 @@ export function Navigation() {
                 priority
               />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">LogiVox</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
+              LogiVox
+            </span>
           </Link>
 
           {/* Desktop Navigation */}

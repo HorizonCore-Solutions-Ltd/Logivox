@@ -21,7 +21,7 @@ export interface LogEntry {
 export async function withObservability(
   handler: (req: Request, context: any) => Promise<Response>,
   req: Request,
-  context: any = {}
+  context: any = {},
 ) {
   const startTime = Date.now();
   const requestId = crypto.randomUUID();
@@ -45,7 +45,6 @@ export async function withObservability(
     });
 
     return response;
-
   } catch (error: any) {
     const duration = Date.now() - startTime;
 
@@ -55,12 +54,13 @@ export async function withObservability(
     const errorResponse = NextResponse.json(
       {
         error: "Internal Server Error",
-        message: process.env.NODE_ENV === "production"
-          ? "The request could not be processed."
-          : error.message,
+        message:
+          process.env.NODE_ENV === "production"
+            ? "The request could not be processed."
+            : error.message,
         requestId,
       },
-      { status: 500 }
+      { status: 500 },
     );
 
     // Audit critical failures

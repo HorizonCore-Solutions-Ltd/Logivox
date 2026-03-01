@@ -18,11 +18,11 @@ import { randomBytes } from "crypto";
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json(
         { error: "Unauthorized - Authentication required" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -31,7 +31,7 @@ export async function POST(request: NextRequest) {
     if (!confirmDeletion) {
       return NextResponse.json(
         { error: "Deletion confirmation required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -50,21 +50,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Verify password if provided
     if (password && user.password) {
       const bcrypt = require("bcryptjs");
       const isValidPassword = await bcrypt.compare(password, user.password);
-      
+
       if (!isValidPassword) {
         return NextResponse.json(
           { error: "Invalid password" },
-          { status: 401 }
+          { status: 401 },
         );
       }
     }
@@ -200,7 +197,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "Your data has been successfully deleted in compliance with GDPR Article 17",
+      message:
+        "Your data has been successfully deleted in compliance with GDPR Article 17",
       details: {
         deletionDate: deletionDate.toISOString(),
         anonymizedId: anonymousId,
@@ -231,7 +229,7 @@ export async function POST(request: NextRequest) {
         error: "Failed to process data deletion request",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -243,12 +241,9 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user has any pending deletion requests
@@ -277,7 +272,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching deletion status:", error);
     return NextResponse.json(
       { error: "Failed to fetch deletion status" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

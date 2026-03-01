@@ -56,7 +56,8 @@ const jsonLd = {
   "@type": "SoftwareApplication",
   name: "LogiVox",
   applicationCategory: "BusinessApplication",
-  description: "Enterprise voice-native warehouse management system with 489 production API endpoints and complete Next-Gen capabilities",
+  description:
+    "Enterprise voice-native warehouse management system with 489 production API endpoints and complete Next-Gen capabilities",
   operatingSystem: "Web, Cloud",
   offers: {
     "@type": "Offer",
@@ -64,7 +65,7 @@ const jsonLd = {
     priceSpecification: {
       "@type": "UnitPriceSpecification",
       priceCurrency: "USD",
-      price: "Contact for quote"
+      price: "Contact for quote",
     },
   },
   featureList: [

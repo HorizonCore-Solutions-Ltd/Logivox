@@ -68,7 +68,7 @@ const STANDARD_VEHICLES: VehicleType[] = [
   // North America - Box Trucks
   {
     id: "box-truck-16",
-    name: '16\' Box Truck',
+    name: "16' Box Truck",
     category: "truck",
     region: "NA",
     volumeCubicFeet: 800,
@@ -80,7 +80,7 @@ const STANDARD_VEHICLES: VehicleType[] = [
   },
   {
     id: "box-truck-24",
-    name: '24\' Box Truck',
+    name: "24' Box Truck",
     category: "truck",
     region: "NA",
     volumeCubicFeet: 1400,
@@ -92,7 +92,7 @@ const STANDARD_VEHICLES: VehicleType[] = [
   },
   {
     id: "box-truck-26",
-    name: '26\' Box Truck',
+    name: "26' Box Truck",
     category: "truck",
     region: "NA",
     volumeCubicFeet: 1700,
@@ -107,7 +107,7 @@ const STANDARD_VEHICLES: VehicleType[] = [
   // North America - Semi Trailers
   {
     id: "semi-dry-van-53",
-    name: '53\' Dry Van Semi',
+    name: "53' Dry Van Semi",
     category: "semi",
     region: "NA",
     volumeCubicFeet: 3800,
@@ -118,7 +118,7 @@ const STANDARD_VEHICLES: VehicleType[] = [
   },
   {
     id: "semi-reefer-53",
-    name: '53\' Refrigerated Semi',
+    name: "53' Refrigerated Semi",
     category: "semi",
     region: "NA",
     volumeCubicFeet: 3700,
@@ -130,7 +130,7 @@ const STANDARD_VEHICLES: VehicleType[] = [
   },
   {
     id: "semi-flatbed-48",
-    name: '48\' Flatbed Semi',
+    name: "48' Flatbed Semi",
     category: "semi",
     region: "NA",
     volumeCubicFeet: 4000,
@@ -254,7 +254,9 @@ export function findSuitableVehicles(
 
   // Filter by region if specified
   if (region) {
-    vehicles = vehicles.filter((v) => v.region === region || v.region === "global");
+    vehicles = vehicles.filter(
+      (v) => v.region === region || v.region === "global",
+    );
   }
 
   // Filter by capacity requirements
@@ -298,10 +300,8 @@ export function recommendVehicle(
     }
 
     // Default: utilization (find vehicle closest to load size for best efficiency)
-    const aUtilization =
-      params.totalVolumeCubicFeet / a.volumeCubicFeet;
-    const bUtilization =
-      params.totalVolumeCubicFeet / b.volumeCubicFeet;
+    const aUtilization = params.totalVolumeCubicFeet / a.volumeCubicFeet;
+    const bUtilization = params.totalVolumeCubicFeet / b.volumeCubicFeet;
 
     // Prefer 75-95% utilization (optimal range)
     const aScore = Math.abs(0.85 - aUtilization);

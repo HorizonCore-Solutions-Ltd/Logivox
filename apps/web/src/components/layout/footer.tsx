@@ -106,7 +106,10 @@ export function Footer() {
         <div className="py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-6">
           {/* Company Info & Contact */}
           <div className="sm:col-span-2 lg:col-span-2">
-            <Link href="/" className="flex items-center space-x-3 mb-4 group w-fit">
+            <Link
+              href="/"
+              className="flex items-center space-x-3 mb-4 group w-fit"
+            >
               <div className="relative h-10 w-10 transition-transform group-hover:scale-105">
                 <Image
                   src="/favicon.svg"
@@ -116,7 +119,9 @@ export function Footer() {
                   className="object-contain"
                 />
               </div>
-              <span className="text-xl font-bold text-white group-hover:text-primary-400 transition-colors">LogiVox</span>
+              <span className="text-xl font-bold text-white group-hover:text-primary-400 transition-colors">
+                LogiVox
+              </span>
             </Link>
             <p className="text-slate-400 mb-6 max-w-sm text-sm leading-relaxed">
               Complete warehouse management system with wave picking, real-time

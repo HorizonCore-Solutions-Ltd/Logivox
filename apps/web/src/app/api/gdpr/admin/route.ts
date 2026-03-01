@@ -18,19 +18,16 @@ import { randomBytes } from "crypto";
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check admin permissions
     if (!hasPermission(session.user.role, "users:delete")) {
       return NextResponse.json(
         { error: "Forbidden - Admin access required" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -39,7 +36,7 @@ export async function POST(request: NextRequest) {
     if (!userId) {
       return NextResponse.json(
         { error: "User ID is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -57,7 +54,7 @@ export async function POST(request: NextRequest) {
     if (!targetUser) {
       return NextResponse.json(
         { error: "Target user not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -65,7 +62,7 @@ export async function POST(request: NextRequest) {
     if (targetUser.role === "SUPER_ADMIN") {
       return NextResponse.json(
         { error: "Cannot delete super admin accounts" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -163,7 +160,7 @@ export async function POST(request: NextRequest) {
         error: "Failed to process deletion",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -175,19 +172,13 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     if (!hasPermission(session.user.role, "users:read")) {
-      return NextResponse.json(
-        { error: "Forbidden" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Fetch all GDPR-related activity logs
@@ -225,7 +216,7 @@ export async function GET(request: NextRequest) {
     console.error("Error fetching GDPR requests:", error);
     return NextResponse.json(
       { error: "Failed to fetch requests" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

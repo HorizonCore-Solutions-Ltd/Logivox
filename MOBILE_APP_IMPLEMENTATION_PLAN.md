@@ -1,4 +1,5 @@
 # Flowstock Mobile App - Implementation Plan
+
 ## React Native iOS/Android Application
 
 **Status:** Ready for Implementation  
@@ -13,12 +14,14 @@
 Build a **voice-native, offline-first React Native mobile application** that enables warehouse workers, managers, and drivers to perform complete WMS operations from any device - with special emphasis on **mobile invoicing and billing**.
 
 ### Competitive Advantage
+
 - **First voice-native mobile WMS** (Manhattan, Blue Yonder, SAP have desktop-only or basic PWAs)
 - **Invoice from anywhere** - dock, yard, delivery site (game changer for cash flow)
 - **True offline mode** - works in dead zones, sync when connected
 - **Native performance** - faster than competitors' browser-based solutions
 
 ### Key Differentiators
+
 ✅ Voice commands via OpenAI Whisper (hands-free operations)  
 ✅ Camera-native barcode scanning (no browser limitations)  
 ✅ Offline-first architecture with background sync  
@@ -35,6 +38,7 @@ Build a **voice-native, offline-first React Native mobile application** that ena
 ### Technology Stack Decision: **Expo (Managed Workflow)**
 
 **Why Expo:**
+
 - ✅ Faster development (80% faster than bare React Native)
 - ✅ OTA (Over-The-Air) updates - fix bugs without app store approval
 - ✅ Expo modules cover 95% of needs (camera, notifications, auth)
@@ -43,6 +47,7 @@ Build a **voice-native, offline-first React Native mobile application** that ena
 - ✅ Can eject to bare workflow if needed later
 
 **Technology Components:**
+
 ```
 Frontend:
 - React Native 0.73+ (via Expo SDK 50+)
@@ -76,12 +81,14 @@ Offline Strategy:
 ### Integration with Existing Backend
 
 **Zero Backend Changes Required:**
+
 - Mobile app consumes existing `/api/*` endpoints (489 APIs)
 - Authentication via existing NextAuth.js token system
 - Real-time updates via existing Pusher WebSocket
 - Voice transcription via existing OpenAI Whisper integration
 
 **API Endpoints Mobile Will Use Most:**
+
 ```
 Authentication:
 POST /api/auth/mobile/login
@@ -191,10 +198,13 @@ apps/
 ---
 
 ## Phase 1: Core Mobile Experience (Week 1-3)
+
 **Goal:** Launch MVP with invoicing, voice commands, and offline basics
 
 ### Week 1: Foundation & Authentication
+
 **Deliverables:**
+
 - [x] Expo project scaffolding (`npx create-expo-app`)
 - [x] TypeScript configuration (strict mode)
 - [x] Folder structure setup
@@ -204,6 +214,7 @@ apps/
 - [x] Navigation structure (Expo Router)
 
 **Implementation Tasks:**
+
 ```bash
 # Initialize project
 cd /workspaces/Flowstock/apps
@@ -222,13 +233,16 @@ npx expo install react-native-gesture-handler react-native-reanimated
 ```
 
 **Key Files to Create:**
+
 1. `lib/api/client.ts` - Axios instance with token refresh
 2. `lib/storage/secure-storage.ts` - Secure token storage
 3. `app/(auth)/login.tsx` - Login screen with biometric option
 4. `lib/hooks/useAuth.ts` - Authentication hook
 
 ### Week 2: Voice Commands & Barcode Scanning
+
 **Deliverables:**
+
 - [x] Voice command button component
 - [x] OpenAI Whisper integration (reuse existing `/api/voice/transcribe`)
 - [x] Camera permissions and barcode scanner
@@ -236,6 +250,7 @@ npx expo install react-native-gesture-handler react-native-reanimated
 - [x] Voice feedback (TTS for confirmations)
 
 **Implementation Tasks:**
+
 ```bash
 # Install voice and camera
 npx expo install expo-camera expo-barcode-scanner
@@ -244,13 +259,16 @@ npx expo install expo-haptics
 ```
 
 **Key Files to Create:**
+
 1. `components/voice/VoiceCommandButton.tsx`
 2. `components/barcode/BarcodeScannerModal.tsx`
 3. `lib/hooks/useVoiceCommand.ts`
 4. `lib/utils/voice-processor.ts` - Parse voice commands to actions
 
 ### Week 3: Mobile Invoicing (PRIMARY FEATURE)
+
 **Deliverables:**
+
 - [x] Invoice creation from order completion
 - [x] Line item editing with voice input
 - [x] Photo attachment (condition documentation)
@@ -260,6 +278,7 @@ npx expo install expo-haptics
 - [x] Offline invoice queue
 
 **Implementation Tasks:**
+
 ```bash
 # Install invoice-specific tools
 npx expo install expo-print expo-sharing
@@ -268,6 +287,7 @@ npx expo install @react-native-community/netinfo
 ```
 
 **Key Files to Create:**
+
 1. `app/(tabs)/invoicing.tsx` - Main invoicing screen
 2. `components/invoicing/InvoiceCreator.tsx`
 3. `components/invoicing/SignatureCapture.tsx`
@@ -276,6 +296,7 @@ npx expo install @react-native-community/netinfo
 6. `lib/utils/pdf-generator.ts` - Generate invoice PDFs
 
 **Mobile Invoicing Flow:**
+
 ```
 1. Complete order picking/loading
    ↓
@@ -301,10 +322,13 @@ npx expo install @react-native-community/netinfo
 ---
 
 ## Phase 2: Advanced Operations (Week 4-9)
+
 **Goal:** Full WMS operations on mobile
 
 ### Week 4-5: Inventory Management
+
 **Deliverables:**
+
 - [x] Inventory item search (voice or scan)
 - [x] Stock level adjustments
 - [x] Location transfers
@@ -312,12 +336,15 @@ npx expo install @react-native-community/netinfo
 - [x] Batch operations (adjust multiple items)
 
 **Key Screens:**
+
 - `app/(tabs)/inventory.tsx`
 - `app/inventory/item-detail.tsx`
 - `app/inventory/cycle-count.tsx`
 
 ### Week 6-7: Order Picking & Fulfillment
+
 **Deliverables:**
+
 - [x] Pick list view (priority sorted)
 - [x] Voice-guided picking ("Pick 5 units from A-12-3")
 - [x] Barcode verification
@@ -325,12 +352,15 @@ npx expo install @react-native-community/netinfo
 - [x] Batch picking for multiple orders
 
 **Key Screens:**
+
 - `app/(tabs)/orders.tsx`
 - `app/orders/[id]/pick.tsx`
 - `app/orders/[id]/pack.tsx`
 
 ### Week 8-9: Receiving & Putaway
+
 **Deliverables:**
+
 - [x] ASN scanning and verification
 - [x] Receiving line items with photos
 - [x] Voice-guided putaway
@@ -338,6 +368,7 @@ npx expo install @react-native-community/netinfo
 - [x] Quality check workflow
 
 **Key Screens:**
+
 - `app/(tabs)/receiving.tsx`
 - `app/receiving/[id]/scan.tsx`
 - `app/receiving/[id]/putaway.tsx`
@@ -345,10 +376,13 @@ npx expo install @react-native-community/netinfo
 ---
 
 ## Phase 3: Advanced Features (Week 10-16)
+
 **Goal:** Yard management, driver app, analytics
 
 ### Week 10-12: Yard Management Mobile
+
 **Deliverables:**
+
 - [x] Trailer check-in with photos
 - [x] Dock assignment
 - [x] Yard location tracking
@@ -356,12 +390,15 @@ npx expo install @react-native-community/netinfo
 - [x] Gate pass generation
 
 **Key Screens:**
+
 - `app/(tabs)/yard.tsx`
 - `app/yard/check-in.tsx`
 - `app/yard/trailer/[id].tsx`
 
 ### Week 13-14: Driver/Delivery Extension
+
 **Deliverables:**
+
 - [x] Delivery route optimization
 - [x] Navigation integration (Google Maps)
 - [x] Proof of delivery (photo + signature)
@@ -369,12 +406,15 @@ npx expo install @react-native-community/netinfo
 - [x] Exception reporting (refused delivery)
 
 **Key Screens:**
+
 - `app/driver/route.tsx`
 - `app/driver/delivery/[id].tsx`
 - `app/driver/pod.tsx` (Proof of Delivery)
 
 ### Week 15-16: Analytics & Notifications
+
 **Deliverables:**
+
 - [x] Push notifications (order alerts, inventory thresholds)
 - [x] Dashboard with KPIs
 - [x] Productivity metrics (picks per hour)
@@ -382,6 +422,7 @@ npx expo install @react-native-community/netinfo
 - [x] Background notification handling
 
 **Implementation Tasks:**
+
 ```bash
 npx expo install expo-notifications expo-task-manager
 ```
@@ -391,111 +432,113 @@ npx expo install expo-notifications expo-task-manager
 ## Offline-First Architecture
 
 ### WatermelonDB Schema
+
 ```typescript
 // lib/storage/watermelon-schema.ts
-import { appSchema, tableSchema } from '@nozbe/watermelondb'
+import { appSchema, tableSchema } from "@nozbe/watermelondb";
 
 export const schema = appSchema({
   version: 1,
   tables: [
     tableSchema({
-      name: 'orders',
+      name: "orders",
       columns: [
-        { name: 'order_id', type: 'string', isIndexed: true },
-        { name: 'status', type: 'string' },
-        { name: 'customer_name', type: 'string' },
-        { name: 'items', type: 'string' }, // JSON
-        { name: 'synced', type: 'boolean' },
-        { name: 'created_at', type: 'number' },
-        { name: 'updated_at', type: 'number' },
-      ]
+        { name: "order_id", type: "string", isIndexed: true },
+        { name: "status", type: "string" },
+        { name: "customer_name", type: "string" },
+        { name: "items", type: "string" }, // JSON
+        { name: "synced", type: "boolean" },
+        { name: "created_at", type: "number" },
+        { name: "updated_at", type: "number" },
+      ],
     }),
     tableSchema({
-      name: 'invoices',
+      name: "invoices",
       columns: [
-        { name: 'invoice_id', type: 'string', isIndexed: true },
-        { name: 'order_id', type: 'string' },
-        { name: 'amount', type: 'number' },
-        { name: 'line_items', type: 'string' }, // JSON
-        { name: 'signature_uri', type: 'string', isOptional: true },
-        { name: 'photos', type: 'string', isOptional: true }, // JSON array
-        { name: 'pdf_uri', type: 'string', isOptional: true },
-        { name: 'synced', type: 'boolean' },
-        { name: 'created_at', type: 'number' },
-      ]
+        { name: "invoice_id", type: "string", isIndexed: true },
+        { name: "order_id", type: "string" },
+        { name: "amount", type: "number" },
+        { name: "line_items", type: "string" }, // JSON
+        { name: "signature_uri", type: "string", isOptional: true },
+        { name: "photos", type: "string", isOptional: true }, // JSON array
+        { name: "pdf_uri", type: "string", isOptional: true },
+        { name: "synced", type: "boolean" },
+        { name: "created_at", type: "number" },
+      ],
     }),
     tableSchema({
-      name: 'inventory_items',
+      name: "inventory_items",
       columns: [
-        { name: 'sku', type: 'string', isIndexed: true },
-        { name: 'name', type: 'string' },
-        { name: 'quantity', type: 'number' },
-        { name: 'location', type: 'string' },
-        { name: 'synced', type: 'boolean' },
-        { name: 'updated_at', type: 'number' },
-      ]
+        { name: "sku", type: "string", isIndexed: true },
+        { name: "name", type: "string" },
+        { name: "quantity", type: "number" },
+        { name: "location", type: "string" },
+        { name: "synced", type: "boolean" },
+        { name: "updated_at", type: "number" },
+      ],
     }),
     tableSchema({
-      name: 'sync_queue',
+      name: "sync_queue",
       columns: [
-        { name: 'action', type: 'string' }, // 'create', 'update', 'delete'
-        { name: 'entity_type', type: 'string' }, // 'order', 'invoice', etc.
-        { name: 'entity_id', type: 'string' },
-        { name: 'payload', type: 'string' }, // JSON
-        { name: 'retry_count', type: 'number' },
-        { name: 'created_at', type: 'number' },
-      ]
+        { name: "action", type: "string" }, // 'create', 'update', 'delete'
+        { name: "entity_type", type: "string" }, // 'order', 'invoice', etc.
+        { name: "entity_id", type: "string" },
+        { name: "payload", type: "string" }, // JSON
+        { name: "retry_count", type: "number" },
+        { name: "created_at", type: "number" },
+      ],
     }),
-  ]
-})
+  ],
+});
 ```
 
 ### Background Sync Strategy
+
 ```typescript
 // lib/storage/sync-queue.ts
-import NetInfo from '@react-native-community/netinfo'
-import { syncQueue } from './watermelon-schema'
+import NetInfo from "@react-native-community/netinfo";
+import { syncQueue } from "./watermelon-schema";
 
 export class SyncManager {
-  private syncInterval: NodeJS.Timer | null = null
+  private syncInterval: NodeJS.Timer | null = null;
 
   async startBackgroundSync() {
     // Monitor network status
-    NetInfo.addEventListener(state => {
+    NetInfo.addEventListener((state) => {
       if (state.isConnected && state.isInternetReachable) {
-        this.processSyncQueue()
+        this.processSyncQueue();
       }
-    })
+    });
 
     // Periodic sync every 30 seconds
     this.syncInterval = setInterval(() => {
-      this.processSyncQueue()
-    }, 30000)
+      this.processSyncQueue();
+    }, 30000);
   }
 
   async processSyncQueue() {
-    const queue = await syncQueue.query().fetch()
-    
+    const queue = await syncQueue.query().fetch();
+
     for (const item of queue) {
       try {
         // Process based on entity type
-        if (item.entity_type === 'invoice') {
-          await this.syncInvoice(item)
-        } else if (item.entity_type === 'order') {
-          await this.syncOrder(item)
+        if (item.entity_type === "invoice") {
+          await this.syncInvoice(item);
+        } else if (item.entity_type === "order") {
+          await this.syncOrder(item);
         }
-        
+
         // Remove from queue on success
-        await item.destroyPermanently()
+        await item.destroyPermanently();
       } catch (error) {
         // Increment retry count
-        await item.update(record => {
-          record.retry_count += 1
-        })
-        
+        await item.update((record) => {
+          record.retry_count += 1;
+        });
+
         // Give up after 5 retries
         if (item.retry_count >= 5) {
-          await item.destroyPermanently()
+          await item.destroyPermanently();
           // Log to error tracking
         }
       }
@@ -503,12 +546,12 @@ export class SyncManager {
   }
 
   async syncInvoice(item: SyncQueueItem) {
-    const payload = JSON.parse(item.payload)
-    
-    if (item.action === 'create') {
-      await api.post('/api/invoices/create', payload)
-    } else if (item.action === 'update') {
-      await api.put(`/api/invoices/${item.entity_id}`, payload)
+    const payload = JSON.parse(item.payload);
+
+    if (item.action === "create") {
+      await api.post("/api/invoices/create", payload);
+    } else if (item.action === "update") {
+      await api.put(`/api/invoices/${item.entity_id}`, payload);
     }
   }
 }
@@ -520,68 +563,68 @@ export class SyncManager {
 
 ```typescript
 // lib/hooks/useAuth.ts
-import { useQuery, useMutation } from '@tanstack/react-query'
-import * as SecureStore from 'expo-secure-store'
-import * as LocalAuthentication from 'expo-local-authentication'
+import { useQuery, useMutation } from "@tanstack/react-query";
+import * as SecureStore from "expo-secure-store";
+import * as LocalAuthentication from "expo-local-authentication";
 
 export function useAuth() {
   // Check for saved session
   const { data: session } = useQuery({
-    queryKey: ['session'],
+    queryKey: ["session"],
     queryFn: async () => {
-      const token = await SecureStore.getItemAsync('auth_token')
-      const user = await SecureStore.getItemAsync('user')
-      
-      if (!token || !user) return null
-      
-      return { token, user: JSON.parse(user) }
-    }
-  })
+      const token = await SecureStore.getItemAsync("auth_token");
+      const user = await SecureStore.getItemAsync("user");
+
+      if (!token || !user) return null;
+
+      return { token, user: JSON.parse(user) };
+    },
+  });
 
   // Login with credentials
   const loginMutation = useMutation({
     mutationFn: async ({ email, password }: LoginCredentials) => {
-      const response = await api.post('/api/auth/mobile/login', {
+      const response = await api.post("/api/auth/mobile/login", {
         email,
         password,
-      })
-      return response.data
+      });
+      return response.data;
     },
     onSuccess: async (data) => {
-      await SecureStore.setItemAsync('auth_token', data.token)
-      await SecureStore.setItemAsync('user', JSON.stringify(data.user))
-    }
-  })
+      await SecureStore.setItemAsync("auth_token", data.token);
+      await SecureStore.setItemAsync("user", JSON.stringify(data.user));
+    },
+  });
 
   // Biometric authentication
   const biometricLogin = async () => {
-    const hasHardware = await LocalAuthentication.hasHardwareAsync()
-    const isEnrolled = await LocalAuthentication.isEnrolledAsync()
-    
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
     if (!hasHardware || !isEnrolled) {
-      throw new Error('Biometric authentication not available')
+      throw new Error("Biometric authentication not available");
     }
 
     const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: 'Login to Flowstock',
-      fallbackLabel: 'Use password',
-    })
+      promptMessage: "Login to Flowstock",
+      fallbackLabel: "Use password",
+    });
 
     if (result.success) {
       // Token already in secure store, just return session
-      return session
+      return session;
     }
-  }
+  };
 
   return {
     session,
     login: loginMutation.mutate,
     biometricLogin,
     logout: async () => {
-      await SecureStore.deleteItemAsync('auth_token')
-      await SecureStore.deleteItemAsync('user')
-    }
-  }
+      await SecureStore.deleteItemAsync("auth_token");
+      await SecureStore.deleteItemAsync("user");
+    },
+  };
 }
 ```
 
@@ -617,13 +660,13 @@ export function VoiceCommandButton() {
 
     await recording.stopAndUnloadAsync()
     const uri = recording.getURI()
-    
+
     if (uri) {
       // Convert to base64 and send to Whisper API
       const base64 = await FileSystem.readAsStringAsync(uri, {
         encoding: FileSystem.EncodingType.Base64,
       })
-      
+
       await processVoiceCommand(base64)
     }
 
@@ -647,23 +690,23 @@ export function useVoiceCommand() {
 
   async function processVoiceCommand(audioBase64: string) {
     setIsProcessing(true)
-    
+
     try {
       // Send to existing Whisper API
       const response = await api.post('/api/voice/transcribe', {
         audio: audioBase64,
       })
-      
+
       const transcription = response.data.text
-      
+
       // Parse command (using existing backend NLP)
       const commandResponse = await api.post('/api/voice/command', {
         text: transcription,
       })
-      
+
       // Execute command
       executeCommand(commandResponse.data)
-      
+
     } finally {
       setIsProcessing(false)
     }
@@ -706,9 +749,9 @@ export default function InvoicingScreen() {
   return (
     <ScrollView>
       <Text>Create Invoice</Text>
-      
+
       {/* Voice command button */}
-      <VoiceCommandButton 
+      <VoiceCommandButton
         onCommand={(text) => {
           // "Add 10 pallets of SKU-12345" → parse and add line item
           const item = parseVoiceInvoiceItem(text)
@@ -735,22 +778,22 @@ export default function InvoicingScreen() {
       ))}
 
       {/* Signature capture */}
-      <SignatureCapture 
+      <SignatureCapture
         onSignature={setSignature}
       />
 
       {/* Create invoice */}
-      <Button 
+      <Button
         onPress={async () => {
           const invoice = await createInvoice({
             lineItems,
             signature,
             photos,
           })
-          
+
           // Generate PDF
           await generateInvoicePDF(invoice)
-          
+
           // Send via email
           await sendInvoice(invoice)
         }}
@@ -765,7 +808,7 @@ export default function InvoicingScreen() {
 // lib/hooks/useInvoicing.ts
 export function useInvoicing() {
   const { isOnline } = useNetworkStatus()
-  
+
   const createMutation = useMutation({
     mutationFn: async (invoiceData: CreateInvoiceInput) => {
       if (isOnline) {
@@ -782,10 +825,10 @@ export function useInvoicing() {
             record.synced = false
           })
         })
-        
+
         // Add to sync queue
         await addToSyncQueue('invoice', 'create', localInvoice.id, invoiceData)
-        
+
         return localInvoice
       }
     }
@@ -876,7 +919,7 @@ export async function generateInvoicePDF(invoice: Invoice) {
   `
 
   const { uri } = await Print.printToFileAsync({ html })
-  
+
   return uri
 }
 
@@ -886,7 +929,7 @@ export async function sendInvoice(invoice: Invoice, pdfUri: string) {
     mimeType: 'application/pdf',
     dialogTitle: `Invoice ${invoice.invoice_number}`,
   })
-  
+
   // Or send via API
   await api.post(`/api/invoices/${invoice.id}/send`, {
     email: invoice.customer_email,
@@ -901,9 +944,9 @@ export async function sendInvoice(invoice: Invoice, pdfUri: string) {
 
 ```typescript
 // lib/notifications/setup.ts
-import * as Notifications from 'expo-notifications'
-import * as Device from 'expo-device'
-import { Platform } from 'react-native'
+import * as Notifications from "expo-notifications";
+import * as Device from "expo-device";
+import { Platform } from "react-native";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -911,70 +954,73 @@ Notifications.setNotificationHandler({
     shouldPlaySound: true,
     shouldSetBadge: true,
   }),
-})
+});
 
 export async function registerForPushNotifications() {
   if (!Device.isDevice) {
-    console.log('Push notifications only work on physical devices')
-    return
+    console.log("Push notifications only work on physical devices");
+    return;
   }
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync()
-  let finalStatus = existingStatus
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
 
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync()
-    finalStatus = status
+  if (existingStatus !== "granted") {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
   }
 
-  if (finalStatus !== 'granted') {
-    throw new Error('Push notification permission denied')
+  if (finalStatus !== "granted") {
+    throw new Error("Push notification permission denied");
   }
 
   // Get Expo push token
-  const token = (await Notifications.getExpoPushTokenAsync()).data
+  const token = (await Notifications.getExpoPushTokenAsync()).data;
 
   // Send token to backend
-  await api.post('/api/users/push-token', { token })
+  await api.post("/api/users/push-token", { token });
 
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
+  if (Platform.OS === "android") {
+    Notifications.setNotificationChannelAsync("default", {
+      name: "default",
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    })
+      lightColor: "#FF231F7C",
+    });
   }
 
-  return token
+  return token;
 }
 
 // Listen for notifications
 export function useNotifications() {
   useEffect(() => {
     // Foreground notifications
-    const subscription = Notifications.addNotificationReceivedListener(notification => {
-      console.log('Notification received:', notification)
-      // Handle based on notification.request.content.data
-    })
+    const subscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        console.log("Notification received:", notification);
+        // Handle based on notification.request.content.data
+      },
+    );
 
     // User tapped notification
-    const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
-      const data = response.notification.request.content.data
-      
-      // Navigate based on notification type
-      if (data.type === 'order_ready') {
-        router.push(`/orders/${data.order_id}`)
-      } else if (data.type === 'inventory_low') {
-        router.push(`/inventory/${data.sku}`)
-      }
-    })
+    const responseSubscription =
+      Notifications.addNotificationResponseReceivedListener((response) => {
+        const data = response.notification.request.content.data;
+
+        // Navigate based on notification type
+        if (data.type === "order_ready") {
+          router.push(`/orders/${data.order_id}`);
+        } else if (data.type === "inventory_low") {
+          router.push(`/inventory/${data.sku}`);
+        }
+      });
 
     return () => {
-      subscription.remove()
-      responseSubscription.remove()
-    }
-  }, [])
+      subscription.remove();
+      responseSubscription.remove();
+    };
+  }, []);
 }
 ```
 
@@ -983,49 +1029,54 @@ export function useNotifications() {
 ## Testing Strategy
 
 ### Unit Tests (Jest + React Native Testing Library)
+
 ```bash
 npm install --save-dev @testing-library/react-native jest
 ```
 
 **Key Test Files:**
+
 ```typescript
 // __tests__/hooks/useInvoicing.test.ts
-describe('useInvoicing', () => {
-  it('creates invoice online', async () => {
+describe("useInvoicing", () => {
+  it("creates invoice online", async () => {
     // Mock online status
     // Test API call
-  })
+  });
 
-  it('queues invoice offline', async () => {
+  it("queues invoice offline", async () => {
     // Mock offline status
     // Test local DB write
-  })
-})
+  });
+});
 
 // __tests__/components/VoiceCommandButton.test.tsx
-describe('VoiceCommandButton', () => {
-  it('records audio on press and hold', async () => {
+describe("VoiceCommandButton", () => {
+  it("records audio on press and hold", async () => {
     // Test recording flow
-  })
+  });
 
-  it('sends to Whisper API on release', async () => {
+  it("sends to Whisper API on release", async () => {
     // Mock API
-  })
-})
+  });
+});
 ```
 
 ### Integration Tests (Detox)
+
 ```bash
 npm install --save-dev detox
 ```
 
 **E2E Test Scenarios:**
+
 - Complete pick-to-invoice flow
 - Offline invoice creation and sync
 - Voice command end-to-end
 - Barcode scanning accuracy
 
 ### Device Testing
+
 - **iOS:** Test on iPhone 12+ (iOS 14+)
 - **Android:** Test on Samsung Galaxy S21+ (Android 11+)
 - **Warehouse Devices:** Zebra TC52, Honeywell CT40
@@ -1035,6 +1086,7 @@ npm install --save-dev detox
 ## Deployment Strategy
 
 ### EAS Build Configuration
+
 ```json
 // eas.json
 {
@@ -1073,6 +1125,7 @@ npm install --save-dev detox
 ```
 
 ### Build Commands
+
 ```bash
 # Development build (for testing)
 eas build --profile development --platform ios
@@ -1090,6 +1143,7 @@ eas submit --platform android
 ```
 
 ### Over-The-Air (OTA) Updates
+
 ```bash
 # Push update without app store approval (JS/assets only)
 eas update --branch production --message "Fixed invoice PDF generation"
@@ -1118,6 +1172,7 @@ EXPO_PROJECT_ID=your_expo_project_id
 ## Success Metrics
 
 ### Phase 1 KPIs:
+
 - ✅ Authentication success rate: >99%
 - ✅ Voice command accuracy: >90%
 - ✅ Barcode scan time: <2 seconds
@@ -1125,12 +1180,14 @@ EXPO_PROJECT_ID=your_expo_project_id
 - ✅ Offline queue sync success: >95%
 
 ### Phase 2 KPIs:
+
 - ✅ Pick rate increase: 25% faster than desktop
 - ✅ Inventory accuracy: 99.9%
 - ✅ App crash rate: <0.1%
 - ✅ Average rating: 4.5+ stars
 
 ### Phase 3 KPIs:
+
 - ✅ Driver adoption rate: >80%
 - ✅ POD capture rate: 100%
 - ✅ Invoice send time reduction: 80%
@@ -1140,11 +1197,13 @@ EXPO_PROJECT_ID=your_expo_project_id
 ## Team Requirements
 
 **For Tonight's Implementation (Phase 1):**
+
 - 1 React Native developer (lead)
 - 1 Backend developer (API integration support)
 - 1 Designer (UI/UX for mobile screens)
 
 **Total Timeline:**
+
 - Phase 1: 2-3 weeks (2 developers)
 - Phase 2: 4-6 weeks (2-3 developers)
 - Phase 3: 6-8 weeks (3-4 developers)
@@ -1153,13 +1212,13 @@ EXPO_PROJECT_ID=your_expo_project_id
 
 ## Risk Mitigation
 
-| Risk | Mitigation |
-|------|------------|
+| Risk                                          | Mitigation                                                |
+| --------------------------------------------- | --------------------------------------------------------- |
 | Voice recognition accuracy in noisy warehouse | Noise cancellation, push-to-talk UI, fallback to keyboard |
-| Offline sync conflicts | Last-write-wins with manual conflict resolution UI |
-| App store approval delays | Use EAS OTA updates for quick fixes |
-| Battery drain from background sync | Limit sync frequency, use efficient listeners |
-| Barcode scanning performance | Use native camera module, hardware acceleration |
+| Offline sync conflicts                        | Last-write-wins with manual conflict resolution UI        |
+| App store approval delays                     | Use EAS OTA updates for quick fixes                       |
+| Battery drain from background sync            | Limit sync frequency, use efficient listeners             |
+| Barcode scanning performance                  | Use native camera module, hardware acceleration           |
 
 ---
 
@@ -1177,13 +1236,16 @@ EXPO_PROJECT_ID=your_expo_project_id
 ## Next Steps (Tonight)
 
 ### Immediate Actions (Hour 1-2):
+
 1. **Initialize Expo project:**
+
    ```bash
    cd /workspaces/Flowstock/apps
    npx create-expo-app mobile --template expo-template-blank-typescript
    ```
 
 2. **Install core dependencies:**
+
    ```bash
    cd mobile
    npx expo install expo-router react-native-safe-area-context react-native-screens
@@ -1201,6 +1263,7 @@ EXPO_PROJECT_ID=your_expo_project_id
    - Biometric setup
 
 ### Week 1 Deliverables:
+
 - ✅ Working authentication
 - ✅ Basic voice command recording
 - ✅ Barcode scanner modal
@@ -1213,15 +1276,15 @@ EXPO_PROJECT_ID=your_expo_project_id
 **Your Marketing Pitch:**
 
 > **"The First Voice-Native Mobile WMS"**
-> 
+>
 > While Manhattan, Blue Yonder, and SAP force your team to desktop computers or clunky browsers, Flowstock puts enterprise-grade WMS in your pocket.
-> 
+>
 > ✅ **Invoice customers from the dock** - not the desk  
 > ✅ **Voice-directed operations** - hands-free picking, receiving, putaway  
 > ✅ **Works offline** - dead zones won't stop your warehouse  
 > ✅ **Native iOS/Android** - App Store credibility, not web wrapper  
-> ✅ **True camera scanning** - faster than browser-based alternatives  
-> 
+> ✅ **True camera scanning** - faster than browser-based alternatives
+>
 > **Result:** 25% faster operations, 80% faster invoicing, 100% mobile workforce.
 
 ---
@@ -1229,17 +1292,20 @@ EXPO_PROJECT_ID=your_expo_project_id
 ## Support & Resources
 
 **Documentation:**
+
 - Expo Docs: https://docs.expo.dev
 - React Native: https://reactnative.dev
 - WatermelonDB: https://watermelondb.dev
 - React Query: https://tanstack.com/query
 
 **Development Tools:**
+
 - Expo Go (iOS/Android) - Test on device without builds
 - React Native Debugger - Chrome DevTools for RN
 - Flipper - Advanced debugging with network inspector
 
 **Community:**
+
 - Expo Discord: https://chat.expo.dev
 - React Native Community: https://reactnative.dev/community/overview
 

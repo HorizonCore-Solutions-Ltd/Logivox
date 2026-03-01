@@ -1,9 +1,9 @@
-const { chromium } = require('playwright');
-const fs = require('fs');
-const path = require('path');
+const { chromium } = require("playwright");
+const fs = require("fs");
+const path = require("path");
 
-const outputDir = path.join(__dirname, 'apps/web/public/icons');
-const brandDir = path.join(__dirname, 'assets/brand/logos');
+const outputDir = path.join(__dirname, "apps/web/public/icons");
+const brandDir = path.join(__dirname, "assets/brand/logos");
 
 if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 if (!fs.existsSync(brandDir)) fs.mkdirSync(brandDir, { recursive: true });
@@ -77,40 +77,50 @@ const htmlContent = `
 `;
 
 async function generateIcons() {
-  fs.writeFileSync(path.join(__dirname, 'icon.html'), htmlContent);
+  fs.writeFileSync(path.join(__dirname, "icon.html"), htmlContent);
   // Also save the SVG vector
-  fs.writeFileSync(path.join(outputDir, '../favicon.svg'), svgMarkup);
-  fs.writeFileSync(path.join(brandDir, 'logivox-logo-mark.svg'), svgMarkup);
+  fs.writeFileSync(path.join(outputDir, "../favicon.svg"), svgMarkup);
+  fs.writeFileSync(path.join(brandDir, "logivox-logo-mark.svg"), svgMarkup);
 
   const browser = await chromium.launch({ headless: true });
-  
+
   const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
-  
+
   for (const size of sizes) {
-    const page = await browser.newPage({ viewport: { width: size, height: size }});
-    await page.goto("file://" + path.join(__dirname, 'icon.html'));
-    
+    const page = await browser.newPage({
+      viewport: { width: size, height: size },
+    });
+    await page.goto("file://" + path.join(__dirname, "icon.html"));
+
     // Ensure render
-    await page.waitForTimeout(500); 
-    
+    await page.waitForTimeout(500);
+
     // Transparent screenshot, but our svg has rounded corners so it's a solid app icon anyway
-    const outputPath = path.join(outputDir, "icon-" + size + "x" + size + ".png");
+    const outputPath = path.join(
+      outputDir,
+      "icon-" + size + "x" + size + ".png",
+    );
     await page.screenshot({ path: outputPath, omitBackground: true });
     console.log("Generated " + outputPath);
-    
+
     await page.close();
   }
 
   // Generate generic app icon for brand dir
-  const page = await browser.newPage({ viewport: { width: 1024, height: 1024 }});
-  await page.goto("file://" + path.join(__dirname, 'icon.html'));
+  const page = await browser.newPage({
+    viewport: { width: 1024, height: 1024 },
+  });
+  await page.goto("file://" + path.join(__dirname, "icon.html"));
   await page.waitForTimeout(500);
-  await page.screenshot({ path: path.join(brandDir, 'logivox-app-icon.png'), omitBackground: true });
-  console.log('Generated Brand High-Res Icon');
-  
+  await page.screenshot({
+    path: path.join(brandDir, "logivox-app-icon.png"),
+    omitBackground: true,
+  });
+  console.log("Generated Brand High-Res Icon");
+
   await browser.close();
   // Cleanup tmp html
-  fs.unlinkSync(path.join(__dirname, 'icon.html'));
+  fs.unlinkSync(path.join(__dirname, "icon.html"));
 }
 
 generateIcons().catch(console.error);
