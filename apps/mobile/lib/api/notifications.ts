@@ -32,7 +32,11 @@ export async function getNotifications(params?: {
   pageSize?: number;
 }) {
   const { data } = await apiClient.get("/api/notifications", { params });
-  return data as { items: AppNotification[]; total: number; unreadCount: number };
+  return data as {
+    items: AppNotification[];
+    total: number;
+    unreadCount: number;
+  };
 }
 
 // GET /api/notifications/unread-count
@@ -59,8 +63,14 @@ export async function deleteNotification(id: string) {
 }
 
 // POST /api/notifications/register-token — register Expo push token with server
-export async function registerPushToken(token: string, platform: "ios" | "android") {
-  const { data } = await apiClient.post("/api/notifications/register-token", { token, platform });
+export async function registerPushToken(
+  token: string,
+  platform: "ios" | "android",
+) {
+  const { data } = await apiClient.post("/api/notifications/register-token", {
+    token,
+    platform,
+  });
   return data as { success: boolean };
 }
 

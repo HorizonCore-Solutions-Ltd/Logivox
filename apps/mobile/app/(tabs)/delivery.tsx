@@ -46,7 +46,9 @@ export default function DeliveryScreen() {
   const qc = useQueryClient();
   const { user } = useAuthStore();
   const [selectedStop, setSelectedStop] = useState<DeliveryStop | null>(null);
-  const [modalType, setModalType] = useState<"ITEMS" | "POD" | "FAIL" | "INCIDENT" | null>(null);
+  const [modalType, setModalType] = useState<
+    "ITEMS" | "POD" | "FAIL" | "INCIDENT" | null
+  >(null);
   const [today] = useState(new Date().toISOString().split("T")[0]);
 
   // POD State
@@ -67,7 +69,9 @@ export default function DeliveryScreen() {
   const run = data?.run;
   const stops = (data as any)?.stops ?? [];
 
-  const completedStops = stops.filter((s: DeliveryStop) => s.status === "DELIVERED" || s.status === "FAILED").length;
+  const completedStops = stops.filter(
+    (s: DeliveryStop) => s.status === "DELIVERED" || s.status === "FAILED",
+  ).length;
   const progress = stops.length > 0 ? completedStops / stops.length : 0;
 
   const startRunMut = useMutation({
@@ -129,8 +133,14 @@ export default function DeliveryScreen() {
 
   const handleNavigate = (stop: DeliveryStop) => {
     // Basic geo navigation intent
-    const scheme = Platform.select({ ios: "maps:0,0?q=", android: "geo:0,0?q=" });
-    const latLng = stop.latitude && stop.longitude ? `${stop.latitude},${stop.longitude}` : "";
+    const scheme = Platform.select({
+      ios: "maps:0,0?q=",
+      android: "geo:0,0?q=",
+    });
+    const latLng =
+      stop.latitude && stop.longitude
+        ? `${stop.latitude},${stop.longitude}`
+        : "";
     const label = stop.address;
     const url = Platform.select({
       ios: `${scheme}${label}@${latLng}`,
@@ -142,7 +152,10 @@ export default function DeliveryScreen() {
   const takePhoto = async () => {
     const perm = await ImagePicker.requestCameraPermissionsAsync();
     if (!perm.granted) {
-      Alert.alert("No Camera Access", "Permission required to take POD photos.");
+      Alert.alert(
+        "No Camera Access",
+        "Permission required to take POD photos.",
+      );
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -177,7 +190,9 @@ export default function DeliveryScreen() {
   }
 
   const renderStop = ({ item }: { item: DeliveryStop }) => {
-    const isNext = item.status === "PENDING" && stops.find(s => s.status === "PENDING")?.id === item.id;
+    const isNext =
+      item.status === "PENDING" &&
+      stops.find((s) => s.status === "PENDING")?.id === item.id;
     const color = STOP_COLORS[item.status] ?? "#666";
 
     return (
@@ -201,17 +216,26 @@ export default function DeliveryScreen() {
             ) : null}
             {/* Quick Contact Info Display */}
             {item.contactPhone && (
-              <View style={{flexDirection: 'row', alignItems: 'center', marginTop: 4}}>
-                   <Ionicons name="call-outline" size={12} color="#4b5563" />
-                   <Text style={{fontSize: 12, color: "#4b5563", marginLeft: 4}}>
-                     {item.contactName ? `${item.contactName} • ` : ""}{item.contactPhone}
-                   </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginTop: 4,
+                }}
+              >
+                <Ionicons name="call-outline" size={12} color="#4b5563" />
+                <Text style={{ fontSize: 12, color: "#4b5563", marginLeft: 4 }}>
+                  {item.contactName ? `${item.contactName} • ` : ""}
+                  {item.contactPhone}
+                </Text>
               </View>
             )}
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <Text style={[styles.statusText, { color }]}>{item.status}</Text>
-            <Text style={styles.time}>{item.arrivalTime ? item.arrivalTime.substring(11, 16) : "--:--"}</Text>
+            <Text style={styles.time}>
+              {item.arrivalTime ? item.arrivalTime.substring(11, 16) : "--:--"}
+            </Text>
           </View>
         </View>
 
@@ -235,21 +259,28 @@ export default function DeliveryScreen() {
             </TouchableOpacity>
             {item.status === "PENDING" ? (
               <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: "#3b82f6", flex: 1, justifyContent: "center" }]}
+                style={[
+                  styles.actionBtn,
+                  {
+                    backgroundColor: "#3b82f6",
+                    flex: 1,
+                    justifyContent: "center",
+                  },
+                ]}
                 onPress={() => arriveMut.mutate(item.id)}
               >
                 <Text style={styles.actionText}>Arrive</Text>
               </TouchableOpacity>
             ) : null}
-             <TouchableOpacity
-                style={[styles.actionBtn, { backgroundColor: "#ef4444" }]}
-                onPress={() => {
-                    setSelectedStop(item);
-                    setModalType("INCIDENT");
-                }}
-              >
-                <Ionicons name="warning-outline" size={18} color="#fff" />
-              </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionBtn, { backgroundColor: "#ef4444" }]}
+              onPress={() => {
+                setSelectedStop(item);
+                setModalType("INCIDENT");
+              }}
+            >
+              <Ionicons name="warning-outline" size={18} color="#fff" />
+            </TouchableOpacity>
           </View>
         )}
       </TouchableOpacity>
@@ -261,16 +292,22 @@ export default function DeliveryScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-            <Text style={styles.title}>Run #{run.runNumber}</Text>
-            <Text style={styles.subTitle}>{new Date().toDateString()}</Text>
+          <Text style={styles.title}>Run #{run.runNumber}</Text>
+          <Text style={styles.subTitle}>{new Date().toDateString()}</Text>
         </View>
-        <View style={{flexDirection: 'row', gap: 12}}>
-            <TouchableOpacity onPress={() => { setSelectedStop(null); setModalType("INCIDENT");}} style={styles.incidentBtn}>
-                 <Ionicons name="warning-outline" size={20} color="#fff" />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.refreshBtn} onPress={() => refetch()}>
-                 <Ionicons name="refresh" size={20} color="#666" />
-            </TouchableOpacity>
+        <View style={{ flexDirection: "row", gap: 12 }}>
+          <TouchableOpacity
+            onPress={() => {
+              setSelectedStop(null);
+              setModalType("INCIDENT");
+            }}
+            style={styles.incidentBtn}
+          >
+            <Ionicons name="warning-outline" size={20} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.refreshBtn} onPress={() => refetch()}>
+            <Ionicons name="refresh" size={20} color="#666" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -296,11 +333,11 @@ export default function DeliveryScreen() {
         stop={selectedStop}
         type={modalType}
         onClose={() => {
-            setModalType(null);
-            setSelectedStop(null);
-            resetPod();
-            setIncidentDesc("");
-            setPhoto(null);
+          setModalType(null);
+          setSelectedStop(null);
+          resetPod();
+          setIncidentDesc("");
+          setPhoto(null);
         }}
         onTypeChange={setModalType}
         podState={{ recipientName, photo, podNotes }}
@@ -316,7 +353,11 @@ export default function DeliveryScreen() {
         }
         onFail={(reason: string) =>
           selectedStop &&
-          failMut.mutate({ id: selectedStop.id, reason, photo: photo ?? undefined })
+          failMut.mutate({
+            id: selectedStop.id,
+            reason,
+            photo: photo ?? undefined,
+          })
         }
         onReport={() =>
           incidentMut.mutate({
@@ -358,18 +399,27 @@ function StopModal({
   });
 
   const allItems: DeliveryItem[] = (itemsData as any)?.items ?? [];
-  const deliveries = allItems.filter(i => i.type === "DELIVERY" || !i.type);
-  const collections = allItems.filter(i => i.type === "COLLECTION" || i.type === "RETURN");
+  const deliveries = allItems.filter((i) => i.type === "DELIVERY" || !i.type);
+  const collections = allItems.filter(
+    (i) => i.type === "COLLECTION" || i.type === "RETURN",
+  );
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+    <Modal
+      visible={visible}
+      animationType="slide"
+      presentationStyle="pageSheet"
+    >
       <View style={styles.modalCont}>
         <View style={styles.modalHeader}>
           <Text style={styles.modalTitle}>
-            {type === "ITEMS" ? "Stop Details" : 
-             type === "POD" ? "Proof of Delivery" : 
-             type === "FAIL" ? "Delivery Failure" :
-             "Report Incident"}
+            {type === "ITEMS"
+              ? "Stop Details"
+              : type === "POD"
+                ? "Proof of Delivery"
+                : type === "FAIL"
+                  ? "Delivery Failure"
+                  : "Report Incident"}
           </Text>
           <TouchableOpacity onPress={onClose}>
             <Ionicons name="close-circle" size={30} color="#666" />
@@ -379,73 +429,102 @@ function StopModal({
         {type === "ITEMS" && stop && (
           <View style={{ flex: 1 }}>
             <View style={styles.stopInfo}>
-                <Text style={styles.custName}>{stop.customerName}</Text>
-                <Text style={styles.addr}>{stop.address}</Text>
+              <Text style={styles.custName}>{stop.customerName}</Text>
+              <Text style={styles.addr}>{stop.address}</Text>
             </View>
             <ScrollView contentContainerStyle={{ padding: 16 }}>
-                {deliveries.length > 0 && (
-                    <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>To Deliver ({deliveries.length})</Text>
-                    </View>
-                )}
-                {deliveries.map(item => (
-                    <View key={item.id} style={styles.itemRow}>
-                        <View style={{flex: 1}}>
-                            <Text style={styles.prodName}>{item.productName}</Text>
-                            <Text style={styles.sku}>{item.sku}</Text>
-                        </View>
-                        <View style={{alignItems: 'flex-end'}}>
-                            <Text style={styles.qty}>{item.quantity} {item.unitLabel}s</Text>
-                            {item.trailerSection && (
-                                <View style={styles.locBadge}>
-                                    <Text style={styles.locText}>
-                                        {item.trailerSection} • L{item.trailerLayer} • {item.trailerPosition}
-                                    </Text>
-                                </View>
-                            )}
-                        </View>
-                    </View>
-                ))}
-
-                {collections.length > 0 && (
-                    <View style={[styles.sectionHeader, { marginTop: 16, backgroundColor: '#fff7ed' }]}>
-                        <Text style={[styles.sectionTitle, { color: '#c2410c' }]}>To Collect ({collections.length})</Text>
-                    </View>
-                )}
-                {collections.map(item => (
-                    <View key={item.id} style={[styles.itemRow, { borderLeftWidth: 3, borderLeftColor: '#f97316' }]}>
-                        <View style={{flex: 1}}>
-                            <Text style={styles.prodName}>{item.productName}</Text>
-                            <Text style={styles.sku}>{item.sku}</Text>
-                            {item.destinationLabel && (
-                                <Text style={styles.destination}>Destination: {item.destinationLabel}</Text>
-                            )}
-                        </View>
-                        <View style={{alignItems: 'flex-end'}}>
-                            <Text style={styles.qty}>{item.quantity} {item.unitLabel}s</Text>
-                            <View style={[styles.locBadge, { backgroundColor: '#ffedd5' }]}>
-                                <Text style={[styles.locText, { color: '#c2410c' }]}>COLLECT</Text>
-                            </View>
-                        </View>
-                    </View>
-                ))}
-            </ScrollView>
-            
-            {stop.status !== "DELIVERED" && stop.status !== "FAILED" && (
-                <View style={styles.modalActions}>
-                  <TouchableOpacity
-                    style={[styles.modalBtn, { backgroundColor: "#ef4444" }]}
-                    onPress={() => onTypeChange("FAIL")}
-                  >
-                    <Text style={styles.modalBtnText}>Skip</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.modalBtn, { backgroundColor: "#10b981", flex: 2 }]}
-                    onPress={() => onTypeChange("POD")}
-                  >
-                    <Text style={styles.modalBtnText}>Complete Stop</Text>
-                  </TouchableOpacity>
+              {deliveries.length > 0 && (
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>
+                    To Deliver ({deliveries.length})
+                  </Text>
                 </View>
+              )}
+              {deliveries.map((item) => (
+                <View key={item.id} style={styles.itemRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.prodName}>{item.productName}</Text>
+                    <Text style={styles.sku}>{item.sku}</Text>
+                  </View>
+                  <View style={{ alignItems: "flex-end" }}>
+                    <Text style={styles.qty}>
+                      {item.quantity} {item.unitLabel}s
+                    </Text>
+                    {item.trailerSection && (
+                      <View style={styles.locBadge}>
+                        <Text style={styles.locText}>
+                          {item.trailerSection} • L{item.trailerLayer} •{" "}
+                          {item.trailerPosition}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              ))}
+
+              {collections.length > 0 && (
+                <View
+                  style={[
+                    styles.sectionHeader,
+                    { marginTop: 16, backgroundColor: "#fff7ed" },
+                  ]}
+                >
+                  <Text style={[styles.sectionTitle, { color: "#c2410c" }]}>
+                    To Collect ({collections.length})
+                  </Text>
+                </View>
+              )}
+              {collections.map((item) => (
+                <View
+                  key={item.id}
+                  style={[
+                    styles.itemRow,
+                    { borderLeftWidth: 3, borderLeftColor: "#f97316" },
+                  ]}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.prodName}>{item.productName}</Text>
+                    <Text style={styles.sku}>{item.sku}</Text>
+                    {item.destinationLabel && (
+                      <Text style={styles.destination}>
+                        Destination: {item.destinationLabel}
+                      </Text>
+                    )}
+                  </View>
+                  <View style={{ alignItems: "flex-end" }}>
+                    <Text style={styles.qty}>
+                      {item.quantity} {item.unitLabel}s
+                    </Text>
+                    <View
+                      style={[styles.locBadge, { backgroundColor: "#ffedd5" }]}
+                    >
+                      <Text style={[styles.locText, { color: "#c2410c" }]}>
+                        COLLECT
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            {stop.status !== "DELIVERED" && stop.status !== "FAILED" && (
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalBtn, { backgroundColor: "#ef4444" }]}
+                  onPress={() => onTypeChange("FAIL")}
+                >
+                  <Text style={styles.modalBtnText}>Skip</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.modalBtn,
+                    { backgroundColor: "#10b981", flex: 2 },
+                  ]}
+                  onPress={() => onTypeChange("POD")}
+                >
+                  <Text style={styles.modalBtnText}>Complete Stop</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         )}
@@ -453,10 +532,22 @@ function StopModal({
         {type === "POD" && (
           <ScrollView contentContainerStyle={{ padding: 20 }}>
             {collections.length > 0 && (
-                <View style={{ marginBottom: 16, padding: 12, backgroundColor: '#fff7ed', borderRadius: 8 }}>
-                    <Text style={{ fontWeight: 'bold', color: '#c2410c' }}>Reminder:</Text>
-                    <Text style={{ color: '#9a3412' }}>Ensure {collections.reduce((acc, c) => acc + c.quantity, 0)} items are collected before departure.</Text>
-                </View>
+              <View
+                style={{
+                  marginBottom: 16,
+                  padding: 12,
+                  backgroundColor: "#fff7ed",
+                  borderRadius: 8,
+                }}
+              >
+                <Text style={{ fontWeight: "bold", color: "#c2410c" }}>
+                  Reminder:
+                </Text>
+                <Text style={{ color: "#9a3412" }}>
+                  Ensure {collections.reduce((acc, c) => acc + c.quantity, 0)}{" "}
+                  items are collected before departure.
+                </Text>
+              </View>
             )}
             <Text style={styles.label}>Recipient Name</Text>
             <TextInput
@@ -467,8 +558,13 @@ function StopModal({
             />
 
             <Text style={styles.label}>Signature (Tap to Sign)</Text>
-            <TouchableOpacity style={styles.sigBox} onPress={() => Alert.alert("Signature", "Simulated signature capture.")}>
-                <Text style={{color: '#999'}}>Tap to capture signature</Text>
+            <TouchableOpacity
+              style={styles.sigBox}
+              onPress={() =>
+                Alert.alert("Signature", "Simulated signature capture.")
+              }
+            >
+              <Text style={{ color: "#999" }}>Tap to capture signature</Text>
             </TouchableOpacity>
 
             <Text style={styles.label}>Photo Proof</Text>
@@ -480,8 +576,10 @@ function StopModal({
                 />
               ) : (
                 <>
-                    <Ionicons name="camera-outline" size={32} color="#666" />
-                    <Text style={{color: '#666', marginTop: 4}}>Take Photo</Text>
+                  <Ionicons name="camera-outline" size={32} color="#666" />
+                  <Text style={{ color: "#666", marginTop: 4 }}>
+                    Take Photo
+                  </Text>
                 </>
               )}
             </TouchableOpacity>
@@ -496,16 +594,22 @@ function StopModal({
             />
 
             <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: "#10b981", marginTop: 20 }]}
-                onPress={onComplete}
+              style={[
+                styles.modalBtn,
+                { backgroundColor: "#10b981", marginTop: 20 },
+              ]}
+              onPress={onComplete}
             >
-                <Text style={styles.modalBtnText}>Confirm Delivery</Text>
+              <Text style={styles.modalBtnText}>Confirm Delivery</Text>
             </TouchableOpacity>
-             <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: "#ccc", marginTop: 12 }]}
-                onPress={() => onTypeChange("ITEMS")}
+            <TouchableOpacity
+              style={[
+                styles.modalBtn,
+                { backgroundColor: "#ccc", marginTop: 12 },
+              ]}
+              onPress={() => onTypeChange("ITEMS")}
             >
-                <Text style={[styles.modalBtnText, {color: '#333'}]}>Back</Text>
+              <Text style={[styles.modalBtnText, { color: "#333" }]}>Back</Text>
             </TouchableOpacity>
           </ScrollView>
         )}
@@ -513,20 +617,29 @@ function StopModal({
         {type === "FAIL" && (
           <View style={{ padding: 20 }}>
             <Text style={styles.label}>Reason for Failure</Text>
-            {["Customer Not In", "Premises Closed", "Refused Goods", "Wrong Address", "Damaged Goods"].map((r) => (
-                <TouchableOpacity 
-                    key={r} 
-                    style={styles.reasonBtn}
-                    onPress={() => onFail(r)}
-                >
-                    <Text style={styles.reasonText}>{r}</Text>
-                </TouchableOpacity>
+            {[
+              "Customer Not In",
+              "Premises Closed",
+              "Refused Goods",
+              "Wrong Address",
+              "Damaged Goods",
+            ].map((r) => (
+              <TouchableOpacity
+                key={r}
+                style={styles.reasonBtn}
+                onPress={() => onFail(r)}
+              >
+                <Text style={styles.reasonText}>{r}</Text>
+              </TouchableOpacity>
             ))}
-             <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: "#ccc", marginTop: 12 }]}
-                onPress={() => onTypeChange("ITEMS")}
+            <TouchableOpacity
+              style={[
+                styles.modalBtn,
+                { backgroundColor: "#ccc", marginTop: 12 },
+              ]}
+              onPress={() => onTypeChange("ITEMS")}
             >
-                <Text style={[styles.modalBtnText, {color: '#333'}]}>Back</Text>
+              <Text style={[styles.modalBtnText, { color: "#333" }]}>Back</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -534,22 +647,34 @@ function StopModal({
         {type === "INCIDENT" && (
           <ScrollView contentContainerStyle={{ padding: 20 }}>
             <Text style={styles.label}>Incident Type</Text>
-            <View style={{flexDirection: 'row', flexWrap: 'wrap', gap: 8}}>
-                {["DAMAGE", "DELAY", "BREAKDOWN", "ACCIDENT", "OTHER"].map((t) => (
-                    <TouchableOpacity
-                        key={t}
-                        style={[
-                            styles.reasonBtn,
-                            { backgroundColor: incidentState.incidentType === t ? '#f97316' : '#fff' }
-                        ]}
-                        onPress={() => setIncidentState.setIncidentType(t)}
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+              {["DAMAGE", "DELAY", "BREAKDOWN", "ACCIDENT", "OTHER"].map(
+                (t) => (
+                  <TouchableOpacity
+                    key={t}
+                    style={[
+                      styles.reasonBtn,
+                      {
+                        backgroundColor:
+                          incidentState.incidentType === t ? "#f97316" : "#fff",
+                      },
+                    ]}
+                    onPress={() => setIncidentState.setIncidentType(t)}
+                  >
+                    <Text
+                      style={[
+                        styles.reasonText,
+                        {
+                          color:
+                            incidentState.incidentType === t ? "#fff" : "#111",
+                        },
+                      ]}
                     >
-                        <Text style={[
-                            styles.reasonText,
-                            { color: incidentState.incidentType === t ? '#fff' : '#111' }
-                        ]}>{t}</Text>
-                    </TouchableOpacity>
-                ))}
+                      {t}
+                    </Text>
+                  </TouchableOpacity>
+                ),
+              )}
             </View>
 
             <Text style={styles.label}>Description</Text>
@@ -570,17 +695,22 @@ function StopModal({
                 />
               ) : (
                 <>
-                    <Ionicons name="camera-outline" size={32} color="#666" />
-                    <Text style={{color: '#666', marginTop: 4}}>Take Photo</Text>
+                  <Ionicons name="camera-outline" size={32} color="#666" />
+                  <Text style={{ color: "#666", marginTop: 4 }}>
+                    Take Photo
+                  </Text>
                 </>
               )}
             </TouchableOpacity>
 
             <TouchableOpacity
-                style={[styles.modalBtn, { backgroundColor: "#f97316", marginTop: 20 }]}
-                onPress={onReport}
+              style={[
+                styles.modalBtn,
+                { backgroundColor: "#f97316", marginTop: 20 },
+              ]}
+              onPress={onReport}
             >
-                <Text style={styles.modalBtnText}>Submit Report</Text>
+              <Text style={styles.modalBtnText}>Submit Report</Text>
             </TouchableOpacity>
           </ScrollView>
         )}
@@ -606,8 +736,13 @@ const styles = StyleSheet.create({
   title: { fontSize: 20, fontWeight: "bold", color: "#111" },
   subTitle: { fontSize: 14, color: "#666" },
   refreshBtn: { padding: 8 },
-  incidentBtn: { padding: 8, backgroundColor: '#f97316', borderRadius: 8 },
-  btnMain: { marginTop: 16, backgroundColor: "#2563EB", padding: 12, borderRadius: 8 },
+  incidentBtn: { padding: 8, backgroundColor: "#f97316", borderRadius: 8 },
+  btnMain: {
+    marginTop: 16,
+    backgroundColor: "#2563EB",
+    padding: 12,
+    borderRadius: 8,
+  },
   btnText: { color: "#fff", fontWeight: "600" },
   startBanner: {
     backgroundColor: "#10b981",
@@ -659,30 +794,125 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   actionText: { color: "#fff", fontSize: 13, fontWeight: "600" },
-  
+
   // Modal
-  modalCont: { flex: 1, backgroundColor: "#f9fafb", marginTop: 50, borderTopLeftRadius: 16, borderTopRightRadius: 16 },
-  modalHeader: { padding: 16, flexDirection: "row", justifyContent: "space-between", alignItems: "center", borderBottomWidth: 1, borderBottomColor: "#eee" },
+  modalCont: {
+    flex: 1,
+    backgroundColor: "#f9fafb",
+    marginTop: 50,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+  },
+  modalHeader: {
+    padding: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
   modalTitle: { fontSize: 18, fontWeight: "bold" },
-  stopInfo: { padding: 20, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#eee" },
-  itemRow: { flexDirection: "row", padding: 12, backgroundColor: "#fff", marginBottom: 1, borderBottomWidth: 1, borderBottomColor: "#f3f4f6" },
+  stopInfo: {
+    padding: 20,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+  },
+  itemRow: {
+    flexDirection: "row",
+    padding: 12,
+    backgroundColor: "#fff",
+    marginBottom: 1,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+  },
   prodName: { fontSize: 15, fontWeight: "500" },
   sku: { fontSize: 12, color: "#999" },
   qty: { fontSize: 15, fontWeight: "600", color: "#2563EB" },
-  locBadge: { backgroundColor: "#e0f2fe", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, marginTop: 4 },
+  locBadge: {
+    backgroundColor: "#e0f2fe",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginTop: 4,
+  },
   locText: { fontSize: 10, color: "#0369a1", fontWeight: "500" },
-  modalActions: { flexDirection: "row", padding: 16, gap: 12, borderTopWidth: 1, borderTopColor: "#eee", backgroundColor: "#fff" },
-  modalBtn: { padding: 16, borderRadius: 8, alignItems: "center", justifyContent: "center", flex: 1 },
+  modalActions: {
+    flexDirection: "row",
+    padding: 16,
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    backgroundColor: "#fff",
+  },
+  modalBtn: {
+    padding: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
   modalBtnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
-  
+
   // POD Form
-  label: { fontSize: 14, fontWeight: "600", color: "#374151", marginBottom: 6, marginTop: 12 },
-  input: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 12, fontSize: 16 },
-  sigBox: { height: 100, backgroundColor: "#fff", borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, justifyContent: "center", alignItems: "center", borderStyle: "dashed" },
-  photoBox: { height: 160, backgroundColor: "#e5e7eb", borderRadius: 8, justifyContent: "center", alignItems: "center" },
-  reasonBtn: { padding: 12, backgroundColor: "#fff", borderRadius: 8, marginBottom: 8, borderWidth: 1, borderColor: "#e5e7eb", minWidth: '45%' },
-  reasonText: { fontSize: 14, fontWeight: '600', color: "#111", textAlign: 'center' },
-  destination: { fontSize: 12, color: '#c2410c', fontWeight: '500', marginTop: 2 },
-  sectionHeader: { padding: 8, backgroundColor: '#eff6ff', borderRadius: 4, marginBottom: 8 },
-  sectionTitle: { fontSize: 13, fontWeight: '700', color: '#1d4ed8' },
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 6,
+    marginTop: 12,
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+  },
+  sigBox: {
+    height: 100,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    borderStyle: "dashed",
+  },
+  photoBox: {
+    height: 160,
+    backgroundColor: "#e5e7eb",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  reasonBtn: {
+    padding: 12,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    minWidth: "45%",
+  },
+  reasonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#111",
+    textAlign: "center",
+  },
+  destination: {
+    fontSize: 12,
+    color: "#c2410c",
+    fontWeight: "500",
+    marginTop: 2,
+  },
+  sectionHeader: {
+    padding: 8,
+    backgroundColor: "#eff6ff",
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  sectionTitle: { fontSize: 13, fontWeight: "700", color: "#1d4ed8" },
 });

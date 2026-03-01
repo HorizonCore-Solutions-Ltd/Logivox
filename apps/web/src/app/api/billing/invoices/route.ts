@@ -51,28 +51,46 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const customerId = searchParams.get("customerId");
     const status = searchParams.get("status");
+    const search = searchParams.get("search");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(100, parseInt(searchParams.get("limit") || "20", 10));
 
-    const invoices = await prisma.invoice.findMany({
-      where: {
-        organizationId,
-        ...(customerId && { customerId }),
-        ...(status && { status: status as any }),
-        ...(startDate && { billingPeriodStart: { gte: new Date(startDate) } }),
-        ...(endDate && { billingPeriodEnd: { lte: new Date(endDate) } }),
-      },
-      include: {
-        customer: {
-          select: { id: true, name: true, code: true, email: true },
+    const where: any = {
+      organizationId,
+      ...(customerId && { customerId }),
+      ...(status && { status: status as any }),
+      ...(startDate && { billingPeriodStart: { gte: new Date(startDate) } }),
+      ...(endDate && { billingPeriodEnd: { lte: new Date(endDate) } }),
+      ...(search && {
+        OR: [
+          { invoiceNumber: { contains: search, mode: "insensitive" } },
+          { soNumber: { contains: search, mode: "insensitive" } },
+          { customer: { name: { contains: search, mode: "insensitive" } } },
+        ],
+      }),
+    };
+
+    const [invoices, total] = await prisma.$transaction([
+      prisma.invoice.findMany({
+        where,
+        include: {
+          customer: { select: { id: true, name: true, code: true, email: true } },
+          lineItems: true,
+          payments: true,
         },
-        lineItems: true,
-        payments: true,
-      },
-      orderBy: { createdAt: "desc" },
-    });
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.invoice.count({ where }),
+    ]);
 
-    return NextResponse.json(invoices);
+    return NextResponse.json({
+      invoices,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) },
+    });
   } catch (error: any) {
     console.error("Error fetching invoices:", error);
     return NextResponse.json(

@@ -50,7 +50,12 @@ export interface DeliveryItem {
   destinationLabel?: string; // e.g., "Return to Depot"
 }
 
-export type IncidentType = "DAMAGE" | "DELAY" | "BREAKDOWN" | "ACCIDENT" | "OTHER";
+export type IncidentType =
+  | "DAMAGE"
+  | "DELAY"
+  | "BREAKDOWN"
+  | "ACCIDENT"
+  | "OTHER";
 
 export interface IncidentReport {
   runId: string;
@@ -77,9 +82,11 @@ export function reportIncident(report: IncidentReport) {
 }
 
 export function requestEmergencyAccess(code: string) {
-  return apiClient.post<{ token: string; runId: string; user: any }>("/api/auth/emergency-login", { code });
+  return apiClient.post<{ token: string; runId: string; user: any }>(
+    "/api/auth/emergency-login",
+    { code },
+  );
 }
-
 
 // ─── API Functions ────────────────────────────────────────────────────────────
 
@@ -87,7 +94,7 @@ export function getMyRun(date?: string) {
   // Defaults to today for the logged-in driver
   const q = date ? `?date=${date}` : "";
   return apiClient<{ run: DeliveryRun | null; stops: DeliveryStop[] }>(
-    `/api/delivery/my-run${q}`
+    `/api/delivery/my-run${q}`,
   ).then((res) => res.data);
 }
 
@@ -104,7 +111,9 @@ export function confirmStopArrival(stopId: string) {
 }
 
 export function getStopItems(stopId: string) {
-  return apiClient<{ items: DeliveryItem[] }>(`/api/delivery/stops/${stopId}/items`).then((res) => res.data);
+  return apiClient<{ items: DeliveryItem[] }>(
+    `/api/delivery/stops/${stopId}/items`,
+  ).then((res) => res.data);
 }
 
 export function completeDelivery(
@@ -112,10 +121,10 @@ export function completeDelivery(
   pod: {
     recipientName: string;
     signature?: string; // base64
-    photo?: string;     // base64
+    photo?: string; // base64
     notes?: string;
     location?: { lat: number; lng: number };
-  }
+  },
 ) {
   return apiClient<DeliveryStop>(`/api/delivery/stops/${stopId}/complete`, {
     method: "POST",

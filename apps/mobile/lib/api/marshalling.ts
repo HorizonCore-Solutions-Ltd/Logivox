@@ -134,7 +134,7 @@ export interface LoadSheetLine {
   volume?: number;
   status: LoadSheetLineStatus;
   loadSection: TrailerSection;
-  loadLayer?: number;    // 1 = floor, 2 = second layer, etc.
+  loadLayer?: number; // 1 = floor, 2 = second layer, etc.
   loadPosition?: string; // e.g. "LEFT-REAR-1"
   pickTaskId?: string;
   pickerName?: string;
@@ -216,13 +216,13 @@ export interface LoadProgress {
 
 export function getDockBays() {
   return apiClient<{ bays: DockBay[] }>("/api/dock/status").then(
-    (res) => res.data
+    (res) => res.data,
   );
 }
 
 export function assignTrailerToBay(
   bayId: string,
-  data: { trailerNumber: string; loadSheetId?: string; carrierName?: string }
+  data: { trailerNumber: string; loadSheetId?: string; carrierName?: string },
 ) {
   return apiClient<DockBay>(`/api/dock/bays/${bayId}/assign`, {
     method: "POST",
@@ -230,7 +230,11 @@ export function assignTrailerToBay(
   }).then((res) => res.data);
 }
 
-export function updateBayStatus(bayId: string, status: BayStatus, notes?: string) {
+export function updateBayStatus(
+  bayId: string,
+  status: BayStatus,
+  notes?: string,
+) {
   return apiClient<DockBay>(`/api/dock/bays/${bayId}/status`, {
     method: "PATCH",
     data: { status, notes },
@@ -250,7 +254,7 @@ export function getLoadSheets(params?: {
   if (params?.search) q.set("search", params.search);
   const qs = q.toString() ? `?${q.toString()}` : "";
   return apiClient<{ loadSheets: LoadSheet[]; count: number }>(
-    `/api/loadsheets${qs}`
+    `/api/loadsheets${qs}`,
   ).then((res) => res.data);
 }
 
@@ -271,7 +275,7 @@ export function createLoadSheet(data: {
   customerId?: string;
 }) {
   return apiClient<LoadSheet>("/api/loadsheets", { method: "POST", data }).then(
-    (res) => res.data
+    (res) => res.data,
   );
 }
 
@@ -282,7 +286,11 @@ export function scanTrailerNumber(loadSheetId: string, trailerNumber: string) {
   }).then((res) => res.data);
 }
 
-export function sealTrailer(loadSheetId: string, sealNumber: string, notes?: string) {
+export function sealTrailer(
+  loadSheetId: string,
+  sealNumber: string,
+  notes?: string,
+) {
   return apiClient<LoadSheet>(`/api/loadsheets/${loadSheetId}/seal`, {
     method: "POST",
     data: { sealNumber, notes },
@@ -296,7 +304,7 @@ export function advanceLoadSheetStatus(
     userId?: string;
     userName?: string;
     notes?: string;
-  }
+  },
 ) {
   return apiClient<LoadSheet>(`/api/loadsheets/${loadSheetId}/status`, {
     method: "POST",
@@ -308,7 +316,7 @@ export function advanceLoadSheetStatus(
 
 export function getLoadSheetLines(loadSheetId: string) {
   return apiClient<{ lines: LoadSheetLine[] }>(
-    `/api/loadsheets/${loadSheetId}/lines`
+    `/api/loadsheets/${loadSheetId}/lines`,
   ).then((res) => res.data);
 }
 
@@ -323,24 +331,29 @@ export function recordBoxLoaded(
     notes?: string;
     loadedBy?: string;
     userId?: string;
-  }
+  },
 ) {
   return apiClient<LoadSheetLine>(
     `/api/loadsheets/${loadSheetId}/lines/${lineId}/loaded`,
-    { method: "POST", data }
+    { method: "POST", data },
   ).then((res) => res.data);
 }
 
-export function recordBoxAtBay(loadSheetId: string, lineId: string, pickTaskId?: string) {
+export function recordBoxAtBay(
+  loadSheetId: string,
+  lineId: string,
+  pickTaskId?: string,
+) {
   return apiClient<LoadSheetLine>(
     `/api/loadsheets/${loadSheetId}/lines/${lineId}/at-bay`,
-    { method: "POST", data: { pickTaskId } }
+    { method: "POST", data: { pickTaskId } },
   ).then((res) => res.data);
 }
 
 export function getLoadProgress(loadSheetId: string) {
-  return apiClient<LoadProgress>(`/api/loadsheets/${loadSheetId}/progress`)
-    .then((res) => res.data);
+  return apiClient<LoadProgress>(
+    `/api/loadsheets/${loadSheetId}/progress`,
+  ).then((res) => res.data);
 }
 
 // ─── Pick Tasks ───────────────────────────────────────────────────────────────
@@ -358,7 +371,7 @@ export function getPickTasks(params?: {
   if (params?.taskType) q.set("taskType", params.taskType);
   const qs = q.toString() ? `?${q.toString()}` : "";
   return apiClient<{ tasks: PickTask[]; total: number }>(
-    `/api/picking-tasks${qs}`
+    `/api/picking-tasks${qs}`,
   ).then((res) => res.data);
 }
 
@@ -373,9 +386,10 @@ export function createPickTask(data: {
   dueBy?: string;
   notes?: string;
 }) {
-  return apiClient<PickTask>("/api/picking-tasks", { method: "POST", data }).then(
-    (res) => res.data
-  );
+  return apiClient<PickTask>("/api/picking-tasks", {
+    method: "POST",
+    data,
+  }).then((res) => res.data);
 }
 
 export function assignPickTask(taskId: string, pickerId: string) {
@@ -394,7 +408,7 @@ export function startPickTask(taskId: string) {
 export function completePickTask(
   taskId: string,
   completedQty: number,
-  notes?: string
+  notes?: string,
 ) {
   return apiClient<PickTask>(`/api/picking-tasks/${taskId}/complete`, {
     method: "POST",
@@ -402,7 +416,11 @@ export function completePickTask(
   }).then((res) => res.data);
 }
 
-export function shortPickTask(taskId: string, shortQty: number, reason: string) {
+export function shortPickTask(
+  taskId: string,
+  shortQty: number,
+  reason: string,
+) {
   return apiClient<PickTask>(`/api/picking-tasks/${taskId}/short`, {
     method: "POST",
     data: { shortQuantity: shortQty, reason },
@@ -412,19 +430,19 @@ export function shortPickTask(taskId: string, shortQty: number, reason: string) 
 // ─── Trailer Optimisation ─────────────────────────────────────────────────────
 
 export function runTrailerOptimisation(loadSheetId: string) {
-  return apiClient<TrailerOptimisationResult>(
-    `/api/load-planning/optimize`,
-    { method: "POST", data: { loadSheetId } }
-  ).then((res) => res.data);
+  return apiClient<TrailerOptimisationResult>(`/api/load-planning/optimize`, {
+    method: "POST",
+    data: { loadSheetId },
+  }).then((res) => res.data);
 }
 
 export function applyOptimisationPlan(
   loadSheetId: string,
-  plan: TrailerOptimisationResult
+  plan: TrailerOptimisationResult,
 ) {
   return apiClient<{ applied: number }>(
     `/api/loadsheets/${loadSheetId}/apply-optimisation`,
-    { method: "POST", data: { plan } }
+    { method: "POST", data: { plan } },
   ).then((res) => res.data);
 }
 
@@ -433,14 +451,14 @@ export function applyOptimisationPlan(
 export function emailLoadSheet(
   loadSheetId: string,
   recipients: string[],
-  includeDriverInstructions: boolean = true
+  includeDriverInstructions: boolean = true,
 ) {
   return apiClient<{ success: boolean; sentTo: string[] }>(
     `/api/loadsheets/${loadSheetId}/email`,
     {
       method: "POST",
       data: { recipients, includeDriverInstructions },
-    }
+    },
   ).then((res) => res.data);
 }
 

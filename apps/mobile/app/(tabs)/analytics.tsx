@@ -28,10 +28,14 @@ function KPITile({ kpi }: { kpi: KPICard }) {
     kpi.trend === "UP"
       ? "trending-up"
       : kpi.trend === "DOWN"
-      ? "trending-down"
-      : "remove";
+        ? "trending-down"
+        : "remove";
   const trendColor =
-    kpi.trend === "UP" ? "#10b981" : kpi.trend === "DOWN" ? "#ef4444" : "#6b7280";
+    kpi.trend === "UP"
+      ? "#10b981"
+      : kpi.trend === "DOWN"
+        ? "#ef4444"
+        : "#6b7280";
   return (
     <View style={styles.kpiTile}>
       <Text style={styles.kpiLabel}>{kpi.label}</Text>
@@ -51,7 +55,15 @@ function KPITile({ kpi }: { kpi: KPICard }) {
   );
 }
 
-function MetricRow({ label, value, unit }: { label: string; value: number; unit?: string }) {
+function MetricRow({
+  label,
+  value,
+  unit,
+}: {
+  label: string;
+  value: number;
+  unit?: string;
+}) {
   return (
     <View style={styles.metricRow}>
       <Text style={styles.metricLabel}>{label}</Text>
@@ -115,7 +127,10 @@ export default function AnalyticsScreen() {
             onPress={() => setPeriod(p)}
           >
             <Text
-              style={[styles.periodBtnText, period === p && styles.periodBtnTextActive]}
+              style={[
+                styles.periodBtnText,
+                period === p && styles.periodBtnTextActive,
+              ]}
             >
               {p.charAt(0).toUpperCase() + p.slice(1)}
             </Text>
@@ -133,7 +148,9 @@ export default function AnalyticsScreen() {
             <KPITile key={i} kpi={k} />
           ))}
           {kpis.length === 0 && (
-            <Text style={styles.noDataText}>No KPI data available for this period.</Text>
+            <Text style={styles.noDataText}>
+              No KPI data available for this period.
+            </Text>
           )}
         </View>
       )}
@@ -165,7 +182,9 @@ export default function AnalyticsScreen() {
               {inv.topMovers.slice(0, 5).map((m: any) => (
                 <View key={m.sku} style={styles.moverRow}>
                   <Text style={styles.moverSku}>{m.sku}</Text>
-                  <Text style={styles.moverName} numberOfLines={1}>{m.name}</Text>
+                  <Text style={styles.moverName} numberOfLines={1}>
+                    {m.name}
+                  </Text>
                   <Text style={styles.moverVelocity}>{m.velocity}/day</Text>
                 </View>
               ))}
@@ -181,7 +200,9 @@ export default function AnalyticsScreen() {
           {laborData.slice(0, 10).map((w: any) => (
             <View key={w.id} style={styles.laborRow}>
               <View style={styles.laborAvatar}>
-                <Text style={styles.laborInitial}>{w.name?.charAt(0) ?? "?"}</Text>
+                <Text style={styles.laborInitial}>
+                  {w.name?.charAt(0) ?? "?"}
+                </Text>
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.laborName}>{w.name}</Text>
@@ -189,7 +210,9 @@ export default function AnalyticsScreen() {
               </View>
               <View style={{ alignItems: "flex-end" }}>
                 <Text style={styles.laborPicks}>{w.picksToday} picks</Text>
-                <Text style={styles.laborAccuracy}>{w.accuracy?.toFixed(1)}%</Text>
+                <Text style={styles.laborAccuracy}>
+                  {w.accuracy?.toFixed(1)}%
+                </Text>
               </View>
             </View>
           ))}
@@ -210,12 +233,29 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 3,
   },
-  periodBtn: { flex: 1, paddingVertical: 6, alignItems: "center", borderRadius: 6 },
+  periodBtn: {
+    flex: 1,
+    paddingVertical: 6,
+    alignItems: "center",
+    borderRadius: 6,
+  },
   periodBtnActive: { backgroundColor: "#fff" },
   periodBtnText: { fontSize: 13, color: "#6b7280", fontWeight: "600" },
   periodBtnTextActive: { color: "#111827" },
-  sectionTitle: { fontSize: 15, fontWeight: "700", color: "#111827", marginHorizontal: 12, marginTop: 4, marginBottom: 8 },
-  kpiGrid: { flexDirection: "row", flexWrap: "wrap", paddingHorizontal: 12, gap: 10 },
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#111827",
+    marginHorizontal: 12,
+    marginTop: 4,
+    marginBottom: 8,
+  },
+  kpiGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    paddingHorizontal: 12,
+    gap: 10,
+  },
   kpiTile: {
     width: TILE_W,
     backgroundColor: "#fff",
@@ -226,10 +266,20 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  kpiLabel: { fontSize: 11, color: "#6b7280", marginBottom: 4, fontWeight: "600" },
+  kpiLabel: {
+    fontSize: 11,
+    color: "#6b7280",
+    marginBottom: 4,
+    fontWeight: "600",
+  },
   kpiValue: { fontSize: 24, fontWeight: "700", color: "#111827" },
   kpiUnit: { fontSize: 12, color: "#6b7280", fontWeight: "400" },
-  kpiTrend: { flexDirection: "row", alignItems: "center", gap: 2, marginTop: 4 },
+  kpiTrend: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 2,
+    marginTop: 4,
+  },
   kpiChangeText: { fontSize: 11, fontWeight: "600" },
   noDataText: { fontSize: 13, color: "#9ca3af", paddingHorizontal: 4 },
   section: {
@@ -242,16 +292,47 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  metricRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6, borderBottomWidth: 1, borderColor: "#f3f4f6" },
+  metricRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 6,
+    borderBottomWidth: 1,
+    borderColor: "#f3f4f6",
+  },
   metricLabel: { fontSize: 13, color: "#374151" },
   metricValue: { fontSize: 13, fontWeight: "700", color: "#111827" },
-  subHeading: { fontSize: 12, fontWeight: "700", color: "#6b7280", marginTop: 12, marginBottom: 6 },
-  moverRow: { flexDirection: "row", alignItems: "center", paddingVertical: 5, gap: 6 },
+  subHeading: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#6b7280",
+    marginTop: 12,
+    marginBottom: 6,
+  },
+  moverRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 5,
+    gap: 6,
+  },
   moverSku: { fontSize: 11, color: "#3b82f6", fontWeight: "700", width: 70 },
   moverName: { flex: 1, fontSize: 12, color: "#374151" },
   moverVelocity: { fontSize: 12, fontWeight: "600", color: "#10b981" },
-  laborRow: { flexDirection: "row", alignItems: "center", paddingVertical: 8, borderBottomWidth: 1, borderColor: "#f3f4f6", gap: 10 },
-  laborAvatar: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#3b82f6", alignItems: "center", justifyContent: "center" },
+  laborRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderColor: "#f3f4f6",
+    gap: 10,
+  },
+  laborAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#3b82f6",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   laborInitial: { color: "#fff", fontSize: 16, fontWeight: "700" },
   laborName: { fontSize: 13, fontWeight: "700", color: "#111827" },
   laborRole: { fontSize: 11, color: "#6b7280" },

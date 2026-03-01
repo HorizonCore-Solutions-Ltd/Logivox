@@ -140,9 +140,9 @@ pg_dump -h $DB_HOST -U $DB_USER -d logivox -F c -f backup_$(date +%Y%m%d_%H%M%S)
 
 ### Monthly DR Test Checklist
 
-**Test Date:** ******\_******  
+**Test Date:** **\*\***\_**\*\***  
 **Test Type:** [ ] Partial [ ] Full [ ] Regional Failover  
-**Tester:** ******\_******
+**Tester:** **\*\***\_**\*\***
 
 #### Pre-Test Checklist
 

@@ -25,17 +25,30 @@ import {
   AlertCircle,
   Zap,
 } from "lucide-react-native";
-import { getSalesOrders, completeOrderPicking, type PickingOrder } from "@/lib/api/orders";
+import {
+  getSalesOrders,
+  completeOrderPicking,
+  type PickingOrder,
+} from "@/lib/api/orders";
 
 // ── Priority & Status colours ─────────────────────────────────────────────────
 const PRIORITY_COLOR: Record<string, string> = {
-  CRITICAL: "#DC2626", URGENT: "#D97706", HIGH: "#F59E0B",
-  NORMAL: "#2563EB", LOW: "#64748B",
+  CRITICAL: "#DC2626",
+  URGENT: "#D97706",
+  HIGH: "#F59E0B",
+  NORMAL: "#2563EB",
+  LOW: "#64748B",
 };
 const STATUS_COLOR: Record<string, string> = {
-  PENDING: "#94A3B8", APPROVED: "#2563EB", PICKING: "#D97706",
-  PICKED: "#7C3AED", PACKING: "#F59E0B", PACKED: "#059669",
-  SHIPPED: "#0891B2", DELIVERED: "#059669", CANCELLED: "#DC2626",
+  PENDING: "#94A3B8",
+  APPROVED: "#2563EB",
+  PICKING: "#D97706",
+  PICKED: "#7C3AED",
+  PACKING: "#F59E0B",
+  PACKED: "#059669",
+  SHIPPED: "#0891B2",
+  DELIVERED: "#059669",
+  CANCELLED: "#DC2626",
 };
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -88,13 +101,33 @@ export default function OrdersScreen() {
       <View style={styles.orderTop}>
         <View style={styles.orderNumRow}>
           <Text style={styles.orderNum}>{item.soNumber}</Text>
-          <View style={[styles.statusChip, { backgroundColor: `${STATUS_COLOR[item.status] ?? "#94A3B8"}15` }]}>
-            <Text style={[styles.statusChipText, { color: STATUS_COLOR[item.status] ?? "#94A3B8" }]}>
+          <View
+            style={[
+              styles.statusChip,
+              {
+                backgroundColor: `${STATUS_COLOR[item.status] ?? "#94A3B8"}15`,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.statusChipText,
+                { color: STATUS_COLOR[item.status] ?? "#94A3B8" },
+              ]}
+            >
               {item.status}
             </Text>
           </View>
         </View>
-        <View style={[styles.priorityDot, { backgroundColor: PRIORITY_COLOR[item.priority ?? "NORMAL"] ?? "#6B7280" }]} />
+        <View
+          style={[
+            styles.priorityDot,
+            {
+              backgroundColor:
+                PRIORITY_COLOR[item.priority ?? "NORMAL"] ?? "#6B7280",
+            },
+          ]}
+        />
       </View>
 
       <Text style={styles.customerName} numberOfLines={1}>
@@ -150,10 +183,18 @@ export default function OrdersScreen() {
         contentContainerStyle={styles.filterTabs}
         renderItem={({ item: tab }) => (
           <TouchableOpacity
-            style={[styles.filterTab, statusFilter === tab && styles.filterTabActive]}
+            style={[
+              styles.filterTab,
+              statusFilter === tab && styles.filterTabActive,
+            ]}
             onPress={() => setStatusFilter(tab)}
           >
-            <Text style={[styles.filterTabText, statusFilter === tab && styles.filterTabTextActive]}>
+            <Text
+              style={[
+                styles.filterTabText,
+                statusFilter === tab && styles.filterTabTextActive,
+              ]}
+            >
               {tab}
             </Text>
           </TouchableOpacity>
@@ -162,7 +203,11 @@ export default function OrdersScreen() {
 
       {/* Orders list */}
       {isLoading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color="#2563EB" size="large" />
+        <ActivityIndicator
+          style={{ marginTop: 40 }}
+          color="#2563EB"
+          size="large"
+        />
       ) : (
         <FlatList
           data={orders}
@@ -170,7 +215,11 @@ export default function OrdersScreen() {
           renderItem={renderOrder}
           contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor="#2563EB" />
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={() => refetch()}
+              tintColor="#2563EB"
+            />
           }
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           ListEmptyComponent={
@@ -196,23 +245,48 @@ export default function OrdersScreen() {
               <>
                 <View style={styles.detailHeader}>
                   <View>
-                    <Text style={styles.detailOrderNum}>{selectedOrder.soNumber}</Text>
+                    <Text style={styles.detailOrderNum}>
+                      {selectedOrder.soNumber}
+                    </Text>
                     <Text style={styles.detailCustomer}>
                       {selectedOrder.customerName}
                     </Text>
                   </View>
-                  <View style={[styles.statusChip, { backgroundColor: `${STATUS_COLOR[selectedOrder.status]}15` }]}>
-                    <Text style={[styles.statusChipText, { color: STATUS_COLOR[selectedOrder.status] }]}>
+                  <View
+                    style={[
+                      styles.statusChip,
+                      {
+                        backgroundColor: `${STATUS_COLOR[selectedOrder.status]}15`,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusChipText,
+                        { color: STATUS_COLOR[selectedOrder.status] },
+                      ]}
+                    >
                       {selectedOrder.status}
                     </Text>
                   </View>
                 </View>
 
                 <View style={styles.infoGrid}>
-                  <InfoRow label="Lines" value={String(selectedOrder.totalItems ?? 0)} />
-                  <InfoRow label="Priority" value={selectedOrder.priority ?? "NORMAL"} />
+                  <InfoRow
+                    label="Lines"
+                    value={String(selectedOrder.totalItems ?? 0)}
+                  />
+                  <InfoRow
+                    label="Priority"
+                    value={selectedOrder.priority ?? "NORMAL"}
+                  />
                   {selectedOrder.shipDate && (
-                    <InfoRow label="Ship Date" value={new Date(selectedOrder.shipDate).toLocaleDateString()} />
+                    <InfoRow
+                      label="Ship Date"
+                      value={new Date(
+                        selectedOrder.shipDate,
+                      ).toLocaleDateString()}
+                    />
                   )}
                 </View>
 
@@ -250,13 +324,17 @@ export default function OrdersScreen() {
                     <View style={styles.statusInfoBox}>
                       <AlertCircle color="#94A3B8" size={18} />
                       <Text style={styles.statusInfoText}>
-                        Order is {selectedOrder.status.toLowerCase()} — no actions available
+                        Order is {selectedOrder.status.toLowerCase()} — no
+                        actions available
                       </Text>
                     </View>
                   )}
                 </View>
 
-                <TouchableOpacity style={styles.closeBtn} onPress={() => setSelectedOrder(null)}>
+                <TouchableOpacity
+                  style={styles.closeBtn}
+                  onPress={() => setSelectedOrder(null)}
+                >
                   <Text style={styles.closeBtnText}>Close</Text>
                 </TouchableOpacity>
               </>
@@ -281,26 +359,54 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8FAFC" },
   searchBar: { padding: 16, paddingBottom: 8 },
   searchInput: {
-    flexDirection: "row", alignItems: "center", backgroundColor: "#fff",
-    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, gap: 8,
-    shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
   },
   input: { flex: 1, fontSize: 15, color: "#0F172A" },
-  statsStrip: { flexDirection: "row", justifyContent: "space-around", paddingHorizontal: 16, paddingBottom: 8 },
+  statsStrip: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
   stripItem: { alignItems: "center" },
   stripValue: { fontSize: 22, fontWeight: "800" },
   stripLabel: { fontSize: 11, color: "#94A3B8", fontWeight: "600" },
   filterTabs: { paddingHorizontal: 16, paddingBottom: 8, gap: 8 },
-  filterTab: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: "#F1F5F9" },
+  filterTab: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
+  },
   filterTabActive: { backgroundColor: "#2563EB" },
   filterTabText: { fontSize: 13, fontWeight: "600", color: "#64748B" },
   filterTabTextActive: { color: "#fff" },
   list: { padding: 16, paddingTop: 4, paddingBottom: 32 },
   orderCard: {
-    backgroundColor: "#fff", borderRadius: 16, padding: 16,
-    shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  orderTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
+  orderTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
   orderNumRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   orderNum: { fontSize: 15, fontWeight: "800", color: "#0F172A" },
   statusChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
@@ -313,10 +419,33 @@ const styles = StyleSheet.create({
   empty: { alignItems: "center", paddingTop: 80, gap: 12 },
   emptyTitle: { fontSize: 18, fontWeight: "700", color: "#64748B" },
   // Modal
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
-  detailSheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 40, maxHeight: "80%" },
-  handle: { width: 40, height: 4, backgroundColor: "#E2E8F0", borderRadius: 2, alignSelf: "center", marginBottom: 20 },
-  detailHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  detailSheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+    maxHeight: "80%",
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#E2E8F0",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  detailHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 20,
+  },
   detailOrderNum: { fontSize: 22, fontWeight: "800", color: "#0F172A" },
   detailCustomer: { fontSize: 14, color: "#64748B", marginTop: 4 },
   infoGrid: { gap: 12, marginBottom: 20 },
@@ -324,10 +453,29 @@ const styles = StyleSheet.create({
   infoLabel: { fontSize: 14, color: "#64748B" },
   infoValue: { fontSize: 14, fontWeight: "700", color: "#0F172A" },
   actionButtons: { gap: 10, marginBottom: 16 },
-  actionBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, padding: 16, borderRadius: 14 },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    padding: 16,
+    borderRadius: 14,
+  },
   actionBtnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
-  statusInfoBox: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#F8FAFC", borderRadius: 12, padding: 14 },
+  statusInfoBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#F8FAFC",
+    borderRadius: 12,
+    padding: 14,
+  },
   statusInfoText: { color: "#94A3B8", fontSize: 14 },
-  closeBtn: { backgroundColor: "#F1F5F9", borderRadius: 14, padding: 14, alignItems: "center" },
+  closeBtn: {
+    backgroundColor: "#F1F5F9",
+    borderRadius: 14,
+    padding: 14,
+    alignItems: "center",
+  },
   closeBtnText: { fontSize: 16, fontWeight: "700", color: "#334155" },
 });

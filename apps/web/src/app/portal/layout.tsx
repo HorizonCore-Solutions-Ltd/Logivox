@@ -2,7 +2,15 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import Link from "next/link";
-import { Package, ShoppingCart, History, User, LogOut } from "lucide-react";
+import {
+  Package,
+  ShoppingCart,
+  History,
+  User,
+  LogOut,
+  RotateCcw,
+  FileText,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default async function PortalLayout({
@@ -61,6 +69,18 @@ export default async function PortalLayout({
                 >
                   Track Shipments
                 </Link>
+                <Link
+                  href="/portal/returns"
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  My Returns
+                </Link>
+                <Link
+                  href="/portal/documents"
+                  className="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Documents
+                </Link>
               </nav>
             </div>
 
@@ -116,6 +136,20 @@ export default async function PortalLayout({
             >
               <Package className="h-4 w-4" />
               <span>Track</span>
+            </Link>
+            <Link
+              href="/portal/returns"
+              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap"
+            >
+              <RotateCcw className="h-4 w-4" />
+              <span>Returns</span>
+            </Link>
+            <Link
+              href="/portal/documents"
+              className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium whitespace-nowrap"
+            >
+              <FileText className="h-4 w-4" />
+              <span>Documents</span>
             </Link>
           </div>
         </div>

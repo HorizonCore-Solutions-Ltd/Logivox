@@ -71,6 +71,7 @@ model User {
   createdAutomations           TaskAutomation[]         @relation("AutomationCreator")
   assignedWaves                WavePick[]               @relation("WaveAssignee")
   createdWaves                 WavePick[]               @relation("WaveCreator")
+  createdWaveRules             WaveAutomationRule[]     @relation("WaveRuleCreator")
   assignedPickLines            WavePickLine[]           @relation("LinePickerAssignee")
   pickedLines                  WavePickLine[]           @relation("LinePicker")
   verifiedLines                WavePickLine[]           @relation("LineVerifier")
@@ -154,6 +155,7 @@ model Organization {
   updatedAt                  DateTime                     @updatedAt
   createdById                String
   securitySettings           Json?
+  invoiceSettings            Json?   // { trigger, termsNet, footerText, showPackingSlip, logoUrl }
   alerts                     Alert[]
   alertRules                 AlertRule[]
   externalIntegrations       ExternalIntegration[]
@@ -169,6 +171,8 @@ model Organization {
   taskAutomations            TaskAutomation[]
   taskExecutions             TaskExecution[]
   waves                      WavePick[]
+  waveAutomationRules        WaveAutomationRule[]
+  waveAutomationExecutions   WaveAutomationExecution[]
   wavePickLines              WavePickLine[]
   accessControlZones         AccessControlZone[]
   activityLogs               ActivityLog[]
@@ -187,7 +191,16 @@ model Organization {
   carrierConfigs             CarrierConfig[]
   categories                 Category[]
   clientInvoices             ClientInvoice[]
+  invoices                   Invoice[]
   clients                    Client[]
+  replenishmentRules         ReplenishmentRule[]
+  replenishmentTasks         ReplenishmentTask[]
+  accessorialCodes           AccessorialChargeCode[]
+  accessorialLines           AccessorialChargeLine[]
+  customerContracts          CustomerContract[]
+  exceptions                 ExceptionRecord[]
+  cartonTypes                CartonType[]
+  outboundASNs               OutboundASN[]
   capas                      CorrectivePreventiveAction[]
   crossBorderReturns         CrossBorderReturn[]
   customerReturnProfiles     CustomerReturnProfile[]
@@ -282,8 +295,8 @@ model Organization {
   suppliers                  Supplier[]
   sustainabilityReports      SustainabilityReport[]
   temperatureLogs            TemperatureLog[]
-  timeEntries                TimeEntry[]
   timeAttendanceMappings     TimeAttendanceMapping[]
+  timeEntries                TimeEntry[]
   training_courses           training_courses[]
   vehicleBlacklist           VehicleBlacklist[]
   vehicleWhitelist           VehicleWhitelist[]
@@ -336,6 +349,7 @@ model Warehouse {
   pickingRoutes          PickingRoute[]
   pickingTasks           PickingTask[]
   waves                  WavePick[]
+  waveAutomationRules    WaveAutomationRule[]
   assemblyOrders         AssemblyOrder[]
   grns                   GoodsReceiptNote[]
   inventoryItems         InventoryItem[]
@@ -599,6 +613,14 @@ model Customer {
   country               String?
   notes                 String?
   isActive              Boolean                @default(true)
+  // ── Credit & payment terms ──────────────────────────────────────────────
+  creditLimit           Decimal?               @db.Decimal(12, 2)
+  creditUsed            Decimal                @default(0) @db.Decimal(12, 2)
+  creditHold            Boolean                @default(false)
+  paymentTermsDays      Int?                   // default payment terms (days)
+  taxId                 String?                // VAT/GST registration
+  currency              String                 @default("USD")
+  // ───────────────────────────────────────────────────────────────────────
   createdAt             DateTime               @default(now())
   updatedAt             DateTime               @updatedAt
   qrReturns             QRReturn[]
@@ -613,6 +635,8 @@ model Customer {
   rmas                  RMA[]
   salesOrders           SalesOrder[]
   serialNumbers         SerialNumber[]
+  invoices              Invoice[]
+  contracts             CustomerContract[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -797,10 +821,16 @@ model SalesOrder {
   priority        Int              @default(0)
   approvedById    String?
   approvedDate    DateTime?
+  releasedById    String?
+  releasedDate    DateTime?        @map("released_date")
   pickedById      String?
   pickedDate      DateTime?
   packedById      String?
   packedDate      DateTime?
+  invoicedAt      DateTime?        @map("invoiced_at")
+  invoiceNumber   String?          @map("invoice_number")
+  closedAt        DateTime?        @map("closed_at")
+  closedById      String?          @map("closed_by_id")
   notes           String?
   internalNotes   String?
   createdAt       DateTime         @default(now())
@@ -813,6 +843,7 @@ model SalesOrder {
   pickLists       PickList[]
   qcInspections   QCInspection[]
   rmas            RMA[]
+  invoices        Invoice[]
   items           SalesOrderItem[]
   approvedBy      User?            @relation("SOApprover", fields: [approvedById], references: [id])
   createdBy       User             @relation("SOCreator", fields: [createdById], references: [id])
@@ -2634,17 +2665,16 @@ model IntegrationWebhook {
 }
 
 model WebhookDelivery {
-  id          String   @id @default(cuid())
-  webhookId   String
-  event       String
-  payload     Json
-  statusCode  Int
-  responseBody String? @db.Text
-  durationMs  Int
-  success     Boolean  @default(false)
-  createdAt   DateTime @default(now())
-
-  webhook IntegrationWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  id           String             @id @default(cuid())
+  webhookId    String
+  event        String
+  payload      Json
+  statusCode   Int
+  responseBody String?
+  durationMs   Int
+  success      Boolean            @default(false)
+  createdAt    DateTime           @default(now())
+  webhook      IntegrationWebhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
 
   @@index([webhookId])
   @@index([event])
@@ -2926,42 +2956,42 @@ model TaskExecution {
 }
 
 model Employee {
-  id                 String               @id @default(cuid())
-  organizationId     String
-  userId             String?              @unique
-  employeeNumber     String
-  firstName          String
-  lastName           String
-  email              String?
-  phone              String?
-  dateOfBirth        DateTime?
-  hireDate           DateTime
-  terminationDate    DateTime?
-  status             EmployeeStatus       @default(ACTIVE)
-  employmentType     EmploymentType       @default(FULL_TIME)
-  department         String?
-  position           String?
-  hourlyRate         Decimal?             @db.Decimal(10, 2)
-  warehouseId        String?
-  defaultZoneId      String?
-  skills             Json?
-  certifications     Json?
-  preferredShiftType ShiftType?
-  maxHoursPerWeek    Float?               @default(40)
-  notes              String?
-  metadata           Json?
-  isActive           Boolean              @default(true)
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
-  createdById        String?
-  tasks              PickingTask[]        @relation("TaskAssignee")
-  organization       Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  user               User?                @relation(fields: [userId], references: [id])
-  productivity       ProductivityRecord[]
-  securityPersonnel  SecurityPersonnel?
-  shiftAssignments   ShiftAssignment[]
-  timeEntries        TimeEntry[]
+  id                     String                  @id @default(cuid())
+  organizationId         String
+  userId                 String?                 @unique
+  employeeNumber         String
+  firstName              String
+  lastName               String
+  email                  String?
+  phone                  String?
+  dateOfBirth            DateTime?
+  hireDate               DateTime
+  terminationDate        DateTime?
+  status                 EmployeeStatus          @default(ACTIVE)
+  employmentType         EmploymentType          @default(FULL_TIME)
+  department             String?
+  position               String?
+  hourlyRate             Decimal?                @db.Decimal(10, 2)
+  warehouseId            String?
+  defaultZoneId          String?
+  skills                 Json?
+  certifications         Json?
+  preferredShiftType     ShiftType?
+  maxHoursPerWeek        Float?                  @default(40)
+  notes                  String?
+  metadata               Json?
+  isActive               Boolean                 @default(true)
+  createdAt              DateTime                @default(now())
+  updatedAt              DateTime                @updatedAt
+  createdById            String?
+  tasks                  PickingTask[]           @relation("TaskAssignee")
+  organization           Organization            @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user                   User?                   @relation(fields: [userId], references: [id])
+  productivity           ProductivityRecord[]
+  securityPersonnel      SecurityPersonnel?
+  shiftAssignments       ShiftAssignment[]
   timeAttendanceMappings TimeAttendanceMapping[]
+  timeEntries            TimeEntry[]
 
   @@unique([organizationId, employeeNumber])
   @@index([organizationId])
@@ -3066,28 +3096,28 @@ model TimeEntry {
   employee       Employee        @relation(fields: [employeeId], references: [id])
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+  @@unique([externalId, provider])
   @@index([organizationId])
   @@index([employeeId])
   @@index([startTime])
   @@index([status])
   @@index([entryType])
   @@index([externalId, provider])
-  @@unique([externalId, provider])
   @@map("time_entries")
 }
 
 model TimeAttendanceMapping {
-  id                  String       @id @default(cuid())
-  organizationId      String
-  employeeId          String
-  externalEmployeeId  String
-  provider            String
-  locationExternalId  String?
-  metadata            Json?
-  createdAt           DateTime     @default(now())
-  updatedAt           DateTime     @updatedAt
-  employee            Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  organization        Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  id                 String       @id @default(cuid())
+  organizationId     String
+  employeeId         String
+  externalEmployeeId String
+  provider           String
+  locationExternalId String?
+  metadata           Json?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  employee           Employee     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([provider, externalEmployeeId])
   @@index([organizationId])
@@ -3467,6 +3497,74 @@ model BillingTransaction {
   @@index([transactionDate])
   @@index([billingStatus])
   @@map("billing_transactions")
+}
+
+model Invoice {
+  id                String             @id @default(cuid())
+  organizationId    String
+  customerId        String
+  salesOrderId      String?            @map("sales_order_id")
+  invoiceNumber     String
+  soNumber          String?            @map("so_number")
+  billingPeriodStart DateTime          @map("billing_period_start")
+  billingPeriodEnd  DateTime          @map("billing_period_end")
+  dueDate           DateTime          @map("due_date")
+  subtotal          Decimal           @db.Decimal(12, 2)
+  taxAmount         Decimal           @default(0) @db.Decimal(12, 2) @map("tax_amount")
+  discountAmount    Decimal           @default(0) @db.Decimal(12, 2) @map("discount_amount")
+  shippingAmount    Decimal           @default(0) @db.Decimal(12, 2) @map("shipping_amount")
+  totalAmount       Decimal           @db.Decimal(12, 2) @map("total_amount")
+  currency          String            @default("USD")
+  status            InvoiceStatus     @default(DRAFT)
+  notes             String?
+  paymentTerms      String?           @map("payment_terms")
+  sentAt            DateTime?         @map("sent_at")
+  paidAt            DateTime?         @map("paid_at")
+  metadata          Json?
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+  customer          Customer          @relation(fields: [customerId], references: [id])
+  organization      Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  salesOrder        SalesOrder?       @relation(fields: [salesOrderId], references: [id])
+  lineItems         InvoiceLineItem[]
+  payments          InvoicePayment[]
+
+  @@unique([organizationId, invoiceNumber])
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([salesOrderId])
+  @@index([status])
+  @@index([dueDate])
+  @@map("invoices")
+}
+
+model InvoiceLineItem {
+  id          String   @id @default(cuid())
+  invoiceId   String   @map("invoice_id")
+  description String
+  quantity    Decimal  @db.Decimal(12, 4)
+  unitPrice   Decimal  @db.Decimal(12, 4) @map("unit_price")
+  amount      Decimal  @db.Decimal(12, 2)
+  metadata    Json?
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_line_items")
+}
+
+model InvoicePayment {
+  id            String        @id @default(cuid())
+  invoiceId     String        @map("invoice_id")
+  amount        Decimal       @db.Decimal(12, 2)
+  paymentDate   DateTime      @map("payment_date")
+  method        String?
+  reference     String?
+  notes         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  invoice       Invoice       @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@map("invoice_payments")
 }
 
 model ClientInvoice {
@@ -6824,6 +6922,100 @@ model weather_logs {
   @@index([warehouseId])
 }
 
+model DutyType {
+  id               String       @id @default(cuid())
+  organizationId   String
+  name             String
+  category         DutyCategory @default(OTHER)
+  description      String?
+  requiredSkills   String[]
+  requiredCerts    String[]
+  defaultDuration  Int          @default(30)
+  voiceTemplate    Json?
+  checklistItems   Json?
+  requiresEvidence Boolean      @default(false)
+  evidenceTypes    String[]
+  isActive         Boolean      @default(true)
+  metadata         Json?
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  duties           Duty[]
+  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
+  @@index([category])
+  @@map("duty_types")
+}
+
+model Duty {
+  id                 String         @id @default(cuid())
+  organizationId     String
+  dutyTypeId         String?
+  shiftId            String?
+  employeeId         String?
+  assignedBy         String?
+  zoneId             String?
+  zoneName           String?
+  warehouseId        String?
+  title              String
+  description        String?
+  category           DutyCategory   @default(OTHER)
+  status             DutyStatus     @default(PLANNED)
+  priority           DutyPriority   @default(MEDIUM)
+  scheduledStart     DateTime?
+  scheduledEnd       DateTime?
+  actualStart        DateTime?
+  actualEnd          DateTime?
+  durationMinutes    Int?
+  slaMinutes         Int?
+  slaBreached        Boolean        @default(false)
+  capaId             String?
+  capaStage          String?
+  ncrId              String?
+  autoAssigned       Boolean        @default(false)
+  assignmentRule     String?
+  voiceScriptRef     String?
+  voiceSessionId     String?
+  checklistItems     Json?
+  completionNotes    String?
+  rejectionReason    String?
+  previousEmployeeId String?
+  reassignReason     String?
+  reassignCount      Int            @default(0)
+  metadata           Json?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  dutyType           DutyType?      @relation(fields: [dutyTypeId], references: [id])
+  organization       Organization   @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  evidence           DutyEvidence[]
+
+  @@index([organizationId])
+  @@index([status])
+  @@index([employeeId])
+  @@index([shiftId])
+  @@index([capaId])
+  @@index([scheduledStart])
+  @@index([slaBreached])
+  @@map("duties")
+}
+
+model DutyEvidence {
+  id           String       @id @default(cuid())
+  dutyId       String
+  evidenceType EvidenceType
+  label        String?
+  value        String?
+  fileKey      String?
+  capturedBy   String?
+  capturedAt   DateTime     @default(now())
+  metadata     Json?
+  duty         Duty         @relation(fields: [dutyId], references: [id], onDelete: Cascade)
+
+  @@index([dutyId])
+  @@map("duty_evidence")
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN
@@ -6930,14 +7122,24 @@ enum SalesOrderStatus {
   DRAFT
   PENDING_APPROVAL
   APPROVED
+  RELEASED          // Released to warehouse / wave for fulfilment
   PICKING
   PICKED
   PACKING
   PACKED
   SHIPPED
   DELIVERED
+  INVOICED          // Invoice generated and sent to customer
+  CLOSED            // Payment confirmed, order fully closed
   CANCELLED
   ON_HOLD
+}
+
+enum InvoiceTrigger {
+  ON_ORDER_CONFIRMATION   // Invoice immediately on approval
+  ON_SHIPMENT             // Invoice when order ships
+  ON_DELIVERY_CONFIRMATION // Invoice when customer confirms receipt
+  MANUAL                  // Staff must manually trigger invoice
 }
 
 enum PaymentStatus {
@@ -7442,12 +7644,10 @@ enum DigestFrequency {
 }
 
 enum IntegrationProvider {
-  // Accounting & Finance
   QUICKBOOKS_ONLINE
   QUICKBOOKS_DESKTOP
   XERO
   SAGE
-  // ERP
   NETSUITE
   SAP
   SAP_S4HANA
@@ -7455,7 +7655,6 @@ enum IntegrationProvider {
   MICROSOFT_DYNAMICS
   MICROSOFT_DYNAMICS_365
   ODOO
-  // E-commerce
   SHOPIFY
   WOOCOMMERCE
   MAGENTO
@@ -7463,7 +7662,6 @@ enum IntegrationProvider {
   AMAZON
   EBAY
   ETSY
-  // Carriers
   FEDEX
   UPS
   DHL
@@ -7473,40 +7671,34 @@ enum IntegrationProvider {
   SHIPSTATION
   EASYPOST
   SHIPPO
-  // HR & Workforce
   WORKDAY
   SAP_SUCCESSFACTORS
   UKG
   BAMBOOHR
   HIBOB
   ADP
-  // SSO / Identity
   ENTRA_ID
   OKTA
   GOOGLE_WORKSPACE
   AUTH0
   ONELOGIN
-  // CRM & Marketing
   SALESFORCE
   HUBSPOT
   ZOHO_CRM
   TWILIO
   SENDGRID
   MAILCHIMP
-  // Payment
   STRIPE
   PAYPAL
   SQUARE
   BRAINTREE
   AUTHORIZE_NET
-  // Access Control & Security
   PAXTON_NET2
   GALLAGHER
   HID_ORIGO
   LENELS2
   BRIVO
   GENETEC
-  // Warehouse Hardware
   ZEBRA
   HONEYWELL_SCANNER
   DATALOGIC
@@ -7514,47 +7706,39 @@ enum IntegrationProvider {
   ZEBRA_PRINTER
   SIEMENS_PLC
   ALLEN_BRADLEY
-  // Robotics & Automation
   AUTOSTORE
   DEMATIC
   LOCUS_ROBOTICS
   GEEK_PLUS
   SIX_RIVER_SYSTEMS
   FETCH_ROBOTICS
-  // TMS & YMS
   FLEETOPS360
   SAMSARA
   WEBFLEET
   TRAILER_YARD_SYSTEMS
   TRIMBLE_TMS
   MERCURYGATE
-  // QMS
   IAUDITOR
   ECOONLINE
   MASTERCONTROL
   ETQ_RELIANCE
   VEEVA_VAULT
-  // Voice Hardware
   HONEYWELL_VOCOLLECT
   LYDIA_VOICE
   ANDROID_HEADSET
-  // BI & Analytics
   POWER_BI
   TABLEAU
   LOOKER
   QLIK
   DOMO
-  // IoT Cloud
   AWS_IOT
   AZURE_IOT
   GOOGLE_IOT
-  // Other
   CUSTOM
   WEBHOOK
 }
 
 enum IntegrationCategory {
-  // Existing
   ACCOUNTING
   ECOMMERCE
   SHIPPING
@@ -7563,7 +7747,6 @@ enum IntegrationCategory {
   MARKETING
   COMMUNICATION
   ANALYTICS
-  // New — Playbook additions
   ERP
   HR
   SSO
@@ -7987,6 +8170,7 @@ enum InvoiceStatus {
   OVERDUE
   CANCELLED
   DISPUTED
+  VOID
 }
 
 enum YardLocationType {
@@ -8617,109 +8801,6 @@ enum PatrolStatus {
   CANCELLED
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// DUTIES MODULE — WMS + CAPA + Voice
-// ─────────────────────────────────────────────────────────────────────────────
-
-model DutyType {
-  id               String       @id @default(cuid())
-  organizationId   String
-  name             String
-  category         DutyCategory @default(OTHER)
-  description      String?
-  requiredSkills   String[]
-  requiredCerts    String[]
-  defaultDuration  Int          @default(30)
-  voiceTemplate    Json?
-  checklistItems   Json?
-  requiresEvidence Boolean      @default(false)
-  evidenceTypes    String[]
-  isActive         Boolean      @default(true)
-  metadata         Json?
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
-  duties           Duty[]
-  organization     Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@unique([organizationId, name])
-  @@index([organizationId])
-  @@index([category])
-  @@map("duty_types")
-}
-
-model Duty {
-  id                 String       @id @default(cuid())
-  organizationId     String
-  dutyTypeId         String?
-  shiftId            String?
-  employeeId         String?
-  assignedBy         String?
-  zoneId             String?
-  zoneName           String?
-  warehouseId        String?
-  title              String
-  description        String?
-  category           DutyCategory @default(OTHER)
-  status             DutyStatus   @default(PLANNED)
-  priority           DutyPriority @default(MEDIUM)
-  scheduledStart     DateTime?
-  scheduledEnd       DateTime?
-  actualStart        DateTime?
-  actualEnd          DateTime?
-  durationMinutes    Int?
-  slaMinutes         Int?
-  slaBreached        Boolean      @default(false)
-  // CAPA coupling
-  capaId             String?
-  capaStage          String?
-  ncrId              String?
-  // Auto-assignment
-  autoAssigned       Boolean      @default(false)
-  assignmentRule     String?
-  // Voice
-  voiceScriptRef     String?
-  voiceSessionId     String?
-  // Progress
-  checklistItems     Json?
-  completionNotes    String?
-  rejectionReason    String?
-  // Reassignment tracking
-  previousEmployeeId String?
-  reassignReason     String?
-  reassignCount      Int          @default(0)
-  metadata           Json?
-  createdAt          DateTime     @default(now())
-  updatedAt          DateTime     @updatedAt
-  dutyType           DutyType?    @relation(fields: [dutyTypeId], references: [id])
-  organization       Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  evidence           DutyEvidence[]
-
-  @@index([organizationId])
-  @@index([status])
-  @@index([employeeId])
-  @@index([shiftId])
-  @@index([capaId])
-  @@index([scheduledStart])
-  @@index([slaBreached])
-  @@map("duties")
-}
-
-model DutyEvidence {
-  id           String       @id @default(cuid())
-  dutyId       String
-  evidenceType EvidenceType
-  label        String?
-  value        String?
-  fileKey      String?
-  capturedBy   String?
-  capturedAt   DateTime     @default(now())
-  metadata     Json?
-  duty         Duty         @relation(fields: [dutyId], references: [id], onDelete: Cascade)
-
-  @@index([dutyId])
-  @@map("duty_evidence")
-}
-
 enum DutyStatus {
   PLANNED
   ACTIVE
@@ -8765,4 +8846,472 @@ enum EvidenceType {
   BARCODE_SCAN
   TEMPERATURE
   CHECKLIST
+}
+
+// ─── Autonomous Wave Generation ──────────────────────────────────────────────
+
+model WaveAutomationRule {
+  id                  String            @id @default(cuid())
+  organizationId      String
+  warehouseId         String
+  name                String
+  description         String?
+  isActive            Boolean           @default(true)
+  triggerType         WaveRuleTrigger
+  /// For THRESHOLD trigger: minimum number of pending orders before wave fires
+  pendingOrderThreshold Int?
+  /// For THRESHOLD trigger: minimum total order lines before wave fires
+  pendingLineThreshold  Int?
+  /// For SCHEDULE trigger: cron expression e.g. "0 8 * * 1-5"
+  cronExpression      String?
+  /// Default wave settings applied when auto-creating
+  defaultWaveType     WaveType          @default(BATCH)
+  defaultPriority     WavePriority      @default(NORMAL)
+  defaultStrategy     WaveStrategy      @default(FIFO)
+  defaultMaxOrders    Int?
+  defaultMaxLines     Int?
+  /// Only include orders whose ship date is within this many hours
+  shipWindowHours     Int?
+  /// Carrier filter (optional)
+  carrierFilter       String[]
+  /// Minimum time between automatic firings (minutes)
+  cooldownMinutes     Int               @default(30)
+  lastFiredAt         DateTime?
+  nextScheduledAt     DateTime?
+  fireCount           Int               @default(0)
+  successCount        Int               @default(0)
+  failureCount        Int               @default(0)
+  status              WaveRuleStatus    @default(IDLE)
+  lastError           String?
+  tags                String[]
+  metadata            Json?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  createdById         String
+  createdBy           User              @relation("WaveRuleCreator", fields: [createdById], references: [id])
+  organization        Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  warehouse           Warehouse         @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  executions          WaveAutomationExecution[]
+
+  @@index([organizationId, warehouseId])
+  @@index([isActive, triggerType])
+  @@index([nextScheduledAt])
+}
+
+model WaveAutomationExecution {
+  id             String            @id @default(cuid())
+  organizationId String
+  ruleId         String
+  triggeredBy    String            @default("SYSTEM")
+  triggerData    Json
+  status         ExecutionStatus   @default(PENDING)
+  wavePickId     String?
+  waveNumber     String?
+  ordersIncluded Int               @default(0)
+  linesIncluded  Int               @default(0)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  durationMs     Int?
+  error          String?
+  createdAt      DateTime          @default(now())
+  rule           WaveAutomationRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  organization   Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, ruleId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum WaveRuleTrigger {
+  THRESHOLD
+  SCHEDULE
+  DEMAND_SPIKE
+}
+
+enum WaveRuleStatus {
+  IDLE
+  EVALUATING
+  FIRING
+  ERROR
+  PAUSED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// REPLENISHMENT ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ReplenishmentRule {
+  id                String               @id @default(cuid())
+  organizationId    String
+  warehouseId       String?
+  inventoryItemId   String?              // null = apply to all items matching filter
+  name              String
+  strategy          ReplenishStrategy    @default(MIN_MAX)
+  minQty            Int                  @default(0)
+  maxQty            Int                  @default(0)
+  reorderPoint      Int                  @default(0)
+  reorderQty        Int                  @default(0)
+  demandDays        Int                  @default(30)  // lookback for demand-based
+  leadTimeDays      Int                  @default(3)
+  supplierId        String?
+  autoCreatePO      Boolean              @default(false)
+  isActive          Boolean              @default(true)
+  lastTriggeredAt   DateTime?
+  createdById       String
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  tasks             ReplenishmentTask[]
+  organization      Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([inventoryItemId])
+  @@index([isActive])
+  @@map("replenishment_rules")
+}
+
+model ReplenishmentTask {
+  id                String               @id @default(cuid())
+  organizationId    String
+  ruleId            String?
+  warehouseId       String
+  inventoryItemId   String
+  fromLocationId    String?
+  toLocationId      String?
+  requiredQty       Int
+  pickedQty         Int                  @default(0)
+  status            ReplenishTaskStatus  @default(PENDING)
+  priority          Priority             @default(MEDIUM)
+  assignedToId      String?
+  startedAt         DateTime?
+  completedAt       DateTime?
+  notes             String?
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+  rule              ReplenishmentRule?   @relation(fields: [ruleId], references: [id])
+  organization      Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([assignedToId])
+  @@map("replenishment_tasks")
+}
+
+enum ReplenishStrategy {
+  MIN_MAX
+  REORDER_POINT
+  DEMAND_BASED
+  PERIODIC_REVIEW
+}
+
+enum ReplenishTaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  FAILED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACCESSORIAL / 3PL BILLING ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model AccessorialChargeCode {
+  id               String              @id @default(cuid())
+  organizationId   String
+  code             String
+  name             String
+  description      String?
+  chargeType       AccessorialType     @default(PER_ORDER)
+  unitLabel        String              @default("order")  // "pallet", "kg", "hour"
+  defaultRate      Decimal             @db.Decimal(10, 4)
+  currency         String              @default("USD")
+  minCharge        Decimal?            @db.Decimal(10, 2)
+  maxCharge        Decimal?            @db.Decimal(10, 2)
+  markup           Decimal             @default(0) @db.Decimal(5, 2)  // %
+  isActive         Boolean             @default(true)
+  glCode           String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  lines            AccessorialChargeLine[]
+  organization     Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("accessorial_charge_codes")
+}
+
+model AccessorialChargeLine {
+  id               String              @id @default(cuid())
+  organizationId   String
+  chargeCodeId     String
+  invoiceId        String?
+  salesOrderId     String?
+  customerId       String?
+  periodStart      DateTime?
+  periodEnd        DateTime?
+  quantity         Decimal             @db.Decimal(10, 3)
+  unitRate         Decimal             @db.Decimal(10, 4)
+  subtotal         Decimal             @db.Decimal(10, 2)
+  markup           Decimal             @default(0) @db.Decimal(10, 2)
+  total            Decimal             @db.Decimal(10, 2)
+  currency         String              @default("USD")
+  description      String?
+  status           ChargeLineStatus    @default(DRAFT)
+  invoicedAt       DateTime?
+  metadata         Json?
+  createdAt        DateTime            @default(now())
+  chargeCode       AccessorialChargeCode @relation(fields: [chargeCodeId], references: [id])
+  organization     Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([customerId])
+  @@index([status])
+  @@index([invoiceId])
+  @@map("accessorial_charge_lines")
+}
+
+enum AccessorialType {
+  PER_ORDER
+  PER_LINE
+  PER_UNIT
+  PER_PALLET
+  PER_KG
+  PER_CBM
+  PER_HOUR
+  PER_DAY
+  FLAT_FEE
+  RECURRING_STORAGE
+  PERCENTAGE
+}
+
+enum ChargeLineStatus {
+  DRAFT
+  APPROVED
+  INVOICED
+  VOID
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CUSTOMER CONTRACTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CustomerContract {
+  id               String              @id @default(cuid())
+  organizationId   String
+  customerId       String
+  contractNumber   String
+  name             String
+  description      String?
+  status           ContractStatus      @default(DRAFT)
+  startDate        DateTime
+  endDate          DateTime?
+  autoRenew        Boolean             @default(false)
+  currency         String              @default("USD")
+  paymentTermsDays Int                 @default(30)
+  creditLimit      Decimal?            @db.Decimal(12, 2)
+  discountPct      Decimal             @default(0) @db.Decimal(5, 2)
+  pricingTier      String?             // "STANDARD" | "PREMIUM" | "VIP" | custom
+  slaHours         Int?                // order-to-ship SLA hours
+  notes            String?
+  signedDate       DateTime?
+  signedById       String?
+  renewedAt        DateTime?
+  terminatedAt     DateTime?
+  pricingRules     Json?               // [{sku, price}, ...] or [{category, discount}]
+  metadata         Json?
+  createdById      String
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  customer         Customer            @relation(fields: [customerId], references: [id])
+  organization     Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, contractNumber])
+  @@index([organizationId])
+  @@index([customerId])
+  @@index([status])
+  @@index([endDate])
+  @@map("customer_contracts")
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  SUSPENDED
+  TERMINATED
+  PENDING_RENEWAL
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXCEPTION MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────────────
+
+model ExceptionRecord {
+  id               String              @id @default(cuid())
+  organizationId   String
+  type             ExceptionType
+  severity         ExceptionSeverity   @default(MEDIUM)
+  status           ExceptionStatus     @default(OPEN)
+  title            String
+  description      String?
+  resourceType     String?             // "SalesOrder", "Shipment", "InventoryItem" etc.
+  resourceId       String?
+  resourceRef      String?             // human-readable reference (SO-0001)
+  detectedAt       DateTime            @default(now())
+  acknowledgedAt   DateTime?
+  acknowledgedById String?
+  resolvedAt       DateTime?
+  resolvedById     String?
+  resolution       String?
+  autoResolved     Boolean             @default(false)
+  slaBreachAt      DateTime?           // when SLA will/did breach
+  slaBreached      Boolean             @default(false)
+  metadata         Json?
+  escalatedAt      DateTime?
+  escalatedToId    String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  organization     Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([type])
+  @@index([status])
+  @@index([severity])
+  @@index([resourceType, resourceId])
+  @@index([detectedAt])
+  @@map("exception_records")
+}
+
+enum ExceptionType {
+  DELAYED_ORDER
+  SLA_BREACH
+  STOCKOUT
+  LOW_STOCK
+  OVERDUE_INVOICE
+  OVERDUE_SHIPMENT
+  PICKING_ERROR
+  RECEIVING_DISCREPANCY
+  CREDIT_LIMIT_EXCEEDED
+  DAMAGED_GOODS
+  CARRIER_FAILURE
+  SYSTEM_ERROR
+  CUSTOM
+}
+
+enum ExceptionSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ExceptionStatus {
+  OPEN
+  ACKNOWLEDGED
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+  SUPPRESSED
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CARTONISATION ENGINE
+// ─────────────────────────────────────────────────────────────────────────────
+
+model CartonType {
+  id               String              @id @default(cuid())
+  organizationId   String
+  name             String
+  code             String
+  lengthCm         Decimal             @db.Decimal(8, 2)
+  widthCm          Decimal             @db.Decimal(8, 2)
+  heightCm         Decimal             @db.Decimal(8, 2)
+  maxWeightKg      Decimal             @db.Decimal(8, 3)
+  tarWeightKg      Decimal             @default(0) @db.Decimal(8, 3)
+  costPerUnit      Decimal?            @db.Decimal(8, 4)
+  isActive         Boolean             @default(true)
+  isDefault        Boolean             @default(false)
+  metadata         Json?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  organization     Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, code])
+  @@index([organizationId])
+  @@index([isActive])
+  @@map("carton_types")
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// OUTBOUND ASN (Advanced Shipment Notice)
+// ─────────────────────────────────────────────────────────────────────────────
+
+model OutboundASN {
+  id               String          @id @default(cuid())
+  organizationId   String
+  asnNumber        String
+  salesOrderId     String?
+  shipmentId       String?
+  customerId       String?
+  warehouseId      String?
+  status           ASNStatus       @default(DRAFT)
+  shipDate         DateTime?
+  estimatedArrival DateTime?
+  carrier          String?
+  trackingNumber   String?
+  totalSkus        Int             @default(0)
+  totalUnits       Int             @default(0)
+  totalCartons     Int             @default(0)
+  totalWeightKg    Decimal?        @db.Decimal(10, 3)
+  totalVolumeCbm   Decimal?        @db.Decimal(10, 4)
+  notes            String?
+  ediSent          Boolean         @default(false)
+  ediSentAt        DateTime?
+  metadata         Json?
+  createdById      String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  items            OutboundASNItem[]
+  organization     Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, asnNumber])
+  @@index([organizationId])
+  @@index([salesOrderId])
+  @@index([status])
+  @@index([shipDate])
+  @@map("outbound_asns")
+}
+
+model OutboundASNItem {
+  id              String      @id @default(cuid())
+  asnId           String
+  inventoryItemId String?
+  sku             String
+  description     String?
+  quantity        Int
+  unitOfMeasure   String      @default("EA")
+  lotNumber       String?
+  serialNumbers   Json?       // array of strings
+  expiryDate      DateTime?
+  cartonCount     Int         @default(1)
+  weightKg        Decimal?    @db.Decimal(10, 3)
+  createdAt       DateTime    @default(now())
+  asn             OutboundASN @relation(fields: [asnId], references: [id], onDelete: Cascade)
+
+  @@index([asnId])
+  @@index([sku])
+  @@map("outbound_asn_items")
+}
+
+enum ASNStatus {
+  DRAFT
+  CONFIRMED
+  SENT
+  IN_TRANSIT
+  RECEIVED
+  CANCELLED
 }

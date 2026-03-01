@@ -57,8 +57,8 @@ function WaveCard({
     wave.status === "COMPLETED"
       ? "#10b981"
       : wave.status === "IN_PROGRESS"
-      ? "#f59e0b"
-      : "#3b82f6";
+        ? "#f59e0b"
+        : "#3b82f6";
 
   return (
     <View style={styles.card}>
@@ -80,7 +80,9 @@ function WaveCard({
             { backgroundColor: PRIORITY_COLORS[wave.priority] + "22" },
           ]}
         >
-          <Text style={[styles.tagText, { color: PRIORITY_COLORS[wave.priority] }]}>
+          <Text
+            style={[styles.tagText, { color: PRIORITY_COLORS[wave.priority] }]}
+          >
             {wave.priority}
           </Text>
         </View>
@@ -100,9 +102,13 @@ function WaveCard({
       </View>
       {wave.targetTrailerNumber ? (
         <Text style={[styles.detail, { marginTop: 4 }]}>
-          <Ionicons name="car-outline" size={14} color="#6b7280" /> Trailer: {wave.targetTrailerNumber}
+          <Ionicons name="car-outline" size={14} color="#6b7280" /> Trailer:{" "}
+          {wave.targetTrailerNumber}
           {wave.exceedsTrailerCapacity && (
-            <Text style={{ color: "#ef4444", fontWeight: "bold" }}> (Exceeds Capacity!)</Text>
+            <Text style={{ color: "#ef4444", fontWeight: "bold" }}>
+              {" "}
+              (Exceeds Capacity!)
+            </Text>
           )}
         </Text>
       ) : null}
@@ -112,7 +118,9 @@ function WaveCard({
             <Text style={styles.progressLabel}>
               {wave.completedLines}/{wave.totalLines} lines
             </Text>
-            <Text style={[styles.progressLabel, { color: barColor }]}>{progress}%</Text>
+            <Text style={[styles.progressLabel, { color: barColor }]}>
+              {progress}%
+            </Text>
           </View>
           <View style={styles.trackBg}>
             <View
@@ -145,7 +153,11 @@ function WaveCard({
             onPress={() =>
               Alert.alert("Cancel Wave", "Cancel this wave?", [
                 { text: "No" },
-                { text: "Yes", style: "destructive", onPress: () => onCancel(wave.id) },
+                {
+                  text: "Yes",
+                  style: "destructive",
+                  onPress: () => onCancel(wave.id),
+                },
               ])
             }
           >
@@ -175,7 +187,9 @@ function RuleCard({
             { backgroundColor: rule.isActive ? "#10b981" : "#6b7280" },
           ]}
         >
-          <Text style={styles.badgeText}>{rule.isActive ? "ACTIVE" : "OFF"}</Text>
+          <Text style={styles.badgeText}>
+            {rule.isActive ? "ACTIVE" : "OFF"}
+          </Text>
         </View>
       </View>
       <Text style={styles.detail}>Trigger: {rule.triggerType}</Text>
@@ -186,7 +200,10 @@ function RuleCard({
       ) : null}
       {rule.isActive ? (
         <TouchableOpacity
-          style={[styles.actionBtn, { backgroundColor: "#8b5cf6", marginTop: 10 }]}
+          style={[
+            styles.actionBtn,
+            { backgroundColor: "#8b5cf6", marginTop: 10 },
+          ]}
           onPress={() => onTrigger(rule.id)}
         >
           <Ionicons name="flash-outline" size={14} color="#fff" />
@@ -248,7 +265,9 @@ export default function WavesScreen() {
             style={[styles.tabBtn, tab === t && styles.tabBtnActive]}
             onPress={() => setTab(t)}
           >
-            <Text style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}>
+            <Text
+              style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}
+            >
               {t === "waves" ? "Waves" : "Automation Rules"}
             </Text>
           </TouchableOpacity>
@@ -258,13 +277,26 @@ export default function WavesScreen() {
       {tab === "waves" ? (
         <>
           <View style={styles.filterRow}>
-            {(["ALL", "DRAFT", "PLANNED", "RELEASED", "IN_PROGRESS"] as StatusFilter[]).map((f) => (
+            {(
+              [
+                "ALL",
+                "DRAFT",
+                "PLANNED",
+                "RELEASED",
+                "IN_PROGRESS",
+              ] as StatusFilter[]
+            ).map((f) => (
               <TouchableOpacity
                 key={f}
                 style={[styles.chip, statusFilter === f && styles.chipActive]}
                 onPress={() => setStatusFilter(f)}
               >
-                <Text style={[styles.chipText, statusFilter === f && styles.chipTextActive]}>
+                <Text
+                  style={[
+                    styles.chipText,
+                    statusFilter === f && styles.chipTextActive,
+                  ]}
+                >
                   {f.replace("_", " ")}
                 </Text>
               </TouchableOpacity>
@@ -309,7 +341,9 @@ export default function WavesScreen() {
           ListEmptyComponent={
             <View style={styles.empty}>
               <Ionicons name="flash-outline" size={48} color="#d1d5db" />
-              <Text style={styles.emptyText}>No automation rules configured.</Text>
+              <Text style={styles.emptyText}>
+                No automation rules configured.
+              </Text>
             </View>
           }
         />
@@ -320,34 +354,80 @@ export default function WavesScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
-  tabRow: { flexDirection: "row", backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#e2e8f0" },
+  tabRow: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
+  },
   tabBtn: { flex: 1, paddingVertical: 12, alignItems: "center" },
   tabBtnActive: { borderBottomWidth: 2, borderBottomColor: "#2563eb" },
   tabBtnText: { fontSize: 13, color: "#6b7280", fontWeight: "600" },
   tabBtnTextActive: { color: "#2563eb" },
   filterRow: { flexDirection: "row", flexWrap: "wrap", padding: 8, gap: 6 },
-  chip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14, backgroundColor: "#e2e8f0" },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    backgroundColor: "#e2e8f0",
+  },
   chipActive: { backgroundColor: "#2563eb" },
   chipText: { fontSize: 11, color: "#374151", fontWeight: "600" },
   chipTextActive: { color: "#fff" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
   ref: { fontSize: 15, fontWeight: "700", color: "#1e293b", flexShrink: 1 },
-  metaRow: { flexDirection: "row", gap: 8, alignItems: "center", marginBottom: 6 },
+  metaRow: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+    marginBottom: 6,
+  },
   tag: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
   tagText: { fontSize: 10, fontWeight: "700" },
   detail: { fontSize: 12, color: "#6b7280", marginTop: 2 },
   statsRow: { flexDirection: "row", gap: 16, marginVertical: 6 },
   stat: { fontSize: 12, color: "#6b7280" },
   statVal: { fontWeight: "700", color: "#1e293b" },
-  progressRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 6 },
+  progressRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 6,
+  },
   progressLabel: { fontSize: 12, color: "#6b7280" },
-  trackBg: { height: 6, backgroundColor: "#e2e8f0", borderRadius: 3, marginTop: 4, marginBottom: 6 },
+  trackBg: {
+    height: 6,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 3,
+    marginTop: 4,
+    marginBottom: 6,
+  },
   trackFill: { height: 6, borderRadius: 3 },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
   badgeText: { fontSize: 10, color: "#fff", fontWeight: "700" },
   cardActions: { flexDirection: "row", gap: 8, marginTop: 8 },
-  actionBtn: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 7 },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 7,
+  },
   actionBtnText: { color: "#fff", fontSize: 13, fontWeight: "600" },
   empty: { alignItems: "center", paddingTop: 60, gap: 10 },
   emptyText: { fontSize: 14, color: "#9ca3af" },

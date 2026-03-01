@@ -26,7 +26,9 @@ export interface MFAVerifyPayload {
 }
 
 // POST /api/auth/mobile/login
-export async function login(credentials: LoginCredentials): Promise<AuthResponse> {
+export async function login(
+  credentials: LoginCredentials,
+): Promise<AuthResponse> {
   const { data } = await apiClient.post<AuthResponse>(
     "/api/auth/mobile/login",
     credentials,
@@ -69,7 +71,9 @@ export async function getSession(): Promise<AuthResponse["user"] | null> {
 }
 
 // POST /api/auth/mfa/verify
-export async function verifyMFA(payload: MFAVerifyPayload): Promise<AuthResponse> {
+export async function verifyMFA(
+  payload: MFAVerifyPayload,
+): Promise<AuthResponse> {
   const { data } = await apiClient.post<AuthResponse>(
     "/api/auth/mfa/verify",
     payload,

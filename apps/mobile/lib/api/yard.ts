@@ -59,7 +59,7 @@ export function getGateLog(direction?: "INBOUND" | "OUTBOUND") {
   const params = new URLSearchParams();
   if (direction) params.set("direction", direction);
   return apiClient<{ entries: GateEntry[]; summary: GateSummary }>(
-    `/api/yard/gate-log?${params}`
+    `/api/yard/gate-log?${params}`,
   ).then((res) => res.data);
 }
 
@@ -87,13 +87,13 @@ export function checkOutGateEntry(id: string, notes?: string) {
 
 export function getYardLocations() {
   return apiClient<{ locations: YardLocation[] }>("/api/yard/shunter").then(
-    (res) => res.data
+    (res) => res.data,
   );
 }
 
 export function getShunterTasks() {
   return apiClient<{ tasks: ShunterTask[] }>("/api/yard/shunter").then(
-    (res) => res.data
+    (res) => res.data,
   );
 }
 

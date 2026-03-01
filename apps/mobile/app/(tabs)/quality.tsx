@@ -17,7 +17,13 @@ import {
   holdInspection,
   type QCInspection,
 } from "../../lib/api/quality";
-import { Play, CheckCircle, XCircle, Ban, ShieldCheck } from "lucide-react-native";
+import {
+  Play,
+  CheckCircle,
+  XCircle,
+  Ban,
+  ShieldCheck,
+} from "lucide-react-native";
 
 const STATUS_COLORS: Record<string, string> = {
   PENDING: "#6b7280",
@@ -41,7 +47,8 @@ function InspectionCard({
   onHold: (id: string) => void;
 }) {
   const color = STATUS_COLORS[item.status] ?? "#6b7280";
-  const passedC = item.checklistItems?.filter((c) => c.result === "PASS").length ?? 0;
+  const passedC =
+    item.checklistItems?.filter((c) => c.result === "PASS").length ?? 0;
   const total = item.checklistItems?.length ?? 0;
 
   return (
@@ -52,7 +59,9 @@ function InspectionCard({
           <Text style={styles.badgeText}>{item.status.replace("_", " ")}</Text>
         </View>
       </View>
-      <Text style={styles.cardSubtitle}>{item.productName ?? item.productId}</Text>
+      <Text style={styles.cardSubtitle}>
+        {item.productName ?? item.productId}
+      </Text>
       <Text style={styles.detail}>Type: {item.type}</Text>
       {item.checklistItems?.length ? (
         <Text style={styles.detail}>
@@ -115,21 +124,24 @@ export default function QualityScreen() {
 
   const startMutation = useMutation({
     mutationFn: startInspection,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["qcInspections"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["qcInspections"] }),
     onError: () => Alert.alert("Error", "Failed to start inspection."),
   });
 
   const completeMutation = useMutation({
     mutationFn: ({ id, result }: { id: string; result: "PASS" | "FAIL" }) =>
       completeInspection(id, { result, checklistItems: [], defectsFound: 0 }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["qcInspections"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["qcInspections"] }),
     onError: () => Alert.alert("Error", "Failed to complete inspection."),
   });
 
   const holdMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
       holdInspection(id, reason),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["qcInspections"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["qcInspections"] }),
     onError: () => Alert.alert("Error", "Failed to put inspection on hold."),
   });
 
@@ -155,11 +167,15 @@ export default function QualityScreen() {
             <Text style={styles.sumLabel}>Pass Rate</Text>
           </View>
           <View style={styles.sumItem}>
-            <Text style={[styles.sumValue, { color: "#8b5cf6" }]}>{summary.onHold ?? 0}</Text>
+            <Text style={[styles.sumValue, { color: "#8b5cf6" }]}>
+              {summary.onHold ?? 0}
+            </Text>
             <Text style={styles.sumLabel}>On Hold</Text>
           </View>
           <View style={styles.sumItem}>
-            <Text style={[styles.sumValue, { color: "#ef4444" }]}>{summary.failed ?? 0}</Text>
+            <Text style={[styles.sumValue, { color: "#ef4444" }]}>
+              {summary.failed ?? 0}
+            </Text>
             <Text style={styles.sumLabel}>Failed</Text>
           </View>
         </View>
@@ -175,7 +191,11 @@ export default function QualityScreen() {
           style={[styles.chip, !filterStatus && styles.chipActive]}
           onPress={() => setFilterStatus(undefined)}
         >
-          <Text style={[styles.chipText, !filterStatus && styles.chipTextActive]}>All</Text>
+          <Text
+            style={[styles.chipText, !filterStatus && styles.chipTextActive]}
+          >
+            All
+          </Text>
         </TouchableOpacity>
         {statuses.map((s) => (
           <TouchableOpacity
@@ -183,14 +203,21 @@ export default function QualityScreen() {
             style={[styles.chip, filterStatus === s && styles.chipActive]}
             onPress={() => setFilterStatus(filterStatus === s ? undefined : s)}
           >
-            <Text style={[styles.chipText, filterStatus === s && styles.chipTextActive]}>
+            <Text
+              style={[
+                styles.chipText,
+                filterStatus === s && styles.chipTextActive,
+              ]}
+            >
               {s.replace("_", " ")}
             </Text>
           </TouchableOpacity>
         ))}
       </ScrollView>
 
-      <Text style={styles.screenTitle}>QC Inspections ({inspection.length})</Text>
+      <Text style={styles.screenTitle}>
+        QC Inspections ({inspection.length})
+      </Text>
 
       {isLoading ? (
         <ActivityIndicator style={{ marginTop: 40 }} color="#3b82f6" />
@@ -210,7 +237,9 @@ export default function QualityScreen() {
               onStart={(id) => startMutation.mutate(id)}
               onPass={(id) => completeMutation.mutate({ id, result: "PASS" })}
               onFail={(id) => completeMutation.mutate({ id, result: "FAIL" })}
-              onHold={(id) => holdMutation.mutate({ id, reason: "Flagged for review" })}
+              onHold={(id) =>
+                holdMutation.mutate({ id, reason: "Flagged for review" })
+              }
             />
           )}
         />
@@ -231,7 +260,12 @@ const styles = StyleSheet.create({
   sumItem: { alignItems: "center" },
   sumValue: { color: "#fff", fontSize: 20, fontWeight: "700" },
   sumLabel: { color: "#94a3b8", fontSize: 11, marginTop: 2 },
-  filterStrip: { paddingHorizontal: 12, paddingVertical: 8, flexDirection: "row", gap: 6 },
+  filterStrip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: "row",
+    gap: 6,
+  },
   chip: {
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -242,7 +276,13 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: "#3b82f6" },
   chipText: { fontSize: 12, color: "#374151", fontWeight: "600" },
   chipTextActive: { color: "#fff" },
-  screenTitle: { fontSize: 16, fontWeight: "700", color: "#111827", paddingHorizontal: 16, marginBottom: 4 },
+  screenTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+    paddingHorizontal: 16,
+    marginBottom: 4,
+  },
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -253,7 +293,12 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
   ref: { fontSize: 14, fontWeight: "700", color: "#1e40af" },
   cardSubtitle: { fontSize: 13, color: "#374151", marginBottom: 4 },
   detail: { fontSize: 12, color: "#6b7280", marginBottom: 2 },

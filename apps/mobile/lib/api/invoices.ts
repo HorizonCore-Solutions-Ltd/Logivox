@@ -84,7 +84,10 @@ export async function sendInvoice(
   id: string,
   payload: SendInvoicePayload,
 ): Promise<{ sent: boolean; deliveryId?: string }> {
-  const { data } = await apiClient.put(`/api/invoices/mobile/${id}/send`, payload);
+  const { data } = await apiClient.put(
+    `/api/invoices/mobile/${id}/send`,
+    payload,
+  );
   return data;
 }
 

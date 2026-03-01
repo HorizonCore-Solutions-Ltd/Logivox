@@ -61,7 +61,8 @@ export default function InvoicesScreen() {
   });
 
   const sendMutation = useMutation({
-    mutationFn: (id: string) => sendInvoice(id, { method: "EMAIL" } as SendInvoicePayload),
+    mutationFn: (id: string) =>
+      sendInvoice(id, { method: "EMAIL" } as SendInvoicePayload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       setSelectedInvoice(null);
@@ -183,9 +184,21 @@ export default function InvoicesScreen() {
       {/* Summary strip */}
       {totals && (
         <View style={styles.summaryStrip}>
-          <SummaryBlock label="Outstanding" value={`$${Number(totals.outstanding ?? 0).toLocaleString()}`} color="#DC2626" />
-          <SummaryBlock label="Overdue" value={`$${Number(totals.overdue ?? 0).toLocaleString()}`} color="#D97706" />
-          <SummaryBlock label="Paid" value={`$${Number(totals.paid ?? 0).toLocaleString()}`} color="#059669" />
+          <SummaryBlock
+            label="Outstanding"
+            value={`$${Number(totals.outstanding ?? 0).toLocaleString()}`}
+            color="#DC2626"
+          />
+          <SummaryBlock
+            label="Overdue"
+            value={`$${Number(totals.overdue ?? 0).toLocaleString()}`}
+            color="#D97706"
+          />
+          <SummaryBlock
+            label="Paid"
+            value={`$${Number(totals.paid ?? 0).toLocaleString()}`}
+            color="#059669"
+          />
         </View>
       )}
 
@@ -198,10 +211,18 @@ export default function InvoicesScreen() {
         contentContainerStyle={styles.filterTabs}
         renderItem={({ item: tab }) => (
           <TouchableOpacity
-            style={[styles.filterTab, statusFilter === tab && styles.filterTabActive]}
+            style={[
+              styles.filterTab,
+              statusFilter === tab && styles.filterTabActive,
+            ]}
             onPress={() => setStatusFilter(tab)}
           >
-            <Text style={[styles.filterTabText, statusFilter === tab && styles.filterTabTextActive]}>
+            <Text
+              style={[
+                styles.filterTabText,
+                statusFilter === tab && styles.filterTabTextActive,
+              ]}
+            >
               {tab}
             </Text>
           </TouchableOpacity>
@@ -210,7 +231,11 @@ export default function InvoicesScreen() {
 
       {/* List */}
       {isLoading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color="#2563EB" size="large" />
+        <ActivityIndicator
+          style={{ marginTop: 40 }}
+          color="#2563EB"
+          size="large"
+        />
       ) : (
         <FlatList
           data={invoices}
@@ -218,7 +243,11 @@ export default function InvoicesScreen() {
           renderItem={renderInvoice}
           contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl refreshing={isRefetching} onRefresh={() => refetch()} tintColor="#2563EB" />
+            <RefreshControl
+              refreshing={isRefetching}
+              onRefresh={() => refetch()}
+              tintColor="#2563EB"
+            />
           }
           ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
           ListEmptyComponent={
@@ -244,13 +273,28 @@ export default function InvoicesScreen() {
               <>
                 <View style={styles.sheetHeader}>
                   <View>
-                    <Text style={styles.sheetInvoiceNum}>{selectedInvoice.invoiceNumber}</Text>
+                    <Text style={styles.sheetInvoiceNum}>
+                      {selectedInvoice.invoiceNumber}
+                    </Text>
                     <Text style={styles.sheetCustomer}>
-                      {selectedInvoice.customerName ?? selectedInvoice.customerId}
+                      {selectedInvoice.customerName ??
+                        selectedInvoice.customerId}
                     </Text>
                   </View>
-                  <View style={[styles.statusChip, { backgroundColor: `${STATUS_COLOR[selectedInvoice.status]}18` }]}>
-                    <Text style={[styles.statusText, { color: STATUS_COLOR[selectedInvoice.status] }]}>
+                  <View
+                    style={[
+                      styles.statusChip,
+                      {
+                        backgroundColor: `${STATUS_COLOR[selectedInvoice.status]}18`,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.statusText,
+                        { color: STATUS_COLOR[selectedInvoice.status] },
+                      ]}
+                    >
                       {selectedInvoice.status}
                     </Text>
                   </View>
@@ -259,19 +303,39 @@ export default function InvoicesScreen() {
                 <View style={styles.amountCard}>
                   <Text style={styles.amountLabel}>Total Amount</Text>
                   <Text style={styles.amountLarge}>
-                    ${Number(selectedInvoice.total ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                    $
+                    {Number(selectedInvoice.total ?? 0).toLocaleString(
+                      "en-US",
+                      { minimumFractionDigits: 2 },
+                    )}
                   </Text>
                   {selectedInvoice.dueDate && (
                     <Text style={styles.dueLine}>
-                      Due: {new Date(selectedInvoice.dueDate).toLocaleDateString()}
+                      Due:{" "}
+                      {new Date(selectedInvoice.dueDate).toLocaleDateString()}
                     </Text>
                   )}
                 </View>
 
                 <View style={styles.detailRows}>
-                  <DetailRow label="Invoice Date" value={selectedInvoice.invoiceDate ? new Date(selectedInvoice.invoiceDate).toLocaleDateString() : "—"} />
-                  <DetailRow label="Subtotal" value={`$${Number(selectedInvoice.subtotal ?? 0).toFixed(2)}`} />
-                  <DetailRow label="Tax" value={`$${Number(selectedInvoice.taxAmount ?? 0).toFixed(2)}`} />
+                  <DetailRow
+                    label="Invoice Date"
+                    value={
+                      selectedInvoice.invoiceDate
+                        ? new Date(
+                            selectedInvoice.invoiceDate,
+                          ).toLocaleDateString()
+                        : "—"
+                    }
+                  />
+                  <DetailRow
+                    label="Subtotal"
+                    value={`$${Number(selectedInvoice.subtotal ?? 0).toFixed(2)}`}
+                  />
+                  <DetailRow
+                    label="Tax"
+                    value={`$${Number(selectedInvoice.taxAmount ?? 0).toFixed(2)}`}
+                  />
                 </View>
 
                 {/* Actions */}
@@ -321,7 +385,10 @@ export default function InvoicesScreen() {
                   )}
                 </View>
 
-                <TouchableOpacity style={styles.closeBtn} onPress={() => setSelectedInvoice(null)}>
+                <TouchableOpacity
+                  style={styles.closeBtn}
+                  onPress={() => setSelectedInvoice(null)}
+                >
                   <Text style={styles.closeBtnText}>Close</Text>
                 </TouchableOpacity>
               </>
@@ -333,7 +400,15 @@ export default function InvoicesScreen() {
   );
 }
 
-function SummaryBlock({ label, value, color }: { label: string; value: string; color: string }) {
+function SummaryBlock({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: string;
+  color: string;
+}) {
   return (
     <View style={styles.summaryBlock}>
       <Text style={[styles.summaryValue, { color }]}>{value}</Text>
@@ -355,26 +430,59 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F8FAFC" },
   searchBar: { padding: 16, paddingBottom: 8 },
   searchInput: {
-    flexDirection: "row", alignItems: "center", backgroundColor: "#fff",
-    borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, gap: 8,
-    shadowColor: "#000", shadowOpacity: 0.04, shadowRadius: 4, elevation: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
   },
   input: { flex: 1, fontSize: 15, color: "#0F172A" },
-  summaryStrip: { flexDirection: "row", justifyContent: "space-around", paddingHorizontal: 16, paddingBottom: 8 },
+  summaryStrip: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
   summaryBlock: { alignItems: "center" },
   summaryValue: { fontSize: 20, fontWeight: "800" },
-  summaryLabel: { fontSize: 11, color: "#94A3B8", fontWeight: "600", marginTop: 2 },
+  summaryLabel: {
+    fontSize: 11,
+    color: "#94A3B8",
+    fontWeight: "600",
+    marginTop: 2,
+  },
   filterTabs: { paddingHorizontal: 16, paddingBottom: 8, gap: 8 },
-  filterTab: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: "#F1F5F9" },
+  filterTab: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: "#F1F5F9",
+  },
   filterTabActive: { backgroundColor: "#2563EB" },
   filterTabText: { fontSize: 13, fontWeight: "600", color: "#64748B" },
   filterTabTextActive: { color: "#fff" },
   list: { padding: 16, paddingTop: 4, paddingBottom: 32 },
   card: {
-    backgroundColor: "#fff", borderRadius: 16, padding: 16,
-    shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  cardTop: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
+  cardTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
   invoiceNum: { fontSize: 16, fontWeight: "800", color: "#0F172A" },
   statusChip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20 },
   statusText: { fontSize: 11, fontWeight: "700" },
@@ -387,25 +495,78 @@ const styles = StyleSheet.create({
   empty: { alignItems: "center", paddingTop: 80, gap: 12 },
   emptyTitle: { fontSize: 18, fontWeight: "700", color: "#64748B" },
   // Sheet
-  backdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
-  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 40, maxHeight: "90%" },
-  handle: { width: 40, height: 4, backgroundColor: "#E2E8F0", borderRadius: 2, alignSelf: "center", marginBottom: 20 },
-  sheetHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 },
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  sheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+    maxHeight: "90%",
+  },
+  handle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#E2E8F0",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
   sheetInvoiceNum: { fontSize: 22, fontWeight: "800", color: "#0F172A" },
   sheetCustomer: { fontSize: 14, color: "#64748B", marginTop: 4 },
-  amountCard: { backgroundColor: "#ECFDF5", borderRadius: 16, padding: 16, alignItems: "center", marginBottom: 20 },
+  amountCard: {
+    backgroundColor: "#ECFDF5",
+    borderRadius: 16,
+    padding: 16,
+    alignItems: "center",
+    marginBottom: 20,
+  },
   amountLabel: { fontSize: 13, color: "#059669", fontWeight: "600" },
-  amountLarge: { fontSize: 32, fontWeight: "900", color: "#059669", marginTop: 4 },
+  amountLarge: {
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#059669",
+    marginTop: 4,
+  },
   dueLine: { fontSize: 12, color: "#64748B", marginTop: 4 },
   detailRows: { gap: 10, marginBottom: 20 },
   detailRow: { flexDirection: "row", justifyContent: "space-between" },
   detailLabel: { fontSize: 14, color: "#64748B" },
   detailValue: { fontSize: 14, fontWeight: "700", color: "#0F172A" },
   actions: { gap: 10, marginBottom: 16 },
-  actionBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 10, padding: 16, borderRadius: 14 },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    padding: 16,
+    borderRadius: 14,
+  },
   actionBtnText: { color: "#fff", fontSize: 16, fontWeight: "700" },
-  paidConfirmation: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#ECFDF5", borderRadius: 12, padding: 14 },
+  paidConfirmation: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: "#ECFDF5",
+    borderRadius: 12,
+    padding: 14,
+  },
   paidText: { color: "#059669", fontWeight: "700", fontSize: 15 },
-  closeBtn: { backgroundColor: "#F1F5F9", borderRadius: 14, padding: 14, alignItems: "center" },
+  closeBtn: {
+    backgroundColor: "#F1F5F9",
+    borderRadius: 14,
+    padding: 14,
+    alignItems: "center",
+  },
   closeBtnText: { fontSize: 16, fontWeight: "700", color: "#334155" },
 });

@@ -54,7 +54,10 @@ export const useAddOnsStore = create<AddOnsState>((set, get) => ({
       });
     } catch (err) {
       // Fallback silently to the static config — don't block app startup
-      console.warn("[AddOns] Failed to load tenant config, using defaults:", err);
+      console.warn(
+        "[AddOns] Failed to load tenant config, using defaults:",
+        err,
+      );
       set({ hydrated: true, error: (err as Error).message });
     }
   },

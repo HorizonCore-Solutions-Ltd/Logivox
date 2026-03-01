@@ -28,7 +28,12 @@ function ScoreBar({ label, value }: { label: string; value: number }) {
         <Text style={[styles.scoreBarValue, { color }]}>{value}%</Text>
       </View>
       <View style={styles.trackBg}>
-        <View style={[styles.trackFill, { width: `${value}%` as any, backgroundColor: color }]} />
+        <View
+          style={[
+            styles.trackFill,
+            { width: `${value}%` as any, backgroundColor: color },
+          ]}
+        />
       </View>
     </View>
   );
@@ -54,7 +59,9 @@ function ScorecardView({ supplierId }: { supplierId: string }) {
 }
 
 export default function SuppliersScreen() {
-  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
+  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(
+    null,
+  );
   const [tab, setTab] = useState<"suppliers" | "pos">("suppliers");
 
   const { data: suppliersData, isLoading: suppliersLoading } = useQuery({
@@ -70,7 +77,8 @@ export default function SuppliersScreen() {
   });
 
   const suppliers: Supplier[] =
-    (suppliersData as any)?.suppliers ?? (Array.isArray(suppliersData) ? suppliersData : []);
+    (suppliersData as any)?.suppliers ??
+    (Array.isArray(suppliersData) ? suppliersData : []);
   const orders: PurchaseOrder[] =
     (posData as any)?.orders ?? (Array.isArray(posData) ? posData : []);
 
@@ -90,9 +98,14 @@ export default function SuppliersScreen() {
           <TouchableOpacity
             key={t}
             style={[styles.tabBtn, tab === t && styles.tabBtnActive]}
-            onPress={() => { setTab(t); setSelectedSupplierId(null); }}
+            onPress={() => {
+              setTab(t);
+              setSelectedSupplierId(null);
+            }}
           >
-            <Text style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}>
+            <Text
+              style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}
+            >
               {t === "suppliers" ? "Suppliers" : "Purchase Orders"}
             </Text>
           </TouchableOpacity>
@@ -111,7 +124,9 @@ export default function SuppliersScreen() {
               <TouchableOpacity
                 style={styles.card}
                 onPress={() =>
-                  setSelectedSupplierId(selectedSupplierId === item.id ? null : item.id)
+                  setSelectedSupplierId(
+                    selectedSupplierId === item.id ? null : item.id,
+                  )
                 }
               >
                 <View style={styles.cardRow}>
@@ -123,7 +138,10 @@ export default function SuppliersScreen() {
                     <View
                       style={[
                         styles.badge,
-                        { backgroundColor: item.status === "ACTIVE" ? "#10b981" : "#6b7280" },
+                        {
+                          backgroundColor:
+                            item.status === "ACTIVE" ? "#10b981" : "#6b7280",
+                        },
                       ]}
                     >
                       <Text style={styles.badgeText}>{item.status}</Text>
@@ -131,9 +149,15 @@ export default function SuppliersScreen() {
                     <Text style={styles.detail}>{item.leadTimeDays}d lead</Text>
                   </View>
                 </View>
-                {item.email ? <Text style={styles.detail}>{item.email}</Text> : null}
+                {item.email ? (
+                  <Text style={styles.detail}>{item.email}</Text>
+                ) : null}
                 <Ionicons
-                  name={selectedSupplierId === item.id ? "chevron-up" : "chevron-down"}
+                  name={
+                    selectedSupplierId === item.id
+                      ? "chevron-up"
+                      : "chevron-down"
+                  }
                   size={16}
                   color="#6b7280"
                   style={{ alignSelf: "flex-end", marginTop: 4 }}
@@ -165,13 +189,18 @@ export default function SuppliersScreen() {
                 <View
                   style={[
                     styles.badge,
-                    { backgroundColor: PO_STATUS_COLORS[item.status] ?? "#6b7280" },
+                    {
+                      backgroundColor:
+                        PO_STATUS_COLORS[item.status] ?? "#6b7280",
+                    },
                   ]}
                 >
                   <Text style={styles.badgeText}>{item.status}</Text>
                 </View>
               </View>
-              <Text style={styles.detail}>Supplier: {item.supplierName ?? item.supplierId}</Text>
+              <Text style={styles.detail}>
+                Supplier: {item.supplierName ?? item.supplierId}
+              </Text>
               <Text style={styles.detail}>
                 Total: {item.currency} {item.totalAmount?.toFixed(2) ?? "—"}
               </Text>
@@ -184,7 +213,11 @@ export default function SuppliersScreen() {
           )}
           ListEmptyComponent={
             <View style={styles.empty}>
-              <Ionicons name="document-text-outline" size={48} color="#d1d5db" />
+              <Ionicons
+                name="document-text-outline"
+                size={48}
+                color="#d1d5db"
+              />
               <Text style={styles.emptyText}>No purchase orders found.</Text>
             </View>
           }
@@ -196,22 +229,59 @@ export default function SuppliersScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
-  tabRow: { flexDirection: "row", borderBottomWidth: 1, borderColor: "#e5e7eb" },
+  tabRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderColor: "#e5e7eb",
+  },
   tabBtn: { flex: 1, paddingVertical: 12, alignItems: "center" },
   tabBtnActive: { borderBottomWidth: 2, borderColor: "#3b82f6" },
   tabBtnText: { fontSize: 14, color: "#6b7280", fontWeight: "600" },
   tabBtnTextActive: { color: "#3b82f6" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 4,
+  },
   ref: { fontSize: 14, fontWeight: "700", color: "#1e40af" },
   detail: { fontSize: 12, color: "#6b7280", marginBottom: 2 },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
   badgeText: { color: "#fff", fontSize: 10, fontWeight: "600" },
-  empty: { paddingTop: 60, alignItems: "center", justifyContent: "center", gap: 12 },
+  empty: {
+    paddingTop: 60,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+  },
   emptyText: { fontSize: 14, color: "#9ca3af" },
-  scorecardSection: { marginTop: 14, borderTopWidth: 1, borderColor: "#e5e7eb", paddingTop: 12 },
-  sectionTitle: { fontSize: 13, fontWeight: "700", color: "#111827", marginBottom: 10 },
-  scoreBarRow: { flexDirection: "row", justifyContent: "space-between", marginBottom: 3 },
+  scorecardSection: {
+    marginTop: 14,
+    borderTopWidth: 1,
+    borderColor: "#e5e7eb",
+    paddingTop: 12,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 10,
+  },
+  scoreBarRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 3,
+  },
   scoreBarLabel: { fontSize: 12, color: "#374151" },
   scoreBarValue: { fontSize: 12, fontWeight: "700" },
   trackBg: { height: 6, backgroundColor: "#e5e7eb", borderRadius: 3 },

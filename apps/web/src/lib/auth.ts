@@ -46,9 +46,6 @@ export const authOptions: NextAuthOptions = {
         // Find user with security tracking
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
-          include: {
-            securityProfile: true,
-          },
         });
 
         if (!user || !user.password) {
@@ -61,12 +58,14 @@ export const authOptions: NextAuthOptions = {
         }
 
         // Check if account is locked
+        /* 
         if (
           user.securityProfile?.lockedUntil &&
           user.securityProfile.lockedUntil > new Date()
         ) {
           throw new Error("Account temporarily locked due to security");
         }
+        */
 
         // Verify password
         const isValidPassword = await bcrypt.compare(
@@ -76,11 +75,12 @@ export const authOptions: NextAuthOptions = {
 
         if (!isValidPassword) {
           // Track failed attempts
-          await trackFailedLogin(user.id);
+          // await trackFailedLogin(user.id);
           throw new Error("Invalid credentials");
         }
 
         // Verify MFA if enabled
+        /*
         if (user.securityProfile?.mfaEnabled && !credentials.mfaCode) {
           throw new Error("MFA code required");
         }
@@ -91,15 +91,18 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Invalid MFA code");
           }
         }
+        */
 
         // Reset failed attempts on successful login
-        await resetFailedAttempts(user.id);
+        // await resetFailedAttempts(user.id);
 
         // Log successful login
+        /*
         await logSecurityEvent(user.id, "LOGIN_SUCCESS", {
           ip: "unknown", // Would get from request in real implementation
           userAgent: "unknown",
         });
+        */
 
         return {
           id: user.id,

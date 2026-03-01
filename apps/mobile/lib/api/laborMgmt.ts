@@ -14,8 +14,8 @@ export interface ActiveWorker {
   clockedInAt?: string;
   picksToday?: number;
   unitsToday?: number;
-  throughput?: number;   // units per hour
-  standard?: number;     // expected units per hour
+  throughput?: number; // units per hour
+  standard?: number; // expected units per hour
   efficiencyPct?: number;
   overtime?: boolean;
 }
@@ -38,7 +38,7 @@ export interface LaborDashboard {
 
 export interface HeatmapCell {
   zone: string;
-  activityScore: number;     // 0-100
+  activityScore: number; // 0-100
   workerCount: number;
   throughput: number;
   congestionLevel: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";

@@ -3,7 +3,13 @@ import { apiClient } from "./client";
 export interface ComplianceTask {
   id: string;
   taskNumber: string;
-  type: "AUDIT" | "CERTIFICATION" | "TRAINING" | "INSPECTION" | "REPORTING" | "REVIEW";
+  type:
+    | "AUDIT"
+    | "CERTIFICATION"
+    | "TRAINING"
+    | "INSPECTION"
+    | "REPORTING"
+    | "REVIEW";
   status: "PENDING" | "IN_PROGRESS" | "COMPLETED" | "OVERDUE" | "WAIVED";
   priority: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   title: string;
@@ -20,7 +26,12 @@ export interface ComplianceTask {
 
 export interface ComplianceScore {
   overall: number;
-  byCategory: Array<{ category: string; score: number; total: number; passed: number }>;
+  byCategory: Array<{
+    category: string;
+    score: number;
+    total: number;
+    passed: number;
+  }>;
   trend: "UP" | "DOWN" | "STABLE";
   lastAuditDate?: string;
 }
@@ -35,7 +46,12 @@ export async function getComplianceTasks(params?: {
   const { data } = await apiClient.get("/api/compliance", { params });
   return data as {
     tasks: ComplianceTask[];
-    summary: { pending: number; overdue: number; completedThisMonth: number; complianceRate: number };
+    summary: {
+      pending: number;
+      overdue: number;
+      completedThisMonth: number;
+      complianceRate: number;
+    };
   };
 }
 
@@ -46,14 +62,26 @@ export async function getComplianceScore() {
 }
 
 // PUT /api/compliance/:id/complete
-export async function completeComplianceTask(id: string, payload: { notes?: string; evidenceUrls?: string[] }) {
-  const { data } = await apiClient.put(`/api/compliance/${id}/complete`, payload);
+export async function completeComplianceTask(
+  id: string,
+  payload: { notes?: string; evidenceUrls?: string[] },
+) {
+  const { data } = await apiClient.put(
+    `/api/compliance/${id}/complete`,
+    payload,
+  );
   return data;
 }
 
 // GET /api/compliance/audit-logs
-export async function getAuditLogs(params?: { limit?: number; from?: string; to?: string }) {
-  const { data } = await apiClient.get("/api/compliance/audit-logs", { params });
+export async function getAuditLogs(params?: {
+  limit?: number;
+  from?: string;
+  to?: string;
+}) {
+  const { data } = await apiClient.get("/api/compliance/audit-logs", {
+    params,
+  });
   return data as Array<{
     id: string;
     action: string;

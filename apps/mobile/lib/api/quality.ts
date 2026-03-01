@@ -39,7 +39,14 @@ export async function getQCInspections(params?: {
   const { data } = await apiClient.get("/api/qc-inspections", { params });
   return data as {
     inspections: QCInspection[];
-    summary: { scheduled: number; inProgress: number; passed: number; failed: number; onHold: number; passRate: number };
+    summary: {
+      scheduled: number;
+      inProgress: number;
+      passed: number;
+      failed: number;
+      onHold: number;
+      passRate: number;
+    };
   };
 }
 
@@ -56,24 +63,41 @@ export async function startInspection(id: string) {
 }
 
 // PUT /api/qc-inspections/:id/complete — submit inspection result
-export async function completeInspection(id: string, payload: {
-  result: "PASS" | "FAIL" | "CONDITIONAL_PASS";
-  checklistItems: { id: string; result: "PASS" | "FAIL" | "N/A"; notes?: string }[];
-  defectsFound: number;
-  notes?: string;
-}) {
-  const { data } = await apiClient.put(`/api/qc-inspections/${id}/complete`, payload);
+export async function completeInspection(
+  id: string,
+  payload: {
+    result: "PASS" | "FAIL" | "CONDITIONAL_PASS";
+    checklistItems: {
+      id: string;
+      result: "PASS" | "FAIL" | "N/A";
+      notes?: string;
+    }[];
+    defectsFound: number;
+    notes?: string;
+  },
+) {
+  const { data } = await apiClient.put(
+    `/api/qc-inspections/${id}/complete`,
+    payload,
+  );
   return data;
 }
 
 // PUT /api/qc-inspections/:id/hold — put item on hold
 export async function holdInspection(id: string, reason: string) {
-  const { data } = await apiClient.put(`/api/qc-inspections/${id}/hold`, { reason });
+  const { data } = await apiClient.put(`/api/qc-inspections/${id}/hold`, {
+    reason,
+  });
   return data;
 }
 
 // GET /api/inspection-templates — get quality checklists
 export async function getInspectionTemplates() {
   const { data } = await apiClient.get("/api/inspection-templates");
-  return data as Array<{ id: string; name: string; type: string; checklistItems: ChecklistItem[] }>;
+  return data as Array<{
+    id: string;
+    name: string;
+    type: string;
+    checklistItems: ChecklistItem[];
+  }>;
 }

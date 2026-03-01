@@ -40,8 +40,7 @@ export default function SignInPage() {
   // Redirect if already authenticated
   React.useEffect(() => {
     if (isAuthenticated && !isLoading) {
-      const callbackUrl =
-        searchParams.get("callbackUrl") || "/dashboard/dashboard";
+      const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
       router.push(callbackUrl);
     }
   }, [isAuthenticated, isLoading, router, searchParams]);

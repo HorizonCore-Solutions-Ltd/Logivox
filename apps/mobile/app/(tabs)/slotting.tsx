@@ -106,7 +106,8 @@ function RecommendationCard({
       <View style={styles.metaRow}>
         {timeSaving ? (
           <Text style={styles.saving}>
-            <Ionicons name="time-outline" size={12} color="#10b981" /> Saves ~{timeSaving}
+            <Ionicons name="time-outline" size={12} color="#10b981" /> Saves ~
+            {timeSaving}
           </Text>
         ) : null}
         {item.confidence != null ? (
@@ -169,7 +170,7 @@ export default function SlottingScreen() {
       queryClient.invalidateQueries({ queryKey: ["slottingRecommendations"] });
       Alert.alert(
         "Optimisation Complete",
-        `${(result as any)?.recommendationsGenerated ?? 0} recommendations generated.`
+        `${(result as any)?.recommendationsGenerated ?? 0} recommendations generated.`,
       );
     } catch {
       Alert.alert("Error", "Optimisation failed.");
@@ -191,10 +192,7 @@ export default function SlottingScreen() {
           <Text style={styles.headerSub}>{total} total recommendations</Text>
         </View>
         <TouchableOpacity
-          style={[
-            styles.runBtn,
-            isRunning && { backgroundColor: "#6b7280" },
-          ]}
+          style={[styles.runBtn, isRunning && { backgroundColor: "#6b7280" }]}
           onPress={runOptimisation}
           disabled={isRunning}
         >
@@ -211,13 +209,26 @@ export default function SlottingScreen() {
 
       {/* Filter tabs */}
       <View style={styles.filterRow}>
-        {(["PENDING", "APPROVED", "APPLIED", "REJECTED", "ALL"] as StatusFilter[]).map((f) => (
+        {(
+          [
+            "PENDING",
+            "APPROVED",
+            "APPLIED",
+            "REJECTED",
+            "ALL",
+          ] as StatusFilter[]
+        ).map((f) => (
           <TouchableOpacity
             key={f}
             style={[styles.chip, statusFilter === f && styles.chipActive]}
             onPress={() => setStatusFilter(f)}
           >
-            <Text style={[styles.chipText, statusFilter === f && styles.chipTextActive]}>
+            <Text
+              style={[
+                styles.chipText,
+                statusFilter === f && styles.chipTextActive,
+              ]}
+            >
               {f}
             </Text>
           </TouchableOpacity>
@@ -260,34 +271,96 @@ export default function SlottingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: "#1e3a5f", padding: 16 },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#1e3a5f",
+    padding: 16,
+  },
   headerTitle: { fontSize: 16, fontWeight: "700", color: "#fff" },
   headerSub: { fontSize: 12, color: "#94a3b8", marginTop: 2 },
-  runBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "#8b5cf6", paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
+  runBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#8b5cf6",
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
   runBtnText: { color: "#fff", fontSize: 13, fontWeight: "700" },
   filterRow: { flexDirection: "row", flexWrap: "wrap", padding: 8, gap: 6 },
-  chip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14, backgroundColor: "#e2e8f0" },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    backgroundColor: "#e2e8f0",
+  },
   chipActive: { backgroundColor: "#2563eb" },
   chipText: { fontSize: 11, color: "#374151", fontWeight: "600" },
   chipTextActive: { color: "#fff" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
-  velocityBadge: { width: 24, height: 24, borderRadius: 12, justifyContent: "center", alignItems: "center" },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  velocityBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   velocityText: { fontSize: 12, fontWeight: "800" },
   ref: { fontSize: 14, fontWeight: "700", color: "#1e293b" },
   productName: { fontSize: 13, color: "#475569", marginBottom: 10 },
-  moveRow: { flexDirection: "row", alignItems: "center", gap: 10, marginBottom: 8 },
-  locationBox: { flex: 1, backgroundColor: "#f1f5f9", borderRadius: 8, padding: 8, alignItems: "center" },
+  moveRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 8,
+  },
+  locationBox: {
+    flex: 1,
+    backgroundColor: "#f1f5f9",
+    borderRadius: 8,
+    padding: 8,
+    alignItems: "center",
+  },
   locationLabel: { fontSize: 10, color: "#6b7280", marginBottom: 2 },
   locationCode: { fontSize: 16, fontWeight: "700", color: "#1e293b" },
   locationZone: { fontSize: 10, color: "#6b7280", marginTop: 2 },
-  reason: { fontSize: 12, color: "#6b7280", fontStyle: "italic", marginBottom: 6 },
+  reason: {
+    fontSize: 12,
+    color: "#6b7280",
+    fontStyle: "italic",
+    marginBottom: 6,
+  },
   metaRow: { flexDirection: "row", gap: 12, marginBottom: 4 },
   saving: { fontSize: 12, color: "#10b981", fontWeight: "600" },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
   badgeText: { fontSize: 10, color: "#fff", fontWeight: "700" },
   cardActions: { flexDirection: "row", gap: 8, marginTop: 10 },
-  actionBtn: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 7 },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 7,
+  },
   actionBtnText: { color: "#fff", fontSize: 13, fontWeight: "600" },
   empty: { alignItems: "center", paddingTop: 60, gap: 8 },
   emptyText: { fontSize: 14, color: "#9ca3af" },

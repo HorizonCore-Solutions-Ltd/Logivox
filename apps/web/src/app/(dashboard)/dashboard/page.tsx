@@ -30,6 +30,7 @@ import {
   BarChart3,
   ShieldAlert,
   FileWarning,
+  Map,
 } from "lucide-react";
 
 interface DashboardStats {
@@ -351,6 +352,22 @@ export default function DashboardPage() {
                 className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
               />
               Refresh
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => router.push("/dock/load-planning")}
+            >
+              <Truck className="h-4 w-4 mr-2" />
+              Load Planning
+            </Button>
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => router.push("/dock/bay-doors")}
+            >
+              <Map className="h-4 w-4 mr-2" />
+              Bay Doors
             </Button>
             <Button
               size="sm"

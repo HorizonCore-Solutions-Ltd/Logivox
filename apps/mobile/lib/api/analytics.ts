@@ -16,7 +16,11 @@ export interface DashboardData {
     title: string;
     data: Array<{ label: string; value: number }>;
   }>;
-  alerts?: Array<{ id: string; message: string; severity: "INFO" | "WARNING" | "ERROR" | "CRITICAL" }>;
+  alerts?: Array<{
+    id: string;
+    message: string;
+    severity: "INFO" | "WARNING" | "ERROR" | "CRITICAL";
+  }>;
   period: string;
 }
 
@@ -42,13 +46,17 @@ export interface FinancialMetrics {
 
 // GET /api/dashboards/role — role-adaptive dashboard
 export async function getRoleDashboard(role?: string) {
-  const { data } = await apiClient.get("/api/dashboards/role", { params: { role } });
+  const { data } = await apiClient.get("/api/dashboards/role", {
+    params: { role },
+  });
   return data as DashboardData;
 }
 
 // GET /api/metrics/warehouse
 export async function getWarehouseMetrics(warehouseId?: string) {
-  const { data } = await apiClient.get("/api/metrics/warehouse", { params: { warehouseId } });
+  const { data } = await apiClient.get("/api/metrics/warehouse", {
+    params: { warehouseId },
+  });
   return data as WarehouseMetrics;
 }
 
@@ -68,7 +76,9 @@ export async function getPickerMetrics() {
 
 // GET /api/reporting/financial
 export async function getFinancialMetrics(period = "month") {
-  const { data } = await apiClient.get("/api/reporting/financial", { params: { period } });
+  const { data } = await apiClient.get("/api/reporting/financial", {
+    params: { period },
+  });
   return data as FinancialMetrics;
 }
 
@@ -87,7 +97,10 @@ export async function getInventoryAnalytics() {
 }
 
 // GET /api/labor/performance — labor/workforce performance
-export async function getLaborPerformance(params?: { period?: string; warehouseId?: string }) {
+export async function getLaborPerformance(params?: {
+  period?: string;
+  warehouseId?: string;
+}) {
   const { data } = await apiClient.get("/api/labor/performance", { params });
   return data as {
     workers: Array<{

@@ -20,8 +20,15 @@ import { useAuthStore } from "@/lib/store/auth.store";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { signIn, signInWithBiometric, signInWithCode, biometricEnabled, isLoading, error, clearError } =
-    useAuthStore();
+  const {
+    signIn,
+    signInWithBiometric,
+    signInWithCode,
+    biometricEnabled,
+    isLoading,
+    error,
+    clearError,
+  } = useAuthStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,11 +40,11 @@ export default function LoginScreen() {
   const handleCodeAccess = async () => {
     if (!accessCode.trim()) return;
     try {
-        await signInWithCode(accessCode);
-        setShowCodeModal(false);
-        router.replace("/(tabs)");
+      await signInWithCode(accessCode);
+      setShowCodeModal(false);
+      router.replace("/(tabs)");
     } catch (e) {
-        // error handling by store
+      // error handling by store
     }
   };
 
@@ -79,7 +86,10 @@ export default function LoginScreen() {
     if (success) {
       router.replace("/(tabs)");
     } else {
-      Alert.alert("Biometric Failed", "Could not authenticate. Please use your password.");
+      Alert.alert(
+        "Biometric Failed",
+        "Could not authenticate. Please use your password.",
+      );
     }
   };
 
@@ -100,35 +110,76 @@ export default function LoginScreen() {
 
         {/* Form */}
         <View style={styles.form}>
-        <Modal visible={showCodeModal} animationType="slide" transparent>
-            <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{flex: 1, justifyContent: 'flex-end'}}>
-                <TouchableOpacity style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.5)'}} onPress={() => setShowCodeModal(false)} />
-                <View style={{backgroundColor: '#1e293b', padding: 24, borderTopLeftRadius: 16, borderTopRightRadius: 16}}>
-                    <Text style={{fontSize: 18, color: '#fff', fontWeight: 'bold', marginBottom: 12}}>Emergency Driver Access</Text>
-                    <Text style={{color: '#94a3b8', marginBottom: 16}}>Enter your one-time service code provided by dispatch.</Text>
-                    <TextInput 
-                        style={[styles.input, { marginBottom: 16, textAlign: 'center', fontSize: 24, letterSpacing: 4 }]} 
-                        placeholder="000"
-                        placeholderTextColor="#475569"
-                        keyboardType="number-pad"
-                        maxLength={3}
-                        value={accessCode}
-                        onChangeText={setAccessCode}
-                        autoFocus
-                    />
-                    <TouchableOpacity 
-                        style={[styles.loginButton, {backgroundColor: '#f97316'}]}
-                        onPress={handleCodeAccess}
-                        disabled={isLoading}
-                    >
-                         {isLoading ? <ActivityIndicator color="#fff" /> : <Text style={styles.loginButtonText}>Enter Service Mode</Text>}
-                    </TouchableOpacity>
-                     <TouchableOpacity style={{alignItems: 'center', padding: 16}} onPress={() => setShowCodeModal(false)}>
-                        <Text style={{color: '#94a3b8'}}>Cancel</Text>
-                    </TouchableOpacity>
-                </View>
+          <Modal visible={showCodeModal} animationType="slide" transparent>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
+              style={{ flex: 1, justifyContent: "flex-end" }}
+            >
+              <TouchableOpacity
+                style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)" }}
+                onPress={() => setShowCodeModal(false)}
+              />
+              <View
+                style={{
+                  backgroundColor: "#1e293b",
+                  padding: 24,
+                  borderTopLeftRadius: 16,
+                  borderTopRightRadius: 16,
+                }}
+              >
+                <Text
+                  style={{
+                    fontSize: 18,
+                    color: "#fff",
+                    fontWeight: "bold",
+                    marginBottom: 12,
+                  }}
+                >
+                  Emergency Driver Access
+                </Text>
+                <Text style={{ color: "#94a3b8", marginBottom: 16 }}>
+                  Enter your one-time service code provided by dispatch.
+                </Text>
+                <TextInput
+                  style={[
+                    styles.input,
+                    {
+                      marginBottom: 16,
+                      textAlign: "center",
+                      fontSize: 24,
+                      letterSpacing: 4,
+                    },
+                  ]}
+                  placeholder="000"
+                  placeholderTextColor="#475569"
+                  keyboardType="number-pad"
+                  maxLength={3}
+                  value={accessCode}
+                  onChangeText={setAccessCode}
+                  autoFocus
+                />
+                <TouchableOpacity
+                  style={[styles.loginButton, { backgroundColor: "#f97316" }]}
+                  onPress={handleCodeAccess}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <ActivityIndicator color="#fff" />
+                  ) : (
+                    <Text style={styles.loginButtonText}>
+                      Enter Service Mode
+                    </Text>
+                  )}
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ alignItems: "center", padding: 16 }}
+                  onPress={() => setShowCodeModal(false)}
+                >
+                  <Text style={{ color: "#94a3b8" }}>Cancel</Text>
+                </TouchableOpacity>
+              </View>
             </KeyboardAvoidingView>
-        </Modal>
+          </Modal>
 
           <Text style={styles.welcomeText}>Welcome back</Text>
           <Text style={styles.subText}>Sign in to your account</Text>
@@ -166,7 +217,9 @@ export default function LoginScreen() {
                 style={styles.eyeButton}
                 onPress={() => setShowPassword(!showPassword)}
               >
-                <Text style={styles.eyeText}>{showPassword ? "Hide" : "Show"}</Text>
+                <Text style={styles.eyeText}>
+                  {showPassword ? "Hide" : "Show"}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -198,9 +251,16 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity onPress={() => setShowCodeModal(true)}>
-            <Text style={{textAlign: 'center', color: '#6366f1', marginTop: 16, fontWeight: '600'}}>
-                Emergency Driver? Access Here
-            </Text>
+          <Text
+            style={{
+              textAlign: "center",
+              color: "#6366f1",
+              marginTop: 16,
+              fontWeight: "600",
+            }}
+          >
+            Emergency Driver? Access Here
+          </Text>
         </TouchableOpacity>
 
         <Text style={styles.footer}>

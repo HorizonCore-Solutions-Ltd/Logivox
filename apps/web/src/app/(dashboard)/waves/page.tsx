@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Package,
   Users,
@@ -15,6 +16,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Zap,
 } from "lucide-react";
 
 interface Wave {
@@ -167,13 +169,22 @@ export default function WavesPage() {
             Batch orders for efficient picking
           </p>
         </div>
-        <button
-          onClick={() => router.push("/waves/new")}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
-        >
-          <Plus className="w-5 h-5" />
-          Create Wave
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/waves/automation"
+            className="border border-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 flex items-center gap-2 text-sm"
+          >
+            <Zap className="w-4 h-4 text-yellow-500" />
+            Automation Rules
+          </Link>
+          <button
+            onClick={() => router.push("/waves/new")}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          >
+            <Plus className="w-5 h-5" />
+            Create Wave
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}

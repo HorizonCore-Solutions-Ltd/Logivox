@@ -46,7 +46,12 @@ export async function getInventoryItems(params: InventoryListParams = {}) {
   const { data } = await apiClient.get("/api/inventory", { params });
   return data as {
     items: InventoryItem[];
-    pagination: { page: number; limit: number; total: number; totalPages: number };
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
   };
 }
 
@@ -67,7 +72,10 @@ export async function scanBarcode(barcode: string) {
 
 // POST /api/inventory/adjustments
 export async function adjustStock(adjustment: StockAdjustment) {
-  const { data } = await apiClient.post("/api/inventory/adjustments", adjustment);
+  const { data } = await apiClient.post(
+    "/api/inventory/adjustments",
+    adjustment,
+  );
   return data;
 }
 

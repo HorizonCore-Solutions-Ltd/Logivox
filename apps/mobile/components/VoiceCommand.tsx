@@ -25,9 +25,20 @@ interface VoiceCommandButtonProps {
  * Press (start) → hold → release to transcribe + process a voice command.
  * Shows a transcript bubble and the AI response while processing.
  */
-export function VoiceCommandButton({ screen, warehouseId, onCommand }: VoiceCommandButtonProps) {
-  const { state, transcript, result, error, startRecording, stopRecording, reset } =
-    useVoiceCommand({ screen, warehouseId, onCommand });
+export function VoiceCommandButton({
+  screen,
+  warehouseId,
+  onCommand,
+}: VoiceCommandButtonProps) {
+  const {
+    state,
+    transcript,
+    result,
+    error,
+    startRecording,
+    stopRecording,
+    reset,
+  } = useVoiceCommand({ screen, warehouseId, onCommand });
 
   // Pulsing animation ring while recording
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -49,7 +60,7 @@ export function VoiceCommandButton({ screen, warehouseId, onCommand }: VoiceComm
             easing: Easing.in(Easing.ease),
             useNativeDriver: true,
           }),
-        ])
+        ]),
       );
       pulseLoop.current.start();
     } else {
@@ -98,7 +109,13 @@ export function VoiceCommandButton({ screen, warehouseId, onCommand }: VoiceComm
         <Animated.View
           style={[
             styles.pulseRing,
-            { transform: [{ scale: pulseAnim }], opacity: pulseAnim.interpolate({ inputRange: [1, 1.6], outputRange: [0.35, 0] }) },
+            {
+              transform: [{ scale: pulseAnim }],
+              opacity: pulseAnim.interpolate({
+                inputRange: [1, 1.6],
+                outputRange: [0.35, 0],
+              }),
+            },
           ]}
           pointerEvents="none"
         />
@@ -155,8 +172,18 @@ const styles = StyleSheet.create({
   processingRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   processingText: { fontSize: 14, color: "#2563EB", fontWeight: "600" },
   listeningText: { fontSize: 14, color: "#94A3B8", fontStyle: "italic" },
-  transcriptText: { fontSize: 14, color: "#475569", fontStyle: "italic", marginBottom: 4 },
-  resultText: { fontSize: 14, color: "#0F172A", fontWeight: "600", lineHeight: 20 },
+  transcriptText: {
+    fontSize: 14,
+    color: "#475569",
+    fontStyle: "italic",
+    marginBottom: 4,
+  },
+  resultText: {
+    fontSize: 14,
+    color: "#0F172A",
+    fontWeight: "600",
+    lineHeight: 20,
+  },
   errorText: { fontSize: 14, color: "#DC2626", fontWeight: "500" },
   dismissBtn: {
     position: "absolute",

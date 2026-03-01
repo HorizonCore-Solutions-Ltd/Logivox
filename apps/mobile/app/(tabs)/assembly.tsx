@@ -57,20 +57,25 @@ function BOMLineCard({
   orderId: string;
   onPick: (orderId: string, lineId: string, qty: number) => void;
 }) {
-  const canPick =
-    line.status === "ALLOCATED" && line.availableQuantity > 0;
+  const canPick = line.status === "ALLOCATED" && line.availableQuantity > 0;
   return (
     <View style={styles.bomLine}>
       <View style={styles.cardRow}>
         <Text style={styles.bomSku}>{line.componentSku}</Text>
-        <View style={[styles.badge, { backgroundColor: BOM_STATUS_COLORS[line.status] ?? "#6b7280" }]}>
+        <View
+          style={[
+            styles.badge,
+            { backgroundColor: BOM_STATUS_COLORS[line.status] ?? "#6b7280" },
+          ]}
+        >
           <Text style={styles.badgeText}>{line.status}</Text>
         </View>
       </View>
       <Text style={styles.bomName}>{line.componentName}</Text>
       {line.componentLocationCode ? (
         <Text style={styles.detail}>
-          <Ionicons name="location-outline" size={12} /> {line.componentLocationCode}
+          <Ionicons name="location-outline" size={12} />{" "}
+          {line.componentLocationCode}
         </Text>
       ) : null}
       <View style={styles.statsRow}>
@@ -78,7 +83,20 @@ function BOMLineCard({
           Required: <Text style={styles.statVal}>{line.requiredQuantity}</Text>
         </Text>
         <Text style={styles.stat}>
-          Available: <Text style={[styles.statVal, { color: line.availableQuantity < line.requiredQuantity ? "#ef4444" : "#10b981" }]}>{line.availableQuantity}</Text>
+          Available:{" "}
+          <Text
+            style={[
+              styles.statVal,
+              {
+                color:
+                  line.availableQuantity < line.requiredQuantity
+                    ? "#ef4444"
+                    : "#10b981",
+              },
+            ]}
+          >
+            {line.availableQuantity}
+          </Text>
         </Text>
         <Text style={styles.stat}>
           Picked: <Text style={styles.statVal}>{line.pickedQuantity}</Text>
@@ -86,11 +104,22 @@ function BOMLineCard({
       </View>
       {canPick ? (
         <TouchableOpacity
-          style={[styles.actionBtn, { backgroundColor: "#f59e0b", marginTop: 8 }]}
-          onPress={() => onPick(orderId, line.id, line.requiredQuantity - line.pickedQuantity)}
+          style={[
+            styles.actionBtn,
+            { backgroundColor: "#f59e0b", marginTop: 8 },
+          ]}
+          onPress={() =>
+            onPick(
+              orderId,
+              line.id,
+              line.requiredQuantity - line.pickedQuantity,
+            )
+          }
         >
           <Ionicons name="scan-outline" size={14} color="#fff" />
-          <Text style={styles.actionBtnText}>Pick {line.requiredQuantity - line.pickedQuantity}</Text>
+          <Text style={styles.actionBtnText}>
+            Pick {line.requiredQuantity - line.pickedQuantity}
+          </Text>
         </TouchableOpacity>
       ) : null}
     </View>
@@ -122,16 +151,33 @@ function OrderCard({
       <TouchableOpacity onPress={onToggle}>
         <View style={styles.cardRow}>
           <Text style={styles.ref}>{order.orderNumber}</Text>
-          <View style={[styles.badge, { backgroundColor: STATUS_COLORS[order.status] ?? "#6b7280" }]}>
-            <Text style={styles.badgeText}>{order.status.replace("_", " ")}</Text>
+          <View
+            style={[
+              styles.badge,
+              { backgroundColor: STATUS_COLORS[order.status] ?? "#6b7280" },
+            ]}
+          >
+            <Text style={styles.badgeText}>
+              {order.status.replace("_", " ")}
+            </Text>
           </View>
         </View>
         <View style={styles.cardRow}>
           <Text style={styles.productName} numberOfLines={1}>
             {order.assemblyItemName}
           </Text>
-          <View style={[styles.tag, { backgroundColor: PRIORITY_COLORS[order.priority] + "22" }]}>
-            <Text style={[styles.tagText, { color: PRIORITY_COLORS[order.priority] }]}>
+          <View
+            style={[
+              styles.tag,
+              { backgroundColor: PRIORITY_COLORS[order.priority] + "22" },
+            ]}
+          >
+            <Text
+              style={[
+                styles.tagText,
+                { color: PRIORITY_COLORS[order.priority] },
+              ]}
+            >
               {order.priority}
             </Text>
           </View>
@@ -141,14 +187,27 @@ function OrderCard({
             SKU: <Text style={styles.statVal}>{order.assemblyItemSku}</Text>
           </Text>
           <Text style={styles.stat}>
-            Qty: <Text style={styles.statVal}>{order.completedQuantity}/{order.quantity}</Text>
+            Qty:{" "}
+            <Text style={styles.statVal}>
+              {order.completedQuantity}/{order.quantity}
+            </Text>
           </Text>
         </View>
         {order.dueDate ? (
-          <Text style={styles.detail}>Due: {new Date(order.dueDate).toLocaleDateString()}</Text>
+          <Text style={styles.detail}>
+            Due: {new Date(order.dueDate).toLocaleDateString()}
+          </Text>
         ) : null}
         <View style={styles.trackBg}>
-          <View style={[styles.trackFill, { width: `${progress}%` as any, backgroundColor: progress === 100 ? "#10b981" : "#3b82f6" }]} />
+          <View
+            style={[
+              styles.trackFill,
+              {
+                width: `${progress}%` as any,
+                backgroundColor: progress === 100 ? "#10b981" : "#3b82f6",
+              },
+            ]}
+          />
         </View>
       </TouchableOpacity>
 
@@ -162,14 +221,18 @@ function OrderCard({
             <Text style={styles.actionBtnText}>Start</Text>
           </TouchableOpacity>
         ) : null}
-        {(order.status === "PICKING" || order.status === "ASSEMBLING") ? (
+        {order.status === "PICKING" || order.status === "ASSEMBLING" ? (
           <TouchableOpacity
             style={[styles.actionBtn, { backgroundColor: "#10b981" }]}
             onPress={() =>
-              Alert.alert("Complete Order", `Complete assembly of ${order.assemblyItemSku}?`, [
-                { text: "Cancel" },
-                { text: "Complete", onPress: () => onComplete(order.id) },
-              ])
+              Alert.alert(
+                "Complete Order",
+                `Complete assembly of ${order.assemblyItemSku}?`,
+                [
+                  { text: "Cancel" },
+                  { text: "Complete", onPress: () => onComplete(order.id) },
+                ],
+              )
             }
           >
             <Ionicons name="checkmark-done-outline" size={14} color="#fff" />
@@ -210,12 +273,16 @@ export default function AssemblyScreen() {
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("ALL");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [expandedOrderData, setExpandedOrderData] = useState<Record<string, AssemblyOrder & { bomLines?: BOMLine[] }>>({});
+  const [expandedOrderData, setExpandedOrderData] = useState<
+    Record<string, AssemblyOrder & { bomLines?: BOMLine[] }>
+  >({});
 
   const { data, isLoading } = useQuery({
     queryKey: ["assemblyOrders", statusFilter],
     queryFn: () =>
-      getAssemblyOrders({ status: statusFilter === "ALL" ? undefined : statusFilter }),
+      getAssemblyOrders({
+        status: statusFilter === "ALL" ? undefined : statusFilter,
+      }),
   });
 
   const expandQuery = useQuery({
@@ -226,21 +293,33 @@ export default function AssemblyScreen() {
 
   const startMutation = useMutation({
     mutationFn: (id: string) => startAssemblyOrder(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["assemblyOrders"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["assemblyOrders"] }),
     onError: () => Alert.alert("Error", "Failed to start order."),
   });
 
   const completeMutation = useMutation({
     mutationFn: (id: string) => completeAssemblyOrder(id, 1),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["assemblyOrders"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["assemblyOrders"] }),
     onError: () => Alert.alert("Error", "Failed to complete order."),
   });
 
   const pickMutation = useMutation({
-    mutationFn: ({ orderId, lineId, qty }: { orderId: string; lineId: string; qty: number }) =>
-      pickBOMComponent(orderId, lineId, qty),
+    mutationFn: ({
+      orderId,
+      lineId,
+      qty,
+    }: {
+      orderId: string;
+      lineId: string;
+      qty: number;
+    }) => pickBOMComponent(orderId, lineId, qty),
     onSuccess: () => {
-      if (expandedId) queryClient.invalidateQueries({ queryKey: ["assemblyOrder", expandedId] });
+      if (expandedId)
+        queryClient.invalidateQueries({
+          queryKey: ["assemblyOrder", expandedId],
+        });
     },
     onError: () => Alert.alert("Error", "Failed to record pick."),
   });
@@ -249,7 +328,9 @@ export default function AssemblyScreen() {
 
   const enrichedOrders = orders.map((o) => {
     if (expandedId === o.id && expandQuery.data) {
-      return expandQuery.data as unknown as AssemblyOrder & { bomLines?: BOMLine[] };
+      return expandQuery.data as unknown as AssemblyOrder & {
+        bomLines?: BOMLine[];
+      };
     }
     return o;
   });
@@ -257,17 +338,24 @@ export default function AssemblyScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.filterRow}>
-        {(["ALL", "PLANNED", "PICKING", "ASSEMBLING"] as StatusFilter[]).map((f) => (
-          <TouchableOpacity
-            key={f}
-            style={[styles.chip, statusFilter === f && styles.chipActive]}
-            onPress={() => setStatusFilter(f)}
-          >
-            <Text style={[styles.chipText, statusFilter === f && styles.chipTextActive]}>
-              {f.replace("_", " ")}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        {(["ALL", "PLANNED", "PICKING", "ASSEMBLING"] as StatusFilter[]).map(
+          (f) => (
+            <TouchableOpacity
+              key={f}
+              style={[styles.chip, statusFilter === f && styles.chipActive]}
+              onPress={() => setStatusFilter(f)}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  statusFilter === f && styles.chipTextActive,
+                ]}
+              >
+                {f.replace("_", " ")}
+              </Text>
+            </TouchableOpacity>
+          ),
+        )}
       </View>
       {isLoading ? (
         <ActivityIndicator style={{ marginTop: 40 }} color="#3b82f6" />
@@ -305,12 +393,31 @@ export default function AssemblyScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
   filterRow: { flexDirection: "row", flexWrap: "wrap", padding: 8, gap: 6 },
-  chip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 14, backgroundColor: "#e2e8f0" },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
+    backgroundColor: "#e2e8f0",
+  },
   chipActive: { backgroundColor: "#2563eb" },
   chipText: { fontSize: 11, color: "#374151", fontWeight: "600" },
   chipTextActive: { color: "#fff" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
   ref: { fontSize: 15, fontWeight: "700", color: "#1e293b" },
   productName: { fontSize: 13, color: "#475569", flex: 1 },
   detail: { fontSize: 13, color: "#6b7280", marginTop: 2 },
@@ -321,14 +428,46 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: "row", gap: 14, marginVertical: 4 },
   stat: { fontSize: 12, color: "#6b7280" },
   statVal: { fontWeight: "700", color: "#1e293b" },
-  trackBg: { height: 5, backgroundColor: "#e2e8f0", borderRadius: 3, marginTop: 8 },
+  trackBg: {
+    height: 5,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 3,
+    marginTop: 8,
+  },
   trackFill: { height: 5, borderRadius: 3 },
-  cardActions: { flexDirection: "row", gap: 8, marginTop: 10, flexWrap: "wrap" },
-  actionBtn: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 7 },
+  cardActions: {
+    flexDirection: "row",
+    gap: 8,
+    marginTop: 10,
+    flexWrap: "wrap",
+  },
+  actionBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 7,
+  },
   actionBtnText: { color: "#fff", fontSize: 13, fontWeight: "600" },
-  bomSection: { marginTop: 12, borderTopWidth: 1, borderTopColor: "#e2e8f0", paddingTop: 10 },
-  bomSectionTitle: { fontSize: 13, fontWeight: "700", color: "#374151", marginBottom: 8 },
-  bomLine: { backgroundColor: "#f8fafc", borderRadius: 8, padding: 10, marginBottom: 8 },
+  bomSection: {
+    marginTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+    paddingTop: 10,
+  },
+  bomSectionTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#374151",
+    marginBottom: 8,
+  },
+  bomLine: {
+    backgroundColor: "#f8fafc",
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 8,
+  },
   bomSku: { fontSize: 13, fontWeight: "700", color: "#1e293b" },
   bomName: { fontSize: 12, color: "#6b7280", marginBottom: 4 },
   empty: { alignItems: "center", paddingTop: 60, gap: 10 },

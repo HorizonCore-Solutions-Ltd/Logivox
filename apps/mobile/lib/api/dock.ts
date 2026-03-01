@@ -5,7 +5,12 @@ import { apiClient } from "./client";
 export interface DockAppointment {
   id: string;
   appointmentNumber: string;
-  appointmentType: "INBOUND" | "OUTBOUND" | "CROSS_DOCK" | "MAINTENANCE" | "OTHER";
+  appointmentType:
+    | "INBOUND"
+    | "OUTBOUND"
+    | "CROSS_DOCK"
+    | "MAINTENANCE"
+    | "OTHER";
   status:
     | "SCHEDULED"
     | "CONFIRMED"
@@ -65,7 +70,7 @@ export function getDockAppointments(params?: {
 }) {
   const qs = new URLSearchParams(params as Record<string, string>).toString();
   return apiClient<{ appointments: DockAppointment[]; total: number }>(
-    `/api/dock/appointments${qs ? `?${qs}` : ""}`
+    `/api/dock/appointments${qs ? `?${qs}` : ""}`,
   );
 }
 
@@ -80,7 +85,7 @@ export function createDockAppointment(
     scheduledStart: string;
     scheduledEnd: string;
     duration: number;
-  }
+  },
 ) {
   return apiClient<DockAppointment>("/api/dock/appointments", {
     method: "POST",
@@ -95,7 +100,7 @@ export function checkInAppointment(
     vehicleNumber?: string;
     trailerNumber?: string;
     sealNumber?: string;
-  }
+  },
 ) {
   return apiClient<DockAppointment>(`/api/dock/appointments/${id}/check-in`, {
     method: "POST",
@@ -132,6 +137,6 @@ export function markLoadReady(shipmentId: string, verifiedBy: string) {
 
 export function getBOL(appointmentId: string) {
   return apiClient<{ url: string; bolNumber: string }>(
-    `/api/dock/bol?appointmentId=${appointmentId}`
+    `/api/dock/bol?appointmentId=${appointmentId}`,
   );
 }

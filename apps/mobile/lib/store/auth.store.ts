@@ -84,9 +84,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return response;
     } catch (err: unknown) {
       const message =
-        err instanceof Error
-          ? err.message
-          : "Invalid email or password";
+        err instanceof Error ? err.message : "Invalid email or password";
       set({ error: message });
       throw err;
     } finally {
@@ -97,7 +95,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   signInWithCode: async (code: string) => {
     try {
       set({ isLoading: true, error: null });
-      
+
       const { data } = await requestEmergencyAccess(code);
       const { user, token, runId } = data as any; // Assuming API returns user, token, runId
 
@@ -106,7 +104,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await tokenStorage.setAccessToken(token);
       // Emergency logins might not have refresh tokens or use samesite cookies
       // We'll set a dummy refresh token if needed or handle expiration gracefully
-      
+
       set({ user, isAuthenticated: true, error: null, isLoading: false });
     } catch (err: any) {
       set({ error: err.message || "Code access failed" });

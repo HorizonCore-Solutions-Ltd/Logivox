@@ -33,7 +33,7 @@ export type AppRole =
   | "DRIVER";
 
 export type TabName =
-  | "index"         // Dashboard — always included
+  | "index" // Dashboard — always included
   | "picking"
   | "inventory"
   | "orders"
@@ -47,8 +47,8 @@ export type TabName =
   | "analytics"
   | "cyclecount"
   | "invoices"
-  | "more"          // Admin overflow grid
-  | "profile"       // Always included
+  | "more" // Admin overflow grid
+  | "profile" // Always included
   // ── New operational tabs ─────────────────────────────────────────────────────
   | "yard"
   | "dock"
@@ -60,8 +60,8 @@ export type TabName =
   | "assembly";
 
 export interface RoleConfig {
-  label: string;          // Human-readable role name
-  tabs: TabName[];        // Ordered list; "index" first, "profile" last
+  label: string; // Human-readable role name
+  tabs: TabName[]; // Ordered list; "index" first, "profile" last
   homeKPIs: string[];
   quickActions: string[];
   features: string[];
@@ -79,7 +79,12 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
   RECEIVER: {
     label: "Receiver",
     tabs: ["index", "receiving", "inventory", "profile"],
-    homeKPIs: ["asnsDue", "itemsReceivedToday", "pendingPutaway", "discrepancies"],
+    homeKPIs: [
+      "asnsDue",
+      "itemsReceivedToday",
+      "pendingPutaway",
+      "discrepancies",
+    ],
     quickActions: ["scanASN", "receiveASN", "reportDiscrepancy", "viewASNs"],
     features: ["receiving", "inventory.view", "scanning", "voiceCommand"],
   },
@@ -87,8 +92,18 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
   STOCK_CONTROLLER: {
     label: "Stock Controller",
     tabs: ["index", "inventory", "cyclecount", "profile"],
-    homeKPIs: ["totalSKUs", "lowStockAlerts", "cycleCountsDue", "inventoryValue"],
-    quickActions: ["startCycleCount", "adjustStock", "viewLowStock", "scanItem"],
+    homeKPIs: [
+      "totalSKUs",
+      "lowStockAlerts",
+      "cycleCountsDue",
+      "inventoryValue",
+    ],
+    quickActions: [
+      "startCycleCount",
+      "adjustStock",
+      "viewLowStock",
+      "scanItem",
+    ],
     features: [
       "inventory.view",
       "inventory.adjust",
@@ -101,8 +116,18 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
   RETURNS_AGENT: {
     label: "Returns Agent",
     tabs: ["index", "returns", "inventory", "profile"],
-    homeKPIs: ["returnsOpen", "returnsPendingApproval", "returnsReceivedToday", "returnValuePending"],
-    quickActions: ["createReturn", "approveReturn", "receiveReturn", "viewReturns"],
+    homeKPIs: [
+      "returnsOpen",
+      "returnsPendingApproval",
+      "returnsReceivedToday",
+      "returnValuePending",
+    ],
+    quickActions: [
+      "createReturn",
+      "approveReturn",
+      "receiveReturn",
+      "viewReturns",
+    ],
     features: ["returns", "inventory.view", "scanning"],
   },
 
@@ -110,15 +135,30 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
     label: "QC Inspector",
     tabs: ["index", "quality", "returns", "profile"],
     homeKPIs: ["inspectionsDue", "passRate", "failedToday", "onHold"],
-    quickActions: ["startInspection", "viewInspections", "viewReturns", "raiseCAPA"],
+    quickActions: [
+      "startInspection",
+      "viewInspections",
+      "viewReturns",
+      "raiseCAPA",
+    ],
     features: ["quality", "returns.view", "capa.create"],
   },
 
   CAPA_OFFICER: {
     label: "CAPA Officer",
     tabs: ["index", "capa", "compliance", "profile"],
-    homeKPIs: ["capaOpen", "capaOverdue", "capaClosedThisMonth", "complianceScore"],
-    quickActions: ["createCAPA", "reviewCAPA", "viewCompliance", "viewAuditLog"],
+    homeKPIs: [
+      "capaOpen",
+      "capaOverdue",
+      "capaClosedThisMonth",
+      "complianceScore",
+    ],
+    quickActions: [
+      "createCAPA",
+      "reviewCAPA",
+      "viewCompliance",
+      "viewAuditLog",
+    ],
     features: ["capa", "compliance.view"],
   },
 
@@ -126,23 +166,48 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
     label: "Compliance Officer",
     tabs: ["index", "compliance", "capa", "profile"],
     homeKPIs: ["complianceScore", "tasksDue", "auditsDue", "capaOverdue"],
-    quickActions: ["viewCompliance", "completeTask", "viewAuditLog", "reviewCAPA"],
+    quickActions: [
+      "viewCompliance",
+      "completeTask",
+      "viewAuditLog",
+      "reviewCAPA",
+    ],
     features: ["compliance", "capa.view", "auditLog"],
   },
 
   FINANCE: {
     label: "Finance",
     tabs: ["index", "invoices", "profile"],
-    homeKPIs: ["outstandingInvoices", "overdueAmount", "revenueThisMonth", "cashCollected"],
-    quickActions: ["viewInvoices", "approveInvoice", "viewOverdue", "exportReport"],
+    homeKPIs: [
+      "outstandingInvoices",
+      "overdueAmount",
+      "revenueThisMonth",
+      "cashCollected",
+    ],
+    quickActions: [
+      "viewInvoices",
+      "approveInvoice",
+      "viewOverdue",
+      "exportReport",
+    ],
     features: ["invoices", "reporting.financial"],
   },
 
   SHIPPING_CLERK: {
     label: "Shipping Clerk",
     tabs: ["index", "shipping", "orders", "profile"],
-    homeKPIs: ["packingTasksDue", "shipmentsToday", "pendingDispatch", "lateShipments"],
-    quickActions: ["viewPackingTasks", "generateLabel", "dispatchShipment", "viewOrders"],
+    homeKPIs: [
+      "packingTasksDue",
+      "shipmentsToday",
+      "pendingDispatch",
+      "lateShipments",
+    ],
+    quickActions: [
+      "viewPackingTasks",
+      "generateLabel",
+      "dispatchShipment",
+      "viewOrders",
+    ],
     features: ["shipping", "orders.view", "scanning"],
   },
 
@@ -157,8 +222,18 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
   SALES: {
     label: "Sales",
     tabs: ["index", "orders", "invoices", "profile"],
-    homeKPIs: ["ordersToday", "ordersPending", "revenueThisMonth", "outstandingInvoices"],
-    quickActions: ["createOrder", "viewOrders", "viewInvoices", "viewCustomers"],
+    homeKPIs: [
+      "ordersToday",
+      "ordersPending",
+      "revenueThisMonth",
+      "outstandingInvoices",
+    ],
+    quickActions: [
+      "createOrder",
+      "viewOrders",
+      "viewInvoices",
+      "viewCustomers",
+    ],
     features: ["orders", "invoices.view", "customers"],
   },
 
@@ -246,7 +321,12 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
   YARD_OPERATIVE: {
     label: "Yard Operative",
     tabs: ["index", "yard", "profile"],
-    homeKPIs: ["vehiclesOnSite", "inboundToday", "outboundToday", "pendingCheckIn"],
+    homeKPIs: [
+      "vehiclesOnSite",
+      "inboundToday",
+      "outboundToday",
+      "pendingCheckIn",
+    ],
     quickActions: ["gateCheckIn", "gateCheckOut", "viewYard", "shunterTasks"],
     features: ["yard"],
   },
@@ -254,16 +334,43 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
   MARSHALLER: {
     label: "Marshaller",
     tabs: ["index", "marshalling", "yard", "profile"],
-    homeKPIs: ["loadSheetsActive", "boxesLoadedToday", "pendingPickTasks", "baysLoading"],
-    quickActions: ["viewBayBoard", "viewLoadSheets", "assignPicks", "runTrailerPlan"],
-    features: ["marshalling", "marshalling.bayBoard", "marshalling.loadSheets", "marshalling.picks", "marshalling.trailerPlan", "yard"],
+    homeKPIs: [
+      "loadSheetsActive",
+      "boxesLoadedToday",
+      "pendingPickTasks",
+      "baysLoading",
+    ],
+    quickActions: [
+      "viewBayBoard",
+      "viewLoadSheets",
+      "assignPicks",
+      "runTrailerPlan",
+    ],
+    features: [
+      "marshalling",
+      "marshalling.bayBoard",
+      "marshalling.loadSheets",
+      "marshalling.picks",
+      "marshalling.trailerPlan",
+      "yard",
+    ],
   },
 
   LOAD_PLANNER: {
     label: "Load Planner",
     tabs: ["index", "dock", "analytics", "profile"],
-    homeKPIs: ["trailersToLoad", "appointmentsToday", "loadEfficiency", "pendingDispatch"],
-    quickActions: ["viewDockAppointments", "viewLoadPlanning", "dispatchShipment", "viewAnalytics"],
+    homeKPIs: [
+      "trailersToLoad",
+      "appointmentsToday",
+      "loadEfficiency",
+      "pendingDispatch",
+    ],
+    quickActions: [
+      "viewDockAppointments",
+      "viewLoadPlanning",
+      "dispatchShipment",
+      "viewAnalytics",
+    ],
     features: ["dock", "dock.loadPlanning", "shipping.view", "analytics"],
   },
 
@@ -271,15 +378,30 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
     label: "Wave Planner",
     tabs: ["index", "waves", "picking", "analytics", "profile"],
     homeKPIs: ["wavesActive", "wavesCompleted", "picksToday", "pickAccuracy"],
-    quickActions: ["createWave", "releaseWave", "viewWaves", "viewPickerMetrics"],
+    quickActions: [
+      "createWave",
+      "releaseWave",
+      "viewWaves",
+      "viewPickerMetrics",
+    ],
     features: ["waves", "picking.view", "analytics"],
   },
 
   ASSEMBLY_OPERATIVE: {
     label: "Assembly Operative",
     tabs: ["index", "assembly", "inventory", "profile"],
-    homeKPIs: ["ordersAssigned", "ordersInProgress", "componentsPicked", "completedToday"],
-    quickActions: ["viewAssemblyOrders", "startAssembly", "pickComponent", "completeAssembly"],
+    homeKPIs: [
+      "ordersAssigned",
+      "ordersInProgress",
+      "componentsPicked",
+      "completedToday",
+    ],
+    quickActions: [
+      "viewAssemblyOrders",
+      "startAssembly",
+      "pickComponent",
+      "completeAssembly",
+    ],
     features: ["assembly", "inventory.view", "scanning"],
   },
 
@@ -294,7 +416,12 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
       "pickAccuracy",
       "utilizationRate",
     ],
-    quickActions: ["viewLaborDashboard", "runSlotting", "viewWaves", "viewAnalytics"],
+    quickActions: [
+      "viewLaborDashboard",
+      "runSlotting",
+      "viewWaves",
+      "viewAnalytics",
+    ],
     features: [
       "labor",
       "slotting",
@@ -320,8 +447,6 @@ const ROLE_CONFIG: Record<AppRole, RoleConfig> = {
   },
 };
 
-
-
 // ── Add-on gate map ────────────────────────────────────────────────────────
 // Maps each optional tab to the add-on key that must be enabled for it to appear.
 // Exported so _layout.tsx can gate tabs against the runtime add-ons store.
@@ -346,10 +471,13 @@ export function getTabsForRole(role?: string | null): TabName[] {
 }
 
 /** Returns true if a role has access to a given feature key. */
-export function canAccess(role: string | null | undefined, feature: string): boolean {
+export function canAccess(
+  role: string | null | undefined,
+  feature: string,
+): boolean {
   const config = getRoleConfig(role);
   return config.features.some(
-    (f) => f === feature || f === feature.split(".")[0]
+    (f) => f === feature || f === feature.split(".")[0],
   );
 }
 
@@ -357,7 +485,10 @@ export function canAccess(role: string | null | undefined, feature: string): boo
  * True if the given tab should be visible for this role.
  * Add-on gating is handled separately in _layout.tsx via the runtime addons store.
  */
-export function isTabVisible(role: string | null | undefined, tab: TabName): boolean {
+export function isTabVisible(
+  role: string | null | undefined,
+  tab: TabName,
+): boolean {
   return getTabsForRole(role).includes(tab);
 }
 

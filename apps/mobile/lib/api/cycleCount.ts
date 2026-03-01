@@ -19,7 +19,12 @@ export interface CycleCount {
   warehouseId: string;
   warehouseName?: string;
   type: "FULL" | "PARTIAL" | "LOCATION" | "ABC";
-  status: "SCHEDULED" | "IN_PROGRESS" | "PENDING_REVIEW" | "COMPLETED" | "CANCELLED";
+  status:
+    | "SCHEDULED"
+    | "IN_PROGRESS"
+    | "PENDING_REVIEW"
+    | "COMPLETED"
+    | "CANCELLED";
   assignedTo?: string;
   assignedToName?: string;
   scheduledDate?: string;
@@ -41,7 +46,12 @@ export async function getCycleCounts(params?: {
   pageSize?: number;
 }) {
   const { data } = await apiClient.get("/api/cycle-counts", { params });
-  return data as { items: CycleCount[]; total: number; page: number; pageSize: number };
+  return data as {
+    items: CycleCount[];
+    total: number;
+    page: number;
+    pageSize: number;
+  };
 }
 
 // GET /api/cycle-counts/:id
@@ -71,18 +81,20 @@ export async function startCycleCount(id: string) {
 export async function recordCount(
   cycleCountId: string,
   lineId: string,
-  payload: { countedQty: number; notes?: string }
+  payload: { countedQty: number; notes?: string },
 ) {
   const { data } = await apiClient.put(
     `/api/cycle-counts/${cycleCountId}/lines/${lineId}`,
-    payload
+    payload,
   );
   return data as CycleCountLine;
 }
 
 // POST /api/cycle-counts/:id/submit — submit for review
 export async function submitCycleCount(id: string, notes?: string) {
-  const { data } = await apiClient.post(`/api/cycle-counts/${id}/submit`, { notes });
+  const { data } = await apiClient.post(`/api/cycle-counts/${id}/submit`, {
+    notes,
+  });
   return data as CycleCount;
 }
 
@@ -93,10 +105,14 @@ export async function completeCycleCount(id: string) {
 }
 
 // POST /api/cycle-counts/:id/lines/:lineId/recount — flag for recount
-export async function requestRecount(cycleCountId: string, lineId: string, reason: string) {
+export async function requestRecount(
+  cycleCountId: string,
+  lineId: string,
+  reason: string,
+) {
   const { data } = await apiClient.post(
     `/api/cycle-counts/${cycleCountId}/lines/${lineId}/recount`,
-    { reason }
+    { reason },
   );
   return data as CycleCountLine;
 }

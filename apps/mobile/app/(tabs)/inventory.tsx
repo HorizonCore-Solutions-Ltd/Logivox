@@ -90,7 +90,7 @@ export default function InventoryScreen() {
   const items: InventoryItem[] = data?.items ?? [];
   const total = data?.pagination?.total ?? 0;
 
-const renderItem = ({ item }: { item: InventoryItem }) => (
+  const renderItem = ({ item }: { item: InventoryItem }) => (
     <TouchableOpacity
       style={styles.itemCard}
       onPress={() => setSelectedItem(item)}
@@ -125,23 +125,37 @@ const renderItem = ({ item }: { item: InventoryItem }) => (
               {stockStatusLabel(item)}
             </Text>
             {item.location && (
-              <Text style={styles.locationText}>· {item.location.code ?? item.location.zone}</Text>
+              <Text style={styles.locationText}>
+                · {item.location.code ?? item.location.zone}
+              </Text>
             )}
           </View>
         </View>
       </View>
-      
+
       {/* Quick Actions */}
-      <View style={{flexDirection: 'row', alignItems: 'center', gap: 12}}>
-        <TouchableOpacity 
-           onPress={(e) => { e.stopPropagation(); /* TODO: Open Label Modal */ Alert.alert("Print Label", `Printing label for ${item.sku}`); }}
-           style={{padding: 8, backgroundColor: '#f1f5f9', borderRadius: 8}}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation();
+            /* TODO: Open Label Modal */ Alert.alert(
+              "Print Label",
+              `Printing label for ${item.sku}`,
+            );
+          }}
+          style={{ padding: 8, backgroundColor: "#f1f5f9", borderRadius: 8 }}
         >
           <Package color="#475569" size={18} />
         </TouchableOpacity>
-        <TouchableOpacity 
-           onPress={(e) => { e.stopPropagation(); /* TODO: Open Adjust Modal */ Alert.alert("Adjust Stock", `Adjusting ${item.sku}`); }}
-           style={{padding: 8, backgroundColor: '#eff6ff', borderRadius: 8}}
+        <TouchableOpacity
+          onPress={(e) => {
+            e.stopPropagation();
+            /* TODO: Open Adjust Modal */ Alert.alert(
+              "Adjust Stock",
+              `Adjusting ${item.sku}`,
+            );
+          }}
+          style={{ padding: 8, backgroundColor: "#eff6ff", borderRadius: 8 }}
         >
           <TrendingDown color="#2563EB" size={18} />
         </TouchableOpacity>
@@ -190,7 +204,11 @@ const renderItem = ({ item }: { item: InventoryItem }) => (
 
       {/* List */}
       {isLoading ? (
-        <ActivityIndicator style={{ marginTop: 40 }} color="#2563EB" size="large" />
+        <ActivityIndicator
+          style={{ marginTop: 40 }}
+          color="#2563EB"
+          size="large"
+        />
       ) : (
         <FlatList
           data={items}
@@ -226,8 +244,15 @@ const renderItem = ({ item }: { item: InventoryItem }) => (
             onBarcodeScanned={handleBarcodeScanned}
             barcodeScannerSettings={{
               barcodeTypes: [
-                "qr", "pdf417", "ean13", "ean8", "code128",
-                "code39", "itf14", "upc_a", "upc_e",
+                "qr",
+                "pdf417",
+                "ean13",
+                "ean8",
+                "code128",
+                "code39",
+                "itf14",
+                "upc_a",
+                "upc_e",
               ],
             }}
           />
@@ -268,11 +293,23 @@ const renderItem = ({ item }: { item: InventoryItem }) => (
                 <Text style={styles.detailSku}>SKU: {selectedItem.sku}</Text>
 
                 <View style={styles.detailGrid}>
-                  <DetailRow label="Quantity" value={String(selectedItem.quantity)} />
-                  <DetailRow label="Location" value={selectedItem.location ? selectedItem.location.code : "—"} />
+                  <DetailRow
+                    label="Quantity"
+                    value={String(selectedItem.quantity)}
+                  />
+                  <DetailRow
+                    label="Location"
+                    value={
+                      selectedItem.location ? selectedItem.location.code : "—"
+                    }
+                  />
                   <DetailRow
                     label="Reorder Point"
-                    value={selectedItem.reorderPoint != null ? String(selectedItem.reorderPoint) : "—"}
+                    value={
+                      selectedItem.reorderPoint != null
+                        ? String(selectedItem.reorderPoint)
+                        : "—"
+                    }
                   />
                   <DetailRow
                     label="Unit Cost"
@@ -293,9 +330,15 @@ const renderItem = ({ item }: { item: InventoryItem }) => (
                   ]}
                 >
                   {selectedItem.quantity <= (selectedItem.reorderPoint ?? 0) ? (
-                    <TrendingDown color={stockStatusColor(selectedItem)} size={16} />
+                    <TrendingDown
+                      color={stockStatusColor(selectedItem)}
+                      size={16}
+                    />
                   ) : (
-                    <CheckCircle2 color={stockStatusColor(selectedItem)} size={16} />
+                    <CheckCircle2
+                      color={stockStatusColor(selectedItem)}
+                      size={16}
+                    />
                   )}
                   <Text
                     style={[
@@ -349,8 +392,19 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   input: { flex: 1, fontSize: 15, color: "#0F172A" },
-  scanBtn: { backgroundColor: "#2563EB", borderRadius: 12, padding: 12, justifyContent: "center", alignItems: "center" },
-  countText: { fontSize: 12, color: "#94A3B8", paddingHorizontal: 16, paddingBottom: 4 },
+  scanBtn: {
+    backgroundColor: "#2563EB",
+    borderRadius: 12,
+    padding: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  countText: {
+    fontSize: 12,
+    color: "#94A3B8",
+    paddingHorizontal: 16,
+    paddingBottom: 4,
+  },
   list: { padding: 16, paddingTop: 8, paddingBottom: 32 },
   itemCard: {
     flexDirection: "row",
@@ -365,43 +419,117 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   itemLeft: { flexDirection: "row", alignItems: "center", flex: 1, gap: 12 },
-  qtyBadge: { width: 52, height: 52, borderRadius: 12, justifyContent: "center", alignItems: "center" },
+  qtyBadge: {
+    width: 52,
+    height: 52,
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   qtyText: { fontSize: 18, fontWeight: "800" },
   itemInfo: { flex: 1 },
   itemName: { fontSize: 15, fontWeight: "700", color: "#0F172A" },
   itemSku: { fontSize: 12, color: "#94A3B8", marginTop: 2 },
-  statusRow: { flexDirection: "row", alignItems: "center", gap: 4, marginTop: 4 },
+  statusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 4,
+  },
   statusDot: { width: 6, height: 6, borderRadius: 3 },
   statusLabel: { fontSize: 11, fontWeight: "600" },
   locationText: { fontSize: 11, color: "#94A3B8" },
   separator: { height: 8 },
   empty: { alignItems: "center", paddingTop: 80, gap: 12 },
   emptyTitle: { fontSize: 18, fontWeight: "700", color: "#64748B" },
-  emptySubtitle: { fontSize: 14, color: "#94A3B8", textAlign: "center", paddingHorizontal: 32 },
+  emptySubtitle: {
+    fontSize: 14,
+    color: "#94A3B8",
+    textAlign: "center",
+    paddingHorizontal: 32,
+  },
   // Scanner
   scannerContainer: { flex: 1, backgroundColor: "#000" },
-  scanOverlay: { ...StyleSheet.absoluteFillObject, justifyContent: "center", alignItems: "center" },
+  scanOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   scanFrame: { width: 260, height: 260, position: "relative" },
-  corner: { position: "absolute", width: 32, height: 32, borderColor: "#fff", borderWidth: 3 },
+  corner: {
+    position: "absolute",
+    width: 32,
+    height: 32,
+    borderColor: "#fff",
+    borderWidth: 3,
+  },
   cornerTL: { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0 },
   cornerTR: { top: 0, right: 0, borderLeftWidth: 0, borderBottomWidth: 0 },
   cornerBL: { bottom: 0, left: 0, borderRightWidth: 0, borderTopWidth: 0 },
   cornerBR: { bottom: 0, right: 0, borderLeftWidth: 0, borderTopWidth: 0 },
-  scanHint: { color: "#fff", fontSize: 14, marginTop: 24, textAlign: "center", backgroundColor: "rgba(0,0,0,0.5)", paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20 },
-  scanClose: { position: "absolute", top: 56, right: 20, width: 44, height: 44, borderRadius: 22, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" },
+  scanHint: {
+    color: "#fff",
+    fontSize: 14,
+    marginTop: 24,
+    textAlign: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  scanClose: {
+    position: "absolute",
+    top: 56,
+    right: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   // Detail modal
-  modalBackdrop: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },
-  detailSheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, paddingBottom: 40 },
-  detailHandle: { width: 40, height: 4, backgroundColor: "#E2E8F0", borderRadius: 2, alignSelf: "center", marginBottom: 20 },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
+  detailSheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 24,
+    paddingBottom: 40,
+  },
+  detailHandle: {
+    width: 40,
+    height: 4,
+    backgroundColor: "#E2E8F0",
+    borderRadius: 2,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
   detailName: { fontSize: 20, fontWeight: "800", color: "#0F172A" },
   detailSku: { fontSize: 13, color: "#94A3B8", marginTop: 4, marginBottom: 20 },
   detailGrid: { gap: 12, marginBottom: 20 },
   detailRow: { flexDirection: "row", justifyContent: "space-between" },
   detailLabel: { fontSize: 14, color: "#64748B" },
   detailValue: { fontSize: 14, fontWeight: "700", color: "#0F172A" },
-  statusPill: { flexDirection: "row", alignItems: "center", gap: 8, borderRadius: 10, padding: 10, marginBottom: 20 },
+  statusPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 20,
+  },
   statusPillText: { fontSize: 14, fontWeight: "700" },
-  closeDetailBtn: { backgroundColor: "#F1F5F9", borderRadius: 14, padding: 14, alignItems: "center" },
+  closeDetailBtn: {
+    backgroundColor: "#F1F5F9",
+    borderRadius: 14,
+    padding: 14,
+    alignItems: "center",
+  },
   closeDetailText: { fontSize: 16, fontWeight: "700", color: "#334155" },
   // Detail row for item alert
   alertDot: { width: 8, height: 8, borderRadius: 4 },

@@ -59,7 +59,14 @@ import { createShunterTask } from "../../lib/api/yard";
 const UNIT_LABEL = (sheet?: LoadSheet | null) => sheet?.unitLabel ?? "Box";
 
 // Trailer types for shunter request dropdown/selection
-const TRAILER_TYPES = ["40ft Standard", "40ft High Cube", "20ft", "Curtainsider", "Reefer", "Double Decker"];
+const TRAILER_TYPES = [
+  "40ft Standard",
+  "40ft High Cube",
+  "20ft",
+  "Curtainsider",
+  "Reefer",
+  "Double Decker",
+];
 
 const BAY_COLOURS: Record<BayStatus, string> = {
   EMPTY: "#6b7280",
@@ -101,7 +108,13 @@ type MainTab = "bays" | "sheets" | "picks" | "plan";
 
 // ─── Bay Board ────────────────────────────────────────────────────────────────
 
-function BayCard({ bay, onUpdateStatus }: { bay: DockBay; onUpdateStatus: (bay: DockBay) => void }) {
+function BayCard({
+  bay,
+  onUpdateStatus,
+}: {
+  bay: DockBay;
+  onUpdateStatus: (bay: DockBay) => void;
+}) {
   const col = BAY_COLOURS[bay.status] ?? "#6b7280";
   return (
     <View style={[styles.card, { borderLeftColor: col, borderLeftWidth: 4 }]}>
@@ -113,9 +126,13 @@ function BayCard({ bay, onUpdateStatus }: { bay: DockBay; onUpdateStatus: (bay: 
           ) : (
             <Text style={[styles.sub, { color: "#9ca3af" }]}>No trailer</Text>
           )}
-          {bay.carrierName ? <Text style={styles.sub}>{bay.carrierName}</Text> : null}
+          {bay.carrierName ? (
+            <Text style={styles.sub}>{bay.carrierName}</Text>
+          ) : null}
           {bay.loadSheetNumber ? (
-            <Text style={[styles.sub, { color: "#3b82f6" }]}>LS: {bay.loadSheetNumber}</Text>
+            <Text style={[styles.sub, { color: "#3b82f6" }]}>
+              LS: {bay.loadSheetNumber}
+            </Text>
           ) : null}
         </View>
         <View style={{ alignItems: "flex-end", gap: 6 }}>
@@ -132,7 +149,11 @@ function BayCard({ bay, onUpdateStatus }: { bay: DockBay; onUpdateStatus: (bay: 
       </View>
       {bay.spottedAt && (
         <Text style={styles.meta}>
-          Spotted: {new Date(bay.spottedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+          Spotted:{" "}
+          {new Date(bay.spottedAt).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
         </Text>
       )}
     </View>
@@ -162,11 +183,24 @@ function BayBoard() {
 
   const bays: DockBay[] = (data as any)?.bays ?? [];
 
-  const STATUS_ORDER: BayStatus[] = ["EMPTY", "INCOMING", "SPOTTED", "LOADING", "SEALED", "DEPARTING", "OUT_OF_USE"];
+  const STATUS_ORDER: BayStatus[] = [
+    "EMPTY",
+    "INCOMING",
+    "SPOTTED",
+    "LOADING",
+    "SEALED",
+    "DEPARTING",
+    "OUT_OF_USE",
+  ];
 
   const shunterMut = useMutation({
-    mutationFn: (data: { trailerNumber: string; toLocationName: string, fromLocationName: string, priority: "HIGH" | "URGENT", notes?: string }) =>
-      createShunterTask({ ...data, taskType: "SPOT" }),
+    mutationFn: (data: {
+      trailerNumber: string;
+      toLocationName: string;
+      fromLocationName: string;
+      priority: "HIGH" | "URGENT";
+      notes?: string;
+    }) => createShunterTask({ ...data, taskType: "SPOT" }),
     onSuccess: () => {
       Alert.alert("Sent", "Shunter request created");
       setModalVisible(false);
@@ -183,10 +217,15 @@ function BayBoard() {
         renderItem={({ item }) => (
           <BayCard
             bay={item}
-            onUpdateStatus={(b) => { setSelectedBay(b); setModalVisible(true); }}
+            onUpdateStatus={(b) => {
+              setSelectedBay(b);
+              setModalVisible(true);
+            }}
           />
         )}
-        ListEmptyComponent={<Text style={styles.empty}>No bays configured</Text>}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No bays configured</Text>
+        }
       />
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.overlay}>
@@ -194,7 +233,9 @@ function BayBoard() {
             <Text style={styles.modalTitle}>
               Update Door {selectedBay?.doorNumber}
             </Text>
-            <Text style={styles.sub}>Trailer: {selectedBay?.trailerNumber ?? "—"}</Text>
+            <Text style={styles.sub}>
+              Trailer: {selectedBay?.trailerNumber ?? "—"}
+            </Text>
             <View style={{ gap: 8, marginTop: 12 }}>
               {STATUS_ORDER.map((s) => (
                 <TouchableOpacity
@@ -214,22 +255,33 @@ function BayBoard() {
                           { text: "Cancel", style: "cancel" },
                           {
                             text: "Confirm & Release",
-                            onPress: () => selectedBay && updateMut.mutate({ id: selectedBay.id, status: s })
-                          }
-                        ]
+                            onPress: () =>
+                              selectedBay &&
+                              updateMut.mutate({
+                                id: selectedBay.id,
+                                status: s,
+                              }),
+                          },
+                        ],
                       );
                     } else if (s === "OUT_OF_USE") {
-                        Alert.prompt(
-                            "Bay Out of Use",
-                            "Enter reason for taking bay out of service:",
-                            (reason) => {
-                                if (reason) {
-                                    selectedBay && updateMut.mutate({ id: selectedBay.id, status: s, notes: reason });
-                                }
-                            }
-                        );
+                      Alert.prompt(
+                        "Bay Out of Use",
+                        "Enter reason for taking bay out of service:",
+                        (reason) => {
+                          if (reason) {
+                            selectedBay &&
+                              updateMut.mutate({
+                                id: selectedBay.id,
+                                status: s,
+                                notes: reason,
+                              });
+                          }
+                        },
+                      );
                     } else {
-                      selectedBay && updateMut.mutate({ id: selectedBay.id, status: s });
+                      selectedBay &&
+                        updateMut.mutate({ id: selectedBay.id, status: s });
                     }
                   }}
                 >
@@ -238,23 +290,29 @@ function BayBoard() {
               ))}
 
               <TouchableOpacity
-                style={[styles.btn, { backgroundColor: "#0891b2", marginTop: 8 }]}
+                style={[
+                  styles.btn,
+                  { backgroundColor: "#0891b2", marginTop: 8 },
+                ]}
                 disabled={!selectedBay || shunterMut.isPending}
                 onPress={() => {
                   if (!selectedBay) return;
                   if (selectedBay.status === "OUT_OF_USE") {
-                    Alert.alert("Bay Out of Use", "Cannot request shunter for broken bay");
+                    Alert.alert(
+                      "Bay Out of Use",
+                      "Cannot request shunter for broken bay",
+                    );
                     return;
                   }
-                  
+
                   // Use Alert.prompt for trailer number, then action sheet for options
                   Alert.alert(
                     "Request Shunter",
                     `What trailer is needed at Door ${selectedBay.doorNumber}?`,
                     [
                       { text: "Cancel", style: "cancel" },
-                      { 
-                        text: "Specific Trailer No.", 
+                      {
+                        text: "Specific Trailer No.",
                         onPress: () => {
                           Alert.prompt(
                             "Specific Trailer",
@@ -266,20 +324,20 @@ function BayBoard() {
                                 toLocationName: `Door ${selectedBay.doorNumber}`,
                                 fromLocationName: "Yard",
                                 priority: "URGENT",
-                                notes: "Specific trailer requested"
+                                notes: "Specific trailer requested",
                               });
-                            }
+                            },
                           );
-                        }
+                        },
                       },
-                      { 
-                        text: "Any Available Empty", 
+                      {
+                        text: "Any Available Empty",
                         onPress: () => {
                           // Ask for size/type
                           Alert.alert(
-                            "Trailer Type", 
+                            "Trailer Type",
                             "Select required trailer size:",
-                            TRAILER_TYPES.map(type => ({
+                            TRAILER_TYPES.map((type) => ({
                               text: type,
                               onPress: () => {
                                 shunterMut.mutate({
@@ -287,14 +345,20 @@ function BayBoard() {
                                   toLocationName: `Door ${selectedBay.doorNumber}`,
                                   fromLocationName: "Yard",
                                   priority: "HIGH",
-                                  notes: `Requires ${type} trailer`
+                                  notes: `Requires ${type} trailer`,
                                 });
-                              }
-                            })).concat([{ text: "Cancel", style: "cancel", onPress: () => {} }])
+                              },
+                            })).concat([
+                              {
+                                text: "Cancel",
+                                style: "cancel",
+                                onPress: () => {},
+                              },
+                            ]),
                           );
-                        }
-                      }
-                    ]
+                        },
+                      },
+                    ],
                   );
                 }}
               >
@@ -338,21 +402,37 @@ function LoadSheetRow({
       <View style={styles.cardRow}>
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>{sheet.loadSheetNumber}</Text>
-          {sheet.carrierName && <Text style={styles.sub}>{sheet.carrierName}</Text>}
+          {sheet.carrierName && (
+            <Text style={styles.sub}>{sheet.carrierName}</Text>
+          )}
           {sheet.destinationBranch && (
             <Text style={styles.sub}>→ {sheet.destinationBranch}</Text>
           )}
-          {sheet.trailerNumber && <Text style={styles.sub}>🚛 {sheet.trailerNumber}</Text>}
+          {sheet.trailerNumber && (
+            <Text style={styles.sub}>🚛 {sheet.trailerNumber}</Text>
+          )}
         </View>
         <View style={{ alignItems: "flex-end", gap: 6 }}>
           <View style={[styles.badge, { backgroundColor: col + "22" }]}>
-            <Text style={[styles.badgeText, { color: col }]}>{sheet.status}</Text>
+            <Text style={[styles.badgeText, { color: col }]}>
+              {sheet.status}
+            </Text>
           </View>
           <View style={{ flexDirection: "row", gap: 12, marginRight: 4 }}>
-            <TouchableOpacity onPress={(e) => { e.stopPropagation(); onShare(sheet.id); }}>
+            <TouchableOpacity
+              onPress={(e) => {
+                e.stopPropagation();
+                onShare(sheet.id);
+              }}
+            >
               <Ionicons name="share-outline" size={20} color="#2563EB" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={(e) => { e.stopPropagation(); onEmail(sheet.id); }}>
+            <TouchableOpacity
+              onPress={(e) => {
+                e.stopPropagation();
+                onEmail(sheet.id);
+              }}
+            >
               <Ionicons name="mail-outline" size={20} color="#2563EB" />
             </TouchableOpacity>
           </View>
@@ -360,7 +440,12 @@ function LoadSheetRow({
       </View>
       {/* Progress bar */}
       <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${pct}%` as any, backgroundColor: col }]} />
+        <View
+          style={[
+            styles.progressFill,
+            { width: `${pct}%` as any, backgroundColor: col },
+          ]}
+        />
       </View>
       <View style={styles.cardRow}>
         <View>
@@ -368,8 +453,21 @@ function LoadSheetRow({
             {sheet.loadedBoxes}/{sheet.totalBoxes} {unit}s loaded
           </Text>
           {!!sheet.maxWeightCapacity && (
-            <Text style={[styles.meta, { color: sheet.totalWeight > sheet.maxWeightCapacity ? "#ef4444" : "#64748b" }]}>
-              {sheet.totalWeight} / {sheet.maxWeightCapacity} kg {(sheet.totalWeight > sheet.maxWeightCapacity) ? "(Overweight)" : ""}
+            <Text
+              style={[
+                styles.meta,
+                {
+                  color:
+                    sheet.totalWeight > sheet.maxWeightCapacity
+                      ? "#ef4444"
+                      : "#64748b",
+                },
+              ]}
+            >
+              {sheet.totalWeight} / {sheet.maxWeightCapacity} kg{" "}
+              {sheet.totalWeight > sheet.maxWeightCapacity
+                ? "(Overweight)"
+                : ""}
             </Text>
           )}
         </View>
@@ -467,7 +565,10 @@ function LoadSheetDetail({
 
   const advanceMut = useMutation({
     mutationFn: (action: Parameters<typeof advanceLoadSheetStatus>[1]) =>
-      advanceLoadSheetStatus(sheetId, action, { userId: user?.id, userName: user?.name }),
+      advanceLoadSheetStatus(sheetId, action, {
+        userId: user?.id,
+        userName: user?.name,
+      }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["load-sheet", sheetId] });
       qc.invalidateQueries({ queryKey: ["load-sheets"] });
@@ -481,12 +582,12 @@ function LoadSheetDetail({
       "Please confirm the load is secure, balanced, and safe for transport.",
       [
         { text: "Cancel", style: "cancel" },
-        { 
-          text: "Safe & Dispatch", 
-          style: "default", 
-          onPress: () => advanceMut.mutate("dispatch") 
-        }
-      ]
+        {
+          text: "Safe & Dispatch",
+          style: "default",
+          onPress: () => advanceMut.mutate("dispatch"),
+        },
+      ],
     );
   };
 
@@ -514,16 +615,26 @@ function LoadSheetDetail({
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>{s?.loadSheetNumber ?? "…"}</Text>
-          <Text style={styles.sub}>{s?.carrierName}{s?.trailerNumber ? ` — 🚛 ${s.trailerNumber}` : ""}</Text>
+          <Text style={styles.sub}>
+            {s?.carrierName}
+            {s?.trailerNumber ? ` — 🚛 ${s.trailerNumber}` : ""}
+          </Text>
           {s?.dispatchedBy && (
-            <Text style={[styles.sub, { color: "#059669", fontWeight: "600", marginTop: 4 }]}>
+            <Text
+              style={[
+                styles.sub,
+                { color: "#059669", fontWeight: "600", marginTop: 4 },
+              ]}
+            >
               Safe confirmation & Dispatched by: {s.dispatchedBy}
             </Text>
           )}
         </View>
         <View style={{ alignItems: "flex-end", gap: 6 }}>
           <View style={[styles.badge, { backgroundColor: col + "22" }]}>
-            <Text style={[styles.badgeText, { color: col }]}>{s?.status ?? "…"}</Text>
+            <Text style={[styles.badgeText, { color: col }]}>
+              {s?.status ?? "…"}
+            </Text>
           </View>
           <View style={{ flexDirection: "row", gap: 12, marginRight: 4 }}>
             <TouchableOpacity onPress={handleShare}>
@@ -555,7 +666,11 @@ function LoadSheetDetail({
 
       {/* Advance status actions */}
       {s && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={{ flexGrow: 0 }}
+        >
           <View style={{ flexDirection: "row", gap: 8, padding: 12 }}>
             {s.status === "READY" && (
               <TouchableOpacity
@@ -596,24 +711,59 @@ function LoadSheetDetail({
         renderItem={({ item }) => {
           const lc = LINE_STATUS_COLORS[item.status] ?? "#6b7280";
           return (
-            <View style={[styles.card, { borderLeftColor: lc, borderLeftWidth: 4 }]}>
+            <View
+              style={[styles.card, { borderLeftColor: lc, borderLeftWidth: 4 }]}
+            >
               <View style={styles.cardRow}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.cardTitle} numberOfLines={1}>{item.productName}</Text>
-                  <Text style={styles.sub}>{item.sku}{item.orderNumber ? ` — Order ${item.orderNumber}` : ""}</Text>
+                  <Text style={styles.cardTitle} numberOfLines={1}>
+                    {item.productName}
+                  </Text>
                   <Text style={styles.sub}>
-                    {item.unitCount ?? item.boxes} {unit}{(item.unitCount ?? item.boxes) !== 1 ? "s" : ""}{" "}
-                    {item.stillageType ? `· ${item.stillageType.replace("_", " ")}` : ""}
+                    {item.sku}
+                    {item.orderNumber ? ` — Order ${item.orderNumber}` : ""}
+                  </Text>
+                  <Text style={styles.sub}>
+                    {item.unitCount ?? item.boxes} {unit}
+                    {(item.unitCount ?? item.boxes) !== 1 ? "s" : ""}{" "}
+                    {item.stillageType
+                      ? `· ${item.stillageType.replace("_", " ")}`
+                      : ""}
                   </Text>
                   {item.loadedBy && (
-                    <Text style={[styles.sub, { marginTop: 4, fontStyle: "italic" }]}>
+                    <Text
+                      style={[
+                        styles.sub,
+                        { marginTop: 4, fontStyle: "italic" },
+                      ]}
+                    >
                       Loaded by: {item.loadedBy}
                     </Text>
                   )}
                   {item.loadSection !== "UNASSIGNED" && (
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 4, marginTop: 2 }}>
-                      <View style={[styles.badge, { backgroundColor: SECTION_COLOURS[item.loadSection] + "22" }]}>
-                        <Text style={[styles.badgeText, { color: SECTION_COLOURS[item.loadSection] }]}>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 4,
+                        marginTop: 2,
+                      }}
+                    >
+                      <View
+                        style={[
+                          styles.badge,
+                          {
+                            backgroundColor:
+                              SECTION_COLOURS[item.loadSection] + "22",
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.badgeText,
+                            { color: SECTION_COLOURS[item.loadSection] },
+                          ]}
+                        >
                           {item.loadSection}
                         </Text>
                       </View>
@@ -625,7 +775,9 @@ function LoadSheetDetail({
                 </View>
                 <View style={{ alignItems: "flex-end", gap: 6 }}>
                   <View style={[styles.badge, { backgroundColor: lc + "22" }]}>
-                    <Text style={[styles.badgeText, { color: lc }]}>{item.status}</Text>
+                    <Text style={[styles.badgeText, { color: lc }]}>
+                      {item.status}
+                    </Text>
                   </View>
                   {item.status === "PICKED" && (
                     <TouchableOpacity
@@ -640,7 +792,11 @@ function LoadSheetDetail({
                     <TouchableOpacity
                       style={[styles.btn, { backgroundColor: "#10b981" }]}
                       onPress={() => {
-                        setSectionPick(item.loadSection !== "UNASSIGNED" ? item.loadSection : "REAR");
+                        setSectionPick(
+                          item.loadSection !== "UNASSIGNED"
+                            ? item.loadSection
+                            : "REAR",
+                        );
                         setPosInput(item.loadPosition ?? "");
                         setRecordModal(item);
                       }}
@@ -651,12 +807,19 @@ function LoadSheetDetail({
                 </View>
               </View>
               {item.pickerName && (
-                <Text style={styles.meta}>Picker: {item.pickerName}{item.pickedAt ? ` · ${new Date(item.pickedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}</Text>
+                <Text style={styles.meta}>
+                  Picker: {item.pickerName}
+                  {item.pickedAt
+                    ? ` · ${new Date(item.pickedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                    : ""}
+                </Text>
               )}
             </View>
           );
         }}
-        ListEmptyComponent={<Text style={styles.empty}>No lines on this load sheet</Text>}
+        ListEmptyComponent={
+          <Text style={styles.empty}>No lines on this load sheet</Text>
+        }
       />
 
       {/* Record box loaded modal */}
@@ -664,28 +827,47 @@ function LoadSheetDetail({
         <View style={styles.overlay}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Record {unit} Loaded</Text>
-            <Text style={styles.sub} numberOfLines={2}>{recordModal?.productName}</Text>
+            <Text style={styles.sub} numberOfLines={2}>
+              {recordModal?.productName}
+            </Text>
             <Text style={styles.sub}>
-              {recordModal?.unitCount ?? recordModal?.boxes} {unit}{(recordModal?.unitCount ?? recordModal?.boxes) !== 1 ? "s" : ""}
+              {recordModal?.unitCount ?? recordModal?.boxes} {unit}
+              {(recordModal?.unitCount ?? recordModal?.boxes) !== 1 ? "s" : ""}
             </Text>
 
-            <Text style={[styles.label, { marginTop: 12 }]}>Trailer Section</Text>
+            <Text style={[styles.label, { marginTop: 12 }]}>
+              Trailer Section
+            </Text>
             <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6 }}>
-              {(["FRONT", "MID", "REAR", "UNASSIGNED"] as TrailerSection[]).map((sec) => (
-                <TouchableOpacity
-                  key={sec}
-                  style={[
-                    styles.chip,
-                    sectionPick === sec && { backgroundColor: SECTION_COLOURS[sec], borderColor: SECTION_COLOURS[sec] },
-                  ]}
-                  onPress={() => setSectionPick(sec)}
-                >
-                  <Text style={[styles.chipText, sectionPick === sec && { color: "#fff" }]}>{sec}</Text>
-                </TouchableOpacity>
-              ))}
+              {(["FRONT", "MID", "REAR", "UNASSIGNED"] as TrailerSection[]).map(
+                (sec) => (
+                  <TouchableOpacity
+                    key={sec}
+                    style={[
+                      styles.chip,
+                      sectionPick === sec && {
+                        backgroundColor: SECTION_COLOURS[sec],
+                        borderColor: SECTION_COLOURS[sec],
+                      },
+                    ]}
+                    onPress={() => setSectionPick(sec)}
+                  >
+                    <Text
+                      style={[
+                        styles.chipText,
+                        sectionPick === sec && { color: "#fff" },
+                      ]}
+                    >
+                      {sec}
+                    </Text>
+                  </TouchableOpacity>
+                ),
+              )}
             </View>
 
-            <Text style={[styles.label, { marginTop: 10 }]}>Layer (1 = floor)</Text>
+            <Text style={[styles.label, { marginTop: 10 }]}>
+              Layer (1 = floor)
+            </Text>
             <TextInput
               style={styles.input}
               value={layerInput}
@@ -694,7 +876,9 @@ function LoadSheetDetail({
               placeholder="1"
             />
 
-            <Text style={[styles.label, { marginTop: 10 }]}>Position (e.g. LEFT-REAR-1)</Text>
+            <Text style={[styles.label, { marginTop: 10 }]}>
+              Position (e.g. LEFT-REAR-1)
+            </Text>
             <TextInput
               style={styles.input}
               value={posInput}
@@ -740,9 +924,13 @@ function LoadSheetDetail({
         <View style={styles.overlay}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Email Load Sheet</Text>
-            <Text style={styles.sub}>Send a copy of Load Sheet {s?.loadSheetNumber} to:</Text>
-            
-            <Text style={[styles.label, { marginTop: 12 }]}>Recipients (comma separated)</Text>
+            <Text style={styles.sub}>
+              Send a copy of Load Sheet {s?.loadSheetNumber} to:
+            </Text>
+
+            <Text style={[styles.label, { marginTop: 12 }]}>
+              Recipients (comma separated)
+            </Text>
             <TextInput
               style={styles.input}
               value={emailRecipients}
@@ -764,7 +952,10 @@ function LoadSheetDetail({
                 style={[styles.btn, { flex: 1, backgroundColor: "#2563EB" }]}
                 disabled={emailMut.isPending || !emailRecipients}
                 onPress={() => {
-                  const recipients = emailRecipients.split(",").map(e => e.trim()).filter(Boolean);
+                  const recipients = emailRecipients
+                    .split(",")
+                    .map((e) => e.trim())
+                    .filter(Boolean);
                   if (recipients.length > 0) {
                     emailMut.mutate(recipients);
                   }
@@ -787,7 +978,12 @@ function LoadSheetDetail({
 // ─── Load Sheets Tab (list → detail) ─────────────────────────────────────────
 
 const LS_STATUS_FILTERS: Array<LoadSheetStatus | "ALL"> = [
-  "ALL", "BUILDING", "READY", "LOADING", "LOADED", "DISPATCHED",
+  "ALL",
+  "BUILDING",
+  "READY",
+  "LOADING",
+  "LOADED",
+  "DISPATCHED",
 ];
 
 function LoadSheetsTab() {
@@ -806,7 +1002,10 @@ function LoadSheetsTab() {
   });
 
   const emailMut = useMutation({
-    mutationFn: (recipients: string[]) => emailSheetId ? emailLoadSheet(emailSheetId, recipients) : Promise.reject("No sheet selected"),
+    mutationFn: (recipients: string[]) =>
+      emailSheetId
+        ? emailLoadSheet(emailSheetId, recipients)
+        : Promise.reject("No sheet selected"),
     onSuccess: () => {
       Alert.alert("Success", "Load sheet emailed successfully");
       setEmailSheetId(null);
@@ -830,12 +1029,18 @@ function LoadSheetsTab() {
   const sheets: LoadSheet[] = (data as any)?.loadSheets ?? [];
 
   if (selected) {
-    return <LoadSheetDetail sheetId={selected} onBack={() => setSelected(null)} />;
+    return (
+      <LoadSheetDetail sheetId={selected} onBack={() => setSelected(null)} />
+    );
   }
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterScroll}
+      >
         <View style={styles.filterRow}>
           {LS_STATUS_FILTERS.map((f) => (
             <TouchableOpacity
@@ -843,7 +1048,11 @@ function LoadSheetsTab() {
               style={[styles.chip, filter === f && styles.chipActive]}
               onPress={() => setFilter(f)}
             >
-              <Text style={[styles.chipText, filter === f && styles.chipActiveText]}>{f}</Text>
+              <Text
+                style={[styles.chipText, filter === f && styles.chipActiveText]}
+              >
+                {f}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -857,14 +1066,16 @@ function LoadSheetsTab() {
           keyExtractor={(s) => s.id}
           contentContainerStyle={styles.list}
           renderItem={({ item }) => (
-            <LoadSheetRow 
-              sheet={item} 
-              onOpen={setSelected} 
+            <LoadSheetRow
+              sheet={item}
+              onOpen={setSelected}
               onShare={handleShare}
               onEmail={(id) => setEmailSheetId(id)}
             />
           )}
-          ListEmptyComponent={<Text style={styles.empty}>No load sheets found</Text>}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No load sheets found</Text>
+          }
         />
       )}
 
@@ -874,8 +1085,10 @@ function LoadSheetsTab() {
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Email Load Sheet</Text>
             <Text style={styles.sub}>Enter recipients for the load sheet:</Text>
-            
-            <Text style={[styles.label, { marginTop: 12 }]}>Recipients (comma separated)</Text>
+
+            <Text style={[styles.label, { marginTop: 12 }]}>
+              Recipients (comma separated)
+            </Text>
             <TextInput
               style={styles.input}
               value={emailRecipients}
@@ -889,7 +1102,10 @@ function LoadSheetsTab() {
             <View style={{ flexDirection: "row", gap: 8, marginTop: 14 }}>
               <TouchableOpacity
                 style={[styles.btn, { flex: 1, backgroundColor: "#6b7280" }]}
-                onPress={() => { setEmailSheetId(null); setEmailRecipients(""); }}
+                onPress={() => {
+                  setEmailSheetId(null);
+                  setEmailRecipients("");
+                }}
               >
                 <Text style={styles.btnText}>Cancel</Text>
               </TouchableOpacity>
@@ -897,7 +1113,10 @@ function LoadSheetsTab() {
                 style={[styles.btn, { flex: 1, backgroundColor: "#2563EB" }]}
                 disabled={emailMut.isPending || !emailRecipients}
                 onPress={() => {
-                  const recipients = emailRecipients.split(",").map(e => e.trim()).filter(Boolean);
+                  const recipients = emailRecipients
+                    .split(",")
+                    .map((e) => e.trim())
+                    .filter(Boolean);
                   if (recipients.length > 0) emailMut.mutate(recipients);
                 }}
               >
@@ -930,14 +1149,24 @@ function PickTaskCard({
 }) {
   const col = PICK_COLOURS[task.status] ?? "#6b7280";
   const PRIORITY_COLOURS: Record<string, string> = {
-    LOW: "#6b7280", NORMAL: "#3b82f6", HIGH: "#f59e0b", URGENT: "#f97316", CRITICAL: "#ef4444",
+    LOW: "#6b7280",
+    NORMAL: "#3b82f6",
+    HIGH: "#f59e0b",
+    URGENT: "#f97316",
+    CRITICAL: "#ef4444",
   };
   return (
     <View style={[styles.card, { borderLeftColor: col, borderLeftWidth: 4 }]}>
       <View style={styles.cardRow}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.cardTitle} numberOfLines={1}>{task.title}</Text>
-          {task.productName && <Text style={styles.sub}>{task.sku} — {task.productName}</Text>}
+          <Text style={styles.cardTitle} numberOfLines={1}>
+            {task.title}
+          </Text>
+          {task.productName && (
+            <Text style={styles.sub}>
+              {task.sku} — {task.productName}
+            </Text>
+          )}
           <Text style={styles.sub}>
             {task.fromLocationCode ? `From: ${task.fromLocationCode}  ` : ""}
             Qty: {task.completedQuantity}/{task.quantity}
@@ -948,10 +1177,24 @@ function PickTaskCard({
         </View>
         <View style={{ alignItems: "flex-end", gap: 4 }}>
           <View style={[styles.badge, { backgroundColor: col + "22" }]}>
-            <Text style={[styles.badgeText, { color: col }]}>{task.status}</Text>
+            <Text style={[styles.badgeText, { color: col }]}>
+              {task.status}
+            </Text>
           </View>
-          <View style={[styles.badge, { backgroundColor: PRIORITY_COLOURS[task.priority] + "22" }]}>
-            <Text style={[styles.badgeText, { color: PRIORITY_COLOURS[task.priority] }]}>{task.priority}</Text>
+          <View
+            style={[
+              styles.badge,
+              { backgroundColor: PRIORITY_COLOURS[task.priority] + "22" },
+            ]}
+          >
+            <Text
+              style={[
+                styles.badgeText,
+                { color: PRIORITY_COLOURS[task.priority] },
+              ]}
+            >
+              {task.priority}
+            </Text>
           </View>
         </View>
       </View>
@@ -964,7 +1207,9 @@ function PickTaskCard({
             <Text style={styles.btnText}>Assign</Text>
           </TouchableOpacity>
         )}
-        {(task.status === "ASSIGNED" || task.status === "IN_PROGRESS" || task.status === "AT_BAY") && (
+        {(task.status === "ASSIGNED" ||
+          task.status === "IN_PROGRESS" ||
+          task.status === "AT_BAY") && (
           <>
             <TouchableOpacity
               style={[styles.btn, { backgroundColor: "#10b981" }]}
@@ -990,14 +1235,18 @@ function PickTaskCard({
 
 function PicksTab() {
   const qc = useQueryClient();
-  const [statusFilter, setStatusFilter] = useState<"ALL" | "UNASSIGNED" | "IN_PROGRESS" | "AT_BAY">("ALL");
+  const [statusFilter, setStatusFilter] = useState<
+    "ALL" | "UNASSIGNED" | "IN_PROGRESS" | "AT_BAY"
+  >("ALL");
   const [assignModal, setAssignModal] = useState<PickTask | null>(null);
   const [pickerIdInput, setPickerIdInput] = useState("");
 
   const { data, isLoading } = useQuery({
     queryKey: ["pick-tasks", statusFilter],
     queryFn: () =>
-      getPickTasks(statusFilter !== "ALL" ? { status: statusFilter as any } : undefined),
+      getPickTasks(
+        statusFilter !== "ALL" ? { status: statusFilter as any } : undefined,
+      ),
     refetchInterval: 20000,
   });
 
@@ -1028,11 +1277,20 @@ function PicksTab() {
 
   const tasks: PickTask[] = (data as any)?.tasks ?? [];
 
-  const PICK_STATUS_FILTERS = ["ALL", "UNASSIGNED", "IN_PROGRESS", "AT_BAY"] as const;
+  const PICK_STATUS_FILTERS = [
+    "ALL",
+    "UNASSIGNED",
+    "IN_PROGRESS",
+    "AT_BAY",
+  ] as const;
 
   return (
     <View style={{ flex: 1 }}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.filterScroll}
+      >
         <View style={styles.filterRow}>
           {PICK_STATUS_FILTERS.map((f) => (
             <TouchableOpacity
@@ -1040,7 +1298,14 @@ function PicksTab() {
               style={[styles.chip, statusFilter === f && styles.chipActive]}
               onPress={() => setStatusFilter(f as any)}
             >
-              <Text style={[styles.chipText, statusFilter === f && styles.chipActiveText]}>{f}</Text>
+              <Text
+                style={[
+                  styles.chipText,
+                  statusFilter === f && styles.chipActiveText,
+                ]}
+              >
+                {f}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -1059,26 +1324,41 @@ function PicksTab() {
               onComplete={(t) =>
                 Alert.alert("Complete Pick", `Mark ${t.quantity} completed?`, [
                   { text: "Cancel", style: "cancel" },
-                  { text: "Confirm", onPress: () => completeMut.mutate({ taskId: t.id, qty: t.quantity }) },
+                  {
+                    text: "Confirm",
+                    onPress: () =>
+                      completeMut.mutate({ taskId: t.id, qty: t.quantity }),
+                  },
                 ])
               }
               onShort={(t) =>
                 Alert.alert("Short Pick", "Record short pick?", [
                   { text: "Cancel", style: "cancel" },
-                  { text: "Short", style: "destructive", onPress: () => shortMut.mutate({ taskId: t.id, qty: t.quantity }) },
+                  {
+                    text: "Short",
+                    style: "destructive",
+                    onPress: () =>
+                      shortMut.mutate({ taskId: t.id, qty: t.quantity }),
+                  },
                 ])
               }
             />
           )}
-          ListEmptyComponent={<Text style={styles.empty}>No pick tasks found</Text>}
+          ListEmptyComponent={
+            <Text style={styles.empty}>No pick tasks found</Text>
+          }
         />
       )}
       <Modal visible={!!assignModal} transparent animationType="slide">
         <View style={styles.overlay}>
           <View style={styles.modal}>
             <Text style={styles.modalTitle}>Assign Pick Task</Text>
-            <Text style={styles.sub} numberOfLines={2}>{assignModal?.title}</Text>
-            <Text style={[styles.label, { marginTop: 12 }]}>Picker Employee ID</Text>
+            <Text style={styles.sub} numberOfLines={2}>
+              {assignModal?.title}
+            </Text>
+            <Text style={[styles.label, { marginTop: 12 }]}>
+              Picker Employee ID
+            </Text>
             <TextInput
               style={styles.input}
               value={pickerIdInput}
@@ -1098,7 +1378,10 @@ function PicksTab() {
                 disabled={!pickerIdInput.trim() || assignMut.isPending}
                 onPress={() =>
                   assignModal &&
-                  assignMut.mutate({ taskId: assignModal.id, pickerId: pickerIdInput.trim() })
+                  assignMut.mutate({
+                    taskId: assignModal.id,
+                    pickerId: pickerIdInput.trim(),
+                  })
                 }
               >
                 {assignMut.isPending ? (
@@ -1148,7 +1431,9 @@ function TrailerPlanTab() {
     <ScrollView contentContainerStyle={styles.list}>
       <Text style={styles.sectionHeader}>Select a LOADING load sheet</Text>
       {sheets.length === 0 && (
-        <Text style={styles.empty}>No load sheets currently in LOADING status</Text>
+        <Text style={styles.empty}>
+          No load sheets currently in LOADING status
+        </Text>
       )}
       {sheets.map((s) => (
         <TouchableOpacity
@@ -1157,12 +1442,19 @@ function TrailerPlanTab() {
             styles.card,
             sheetId === s.id && { borderColor: "#2563eb", borderWidth: 2 },
           ]}
-          onPress={() => { setSheetId(s.id); setResult(null); }}
+          onPress={() => {
+            setSheetId(s.id);
+            setResult(null);
+          }}
         >
           <Text style={styles.cardTitle}>{s.loadSheetNumber}</Text>
-          <Text style={styles.sub}>{s.carrierName}{s.trailerNumber ? ` — 🚛 ${s.trailerNumber}` : ""}</Text>
           <Text style={styles.sub}>
-            {s.loadedBoxes}/{s.totalBoxes} {UNIT_LABEL(s)}s loaded · {s.completionPct.toFixed(0)}%
+            {s.carrierName}
+            {s.trailerNumber ? ` — 🚛 ${s.trailerNumber}` : ""}
+          </Text>
+          <Text style={styles.sub}>
+            {s.loadedBoxes}/{s.totalBoxes} {UNIT_LABEL(s)}s loaded ·{" "}
+            {s.completionPct.toFixed(0)}%
           </Text>
         </TouchableOpacity>
       ))}
@@ -1188,28 +1480,64 @@ function TrailerPlanTab() {
             <Text style={styles.sub}>
               Est. load time: {result.estimatedLoadTimeMins} mins
             </Text>
-            <Text style={[styles.sub, { color: result.weightDistributionOk ? "#10b981" : "#ef4444" }]}>
-              Weight distribution: {result.weightDistributionOk ? "✓ OK" : "⚠ Review"}
+            <Text
+              style={[
+                styles.sub,
+                { color: result.weightDistributionOk ? "#10b981" : "#ef4444" },
+              ]}
+            >
+              Weight distribution:{" "}
+              {result.weightDistributionOk ? "✓ OK" : "⚠ Review"}
             </Text>
           </View>
           {result.sections.map((sec) => (
-            <View key={sec.section} style={[styles.card, { borderLeftColor: SECTION_COLOURS[sec.section], borderLeftWidth: 4 }]}>
+            <View
+              key={sec.section}
+              style={[
+                styles.card,
+                {
+                  borderLeftColor: SECTION_COLOURS[sec.section],
+                  borderLeftWidth: 4,
+                },
+              ]}
+            >
               <View style={styles.cardRow}>
                 <Text style={styles.cardTitle}>{sec.label}</Text>
-                <Text style={styles.sub}>{sec.totalBoxes} boxes · {sec.totalWeight.toFixed(0)} kg</Text>
+                <Text style={styles.sub}>
+                  {sec.totalBoxes} boxes · {sec.totalWeight.toFixed(0)} kg
+                </Text>
               </View>
               <View style={styles.progressTrack}>
-                <View style={[styles.progressFill, { width: `${sec.utilizationPct}%` as any, backgroundColor: SECTION_COLOURS[sec.section] }]} />
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${sec.utilizationPct}%` as any,
+                      backgroundColor: SECTION_COLOURS[sec.section],
+                    },
+                  ]}
+                />
               </View>
-              <Text style={styles.meta}>{sec.utilizationPct.toFixed(0)}% utilisation</Text>
+              <Text style={styles.meta}>
+                {sec.utilizationPct.toFixed(0)}% utilisation
+              </Text>
               {sec.lines.slice(0, 5).map((ln) => (
-                <View key={ln.lineId} style={[styles.cardRow, { marginTop: 4 }]}>
-                  <Text style={[styles.sub, { flex: 1 }]} numberOfLines={1}>{ln.productName}</Text>
-                  <Text style={styles.meta}>Order {ln.loadOrder} · L{ln.layer}</Text>
+                <View
+                  key={ln.lineId}
+                  style={[styles.cardRow, { marginTop: 4 }]}
+                >
+                  <Text style={[styles.sub, { flex: 1 }]} numberOfLines={1}>
+                    {ln.productName}
+                  </Text>
+                  <Text style={styles.meta}>
+                    Order {ln.loadOrder} · L{ln.layer}
+                  </Text>
                 </View>
               ))}
               {sec.lines.length > 5 && (
-                <Text style={styles.meta}>+{sec.lines.length - 5} more items</Text>
+                <Text style={styles.meta}>
+                  +{sec.lines.length - 5} more items
+                </Text>
               )}
             </View>
           ))}
@@ -1259,7 +1587,11 @@ export default function MarshallingScreen() {
       </View>
 
       {/* Tab switcher */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0 }}>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ flexGrow: 0 }}
+      >
         <View style={styles.tabRow}>
           {TABS.map(({ key, label, icon }) => (
             <TouchableOpacity
@@ -1272,7 +1604,12 @@ export default function MarshallingScreen() {
                 size={15}
                 color={tab === key ? "#2563EB" : "#94a3b8"}
               />
-              <Text style={[styles.tabBtnText, tab === key && styles.tabBtnActiveText]}>
+              <Text
+                style={[
+                  styles.tabBtnText,
+                  tab === key && styles.tabBtnActiveText,
+                ]}
+              >
                 {label}
               </Text>
             </TouchableOpacity>
@@ -1307,7 +1644,12 @@ const styles = StyleSheet.create({
     borderBottomColor: "#E2E8F0",
   },
   screenTitle: { fontSize: 18, fontWeight: "700", color: "#1e293b" },
-  tabRow: { flexDirection: "row", gap: 6, paddingHorizontal: 12, paddingVertical: 10 },
+  tabRow: {
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
   tabBtn: {
     flexDirection: "row",
     alignItems: "center",
@@ -1331,7 +1673,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  cardRow: { flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between" },
+  cardRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+  },
   cardTitle: { fontSize: 15, fontWeight: "600", color: "#1e293b" },
   sub: { fontSize: 13, color: "#64748b", marginTop: 2 },
   meta: { fontSize: 11, color: "#94a3b8", marginTop: 3 },
@@ -1371,7 +1717,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   empty: { textAlign: "center", color: "#94a3b8", marginTop: 40, fontSize: 14 },
-  filterScroll: { flexGrow: 0, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#e2e8f0" },
+  filterScroll: {
+    flexGrow: 0,
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
+  },
   filterRow: { flexDirection: "row", gap: 8, padding: 10 },
   chip: {
     paddingVertical: 5,
@@ -1384,7 +1735,11 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: "#2563EB", borderColor: "#2563EB" },
   chipText: { fontSize: 12, color: "#64748b", fontWeight: "500" },
   chipActiveText: { color: "#fff" },
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "flex-end" },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.45)",
+    justifyContent: "flex-end",
+  },
   modal: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 20,
@@ -1392,7 +1747,12 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 36,
   },
-  modalTitle: { fontSize: 17, fontWeight: "700", color: "#1e293b", marginBottom: 6 },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#1e293b",
+    marginBottom: 6,
+  },
   label: { fontSize: 13, color: "#64748b", fontWeight: "500", marginBottom: 4 },
   input: {
     borderWidth: 1,

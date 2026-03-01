@@ -5,7 +5,15 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowRight, Shield, Zap, Brain, Activity, Truck, GitMerge } from "lucide-react";
+import {
+  ArrowRight,
+  Shield,
+  Zap,
+  Brain,
+  Activity,
+  Truck,
+  GitMerge,
+} from "lucide-react";
 
 const offerings = [
   {

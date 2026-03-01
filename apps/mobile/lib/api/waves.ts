@@ -65,11 +65,11 @@ export function getWaves(params?: {
 }) {
   const qs = new URLSearchParams(
     Object.fromEntries(
-      Object.entries(params ?? {}).filter(([, v]) => v != null)
-    ) as Record<string, string>
+      Object.entries(params ?? {}).filter(([, v]) => v != null),
+    ) as Record<string, string>,
   ).toString();
   return apiClient<{ waves: Wave[]; total: number }>(
-    `/api/waves${qs ? `?${qs}` : ""}`
+    `/api/waves${qs ? `?${qs}` : ""}`,
   );
 }
 
@@ -112,20 +112,27 @@ export function cancelWave(id: string, reason?: string) {
 }
 
 export function getWaveLines(id: string) {
-  return apiClient<{ lines: Array<{ id: string; orderId: string; sku: string; quantity: number; pickedQuantity: number; status: string }> }>(
-    `/api/waves/${id}/lines`
-  );
+  return apiClient<{
+    lines: Array<{
+      id: string;
+      orderId: string;
+      sku: string;
+      quantity: number;
+      pickedQuantity: number;
+      status: string;
+    }>;
+  }>(`/api/waves/${id}/lines`);
 }
 
 export function getWaveAutomationRules() {
   return apiClient<{ rules: WaveAutomationRule[] }>(
-    "/api/waves/automation-rules"
+    "/api/waves/automation-rules",
   );
 }
 
 export function triggerWaveRule(ruleId: string) {
   return apiClient<{ message: string; waveId?: string }>(
     `/api/waves/automation-rules/${ruleId}/trigger`,
-    { method: "POST" }
+    { method: "POST" },
   );
 }

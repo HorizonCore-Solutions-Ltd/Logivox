@@ -32,7 +32,12 @@ export async function getCAPAItems(params?: {
   const { data } = await apiClient.get("/api/capa", { params });
   return data as {
     items: CAPAItem[];
-    summary: { open: number; inProgress: number; overdue: number; closedThisMonth: number };
+    summary: {
+      open: number;
+      inProgress: number;
+      overdue: number;
+      closedThisMonth: number;
+    };
   };
 }
 
@@ -62,7 +67,14 @@ export async function updateCAPAItem(id: string, payload: Partial<CAPAItem>) {
 }
 
 // PUT /api/capa/:id/close — close CAPA with resolution notes
-export async function closeCAPAItem(id: string, resolution: string, verificationNotes?: string) {
-  const { data } = await apiClient.put(`/api/capa/${id}/close`, { resolution, verificationNotes });
+export async function closeCAPAItem(
+  id: string,
+  resolution: string,
+  verificationNotes?: string,
+) {
+  const { data } = await apiClient.put(`/api/capa/${id}/close`, {
+    resolution,
+    verificationNotes,
+  });
   return data;
 }

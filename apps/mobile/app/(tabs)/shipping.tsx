@@ -19,14 +19,14 @@ import {
   type Shipment,
   type PackTask,
 } from "../../lib/api/shipping";
-import { 
-  Printer, 
-  Truck, 
-  MapPin, 
-  PackageCheck, 
-  Package, 
-  Box, 
-  Plane 
+import {
+  Printer,
+  Truck,
+  MapPin,
+  PackageCheck,
+  Package,
+  Box,
+  Plane,
 } from "lucide-react-native";
 
 const SHIP_STATUS_COLORS: Record<string, string> = {
@@ -56,7 +56,8 @@ export default function ShippingScreen() {
 
   const packMutation = useMutation({
     mutationFn: (id: string) => completePackingTask(id, 1),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["packingTasks"] }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["packingTasks"] }),
     onError: () => Alert.alert("Error", "Failed to complete packing task."),
   });
 
@@ -89,7 +90,9 @@ export default function ShippingScreen() {
             style={[styles.tabBtn, tab === t && styles.tabBtnActive]}
             onPress={() => setTab(t)}
           >
-            <Text style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}>
+            <Text
+              style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}
+            >
               {t === "pack" ? "Packing Tasks" : "Shipments"}
             </Text>
           </TouchableOpacity>
@@ -116,17 +119,25 @@ export default function ShippingScreen() {
                   <View
                     style={[
                       styles.badge,
-                      { backgroundColor: item.status === "PACKED" ? "#10b981" : "#f59e0b" },
+                      {
+                        backgroundColor:
+                          item.status === "PACKED" ? "#10b981" : "#f59e0b",
+                      },
                     ]}
                   >
                     <Text style={styles.badgeText}>{item.status}</Text>
                   </View>
                 </View>
-                <Text style={styles.detail}>Assigned: {item.assignedTo ?? "Unassigned"}</Text>
+                <Text style={styles.detail}>
+                  Assigned: {item.assignedTo ?? "Unassigned"}
+                </Text>
                 <Text style={styles.detail}>Items: {item.itemCount}</Text>
                 {item.status !== "PACKED" && (
                   <TouchableOpacity
-                    style={[styles.btn, { backgroundColor: "#10b981", marginTop: 10 }]}
+                    style={[
+                      styles.btn,
+                      { backgroundColor: "#10b981", marginTop: 10 },
+                    ]}
                     onPress={() => packMutation.mutate(item.id)}
                     disabled={packMutation.isPending}
                   >
@@ -157,14 +168,16 @@ export default function ShippingScreen() {
                 </View>
                 <Text style={styles.detail}>Carrier: {item.carrierName}</Text>
                 {item.trackingNumber ? (
-                  <Text style={styles.detail}>Tracking: {item.trackingNumber}</Text>
+                  <Text style={styles.detail}>
+                    Tracking: {item.trackingNumber}
+                  </Text>
                 ) : null}
                 {item.estimatedDelivery ? (
                   <Text style={styles.detail}>
                     ETA: {new Date(item.estimatedDelivery).toLocaleDateString()}
                   </Text>
                 ) : null}
-                <View style={[styles.cardActions, {flexWrap: 'wrap'}]}>
+                <View style={[styles.cardActions, { flexWrap: "wrap" }]}>
                   {item.status === "PACKED" && !item.labelUrl && (
                     <TouchableOpacity
                       style={[styles.btn, { backgroundColor: "#3b82f6" }]}
@@ -186,7 +199,12 @@ export default function ShippingScreen() {
                   {item.trackingNumber && (
                     <TouchableOpacity
                       style={[styles.btn, { backgroundColor: "#64748b" }]}
-                      onPress={() => Alert.alert("Tracking", `Opening tracker for ${item.trackingNumber}`)}
+                      onPress={() =>
+                        Alert.alert(
+                          "Tracking",
+                          `Opening tracker for ${item.trackingNumber}`,
+                        )
+                      }
                     >
                       <MapPin size={16} color="#fff" />
                       <Text style={styles.btnText}>Track</Text>
@@ -210,20 +228,51 @@ export default function ShippingScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
-  tabRow: { flexDirection: "row", borderBottomWidth: 1, borderColor: "#e5e7eb" },
+  tabRow: {
+    flexDirection: "row",
+    borderBottomWidth: 1,
+    borderColor: "#e5e7eb",
+  },
   tabBtn: { flex: 1, paddingVertical: 12, alignItems: "center" },
   tabBtnActive: { borderBottomWidth: 2, borderColor: "#3b82f6" },
   tabBtnText: { fontSize: 14, color: "#6b7280", fontWeight: "600" },
   tabBtnTextActive: { color: "#3b82f6" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
   ref: { fontSize: 14, fontWeight: "700", color: "#1e40af" },
   detail: { fontSize: 12, color: "#6b7280", marginBottom: 2 },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
   badgeText: { color: "#fff", fontSize: 10, fontWeight: "600" },
   cardActions: { flexDirection: "row", gap: 8, marginTop: 10 },
-  btn: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 6 },
+  btn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 6,
+  },
   btnText: { color: "#fff", fontSize: 12, fontWeight: "600" },
-  empty: { flex: 1, alignItems: "center", justifyContent: "center", gap: 12, paddingTop: 60 },
+  empty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 12,
+    paddingTop: 60,
+  },
   emptyText: { fontSize: 14, color: "#9ca3af" },
 });

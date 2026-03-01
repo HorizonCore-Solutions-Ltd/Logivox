@@ -89,7 +89,8 @@ function TaskCard({
       <Text style={styles.cardSubtitle}>{task.name}</Text>
       <View style={styles.cardRow}>
         <Text style={styles.detail}>
-          <Ionicons name="location-outline" size={12} /> {task.locationCode} ({task.zone})
+          <Ionicons name="location-outline" size={12} /> {task.locationCode} (
+          {task.zone})
         </Text>
         <Text style={styles.detail}>
           Qty: <Text style={{ fontWeight: "700" }}>{task.orderedQuantity}</Text>
@@ -138,9 +139,15 @@ export default function PickingScreen() {
 
   const confirmMutation = useMutation({
     mutationFn: (task: PickTask) =>
-      pickItem({ orderId: task.orderId, itemId: task.id, quantity: task.orderedQuantity }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["pickingQueue"] }),
-    onError: () => Alert.alert("Error", "Failed to confirm pick. Please try again."),
+      pickItem({
+        orderId: task.orderId,
+        itemId: task.id,
+        quantity: task.orderedQuantity,
+      }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["pickingQueue"] }),
+    onError: () =>
+      Alert.alert("Error", "Failed to confirm pick. Please try again."),
   });
 
   const shortMutation = useMutation({
@@ -163,9 +170,14 @@ export default function PickingScreen() {
   });
 
   const orders: PickingOrder[] =
-    (tasksData as any)?.orders ?? (Array.isArray(tasksData) ? (tasksData as PickingOrder[]) : []);
+    (tasksData as any)?.orders ??
+    (Array.isArray(tasksData) ? (tasksData as PickingOrder[]) : []);
   const tasks: PickTask[] = orders.flatMap((o) =>
-    (o.items ?? []).map((item) => ({ ...item, orderId: o.id, orderNumber: o.soNumber }))
+    (o.items ?? []).map((item) => ({
+      ...item,
+      orderId: o.id,
+      orderNumber: o.soNumber,
+    })),
   );
   const metrics = metricsData as {
     picksToday: number;
@@ -203,8 +215,14 @@ export default function PickingScreen() {
         <ActivityIndicator style={{ marginTop: 40 }} color="#3b82f6" />
       ) : tasks.length === 0 ? (
         <View style={styles.empty}>
-          <Ionicons name="checkmark-done-circle-outline" size={48} color="#10b981" />
-          <Text style={styles.emptyText}>No tasks assigned — check back soon!</Text>
+          <Ionicons
+            name="checkmark-done-circle-outline"
+            size={48}
+            color="#10b981"
+          />
+          <Text style={styles.emptyText}>
+            No tasks assigned — check back soon!
+          </Text>
         </View>
       ) : (
         <FlatList
@@ -269,9 +287,8 @@ export default function PickingScreen() {
           </View>
         </View>
       </Modal>
-
-      </View>
-    );
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -340,9 +357,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     padding: 20,
   },
-  modalTitle: { fontSize: 16, fontWeight: "700", color: "#111827", marginBottom: 4 },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 4,
+  },
   modalSubtitle: { fontSize: 13, color: "#6b7280", marginBottom: 14 },
-  inputLabel: { fontSize: 12, color: "#374151", fontWeight: "600", marginBottom: 4 },
+  inputLabel: {
+    fontSize: 12,
+    color: "#374151",
+    fontWeight: "600",
+    marginBottom: 4,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#d1d5db",

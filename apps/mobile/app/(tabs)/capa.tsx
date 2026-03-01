@@ -42,7 +42,9 @@ export default function CAPAScreen() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type, setType] = useState<"CORRECTIVE" | "PREVENTIVE">("CORRECTIVE");
-  const [priority, setPriority] = useState<"LOW" | "MEDIUM" | "HIGH" | "CRITICAL">("MEDIUM");
+  const [priority, setPriority] = useState<
+    "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
+  >("MEDIUM");
 
   const { data, isLoading } = useQuery({
     queryKey: ["capa", filterStatus],
@@ -67,11 +69,24 @@ export default function CAPAScreen() {
     onError: () => Alert.alert("Error", "Failed to close CAPA item."),
   });
 
-  const items: CAPAItem[] = (data as any)?.items ?? (Array.isArray(data) ? data : []);
-  const statuses = ["OPEN", "IN_PROGRESS", "PENDING_REVIEW", "CLOSED", "OVERDUE"];
-  const types: Array<"CORRECTIVE" | "PREVENTIVE"> = ["CORRECTIVE", "PREVENTIVE"];
+  const items: CAPAItem[] =
+    (data as any)?.items ?? (Array.isArray(data) ? data : []);
+  const statuses = [
+    "OPEN",
+    "IN_PROGRESS",
+    "PENDING_REVIEW",
+    "CLOSED",
+    "OVERDUE",
+  ];
+  const types: Array<"CORRECTIVE" | "PREVENTIVE"> = [
+    "CORRECTIVE",
+    "PREVENTIVE",
+  ];
   const priorities: Array<"LOW" | "MEDIUM" | "HIGH" | "CRITICAL"> = [
-    "LOW", "MEDIUM", "HIGH", "CRITICAL",
+    "LOW",
+    "MEDIUM",
+    "HIGH",
+    "CRITICAL",
   ];
 
   return (
@@ -85,7 +100,11 @@ export default function CAPAScreen() {
           style={[styles.chip, !filterStatus && styles.chipActive]}
           onPress={() => setFilterStatus(undefined)}
         >
-          <Text style={[styles.chipText, !filterStatus && styles.chipTextActive]}>All</Text>
+          <Text
+            style={[styles.chipText, !filterStatus && styles.chipTextActive]}
+          >
+            All
+          </Text>
         </TouchableOpacity>
         {statuses.map((s) => (
           <TouchableOpacity
@@ -93,7 +112,12 @@ export default function CAPAScreen() {
             style={[styles.chip, filterStatus === s && styles.chipActive]}
             onPress={() => setFilterStatus(filterStatus === s ? undefined : s)}
           >
-            <Text style={[styles.chipText, filterStatus === s && styles.chipTextActive]}>
+            <Text
+              style={[
+                styles.chipText,
+                filterStatus === s && styles.chipTextActive,
+              ]}
+            >
               {s.replace("_", " ")}
             </Text>
           </TouchableOpacity>
@@ -102,7 +126,10 @@ export default function CAPAScreen() {
 
       <View style={styles.header}>
         <Text style={styles.title}>CAPA Items ({items.length})</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={() => setShowCreate(true)}>
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => setShowCreate(true)}
+        >
           <Ionicons name="add" size={18} color="#fff" />
           <Text style={styles.addBtnText}>New CAPA</Text>
         </TouchableOpacity>
@@ -129,10 +156,14 @@ export default function CAPAScreen() {
                 <View
                   style={[
                     styles.badge,
-                    { backgroundColor: STATUS_COLORS[item.status] ?? "#6b7280" },
+                    {
+                      backgroundColor: STATUS_COLORS[item.status] ?? "#6b7280",
+                    },
                   ]}
                 >
-                  <Text style={styles.badgeText}>{item.status.replace("_", " ")}</Text>
+                  <Text style={styles.badgeText}>
+                    {item.status.replace("_", " ")}
+                  </Text>
                 </View>
               </View>
               <View style={styles.cardRow}>
@@ -140,7 +171,9 @@ export default function CAPAScreen() {
                 <View
                   style={[
                     styles.priorityBadge,
-                    { borderColor: PRIORITY_COLORS[item.priority] ?? "#6b7280" },
+                    {
+                      borderColor: PRIORITY_COLORS[item.priority] ?? "#6b7280",
+                    },
                   ]}
                 >
                   <Text
@@ -163,9 +196,15 @@ export default function CAPAScreen() {
               ) : null}
               {item.status !== "CLOSED" && (
                 <TouchableOpacity
-                  style={[styles.btn, { backgroundColor: "#10b981", marginTop: 10 }]}
+                  style={[
+                    styles.btn,
+                    { backgroundColor: "#10b981", marginTop: 10 },
+                  ]}
                   onPress={() =>
-                    closeMutation.mutate({ id: item.id, notes: "Action completed and verified." })
+                    closeMutation.mutate({
+                      id: item.id,
+                      notes: "Action completed and verified.",
+                    })
                   }
                 >
                   <Text style={styles.btnText}>Close</Text>
@@ -206,7 +245,11 @@ export default function CAPAScreen() {
                   style={[styles.toggleBtn, type === t && styles.toggleActive]}
                   onPress={() => setType(t)}
                 >
-                  <Text style={[styles.toggleText, type === t && { color: "#fff" }]}>{t}</Text>
+                  <Text
+                    style={[styles.toggleText, type === t && { color: "#fff" }]}
+                  >
+                    {t}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -222,7 +265,14 @@ export default function CAPAScreen() {
                   ]}
                   onPress={() => setPriority(p)}
                 >
-                  <Text style={[styles.toggleText, priority === p && { color: "#fff" }]}>{p}</Text>
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      priority === p && { color: "#fff" },
+                    ]}
+                  >
+                    {p}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -255,34 +305,127 @@ export default function CAPAScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
-  filterStrip: { paddingHorizontal: 12, paddingVertical: 8, flexDirection: "row", gap: 6 },
-  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: "#e5e7eb", marginBottom: 4 },
+  filterStrip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: "row",
+    gap: 6,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "#e5e7eb",
+    marginBottom: 4,
+  },
   chipActive: { backgroundColor: "#3b82f6" },
   chipText: { fontSize: 12, color: "#374151", fontWeight: "600" },
   chipTextActive: { color: "#fff" },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingBottom: 8 },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
   title: { fontSize: 18, fontWeight: "700", color: "#111827" },
-  addBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "#3b82f6", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8 },
+  addBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#3b82f6",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+  },
   addBtnText: { color: "#fff", fontSize: 13, fontWeight: "600" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
-  ref: { fontSize: 13, fontWeight: "700", color: "#1e40af", flex: 1, marginRight: 8 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  ref: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#1e40af",
+    flex: 1,
+    marginRight: 8,
+  },
   detail: { fontSize: 12, color: "#6b7280", marginBottom: 2 },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
   badgeText: { color: "#fff", fontSize: 10, fontWeight: "600" },
-  priorityBadge: { borderWidth: 1, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10 },
+  priorityBadge: {
+    borderWidth: 1,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+  },
   priorityText: { fontSize: 10, fontWeight: "700" },
-  btn: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 6, alignItems: "center" },
+  btn: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 6,
+    alignItems: "center",
+  },
   btnText: { color: "#fff", fontSize: 12, fontWeight: "600" },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", gap: 12 },
   emptyText: { fontSize: 14, color: "#9ca3af" },
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-end" },
-  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
-  sheetTitle: { fontSize: 16, fontWeight: "700", color: "#111827", marginBottom: 12 },
-  inputLabel: { fontSize: 12, color: "#374151", fontWeight: "600", marginBottom: 4, marginTop: 8 },
-  input: { borderWidth: 1, borderColor: "#d1d5db", borderRadius: 8, padding: 10, fontSize: 14, marginBottom: 4, color: "#111827" },
-  toggleRow: { flexDirection: "row", flexWrap: "wrap", gap: 6, marginBottom: 4 },
-  toggleBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6, backgroundColor: "#e5e7eb" },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  sheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+  },
+  sheetTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 12,
+  },
+  inputLabel: {
+    fontSize: 12,
+    color: "#374151",
+    fontWeight: "600",
+    marginBottom: 4,
+    marginTop: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 14,
+    marginBottom: 4,
+    color: "#111827",
+  },
+  toggleRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginBottom: 4,
+  },
+  toggleBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    backgroundColor: "#e5e7eb",
+  },
   toggleActive: { backgroundColor: "#3b82f6" },
   toggleText: { fontSize: 12, color: "#374151", fontWeight: "600" },
   sheetActions: { flexDirection: "row", gap: 10, marginTop: 16 },

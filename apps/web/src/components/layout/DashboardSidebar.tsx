@@ -46,6 +46,12 @@ import {
   FileWarning,
   AlertTriangle,
   Zap,
+  DollarSign,
+  ArrowDownCircle,
+  Receipt,
+  FileCheck,
+  TrendingUp,
+  AlertCircle,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { OrganizationSwitcher } from "@/components/organizations/organization-switcher";
@@ -65,6 +71,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     Procurement: false,
     Operations: false,
     Quality: false,
+    Billing: false,
     Duties: false,
     "Next-Gen": false,
   });
@@ -100,6 +107,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         { name: "All Items", href: "/dashboard/inventory", icon: Package },
         { name: "Warehouses", href: "/dashboard/warehouses", icon: Warehouse },
         { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
+        { name: "Replenishment", href: "/dashboard/replenishment", icon: ArrowDownCircle },
       ],
     },
     {
@@ -120,6 +128,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         },
         { name: "Packing", href: "/dashboard/packs", icon: BoxSelect },
         { name: "Shipments", href: "/dashboard/shipments", icon: Truck },
+        { name: "Invoices", href: "/billing/invoices", icon: Receipt },
       ],
     },
     {
@@ -143,6 +152,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           icon: ClipboardCheck,
         },
         { name: "Suppliers", href: "/dashboard/suppliers", icon: Building },
+        { name: "ASN Processing", href: "/receiving/asn-processing", icon: FileCheck },
       ],
     },
     {
@@ -171,6 +181,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           href: "/dashboard/cycle-counts",
           icon: ClipboardList,
         },
+        { name: "Exceptions", href: "/dashboard/exceptions", icon: AlertCircle },
       ],
     },
     {
@@ -256,7 +267,25 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         },
       ],
     },
-    { name: "Customers", href: "/dashboard/customers", icon: Users },
+    {
+      name: "Billing",
+      href: "/billing/invoices",
+      icon: DollarSign,
+      subItems: [
+        { name: "Invoices", href: "/billing/invoices", icon: Receipt },
+        { name: "Accessorial Charges", href: "/billing/accessorial", icon: TrendingUp },
+        { name: "Invoice Settings", href: "/organization/invoice-settings", icon: Settings },
+      ],
+    },
+    {
+      name: "Customers",
+      href: "/dashboard/customers",
+      icon: Users,
+      subItems: [
+        { name: "All Customers", href: "/dashboard/customers", icon: Users },
+        { name: "Contracts", href: "/dashboard/customers/contracts", icon: FileCheck },
+      ],
+    },
     { name: "Bookings", href: "/dashboard/bookings", icon: FileText },
     { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
     { name: "Reports", href: "/dashboard/reports", icon: FileBarChart },

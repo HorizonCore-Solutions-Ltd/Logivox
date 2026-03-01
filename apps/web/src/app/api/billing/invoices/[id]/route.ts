@@ -7,7 +7,7 @@ import { z } from "zod";
 import { sendEmail } from "@/lib/services/email-service";
 
 const updateInvoiceSchema = z.object({
-  status: z.enum(["DRAFT", "SENT", "PAID", "OVERDUE", "CANCELLED"]).optional(),
+  status: z.enum(["DRAFT", "SENT", "PAID", "PARTIALLY_PAID", "OVERDUE", "CANCELLED", "VOID", "DISPUTED"]).optional(),
   notes: z.string().optional(),
 });
 
@@ -296,3 +296,57 @@ export async function POST(
     );
   }
 }
+/**
+ * PATCH /api/billing/invoices/[id]
+ * Partial update (status, notes)
+ */
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const organizationId = (session.user as any).organizationId;
+    const body = await req.json();
+    const validatedData = updateInvoiceSchema.parse(body);
+
+    const existing = await prisma.invoice.findFirst({
+      where: { id: params.id, organizationId },
+    });
+    if (!existing) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
+
+    const extraData: Record<string, any> = {};
+    if (validatedData.status === "SENT") extraData.sentAt = new Date();
+    if (validatedData.status === "PAID") extraData.paidAt = new Date();
+
+    const invoice = await prisma.invoice.update({
+      where: { id: params.id },
+      data: { ...validatedData, ...extraData },
+    });
+
+    await prisma.activityLog.create({
+      data: {
+        organizationId,
+        userId: session.user.id,
+        action: `INVOICE_${validatedData.status ?? "UPDATED"}`,
+        resourceType: "Invoice",
+        resourceId: invoice.id,
+        details: { invoiceNumber: invoice.invoiceNumber },
+      },
+    });
+
+    return NextResponse.json({ success: true, invoice });
+  } catch (error: any) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: "Validation error", details: error.errors }, { status: 400 });
+    }
+    console.error("Error patching invoice:", error);
+    return NextResponse.json({ error: "Failed to update invoice" }, { status: 500 });
+  }
+}
+export { PUT as PATCH };

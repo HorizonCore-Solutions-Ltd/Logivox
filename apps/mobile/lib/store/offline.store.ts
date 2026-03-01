@@ -36,7 +36,9 @@ interface OfflineState {
 
   // Actions
   initialize: () => Promise<void>;
-  enqueue: (op: Omit<QueuedOperation, "id" | "retries" | "createdAt">) => Promise<void>;
+  enqueue: (
+    op: Omit<QueuedOperation, "id" | "retries" | "createdAt">,
+  ) => Promise<void>;
   processQueue: () => Promise<void>;
   clearQueue: () => Promise<void>;
   setOnline: (online: boolean) => void;
@@ -64,13 +66,19 @@ export const useOfflineStore = create<OfflineState>((set, get) => ({
     }
 
     // Subscribe to connectivity changes
-    NetInfo.addEventListener((state: { isConnected: boolean | null; isInternetReachable: boolean | null }) => {
-      const isOnline = state.isConnected === true && state.isInternetReachable !== false;
-      get().setOnline(isOnline);
-      if (isOnline && get().queue.length > 0) {
-        get().processQueue();
-      }
-    });
+    NetInfo.addEventListener(
+      (state: {
+        isConnected: boolean | null;
+        isInternetReachable: boolean | null;
+      }) => {
+        const isOnline =
+          state.isConnected === true && state.isInternetReachable !== false;
+        get().setOnline(isOnline);
+        if (isOnline && get().queue.length > 0) {
+          get().processQueue();
+        }
+      },
+    );
   },
 
   setOnline: (isOnline: boolean) => set({ isOnline }),

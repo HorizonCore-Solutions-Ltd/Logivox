@@ -49,7 +49,9 @@ function ReturnCard({
           <Text style={styles.badgeText}>{item.status}</Text>
         </View>
       </View>
-      <Text style={styles.cardSubtitle}>{item.customerName ?? `Order ${item.orderId}`}</Text>
+      <Text style={styles.cardSubtitle}>
+        {item.customerName ?? `Order ${item.orderId}`}
+      </Text>
       <Text style={styles.detail}>
         {item.lines?.length ?? 0} line(s) · {item.reason}
       </Text>
@@ -105,7 +107,12 @@ export default function ReturnsScreen() {
 
   const createMutation = useMutation({
     mutationFn: () =>
-      createReturn({ customerId: "UNKNOWN", reason: newReason, orderId: newOrderId, lines: [] }),
+      createReturn({
+        customerId: "UNKNOWN",
+        reason: newReason,
+        orderId: newOrderId,
+        lines: [],
+      }),
     onSuccess: () => {
       setShowCreate(false);
       setNewOrderId("");
@@ -128,7 +135,14 @@ export default function ReturnsScreen() {
   const items: ReturnRequest[] =
     (returnsData as any)?.returns ?? (returnsData as any)?.items ?? [];
 
-  const statuses = ["PENDING", "APPROVED", "RECEIVED", "INSPECTING", "COMPLETED", "REJECTED"];
+  const statuses = [
+    "PENDING",
+    "APPROVED",
+    "RECEIVED",
+    "INSPECTING",
+    "COMPLETED",
+    "REJECTED",
+  ];
 
   return (
     <View style={styles.container}>
@@ -142,7 +156,11 @@ export default function ReturnsScreen() {
           style={[styles.chip, !filterStatus && styles.chipActive]}
           onPress={() => setFilterStatus(undefined)}
         >
-          <Text style={[styles.chipText, !filterStatus && styles.chipTextActive]}>All</Text>
+          <Text
+            style={[styles.chipText, !filterStatus && styles.chipTextActive]}
+          >
+            All
+          </Text>
         </TouchableOpacity>
         {statuses.map((s) => (
           <TouchableOpacity
@@ -150,7 +168,12 @@ export default function ReturnsScreen() {
             style={[styles.chip, filterStatus === s && styles.chipActive]}
             onPress={() => setFilterStatus(filterStatus === s ? undefined : s)}
           >
-            <Text style={[styles.chipText, filterStatus === s && styles.chipTextActive]}>
+            <Text
+              style={[
+                styles.chipText,
+                filterStatus === s && styles.chipTextActive,
+              ]}
+            >
               {s}
             </Text>
           </TouchableOpacity>
@@ -159,7 +182,10 @@ export default function ReturnsScreen() {
 
       <View style={styles.header}>
         <Text style={styles.title}>Returns ({items.length})</Text>
-        <TouchableOpacity style={styles.addBtn} onPress={() => setShowCreate(true)}>
+        <TouchableOpacity
+          style={styles.addBtn}
+          onPress={() => setShowCreate(true)}
+        >
           <Ionicons name="add" size={18} color="#fff" />
           <Text style={styles.addBtnText}>New Return</Text>
         </TouchableOpacity>
@@ -211,7 +237,12 @@ export default function ReturnsScreen() {
                     ]}
                     onPress={() => setNewReason(r.name)}
                   >
-                    <Text style={[styles.chipText, newReason === r.name && styles.chipTextActive]}>
+                    <Text
+                      style={[
+                        styles.chipText,
+                        newReason === r.name && styles.chipTextActive,
+                      ]}
+                    >
                       {r.name}
                     </Text>
                   </TouchableOpacity>
@@ -331,8 +362,18 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 4,
   },
-  sheetTitle: { fontSize: 16, fontWeight: "700", color: "#111827", marginBottom: 12 },
-  inputLabel: { fontSize: 12, color: "#374151", fontWeight: "600", marginBottom: 4 },
+  sheetTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 12,
+  },
+  inputLabel: {
+    fontSize: 12,
+    color: "#374151",
+    fontWeight: "600",
+    marginBottom: 4,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#d1d5db",

@@ -13,7 +13,7 @@ export interface SlottingRecommendation {
   velocityClass: "A" | "B" | "C" | "D";
   reason: string;
   estimatedTimeSavingSeconds?: number;
-  confidence?: number;  // 0-100
+  confidence?: number; // 0-100
   status: "PENDING" | "APPROVED" | "APPLIED" | "REJECTED";
   createdAt: string;
 }
@@ -43,26 +43,33 @@ export function getSlottingRecommendations(params?: {
 }) {
   const qs = new URLSearchParams(
     Object.fromEntries(
-      Object.entries(params ?? {}).filter(([, v]) => v != null)
-    ) as Record<string, string>
+      Object.entries(params ?? {}).filter(([, v]) => v != null),
+    ) as Record<string, string>,
   ).toString();
-  return apiClient<{ recommendations: SlottingRecommendation[]; total: number }>(
-    `/api/slotting/recommendations${qs ? `?${qs}` : ""}`
-  );
+  return apiClient<{
+    recommendations: SlottingRecommendation[];
+    total: number;
+  }>(`/api/slotting/recommendations${qs ? `?${qs}` : ""}`);
 }
 
 export function applyRecommendation(id: string) {
-  return apiClient<SlottingRecommendation>(`/api/slotting/recommendations/${id}`, {
-    method: "PATCH",
-    data: { status: "APPLIED" },
-  });
+  return apiClient<SlottingRecommendation>(
+    `/api/slotting/recommendations/${id}`,
+    {
+      method: "PATCH",
+      data: { status: "APPLIED" },
+    },
+  );
 }
 
 export function rejectRecommendation(id: string, reason?: string) {
-  return apiClient<SlottingRecommendation>(`/api/slotting/recommendations/${id}`, {
-    method: "PATCH",
-    data: { status: "REJECTED", reason },
-  });
+  return apiClient<SlottingRecommendation>(
+    `/api/slotting/recommendations/${id}`,
+    {
+      method: "PATCH",
+      data: { status: "REJECTED", reason },
+    },
+  );
 }
 
 export function runSlottingOptimisation(warehouseId: string) {

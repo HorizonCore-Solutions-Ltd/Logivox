@@ -290,6 +290,7 @@ setLoading(false);
 };
 
 return (
+
 <div>
 <button onClick={getRecommendation} disabled={loading}>
 {loading ? "Calculating..." : "Recommend Vehicle"}

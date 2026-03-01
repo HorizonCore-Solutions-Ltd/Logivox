@@ -47,17 +47,17 @@ export function getAssemblyOrders(params?: {
 }) {
   const qs = new URLSearchParams(
     Object.fromEntries(
-      Object.entries(params ?? {}).filter(([, v]) => v != null)
-    ) as Record<string, string>
+      Object.entries(params ?? {}).filter(([, v]) => v != null),
+    ) as Record<string, string>,
   ).toString();
   return apiClient<{ orders: AssemblyOrder[]; total: number }>(
-    `/api/assembly-orders${qs ? `?${qs}` : ""}`
+    `/api/assembly-orders${qs ? `?${qs}` : ""}`,
   );
 }
 
 export function getAssemblyOrder(id: string) {
   return apiClient<AssemblyOrder & { bomLines: BOMLine[] }>(
-    `/api/assembly-orders/${id}`
+    `/api/assembly-orders/${id}`,
   );
 }
 
@@ -71,7 +71,7 @@ export function startAssemblyOrder(id: string) {
 export function pickBOMComponent(
   orderId: string,
   lineId: string,
-  quantity: number
+  quantity: number,
 ) {
   return apiClient<BOMLine>(`/api/assembly-orders/${orderId}/pick`, {
     method: "POST",
@@ -82,7 +82,7 @@ export function pickBOMComponent(
 export function completeAssemblyOrder(
   id: string,
   completedQuantity: number,
-  notes?: string
+  notes?: string,
 ) {
   return apiClient<AssemblyOrder>(`/api/assembly-orders/${id}`, {
     method: "PATCH",

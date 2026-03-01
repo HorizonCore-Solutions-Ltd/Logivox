@@ -41,10 +41,20 @@ function EfficiencyBar({ value }: { value: number }) {
   return (
     <View style={{ marginTop: 4 }}>
       <View style={styles.progressRow}>
-        <Text style={[styles.effLabel, { color }]}>{value.toFixed(0)}% efficiency</Text>
+        <Text style={[styles.effLabel, { color }]}>
+          {value.toFixed(0)}% efficiency
+        </Text>
       </View>
       <View style={styles.trackBg}>
-        <View style={[styles.trackFill, { width: `${Math.min(value, 100)}%` as any, backgroundColor: color }]} />
+        <View
+          style={[
+            styles.trackFill,
+            {
+              width: `${Math.min(value, 100)}%` as any,
+              backgroundColor: color,
+            },
+          ]}
+        />
       </View>
     </View>
   );
@@ -58,9 +68,16 @@ function WorkerCard({ worker }: { worker: ActiveWorker }) {
           <Text style={styles.ref}>
             {worker.firstName} {worker.lastName}
           </Text>
-          <Text style={styles.detail}>{worker.position ?? worker.department ?? "—"}</Text>
+          <Text style={styles.detail}>
+            {worker.position ?? worker.department ?? "—"}
+          </Text>
         </View>
-        <View style={[styles.badge, { backgroundColor: STATUS_COLORS[worker.status] ?? "#6b7280" }]}>
+        <View
+          style={[
+            styles.badge,
+            { backgroundColor: STATUS_COLORS[worker.status] ?? "#6b7280" },
+          ]}
+        >
           <Text style={styles.badgeText}>{worker.status}</Text>
         </View>
       </View>
@@ -71,7 +88,8 @@ function WorkerCard({ worker }: { worker: ActiveWorker }) {
       ) : null}
       {worker.currentLocation ? (
         <Text style={styles.detail}>
-          <Ionicons name="location-outline" size={12} /> {worker.currentLocation}
+          <Ionicons name="location-outline" size={12} />{" "}
+          {worker.currentLocation}
         </Text>
       ) : null}
       <View style={styles.statsRow}>
@@ -101,7 +119,9 @@ function WorkerCard({ worker }: { worker: ActiveWorker }) {
 function HeatmapCard({ cell }: { cell: HeatmapCell }) {
   const color = CONGESTION_COLORS[cell.congestionLevel] ?? "#6b7280";
   return (
-    <View style={[styles.heatCard, { borderLeftColor: color, borderLeftWidth: 4 }]}>
+    <View
+      style={[styles.heatCard, { borderLeftColor: color, borderLeftWidth: 4 }]}
+    >
       <View style={styles.cardRow}>
         <Text style={styles.ref}>{cell.zone}</Text>
         <View style={[styles.badge, { backgroundColor: color }]}>
@@ -116,11 +136,17 @@ function HeatmapCard({ cell }: { cell: HeatmapCell }) {
           <Text style={styles.statVal}>{cell.throughput}</Text> units/hr
         </Text>
         <Text style={styles.stat}>
-          Activity: <Text style={[styles.statVal, { color }]}>{cell.activityScore}</Text>
+          Activity:{" "}
+          <Text style={[styles.statVal, { color }]}>{cell.activityScore}</Text>
         </Text>
       </View>
       <View style={styles.trackBg}>
-        <View style={[styles.trackFill, { width: `${cell.activityScore}%` as any, backgroundColor: color }]} />
+        <View
+          style={[
+            styles.trackFill,
+            { width: `${cell.activityScore}%` as any, backgroundColor: color },
+          ]}
+        />
       </View>
     </View>
   );
@@ -130,18 +156,30 @@ export default function LaborScreen() {
   const [tab, setTab] = useState<Tab>("workers");
   const [refreshing, setRefreshing] = useState(false);
 
-  const { data: dashboardData, isLoading: dashLoading, refetch: refetchDash } = useQuery({
+  const {
+    data: dashboardData,
+    isLoading: dashLoading,
+    refetch: refetchDash,
+  } = useQuery({
     queryKey: ["laborDashboard"],
     queryFn: () => getLaborDashboard(),
   });
 
-  const { data: workersData, isLoading: workersLoading, refetch: refetchWorkers } = useQuery({
+  const {
+    data: workersData,
+    isLoading: workersLoading,
+    refetch: refetchWorkers,
+  } = useQuery({
     queryKey: ["activeWorkers"],
     queryFn: () => getActiveWorkers(),
     enabled: tab === "workers",
   });
 
-  const { data: heatmapData, isLoading: heatLoading, refetch: refetchHeat } = useQuery({
+  const {
+    data: heatmapData,
+    isLoading: heatLoading,
+    refetch: refetchHeat,
+  } = useQuery({
     queryKey: ["floorHeatmap"],
     queryFn: () => getFloorHeatmap(),
     enabled: tab === "heatmap",
@@ -149,7 +187,10 @@ export default function LaborScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await Promise.all([refetchDash(), tab === "workers" ? refetchWorkers() : refetchHeat()]);
+    await Promise.all([
+      refetchDash(),
+      tab === "workers" ? refetchWorkers() : refetchHeat(),
+    ]);
     setRefreshing(false);
   };
 
@@ -163,13 +204,35 @@ export default function LaborScreen() {
       {dashboard ? (
         <View style={styles.kpiBar}>
           {[
-            { label: "Active", value: dashboard.activeWorkers, total: dashboard.totalWorkers, color: "#10b981" },
-            { label: "On Break", value: dashboard.onBreak, total: null, color: "#f59e0b" },
-            { label: "Avg Eff.", value: `${dashboard.avgEfficiencyPct?.toFixed(0) ?? 0}%`, total: null, color: "#3b82f6" },
-            { label: "Units", value: dashboard.totalUnitsToday, total: null, color: "#8b5cf6" },
+            {
+              label: "Active",
+              value: dashboard.activeWorkers,
+              total: dashboard.totalWorkers,
+              color: "#10b981",
+            },
+            {
+              label: "On Break",
+              value: dashboard.onBreak,
+              total: null,
+              color: "#f59e0b",
+            },
+            {
+              label: "Avg Eff.",
+              value: `${dashboard.avgEfficiencyPct?.toFixed(0) ?? 0}%`,
+              total: null,
+              color: "#3b82f6",
+            },
+            {
+              label: "Units",
+              value: dashboard.totalUnitsToday,
+              total: null,
+              color: "#8b5cf6",
+            },
           ].map((k) => (
             <View key={k.label} style={styles.kpiItem}>
-              <Text style={[styles.kpiValue, { color: k.color }]}>{k.value}</Text>
+              <Text style={[styles.kpiValue, { color: k.color }]}>
+                {k.value}
+              </Text>
               {k.total != null ? (
                 <Text style={styles.kpiLabel}>of {k.total}</Text>
               ) : null}
@@ -191,7 +254,9 @@ export default function LaborScreen() {
             style={[styles.tabBtn, tab === t && styles.tabBtnActive]}
             onPress={() => setTab(t)}
           >
-            <Text style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}>
+            <Text
+              style={[styles.tabBtnText, tab === t && styles.tabBtnTextActive]}
+            >
               {t === "workers" ? "Workers" : "Floor Heatmap"}
             </Text>
           </TouchableOpacity>
@@ -206,7 +271,9 @@ export default function LaborScreen() {
             data={workers}
             keyExtractor={(w) => w.employeeId}
             contentContainerStyle={{ padding: 12 }}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
             renderItem={({ item }) => <WorkerCard worker={item} />}
             ListEmptyComponent={
               <View style={styles.empty}>
@@ -223,7 +290,9 @@ export default function LaborScreen() {
           data={cells}
           keyExtractor={(c) => c.zone}
           contentContainerStyle={{ padding: 12 }}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
           renderItem={({ item }) => <HeatmapCard cell={item} />}
           ListEmptyComponent={
             <View style={styles.empty}>
@@ -239,30 +308,78 @@ export default function LaborScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
-  kpiBar: { flexDirection: "row", backgroundColor: "#1e3a5f", paddingVertical: 14, paddingHorizontal: 8 },
+  kpiBar: {
+    flexDirection: "row",
+    backgroundColor: "#1e3a5f",
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+  },
   kpiItem: { flex: 1, alignItems: "center" },
   kpiValue: { fontSize: 20, fontWeight: "700", color: "#fff" },
   kpiLabel: { fontSize: 10, color: "#94a3b8", marginTop: 2 },
-  tabRow: { flexDirection: "row", backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: "#e2e8f0" },
+  tabRow: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e2e8f0",
+  },
   tabBtn: { flex: 1, paddingVertical: 12, alignItems: "center" },
   tabBtnActive: { borderBottomWidth: 2, borderBottomColor: "#2563eb" },
   tabBtnText: { fontSize: 13, color: "#6b7280", fontWeight: "600" },
   tabBtnTextActive: { color: "#2563eb" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  heatCard: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.05, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 6 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  heatCard: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
   ref: { fontSize: 15, fontWeight: "700", color: "#1e293b" },
   detail: { fontSize: 13, color: "#6b7280", marginTop: 2 },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10 },
   badgeText: { fontSize: 10, color: "#fff", fontWeight: "700" },
-  statsRow: { flexDirection: "row", gap: 14, marginTop: 6, alignItems: "center" },
+  statsRow: {
+    flexDirection: "row",
+    gap: 14,
+    marginTop: 6,
+    alignItems: "center",
+  },
   stat: { fontSize: 12, color: "#6b7280" },
   statVal: { fontWeight: "700", color: "#1e293b" },
-  overtimeBadge: { backgroundColor: "#fde68a", paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
+  overtimeBadge: {
+    backgroundColor: "#fde68a",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+  },
   overtimeText: { fontSize: 10, fontWeight: "700", color: "#92400e" },
   effLabel: { fontSize: 12, fontWeight: "600" },
   progressRow: { flexDirection: "row", justifyContent: "space-between" },
-  trackBg: { height: 5, backgroundColor: "#e2e8f0", borderRadius: 3, marginTop: 4 },
+  trackBg: {
+    height: 5,
+    backgroundColor: "#e2e8f0",
+    borderRadius: 3,
+    marginTop: 4,
+  },
   trackFill: { height: 5, borderRadius: 3 },
   empty: { alignItems: "center", paddingTop: 60, gap: 10 },
   emptyText: { fontSize: 14, color: "#9ca3af" },

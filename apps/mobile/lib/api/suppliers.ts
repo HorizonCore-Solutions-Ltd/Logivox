@@ -36,7 +36,13 @@ export interface PurchaseOrder {
   poNumber: string;
   supplierId: string;
   supplierName?: string;
-  status: "DRAFT" | "SENT" | "CONFIRMED" | "PARTIALLY_RECEIVED" | "FULLY_RECEIVED" | "CANCELLED";
+  status:
+    | "DRAFT"
+    | "SENT"
+    | "CONFIRMED"
+    | "PARTIALLY_RECEIVED"
+    | "FULLY_RECEIVED"
+    | "CANCELLED";
   totalAmount: number;
   currency: string;
   expectedDate?: string;
@@ -45,14 +51,22 @@ export interface PurchaseOrder {
 }
 
 // GET /api/suppliers — list suppliers
-export async function getSuppliers(params?: { status?: string; search?: string; limit?: number }) {
+export async function getSuppliers(params?: {
+  status?: string;
+  search?: string;
+  limit?: number;
+}) {
   const { data } = await apiClient.get("/api/suppliers", { params });
   return data as { suppliers: Supplier[]; pagination: { total: number } };
 }
 
 // GET /api/suppliers/:id/scorecard
-export async function getSupplierScorecard(supplierId: string): Promise<SupplierScorecard> {
-  const { data } = await apiClient.get(`/api/suppliers/${supplierId}/scorecard`);
+export async function getSupplierScorecard(
+  supplierId: string,
+): Promise<SupplierScorecard> {
+  const { data } = await apiClient.get(
+    `/api/suppliers/${supplierId}/scorecard`,
+  );
   return data;
 }
 
@@ -63,7 +77,10 @@ export async function getPurchaseOrders(params?: {
   limit?: number;
 }) {
   const { data } = await apiClient.get("/api/purchase-orders", { params });
-  return data as { purchaseOrders: PurchaseOrder[]; summary: { open: number; overdue: number; totalValue: number } };
+  return data as {
+    purchaseOrders: PurchaseOrder[];
+    summary: { open: number; overdue: number; totalValue: number };
+  };
 }
 
 // POST /api/purchase-orders — create PO

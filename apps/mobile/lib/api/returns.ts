@@ -3,7 +3,14 @@ import { apiClient } from "./client";
 export interface ReturnRequest {
   id: string;
   rmaNumber: string;
-  status: "PENDING" | "APPROVED" | "RECEIVED" | "INSPECTING" | "COMPLETED" | "REJECTED" | "CANCELLED";
+  status:
+    | "PENDING"
+    | "APPROVED"
+    | "RECEIVED"
+    | "INSPECTING"
+    | "COMPLETED"
+    | "REJECTED"
+    | "CANCELLED";
   reason: string;
   condition?: "NEW" | "GOOD" | "DAMAGED" | "DEFECTIVE";
   customerId: string;
@@ -51,7 +58,12 @@ export async function getReturns(params?: {
   return data as {
     returns: ReturnRequest[];
     pagination: { total: number; page: number; totalPages: number };
-    summary: { pending: number; approved: number; received: number; refundValue: number };
+    summary: {
+      pending: number;
+      approved: number;
+      received: number;
+      refundValue: number;
+    };
   };
 }
 
@@ -74,13 +86,24 @@ export async function approveReturn(id: string, notes?: string) {
 }
 
 // PUT /api/returns/:id/receive — mark items as physically received
-export async function receiveReturn(id: string, lines: { lineId: string; quantityReceived: number; condition: string }[]) {
+export async function receiveReturn(
+  id: string,
+  lines: { lineId: string; quantityReceived: number; condition: string }[],
+) {
   const { data } = await apiClient.put(`/api/returns/${id}/receive`, { lines });
   return data;
 }
 
 // PUT /api/returns/:id/inspect — record inspection result per line
-export async function inspectReturn(id: string, lines: { lineId: string; condition: string; disposition: string; notes?: string }[]) {
+export async function inspectReturn(
+  id: string,
+  lines: {
+    lineId: string;
+    condition: string;
+    disposition: string;
+    notes?: string;
+  }[],
+) {
   const { data } = await apiClient.put(`/api/returns/${id}/inspect`, { lines });
   return data;
 }

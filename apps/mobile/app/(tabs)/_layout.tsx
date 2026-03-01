@@ -2,7 +2,11 @@ import { Tabs } from "expo-router";
 import { Platform } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuthStore } from "../../lib/store/auth.store";
-import { isTabVisible, TAB_ADD_ON_MAP, type TabName } from "../../lib/config/roleAccess";
+import {
+  isTabVisible,
+  TAB_ADD_ON_MAP,
+  type TabName,
+} from "../../lib/config/roleAccess";
 import { useAddOnsStore } from "../../lib/store/addons.store";
 
 const ACTIVE = "#2563EB";
@@ -19,30 +23,120 @@ interface TabDef {
 
 const TAB_DEFS: TabDef[] = [
   { name: "index", title: "Home", icon: "home-outline", activeIcon: "home" },
-  { name: "picking", title: "Picking", icon: "layers-outline", activeIcon: "layers" },
-  { name: "inventory", title: "Inventory", icon: "cube-outline", activeIcon: "cube" },
-  { name: "orders", title: "Orders", icon: "receipt-outline", activeIcon: "receipt" },
-  { name: "receiving", title: "Receiving", icon: "download-outline", activeIcon: "download" },
+  {
+    name: "picking",
+    title: "Picking",
+    icon: "layers-outline",
+    activeIcon: "layers",
+  },
+  {
+    name: "inventory",
+    title: "Inventory",
+    icon: "cube-outline",
+    activeIcon: "cube",
+  },
+  {
+    name: "orders",
+    title: "Orders",
+    icon: "receipt-outline",
+    activeIcon: "receipt",
+  },
+  {
+    name: "receiving",
+    title: "Receiving",
+    icon: "download-outline",
+    activeIcon: "download",
+  },
   { name: "returns", title: "Returns", icon: "return-up-back-outline" },
-  { name: "quality", title: "Quality", icon: "shield-checkmark-outline", activeIcon: "shield-checkmark" },
-  { name: "capa", title: "CAPA", icon: "construct-outline", activeIcon: "construct" },
-  { name: "compliance", title: "Compliance", icon: "document-text-outline", activeIcon: "document-text" },
-  { name: "shipping", title: "Shipping", icon: "airplane-outline", activeIcon: "airplane" },
-  { name: "suppliers", title: "Suppliers", icon: "business-outline", activeIcon: "business" },
-  { name: "analytics", title: "Analytics", icon: "bar-chart-outline", activeIcon: "bar-chart" },
+  {
+    name: "quality",
+    title: "Quality",
+    icon: "shield-checkmark-outline",
+    activeIcon: "shield-checkmark",
+  },
+  {
+    name: "capa",
+    title: "CAPA",
+    icon: "construct-outline",
+    activeIcon: "construct",
+  },
+  {
+    name: "compliance",
+    title: "Compliance",
+    icon: "document-text-outline",
+    activeIcon: "document-text",
+  },
+  {
+    name: "shipping",
+    title: "Shipping",
+    icon: "airplane-outline",
+    activeIcon: "airplane",
+  },
+  {
+    name: "suppliers",
+    title: "Suppliers",
+    icon: "business-outline",
+    activeIcon: "business",
+  },
+  {
+    name: "analytics",
+    title: "Analytics",
+    icon: "bar-chart-outline",
+    activeIcon: "bar-chart",
+  },
   { name: "cyclecount", title: "Counts", icon: "swap-horizontal-outline" },
-  { name: "invoices", title: "Invoices", icon: "cash-outline", activeIcon: "cash" },
+  {
+    name: "invoices",
+    title: "Invoices",
+    icon: "cash-outline",
+    activeIcon: "cash",
+  },
   { name: "more", title: "More", icon: "grid-outline", activeIcon: "grid" },
   // ── Operational tabs ───────────────────────────────────────────────────────
   { name: "yard", title: "Yard", icon: "car-outline", activeIcon: "car" },
   { name: "dock", title: "Dock", icon: "enter-outline", activeIcon: "enter" },
-  { name: "marshalling", title: "Marshalling", icon: "git-merge-outline", activeIcon: "git-merge" },
-  { name: "waves", title: "Waves", icon: "layers-outline", activeIcon: "layers" },
-  { name: "labor", title: "Labour", icon: "people-outline", activeIcon: "people" },
-  { name: "slotting", title: "Slotting", icon: "grid-outline", activeIcon: "grid" },
-  { name: "assembly", title: "Assembly", icon: "build-outline", activeIcon: "build" },
-  { name: "delivery", title: "Delivery", icon: "map-outline", activeIcon: "map" },
-  { name: "profile", title: "Profile", icon: "person-outline", activeIcon: "person" },
+  {
+    name: "marshalling",
+    title: "Marshalling",
+    icon: "git-merge-outline",
+    activeIcon: "git-merge",
+  },
+  {
+    name: "waves",
+    title: "Waves",
+    icon: "layers-outline",
+    activeIcon: "layers",
+  },
+  {
+    name: "labor",
+    title: "Labour",
+    icon: "people-outline",
+    activeIcon: "people",
+  },
+  {
+    name: "slotting",
+    title: "Slotting",
+    icon: "grid-outline",
+    activeIcon: "grid",
+  },
+  {
+    name: "assembly",
+    title: "Assembly",
+    icon: "build-outline",
+    activeIcon: "build",
+  },
+  {
+    name: "delivery",
+    title: "Delivery",
+    icon: "map-outline",
+    activeIcon: "map",
+  },
+  {
+    name: "profile",
+    title: "Profile",
+    icon: "person-outline",
+    activeIcon: "person",
+  },
 ];
 
 export default function TabLayout() {

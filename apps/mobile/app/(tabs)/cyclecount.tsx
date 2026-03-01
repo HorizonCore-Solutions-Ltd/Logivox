@@ -39,7 +39,8 @@ function CountLineRow({
   onRecord: (lineId: string, qty: number) => void;
 }) {
   const [qty, setQty] = useState(line.countedQty?.toString() ?? "");
-  const hasVariance = line.countedQty !== undefined && line.countedQty !== line.expectedQty;
+  const hasVariance =
+    line.countedQty !== undefined && line.countedQty !== line.expectedQty;
   return (
     <View style={[styles.lineRow, hasVariance && styles.lineVariance]}>
       <View style={{ flex: 1 }}>
@@ -104,9 +105,17 @@ export default function CycleCountScreen() {
   });
 
   const recordMutation = useMutation({
-    mutationFn: ({ cycleCountId, lineId, qty }: { cycleCountId: string; lineId: string; qty: number }) =>
-      recordCount(cycleCountId, lineId, { countedQty: qty }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cycleCounts"] }),
+    mutationFn: ({
+      cycleCountId,
+      lineId,
+      qty,
+    }: {
+      cycleCountId: string;
+      lineId: string;
+      qty: number;
+    }) => recordCount(cycleCountId, lineId, { countedQty: qty }),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ["cycleCounts"] }),
     onError: () => Alert.alert("Error", "Failed to record count."),
   });
 
@@ -119,9 +128,15 @@ export default function CycleCountScreen() {
     onError: () => Alert.alert("Error", "Failed to submit."),
   });
 
-  const counts: CycleCount[] = (data as any)?.items ?? (Array.isArray(data) ? data : []);
+  const counts: CycleCount[] =
+    (data as any)?.items ?? (Array.isArray(data) ? data : []);
   const statuses = ["SCHEDULED", "IN_PROGRESS", "PENDING_REVIEW", "COMPLETED"];
-  const types: Array<CycleCount["type"]> = ["FULL", "PARTIAL", "LOCATION", "ABC"];
+  const types: Array<CycleCount["type"]> = [
+    "FULL",
+    "PARTIAL",
+    "LOCATION",
+    "ABC",
+  ];
 
   return (
     <View style={styles.container}>
@@ -136,19 +151,31 @@ export default function CycleCountScreen() {
             <View
               style={[
                 styles.badge,
-                { backgroundColor: STATUS_COLORS[selectedCount.status] ?? "#6b7280" },
+                {
+                  backgroundColor:
+                    STATUS_COLORS[selectedCount.status] ?? "#6b7280",
+                },
               ]}
             >
-              <Text style={styles.badgeText}>{selectedCount.status.replace("_", " ")}</Text>
+              <Text style={styles.badgeText}>
+                {selectedCount.status.replace("_", " ")}
+              </Text>
             </View>
           </View>
           <Text style={styles.detailMeta}>
-            {selectedCount.countedLines}/{selectedCount.totalLines} lines counted ·{" "}
-            {selectedCount.varianceCount} variances
+            {selectedCount.countedLines}/{selectedCount.totalLines} lines
+            counted · {selectedCount.varianceCount} variances
           </Text>
           {selectedCount.status === "SCHEDULED" && (
             <TouchableOpacity
-              style={[styles.btn, { backgroundColor: "#3b82f6", margin: 12, alignSelf: "stretch" }]}
+              style={[
+                styles.btn,
+                {
+                  backgroundColor: "#3b82f6",
+                  margin: 12,
+                  alignSelf: "stretch",
+                },
+              ]}
               onPress={() => startMutation.mutate(selectedCount.id)}
             >
               <Text style={styles.btnText}>Start Count</Text>
@@ -174,7 +201,14 @@ export default function CycleCountScreen() {
                 )}
               />
               <TouchableOpacity
-                style={[styles.btn, { backgroundColor: "#10b981", margin: 12, alignSelf: "stretch" }]}
+                style={[
+                  styles.btn,
+                  {
+                    backgroundColor: "#10b981",
+                    margin: 12,
+                    alignSelf: "stretch",
+                  },
+                ]}
                 onPress={() => submitMutation.mutate(selectedCount.id)}
               >
                 <Text style={styles.btnText}>Submit for Review</Text>
@@ -194,15 +228,29 @@ export default function CycleCountScreen() {
               style={[styles.chip, !filterStatus && styles.chipActive]}
               onPress={() => setFilterStatus(undefined)}
             >
-              <Text style={[styles.chipText, !filterStatus && styles.chipTextActive]}>All</Text>
+              <Text
+                style={[
+                  styles.chipText,
+                  !filterStatus && styles.chipTextActive,
+                ]}
+              >
+                All
+              </Text>
             </TouchableOpacity>
             {statuses.map((s) => (
               <TouchableOpacity
                 key={s}
                 style={[styles.chip, filterStatus === s && styles.chipActive]}
-                onPress={() => setFilterStatus(filterStatus === s ? undefined : s)}
+                onPress={() =>
+                  setFilterStatus(filterStatus === s ? undefined : s)
+                }
               >
-                <Text style={[styles.chipText, filterStatus === s && styles.chipTextActive]}>
+                <Text
+                  style={[
+                    styles.chipText,
+                    filterStatus === s && styles.chipTextActive,
+                  ]}
+                >
                   {s.replace("_", " ")}
                 </Text>
               </TouchableOpacity>
@@ -211,7 +259,10 @@ export default function CycleCountScreen() {
 
           <View style={styles.header}>
             <Text style={styles.title}>Cycle Counts ({counts.length})</Text>
-            <TouchableOpacity style={styles.addBtn} onPress={() => setShowCreate(true)}>
+            <TouchableOpacity
+              style={styles.addBtn}
+              onPress={() => setShowCreate(true)}
+            >
               <Ionicons name="add" size={18} color="#fff" />
               <Text style={styles.addBtnText}>New Count</Text>
             </TouchableOpacity>
@@ -221,7 +272,11 @@ export default function CycleCountScreen() {
             <ActivityIndicator style={{ marginTop: 40 }} color="#3b82f6" />
           ) : counts.length === 0 ? (
             <View style={styles.empty}>
-              <Ionicons name="swap-horizontal-outline" size={48} color="#d1d5db" />
+              <Ionicons
+                name="swap-horizontal-outline"
+                size={48}
+                color="#d1d5db"
+              />
               <Text style={styles.emptyText}>No cycle counts found.</Text>
             </View>
           ) : (
@@ -239,14 +294,20 @@ export default function CycleCountScreen() {
                     <View
                       style={[
                         styles.badge,
-                        { backgroundColor: STATUS_COLORS[item.status] ?? "#6b7280" },
+                        {
+                          backgroundColor:
+                            STATUS_COLORS[item.status] ?? "#6b7280",
+                        },
                       ]}
                     >
-                      <Text style={styles.badgeText}>{item.status.replace("_", " ")}</Text>
+                      <Text style={styles.badgeText}>
+                        {item.status.replace("_", " ")}
+                      </Text>
                     </View>
                   </View>
                   <Text style={styles.detail}>
-                    Type: {item.type} · {item.countedLines}/{item.totalLines} lines
+                    Type: {item.type} · {item.countedLines}/{item.totalLines}{" "}
+                    lines
                   </Text>
                   {item.varianceCount > 0 && (
                     <Text style={[styles.detail, { color: "#f59e0b" }]}>
@@ -276,10 +337,20 @@ export default function CycleCountScreen() {
               {types.map((t) => (
                 <TouchableOpacity
                   key={t}
-                  style={[styles.toggleBtn, newType === t && styles.toggleActive]}
+                  style={[
+                    styles.toggleBtn,
+                    newType === t && styles.toggleActive,
+                  ]}
                   onPress={() => setNewType(t)}
                 >
-                  <Text style={[styles.toggleText, newType === t && { color: "#fff" }]}>{t}</Text>
+                  <Text
+                    style={[
+                      styles.toggleText,
+                      newType === t && { color: "#fff" },
+                    ]}
+                  >
+                    {t}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -311,41 +382,141 @@ export default function CycleCountScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#f8fafc" },
-  filterStrip: { paddingHorizontal: 12, paddingVertical: 8, flexDirection: "row", gap: 6 },
-  chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, backgroundColor: "#e5e7eb" },
+  filterStrip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: "row",
+    gap: 6,
+  },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "#e5e7eb",
+  },
   chipActive: { backgroundColor: "#3b82f6" },
   chipText: { fontSize: 12, color: "#374151", fontWeight: "600" },
   chipTextActive: { color: "#fff" },
-  header: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 16, paddingBottom: 8 },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
   title: { fontSize: 18, fontWeight: "700", color: "#111827" },
-  addBtn: { flexDirection: "row", alignItems: "center", gap: 4, backgroundColor: "#3b82f6", paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8 },
+  addBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#3b82f6",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+  },
   addBtnText: { color: "#fff", fontSize: 13, fontWeight: "600" },
-  card: { backgroundColor: "#fff", borderRadius: 10, padding: 14, marginBottom: 10, shadowColor: "#000", shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 },
-  cardRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 4 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
   ref: { fontSize: 14, fontWeight: "700", color: "#1e40af" },
   detail: { fontSize: 12, color: "#6b7280", marginBottom: 2 },
   badge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 12 },
   badgeText: { color: "#fff", fontSize: 10, fontWeight: "600" },
   empty: { flex: 1, alignItems: "center", justifyContent: "center", gap: 12 },
   emptyText: { fontSize: 14, color: "#9ca3af" },
-  detailHeader: { flexDirection: "row", alignItems: "center", gap: 10, padding: 16, borderBottomWidth: 1, borderColor: "#e5e7eb" },
+  detailHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    padding: 16,
+    borderBottomWidth: 1,
+    borderColor: "#e5e7eb",
+  },
   detailTitle: { flex: 1, fontSize: 15, fontWeight: "700", color: "#111827" },
-  detailMeta: { fontSize: 12, color: "#6b7280", paddingHorizontal: 16, paddingVertical: 8 },
-  lineRow: { backgroundColor: "#fff", borderRadius: 8, padding: 12, marginBottom: 8, flexDirection: "row", alignItems: "center" },
+  detailMeta: {
+    fontSize: 12,
+    color: "#6b7280",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  lineRow: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 8,
+    flexDirection: "row",
+    alignItems: "center",
+  },
   lineVariance: { borderLeftWidth: 3, borderColor: "#f59e0b" },
   lineSku: { fontSize: 13, fontWeight: "700", color: "#1e40af" },
   lineLocation: { fontSize: 12, color: "#6b7280" },
   lineExpected: { fontSize: 12, color: "#374151" },
-  qtyInput: { borderWidth: 1, borderColor: "#d1d5db", borderRadius: 6, padding: 6, width: 60, fontSize: 14, textAlign: "center", color: "#111827" },
+  qtyInput: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 6,
+    padding: 6,
+    width: 60,
+    fontSize: 14,
+    textAlign: "center",
+    color: "#111827",
+  },
   recordBtn: { backgroundColor: "#3b82f6", padding: 8, borderRadius: 6 },
-  btn: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 6, alignItems: "center" },
+  btn: {
+    paddingHorizontal: 14,
+    paddingVertical: 9,
+    borderRadius: 6,
+    alignItems: "center",
+  },
   btnText: { color: "#fff", fontSize: 13, fontWeight: "600" },
-  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.4)", justifyContent: "flex-end" },
-  sheet: { backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
-  sheetTitle: { fontSize: 16, fontWeight: "700", color: "#111827", marginBottom: 12 },
-  inputLabel: { fontSize: 12, color: "#374151", fontWeight: "600", marginBottom: 8 },
-  toggleRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 8 },
-  toggleBtn: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 6, backgroundColor: "#e5e7eb" },
+  overlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "flex-end",
+  },
+  sheet: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+  },
+  sheetTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 12,
+  },
+  inputLabel: {
+    fontSize: 12,
+    color: "#374151",
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  toggleRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginBottom: 8,
+  },
+  toggleBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 6,
+    backgroundColor: "#e5e7eb",
+  },
   toggleActive: { backgroundColor: "#3b82f6" },
   toggleText: { fontSize: 13, color: "#374151", fontWeight: "600" },
   sheetActions: { flexDirection: "row", gap: 10, marginTop: 16 },
