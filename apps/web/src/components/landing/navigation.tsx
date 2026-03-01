@@ -4,6 +4,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Building2,
@@ -269,11 +270,18 @@ export function Navigation() {
       <div className="container-enterprise">
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
-              <Building2 className="h-5 w-5" />
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative h-10 w-10 transition-transform group-hover:scale-105">
+              <Image
+                src="/favicon.svg"
+                alt="LogiVox Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+                priority
+              />
             </div>
-            <span className="text-xl font-bold">LogiVox</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">LogiVox</span>
           </Link>
 
           {/* Desktop Navigation */}

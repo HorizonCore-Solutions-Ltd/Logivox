@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Building2,
@@ -105,12 +106,18 @@ export function Footer() {
         <div className="py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-6">
           {/* Company Info & Contact */}
           <div className="sm:col-span-2 lg:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary to-primary/80 text-white">
-                <Building2 className="h-5 w-5" />
+            <Link href="/" className="flex items-center space-x-3 mb-4 group w-fit">
+              <div className="relative h-10 w-10 transition-transform group-hover:scale-105">
+                <Image
+                  src="/favicon.svg"
+                  alt="LogiVox Logo"
+                  width={40}
+                  height={40}
+                  className="object-contain"
+                />
               </div>
-              <span className="text-xl font-bold text-white">LogiVox</span>
-            </div>
+              <span className="text-xl font-bold text-white group-hover:text-primary-400 transition-colors">LogiVox</span>
+            </Link>
             <p className="text-slate-400 mb-6 max-w-sm text-sm leading-relaxed">
               Complete warehouse management system with wave picking, real-time
               inventory tracking, and intelligent order fulfillment.
