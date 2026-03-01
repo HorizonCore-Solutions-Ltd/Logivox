@@ -29,7 +29,9 @@ export async function GET(
       where: { id: params.id, organizationId },
       include: {
         customer: true,
-        warehouse: { select: { id: true, name: true, code: true, address: true } },
+        warehouse: {
+          select: { id: true, name: true, code: true, address: true },
+        },
         items: {
           include: {
             inventoryItem: {
@@ -63,7 +65,14 @@ export async function GET(
           },
         },
         packs: {
-          select: { id: true, packNumber: true, weight: true, length: true, width: true, height: true },
+          select: {
+            id: true,
+            packNumber: true,
+            weight: true,
+            length: true,
+            width: true,
+            height: true,
+          },
         },
       },
     });
@@ -75,7 +84,9 @@ export async function GET(
     const settings = (order.organization.invoiceSettings as any) ?? {};
     const shipment = order.shipments[0];
     const printDate = new Date().toLocaleDateString("en-GB", {
-      day: "2-digit", month: "short", year: "numeric",
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
     });
 
     const rowsHtml = order.items

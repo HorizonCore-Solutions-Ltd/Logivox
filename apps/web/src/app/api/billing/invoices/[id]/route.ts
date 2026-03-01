@@ -7,7 +7,18 @@ import { z } from "zod";
 import { sendEmail } from "@/lib/services/email-service";
 
 const updateInvoiceSchema = z.object({
-  status: z.enum(["DRAFT", "SENT", "PAID", "PARTIALLY_PAID", "OVERDUE", "CANCELLED", "VOID", "DISPUTED"]).optional(),
+  status: z
+    .enum([
+      "DRAFT",
+      "SENT",
+      "PAID",
+      "PARTIALLY_PAID",
+      "OVERDUE",
+      "CANCELLED",
+      "VOID",
+      "DISPUTED",
+    ])
+    .optional(),
   notes: z.string().optional(),
 });
 
@@ -343,10 +354,16 @@ export async function PATCH(
     return NextResponse.json({ success: true, invoice });
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: "Validation error", details: error.errors }, { status: 400 });
+      return NextResponse.json(
+        { error: "Validation error", details: error.errors },
+        { status: 400 },
+      );
     }
     console.error("Error patching invoice:", error);
-    return NextResponse.json({ error: "Failed to update invoice" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to update invoice" },
+      { status: 500 },
+    );
   }
 }
 export { PUT as PATCH };

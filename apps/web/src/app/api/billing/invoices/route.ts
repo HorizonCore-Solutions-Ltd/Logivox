@@ -55,7 +55,10 @@ export async function GET(req: NextRequest) {
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
     const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
-    const limit = Math.min(100, parseInt(searchParams.get("limit") || "20", 10));
+    const limit = Math.min(
+      100,
+      parseInt(searchParams.get("limit") || "20", 10),
+    );
 
     const where: any = {
       organizationId,
@@ -76,7 +79,9 @@ export async function GET(req: NextRequest) {
       prisma.invoice.findMany({
         where,
         include: {
-          customer: { select: { id: true, name: true, code: true, email: true } },
+          customer: {
+            select: { id: true, name: true, code: true, email: true },
+          },
           lineItems: true,
           payments: true,
         },

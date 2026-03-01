@@ -24,22 +24,31 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const customer = await prisma.customer.findFirst({
     where: { id: params.id, organizationId },
     select: {
-      id: true, name: true, code: true, currency: true,
-      creditLimit: true, creditUsed: true, creditHold: true, paymentTermsDays: true,
+      id: true,
+      name: true,
+      code: true,
+      currency: true,
+      creditLimit: true,
+      creditUsed: true,
+      creditHold: true,
+      paymentTermsDays: true,
     },
   });
-  if (!customer) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+  if (!customer)
+    return NextResponse.json({ error: "Customer not found" }, { status: 404 });
 
   const creditLimit = Number(customer.creditLimit ?? 0);
   const creditUsed = Number(customer.creditUsed ?? 0);
   const available = creditLimit > 0 ? creditLimit - creditUsed : null;
-  const utilizationPct = creditLimit > 0 ? Math.round((creditUsed / creditLimit) * 100) : null;
+  const utilizationPct =
+    creditLimit > 0 ? Math.round((creditUsed / creditLimit) * 100) : null;
 
   // Outstanding invoices aging
   const invoices = await prisma.invoice.findMany({
@@ -48,14 +57,23 @@ export async function GET(
       customerId: params.id,
       status: { notIn: ["PAID", "CANCELLED", "VOID"] },
     },
-    select: { id: true, invoiceNumber: true, totalAmount: true, dueDate: true, status: true, createdAt: true },
+    select: {
+      id: true,
+      invoiceNumber: true,
+      totalAmount: true,
+      dueDate: true,
+      status: true,
+      createdAt: true,
+    },
     orderBy: { dueDate: "asc" },
   });
 
   const now = new Date();
   const aging = { current: 0, days30: 0, days60: 0, days90plus: 0 };
   for (const inv of invoices) {
-    const daysOverdue = Math.floor((now.getTime() - new Date(inv.dueDate).getTime()) / 86_400_000);
+    const daysOverdue = Math.floor(
+      (now.getTime() - new Date(inv.dueDate).getTime()) / 86_400_000,
+    );
     const amt = Number(inv.totalAmount);
     if (daysOverdue <= 0) aging.current += amt;
     else if (daysOverdue <= 30) aging.days30 += amt;
@@ -66,7 +84,16 @@ export async function GET(
   // Active contract
   const contract = await prisma.customerContract.findFirst({
     where: { organizationId, customerId: params.id, status: "ACTIVE" },
-    select: { id: true, contractNumber: true, name: true, creditLimit: true, discountPct: true, paymentTermsDays: true, pricingTier: true, endDate: true },
+    select: {
+      id: true,
+      contractNumber: true,
+      name: true,
+      creditLimit: true,
+      discountPct: true,
+      paymentTermsDays: true,
+      pricingTier: true,
+      endDate: true,
+    },
   });
 
   // Open orders value
@@ -108,7 +135,8 @@ export async function POST(
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json();
@@ -116,14 +144,21 @@ export async function POST(
 
   const customer = await prisma.customer.findFirst({
     where: { id: params.id, organizationId },
-    select: { id: true, name: true, creditLimit: true, creditUsed: true, creditHold: true },
+    select: {
+      id: true,
+      name: true,
+      creditLimit: true,
+      creditUsed: true,
+      creditHold: true,
+    },
   });
-  if (!customer) return NextResponse.json({ error: "Customer not found" }, { status: 404 });
+  if (!customer)
+    return NextResponse.json({ error: "Customer not found" }, { status: 404 });
 
   const creditLimit = Number(customer.creditLimit ?? 0);
   const creditUsed = Number(customer.creditUsed ?? 0);
   const available = creditLimit > 0 ? creditLimit - creditUsed : Infinity;
-  const wouldExceed = creditLimit > 0 && (creditUsed + orderValue) > creditLimit;
+  const wouldExceed = creditLimit > 0 && creditUsed + orderValue > creditLimit;
 
   let approved = true;
   let risk: "LOW" | "MEDIUM" | "HIGH" | "BLOCKED" = "LOW";
@@ -136,7 +171,9 @@ export async function POST(
   } else if (wouldExceed) {
     approved = false;
     risk = "BLOCKED";
-    flags.push(`Order value ${orderValue} would exceed credit limit ${creditLimit}`);
+    flags.push(
+      `Order value ${orderValue} would exceed credit limit ${creditLimit}`,
+    );
 
     // Auto-set credit hold
     await prisma.customer.update({
@@ -157,9 +194,15 @@ export async function POST(
       },
     });
   } else {
-    const utilization = creditLimit > 0 ? (creditUsed + orderValue) / creditLimit : 0;
-    if (utilization >= 0.9) { risk = "HIGH"; flags.push("Credit utilization will exceed 90%"); }
-    else if (utilization >= 0.7) { risk = "MEDIUM"; flags.push("Credit utilization above 70%"); }
+    const utilization =
+      creditLimit > 0 ? (creditUsed + orderValue) / creditLimit : 0;
+    if (utilization >= 0.9) {
+      risk = "HIGH";
+      flags.push("Credit utilization will exceed 90%");
+    } else if (utilization >= 0.7) {
+      risk = "MEDIUM";
+      flags.push("Credit utilization above 70%");
+    }
   }
 
   return NextResponse.json({

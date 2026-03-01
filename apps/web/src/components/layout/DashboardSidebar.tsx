@@ -107,7 +107,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         { name: "All Items", href: "/dashboard/inventory", icon: Package },
         { name: "Warehouses", href: "/dashboard/warehouses", icon: Warehouse },
         { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
-        { name: "Replenishment", href: "/dashboard/replenishment", icon: ArrowDownCircle },
+        {
+          name: "Replenishment",
+          href: "/dashboard/replenishment",
+          icon: ArrowDownCircle,
+        },
       ],
     },
     {
@@ -152,7 +156,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           icon: ClipboardCheck,
         },
         { name: "Suppliers", href: "/dashboard/suppliers", icon: Building },
-        { name: "ASN Processing", href: "/receiving/asn-processing", icon: FileCheck },
+        {
+          name: "ASN Processing",
+          href: "/receiving/asn-processing",
+          icon: FileCheck,
+        },
       ],
     },
     {
@@ -181,7 +189,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           href: "/dashboard/cycle-counts",
           icon: ClipboardList,
         },
-        { name: "Exceptions", href: "/dashboard/exceptions", icon: AlertCircle },
+        {
+          name: "Exceptions",
+          href: "/dashboard/exceptions",
+          icon: AlertCircle,
+        },
       ],
     },
     {
@@ -273,8 +285,16 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       icon: DollarSign,
       subItems: [
         { name: "Invoices", href: "/billing/invoices", icon: Receipt },
-        { name: "Accessorial Charges", href: "/billing/accessorial", icon: TrendingUp },
-        { name: "Invoice Settings", href: "/organization/invoice-settings", icon: Settings },
+        {
+          name: "Accessorial Charges",
+          href: "/billing/accessorial",
+          icon: TrendingUp,
+        },
+        {
+          name: "Invoice Settings",
+          href: "/organization/invoice-settings",
+          icon: Settings,
+        },
       ],
     },
     {
@@ -283,7 +303,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       icon: Users,
       subItems: [
         { name: "All Customers", href: "/dashboard/customers", icon: Users },
-        { name: "Contracts", href: "/dashboard/customers/contracts", icon: FileCheck },
+        {
+          name: "Contracts",
+          href: "/dashboard/customers/contracts",
+          icon: FileCheck,
+        },
       ],
     },
     { name: "Bookings", href: "/dashboard/bookings", icon: FileText },

@@ -15,7 +15,10 @@ const createSchema = z.object({
   name: z.string().min(1).max(150),
   description: z.string().optional(),
   startDate: z.string().transform((s) => new Date(s)),
-  endDate: z.string().optional().transform((s) => s ? new Date(s) : undefined),
+  endDate: z
+    .string()
+    .optional()
+    .transform((s) => (s ? new Date(s) : undefined)),
   autoRenew: z.boolean().default(false),
   currency: z.string().length(3).default("USD"),
   paymentTermsDays: z.number().int().min(0).max(365).default(30),
@@ -29,7 +32,8 @@ const createSchema = z.object({
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const { searchParams } = new URL(request.url);
@@ -50,7 +54,17 @@ export async function GET(request: NextRequest) {
       }),
     },
     include: {
-      customer: { select: { id: true, name: true, code: true, email: true, creditLimit: true, creditUsed: true, creditHold: true } },
+      customer: {
+        select: {
+          id: true,
+          name: true,
+          code: true,
+          email: true,
+          creditLimit: true,
+          creditUsed: true,
+          creditHold: true,
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -73,17 +87,26 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json();
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Validation failed", issues: parsed.error.flatten().fieldErrors }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: "Validation failed",
+        issues: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 },
+    );
   }
 
   // Auto-generate contract number
-  const count = await prisma.customerContract.count({ where: { organizationId } });
+  const count = await prisma.customerContract.count({
+    where: { organizationId },
+  });
   const contractNumber = `CTR-${new Date().getFullYear()}-${String(count + 1).padStart(4, "0")}`;
 
   const contract = await prisma.customerContract.create({

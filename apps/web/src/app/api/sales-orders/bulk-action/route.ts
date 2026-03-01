@@ -19,7 +19,13 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-const VALID_ACTIONS = ["release", "generate-invoice", "close", "approve", "cancel"] as const;
+const VALID_ACTIONS = [
+  "release",
+  "generate-invoice",
+  "close",
+  "approve",
+  "cancel",
+] as const;
 type BulkAction = (typeof VALID_ACTIONS)[number];
 
 export async function POST(request: NextRequest) {
@@ -35,7 +41,9 @@ export async function POST(request: NextRequest) {
 
     if (!VALID_ACTIONS.includes(action)) {
       return NextResponse.json(
-        { error: `Invalid action. Must be one of: ${VALID_ACTIONS.join(", ")}` },
+        {
+          error: `Invalid action. Must be one of: ${VALID_ACTIONS.join(", ")}`,
+        },
         { status: 400 },
       );
     }
@@ -59,10 +67,18 @@ export async function POST(request: NextRequest) {
     const orders = await prisma.salesOrder.findMany({
       where: { id: { in: orderIds }, organizationId },
       include: {
-        items: { include: { inventoryItem: { select: { name: true, sku: true } } } },
+        items: {
+          include: { inventoryItem: { select: { name: true, sku: true } } },
+        },
         customer: { select: { id: true, name: true, email: true } },
-        organization: { select: { name: true, invoiceSettings: true, currency: true } },
-        shipments: { take: 1, orderBy: { createdAt: "desc" }, select: { shipmentNumber: true } },
+        organization: {
+          select: { name: true, invoiceSettings: true, currency: true },
+        },
+        shipments: {
+          take: 1,
+          orderBy: { createdAt: "desc" },
+          select: { shipmentNumber: true },
+        },
       },
     });
 
@@ -88,7 +104,9 @@ export async function POST(request: NextRequest) {
           case "approve": {
             if (!["DRAFT", "PENDING_APPROVAL"].includes(order.status)) {
               results.push({
-                orderId, soNumber: order.soNumber, success: false,
+                orderId,
+                soNumber: order.soNumber,
+                success: false,
                 error: `Cannot approve order in status "${order.status}"`,
               });
               break;
@@ -101,7 +119,12 @@ export async function POST(request: NextRequest) {
                 approvedDate: new Date(),
               },
             });
-            results.push({ orderId, soNumber: order.soNumber, success: true, message: "Approved" });
+            results.push({
+              orderId,
+              soNumber: order.soNumber,
+              success: true,
+              message: "Approved",
+            });
             break;
           }
 
@@ -109,7 +132,9 @@ export async function POST(request: NextRequest) {
           case "release": {
             if (!["APPROVED", "DRAFT"].includes(order.status)) {
               results.push({
-                orderId, soNumber: order.soNumber, success: false,
+                orderId,
+                soNumber: order.soNumber,
+                success: false,
                 error: `Cannot release order in status "${order.status}"`,
               });
               break;
@@ -117,7 +142,9 @@ export async function POST(request: NextRequest) {
             const warehouseId = options.warehouseId || order.warehouseId;
             if (!warehouseId) {
               results.push({
-                orderId, soNumber: order.soNumber, success: false,
+                orderId,
+                soNumber: order.soNumber,
+                success: false,
                 error: "No warehouse assigned",
               });
               break;
@@ -131,7 +158,12 @@ export async function POST(request: NextRequest) {
                 releasedById: session.user.id,
               },
             });
-            results.push({ orderId, soNumber: order.soNumber, success: true, message: "Released" });
+            results.push({
+              orderId,
+              soNumber: order.soNumber,
+              success: true,
+              message: "Released",
+            });
             break;
           }
 
@@ -139,7 +171,9 @@ export async function POST(request: NextRequest) {
           case "generate-invoice": {
             if (order.invoiceNumber) {
               results.push({
-                orderId, soNumber: order.soNumber, success: false,
+                orderId,
+                soNumber: order.soNumber,
+                success: false,
                 error: `Already invoiced as ${order.invoiceNumber}`,
               });
               break;
@@ -152,14 +186,19 @@ export async function POST(request: NextRequest) {
             dueDate.setDate(dueDate.getDate() + termsNet);
 
             const dateStr = today.toISOString().split("T")[0].replace(/-/g, "");
-            const count = await prisma.invoice.count({ where: { organizationId } });
-            const invoiceNumber = `INV-${dateStr}-${String(count + results.filter(r => r.success && action === "generate-invoice").length + 1).padStart(4, "0")}`;
+            const count = await prisma.invoice.count({
+              where: { organizationId },
+            });
+            const invoiceNumber = `INV-${dateStr}-${String(count + results.filter((r) => r.success && action === "generate-invoice").length + 1).padStart(4, "0")}`;
 
             const lineItems = order.items.map((item) => ({
               description: `${item.inventoryItem?.sku ? `[${item.inventoryItem.sku}] ` : ""}${item.inventoryItem?.name ?? "Product"}`,
               quantity: item.quantity,
               unitPrice: Number(item.unitPrice),
-              amount: item.quantity * Number(item.unitPrice) * (1 - Number(item.discount ?? 0) / 100),
+              amount:
+                item.quantity *
+                Number(item.unitPrice) *
+                (1 - Number(item.discount ?? 0) / 100),
             }));
 
             await prisma.invoice.create({
@@ -190,7 +229,9 @@ export async function POST(request: NextRequest) {
             });
 
             results.push({
-              orderId, soNumber: order.soNumber, success: true,
+              orderId,
+              soNumber: order.soNumber,
+              success: true,
               message: `Invoice ${invoiceNumber} generated`,
             });
             break;
@@ -198,10 +239,19 @@ export async function POST(request: NextRequest) {
 
           // ── Close ────────────────────────────────────────────────────────
           case "close": {
-            const closeable = ["INVOICED", "SHIPPED", "DELIVERED", "APPROVED", "RELEASED", "PACKED"];
+            const closeable = [
+              "INVOICED",
+              "SHIPPED",
+              "DELIVERED",
+              "APPROVED",
+              "RELEASED",
+              "PACKED",
+            ];
             if (!closeable.includes(order.status)) {
               results.push({
-                orderId, soNumber: order.soNumber, success: false,
+                orderId,
+                soNumber: order.soNumber,
+                success: false,
                 error: `Cannot close order in status "${order.status}"`,
               });
               break;
@@ -214,7 +264,12 @@ export async function POST(request: NextRequest) {
                 closedById: session.user.id,
               },
             });
-            results.push({ orderId, soNumber: order.soNumber, success: true, message: "Closed" });
+            results.push({
+              orderId,
+              soNumber: order.soNumber,
+              success: true,
+              message: "Closed",
+            });
             break;
           }
 
@@ -222,7 +277,9 @@ export async function POST(request: NextRequest) {
           case "cancel": {
             if (["SHIPPED", "DELIVERED", "CLOSED"].includes(order.status)) {
               results.push({
-                orderId, soNumber: order.soNumber, success: false,
+                orderId,
+                soNumber: order.soNumber,
+                success: false,
                 error: `Cannot cancel an already ${order.status.toLowerCase()} order`,
               });
               break;
@@ -231,12 +288,22 @@ export async function POST(request: NextRequest) {
               where: { id: orderId },
               data: { status: "CANCELLED" },
             });
-            results.push({ orderId, soNumber: order.soNumber, success: true, message: "Cancelled" });
+            results.push({
+              orderId,
+              soNumber: order.soNumber,
+              success: true,
+              message: "Cancelled",
+            });
             break;
           }
         }
       } catch (err: any) {
-        results.push({ orderId, soNumber: order.soNumber, success: false, error: err.message });
+        results.push({
+          orderId,
+          soNumber: order.soNumber,
+          success: false,
+          error: err.message,
+        });
       }
     }
 

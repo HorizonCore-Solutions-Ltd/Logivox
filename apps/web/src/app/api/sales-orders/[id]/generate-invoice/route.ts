@@ -27,10 +27,28 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 const TRIGGER_MIN_STATUS: Record<string, string[]> = {
-  ON_ORDER_CONFIRMATION: ["APPROVED", "RELEASED", "PICKING", "PICKED", "PACKING", "PACKED", "SHIPPED", "DELIVERED"],
+  ON_ORDER_CONFIRMATION: [
+    "APPROVED",
+    "RELEASED",
+    "PICKING",
+    "PICKED",
+    "PACKING",
+    "PACKED",
+    "SHIPPED",
+    "DELIVERED",
+  ],
   ON_SHIPMENT: ["SHIPPED", "DELIVERED"],
   ON_DELIVERY_CONFIRMATION: ["DELIVERED"],
-  MANUAL: ["APPROVED", "RELEASED", "PICKING", "PICKED", "PACKING", "PACKED", "SHIPPED", "DELIVERED"],
+  MANUAL: [
+    "APPROVED",
+    "RELEASED",
+    "PICKING",
+    "PICKED",
+    "PACKING",
+    "PACKED",
+    "SHIPPED",
+    "DELIVERED",
+  ],
 };
 
 export async function POST(
@@ -56,10 +74,19 @@ export async function POST(
         warehouse: true,
         items: {
           include: {
-            inventoryItem: { select: { id: true, name: true, sku: true, description: true } },
+            inventoryItem: {
+              select: { id: true, name: true, sku: true, description: true },
+            },
           },
         },
-        organization: { select: { id: true, name: true, invoiceSettings: true, currency: true } },
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            invoiceSettings: true,
+            currency: true,
+          },
+        },
       },
     });
 
@@ -82,7 +109,8 @@ export async function POST(
     const trigger: string = settings.trigger ?? "ON_SHIPMENT";
     const termsNet: number = dueInDays ?? settings.termsNet ?? 30;
 
-    const allowedStatuses = TRIGGER_MIN_STATUS[trigger] ?? TRIGGER_MIN_STATUS.MANUAL;
+    const allowedStatuses =
+      TRIGGER_MIN_STATUS[trigger] ?? TRIGGER_MIN_STATUS.MANUAL;
     if (!force && !allowedStatuses.includes(order.status)) {
       return NextResponse.json(
         {
@@ -111,7 +139,9 @@ export async function POST(
       discount: Number(item.discount ?? 0),
       taxRate: Number(item.taxRate ?? 0),
       lineTotal:
-        (item.quantity * Number(item.unitPrice)) * (1 - Number(item.discount ?? 0) / 100),
+        item.quantity *
+        Number(item.unitPrice) *
+        (1 - Number(item.discount ?? 0) / 100),
     }));
 
     const subtotal = Number(order.subtotal);
@@ -169,7 +199,12 @@ export async function POST(
         action: "SALES_ORDER_INVOICED",
         resourceType: "SalesOrder",
         resourceId: params.id,
-        details: { soNumber: order.soNumber, invoiceNumber, total, sendEmail } as any,
+        details: {
+          soNumber: order.soNumber,
+          invoiceNumber,
+          total,
+          sendEmail,
+        } as any,
       },
     });
 

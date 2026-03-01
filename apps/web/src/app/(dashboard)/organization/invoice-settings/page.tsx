@@ -42,13 +42,41 @@ interface InvoiceSettings {
 }
 
 const TRIGGER_OPTIONS = [
-  { value: "ON_ORDER_CONFIRMATION", label: "On Order Confirmation", description: "Invoice is generated as soon as an order is confirmed/approved" },
-  { value: "ON_SHIPMENT", label: "On Shipment", description: "Invoice is generated when goods leave the warehouse" },
-  { value: "ON_DELIVERY_CONFIRMATION", label: "On Delivery Confirmation", description: "Invoice is generated after customer confirms receipt" },
-  { value: "MANUAL", label: "Manual", description: "Finance team generates invoices manually" },
+  {
+    value: "ON_ORDER_CONFIRMATION",
+    label: "On Order Confirmation",
+    description:
+      "Invoice is generated as soon as an order is confirmed/approved",
+  },
+  {
+    value: "ON_SHIPMENT",
+    label: "On Shipment",
+    description: "Invoice is generated when goods leave the warehouse",
+  },
+  {
+    value: "ON_DELIVERY_CONFIRMATION",
+    label: "On Delivery Confirmation",
+    description: "Invoice is generated after customer confirms receipt",
+  },
+  {
+    value: "MANUAL",
+    label: "Manual",
+    description: "Finance team generates invoices manually",
+  },
 ];
 
-const CURRENCIES = ["USD", "EUR", "GBP", "ZAR", "AUD", "CAD", "JPY", "CNY", "NGN", "KES"];
+const CURRENCIES = [
+  "USD",
+  "EUR",
+  "GBP",
+  "ZAR",
+  "AUD",
+  "CAD",
+  "JPY",
+  "CNY",
+  "NGN",
+  "KES",
+];
 
 export default function InvoiceSettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -105,29 +133,45 @@ export default function InvoiceSettingsPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        const issues = data.issues ? Object.entries(data.issues).map(([k, v]) => `${k}: ${v}`).join("; ") : data.error;
+        const issues = data.issues
+          ? Object.entries(data.issues)
+              .map(([k, v]) => `${k}: ${v}`)
+              .join("; ")
+          : data.error;
         throw new Error(issues);
       }
 
       setSettings((prev) => ({ ...prev, ...data.settings }));
-      toast({ title: "Settings saved", description: "Invoice settings updated successfully." });
+      toast({
+        title: "Settings saved",
+        description: "Invoice settings updated successfully.",
+      });
     } catch (err: any) {
-      toast({ title: "Save failed", description: err.message, variant: "destructive" });
+      toast({
+        title: "Save failed",
+        description: err.message,
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }
   };
 
-  const update = <K extends keyof InvoiceSettings>(key: K, value: InvoiceSettings[K]) =>
-    setSettings((prev) => ({ ...prev, [key]: value }));
+  const update = <K extends keyof InvoiceSettings>(
+    key: K,
+    value: InvoiceSettings[K],
+  ) => setSettings((prev) => ({ ...prev, [key]: value }));
 
-  const selectedTrigger = TRIGGER_OPTIONS.find((t) => t.value === settings.trigger);
+  const selectedTrigger = TRIGGER_OPTIONS.find(
+    (t) => t.value === settings.trigger,
+  );
 
   if (loading) {
     return (
       <DashboardSidebar>
         <div className="flex items-center justify-center h-64 text-muted-foreground">
-          <RefreshCw className="h-5 w-5 animate-spin mr-2" />Loading settings...
+          <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+          Loading settings...
         </div>
       </DashboardSidebar>
     );
@@ -145,7 +189,11 @@ export default function InvoiceSettingsPage() {
             </p>
           </div>
           <Button onClick={save} disabled={saving}>
-            {saving ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            {saving ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
             Save Settings
           </Button>
         </div>
@@ -154,18 +202,26 @@ export default function InvoiceSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Invoice Trigger</CardTitle>
-            <CardDescription>Determines at which point in the order lifecycle an invoice is automatically created</CardDescription>
+            <CardDescription>
+              Determines at which point in the order lifecycle an invoice is
+              automatically created
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label>When to generate invoice</Label>
-              <Select value={settings.trigger} onValueChange={(v) => update("trigger", v)}>
+              <Select
+                value={settings.trigger}
+                onValueChange={(v) => update("trigger", v)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   {TRIGGER_OPTIONS.map((t) => (
-                    <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
+                    <SelectItem key={t.value} value={t.value}>
+                      {t.label}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -180,12 +236,19 @@ export default function InvoiceSettingsPage() {
             {settings.trigger === "ON_DELIVERY_CONFIRMATION" && (
               <div className="flex items-center justify-between rounded-lg border p-3 bg-amber-50">
                 <div>
-                  <p className="text-sm font-medium">Require Delivery Confirmation</p>
-                  <p className="text-xs text-muted-foreground">Block invoice generation until delivery is confirmed by customer</p>
+                  <p className="text-sm font-medium">
+                    Require Delivery Confirmation
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Block invoice generation until delivery is confirmed by
+                    customer
+                  </p>
                 </div>
                 <Switch
                   checked={settings.requireDeliveryConfirmation}
-                  onCheckedChange={(v) => update("requireDeliveryConfirmation", v)}
+                  onCheckedChange={(v) =>
+                    update("requireDeliveryConfirmation", v)
+                  }
                 />
               </div>
             )}
@@ -196,7 +259,9 @@ export default function InvoiceSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Payment Terms</CardTitle>
-            <CardDescription>Default terms applied to all generated invoices</CardDescription>
+            <CardDescription>
+              Default terms applied to all generated invoices
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -209,7 +274,9 @@ export default function InvoiceSettingsPage() {
                 onChange={(e) => update("termsNet", Number(e.target.value))}
                 placeholder="30"
               />
-              <p className="text-xs text-muted-foreground">e.g. 30 = "Net 30" — payment due 30 days from invoice date</p>
+              <p className="text-xs text-muted-foreground">
+                e.g. 30 = "Net 30" — payment due 30 days from invoice date
+              </p>
             </div>
             <div className="space-y-2">
               <Label>Default Tax Rate (%)</Label>
@@ -230,7 +297,9 @@ export default function InvoiceSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Invoice Numbering</CardTitle>
-            <CardDescription>Customize the format of generated invoice numbers</CardDescription>
+            <CardDescription>
+              Customize the format of generated invoice numbers
+            </CardDescription>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -241,7 +310,9 @@ export default function InvoiceSettingsPage() {
                 placeholder="INV"
                 maxLength={20}
               />
-              <p className="text-xs text-muted-foreground">Example: {settings.invoicePrefix || "INV"}-20250101-0001</p>
+              <p className="text-xs text-muted-foreground">
+                Example: {settings.invoicePrefix || "INV"}-20250101-0001
+              </p>
             </div>
             <div className="space-y-2">
               <Label>Next Sequence Number</Label>
@@ -254,10 +325,19 @@ export default function InvoiceSettingsPage() {
             </div>
             <div className="space-y-2">
               <Label>Default Currency</Label>
-              <Select value={settings.currency} onValueChange={(v) => update("currency", v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={settings.currency}
+                onValueChange={(v) => update("currency", v)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {CURRENCIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  {CURRENCIES.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -268,13 +348,20 @@ export default function InvoiceSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Document Settings</CardTitle>
-            <CardDescription>Packing slips and invoice document customisation</CardDescription>
+            <CardDescription>
+              Packing slips and invoice document customisation
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between rounded-lg border p-3">
               <div>
-                <p className="text-sm font-medium">Auto-generate Packing Slips</p>
-                <p className="text-xs text-muted-foreground">Automatically make packing slips available when an order is packed/shipped</p>
+                <p className="text-sm font-medium">
+                  Auto-generate Packing Slips
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Automatically make packing slips available when an order is
+                  packed/shipped
+                </p>
               </div>
               <Switch
                 checked={settings.showPackingSlip}
@@ -308,7 +395,9 @@ export default function InvoiceSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Payment Details</CardTitle>
-            <CardDescription>Information printed on invoices to guide customers on how to pay</CardDescription>
+            <CardDescription>
+              Information printed on invoices to guide customers on how to pay
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -339,7 +428,9 @@ export default function InvoiceSettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Email Notifications</CardTitle>
-            <CardDescription>Additional recipients CC'd on invoice emails</CardDescription>
+            <CardDescription>
+              Additional recipients CC'd on invoice emails
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             <Label>CC Emails (comma-separated)</Label>
@@ -348,7 +439,10 @@ export default function InvoiceSettingsPage() {
               onChange={(e) => setCcEmailInput(e.target.value)}
               placeholder="finance@company.com, accounts@company.com"
             />
-            <p className="text-xs text-muted-foreground">These addresses will be CC'd on every invoice email sent to customers.</p>
+            <p className="text-xs text-muted-foreground">
+              These addresses will be CC'd on every invoice email sent to
+              customers.
+            </p>
           </CardContent>
         </Card>
 
@@ -356,7 +450,11 @@ export default function InvoiceSettingsPage() {
 
         <div className="flex justify-end">
           <Button onClick={save} disabled={saving} size="lg">
-            {saving ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
+            {saving ? (
+              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
             Save All Settings
           </Button>
         </div>

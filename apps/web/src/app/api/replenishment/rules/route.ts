@@ -12,7 +12,9 @@ import { z } from "zod";
 
 const createSchema = z.object({
   name: z.string().min(1).max(100),
-  strategy: z.enum(["MIN_MAX", "REORDER_POINT", "DEMAND_BASED", "PERIODIC_REVIEW"]).default("MIN_MAX"),
+  strategy: z
+    .enum(["MIN_MAX", "REORDER_POINT", "DEMAND_BASED", "PERIODIC_REVIEW"])
+    .default("MIN_MAX"),
   inventoryItemId: z.string().optional(),
   warehouseId: z.string().optional(),
   minQty: z.number().int().min(0).default(0),
@@ -28,7 +30,8 @@ const createSchema = z.object({
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const { searchParams } = new URL(request.url);
@@ -52,13 +55,20 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json();
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Validation failed", issues: parsed.error.flatten().fieldErrors }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: "Validation failed",
+        issues: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 },
+    );
   }
 
   const rule = await prisma.replenishmentRule.create({

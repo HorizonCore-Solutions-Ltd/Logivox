@@ -14,8 +14,14 @@ const createSchema = z.object({
   chargeCodeId: z.string(),
   salesOrderId: z.string().optional(),
   customerId: z.string().optional(),
-  periodStart: z.string().optional().transform((s) => s ? new Date(s) : undefined),
-  periodEnd: z.string().optional().transform((s) => s ? new Date(s) : undefined),
+  periodStart: z
+    .string()
+    .optional()
+    .transform((s) => (s ? new Date(s) : undefined)),
+  periodEnd: z
+    .string()
+    .optional()
+    .transform((s) => (s ? new Date(s) : undefined)),
   quantity: z.number().min(0.001),
   unitRate: z.number().min(0).optional(), // defaults to chargeCode.defaultRate
   markup: z.number().min(0).default(0),
@@ -25,7 +31,8 @@ const createSchema = z.object({
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const { searchParams } = new URL(request.url);
@@ -46,7 +53,9 @@ export async function GET(request: NextRequest) {
     prisma.accessorialChargeLine.findMany({
       where,
       include: {
-        chargeCode: { select: { code: true, name: true, chargeType: true, unitLabel: true } },
+        chargeCode: {
+          select: { code: true, name: true, chargeType: true, unitLabel: true },
+        },
       },
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * limit,
@@ -74,22 +83,41 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json();
   const parsed = createSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Validation failed", issues: parsed.error.flatten().fieldErrors }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: "Validation failed",
+        issues: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 },
+    );
   }
 
-  const { chargeCodeId, quantity, unitRate, markup, description, currency, ...rest } = parsed.data;
+  const {
+    chargeCodeId,
+    quantity,
+    unitRate,
+    markup,
+    description,
+    currency,
+    ...rest
+  } = parsed.data;
 
   // Load charge code for default rate
   const code = await prisma.accessorialChargeCode.findFirst({
     where: { id: chargeCodeId, organizationId, isActive: true },
   });
-  if (!code) return NextResponse.json({ error: "Charge code not found or inactive" }, { status: 404 });
+  if (!code)
+    return NextResponse.json(
+      { error: "Charge code not found or inactive" },
+      { status: 404 },
+    );
 
   const effectiveRate = unitRate ?? Number(code.defaultRate);
   const effectiveMarkup = markup ?? Number(code.markup);
@@ -100,7 +128,10 @@ export async function POST(request: NextRequest) {
   // Enforce minCharge / maxCharge
   const minC = code.minCharge ? Number(code.minCharge) : null;
   const maxC = code.maxCharge ? Number(code.maxCharge) : null;
-  const finalTotal = Math.max(minC ?? 0, maxC !== null ? Math.min(total, maxC) : total);
+  const finalTotal = Math.max(
+    minC ?? 0,
+    maxC !== null ? Math.min(total, maxC) : total,
+  );
 
   const line = await prisma.accessorialChargeLine.create({
     data: {

@@ -21,7 +21,8 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const exc = await prisma.exceptionRecord.findFirst({
@@ -37,17 +38,27 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json();
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Validation failed", issues: parsed.error.flatten().fieldErrors }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: "Validation failed",
+        issues: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 },
+    );
   }
 
-  const existing = await prisma.exceptionRecord.findFirst({ where: { id: params.id, organizationId } });
-  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const existing = await prisma.exceptionRecord.findFirst({
+    where: { id: params.id, organizationId },
+  });
+  if (!existing)
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const now = new Date();
   const update: any = {};
@@ -86,7 +97,10 @@ export async function PATCH(
       action: `EXCEPTION_${parsed.data.action}`,
       resourceType: "ExceptionRecord",
       resourceId: params.id,
-      details: { action: parsed.data.action, resolution: parsed.data.resolution },
+      details: {
+        action: parsed.data.action,
+        resolution: parsed.data.resolution,
+      },
     },
   });
 

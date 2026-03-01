@@ -42,7 +42,14 @@ export async function POST(
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
     }
 
-    const closeable = ["INVOICED", "SHIPPED", "DELIVERED", "APPROVED", "RELEASED", "PACKED"];
+    const closeable = [
+      "INVOICED",
+      "SHIPPED",
+      "DELIVERED",
+      "APPROVED",
+      "RELEASED",
+      "PACKED",
+    ];
     if (!closeable.includes(order.status) && order.status !== "CLOSED") {
       return NextResponse.json(
         { error: `Cannot close order in status "${order.status}"` },
@@ -51,7 +58,10 @@ export async function POST(
     }
 
     if (order.status === "CLOSED") {
-      return NextResponse.json({ error: "Order is already closed" }, { status: 422 });
+      return NextResponse.json(
+        { error: "Order is already closed" },
+        { status: 422 },
+      );
     }
 
     const body = await request.json().catch(() => ({}));

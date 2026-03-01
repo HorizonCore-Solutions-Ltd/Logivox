@@ -61,7 +61,8 @@ async function upsertException(data: {
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json().catch(() => ({}));
@@ -81,18 +82,25 @@ export async function POST(request: NextRequest) {
   });
 
   for (const order of delayedOrders) {
-    const daysLate = Math.floor((now.getTime() - new Date(order.requestedDate!).getTime()) / 86400000);
-    detected.push({ type: "DELAYED_ORDER", id: order.id, title: `${order.soNumber} is ${daysLate}d late` });
-    if (!dryRun) await upsertException({
-      organizationId,
+    const daysLate = Math.floor(
+      (now.getTime() - new Date(order.requestedDate!).getTime()) / 86400000,
+    );
+    detected.push({
       type: "DELAYED_ORDER",
-      severity: daysLate > 3 ? "HIGH" : "MEDIUM",
-      title: `Delayed order: ${order.soNumber}`,
-      description: `Order ${order.soNumber} is ${daysLate} days past its requested delivery date.`,
-      resourceType: "SalesOrder",
-      resourceId: order.id,
-      resourceRef: order.soNumber,
+      id: order.id,
+      title: `${order.soNumber} is ${daysLate}d late`,
     });
+    if (!dryRun)
+      await upsertException({
+        organizationId,
+        type: "DELAYED_ORDER",
+        severity: daysLate > 3 ? "HIGH" : "MEDIUM",
+        title: `Delayed order: ${order.soNumber}`,
+        description: `Order ${order.soNumber} is ${daysLate} days past its requested delivery date.`,
+        resourceType: "SalesOrder",
+        resourceId: order.id,
+        resourceRef: order.soNumber,
+      });
   }
 
   // ── 2. Stockouts ───────────────────────────────────────────────────────────
@@ -103,17 +111,22 @@ export async function POST(request: NextRequest) {
   });
 
   for (const item of stockouts) {
-    detected.push({ type: "STOCKOUT", id: item.id, title: `Stockout: ${item.sku}` });
-    if (!dryRun) await upsertException({
-      organizationId,
+    detected.push({
       type: "STOCKOUT",
-      severity: "HIGH",
-      title: `Stockout: ${item.sku} — ${item.name}`,
-      description: `Item ${item.sku} has zero stock on hand. Immediate replenishment required.`,
-      resourceType: "InventoryItem",
-      resourceId: item.id,
-      resourceRef: item.sku,
+      id: item.id,
+      title: `Stockout: ${item.sku}`,
     });
+    if (!dryRun)
+      await upsertException({
+        organizationId,
+        type: "STOCKOUT",
+        severity: "HIGH",
+        title: `Stockout: ${item.sku} — ${item.name}`,
+        description: `Item ${item.sku} has zero stock on hand. Immediate replenishment required.`,
+        resourceType: "InventoryItem",
+        resourceId: item.id,
+        resourceRef: item.sku,
+      });
   }
 
   // ── 3. Low stock ───────────────────────────────────────────────────────────
@@ -124,22 +137,35 @@ export async function POST(request: NextRequest) {
       quantity: { gt: 0 },
       minStockLevel: { gt: 0 },
     },
-    select: { id: true, name: true, sku: true, quantity: true, minStockLevel: true },
+    select: {
+      id: true,
+      name: true,
+      sku: true,
+      quantity: true,
+      minStockLevel: true,
+    },
     take: 200,
   });
 
-  for (const item of lowStock.filter((i) => i.quantity <= (i.minStockLevel ?? 0))) {
-    detected.push({ type: "LOW_STOCK", id: item.id, title: `Low stock: ${item.sku}` });
-    if (!dryRun) await upsertException({
-      organizationId,
+  for (const item of lowStock.filter(
+    (i) => i.quantity <= (i.minStockLevel ?? 0),
+  )) {
+    detected.push({
       type: "LOW_STOCK",
-      severity: "MEDIUM",
-      title: `Low stock: ${item.sku} — ${item.name}`,
-      description: `Stock ${item.quantity} is at or below minimum level ${item.minStockLevel}.`,
-      resourceType: "InventoryItem",
-      resourceId: item.id,
-      resourceRef: item.sku,
+      id: item.id,
+      title: `Low stock: ${item.sku}`,
     });
+    if (!dryRun)
+      await upsertException({
+        organizationId,
+        type: "LOW_STOCK",
+        severity: "MEDIUM",
+        title: `Low stock: ${item.sku} — ${item.name}`,
+        description: `Stock ${item.quantity} is at or below minimum level ${item.minStockLevel}.`,
+        resourceType: "InventoryItem",
+        resourceId: item.id,
+        resourceRef: item.sku,
+      });
   }
 
   // ── 4. Overdue invoices ────────────────────────────────────────────────────
@@ -149,23 +175,36 @@ export async function POST(request: NextRequest) {
       status: { notIn: ["PAID", "CANCELLED", "VOID"] },
       dueDate: { lt: now },
     },
-    select: { id: true, invoiceNumber: true, totalAmount: true, dueDate: true, customerId: true },
+    select: {
+      id: true,
+      invoiceNumber: true,
+      totalAmount: true,
+      dueDate: true,
+      customerId: true,
+    },
     take: 100,
   });
 
   for (const inv of overdueInvoices) {
-    const daysOverdue = Math.floor((now.getTime() - new Date(inv.dueDate).getTime()) / 86400000);
-    detected.push({ type: "OVERDUE_INVOICE", id: inv.id, title: `${inv.invoiceNumber} ${daysOverdue}d overdue` });
-    if (!dryRun) await upsertException({
-      organizationId,
+    const daysOverdue = Math.floor(
+      (now.getTime() - new Date(inv.dueDate).getTime()) / 86400000,
+    );
+    detected.push({
       type: "OVERDUE_INVOICE",
-      severity: daysOverdue > 30 ? "HIGH" : "MEDIUM",
-      title: `Overdue invoice: ${inv.invoiceNumber}`,
-      description: `Invoice ${inv.invoiceNumber} for ${Number(inv.totalAmount).toFixed(2)} is ${daysOverdue} days overdue.`,
-      resourceType: "Invoice",
-      resourceId: inv.id,
-      resourceRef: inv.invoiceNumber,
+      id: inv.id,
+      title: `${inv.invoiceNumber} ${daysOverdue}d overdue`,
     });
+    if (!dryRun)
+      await upsertException({
+        organizationId,
+        type: "OVERDUE_INVOICE",
+        severity: daysOverdue > 30 ? "HIGH" : "MEDIUM",
+        title: `Overdue invoice: ${inv.invoiceNumber}`,
+        description: `Invoice ${inv.invoiceNumber} for ${Number(inv.totalAmount).toFixed(2)} is ${daysOverdue} days overdue.`,
+        resourceType: "Invoice",
+        resourceId: inv.id,
+        resourceRef: inv.invoiceNumber,
+      });
   }
 
   // ── 5. Credit limit breaches ───────────────────────────────────────────────
@@ -175,14 +214,29 @@ export async function POST(request: NextRequest) {
       creditLimit: { gt: 0 },
       creditHold: false,
     },
-    select: { id: true, name: true, code: true, creditLimit: true, creditUsed: true },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      creditLimit: true,
+      creditUsed: true,
+    },
     take: 100,
   });
 
-  for (const cust of creditBreaches.filter((c) => Number(c.creditUsed) >= Number(c.creditLimit))) {
-    detected.push({ type: "CREDIT_LIMIT_EXCEEDED", id: cust.id, title: `Credit exceeded: ${cust.code}` });
+  for (const cust of creditBreaches.filter(
+    (c) => Number(c.creditUsed) >= Number(c.creditLimit),
+  )) {
+    detected.push({
+      type: "CREDIT_LIMIT_EXCEEDED",
+      id: cust.id,
+      title: `Credit exceeded: ${cust.code}`,
+    });
     if (!dryRun) {
-      await prisma.customer.update({ where: { id: cust.id }, data: { creditHold: true } });
+      await prisma.customer.update({
+        where: { id: cust.id },
+        data: { creditHold: true },
+      });
       await upsertException({
         organizationId,
         type: "CREDIT_LIMIT_EXCEEDED",
@@ -198,7 +252,9 @@ export async function POST(request: NextRequest) {
 
   // ── 6. Auto-resolve exceptions that are no longer active ──────────────────
   if (!dryRun) {
-    const resolvedStockoutIds = stockouts.map((i) => `STOCKOUT-${i.id}-${organizationId}`);
+    const resolvedStockoutIds = stockouts.map(
+      (i) => `STOCKOUT-${i.id}-${organizationId}`,
+    );
     // Resolve stockout exceptions for items now back in stock
     await prisma.exceptionRecord.updateMany({
       where: {
@@ -217,9 +273,12 @@ export async function POST(request: NextRequest) {
     summary: {
       delayedOrders: delayedOrders.length,
       stockouts: stockouts.length,
-      lowStock: lowStock.filter((i) => i.quantity <= (i.minStockLevel ?? 0)).length,
+      lowStock: lowStock.filter((i) => i.quantity <= (i.minStockLevel ?? 0))
+        .length,
       overdueInvoices: overdueInvoices.length,
-      creditBreaches: creditBreaches.filter((c) => Number(c.creditUsed) >= Number(c.creditLimit)).length,
+      creditBreaches: creditBreaches.filter(
+        (c) => Number(c.creditUsed) >= Number(c.creditLimit),
+      ).length,
       total: detected.length,
     },
     detected,

@@ -181,9 +181,9 @@ Reference: [Link to governance doc section]
 
 ## Sign-Off
 
-**Reviewer Name**: ********\_********  
-**Date**: ********\_********  
-**PR Number**: ********\_********  
+**Reviewer Name**: **\*\*\*\***\_**\*\*\*\***  
+**Date**: **\*\*\*\***\_**\*\*\*\***  
+**PR Number**: **\*\*\*\***\_**\*\*\*\***  
 **Status**: ☐ Approved ☐ Requested Changes
 
 ---

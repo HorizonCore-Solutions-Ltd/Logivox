@@ -81,20 +81,66 @@ interface SummaryItem {
   _count: number;
 }
 
-const SEVERITY_CONFIG: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-  CRITICAL: { color: "bg-red-100 text-red-800 border-red-300", icon: <AlertTriangle className="h-3 w-3" />, label: "Critical" },
-  HIGH:     { color: "bg-orange-100 text-orange-800 border-orange-300", icon: <AlertCircle className="h-3 w-3" />, label: "High" },
-  MEDIUM:   { color: "bg-amber-100 text-amber-700 border-amber-300", icon: <AlertCircle className="h-3 w-3" />, label: "Medium" },
-  LOW:      { color: "bg-blue-100 text-blue-700 border-blue-300", icon: <AlertCircle className="h-3 w-3" />, label: "Low" },
-  INFO:     { color: "bg-gray-100 text-gray-600 border-gray-300", icon: <AlertCircle className="h-3 w-3" />, label: "Info" },
+const SEVERITY_CONFIG: Record<
+  string,
+  { color: string; icon: React.ReactNode; label: string }
+> = {
+  CRITICAL: {
+    color: "bg-red-100 text-red-800 border-red-300",
+    icon: <AlertTriangle className="h-3 w-3" />,
+    label: "Critical",
+  },
+  HIGH: {
+    color: "bg-orange-100 text-orange-800 border-orange-300",
+    icon: <AlertCircle className="h-3 w-3" />,
+    label: "High",
+  },
+  MEDIUM: {
+    color: "bg-amber-100 text-amber-700 border-amber-300",
+    icon: <AlertCircle className="h-3 w-3" />,
+    label: "Medium",
+  },
+  LOW: {
+    color: "bg-blue-100 text-blue-700 border-blue-300",
+    icon: <AlertCircle className="h-3 w-3" />,
+    label: "Low",
+  },
+  INFO: {
+    color: "bg-gray-100 text-gray-600 border-gray-300",
+    icon: <AlertCircle className="h-3 w-3" />,
+    label: "Info",
+  },
 };
 
-const STATUS_CONFIG: Record<string, { color: string; label: string; icon: React.ReactNode }> = {
-  OPEN:         { color: "bg-red-50 text-red-700 border-red-200", label: "Open", icon: <AlertTriangle className="h-3 w-3" /> },
-  ACKNOWLEDGED: { color: "bg-amber-50 text-amber-700 border-amber-200", label: "Acknowledged", icon: <Eye className="h-3 w-3" /> },
-  RESOLVED:     { color: "bg-green-50 text-green-700 border-green-200", label: "Resolved", icon: <CheckCircle className="h-3 w-3" /> },
-  ESCALATED:    { color: "bg-purple-50 text-purple-700 border-purple-200", label: "Escalated", icon: <TrendingUp className="h-3 w-3" /> },
-  SUPPRESSED:   { color: "bg-gray-50 text-gray-500 border-gray-200", label: "Suppressed", icon: <XCircle className="h-3 w-3" /> },
+const STATUS_CONFIG: Record<
+  string,
+  { color: string; label: string; icon: React.ReactNode }
+> = {
+  OPEN: {
+    color: "bg-red-50 text-red-700 border-red-200",
+    label: "Open",
+    icon: <AlertTriangle className="h-3 w-3" />,
+  },
+  ACKNOWLEDGED: {
+    color: "bg-amber-50 text-amber-700 border-amber-200",
+    label: "Acknowledged",
+    icon: <Eye className="h-3 w-3" />,
+  },
+  RESOLVED: {
+    color: "bg-green-50 text-green-700 border-green-200",
+    label: "Resolved",
+    icon: <CheckCircle className="h-3 w-3" />,
+  },
+  ESCALATED: {
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+    label: "Escalated",
+    icon: <TrendingUp className="h-3 w-3" />,
+  },
+  SUPPRESSED: {
+    color: "bg-gray-50 text-gray-500 border-gray-200",
+    label: "Suppressed",
+    icon: <XCircle className="h-3 w-3" />,
+  },
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -122,24 +168,40 @@ export default function ExceptionsPage() {
   const [pagination, setPagination] = useState({ page: 1, total: 0, pages: 0 });
 
   // Resolve dialog state
-  const [resolveDialog, setResolveDialog] = useState<{ open: boolean; id: string; title: string }>({ open: false, id: "", title: "" });
+  const [resolveDialog, setResolveDialog] = useState<{
+    open: boolean;
+    id: string;
+    title: string;
+  }>({ open: false, id: "", title: "" });
   const [resolution, setResolution] = useState("");
 
   const fetchExceptions = useCallback(async () => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ page: String(pagination.page), limit: "50" });
+      const params = new URLSearchParams({
+        page: String(pagination.page),
+        limit: "50",
+      });
       if (statusFilter !== "all") params.set("status", statusFilter);
       if (severityFilter !== "all") params.set("severity", severityFilter);
 
       const res = await fetch(`/api/exceptions?${params}`);
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
-      setExceptions((data.exceptions || []).filter((e: ExceptionRecord) =>
-        !search || e.title.toLowerCase().includes(search.toLowerCase()) || e.type.toLowerCase().includes(search.toLowerCase())
-      ));
+      setExceptions(
+        (data.exceptions || []).filter(
+          (e: ExceptionRecord) =>
+            !search ||
+            e.title.toLowerCase().includes(search.toLowerCase()) ||
+            e.type.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
       setSummary(data.summary || []);
-      setPagination((p) => ({ ...p, total: data.pagination?.total || 0, pages: data.pagination?.pages || 0 }));
+      setPagination((p) => ({
+        ...p,
+        total: data.pagination?.total || 0,
+        pages: data.pagination?.pages || 0,
+      }));
     } catch (err) {
       console.error(err);
     } finally {
@@ -155,19 +217,32 @@ export default function ExceptionsPage() {
   const runAutoDetect = async () => {
     setDetecting(true);
     try {
-      const res = await fetch("/api/exceptions/auto-detect", { method: "POST" });
+      const res = await fetch("/api/exceptions/auto-detect", {
+        method: "POST",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Auto-detect failed");
-      toast({ title: "Auto-detect complete", description: `${data.detected} exceptions found, ${data.resolved} auto-resolved.` });
+      toast({
+        title: "Auto-detect complete",
+        description: `${data.detected} exceptions found, ${data.resolved} auto-resolved.`,
+      });
       fetchExceptions();
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
     } finally {
       setDetecting(false);
     }
   };
 
-  const doAction = async (id: string, action: "ACKNOWLEDGE" | "RESOLVE" | "ESCALATE" | "SUPPRESS", res?: string) => {
+  const doAction = async (
+    id: string,
+    action: "ACKNOWLEDGE" | "RESOLVE" | "ESCALATE" | "SUPPRESS",
+    res?: string,
+  ) => {
     setActionLoading(`${id}-${action}`);
     try {
       const response = await fetch(`/api/exceptions/${id}`, {
@@ -177,23 +252,45 @@ export default function ExceptionsPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Action failed");
-      toast({ title: "Updated", description: `Exception ${action.toLowerCase()}d.` });
+      toast({
+        title: "Updated",
+        description: `Exception ${action.toLowerCase()}d.`,
+      });
       fetchExceptions();
     } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
     } finally {
       setActionLoading(null);
     }
   };
 
   // Summary calculations
-  const openCritical = summary.filter((s) => s.severity === "CRITICAL" && s.status === "OPEN").reduce((a, b) => a + b._count, 0);
-  const openHigh = summary.filter((s) => s.severity === "HIGH" && s.status === "OPEN").reduce((a, b) => a + b._count, 0);
-  const totalOpen = summary.filter((s) => s.status === "OPEN").reduce((a, b) => a + b._count, 0);
-  const totalResolved = summary.filter((s) => s.status === "RESOLVED").reduce((a, b) => a + b._count, 0);
+  const openCritical = summary
+    .filter((s) => s.severity === "CRITICAL" && s.status === "OPEN")
+    .reduce((a, b) => a + b._count, 0);
+  const openHigh = summary
+    .filter((s) => s.severity === "HIGH" && s.status === "OPEN")
+    .reduce((a, b) => a + b._count, 0);
+  const totalOpen = summary
+    .filter((s) => s.status === "OPEN")
+    .reduce((a, b) => a + b._count, 0);
+  const totalResolved = summary
+    .filter((s) => s.status === "RESOLVED")
+    .reduce((a, b) => a + b._count, 0);
 
-  const formatDate = (d: string) => new Date(d).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
-  const isBreaching = (e: ExceptionRecord) => e.slaBreachAt && new Date(e.slaBreachAt) < new Date();
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  const isBreaching = (e: ExceptionRecord) =>
+    e.slaBreachAt && new Date(e.slaBreachAt) < new Date();
 
   return (
     <DashboardSidebar>
@@ -202,14 +299,21 @@ export default function ExceptionsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold">Exception Management</h1>
-            <p className="text-muted-foreground text-sm mt-1">Monitor, triage, and resolve operational exceptions in real-time</p>
+            <p className="text-muted-foreground text-sm mt-1">
+              Monitor, triage, and resolve operational exceptions in real-time
+            </p>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="outline" onClick={fetchExceptions} size="sm">
-              <RefreshCw className="h-4 w-4 mr-2" />Refresh
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Refresh
             </Button>
             <Button onClick={runAutoDetect} disabled={detecting} size="sm">
-              {detecting ? <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> : <Zap className="h-4 w-4 mr-2" />}
+              {detecting ? (
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Zap className="h-4 w-4 mr-2" />
+              )}
               Auto-Detect
             </Button>
           </div>
@@ -223,8 +327,12 @@ export default function ExceptionsPage() {
                 <p className="text-xs text-muted-foreground">Critical Open</p>
                 <AlertTriangle className="h-4 w-4 text-red-500" />
               </div>
-              <p className="text-2xl font-bold text-red-700 mt-1">{openCritical}</p>
-              <p className="text-xs text-red-600 mt-0.5">Requires immediate action</p>
+              <p className="text-2xl font-bold text-red-700 mt-1">
+                {openCritical}
+              </p>
+              <p className="text-xs text-red-600 mt-0.5">
+                Requires immediate action
+              </p>
             </CardContent>
           </Card>
           <Card className="border-orange-200 bg-orange-50/30">
@@ -233,8 +341,12 @@ export default function ExceptionsPage() {
                 <p className="text-xs text-muted-foreground">High Open</p>
                 <AlertCircle className="h-4 w-4 text-orange-500" />
               </div>
-              <p className="text-2xl font-bold text-orange-700 mt-1">{openHigh}</p>
-              <p className="text-xs text-orange-600 mt-0.5">Action required today</p>
+              <p className="text-2xl font-bold text-orange-700 mt-1">
+                {openHigh}
+              </p>
+              <p className="text-xs text-orange-600 mt-0.5">
+                Action required today
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -243,8 +355,12 @@ export default function ExceptionsPage() {
                 <p className="text-xs text-muted-foreground">Total Open</p>
                 <Clock className="h-4 w-4 text-amber-500" />
               </div>
-              <p className="text-2xl font-bold text-amber-700 mt-1">{totalOpen}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Across all severities</p>
+              <p className="text-2xl font-bold text-amber-700 mt-1">
+                {totalOpen}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Across all severities
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -253,8 +369,12 @@ export default function ExceptionsPage() {
                 <p className="text-xs text-muted-foreground">Resolved</p>
                 <CheckCircle className="h-4 w-4 text-green-500" />
               </div>
-              <p className="text-2xl font-bold text-green-700 mt-1">{totalResolved}</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Successfully closed</p>
+              <p className="text-2xl font-bold text-green-700 mt-1">
+                {totalResolved}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Successfully closed
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -304,13 +424,16 @@ export default function ExceptionsPage() {
           <CardContent className="p-0">
             {loading ? (
               <div className="flex items-center justify-center h-48 text-muted-foreground">
-                <RefreshCw className="h-5 w-5 animate-spin mr-2" />Scanning for exceptions...
+                <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+                Scanning for exceptions...
               </div>
             ) : exceptions.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-48 text-muted-foreground">
                 <Shield className="h-10 w-10 mb-3 text-green-400" />
                 <p className="font-medium">No exceptions found</p>
-                <p className="text-xs mt-1">Run Auto-Detect to scan for new issues</p>
+                <p className="text-xs mt-1">
+                  Run Auto-Detect to scan for new issues
+                </p>
               </div>
             ) : (
               <Table>
@@ -328,8 +451,10 @@ export default function ExceptionsPage() {
                 </TableHeader>
                 <TableBody>
                   {exceptions.map((exc) => {
-                    const sev = SEVERITY_CONFIG[exc.severity] ?? SEVERITY_CONFIG.INFO;
-                    const stat = STATUS_CONFIG[exc.status] ?? STATUS_CONFIG.OPEN;
+                    const sev =
+                      SEVERITY_CONFIG[exc.severity] ?? SEVERITY_CONFIG.INFO;
+                    const stat =
+                      STATUS_CONFIG[exc.status] ?? STATUS_CONFIG.OPEN;
                     const breaching = isBreaching(exc);
                     return (
                       <TableRow
@@ -337,24 +462,36 @@ export default function ExceptionsPage() {
                         className={`hover:bg-muted/40 ${exc.severity === "CRITICAL" && exc.status === "OPEN" ? "bg-red-50/40" : ""}`}
                       >
                         <TableCell>
-                          <Badge className={`flex items-center gap-1 w-fit text-xs border ${sev.color}`}>
+                          <Badge
+                            className={`flex items-center gap-1 w-fit text-xs border ${sev.color}`}
+                          >
                             {sev.icon}
                             {sev.label}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <p className="font-medium text-sm">{exc.title}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{exc.description}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                            {exc.description}
+                          </p>
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {TYPE_LABELS[exc.type] ?? exc.type}
                         </TableCell>
                         <TableCell>
-                          <p className="text-xs font-mono">{exc.resourceType}</p>
-                          {exc.resourceRef && <p className="text-xs text-muted-foreground">{exc.resourceRef}</p>}
+                          <p className="text-xs font-mono">
+                            {exc.resourceType}
+                          </p>
+                          {exc.resourceRef && (
+                            <p className="text-xs text-muted-foreground">
+                              {exc.resourceRef}
+                            </p>
+                          )}
                         </TableCell>
                         <TableCell>
-                          <Badge className={`flex items-center gap-1 w-fit text-xs border ${stat.color}`}>
+                          <Badge
+                            className={`flex items-center gap-1 w-fit text-xs border ${stat.color}`}
+                          >
                             {stat.icon}
                             {stat.label}
                           </Badge>
@@ -364,11 +501,17 @@ export default function ExceptionsPage() {
                         </TableCell>
                         <TableCell>
                           {exc.slaBreachAt ? (
-                            <span className={`text-xs font-medium ${breaching ? "text-red-600" : "text-amber-600"}`}>
-                              {breaching ? "⚠ Breached" : formatDate(exc.slaBreachAt)}
+                            <span
+                              className={`text-xs font-medium ${breaching ? "text-red-600" : "text-amber-600"}`}
+                            >
+                              {breaching
+                                ? "⚠ Breached"
+                                : formatDate(exc.slaBreachAt)}
                             </span>
                           ) : (
-                            <span className="text-xs text-muted-foreground">—</span>
+                            <span className="text-xs text-muted-foreground">
+                              —
+                            </span>
                           )}
                         </TableCell>
                         <TableCell className="text-right">
@@ -377,33 +520,63 @@ export default function ExceptionsPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                disabled={!!actionLoading?.startsWith(exc.id) || ["RESOLVED", "SUPPRESSED"].includes(exc.status)}
+                                disabled={
+                                  !!actionLoading?.startsWith(exc.id) ||
+                                  ["RESOLVED", "SUPPRESSED"].includes(
+                                    exc.status,
+                                  )
+                                }
                               >
                                 Action <ChevronDown className="h-3 w-3 ml-1" />
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="w-44">
                               {exc.status === "OPEN" && (
-                                <DropdownMenuItem onClick={() => doAction(exc.id, "ACKNOWLEDGE")}>
-                                  <Eye className="h-4 w-4 mr-2" />Acknowledge
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    doAction(exc.id, "ACKNOWLEDGE")
+                                  }
+                                >
+                                  <Eye className="h-4 w-4 mr-2" />
+                                  Acknowledge
                                 </DropdownMenuItem>
                               )}
-                              {["OPEN", "ACKNOWLEDGED"].includes(exc.status) && (
+                              {["OPEN", "ACKNOWLEDGED"].includes(
+                                exc.status,
+                              ) && (
                                 <DropdownMenuItem
-                                  onClick={() => { setResolveDialog({ open: true, id: exc.id, title: exc.title }); setResolution(""); }}
+                                  onClick={() => {
+                                    setResolveDialog({
+                                      open: true,
+                                      id: exc.id,
+                                      title: exc.title,
+                                    });
+                                    setResolution("");
+                                  }}
                                   className="text-green-700"
                                 >
-                                  <CheckCircle className="h-4 w-4 mr-2" />Resolve
+                                  <CheckCircle className="h-4 w-4 mr-2" />
+                                  Resolve
                                 </DropdownMenuItem>
                               )}
-                              {["OPEN", "ACKNOWLEDGED"].includes(exc.status) && (
-                                <DropdownMenuItem onClick={() => doAction(exc.id, "ESCALATE")} className="text-purple-700">
-                                  <TrendingUp className="h-4 w-4 mr-2" />Escalate
+                              {["OPEN", "ACKNOWLEDGED"].includes(
+                                exc.status,
+                              ) && (
+                                <DropdownMenuItem
+                                  onClick={() => doAction(exc.id, "ESCALATE")}
+                                  className="text-purple-700"
+                                >
+                                  <TrendingUp className="h-4 w-4 mr-2" />
+                                  Escalate
                                 </DropdownMenuItem>
                               )}
                               <DropdownMenuSeparator />
-                              <DropdownMenuItem onClick={() => doAction(exc.id, "SUPPRESS")} className="text-muted-foreground">
-                                <XCircle className="h-4 w-4 mr-2" />Suppress
+                              <DropdownMenuItem
+                                onClick={() => doAction(exc.id, "SUPPRESS")}
+                                className="text-muted-foreground"
+                              >
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Suppress
                               </DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -417,10 +590,31 @@ export default function ExceptionsPage() {
 
             {pagination.pages > 1 && (
               <div className="flex items-center justify-between px-6 py-4 border-t">
-                <p className="text-sm text-muted-foreground">Page {pagination.page} of {pagination.pages} ({pagination.total} total)</p>
+                <p className="text-sm text-muted-foreground">
+                  Page {pagination.page} of {pagination.pages} (
+                  {pagination.total} total)
+                </p>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" disabled={pagination.page === 1} onClick={() => setPagination((p) => ({ ...p, page: p.page - 1 }))}>Previous</Button>
-                  <Button variant="outline" size="sm" disabled={pagination.page === pagination.pages} onClick={() => setPagination((p) => ({ ...p, page: p.page + 1 }))}>Next</Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={pagination.page === 1}
+                    onClick={() =>
+                      setPagination((p) => ({ ...p, page: p.page - 1 }))
+                    }
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    disabled={pagination.page === pagination.pages}
+                    onClick={() =>
+                      setPagination((p) => ({ ...p, page: p.page + 1 }))
+                    }
+                  >
+                    Next
+                  </Button>
                 </div>
               </div>
             )}
@@ -429,7 +623,10 @@ export default function ExceptionsPage() {
       </div>
 
       {/* Resolve Dialog */}
-      <Dialog open={resolveDialog.open} onOpenChange={(o) => setResolveDialog((d) => ({ ...d, open: o }))}>
+      <Dialog
+        open={resolveDialog.open}
+        onOpenChange={(o) => setResolveDialog((d) => ({ ...d, open: o }))}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Resolve Exception</DialogTitle>
@@ -445,14 +642,24 @@ export default function ExceptionsPage() {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setResolveDialog((d) => ({ ...d, open: false }))}>Cancel</Button>
+            <Button
+              variant="outline"
+              onClick={() => setResolveDialog((d) => ({ ...d, open: false }))}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={() => {
-                doAction(resolveDialog.id, "RESOLVE", resolution || "Manually resolved");
+                doAction(
+                  resolveDialog.id,
+                  "RESOLVE",
+                  resolution || "Manually resolved",
+                );
                 setResolveDialog((d) => ({ ...d, open: false }));
               }}
             >
-              <CheckCircle className="h-4 w-4 mr-2" />Mark Resolved
+              <CheckCircle className="h-4 w-4 mr-2" />
+              Mark Resolved
             </Button>
           </DialogFooter>
         </DialogContent>

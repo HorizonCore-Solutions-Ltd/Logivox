@@ -11,9 +11,21 @@ import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const patchSchema = z.object({
-  status: z.enum(["DRAFT", "ACTIVE", "EXPIRED", "SUSPENDED", "TERMINATED", "PENDING_RENEWAL"]).optional(),
+  status: z
+    .enum([
+      "DRAFT",
+      "ACTIVE",
+      "EXPIRED",
+      "SUSPENDED",
+      "TERMINATED",
+      "PENDING_RENEWAL",
+    ])
+    .optional(),
   name: z.string().optional(),
-  endDate: z.string().optional().transform((s) => s ? new Date(s) : undefined),
+  endDate: z
+    .string()
+    .optional()
+    .transform((s) => (s ? new Date(s) : undefined)),
   creditLimit: z.number().min(0).optional(),
   discountPct: z.number().min(0).max(100).optional(),
   paymentTermsDays: z.number().int().min(0).optional(),
@@ -21,7 +33,10 @@ const patchSchema = z.object({
   notes: z.string().optional(),
   pricingRules: z.array(z.any()).optional(),
   pricingTier: z.string().optional(),
-  signedDate: z.string().optional().transform((s) => s ? new Date(s) : undefined),
+  signedDate: z
+    .string()
+    .optional()
+    .transform((s) => (s ? new Date(s) : undefined)),
 });
 
 export async function GET(
@@ -29,7 +44,8 @@ export async function GET(
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const contract = await prisma.customerContract.findFirst({
@@ -37,15 +53,22 @@ export async function GET(
     include: {
       customer: {
         select: {
-          id: true, name: true, code: true, email: true,
-          creditLimit: true, creditUsed: true, creditHold: true,
-          paymentTermsDays: true, currency: true,
+          id: true,
+          name: true,
+          code: true,
+          email: true,
+          creditLimit: true,
+          creditUsed: true,
+          creditHold: true,
+          paymentTermsDays: true,
+          currency: true,
         },
       },
     },
   });
 
-  if (!contract) return NextResponse.json({ error: "Contract not found" }, { status: 404 });
+  if (!contract)
+    return NextResponse.json({ error: "Contract not found" }, { status: 404 });
   return NextResponse.json({ contract });
 }
 
@@ -54,21 +77,32 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json();
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: "Validation failed", issues: parsed.error.flatten().fieldErrors }, { status: 400 });
+    return NextResponse.json(
+      {
+        error: "Validation failed",
+        issues: parsed.error.flatten().fieldErrors,
+      },
+      { status: 400 },
+    );
   }
 
-  const existing = await prisma.customerContract.findFirst({ where: { id: params.id, organizationId } });
-  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const existing = await prisma.customerContract.findFirst({
+    where: { id: params.id, organizationId },
+  });
+  if (!existing)
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const extra: any = {};
   if (parsed.data.status === "TERMINATED") extra.terminatedAt = new Date();
-  if (parsed.data.status === "ACTIVE" && existing.status === "PENDING_RENEWAL") extra.renewedAt = new Date();
+  if (parsed.data.status === "ACTIVE" && existing.status === "PENDING_RENEWAL")
+    extra.renewedAt = new Date();
   if (parsed.data.signedDate) extra.signedById = session.user.id;
 
   const contract = await prisma.customerContract.update({

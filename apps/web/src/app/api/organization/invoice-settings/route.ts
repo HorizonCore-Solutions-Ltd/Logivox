@@ -14,24 +14,29 @@ import { z } from "zod";
 // ── Defaults ────────────────────────────────────────────────────────────────
 const DEFAULT_SETTINGS = {
   trigger: "ON_ORDER_CONFIRMATION", // InvoiceTrigger enum value
-  termsNet: 30,                     // payment due in N days
-  footerText: "",                   // printed on packing slip + invoice footer
-  showPackingSlip: true,            // auto-show packing slip upon shipment
-  logoUrl: "",                      // override logo URL for documents
+  termsNet: 30, // payment due in N days
+  footerText: "", // printed on packing slip + invoice footer
+  showPackingSlip: true, // auto-show packing slip upon shipment
+  logoUrl: "", // override logo URL for documents
   requireDeliveryConfirmation: false,
-  taxRate: 0,                       // default tax % (0–100)
-  invoicePrefix: "INV",             // e.g. "INV" → INV-20240101-0001
-  nextSequence: 1,                  // manually override next sequence number
+  taxRate: 0, // default tax % (0–100)
+  invoicePrefix: "INV", // e.g. "INV" → INV-20240101-0001
+  nextSequence: 1, // manually override next sequence number
   currency: "USD",
-  bankDetails: "",                  // free-text bank info printed on invoice
-  paymentInstructions: "",          // free-text payment method instructions
-  ccEmails: [] as string[],         // additional CC addresses on invoice emails
+  bankDetails: "", // free-text bank info printed on invoice
+  paymentInstructions: "", // free-text payment method instructions
+  ccEmails: [] as string[], // additional CC addresses on invoice emails
 };
 
 // ── Validation schema ────────────────────────────────────────────────────────
 const patchSchema = z.object({
   trigger: z
-    .enum(["ON_ORDER_CONFIRMATION", "ON_SHIPMENT", "ON_DELIVERY_CONFIRMATION", "MANUAL"])
+    .enum([
+      "ON_ORDER_CONFIRMATION",
+      "ON_SHIPMENT",
+      "ON_DELIVERY_CONFIRMATION",
+      "MANUAL",
+    ])
     .optional(),
   termsNet: z.number().int().min(0).max(365).optional(),
   footerText: z.string().max(2000).optional(),
@@ -65,7 +70,10 @@ export async function GET() {
   });
 
   if (!org) {
-    return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Organization not found" },
+      { status: 404 },
+    );
   }
 
   const saved = (org.invoiceSettings as Record<string, any>) ?? {};
@@ -94,7 +102,10 @@ export async function PATCH(request: NextRequest) {
   const parsed = patchSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
-      { error: "Validation failed", issues: parsed.error.flatten().fieldErrors },
+      {
+        error: "Validation failed",
+        issues: parsed.error.flatten().fieldErrors,
+      },
       { status: 400 },
     );
   }
@@ -104,7 +115,10 @@ export async function PATCH(request: NextRequest) {
     select: { invoiceSettings: true },
   });
   if (!org) {
-    return NextResponse.json({ error: "Organization not found" }, { status: 404 });
+    return NextResponse.json(
+      { error: "Organization not found" },
+      { status: 404 },
+    );
   }
 
   const current = (org.invoiceSettings as Record<string, any>) ?? {};

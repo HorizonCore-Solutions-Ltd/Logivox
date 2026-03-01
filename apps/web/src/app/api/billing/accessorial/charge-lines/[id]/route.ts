@@ -18,14 +18,18 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const organizationId = (session.user as any).organizationId;
 
   const body = await request.json();
   const { status } = body;
 
   if (!["APPROVED", "VOID"].includes(status)) {
-    return NextResponse.json({ error: "status must be APPROVED or VOID" }, { status: 400 });
+    return NextResponse.json(
+      { error: "status must be APPROVED or VOID" },
+      { status: 400 },
+    );
   }
 
   const line = await prisma.accessorialChargeLine.updateMany({
@@ -33,7 +37,8 @@ export async function PATCH(
     data: { status },
   });
 
-  if (line.count === 0) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (line.count === 0)
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   return NextResponse.json({ success: true, status });
 }
