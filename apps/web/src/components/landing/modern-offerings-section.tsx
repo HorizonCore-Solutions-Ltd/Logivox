@@ -17,6 +17,14 @@ import {
 
 const offerings = [
   {
+    title: "Autonomous Replenishment 2.0",
+    description:
+      "A full digital-twin replenishment engine with Predictive AI forecasting, IoT smart-shelf triggers, AMR robot dispatch, and cost-optimized off-peak scheduling — all live and controllable from one dashboard.",
+    icon: Brain,
+    href: "/solutions/inventory",
+    pill: "New",
+  },
+  {
     title: "Predictive Ops & Anomaly Defense",
     description:
       "Catch bad signals before they hit customers with burn alerts, rollbacks, and SLO dashboards tuned for pick/pack/ship.",

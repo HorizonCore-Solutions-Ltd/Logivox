@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  Building2,
   Mail,
   Lock,
   User,
@@ -25,6 +24,7 @@ import {
   Check,
   AlertCircle,
 } from "lucide-react";
+import Image from "next/image";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function SignUpPage() {
@@ -168,11 +168,20 @@ export default function SignUpPage() {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="flex justify-center mb-8">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
-              <Building2 className="h-6 w-6" />
+          <Link href="/" className="flex items-center space-x-3 group">
+            <div className="relative h-10 w-10 transition-transform group-hover:scale-105">
+              <Image
+                src="/favicon.svg"
+                alt="LogiVox Logo"
+                width={40}
+                height={40}
+                className="object-contain"
+                priority
+              />
             </div>
-            <span className="text-2xl font-bold">LogiVox</span>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
+              LogiVox
+            </span>
           </Link>
         </div>
 

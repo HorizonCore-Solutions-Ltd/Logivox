@@ -661,3 +661,4 @@ textarea:focus-visible,
     font-size: 100% !important;
   }
 }
+.logo-mark-filter { filter: brightness(0) invert(0); } .dark .logo-mark-filter { filter: none; }

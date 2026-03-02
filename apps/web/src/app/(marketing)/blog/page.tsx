@@ -48,6 +48,19 @@ export default function BlogPage() {
 
   const blogPosts = [
     {
+      slug: "autonomous-replenishment-ai-iot-robotics",
+      title:
+        "Autonomous Replenishment 2.0: How AI, IoT, and Robotics Eliminated Stockouts",
+      excerpt:
+        "A deep dive into the full digital-twin replenishment engine we shipped today — predictive AI forecasting, IoT smart-shelf sensors, AMR robot auto-dispatch, and cost-optimised off-peak scheduling.",
+      author: "LogiVox Engineering",
+      date: "2026-03-02",
+      readTime: "12 min read",
+      category: "AI & ML",
+      trending: true,
+      featured: true,
+    },
+    {
       slug: "business-owner-wishlist-premium-features",
       title:
         "Business Owner's Wishlist: Premium Features That Transform Your WMS",

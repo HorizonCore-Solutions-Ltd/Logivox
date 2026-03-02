@@ -46,11 +46,28 @@ export async function GET(request: NextRequest) {
     },
     include: {
       _count: { select: { tasks: { where: { status: "PENDING" } } } },
+      inventoryItem: {
+        select: { id: true, name: true, sku: true, quantity: true },
+      },
+      warehouse: { select: { id: true, name: true, code: true } },
+      supplier: { select: { id: true, name: true } },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json({ rules });
+  // Shape inventoryItem.quantity → currentStock for the UI
+  const shaped = rules.map((r) => ({
+    ...r,
+    inventoryItem: r.inventoryItem
+      ? {
+          name: r.inventoryItem.name,
+          sku: r.inventoryItem.sku,
+          currentStock: r.inventoryItem.quantity,
+        }
+      : undefined,
+  }));
+
+  return NextResponse.json({ rules: shaped });
 }
 
 export async function POST(request: NextRequest) {

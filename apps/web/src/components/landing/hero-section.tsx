@@ -22,8 +22,8 @@ export function HeroSection() {
     { label: "489 Production API Endpoints" },
     { label: "42 Specialized Dashboards" },
     { label: "201 Database Tables" },
-    { label: "5 Next-Gen Pillars Live" },
-    { label: "100% Feature Complete" },
+    { label: "Replenishment v2.0 Beta Live" },
+    { label: "AI · IoT · Robotics · Digital Twin" },
   ];
 
   const stats = [
@@ -59,8 +59,8 @@ export function HeroSection() {
             role="status"
             aria-label="Product features announcement"
           >
-            � Enterprise Proprietary Software • Voice-Native • AI-Powered • ISO
-            27001 & SOC 2 Certified
+            🚀 New: Autonomous Replenishment 2.0 — AI · IoT · Robotics · Digital
+            Twin
           </Badge>
 
           {/* Hero headline */}

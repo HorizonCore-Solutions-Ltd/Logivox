@@ -164,6 +164,10 @@ export default function PricingPage() {
           { name: "Complete CAPA System", included: true },
           { name: "Sustainability Tracking", included: true },
           { name: "Custom AI Models", included: true },
+          {
+            name: "Autonomous Replenishment 2.0 (AI + IoT + Robotics)",
+            included: true,
+          },
         ],
       },
     },
@@ -217,6 +221,15 @@ export default function PricingPage() {
       badge: "Essential",
       price: "+$18/user",
       icon: Truck,
+    },
+    {
+      id: "replenishment",
+      name: "Autonomous Replenishment 2.0",
+      description:
+        "Predictive AI forecasting, IoT smart-shelf triggers, AMR robot dispatch, and cost-optimised off-peak scheduling — the full digital-twin replenishment engine.",
+      badge: "New 🚀",
+      price: "+$35/user",
+      icon: Sparkles,
     },
     {
       id: "marshalling",
@@ -374,6 +387,36 @@ export default function PricingPage() {
         },
         {
           name: "Yard Management",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Autonomous Replenishment 2.0",
+          starter: false,
+          professional: false,
+          enterprise: "Add-On",
+        },
+        {
+          name: "AI Replenishment Forecasting",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "IoT Smart Shelf Triggers",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "AMR Robot Dispatch",
+          starter: false,
+          professional: false,
+          enterprise: true,
+        },
+        {
+          name: "Labor Cost Optimization",
           starter: false,
           professional: false,
           enterprise: true,

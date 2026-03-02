@@ -48,12 +48,13 @@ export async function GET(request: NextRequest) {
       include: {
         rule: { select: { id: true, name: true, strategy: true } },
         inventoryItem: {
-          select: { id: true, name: true, sku: true, unitOfMeasure: true },
+          select: { id: true, name: true, sku: true, quantity: true },
         },
         warehouse: { select: { id: true, name: true, code: true } },
-        fromLocation: { select: { id: true, code: true, zone: true } },
-        toLocation: { select: { id: true, code: true, zone: true } },
+        fromLocation: { select: { id: true, locationCode: true } },
+        toLocation: { select: { id: true, locationCode: true } },
         assignedTo: { select: { id: true, name: true, email: true } },
+        purchaseOrder: { select: { id: true, poNumber: true } },
       },
       orderBy: [{ priority: "desc" }, { createdAt: "asc" }],
       skip: (page - 1) * limit,
@@ -86,37 +87,48 @@ export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
 
   // ── Auto-run all active rules ─────────────────────────────────────────────
+  // Delegates to the same logic as POST /api/replenishment/run
   if (searchParams.get("action") === "run-rules") {
     const rules = await prisma.replenishmentRule.findMany({
       where: { organizationId, isActive: true },
-      include: {
-        inventoryItem: {
-          include: {
-            inventoryLevels: { where: { organizationId } },
-          },
-        },
-      },
     });
 
     const created: string[] = [];
     const skipped: string[] = [];
 
     for (const rule of rules) {
-      const levels = rule.inventoryItem?.inventoryLevels ?? [];
-      const totalQty = levels.reduce((s, l) => s + l.quantityOnHand, 0);
+      if (!rule.warehouseId || !rule.inventoryItemId) {
+        skipped.push(rule.id);
+        continue;
+      }
 
+      const item = await prisma.inventoryItem.findFirst({
+        where: { id: rule.inventoryItemId, organizationId },
+        select: {
+          id: true,
+          quantity: true,
+          minStockLevel: true,
+          reorderPoint: true,
+        },
+      });
+      if (!item) {
+        skipped.push(rule.id);
+        continue;
+      }
+
+      const current = item.quantity || 0;
       let needsReplenishment = false;
       let qty = 0;
 
       if (rule.strategy === "MIN_MAX") {
-        if (totalQty <= (rule.minQty ?? 0)) {
+        if (current <= (rule.minQty || item.minStockLevel || 0)) {
           needsReplenishment = true;
-          qty = (rule.maxQty ?? rule.minQty ?? 0) * 2 - totalQty;
+          qty = (rule.maxQty || rule.minQty * 2) - current;
         }
       } else if (rule.strategy === "REORDER_POINT") {
-        if (totalQty <= (rule.reorderPoint ?? 0)) {
+        if (current <= (rule.reorderPoint || item.reorderPoint || 0)) {
           needsReplenishment = true;
-          qty = rule.replenishQty ?? (rule.reorderPoint ?? 0) * 2 - totalQty;
+          qty = rule.reorderQty;
         }
       }
 
@@ -125,20 +137,14 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      // skip if there's already a pending task for this rule
       const existing = await prisma.replenishmentTask.findFirst({
         where: {
           organizationId,
           ruleId: rule.id,
-          status: { in: ["PENDING", "IN_PROGRESS"] },
+          status: { in: ["PENDING", "IN_PROGRESS", "PO_CREATED"] },
         },
       });
       if (existing) {
-        skipped.push(rule.id);
-        continue;
-      }
-
-      if (!rule.warehouseId) {
         skipped.push(rule.id);
         continue;
       }
@@ -150,7 +156,7 @@ export async function POST(request: NextRequest) {
           warehouseId: rule.warehouseId,
           inventoryItemId: rule.inventoryItemId,
           requiredQty: Math.ceil(qty),
-          priority: rule.priority ?? "MEDIUM",
+          priority: "MEDIUM",
         },
       });
       created.push(rule.id);

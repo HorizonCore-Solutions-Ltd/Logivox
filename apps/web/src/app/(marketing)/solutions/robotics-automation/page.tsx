@@ -55,10 +55,10 @@ export const metadata: Metadata = {
 const AMR_CAPABILITIES = [
   {
     icon: Bot,
-    title: "AI-Powered Fleet Dispatch",
+    title: "AI-Powered Fleet Dispatch + Replenishment",
     description:
-      "LogiVox automatically matches queued tasks to the best available device based on battery level, device type, current location, and task priority — no manual assignment required.",
-    metric: "4× task throughput vs manual dispatch",
+      "LogiVox automatically matches queued tasks to the best available device based on battery level, device type, current location, and task priority. Replenishment 2.0 closes the loop: IoT shelf sensors fire a replenishment signal \u2014 the engine scores available AMRs and dispatches the optimal unit automatically, no human in the loop.",
+    metric: "4\u00d7 task throughput vs manual dispatch",
   },
   {
     icon: Activity,
@@ -196,7 +196,8 @@ export default function RoboticsAutomationPage() {
         <div className="container-enterprise relative">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <Badge className="bg-violet-100 text-violet-800 border-violet-300 px-4 py-1.5 text-sm">
-              🤖 Robotics &amp; Automation — Pillar 4
+              🤖 Robotics &amp; Automation — Now with Autonomous Replenishment
+              2.0
             </Badge>
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
               One Platform. <span className="text-violet-600">Every Robot</span>{" "}
@@ -205,8 +206,11 @@ export default function RoboticsAutomationPage() {
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               LogiVox orchestrates your entire automation estate — AMR fleets,
               AGVs, cobots, cross-belt sorters, conveyors, and AS/RS cranes —
-              from a single WMS-native command centre. No middleware. No
-              integration fees. No separate robot control system.
+              from a single WMS-native command centre. Now with{" "}
+              <strong>Autonomous Replenishment 2.0</strong>: IoT smart-shelf
+              sensors automatically trigger AMR dispatch to replenish bins
+              before stockouts happen. No middleware. No separate robot control
+              system.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-2">
               <Button

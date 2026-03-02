@@ -272,11 +272,11 @@ export default function FeaturesPage() {
       tier: "enterprise",
       icon: Gauge,
       name: "Digital Twin Technology",
-      benefit: "See and test changes before implementing them",
+      benefit: "Simulate, test and automate your entire replenishment cycle",
       description:
-        "Virtual simulation of your warehouse operations for scenario planning and testing optimization changes.",
+        "Virtual simulation of your warehouse operations for scenario planning, plus live Autonomous Replenishment 2.0 — AI forecasting, IoT shelf triggers, AMR dispatch, and cost-optimised scheduling all from one dashboard.",
       impact:
-        "Reduce implementation risk, test changes before release, optimize layouts",
+        "Reduce implementation risk, eliminate stockouts, cut replenishment labor costs by 30%",
       usedBy: ["Enterprise"],
     },
     {
@@ -342,22 +342,46 @@ export default function FeaturesPage() {
       category: "Next-Gen Intelligence",
       tier: "enterprise",
       icon: Sparkles,
-      name: "Robotics & Automation Integration",
-      benefit: "Seamlessly scale with AMRs and sortation systems",
+      name: "Robotics & AMR Orchestration",
+      benefit:
+        "Dispatch Autonomous Mobile Robots for replenishment automatically",
       description:
-        "Future-proof your warehouse with built-in APIs for Autonomous Mobile Robots, conveyors, and automated packing.",
-      impact: "4x increase in scaling capability without adding headcount",
+        "Full AMR fleet management integrated into the replenishment engine. When stock falls below threshold, the system auto-dispatches the nearest available robot, tracks job status, manages battery levels, and handles multi-fleet traffic.",
+      impact: "4x scaling without headcount, zero missed replenishment windows",
       usedBy: ["Enterprise"],
     },
     {
       category: "Next-Gen Intelligence",
       tier: "enterprise",
       icon: Zap,
-      name: "Enterprise IoT Ingestion",
-      benefit: "Proactive management through real-time telemetry",
+      name: "IoT Smart Shelf Triggers",
+      benefit: "Weight sensors fire instant replenishment signals",
       description:
-        "Log and alert on temperature, humidity, weight, and RFID data via a massive sensor network integration.",
-      impact: "100% cold-chain compliance, zero inventory loss from spoilage",
+        "Smart-shelf weight sensors stream real-time telemetry into the replenishment engine. When a bin drops below its programmed threshold, a replenishment signal fires automatically — no scanner, no click, no delay.",
+      impact: "100% cold-chain compliance, zero stockouts from inattention",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: Workflow,
+      name: "Predictive AI Replenishment",
+      benefit: "Stop reacting to stockouts — predict and prevent them",
+      description:
+        "ML models analyse historical sales velocity, seasonal patterns, supplier lead times, and promotion calendars to generate pre-emptive replenishment orders. Integrates directly with Wave Planning for look-ahead demand shaping.",
+      impact:
+        "35% inventory reduction, 99.8% fill rate without safety-stock bloat",
+      usedBy: ["Enterprise"],
+    },
+    {
+      category: "Next-Gen Intelligence",
+      tier: "enterprise",
+      icon: TrendingDown,
+      name: "Cost-Optimised Off-Peak Scheduling",
+      benefit: "Cut replenishment labor costs by 30% automatically",
+      description:
+        "The engine analyses real-time labor rate calendars and warehouse traffic patterns, then schedules heavy replenishment tasks during off-peak windows. Peak-hour surcharges are avoided entirely without manual planning.",
+      impact: "30% labor cost reduction, eliminates scheduling manual effort",
       usedBy: ["Enterprise"],
     },
   ];

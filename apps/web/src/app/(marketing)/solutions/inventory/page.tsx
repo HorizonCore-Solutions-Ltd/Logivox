@@ -115,18 +115,19 @@ export default function InventoryManagementPage() {
       ],
     },
     {
-      title: "Replenishment Automation",
-      description: "Smart restocking to prevent stockouts",
+      title: "Autonomous Replenishment 2.0",
+      description:
+        "The full digital-twin replenishment engine — AI, IoT, Robotics",
       icon: TrendingDown,
       features: [
-        "Automated reorder point calculations",
-        "Demand-based replenishment",
-        "Seasonal adjustment factors",
-        "Lead time variability handling",
-        "Multi-echelon inventory optimization",
-        "Purchase order generation",
-        "Vendor selection optimization",
-        "Replenishment performance analytics",
+        "Predictive AI demand forecasting (ML + seasonality)",
+        "IoT smart-shelf weight sensor triggers",
+        "AMR robot automated dispatch & fleet management",
+        "Cost-optimised off-peak task scheduling",
+        "Wave-aware look-ahead replenishment planning",
+        "Auto-generated purchase orders",
+        "Real-time replenishment cost tracking",
+        "Multi-strategy engine (Min/Max, Reorder Point, Periodic, AI)",
       ],
     },
   ];
@@ -203,16 +204,17 @@ export default function InventoryManagementPage() {
         <div className="container-enterprise relative z-10">
           <div className="mx-auto max-w-3xl text-center">
             <Badge className="mb-4" variant="secondary">
-              Advanced Inventory Control
+              Advanced Inventory Control • Replenishment 2.0 Beta
             </Badge>
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
               Real-Time Inventory Management for Perfect Stock Control
             </h1>
             <p className="mt-6 text-lg text-muted-foreground">
               Achieve 99.9% inventory accuracy with real-time tracking,
-              automated cycle counting, and smart replenishment. Reduce
-              stockouts by 60% and excess inventory by 35% with our
-              comprehensive inventory management system.
+              automated cycle counting, and our new Autonomous Replenishment 2.0
+              engine — powered by Predictive AI, IoT smart-shelf sensors, and
+              AMR robot dispatch. Reduce stockouts by 60% and excess inventory
+              by 35%.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
               <Button size="lg" asChild>
