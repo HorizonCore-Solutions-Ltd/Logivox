@@ -29,7 +29,9 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
+  Plus
 } from "lucide-react";
+import Link from "next/link";
 
 interface QCInspection {
   id: string;
@@ -124,17 +126,25 @@ export default function QCInspectionsPage() {
               production.
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fetchInspections(1, true)}
-            disabled={refreshing}
-          >
-            <RefreshCw
-              className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fetchInspections(1, true)}
+              disabled={refreshing}
+            >
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
+              />
+              Refresh
+            </Button>
+            <Link href="/dashboard/qc-inspections/new">
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                New Inspection
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}

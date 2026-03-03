@@ -138,6 +138,48 @@ export async function POST(
       },
     });
 
+    // Auto-create PickList logic
+    const existingPickList = await prisma.pickList.findFirst({
+      where: { salesOrderId: params.id, organizationId },
+    });
+
+    let pickListId = existingPickList?.id;
+
+    if (!existingPickList) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const count = await prisma.pickList.count({
+        where: {
+          organizationId,
+          createdAt: { gte: today },
+        },
+      });
+
+      const dateStr = new Date().toISOString().split("T")[0].replace(/-/g, "");
+      const pickListNumber = `PL-${dateStr}-${String(count + 1).padStart(4, "0")}`;
+
+      const newPickList = await prisma.pickList.create({
+        data: {
+          organizationId,
+          pickListNumber,
+          salesOrderId: params.id,
+          warehouseId: effectiveWarehouseId,
+          status: "PENDING",
+          createdById: session.user.id,
+          items: {
+            create: order.items.map((item) => ({
+              salesOrderItemId: item.id,
+              inventoryItemId: item.inventoryItemId,
+              quantityToPick: item.quantity,
+              quantityPicked: 0,
+            })),
+          },
+        },
+      });
+      pickListId = newPickList.id;
+    }
+
     // Log activity
     await prisma.activityLog.create({
       data: {

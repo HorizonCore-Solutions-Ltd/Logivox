@@ -213,6 +213,21 @@ export default function GRNDetailPage() {
                       Inventory
                     </Button>
                   )}
+                  {grn.status === "COMPLETED" && !grn.putAwayCompleted && (
+                    <Button
+                      size="sm"
+                      onClick={() => handleAction("generate-putaway")}
+                      disabled={actionLoading}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      <Package className="h-4 w-4 mr-1" /> Generate Putaway Tasks
+                    </Button>
+                  )}
+                   {grn.status === "COMPLETED" && grn.putAwayCompleted && (
+                     <div className="flex items-center text-green-600 text-sm font-medium px-3 py-1 bg-green-50 rounded-md border border-green-200">
+                        <CheckCircle className="h-4 w-4 mr-1" /> Putaway Tasks Generated
+                     </div>
+                  )}
                 </div>
               </div>
 

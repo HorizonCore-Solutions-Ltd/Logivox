@@ -1,96 +1,47 @@
-/**
- * GET  /api/replenishment/rules  – list rules
- * POST /api/replenishment/rules  – create rule
- */
-export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { z } from "zod";
 
-const createSchema = z.object({
-  name: z.string().min(1).max(100),
-  strategy: z
-    .enum(["MIN_MAX", "REORDER_POINT", "DEMAND_BASED", "PERIODIC_REVIEW"])
-    .default("MIN_MAX"),
-  inventoryItemId: z.string().optional(),
-  warehouseId: z.string().optional(),
-  minQty: z.number().int().min(0).default(0),
-  maxQty: z.number().int().min(0).default(0),
-  reorderPoint: z.number().int().min(0).default(0),
-  reorderQty: z.number().int().min(1).default(1),
-  demandDays: z.number().int().min(1).max(365).default(30),
-  leadTimeDays: z.number().int().min(0).max(365).default(3),
-  supplierId: z.string().optional(),
-  autoCreatePO: z.boolean().default(false),
-  isActive: z.boolean().default(true),
-});
+export async function GET(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const organizationId = (session.user as any).organizationId;
 
-export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const organizationId = (session.user as any).organizationId;
+    const rules = await prisma.replenishmentRule.findMany({
+        where: { organizationId, isActive: true },
+        include: { inventoryItem: true, warehouse: true }
+    });
 
-  const { searchParams } = new URL(request.url);
-  const warehouseId = searchParams.get("warehouseId");
-  const isActive = searchParams.get("isActive");
-
-  const rules = await prisma.replenishmentRule.findMany({
-    where: {
-      organizationId,
-      ...(warehouseId && { warehouseId }),
-      ...(isActive !== null && { isActive: isActive === "true" }),
-    },
-    include: {
-      _count: { select: { tasks: { where: { status: "PENDING" } } } },
-      inventoryItem: {
-        select: { id: true, name: true, sku: true, quantity: true },
-      },
-      warehouse: { select: { id: true, name: true, code: true } },
-      supplier: { select: { id: true, name: true } },
-    },
-    orderBy: { createdAt: "desc" },
-  });
-
-  // Shape inventoryItem.quantity → currentStock for the UI
-  const shaped = rules.map((r) => ({
-    ...r,
-    inventoryItem: r.inventoryItem
-      ? {
-          name: r.inventoryItem.name,
-          sku: r.inventoryItem.sku,
-          currentStock: r.inventoryItem.quantity,
-        }
-      : undefined,
-  }));
-
-  return NextResponse.json({ rules: shaped });
+    return NextResponse.json({ rules });
 }
 
-export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.id)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const organizationId = (session.user as any).organizationId;
+export async function POST(req: NextRequest) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const organizationId = (session.user as any).organizationId;
+    const body = await req.json();
 
-  const body = await request.json();
-  const parsed = createSchema.safeParse(body);
-  if (!parsed.success) {
-    return NextResponse.json(
-      {
-        error: "Validation failed",
-        issues: parsed.error.flatten().fieldErrors,
-      },
-      { status: 400 },
-    );
-  }
-
-  const rule = await prisma.replenishmentRule.create({
-    data: { ...parsed.data, organizationId, createdById: session.user.id },
-  });
-
-  return NextResponse.json({ rule }, { status: 201 });
+    try {
+        const rule = await prisma.replenishmentRule.create({
+            data: {
+                organizationId,
+                name: body.name || `Rule for item ${body.inventoryItemId}`,
+                strategy: body.strategy,
+                minQty: body.minQty || 0,
+                maxQty: body.maxQty || 0,
+                reorderPoint: body.reorderPoint || 0,
+                reorderQty: body.reorderQty || 0,
+                leadTimeDays: body.leadTimeDays || 3,
+                reviewFrequencyDays: body.reviewFrequencyDays || 7,
+                inventoryItemId: body.inventoryItemId,
+                warehouseId: body.warehouseId,
+                createdById: session.user.id
+            }
+        });
+        return NextResponse.json({ success: true, rule });
+    } catch (e: any) {
+        return NextResponse.json({ error: e.message }, { status: 500 });
+    }
 }

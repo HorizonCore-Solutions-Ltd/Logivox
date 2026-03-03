@@ -273,6 +273,20 @@ export default function InventoryPage() {
               <Upload className="mr-2 h-4 w-4" />
               Import
             </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/inventory/adjust")}
+            >
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Adjust Stock
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/dashboard/inventory/adjust")}
+            >
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Adjust Stock
+            </Button>
             <Button onClick={() => router.push("/dashboard/inventory/new")}>
               <Plus className="mr-2 h-4 w-4" />
               Add Item

@@ -29,7 +29,9 @@ import {
   CheckCircle,
   XCircle,
   Warehouse,
+  Plus
 } from "lucide-react";
+import Link from "next/link";
 
 interface GRN {
   id: string;
@@ -131,6 +133,12 @@ export default function GRNReceivingPage() {
               <RefreshCw
                 className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
               />
+            <Link href="/dashboard/grn/receive">
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                New Receipt
+              </Button>
+            </Link>
               Refresh
             </Button>
           </div>

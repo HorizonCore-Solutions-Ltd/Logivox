@@ -56,6 +56,8 @@ import {
   Car,
   GitMerge,
   MapPin,
+  HelpCircle,
+  FileInput, 
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { OrganizationSwitcher } from "@/components/organizations/organization-switcher";
@@ -112,6 +114,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       icon: Package,
       subItems: [
         { name: "All Items", href: "/dashboard/inventory", icon: Package },
+        { name: "Import Data", href: "/dashboard/inventory/import", icon: FileInput },
         { name: "Warehouses", href: "/dashboard/warehouses", icon: Warehouse },
         { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
         {
@@ -182,6 +185,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           href: "/dashboard/operations",
           icon: Activity,
         },
+        {
+          name: "Cross Docking",
+          href: "/dashboard/cross-dock",
+          icon: GitMerge,
+        },
         { name: "Returns & RMAs", href: "/returns", icon: RotateCcw },
         {
           name: "RMA Detail View",
@@ -234,12 +242,6 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       icon: Zap,
       badge: "Advanced",
       subItems: [
-        { name: "Labor Management", href: "/dashboard/labor", icon: Users },
-        {
-          name: "Task Interleaving",
-          href: "/dashboard/task-interleaving",
-          icon: Zap,
-        },
         {
           name: "Yard Management",
           href: "/yard",
@@ -249,47 +251,6 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           name: "Marshalling",
           href: "/marshalling",
           icon: GitMerge,
-        },
-        {
-          name: "Floor Heatmap",
-          href: "/dashboard/floor-heatmap",
-          icon: Activity,
-        },
-        {
-          name: "Automation/Robotics",
-          href: "/dashboard/automation",
-          icon: Zap,
-        },
-        { name: "IoT Sensors", href: "/dashboard/iot", icon: Zap },
-        {
-          name: "AI Forecasting",
-          href: "/dashboard/ai-forecasting",
-          icon: BarChart3,
-        },
-        {
-          name: "Demand Forecasting",
-          href: "/dashboard/forecasting",
-          icon: BarChart3,
-        },
-        {
-          name: "Computer Vision",
-          href: "/dashboard/computer-vision",
-          icon: Zap,
-        },
-        {
-          name: "Customer Analytics",
-          href: "/dashboard/customer-analytics",
-          icon: BarChart3,
-        },
-        {
-          name: "Sustainability",
-          href: "/dashboard/sustainability",
-          icon: Globe2,
-        },
-        {
-          name: "Blockchain",
-          href: "/dashboard/blockchain",
-          icon: ShieldCheck,
         },
       ],
     },
@@ -332,6 +293,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     { name: "API Docs", href: "/dashboard/api-docs", icon: Book },
     { name: "Activity Logs", href: "/dashboard/activity", icon: Activity },
     { name: "PWA Settings", href: "/dashboard/pwa-settings", icon: Smartphone },
+    { name: "Help & Support", href: "/help", icon: HelpCircle },
     { name: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
