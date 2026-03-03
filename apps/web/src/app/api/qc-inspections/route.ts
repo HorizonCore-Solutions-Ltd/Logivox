@@ -16,13 +16,19 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  return NextResponse.redirect(new URL(CANONICAL, request.url), { status: 308 });
+  return NextResponse.redirect(new URL(CANONICAL, request.url), {
+    status: 308,
+  });
 }
 
 export async function PUT(request: NextRequest) {
-  return NextResponse.redirect(new URL(CANONICAL, request.url), { status: 308 });
+  return NextResponse.redirect(new URL(CANONICAL, request.url), {
+    status: 308,
+  });
 }
 
 export async function DELETE(request: NextRequest) {
-  return NextResponse.redirect(new URL(CANONICAL, request.url), { status: 308 });
+  return NextResponse.redirect(new URL(CANONICAL, request.url), {
+    status: 308,
+  });
 }

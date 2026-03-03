@@ -127,8 +127,12 @@ export default function ResetPasswordPage() {
 
         <Card>
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Set new password</CardTitle>
-            <CardDescription>Choose a strong password for your account</CardDescription>
+            <CardTitle className="text-2xl font-bold">
+              Set new password
+            </CardTitle>
+            <CardDescription>
+              Choose a strong password for your account
+            </CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -175,7 +179,11 @@ export default function ResetPasswordPage() {
                       onClick={() => setShowPassword((v) => !v)}
                       tabIndex={-1}
                     >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </button>
                   </div>
 
@@ -191,12 +199,18 @@ export default function ResetPasswordPage() {
                         <li
                           key={key}
                           className={
-                            passwordStrength.checks[key as keyof typeof passwordStrength.checks]
+                            passwordStrength.checks[
+                              key as keyof typeof passwordStrength.checks
+                            ]
                               ? "text-green-600"
                               : "text-muted-foreground"
                           }
                         >
-                          {passwordStrength.checks[key as keyof typeof passwordStrength.checks] ? "✓" : "○"}{" "}
+                          {passwordStrength.checks[
+                            key as keyof typeof passwordStrength.checks
+                          ]
+                            ? "✓"
+                            : "○"}{" "}
                           {label}
                         </li>
                       ))}
@@ -222,21 +236,30 @@ export default function ResetPasswordPage() {
                     />
                   </div>
                   {confirm && password !== confirm && (
-                    <p className="text-xs text-destructive mt-1">Passwords do not match</p>
+                    <p className="text-xs text-destructive mt-1">
+                      Passwords do not match
+                    </p>
                   )}
                 </div>
 
                 <Button
                   type="submit"
                   className="w-full"
-                  disabled={isSubmitting || passwordStrength.score < 4 || password !== confirm}
+                  disabled={
+                    isSubmitting ||
+                    passwordStrength.score < 4 ||
+                    password !== confirm
+                  }
                 >
                   {isSubmitting ? "Resetting…" : "Reset password"}
                 </Button>
 
                 <p className="text-center text-sm text-muted-foreground">
                   Remember your password?{" "}
-                  <Link href="/sign-in" className="text-primary hover:underline font-medium">
+                  <Link
+                    href="/sign-in"
+                    className="text-primary hover:underline font-medium"
+                  >
                     Sign in
                   </Link>
                 </p>

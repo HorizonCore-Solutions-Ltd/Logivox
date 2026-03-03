@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
     if (password.length < 8) passwordErrors.push("at least 8 characters");
     if (!/[A-Z]/.test(password)) passwordErrors.push("one uppercase letter");
     if (!/[0-9]/.test(password)) passwordErrors.push("one number");
-    if (!/[^A-Za-z0-9]/.test(password)) passwordErrors.push("one special character");
+    if (!/[^A-Za-z0-9]/.test(password))
+      passwordErrors.push("one special character");
     if (passwordErrors.length > 0) {
       return NextResponse.json(
         { error: `Password must contain: ${passwordErrors.join(", ")}` },
@@ -62,7 +63,9 @@ export async function POST(request: NextRequest) {
 
     // Delete the used token
     await prisma.verificationToken.delete({
-      where: { identifier_token: { identifier: verificationToken.identifier, token } },
+      where: {
+        identifier_token: { identifier: verificationToken.identifier, token },
+      },
     });
 
     // Reset any account lockout

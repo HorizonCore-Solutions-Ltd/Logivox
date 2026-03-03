@@ -20,7 +20,12 @@ interface EffectivenessReview {
   capaTitle: string;
   reviewDate: string;
   dueDate: string;
-  status: "PENDING" | "IN_REVIEW" | "EFFECTIVE" | "INEFFECTIVE" | "PARTIALLY_EFFECTIVE";
+  status:
+    | "PENDING"
+    | "IN_REVIEW"
+    | "EFFECTIVE"
+    | "INEFFECTIVE"
+    | "PARTIALLY_EFFECTIVE";
   score: number | null;
   reviewer: string | null;
   criteria: {
@@ -36,11 +41,31 @@ const STATUS_CONFIG: Record<
   string,
   { label: string; color: string; icon: React.FC<{ className?: string }> }
 > = {
-  PENDING: { label: "Pending", color: "bg-gray-100 text-gray-700", icon: Clock },
-  IN_REVIEW: { label: "In Review", color: "bg-blue-100 text-blue-700", icon: RefreshCw },
-  EFFECTIVE: { label: "Effective", color: "bg-green-100 text-green-700", icon: CheckCircle },
-  INEFFECTIVE: { label: "Ineffective", color: "bg-red-100 text-red-700", icon: XCircle },
-  PARTIALLY_EFFECTIVE: { label: "Partially Effective", color: "bg-yellow-100 text-yellow-700", icon: AlertTriangle },
+  PENDING: {
+    label: "Pending",
+    color: "bg-gray-100 text-gray-700",
+    icon: Clock,
+  },
+  IN_REVIEW: {
+    label: "In Review",
+    color: "bg-blue-100 text-blue-700",
+    icon: RefreshCw,
+  },
+  EFFECTIVE: {
+    label: "Effective",
+    color: "bg-green-100 text-green-700",
+    icon: CheckCircle,
+  },
+  INEFFECTIVE: {
+    label: "Ineffective",
+    color: "bg-red-100 text-red-700",
+    icon: XCircle,
+  },
+  PARTIALLY_EFFECTIVE: {
+    label: "Partially Effective",
+    color: "bg-yellow-100 text-yellow-700",
+    icon: AlertTriangle,
+  },
 };
 
 const MOCK_REVIEWS: EffectivenessReview[] = [
@@ -73,10 +98,15 @@ const MOCK_REVIEWS: EffectivenessReview[] = [
     score: 65,
     reviewer: "Mark Johnson",
     recurrenceCount: 2,
-    notes: "Delivery times improved but variance window still exceeds SLA by 1 day.",
+    notes:
+      "Delivery times improved but variance window still exceeds SLA by 1 day.",
     criteria: [
       { name: "Root cause eliminated", met: true, notes: "" },
-      { name: "Recurrence prevented", met: false, notes: "2 recurrences in past 30 days" },
+      {
+        name: "Recurrence prevented",
+        met: false,
+        notes: "2 recurrences in past 30 days",
+      },
       { name: "Process documented", met: true, notes: "" },
     ],
   },
@@ -140,9 +170,12 @@ export default function EffectivenessPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">CAPA Effectiveness Reviews</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            CAPA Effectiveness Reviews
+          </h1>
           <p className="mt-2 text-gray-600">
-            Verify that corrective and preventive actions have resolved root causes and prevented recurrence.
+            Verify that corrective and preventive actions have resolved root
+            causes and prevented recurrence.
           </p>
         </div>
 
@@ -153,7 +186,9 @@ export default function EffectivenessPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Total Reviews</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {stats.total}
+                  </p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-blue-500" />
               </div>
@@ -164,7 +199,9 @@ export default function EffectivenessPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Effective</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.effective}</p>
+                  <p className="text-2xl font-bold text-green-600">
+                    {stats.effective}
+                  </p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-500" />
               </div>
@@ -175,7 +212,9 @@ export default function EffectivenessPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Ineffective</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.ineffective}</p>
+                  <p className="text-2xl font-bold text-red-600">
+                    {stats.ineffective}
+                  </p>
                 </div>
                 <XCircle className="h-8 w-8 text-red-500" />
               </div>
@@ -186,7 +225,9 @@ export default function EffectivenessPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-500">Avg Score</p>
-                  <p className="text-2xl font-bold text-blue-600">{stats.avgScore}%</p>
+                  <p className="text-2xl font-bold text-blue-600">
+                    {stats.avgScore}%
+                  </p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-blue-500" />
               </div>
@@ -196,21 +237,26 @@ export default function EffectivenessPage() {
 
         {/* Filter Bar */}
         <div className="bg-white rounded-lg shadow p-4 mb-6 flex flex-wrap gap-2">
-          {["all", "PENDING", "IN_REVIEW", "EFFECTIVE", "PARTIALLY_EFFECTIVE", "INEFFECTIVE"].map(
-            (s) => (
-              <button
-                key={s}
-                onClick={() => setFilter(s)}
-                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                  filter === s
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                {s === "all" ? "All" : s.replace(/_/g, " ")}
-              </button>
-            ),
-          )}
+          {[
+            "all",
+            "PENDING",
+            "IN_REVIEW",
+            "EFFECTIVE",
+            "PARTIALLY_EFFECTIVE",
+            "INEFFECTIVE",
+          ].map((s) => (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                filter === s
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {s === "all" ? "All" : s.replace(/_/g, " ")}
+            </button>
+          ))}
         </div>
 
         {/* Reviews List */}
@@ -261,8 +307,8 @@ export default function EffectivenessPage() {
                                 c.met === true
                                   ? "bg-green-50 text-green-700"
                                   : c.met === false
-                                  ? "bg-red-50 text-red-700"
-                                  : "bg-gray-50 text-gray-500"
+                                    ? "bg-red-50 text-red-700"
+                                    : "bg-gray-50 text-gray-500"
                               }`}
                             >
                               {c.met === true ? (
@@ -278,15 +324,21 @@ export default function EffectivenessPage() {
                         </div>
 
                         {review.notes && (
-                          <p className="text-sm text-gray-600">{review.notes}</p>
+                          <p className="text-sm text-gray-600">
+                            {review.notes}
+                          </p>
                         )}
                       </div>
 
                       <div className="text-right text-sm text-gray-500 whitespace-nowrap">
                         {review.reviewer && (
-                          <div className="mb-1">Reviewer: {review.reviewer}</div>
+                          <div className="mb-1">
+                            Reviewer: {review.reviewer}
+                          </div>
                         )}
-                        <div>Due: {new Date(review.dueDate).toLocaleDateString()}</div>
+                        <div>
+                          Due: {new Date(review.dueDate).toLocaleDateString()}
+                        </div>
                         {review.recurrenceCount > 0 && (
                           <div className="text-orange-600 font-medium mt-1">
                             {review.recurrenceCount} recurrence(s)

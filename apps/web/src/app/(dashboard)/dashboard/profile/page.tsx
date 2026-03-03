@@ -3,7 +3,13 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,7 +49,9 @@ export default function ProfilePage() {
         setName(d.user.name || "");
         setEmail(d.user.email || "");
       })
-      .catch(() => toast({ title: "Failed to load profile", variant: "destructive" }))
+      .catch(() =>
+        toast({ title: "Failed to load profile", variant: "destructive" }),
+      )
       .finally(() => setLoading(false));
   }, []);
 
@@ -70,11 +78,14 @@ export default function ProfilePage() {
         throw new Error(err.error || "Update failed");
       }
       const { user } = await res.json();
-      setProfile((prev) => prev ? { ...prev, ...user } : null);
+      setProfile((prev) => (prev ? { ...prev, ...user } : null));
       await updateSession({ name: user.name, email: user.email });
       toast({ title: "Profile updated" });
     } catch (err) {
-      toast({ title: err instanceof Error ? err.message : "Update failed", variant: "destructive" });
+      toast({
+        title: err instanceof Error ? err.message : "Update failed",
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }
@@ -87,7 +98,10 @@ export default function ProfilePage() {
       return;
     }
     if (newPassword.length < 8) {
-      toast({ title: "Password must be at least 8 characters", variant: "destructive" });
+      toast({
+        title: "Password must be at least 8 characters",
+        variant: "destructive",
+      });
       return;
     }
     setSaving(true);
@@ -106,7 +120,10 @@ export default function ProfilePage() {
       setConfirmPassword("");
       toast({ title: "Password changed successfully" });
     } catch (err) {
-      toast({ title: err instanceof Error ? err.message : "Failed", variant: "destructive" });
+      toast({
+        title: err instanceof Error ? err.message : "Failed",
+        variant: "destructive",
+      });
     } finally {
       setSaving(false);
     }
@@ -131,7 +148,9 @@ export default function ProfilePage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">My Profile</h1>
-        <p className="text-muted-foreground mt-1">Manage your account settings and password</p>
+        <p className="text-muted-foreground mt-1">
+          Manage your account settings and password
+        </p>
       </div>
 
       {/* Avatar row */}
@@ -148,7 +167,11 @@ export default function ProfilePage() {
                 <Shield className="h-3 w-3 mr-1" />
                 {profile?.role?.replace(/_/g, " ")}
               </Badge>
-              {profile?.isActive && <Badge variant="default" className="bg-green-500">Active</Badge>}
+              {profile?.isActive && (
+                <Badge variant="default" className="bg-green-500">
+                  Active
+                </Badge>
+              )}
             </div>
           </div>
         </CardContent>
@@ -164,7 +187,10 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-2">
             {profile!.organizationMembers.map(({ organization }) => (
-              <div key={organization.id} className="flex items-center gap-2 text-sm">
+              <div
+                key={organization.id}
+                className="flex items-center gap-2 text-sm"
+              >
                 <Building2 className="h-3 w-3 text-muted-foreground" />
                 {organization.name}
               </div>
@@ -179,22 +205,39 @@ export default function ProfilePage() {
           <CardTitle className="flex items-center gap-2">
             <User className="h-5 w-5" /> Personal Information
           </CardTitle>
-          <CardDescription>Update your display name and email address</CardDescription>
+          <CardDescription>
+            Update your display name and email address
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSaveProfile} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
-                <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" required />
+                <Input
+                  id="name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Your name"
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email Address</Label>
-                <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" required />
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  required
+                />
               </div>
             </div>
             <Button type="submit" disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
               Save Changes
             </Button>
           </form>
@@ -207,27 +250,52 @@ export default function ProfilePage() {
           <CardTitle className="flex items-center gap-2">
             <Lock className="h-5 w-5" /> Change Password
           </CardTitle>
-          <CardDescription>Choose a strong password with at least 8 characters</CardDescription>
+          <CardDescription>
+            Choose a strong password with at least 8 characters
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleChangePassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="current-pw">Current Password</Label>
-              <Input id="current-pw" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="Enter current password" required />
+              <Input
+                id="current-pw"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                placeholder="Enter current password"
+                required
+              />
             </div>
             <Separator />
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="new-pw">New Password</Label>
-                <Input id="new-pw" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 8 characters" required />
+                <Input
+                  id="new-pw"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Min 8 characters"
+                  required
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="confirm-pw">Confirm New Password</Label>
-                <Input id="confirm-pw" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} placeholder="Repeat new password" required />
+                <Input
+                  id="confirm-pw"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repeat new password"
+                  required
+                />
               </div>
             </div>
             <Button type="submit" variant="outline" disabled={saving}>
-              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
+              {saving ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
               Update Password
             </Button>
           </form>
@@ -235,7 +303,10 @@ export default function ProfilePage() {
       </Card>
 
       <p className="text-xs text-muted-foreground">
-        Member since {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : "—"}
+        Member since{" "}
+        {profile?.createdAt
+          ? new Date(profile.createdAt).toLocaleDateString()
+          : "—"}
       </p>
     </div>
   );

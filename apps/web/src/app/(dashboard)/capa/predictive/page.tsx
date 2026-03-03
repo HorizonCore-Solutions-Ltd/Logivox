@@ -117,8 +117,15 @@ export default function PredictiveCAPAPage() {
             </p>
           </div>
         </div>
-        <Button variant="outline" size="sm" onClick={fetchData} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={fetchData}
+          disabled={loading}
+        >
+          <RefreshCw
+            className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
@@ -197,7 +204,9 @@ export default function PredictiveCAPAPage() {
                     className={`border rounded-lg p-4 ${cfg.color}`}
                   >
                     <div className="flex items-start gap-3">
-                      <Icon className={`h-5 w-5 mt-0.5 flex-shrink-0 ${cfg.iconColor}`} />
+                      <Icon
+                        className={`h-5 w-5 mt-0.5 flex-shrink-0 ${cfg.iconColor}`}
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
                           <Badge variant="outline" className="text-xs">
@@ -221,11 +230,13 @@ export default function PredictiveCAPAPage() {
                         )}
                         {alert.recommendedActions?.length > 0 && (
                           <ul className="mt-2 list-disc list-inside space-y-0.5">
-                            {alert.recommendedActions.slice(0, 3).map((a, i) => (
-                              <li key={i} className="text-xs">
-                                {a}
-                              </li>
-                            ))}
+                            {alert.recommendedActions
+                              .slice(0, 3)
+                              .map((a, i) => (
+                                <li key={i} className="text-xs">
+                                  {a}
+                                </li>
+                              ))}
                           </ul>
                         )}
                       </div>
@@ -273,7 +284,8 @@ export default function PredictiveCAPAPage() {
                       {ind.riskLevel}
                     </Badge>
                     <p className="text-xs">
-                      {TREND_ICON[ind.trend]} {ind.currentValue} / {ind.threshold}
+                      {TREND_ICON[ind.trend]} {ind.currentValue} /{" "}
+                      {ind.threshold}
                     </p>
                   </div>
                 </div>

@@ -47,7 +47,10 @@ export async function POST(request: NextRequest) {
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid email format" },
+        { status: 400 },
+      );
     }
 
     // Always return success to prevent email enumeration
@@ -75,7 +78,8 @@ export async function POST(request: NextRequest) {
 
     // Always return the same message (prevent user enumeration)
     return NextResponse.json({
-      message: "If an account exists for this email, a reset link has been sent.",
+      message:
+        "If an account exists for this email, a reset link has been sent.",
     });
   } catch (error) {
     console.error("Forgot password error:", error);

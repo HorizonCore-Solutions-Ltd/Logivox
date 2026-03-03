@@ -147,7 +147,9 @@ export async function POST(request: NextRequest) {
         `,
       });
     } else {
-      console.log(`\n[DEV] Email verification link for ${email}:\n${verifyUrl}\n`);
+      console.log(
+        `\n[DEV] Email verification link for ${email}:\n${verifyUrl}\n`,
+      );
     }
 
     return NextResponse.json({

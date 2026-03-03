@@ -32,7 +32,11 @@ interface RCAResult {
     action: string;
     priority: string;
   }[];
-  similarCAPAs?: { capaNumber: string; similarity: number; resolution: string }[];
+  similarCAPAs?: {
+    capaNumber: string;
+    similarity: number;
+    resolution: string;
+  }[];
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
@@ -142,7 +146,11 @@ export default function AIRCAPage() {
               <AlertTriangle className="h-4 w-4" /> {error}
             </p>
           )}
-          <Button onClick={runAnalysis} disabled={loading} className="w-full md:w-auto">
+          <Button
+            onClick={runAnalysis}
+            disabled={loading}
+            className="w-full md:w-auto"
+          >
             {loading ? (
               <>
                 <RefreshCw className="h-4 w-4 mr-2 animate-spin" /> Analysing…
@@ -259,10 +267,7 @@ export default function AIRCAPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {result.fishbone.map((bone, i) => (
-                    <div
-                      key={i}
-                      className="border rounded-lg p-3 bg-muted/30"
-                    >
+                    <div key={i} className="border rounded-lg p-3 bg-muted/30">
                       <p className="font-semibold text-sm mb-2">
                         {bone.category}
                       </p>

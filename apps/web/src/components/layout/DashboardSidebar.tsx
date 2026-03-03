@@ -53,6 +53,9 @@ import {
   FileCheck,
   TrendingUp,
   AlertCircle,
+  Car,
+  GitMerge,
+  MapPin,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { OrganizationSwitcher } from "@/components/organizations/organization-switcher";
@@ -137,6 +140,8 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         { name: "Packing", href: "/dashboard/packs", icon: BoxSelect },
         { name: "Shipments", href: "/dashboard/shipments", icon: Truck },
         { name: "Invoices", href: "/billing/invoices", icon: Receipt },
+        { name: "Orders", href: "/orders", icon: ShoppingCart },
+        { name: "Delivery", href: "/delivery", icon: MapPin },
       ],
     },
     {
@@ -177,7 +182,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
           href: "/dashboard/operations",
           icon: Activity,
         },
-        { name: "Returns & RMAs", href: "/dashboard/returns", icon: RotateCcw },
+        { name: "Returns & RMAs", href: "/returns", icon: RotateCcw },
         {
           name: "RMA Detail View",
           href: "/dashboard/rmas",
@@ -237,8 +242,13 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
         },
         {
           name: "Yard Management",
-          href: "/dashboard/yard-management",
-          icon: Truck,
+          href: "/yard",
+          icon: Car,
+        },
+        {
+          name: "Marshalling",
+          href: "/marshalling",
+          icon: GitMerge,
         },
         {
           name: "Floor Heatmap",
@@ -335,7 +345,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     pathname.startsWith("/dashboard/sales-orders") ||
     pathname.startsWith("/dashboard/pick-lists") ||
     pathname.startsWith("/dashboard/packs") ||
-    pathname.startsWith("/dashboard/shipments");
+    pathname.startsWith("/dashboard/shipments") ||
+    pathname.startsWith("/orders") ||
+    pathname.startsWith("/delivery");
   const isProcurementActive =
     pathname.startsWith("/dashboard/purchase-orders") ||
     pathname.startsWith("/dashboard/receiving") ||
@@ -344,6 +356,7 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
   const isOperationsActive =
     pathname.startsWith("/dashboard/operations") ||
     pathname.startsWith("/dashboard/returns") ||
+    pathname.startsWith("/returns") ||
     pathname.startsWith("/dashboard/rmas") ||
     pathname.startsWith("/dashboard/qc-inspections") ||
     pathname.startsWith("/dashboard/cycle-counts");
@@ -354,6 +367,8 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
     pathname.startsWith("/dashboard/labor") ||
     pathname.startsWith("/dashboard/task-interleaving") ||
     pathname.startsWith("/dashboard/yard-management") ||
+    pathname.startsWith("/yard") ||
+    pathname.startsWith("/marshalling") ||
     pathname.startsWith("/dashboard/floor-heatmap") ||
     pathname.startsWith("/dashboard/automation") ||
     pathname.startsWith("/dashboard/iot") ||
@@ -392,7 +407,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                 priority
               />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">LogiVox</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
+              LogiVox
+            </span>
           </Link>
         </div>
 
@@ -607,7 +624,9 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
                       priority
                     />
                   </div>
-                  <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">LogiVox</span>
+                  <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">
+                    LogiVox
+                  </span>
                 </Link>
                 <Button
                   variant="ghost"

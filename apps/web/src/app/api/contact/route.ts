@@ -40,19 +40,19 @@ export async function POST(request: NextRequest) {
         message:
           "Thank you for your message. We'll get back to you within 24 hours.",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { success: false, errors: error.errors },
-        { status: 422 }
+        { status: 422 },
       );
     }
     console.error("[contact-form] Unexpected error:", error);
     return NextResponse.json(
       { success: false, message: "Failed to submit form. Please try again." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

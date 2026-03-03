@@ -7,7 +7,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { processVoiceCommand, processTextCommand } from "@/lib/voice/voiceEngine";
+import {
+  processVoiceCommand,
+  processTextCommand,
+} from "@/lib/voice/voiceEngine";
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +27,10 @@ export async function POST(request: NextRequest) {
       const body = await request.json();
       const text: string = body.text ?? "";
       if (!text.trim()) {
-        return NextResponse.json({ error: "No text provided" }, { status: 400 });
+        return NextResponse.json(
+          { error: "No text provided" },
+          { status: 400 },
+        );
       }
       const result = await processTextCommand({
         text,

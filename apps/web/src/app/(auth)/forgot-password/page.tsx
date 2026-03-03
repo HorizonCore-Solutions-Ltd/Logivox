@@ -69,7 +69,9 @@ export default function ForgotPasswordPage() {
 
         <Card>
           <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-bold">Forgot password?</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              Forgot password?
+            </CardTitle>
             <CardDescription>
               Enter your email and we&apos;ll send you a reset link
             </CardDescription>
@@ -88,9 +90,9 @@ export default function ForgotPasswordPage() {
                 <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-md flex items-start space-x-2">
                   <CheckCircle2 className="h-5 w-5 mt-0.5 flex-shrink-0 text-green-600" />
                   <p className="text-sm">
-                    If an account exists for <strong>{email}</strong>, a password
-                    reset link has been sent. Please check your inbox (and spam
-                    folder).
+                    If an account exists for <strong>{email}</strong>, a
+                    password reset link has been sent. Please check your inbox
+                    (and spam folder).
                   </p>
                 </div>
                 <Link href="/sign-in">
@@ -122,7 +124,11 @@ export default function ForgotPasswordPage() {
                   </div>
                 </div>
 
-                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Sending…" : "Send reset link"}
                 </Button>
 

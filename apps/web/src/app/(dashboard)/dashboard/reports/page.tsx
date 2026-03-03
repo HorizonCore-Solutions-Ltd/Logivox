@@ -572,7 +572,9 @@ export default function ReportsPage() {
                 variant="outline"
                 className="w-full"
                 onClick={handleSaveTemplate}
-                disabled={!config.name || config.metrics.length === 0 || isSaving}
+                disabled={
+                  !config.name || config.metrics.length === 0 || isSaving
+                }
               >
                 {isSaving ? "Saving..." : "Save as Template"}
               </Button>

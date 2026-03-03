@@ -34,7 +34,8 @@ export async function GET() {
       },
     },
   });
-  if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!user)
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   return NextResponse.json({ user });
 }
 
@@ -51,9 +52,14 @@ export async function PATCH(request: NextRequest) {
 
   if (data.name) updates.name = data.name;
   if (data.email) {
-    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    const existing = await prisma.user.findUnique({
+      where: { email: data.email },
+    });
     if (existing && existing.id !== session.user.id) {
-      return NextResponse.json({ error: "Email already in use" }, { status: 409 });
+      return NextResponse.json(
+        { error: "Email already in use" },
+        { status: 409 },
+      );
     }
     updates.email = data.email;
   }
@@ -65,12 +71,17 @@ export async function PATCH(request: NextRequest) {
         { status: 400 },
       );
     }
-    const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+    });
     const valid = user?.passwordHash
       ? await bcrypt.compare(data.currentPassword, user.passwordHash)
       : false;
     if (!valid) {
-      return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Current password is incorrect" },
+        { status: 400 },
+      );
     }
     updates.passwordHash = await bcrypt.hash(data.newPassword, 12);
   }

@@ -25,7 +25,10 @@ export async function GET(request: NextRequest) {
       await Promise.all([
         // Total open
         prisma.correctivePreventiveAction.count({
-          where: { organizationId: orgId, status: { in: ["OPEN", "IN_PROGRESS"] } },
+          where: {
+            organizationId: orgId,
+            status: { in: ["OPEN", "IN_PROGRESS"] },
+          },
         }),
         // Overdue
         prisma.correctivePreventiveAction.count({
@@ -48,7 +51,10 @@ export async function GET(request: NextRequest) {
         // By priority
         prisma.correctivePreventiveAction.groupBy({
           by: ["priority"],
-          where: { organizationId: orgId, status: { in: ["OPEN", "IN_PROGRESS"] } },
+          where: {
+            organizationId: orgId,
+            status: { in: ["OPEN", "IN_PROGRESS"] },
+          },
           _count: true,
         }),
         // Recent 10
@@ -76,7 +82,10 @@ export async function GET(request: NextRequest) {
         overdueRate: open > 0 ? Math.round((overdue / open) * 100) : 0,
       },
       byPriority: byPriority.reduce(
-        (acc: Record<string, number>, g: { priority: string; _count: number }) => {
+        (
+          acc: Record<string, number>,
+          g: { priority: string; _count: number },
+        ) => {
           acc[g.priority] = g._count;
           return acc;
         },

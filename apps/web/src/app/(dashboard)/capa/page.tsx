@@ -15,9 +15,7 @@ export default function CAPARootPage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <p className="text-muted-foreground text-sm">
-        Redirecting to CAPA Hub…
-      </p>
+      <p className="text-muted-foreground text-sm">Redirecting to CAPA Hub…</p>
     </div>
   );
 }

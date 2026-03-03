@@ -3,7 +3,8 @@ const withPWA = require("next-pwa")({
   register: true,
   skipWaiting: true,
   // Disable PWA in all non-production envs AND when BUILD_VERIFY=1 to save memory
-  disable: process.env.NODE_ENV === "development" || process.env.BUILD_VERIFY === "1",
+  disable:
+    process.env.NODE_ENV === "development" || process.env.BUILD_VERIFY === "1",
   buildExcludes: [/middleware-manifest\.json$/],
 });
 

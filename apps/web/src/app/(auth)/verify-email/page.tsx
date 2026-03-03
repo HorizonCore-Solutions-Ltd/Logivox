@@ -11,7 +11,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, ArrowLeft, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  Mail,
+  ArrowLeft,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
+} from "lucide-react";
 import Image from "next/image";
 
 export default function VerifyEmailPage() {
@@ -37,7 +43,9 @@ export default function VerifyEmailPage() {
         if (res.ok) {
           setStatus("success");
         } else {
-          setErrorMessage(data.error || "Verification failed. Please try again.");
+          setErrorMessage(
+            data.error || "Verification failed. Please try again.",
+          );
           setStatus("error");
         }
       } catch {
@@ -107,10 +115,15 @@ export default function VerifyEmailPage() {
                     : "Verify Your Email"}
             </CardTitle>
             <CardDescription className="text-center">
-              {status === "idle" && "Enter your email to resend the verification link."}
-              {status === "verifying" && "Please wait while we verify your email."}
-              {status === "success" && "Your email has been verified. You can now sign in."}
-              {status === "error" && (errorMessage || "The verification link is invalid or expired.")}
+              {status === "idle" &&
+                "Enter your email to resend the verification link."}
+              {status === "verifying" &&
+                "Please wait while we verify your email."}
+              {status === "success" &&
+                "Your email has been verified. You can now sign in."}
+              {status === "error" &&
+                (errorMessage ||
+                  "The verification link is invalid or expired.")}
             </CardDescription>
           </CardHeader>
 
@@ -141,7 +154,9 @@ export default function VerifyEmailPage() {
               <div className="space-y-4">
                 <div className="flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 p-3">
                   <AlertCircle className="h-4 w-4 shrink-0 text-destructive" />
-                  <span className="text-sm text-destructive">{errorMessage}</span>
+                  <span className="text-sm text-destructive">
+                    {errorMessage}
+                  </span>
                 </div>
 
                 <p className="text-sm text-muted-foreground text-center">
@@ -177,7 +192,11 @@ export default function VerifyEmailPage() {
                         />
                       </div>
                     </div>
-                    <Button type="submit" className="w-full" disabled={resendLoading}>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={resendLoading}
+                    >
                       {resendLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -224,7 +243,11 @@ export default function VerifyEmailPage() {
                         />
                       </div>
                     </div>
-                    <Button type="submit" className="w-full" disabled={resendLoading}>
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={resendLoading}
+                    >
                       {resendLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -142,7 +142,10 @@ export default function VoiceDashboard() {
     try {
       const form = new FormData();
       form.append("audio", blob, "command.webm");
-      const res = await fetch("/api/voice/process", { method: "POST", body: form });
+      const res = await fetch("/api/voice/process", {
+        method: "POST",
+        body: form,
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Voice processing failed");
       addResult(
@@ -178,7 +181,8 @@ export default function VoiceDashboard() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Voice Commands</h1>
             <p className="mt-2 text-gray-600">
-              Control warehouse operations hands-free with voice or text commands.
+              Control warehouse operations hands-free with voice or text
+              commands.
             </p>
           </div>
           <Button
@@ -241,8 +245,8 @@ export default function VoiceDashboard() {
                   isRecording
                     ? "bg-red-500 hover:bg-red-600 animate-pulse"
                     : processing
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                      ? "bg-gray-300 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 {isRecording ? (
@@ -323,10 +327,7 @@ export default function VoiceDashboard() {
                         <span className="text-xs text-gray-500 font-mono">
                           {r.input}
                         </span>
-                        <Badge
-                          variant="outline"
-                          className="text-xs font-mono"
-                        >
+                        <Badge variant="outline" className="text-xs font-mono">
                           {r.intent}
                         </Badge>
                         {r.confidence < 1 && (

@@ -204,7 +204,9 @@ function parseIntent(text: string): {
   }
 
   // Ship order: "ship order ORD-123" / "dispatch order 456"
-  const shipMatch = lower.match(/\b(?:ship|dispatch|ship out)\s+(?:order\s+)?([a-z0-9\-]+)/i);
+  const shipMatch = lower.match(
+    /\b(?:ship|dispatch|ship out)\s+(?:order\s+)?([a-z0-9\-]+)/i,
+  );
   if (shipMatch) {
     return {
       intent: "SHIP_ORDER",
@@ -245,8 +247,16 @@ function parseIntent(text: string): {
   }
 
   // Exception / problem: "exception", "problem", "issue found", "damaged"
-  if (/\b(exception|problem|issue|damaged|broken|defect|error found)\b/.test(lower)) {
-    return { intent: "EXCEPTION", params: { description: text }, confidence: 0.82 };
+  if (
+    /\b(exception|problem|issue|damaged|broken|defect|error found)\b/.test(
+      lower,
+    )
+  ) {
+    return {
+      intent: "EXCEPTION",
+      params: { description: text },
+      confidence: 0.82,
+    };
   }
 
   // Cancel
