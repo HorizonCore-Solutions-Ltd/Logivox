@@ -1,22 +1,24 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession();
-    if (!session) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const orgId = session.user.organizationId;
 
     const { searchParams } = new URL(request.url);
     const direction = searchParams.get("direction"); // INBOUND | OUTBOUND | null
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000); // last 24 hrs
 
-    const where: Record<string, unknown> = { createdAt: { gte: since } };
+    const where: Record<string, unknown> = { organizationId: orgId, entryTime: { gte: since } };
     if (direction) where.direction = direction;
 
-    const [entries, summary] = await Promise.all([
+    const [entries, dirSummary, onSiteCount, pendingCount] = await Promise.all([
       prisma.gateEntry.findMany({
         where,
         include: {
@@ -30,46 +32,40 @@ export async function GET(request: Request) {
             },
           },
         },
-        orderBy: { createdAt: "desc" },
+        orderBy: { entryTime: "desc" },
         take: 100,
       }),
       prisma.gateEntry.groupBy({
         by: ["direction"],
-        where: { createdAt: { gte: since } },
+        where: { organizationId: orgId, entryTime: { gte: since } },
         _count: { id: true },
+      }),
+      // On site = checked in but not checked out
+      prisma.gateEntry.count({
+        where: { organizationId: orgId, status: { in: ["CHECKED_IN", "PROCESSING", "APPROVED"] }, exitTime: null },
+      }),
+      // Pending = appointments today that haven't checked in yet
+      prisma.dockAppointment.count({
+        where: {
+          organizationId: orgId,
+          status: "SCHEDULED",
+          scheduledDate: { gte: new Date(new Date().setHours(0,0,0,0)) },
+        },
       }),
     ]);
 
-    const inbound =
-      summary.find((s) => s.direction === "INBOUND")?._count.id ?? 0;
-    const outbound =
-      summary.find((s) => s.direction === "OUTBOUND")?._count.id ?? 0;
-
-    // Check-in time KPI: avg minutes between scheduledTime and createdAt
-    const withAppt = entries.filter((e) => e.scheduledTime && e.createdAt);
-    const avgWaitMin =
-      withAppt.length > 0
-        ? Math.round(
-            withAppt.reduce((acc, e) => {
-              const diff =
-                Math.abs(
-                  new Date(e.createdAt).getTime() -
-                    new Date(e.scheduledTime!).getTime(),
-                ) / 60_000;
-              return acc + diff;
-            }, 0) / withAppt.length,
-          )
-        : 0;
+    const inboundToday = dirSummary.find((s) => s.direction === "INBOUND")?._count.id ?? 0;
+    const outboundToday = dirSummary.find((s) => s.direction === "OUTBOUND")?._count.id ?? 0;
 
     return NextResponse.json({
       summary: {
-        totalToday: inbound + outbound,
-        inbound,
-        outbound,
-        avgCheckInVarianceMinutes: avgWaitMin,
+        inboundToday,
+        outboundToday,
+        onSite: onSiteCount,
+        pendingCheckIn: pendingCount,
+        totalToday: inboundToday + outboundToday,
         securityChecksPass: entries.filter((e) => e.securityCheckPassed).length,
-        securityChecksFail: entries.filter((e) => !e.securityCheckPassed)
-          .length,
+        securityChecksFail: entries.filter((e) => !e.securityCheckPassed).length,
       },
       entries: entries.map((e) => ({
         id: e.id,
@@ -78,15 +74,15 @@ export async function GET(request: Request) {
         direction: e.direction,
         gateNumber: e.gateNumber,
         vehicleType: e.vehicleType,
-        vehicleNumber: e.vehicleNumber,
+        vehicleNumber: e.vehicleNumber ?? e.licensePlate,
         licensePlate: e.licensePlate,
         trailerNumber: e.trailerNumber,
         driverName: e.driverName,
         carrierName: e.carrierName ?? e.appointment?.carrierName,
-        scheduledTime: e.scheduledTime?.toISOString(),
-        actualTime: e.createdAt.toISOString(),
+        status: e.status,
+        createdAt: e.entryTime.toISOString(),
+        exitTime: e.exitTime?.toISOString(),
         securityCheckPassed: e.securityCheckPassed,
-        securityNotes: e.securityNotes,
         appointmentNumber: e.appointment?.appointmentNumber,
         appointmentType: e.appointment?.appointmentType,
         appointmentStatus: e.appointment?.status,
@@ -94,19 +90,17 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching gate log:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
-    if (!session) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const orgId = session.user.organizationId;
 
     const body = await request.json();
     const {
@@ -123,23 +117,23 @@ export async function POST(request: Request) {
       appointmentId,
       securityCheckPassed = true,
       securityNotes,
-      organizationId,
       warehouseId,
     } = body;
 
-    if (!vehicleNumber && !driverName) {
+    if (!vehicleNumber && !licensePlate && !driverName) {
       return NextResponse.json(
-        { error: "vehicleNumber or driverName is required" },
+        { error: "vehicleNumber, licensePlate, or driverName is required" },
         { status: 400 },
       );
     }
 
-    // Auto-link to appointment if not provided — match by vehicleNumber
+    // Auto-link to appointment if not provided — match by vehicleNumber or licensePlate
     let resolvedAppointmentId = appointmentId;
-    if (!resolvedAppointmentId && vehicleNumber) {
+    if (!resolvedAppointmentId && (vehicleNumber || licensePlate)) {
       const matchAppt = await prisma.dockAppointment.findFirst({
         where: {
-          vehicleNumber,
+          organizationId: orgId,
+          vehicleNumber: vehicleNumber ?? licensePlate,
           status: { in: ["SCHEDULED", "CONFIRMED"] },
           scheduledDate: {
             gte: new Date(new Date().setHours(0, 0, 0, 0)),
@@ -154,10 +148,7 @@ export async function POST(request: Request) {
       if (matchAppt) {
         await prisma.dockAppointment.update({
           where: { id: matchAppt.id },
-          data: {
-            status: "CHECKED_IN",
-            actualArrival: new Date(),
-          },
+          data: { status: "CHECKED_IN", actualArrival: new Date() },
         });
       }
     }
@@ -180,8 +171,10 @@ export async function POST(request: Request) {
         appointmentId: resolvedAppointmentId,
         securityCheckPassed,
         securityNotes,
-        organizationId: organizationId ?? "default",
+        organizationId: orgId,
         warehouseId,
+        entryTime: new Date(),
+        status: "CHECKED_IN",
       },
     });
 
@@ -193,9 +186,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Error creating gate entry:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

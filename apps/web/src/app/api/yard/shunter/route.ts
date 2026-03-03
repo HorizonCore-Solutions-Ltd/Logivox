@@ -1,21 +1,23 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 // Shunter tasks are derived from: pending DockAppointments that need a trailer
 // moved from a yard parking spot to a loading dock (or vice versa).
 
 export async function GET() {
   try {
-    const session = await getServerSession();
-    if (!session) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    const orgId = session.user.organizationId;
 
     const [yardLocations, pendingAppointments, checkedInAppointments] =
       await Promise.all([
         prisma.yardLocation.findMany({
-          where: { isActive: true },
+          where: { isActive: true, organizationId: orgId },
           include: {
             appointments: {
               where: {
@@ -41,6 +43,7 @@ export async function GET() {
         // Appointments in parking spots that need to move to a dock
         prisma.dockAppointment.findMany({
           where: {
+            organizationId: orgId,
             status: "CHECKED_IN",
             yardLocation: { locationType: "PARKING_SPOT" },
             scheduledStart: {
@@ -62,6 +65,7 @@ export async function GET() {
         // Appointments completed — trailer needs to move out
         prisma.dockAppointment.findMany({
           where: {
+            organizationId: orgId,
             status: "COMPLETED",
             actualEnd: { gte: new Date(Date.now() - 2 * 60 * 60 * 1000) },
             yardLocation: { isNot: undefined },
@@ -118,7 +122,21 @@ export async function GET() {
 
     const allTasks = [...pullTasks, ...spotTasks];
 
+    // Map to ShunterTask shape expected by yard/page.tsx
+    const tasks = allTasks.map((t) => ({
+      id: t.id,
+      trailerNumber: t.trailerNumber ?? "N/A",
+      taskType: t.type,
+      fromLocationName: t.fromLocation,
+      toLocationName: t.toLocation,
+      priority: t.priority,
+      status: t.status,
+      assignedTo: null,
+      createdAt: t.scheduledStart,
+    }));
+
     return NextResponse.json({
+      tasks,
       summary: {
         totalYardLocations: yardLocations.length,
         occupiedSpots: yardLocations.filter((l) => l.isOccupied).length,
@@ -148,8 +166,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
-    if (!session) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

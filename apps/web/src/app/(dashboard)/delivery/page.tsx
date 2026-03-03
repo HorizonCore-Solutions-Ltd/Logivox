@@ -50,7 +50,7 @@ export default function DeliveryPage() {
   const { data: runsData, isLoading: runsLoading } = useQuery<{ routes: DeliveryRun[] }>({
     queryKey: ["delivery-runs"],
     queryFn: async () => {
-      const res = await fetch("/api/routes");
+      const res = await fetch("/api/delivery/runs");
       if (!res.ok) throw new Error("Failed");
       return res.json();
     },
