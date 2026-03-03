@@ -1,75 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { SamplingPlanService } from "@/lib/services/qc/sampling-plan-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(
-  request: NextRequest,
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-    const plan = await SamplingPlanService.getPlanById(params.id);
-
-    if (!plan) {
-      return NextResponse.json(
-        { error: "Sampling plan not found" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json(plan);
-  } catch (error: any) {
-    console.error("Error fetching sampling plan:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch sampling plan" },
-      { status: 500 },
-    );
-  }
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const plan = await prisma.samplingPlan.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!plan) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ plan });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }
 
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const existing = await prisma.samplingPlan.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const body = await request.json();
-    const { action, ...data } = body;
-
-    let result;
-
-    switch (action) {
-      case "recordUsage":
-        result = await SamplingPlanService.recordUsage(params.id);
-        break;
-
-      case "supersede":
-        if (!data.newPlanId) {
-          return NextResponse.json(
-            { error: "newPlanId is required" },
-            { status: 400 },
-          );
-        }
-        result = await SamplingPlanService.supersedePlan(
-          params.id,
-          data.newPlanId,
-        );
-        break;
-
-      default:
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-    }
-
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("Error updating sampling plan:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to update sampling plan" },
-      { status: 500 },
-    );
-  }
+    const plan = await prisma.samplingPlan.update({ where: { id: params.id }, data: body });
+    return NextResponse.json({ success: true, plan });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

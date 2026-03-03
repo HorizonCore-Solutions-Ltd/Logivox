@@ -1,39 +1,22 @@
 import { NextResponse } from "next/server";
-import DocumentService from "@/lib/services/document.service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * POST /api/qc/documents/[id]/training
- * Record training acknowledgment
- */
-export async function POST(
-  request: Request,
+export async function GET(
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-    const body = await request.json();
-
-    const training = await DocumentService.recordTraining({
-      documentId: params.id,
-      userId: body.userId,
-      userName: body.userName,
-      signature: body.signature,
-      passed: body.passed,
-      notes: body.notes,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const doc = await prisma.document.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const acknowledgments = await prisma.trainingAcknowledgment.findMany({
+      where: { documentId: params.id },
+      orderBy: { acknowledgedAt: "desc" },
     });
-
-    return NextResponse.json({
-      success: true,
-      data: training,
-    });
-  } catch (error: any) {
-    console.error("Record training error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to record training" },
-      { status: 500 },
-    );
-  }
+    return NextResponse.json({ documentId: params.id, acknowledgments, total: acknowledgments.length });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

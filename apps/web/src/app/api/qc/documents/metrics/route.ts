@@ -1,30 +1,19 @@
 import { NextResponse } from "next/server";
-import DocumentService from "@/lib/services/document.service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * GET /api/qc/documents/metrics
- * Get document control metrics
- */
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
-    const { searchParams } = new URL(request.url);
-
-    const metrics = await DocumentService.getDocumentMetrics(organizationId);
-
-    return NextResponse.json({
-      success: true,
-      data: metrics,
-    });
-  } catch (error: any) {
-    console.error("Get document metrics error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to get metrics" },
-      { status: 500 },
-    );
-  }
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const [total, pending, approved, overdue] = await Promise.all([
+      prisma.document.count({ where: { organizationId: orgId } }),
+      prisma.document.count({ where: { organizationId: orgId, status: "PENDING_APPROVAL" } }),
+      prisma.document.count({ where: { organizationId: orgId, status: "APPROVED" } }),
+      prisma.document.count({ where: { organizationId: orgId, nextReviewDate: { lt: new Date() }, status: { not: "OBSOLETE" } } }),
+    ]);
+    return NextResponse.json({ metrics: { total, pending, approved, overdue } });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

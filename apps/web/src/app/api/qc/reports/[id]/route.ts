@@ -1,27 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { QualityReportService } from "@/lib/services/qc/quality-report-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(
-  request: NextRequest,
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-    const report = await QualityReportService.getReportById(params.id);
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const report = await prisma.qualityReport.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!report) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ report });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+}
 
-    if (!report) {
-      return NextResponse.json({ error: "Report not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(report);
-  } catch (error: any) {
-    console.error("Error fetching report:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch report" },
-      { status: 500 },
-    );
-  }
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const existing = await prisma.qualityReport.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const body = await request.json();
+    const report = await prisma.qualityReport.update({ where: { id: params.id }, data: body });
+    return NextResponse.json({ success: true, report });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

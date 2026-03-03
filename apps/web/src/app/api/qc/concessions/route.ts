@@ -1,82 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
-import vendorConcessionService from "@/lib/services/qc/vendor-concession-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * GET /api/qc/concessions
- * List vendor concessions
- */
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
-    const searchParams = request.nextUrl.searchParams;
-    const vendorId = searchParams.get("vendorId");
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
-    const concessionType = searchParams.get("concessionType");
-
-    if (!organizationId) {
-      return NextResponse.json(
-        { error: "Organization ID required" },
-        { status: 400 },
-      );
-    }
-
-    const result = await vendorConcessionService.listConcessions({
-      organizationId,
-      vendorId: vendorId || undefined,
-      status: status || undefined,
-      concessionType: concessionType || undefined,
-    });
-
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("Error listing concessions:", error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 },
-    );
-  }
+    const where: Record<string, unknown> = { organizationId: orgId };
+    if (status) where.status = status;
+    const concessions = await prisma.vendorConcession.findMany({ where, orderBy: { createdAt: "desc" }, take: 50 });
+    return NextResponse.json({ concessions, total: concessions.length });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }
 
-/**
- * POST /api/qc/concessions
- * Create vendor concession
- */
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
     const body = await request.json();
-
-    const concession = await vendorConcessionService.createConcession({
-      organizationId: body.organizationId,
-      vendorId: body.vendorId,
-      concessionType: body.concessionType,
-      relatedIssue: body.relatedIssue,
-      rtvId: body.rtvId,
-      chargebackId: body.chargebackId,
-      debitMemoId: body.debitMemoId,
-      originalClaimAmount: body.originalClaimAmount,
-      concessionValue: body.concessionValue,
-      concessionDescription: body.concessionDescription,
-      applicableOrders: body.applicableOrders,
-      expiresAt: body.expiresAt ? new Date(body.expiresAt) : undefined,
-      minimumOrderValue: body.minimumOrderValue,
-      termsAndConditions: body.termsAndConditions,
-      createdBy: body.createdBy || "system",
-    });
-
-    return NextResponse.json(concession, { status: 201 });
-  } catch (error: any) {
-    console.error("Error creating concession:", error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 },
-    );
-  }
+    const concession = await prisma.vendorConcession.create({ data: { ...body, organizationId: orgId } });
+    return NextResponse.json({ success: true, concession }, { status: 201 });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

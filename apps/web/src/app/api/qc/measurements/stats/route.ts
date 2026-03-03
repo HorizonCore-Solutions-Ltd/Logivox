@@ -1,48 +1,28 @@
-import { NextRequest, NextResponse } from "next/server";
-import { QualityMeasurementService } from "@/lib/services/qc/quality-measurement-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
     const { searchParams } = new URL(request.url);
-    const referenceType = searchParams.get("referenceType") || undefined;
-    const referenceId = searchParams.get("referenceId") || undefined;
-    const measurementType = searchParams.get("measurementType") as any;
-    const startDate = searchParams.get("startDate")
-      ? new Date(searchParams.get("startDate")!)
-      : undefined;
-    const endDate = searchParams.get("endDate")
-      ? new Date(searchParams.get("endDate")!)
-      : undefined;
-
-    if (!organizationId) {
-      return NextResponse.json(
-        { error: "organizationId is required" },
-        { status: 400 },
-      );
-    }
-
-    const stats = await QualityMeasurementService.getMeasurementStats(
-      organizationId,
-      {
-        referenceType,
-        referenceId,
-        measurementType,
-        startDate,
-        endDate,
-      },
-    );
-
-    return NextResponse.json(stats);
-  } catch (error: any) {
-    console.error("Error fetching measurement stats:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch measurement stats" },
-      { status: 500 },
-    );
-  }
+    const sku = searchParams.get("sku");
+    const where: Record<string, unknown> = { organizationId: orgId };
+    if (sku) where.productSku = sku;
+    const measurements = await prisma.qualityMeasurement.findMany({
+      where,
+      select: { measuredValue: true, lowerSpecLimit: true, upperSpecLimit: true, isWithinSpec: true },
+      take: 500,
+    });
+    const values = measurements.map((m) => Number(m.measuredValue));
+    const n = values.length;
+    const mean = n > 0 ? values.reduce((a, b) => a + b, 0) / n : 0;
+    const variance = n > 1 ? values.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1) : 0;
+    const stdDev = Math.sqrt(variance);
+    const inSpec = measurements.filter((m) => m.isWithinSpec).length;
+    return NextResponse.json({ stats: { count: n, mean, stdDev, inSpec, outOfSpec: n - inSpec, passRate: n > 0 ? (inSpec / n) * 100 : 0 } });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

@@ -1,32 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
-import debitMemoService from "@/lib/services/qc/debit-memo-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * POST /api/qc/debit-memos/[id]/approve
- * Approve debit memo
- */
 export async function POST(
-  request: NextRequest,
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-    const body = await request.json();
-
-    const debitMemo = await debitMemoService.approveDebitMemo({
-      debitMemoId: params.id,
-      approvedBy: body.approvedBy,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const existing = await prisma.vendorDebitMemo.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const memo = await prisma.vendorDebitMemo.update({
+      where: { id: params.id },
+      data: { status: "APPROVED", approvedAt: new Date(), approvedBy: session.user.name ?? session.user.email ?? "unknown" },
     });
-
-    return NextResponse.json(debitMemo);
-  } catch (error: any) {
-    console.error("Error approving debit memo:", error);
-    return NextResponse.json(
-      { error: error.message || "Internal server error" },
-      { status: 500 },
-    );
-  }
+    return NextResponse.json({ success: true, memo });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

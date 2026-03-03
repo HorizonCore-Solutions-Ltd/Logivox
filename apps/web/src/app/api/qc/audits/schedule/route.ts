@@ -1,30 +1,18 @@
 import { NextResponse } from "next/server";
-import AuditService from "@/lib/services/audit.service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * GET /api/qc/audits/schedule
- * Get audit schedule and overdue audits
- */
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
-    const { searchParams } = new URL(request.url);
-
-    const schedule = await AuditService.getAuditSchedule(organizationId);
-
-    return NextResponse.json({
-      success: true,
-      data: schedule,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const audits = await prisma.audit.findMany({
+      where: { organizationId: orgId, status: { in: ["PLANNED", "IN_PROGRESS"] } },
+      orderBy: { auditDate: "asc" },
+      take: 50,
     });
-  } catch (error: any) {
-    console.error("Get audit schedule error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to get schedule" },
-      { status: 500 },
-    );
-  }
+    return NextResponse.json({ schedule: audits, total: audits.length });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

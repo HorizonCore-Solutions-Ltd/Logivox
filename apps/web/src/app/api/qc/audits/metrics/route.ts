@@ -1,40 +1,20 @@
 import { NextResponse } from "next/server";
-import AuditService from "@/lib/services/audit.service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * GET /api/qc/audits/metrics
- * Get audit metrics
- */
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
-    const { searchParams } = new URL(request.url);
-    const startDate = searchParams.get("startDate")
-      ? new Date(searchParams.get("startDate")!)
-      : undefined;
-    const endDate = searchParams.get("endDate")
-      ? new Date(searchParams.get("endDate")!)
-      : undefined;
-
-    const metrics = await AuditService.getAuditMetrics(
-      organizationId,
-      startDate,
-      endDate,
-    );
-
-    return NextResponse.json({
-      success: true,
-      data: metrics,
-    });
-  } catch (error: any) {
-    console.error("Get audit metrics error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to get metrics" },
-      { status: 500 },
-    );
-  }
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const [total, planned, inProgress, completed] = await Promise.all([
+      prisma.audit.count({ where: { organizationId: orgId } }),
+      prisma.audit.count({ where: { organizationId: orgId, status: "PLANNED" } }),
+      prisma.audit.count({ where: { organizationId: orgId, status: "IN_PROGRESS" } }),
+      prisma.audit.count({ where: { organizationId: orgId, status: "COMPLETED" } }),
+    ]);
+    const findings = await prisma.auditFinding.count({ where: { audit: { organizationId: orgId } } });
+    return NextResponse.json({ metrics: { total, planned, inProgress, completed, findings } });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

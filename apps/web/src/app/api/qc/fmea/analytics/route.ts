@@ -1,30 +1,20 @@
 import { NextResponse } from "next/server";
-import FMEAService from "@/lib/services/fmea.service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * GET /api/qc/fmea/analytics
- * Get FMEA analytics and dashboard metrics
- */
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
-    const { searchParams } = new URL(request.url);
-
-    const analytics = await FMEAService.getFMEAAnalytics(organizationId);
-
-    return NextResponse.json({
-      success: true,
-      data: analytics,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const fmeas = await prisma.fMEA.findMany({
+      where: { organizationId: orgId },
+      include: { failureModes: { select: { rpn: true, severity: true, occurrence: true, detection: true } } },
     });
-  } catch (error: any) {
-    console.error("FMEA analytics error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to calculate FMEA analytics" },
-      { status: 500 },
-    );
-  }
+    const allModes = fmeas.flatMap((f) => f.failureModes);
+    const avgRpn = allModes.length > 0 ? allModes.reduce((a, m) => a + (m.rpn ?? 0), 0) / allModes.length : 0;
+    const highRisk = allModes.filter((m) => (m.rpn ?? 0) >= 100).length;
+    return NextResponse.json({ total: fmeas.length, totalModes: allModes.length, avgRpn, highRisk });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

@@ -1,99 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { QualityHoldService } from "@/lib/services/qc/quality-hold-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(
-  request: NextRequest,
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-    const hold = await QualityHoldService.getHoldById(params.id);
-
-    if (!hold) {
-      return NextResponse.json(
-        { error: "Quality hold not found" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json(hold);
-  } catch (error: any) {
-    console.error("Error fetching quality hold:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch quality hold" },
-      { status: 500 },
-    );
-  }
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const hold = await prisma.qualityHold.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!hold) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ hold });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }
 
 export async function PATCH(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const existing = await prisma.qualityHold.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const body = await request.json();
-    const { action, ...data } = body;
-
-    let result;
-
-    switch (action) {
-      case "requestRelease":
-        result = await QualityHoldService.requestRelease({
-          holdId: params.id,
-          releaseRequestedBy: data.requestedBy,
-          releaseConditions: data.releaseConditions,
-        });
-        break;
-
-      case "approveRelease":
-        result = await QualityHoldService.approveRelease({
-          holdId: params.id,
-          releaseApprovedBy: data.reviewedBy,
-          approved: data.approved,
-          quantity: data.quantityReleased,
-          disposition: data.finalDisposition,
-          dispositionReason: data.reviewNotes,
-        });
-        break;
-
-      case "updateInvestigation":
-        result = await QualityHoldService.updateInvestigation({
-          holdId: params.id,
-          investigationStatus: data.investigationStatus,
-          investigationNotes: data.investigationFindings,
-        });
-        break;
-
-      case "escalate":
-        result = await QualityHoldService.escalateHold({
-          holdId: params.id,
-          escalatedTo: data.escalatedBy,
-        });
-        break;
-
-      case "cancel":
-        result = await QualityHoldService.cancelHold(
-          params.id,
-          data.cancellationReason,
-        );
-        break;
-
-      default:
-        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-    }
-
-    return NextResponse.json(result);
-  } catch (error: any) {
-    console.error("Error updating quality hold:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to update quality hold" },
-      { status: 500 },
-    );
-  }
+    const hold = await prisma.qualityHold.update({ where: { id: params.id }, data: body });
+    return NextResponse.json({ success: true, hold });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

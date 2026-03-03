@@ -1,31 +1,18 @@
 import { NextResponse } from "next/server";
-import DocumentService from "@/lib/services/document.service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * GET /api/qc/documents/pending-approval
- * Get documents pending approval
- */
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
-    const { searchParams } = new URL(request.url);
-
-    const documents =
-      await DocumentService.getDocumentsPendingApproval(organizationId);
-
-    return NextResponse.json({
-      success: true,
-      data: documents,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const docs = await prisma.document.findMany({
+      where: { organizationId: orgId, status: "PENDING_APPROVAL" },
+      orderBy: { updatedAt: "asc" },
+      take: 50,
     });
-  } catch (error: any) {
-    console.error("Get pending documents error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to get pending documents" },
-      { status: 500 },
-    );
-  }
+    return NextResponse.json({ documents: docs, total: docs.length });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

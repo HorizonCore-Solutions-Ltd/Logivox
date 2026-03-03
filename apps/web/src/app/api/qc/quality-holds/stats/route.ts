@@ -1,39 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
-import { QualityHoldService } from "@/lib/services/qc/quality-hold-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
-    const { searchParams } = new URL(request.url);
-    const startDate = searchParams.get("startDate")
-      ? new Date(searchParams.get("startDate")!)
-      : undefined;
-    const endDate = searchParams.get("endDate")
-      ? new Date(searchParams.get("endDate")!)
-      : undefined;
-
-    if (!organizationId) {
-      return NextResponse.json(
-        { error: "organizationId is required" },
-        { status: 400 },
-      );
-    }
-
-    const stats = await QualityHoldService.getHoldStats(organizationId, {
-      startDate,
-      endDate,
-    });
-
-    return NextResponse.json(stats);
-  } catch (error: any) {
-    console.error("Error fetching quality hold stats:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to fetch quality hold stats" },
-      { status: 500 },
-    );
-  }
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const [total, active, released] = await Promise.all([
+      prisma.qualityHold.count({ where: { organizationId: orgId } }),
+      prisma.qualityHold.count({ where: { organizationId: orgId, status: "ACTIVE" } }),
+      prisma.qualityHold.count({ where: { organizationId: orgId, status: "RELEASED" } }),
+    ]);
+    return NextResponse.json({ stats: { total, active, released, pending: total - active - released } });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

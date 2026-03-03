@@ -1,59 +1,29 @@
-import { NextRequest, NextResponse } from "next/server";
-import { SamplingPlanService } from "@/lib/services/qc/sampling-plan-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-export async function GET(request: NextRequest) {
+export async function GET(request: Request) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status") || undefined;
-    const targetType = searchParams.get("targetType") || undefined;
-    const targetId = searchParams.get("targetId") || undefined;
-    const inspectionType = searchParams.get("inspectionType") || undefined;
-
-    if (!organizationId) {
-      return NextResponse.json(
-        { error: "organizationId is required" },
-        { status: 400 },
-      );
-    }
-
-    const plans = await SamplingPlanService.listPlans(organizationId, {
-      status,
-      targetType,
-      targetId,
-      inspectionType,
-    });
-
-    return NextResponse.json(plans);
-  } catch (error: any) {
-    console.error("Error listing sampling plans:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to list sampling plans" },
-      { status: 500 },
-    );
-  }
+    const status = searchParams.get("status");
+    const where: Record<string, unknown> = { organizationId: orgId };
+    if (status) where.status = status;
+    const plans = await prisma.samplingPlan.findMany({ where, orderBy: { createdAt: "desc" }, take: 50 });
+    return NextResponse.json({ plans, total: plans.length });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
     const body = await request.json();
-
-    const plan = await SamplingPlanService.createPlan(body);
-
-    return NextResponse.json(plan, { status: 201 });
-  } catch (error: any) {
-    console.error("Error creating sampling plan:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to create sampling plan" },
-      { status: 500 },
-    );
-  }
+    const plan = await prisma.samplingPlan.create({ data: { ...body, organizationId: orgId } });
+    return NextResponse.json({ success: true, plan }, { status: 201 });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

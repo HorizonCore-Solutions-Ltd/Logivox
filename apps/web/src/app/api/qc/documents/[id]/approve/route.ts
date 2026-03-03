@@ -1,35 +1,22 @@
 import { NextResponse } from "next/server";
-import DocumentService from "@/lib/services/document.service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
-/**
- * POST /api/qc/documents/[id]/approve
- * Approve document
- */
 export async function POST(
-  request: Request,
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-    const body = await request.json();
-
-    const document = await DocumentService.approveDocument(
-      params.id,
-      body.approvedBy || "system",
-    );
-
-    return NextResponse.json({
-      success: true,
-      data: document,
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const existing = await prisma.document.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const doc = await prisma.document.update({
+      where: { id: params.id },
+      data: { status: "APPROVED", approvedAt: new Date(), approvedBy: session.user.name ?? session.user.email ?? "unknown" },
     });
-  } catch (error: any) {
-    console.error("Approve document error:", error);
-    return NextResponse.json(
-      { error: error.message || "Failed to approve document" },
-      { status: 500 },
-    );
-  }
+    return NextResponse.json({ success: true, document: doc });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

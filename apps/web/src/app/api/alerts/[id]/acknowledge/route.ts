@@ -1,38 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { ReorderAlertEngine } from "@/lib/alerts";
+import { authOptions } from "@/lib/auth";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-/**
- * POST /api/alerts/[id]/acknowledge
- * Acknowledge an alert (user has seen it)
- */
 export async function POST(
-  request: NextRequest,
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const session = await getServerSession();
-
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const alertId = params.id;
-
-    const alert = await ReorderAlertEngine.acknowledgeAlert(alertId);
-
-    return NextResponse.json({
-      success: true,
-      alert,
-    });
-  } catch (error) {
-    console.error("[POST /api/alerts/:id/acknowledge] Error:", error);
-    return NextResponse.json(
-      { error: "Failed to acknowledge alert" },
-      { status: 500 },
-    );
-  }
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const alert = await prisma.alert.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!alert) return NextResponse.json({ error: "Alert not found" }, { status: 404 });
+    const updated = await prisma.alert.update({ where: { id: params.id }, data: { acknowledgedAt: new Date(), status: "ACKNOWLEDGED" } });
+    return NextResponse.json({ success: true, alert: updated });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

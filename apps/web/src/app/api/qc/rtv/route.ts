@@ -1,60 +1,29 @@
 import { NextResponse } from "next/server";
-import RTVService from "@/lib/services/qc/rtv-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(request: Request) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
     const { searchParams } = new URL(request.url);
-    const supplierId = searchParams.get("supplierId");
     const status = searchParams.get("status");
-
-    if (!organizationId) {
-      return NextResponse.json(
-        { error: "organizationId required" },
-        { status: 400 },
-      );
-    }
-
-    const rtvs = await RTVService.listRTVs(organizationId, {
-      supplierId: supplierId || undefined,
-      status: status || undefined,
-    });
-
-    return NextResponse.json({ rtvs });
-  } catch (error: any) {
-    console.error("Error fetching RTVs:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+    const where: Record<string, unknown> = { organizationId: orgId };
+    if (status) where.status = status;
+    const rtvs = await prisma.rTV.findMany({ where, orderBy: { createdAt: "desc" }, take: 50 });
+    return NextResponse.json({ rtvs, total: rtvs.length });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }
 
 export async function POST(request: Request) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
     const body = await request.json();
-
-    const rtv = await RTVService.createRTV({
-      organizationId: body.organizationId,
-      defectId: body.defectId,
-      poId: body.poId,
-      supplierId: body.supplierId,
-      warehouseId: body.warehouseId,
-      reason: body.reason,
-      quantity: body.quantity,
-      value: body.value,
-      priority: body.priority,
-      createdBy: body.userId,
-    });
-
-    return NextResponse.json({ rtv }, { status: 201 });
-  } catch (error: any) {
-    console.error("Error creating RTV:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+    const rtv = await prisma.rTV.create({ data: { ...body, organizationId: orgId } });
+    return NextResponse.json({ success: true, rtv }, { status: 201 });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }

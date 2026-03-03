@@ -1,29 +1,23 @@
 import { NextResponse } from "next/server";
-import QCInspectionService from "@/lib/services/qc/inspection-service";
-import { requireApiAuth } from "@/lib/api-guard";
+import { prisma } from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 export async function GET(
-  request: Request,
+  _req: Request,
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
-    const inspection = await QCInspectionService.getInspectionById(params.id);
-
-    if (!inspection) {
-      return NextResponse.json(
-        { error: "Inspection not found" },
-        { status: 404 },
-      );
-    }
-
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const inspection = await prisma.qCInspection.findFirst({
+      where: { id: params.id, organizationId: orgId },
+      include: { checkpoints: true, approvals: true },
+    });
+    if (!inspection) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ inspection });
-  } catch (error: any) {
-    console.error("Error fetching inspection:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }
 
 export async function PATCH(
@@ -31,48 +25,13 @@ export async function PATCH(
   { params }: { params: { id: string } },
 ) {
   try {
-    const auth = await requireApiAuth();
-    if ("error" in auth) return auth.error;
-    const { organizationId } = auth;
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const orgId = session.user.organizationId;
+    const existing = await prisma.qCInspection.findFirst({ where: { id: params.id, organizationId: orgId } });
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const body = await request.json();
-    const { action, userId } = body;
-
-    if (action === "start") {
-      const inspection = await QCInspectionService.startInspection(
-        params.id,
-        userId,
-      );
-      return NextResponse.json({ inspection });
-    }
-
-    if (action === "complete") {
-      const inspection = await QCInspectionService.completeInspection(
-        params.id,
-        userId,
-        body.overallNotes,
-      );
-      return NextResponse.json({ inspection });
-    }
-
-    if (action === "addItem") {
-      const item = await QCInspectionService.addInspectionItem(
-        params.id,
-        body.itemData,
-      );
-      return NextResponse.json({ item });
-    }
-
-    if (action === "recordDefect") {
-      const defect = await QCInspectionService.recordDefect(
-        params.id,
-        body.defectData,
-      );
-      return NextResponse.json({ defect });
-    }
-
-    return NextResponse.json({ error: "Invalid action" }, { status: 400 });
-  } catch (error: any) {
-    console.error("Error updating inspection:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+    const inspection = await prisma.qCInspection.update({ where: { id: params.id }, data: body });
+    return NextResponse.json({ success: true, inspection });
+  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
 }
