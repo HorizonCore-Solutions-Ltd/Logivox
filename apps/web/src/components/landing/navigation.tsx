@@ -35,6 +35,7 @@ import {
   BadgeCheck,
   Briefcase,
   Gift,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -138,6 +139,12 @@ export function Navigation() {
       description: "Labeling, bundling, and customization",
       icon: Gift,
       href: "/solutions/value-added-services",
+    },
+    {
+      title: "Replenishment & Demand Planning",
+      description: "Automated reorder triggers and demand forecasting",
+      icon: RefreshCw,
+      href: "/solutions/replenishment",
     },
     {
       title: "AI Analytics & Forecasting",
@@ -428,11 +435,14 @@ export function Navigation() {
           </NavigationMenu>
 
           {/* CTA Buttons */}
-          <div className="hidden lg:flex items-center space-x-4">
-            <Button variant="ghost" asChild>
+          <div className="hidden lg:flex items-center space-x-3">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/sign-in">Sign In</Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
               <Link href="/demo">Book Demo</Link>
             </Button>
-            <Button asChild>
+            <Button size="sm" asChild>
               <Link href="/sign-up">Start Free Trial</Link>
             </Button>
           </div>

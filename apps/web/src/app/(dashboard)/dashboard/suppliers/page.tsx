@@ -23,7 +23,6 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 import {
   Building,
@@ -134,7 +133,7 @@ export default function SuppliersPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -427,6 +426,6 @@ export default function SuppliersPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

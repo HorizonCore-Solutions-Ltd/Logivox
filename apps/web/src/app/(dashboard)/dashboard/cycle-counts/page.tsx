@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import {
   ClipboardList,
   Search,
@@ -107,7 +106,7 @@ export default function CycleCountsPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 lg:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -387,6 +386,6 @@ export default function CycleCountsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

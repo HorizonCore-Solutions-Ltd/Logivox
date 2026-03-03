@@ -46,7 +46,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { InviteMemberDialog } from "@/components/organizations/invite-member-dialog";
 
 interface Organization {
@@ -278,16 +277,16 @@ export default function OrganizationSettingsPage() {
 
   if (!orgId) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="flex items-center justify-center h-full">
           <p className="text-muted-foreground">No organization found</p>
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Organization Settings</h1>
@@ -642,6 +641,6 @@ export default function OrganizationSettingsPage() {
         onOpenChange={setIsInviteDialogOpen}
         organizationId={orgId}
       />
-    </DashboardSidebar>
+    </>
   );
 }

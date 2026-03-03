@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import {
   ClipboardCheck,
   Search,
@@ -113,7 +112,7 @@ export default function QCInspectionsPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 lg:p-8 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -345,6 +344,6 @@ export default function QCInspectionsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

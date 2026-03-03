@@ -36,28 +36,47 @@ export default function ContactPage() {
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitSuccess, setSubmitSuccess] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState("");
   const [showLiveChat, setShowLiveChat] = React.useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError("");
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    console.log("Form submitted:", formData);
-    alert(
-      "Thank you for contacting us! We'll get back to you within 24 hours.",
-    );
+      const result = await response.json();
 
-    setFormData({
-      name: "",
-      email: "",
-      company: "",
-      phone: "",
-      subject: "",
-      message: "",
-    });
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Failed to send message");
+      }
+
+      setSubmitSuccess(true);
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        subject: "",
+        message: "",
+      });
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error
+          ? err.message
+          : "Failed to send message. Please try again.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
     setIsSubmitting(false);
   };
 
@@ -411,6 +430,26 @@ export default function ContactPage() {
                     </>
                   )}
                 </Button>
+
+                {submitSuccess && (
+                  <div className="flex items-start gap-3 mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
+                    <CheckCircle2 className="h-5 w-5 mt-0.5 flex-shrink-0 text-green-600" />
+                    <div>
+                      <p className="font-medium">Message sent!</p>
+                      <p className="text-sm mt-0.5">
+                        Thank you for contacting us. We&apos;ll get back to you
+                        within 24 hours.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {submitError && (
+                  <div className="flex items-start gap-3 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
+                    <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0 text-red-600" />
+                    <p className="text-sm">{submitError}</p>
+                  </div>
+                )}
               </form>
             </div>
 

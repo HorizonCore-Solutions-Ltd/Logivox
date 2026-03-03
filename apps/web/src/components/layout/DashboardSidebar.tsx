@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
@@ -92,9 +93,12 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
 
   const handleOrgSwitch = (orgId: string) => {
     setCurrentOrgId(orgId);
-    // TODO: Update session context with new org ID
-    // For now, we'll just update local state
-    console.log("Switched to organization:", orgId);
+    // Full session org update requires a dedicated switch endpoint +
+    // NextAuth session.update() — the local state change covers UI display.
+    // Reload to re-fetch data scoped to the selected org.
+    if (typeof window !== "undefined") {
+      window.location.reload();
+    }
   };
 
   const navigation = [
@@ -377,11 +381,18 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-card border-r">
         {/* Logo */}
         <div className="flex items-center h-16 px-6 border-b">
-          <Link href="/" className="flex items-center space-x-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
-              <Building2 className="h-5 w-5" />
+          <Link href="/" className="flex items-center space-x-2 group">
+            <div className="relative h-8 w-8 transition-transform group-hover:scale-105">
+              <Image
+                src="/favicon.svg"
+                alt="LogiVox"
+                width={32}
+                height={32}
+                className="object-contain"
+                priority
+              />
             </div>
-            <span className="text-xl font-bold">LogiVox</span>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">LogiVox</span>
           </Link>
         </div>
 
@@ -585,11 +596,18 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
             <aside className="fixed inset-y-0 left-0 w-64 bg-card border-r shadow-xl">
               {/* Logo */}
               <div className="flex items-center justify-between h-16 px-6 border-b">
-                <Link href="/" className="flex items-center space-x-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-primary-600 to-primary-500 text-white">
-                    <Building2 className="h-5 w-5" />
+                <Link href="/" className="flex items-center space-x-2 group">
+                  <div className="relative h-8 w-8 transition-transform group-hover:scale-105">
+                    <Image
+                      src="/favicon.svg"
+                      alt="LogiVox"
+                      width={32}
+                      height={32}
+                      className="object-contain"
+                      priority
+                    />
                   </div>
-                  <span className="text-xl font-bold">LogiVox</span>
+                  <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-primary-500 bg-clip-text text-transparent">LogiVox</span>
                 </Link>
                 <Button
                   variant="ghost"

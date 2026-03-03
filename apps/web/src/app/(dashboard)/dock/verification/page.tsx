@@ -149,12 +149,31 @@ export default function LoadVerification() {
     }
   };
 
-  const handleScan = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && currentScan) {
-      // Process scan
-      console.log("Scanned:", currentScan);
+  const handleScan = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && currentScan.trim()) {
+      const barcode = currentScan.trim();
       setCurrentScan("");
-      // In production, call API to verify item
+      // Find first in-progress verification to record the scan against
+      const target = activeVerifications.find(
+        (v) => v.status === "IN_PROGRESS",
+      );
+      if (target) {
+        try {
+          await fetch("/api/dock/verification", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "scan_item",
+              verificationId: target.id,
+              sku: barcode,
+            }),
+          });
+          // Refresh to reflect updated counts
+          fetchData();
+        } catch (_err) {
+          // Non-fatal: operator can continue scanning
+        }
+      }
     }
   };
 

@@ -50,8 +50,6 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface SalesOrder {
   id: string;
   soNumber: string;
@@ -326,7 +324,7 @@ export default function SalesOrdersPage() {
     });
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -697,6 +695,6 @@ export default function SalesOrdersPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

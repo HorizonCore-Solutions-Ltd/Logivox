@@ -36,7 +36,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { LowStockAlerts } from "@/components/inventory/low-stock-alerts";
 import { BulkImportExportDialog } from "@/components/inventory/bulk-import-export-dialog";
 
@@ -233,7 +232,7 @@ export default function InventoryPage() {
 
   if (isLoading) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="p-6">
           <div className="flex h-[450px] items-center justify-center">
             <div className="text-center">
@@ -244,12 +243,12 @@ export default function InventoryPage() {
             </div>
           </div>
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -373,6 +372,6 @@ export default function InventoryPage() {
           }}
         />
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

@@ -24,8 +24,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { CategoryDialog } from "@/components/categories/category-dialog";
 import { Badge } from "@/components/ui/badge";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface CategoryType {
   id: string;
   name: string;
@@ -184,7 +182,7 @@ export default function CategoriesPage() {
 
   if (isLoading) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="p-6">
           <div className="flex h-[450px] items-center justify-center">
             <div className="text-center">
@@ -195,12 +193,12 @@ export default function CategoriesPage() {
             </div>
           </div>
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -292,6 +290,6 @@ export default function CategoriesPage() {
           }}
         />
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

@@ -9,7 +9,7 @@ export async function POST(
     const body = await request.json();
     const { recipients } = body;
 
-    console.log(`Sending Load Sheet ${id} to:`, recipients);
+    console.info(`Sending Load Sheet ${id} to:`, recipients);
 
     // Mock email sending
     await new Promise((resolve) => setTimeout(resolve, 1000));

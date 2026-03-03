@@ -32,8 +32,6 @@ import {
   Package,
   Scale,
 } from "lucide-react";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface Pack {
   id: string;
   packNumber: string;
@@ -114,7 +112,7 @@ export default function PacksPage() {
   );
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -291,6 +289,6 @@ export default function PacksPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

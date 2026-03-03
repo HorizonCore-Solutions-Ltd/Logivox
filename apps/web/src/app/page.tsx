@@ -4,7 +4,6 @@ import {
   FeaturesSection,
   TrustSection,
   CTASection,
-  PricingSection,
   ModernOfferingsSection,
   FAQSection,
   NextGenSection,
@@ -95,7 +94,6 @@ export default function HomePage() {
         <NextGenSection />
         <FeaturesSection />
         <ModernOfferingsSection />
-        <PricingSection />
         <FAQSection />
         <CTASection />
       </main>

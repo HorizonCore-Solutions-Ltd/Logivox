@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -165,16 +164,16 @@ export default function NewPurchaseOrderPage() {
 
   if (loadingData) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6 max-w-4xl">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -488,6 +487,6 @@ export default function NewPurchaseOrderPage() {
           </Button>
         </div>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

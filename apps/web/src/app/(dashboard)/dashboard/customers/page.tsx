@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/hooks/use-auth";
 import { useRouter } from "next/navigation";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { CustomerDialog } from "@/components/customers/customer-dialog";
 import { useToast } from "@/hooks/use-toast";
 
@@ -241,7 +240,7 @@ export default function CustomersPage() {
 
   if (isLoading) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="p-6">
           <div className="h-8 w-48 animate-pulse bg-muted rounded mb-6" />
           <div className="grid gap-4 md:grid-cols-4">
@@ -250,12 +249,12 @@ export default function CustomersPage() {
             ))}
           </div>
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -357,6 +356,6 @@ export default function CustomersPage() {
           }}
         />
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

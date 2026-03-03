@@ -29,8 +29,6 @@ import {
   TrendingUp,
   Zap,
 } from "lucide-react";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface FulfillmentStats {
   orders: {
     total: number;
@@ -290,7 +288,7 @@ export default function FulfillmentHubPage() {
   const maxPipeline = Math.max(...pipeline.map((p) => p.value), 1);
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -658,6 +656,6 @@ export default function FulfillmentHubPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

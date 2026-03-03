@@ -125,6 +125,9 @@ model User {
   completedTransfers           WarehouseTransfer[]      @relation("TransferCompletedBy")
   requestedTransfers           WarehouseTransfer[]      @relation("TransferRequestedBy")
   assignedReplenishmentTasks   ReplenishmentTask[]      @relation("ReplenAssignedTo")
+  voiceSessions                VoiceSession[]
+  securityProfile              SecurityProfile?
+  securityLogs                 SecurityLog[]
 
   @@index([email])
   @@map("users")
@@ -9666,4 +9669,70 @@ enum RobotStatus {
   PLACING
   MAINTENANCE
   ERROR
+}
+
+// ─── Voice System (V-2) ────────────────────────────────────────────────────────
+
+model VoiceSession {
+  id             String            @id @default(cuid())
+  userId         String
+  organizationId String?
+  transcript     String            // raw text sent to the engine
+  intent         String?           // parsed intent label, e.g. "PICK"
+  entities       Json?             // extracted entities (sku, qty, location …)
+  response       String?           // text response returned to the user
+  audioUrl       String?           // optional URL to stored audio file
+  language       String            @default("en")
+  status         VoiceSessionStatus @default(PENDING)
+  errorMessage   String?
+  durationMs     Int?              // processing time in milliseconds
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@map("voice_sessions")
+}
+
+enum VoiceSessionStatus {
+  PENDING
+  PROCESSED
+  FAILED
+  CANCELLED
+}
+
+// ─── Auth Security (required by apps/web/src/lib/auth.ts) ─────────────────────
+
+model SecurityProfile {
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  failedLoginAttempts  Int       @default(0)
+  lastFailedLogin      DateTime?
+  lockedUntil          DateTime?
+  mfaEnabled           Boolean   @default(false)
+  mfaSecret            String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("security_profiles")
+}
+
+model SecurityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  event     String   // e.g. "LOGIN_ATTEMPT", "LOGIN_FAILED", "LOGIN_SUCCESS"
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([event])
+  @@index([timestamp])
+  @@map("security_logs")
 }

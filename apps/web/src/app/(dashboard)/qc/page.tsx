@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface QCInspection {
   id: string;
@@ -107,11 +108,49 @@ export default function QCDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Quality Control</h1>
           <p className="mt-2 text-gray-600">
             Manage inspections, templates, and quality standards
           </p>
+        </div>
+
+        {/* Sub-module Navigation */}
+        <div className="bg-white rounded-lg shadow p-4 mb-8">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
+            QC Modules
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+            {[
+              { label: "Calibration", href: "/qc/calibration" },
+              { label: "Non-Conformance", href: "/qc/ncr" },
+              { label: "FMEA", href: "/qc/fmea" },
+              { label: "Quality Holds", href: "/qc/quality-holds" },
+              { label: "Complaints", href: "/qc/complaints" },
+              { label: "Material Review", href: "/qc/mrb" },
+              { label: "SPC", href: "/qc/spc" },
+              { label: "Documents", href: "/qc/documents" },
+              { label: "Training", href: "/qc/training" },
+              { label: "Supplier Quality", href: "/qc/supplier-quality" },
+              { label: "Measurements", href: "/qc/measurements" },
+              { label: "Risk", href: "/qc/risk" },
+              { label: "Debit Memos", href: "/qc/debit-memos" },
+              { label: "Change Control", href: "/qc/changes" },
+              { label: "Return to Vendor", href: "/qc/rtv" },
+              { label: "Concessions", href: "/qc/concessions" },
+              { label: "Reports", href: "/qc/reports" },
+              { label: "Analytics", href: "/qc/analytics" },
+              { label: "Audits", href: "/qc/audits" },
+            ].map((m) => (
+              <Link
+                key={m.href}
+                href={m.href}
+                className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-50 hover:bg-blue-50 hover:text-blue-700 rounded-md border border-gray-200 hover:border-blue-300 transition-colors"
+              >
+                {m.label}
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Tabs */}

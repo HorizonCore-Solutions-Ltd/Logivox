@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { processVoiceCommand } from "@/lib/voice/voiceEngine";
+import { processVoiceCommand, processTextCommand } from "@/lib/voice/voiceEngine";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,7 +17,25 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get form data (audio file + context)
+    const contentType = request.headers.get("content-type") ?? "";
+
+    // ── Text-command fallback (no audio needed) ─────────────────────────────
+    if (contentType.includes("application/json")) {
+      const body = await request.json();
+      const text: string = body.text ?? "";
+      if (!text.trim()) {
+        return NextResponse.json({ error: "No text provided" }, { status: 400 });
+      }
+      const result = await processTextCommand({
+        text,
+        userId: session.user.id,
+        sessionId: body.sessionId,
+        context: body.context,
+      });
+      return NextResponse.json(result);
+    }
+
+    // ── Audio path ──────────────────────────────────────────────────────────
     const formData = await request.formData();
     const audioFile = formData.get("audio") as File;
     const context = formData.get("context");

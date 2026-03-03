@@ -20,8 +20,6 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 export default function ApiDocsPage() {
   const [copiedEndpoint, setCopiedEndpoint] = React.useState<string | null>(
     null,
@@ -40,7 +38,7 @@ export default function ApiDocsPage() {
       : "https://your-domain.com";
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-2">
@@ -442,6 +440,6 @@ export default function ApiDocsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

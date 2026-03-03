@@ -32,7 +32,6 @@ import {
   MapPin,
   ExternalLink,
 } from "lucide-react";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { toast } from "sonner";
 
 interface Shipment {
@@ -177,7 +176,7 @@ export default function ShipmentsPage() {
       : "—";
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -386,6 +385,6 @@ export default function ShipmentsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

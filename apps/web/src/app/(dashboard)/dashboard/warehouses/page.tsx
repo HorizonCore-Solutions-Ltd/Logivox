@@ -30,8 +30,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { WarehouseDialog } from "@/components/warehouses/warehouse-dialog";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface WarehouseType {
   id: string;
   name: string;
@@ -180,7 +178,7 @@ export default function WarehousesPage() {
 
   if (isLoading) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="p-6">
           <div className="flex h-[450px] items-center justify-center">
             <div className="text-center">
@@ -191,12 +189,12 @@ export default function WarehousesPage() {
             </div>
           </div>
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -257,6 +255,6 @@ export default function WarehousesPage() {
           }}
         />
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

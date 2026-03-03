@@ -35,8 +35,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface ActivityLog {
   id: string;
   action: string;
@@ -130,7 +128,7 @@ export default function ActivityLogsPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -373,6 +371,6 @@ export default function ActivityLogsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

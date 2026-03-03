@@ -58,8 +58,6 @@ import {
   Shield,
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface ExceptionRecord {
   id: string;
   type: string;
@@ -293,7 +291,7 @@ export default function ExceptionsPage() {
     e.slaBreachAt && new Date(e.slaBreachAt) < new Date();
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -664,6 +662,6 @@ export default function ExceptionsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardSidebar>
+    </>
   );
 }

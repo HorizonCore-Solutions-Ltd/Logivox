@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import {
   ClipboardList,
   Search,
@@ -146,7 +145,7 @@ export default function PurchaseOrdersPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -384,6 +383,6 @@ export default function PurchaseOrdersPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

@@ -32,8 +32,6 @@ import {
   RefreshCw,
   AlertCircle,
 } from "lucide-react";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface PickList {
   id: string;
   pickListNumber: string;
@@ -122,7 +120,7 @@ export default function PickListsPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -298,6 +296,6 @@ export default function PickListsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

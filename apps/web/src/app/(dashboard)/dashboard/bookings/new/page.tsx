@@ -32,7 +32,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Plus, Trash2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 
 const bookingSchema = z.object({
@@ -152,7 +151,7 @@ export default function NewBookingPage() {
   }, [watchedItems]);
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center space-x-4">
@@ -471,6 +470,6 @@ export default function NewBookingPage() {
           </form>
         </Form>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

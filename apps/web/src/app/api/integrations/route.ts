@@ -289,7 +289,7 @@ async function dispatchToCarrier(loadSheet: any, carrierCode: string) {
         },
       };
 
-      console.log("Dispatching to FedEx:", fedexPayload);
+      console.info("Dispatching to FedEx:", fedexPayload);
 
       return {
         success: true,
@@ -298,7 +298,7 @@ async function dispatchToCarrier(loadSheet: any, carrierCode: string) {
       };
     } else if (carrierCode === "UPS") {
       // UPS API integration
-      console.log("Dispatching to UPS:", loadSheet.loadSheetNumber);
+      console.info("Dispatching to UPS:", loadSheet.loadSheetNumber);
 
       return {
         success: true,
@@ -307,7 +307,7 @@ async function dispatchToCarrier(loadSheet: any, carrierCode: string) {
       };
     } else if (carrierCode === "DHL") {
       // DHL API integration
-      console.log("Dispatching to DHL:", loadSheet.loadSheetNumber);
+      console.info("Dispatching to DHL:", loadSheet.loadSheetNumber);
 
       return {
         success: true,

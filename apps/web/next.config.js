@@ -2,7 +2,8 @@ const withPWA = require("next-pwa")({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === "development",
+  // Disable PWA in all non-production envs AND when BUILD_VERIFY=1 to save memory
+  disable: process.env.NODE_ENV === "development" || process.env.BUILD_VERIFY === "1",
   buildExcludes: [/middleware-manifest\.json$/],
 });
 
@@ -11,6 +12,12 @@ const nextConfig = {
   output: "standalone",
   experimental: {
     serverComponentsExternalPackages: ["@prisma/client"],
+    optimizePackageImports: [
+      "lucide-react",
+      "@radix-ui/react-icons",
+      "date-fns",
+      "recharts",
+    ],
   },
   images: {
     remotePatterns: [

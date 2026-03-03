@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Track search (simplified - could store in database)
-    console.log(
+    console.info(
       `Search tracked: "${query}" by user ${session.user.id} in tenant ${tenantId}`,
     );
 

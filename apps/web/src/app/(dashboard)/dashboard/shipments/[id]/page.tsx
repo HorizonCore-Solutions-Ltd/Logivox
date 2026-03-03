@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import {
   ArrowLeft,
   Truck,
@@ -217,7 +216,7 @@ export default function ShipmentDetailPage() {
     : STATUS_CONFIG.PENDING;
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -598,6 +597,6 @@ export default function ShipmentDetailPage() {
           </div>
         )}
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

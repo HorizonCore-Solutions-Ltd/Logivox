@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "@/components/ui/use-toast";
 import {
   Card,
   CardContent,
@@ -72,6 +73,8 @@ const GROUP_BY_OPTIONS = [
 ];
 
 export default function ReportsPage() {
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [config, setConfig] = useState<ReportConfig>({
     name: "",
     description: "",
@@ -108,14 +111,102 @@ export default function ReportsPage() {
     }));
   };
 
-  const handleGenerateReport = () => {
-    // TODO: Implement report generation
-    console.log("Generate report with config:", config);
+  const handleGenerateReport = async () => {
+    if (config.metrics.length === 0) return;
+    setIsGenerating(true);
+    try {
+      const primaryCategory =
+        AVAILABLE_METRICS.find((m) => config.metrics.includes(m.id))
+          ?.category ?? "inventory";
+      const templateMap: Record<string, string> = {
+        inventory: "inventory-valuation",
+        bookings: "order-summary",
+        customers: "order-summary",
+      };
+      const template = templateMap[primaryCategory] ?? "inventory-valuation";
+
+      const response = await fetch("/api/reports/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          template,
+          fields: config.metrics,
+          filters: config.filters,
+          groupBy: config.groupBy,
+          dateRange: config.dateRange
+            ? {
+                from: config.dateRange.from?.toISOString(),
+                to: config.dateRange.to?.toISOString(),
+              }
+            : undefined,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to generate report");
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${
+        config.name || "report"
+      }-${format(new Date(), "yyyy-MM-dd")}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast({
+        title: "Report generated",
+        description: "Your report has been downloaded.",
+      });
+    } catch (_err) {
+      toast({
+        title: "Error",
+        description: "Failed to generate report. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
-  const handleSaveTemplate = () => {
-    // TODO: Implement template saving
-    console.log("Save template:", config);
+  const handleSaveTemplate = async () => {
+    if (!config.name || config.metrics.length === 0) return;
+    setIsSaving(true);
+    try {
+      const response = await fetch("/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: config.name,
+          description: config.description || "",
+          code: config.name
+            .toLowerCase()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-]/g, ""),
+          reportType: "CUSTOM",
+          category: "CUSTOM",
+          dataSource: "inventory",
+          filters: config.filters,
+          groupBy: [config.groupBy],
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save template");
+
+      toast({
+        title: "Template saved",
+        description: `"${config.name}" saved as a reusable template.`,
+      });
+    } catch (_err) {
+      toast({
+        title: "Error",
+        description: "Failed to save template. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -468,18 +559,22 @@ export default function ReportsPage() {
               <Button
                 className="w-full"
                 onClick={handleGenerateReport}
-                disabled={config.metrics.length === 0}
+                disabled={config.metrics.length === 0 || isGenerating}
               >
-                <FileText className="w-4 h-4 mr-2" />
-                Generate Report
+                {isGenerating ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                ) : (
+                  <FileText className="w-4 h-4 mr-2" />
+                )}
+                {isGenerating ? "Generating..." : "Generate Report"}
               </Button>
               <Button
                 variant="outline"
                 className="w-full"
                 onClick={handleSaveTemplate}
-                disabled={!config.name || config.metrics.length === 0}
+                disabled={!config.name || config.metrics.length === 0 || isSaving}
               >
-                Save as Template
+                {isSaving ? "Saving..." : "Save as Template"}
               </Button>
             </CardContent>
           </Card>

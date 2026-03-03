@@ -44,8 +44,6 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -221,7 +219,7 @@ export default function InvoicesPage() {
     new Date(inv.dueDate) < new Date();
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -487,6 +485,6 @@ export default function InvoicesPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

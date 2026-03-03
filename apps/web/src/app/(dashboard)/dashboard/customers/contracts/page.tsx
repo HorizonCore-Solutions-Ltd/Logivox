@@ -45,8 +45,6 @@ import {
   ShieldAlert,
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 interface Contract {
   id: string;
   contractNumber: string;
@@ -236,7 +234,7 @@ export default function CustomerContractsPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -656,6 +654,6 @@ export default function CustomerContractsPage() {
           </CardContent>
         </Card>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

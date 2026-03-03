@@ -53,7 +53,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -209,7 +208,7 @@ export default function ApiKeysPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -597,6 +596,6 @@ export default function ApiKeysPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </DashboardSidebar>
+    </>
   );
 }

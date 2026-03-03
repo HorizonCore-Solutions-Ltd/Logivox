@@ -43,9 +43,11 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        // Find user with security tracking
+        // Find user with security tracking — include securityProfile so
+        // lockout and MFA checks have real data to work with
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
+          include: { securityProfile: true },
         });
 
         if (!user || !user.password) {
@@ -57,15 +59,18 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        // Check if account is locked
-        /* 
+        // Check if account is disabled/deactivated
+        if (!user.isActive) {
+          throw new Error("Account is disabled. Contact your administrator.");
+        }
+
+        // Check if account is locked (A-4: lockout enforcement)
         if (
           user.securityProfile?.lockedUntil &&
           user.securityProfile.lockedUntil > new Date()
         ) {
           throw new Error("Account temporarily locked due to security");
         }
-        */
 
         // Verify password
         const isValidPassword = await bcrypt.compare(
@@ -74,13 +79,12 @@ export const authOptions: NextAuthOptions = {
         );
 
         if (!isValidPassword) {
-          // Track failed attempts
-          // await trackFailedLogin(user.id);
+          // Track failed attempts (A-5)
+          await trackFailedLogin(user.id);
           throw new Error("Invalid credentials");
         }
 
-        // Verify MFA if enabled
-        /*
+        // Verify MFA if enabled (A-1)
         if (user.securityProfile?.mfaEnabled && !credentials.mfaCode) {
           throw new Error("MFA code required");
         }
@@ -88,13 +92,13 @@ export const authOptions: NextAuthOptions = {
         if (user.securityProfile?.mfaEnabled && credentials.mfaCode) {
           const isValidMFA = await verifyMFACode(user.id, credentials.mfaCode);
           if (!isValidMFA) {
+            await trackFailedLogin(user.id);
             throw new Error("Invalid MFA code");
           }
         }
-        */
 
         // Reset failed attempts on successful login
-        // await resetFailedAttempts(user.id);
+        await resetFailedAttempts(user.id);
 
         // Log successful login
         /*

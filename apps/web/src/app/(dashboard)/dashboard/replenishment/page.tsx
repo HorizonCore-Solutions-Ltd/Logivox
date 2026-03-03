@@ -57,8 +57,6 @@ import {
   History,
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
-
 const STRATEGY_LABELS: Record<string, string> = {
   MIN_MAX: "Min/Max",
   REORDER_POINT: "Reorder Point",
@@ -246,7 +244,7 @@ export default function ReplenishmentPage() {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -629,6 +627,6 @@ export default function ReplenishmentPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

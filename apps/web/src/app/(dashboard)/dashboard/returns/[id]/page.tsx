@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft,
@@ -113,7 +112,7 @@ export default function ReturnDetailPage() {
   );
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">
@@ -435,6 +434,6 @@ export default function ReturnDetailPage() {
           </>
         ) : null}
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

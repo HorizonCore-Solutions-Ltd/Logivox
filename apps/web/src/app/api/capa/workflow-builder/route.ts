@@ -909,7 +909,7 @@ async function executeWorkflowNode(
 
       case "DELAY":
         // Delays are handled by scheduler (not implemented in this demo)
-        console.log(`DELAY node: Wait ${config.duration} ${config.unit}`);
+        console.info(`DELAY node: Wait ${config.duration} ${config.unit}`);
         break;
 
       case "START":
@@ -919,7 +919,7 @@ async function executeWorkflowNode(
       case "INSPECTION":
       case "DOCUMENTATION":
         // These nodes require manual interaction or external triggers
-        console.log(`${type} node executed (manual action may be required)`);
+        console.info(`${type} node executed (manual action may be required)`);
         break;
     }
   } catch (error) {
@@ -949,24 +949,24 @@ async function executeAutoAction(config: any, capaId: string) {
 
     case "ASSIGN_TO_ROLE":
       // Find first user with role (simplified)
-      console.log(`Assign to role: ${config.roleId}`);
+      console.info(`Assign to role: ${config.roleId}`);
       break;
 
     case "ADD_COMMENT":
-      console.log(`Add comment: ${config.comment}`);
+      console.info(`Add comment: ${config.comment}`);
       break;
   }
 }
 
 // Send workflow notification
 async function sendWorkflowNotification(config: any, capaId: string) {
-  console.log(`Sending notification to: ${config.recipients}`);
-  console.log(`Message: ${config.messageTemplate}`);
+  console.info(`Sending notification to: ${config.recipients}`);
+  console.info(`Message: ${config.messageTemplate}`);
   // Actual email sending would be implemented here
 }
 
 // Create training from workflow
 async function createWorkflowTraining(config: any, capaId: string) {
-  console.log(`Creating training: ${config.courseTemplate}`);
+  console.info(`Creating training: ${config.courseTemplate}`);
   // Training creation logic
 }

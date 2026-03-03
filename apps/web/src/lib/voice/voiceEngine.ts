@@ -21,6 +21,14 @@ export type VoiceIntent =
   | "MOVE"
   | "RECEIVE"
   | "CYCLE_COUNT"
+  | "PUTAWAY"
+  | "SHIP_ORDER"
+  | "TRANSFER"
+  | "PACK_ORDER"
+  | "BATCH_PICK"
+  | "EXCEPTION"
+  | "CANCEL"
+  | "REPEAT"
   | "STATUS"
   | "HELP"
   | "ERROR"
@@ -179,6 +187,78 @@ function parseIntent(text: string): {
     };
   }
 
+  // Putaway: "put away 5 of SKU-123 to ZONE-A" / "putaway SKU-123 location BIN-1"
+  const putawayMatch = lower.match(
+    /\bput.?away\s+(?:(\d+)\s+(?:of\s+)?)?([a-z0-9\-]+)(?:\s+(?:to|in|at)\s+([a-z0-9\-]+))?/i,
+  );
+  if (putawayMatch) {
+    return {
+      intent: "PUTAWAY",
+      params: {
+        quantity: putawayMatch[1] ? parseInt(putawayMatch[1], 10) : 1,
+        sku: putawayMatch[2].toUpperCase(),
+        ...(putawayMatch[3] && { location: putawayMatch[3].toUpperCase() }),
+      },
+      confidence: 0.86,
+    };
+  }
+
+  // Ship order: "ship order ORD-123" / "dispatch order 456"
+  const shipMatch = lower.match(/\b(?:ship|dispatch|ship out)\s+(?:order\s+)?([a-z0-9\-]+)/i);
+  if (shipMatch) {
+    return {
+      intent: "SHIP_ORDER",
+      params: { orderId: shipMatch[1].toUpperCase() },
+      confidence: 0.87,
+    };
+  }
+
+  // Transfer: "transfer 10 to ZONE-B" / "transfer SKU-123 to BIN-5"
+  const transferMatch = lower.match(
+    /\btransfer\s+(?:(\d+)\s+(?:of\s+)?)?([a-z0-9\-]+)\s+to\s+([a-z0-9\-]+)/i,
+  );
+  if (transferMatch) {
+    return {
+      intent: "TRANSFER",
+      params: {
+        quantity: transferMatch[1] ? parseInt(transferMatch[1], 10) : 1,
+        item: transferMatch[2].toUpperCase(),
+        destination: transferMatch[3].toUpperCase(),
+      },
+      confidence: 0.85,
+    };
+  }
+
+  // Pack order: "pack order ORD-123" / "pack 456"
+  const packMatch = lower.match(/\bpack(?:\s+order)?\s+([a-z0-9\-]+)/i);
+  if (packMatch) {
+    return {
+      intent: "PACK_ORDER",
+      params: { orderId: packMatch[1].toUpperCase() },
+      confidence: 0.87,
+    };
+  }
+
+  // Batch pick: "start batch pick" / "batch pick" / "begin batch"
+  if (/\b(?:batch.?pick|start batch|begin batch)\b/.test(lower)) {
+    return { intent: "BATCH_PICK", params: {}, confidence: 0.88 };
+  }
+
+  // Exception / problem: "exception", "problem", "issue found", "damaged"
+  if (/\b(exception|problem|issue|damaged|broken|defect|error found)\b/.test(lower)) {
+    return { intent: "EXCEPTION", params: { description: text }, confidence: 0.82 };
+  }
+
+  // Cancel
+  if (/\b(cancel|abort|stop|never mind|quit)\b/.test(lower)) {
+    return { intent: "CANCEL", params: {}, confidence: 0.92 };
+  }
+
+  // Repeat
+  if (/\b(repeat|again|say again|say that again)\b/.test(lower)) {
+    return { intent: "REPEAT", params: {}, confidence: 0.95 };
+  }
+
   // Status
   if (/\b(status|progress|how many|what is)\b/.test(lower)) {
     return { intent: "STATUS", params: {}, confidence: 0.75 };
@@ -211,8 +291,24 @@ function buildResponseText(
       return `Starting cycle count at location ${params.location}.`;
     case "STATUS":
       return "Fetching current task status.";
+    case "PUTAWAY":
+      return `Putting away ${params.quantity ?? 1} of ${params.sku}${params.location ? ` to ${params.location}` : ""}.`;
+    case "SHIP_ORDER":
+      return `Shipping order ${params.orderId}.`;
+    case "TRANSFER":
+      return `Transferring ${params.quantity ?? 1} of ${params.item} to ${params.destination}.`;
+    case "PACK_ORDER":
+      return `Packing order ${params.orderId}.`;
+    case "BATCH_PICK":
+      return "Starting batch pick session.";
+    case "EXCEPTION":
+      return "Exception recorded. Notifying supervisor.";
+    case "CANCEL":
+      return "Operation cancelled.";
+    case "REPEAT":
+      return "Repeating last command.";
     case "HELP":
-      return "Available commands: pick, confirm, scan, move to, receive, cycle count, status.";
+      return "Commands: pick, putaway, confirm, scan, move to, receive, cycle count, ship order, transfer, pack order, batch pick, exception, cancel, repeat, status.";
     case "NOT_CONFIGURED":
       return "Voice processing is not configured. Set OPENAI_API_KEY to enable server-side speech recognition.";
     default:

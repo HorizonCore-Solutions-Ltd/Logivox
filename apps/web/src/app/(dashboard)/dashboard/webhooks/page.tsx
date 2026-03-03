@@ -40,7 +40,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { CreateWebhookDialog } from "@/components/webhooks/create-webhook-dialog";
 
 interface Webhook {
@@ -121,7 +120,7 @@ export default function WebhooksPage() {
   const totalCount = webhooks?.length || 0;
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -330,6 +329,6 @@ export default function WebhooksPage() {
         open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
       />
-    </DashboardSidebar>
+    </>
   );
 }

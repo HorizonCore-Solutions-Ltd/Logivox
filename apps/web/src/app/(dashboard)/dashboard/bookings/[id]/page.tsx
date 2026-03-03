@@ -26,7 +26,6 @@ import {
   FileText,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { useToast } from "@/hooks/use-toast";
 
 interface BookingDetailPageProps {
@@ -83,7 +82,7 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
 
   if (isLoading) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="p-6">
           <div className="h-8 w-48 animate-pulse bg-muted rounded mb-6" />
           <div className="space-y-4">
@@ -91,17 +90,17 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
             <div className="h-64 animate-pulse bg-muted rounded" />
           </div>
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   if (!booking) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="p-6">
           <p>Booking not found</p>
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
@@ -144,7 +143,7 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
   };
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -365,6 +364,6 @@ export default function BookingDetailPage({ params }: BookingDetailPageProps) {
           </Card>
         )}
       </div>
-    </DashboardSidebar>
+    </>
   );
 }

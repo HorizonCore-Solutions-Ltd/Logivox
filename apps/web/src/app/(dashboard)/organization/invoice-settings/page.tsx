@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "@/components/ui/use-toast";
-import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { RefreshCw, Save, Info } from "lucide-react";
 
 interface InvoiceSettings {
@@ -168,17 +167,17 @@ export default function InvoiceSettingsPage() {
 
   if (loading) {
     return (
-      <DashboardSidebar>
+      <>
         <div className="flex items-center justify-center h-64 text-muted-foreground">
           <RefreshCw className="h-5 w-5 animate-spin mr-2" />
           Loading settings...
         </div>
-      </DashboardSidebar>
+      </>
     );
   }
 
   return (
-    <DashboardSidebar>
+    <>
       <div className="p-6 max-w-3xl space-y-6">
         <div className="flex items-center justify-between">
           <div>
@@ -459,6 +458,6 @@ export default function InvoiceSettingsPage() {
           </Button>
         </div>
       </div>
-    </DashboardSidebar>
+    </>
   );
 }
