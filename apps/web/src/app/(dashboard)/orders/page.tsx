@@ -1,259 +1,108 @@
 "use client";
 
 import { useState } from "react";
-import {
-  ClipboardList,
-  Search,
-  Play,
-  CheckCircle2,
-  Clock,
-  Package,
-  AlertCircle,
-  Zap,
-  Filter,
-  Plus,
-  Eye,
-  MoreHorizontal,
-} from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ClipboardList, Search, Play, CheckCircle2, Clock, Package, AlertCircle, Zap, Plus, Eye, MoreHorizontal, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
-const PRIORITY_COLOR: Record<string, string> = {
-  CRITICAL: "destructive",
-  URGENT: "default",
-  HIGH: "default",
-  NORMAL: "secondary",
-  LOW: "outline",
+interface SalesOrder {
+  id: string;
+  soNumber: string;
+  customer?: { name: string } | null;
+  status: string;
+  priority: number;
+  requestedDate?: string | null;
+  totalAmount?: number | null;
+  _count?: { items: number };
+  createdAt: string;
+}
+
+const PRIORITY_LABEL: Record<number, string> = { 1: "LOW", 2: "NORMAL", 3: "HIGH", 4: "URGENT", 5: "CRITICAL" };
+const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  DRAFT: "outline", PENDING_APPROVAL: "secondary", APPROVED: "default", PICKING: "default",
+  PICKED: "default", PACKING: "default", PACKED: "default", SHIPPED: "default", DELIVERED: "default", CANCELLED: "destructive",
 };
-
-const STATUS_COLOR: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  PENDING: "secondary",
-  APPROVED: "default",
-  PICKING: "default",
-  PICKED: "default",
-  PACKING: "default",
-  PACKED: "default",
-  SHIPPED: "default",
-  DELIVERED: "default",
-  CANCELLED: "destructive",
-};
-
-const MOCK_ORDERS = [
-  {
-    id: "1",
-    soNumber: "SO-2026-0412",
-    customer: "Acme Corp",
-    status: "PICKING",
-    priority: "URGENT",
-    itemCount: 12,
-    totalValue: 4850.0,
-    dueDate: "2026-03-04",
-    assignee: "John D.",
-  },
-  {
-    id: "2",
-    soNumber: "SO-2026-0411",
-    customer: "TechFlow Ltd",
-    status: "APPROVED",
-    priority: "HIGH",
-    itemCount: 5,
-    totalValue: 1230.5,
-    dueDate: "2026-03-04",
-    assignee: "Sarah M.",
-  },
-  {
-    id: "3",
-    soNumber: "SO-2026-0410",
-    customer: "Global Retail Inc",
-    status: "PACKING",
-    priority: "NORMAL",
-    itemCount: 28,
-    totalValue: 9200.0,
-    dueDate: "2026-03-05",
-    assignee: "Mike T.",
-  },
-  {
-    id: "4",
-    soNumber: "SO-2026-0409",
-    customer: "FastShip Co",
-    status: "PICKED",
-    priority: "CRITICAL",
-    itemCount: 3,
-    totalValue: 650.0,
-    dueDate: "2026-03-03",
-    assignee: "Lisa R.",
-  },
-  {
-    id: "5",
-    soNumber: "SO-2026-0408",
-    customer: "BigBox Stores",
-    status: "PACKED",
-    priority: "NORMAL",
-    itemCount: 45,
-    totalValue: 12400.0,
-    dueDate: "2026-03-06",
-    assignee: "Tom B.",
-  },
-  {
-    id: "6",
-    soNumber: "SO-2026-0407",
-    customer: "HealthCare Plus",
-    status: "SHIPPED",
-    priority: "HIGH",
-    itemCount: 8,
-    totalValue: 3100.0,
-    dueDate: "2026-03-03",
-    assignee: "Anna K.",
-  },
-  {
-    id: "7",
-    soNumber: "SO-2026-0406",
-    customer: "MegaMart",
-    status: "PENDING",
-    priority: "LOW",
-    itemCount: 20,
-    totalValue: 5500.0,
-    dueDate: "2026-03-07",
-    assignee: null,
-  },
-  {
-    id: "8",
-    soNumber: "SO-2026-0405",
-    customer: "ElectroParts",
-    status: "CANCELLED",
-    priority: "NORMAL",
-    itemCount: 6,
-    totalValue: 880.0,
-    dueDate: "2026-03-02",
-    assignee: "Chris L.",
-  },
-];
-
-const KPI_CARDS = [
-  {
-    title: "Pending Approval",
-    value: "14",
-    icon: Clock,
-    color: "text-yellow-500",
-    bg: "bg-yellow-50",
-  },
-  {
-    title: "In Picking",
-    value: "23",
-    icon: Play,
-    color: "text-blue-500",
-    bg: "bg-blue-50",
-  },
-  {
-    title: "Ready to Ship",
-    value: "8",
-    icon: Package,
-    color: "text-green-500",
-    bg: "bg-green-50",
-  },
-  {
-    title: "Overdue",
-    value: "3",
-    icon: AlertCircle,
-    color: "text-red-500",
-    bg: "bg-red-50",
-  },
-];
-
-const STATUS_TABS = [
-  "ALL",
-  "PENDING",
-  "APPROVED",
-  "PICKING",
-  "PICKED",
-  "PACKING",
-  "PACKED",
-  "SHIPPED",
-];
+const STATUS_TABS = ["ALL", "PENDING_APPROVAL", "APPROVED", "PICKING", "PICKED", "PACKING", "PACKED", "SHIPPED"];
 
 export default function OrdersPage() {
+  const { toast } = useToast();
+  const router = useRouter();
+  const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
-  const [priorityFilter, setPriorityFilter] = useState("ALL");
 
-  const filtered = MOCK_ORDERS.filter((o) => {
-    const matchSearch =
-      !search ||
-      o.soNumber.toLowerCase().includes(search.toLowerCase()) ||
-      o.customer.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "ALL" || o.status === statusFilter;
-    const matchPriority =
-      priorityFilter === "ALL" || o.priority === priorityFilter;
-    return matchSearch && matchStatus && matchPriority;
+  const { data, isLoading } = useQuery<{ orders: SalesOrder[]; pagination: { total: number } }>({
+    queryKey: ["sales-orders", search, statusFilter],
+    queryFn: async () => {
+      const p = new URLSearchParams({ limit: "50" });
+      if (search) p.set("search", search);
+      if (statusFilter !== "ALL") p.set("status", statusFilter);
+      const res = await fetch(`/api/sales-orders?${p}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      return res.json();
+    },
   });
+
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/sales-orders/${id}/approve`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["sales-orders"] }); toast({ title: "Order approved" }); },
+    onError: () => toast({ title: "Failed to approve", variant: "destructive" }),
+  });
+
+  const releaseMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/sales-orders/${id}/release`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["sales-orders"] }); toast({ title: "Released to picking" }); },
+    onError: () => toast({ title: "Failed to release", variant: "destructive" }),
+  });
+
+  const orders = data?.orders ?? [];
+  const total = data?.pagination?.total ?? 0;
+  const overdue = orders.filter((o) => o.requestedDate && new Date(o.requestedDate) < new Date() && !["SHIPPED","DELIVERED","CANCELLED"].includes(o.status)).length;
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <ClipboardList className="h-6 w-6 text-blue-600" />
-            Sales Orders
+            <ClipboardList className="h-6 w-6 text-blue-600" />Sales Orders
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Manage and track all outbound sales orders
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">{total} total orders</p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <Zap className="h-4 w-4 mr-2" />
-            Auto-Allocate
-          </Button>
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            New Order
+          <Button size="sm" onClick={() => router.push("/dashboard/sales-orders/new")}>
+            <Plus className="h-4 w-4 mr-2" />New Order
           </Button>
         </div>
       </div>
 
-      {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {KPI_CARDS.map((kpi) => (
+        {[
+          { title: "Pending Approval", value: orders.filter(o => o.status === "PENDING_APPROVAL").length, icon: Clock, color: "text-yellow-500", bg: "bg-yellow-50" },
+          { title: "In Picking", value: orders.filter(o => o.status === "PICKING").length, icon: Play, color: "text-blue-500", bg: "bg-blue-50" },
+          { title: "Ready to Ship", value: orders.filter(o => o.status === "PACKED").length, icon: Package, color: "text-green-500", bg: "bg-green-50" },
+          { title: "Overdue", value: overdue, icon: AlertCircle, color: "text-red-500", bg: "bg-red-50" },
+        ].map((kpi) => (
           <Card key={kpi.title}>
             <CardContent className="pt-4 pb-4">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${kpi.bg}`}>
-                  <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
-                </div>
+                <div className={`p-2 rounded-lg ${kpi.bg}`}><kpi.icon className={`h-5 w-5 ${kpi.color}`} /></div>
                 <div>
-                  <p className="text-2xl font-bold">{kpi.value}</p>
+                  <p className="text-2xl font-bold">{isLoading ? "—" : kpi.value}</p>
                   <p className="text-xs text-muted-foreground">{kpi.title}</p>
                 </div>
               </div>
@@ -262,144 +111,67 @@ export default function OrdersPage() {
         ))}
       </div>
 
-      {/* Filters */}
       <Card>
         <CardHeader className="pb-3">
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
-            <div className="flex items-center gap-2 flex-1 max-w-md">
-              <Search className="h-4 w-4 text-muted-foreground absolute ml-3 pointer-events-none" />
-              <Input
-                placeholder="Search orders or customers..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-                <SelectTrigger className="w-36">
-                  <Filter className="h-3 w-3 mr-1" />
-                  <SelectValue placeholder="Priority" />
-                </SelectTrigger>
-                <SelectContent>
-                  {["ALL", "CRITICAL", "URGENT", "HIGH", "NORMAL", "LOW"].map(
-                    (p) => (
-                      <SelectItem key={p} value={p}>
-                        {p}
-                      </SelectItem>
-                    )
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="relative max-w-md">
+            <Search className="h-4 w-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Input placeholder="Search order # or customer..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-9" />
           </div>
-          {/* Status tabs */}
           <div className="flex gap-1 flex-wrap pt-2">
             {STATUS_TABS.map((s) => (
-              <Button
-                key={s}
-                size="sm"
-                variant={statusFilter === s ? "default" : "ghost"}
-                className="h-7 text-xs"
-                onClick={() => setStatusFilter(s)}
-              >
-                {s}
+              <Button key={s} size="sm" variant={statusFilter === s ? "default" : "ghost"} className="h-7 text-xs" onClick={() => setStatusFilter(s)}>
+                {s.replace(/_/g, " ")}
               </Button>
             ))}
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Order #</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead className="text-right">Items</TableHead>
-                <TableHead className="text-right">Value</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Assignee</TableHead>
-                <TableHead className="w-10" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 ? (
+          {isLoading ? (
+            <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+          ) : (
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
-                    No orders match your filters.
-                  </TableCell>
+                  <TableHead>Order #</TableHead><TableHead>Customer</TableHead><TableHead>Status</TableHead>
+                  <TableHead>Priority</TableHead><TableHead className="text-right">Items</TableHead>
+                  <TableHead className="text-right">Value</TableHead><TableHead>Requested</TableHead><TableHead className="w-10" />
                 </TableRow>
-              ) : (
-                filtered.map((order) => (
-                  <TableRow key={order.id} className="cursor-pointer hover:bg-muted/50">
-                    <TableCell className="font-mono font-semibold text-blue-600">
-                      {order.soNumber}
-                    </TableCell>
-                    <TableCell>{order.customer}</TableCell>
-                    <TableCell>
-                      <Badge variant={STATUS_COLOR[order.status] ?? "secondary"}>
-                        {order.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          (PRIORITY_COLOR[order.priority] as "default" | "secondary" | "destructive" | "outline") ??
-                          "secondary"
-                        }
-                      >
-                        {order.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">{order.itemCount}</TableCell>
+              </TableHeader>
+              <TableBody>
+                {orders.length === 0 ? (
+                  <TableRow><TableCell colSpan={8} className="text-center py-10 text-muted-foreground">No orders found.</TableCell></TableRow>
+                ) : orders.map((o) => (
+                  <TableRow key={o.id} className="cursor-pointer hover:bg-muted/50" onClick={() => router.push(`/dashboard/sales-orders/${o.id}`)}>
+                    <TableCell className="font-mono font-semibold text-blue-600">{o.soNumber}</TableCell>
+                    <TableCell>{o.customer?.name ?? "—"}</TableCell>
+                    <TableCell><Badge variant={STATUS_VARIANT[o.status] ?? "secondary"}>{o.status.replace(/_/g, " ")}</Badge></TableCell>
+                    <TableCell><Badge variant="outline">{PRIORITY_LABEL[o.priority] ?? o.priority}</Badge></TableCell>
+                    <TableCell className="text-right">{o._count?.items ?? "—"}</TableCell>
                     <TableCell className="text-right font-medium">
-                      £{order.totalValue.toLocaleString("en-GB", { minimumFractionDigits: 2 })}
+                      {o.totalAmount != null ? `£${Number(o.totalAmount).toLocaleString("en-GB", { minimumFractionDigits: 2 })}` : "—"}
                     </TableCell>
                     <TableCell className="text-sm">
-                      <span
-                        className={
-                          new Date(order.dueDate) < new Date()
-                            ? "text-red-600 font-semibold"
-                            : ""
-                        }
-                      >
-                        {order.dueDate}
-                      </span>
+                      {o.requestedDate ? (
+                        <span className={new Date(o.requestedDate) < new Date() && !["SHIPPED","DELIVERED","CANCELLED"].includes(o.status) ? "text-red-600 font-semibold" : ""}>
+                          {new Date(o.requestedDate).toLocaleDateString("en-GB")}
+                        </span>
+                      ) : "—"}
                     </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {order.assignee ?? (
-                        <span className="italic text-muted-foreground">Unassigned</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
+                    <TableCell onClick={(e) => e.stopPropagation()}>
                       <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-7 w-7">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
+                        <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Play className="h-4 w-4 mr-2" />
-                            Start Picking
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                            Mark Complete
-                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => router.push(`/dashboard/sales-orders/${o.id}`)}><Eye className="h-4 w-4 mr-2" />View Details</DropdownMenuItem>
+                          {o.status === "PENDING_APPROVAL" && <DropdownMenuItem onClick={() => approveMutation.mutate(o.id)}><CheckCircle2 className="h-4 w-4 mr-2" />Approve</DropdownMenuItem>}
+                          {o.status === "APPROVED" && <DropdownMenuItem onClick={() => releaseMutation.mutate(o.id)}><Play className="h-4 w-4 mr-2" />Release to Picking</DropdownMenuItem>}
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

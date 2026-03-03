@@ -1,167 +1,153 @@
 "use client";
 
-import { useState } from "react";
-import {
-  GitMerge,
-  Plus,
-  Eye,
-  CheckCircle2,
-  AlertTriangle,
-  Layers,
-  ClipboardList,
-  Truck,
-  Share2,
-  MoreHorizontal,
-  RefreshCw,
-  Package,
-  SendHorizonal,
-} from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { LayoutGrid, Package, ClipboardList, Truck, CheckCircle2, MoreHorizontal, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 
-const BAY_STATUS_STYLES: Record<string, { bg: string; text: string; label: string }> = {
-  FREE: { bg: "bg-green-100", text: "text-green-700", label: "Free" },
-  LOADING: { bg: "bg-blue-100", text: "text-blue-700", label: "Loading" },
-  STAGED: { bg: "bg-yellow-100", text: "text-yellow-700", label: "Staged" },
-  BLOCKED: { bg: "bg-red-100", text: "text-red-700", label: "Blocked" },
-  MAINTENANCE: { bg: "bg-gray-100", text: "text-gray-700", label: "Maintenance" },
+interface DockBay {
+  id: string;
+  doorNumber: string;
+  status: string;
+  trailerNumber?: string;
+  loadSheetId?: string;
+  loadSheetNumber?: string;
+}
+
+interface LoadSheet {
+  id: string;
+  loadSheetNumber: string;
+  status: string;
+  trailerNumber?: string;
+  bayDoor?: { doorNumber: string };
+  routeCode?: string;
+  totalBoxes: number;
+  loadedBoxes: number;
+  completionPct: number;
+  dispatchedAt?: string;
+}
+
+interface PickTask {
+  id: string;
+  taskNumber: string;
+  status: string;
+  title: string;
+  sku?: string;
+  productName?: string;
+  fromLocationCode?: string;
+  quantity: number;
+  completedQuantity: number;
+  assignedToName?: string;
+}
+
+const BAY_STATUS_COLOR: Record<string, string> = {
+  EMPTY: "bg-gray-100 border-gray-300 text-gray-600",
+  SPOTTED: "bg-blue-100 border-blue-400 text-blue-800",
+  LOADING: "bg-yellow-100 border-yellow-400 text-yellow-800",
+  SEALED: "bg-green-100 border-green-400 text-green-800",
+  DEPARTING: "bg-purple-100 border-purple-400 text-purple-800",
+  OUT_OF_USE: "bg-red-100 border-red-300 text-red-600",
 };
 
-const MOCK_BAYS = [
-  { id: "B01", status: "LOADING", trailer: "TR22 XYZ", loadSheet: "LS-0045", progress: 65 },
-  { id: "B02", status: "STAGED", trailer: "WH20 ABC", loadSheet: "LS-0044", progress: 100 },
-  { id: "B03", status: "FREE", trailer: null, loadSheet: null, progress: 0 },
-  { id: "B04", status: "LOADING", trailer: "LV24 DEF", loadSheet: "LS-0046", progress: 30 },
-  { id: "B05", status: "BLOCKED", trailer: "MT18 GHI", loadSheet: null, progress: 0 },
-  { id: "B06", status: "FREE", trailer: null, loadSheet: null, progress: 0 },
-  { id: "B07", status: "LOADING", trailer: "FT21 JKL", loadSheet: "LS-0047", progress: 80 },
-  { id: "B08", status: "MAINTENANCE", trailer: null, loadSheet: null, progress: 0 },
-];
-
-const MOCK_LOAD_SHEETS = [
-  {
-    id: "1",
-    reference: "LS-0047",
-    route: "London North Run",
-    trailer: "FT21 JKL",
-    bay: "B07",
-    status: "LOADING",
-    unitLabel: "Box",
-    totalBoxes: 120,
-    loaded: 96,
-    stops: 8,
-    dispatchEta: "2026-03-03T14:00:00Z",
-  },
-  {
-    id: "2",
-    reference: "LS-0046",
-    route: "Midlands Circuit",
-    trailer: "LV24 DEF",
-    bay: "B04",
-    status: "LOADING",
-    unitLabel: "Pallet",
-    totalBoxes: 24,
-    loaded: 7,
-    stops: 5,
-    dispatchEta: "2026-03-03T15:30:00Z",
-  },
-  {
-    id: "3",
-    reference: "LS-0045",
-    route: "South West Loop",
-    trailer: "TR22 XYZ",
-    bay: "B01",
-    status: "STAGED",
-    unitLabel: "Box",
-    totalBoxes: 85,
-    loaded: 85,
-    stops: 6,
-    dispatchEta: "2026-03-03T12:00:00Z",
-  },
-  {
-    id: "4",
-    reference: "LS-0044",
-    route: "Scotland Express",
-    trailer: "WH20 ABC",
-    bay: "B02",
-    status: "DISPATCHED",
-    unitLabel: "Box",
-    totalBoxes: 60,
-    loaded: 60,
-    stops: 4,
-    dispatchEta: "2026-03-03T08:00:00Z",
-  },
-];
-
-const MOCK_PICK_TASKS = [
-  { id: "1", sku: "SK-1001", name: "Widget A", qty: 20, bay: "B07", status: "PENDING", assignee: null },
-  { id: "2", sku: "SK-1042", name: "Gadget Pro", qty: 8, bay: "B04", status: "IN_PROGRESS", assignee: "Dave P." },
-  { id: "3", sku: "SK-2011", name: "Component X", qty: 50, bay: "B07", status: "AT_BAY", assignee: "Steve M." },
-  { id: "4", sku: "SK-3300", name: "Unit Y", qty: 15, bay: "B01", status: "LOADED", assignee: "Anna K." },
-];
-
-const KPI_CARDS = [
-  { title: "Active Bays", value: "3", icon: Truck, color: "text-blue-500", bg: "bg-blue-50" },
-  { title: "Load Sheets Open", value: "2", icon: ClipboardList, color: "text-purple-500", bg: "bg-purple-50" },
-  { title: "Picks Remaining", value: "28", icon: Package, color: "text-orange-500", bg: "bg-orange-50" },
-  { title: "Ready to Dispatch", value: "1", icon: SendHorizonal, color: "text-green-500", bg: "bg-green-50" },
-];
+const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
+  PENDING: "secondary", PICKING: "default", LOADING: "default", SEALED: "default",
+  DISPATCHED: "default", COMPLETED: "outline",
+};
 
 export default function MarshallingPage() {
-  const [activeTab, setActiveTab] = useState("bays");
+  const { toast } = useToast();
+  const qc = useQueryClient();
+
+  const { data: bayData, isLoading: bayLoading } = useQuery<{ bays: DockBay[] }>({
+    queryKey: ["dock-bays"],
+    queryFn: async () => {
+      const res = await fetch("/api/dock/status");
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    refetchInterval: 20_000,
+  });
+
+  const { data: loadSheetData, isLoading: lsLoading } = useQuery<{ loadSheets: LoadSheet[]; count: number }>({
+    queryKey: ["loadsheets"],
+    queryFn: async () => {
+      const res = await fetch("/api/loadsheets?limit=50");
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    refetchInterval: 20_000,
+  });
+
+  const { data: pickData, isLoading: pickLoading } = useQuery<{ tasks: PickTask[]; total: number }>({
+    queryKey: ["pick-tasks"],
+    queryFn: async () => {
+      const res = await fetch("/api/picking-tasks?limit=50");
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    refetchInterval: 20_000,
+  });
+
+  const advanceMutation = useMutation({
+    mutationFn: async ({ id, action }: { id: string; action: string }) => {
+      const res = await fetch(`/api/loadsheets/${id}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["loadsheets"] }); qc.invalidateQueries({ queryKey: ["dock-bays"] }); toast({ title: "Load sheet updated" }); },
+    onError: () => toast({ title: "Failed", variant: "destructive" }),
+  });
+
+  const completePickMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/picking-tasks/${id}/complete`, { method: "POST" });
+      if (!res.ok) throw new Error("Failed");
+      return res.json();
+    },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["pick-tasks"] }); toast({ title: "Pick completed" }); },
+    onError: () => toast({ title: "Failed", variant: "destructive" }),
+  });
+
+  const bays = bayData?.bays ?? [];
+  const loadSheets = loadSheetData?.loadSheets ?? [];
+  const picks = pickData?.tasks ?? [];
+
+  const activeBays = bays.filter(b => b.status !== "EMPTY" && b.status !== "OUT_OF_USE").length;
+  const activeLoads = loadSheets.filter(ls => ls.status !== "DISPATCHED" && ls.status !== "COMPLETED").length;
+  const openPicks = picks.filter(p => p.status === "PENDING" || p.status === "IN_PROGRESS").length;
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <GitMerge className="h-6 w-6 text-indigo-600" />
-            Marshalling
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Bay board, load sheets, pick tasks and trailer loading optimisation
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          <Button size="sm">
-            <Plus className="h-4 w-4 mr-2" />
-            New Load Sheet
-          </Button>
+          <h1 className="text-2xl font-bold flex items-center gap-2"><LayoutGrid className="h-6 w-6 text-teal-600" />Marshalling</h1>
+          <p className="text-sm text-muted-foreground mt-1">Bay board, load sheets and pick task management</p>
         </div>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {KPI_CARDS.map((kpi) => (
+        {[
+          { title: "Total Bays", value: bays.length, icon: Truck, color: "text-blue-500", bg: "bg-blue-50" },
+          { title: "Active Bays", value: activeBays, icon: LayoutGrid, color: "text-teal-500", bg: "bg-teal-50" },
+          { title: "Open Loads", value: activeLoads, icon: Package, color: "text-yellow-500", bg: "bg-yellow-50" },
+          { title: "Open Picks", value: openPicks, icon: ClipboardList, color: "text-orange-500", bg: "bg-orange-50" },
+        ].map((kpi) => (
           <Card key={kpi.title}>
             <CardContent className="pt-4 pb-4">
               <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg ${kpi.bg}`}>
-                  <kpi.icon className={`h-5 w-5 ${kpi.color}`} />
-                </div>
+                <div className={`p-2 rounded-lg ${kpi.bg}`}><kpi.icon className={`h-5 w-5 ${kpi.color}`} /></div>
                 <div>
-                  <p className="text-2xl font-bold">{kpi.value}</p>
+                  <p className="text-2xl font-bold">{bayLoading ? "—" : kpi.value}</p>
                   <p className="text-xs text-muted-foreground">{kpi.title}</p>
                 </div>
               </div>
@@ -170,184 +156,120 @@ export default function MarshallingPage() {
         ))}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs defaultValue="bayboard">
         <TabsList>
-          <TabsTrigger value="bays">Bay Board</TabsTrigger>
+          <TabsTrigger value="bayboard">Bay Board</TabsTrigger>
           <TabsTrigger value="loadsheets">Load Sheets</TabsTrigger>
           <TabsTrigger value="picks">Pick Tasks</TabsTrigger>
         </TabsList>
 
-        {/* Bay Board */}
-        <TabsContent value="bays">
+        <TabsContent value="bayboard">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Live Bay Status</CardTitle>
-            </CardHeader>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Dock Bay Status</CardTitle></CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {MOCK_BAYS.map((bay) => {
-                  const style = BAY_STATUS_STYLES[bay.status] ?? BAY_STATUS_STYLES.FREE;
-                  return (
-                    <div
-                      key={bay.id}
-                      className={`rounded-lg border-2 p-4 cursor-pointer hover:shadow-md transition-shadow ${bay.status === "FREE" ? "border-green-200" : bay.status === "BLOCKED" || bay.status === "MAINTENANCE" ? "border-red-200" : "border-blue-200"}`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-lg">{bay.id}</span>
-                        <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${style.bg} ${style.text}`}>
-                          {style.label}
-                        </span>
-                      </div>
-                      {bay.trailer ? (
-                        <>
-                          <p className="text-sm font-mono text-muted-foreground">{bay.trailer}</p>
-                          <p className="text-xs text-muted-foreground">{bay.loadSheet}</p>
-                          {bay.progress > 0 && (
-                            <div className="mt-2">
-                              <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                                <span>Loading</span>
-                                <span>{bay.progress}%</span>
-                              </div>
-                              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-blue-500 rounded-full"
-                                  style={{ width: `${bay.progress}%` }}
-                                />
-                              </div>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {bay.status === "FREE" ? "Available" : bay.status}
-                        </p>
-                      )}
+              {bayLoading ? <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div> : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                  {bays.length === 0 ? <p className="col-span-full text-center py-8 text-muted-foreground">No dock bays configured.</p> : bays.map((bay) => (
+                    <div key={bay.id} className={`border-2 rounded-lg p-3 text-center ${BAY_STATUS_COLOR[bay.status] ?? "bg-gray-50 border-gray-200"}`}>
+                      <p className="font-bold text-lg">Door {bay.doorNumber}</p>
+                      <p className="text-xs font-medium mt-1">{bay.status.replace(/_/g, " ")}</p>
+                      {bay.trailerNumber && <p className="text-xs mt-1 font-mono">{bay.trailerNumber}</p>}
+                      {bay.loadSheetNumber && <p className="text-xs text-blue-600">{bay.loadSheetNumber}</p>}
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Load Sheets */}
         <TabsContent value="loadsheets">
           <Card>
-            <CardContent className="p-0 mt-2">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Ref</TableHead>
-                    <TableHead>Route</TableHead>
-                    <TableHead>Trailer</TableHead>
-                    <TableHead>Bay</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Progress</TableHead>
-                    <TableHead>Stops</TableHead>
-                    <TableHead>Dispatch ETA</TableHead>
-                    <TableHead className="w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {MOCK_LOAD_SHEETS.map((ls) => (
-                    <TableRow key={ls.id} className="hover:bg-muted/50 cursor-pointer">
-                      <TableCell className="font-mono font-semibold text-indigo-600">{ls.reference}</TableCell>
-                      <TableCell className="font-medium">{ls.route}</TableCell>
-                      <TableCell className="text-sm font-mono">{ls.trailer}</TableCell>
-                      <TableCell className="text-sm">{ls.bay}</TableCell>
-                      <TableCell>
-                        <Badge variant={ls.status === "DISPATCHED" ? "outline" : ls.status === "LOADING" ? "default" : "secondary"}>
-                          {ls.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <div className="h-1.5 w-20 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-blue-500 rounded-full"
-                              style={{ width: `${Math.round((ls.loaded / ls.totalBoxes) * 100)}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-muted-foreground">
-                            {ls.loaded}/{ls.totalBoxes} {ls.unitLabel}s
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-sm text-center">{ls.stops}</TableCell>
-                      <TableCell className="text-sm">
-                        {new Date(ls.dispatchEta).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><Eye className="h-4 w-4 mr-2" />View Lines</DropdownMenuItem>
-                            <DropdownMenuItem><Share2 className="h-4 w-4 mr-2" />Email Driver</DropdownMenuItem>
-                            <DropdownMenuItem><CheckCircle2 className="h-4 w-4 mr-2" />Dispatch</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Load Sheets</CardTitle></CardHeader>
+            <CardContent className="p-0">
+              {lsLoading ? <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div> : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Load #</TableHead><TableHead>Route</TableHead><TableHead>Status</TableHead>
+                      <TableHead>Bay</TableHead><TableHead>Trailer</TableHead><TableHead>Progress</TableHead><TableHead className="w-10" />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {loadSheets.length === 0 ? (
+                      <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No load sheets.</TableCell></TableRow>
+                    ) : loadSheets.map((ls) => (
+                      <TableRow key={ls.id} className="hover:bg-muted/50">
+                        <TableCell className="font-mono font-semibold text-blue-700">{ls.loadSheetNumber}</TableCell>
+                        <TableCell className="text-sm">{ls.routeCode ?? "—"}</TableCell>
+                        <TableCell><Badge variant={STATUS_VARIANT[ls.status] ?? "secondary"}>{ls.status}</Badge></TableCell>
+                        <TableCell className="text-sm font-mono">{ls.bayDoor?.doorNumber ?? "—"}</TableCell>
+                        <TableCell className="text-sm font-mono">{ls.trailerNumber ?? "—"}</TableCell>
+                        <TableCell className="min-w-[120px]">
+                          <div className="flex items-center gap-2">
+                            <Progress value={ls.completionPct} className="h-2 flex-1" />
+                            <span className="text-xs text-muted-foreground whitespace-nowrap">{ls.loadedBoxes}/{ls.totalBoxes}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem onClick={() => advanceMutation.mutate({ id: ls.id, action: "advance" })}><ArrowRight className="h-4 w-4 mr-2" />Advance Status</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => advanceMutation.mutate({ id: ls.id, action: "dispatch" })}><Truck className="h-4 w-4 mr-2" />Dispatch</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
 
-        {/* Pick Tasks */}
         <TabsContent value="picks">
           <Card>
-            <CardContent className="p-0 mt-2">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>SKU</TableHead>
-                    <TableHead>Product</TableHead>
-                    <TableHead className="text-right">Qty</TableHead>
-                    <TableHead>Target Bay</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Assignee</TableHead>
-                    <TableHead className="w-10" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {MOCK_PICK_TASKS.map((task) => (
-                    <TableRow key={task.id} className="hover:bg-muted/50">
-                      <TableCell className="font-mono text-sm">{task.sku}</TableCell>
-                      <TableCell className="font-medium">{task.name}</TableCell>
-                      <TableCell className="text-right font-semibold">{task.qty}</TableCell>
-                      <TableCell className="font-semibold">{task.bay}</TableCell>
-                      <TableCell>
-                        <Badge variant={task.status === "LOADED" ? "default" : task.status === "AT_BAY" ? "secondary" : "outline"}>
-                          {task.status.replace("_", " ")}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {task.assignee ?? <span className="italic">Unassigned</span>}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem><CheckCircle2 className="h-4 w-4 mr-2" />Mark at Bay</DropdownMenuItem>
-                            <DropdownMenuItem><Layers className="h-4 w-4 mr-2" />Mark Loaded</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive"><AlertTriangle className="h-4 w-4 mr-2" />Short Pick</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+            <CardHeader className="pb-2"><CardTitle className="text-base">Pick Tasks</CardTitle></CardHeader>
+            <CardContent className="p-0">
+              {pickLoading ? <div className="flex justify-center py-8"><Loader2 className="h-5 w-5 animate-spin text-muted-foreground" /></div> : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Task #</TableHead><TableHead>Item</TableHead><TableHead>From</TableHead>
+                      <TableHead>Qty</TableHead><TableHead>Status</TableHead><TableHead>Assignee</TableHead><TableHead className="w-10" />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {picks.length === 0 ? (
+                      <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No pick tasks.</TableCell></TableRow>
+                    ) : picks.map((p) => (
+                      <TableRow key={p.id} className="hover:bg-muted/50">
+                        <TableCell className="font-mono font-semibold text-sm">{p.taskNumber}</TableCell>
+                        <TableCell>
+                          <p className="text-sm font-medium">{p.productName ?? p.title}</p>
+                          {p.sku && <p className="text-xs text-muted-foreground font-mono">{p.sku}</p>}
+                        </TableCell>
+                        <TableCell className="text-sm font-mono">{p.fromLocationCode ?? "—"}</TableCell>
+                        <TableCell className="text-sm">{p.completedQuantity}/{p.quantity}</TableCell>
+                        <TableCell><Badge variant={STATUS_VARIANT[p.status] ?? "secondary"}>{p.status}</Badge></TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{p.assignedToName ?? <span className="italic">Unassigned</span>}</TableCell>
+                        <TableCell>
+                          {(p.status === "PENDING" || p.status === "IN_PROGRESS") && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => completePickMutation.mutate(p.id)}><CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />Complete Pick</DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>
