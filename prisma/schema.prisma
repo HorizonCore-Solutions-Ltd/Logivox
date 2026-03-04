@@ -125,6 +125,7 @@ model User {
   completedTransfers           WarehouseTransfer[]      @relation("TransferCompletedBy")
   requestedTransfers           WarehouseTransfer[]      @relation("TransferRequestedBy")
   assignedReplenishmentTasks   ReplenishmentTask[]      @relation("ReplenAssignedTo")
+  assignedYardMoves            YardMove[]               @relation("YardMoveAssignee")
   voiceSessions                VoiceSession[]
   securityProfile              SecurityProfile?
   securityLogs                 SecurityLog[]
@@ -175,6 +176,7 @@ model Organization {
   taskAutomations            TaskAutomation[]
   taskExecutions             TaskExecution[]
   waves                      WavePick[]
+  yardMoves                  YardMove[]
   waveAutomationRules        WaveAutomationRule[]
   waveAutomationExecutions   WaveAutomationExecution[]
   wavePickLines              WavePickLine[]
@@ -3657,6 +3659,8 @@ model YardLocation {
   createdAt      DateTime          @default(now())
   updatedAt      DateTime          @updatedAt
   appointments   DockAppointment[]
+  movesFrom      YardMove[]        @relation("MovesFrom")
+  movesTo        YardMove[]        @relation("MovesTo")
   organization   Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   @@unique([organizationId, locationCode])
@@ -3705,6 +3709,7 @@ model DockAppointment {
   organization      Organization        @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   yardLocation      YardLocation?       @relation(fields: [yardLocationId], references: [id])
   gateEntries       GateEntry[]
+  yardMoves         YardMove[]
 
   @@unique([organizationId, appointmentNumber])
   @@index([organizationId])
@@ -9900,4 +9905,44 @@ model ContainerItem {
   @@index([salesOrderId])
   @@index([inventoryItemId])
   @@map("container_items")
+}
+
+model YardMove {
+  id             String         @id @default(cuid())
+  organizationId String
+  warehouseId    String
+  trailerNumber  String
+  fromLocationId String
+  toLocationId   String
+  appointmentId  String?
+  status         YardMoveStatus @default(PENDING)
+  priority       Int            @default(1)
+  assignedToId   String?       // Yard jockey user ID
+  completedBy    String?
+  completedAt    DateTime?
+  startedAt      DateTime?
+  notes          String?
+  metadata       Json?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  fromLocation   YardLocation    @relation("MovesFrom", fields: [fromLocationId], references: [id])
+  toLocation     YardLocation    @relation("MovesTo", fields: [toLocationId], references: [id])
+  appointment    DockAppointment? @relation(fields: [appointmentId], references: [id])
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  assignedTo     User?           @relation("YardMoveAssignee", fields: [assignedToId], references: [id])
+  
+  @@index([organizationId])
+  @@index([warehouseId])
+  @@index([status])
+  @@index([assignedToId])
+  @@map("yard_moves")
+}
+
+enum YardMoveStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }

@@ -6,7 +6,8 @@ import { authOptions } from "@/lib/auth";
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.organizationId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const orgId = session.user.organizationId;
     const body = await request.json();
     const { productIds } = body;
@@ -16,7 +17,10 @@ export async function POST(request: Request) {
     if (productIds?.length) where.id = { in: productIds };
 
     const items = await prisma.inventoryItem.findMany({
-      where: { ...where, quantity: { lte: prisma.inventoryItem.fields.reorderPoint } },
+      where: {
+        ...where,
+        quantity: { lte: prisma.inventoryItem.fields.reorderPoint },
+      },
       take: 50,
     });
 
@@ -36,6 +40,16 @@ export async function POST(request: Request) {
       ),
     );
 
-    return NextResponse.json({ success: true, decisionsCreated: decisions.length, decisions });
-  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+    return NextResponse.json({
+      success: true,
+      decisionsCreated: decisions.length,
+      decisions,
+    });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }

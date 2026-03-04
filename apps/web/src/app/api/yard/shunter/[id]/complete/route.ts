@@ -24,7 +24,10 @@ export async function POST(
     });
 
     if (!appointment) {
-      return NextResponse.json({ error: "Shunter task not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Shunter task not found" },
+        { status: 404 },
+      );
     }
 
     const updated = await prisma.dockAppointment.update({
@@ -46,6 +49,9 @@ export async function POST(
     });
   } catch (error) {
     console.error("Error completing shunter task:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

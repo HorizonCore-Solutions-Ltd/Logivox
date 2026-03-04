@@ -40,10 +40,10 @@ export default function CrossDockingPage() {
     },
     {
       icon: RefreshCw,
-      title: "Opportunistic Matching",
+      title: "The Inbound Brain",
       description:
-        "Real-time AI matching of received goods to open orders. Identify cross-dock opportunities on the fly.",
-      metrics: "85% match rate",
+        "Our AI engine scans every receipt against live backorders. Instantly flags critical stock for cross-docking vs. putaway.",
+      metrics: "Zero-latency decisions",
     },
     {
       icon: MapPin,
@@ -82,7 +82,7 @@ export default function CrossDockingPage() {
         "ASN pre-advice processing",
         "Dock appointment scheduling",
         "Real-time receiving",
-        "Automatic quality checks",
+        "Smart QC & Risk Triggers",
         "Lot/serial tracking",
         "Exception handling",
       ],

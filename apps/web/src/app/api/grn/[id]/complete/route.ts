@@ -68,6 +68,52 @@ export async function POST(
     const result = await prisma.$transaction(async (tx: any) => {
       // Update inventory quantities for each item
       for (const item of grn.items) {
+        // 1. Create or Update Lot
+        // Use the binLocation from the GRN item (set by Brain or User)
+        const lotNumber =
+          item.batchNumber || `LOT-${grn.grnNumber}-${item.id.slice(-4)}`;
+        
+        // Check if we already have this lot in this location to merge
+        // Note: For strict traceability, we might want new Lots every time, 
+        // but for efficiency, we merge if batch/loc matches.
+        let existingLot = await tx.lot.findFirst({
+          where: {
+            organizationId,
+            inventoryId: item.inventoryItemId,
+            lotNumber: lotNumber,
+            locationId: item.binLocation,
+          },
+        });
+
+        if (existingLot) {
+          await tx.lot.update({
+            where: { id: existingLot.id },
+            data: {
+              currentQuantity: { increment: item.acceptedQuantity },
+              // We don't increment initialQuantity usually for merging, but context depends
+            },
+          });
+        } else {
+          // Create new Lot
+          await tx.lot.create({
+            data: {
+              organizationId,
+              inventoryId: item.inventoryItemId,
+              lotNumber: lotNumber,
+              initialQuantity: item.acceptedQuantity,
+              currentQuantity: item.acceptedQuantity,
+              receivedDate: new Date(),
+              // Use the location decided during receipt
+              locationId: item.binLocation, 
+              grnId: grn.id,
+              status: "AVAILABLE", // Default to available unless QC
+              qcStatus: (item.qcStatus as any) || "PENDING",
+              expiryDate: item.expiryDate,
+            },
+          });
+        }
+
+        // 2. Update Aggregated Inventory Item
         // Add accepted quantity to inventory
         await tx.inventoryItem.update({
           where: { id: item.inventoryItemId },

@@ -34,17 +34,20 @@ export async function GET(request: Request) {
         description: m.description,
         category: m.category,
         currentValue: Number(m.currentValue),
-        previousValue: m.previousValue !== null ? Number(m.previousValue) : null,
+        previousValue:
+          m.previousValue !== null ? Number(m.previousValue) : null,
         targetValue: m.targetValue !== null ? Number(m.targetValue) : null,
         unit: m.unit,
         changeAmount: m.changeAmount !== null ? Number(m.changeAmount) : null,
-        changePercent: m.changePercent !== null ? Number(m.changePercent) : null,
+        changePercent:
+          m.changePercent !== null ? Number(m.changePercent) : null,
         trend: m.trend,
         periodType: m.periodType,
         periodStart: m.periodStart.toISOString(),
         periodEnd: m.periodEnd.toISOString(),
         status: m.status,
-        alertThreshold: m.alertThreshold !== null ? Number(m.alertThreshold) : null,
+        alertThreshold:
+          m.alertThreshold !== null ? Number(m.alertThreshold) : null,
         displayOrder: m.displayOrder,
         isVisible: m.isVisible,
         icon: m.icon,
@@ -55,7 +58,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching KPI metrics:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -89,7 +95,10 @@ export async function POST(request: Request) {
 
     if (!metricCode || !metricName || !category || currentValue === undefined) {
       return NextResponse.json(
-        { error: "metricCode, metricName, category, and currentValue are required" },
+        {
+          error:
+            "metricCode, metricName, category, and currentValue are required",
+        },
         { status: 400 },
       );
     }
@@ -119,6 +128,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, metric }, { status: 201 });
   } catch (error) {
     console.error("Error creating KPI metric:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

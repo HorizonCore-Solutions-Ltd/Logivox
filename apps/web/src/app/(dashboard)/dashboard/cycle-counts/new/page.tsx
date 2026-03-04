@@ -20,7 +20,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowLeft, Save, Loader2, Calendar as CalendarIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  Loader2,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -40,25 +45,31 @@ export default function NewCycleCountPage() {
   });
 
   // Mock data for dropdowns
-  const [locations, setLocations] = useState<{id: string, name: string}[]>([]);
-  const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
-  const [employees, setEmployees] = useState<{id: string, name: string}[]>([]);
+  const [locations, setLocations] = useState<{ id: string; name: string }[]>(
+    [],
+  );
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>(
+    [],
+  );
+  const [employees, setEmployees] = useState<{ id: string; name: string }[]>(
+    [],
+  );
 
   useEffect(() => {
     // In a real app, fetch these from APIs
     setLocations([
-        { id: "loc-1", name: "Zone A - High Velocity" },
-        { id: "loc-2", name: "Zone B - Bulk Storage" },
-        { id: "loc-3", name: "Zone C - Cold Chain" },
+      { id: "loc-1", name: "Zone A - High Velocity" },
+      { id: "loc-2", name: "Zone B - Bulk Storage" },
+      { id: "loc-3", name: "Zone C - Cold Chain" },
     ]);
     setCategories([
-        { id: "cat-1", name: "Electronics" },
-        { id: "cat-2", name: "Apparel" },
-        { id: "cat-3", name: "Perishables" },
+      { id: "cat-1", name: "Electronics" },
+      { id: "cat-2", name: "Apparel" },
+      { id: "cat-3", name: "Perishables" },
     ]);
     setEmployees([
-        { id: "emp-1", name: "John Doe" },
-        { id: "emp-2", name: "Jane Smith" },
+      { id: "emp-1", name: "John Doe" },
+      { id: "emp-2", name: "Jane Smith" },
     ]);
   }, []);
 
@@ -109,23 +120,28 @@ export default function NewCycleCountPage() {
       <Card>
         <CardHeader>
           <CardTitle>Count Configuration</CardTitle>
-          <CardDescription>Define the scope and assignment for this count.</CardDescription>
+          <CardDescription>
+            Define the scope and assignment for this count.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
               <div className="space-y-2">
                 <Label>Count Type</Label>
-                <Select 
-                    value={formData.type} 
-                    onValueChange={(v) => setFormData({...formData, type: v})}
+                <Select
+                  value={formData.type}
+                  onValueChange={(v) => setFormData({ ...formData, type: v })}
                 >
-                  <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ADHOC">Ad-Hoc (Immediate)</SelectItem>
                     <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-                    <SelectItem value="SPOT">Spot Check (Specific Location)</SelectItem>
+                    <SelectItem value="SPOT">
+                      Spot Check (Specific Location)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -133,82 +149,121 @@ export default function NewCycleCountPage() {
               <div className="space-y-2">
                 <Label>Scheduled Date</Label>
                 <div className="relative">
-                    <Input 
-                        type="date"
-                        value={formData.scheduledDate}
-                        onChange={(e) => setFormData({...formData, scheduledDate: e.target.value})}
-                    />
+                  <Input
+                    type="date"
+                    value={formData.scheduledDate}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        scheduledDate: e.target.value,
+                      })
+                    }
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label>Category Filter</Label>
-                <Select 
-                    value={formData.categoryId}
-                    onValueChange={(v) => setFormData({...formData, categoryId: v})}
+                <Select
+                  value={formData.categoryId}
+                  onValueChange={(v) =>
+                    setFormData({ ...formData, categoryId: v })
+                  }
                 >
-                    <SelectTrigger><SelectValue placeholder="All Categories" /></SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="ALL">All Categories</SelectItem>
-                        {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                    </SelectContent>
+                  <SelectTrigger>
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">All Categories</SelectItem>
+                    {categories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
                 <Label>Location / Zone</Label>
-                <Select 
-                     value={formData.locationId}
-                     onValueChange={(v) => setFormData({...formData, locationId: v})}
+                <Select
+                  value={formData.locationId}
+                  onValueChange={(v) =>
+                    setFormData({ ...formData, locationId: v })
+                  }
                 >
-                    <SelectTrigger><SelectValue placeholder="Select location (Optional)" /></SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="_NONE_">Entire Warehouse</SelectItem>
-                        {locations.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}
-                    </SelectContent>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select location (Optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_NONE_">Entire Warehouse</SelectItem>
+                    {locations.map((l) => (
+                      <SelectItem key={l.id} value={l.id}>
+                        {l.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
 
-             <div className="space-y-2">
+              <div className="space-y-2">
                 <Label>Assign To</Label>
-                <Select 
-                     value={formData.assigneeId}
-                     onValueChange={(v) => setFormData({...formData, assigneeId: v})}
+                <Select
+                  value={formData.assigneeId}
+                  onValueChange={(v) =>
+                    setFormData({ ...formData, assigneeId: v })
+                  }
                 >
-                    <SelectTrigger><SelectValue placeholder="Unassigned" /></SelectTrigger>
-                    <SelectContent>
-                        {employees.map(e => <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>)}
-                    </SelectContent>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Unassigned" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((e) => (
+                      <SelectItem key={e.id} value={e.id}>
+                        {e.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div className="flex items-center space-x-2">
-                <Checkbox 
-                    id="includeZero" 
-                    checked={formData.includeZeroQty}
-                    onCheckedChange={(c) => setFormData({...formData, includeZeroQty: c === true})}
-                />
-                <Label htmlFor="includeZero" className="cursor-pointer">
-                    Include products with zero system quantity?
-                </Label>
+              <Checkbox
+                id="includeZero"
+                checked={formData.includeZeroQty}
+                onCheckedChange={(c) =>
+                  setFormData({ ...formData, includeZeroQty: c === true })
+                }
+              />
+              <Label htmlFor="includeZero" className="cursor-pointer">
+                Include products with zero system quantity?
+              </Label>
             </div>
 
             <div className="space-y-2">
-                <Label>Notes / Instructions</Label>
-                <Textarea 
-                    placeholder="Special instructions for counters..." 
-                    value={formData.notes}
-                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
-                />
+              <Label>Notes / Instructions</Label>
+              <Textarea
+                placeholder="Special instructions for counters..."
+                value={formData.notes}
+                onChange={(e) =>
+                  setFormData({ ...formData, notes: e.target.value })
+                }
+              />
             </div>
 
             <div className="flex justify-end gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={() => router.back()}>Cancel</Button>
-                <Button type="submit" disabled={loading}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Create Count Session
-                </Button>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => router.back()}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Count Session
+              </Button>
             </div>
           </form>
         </CardContent>

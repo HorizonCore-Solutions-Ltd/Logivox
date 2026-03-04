@@ -15,7 +15,10 @@ export async function GET(request: Request) {
     const direction = searchParams.get("direction"); // INBOUND | OUTBOUND | null
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000); // last 24 hrs
 
-    const where: Record<string, unknown> = { organizationId: orgId, entryTime: { gte: since } };
+    const where: Record<string, unknown> = {
+      organizationId: orgId,
+      entryTime: { gte: since },
+    };
     if (direction) where.direction = direction;
 
     const [entries, dirSummary, onSiteCount, pendingCount] = await Promise.all([
@@ -42,20 +45,26 @@ export async function GET(request: Request) {
       }),
       // On site = checked in but not checked out
       prisma.gateEntry.count({
-        where: { organizationId: orgId, status: { in: ["CHECKED_IN", "PROCESSING", "APPROVED"] }, exitTime: null },
+        where: {
+          organizationId: orgId,
+          status: { in: ["CHECKED_IN", "PROCESSING", "APPROVED"] },
+          exitTime: null,
+        },
       }),
       // Pending = appointments today that haven't checked in yet
       prisma.dockAppointment.count({
         where: {
           organizationId: orgId,
           status: "SCHEDULED",
-          scheduledDate: { gte: new Date(new Date().setHours(0,0,0,0)) },
+          scheduledDate: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
         },
       }),
     ]);
 
-    const inboundToday = dirSummary.find((s) => s.direction === "INBOUND")?._count.id ?? 0;
-    const outboundToday = dirSummary.find((s) => s.direction === "OUTBOUND")?._count.id ?? 0;
+    const inboundToday =
+      dirSummary.find((s) => s.direction === "INBOUND")?._count.id ?? 0;
+    const outboundToday =
+      dirSummary.find((s) => s.direction === "OUTBOUND")?._count.id ?? 0;
 
     return NextResponse.json({
       summary: {
@@ -65,7 +74,8 @@ export async function GET(request: Request) {
         pendingCheckIn: pendingCount,
         totalToday: inboundToday + outboundToday,
         securityChecksPass: entries.filter((e) => e.securityCheckPassed).length,
-        securityChecksFail: entries.filter((e) => !e.securityCheckPassed).length,
+        securityChecksFail: entries.filter((e) => !e.securityCheckPassed)
+          .length,
       },
       entries: entries.map((e) => ({
         id: e.id,
@@ -90,7 +100,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching gate log:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -186,6 +199,9 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Error creating gate entry:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

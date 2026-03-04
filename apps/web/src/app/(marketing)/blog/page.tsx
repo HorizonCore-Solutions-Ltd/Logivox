@@ -48,6 +48,18 @@ export default function BlogPage() {
 
   const blogPosts = [
     {
+      slug: "introducing-inbound-brain-ai",
+      title: "Meet the Inbound Brain: Zero-Touch Receiving Decisions",
+      excerpt:
+        "Warehouse receiving has always been a bottleneck. We've built an AI engine that makes every decision instantly—from urgent cross-docks to risk-based quality checks.",
+      author: "Engineering Team",
+      date: "2026-10-15",
+      readTime: "5 min read",
+      category: "Product Updates",
+      trending: true,
+      featured: true,
+    },
+    {
       slug: "autonomous-replenishment-ai-iot-robotics",
       title:
         "Autonomous Replenishment 2.0: How AI, IoT, and Robotics Eliminated Stockouts",

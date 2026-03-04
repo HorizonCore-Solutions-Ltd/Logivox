@@ -133,18 +133,22 @@ async function createSecurityAuditLog(
     // Use standard ActivityLog table since securityAuditLog doesn't exist in schema
     await prisma.activityLog.create({
       data: {
-        action: request.method === 'POST' ? 'INVENTORY_CREATE' : auditData.action,
+        action:
+          request.method === "POST" ? "INVENTORY_CREATE" : auditData.action,
         userId: auditData.userId,
         // map metadata to details or description as feasible
-        description: `Action: ${auditData.action}, Result: ${auditData.result}`, 
+        description: `Action: ${auditData.action}, Result: ${auditData.result}`,
         ipAddress: auditData.ip,
         userAgent: auditData.userAgent,
-        organizationId: typeof data?.organizationId === 'string' ? data.organizationId : undefined,
+        organizationId:
+          typeof data?.organizationId === "string"
+            ? data.organizationId
+            : undefined,
         // entityId and entityType would be nice if we had the resulting item ID, but this log happens inside an error block sometimes too?
         // Wait, duplicate logging? let's keep it simple and safe.
         // We will default entityType to SYSTEM or INVENTORY
-        entityType: 'INVENTORY_SYSTEM',
-        entityId: 'SYSTEM',
+        entityType: "INVENTORY_SYSTEM",
+        entityId: "SYSTEM",
       },
     });
   } catch (error) {

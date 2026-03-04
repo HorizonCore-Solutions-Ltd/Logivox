@@ -57,7 +57,7 @@ import {
   GitMerge,
   MapPin,
   HelpCircle,
-  FileInput, 
+  FileInput,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { OrganizationSwitcher } from "@/components/organizations/organization-switcher";
@@ -114,7 +114,11 @@ export function DashboardSidebar({ children }: DashboardSidebarProps) {
       icon: Package,
       subItems: [
         { name: "All Items", href: "/dashboard/inventory", icon: Package },
-        { name: "Import Data", href: "/dashboard/inventory/import", icon: FileInput },
+        {
+          name: "Import Data",
+          href: "/dashboard/inventory/import",
+          icon: FileInput,
+        },
         { name: "Warehouses", href: "/dashboard/warehouses", icon: Warehouse },
         { name: "Categories", href: "/dashboard/categories", icon: FolderTree },
         {

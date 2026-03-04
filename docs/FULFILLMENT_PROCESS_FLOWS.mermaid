@@ -1,0 +1,61 @@
+graph TD
+    %% REPLENISHMENT MODULE
+    subgraph Replenishment_Logic
+        R_Start[Stock Low Trigger] --> R_Check[Check Governance Mode]
+        
+        R_Check -- Admin Mode --> R_Queue[Queue 'Replen Request']
+        R_Queue --> R_Approve[Admin Approves]
+        R_Approve --> R_Task[Create Task]
+        
+        R_Check -- Autonomous --> R_Pred[Predictive Analysis]
+        R_Pred -- Urgent --> R_Task
+        R_Pred -- Forecast --> R_Task
+        
+        R_Task --> R_Interleave{Driver Nearby?}
+        R_Interleave -- Yes --> R_Assign[Assign to Active Driver]
+        R_Interleave -- No --> R_Pool[Add to General Job Pool]
+        
+        R_Assign --> R_Exec[Driver Executes]
+        R_Exec --> R_Update[Update Inventory]
+    end
+
+    %% RETURNS MODULE
+    subgraph Returns_Intake
+        Ret_Start[Scan Item/RMA] --> Ret_Grade{Grade Item}
+        
+        Ret_Grade -- A: New --> Ret_Restock[Route: Restock/Putwall]
+        Ret_Grade -- B: Open Box --> Ret_Discount[Route: Discount Bin]
+        Ret_Grade -- C: Damaged --> Ret_Refurb{Refurb Viable?}
+        Ret_Grade -- D: Scrap --> Ret_Recycle[Route: Recycle]
+        
+        Ret_Refurb -- Yes --> Ret_Repair[Create Repair Task]
+        Ret_Refurb -- No --> Ret_RTV[Route: Return to Vendor]
+        
+        Ret_Restock --> Ret_Credit[Trigger Credit API]
+        Ret_Discount --> Ret_Credit
+        Ret_RTV --> Ret_Credit_Vendor[Request Vendor Credit]
+    end
+
+    %% ORDER RELEASE
+    subgraph Order_Release
+        O_In[Order Received] --> O_Classify[Classify: VIP/Standard/Hazmat]
+        O_Classify --> O_Inv{Inventory Check}
+        
+        O_Inv -- Full --> O_Mode{Governance Mode}
+        O_Inv -- Partial --> O_Cut{Rule: Cut or Hold?}
+        
+        O_Cut -- Cut --> O_Split[Split Order]
+        O_Split --> O_Mode
+        O_Cut -- Hold --> O_Wait[Wait for Stock]
+        
+        O_Mode -- Admin Mode --> O_Wave[Add to Wave Pool]
+        O_Wave --> O_ManRel[Manual Release]
+        
+        O_Mode -- Autonomous --> O_Waveless[Waveless Queue]
+        O_Waveless --> O_Slot{Picker Slot Available?}
+        O_Slot -- Yes --> O_Inject[Inject into Cluster]
+        O_Slot -- No --> O_Priority[Prioritize in Queue]
+        
+        O_ManRel --> O_Task[Create Pick Tasks]
+        O_Inject --> O_Task
+    end

@@ -36,6 +36,7 @@ import {
   Briefcase,
   Gift,
   RefreshCw,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -67,6 +68,12 @@ export function Navigation() {
       description: "Complete WMS with real-time inventory control",
       icon: Warehouse,
       href: "/solutions/warehouse-management",
+    },
+    {
+      title: "AI Slotting Optimization",
+      description: "Smart inventory placement based on velocity",
+      icon: LayoutGrid,
+      href: "/solutions/slotting-optimization",
     },
     {
       title: "Voice-Enabled Operations",

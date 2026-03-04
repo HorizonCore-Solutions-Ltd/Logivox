@@ -114,7 +114,9 @@ export default function NewQCInspectionPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="INBOUND">Inbound (GRN)</SelectItem>
-                    <SelectItem value="FAI">First Article Inspection</SelectItem>
+                    <SelectItem value="FAI">
+                      First Article Inspection
+                    </SelectItem>
                     <SelectItem value="RANDOM">Random Sampling</SelectItem>
                     <SelectItem value="RETURN">Return (RMA)</SelectItem>
                   </SelectContent>
@@ -153,9 +155,15 @@ export default function NewQCInspectionPage() {
                     <SelectValue placeholder="Select reference" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="PURCHASE_ORDER">Purchase Order</SelectItem>
-                    <SelectItem value="HELD_ITEM">Held Inventory Item</SelectItem>
-                    <SelectItem value="PRODUCTION_ORDER">Production Order</SelectItem>
+                    <SelectItem value="PURCHASE_ORDER">
+                      Purchase Order
+                    </SelectItem>
+                    <SelectItem value="HELD_ITEM">
+                      Held Inventory Item
+                    </SelectItem>
+                    <SelectItem value="PRODUCTION_ORDER">
+                      Production Order
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>

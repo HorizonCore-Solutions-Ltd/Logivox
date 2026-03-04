@@ -9,14 +9,28 @@ export async function POST(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.organizationId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const orgId = session.user.organizationId;
-    const existing = await prisma.vendorDebitMemo.findFirst({ where: { id: params.id, organizationId: orgId } });
-    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const existing = await prisma.vendorDebitMemo.findFirst({
+      where: { id: params.id, organizationId: orgId },
+    });
+    if (!existing)
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     const memo = await prisma.vendorDebitMemo.update({
       where: { id: params.id },
-      data: { status: "APPROVED", approvedAt: new Date(), approvedBy: session.user.name ?? session.user.email ?? "unknown" },
+      data: {
+        status: "APPROVED",
+        approvedAt: new Date(),
+        approvedBy: session.user.name ?? session.user.email ?? "unknown",
+      },
     });
     return NextResponse.json({ success: true, memo });
-  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }

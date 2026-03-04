@@ -6,7 +6,8 @@ import { authOptions } from "@/lib/auth";
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.organizationId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const orgId = session.user.organizationId;
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -23,17 +24,28 @@ export async function GET(request: Request) {
       prisma.goodsReceiptNote.count({ where }),
     ]);
     return NextResponse.json({ grns, total });
-  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.organizationId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const orgId = session.user.organizationId;
     const body = await request.json();
     const { purchaseOrderId, warehouseId, items, ...rest } = body;
-    if (!purchaseOrderId) return NextResponse.json({ error: "purchaseOrderId is required" }, { status: 400 });
+    if (!purchaseOrderId)
+      return NextResponse.json(
+        { error: "purchaseOrderId is required" },
+        { status: 400 },
+      );
     const grnNumber = `GRN-${Date.now()}`;
     const grn = await prisma.goodsReceiptNote.create({
       data: {
@@ -48,5 +60,11 @@ export async function POST(request: Request) {
       include: { items: true },
     });
     return NextResponse.json({ success: true, grn }, { status: 201 });
-  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }

@@ -18,7 +18,10 @@ export async function GET(req: NextRequest) {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 7);
     const dateFilter = date
-      ? { gte: new Date(date), lt: new Date(new Date(date).getTime() + 86_400_000) }
+      ? {
+          gte: new Date(date),
+          lt: new Date(new Date(date).getTime() + 86_400_000),
+        }
       : { gte: cutoff };
 
     const routes = await prisma.deliveryRoute.findMany({
@@ -29,7 +32,11 @@ export async function GET(req: NextRequest) {
     });
 
     // Map DB status PLANNED → SCHEDULED so the delivery page UI matches
-    const statusMap: Record<string, string> = { PLANNED: "SCHEDULED", OPTIMIZED: "SCHEDULED", ASSIGNED: "SCHEDULED" };
+    const statusMap: Record<string, string> = {
+      PLANNED: "SCHEDULED",
+      OPTIMIZED: "SCHEDULED",
+      ASSIGNED: "SCHEDULED",
+    };
 
     const runs = routes.map((r) => ({
       id: r.id,
@@ -38,7 +45,8 @@ export async function GET(req: NextRequest) {
       driverName: r.driverName,
       vehicleRegistration: r.vehicleId,
       totalStops: r.stops.length,
-      completedStops: r.stops.filter((s) => s.deliveryStatus === "DELIVERED").length,
+      completedStops: r.stops.filter((s) => s.deliveryStatus === "DELIVERED")
+        .length,
       status: statusMap[r.status] ?? r.status,
       startTime: r.startTime?.toISOString(),
       endTime: r.endTime?.toISOString(),
@@ -50,6 +58,9 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ routes: runs, total: runs.length });
   } catch (error) {
     console.error("GET /api/delivery/runs error:", error);
-    return NextResponse.json({ error: "Failed to fetch delivery runs" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch delivery runs" },
+      { status: 500 },
+    );
   }
 }

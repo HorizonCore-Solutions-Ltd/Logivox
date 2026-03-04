@@ -9,7 +9,8 @@ export async function GET(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.organizationId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const orgId = session.user.organizationId;
     const rtv = await prisma.rTV.findFirst({
       where: { id: params.id, organizationId: orgId },
@@ -17,7 +18,13 @@ export async function GET(
     });
     if (!rtv) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ rtv });
-  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function PATCH(
@@ -26,12 +33,25 @@ export async function PATCH(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.organizationId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const orgId = session.user.organizationId;
-    const existing = await prisma.rTV.findFirst({ where: { id: params.id, organizationId: orgId } });
-    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    const existing = await prisma.rTV.findFirst({
+      where: { id: params.id, organizationId: orgId },
+    });
+    if (!existing)
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
     const body = await request.json();
-    const rtv = await prisma.rTV.update({ where: { id: params.id }, data: body });
+    const rtv = await prisma.rTV.update({
+      where: { id: params.id },
+      data: body,
+    });
     return NextResponse.json({ success: true, rtv });
-  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }

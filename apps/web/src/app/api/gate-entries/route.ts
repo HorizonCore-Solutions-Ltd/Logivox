@@ -38,8 +38,10 @@ export async function GET(request: Request) {
     const todayEntries = entries.filter((e) => e.entryTime >= today);
     const stats = {
       totalToday: todayEntries.length,
-      inboundToday: todayEntries.filter((e) => e.direction === "INBOUND").length,
-      outboundToday: todayEntries.filter((e) => e.direction === "OUTBOUND").length,
+      inboundToday: todayEntries.filter((e) => e.direction === "INBOUND")
+        .length,
+      outboundToday: todayEntries.filter((e) => e.direction === "OUTBOUND")
+        .length,
       onSite: entries.filter(
         (e) =>
           e.status === "CHECKED_IN" ||
@@ -72,7 +74,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching gate entries:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -111,7 +116,9 @@ export async function POST(request: Request) {
     }
 
     // Generate sequential entry number
-    const count = await prisma.gateEntry.count({ where: { organizationId: orgId } });
+    const count = await prisma.gateEntry.count({
+      where: { organizationId: orgId },
+    });
     const entryNumber = `GE-${String(count + 1).padStart(5, "0")}`;
 
     const entry = await prisma.gateEntry.create({
@@ -141,6 +148,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, entry }, { status: 201 });
   } catch (error) {
     console.error("Error creating gate entry:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

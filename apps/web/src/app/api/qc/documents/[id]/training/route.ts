@@ -9,14 +9,27 @@ export async function GET(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.organizationId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.organizationId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const orgId = session.user.organizationId;
-    const doc = await prisma.document.findFirst({ where: { id: params.id, organizationId: orgId } });
+    const doc = await prisma.document.findFirst({
+      where: { id: params.id, organizationId: orgId },
+    });
     if (!doc) return NextResponse.json({ error: "Not found" }, { status: 404 });
     const acknowledgments = await prisma.trainingAcknowledgment.findMany({
       where: { documentId: params.id },
       orderBy: { acknowledgedAt: "desc" },
     });
-    return NextResponse.json({ documentId: params.id, acknowledgments, total: acknowledgments.length });
-  } catch (e) { console.error(e); return NextResponse.json({ error: "Internal server error" }, { status: 500 }); }
+    return NextResponse.json({
+      documentId: params.id,
+      acknowledgments,
+      total: acknowledgments.length,
+    });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }

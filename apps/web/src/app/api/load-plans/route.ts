@@ -51,7 +51,8 @@ export async function GET(request: Request) {
         totalVolume: p.totalVolume,
         totalPallets: p.totalPallets,
         utilization: p.utilization,
-        estimatedCost: p.estimatedCost !== null ? Number(p.estimatedCost) : null,
+        estimatedCost:
+          p.estimatedCost !== null ? Number(p.estimatedCost) : null,
         actualCost: p.actualCost !== null ? Number(p.actualCost) : null,
         approvedBy: p.approvedBy,
         itemCount: p.items.length,
@@ -72,7 +73,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching load plans:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -102,7 +106,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const count = await prisma.loadPlan.count({ where: { organizationId: orgId } });
+    const count = await prisma.loadPlan.count({
+      where: { organizationId: orgId },
+    });
     const planNumber = `LP-${String(count + 1).padStart(5, "0")}`;
 
     const plan = await prisma.loadPlan.create({
@@ -123,6 +129,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, plan }, { status: 201 });
   } catch (error) {
     console.error("Error creating load plan:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

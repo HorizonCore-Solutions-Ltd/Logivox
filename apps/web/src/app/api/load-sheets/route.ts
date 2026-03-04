@@ -82,7 +82,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching load sheets:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -114,7 +117,9 @@ export async function POST(request: Request) {
       );
     }
 
-    const count = await prisma.loadSheet.count({ where: { organizationId: orgId } });
+    const count = await prisma.loadSheet.count({
+      where: { organizationId: orgId },
+    });
     const loadSheetNumber = `LS-${String(count + 1).padStart(5, "0")}`;
 
     const sheet = await prisma.loadSheet.create({
@@ -137,6 +142,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, sheet }, { status: 201 });
   } catch (error) {
     console.error("Error creating load sheet:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

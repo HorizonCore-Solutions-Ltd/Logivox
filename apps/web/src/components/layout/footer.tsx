@@ -41,6 +41,8 @@ export function Footer() {
           name: "Warehouse Management",
           href: "/solutions/warehouse-management",
         },
+        { name: "Inbound & Inventory", href: "/solutions/inbound-inventory" },
+        { name: "Slotting Optimization", href: "/solutions/slotting-optimization" },
         { name: "Voice Operations", href: "/solutions/voice-operations" },
         { name: "Inventory Tracking", href: "/solutions/inventory" },
         { name: "Order Fulfillment", href: "/solutions/fulfillment" },

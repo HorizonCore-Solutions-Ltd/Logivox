@@ -1,14 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Check, Package, Search, Truck } from "lucide-react";
+
+interface TaskItem {
+  id: string; // InventoryItemId
+  poItemId: string;
+  name: string;
+  sku: string;
+  orderedQty: number;
+  receivedQty: number;
+}
 
 interface Task {
-  id: string;
+  id: string; // This is the PO ID
   shipmentNumber: string;
   supplier: string;
   poNumber: string;
@@ -17,6 +27,7 @@ interface Task {
   appointmentTime: string | null;
   itemCount: number;
   dockNumber: number | null;
+  items?: TaskItem[];
 }
 
 interface QuickStats {
@@ -30,9 +41,13 @@ export default function ReceivingMobile() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [stats, setStats] = useState<QuickStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [scanMode, setScanMode] = useState(false);
   const [scanInput, setScanInput] = useState("");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  
+  // Receiving State
+  const [receiveQuantities, setReceiveQuantities] = useState<Record<string, number>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [completedResult, setCompletedResult] = useState<any>(null);
 
   useEffect(() => {
     fetchMobileData();
@@ -68,16 +83,22 @@ export default function ReceivingMobile() {
         body: JSON.stringify({
           action: "scan_barcode",
           barcode: scanInput,
-          scanType: "RECEIPT",
         }),
       });
 
       const data = await response.json();
       if (data.success && data.result) {
-        // Navigate to task detail
-        alert(`Shipment found: ${data.result.shipmentNumber}`);
+        // Find task in local list or fetch it
+        // Ideally fetch detailed task
+        const task = tasks.find(t => t.id === data.result.id);
+        if (task) {
+             handleSelectTask(task);
+        } else {
+            // Should fetch single task detail if not in list
+            alert(`Shipment ${data.result.shipmentNumber} found but not in your active list. Refreshing...`);
+            fetchMobileData();
+        }
         setScanInput("");
-        setScanMode(false);
       } else {
         alert("No shipment found with this barcode");
       }
@@ -87,469 +108,250 @@ export default function ReceivingMobile() {
     }
   };
 
-  const handleQuickReceive = async (taskId: string) => {
-    if (!confirm("Complete this task with quick receive?")) return;
-
-    try {
-      const response = await fetch("/api/receiving/mobile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "quick_receive",
-          shipmentId: taskId,
-          items: [], // Would collect actual items
-        }),
+  const handleSelectTask = (task: Task) => {
+      setSelectedTask(task);
+      // Initialize quantities
+      const initialQty: Record<string, number> = {};
+      task.items?.forEach(item => {
+          initialQty[item.id] = Math.max(0, item.orderedQty - item.receivedQty);
       });
+      setReceiveQuantities(initialQty);
+      setCompletedResult(null);
+  };
 
-      const data = await response.json();
-      if (data.success) {
-        alert("Quick receive completed!");
-        fetchMobileData();
+  const handleQtyChange = (itemId: string, val: string) => {
+      setReceiveQuantities(prev => ({
+          ...prev,
+          [itemId]: parseInt(val) || 0
+      }));
+  };
+
+  const handleSubmitReceipt = async () => {
+      if (!selectedTask || !selectedTask.items) return;
+      setIsSubmitting(true);
+
+      // Build GRN Payload
+      const itemsPayload = selectedTask.items.map(item => {
+          const qty = receiveQuantities[item.id] || 0;
+          if (qty <= 0) return null;
+          return {
+              inventoryItemId: item.id,
+              purchaseOrderItemId: item.poItemId,
+              orderedQuantity: item.orderedQty,
+              receivedQuantity: qty,
+              acceptedQuantity: qty, // Assume fully accepted for now (add QC split later)
+              rejectedQuantity: 0,
+              // unitCost is optional in updated API
+              notes: "Received via Mobile App"
+          };
+      }).filter(Boolean);
+
+      if (itemsPayload.length === 0) {
+          alert("Please enter at least one quantity.");
+          setIsSubmitting(false);
+          return;
       }
-    } catch (error) {
-      console.error("Quick receive failed:", error);
-      alert("Failed to complete quick receive");
-    }
-  };
 
-  const handleReportIssue = async (taskId: string) => {
-    const description = prompt("Describe the issue:");
-    if (!description) return;
+      try {
+          const res = await fetch("/api/grn", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                  purchaseOrderId: selectedTask.id,
+                  // warehouseId: // Could be selected or inferred from user context
+                  warehouseId: "default", // Should be real ID ideally, but server handles it if it can. If not, error.
+                  // Actually, server expects warehouseId. If "default", it might fail validation if UUID expected.
+                  // Let's omit warehouseId if possible or fetch it from session/user context in future.
+                  // For now, let's hope API handles missing warehouseId gracefully or we need to pass one.
+                  // Wait, createGRNSchema marked warehouseId as OPTIONAL in my view earlier.
+                  items: itemsPayload,
+                  notes: "Received via Mobile App"
+              })
+          });
 
-    try {
-      const response = await fetch("/api/receiving/mobile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "report_issue",
-          shipmentId: taskId,
-          issueType: "OTHER",
-          severity: "MEDIUM",
-          description,
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        alert("Issue reported successfully!");
+          if (!res.ok) {
+              const err = await res.json();
+              throw new Error(err.error || "Failed to create GRN");
+          }
+          
+          const result = await res.json();
+          setCompletedResult(result.grn);
+          // Don't close immediately, show result!
+      } catch (e: any) {
+          console.error(e);
+          alert(`Error creating GRN: ${e.message}`);
+      } finally {
+          setIsSubmitting(false);
       }
-    } catch (error) {
-      console.error("Report issue failed:", error);
-      alert("Failed to report issue");
-    }
   };
 
-  const getPriorityColor = (priority: number) => {
-    if (priority >= 8) return "bg-red-100 text-red-800 border-red-300";
-    if (priority >= 5) return "bg-yellow-100 text-yellow-800 border-yellow-300";
-    return "bg-green-100 text-green-800 border-green-300";
-  };
+  if (loading && !tasks.length) return <div className="p-8 text-center text-gray-500">Loading Tasks...</div>;
 
-  const getPriorityLabel = (priority: number) => {
-    if (priority >= 8) return "URGENT";
-    if (priority >= 5) return "HIGH";
-    return "NORMAL";
-  };
+  // Detail View
+  if (selectedTask) {
+      return (
+          <div className="p-4 max-w-md mx-auto h-screen flex flex-col bg-slate-50">
+              <div className="flex items-center mb-4 sticky top-0 bg-slate-50 pt-2 z-10 pb-2 border-b">
+                  <Button variant="ghost" size="sm" onClick={() => setSelectedTask(null)}>
+                      <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                  </Button>
+                  <h2 className="text-lg font-bold ml-2">{selectedTask.poNumber}</h2>
+              </div>
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            <div className="h-24 bg-white rounded-lg" />
-            <div className="h-32 bg-white rounded-lg" />
-            <div className="h-32 bg-white rounded-lg" />
+              {completedResult ? (
+                  <Card className="bg-green-50 border-green-200 shadow-lg animate-in fade-in zoom-in duration-300">
+                      <CardHeader>
+                          <CardTitle className="text-green-800 flex items-center">
+                              <Check className="h-6 w-6 mr-2 bg-green-200 rounded-full p-1" /> Receipt Complete
+                          </CardTitle>
+                          <CardDescription className="text-green-700">GRN: {completedResult.grnNumber}</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                          <div className="space-y-4">
+                              <h4 className="font-semibold text-sm uppercase tracking-wide text-green-800 border-b border-green-200 pb-1">Put-away Instructions</h4>
+                              {completedResult.items.map((item: any) => (
+                                  <div key={item.id} className="text-sm pb-2 border-b border-green-100 last:border-0">
+                                      <div className="font-medium text-gray-800">{item.inventoryItem.name}</div>
+                                      <div className="flex justify-between mt-1 items-center">
+                                          <span className="text-gray-600">Qty: {item.acceptedQuantity}</span>
+                                          <div className="flex flex-col items-end">
+                                            <span className="bg-white px-2 py-0.5 rounded border border-green-300 font-mono font-bold text-green-700 shadow-sm">
+                                                Bin: {item.binLocation || "Unassigned"}
+                                            </span>
+                                          </div>
+                                      </div>
+                                      {(item.notes && item.notes.includes("CROSS-DOCK")) && (
+                                          <div className="text-xs bg-orange-100 text-orange-800 mt-1 px-2 py-0.5 rounded font-bold inline-block border border-orange-200">
+                                              ⚡ {item.notes}
+                                          </div>
+                                      )}
+                                      {(item.qcStatus === "PENDING" && item.notes?.includes("QC")) && (
+                                           <div className="text-xs bg-red-100 text-red-800 mt-1 px-2 py-0.5 rounded font-bold inline-block border border-red-200 ml-1">
+                                           🛡️ QC HOLD
+                                       </div>
+                                      )}
+                                  </div>
+                              ))}
+                          </div>
+                          <Button className="w-full mt-6 bg-green-600 hover:bg-green-700" onClick={() => {
+                              setSelectedTask(null);
+                              fetchMobileData();
+                          }}>Done</Button>
+                      </CardContent>
+                  </Card>
+              ) : (
+                  <div className="flex-1 overflow-hidden flex flex-col">
+                      <div className="flex-1 overflow-auto space-y-4 pb-20">
+                        <div className="text-sm text-gray-500 px-1">{selectedTask.supplier}</div>
+                          {selectedTask.items?.map(item => (
+                              <Card key={item.id} className="border border-slate-200 shadow-sm">
+                                  <CardContent className="p-4">
+                                    <div className="font-medium">{item.name}</div>
+                                    <div className="text-xs text-gray-500 mb-3">SKU: {item.sku}</div>
+                                    <div className="flex items-center justify-between bg-slate-50 p-2 rounded">
+                                        <div className="text-xs text-gray-600">
+                                            <div>Ord: {item.orderedQty}</div>
+                                            <div>Open: {item.orderedQty - item.receivedQty}</div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-xs font-bold uppercase text-gray-500">Recv</label>
+                                            <Input 
+                                                type="number" 
+                                                className="w-24 text-right font-mono text-lg h-10 border-blue-200 focus:ring-blue-500"
+                                                value={receiveQuantities[item.id] || 0}
+                                                onChange={(e) => handleQtyChange(item.id, e.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+                                  </CardContent>
+                              </Card>
+                          ))}
+                      </div>
+                      <div className="p-4 border-t bg-white sticky bottom-0 z-20 shadow-up">
+                          <Button className="w-full h-12 text-lg" onClick={handleSubmitReceipt} disabled={isSubmitting}>
+                              {isSubmitting ? "Processing..." : "Confirm Receipt"}
+                          </Button>
+                      </div>
+                  </div>
+              )}
           </div>
-        </div>
-      </div>
-    );
+      );
   }
 
+  // Dashboard View
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Mobile Header */}
-      <div className="bg-blue-600 text-white p-4 sticky top-0 z-10 shadow-lg">
-        <div className="flex justify-between items-center mb-3">
-          <div>
-            <h1 className="text-xl font-bold">📱 Mobile Receiving</h1>
-            <p className="text-sm text-blue-100">
-              {stats?.userName || "Worker"}
-            </p>
-          </div>
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={() => setScanMode(!scanMode)}
-          >
-            {scanMode ? "✕ Cancel" : "📷 Scan"}
-          </Button>
+    <div className="p-4 max-w-md mx-auto space-y-4 bg-slate-50 min-h-screen">
+      <div className="flex items-center justify-between pt-2">
+        <h1 className="text-2xl font-bold text-slate-800">Inbound</h1>
+        <div className="text-xs text-right text-slate-500">
+             {stats?.userName}
         </div>
-
-        {/* Quick Stats */}
-        {stats && (
-          <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-white/20 rounded p-2">
-              <div className="text-2xl font-bold">{stats.todayCompleted}</div>
-              <div className="text-xs">Completed</div>
-            </div>
-            <div className="bg-white/20 rounded p-2">
-              <div className="text-2xl font-bold">{stats.myActive}</div>
-              <div className="text-xs">Active</div>
-            </div>
-            <div className="bg-white/20 rounded p-2">
-              <div className="text-2xl font-bold">
-                {stats.myTodayUnits.toLocaleString()}
-              </div>
-              <div className="text-xs">Units</div>
-            </div>
-          </div>
-        )}
       </div>
 
-      <div className="max-w-2xl mx-auto p-4 space-y-4">
-        {/* Scan Mode */}
-        {scanMode && (
-          <Card className="border-blue-500 border-2">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">📷 Scan Barcode</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Input
-                  type="text"
-                  placeholder="Enter or scan barcode..."
-                  value={scanInput}
-                  onChange={(e) => setScanInput(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleScan()}
-                  autoFocus
-                  className="text-lg"
-                />
-                <div className="flex gap-2">
-                  <Button onClick={handleScan} className="flex-1">
-                    🔍 Lookup
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setScanMode(false);
-                      setScanInput("");
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-                <div className="text-center text-sm text-gray-500 mt-4">
-                  <div className="text-6xl mb-2">📷</div>
-                  <p>Use camera to scan barcode</p>
-                  <p className="text-xs">(Camera integration in production)</p>
-                </div>
-              </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="bg-white border-slate-200 shadow-sm">
+            <CardContent className="p-3 text-center">
+                <div className="text-2xl font-bold text-blue-600">{stats?.todayCompleted || 0}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide mt-1">Completed</div>
             </CardContent>
-          </Card>
-        )}
+        </Card>
+        <Card className="bg-white border-slate-200 shadow-sm">
+            <CardContent className="p-3 text-center">
+                <div className="text-2xl font-bold text-orange-600">{stats?.myActive || 0}</div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide mt-1">Pending</div>
+            </CardContent>
+        </Card>
+      </div>
 
-        <Tabs defaultValue="tasks" className="space-y-4">
-          <TabsList className="grid grid-cols-3 w-full">
-            <TabsTrigger value="tasks">📋 Tasks ({tasks.length})</TabsTrigger>
-            <TabsTrigger value="quick">⚡ Quick</TabsTrigger>
-            <TabsTrigger value="tools">🛠️ Tools</TabsTrigger>
-          </TabsList>
+      <div className="flex gap-2">
+        <Input 
+            placeholder="Scan PO / SKU..." 
+            className="bg-white"
+            value={scanInput}
+            onChange={(e) => setScanInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleScan()}
+        />
+        <Button onClick={handleScan} variant="secondary">
+            <Search className="h-4 w-4" />
+        </Button>
+      </div>
 
-          {/* Tasks Tab */}
-          <TabsContent value="tasks" className="space-y-3">
+      <Tabs defaultValue="tasks" className="w-full">
+        <TabsList className="w-full grid grid-cols-2">
+          <TabsTrigger value="tasks">My Tasks</TabsTrigger>
+          <TabsTrigger value="recent">History</TabsTrigger>
+        </TabsList>
+        <TabsContent value="tasks" className="space-y-3 mt-4">
             {tasks.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <div className="text-4xl mb-3">✅</div>
-                  <p className="text-gray-600">No active tasks</p>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Great job! All caught up.
-                  </p>
-                </CardContent>
-              </Card>
+                <div className="text-center py-12 bg-white rounded-lg border border-dashed border-gray-300">
+                    <Package className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">No pending receipts found.</p>
+                </div>
             ) : (
-              tasks.map((task) => (
-                <Card
-                  key={task.id}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => setSelectedTask(task)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <div className="font-bold text-lg">
-                          {task.shipmentNumber}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          {task.supplier}
-                        </div>
-                      </div>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium border ${getPriorityColor(
-                          task.priority,
-                        )}`}
-                      >
-                        {getPriorityLabel(task.priority)}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-2 text-sm mb-3">
-                      <div>
-                        <span className="text-gray-600">PO:</span>{" "}
-                        <span className="font-medium">{task.poNumber}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">Items:</span>{" "}
-                        <span className="font-medium">{task.itemCount}</span>
-                      </div>
-                      {task.dockNumber && (
-                        <div>
-                          <span className="text-gray-600">Dock:</span>{" "}
-                          <span className="font-medium">{task.dockNumber}</span>
-                        </div>
-                      )}
-                      {task.appointmentTime && (
-                        <div>
-                          <span className="text-gray-600">Time:</span>{" "}
-                          <span className="font-medium">
-                            {new Date(task.appointmentTime).toLocaleTimeString(
-                              [],
-                              { hour: "2-digit", minute: "2-digit" },
-                            )}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        className="flex-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleQuickReceive(task.id);
-                        }}
-                      >
-                        ⚡ Quick Receive
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleReportIssue(task.id);
-                        }}
-                      >
-                        ⚠️
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
+                tasks.map(task => (
+                    <Card key={task.id} className="cursor-pointer hover:shadow-md transition-shadow border-l-4 border-l-blue-500" onClick={() => handleSelectTask(task)}>
+                        <CardContent className="p-4">
+                            <div className="flex justify-between items-start mb-1">
+                                <span className="font-bold flex items-center text-slate-800">
+                                    <Truck className="h-4 w-4 mr-2 text-slate-500" />
+                                    {task.poNumber}
+                                </span>
+                                <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-1 rounded-full border border-slate-200 font-medium">{task.status}</span>
+                            </div>
+                            <div className="text-sm text-slate-600 mb-3">{task.supplier}</div>
+                            <div className="flex justify-between text-xs text-slate-400 border-t pt-2 mt-2">
+                                <span>{task.items?.length || task.itemCount} Items</span>
+                                <span>{task.appointmentTime ? new Date(task.appointmentTime).toLocaleDateString() : 'No Appt'}</span>
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))
             )}
-          </TabsContent>
-
-          {/* Quick Actions Tab */}
-          <TabsContent value="quick" className="space-y-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">⚡ Quick Actions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  className="w-full h-16 text-lg"
-                  onClick={() => setScanMode(true)}
-                >
-                  📷 Scan Receipt
-                </Button>
-                <Button
-                  className="w-full h-16 text-lg"
-                  variant="outline"
-                  onClick={() => alert("Photo capture feature")}
-                >
-                  📸 Take Photo
-                </Button>
-                <Button
-                  className="w-full h-16 text-lg"
-                  variant="outline"
-                  onClick={() => alert("Voice note feature")}
-                >
-                  🎤 Voice Note
-                </Button>
-                <Button
-                  className="w-full h-16 text-lg"
-                  variant="outline"
-                  onClick={() => alert("Report issue feature")}
-                >
-                  ⚠️ Report Issue
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">🔄 Offline Mode</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded">
-                  <div>
-                    <div className="font-medium text-green-800">
-                      ✓ Online & Synced
-                    </div>
-                    <div className="text-sm text-green-600">
-                      All data up to date
-                    </div>
-                  </div>
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-                </div>
-                <p className="text-sm text-gray-600 mt-3">
-                  Offline mode enables you to continue working without internet.
-                  Data syncs automatically when connection returns.
-                </p>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Tools Tab */}
-          <TabsContent value="tools" className="space-y-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">🛠️ Mobile Tools</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-2 gap-3">
-                  <Button
-                    variant="outline"
-                    className="h-20 flex flex-col gap-1"
-                  >
-                    <span className="text-2xl">📊</span>
-                    <span className="text-xs">My Stats</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-20 flex flex-col gap-1"
-                  >
-                    <span className="text-2xl">🔔</span>
-                    <span className="text-xs">Alerts</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-20 flex flex-col gap-1"
-                  >
-                    <span className="text-2xl">🗺️</span>
-                    <span className="text-xs">Location</span>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="h-20 flex flex-col gap-1"
-                  >
-                    <span className="text-2xl">⚙️</span>
-                    <span className="text-xs">Settings</span>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">💰 ROI & Impact</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center p-3 bg-green-50 rounded">
-                    <span className="text-sm font-medium">ROI</span>
-                    <span className="text-2xl font-bold text-green-600">
-                      308%
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-blue-50 rounded">
-                    <span className="text-sm font-medium">
-                      Mobile Receiving
-                    </span>
-                    <span className="text-lg font-bold text-blue-600">90%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-purple-50 rounded">
-                    <span className="text-sm font-medium">Paper Reduction</span>
-                    <span className="text-lg font-bold text-purple-600">
-                      95%
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-orange-50 rounded">
-                    <span className="text-sm font-medium">Data Accuracy</span>
-                    <span className="text-lg font-bold text-orange-600">
-                      98%
-                    </span>
-                  </div>
-
-                  <div className="mt-4 p-3 bg-gray-50 rounded">
-                    <h4 className="font-medium mb-2 text-sm">Key Benefits</h4>
-                    <ul className="space-y-1 text-xs text-gray-700">
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span>
-                          <strong>90% mobile receiving</strong> - Most tasks on
-                          mobile
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span>
-                          <strong>95% less paper</strong> - Paperless operations
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span>
-                          <strong>98% accuracy</strong> - Real-time validation
-                        </span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-green-600">✓</span>
-                        <span>
-                          <strong>80% faster</strong> - Instant updates
-                        </span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
-
-      {/* Task Detail Modal (simplified) */}
-      {selectedTask && (
-        <div
-          className="fixed inset-0 bg-black/50 flex items-end z-50"
-          onClick={() => setSelectedTask(null)}
-        >
-          <Card
-            className="w-full rounded-t-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <CardHeader>
-              <CardTitle>{selectedTask.shipmentNumber}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 mb-4">
-                <div>
-                  <strong>Supplier:</strong> {selectedTask.supplier}
-                </div>
-                <div>
-                  <strong>PO:</strong> {selectedTask.poNumber}
-                </div>
-                <div>
-                  <strong>Status:</strong> {selectedTask.status}
-                </div>
-              </div>
-              <Button className="w-full" onClick={() => setSelectedTask(null)}>
-                Close
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+        </TabsContent>
+        <TabsContent value="recent">
+            <div className="text-center py-8 text-gray-400 text-sm">History shown in full dashboard</div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

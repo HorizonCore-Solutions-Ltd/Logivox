@@ -29,7 +29,7 @@ import {
   Printer,
   User,
   MapPin,
-  Clock
+  Clock,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -60,7 +60,11 @@ interface PickList {
   createdAt: string;
 }
 
-export default function PickListDetailPage({ params }: { params: { id: string } }) {
+export default function PickListDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
   const { toast } = useToast();
   const [pickList, setPickList] = useState<PickList | null>(null);
@@ -78,7 +82,7 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
       if (!res.ok) throw new Error("Failed to load pick list");
       const data = await res.json();
       setPickList(data);
-      
+
       // Initialize picking map with current progress
       const initialMap: Record<string, number> = {};
       data.items.forEach((item: PickListItem) => {
@@ -86,7 +90,11 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
       });
       setPickingMap(initialMap);
     } catch (error) {
-      toast({ title: "Error", description: "Could not load pick list details.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Could not load pick list details.",
+        variant: "destructive",
+      });
       router.push("/dashboard/pick-lists");
     } finally {
       setLoading(false);
@@ -95,29 +103,47 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
 
   const handleStartPicking = async () => {
     try {
-      const res = await fetch(`/api/pick-lists/${params.id}/start`, { method: "POST" });
+      const res = await fetch(`/api/pick-lists/${params.id}/start`, {
+        method: "POST",
+      });
       if (!res.ok) throw new Error("Failed to start picking");
       toast({ title: "Started", description: "Pick list is now in progress." });
       fetchPickList();
     } catch (error) {
-      toast({ title: "Error", description: "Could not start picking.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Could not start picking.",
+        variant: "destructive",
+      });
     }
   };
 
   const handleCreatePack = async () => {
     try {
-      const res = await fetch(`/api/pick-lists/${params.id}/pack`, { method: "POST" });
+      const res = await fetch(`/api/pick-lists/${params.id}/pack`, {
+        method: "POST",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to create pack");
-      
+
       if (data.message === "Pack already exists") {
-          toast({ title: "Pack Exists", description: "Pack already created for this pick list." });
+        toast({
+          title: "Pack Exists",
+          description: "Pack already created for this pick list.",
+        });
       } else {
-          toast({ title: "Pack Created", description: `Pack #${data.pack.packNumber} created.` });
+        toast({
+          title: "Pack Created",
+          description: `Pack #${data.pack.packNumber} created.`,
+        });
       }
       router.push("/dashboard/packs");
     } catch (error: any) {
-      toast({ title: "Error", description: error.message, variant: "destructive" });
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -132,25 +158,32 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           pickListItemId: itemId,
-          quantityPicked: qty
-        })
+          quantityPicked: qty,
+        }),
       });
 
       if (!res.ok) throw new Error("Failed to update item");
 
       const data = await res.json();
-      
+
       if (data.pickListCompleted) {
-        toast({ title: "Picking Complete!", description: "All items have been picked." });
+        toast({
+          title: "Picking Complete!",
+          description: "All items have been picked.",
+        });
         // Refresh to show completed state
         fetchPickList();
       } else {
         toast({ title: "Item Updated", description: "Quantity recorded." });
         // Update local state without full reload if possible, but strict consistency is better
-        fetchPickList(); 
+        fetchPickList();
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to confirm picking.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to confirm picking.",
+        variant: "destructive",
+      });
     } finally {
       setSubmitting(null);
     }
@@ -177,13 +210,17 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
           </Button>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold tracking-tight">{pickList.pickListNumber}</h1>
+              <h1 className="text-2xl font-bold tracking-tight">
+                {pickList.pickListNumber}
+              </h1>
               <Badge variant={isCompleted ? "default" : "secondary"}>
                 {pickList.status}
               </Badge>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
-              <span className="font-medium">Order: {pickList.salesOrder.soNumber}</span>
+              <span className="font-medium">
+                Order: {pickList.salesOrder.soNumber}
+              </span>
               <span>•</span>
               <span>{pickList.salesOrder.customer.name}</span>
             </div>
@@ -198,7 +235,7 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
           )}
           {pickList.status === "COMPLETED" && (
             <Button onClick={handleCreatePack}>
-                <Package className="mr-2 h-4 w-4" /> Create Pack
+              <Package className="mr-2 h-4 w-4" /> Create Pack
             </Button>
           )}
         </div>
@@ -206,44 +243,56 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card>
-            <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Warehouse Location</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-semibold">{pickList.warehouse.name}</span>
-                </div>
-            </CardContent>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Warehouse Location
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold">{pickList.warehouse.name}</span>
+            </div>
+          </CardContent>
         </Card>
         <Card>
-            <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Assigned To</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center gap-2">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-semibold">{pickList.assignedTo?.name || "Unassigned"}</span>
-                </div>
-            </CardContent>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Assigned To
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold">
+                {pickList.assignedTo?.name || "Unassigned"}
+              </span>
+            </div>
+          </CardContent>
         </Card>
         <Card>
-             <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Created</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-semibold">{new Date(pickList.createdAt).toLocaleDateString()}</span>
-                </div>
-            </CardContent>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Created
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="font-semibold">
+                {new Date(pickList.createdAt).toLocaleDateString()}
+              </span>
+            </div>
+          </CardContent>
         </Card>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Pick Items</CardTitle>
-          <CardDescription>Verify item locations and quantities.</CardDescription>
+          <CardDescription>
+            Verify item locations and quantities.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
@@ -258,51 +307,65 @@ export default function PickListDetailPage({ params }: { params: { id: string } 
             </TableHeader>
             <TableBody>
               {pickList.items.map((item) => {
-                const isFullyPicked = item.quantityPicked >= item.quantityToPick;
+                const isFullyPicked =
+                  item.quantityPicked >= item.quantityToPick;
                 const currentVal = pickingMap[item.id] ?? 0;
 
                 return (
-                  <TableRow key={item.id} className={isFullyPicked ? "bg-muted/50" : ""}>
+                  <TableRow
+                    key={item.id}
+                    className={isFullyPicked ? "bg-muted/50" : ""}
+                  >
                     <TableCell className="font-mono font-medium">
                       {item.inventoryItem.binLocation || "N/A"}
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium">{item.inventoryItem.name}</div>
-                      <div className="text-sm text-muted-foreground">{item.inventoryItem.sku}</div>
+                      <div className="font-medium">
+                        {item.inventoryItem.name}
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {item.inventoryItem.sku}
+                      </div>
                     </TableCell>
-                    <TableCell className="text-right">{item.quantityToPick}</TableCell>
                     <TableCell className="text-right">
-                       <div className="flex justify-end items-center gap-2">
-                         <Input 
-                            type="number"
-                            className="w-20 text-right h-8"
-                            min={0}
-                            disabled={isCompleted} // Allow modifying even if fully picked, unless PickList is done
-                            value={currentVal}
-                            onChange={(e) => setPickingMap(prev => ({
-                                ...prev,
-                                [item.id]: parseInt(e.target.value) || 0
-                            }))}
-                         />
-                       </div>
+                      {item.quantityToPick}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex justify-end items-center gap-2">
+                        <Input
+                          type="number"
+                          className="w-20 text-right h-8"
+                          min={0}
+                          disabled={isCompleted} // Allow modifying even if fully picked, unless PickList is done
+                          value={currentVal}
+                          onChange={(e) =>
+                            setPickingMap((prev) => ({
+                              ...prev,
+                              [item.id]: parseInt(e.target.value) || 0,
+                            }))
+                          }
+                        />
+                      </div>
                     </TableCell>
                     <TableCell>
-                        {!isCompleted && (
-                             <Button 
-                                size="sm" 
-                                variant={isFullyPicked ? "outline" : "default"}
-                                onClick={() => handleConfirmPick(item.id)}
-                                disabled={submitting === item.id}
-                            >
-                                {submitting === item.id && <Loader2 className="mr-2 h-3 w-3 animate-spin"/>}
-                                {isFullyPicked ? "Update" : "Confirm"}
-                             </Button>
-                        )}
-                        {isCompleted && (
-                            <div className="flex items-center text-green-600 text-sm font-medium">
-                                <CheckCircle className="mr-2 h-4 w-4" /> Done
-                            </div>
-                        )}
+                      {!isCompleted && (
+                        <Button
+                          size="sm"
+                          variant={isFullyPicked ? "outline" : "default"}
+                          onClick={() => handleConfirmPick(item.id)}
+                          disabled={submitting === item.id}
+                        >
+                          {submitting === item.id && (
+                            <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                          )}
+                          {isFullyPicked ? "Update" : "Confirm"}
+                        </Button>
+                      )}
+                      {isCompleted && (
+                        <div className="flex items-center text-green-600 text-sm font-medium">
+                          <CheckCircle className="mr-2 h-4 w-4" /> Done
+                        </div>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

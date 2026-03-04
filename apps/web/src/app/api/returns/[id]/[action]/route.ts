@@ -26,27 +26,39 @@ export async function PUT(
     switch (action) {
       case "approve":
         if (!["PENDING"].includes(rma.status)) {
-          return NextResponse.json({ error: "RMA must be PENDING to approve" }, { status: 400 });
+          return NextResponse.json(
+            { error: "RMA must be PENDING to approve" },
+            { status: 400 },
+          );
         }
         updateData = { status: "APPROVED", approvedDate: new Date() };
         break;
 
       case "receive":
         if (!["APPROVED", "IN_TRANSIT"].includes(rma.status)) {
-          return NextResponse.json({ error: "RMA must be APPROVED or IN_TRANSIT to receive" }, { status: 400 });
+          return NextResponse.json(
+            { error: "RMA must be APPROVED or IN_TRANSIT to receive" },
+            { status: 400 },
+          );
         }
         updateData = { status: "RECEIVED", receivedDate: new Date() };
         break;
 
       case "complete":
         if (!["RECEIVED", "INSPECTING"].includes(rma.status)) {
-          return NextResponse.json({ error: "RMA must be RECEIVED or INSPECTING to complete" }, { status: 400 });
+          return NextResponse.json(
+            { error: "RMA must be RECEIVED or INSPECTING to complete" },
+            { status: 400 },
+          );
         }
         updateData = { status: "COMPLETED", completedDate: new Date() };
         break;
 
       default:
-        return NextResponse.json({ error: `Unknown action: ${action}` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Unknown action: ${action}` },
+          { status: 400 },
+        );
     }
 
     const updated = await prisma.rMA.update({
@@ -60,7 +72,10 @@ export async function PUT(
 
     return NextResponse.json({ success: true, rma: updated });
   } catch (error) {
-    console.error(`PUT /api/returns/${params.id}/${params.action} error:`, error);
+    console.error(
+      `PUT /api/returns/${params.id}/${params.action} error:`,
+      error,
+    );
     return NextResponse.json({ error: "Action failed" }, { status: 500 });
   }
 }

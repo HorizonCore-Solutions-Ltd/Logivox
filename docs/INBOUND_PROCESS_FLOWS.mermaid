@@ -1,0 +1,52 @@
+graph TD
+    %% INBOUND FLOW
+    subgraph Inbound_Process
+        In_Start[Truck Arrives] --> In_Gate{Appointment?}
+        In_Gate -- Yes --> In_Check[Check In & Assign Dock]
+        In_Gate -- No --> In_Exp{Ad-Hoc Allowed?}
+        In_Exp -- Yes --> In_Check
+        In_Exp -- No --> In_Reject[Reject Truck]
+        
+        In_Check --> In_Dock[Move to Dock]
+        In_Dock --> In_Unload[Unload Pallets]
+        In_Unload --> In_Scan{Scan LPN/ASN}
+    end
+
+    %% RECEIVING LOGIC
+    subgraph Receiving_Logic
+        In_Scan -- Match --> Rec_Validate[Validate Qty/Cond]
+        In_Scan -- No Match --> Rec_Blind[Create Blind Receipt]
+        
+        Rec_Validate --> Rec_Brain{Fulfillment Brain Check}
+        Rec_Blind --> Rec_Brain
+        
+        Rec_Brain -- Backordered? --> Cross_Dock{Cross Dock?}
+        Cross_Dock -- Yes --> Task_Move[Task: Move to Outbound]
+        Cross_Dock -- No --> Put_Calc[Calculate Put-Away Score]
+        
+        Rec_Brain -- QC Rules? --> QC_Task[Task: Move to QC Lab]
+        Rec_Brain -- Standard --> Put_Calc
+    end
+
+    %% PUT-AWAY OPTIMIZATION
+    subgraph Slotting_Engine
+        Put_Calc --> Slot_Filter[Filter: Hazmat/Temp/Size]
+        Slot_Filter --> Slot_Score[Score: Dist + Consolidate + Velocity]
+        Slot_Score --> Slot_Assign[Assign Best Bin]
+        Slot_Assign --> Task_Put[Task: Put Away to Bin X]
+    end
+
+    %% INVENTORY CONTROL
+    subgraph Inventory_Integrity
+        Task_Put --> Inv_Confirm{Driver Confirms?}
+        Inv_Confirm -- Yes --> Upd_Stock[Update: Available]
+        Inv_Confirm -- No (Full) --> Re_Calc[Re-Calculate Slot]
+        
+        Upd_Stock --> Cycle_Trig{Trigger Cycle Count?}
+        Cycle_Trig -- Random/ABC --> Task_Count[Task: Cycle Count Bin]
+        
+        Task_Count --> Count_Res{Match?}
+        Count_Res -- No --> Adj_Rule{Value > Thresh?}
+        Adj_Rule -- Low --> Auto_Adj[Auto Adjust & Log]
+        Adj_Rule -- High --> Man_App[Request Supervisor Approval]
+    end

@@ -39,35 +39,37 @@ export default function AdjustStockPage() {
     // Mock search for now or use existing API if available
     // In a real scenario: fetch(`/api/inventory?sku=${sku}`)
     try {
-        const res = await fetch(`/api/inventory?search=${encodeURIComponent(sku)}`);
-        if(res.ok) {
-            const data = await res.json();
-             // The API returns { items: [...] } or just array? Usually { items: [...] } or similar.
-             // The API `inventory/route.ts` I read earlier uses `NextResponse.json(items)`. Wait.
-             // Let's check `inventory/route.ts` return format again.
-             // It seems to be paginated or array.
-             // I'll assume array if not paginated object. 
-             // Actually, `inventory/page.tsx` uses `res.json()` and assigns to `items`.
-             // `const { data: items = [], isLoading } = useQuery...`
-             // So the API returns an ARRAY directly? Or object with items property?
-             // `return NextResponse.json(items);` (from standard GET usually).
-             // Let's assume it returns an array if my memory serves right about `prisma.findMany` results in Next.js APIs usually being wrapped or not.
-             // Looking at `inventory/route.ts`... wait I read `inventory/[id]/route.ts`.
-             // I only read the input validation part of `inventory/route.ts`.
-             // I better assume data structure based on `InventoryPage`: `const { data: items = [] }`. This implies the API returns an array directly, `items` being the alias.
-             // So `data` IS the array.
-            const list = Array.isArray(data) ? data : (data.items || []);
-            
-            if(list.length > 0) {
-                setItem(list[0]);
-            } else {
-                toast({ title: "Item not found", variant: "destructive" });
-            }
+      const res = await fetch(
+        `/api/inventory?search=${encodeURIComponent(sku)}`,
+      );
+      if (res.ok) {
+        const data = await res.json();
+        // The API returns { items: [...] } or just array? Usually { items: [...] } or similar.
+        // The API `inventory/route.ts` I read earlier uses `NextResponse.json(items)`. Wait.
+        // Let's check `inventory/route.ts` return format again.
+        // It seems to be paginated or array.
+        // I'll assume array if not paginated object.
+        // Actually, `inventory/page.tsx` uses `res.json()` and assigns to `items`.
+        // `const { data: items = [], isLoading } = useQuery...`
+        // So the API returns an ARRAY directly? Or object with items property?
+        // `return NextResponse.json(items);` (from standard GET usually).
+        // Let's assume it returns an array if my memory serves right about `prisma.findMany` results in Next.js APIs usually being wrapped or not.
+        // Looking at `inventory/route.ts`... wait I read `inventory/[id]/route.ts`.
+        // I only read the input validation part of `inventory/route.ts`.
+        // I better assume data structure based on `InventoryPage`: `const { data: items = [] }`. This implies the API returns an array directly, `items` being the alias.
+        // So `data` IS the array.
+        const list = Array.isArray(data) ? data : data.items || [];
+
+        if (list.length > 0) {
+          setItem(list[0]);
+        } else {
+          toast({ title: "Item not found", variant: "destructive" });
         }
-    } catch(e) {
-        toast({ title: "Error searching", variant: "destructive" });
+      }
+    } catch (e) {
+      toast({ title: "Error searching", variant: "destructive" });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -90,10 +92,17 @@ export default function AdjustStockPage() {
 
       if (!res.ok) throw new Error("Failed");
 
-      toast({ title: "Stock Adjusted", description: "Inventory updated successfully." });
+      toast({
+        title: "Stock Adjusted",
+        description: "Inventory updated successfully.",
+      });
       router.push("/dashboard/inventory");
     } catch (error) {
-      toast({ title: "Error", description: "Failed to adjust stock.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to adjust stock.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -116,18 +125,25 @@ export default function AdjustStockPage() {
       <Card>
         <CardHeader>
           <CardTitle>Adjustment Details</CardTitle>
-          <CardDescription>Search for an item and enter the adjustment quantity (positive for gain, negative for loss).</CardDescription>
+          <CardDescription>
+            Search for an item and enter the adjustment quantity (positive for
+            gain, negative for loss).
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             <div className="flex gap-4">
-              <Input 
-                placeholder="Search by SKU..." 
-                value={sku} 
-                onChange={(e) => setSku(e.target.value)} 
+              <Input
+                placeholder="Search by SKU..."
+                value={sku}
+                onChange={(e) => setSku(e.target.value)}
               />
               <Button onClick={handleSearch} disabled={loading || !sku}>
-                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Search className="h-4 w-4" />
+                )}
               </Button>
             </div>
 
@@ -135,47 +151,61 @@ export default function AdjustStockPage() {
               <div className="bg-muted/50 p-4 rounded-lg space-y-4">
                 <div>
                   <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">Current Qty: {item.quantity}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Current Qty: {item.quantity}
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Adjustment Quantity (+/-)</Label>
-                    <Input 
-                      type="number" 
-                      value={quantityChange} 
-                      onChange={(e) => setQuantityChange(Number(e.target.value))} 
+                    <Input
+                      type="number"
+                      value={quantityChange}
+                      onChange={(e) =>
+                        setQuantityChange(Number(e.target.value))
+                      }
                     />
                     <p className="text-xs text-muted-foreground">
-                        New Quantity: {item.quantity + Number(quantityChange)}
+                      New Quantity: {item.quantity + Number(quantityChange)}
                     </p>
                   </div>
                   <div className="space-y-2">
                     <Label>Reason Code</Label>
-                     <Select value={reason} onValueChange={setReason}>
-                        <SelectTrigger><SelectValue placeholder="Reason" /></SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="FOUND">Found Stock (+)</SelectItem>
-                            <SelectItem value="DAMAGED">Damaged (-)</SelectItem>
-                            <SelectItem value="SHRINKAGE">Theft/Loss (-)</SelectItem>
-                            <SelectItem value="CORRECTION">Data Correction (+/-)</SelectItem>
-                        </SelectContent>
+                    <Select value={reason} onValueChange={setReason}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Reason" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="FOUND">Found Stock (+)</SelectItem>
+                        <SelectItem value="DAMAGED">Damaged (-)</SelectItem>
+                        <SelectItem value="SHRINKAGE">
+                          Theft/Loss (-)
+                        </SelectItem>
+                        <SelectItem value="CORRECTION">
+                          Data Correction (+/-)
+                        </SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                 </div>
 
-                 <div className="space-y-2">
-                    <Label>Notes</Label>
-                    <Textarea 
-                        placeholder="Optional details..." 
-                        value={notes} 
-                        onChange={(e) => setNotes(e.target.value)}
-                    />
+                <div className="space-y-2">
+                  <Label>Notes</Label>
+                  <Textarea
+                    placeholder="Optional details..."
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
                 </div>
 
-                <Button onClick={handleSubmit} className="w-full" disabled={loading || quantityChange === 0 || !reason}>
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Confirm Adjustment
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full"
+                  disabled={loading || quantityChange === 0 || !reason}
+                >
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Confirm Adjustment
                 </Button>
               </div>
             )}

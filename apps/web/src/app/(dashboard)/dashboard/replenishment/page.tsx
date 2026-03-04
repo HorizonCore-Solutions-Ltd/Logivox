@@ -354,7 +354,7 @@ export default function ReplenishmentPage() {
               <DollarSign className="h-4 w-4 mr-2" /> Unit Costs
             </TabsTrigger>
             <TabsTrigger value="reports">
-               <History className="h-4 w-4 mr-2" /> Compliance & KPI
+              <History className="h-4 w-4 mr-2" /> Compliance & KPI
             </TabsTrigger>
             <TabsTrigger value="rules">
               <Settings className="h-4 w-4 mr-2" /> Rules Engine
@@ -364,29 +364,39 @@ export default function ReplenishmentPage() {
           <TabsContent value="tasks">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                 <CardTitle>Active Replenishment Stream</CardTitle>
-                 <Button size="sm" variant="secondary" onClick={() => {
-                     // Simulator: Short Pick
-                     // In reality this comes from the picking app
-                     const item = rules[0]?.inventoryItem;
-                     if(item) {
-                         fetch("/api/replenishment/short-pick", {
-                             method: "POST",
-                             body: JSON.stringify({
-                                 inventoryItemId: item.id,
-                                 locationId: "LOC-PICK-FACE-01",
-                                 notes: "Simulated short pick by admin"
-                             })
-                         }).then(() => {
-                             toast({ title: "Short Pick Reported", description: "Urgent replenishment task generated."});
-                             fetchAll();
-                         });
-                     } else {
-                         toast({ title: "No items to simulate", variant: "destructive"});
-                     }
-                 }}>
-                    <AlertTriangle className="h-4 w-4 mr-2" /> Simulate Short Pick
-                 </Button>
+                <CardTitle>Active Replenishment Stream</CardTitle>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => {
+                    // Simulator: Short Pick
+                    // In reality this comes from the picking app
+                    const item = rules[0]?.inventoryItem;
+                    if (item) {
+                      fetch("/api/replenishment/short-pick", {
+                        method: "POST",
+                        body: JSON.stringify({
+                          inventoryItemId: item.id,
+                          locationId: "LOC-PICK-FACE-01",
+                          notes: "Simulated short pick by admin",
+                        }),
+                      }).then(() => {
+                        toast({
+                          title: "Short Pick Reported",
+                          description: "Urgent replenishment task generated.",
+                        });
+                        fetchAll();
+                      });
+                    } else {
+                      toast({
+                        title: "No items to simulate",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  <AlertTriangle className="h-4 w-4 mr-2" /> Simulate Short Pick
+                </Button>
               </CardHeader>
               <CardContent className="p-0">
                 {tasks.length === 0 ? (
@@ -649,101 +659,130 @@ export default function ReplenishmentPage() {
 
           <TabsContent value="reports">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-               <Card className="col-span-1 md:col-span-2">
-                   <CardHeader>
-                       <CardTitle>Replenishment Latency Analysis</CardTitle>
-                       <CardDescription>Time from trigger to shelf availability (mins)</CardDescription>
-                   </CardHeader>
-                   <CardContent>
-                       <div className="h-[200px] flex items-end justify-between border-b pb-2 gap-2">
-                           {[12, 18, 10, 8, 15, 12, 6].map((v, i) => (
-                               <div key={i} className="flex flex-col items-center flex-1">
-                                    <div className="w-full bg-indigo-100 dark:bg-indigo-900 rounded-t-md hover:bg-indigo-200 transition-colors" style={{ height: `${v*10}%` }}></div>
-                                    <span className="text-xs text-muted-foreground mt-2">{['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}</span>
-                               </div>
-                           ))}
-                       </div>
-                   </CardContent>
-               </Card>
-               <Card>
-                   <CardHeader>
-                       <CardTitle>Empty Face Incidents</CardTitle>
-                       <CardDescription>Short picks reported by pickers</CardDescription>
-                   </CardHeader>
-                   <CardContent className="flex items-center justify-center p-6">
-                       <div className="text-center">
-                           <p className="text-4xl font-bold text-red-600">3</p>
-                           <p className="text-sm text-muted-foreground mt-1">This Week</p>
-                           <div className="mt-4 text-xs bg-red-50 text-red-700 p-2 rounded">
-                               Target: &lt; 5 per week
-                           </div>
-                       </div>
-                   </CardContent>
-               </Card>
-                <Card>
-                   <CardHeader>
-                       <CardTitle>Driver Efficiency</CardTitle>
-                       <CardDescription>Average moves per hour</CardDescription>
-                   </CardHeader>
-                   <CardContent className="flex items-center justify-center p-6">
-                       <div className="text-center">
-                           <p className="text-4xl font-bold text-blue-600">24.5</p>
-                           <p className="text-sm text-muted-foreground mt-1">Tasks / Hour</p>
-                           <div className="mt-4 text-xs bg-blue-50 text-blue-700 p-2 rounded">
-                               +12% vs Last Week
-                           </div>
-                       </div>
-                   </CardContent>
-               </Card>
-               <Card>
-                   <CardHeader>
-                       <CardTitle>Rule Trigger Distribution</CardTitle>
-                       <CardDescription>By Strategy Type</CardDescription>
-                   </CardHeader>
-                   <CardContent>
-                       <div className="space-y-4">
-                           <div className="flex items-center justify-between text-sm">
-                               <span>Min/Max (Reactive)</span>
-                               <span className="font-bold">45%</span>
-                           </div>
-                           <div className="w-full bg-gray-100 rounded-full h-2">
-                               <div className="bg-slate-500 h-2 rounded-full" style={{ width: '45%' }}></div>
-                           </div>
-                           <div className="flex items-center justify-between text-sm">
-                               <span>Predictive AI (Proactive)</span>
-                               <span className="font-bold">35%</span>
-                           </div>
-                           <div className="w-full bg-gray-100 rounded-full h-2">
-                               <div className="bg-indigo-500 h-2 rounded-full" style={{ width: '35%' }}></div>
-                           </div>
-                           <div className="flex items-center justify-between text-sm">
-                               <span>Short Pick (Urgent)</span>
-                               <span className="font-bold">20%</span>
-                           </div>
-                           <div className="w-full bg-gray-100 rounded-full h-2">
-                               <div className="bg-red-500 h-2 rounded-full" style={{ width: '20%' }}></div>
-                           </div>
-                       </div>
-                   </CardContent>
-               </Card>
-               <Card>
-                   <CardHeader>
-                       <CardTitle>Wasted Travel Metric</CardTitle>
-                       <CardDescription>Deadheading vs Productive Moves</CardDescription>
-                   </CardHeader>
-                   <CardContent className="flex items-center justify-center p-6">
-                       <div className="relative w-32 h-32 rounded-full border-8 border-slate-100 flex items-center justify-center">
-                           <div className="absolute top-0 left-0 w-full h-full rounded-full border-8 border-green-500 border-t-transparent border-r-transparent transform -rotate-45"></div>
-                           <div className="text-center">
-                               <span className="text-2xl font-bold">88%</span>
-                               <p className="text-[10px] uppercase text-muted-foreground">Efficiency</p>
-                           </div>
-                       </div>
-                   </CardContent>
-               </Card>
+              <Card className="col-span-1 md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Replenishment Latency Analysis</CardTitle>
+                  <CardDescription>
+                    Time from trigger to shelf availability (mins)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="h-[200px] flex items-end justify-between border-b pb-2 gap-2">
+                    {[12, 18, 10, 8, 15, 12, 6].map((v, i) => (
+                      <div
+                        key={i}
+                        className="flex flex-col items-center flex-1"
+                      >
+                        <div
+                          className="w-full bg-indigo-100 dark:bg-indigo-900 rounded-t-md hover:bg-indigo-200 transition-colors"
+                          style={{ height: `${v * 10}%` }}
+                        ></div>
+                        <span className="text-xs text-muted-foreground mt-2">
+                          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][i]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Empty Face Incidents</CardTitle>
+                  <CardDescription>
+                    Short picks reported by pickers
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center p-6">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-red-600">3</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      This Week
+                    </p>
+                    <div className="mt-4 text-xs bg-red-50 text-red-700 p-2 rounded">
+                      Target: &lt; 5 per week
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Driver Efficiency</CardTitle>
+                  <CardDescription>Average moves per hour</CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center p-6">
+                  <div className="text-center">
+                    <p className="text-4xl font-bold text-blue-600">24.5</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Tasks / Hour
+                    </p>
+                    <div className="mt-4 text-xs bg-blue-50 text-blue-700 p-2 rounded">
+                      +12% vs Last Week
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Rule Trigger Distribution</CardTitle>
+                  <CardDescription>By Strategy Type</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Min/Max (Reactive)</span>
+                      <span className="font-bold">45%</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div
+                        className="bg-slate-500 h-2 rounded-full"
+                        style={{ width: "45%" }}
+                      ></div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Predictive AI (Proactive)</span>
+                      <span className="font-bold">35%</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div
+                        className="bg-indigo-500 h-2 rounded-full"
+                        style={{ width: "35%" }}
+                      ></div>
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span>Short Pick (Urgent)</span>
+                      <span className="font-bold">20%</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div
+                        className="bg-red-500 h-2 rounded-full"
+                        style={{ width: "20%" }}
+                      ></div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Wasted Travel Metric</CardTitle>
+                  <CardDescription>
+                    Deadheading vs Productive Moves
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="flex items-center justify-center p-6">
+                  <div className="relative w-32 h-32 rounded-full border-8 border-slate-100 flex items-center justify-center">
+                    <div className="absolute top-0 left-0 w-full h-full rounded-full border-8 border-green-500 border-t-transparent border-r-transparent transform -rotate-45"></div>
+                    <div className="text-center">
+                      <span className="text-2xl font-bold">88%</span>
+                      <p className="text-[10px] uppercase text-muted-foreground">
+                        Efficiency
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="billing">
             <Card>
               <CardContent className="p-12 text-center text-muted-foreground text-sm">

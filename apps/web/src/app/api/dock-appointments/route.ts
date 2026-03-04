@@ -30,7 +30,12 @@ export async function GET(request: Request) {
       where,
       include: {
         yardLocation: {
-          select: { id: true, locationCode: true, locationName: true, locationType: true },
+          select: {
+            id: true,
+            locationCode: true,
+            locationName: true,
+            locationType: true,
+          },
         },
       },
       orderBy: { scheduledStart: "asc" },
@@ -62,7 +67,10 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("Error fetching dock appointments:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
 
@@ -92,14 +100,24 @@ export async function POST(request: Request) {
       yardLocationId,
     } = body;
 
-    if (!appointmentType || !scheduledDate || !scheduledStart || !scheduledEnd) {
+    if (
+      !appointmentType ||
+      !scheduledDate ||
+      !scheduledStart ||
+      !scheduledEnd
+    ) {
       return NextResponse.json(
-        { error: "appointmentType, scheduledDate, scheduledStart, scheduledEnd are required" },
+        {
+          error:
+            "appointmentType, scheduledDate, scheduledStart, scheduledEnd are required",
+        },
         { status: 400 },
       );
     }
 
-    const count = await prisma.dockAppointment.count({ where: { organizationId: orgId } });
+    const count = await prisma.dockAppointment.count({
+      where: { organizationId: orgId },
+    });
     const appointmentNumber = `DA-${String(count + 1).padStart(5, "0")}`;
 
     const appointment = await prisma.dockAppointment.create({
@@ -127,6 +145,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: true, appointment }, { status: 201 });
   } catch (error) {
     console.error("Error creating dock appointment:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

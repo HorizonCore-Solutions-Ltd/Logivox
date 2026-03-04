@@ -20,7 +20,10 @@ export async function POST(
     });
 
     if (!existing) {
-      return NextResponse.json({ error: "Gate entry not found" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Gate entry not found" },
+        { status: 404 },
+      );
     }
 
     const updated = await prisma.gateEntry.update({
@@ -41,6 +44,9 @@ export async function POST(
     });
   } catch (error) {
     console.error("Error checking out gate entry:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

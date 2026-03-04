@@ -25,23 +25,26 @@ export async function GET(request: Request) {
       ];
     }
 
-    const [rmas, total, pendingCount, approvedCount, receivedCount] = await Promise.all([
-      prisma.rMA.findMany({
-        where,
-        include: {
-          customer: { select: { id: true, name: true, code: true } },
-          returnReason: { select: { name: true, code: true } },
-          items: { select: { id: true, quantityRequested: true, refundAmount: true } },
-          salesOrder: { select: { soNumber: true } },
-        },
-        orderBy: { createdAt: "desc" },
-        take: limit,
-      }),
-      prisma.rMA.count({ where }),
-      prisma.rMA.count({ where: { status: "PENDING" } }),
-      prisma.rMA.count({ where: { status: "APPROVED" } }),
-      prisma.rMA.count({ where: { status: "RECEIVED" } }),
-    ]);
+    const [rmas, total, pendingCount, approvedCount, receivedCount] =
+      await Promise.all([
+        prisma.rMA.findMany({
+          where,
+          include: {
+            customer: { select: { id: true, name: true, code: true } },
+            returnReason: { select: { name: true, code: true } },
+            items: {
+              select: { id: true, quantityRequested: true, refundAmount: true },
+            },
+            salesOrder: { select: { soNumber: true } },
+          },
+          orderBy: { createdAt: "desc" },
+          take: limit,
+        }),
+        prisma.rMA.count({ where }),
+        prisma.rMA.count({ where: { status: "PENDING" } }),
+        prisma.rMA.count({ where: { status: "APPROVED" } }),
+        prisma.rMA.count({ where: { status: "RECEIVED" } }),
+      ]);
 
     // Total refund value of open/in-progress RMAs
     const openRmas = await prisma.rMA.findMany({
@@ -63,7 +66,10 @@ export async function GET(request: Request) {
       orderId: r.salesOrderId,
       orderNumber: r.salesOrder?.soNumber,
       totalItems: r.items.reduce((s, i) => s + i.quantityRequested, 0),
-      refundAmount: r.items.reduce((s, i) => s + Number(i.refundAmount ?? 0), 0),
+      refundAmount: r.items.reduce(
+        (s, i) => s + Number(i.refundAmount ?? 0),
+        0,
+      ),
       lines: r.items.map((i) => ({ id: i.id })),
       createdAt: r.createdAt.toISOString(),
     }));
@@ -80,6 +86,9 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("GET /api/returns error:", error);
-    return NextResponse.json({ error: "Failed to fetch returns" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch returns" },
+      { status: 500 },
+    );
   }
 }

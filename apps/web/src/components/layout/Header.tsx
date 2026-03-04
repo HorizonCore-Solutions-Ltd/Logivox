@@ -88,6 +88,12 @@ export function Header() {
           description: "Real-time insights and reporting",
           icon: BarChart3,
         },
+        {
+          name: "Inbound & Inventory",
+          href: "/solutions/inbound-inventory",
+          description: "Smart receiving and cross-docking",
+          icon: Package,
+        },
       ],
     },
     {

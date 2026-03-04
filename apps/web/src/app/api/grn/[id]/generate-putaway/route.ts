@@ -1,4 +1,3 @@
-
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -101,18 +100,26 @@ export async function POST(
         let targetLocId = defaultStorage?.id;
 
         if (item.binLocation) {
-          const specificLoc = await tx.location.findFirst({
-            where: {
-              organizationId,
-              warehouseId: grn.warehouseId,
-              OR: [
-                { locationCode: item.binLocation },
-                { name: item.binLocation },
-              ],
-            },
+          // Check if binLocation is an ID first (standard for Brain)
+          const locById = await tx.location.findUnique({
+             where: { id: item.binLocation }
           });
-          if (specificLoc) {
-            targetLocId = specificLoc.id;
+          
+          if (locById) {
+              targetLocId = locById.id;
+          } else {
+             // Fallback for legacy (Name/Code)
+             const specificLoc = await tx.location.findFirst({
+                where: {
+                organizationId,
+                warehouseId: grn.warehouseId,
+                OR: [
+                    { locationCode: item.binLocation },
+                    { name: item.binLocation },
+                ],
+                },
+            });
+            if (specificLoc) targetLocId = specificLoc.id;
           }
         }
 

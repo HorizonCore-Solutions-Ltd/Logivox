@@ -29,7 +29,7 @@ import {
   CheckCircle,
   AlertCircle,
   DollarSign,
-  Plus
+  Plus,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -145,12 +145,12 @@ export default function ReturnsPage() {
               <RefreshCw
                 className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
               />
-            <Link href="/dashboard/returns/new">
-              <Button size="sm">
-                <Plus className="h-4 w-4 mr-2" />
-                New Return
-              </Button>
-            </Link>
+              <Link href="/dashboard/returns/new">
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  New Return
+                </Button>
+              </Link>
               Refresh
             </Button>
           </div>
